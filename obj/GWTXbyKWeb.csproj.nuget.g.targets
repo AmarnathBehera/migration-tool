@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <Import Project="$(NuGetPackageRoot)microsoft.extensions.fileproviders.embedded\8.0.22\build\netstandard2.0\Microsoft.Extensions.FileProviders.Embedded.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.extensions.fileproviders.embedded\8.0.22\build\netstandard2.0\Microsoft.Extensions.FileProviders.Embedded.targets')" />
+    <Import Project="$(NuGetPackageRoot)magick.net-q8-anycpu\14.10.2\buildTransitive\netstandard20\Magick.NET-Q8-AnyCPU.targets" Condition="Exists('$(NuGetPackageRoot)magick.net-q8-anycpu\14.10.2\buildTransitive\netstandard20\Magick.NET-Q8-AnyCPU.targets')" />
+    <Import Project="$(NuGetPackageRoot)hotchocolate.data\15.0.3\build\HotChocolate.Data.targets" Condition="Exists('$(NuGetPackageRoot)hotchocolate.data\15.0.3\build\HotChocolate.Data.targets')" />
+    <Import Project="$(NuGetPackageRoot)hotchocolate.aspnetcore\15.0.3\build\HotChocolate.AspNetCore.targets" Condition="Exists('$(NuGetPackageRoot)hotchocolate.aspnetcore\15.0.3\build\HotChocolate.AspNetCore.targets')" />
+    <Import Project="$(NuGetPackageRoot)kentico.xperience.admin\31.1.2\build\Kentico.Xperience.Admin.targets" Condition="Exists('$(NuGetPackageRoot)kentico.xperience.admin\31.1.2\build\Kentico.Xperience.Admin.targets')" />
+  </ImportGroup>
+</Project>
