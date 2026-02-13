@@ -1,0 +1,64 @@
+# .NET build artifacts
+bin/
+bin/**
+obj/
+obj/**
+out/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio folder
+.vs/
+
+# Visual Studio Code settings
+.vscode/
+
+# Rider settings
+.idea/
+
+# ASP.NET temporary files
+*.vspscc
+*.vssscc
+*.dbmdl
+
+# NuGet packages
+*.nupkg
+packages/
+.nuget/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Publish output
+publish/
+wwwroot/dist/
+wwwroot/node_modules/
+
+# Test results
+TestResults/
+*.coverage
+*.coveragexml
+
+# Azure Pipelines
+*.azure-pipelines.yml
+
+# Local secrets
+secrets.json
+appsettings.Development.json
+appsettings.Local.json
+
+# Node modules (if using Node.js tooling)
+node_modules/
+
+# Others
+_ReSharper*/
+*.resharper
+*.DotSettings.user
