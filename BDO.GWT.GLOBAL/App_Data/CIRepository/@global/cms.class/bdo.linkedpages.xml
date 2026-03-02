@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <CodeNameColumn>LinkedPagesCodeName</CodeNameColumn>
+      <DisplayNameColumn>LinkedPagesName</DisplayNameColumn>
+      <GUIDColumn>LinkedPagesGuid</GUIDColumn>
+      <LastModifiedColumn>LinkedPagesLastModified</LastModifiedColumn>
+      <NameSpace>BDO.GWT.SharedXperience.BDO</NameSpace>
+      <ObjectType>bdo.linkedpages</ObjectType>
+      <SiteIDColumn>LinkedPagesSiteID</SiteIDColumn>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassDisplayName>LinkedPages</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="LinkedPagesID" columntype="integer" guid="122b2eac-a5a1-46f2-9832-b662e8404d2b" isPK="true">
+        <properties>
+          <fieldcaption>LinkedPagesID</fieldcaption>
+        </properties>
+      </field>
+      <field column="LinkedPagesName" columnsize="200" columntype="text" enabled="true" guid="21ec42f4-b4a6-4fd9-b4d9-4dc72cd814af">
+        <properties>
+          <fieldcaption>Name</fieldcaption>
+        </properties>
+      </field>
+      <field column="LinkedPagesCodeName" columnsize="200" columntype="text" enabled="true" guid="13cefb37-24f6-42e6-a441-f70fafade833" isunique="true">
+        <properties>
+          <fieldcaption>Code name</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="LinkedPagesCultureCode" columnsize="200" columntype="text" enabled="true" guid="377f7936-2988-43b2-ba0d-b0e96825f07d">
+        <properties>
+          <defaultvalue ismacro="true">
+            <![CDATA[{%LocalizationContext.CurrentCulture.CultureCode|(identity)GlobalAdministrator|(hash)a8a3a9f3adaa0164b071967fb81d864d9702d929e4f017a73c7e9de03aa07522%}]]>
+          </defaultvalue>
+          <fieldcaption>Language</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="LinkedPagesNodeId" columntype="integer" enabled="true" guid="19b2166d-fb55-4a03-aeec-e607e7233544">
+        <properties>
+          <fieldcaption>Node ID</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="LinkedPagesPeopleID" columnsize="200" columntype="text" enabled="true" guid="013e1b2a-a0d0-4ac1-99d1-1a4a00369710">
+        <properties>
+          <fieldcaption>LinkedPagesPeopleID</fieldcaption>
+        </properties>
+      </field>
+      <field column="LinkedPagesNodeGUID" columntype="guid" guid="68da6765-8517-4169-bc71-cc176e3c3bea" />
+      <field allowempty="true" column="LinkedPagesAfterImportNodeIDs" columntype="integer" enabled="true" guid="b7b1d56f-ee4b-4579-8c45-2fb0cac835a1">
+        <properties>
+          <fieldcaption>IDs after import</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="LinkedPagesAfterImportPeopleIDs" columnsize="200" columntype="text" enabled="true" guid="296f3d97-9f3f-4823-baae-096015851c9c" isunique="true">
+        <properties>
+          <fieldcaption>LinkedPagesAfterImportPeopleIDs</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="LinkedPagesClassname" columnsize="200" columntype="text" enabled="true" guid="3a59c1a5-4b85-44b1-a361-c9beedb62a64">
+        <properties>
+          <fieldcaption>LinkedPagesClassname</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="LinkedPagesSiteID" columntype="integer" guid="0245b652-f609-491f-b721-708f15c28f04">
+        <properties>
+          <defaultvalue ismacro="true">
+            <![CDATA[{%CurrentSite.SiteID|(identity)GlobalAdministrator|(hash)571ca26443a0eac7c877015eee6f4fadfa94e2c303c70458edae269d9c60ab9a%}]]>
+          </defaultvalue>
+        </properties>
+      </field>
+      <field column="LinkedPagesGuid" columntype="guid" guid="c0214fa0-3376-41e1-a4cb-c677d0c37481">
+        <properties>
+          <fieldcaption>GUID</fieldcaption>
+        </properties>
+      </field>
+      <field column="LinkedPagesLastModified" columnprecision="7" columntype="datetime" guid="0366bb06-653f-4749-a2b0-be07be3460cb">
+        <properties>
+          <fieldcaption>Last modified</fieldcaption>
+        </properties>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>bc6bc79c-c80d-40c0-80eb-2bd2635ca660</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.LinkedPages</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO</CodeName>
+    <GUID>36f44633-74cd-4968-a0b1-a934a2c35198</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_LinkedPages</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

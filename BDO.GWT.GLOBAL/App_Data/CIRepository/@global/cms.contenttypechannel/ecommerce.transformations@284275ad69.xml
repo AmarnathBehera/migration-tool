@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttypechannel>
+  <Parent>
+    <CodeName>Ecommerce.Transformations</CodeName>
+    <GUID>7539c21d-cde0-4d71-ab9f-12de5ddec092</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.channel_Site">
+      <ContentTypeChannelChannelID>
+        <CodeName>Site</CodeName>
+        <GUID>023a7dab-ce39-436c-afdd-84f3c631e819</GUID>
+        <ObjectType>cms.channel</ObjectType>
+      </ContentTypeChannelChannelID>
+    </Binding>
+  </Bindings>
+</cms.contenttypechannel>

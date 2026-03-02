@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <GUIDColumn>GDPRDeleteLogGuid</GUIDColumn>
+      <LastModifiedColumn>GDPRDeleteLogLastModified</LastModifiedColumn>
+      <NameSpace>BDO.GWT.SharedXperience.BDOGdpr</NameSpace>
+      <ObjectType>bdo.gdpr_deletelog</ObjectType>
+      <SiteIDColumn>SiteID</SiteIDColumn>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassDisplayName>BDO GDPR Delete Count</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="GDPRDeleteLogID" columntype="integer" guid="d7303b49-662a-43c0-8b09-ae274c3c950b" isPK="true">
+        <properties>
+          <fieldcaption>GDPRDeleteLogID</fieldcaption>
+        </properties>
+      </field>
+      <field column="GDPRDeleteLogGuid" columntype="guid" guid="4e0a17bc-ead3-4a2f-a808-8b79e7bf2f01">
+        <properties>
+          <fieldcaption>GUID</fieldcaption>
+        </properties>
+      </field>
+      <field column="GDPRDeleteLogLastModified" columnprecision="7" columntype="datetime" guid="f2c7d743-4f91-491e-b3e3-67b0956fa696">
+        <properties>
+          <fieldcaption>Last modified</fieldcaption>
+        </properties>
+      </field>
+      <field column="SiteID" columntype="integer" enabled="true" guid="f414589e-c9b1-4a7b-b0f8-fd882b80e097" />
+      <field allowempty="true" column="SanitizeCount" columntype="integer" enabled="true" guid="2aa1f759-9afc-4a2b-b270-2ce2a37be307">
+        <properties>
+          <defaultvalue>0</defaultvalue>
+        </properties>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>59cd9f18-68c2-4d4c-9105-62e6e84aff43</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.GDPRDeleteLog</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.GDPR</CodeName>
+    <GUID>a1e42e8b-94c8-4b92-9720-bf63c9259b9c</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_GDPRDeleteLog</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

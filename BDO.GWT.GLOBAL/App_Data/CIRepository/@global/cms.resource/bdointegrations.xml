@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.resource>
+  <ResourceDescription>Allows to integrate GWT with external systems.</ResourceDescription>
+  <ResourceDisplayName>BDO Integrations</ResourceDisplayName>
+  <ResourceGUID>52f2abe5-b948-4b46-a45d-9c07e88c95d3</ResourceGUID>
+  <ResourceIsInDevelopment>False</ResourceIsInDevelopment>
+  <ResourceName>BDOIntegrations</ResourceName>
+</cms.resource>

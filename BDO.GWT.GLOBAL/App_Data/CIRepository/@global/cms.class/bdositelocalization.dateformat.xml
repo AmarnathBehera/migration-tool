@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <CodeNameColumn>DateFormatCodeName</CodeNameColumn>
+      <DisplayNameColumn>DateFormatCode</DisplayNameColumn>
+      <GUIDColumn>DateFormatGuid</GUIDColumn>
+      <LastModifiedColumn>DateFormatLastModified</LastModifiedColumn>
+      <NameSpace>BDOSiteLocalization</NameSpace>
+      <ObjectType>bdositelocalization.dateformat</ObjectType>
+      <SiteIDColumn>DateFormatSiteID</SiteIDColumn>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassDisplayName>Date Format</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="DateFormatID" columntype="integer" guid="53d543c0-21e8-41df-91b5-21e069caab60" isPK="true">
+        <properties>
+          <fieldcaption>DateFormatID</fieldcaption>
+        </properties>
+      </field>
+      <field column="DateFormatName" columnsize="200" columntype="text" enabled="true" guid="11671fe7-16c8-4726-bc8a-4186e4219df9">
+        <properties>
+          <fieldcaption>Format name</fieldcaption>
+        </properties>
+      </field>
+      <field column="DateFormatCodeName" columnsize="200" columntype="text" enabled="true" guid="10ff3fc2-72ce-4615-bd74-62e4de9ed62f" isunique="true">
+        <properties>
+          <fieldcaption>Code name</fieldcaption>
+        </properties>
+      </field>
+      <field column="DateFormatCode" columnsize="35" columntype="text" enabled="true" guid="0e95f51f-9a9d-48d0-b6da-d28dcd9bbfd6">
+        <properties>
+          <fieldcaption>Format</fieldcaption>
+        </properties>
+      </field>
+      <field column="DateFormatCultureCode" columnsize="20" columntype="text" enabled="true" guid="9091e5d4-4914-44f2-b9fe-950033fb137a">
+        <properties>
+          <defaultvalue ismacro="true">
+            <![CDATA[{%LocalizationContext.CurrentCulture.CultureCode|(identity)GlobalAdministrator|(hash)a8a3a9f3adaa0164b071967fb81d864d9702d929e4f017a73c7e9de03aa07522%}]]>
+          </defaultvalue>
+          <fieldcaption>Culture code</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="DateFormatType" columnsize="200" columntype="text" guid="d4d1b2c5-1494-46fe-b381-0e4baafc9d29" />
+      <field allowempty="true" column="DateFormatSiteID" columntype="integer" guid="d195193c-26df-4ce6-adfa-cf0103c4d01a">
+        <properties>
+          <defaultvalue ismacro="true">
+            <![CDATA[{% SiteContext.CurrentSiteID |(identity)GlobalAdministrator|(hash)4c87ec20da5d5500e604b06d4130c645fd7e8066c52863f4ef486c2f60f05d7c%}]]>
+          </defaultvalue>
+        </properties>
+      </field>
+      <field column="DateFormatGuid" columntype="guid" guid="6ee5b755-e996-4eb6-b641-5a827dee6fbf">
+        <properties>
+          <fieldcaption>GUID</fieldcaption>
+        </properties>
+      </field>
+      <field column="DateFormatLastModified" columnprecision="7" columntype="datetime" guid="378cf555-b81d-4027-a4e9-ea4509186dc2">
+        <properties>
+          <fieldcaption>Last modified</fieldcaption>
+        </properties>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>2dd51cd6-9245-427d-860c-0546e95090b0</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDOSiteLocalization.DateFormat</ClassName>
+  <ClassResourceID>
+    <CodeName>BDOSiteLocalization</CodeName>
+    <GUID>c5e6ad4e-2dad-4956-a30f-4f66cd901460</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDOSiteLocalization_DateFormat</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

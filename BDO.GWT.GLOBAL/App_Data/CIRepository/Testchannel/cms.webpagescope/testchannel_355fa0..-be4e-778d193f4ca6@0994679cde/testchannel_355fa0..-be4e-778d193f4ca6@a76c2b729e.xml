@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpagescope>
+  <WebPageScopeGUID>8ab10cde-e837-44aa-9e42-bc119c695f81</WebPageScopeGUID>
+  <WebPageScopeIncludeChildren>False</WebPageScopeIncludeChildren>
+  <WebPageScopeWebsiteChannelID>
+    <GUID>355fa0b6-efb0-4588-be4e-778d193f4ca6</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Testchannel</CodeName>
+      <GUID>762cd8de-6e26-4aa8-9180-718b5360638b</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageScopeWebsiteChannelID>
+</cms.webpagescope>

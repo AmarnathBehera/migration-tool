@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <CodeNameColumn>ContentTypeCodeName</CodeNameColumn>
+      <DisplayNameColumn>ContentTypeName</DisplayNameColumn>
+      <GUIDColumn>ContentTypeGuid</GUIDColumn>
+      <LastModifiedColumn>ContentTypeLastModified</LastModifiedColumn>
+      <NameSpace>BDO.GWT.SharedXperience.BDOMetadata</NameSpace>
+      <ObjectType>bdometadata.contenttype</ObjectType>
+      <SiteIDColumn>ContentTypeSiteID</SiteIDColumn>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassConnectionString>CMSConnectionString</ClassConnectionString>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassDisplayName>Content type</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentTypeID" columntype="integer" guid="d3a7b748-cef2-4f4c-b596-7d8ecd5d6e3b" isPK="true">
+        <properties>
+          <fieldcaption>ContentTypeID</fieldcaption>
+        </properties>
+      </field>
+      <field column="ContentTypeName" columnsize="200" columntype="text" enabled="true" guid="ada59c6c-c862-4d75-a982-3b2346ec39b3">
+        <properties>
+          <fieldcaption>Name</fieldcaption>
+        </properties>
+      </field>
+      <field column="ContentTypeCodeName" columnsize="200" columntype="text" enabled="true" guid="1e8dd76d-fec1-4dca-92fd-181c1ac197b7" isunique="true">
+        <properties>
+          <fieldcaption>Code name</fieldcaption>
+        </properties>
+      </field>
+      <field column="ContentTypeCultureCode" columnsize="200" columntype="text" enabled="true" guid="85ae30db-caa7-4b2b-9270-f663f980fd75">
+        <properties>
+          <defaultvalue ismacro="true">
+            <![CDATA[{%LocalizationContext.CurrentCulture.CultureCode|(identity)GlobalAdministrator|(hash)a8a3a9f3adaa0164b071967fb81d864d9702d929e4f017a73c7e9de03aa07522%}]]>
+          </defaultvalue>
+          <fieldcaption>Language</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="ContentTypeSeeAll" columnsize="200" columntype="text" enabled="true" guid="d7b203b9-0720-48a5-83e2-b1116c032d0f">
+        <properties>
+          <fieldcaption>See All Text</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="ContentTypeShowSeeAll" columntype="boolean" enabled="true" guid="e907292e-3f54-4888-ad99-ff265b41e01c">
+        <properties>
+          <defaultvalue>true</defaultvalue>
+          <fieldcaption>Show See All Text</fieldcaption>
+        </properties>
+      </field>
+      <field column="ContentTypeSiteID" columntype="integer" guid="3172aec1-7885-4c0f-8ac6-a48dd80a9398" refobjtype="cms.site" reftype="Required" />
+      <field column="ContentTypeGuid" columntype="guid" guid="b2f2d706-ca5d-428a-90d9-8290003130e5">
+        <properties>
+          <fieldcaption>GUID</fieldcaption>
+        </properties>
+      </field>
+      <field column="ContentTypeLastModified" columnprecision="7" columntype="datetime" guid="58d0bc2a-8308-4a7b-8d64-1a3434c56a7a">
+        <properties>
+          <fieldcaption>Last modified</fieldcaption>
+        </properties>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>7c2924d2-20da-42dc-b653-be0c248e33ac</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDOMetadata.ContentType</ClassName>
+  <ClassResourceID>
+    <CodeName>BDOMetadata</CodeName>
+    <GUID>d2623ab4-a8e2-4896-aea5-14bad509d3fb</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDOMetadata_ContentType</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <CodeNameColumn>CareerLevelCodeName</CodeNameColumn>
+      <DisplayNameColumn>CareerLevelName</DisplayNameColumn>
+      <GUIDColumn>CareerLevelGuid</GUIDColumn>
+      <LastModifiedColumn>CareerLevelLastModified</LastModifiedColumn>
+      <NameSpace>BDO.GWT.SharedXperience.BDOMetadata</NameSpace>
+      <ObjectType>bdometadata.careerlevel</ObjectType>
+      <SiteIDColumn>CareerLevelSiteID</SiteIDColumn>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassConnectionString>CMSConnectionString</ClassConnectionString>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassDisplayName>Career level</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="CareerLevelID" columntype="integer" guid="33671986-17e8-45df-bea9-11173841b8ba" isPK="true">
+        <properties>
+          <fieldcaption>CareerLevelID</fieldcaption>
+        </properties>
+      </field>
+      <field column="CareerLevelName" columnsize="200" columntype="text" enabled="true" guid="9a2a8185-6853-4e51-99a9-9f416ade88e6">
+        <properties>
+          <fieldcaption>Name</fieldcaption>
+        </properties>
+      </field>
+      <field column="CareerLevelCodeName" columnsize="200" columntype="text" enabled="true" guid="7cf1dff3-0103-4380-b9a2-18d38a17ea7d" isunique="true">
+        <properties>
+          <fieldcaption>Code name</fieldcaption>
+        </properties>
+      </field>
+      <field column="CareerLevelCultureCode" columnsize="200" columntype="text" enabled="true" guid="ea2f8a24-f6e3-4b15-91e5-dcfc68612324">
+        <properties>
+          <defaultvalue ismacro="true">
+            <![CDATA[{%LocalizationContext.CurrentCulture.CultureCode|(identity)GlobalAdministrator|(hash)a8a3a9f3adaa0164b071967fb81d864d9702d929e4f017a73c7e9de03aa07522%}]]>
+          </defaultvalue>
+          <fieldcaption>Language</fieldcaption>
+        </properties>
+      </field>
+      <field column="CareerLevelSiteID" columntype="integer" guid="906fead9-00b8-4556-9fd1-4e920c32be4f" refobjtype="cms.site" reftype="Required">
+        <properties>
+          <defaultvalue ismacro="true">
+            <![CDATA[{%CurrentSite.SiteID|(identity)GlobalAdministrator|(hash)571ca26443a0eac7c877015eee6f4fadfa94e2c303c70458edae269d9c60ab9a%}]]>
+          </defaultvalue>
+        </properties>
+      </field>
+      <field column="CareerLevelGuid" columntype="guid" guid="285fbffa-eb3b-44f2-b9e2-86178266fc54">
+        <properties>
+          <fieldcaption>GUID</fieldcaption>
+        </properties>
+      </field>
+      <field column="CareerLevelLastModified" columnprecision="7" columntype="datetime" guid="f0366775-5bed-4dc3-b402-2d4e75bb85b8">
+        <properties>
+          <fieldcaption>Last modified</fieldcaption>
+        </properties>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>f234bc81-5aed-4f48-9e1a-c4ed99f7dfd1</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDOMetadata.CareerLevel</ClassName>
+  <ClassResourceID>
+    <CodeName>BDOMetadata</CodeName>
+    <GUID>d2623ab4-a8e2-4896-aea5-14bad509d3fb</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDOMetadata_CareerLevel</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

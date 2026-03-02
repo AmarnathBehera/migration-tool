@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentlanguage>
+  <ContentLanguageCultureFormat>en-GB</ContentLanguageCultureFormat>
+  <ContentLanguageDisplayName>English - United Kingdom</ContentLanguageDisplayName>
+  <ContentLanguageFlagIconName />
+  <ContentLanguageGUID>6f39c406-b77d-45c9-b508-f5ec82efbbd4</ContentLanguageGUID>
+  <ContentLanguageIsDefault>True</ContentLanguageIsDefault>
+  <ContentLanguageName>en-GB</ContentLanguageName>
+</cms.contentlanguage>

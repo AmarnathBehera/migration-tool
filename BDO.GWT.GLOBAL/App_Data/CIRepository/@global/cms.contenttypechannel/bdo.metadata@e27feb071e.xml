@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttypechannel>
+  <Parent>
+    <CodeName>BDO.Metadata</CodeName>
+    <GUID>704285f8-cdd5-43a3-86f2-5e77230931c2</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.channel_Site">
+      <ContentTypeChannelChannelID>
+        <CodeName>Site</CodeName>
+        <GUID>023a7dab-ce39-436c-afdd-84f3c631e819</GUID>
+        <ObjectType>cms.channel</ObjectType>
+      </ContentTypeChannelChannelID>
+    </Binding>
+  </Bindings>
+</cms.contenttypechannel>

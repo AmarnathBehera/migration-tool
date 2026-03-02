@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>ThisIsTheHome-le399f6w</CodeName>
+    <GUID>387b152a-2860-4563-ac0b-e5beab1181a8</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-GB</CodeName>
+    <GUID>6f39c406-b77d-45c9-b508-f5ec82efbbd4</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataGUID>b5989e65-a782-4277-81d8-3ae0d5372d4d</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderWidgets>
+    <![CDATA[{"editableAreas":[{"identifier":"mainArea","sections":[{"identifier":"5eeadd9b-af26-4728-bdcd-5964fa7357ad","type":"Kentico.DefaultSection","properties":null,"zones":[{"identifier":"aa2f8368-5a5f-4042-b0e7-d2486ade1dbe","widgets":[{"identifier":"5eecd12c-970c-4580-ba69-190d4ccf59cd","type":"BDO.Widget.InsightAnimationCard","variants":[{"identifier":"230ef38a-e09c-4ec5-9e91-bfa177cf08b9","properties":{"title":"Animation widget Title","description":"Animation Description","insightCards":[{"nodeGuid":"0a4aae6d-5158-499e-a9e1-da8f18a2e997"}],"openInNewTab":"_blank","seeAllLinkText":"action","seeAllLinkURL":"~/google.com","topMargin":"20px","bottomMargin":"40px","widgetID":"11"}}]},{"identifier":"c44a4742-4d93-4e09-93f8-92a0bc70f371","type":"BDO.Widget.InsightCarousel","variants":[{"identifier":"35c7616e-2a75-42a9-8e96-054ae0d546c3","properties":{"title":"Main Title","description":"Main Desc","filteringEnabled":true,"filters":"contentType;businessIssue;businessLine;industryCategory","featuredInsights":[{"nodeGuid":"b872d48a-c714-4350-afd1-dfa80782cbd6"},{"nodeGuid":"e9584558-77e2-4904-955c-1158b0042736"}],"backgroundImages":[],"backgroundImageAltText":null,"seeAllLinkText":null,"seeAllLinkURL":null,"seeAllLinkURLTarget":"_self","topMargin":"0px","bottomMargin":"0px","widgetID":null}}]}]}]}]}]}]]>
+  </ContentItemCommonDataVisualBuilderWidgets>
+</cms.contentitemcommondata>

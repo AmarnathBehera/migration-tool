@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <CodeNameColumn>Name</CodeNameColumn>
+      <DisplayNameColumn>Name</DisplayNameColumn>
+      <GUIDColumn>UpgradeLogGuid</GUIDColumn>
+      <LastModifiedColumn>UpgradeLogLastModified</LastModifiedColumn>
+      <NameSpace>BDORelease</NameSpace>
+      <ObjectType>bdorelease.upgradelog</ObjectType>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassDisplayName>Upgrade Log</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="UpgradeLogID" columntype="integer" guid="581d4a7a-7be9-4c16-91d4-3596bf932a35" isPK="true">
+        <properties>
+          <fieldcaption>UpgradeLogID</fieldcaption>
+        </properties>
+      </field>
+      <field column="UpgradeLogGuid" columntype="guid" guid="aa049802-d8b0-428e-ba9e-fa54a31de588">
+        <properties>
+          <fieldcaption>GUID</fieldcaption>
+        </properties>
+      </field>
+      <field column="UpgradeLogLastModified" columnprecision="7" columntype="datetime" guid="2674c478-7bce-4ab3-a7de-27ab85b428c5">
+        <properties>
+          <fieldcaption>Last modified</fieldcaption>
+        </properties>
+      </field>
+      <field column="Type" columnsize="200" columntype="text" enabled="true" guid="e8e988f0-3b74-4273-a3eb-1321324ea9cc">
+        <properties>
+          <fieldcaption>Type</fieldcaption>
+        </properties>
+      </field>
+      <field column="Version" columnsize="20" columntype="text" enabled="true" guid="7600fe98-656d-4c1a-9547-8941c12cb402">
+        <properties>
+          <fieldcaption>Version</fieldcaption>
+        </properties>
+      </field>
+      <field column="Name" columnsize="200" columntype="text" enabled="true" guid="7dd1814b-92db-46f2-ae7a-85909dbad818">
+        <properties>
+          <fieldcaption>Name</fieldcaption>
+        </properties>
+      </field>
+      <field column="DateTime" columnprecision="0" columntype="datetime" enabled="true" guid="2d1af0f4-2c6f-4e1e-a3af-9145b2ecd1f5">
+        <properties>
+          <fieldcaption>DateTime</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="State" columnsize="20" columntype="text" enabled="true" guid="12b783a9-7419-4217-887c-18f7655660f4">
+        <properties>
+          <fieldcaption>State</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="Message" columntype="richtexthtml" enabled="true" guid="e7c263a9-7142-4394-bfad-63eafca09c0f">
+        <properties>
+          <fieldcaption>Message</fieldcaption>
+        </properties>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>634aeb6c-5299-45ed-a730-7d7441cddca8</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDORelease.UpgradeLog</ClassName>
+  <ClassResourceID>
+    <CodeName>BDORelease</CodeName>
+    <GUID>1c4398ec-bb67-415a-9f2f-045af7db7671</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDORelease_UpgradeLog</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

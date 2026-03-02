@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.form>
+  <FormAccess>0</FormAccess>
+  <FormBuilderLayout>
+    <![CDATA[{ "editableAreas": [ { "identifier": "DefaultFormBuilderArea", "sections": [ { "identifier": "00000000-0000-0000-0000-000000000000", "type": "Kentico.DefaultSection", "zones": [ { "identifier": "b939d174-eb0e-4466-97f1-cd299eb0d389", "formComponents": [ { "identifier": "97c4f802-4b08-4878-8a6e-3201922c106d" }, { "identifier": "fcf843be-67b8-4727-bc71-3cb2131a8c60" }, { "identifier": "cc48787d-aee3-4e04-aefc-7a3e29c99ca6" }, { "identifier": "a4ba7e02-659b-4634-8c88-0a2c36d67419" }, { "identifier": "096c6b75-0b88-418f-a494-60e04d4d9725" }, { "identifier": "237be4df-f997-403d-a5b7-5c35d1f883d8" }, { "identifier": "15a15d20-40ac-4c08-9c0b-b71630776cb4" } ] } ], "properties": null } ] } ] }]]>
+  </FormBuilderLayout>
+  <FormClassID>
+    <CodeName>BizForm.BDOEventTemplate_DoNotModify</CodeName>
+    <GUID>c16ad244-78e7-4db7-b798-f9aa97c3194c</GUID>
+    <ObjectType>cms.formclass</ObjectType>
+  </FormClassID>
+  <FormDisplayName>* BDO Event Template (Do Not Modify)</FormDisplayName>
+  <FormGUID>75f60e75-cc71-4cca-a82f-9ba8f6ee037a</FormGUID>
+  <FormItems>0</FormItems>
+  <FormLogActivity>True</FormLogActivity>
+  <FormName>BDOEventTemplate_DoNotModify</FormName>
+</cms.form>

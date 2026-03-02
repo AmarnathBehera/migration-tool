@@ -1,0 +1,263 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <NameSpace>BDO</NameSpace>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Metadata</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="b052ba78-9215-49a9-acd4-55c297bdfd67" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="4c7e8e41-7041-42e9-8461-f8ca01831b41" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="01376332-9b4a-484b-83f8-d1202de4a254" isunique="true" system="true" />
+      <field column="MetadataTitle" columnsize="200" columntype="text" enabled="true" guid="790af3a1-a5c1-4b1e-b15c-27ebc8378a17" visible="true">
+        <properties>
+          <fieldcaption>Title</fieldcaption>
+        </properties>
+        <settings>
+          <AutoCompleteEnableCaching>False</AutoCompleteEnableCaching>
+          <AutoCompleteFirstRowSelected>False</AutoCompleteFirstRowSelected>
+          <AutoCompleteShowOnlyCurrentWordInCompletionListItem>False</AutoCompleteShowOnlyCurrentWordInCompletionListItem>
+          <controlname>Kentico.Administration.TextInput</controlname>
+          <FilterMode>False</FilterMode>
+          <Trim>False</Trim>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataDescription" columntype="richtexthtml" enabled="true" guid="6c1da4be-439b-4083-a470-3d3bb5881278" visible="true">
+        <properties>
+          <fieldcaption>Description</fieldcaption>
+        </properties>
+        <settings>
+          <ConfigurationName>Kentico.Administration.StructuredContent</ConfigurationName>
+          <controlname>Kentico.Administration.RichTextEditor</controlname>
+          <Dialogs_Content_Hide>False</Dialogs_Content_Hide>
+          <HeightUnitType>PX</HeightUnitType>
+          <MediaDialogConfiguration>True</MediaDialogConfiguration>
+          <ShowAddStampButton>False</ShowAddStampButton>
+          <ToolbarSet>Full</ToolbarSet>
+          <WidthUnitType>PX</WidthUnitType>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataTeaserImage" columnsize="200" columntype="contentitemreference" enabled="true" guid="909fee1f-12db-47e7-b118-e09e89c51549" visible="true">
+        <properties>
+          <explanationtext ismacro="true">
+<![CDATA[
+{%var explaintext = ""; 
+
+if (EditedObject.ClassName == "BDO.SectionIndustries")  {     explaintext = "Please use the following:</br><strong>Image dimension</strong> – 390x180px</br> "  } 
+if (EditedObject.ClassName == "BDO.Service")  {      explaintext = "Please use the following:</br><strong>Image dimension</strong> – 475x375px</br> "  }  
+if (EditedObject.ClassName == "BDO.Industry")  {      explaintext = "Please use the following:</br><strong>Image dimension</strong> – 350x274px</br> "   }  
+if (EditedObject.ClassName == "BDO.Person")  {      explaintext = "Please use the following:</br><strong>Image dimension</strong> – 280x280px</br>"  }  
+if (EditedObject.ClassName == "BDO.AboutPage")  {      explaintext = "Please use the following:</br><strong>Image dimension</strong> – 350x274px</br>"  }  
+if (EditedObject.ClassName == "BDO.BusinessLine")  {      explaintext = "For the teaser image please use the following:</br><strong>Image dimension</strong> – 330x200px</br>"  }  
+if (EditedObject.ClassName == "BDO.SpecialitiesCategory")  {      explaintext = "Please use the following:</br><strong>Image dimension</strong> – 370x292px</br>"  }  
+if (EditedObject.ClassName == "BDO.Career")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.IndustryCategory")  {      explaintext = "Please use the following:</br><strong>Image dimension</strong> – 350x274px</br>"  }  
+if (EditedObject.ClassName == "BDO.Homepage")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.Contact")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.SectionAbout")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.SectionInsights")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.SectionCareers")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.CareerCategory")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.Careers")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.StatusCode")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.SectionSpecialities")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.SpecialitiesArea")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.SpecialitiesPage")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.CareerContent")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.ServiceArea")  {      explaintext = "For the teaser image please use the following:</br><strong>Image dimension</strong> – 330x200px</br>"  }  
+if (EditedObject.ClassName == "BDO.SectionServices")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.Insight")  {      explaintext = "Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.InsightCategory")  {      explaintext = "Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.Search")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.SectionNews")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.NewsArticle")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.SectionPeoplePage")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.Sitemap")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.SectionLegal")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.LegalPage")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.Locations")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.LocationCity")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.LocationOffice")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.Subscribe")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.SectionEvents")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.Event")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.EventSearch")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.EventTab")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.SectionRSS")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.MicrositePage")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.MicrositeTestimonial")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.SectionBlogs")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.BlogContent")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.Registration")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.Profile")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.Logout")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.ResetPassword")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.ProfileEdit")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.Login")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.ChangePassword")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.ThankYouConversionPage")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.SubService")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.IndustryService")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.Deal")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension:</strong></br>For non-logo images: At least 320x240px or bigger (4:3 aspect ratio)</br>For logo images: At least 100px height with white or transparent background (width will scale automatically)</br>"  }  
+if (EditedObject.ClassName == "BDO.SectionDeals")  {      explaintext = "The teaser image will also be used when sharing social media posts if no image is added in the OG metadata section..</br></br>Please use the following:</br><strong>Image dimension</strong> – 540px wide (height will scale automatically)</br>"  }
+return explaintext + "<strong>Type:</strong> JPG, PNG, GIF</br><strong>Quality:</strong> 72dpi</br><strong>Size:</strong> 1&nbsp;MB advised – 5&nbsp;MB max"; |(identity)GlobalAdministrator|(hash)5034c8a1ab8bcbef1c8e991bc112c2cc4003ca94e4b0fb5a4a1bfbb4421b2114%}
+]]>
+          </explanationtext>
+          <fieldcaption>Teaser image</fieldcaption>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["bb17604c-c134-4faa-a401-2727cad93707","205639d0-5385-472a-bd1a-ba685cf3915d","4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <ShowPreview>True</ShowPreview>
+        </settings>
+      </field>
+      <field column="MetadataTeaserImageAltText" columnsize="200" columntype="text" enabled="true" guid="34d32078-3909-49bd-b1a6-ec7e66d5b64b" visible="true">
+        <properties>
+          <fieldcaption>Teaser image alt text</fieldcaption>
+          <visiblemacro ismacro="true">{%MetadataTeaserImage != null%}</visiblemacro>
+        </properties>
+        <settings>
+          <AutoCompleteEnableCaching>False</AutoCompleteEnableCaching>
+          <AutoCompleteFirstRowSelected>False</AutoCompleteFirstRowSelected>
+          <AutoCompleteShowOnlyCurrentWordInCompletionListItem>False</AutoCompleteShowOnlyCurrentWordInCompletionListItem>
+          <controlname>Kentico.Administration.TextInput</controlname>
+          <FilterMode>False</FilterMode>
+          <Trim>False</Trim>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataCanonical" columnsize="2000" columntype="text" enabled="true" guid="618b60f2-0213-4944-98d7-182f78f3f67f" visible="true">
+        <properties>
+          <fieldcaption>Canonical link</fieldcaption>
+          <fielddescription>
+            <![CDATA[link to the original page where the content from this page is copied from]]>
+          </fielddescription>
+        </properties>
+        <settings>
+          <AutoCompleteEnableCaching>False</AutoCompleteEnableCaching>
+          <AutoCompleteFirstRowSelected>False</AutoCompleteFirstRowSelected>
+          <AutoCompleteShowOnlyCurrentWordInCompletionListItem>False</AutoCompleteShowOnlyCurrentWordInCompletionListItem>
+          <controlname>Kentico.Administration.TextInput</controlname>
+          <FilterMode>False</FilterMode>
+          <Trim>False</Trim>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataOGTitle" columnsize="60" columntype="text" enabled="true" guid="78be3e24-7f51-493c-8243-12b85a881aac" visible="true">
+        <properties>
+          <fieldcaption>OG metadata title</fieldcaption>
+        </properties>
+        <settings>
+          <AutoCompleteEnableCaching>False</AutoCompleteEnableCaching>
+          <AutoCompleteFirstRowSelected>False</AutoCompleteFirstRowSelected>
+          <AutoCompleteShowOnlyCurrentWordInCompletionListItem>False</AutoCompleteShowOnlyCurrentWordInCompletionListItem>
+          <controlname>Kentico.Administration.TextInput</controlname>
+          <FilterMode>False</FilterMode>
+          <Trim>False</Trim>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataOGDescription" columnsize="500" columntype="text" enabled="true" guid="1ce90c84-37c2-4afa-bfc4-142837238212" visible="true">
+        <properties>
+          <fieldcaption>OG metadata description</fieldcaption>
+        </properties>
+        <settings>
+          <AutoCompleteEnableCaching>False</AutoCompleteEnableCaching>
+          <AutoCompleteFirstRowSelected>False</AutoCompleteFirstRowSelected>
+          <AutoCompleteShowOnlyCurrentWordInCompletionListItem>False</AutoCompleteShowOnlyCurrentWordInCompletionListItem>
+          <controlname>Kentico.Administration.TextArea</controlname>
+          <FilterMode>False</FilterMode>
+          <Wrap>True</Wrap>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataOGImage" columnsize="500" columntype="contentitemreference" enabled="true" guid="05332774-7055-4b1d-9dc6-50492e31e60e" visible="true">
+        <properties>
+          <explanationtext>
+            <![CDATA[Please use the following:<br /><strong>Image dimension</strong>: we are recommending the following dimensions 1200px wide by 630px high (please note that different social media platforms may be optimized for different image sizes and may resize and crop images when sharing)<br /><strong>Type</strong>: JPG, PNG, GIF<br /><strong>Quality</strong>: 72dpi<br /><strong>Size</strong>: 2MB maximum]]>
+          </explanationtext>
+          <fieldcaption>OG metadata image</fieldcaption>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["bb17604c-c134-4faa-a401-2727cad93707","205639d0-5385-472a-bd1a-ba685cf3915d","4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <ShowPreview>True</ShowPreview>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataOGTwitterImageSizeCheckbox" columntype="boolean" enabled="true" guid="cfc4da1f-604e-41f7-9587-ed531b5beff2" visible="true">
+        <properties>
+          <fieldcaption>Use small image for Twitter (1:1)</fieldcaption>
+          <fielddescription>Use small image for Twitter (1:1)</fielddescription>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataOGTwitterImage" columnsize="500" columntype="contentitemreference" enabled="true" guid="fdf65192-f78d-46be-9bf2-3ef1253381e2" visible="true">
+        <properties>
+          <enabledmacro ismacro="true">
+            <![CDATA[{%MetadataOGTwitterImageSizeCheckbox.Value|(identity)GlobalAdministrator|(hash)c6155c5ebcc6032917927d0e2d59ea0a93e42f8877819d1cdd96a1ff2eabe3ab%}]]>
+          </enabledmacro>
+          <fieldcaption>Twitter OG metadata image</fieldcaption>
+          <fielddescription>Used only for Twitter images with aspect ratio 1:1</fielddescription>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["bb17604c-c134-4faa-a401-2727cad93707","205639d0-5385-472a-bd1a-ba685cf3915d","4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <ShowPreview>True</ShowPreview>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataNofollow" columntype="boolean" enabled="true" guid="8fd055e2-301f-42b6-828d-2db486828201" visible="true">
+        <properties>
+          <explanationtext>
+            <![CDATA[Do not allow search engine bots to follow links on this page]]>
+          </explanationtext>
+          <fieldcaption>Nofollow</fieldcaption>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataNoindex" columntype="boolean" enabled="true" guid="435dcf97-b9d6-43a7-9892-3e549093c3f4" visible="true">
+        <properties>
+          <explanationtext>Do not allow search engine to index this page</explanationtext>
+          <fieldcaption>Noindex</fieldcaption>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="IncludeInSitemap" columntype="boolean" enabled="true" guid="b2641d88-58ae-427b-b2bd-2d8d83922361" visible="true">
+        <properties>
+          <defaultvalue>true</defaultvalue>
+          <fieldcaption>Include page in the sitemap</fieldcaption>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field column="DocumentName" columnprecision="0" columnsize="100" columntype="text" enabled="true" guid="69a52ae9-e9df-5470-bca9-c342254ffd5b" visible="true">
+        <properties>
+          <fieldcaption>Page Name</fieldcaption>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>704285f8-cdd5-43a3-86f2-5e77230931c2</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>icon-doc-o</ClassIconClass>
+  <ClassName>BDO.Metadata</ClassName>
+  <ClassShortName>BDOMetadataUt8e9zmk</ClassShortName>
+  <ClassTableName>BDO_Metadata</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

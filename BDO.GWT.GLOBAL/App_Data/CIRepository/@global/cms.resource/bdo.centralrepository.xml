@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.resource>
+  <ResourceDisplayName>BDO Central Repository</ResourceDisplayName>
+  <ResourceGUID>3b072c5a-9e8a-47e2-b789-a31f5e4a2642</ResourceGUID>
+  <ResourceIsInDevelopment>False</ResourceIsInDevelopment>
+  <ResourceName>BDO.CentralRepository</ResourceName>
+</cms.resource>

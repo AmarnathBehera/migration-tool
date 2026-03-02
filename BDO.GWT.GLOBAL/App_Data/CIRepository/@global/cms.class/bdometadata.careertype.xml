@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <CodeNameColumn>CareerTypeCodeName</CodeNameColumn>
+      <DisplayNameColumn>CareerTypeName</DisplayNameColumn>
+      <GUIDColumn>CareerTypeGuid</GUIDColumn>
+      <LastModifiedColumn>CareerTypeLastModified</LastModifiedColumn>
+      <NameSpace>BDO.GWT.SharedXperience.BDOMetadata</NameSpace>
+      <ObjectType>bdometadata.careertype</ObjectType>
+      <SiteIDColumn>CareerTypeSiteID</SiteIDColumn>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassConnectionString>CMSConnectionString</ClassConnectionString>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassDisplayName>Career type</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="CareerTypeID" columntype="integer" guid="c2e98d7a-b9ae-4ec2-abd7-245afefb1d49" isPK="true">
+        <properties>
+          <fieldcaption>CareerTypeID</fieldcaption>
+        </properties>
+      </field>
+      <field column="CareerTypeName" columnsize="200" columntype="text" enabled="true" guid="567fd19a-f10b-4b4b-8b16-79f4785abc4c">
+        <properties>
+          <fieldcaption>Name</fieldcaption>
+        </properties>
+      </field>
+      <field column="CareerTypeCodeName" columnsize="200" columntype="text" enabled="true" guid="8b058ec2-b749-400b-866a-fb30deae2ef5" isunique="true">
+        <properties>
+          <fieldcaption>Code name</fieldcaption>
+        </properties>
+      </field>
+      <field column="CareerTypeCultureCode" columnsize="200" columntype="text" enabled="true" guid="5363f01b-2e53-42ee-9ca3-97f998a25774">
+        <properties>
+          <defaultvalue ismacro="true">
+            <![CDATA[{%LocalizationContext.CurrentCulture.CultureCode|(identity)GlobalAdministrator|(hash)a8a3a9f3adaa0164b071967fb81d864d9702d929e4f017a73c7e9de03aa07522%}]]>
+          </defaultvalue>
+          <fieldcaption>Language</fieldcaption>
+        </properties>
+      </field>
+      <field column="CareerTypeSiteID" columntype="integer" guid="fc53abd2-5311-460e-8c3e-01e193fe69e0" refobjtype="cms.site" reftype="Required" />
+      <field column="CareerTypeGuid" columntype="guid" guid="439ca943-d97f-4345-8c6a-a671c8b732fd">
+        <properties>
+          <fieldcaption>GUID</fieldcaption>
+        </properties>
+      </field>
+      <field column="CareerTypeLastModified" columnprecision="7" columntype="datetime" guid="dc19d508-7f97-4759-a96e-63f4ec356e43">
+        <properties>
+          <fieldcaption>Last modified</fieldcaption>
+        </properties>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>98898183-10b7-4145-bde0-9244c9f41fcd</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDOMetadata.CareerType</ClassName>
+  <ClassResourceID>
+    <CodeName>BDOMetadata</CodeName>
+    <GUID>d2623ab4-a8e2-4896-aea5-14bad509d3fb</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDOMetadata_CareerType</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

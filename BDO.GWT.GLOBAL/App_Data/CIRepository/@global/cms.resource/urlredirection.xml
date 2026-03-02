@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.resource>
+  <ResourceDescription>
+    <![CDATA[Module to manage redirects through the Xperience CMS.  This package is for the Admin, not the MVC sites.1]]>
+  </ResourceDescription>
+  <ResourceDisplayName>XperienceCommunity.UrlRedirection</ResourceDisplayName>
+  <ResourceGUID>448ec3fa-8afc-459f-8c21-ae6e71996394</ResourceGUID>
+  <ResourceIsInDevelopment>False</ResourceIsInDevelopment>
+  <ResourceName>URLRedirection</ResourceName>
+</cms.resource>

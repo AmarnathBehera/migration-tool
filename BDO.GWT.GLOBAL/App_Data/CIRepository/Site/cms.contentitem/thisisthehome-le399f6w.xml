@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitem>
+  <ContentItemChannelID>
+    <CodeName>Site</CodeName>
+    <GUID>023a7dab-ce39-436c-afdd-84f3c631e819</GUID>
+    <ObjectType>cms.channel</ObjectType>
+  </ContentItemChannelID>
+  <ContentItemContentFolderID>
+    <CodeName>Root</CodeName>
+    <GUID>9d6509a4-a231-4837-8f1c-81a90705f988</GUID>
+    <ObjectType>cms.contentfolder</ObjectType>
+  </ContentItemContentFolderID>
+  <ContentItemContentTypeID>
+    <CodeName>BDO.HomePage</CodeName>
+    <GUID>31f6383b-697e-4d8f-acec-be459fe4ad01</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </ContentItemContentTypeID>
+  <ContentItemGUID>387b152a-2860-4563-ac0b-e5beab1181a8</ContentItemGUID>
+  <ContentItemIsReusable>False</ContentItemIsReusable>
+  <ContentItemIsSecured>False</ContentItemIsSecured>
+  <ContentItemName>ThisIsTheHome-le399f6w</ContentItemName>
+  <ContentItemWorkspaceID>
+    <CodeName>KenticoDefault</CodeName>
+    <GUID>43f674d6-540d-4f91-8c19-608b5bddb2f2</GUID>
+    <ObjectType>cms.workspace</ObjectType>
+  </ContentItemWorkspaceID>
+</cms.contentitem>

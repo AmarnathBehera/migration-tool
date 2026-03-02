@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <CodeNameColumn>OriginalDocumentOwnerName</CodeNameColumn>
+      <GUIDColumn>InsightGuid</GUIDColumn>
+      <LastModifiedColumn>InsightLastModified</LastModifiedColumn>
+      <NameSpace>BDO.GWT.SharedXperience</NameSpace>
+      <ObjectType>bdo.centralrepository_insight</ObjectType>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassConnectionString>CMSConnectionString</ClassConnectionString>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassDisplayName>BDO - Insight</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="InsightID" columntype="integer" guid="ad48d5a7-1ab2-47de-bbc5-a0637b21e94b" isPK="true">
+        <properties>
+          <fieldcaption>InsightID</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="Title" columnsize="200" columntype="text" guid="5bf0cba6-d423-4301-8bfc-2fbd05134900" />
+      <field allowempty="true" column="Culture" columnsize="200" columntype="text" guid="2efcf9aa-4957-4420-9bc8-e99341b1624a" />
+      <field allowempty="true" column="DateFirstShared" columnprecision="7" columntype="datetime" guid="c9b2223f-5a9a-4d46-8616-72c0ce86d54f" />
+      <field allowempty="true" column="CountryInvolved" columnsize="200" columntype="text" guid="b7ca8a3c-ccef-4a1f-aa1f-e6385ddc8f67" />
+      <field allowempty="true" column="ServiceLines" columnsize="200" columntype="text" guid="60dc7822-2c44-4084-bea8-433453581737" />
+      <field allowempty="true" column="Industries" columnsize="200" columntype="text" guid="e4754985-5f8a-4881-a2eb-b3d794be0696" />
+      <field allowempty="true" column="OriginalSiteGuid" columntype="guid" guid="1b4bce20-7d4a-47ec-a2cf-4acc1c95257a" />
+      <field allowempty="true" column="OriginalDocumentGuid" columntype="guid" guid="3a0ee227-abe9-42bb-842e-d2bd7edea3cf" />
+      <field allowempty="true" column="OriginalDocumentOwnerName" columnsize="200" columntype="text" guid="26571881-c669-4200-a196-9f355aaaed7d" />
+      <field allowempty="true" column="OriginalDocumentOwnerEmail" columnsize="200" columntype="text" guid="ac57098b-022f-4071-995a-c7e08ae20f17" />
+      <field allowempty="true" column="OriginalDocumentOwnerOptOut" columntype="boolean" guid="d57aa001-9921-4445-a45f-d58c2a28673a" />
+      <field allowempty="true" column="SourceSiteGuid" columntype="guid" guid="db9ae546-c20c-4ffa-aa8b-1723e90eabd4" />
+      <field allowempty="true" column="SourceSiteName" columnsize="200" columntype="text" guid="5f6c4566-7e9a-4f19-ab9a-471f8218e823" />
+      <field allowempty="true" column="SourceDocumentGuid" columntype="guid" guid="7e4a7a51-115c-486f-a3c0-9053fb74cdcc" />
+      <field allowempty="true" column="SourceLastModified" columnprecision="7" columntype="datetime" guid="a9903bc5-e13b-4611-8569-5517197efc04" />
+      <field allowempty="true" column="Url" columnsize="2000" columntype="text" guid="59532995-6551-476b-a44a-3262826b8d1c" />
+      <field allowempty="true" column="InsightsCodeName" columnsize="200" columntype="text" guid="00e95988-35b3-404f-a0e7-e7bb41c6b851" />
+      <field allowempty="true" column="Description" columntype="longtext" guid="4a14f964-844f-4ce0-be14-94ef8fcaf3a5" />
+      <field allowempty="true" column="OriginalInsightIsNotPublished" columntype="boolean" guid="1ab1e788-dfb4-4656-aff4-65ccc60ef216">
+        <properties>
+          <defaultvalue>false</defaultvalue>
+        </properties>
+      </field>
+      <field column="InsightGuid" columntype="guid" guid="b7bf497f-cf54-40a6-896f-c838d9a60052">
+        <properties>
+          <fieldcaption>GUID</fieldcaption>
+        </properties>
+      </field>
+      <field column="InsightLastModified" columnprecision="7" columntype="datetime" guid="1afb7f9d-6b0e-48e5-a59b-25bbc92e6815">
+        <properties>
+          <fieldcaption>Last modified</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="SharingInstructions" columnsize="4000" columntype="text" guid="ef95c868-4c32-4715-8fc8-e2e8bb1e1788" />
+      <field allowempty="true" column="SharingHeadline" columntype="boolean" enabled="true" guid="070cd02f-239d-45ff-ab72-6b91c7508c17">
+        <properties>
+          <defaultvalue>false</defaultvalue>
+          <fieldcaption>Check box</fieldcaption>
+        </properties>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>fc02ba50-528f-4db8-9424-29515083e2dd</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.CentralRepositoryInsight</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.CentralRepository</CodeName>
+    <GUID>3b072c5a-9e8a-47e2-b789-a31f5e4a2642</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_CentralRepositoryInsights</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

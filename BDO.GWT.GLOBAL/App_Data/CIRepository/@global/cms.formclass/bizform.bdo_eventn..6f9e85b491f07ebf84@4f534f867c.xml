@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.formclass>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassDisplayName>x(DELETED)29/12/2025-29/12/2025 tax webinar</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="BDO_EventNodea53f65c0828b436f9e85b491f07ebf84ID" columntype="integer" guid="fbe3f22f-6656-4949-a401-358780020312" isPK="true">
+        <properties>
+          <fieldcaption>BDO_EventNodea53f65c0828b436f9e85b491f07ebf84ID</fieldcaption>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.TextInput</componentidentifier>
+        </settings>
+      </field>
+      <field column="FormInserted" columnprecision="7" columntype="datetime" guid="80046d63-0649-4593-9d77-f40180927683" system="true">
+        <properties>
+          <fieldcaption>Form inserted</fieldcaption>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.TextInput</componentidentifier>
+        </settings>
+      </field>
+      <field column="FormUpdated" columnprecision="7" columntype="datetime" guid="078e8e84-0078-4dde-9fff-7f7eb39821bc" system="true">
+        <properties>
+          <fieldcaption>Form updated</fieldcaption>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.TextInput</componentidentifier>
+        </settings>
+      </field>
+      <field column="FirstName" columnsize="500" columntype="text" enabled="true" guid="97c4f802-4b08-4878-8a6e-3201922c106d" visible="true">
+        <properties>
+          <fieldcaption>{$BDO.LiveSite.Form.FirstName$}</fieldcaption>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.TextInput</componentidentifier>
+        </settings>
+      </field>
+      <field column="LastName" columnsize="500" columntype="text" enabled="true" guid="fcf843be-67b8-4727-bc71-3cb2131a8c60" visible="true">
+        <properties>
+          <fieldcaption>{$BDO.LiveSite.Form.LastName$}</fieldcaption>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.TextInput</componentidentifier>
+        </settings>
+      </field>
+      <field column="Email" columnsize="500" columntype="text" enabled="true" guid="cc48787d-aee3-4e04-aefc-7a3e29c99ca6" visible="true">
+        <properties>
+          <fieldcaption>{$BDO.LiveSite.Form.Email$}</fieldcaption>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.TextInput</componentidentifier>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <Identifier>Kentico.Email</Identifier>
+            <ValidationRule>
+              <InstanceIdentifier>a801ab91-863e-44d9-998f-c8cab7bc16cc</InstanceIdentifier>
+              <ErrorMessage>Must be email</ErrorMessage>
+            </ValidationRule>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+      <field column="PhoneNumber" columnsize="500" columntype="text" enabled="true" guid="a4ba7e02-659b-4634-8c88-0a2c36d67419" visible="true">
+        <properties>
+          <fieldcaption>{$BDO.LiveSite.Form.PhoneNumber$}</fieldcaption>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.TextInput</componentidentifier>
+        </settings>
+      </field>
+      <field column="Company" columnsize="500" columntype="text" enabled="true" guid="096c6b75-0b88-418f-a494-60e04d4d9725" visible="true">
+        <properties>
+          <fieldcaption>{$BDO.LiveSite.Form.Company$}</fieldcaption>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.TextInput</componentidentifier>
+        </settings>
+      </field>
+      <field column="JobTitle" columnsize="500" columntype="text" enabled="true" guid="237be4df-f997-403d-a5b7-5c35d1f883d8" visible="true">
+        <properties>
+          <fieldcaption>{$BDO.LiveSite.Form.JobTitle$}</fieldcaption>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.TextInput</componentidentifier>
+        </settings>
+      </field>
+      <field allowempty="true" column="SecurityCode" columnsize="1" columntype="text" enabled="true" guid="15a15d20-40ac-4c08-9c0b-b71630776cb4" visible="true">
+        <properties>
+          <fieldcaption>Security Code</fieldcaption>
+        </properties>
+        <settings>
+          <Badge>bottomright</Badge>
+          <componentidentifier>BDO.FormComponent.SecurityCode</componentidentifier>
+          <Version>v2</Version>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>590a189f-a418-419d-8d3a-b2143c5e131c</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>
+    <![CDATA[bizform.BDO_EventNodea53f65c0828b436f9e85b491f07ebf84]]>
+  </ClassName>
+  <ClassTableName>Form_BDO_EventNodea53f65c0828b436f9e85b491f07ebf84</ClassTableName>
+  <ClassType>Form</ClassType>
+  <ClassXmlSchema>
+<![CDATA[
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Form_BDO_EventNodea53f65c0828b436f9e85b491f07ebf84">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="BDO_EventNodea53f65c0828b436f9e85b491f07ebf84ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" type="xs:int" />
+              <xs:element name="FormInserted" type="xs:dateTime" />
+              <xs:element name="FormUpdated" type="xs:dateTime" />
+              <xs:element name="FirstName">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="500" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="LastName">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="500" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Email">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="500" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="PhoneNumber">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="500" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Company">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="500" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="JobTitle">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="500" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="SecurityCode" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="1" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//Form_BDO_EventNodea53f65c0828b436f9e85b491f07ebf84" />
+      <xs:field xpath="BDO_EventNodea53f65c0828b436f9e85b491f07ebf84ID" />
+    </xs:unique>
+  </xs:element>
+</xs:schema>
+]]>
+  </ClassXmlSchema>
+</cms.formclass>
