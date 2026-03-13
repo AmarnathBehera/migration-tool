@@ -13,7 +13,7 @@ stages:
     displayName: Build and Test
     jobs:
       - job: Build
-        enabled: true
+        condition: true
         displayName: 'Build XbyK Web DotNet project'
         pool:
           vmImage: 'ubuntu-latest'
@@ -35,7 +35,7 @@ stages:
             displayName: 'Build $(projectFile)'
 
       - job: Test
-        enabled: false # Temporarily disable tests until they are fixed
+        condition: false # Temporarily disable tests until they are fixed
         displayName: 'Run Tests for XbyK Web DotNet project'
         dependsOn: Build
         pool:
