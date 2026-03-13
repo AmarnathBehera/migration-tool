@@ -2,9 +2,11 @@
 # This pipeline is responsible for building the XbyK project and running tests.
 
 name: XbyK Web Build and Test
-trigger:
-  exclude:
-    - _deploy/*
+
+variables:
+  buildConfiguration: 'Release'
+  dotnetVersion: '10.x'
+  projectFile: 'GWTXbyKWeb.csproj'
 
 jobs:
   - job: Build
@@ -13,14 +15,20 @@ jobs:
       vmImage: 'ubuntu-latest'
     steps:
       - task: UseDotNet@2
+        displayName: 'Use .NET $(dotnetVersion)'
         inputs:
           packageType: 'sdk'
-          version: '10.x'
+          version: '$(dotnetVersion)'
           installationPath: $(Agent.ToolsDirectory)/dotnet
 
-      - script: |
-          dotnet build GWTXbyKWeb.csproj --configuration Release
-        displayName: 'Build Solution'
+      - script: dotnet restore $(projectFile)
+        displayName: 'Restore NuGet packages'
+
+      - script: >
+          dotnet build $(projectFile)
+          --configuration $(buildConfiguration)
+          --no-restore
+        displayName: 'Build $(projectFile)'
 
   - job: Test
     displayName: 'Run Tests for XbyK Web project'
@@ -31,9 +39,9 @@ jobs:
       - task: UseDotNet@2
         inputs:
           packageType: 'sdk'
-          version: '10.x'
+          version: '$(dotnetVersion)'
           installationPath: $(Agent.ToolsDirectory)/dotnet
 
       - script: |
-          dotnet test GWTXbyKWeb.Tests.csproj --configuration Release --no-build
+          dotnet test GWTXbyKWeb.Tests.csproj --configuration $(buildConfiguration) --no-build
         displayName: 'Run Tests'
