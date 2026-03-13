@@ -1,0 +1,39 @@
+# XbyK Build and Test Pipeline
+# This pipeline is responsible for building the XbyK project and running tests.
+
+name: XbyK Web Build and Test
+trigger:
+  exclude:
+    - _deploy/*
+
+jobs:
+  - job: Build
+    displayName: 'Build XbyK Web project'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - task: UseDotNet@2
+        inputs:
+          packageType: 'sdk'
+          version: '10.x'
+          installationPath: $(Agent.ToolsDirectory)/dotnet
+
+      - script: |
+          dotnet build GWTXbyKWeb.csproj --configuration Release
+        displayName: 'Build Solution'
+
+  - job: Test
+    displayName: 'Run Tests for XbyK Web project'
+    dependsOn: Build
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - task: UseDotNet@2
+        inputs:
+          packageType: 'sdk'
+          version: '10.x'
+          installationPath: $(Agent.ToolsDirectory)/dotnet
+
+      - script: |
+          dotnet test GWTXbyKWeb.Tests.csproj --configuration Release --no-build
+        displayName: 'Run Tests'
