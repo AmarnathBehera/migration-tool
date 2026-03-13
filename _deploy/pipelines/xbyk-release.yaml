@@ -3,10 +3,12 @@
 
 name: XbyK Web Publish and Release
 
+# Trigger on main and Release/* branches
 trigger:
   branches:
     include:
-      - '*'
+      - main
+      - 'Release/*'
 
 variables:
   buildConfiguration: 'Release'
@@ -129,9 +131,10 @@ stages:
               PackageVersion: "$(Build.BuildNumber)"
               Replace: OverwriteExisting
 
+          # Create release on 'Pre-Release' channel for main branch, and 'Stable' channel for Release/* branches
           - task: OctopusCreateRelease@7
             displayName: Create Octopus Release on Pre-Release Channel
-            condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/main'))
+            condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
             continueOnError: true
             inputs:
               OctoConnectedServiceName: "Octopus Cloud"
@@ -145,7 +148,7 @@ stages:
 
           - task: OctopusCreateRelease@7
             displayName: Create Octopus Release on Stable Channel
-            condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['GitVersion_PreReleaseNumber'], ''), eq(variables['GitVersion_FullSemVer'], variables['GitVersion_MajorMinorPatch']))
+            condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/Release/'))
             inputs:
               OctoConnectedServiceName: "Octopus Cloud"
               Space: "$(octopusSpaceName)"
