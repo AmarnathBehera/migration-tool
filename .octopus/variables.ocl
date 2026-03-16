@@ -4,4 +4,9 @@ variable "Octopus.Azure.Account" {
     value "octopus-npe-gwt-oidc" {
         description = ""
     }
+
+    value "octopus-gwt-prd" {
+        description = ""
+        environment = ["production"]
+    }
 }
