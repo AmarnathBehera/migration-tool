@@ -1,0 +1,34 @@
+step "deploy-cms-app-service" {
+    name = "Deploy CMS App Service"
+    properties = {
+        Octopus.Action.TargetRoles = "xbyk-cms-webapp"
+    }
+
+    action {
+        action_type = "Octopus.AzureAppService"
+        properties = {
+            Octopus.Action.Azure.DeploymentType = "Package"
+            Octopus.Action.EnabledFeatures = "Octopus.Features.ConfigurationVariables,Octopus.Features.JsonConfigurationVariables,Octopus.Features.ConfigurationTransforms,Octopus.Features.SubstituteInFiles"
+            Octopus.Action.Package.DownloadOnTentacle = "False"
+            Octopus.Action.Package.FeedId = "octopus-server-built-in"
+            Octopus.Action.Package.JsonConfigurationVariablesTargets = "appsettings.json"
+            Octopus.Action.Package.PackageId = "GWT.XbyK.Deploy.Web"
+            OctopusUseBundledTooling = "False"
+        }
+        worker_pool = "hosted-ubuntu"
+
+        container {
+            feed = "bdoacroctprdeurwe-azurecr-io"
+            image = "#{deploy.octopusContainer}"
+        }
+
+        packages {
+            acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = "GWT.XbyK.Deploy.Web"
+            properties = {
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}

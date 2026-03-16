@@ -1,0 +1,16 @@
+variable "Octopus.Azure.Account" {
+    type = "AzureAccount"
+
+    value "octopus-npe-gwt-oidc" {
+        description = ""
+    }
+
+    value "octopus-gwt-prd" {
+        description = ""
+        environment = ["production"]
+    }
+}
+
+variable "deploy.octopusContainer" {
+    value "ubuntu-24:1.11.0" {}
+}
