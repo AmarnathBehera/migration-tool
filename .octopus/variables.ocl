@@ -10,3 +10,7 @@ variable "Octopus.Azure.Account" {
         environment = ["production"]
     }
 }
+
+variable "deploy.octopusContainer" {
+    value "ubuntu-24:1.11.0" {}
+}
