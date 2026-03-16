@@ -1,0 +1,7 @@
+variable "Octopus.Azure.Account" {
+    type = "AzureAccount"
+
+    value "octopus-npe-gwt-oidc" {
+        description = ""
+    }
+}
