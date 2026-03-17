@@ -134,7 +134,7 @@ stages:
           # Create release on 'Pre-Release' channel for main branch, and 'Stable' channel for Release/* branches
           - task: OctopusCreateRelease@7
             displayName: Create Octopus Release on Pre-Release Channel
-            condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+            condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/Release/')))
             continueOnError: true
             inputs:
               OctoConnectedServiceName: "Octopus Cloud"
