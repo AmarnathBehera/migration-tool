@@ -12,9 +12,11 @@ variable "Octopus.Azure.Account" {
 }
 
 variable "deploy.octopus.workerPool" {
-    value "GWT NPE Worker Pool" {}
+    type = "WorkerPool"
 
-    value "GWT PRD Worker Pool" {
+    value "gwt-npe-worker-pool" {}
+
+    value "gwt-prd-worker-pool" {
         description = ""
         environment = ["production"]
     }
