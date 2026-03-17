@@ -17,11 +17,6 @@ step "deploy-cms-app-service" {
         }
         worker_pool_variable = "deploy.octopus.workerPool"
 
-        container {
-            feed = "bdoacroctprdeurwe-azurecr-io"
-            image = "#{deploy.octopusContainer}"
-        }
-
         packages {
             acquisition_location = "Server"
             feed = "octopus-server-built-in"
