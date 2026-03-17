@@ -15,7 +15,7 @@ step "deploy-cms-app-service" {
             Octopus.Action.Package.PackageId = "GWT.XbyK.Deploy.Web"
             OctopusUseBundledTooling = "False"
         }
-        worker_pool = "hosted-ubuntu"
+        worker_pool_variable = "deploy.octopus.workerPool"
 
         container {
             feed = "bdoacroctprdeurwe-azurecr-io"
