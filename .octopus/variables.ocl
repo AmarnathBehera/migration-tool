@@ -11,6 +11,11 @@ variable "Octopus.Azure.Account" {
     }
 }
 
-variable "deploy.octopusContainer" {
-    value "ubuntu-24:1.11.0" {}
+variable "deploy.octopus.workerPool" {
+    value "GWT NPE Worker Pool" {}
+
+    value "GWT PRD Worker Pool" {
+        description = ""
+        environment = ["production"]
+    }
 }
