@@ -1,0 +1,8 @@
+﻿@* @inject IReactHelper ReactHelper
+@using BDO.GWT.Web.Core.LiveSite.Helpers
+@model BDO.GWT.Web.Core.DTOs.TiledLinkSectionDto
+
+@ReactHelper.RenderComponent(Html, "TiledLinkSection", new {
+    TiledLinkSection = Model,
+})
+ *@

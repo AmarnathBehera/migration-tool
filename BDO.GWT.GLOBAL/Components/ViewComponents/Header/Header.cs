@@ -1,0 +1,27 @@
+﻿using BDO.GWT.Core;
+using BDO.GWT.Core.Services.Header;
+using BDO.GWT.Core.ValueObjects;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace BDO.GWT.Web.Core.LiveSite.Components.ViewComponents
+{
+    public class Header : ViewComponent
+    {
+        private readonly IHeaderService _headerService;
+        private readonly IContentService _contentService;
+
+        public Header(IHeaderService headerService, IContentService contentService)
+        {
+            _headerService = headerService;
+            _contentService = contentService;
+        }
+
+        public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken)
+        {
+            var headerDto = await _headerService.GetAsync(_contentService, cancellationToken);
+            return View(headerDto);
+        }
+    }
+}

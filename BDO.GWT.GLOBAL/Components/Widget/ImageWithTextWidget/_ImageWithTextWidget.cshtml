@@ -1,0 +1,88 @@
+﻿@using BDO.GWT.Common.Core.LiveSite.Data
+@model ImageWithTextData
+
+@{
+    var mediaOnLeft = Model.MediaPosition?.ToLower() == "left";
+    var hasBackground = !string.IsNullOrEmpty(Model.BackgroundImageURL);
+    var backgroundStyle = hasBackground ? $"background-image: url('{Model.BackgroundImageURL}'); background-size: cover; background-position: center;" : "";
+}
+
+<section class="image-with-text-widget @Model.Theme" style="@backgroundStyle;">
+    <div class="container">
+        <div class="row align-items-center">
+            @if (mediaOnLeft)
+            {
+                <div class="col-md-6">
+                    @if (!string.IsNullOrEmpty(Model.ImageURL))
+                    {
+                        <img src="@Model.ImageURL" alt="@Model.ImageAltText" class="img-fluid" />
+                    }
+                    else if (!string.IsNullOrEmpty(Model.EmbedCode))
+                    {
+                        @Html.Raw(Model.EmbedCode)
+                    }
+                </div>
+                <div class="col-md-6">
+                    <h2>@Model.Title</h2>
+                    <p>@Model.Description</p>
+                    @if (!string.IsNullOrEmpty(Model.ButtonURL) && !string.IsNullOrEmpty(Model.ButtonTitle))
+                    {
+                        <a href="@Model.ButtonURL" class="btn @Model.ButtonType" target="@Model.PrimaryButtonLinkTarget">@Model.ButtonTitle</a>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="col-md-6">
+                    <h2>@Model.Title</h2>
+                    <p>@Model.Description</p>
+                    @if (!string.IsNullOrEmpty(Model.ButtonURL) && !string.IsNullOrEmpty(Model.ButtonTitle))
+                    {
+                        <a href="@Model.ButtonURL" class="btn @Model.ButtonType" target="@Model.PrimaryButtonLinkTarget">@Model.ButtonTitle</a>
+                    }
+                </div>
+                <div class="col-md-6">
+                    @if (!string.IsNullOrEmpty(Model.ImageURL))
+                    {
+                        <img src="@Model.ImageURL" alt="@Model.ImageAltText" class="img-fluid" />
+                    }
+                    else if (!string.IsNullOrEmpty(Model.EmbedCode))
+                    {
+                        @Html.Raw(Model.EmbedCode)
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<style>
+    .image-with-text-widget {
+        padding: 40px 0;
+        color: #333;
+    }
+
+        .image-with-text-widget h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .image-with-text-widget p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .image-with-text-widget .btn {
+            padding: 10px 20px;
+            font-size: 1rem;
+        }
+
+        /* Example theme overrides */
+        .image-with-text-widget.dark {
+            color: #fff;
+        }
+
+        .image-with-text-widget.light {
+            color: #000;
+        }
+</style>
