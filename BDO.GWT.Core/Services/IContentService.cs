@@ -1,11 +1,12 @@
 ﻿namespace BDO.GWT.Core
 {
+    using BDO.GWT.Core.ValueObjects;
+    using CMS.ContentEngine;
+    using CMS.Websites;    
     using System;
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
-    using CMS.ContentEngine;
-    using CMS.Websites;    
 
     public interface IContentReadOnlyQuery
     {
@@ -44,5 +45,17 @@
             Action<ContentItemQueryBuilder>? configure = null,
             CancellationToken cancellationToken = default)
             where T : class;
+
+        /// <summary>
+        /// Retrieves content items for multiple content types.
+        /// </summary>
+        Task<IReadOnlyList<object>> GetItemsByTypesAsync(
+            Type[] types, int currentPageData,
+            CancellationToken cancellationToken = default);
+
+
+        //Retrieve page based on GUID
+
+        Task<IEnumerable<IWebPageFieldsSource>> GetItemsByGUIDAsync(List<Guid> webPageItemGuidsfirst);
     }
 }

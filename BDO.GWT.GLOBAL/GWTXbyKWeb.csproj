@@ -3,10 +3,12 @@
     <TargetFramework Condition="'$(TargetFramework)' == ''">net10.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="kentico.xperience.admin" Version="31.1.2" />
-    <PackageReference Include="kentico.xperience.azurestorage" Version="31.1.2" />
-    <PackageReference Include="kentico.xperience.imageprocessing" Version="31.1.2" />
-    <PackageReference Include="kentico.xperience.webapp" Version="31.1.2" />
+    <Content Include="Properties\launchSettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Kentico.Xperience.Admin" Version="31.2.3" />
+    <PackageReference Include="kentico.xperience.azurestorage" Version="31.2.3" />
+    <PackageReference Include="kentico.xperience.imageprocessing" Version="31.2.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BDO.GWT.Core\BDO.GWT.Core.csproj" />

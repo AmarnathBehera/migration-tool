@@ -1,0 +1,41 @@
+﻿@using BDO.GWT.Global.Components.ViewComponents
+@using BDO.GWT.Web.Core.LiveSite.Components.ViewComponents
+@using BDO.GWT.Xperience
+@using GWTXbyKWeb.Components.ViewComponents
+@using Kentico.Activities.Web.Mvc
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Kentico.PageBuilder.Web.Mvc
+
+<!DOCTYPE html>
+<html class="scroll-smooth">
+<head id="head">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <partial name="_Favicon.cshtml" />
+    @(await Component.InvokeAsync<ScriptsHead>())
+
+    @RenderSection("styles", required: false)
+    @await (Component.InvokeAsync<StartScriptsHead>())
+    @await (Component.InvokeAsync<ScriptsWhenCookiesAccepted>())
+    @await (Component.InvokeAsync<MarketoMunchkincode>())
+    @Html.Kentico().ActivityLoggingScriptV2()
+    <page-builder-styles />
+</head>
+
+<body>
+    @await (Component.InvokeAsync<ScriptsTopBody>())
+
+    @RenderSection("styles", required: false)
+
+    @await(Component.InvokeAsync<Header>())
+
+    @RenderBody()
+@(await Component.InvokeAsync<Test>())
+@(await Component.InvokeAsync<Footer>())
+    <page-builder-scripts />
+
+    @await Html.Kentico().PageBuilderScriptsAsync()
+    @await (Component.InvokeAsync<ScriptsBottomBody>())
+
+</body>
+</html>
