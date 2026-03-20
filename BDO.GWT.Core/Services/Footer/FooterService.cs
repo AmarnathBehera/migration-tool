@@ -150,40 +150,20 @@ public class FooterService : IFooterService
     }
     private async Task<IEnumerable<SocialButtonDto>> GetSocialLinks()
     {
-        var socialLinksPages = (await _contentService.GetItemsAsync<FooterLinks>())
-            .Take(8)
-            .ToList();
+        var socialLinksPages = (await _contentService.GetItemsAsync<SocialLinks>())
+            .Take(8);
 
-        var socialPages = new List<SocialButtonDto>();
-
-        var allGuids = socialLinksPages
-            .Where(x => x.TargetURL != null)
-            .SelectMany(x => x.TargetURL.Select(t => t.WebPageGuid))
-            .Distinct()
-            .ToList();
-
-        var selectedPages = await _contentService.GetItemsByGUIDAsync(allGuids);
-
-        var pageUrlMap = selectedPages.ToDictionary(
-            p => p.SystemFields.ContentItemGUID,
-            p => p.GetUrl()?.RelativePath ?? string.Empty
-        );
-
-        foreach (var link in socialLinksPages)
-        {
-            var guid = link.TargetURL?.FirstOrDefault()?.WebPageGuid;
-
-            socialPages.Add(new SocialButtonDto
+        return socialLinksPages
+            .Select(link => new SocialButtonDto
             {
-                //AltText = link.AltText,
-                //AriaLabel = link.AriaLabel,
+                AltText = link.Alttext,
+                AriaLabel = link.AriaLabel,
                 //IconType = link.IconType,
-                //     CustomIcon = link.IconType == SocialLinkIconType.Custom ? link.CustomIcon : null,
-                //   Order = link.Order,
-                //    URL = link.Link.ToString(),
-            });
-        }
-
-        return socialPages;
+                //CustomIcon = link.IconType == "Custom" ? link.CustomIcon : null,
+                //Order = link.Order,
+                //URL = link.Link?.ToString() ?? "#"
+            })
+            .OrderBy(x => x.Order)
+            .ToList();
     }
 }
