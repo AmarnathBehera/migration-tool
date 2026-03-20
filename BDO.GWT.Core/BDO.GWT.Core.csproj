@@ -9,10 +9,4 @@
   <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Admin" Version="31.2.3" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Extensions\" />
-  </ItemGroup>
-
-	
 </Project>

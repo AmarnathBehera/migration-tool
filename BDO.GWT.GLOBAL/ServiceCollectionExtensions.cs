@@ -1,4 +1,6 @@
 ﻿using BDO.GWT.Core.Services;
+using BDO.GWT.Core.Services.Footer;
+using BDO.GWT.Core.Services.Header;
 using BDO.GWT.Domain.Services;
 using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Xperience;
