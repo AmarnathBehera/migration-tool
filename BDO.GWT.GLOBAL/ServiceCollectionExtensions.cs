@@ -2,6 +2,7 @@
 using BDO.GWT.Core.Services.Footer;
 using BDO.GWT.Core.Services.Header;
 using BDO.GWT.Domain.Services;
+using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Xperience;
 using BDO.GWT.Xperience.LiveSite.Services;
 using CMS.Core;
@@ -20,6 +21,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IHeaderService, HeaderService>();
         serviceCollection.AddScoped<IFooterService, FooterService>();
         serviceCollection.ConfigureOptions<RobotsOptionsSetup>();
+        serviceCollection.AddScoped<IPageContext, XperiencePageContext>();
     }
 
 }
