@@ -1,4 +1,4 @@
-﻿namespace BDO.GWT.Core.DTOs;
+﻿namespace BDO.GWT.Core.DTOs.Footer;
 
 public class FooterLinkDto : LinkItemDto
 {

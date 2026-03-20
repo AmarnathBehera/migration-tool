@@ -1,14 +1,8 @@
-﻿using BDO;
-using BDO.GWT.Core.DTOs;
+﻿using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Header;
-using BDO.GWT.Core.ValueObjects;
-using CMS.Base;
-using CMS.Helpers;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
-using Kentico.Content.Web.Mvc.Routing;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace BDO.GWT.Core.Services.Header;
 
@@ -20,21 +14,15 @@ public interface IHeaderService
 public class HeaderService : IHeaderService
 {
     private readonly IContentService _contentService;
-    private readonly IPreferredLanguageRetriever _currentLanguageRetriever;
-    private readonly IProgressiveCache _progressiveCache;
     private readonly IContentRetriever _contentRetriever;
     public readonly IHomePageService _homePageService;
-    private readonly IWebPageDataContextRetriever _webPageDataContextRetriever;
     private readonly IWebsiteCulturesService _websiteCulturesService;
     private readonly IWebsiteChannelContext _websiteChannel;
-    public HeaderService(IContentService contentService, IPreferredLanguageRetriever currentLanguageRetriever, IProgressiveCache progressiveCache, IContentRetriever contentRetriever, IHomePageService homePageService, IWebPageDataContextRetriever webPageDataContextRetriever, IWebsiteCulturesService websiteCulturesService, IWebsiteChannelContext websiteChannel)
+    public HeaderService(IContentService contentService ,IContentRetriever contentRetriever, IHomePageService homePageService, IWebsiteCulturesService websiteCulturesService, IWebsiteChannelContext websiteChannel)
     {
         _contentService = contentService;
-        _currentLanguageRetriever = currentLanguageRetriever;
-        _progressiveCache = progressiveCache;
         _contentRetriever = contentRetriever;
         _homePageService = homePageService;
-        _webPageDataContextRetriever = webPageDataContextRetriever;
         _websiteCulturesService = websiteCulturesService;
         _websiteChannel = websiteChannel;
     }
@@ -102,7 +90,7 @@ public class HeaderService : IHeaderService
             Title = p.MicrositeTitle,
             URL = p.GetUrl().AbsoluteUrl.ToString() ?? string.Empty
         }));
-        var contactPage = (await _contentRetriever.RetrievePages<HomePage>(
+        var contactPage = (await _contentRetriever.RetrievePages<Contact>(
            new RetrievePagesParameters
            { },
            query => query.OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
@@ -220,8 +208,6 @@ public class HeaderService : IHeaderService
                 Target = selectedPagesfirst.FirstOrDefault()?.GetUrl()?.AbsoluteUrl ?? string.Empty
             });
         }
-
         return megaMenu;
     }
-
 }

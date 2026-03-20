@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.Web.Core.LiveSite.Components.ViewComponents
+namespace BDO.GWT.Global.Components.ViewComponents
 {
     public class Header : ViewComponent
     {
