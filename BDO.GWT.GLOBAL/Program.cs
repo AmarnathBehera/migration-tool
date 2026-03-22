@@ -42,6 +42,7 @@ builder.Services.AddAuthentication();
 builder.Services.AddContentServices();
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddScoped<IPageBuilderService, PageBuilderService>();
+builder.Services.AddScoped<IContentService, ContentService>();
 
 builder.Services.AddXperience();
 builder.Services.AddControllersWithViews();

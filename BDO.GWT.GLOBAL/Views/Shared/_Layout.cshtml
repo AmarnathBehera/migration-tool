@@ -1,11 +1,14 @@
 ﻿@using BDO.GWT.Global.Components.ViewComponents
 @using BDO.GWT.Web.Core.LiveSite.Components.ViewComponents
 @using BDO.GWT.Xperience
+@using CMS.Websites.Routing
 @using GWTXbyKWeb.Components.ViewComponents
 @using Kentico.Activities.Web.Mvc
+@using Kentico.Content.Web.Mvc
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using Kentico.PageBuilder.Web.Mvc
-
+@inject IContentRetriever contentRetriever;
+@inject IWebsiteChannelContext websiteChannelContext;
 <!DOCTYPE html>
 <html class="scroll-smooth">
 <head id="head">

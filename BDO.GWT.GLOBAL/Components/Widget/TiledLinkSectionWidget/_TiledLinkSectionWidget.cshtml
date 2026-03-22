@@ -1,8 +1,39 @@
-﻿@* @inject IReactHelper ReactHelper
-@using BDO.GWT.Web.Core.LiveSite.Helpers
-@model BDO.GWT.Web.Core.DTOs.TiledLinkSectionDto
+﻿@using BDO.GWT.Web.Core.LiveSite.Data
+@model TiledLinkSectionData
 
-@ReactHelper.RenderComponent(Html, "TiledLinkSection", new {
-    TiledLinkSection = Model,
-})
- *@
+
+    <!-- Section Title -->
+@if (!string.IsNullOrEmpty(Model.Description))
+{
+ <h2 style="color: #333; font-size: 2em; margin-bottom: 0.5em;">@Model.Title</h2>
+ }
+    <!-- Section Description -->
+    @if (!string.IsNullOrEmpty(Model.Description))
+    {
+        <p style="color: #555; font-size: 1em; margin-bottom: 1.5em;">@Model.Description</p>
+    }
+
+    <!-- Tiles Container -->
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;">
+       @if (Model.TileNodeGuids != null)
+{
+        foreach (var tile in Model.TileNodeGuids)
+        {
+        <div>
+            @tile.Title
+        </div>
+        } 
+}
+    </div>
+
+    <!-- See All Link -->
+    @if (!string.IsNullOrEmpty(Model.BackgroundImageMediaFileGuid))
+    {
+   
+    
+        <div style="margin-top: 2em;">
+        <img src="@Model.BackgroundImageMediaFileGuid" alt="@Model.BackgroundImageMediaFileGuid" class="img-fluid" />
+
+        </div>
+    }
+</div> 
