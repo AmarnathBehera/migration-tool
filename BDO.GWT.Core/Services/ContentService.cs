@@ -236,23 +236,26 @@
             // This example demonstrates how to retrieve content items of multiple content types
             string languageName = "en";
             int maxLevel = 1;
-          //  string[] contentTypeNames = contentTypes.Select(t => t.Name).ToArray();
+            //  string[] contentTypeNames = contentTypes.Select(t => t.Name).ToArray();
+
+#pragma warning disable CS8619 // Nullability of reference types in value doesn't match target type.
             string[] contentTypeNames = contentTypes
        .Select(t => t.GetField("CONTENT_TYPE_NAME")?.GetValue(null)?.ToString())
        .Where(name => !string.IsNullOrEmpty(name))
        .ToArray();
-            ContentItemQueryBuilder builder =
-                    new ContentItemQueryBuilder()
-                            .ForContentTypes(subqueryParameters =>
+#pragma warning restore CS8619 // Nullability of reference types in value doesn't match target type.
+
+
+            ContentItemQueryBuilder builder =  new ContentItemQueryBuilder().ForContentTypes(subqueryParameters =>
                             {
                                 subqueryParameters
                                  .OfContentType(contentTypeNames)
-                                .WithContentTypeFields()
+                                //.WithContentTypeFields()
                                 .WithLinkedItems(maxLevel);
-                            })//.InLanguage(languageName)
+                               })//.InLanguage(languageName)
                               .Parameters(subqueryParameters => {
                                   subqueryParameters.Where(w => w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
-                             //     subqueryParameters.OrderBy(new OrderByColumn("ProductRating", OrderDirection.Descending));
+                             
                               });
 
 
