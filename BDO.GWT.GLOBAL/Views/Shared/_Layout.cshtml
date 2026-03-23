@@ -13,11 +13,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="UTF-8" />
     @{
-            var metaDto = await PageContext.GetCurrentPageMetadataAsync();            
-     }
+        var metaDataSeoDto = await PageContext.GetCurrentPageMetadataAsync();
     }
-    <title>@metaDto.MetaTitle</title>
-    <meta name="description" content="@metaDto.MetaDescription" />
+    
+    <title>@metaDataSeoDto.MetaData.MetaTitle</title>
+    <meta name="description" content="@metaDataSeoDto.MetaData.MetaDescription" />
     <partial name="_Favicon.cshtml" />
 
     <style>

@@ -1,4 +1,5 @@
-﻿using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
+﻿using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
 using BDO.GWT.Core.Services;
 using CMS.Base;
 using CMS.ContentEngine;
@@ -70,7 +71,7 @@ public class XperiencePageContext : IPageContext
 
 
     // Pull from the WebPageItemInfo fields that are available.
-    public async Task<MetaDataDto> GetCurrentPageMetadataAsync(CancellationToken cancellationToken = default)
+    public async Task<MetaDataSEOItemsDto> GetCurrentPageMetadataAsync(CancellationToken cancellationToken = default)
     {
        
         var canRetrieve = _webPageDataContextRetriever.TryRetrieve(out var ctx);
@@ -78,7 +79,7 @@ public class XperiencePageContext : IPageContext
         
         if (!canRetrieve || ctx.WebPage == null)
         {
-            return new MetaDataDto();
+            return new MetaDataSEOItemsDto();
         }
 
         
@@ -94,15 +95,36 @@ public class XperiencePageContext : IPageContext
 
         var result = await _queryExecutor.GetWebPageResult(
             query,
-            item => new MetaDataDto
+            item => new MetaDataSEOItemsDto
             {
-                MetaTitle = item.GetValue<string>("MetadataTitle"),
-                MetaDescription = item.GetValue<string>("MetadataDescription") 
+                MetaData = new MetaDataDto
+                {
+                    MetaTitle = item.TryGetValue("MetadataTitle", out string? metaTitle) ? metaTitle : null,
+                    MetaDescription = item.TryGetValue("MetadataDescription", out string? metaDesc) ? metaDesc : null,
+                    MetaTeaserImageAltText = item.TryGetValue("MetaTeaserImageAltText", out string? metaTeaserImageAltText) ? metaTeaserImageAltText : null,
+                    MetaCanonical = item.TryGetValue("MetaCanonical", out string? metaCanonical) ? metaCanonical : null
+                },
+
+                OGMetaData = new OGMetaDataDto
+                {
+                    // map your OG fields here
+                    MetadataOGTitle = item.TryGetValue("MetadataOGTitle", out string? ogTitle) ? ogTitle : null,
+                    MetadataOGDescription = item.TryGetValue("MetadataOGDescription", out string? ogDesc) ? ogDesc : null
+                    
+                },
+
+                SEOItemsDto = new SearchAndSEODto
+            {
+                    // map your SEO fields here
+                    IncludeInSitemap = item.TryGetValue("IncludeInSitemap", out bool includeInSitemap) ? includeInSitemap : false,
+                    MetadataNofollow = item.TryGetValue("MetadataNofollow", out bool metadataNofollow) ? metadataNofollow : false,
+                    MetadataNoindex = item.TryGetValue("MetadataNoindex", out bool metadataNoindex) ? metadataNoindex : false
+                }
             },
             new ContentQueryExecutionOptions(),
             cancellationToken);
 
-       var curPageMeta = result.FirstOrDefault() ?? new MetaDataDto();
+       var curPageMeta = result.FirstOrDefault() ?? new MetaDataSEOItemsDto();
 
         return curPageMeta;
     }
