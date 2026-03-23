@@ -55,7 +55,7 @@ public class FooterService : IFooterService
                 IconType = link.IconType,
                 //     CustomIcon = link.IconType == SocialLinkIconType.Custom ? link.CustomIcon : null,
                 Order = link.Order,
-                //    URL = link.Link.ToString(),
+                URL = link.URL.ToString(),
             }).OrderBy(o => o.Order).Take(5).ToList(),
         };
 
@@ -64,7 +64,7 @@ public class FooterService : IFooterService
 
     private async Task<Link?> GetSubscribePageLinkAsync(CancellationToken cancellationToken)
     {
-        var subscribePages = await _contentService.GetContentType<HomePage>(cancellationToken);
+        var subscribePages = await _contentService.GetContentType<Subscribe>(cancellationToken);
         var subscribePage = subscribePages.FirstOrDefault();
         if (subscribePage is null)
         {
@@ -84,31 +84,28 @@ public class FooterService : IFooterService
 
     private async Task<List<FooterLinkDto>> GetMandatoryFooterLinkDtosAsync(CancellationToken cancellationToken)
     {
-        Type[] types = MandatoryPageTypesWithOrders.Select(t => t.PageType).ToArray();
-      //  Type[] types = { typeof(HomePage) };
+        var typeList = MandatoryPageTypesWithOrders.ToList();
 
-        var pages = await _contentService.RetrieveContentItemsOfContentTypes(types);
-
-        var pageByType = pages.DistinctBy(d => d.GetType()).ToDictionary(x => x.GetType(), x => x);
-
-        var mandatoryFooterLinkDtos = new List<FooterLinkDto>();
-
-        foreach (var (pageType, order) in MandatoryPageTypesWithOrders)
+        var pages = (await _contentService
+            .RetrieveContentItemsOfContentTypes(typeList.Select(t => t.PageType).ToArray()))
+            .ToList();
+        var typeOrderMap = MandatoryPageTypesWithOrders.ToDictionary(t => t.PageType.GetField("CONTENT_TYPE_NAME")?
+                                                                                    .GetValue(null)?.ToString(),
+                                                                                     t => t.Order);
+        var result = pages.Select(page =>
         {
-            if (!pageByType.TryGetValue(pageType, out var page)) continue;
-
-            var footerLinkDto = new FooterLinkDto
+            return new FooterLinkDto
             {
-                Title = page.MetadataTitle,
+                Title = page.MetadataTitle ?? string.Empty,
                 OpenInNewTab = false,
-                Order = order,
-                URL = page.SystemFields.WebPageUrlPath.ToString()
+                Order = page.ContentTypeName != null && typeOrderMap.TryGetValue(page.ContentTypeName, out var order) ? order : 0,
+                URL = page.SystemFields.WebPageUrlPath?.ToString() ?? string.Empty
             };
+        })
+        .OrderBy(x => x.Order)
+        .ToList();
 
-            mandatoryFooterLinkDtos.Add(footerLinkDto);
-        }
-
-        return mandatoryFooterLinkDtos;
+        return result;
     }
     private async Task<IEnumerable<FooterLinkDto>> GetFooterLinks()
     {
@@ -127,41 +124,40 @@ public class FooterService : IFooterService
         var selectedPages = await _contentService.GetItemsByGUIDAsync(allGuids);
 
         var pageUrlMap = selectedPages.ToDictionary(
-            p => p.SystemFields.ContentItemGUID,
+            p => p.SystemFields.WebPageItemGUID,
             p => p.GetUrl()?.RelativePath ?? string.Empty
         );
-
+        int order = -4;
         foreach (var link in footerLinksPages)
         {
             var guid = link.TargetURL?.FirstOrDefault()?.WebPageGuid;
 
             footerPages.Add(new FooterLinkDto
             {
-                OpenInNewTab = true,//link.OpenInNewTab,
-                                    //   Order = link.Order,
+                OpenInNewTab = link.OpenInNewTab,
+                Order = order--,
                 Title = link.Title,
                 URL = guid != null && pageUrlMap.ContainsKey(guid.Value)
                     ? pageUrlMap[guid.Value]
                     : string.Empty
             });
         }
-
         return footerPages;
     }
     private async Task<IEnumerable<SocialButtonDto>> GetSocialLinks()
     {
         var socialLinksPages = (await _contentService.GetItemsAsync<SocialLinks>())
             .Take(8);
-
+        int order = 1;
         return socialLinksPages
             .Select(link => new SocialButtonDto
             {
                 AltText = link.Alttext,
                 AriaLabel = link.AriaLabel,
-                //IconType = link.IconType,
+                IconType = link.Icontype,
                 //CustomIcon = link.IconType == "Custom" ? link.CustomIcon : null,
-                //Order = link.Order,
-                //URL = link.Link?.ToString() ?? "#"
+                Order = order++,
+                URL = link.Url?.ToString() ?? "#"
             })
             .OrderBy(x => x.Order)
             .ToList();

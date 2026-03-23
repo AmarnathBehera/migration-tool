@@ -27,6 +27,36 @@
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
+      <field column="Icontype" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="840d5dac-e409-404d-8da1-1db702eb2872" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Icon type</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.DropDownSelector</controlname>
+          <Options>
+<![CDATA[
+facebook;Facebook
+instagram;Instagram
+youtube;YouTube
+twitter;Twitter
+linkedin;LinkedIn
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+      </field>
+      <field column="Url" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="c9b8296d-9550-49aa-a285-63ed169f8d27" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Url</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
     </form>
   </ClassFormDefinition>
   <ClassGUID>464907cb-9fcf-4b70-b838-9c3a229c59af</ClassGUID>

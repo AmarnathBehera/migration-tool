@@ -45,5 +45,17 @@ namespace BDO
 		/// AriaLabel.
 		/// </summary>
 		public string AriaLabel { get; set; }
+
+
+		/// <summary>
+		/// Icontype.
+		/// </summary>
+		public string Icontype { get; set; }
+
+
+		/// <summary>
+		/// Url.
+		/// </summary>
+		public string Url { get; set; }
 	}
 }

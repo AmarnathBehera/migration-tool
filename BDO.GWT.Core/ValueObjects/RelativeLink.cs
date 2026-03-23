@@ -23,7 +23,7 @@ public record RelativeLink : Link
 
         return uriString;
     }
-    
+
     public override string ToHtmlCompatibleString()
     {
         return ToString().TrimStart('~');

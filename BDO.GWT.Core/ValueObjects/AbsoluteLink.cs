@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BDO.GWT.Core.Utilities;
+using System;
 
 namespace BDO.GWT.Core.ValueObjects;
 
@@ -46,7 +47,7 @@ public record AbsoluteLink : Link
             UserInfo = absoluteLink.UserInfo,
             HostName = absoluteLink.HostName,
             Port = absoluteLink.Port,
-            Path =absoluteLink.Path+" "+link.Path, //UriUtility.CombinePaths(absoluteLink.Path, link.Path),
+            Path = UriUtility.CombinePaths(absoluteLink.Path, link.Path),
             Query = link.Query,
             Hash = link.Hash,
         };
