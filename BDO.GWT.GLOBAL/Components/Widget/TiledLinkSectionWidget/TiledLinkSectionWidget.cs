@@ -1,6 +1,7 @@
 ﻿using BDO;
 using BDO.GWT.Core;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.Services.Widget;
 using BDO.GWT.Web.Core.LiveSite.Data;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWidget;
 using CMS.ContentEngine;
@@ -29,74 +30,67 @@ namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWid
     public class TiledLinkSectionWidget : ViewComponent
     {
         private readonly IContentRetriever _contentRetriever;
+        private readonly ITileContentService _tileContentService;
 
-        public TiledLinkSectionWidget(IContentRetriever contentRetriever)
+        public TiledLinkSectionWidget(
+            IContentRetriever contentRetriever,
+            ITileContentService tileContentService)
         {
             _contentRetriever = contentRetriever;
+            _tileContentService = tileContentService;
         }
 
-        public async Task<ViewViewComponentResult> InvokeAsync(ComponentViewModel<TiledLinkSectionWidgetProperties> model)
+        public async Task<ViewViewComponentResult> InvokeAsync(
+            ComponentViewModel<TiledLinkSectionWidgetProperties> model)
         {
             var cancellationToken = HttpContext?.RequestAborted ?? CancellationToken.None;
 
             var tilePages = new List<TilePageDto>();
 
-            // ✅ Background Image
-            var image = await GetImage(model.Properties, cancellationToken);
-
-            // ✅ Content Retrieval
-            if (model.Properties?.TilePages != null && model.Properties.TilePages.Any())
+            if (model?.Properties?.TilePages != null && model.Properties.TilePages.Any())
             {
-                var multipleContentTypes = new[]
-                {
-                    HomePage.CONTENT_TYPE_NAME,
-                    Navigation.CONTENT_TYPE_NAME
-                };
-
                 var guids = model.Properties.TilePages
                     .Where(x => x.Identifier != Guid.Empty)
                     .Select(x => x.Identifier)
                     .ToList();
 
-                if (guids.Any())
-                {
-                    var contentItems = await _contentRetriever
-                        .RetrieveContentOfContentTypesByGuids<IContentItemFieldsSource>(
-                            multipleContentTypes,
-                            guids,
-                            cancellationToken
-                        );
-
-                    tilePages = contentItems.Select(x => new TilePageDto
-                    {
-                        Title = x.SystemFields.ContentItemName,
-                    }).ToList();
-                }
+                tilePages = await _tileContentService
+                    .GetTilePagesAsync(guids, cancellationToken);
             }
 
-            // ✅ Final Model
+            
+            var image = await GetImage(model.Properties, cancellationToken);
+
+            
             var data = new TiledLinkSectionData
             {
                 Title = model.Properties?.Title,
                 Description = model.Properties?.Description,
+
                 BackgroundImageMediaFileGuid = image?.MediaFile?.Url,
                 BackgroundImageAltText = model.Properties?.BackgroundImageAltText,
+
                 Theme = model.Properties?.Theme,
+
                 SeeAllLinkText = model.Properties?.SeeAllLinkText,
                 SeeAllLinkUrl = model.Properties?.SeeAllLinkURL,
                 SeeAllLinkURLTarget = model.Properties?.SeeAllLinkURLTarget,
+
                 TopMargin = model.Properties?.TopMargin,
                 BottomMargin = model.Properties?.BottomMargin,
 
                 TileNodeGuids = tilePages
-            }; 
-            return View("~/Components/Widget/TiledLinkSectionWidget/_TiledLinkSectionWidget.cshtml", data);
+            };
+
+            return View(
+                "~/Components/Widget/TiledLinkSectionWidget/_TiledLinkSectionWidget.cshtml",
+                data
+            );
         }
 
-        // =========================
-        // ✅ IMAGE RETRIEVAL
-        // =========================
-        private async Task<MigratedMediaFile> GetImage(TiledLinkSectionWidgetProperties properties, CancellationToken cancellationToken)
+        private async Task<MigratedMediaFile> GetImage(
+            TiledLinkSectionWidgetProperties properties,
+            CancellationToken cancellationToken)
         {
             var imageGuid = properties?.BackgroundImages?.FirstOrDefault();
 

@@ -1,5 +1,6 @@
 ﻿
 using AngleSharp.Dom;
+using BDO.GWT.Core.DTOs;
 using CMS.ContentEngine;
 using Kentico.Xperience.Admin.Base;
 using System;
@@ -31,9 +32,4 @@ public class TiledLinkSectionData
 
     public string BottomMargin { get; set; } = null!;
     public List<TilePageDto> TileNodeGuids { get; set; }
-}
-public class TilePageDto
-{
-    public string Title { get; set; }
-    public string Url { get; set; }
 }

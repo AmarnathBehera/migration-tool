@@ -27,8 +27,8 @@ public class TiledLinkSectionWidgetProperties : IWidgetProperties
     [TextInputComponent(Label = "Background image alt text", Order = 3)]
     public string BackgroundImageAltText { get; set; } = "";
 
-    [DropDownComponent(Label = "Tile page type", Order = 4, Options = "HomePage,Test")]
-    public string TilePageType { get; set; }
+    //[DropDownComponent(Label = "Tile page type", Order = 4, Options = "HomePage,Test")]
+    //public string TilePageType { get; set; }
  
     [ContentItemSelectorComponent(new string[] { HomePage.CONTENT_TYPE_NAME }, Label = "Tile pages", Order = 5)]
     public IEnumerable<ContentItemReference> TilePages { get; set; } = new List<ContentItemReference>();

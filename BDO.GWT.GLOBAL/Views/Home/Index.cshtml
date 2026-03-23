@@ -23,12 +23,12 @@
 }
 
 <div>
-    @* Editable area for Page Builder *@
+  
     @await Html.Kentico().EditableAreaAsync(
     "mainContent", // Unique identifier
         new EditableAreaOptions
         {
-            // AllowedSections = sectionsList,
+          
             AllowedWidgets = widgetsList
         })
 </div>
