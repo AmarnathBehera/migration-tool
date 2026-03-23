@@ -233,14 +233,12 @@
 
         public async Task<IEnumerable<Dto>> RetrieveContentItemsOfContentTypes(Type[] contentTypes)
         {
-            // This example demonstrates how to retrieve content items of multiple content types
             string languageName = "en";
             int maxLevel = 1;
-          //  string[] contentTypeNames = contentTypes.Select(t => t.Name).ToArray();
-            string[] contentTypeNames = contentTypes
-       .Select(t => t.GetField("CONTENT_TYPE_NAME")?.GetValue(null)?.ToString())
-       .Where(name => !string.IsNullOrEmpty(name))
-       .ToArray();
+
+            string[] contentTypeNames = contentTypes.Select(t => t.GetField("CONTENT_TYPE_NAME")?.GetValue(null)?.ToString())
+                .Where(name => !string.IsNullOrEmpty(name))
+                .ToArray();
             ContentItemQueryBuilder builder =
                     new ContentItemQueryBuilder()
                             .ForContentTypes(subqueryParameters =>
@@ -248,38 +246,30 @@
                                 subqueryParameters
                                  .OfContentType(contentTypeNames)
                                 .WithContentTypeFields()
+                                .WithWebPageData()
                                 .WithLinkedItems(maxLevel);
                             })//.InLanguage(languageName)
                               .Parameters(subqueryParameters => {
                                   subqueryParameters.Where(w => w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
                              //     subqueryParameters.OrderBy(new OrderByColumn("ProductRating", OrderDirection.Descending));
                               });
-
-
-            // Executes the query specified in 'builder' and binds it using the logic in 'ModelBinder'.
-            // The second argument of the 'GetResult' method is a delegate function used to specify the mapping behavior.
-            IEnumerable<Dto> result =
-                    await _contentQueryExecutor
-                            .GetResult(builder, ModelBinder);
+            IEnumerable<Dto> result = await _contentQueryExecutor.GetResult(builder, ModelBinder);
             return result;
 
         }
-
-
         private Dto ModelBinder(IContentQueryDataContainer container)
         {
-            // Maps column data to corresponding properties of the custom model class based on matching names. For the example 'Dto' object,
-            // only columns named 'Name', 'ProductRating' and 'ShortDescription' get mapped in addition to
-            // 'SystemFields'. All other fields of content types are ignored.
-            return _contentQueryModelTypeMapper.Map<Dto>(container);
-        }
+            var dto = _contentQueryModelTypeMapper.Map<Dto>(container);
 
+            dto.ContentTypeName = container.ContentTypeName;
+
+            return dto;
+        }
         public class Dto
         {
-            // Maps Xperience-specific fields
             public WebPageFields SystemFields { get; set; }
-            // Maps the 'Name' column from the database
             public string MetadataTitle { get; set; }
+            public string ContentTypeName { get; set; }
         }
     }
 }

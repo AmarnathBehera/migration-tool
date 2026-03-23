@@ -1,4 +1,4 @@
-﻿using System;
+﻿using BDO.GWT.Core.Utilities;
 using System.Diagnostics.CodeAnalysis;
 
 namespace BDO.GWT.Core.ValueObjects;
@@ -30,7 +30,7 @@ public abstract record Link
             link = new AbsoluteLink
             {
                 Scheme = uri.Scheme,
-                SlashesAfterColon = "uri",//UriUtility.ExtractSlashesAfterColon(uri),
+                SlashesAfterColon = UriUtility.ExtractSlashesAfterColon(uri),
                 UserInfo = string.IsNullOrEmpty(uri.UserInfo) ? null : uri.UserInfo,
                 HostName = uri.Host,
                 Port = port,
@@ -42,9 +42,9 @@ public abstract record Link
         else
         {
             var baseUri = new Uri("https://localhost");
-            var absoluteUri = new Uri(baseUri, uri);
+            var absolutizedUri = new Uri(baseUri, uri);
 
-            var (path, query, hash) = ExtractRelativeUriParameters(absoluteUri);
+            var (path, query, hash) = ExtractRelativeUriParameters(absolutizedUri);
 
             link = new RelativeLink
             {
