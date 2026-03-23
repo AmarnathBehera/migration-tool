@@ -248,10 +248,10 @@
                                 .WithContentTypeFields()
                                 .WithWebPageData()
                                 .WithLinkedItems(maxLevel);
-                            })//.InLanguage(languageName)
+                               })//.InLanguage(languageName)
                               .Parameters(subqueryParameters => {
                                   subqueryParameters.Where(w => w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
-                             //     subqueryParameters.OrderBy(new OrderByColumn("ProductRating", OrderDirection.Descending));
+                             
                               });
             IEnumerable<Dto> result = await _contentQueryExecutor.GetResult(builder, ModelBinder);
             return result;

@@ -1,9 +1,10 @@
-﻿using BDO.GWT.Core;
+﻿using BDO;
+using BDO.GWT.Core;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
-using BDO;
 using CMS.ContentEngine;
 using CMS.Websites;
+using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Org.BouncyCastle.Security;
 using System;
@@ -29,14 +30,15 @@ public class HomePageService : IHomePageService
     private readonly IContentQueryExecutor _executor;
     private readonly IWebPageDataContextRetriever _webPageDataContextRetriever;
     private readonly IContentRetriever _contentretriever;
-
+    private readonly IWebsiteChannelContext _websiteChannelContext;
     public HomePageService(IContentService pageRetriever, IContentQueryExecutor executor,
-        IWebPageDataContextRetriever webPageDataContextRetriever, IContentRetriever contentretriever    )
+        IWebPageDataContextRetriever webPageDataContextRetriever, IContentRetriever contentretriever, IWebsiteChannelContext websiteChannelContext)
     {
         _contentRetriever = pageRetriever;
         _executor = executor;
         _webPageDataContextRetriever = webPageDataContextRetriever;
         _contentretriever = contentretriever;
+        _websiteChannelContext = websiteChannelContext;
     }
 
     public async Task<HomeDto> GetHomePageDtoAsync(HomePage page, CancellationToken cancellationToken = default)
@@ -52,7 +54,8 @@ public class HomePageService : IHomePageService
 
         var options = new ContentQueryExecutionOptions
         {
-            ForPreview = false
+            ForPreview = _websiteChannelContext.IsPreview
+
         };
 
         var results = await _executor.GetMappedWebPageResult<HomePage>(
