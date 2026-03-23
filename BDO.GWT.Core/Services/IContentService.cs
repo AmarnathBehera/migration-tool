@@ -7,6 +7,7 @@
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
+    using static BDO.GWT.Core.ContentService;
 
     public interface IContentReadOnlyQuery
     {
@@ -53,9 +54,20 @@
             Type[] types, int currentPageData,
             CancellationToken cancellationToken = default);
 
-
+        /// <summary>
         //Retrieve page based on GUID
-
+        /// </summary>
         Task<IEnumerable<IWebPageFieldsSource>> GetItemsByGUIDAsync(List<Guid> webPageItemGuidsfirst);
+
+        /// <summary>
+        //Retrieve page 
+        /// </summary>
+        Task<IEnumerable<T>> GetContentType<T>(CancellationToken cancellationToken = default) where T : class, IWebPageFieldsSource;
+
+        /// <summary>
+        //Retrieve multipages based on current channel and language
+        /// </summary>
+
+        Task<IEnumerable<Dto>> RetrieveContentItemsOfContentTypes(Type[] contentTypes);
     }
 }

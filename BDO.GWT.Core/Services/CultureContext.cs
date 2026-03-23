@@ -1,6 +1,8 @@
 ﻿using System.Globalization;
 using Kentico.Content.Web.Mvc.Routing;
 
+namespace BDO.GWT.Core.Services;
+
 public interface ICultureContext
 {
     public string CurrentLanguageTag { get; }
