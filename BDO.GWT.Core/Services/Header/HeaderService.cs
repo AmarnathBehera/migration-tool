@@ -82,13 +82,13 @@ public class HeaderService : IHeaderService
         topMenuItems.AddRange(homePages.Select(p => new LinkItemDto
         {
             Title = p.MetadataTitle,
-            URL = p.GetUrl().AbsoluteUrl
+            URL = p.GetUrl().RelativePath
         }));
 
         topMenuItems.AddRange(microsites.Select(p => new LinkItemDto
         {
             Title = p.MicrositeTitle,
-            URL = p.GetUrl().AbsoluteUrl.ToString() ?? string.Empty
+            URL = p.GetUrl().RelativePath.ToString() ?? string.Empty
         }));
         var contactPage = (await _contentRetriever.RetrievePages<Contact>(
            new RetrievePagesParameters
@@ -99,8 +99,8 @@ public class HeaderService : IHeaderService
        )).FirstOrDefault();
         var linkItemDto = new LinkItemDto
         {
-            Title = contactPage?.MetadataTitle,
-            URL = contactPage?.GetUrl().AbsoluteUrl.ToString() ?? string.Empty
+            Title = contactPage?.MetadataTitle ?? string.Empty,
+            URL = contactPage?.GetUrl().RelativePath.ToString() ?? string.Empty
         };
 
         return (topMenuItems, linkItemDto);
@@ -183,7 +183,7 @@ public class HeaderService : IHeaderService
                     thirdLevelDtos.Add(new ThirdLevelMenuItemDto
                     {
                         Title = third.Title,
-                        URL = selectedPagesThird.FirstOrDefault()?.GetUrl()?.AbsoluteUrl ?? string.Empty
+                        URL = selectedPagesThird.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty
                     });
                 }
 
@@ -191,7 +191,7 @@ public class HeaderService : IHeaderService
                 {
                     Title = second.Title,
                     Children = thirdLevelDtos,
-                    URL = selectedPagesSecond.FirstOrDefault()?.GetUrl()?.AbsoluteUrl ?? string.Empty
+                    URL = selectedPagesSecond.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty
                 });
             }
 
@@ -205,7 +205,7 @@ public class HeaderService : IHeaderService
                 Title = first.Title,
                 Children = secondLevelDtos,
                 Featured = featuredDtos,
-                Target = selectedPagesfirst.FirstOrDefault()?.GetUrl()?.AbsoluteUrl ?? string.Empty
+                Target = selectedPagesfirst.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty
             });
         }
         return megaMenu;
