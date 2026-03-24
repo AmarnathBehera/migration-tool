@@ -15,7 +15,7 @@ namespace BDO
     /// <summary>
     /// Data container class for <see cref="WebChannelSnippetInfo"/>.
     /// </summary>
-    public partial class WebChannelSnippetInfo : AbstractInfo<WebChannelSnippetInfo, IInfoProvider<WebChannelSnippetInfo>>, IInfoWithId, IInfoWithName
+    public partial class WebChannelSnippetInfo : AbstractInfo<WebChannelSnippetInfo, IInfoProvider<WebChannelSnippetInfo>>, IInfoWithId
     {
         /// <summary>
         /// Object type.
@@ -27,7 +27,7 @@ namespace BDO
         /// Type information.
         /// </summary>
 #warning "You will need to configure the type info."
-        public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(IInfoProvider<WebChannelSnippetInfo>), OBJECT_TYPE, "BDO.WebChannelSnippet", "WebChannelSnippetID", null, null, "WebChannelSnippetCodeName", "WebChannelSnippetDisplayName", null, null, null)
+        public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(IInfoProvider<WebChannelSnippetInfo>), OBJECT_TYPE, "BDO.WebChannelSnippet", "WebChannelSnippetID", null, null, null, "WebChannelSnippetDisplayName", null, null, null)
         {
             TouchCacheDependencies = true,
             DependsOn = new List<ObjectDependency>()
@@ -55,7 +55,7 @@ namespace BDO
         public virtual string WebChannelSnippetType
         {
             get => ValidationHelper.GetString(GetValue(nameof(WebChannelSnippetType)), String.Empty);
-            set => SetValue(nameof(WebChannelSnippetType), value);
+            set => SetValue(nameof(WebChannelSnippetType), value, String.Empty);
         }
 
 
@@ -66,7 +66,7 @@ namespace BDO
         public virtual string WebChannelSnippetCode
         {
             get => ValidationHelper.GetString(GetValue(nameof(WebChannelSnippetCode)), String.Empty);
-            set => SetValue(nameof(WebChannelSnippetCode), value);
+            set => SetValue(nameof(WebChannelSnippetCode), value, String.Empty);
         }
 
 
@@ -100,6 +100,17 @@ namespace BDO
         {
             get => ValidationHelper.GetString(GetValue(nameof(WebChannelSnippetCodeName)), String.Empty);
             set => SetValue(nameof(WebChannelSnippetCodeName), value);
+        }
+
+
+        /// <summary>
+        /// Webchannel code name.
+        /// </summary>
+        [DatabaseField]
+        public virtual string WebchannelCodeName
+        {
+            get => ValidationHelper.GetString(GetValue(nameof(WebchannelCodeName)), String.Empty);
+            set => SetValue(nameof(WebchannelCodeName), value);
         }
 
 
