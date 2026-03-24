@@ -68,12 +68,12 @@ public class HomePageService : IHomePageService
             return null;
         }
 
-        //var homeHeroSlides = await RetrieveHomeHeroSlidesDtoAsync(homePage, cancellationToken);
+        var homeHeroSlides = await RetrieveHomeHeroSlidesDtoAsync(homePage, cancellationToken);
         //var trendingTopics = await RetrieveTrendingTopicsDtoAsync(homePage, cancellationToken);
 
         return new HomeDto
         {
-            //HomeHeroSlides = homeHeroSlides,
+            HomeHeroSlides = homeHeroSlides,
             //TrendingTopics = trendingTopics
             MetaData = new MetaDataDto
             {
@@ -141,4 +141,36 @@ public class HomePageService : IHomePageService
 
         return homePageUrl;
     }
+
+
+    public async Task<IEnumerable<HomeHeroSlideDto>> RetrieveHomeHeroSlidesDtoAsync(HomePage homePage, CancellationToken cancellationToken)
+    {
+
+
+        var homeHeroSlides = await _contentretriever.RetrievePages<HomeHeroSlide>(new RetrievePagesParameters
+        {
+            LinkedItemsMaxLevel = 3
+        }, cancellationToken);
+
+        var homeHeroSlidesdto = homeHeroSlides.Select(homeHeroSlide => new HomeHeroSlideDto
+        {
+            Title = homeHeroSlide.Title,
+            Description = homeHeroSlide.Description,
+            ImageURL = homeHeroSlide.Image_Mobile?.FirstOrDefault()?.LegacyAttachmentAsset.Url,
+            ImageAltText = homeHeroSlide.ImageAltText,
+            MobileImageURL = homeHeroSlide.Image_Mobile?.FirstOrDefault()?.LegacyAttachmentAsset.Url,
+            MobileImageAltText = homeHeroSlide.Image_MobileAltText,
+            ThumbnailImageURL = homeHeroSlide.Image_Thumbnail?.FirstOrDefault()?.LegacyAttachmentAsset?.Url,
+            ThumbnailImageAltText = homeHeroSlide.Image_ThumbnailAltText,
+            Button = homeHeroSlide.CTAButtonText != null && homeHeroSlide.CTAButtonUrl != null ? new LinkItemDto
+            {
+                Title = homeHeroSlide.CTAButtonText,
+                URL = homeHeroSlide.CTAButtonUrl,
+            } : null,
+        }).ToList();
+
+
+        return homeHeroSlidesdto;
+    }
 }
+
