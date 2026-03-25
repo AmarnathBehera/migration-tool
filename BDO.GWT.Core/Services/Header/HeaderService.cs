@@ -219,22 +219,22 @@ public class HeaderService : IHeaderService
                 : Enumerable.Empty<IWebPageFieldsSource>();
 
 
-            string imageUrl = string.Empty;
-            if (featured.FeaturedImageFile != null)
-            {
-                var firstAttachment = featured.FeaturedImageFile.FirstOrDefault();
-                if (firstAttachment?.LegacyAttachmentAsset != null)
-                {
-                    imageUrl = firstAttachment.LegacyAttachmentAsset.Url ?? string.Empty;
-                }
-            }
+            //string imageUrl = string.Empty;
+            //if (featured.FeaturedImageFile != null)
+            //{
+            //    var firstAttachment = featured.FeaturedImageFile.FirstOrDefault();
+            //    if (firstAttachment?.LegacyAttachmentAsset != null)
+            //    {
+            //        imageUrl = firstAttachment.LegacyAttachmentAsset.Url ?? string.Empty;
+            //    }
+            //}
 
             featuredDtos.Add(new FeaturedMenuItemDto
             {
                 Title = featured.Title ?? string.Empty,
                 Description = featured.Description ?? string.Empty,
                 URL = selectedPagesFeatured.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty,
-                ImageURL = imageUrl,
+             //   ImageURL = imageUrl,
                 ImageAltText = featured.FeaturedImageAltText,
             });
         }
