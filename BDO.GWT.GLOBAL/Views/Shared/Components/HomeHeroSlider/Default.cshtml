@@ -1,0 +1,219 @@
+﻿@model BDO.GWT.Core.DTOs.HomeHeroSlideDto
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home Hero</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* MAIN HERO */
+        .home-hero {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* LEFT */
+        .home-hero__left {
+            position: absolute;
+            width: 45%;
+            height: 100%;
+            background: white;
+            z-index: 2;
+            padding: 60px;
+            box-sizing: border-box;
+        }
+
+        .home-hero__title {
+            font-size: 40px;
+            font-weight: bold;
+        }
+
+        .home-hero__desc {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        .home-hero__btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #e81a3b;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* RIGHT IMAGE */
+        .home-hero__right {
+            position: absolute;
+            right: 0;
+            width: 65%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+            .home-hero__right img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        /* RED ANGLE */
+        .home-hero__red {
+            position: absolute;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(125deg, transparent 60%, #e81a3b 60%);
+            z-index: 1;
+        }
+
+        /* THUMBNAILS */
+        .carousel {
+            position: absolute;
+            bottom: 40px;
+            left: 60px;
+            display: flex;
+            gap: 10px;
+            z-index: 3;
+        }
+
+            .carousel img {
+                width: 120px;
+                height: 70px;
+                object-fit: cover;
+                cursor: pointer;
+                opacity: 0.5;
+                transition: 0.3s;
+            }
+
+                .carousel img.active {
+                    opacity: 1;
+                    border: 2px solid #e81a3b;
+                }
+
+        /* MOBILE */
+        /* media(max - width: 768px)
+
+        {
+            .home-hero__left {
+                width: 100%;
+                padding: 20px;
+            }
+
+            .home-hero__right {
+                width: 100%;
+                opacity: 0.3;
+            }
+
+            .carousel {
+                left: 20px;
+            } */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="home-hero">
+
+        <!-- LEFT CONTENT -->
+        <div class="home-hero__left">
+            <div class="home-hero__title" id="title">@Model.Title</div>
+            <div class="home-hero__desc" id="desc">@Model.Description</div>
+            <button class="home-hero__btn" id="btn">@Model.Button.Title</button>
+        </div>
+
+        <!-- RIGHT IMAGE -->
+        <div class="home-hero__right">
+            <img id="heroImg" src="" />
+        </div>
+
+        <!-- RED ANGLE -->
+        <div class="home-hero__red"></div>
+
+        <!-- THUMBNAILS -->
+        <div class="carousel" id="carousel"></div>
+
+    </div>
+
+    <script>
+        const data = [
+          {
+            title: "Slide 1",
+            desc: "This is description 1",
+            btn: "Learn More",
+            img: "https://picsum.photos/id/1015/1200/800",
+            thumb: "https://picsum.photos/id/1015/200/120"
+          },
+          {
+            title: "Slide 2",
+            desc: "This is description 2",
+            btn: "Explore",
+            img: "https://picsum.photos/id/1016/1200/800",
+            thumb: "https://picsum.photos/id/1016/200/120"
+          },
+          {
+            title: "Slide 3",
+            desc: "This is description 3",
+            btn: "Get Started",
+            img: "https://picsum.photos/id/1018/1200/800",
+            thumb: "https://picsum.photos/id/1018/200/120"
+          }
+        ];
+
+        let current = 0;
+
+        const title = document.getElementById("title");
+        const desc = document.getElementById("desc");
+        const btn = document.getElementById("btn");
+        const img = document.getElementById("heroImg");
+        const carousel = document.getElementById("carousel");
+
+        function renderSlide(index) {
+          const item = data[index];
+
+          title.innerText = item.title;
+          desc.innerText = item.desc;
+          btn.innerText = item.btn;
+          img.src = item.img;
+
+          document.querySelectorAll(".carousel img").forEach((el, i) => {
+            el.classList.toggle("active", i === index);
+          });
+
+          current = index;
+        }
+
+        function renderThumbnails() {
+          data.forEach((item, index) => {
+            const thumb = document.createElement("img");
+            thumb.src = item.thumb;
+
+            thumb.onclick = () => renderSlide(index);
+
+            carousel.appendChild(thumb);
+          });
+        }
+
+        function autoPlay() {
+          setInterval(() => {
+            let next = (current + 1) % data.length;
+            renderSlide(next);
+          }, 5000);
+        }
+
+        renderThumbnails();
+        renderSlide(0);
+        autoPlay();
+    </script>
+
+</body>
+</html>
