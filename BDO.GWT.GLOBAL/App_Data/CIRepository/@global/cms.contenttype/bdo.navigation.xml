@@ -17,6 +17,18 @@
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
+      <field column="TopMenu" columnprecision="0" columntype="webpages" enabled="true" guid="43823144-ee28-40ec-8c27-14a50cba0003" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Top Menu</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.WebPageSelector</controlname>
+          <MaximumPages>5</MaximumPages>
+          <Sortable>False</Sortable>
+        </settings>
+      </field>
     </form>
   </ClassFormDefinition>
   <ClassGUID>bba6a14e-0cf1-44cd-9b10-119588fc6271</ClassGUID>
@@ -26,5 +38,5 @@
   <ClassShortName>BDONavigation</ClassShortName>
   <ClassTableName>BDO_Navigation</ClassTableName>
   <ClassType>Content</ClassType>
-  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
 </cms.contenttype>

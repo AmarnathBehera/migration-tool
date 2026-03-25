@@ -38,5 +38,5 @@
   <ClassShortName>BDONavigationSecondLevelItem</ClassShortName>
   <ClassTableName>BDO_NavigationSecondLevelItem</ClassTableName>
   <ClassType>Content</ClassType>
-  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
 </cms.contenttype>

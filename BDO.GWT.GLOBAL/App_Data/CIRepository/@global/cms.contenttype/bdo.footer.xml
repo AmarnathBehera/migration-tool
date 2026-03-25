@@ -25,5 +25,5 @@
   <ClassShortName>BDOFooter</ClassShortName>
   <ClassTableName>BDO_Footer</ClassTableName>
   <ClassType>Content</ClassType>
-  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
 </cms.contenttype>
