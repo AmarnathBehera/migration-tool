@@ -16,25 +16,27 @@ using CMS.ContentEngine;
 namespace BDO
 {
 	/// <summary>
-	/// Defines a contract for content types with the <see cref="IImage"/> reusable schema assigned.
+	/// Represents a content item of type <see cref="ContentAttachment"/>.
 	/// </summary>
-	public interface IImage
+	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
+	public partial class ContentAttachment : IContentItemFieldsSource
 	{
 		/// <summary>
-		/// Code name of the reusable field schema.
+		/// Code name of the content type.
 		/// </summary>
-		public const string REUSABLE_FIELD_SCHEMA_NAME = "Image";
+		public const string CONTENT_TYPE_NAME = "BDO.ContentAttachment";
 
 
 		/// <summary>
-		/// Image.
+		/// Represents system properties for a content item.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> Image1 { get; set; }
+		[SystemField]
+		public ContentItemFields SystemFields { get; set; }
 
 
 		/// <summary>
-		/// ImageAltText.
+		/// ContentAttachmentAsset.
 		/// </summary>
-		public string ImageAltText { get; set; }
+		public ContentItemAsset ContentAttachmentAsset { get; set; }
 	}
 }

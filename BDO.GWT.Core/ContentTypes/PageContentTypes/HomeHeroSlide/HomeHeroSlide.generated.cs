@@ -68,7 +68,7 @@ namespace BDO
 		/// <summary>
 		/// Image.
 		/// </summary>
-		public IEnumerable<Attachment> Image { get; set; }
+		public IEnumerable<ContentAttachment> Image { get; set; }
 
 
 		/// <summary>
@@ -80,7 +80,7 @@ namespace BDO
 		/// <summary>
 		/// Image_Mobile.
 		/// </summary>
-		public IEnumerable<Attachment> Image_Mobile { get; set; }
+		public IEnumerable<ContentAttachment> Image_Mobile { get; set; }
 
 
 		/// <summary>
@@ -92,7 +92,7 @@ namespace BDO
 		/// <summary>
 		/// Image_Thumbnail.
 		/// </summary>
-		public IEnumerable<Attachment> Image_Thumbnail { get; set; }
+		public IEnumerable<ContentAttachment> Image_Thumbnail { get; set; }
 
 
 		/// <summary>
