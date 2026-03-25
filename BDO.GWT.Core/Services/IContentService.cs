@@ -64,10 +64,10 @@
         /// </summary>
         Task<IEnumerable<T>> GetContentType<T>(CancellationToken cancellationToken = default) where T : class, IWebPageFieldsSource;
 
-        /// <summary>
-        //Retrieve multipages based on current channel and language
-        /// </summary>
+        Task<IEnumerable<TPage>> GetChildPagesByParentGuidAsync<TPage>(
+       int parentGuid,
+       CancellationToken cancellationToken = default)
+       where TPage : IWebPageFieldsSource;
 
-        Task<IEnumerable<Dto>> RetrieveContentItemsOfContentTypes(Type[] contentTypes);
     }
 }

@@ -39,5 +39,11 @@ namespace BDO
 		/// Title.
 		/// </summary>
 		public string Title { get; set; }
+
+
+		/// <summary>
+		/// TopMenu.
+		/// </summary>
+		public IEnumerable<WebPageRelatedItem> TopMenu { get; set; }
 	}
 }

@@ -51,5 +51,11 @@ namespace BDO
 		/// TargetURL.
 		/// </summary>
 		public IEnumerable<WebPageRelatedItem> TargetURL { get; set; }
+
+
+		/// <summary>
+		/// FeaturedImageAltText.
+		/// </summary>
+		public string FeaturedImageAltText { get; set; }
 	}
 }
