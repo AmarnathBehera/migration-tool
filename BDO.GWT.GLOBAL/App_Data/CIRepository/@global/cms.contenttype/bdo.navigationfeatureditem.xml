@@ -39,6 +39,16 @@
           <Sortable>False</Sortable>
         </settings>
       </field>
+      <field column="FeaturedImageAltText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="80a89765-c97c-48ab-8f89-8fb9730a8df5" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Image alt text</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
     </form>
   </ClassFormDefinition>
   <ClassGUID>c37981b7-d491-49fd-b6ad-d06c01b9efee</ClassGUID>
@@ -48,5 +58,5 @@
   <ClassShortName>BDONavigationFeaturedItem</ClassShortName>
   <ClassTableName>BDO_NavigationFeaturedItem</ClassTableName>
   <ClassType>Content</ClassType>
-  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
 </cms.contenttype>

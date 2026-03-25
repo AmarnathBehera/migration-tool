@@ -1,236 +1,154 @@
 ﻿@model BDO.GWT.Core.DTOs.Header.HeaderDto
 
-<!-- ============================= -->
-<!-- HEADER -->
-<!-- ============================= -->
 <header class="site-header">
 
-    <!-- ===== TOP MENU ===== -->
+    <!-- TOP MENU -->
     <div class="top-menu">
-
-        <!-- Left Menu -->
         <ul class="top-menu-links">
             @foreach (var item in Model.MenuItems)
             {
                 <li>
-                    <a href="@item.URL" target="@item.Target">
-                        @item.Title
-                    </a>
+                    <a href="@item.URL" target="@item.Target">@item.Title</a>
                 </li>
             }
         </ul>
 
-        <!-- Right Menu -->
         <div class="top-menu-right">
-            <div class="culture-switcher">
-                <ul class="culture-list">
-                    @foreach (var culture in Model.Cultures)
-                    {
-                        <li>
-                            <a href="@culture.Url" title="@culture.Name">
-                                @culture.ShortName
-                            </a>
-                        </li>
-                    }
-                </ul>
-            </div>
+            <ul class="culture-list">
+                @foreach (var culture in Model.Cultures)
+                {
+                    <li><a href="@culture.Url">@culture.ShortName</a></li>
+                }
+            </ul>
+
             @if (Model.Contact != null)
             {
-                <div class="contact">
-                    <a href="@Model.Contact.URL" class="contact-btn">
-                        @Model.Contact.Title
-                    </a>
-                </div>
+                <a href="@Model.Contact.URL" class="contact-btn">@Model.Contact.Title</a>
             }
-
         </div>
-
     </div>
 
-
-    <!-- ===== LOGO + SEARCH ===== -->
+    <!-- LOGO + SEARCH -->
     <div class="logo-search">
         <div class="logo">
-            <img src="https://cdn.bdo.global/images/bdo_logo/1.0.0/bdo_logo_color.png"
-                 alt="BDO Logo">
+            <img src="https://cdn.bdo.global/images/bdo_logo/1.0.0/bdo_logo_color.png" />
             <span>Norge</span>
         </div>
         <div class="search-box">
             <input type="text" placeholder="Søk">
         </div>
     </div>
+
 </header>
 
-
-<!-- ============================= -->
-<!-- MEGA MENU -->
-<!-- ============================= -->
 @if (Model.MegaMenuItems != null && Model.MegaMenuItems.Any())
 {
     <div class="mega-menu-wrapper">
-
         <ul class="mega-main">
-
             @foreach (var first in Model.MegaMenuItems)
             {
                 <li class="mega-parent">
-
                     <a href="@first.URL">@first.Title</a>
 
                     <div class="mega-dropdown">
-
                         <div class="mega-container">
 
-                            <!-- SECOND LEVEL -->
+                            <!-- COLUMNS -->
                             <div class="mega-columns">
-
                                 @foreach (var second in first.Children)
                                 {
                                     <div class="column">
-
-                                        <h4>
-                                            <a href="@second.URL">@second.Title</a>
-                                        </h4>
-
+                                        <h4><a href="@second.URL">@second.Title</a></h4>
                                         @if (!string.IsNullOrEmpty(second.Description))
                                         {
-                                            <p class="column-desc">
-                                                @second.Description
-                                            </p>
+                                            <p class="column-desc">@second.Description</p>
                                         }
 
-                                        <!-- THIRD LEVEL -->
                                         @if (second.Children != null && second.Children.Any())
                                         {
                                             <ul class="third-level">
-
                                                 @foreach (var third in second.Children)
                                                 {
-                                                    <li>
-                                                        <a href="@third.URL">
-                                                            @third.Title
-                                                        </a>
-                                                    </li>
+                                                    <li><a href="@third.URL">@third.Title</a></li>
                                                 }
-
                                             </ul>
                                         }
-
                                     </div>
                                 }
-
                             </div>
 
-                            <!-- FEATURED ITEMS -->
+                            <!-- FEATURED -->
                             @if (first.Featured != null && first.Featured.Any())
                             {
                                 <div class="featured-items">
-
                                     @foreach (var featured in first.Featured)
                                     {
                                         <div class="featured">
-
                                             <a href="@featured.URL">
-
                                                 <h5>@featured.Title</h5>
-
                                                 <p>@featured.Description</p>
-
                                             </a>
-
                                         </div>
                                     }
-
                                 </div>
                             }
 
                         </div>
-
                     </div>
 
                 </li>
             }
-
         </ul>
-
     </div>
 }
 
 
-<!-- ============================= -->
-<!-- STYLES -->
-<!-- ============================= -->
-<style>
 
+                                            <style>
+    /* ================= HEADER ================= */
     .site-header {
         width: 100%;
-        background: #ffffff;
+        background: #fff;
         border-bottom: 1px solid #e5e5e5;
-        font-family: Arial, Helvetica, sans-serif;
     }
 
-    /* TOP MENU */
-
+    /* ================= TOP MENU ================= */
     .top-menu {
         display: flex;
         justify-content: space-between;
-        align-items: center;
         padding: 10px 40px;
         font-size: 14px;
     }
 
-    .top-menu-links {
+    .top-menu-links,
+    .culture-list {
         display: flex;
-        gap: 20px;
+        gap: 15px;
         list-style: none;
         margin: 0;
         padding: 0;
     }
 
-        .top-menu-links a {
-            text-decoration: none;
-            color: #333;
-        }
+    .top-menu a {
+        color: #333;
+        text-decoration: none;
+    }
 
     .top-menu-right {
         display: flex;
         align-items: center;
-        gap: 20px;
+        gap: 15px;
     }
 
     .contact-btn {
         background: #e30613;
         color: #fff;
-        padding: 8px 16px;
+        padding: 6px 12px;
         border-radius: 4px;
-        text-decoration: none;
+        white-space: nowrap;
     }
 
-    .culture-switcher {
-        display: flex;
-    }
-
-    .culture-list {
-        display: flex;
-        gap: 10px;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
-
-        .culture-list li a {
-            text-decoration: none;
-            color: #333;
-        }
-
-        .culture-list li:not(:last-child)::after {
-            content: "|";
-            margin-left: 10px;
-            color: #aaa;
-        }
-
-    /* LOGO + SEARCH */
-
+    /* ================= LOGO ================= */
     .logo-search {
         display: flex;
         justify-content: space-between;
@@ -248,80 +166,170 @@
             height: 40px;
         }
 
-        .logo span {
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-    .search-box input {
-        padding: 8px 12px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-
-    /* MEGA MENU */
-
+    /* ================= MEGA MENU ================= */
     .mega-menu-wrapper {
         background: #fff;
+        border-top: 1px solid #ddd;
+        position: relative;
+        z-index: 1000;
     }
 
+    /* MAIN MENU */
     .mega-main {
         list-style: none;
         display: flex;
         gap: 30px;
-        padding: 15px 40px;
         margin: 0;
+        padding: 15px 40px;
+        position: relative; /* IMPORTANT */
     }
 
     .mega-parent {
-        position: relative;
+        position: static; /* IMPORTANT for full-width dropdown */
     }
 
+        .mega-parent > a {
+            text-decoration: none;
+            color: #000;
+            font-weight: 500;
+        }
+
+    /* ================= DROPDOWN ================= */
     .mega-dropdown {
-        display: none;
         position: absolute;
-        background: #fff;
-        width: 100%;
         left: 0;
-        top: 40px;
+        top: 100%;
+        width: 100%;
+        background: #fff;
+        padding: 25px 0;
         border-top: 1px solid #ddd;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        /* Hidden by default */
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: all 0.25s ease;
     }
 
-    .mega-parent:hover .mega-dropdown {
-        display: block;
+    /* SHOW ONLY CURRENT MENU */
+    .mega-parent:hover > .mega-dropdown {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
     }
 
+    /* ================= CONTAINER ================= */
     .mega-container {
-        padding: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 40px;
+        display: flex;
+        gap: 40px;
+        flex-wrap: wrap;
     }
 
+    /* ================= COLUMNS ================= */
     .mega-columns {
         display: flex;
         gap: 40px;
+        flex-wrap: wrap;
     }
 
     .column {
-        width: 200px;
+        min-width: 200px;
+        max-width: 250px;
     }
 
+        /* SECOND LEVEL TITLE */
+        .column h4 {
+            margin-bottom: 8px;
+        }
+
+            .column h4 a {
+                color: #000 !important;
+                font-weight: bold;
+                text-decoration: none;
+            }
+
+    /* DESCRIPTION */
+    .column-desc {
+        color: #555 !important;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    /* ================= THIRD LEVEL ================= */
     .third-level {
         list-style: none;
         padding: 0;
-        margin-top: 10px;
+        margin: 0;
     }
 
         .third-level li {
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
 
+        .third-level a {
+            color: #333 !important;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+            /* HOVER EFFECT */
+            .column a:hover,
+            .third-level a:hover {
+                color: #e30613 !important;
+            }
+
+    /* ================= FEATURED ================= */
     .featured-items {
-        margin-top: 30px;
         display: flex;
-        gap: 30px;
+        gap: 20px;
+        flex-wrap: wrap;
     }
 
     .featured {
         width: 250px;
     }
 
+        .featured a {
+            text-decoration: none;
+        }
+
+            .featured a h5 {
+                color: #000 !important;
+                margin-bottom: 5px;
+            }
+
+            .featured a p {
+                color: #555 !important;
+                font-size: 14px;
+            }
+
+    /* ================= SEARCH ================= */ 
+    .mega-parent {
+        position: relative; /* change from static to relative */
+    }
+
+    .mega-dropdown {
+        position: absolute;
+        width: 100%; /* full width of wrapper */
+    }
+
+    .search-box input {
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .mega-dropdown {
+        transition: opacity 0.3s ease;
+    }
+
+        .mega-parent:hover > .mega-dropdown,
+        .mega-dropdown:hover {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
 </style>
