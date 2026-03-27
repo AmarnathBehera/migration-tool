@@ -23,6 +23,19 @@
 }
 
 <div>
+    @if (Model?.HomeHeroSlides?.Any() == true)
+    {
+        var firstSlide = Model.HomeHeroSlides.FirstOrDefault();
+        if (!string.IsNullOrEmpty(firstSlide?.MobileImageURL))
+        {
+            <img src="@Url.Content(firstSlide.MobileImageURL)" alt="@(firstSlide.MobileImageAltText ?? "Hero image")" />
+            <img src="@Url.Content(firstSlide.ImageURL)" alt="@(firstSlide.ImageAltText ?? "Image image")" />
+            <img src="@Url.Content(firstSlide.ThumbnailImageURL)" alt="@(firstSlide.ThumbnailImageAltText ?? "Thumbnail image")" />
+        }
+    }
+</div>
+
+<div>
   
     @await Html.Kentico().EditableAreaAsync(
     "mainContent", // Unique identifier
