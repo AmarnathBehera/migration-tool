@@ -108,10 +108,9 @@
     @await(Component.InvokeAsync<Header>())
 
     @RenderBody()
-@(await Component.InvokeAsync<Test>())
 @(await Component.InvokeAsync<Footer>())
 @await Html.Kentico().PageBuilderScriptsAsync()
-    @await (Component.InvokeAsync<ScriptsBottomBody>())
+@await (Component.InvokeAsync<ScriptsBottomBody>())
 
 </body>
 </html>

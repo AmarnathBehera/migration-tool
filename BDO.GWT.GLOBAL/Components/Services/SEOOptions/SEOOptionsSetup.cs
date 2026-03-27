@@ -1,25 +1,24 @@
 ﻿using BDO;
 using CMS.DataEngine;
 using CMS.Websites.Routing;
-using GWTXbyKWeb.Components.Services.RobotsOptions;
 using Microsoft.Extensions.Options;
 using System.Linq;
 
-namespace GWTXbyKWeb.Components.Services.RobotsOptions;
-public class RobotsOptionsSetup : IConfigureOptions<RobotsOptions>
+namespace GWTXbyKWeb.Components.Services.SEOOptions;
+public class SEOOptionsSetup : IConfigureOptions<SEOOptions>
 {
     private readonly IInfoProvider<SEOSettingsInfo> seoSettingsInfoProvider;
     private readonly IWebsiteChannelContext websiteChannelContext;
     private readonly IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider;
 
-    public RobotsOptionsSetup(IInfoProvider<SEOSettingsInfo> seoSettingsInfoProvider, IWebsiteChannelContext websiteChannelContext, IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider)
+    public SEOOptionsSetup(IInfoProvider<SEOSettingsInfo> seoSettingsInfoProvider, IWebsiteChannelContext websiteChannelContext, IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider)
     {
         this.seoSettingsInfoProvider = seoSettingsInfoProvider;
         this.websiteChannelContext = websiteChannelContext;
         this.webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
     }
 
-    public void Configure(RobotsOptions options)
+    public void Configure(SEOOptions options)
     {
         int currentChannelID = websiteChannelContext.WebsiteChannelID;
 
@@ -33,5 +32,6 @@ public class RobotsOptionsSetup : IConfigureOptions<RobotsOptions>
             .FirstOrDefault();
 
         options.RobotsText = seoSettings?.SeoSettingsRobots ?? string.Empty;
+        options.SecurityText = seoSettings?.SeoSettingsSecurity ?? string.Empty;
     }
 }
