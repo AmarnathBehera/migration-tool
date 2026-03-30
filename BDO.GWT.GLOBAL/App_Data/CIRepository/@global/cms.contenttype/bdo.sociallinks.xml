@@ -65,5 +65,5 @@ linkedin;LinkedIn
   <ClassShortName>BDOSocialLinks</ClassShortName>
   <ClassTableName>BDO_SocialLinks</ClassTableName>
   <ClassType>Content</ClassType>
-  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
 </cms.contenttype>

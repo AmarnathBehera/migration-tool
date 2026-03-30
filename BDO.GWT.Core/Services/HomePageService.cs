@@ -86,9 +86,9 @@ public class HomePageService : IHomePageService
 
             SearchAndSEO = new SearchAndSEODto
             {
-            IncludeInSitemap = homePage.IncludeInSitemap,
-            MetadataNofollow = homePage.MetadataNofollow,
-            MetadataNoindex = homePage.MetadataNoindex
+                IncludeInSitemap = homePage.IncludeInSitemap,
+                MetadataNofollow = homePage.MetadataNofollow,
+                MetadataNoindex = homePage.MetadataNoindex
             },
 
             OGMetaData = new OGMetaDataDto
@@ -143,34 +143,46 @@ public class HomePageService : IHomePageService
     }
 
 
-    public async Task<IEnumerable<HomeHeroSlideDto>> RetrieveHomeHeroSlidesDtoAsync(HomePage homePage, CancellationToken cancellationToken)
+    public async Task<IEnumerable<HomeHeroSlideDto?>?> RetrieveHomeHeroSlidesDtoAsync(HomePage homePage, CancellationToken cancellationToken)
     {
-
-
-        var homeHeroSlides = await _contentretriever.RetrievePages<HomeHeroSlide>(new RetrievePagesParameters
+        try
         {
-            LinkedItemsMaxLevel = 3
-        }, cancellationToken);
-
-        var homeHeroSlidesdto = homeHeroSlides.Select(homeHeroSlide => new HomeHeroSlideDto
-        {
-            Title = homeHeroSlide.Title,
-            Description = homeHeroSlide.Description,
-            ImageURL = homeHeroSlide.Image_Mobile?.FirstOrDefault()?.LegacyAttachmentAsset.Url,
-            ImageAltText = homeHeroSlide.ImageAltText,
-            MobileImageURL = homeHeroSlide.Image_Mobile?.FirstOrDefault()?.LegacyAttachmentAsset.Url,
-            MobileImageAltText = homeHeroSlide.Image_MobileAltText,
-            ThumbnailImageURL = homeHeroSlide.Image_Thumbnail?.FirstOrDefault()?.LegacyAttachmentAsset?.Url,
-            ThumbnailImageAltText = homeHeroSlide.Image_ThumbnailAltText,
-            Button = homeHeroSlide.CTAButtonText != null && homeHeroSlide.CTAButtonUrl != null ? new LinkItemDto
+            var homeHeroSlides = await _contentretriever.RetrievePages<HomeHeroSlide>(new RetrievePagesParameters
             {
-                Title = homeHeroSlide.CTAButtonText,
-                URL = homeHeroSlide.CTAButtonUrl,
-            } : null,
-        }).ToList();
+                LinkedItemsMaxLevel = 3
+            }, cancellationToken);
+
+            if (homeHeroSlides == null || !homeHeroSlides.Any())
+            {
+                return null;
+            }
+            var homeHeroSlidesdto = homeHeroSlides.Select(homeHeroSlide => new HomeHeroSlideDto
+            {
+                Title = homeHeroSlide.Title,
+                Description = homeHeroSlide.Description,
+                ImageURL = homeHeroSlide.Image_Mobile?.FirstOrDefault()?.ContentAttachmentAsset.Url,
+                ImageAltText = homeHeroSlide.ImageAltText,
+                MobileImageURL = homeHeroSlide.Image_Mobile?.FirstOrDefault()?.ContentAttachmentAsset.Url,
+                MobileImageAltText = homeHeroSlide.Image_MobileAltText,
+                ThumbnailImageURL = homeHeroSlide.Image_Thumbnail?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+                ThumbnailImageAltText = homeHeroSlide.Image_ThumbnailAltText,
+                Button = homeHeroSlide.CTAButtonText != null && homeHeroSlide.CTAButtonUrl != null ? new LinkItemDto
+                {
+                    Title = homeHeroSlide.CTAButtonText,
+                    URL = homeHeroSlide.CTAButtonUrl,
+                } : null,
+            }).ToList();
 
 
-        return homeHeroSlidesdto;
+            return homeHeroSlidesdto;
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+       
+
+       
     }
 }
 

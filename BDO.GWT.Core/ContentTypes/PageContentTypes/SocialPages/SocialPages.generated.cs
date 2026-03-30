@@ -12,29 +12,32 @@
 using System;
 using System.Collections.Generic;
 using CMS.ContentEngine;
+using CMS.Websites;
 
 namespace BDO
 {
 	/// <summary>
-	/// Defines a contract for content types with the <see cref="IImage"/> reusable schema assigned.
+	/// Represents a page of type <see cref="SocialPages"/>.
 	/// </summary>
-	public interface IImage
+	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
+	public partial class SocialPages : IWebPageFieldsSource
 	{
 		/// <summary>
-		/// Code name of the reusable field schema.
+		/// Code name of the content type.
 		/// </summary>
-		public const string REUSABLE_FIELD_SCHEMA_NAME = "Image";
+		public const string CONTENT_TYPE_NAME = "BDO.SocialPages";
 
 
 		/// <summary>
-		/// Image.
+		/// Represents system properties for a web page item.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> Image1 { get; set; }
+		[SystemField]
+		public WebPageFields SystemFields { get; set; }
 
 
 		/// <summary>
-		/// ImageAltText.
+		/// Title.
 		/// </summary>
-		public string ImageAltText { get; set; }
+		public string Title { get; set; }
 	}
 }

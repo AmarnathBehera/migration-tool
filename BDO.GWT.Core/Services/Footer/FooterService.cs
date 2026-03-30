@@ -1,6 +1,8 @@
-﻿using BDO.GWT.Core.DTOs.Footer;
+﻿using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.Footer;
 using BDO.GWT.Core.ValueObjects;
 using CMS.Websites;
+using Kentico.Content.Web.Mvc;
 
 namespace BDO.GWT.Core.Services.Footer;
 
@@ -11,26 +13,21 @@ public interface IFooterService
 
 public class FooterService : IFooterService
 {
-    private static readonly (Type PageType, int Order)[] MandatoryPageTypesWithOrders = {
-        (typeof(Contact), -3),
-        (typeof(Locations), -2),
-        (typeof(LegalPage), -1),
-        (typeof(Sitemap), 0),
-    };
-
     private readonly IContentService _contentService;
+    private readonly IContentRetriever _contentRetriever;
 
-    public FooterService(IContentService contentService)
+    public FooterService(IContentService contentService, IContentRetriever contentRetriever)
     {
         _contentService = contentService;
+        _contentRetriever = contentRetriever;
     }
 
     public async Task<FooterDto> GetAsync(CancellationToken cancellationToken)
     {
         var mandatoryFooterLinks = await GetMandatoryFooterLinkDtosAsync(cancellationToken);
 
-        var footerLinks = await GetFooterLinks();
-        var socialLinks = await GetSocialLinks();
+        var footerLinks = await GetFooterLinks() ?? Enumerable.Empty<FooterLinkDto>();
+        var socialLinks = await GetSocialLinks() ?? Enumerable.Empty<SocialButtonDto>();
 
         //var displaySubscriptionsSectionSetting = await _settingsService.GetCurrentSiteSettingAsync(SettingName.BDO.DisplaySubscriptionsSection, cancellationToken);
 
@@ -41,125 +38,126 @@ public class FooterService : IFooterService
             FooterLinks = mandatoryFooterLinks.Concat(footerLinks
                 .Select(link => new FooterLinkDto
                 {
-                    OpenInNewTab = link.OpenInNewTab,
-                    Order = link.Order,
-                    Title = link.Title,
-                    URL = link.URL.ToString(),
+                    OpenInNewTab = link?.OpenInNewTab ?? false,
+                    Order = link?.Order ?? 0,
+                    Title = link?.Title ?? string.Empty,
+                    URL = link?.URL?.ToString() ?? string.Empty,
                 })
                 .OrderBy(o => o.Order)
             ).Take(12).ToList(),
             SocialButtons = socialLinks.Select(link => new SocialButtonDto
             {
-                AltText = link.AltText,
-                AriaLabel = link.AriaLabel,
-                IconType = link.IconType,
-                //     CustomIcon = link.IconType == SocialLinkIconType.Custom ? link.CustomIcon : null,
-                Order = link.Order,
-                URL = link.URL.ToString(),
+                AltText = link?.AltText ?? string.Empty,
+                AriaLabel = link?.AriaLabel ?? string.Empty,
+                IconType = link?.IconType ?? string.Empty,
+                //CustomIcon = link.IconType == SocialLinkIconType.Custom ? link.CustomIcon : null,
+                Order = link?.Order ?? 0,
+                URL = link?.URL?.ToString() ?? string.Empty,
             }).OrderBy(o => o.Order).Take(5).ToList(),
         };
 
         return footerDto;
     }
-
     private async Task<Link?> GetSubscribePageLinkAsync(CancellationToken cancellationToken)
     {
         var subscribePages = await _contentService.GetContentType<Subscribe>(cancellationToken);
-        var subscribePage = subscribePages.FirstOrDefault();
-        if (subscribePage is null)
-        {
+        var subscribePage = subscribePages?.FirstOrDefault();
+        if (subscribePage == null)
             return null;
-        }
+
         var url = subscribePage.GetUrl()?.AbsoluteUrl;
         if (string.IsNullOrEmpty(url))
-        {
             return null;
-        }
-        if (Link.TryParse(url, out var link))
-        {
-            return link;
-        }
-        return null;
+
+        return Link.TryParse(url, out var link) ? link : null;
     }
 
     private async Task<List<FooterLinkDto>> GetMandatoryFooterLinkDtosAsync(CancellationToken cancellationToken)
     {
-        var typeList = MandatoryPageTypesWithOrders.ToList();
+        string rootPath = "/";
+        var pages = (await _contentRetriever.RetrievePages<FooterPages>(
+            new RetrievePagesParameters { PathMatch = PathMatch.Children(rootPath, 1) },
+            query => query.OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken
+        ))?.ToList() ?? new List<FooterPages>();
 
-        var pages = (await _contentService
-            .RetrieveContentItemsOfContentTypes(typeList.Select(t => t.PageType).ToArray()))
+        var allGuids = pages
+            .Where(p => p.FooterLink != null)
+            .SelectMany(p => p.FooterLink?.Select(i => i.WebPageGuid) ?? Enumerable.Empty<Guid>())
+            .Distinct()
             .ToList();
-        var typeOrderMap = MandatoryPageTypesWithOrders.ToDictionary(t => t.PageType.GetField("CONTENT_TYPE_NAME")?
-                                                                                    .GetValue(null)?.ToString(),
-                                                                                     t => t.Order);
-        var result = pages.Select(page =>
+
+        var selectedPages = allGuids.Any()
+            ? await _contentService.GetItemsByGUIDAsync(allGuids)
+            : Enumerable.Empty<IWebPageFieldsSource>();
+
+        int order = 0;
+        var result = selectedPages?.Select(page => new FooterLinkDto
         {
-            return new FooterLinkDto
-            {
-                Title = page.MetadataTitle ?? string.Empty,
-                OpenInNewTab = false,
-                Order = page.ContentTypeName != null && typeOrderMap.TryGetValue(page.ContentTypeName, out var order) ? order : 0,
-                URL = page.SystemFields.WebPageUrlPath?.ToString() ?? string.Empty
-            };
+            Title = (page as IMetadata)?.MetadataTitle ?? string.Empty,
+            OpenInNewTab = false,
+            Order = order--,
+            URL = page?.GetUrl()?.RelativePath?.ToString() ?? string.Empty
         })
         .OrderBy(x => x.Order)
-        .ToList();
+        .ToList() ?? new List<FooterLinkDto>();
 
         return result;
     }
+
     private async Task<IEnumerable<FooterLinkDto>> GetFooterLinks()
     {
-        var footerLinksPages = (await _contentService.GetItemsAsync<FooterLinks>())
-            .Take(8)
-            .ToList();
-
+        var footerLinksPages = (await _contentService.GetItemsAsync<FooterLinks>())?.Take(8).ToList() ?? new List<FooterLinks>();
         var footerPages = new List<FooterLinkDto>();
 
         var allGuids = footerLinksPages
             .Where(x => x.TargetURL != null)
-            .SelectMany(x => x.TargetURL.Select(t => t.WebPageGuid))
+            .SelectMany(x => x.TargetURL?.Select(t => t.WebPageGuid) ?? Enumerable.Empty<Guid>())
             .Distinct()
             .ToList();
 
-        var selectedPages = await _contentService.GetItemsByGUIDAsync(allGuids);
+        var selectedPages = allGuids.Any()
+            ? await _contentService.GetItemsByGUIDAsync(allGuids)
+            : Enumerable.Empty<IWebPageFieldsSource>();
 
-        var pageUrlMap = selectedPages.ToDictionary(
-            p => p.SystemFields.WebPageItemGUID,
+        var pageUrlMap = selectedPages?.ToDictionary(
+            p => p.SystemFields?.WebPageItemGUID ?? Guid.Empty,
             p => p.GetUrl()?.RelativePath ?? string.Empty
-        );
-        int order = -4;
+        ) ?? new Dictionary<Guid, string>();
+
+        int order = 1;
         foreach (var link in footerLinksPages)
         {
-            var guid = link.TargetURL?.FirstOrDefault()?.WebPageGuid;
+            var guid = link?.TargetURL?.FirstOrDefault()?.WebPageGuid;
 
             footerPages.Add(new FooterLinkDto
             {
-                OpenInNewTab = link.OpenInNewTab,
-                Order = order--,
-                Title = link.Title,
-                URL = guid != null && pageUrlMap.ContainsKey(guid.Value)
-                    ? pageUrlMap[guid.Value]
-                    : string.Empty
+                OpenInNewTab = link?.OpenInNewTab ?? false,
+                Order = order++,
+                Title = link?.Title ?? string.Empty,
+                URL = guid != null && pageUrlMap.ContainsKey(guid.Value) ? pageUrlMap[guid.Value] : string.Empty
             });
         }
         return footerPages;
     }
+
     private async Task<IEnumerable<SocialButtonDto>> GetSocialLinks()
     {
-        var socialLinksPages = (await _contentService.GetItemsAsync<SocialLinks>())
-            .Take(8);
+        var socialLinksPages = (await _contentService.GetItemsAsync<SocialLinks>())?.Take(8) ?? Enumerable.Empty<SocialLinks>();
         int order = 1;
+
         return socialLinksPages
             .Select(link => new SocialButtonDto
             {
-                AltText = link.Alttext,
-                AriaLabel = link.AriaLabel,
-                IconType = link.Icontype,
-                //CustomIcon = link.IconType == "Custom" ? link.CustomIcon : null,
+                AltText = link?.Alttext ?? string.Empty,
+                AriaLabel = link?.AriaLabel ?? string.Empty,
+                IconType = link?.Icontype ?? string.Empty,
                 Order = order++,
-                URL = link.Url?.ToString() ?? "#"
+                URL = link?.Url?.ToString() ?? "#"
             })
             .OrderBy(x => x.Order)
             .ToList();
     }
+
 }

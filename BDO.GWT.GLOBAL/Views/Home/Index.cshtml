@@ -6,7 +6,7 @@
 @{
     Layout = "_Layout";
 
-    
+
     var widgetsList = new[]
     {
         ComponentIdentifiers.ExternalNavigation,
@@ -36,12 +36,12 @@
 </div>
 
 <div>
-  
+
     @await Html.Kentico().EditableAreaAsync(
     "mainContent", // Unique identifier
         new EditableAreaOptions
         {
-          
+
             AllowedWidgets = widgetsList
         })
 </div>

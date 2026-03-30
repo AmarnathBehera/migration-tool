@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassContentTypeType>Reusable</ClassContentTypeType>
+  <ClassDisplayName>Content Attachment</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="3826e18f-c147-469a-bbd5-76ec12b3b332" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="8c8bcfcf-f4e8-4b41-a7e0-e8d689491061" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="c515762b-6420-4626-b756-e33d957a47e7" isunique="true" system="true" />
+      <field allowempty="true" column="ContentAttachmentAsset" columnprecision="0" columntype="contentitemasset" enabled="true" guid="50c2bc4c-a8ff-46ba-95c2-0e74752d147f" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Asset</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedExtensions>_INHERITED_</AllowedExtensions>
+          <controlname>Kentico.Administration.ContentItemAssetUploader</controlname>
+          <IsFormatConversionEnabled>False</IsFormatConversionEnabled>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>4e214df1-edd5-4441-a0b7-53849526b1d3</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.ContentAttachment</ClassName>
+  <ClassShortName>ContentAttachmentHjvi2pu4</ClassShortName>
+  <ClassShowTemplateSelection>False</ClassShowTemplateSelection>
+  <ClassTableName>Legacy_Attachment</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

@@ -1,8 +1,6 @@
 ﻿namespace BDO.GWT.Core
 {
-    using BDO.GWT.Core.ValueObjects;
     using CMS.ContentEngine;
-    using CMS.DataEngine;
     using CMS.Helpers;
     using CMS.Websites;
     using CMS.Websites.Routing;
@@ -227,49 +225,28 @@
         {
             return await _contentRetriever.RetrievePages<T>(cancellationToken);
         }
-
-
-
-
-        public async Task<IEnumerable<Dto>> RetrieveContentItemsOfContentTypes(Type[] contentTypes)
+        public async Task<IEnumerable<TPage>> GetChildPagesByParentGuidAsync<TPage>(
+       int parentGuid,
+       CancellationToken cancellationToken = default)
+       where TPage : IWebPageFieldsSource
         {
-            string languageName = "en";
-            int maxLevel = 1;
+            if (parentGuid == 0)
+                throw new ArgumentException("Parent GUID must be provided", nameof(parentGuid));
 
-            string[] contentTypeNames = contentTypes.Select(t => t.GetField("CONTENT_TYPE_NAME")?.GetValue(null)?.ToString())
-                .Where(name => !string.IsNullOrEmpty(name))
-                .ToArray();
-            ContentItemQueryBuilder builder =
-                    new ContentItemQueryBuilder()
-                            .ForContentTypes(subqueryParameters =>
-                            {
-                                subqueryParameters
-                                 .OfContentType(contentTypeNames)
-                                .WithContentTypeFields()
-                                .WithWebPageData()
-                                .WithLinkedItems(maxLevel);
-                               })//.InLanguage(languageName)
-                              .Parameters(subqueryParameters => {
-                                  subqueryParameters.Where(w => w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
-                             
-                              });
-            IEnumerable<Dto> result = await _contentQueryExecutor.GetResult(builder, ModelBinder);
-            return result;
+            // Use RetrievePages<TSource, TResult> overload
+            var childPages = await _contentRetriever.RetrievePages<TPage>(
+                new RetrievePagesParameters(),                  // basic parameters
+                query =>
+                {
+                    // Filter by parent GUID
+                    query.Where(w => w.WhereEquals("WebPageItemParentID", parentGuid))
+                         .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder));
+                },
+                cacheSettings: RetrievalCacheSettings.CacheDisabled, // Use the predefined disabled cache
+                cancellationToken: cancellationToken
+            );
 
-        }
-        private Dto ModelBinder(IContentQueryDataContainer container)
-        {
-            var dto = _contentQueryModelTypeMapper.Map<Dto>(container);
-
-            dto.ContentTypeName = container.ContentTypeName;
-
-            return dto;
-        }
-        public class Dto
-        {
-            public WebPageFields SystemFields { get; set; }
-            public string MetadataTitle { get; set; }
-            public string ContentTypeName { get; set; }
+            return childPages;
         }
     }
 }

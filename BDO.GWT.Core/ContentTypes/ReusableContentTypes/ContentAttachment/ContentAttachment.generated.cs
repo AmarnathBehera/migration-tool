@@ -16,15 +16,15 @@ using CMS.ContentEngine;
 namespace BDO
 {
 	/// <summary>
-	/// Represents a content item of type <see cref="Attachment"/>.
+	/// Represents a content item of type <see cref="ContentAttachment"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class Attachment : IContentItemFieldsSource
+	public partial class ContentAttachment : IContentItemFieldsSource
 	{
 		/// <summary>
 		/// Code name of the content type.
 		/// </summary>
-		public const string CONTENT_TYPE_NAME = "Legacy.Attachment";
+		public const string CONTENT_TYPE_NAME = "BDO.ContentAttachment";
 
 
 		/// <summary>
@@ -35,8 +35,8 @@ namespace BDO
 
 
 		/// <summary>
-		/// LegacyAttachmentAsset.
+		/// ContentAttachmentAsset.
 		/// </summary>
-		public ContentItemAsset LegacyAttachmentAsset { get; set; }
+		public ContentItemAsset ContentAttachmentAsset { get; set; }
 	}
 }
