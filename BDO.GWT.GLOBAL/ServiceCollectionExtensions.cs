@@ -8,7 +8,7 @@ using BDO.GWT.Xperience;
 using BDO.GWT.Xperience.LiveSite.Services;
 using CMS.Core;
 using CMS.DataEngine;
-using GWTXbyKWeb.Components.Services.RobotsOptions;
+using GWTXbyKWeb.Components.Services.SEOOptions;
 using Microsoft.Extensions.DependencyInjection;
 namespace BDO.GWT.Common;
 
@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IWebsiteContext, WebsiteContext>();
         serviceCollection.AddScoped<IHeaderService, HeaderService>();
         serviceCollection.AddScoped<IFooterService, FooterService>();
-        serviceCollection.ConfigureOptions<RobotsOptionsSetup>();
+        serviceCollection.ConfigureOptions<SEOOptionsSetup>();
         serviceCollection.AddScoped<IPageContext, XperiencePageContext>();
         serviceCollection.AddScoped<ITileContentService, TileContentService>();
 

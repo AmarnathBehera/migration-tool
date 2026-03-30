@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Cookiebot</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="CookiebotID" columntype="integer" enabled="true" guid="664ab231-d9b2-4c47-9008-b6295580e0d1" isPK="true" />
+      <field column="EnableCookiebot" columnprecision="0" columntype="boolean" enabled="true" guid="2e8eb269-8971-4eec-9c75-37ff9fedda68" />
+      <field column="CookieID" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="fc283928-a6c6-41ae-962e-534fba5ea178" />
+      <field column="CustomCookiebotScript" columnprecision="0" columntype="longtext" enabled="true" guid="4c200dbf-5d27-4eeb-a2e9-867d373f7270" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>620d4bbd-6d3c-4e83-8411-c56072b93dd9</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.Cookiebot</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_Cookiebot</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

@@ -60,6 +60,17 @@ namespace BDO
 
 
         /// <summary>
+        /// Seo settings security.
+        /// </summary>
+        [DatabaseField]
+        public virtual string SeoSettingsSecurity
+        {
+            get => ValidationHelper.GetString(GetValue(nameof(SeoSettingsSecurity)), String.Empty);
+            set => SetValue(nameof(SeoSettingsSecurity), value);
+        }
+
+
+        /// <summary>
         /// Seo settings web channel setting ID.
         /// </summary>
         [DatabaseField]

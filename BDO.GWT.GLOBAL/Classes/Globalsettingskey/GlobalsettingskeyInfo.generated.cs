@@ -13,7 +13,7 @@ namespace BDO
     /// <summary>
     /// Data container class for <see cref="GlobalsettingskeyInfo"/>.
     /// </summary>
-    public partial class GlobalsettingskeyInfo : AbstractInfo<GlobalsettingskeyInfo, IInfoProvider<GlobalsettingskeyInfo>>, IInfoWithId, IInfoWithName
+    public partial class GlobalsettingskeyInfo : AbstractInfo<GlobalsettingskeyInfo, IInfoProvider<GlobalsettingskeyInfo>>, IInfoWithId
     {
         /// <summary>
         /// Object type.
@@ -25,7 +25,7 @@ namespace BDO
         /// Type information.
         /// </summary>
 #warning "You will need to configure the type info."
-        public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(IInfoProvider<GlobalsettingskeyInfo>), OBJECT_TYPE, "BDO.Globalsettingskey", "GlobalsettingskeyID", null, null, "GlobalSettingsKeyName", "GlobalSettingsKeyDisplayName", null, null, null)
+        public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(IInfoProvider<GlobalsettingskeyInfo>), OBJECT_TYPE, "BDO.Globalsettingskey", "GlobalsettingskeyID", null, null, null, "GlobalSettingsKeyDisplayName", null, null, null)
         {
             TouchCacheDependencies = true,
         };

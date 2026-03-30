@@ -1,8 +1,10 @@
 ﻿using CMS.ContentEngine;
 using CMS.DataEngine;
+using CMS.Membership;
 using Kentico.Xperience.Admin.Base;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
@@ -37,8 +39,6 @@ public class WebChannelSettingsListingPage : ListingPage
 
         await base.ConfigurePage();
     }
-
-    //Creates necessary settings objects if they do not exist, and ensures proper channel names.
     private void EnsureSettingsListData()
     {
         var channels = channelInfoProvider.Get();
@@ -59,7 +59,6 @@ public class WebChannelSettingsListingPage : ListingPage
         }
     }
 
-    //Creates a new WebChannelSettingsInfo for the provided channel if none exists.
     private void EnsureChannelSetting(List<WebChannelSettingsInfo> currentChannelSettings, ChannelInfo channel)
     {
         if (currentChannelSettings.Count() == 0)
@@ -74,7 +73,6 @@ public class WebChannelSettingsListingPage : ListingPage
         }
     }
 
-    //Updates display name of provided WebChannelSettingsInfo to match its channel if they are different.
     private void EnsureChannelSettingDisplayName(ChannelInfo channel, WebChannelSettingsInfo? currentChannelSetting)
     {
         if (currentChannelSetting != null && !channel.ChannelDisplayName.Equals(currentChannelSetting.WebChannelSettingsChannelDisplayName))
@@ -84,8 +82,7 @@ public class WebChannelSettingsListingPage : ListingPage
         }
     }
 
-    //Creates a new SeoSettingsInfo object for the provided WebChannelSettingsInfoif none exists.
-    private void EnsureSeoSettings(WebChannelSettingsInfo? currentChannelSetting, IEnumerable<SEOSettingsInfo> seoSettings)
+     private void EnsureSeoSettings(WebChannelSettingsInfo? currentChannelSetting, IEnumerable<SEOSettingsInfo> seoSettings)
     {
         int? webChannelSettingsId = currentChannelSetting?.WebChannelSettingsID;
 

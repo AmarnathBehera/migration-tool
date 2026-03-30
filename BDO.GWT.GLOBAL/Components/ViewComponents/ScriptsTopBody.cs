@@ -1,6 +1,8 @@
 ﻿using BDO;
+using BDO.GWT.Common;
 using BDO.GWT.Xperience;
 using CMS.DataEngine;
+using CMS.Websites.Routing;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading;
@@ -11,26 +13,51 @@ namespace GWTXbyKWeb.Components.ViewComponents
     public class ScriptsTopBody : ViewComponent
     {
         private readonly IInfoProvider<GlobalsettingskeyInfo> _provider;
+        private readonly IInfoProvider<WebChannelSnippetInfo> _siteProvider;
+        private readonly IWebsiteContext _websiteContext;
+        private readonly IWebsiteChannelContext _websiteChannelContext;
+        private readonly IInfoProvider<WebChannelSettingsInfo> _webChannelSettingsInfoProvider; 
         private const string ScriptintopofBODYKey = "BDO_ScriptintopofBODY";
-        public ScriptsTopBody(IInfoProvider<GlobalsettingskeyInfo> provider)
+        public ScriptsTopBody(IInfoProvider<GlobalsettingskeyInfo> provider, IInfoProvider<WebChannelSnippetInfo> siteProvider, IWebsiteContext websiteContext, IWebsiteChannelContext websiteChannelContext, IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider)
         {
             _provider = provider;
+            _siteProvider = siteProvider;
+            _websiteContext = websiteContext;
+            _websiteChannelContext = websiteChannelContext;
+            _webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
 
         }
+
         public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken)
         {
-            var ScriptintopofBODYValue = _provider.Get()
+            int currentWebsiteID = _websiteChannelContext.WebsiteChannelID;
+            var currentChannelId = _webChannelSettingsInfoProvider
+              .Get()
+              .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), currentWebsiteID)
+              .FirstOrDefault();
+
+            var siteScriptintopofBODYValue = _siteProvider.Get()
+                             .WhereEquals(
+                                 nameof(WebChannelSnippetInfo.WebChannelSnippetCodeName),
+                                 ScriptintopofBODYKey)
+                             .WhereEquals(
+                                 nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID),
+                                 currentChannelId.WebChannelSettingsID)
+                             .TopN(1)
+                             .GetEnumerableTypedResult().FirstOrDefault()?.WebChannelSnippetCode;
+
+            var GlobalScriptintopofBODYValue = _provider.Get()
                              .WhereEquals(
                                  nameof(GlobalsettingskeyInfo.GlobalSettingsKeyName),
                                  ScriptintopofBODYKey)
                              .TopN(1)
-                             .GetEnumerableTypedResult();
-            var first = ScriptintopofBODYValue?.FirstOrDefault();
-            var model = new GlobalsettingDTO
-            {
-                value = first?.GlobalSettingsKeyValue
-            };
-            return View("~/Views/Shared/Components/Scripts/Default.cshtml", model.value);
+                             .GetEnumerableTypedResult().FirstOrDefault()?.GlobalSettingsKeyValue;
+
+            var finalValue = !string.IsNullOrWhiteSpace(siteScriptintopofBODYValue)
+               ? siteScriptintopofBODYValue
+               : GlobalScriptintopofBODYValue;
+
+            return View("~/Views/Shared/Components/Scripts/Default.cshtml", finalValue);
         }
     }
 }
