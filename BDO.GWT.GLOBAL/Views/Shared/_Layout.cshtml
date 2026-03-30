@@ -1,4 +1,5 @@
 ﻿@using BDO.GWT.Global.Components.ViewComponents
+@using BDO.GWT.Web.Core.LiveSite.Components.ViewComponents
 @using BDO.GWT.Xperience
 @using GWTXbyKWeb.Components.ViewComponents
 @using Kentico.Activities.Web.Mvc
@@ -23,6 +24,8 @@
     @Html.Kentico().PageBuilderStyles()
     @(await Component.InvokeAsync<ScriptsHead>())
     @(await Component.InvokeAsync<StartScriptsHead>())
+    @await (Component.InvokeAsync<Cookiebot>())
+
     @(await Component.InvokeAsync<ScriptsWhenCookiesAccepted>())
     @(await Component.InvokeAsync<MarketoMunchkincode>())
     @Html.Kentico().ActivityLoggingScriptV2()

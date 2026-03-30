@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>SEO Settings</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="SEOSettingsID" columntype="integer" enabled="true" guid="c09c8feb-c4bd-4c40-9af4-3ab36cb7aead" isPK="true" />
+      <field allowempty="true" column="SeoSettingsRobots" columnprecision="0" columnsize="3000" columntype="text" enabled="true" guid="d41a72d4-1476-4629-b47e-a2f721359cc0" />
+      <field allowempty="true" column="SeoSettingsSecurity" columnprecision="0" columnsize="3000" columntype="text" enabled="true" guid="6cdef016-3826-424b-907f-81012efbef75" />
+      <field column="SeoSettingsWebChannelSettingID" columnprecision="0" columntype="integer" enabled="true" guid="32a42839-db80-4238-a0da-e52e812ce505" refobjtype="bdo.webchannelsettings" reftype="Required">
+        <properties>
+          <defaultvalue>0</defaultvalue>
+        </properties>
+      </field>
+      <field column="SeoSettingsGUID" columnprecision="0" columntype="guid" enabled="true" guid="9a094ba3-f79d-4b4f-bb78-4762696dfbb8" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>486c432f-6348-4278-b641-7912986ed324</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.SEOSettings</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_SEOSettings</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

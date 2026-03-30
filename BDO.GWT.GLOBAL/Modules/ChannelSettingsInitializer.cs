@@ -86,7 +86,7 @@ public class ChannelSettingsInitializer : Module
         var globalSettings = _globalProvider.Get().GetEnumerableTypedResult();
 
         // ✅ Safe & clean channel name
-        string safeChannelName = (_websiteChannelContext.WebsiteChannelName ?? "site")
+        string safeChannelName = (channel.WebChannelSettingsChannelDisplayName ?? "site")
                                     .ToLower()
                                     .Replace(" ", "_");
 

@@ -13,6 +13,15 @@ using Kentico.Xperience.Admin.Base;
     order: 0)]
 
 [assembly: UIPage(
+    parentType: typeof(ProjectSettingsApplication),
+    slug: "Cookiebot",
+    uiPageType: typeof(CookiebootEditPage),
+    name: "Cookiebot",
+    templateName: TemplateNames.EDIT,
+    order: 0)]
+
+
+[assembly: UIPage(
     parentType: typeof(GlobalSettingsListingPage),
     slug: PageParameterConstants.PARAMETERIZED_SLUG,
     uiPageType: typeof(GlobalSettingsEditSection),

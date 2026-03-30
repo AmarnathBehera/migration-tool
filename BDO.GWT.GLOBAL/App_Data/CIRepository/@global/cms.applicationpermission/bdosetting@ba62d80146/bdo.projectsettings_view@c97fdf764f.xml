@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.applicationpermission>
+  <ApplicationName>BDO.Projectsettings</ApplicationName>
+  <ApplicationPermissionGuid>d412765e-ac82-4724-9882-186333faa628</ApplicationPermissionGuid>
+  <PermissionName>View</PermissionName>
+  <RoleID>
+    <CodeName>BDOSetting</CodeName>
+    <GUID>95b21e94-7791-4c95-9779-d9096f42d8f0</GUID>
+    <ObjectType>cms.role</ObjectType>
+  </RoleID>
+</cms.applicationpermission>

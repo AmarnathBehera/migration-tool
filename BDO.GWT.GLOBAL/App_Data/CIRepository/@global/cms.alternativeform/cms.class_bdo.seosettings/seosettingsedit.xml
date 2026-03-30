@@ -23,7 +23,7 @@
           <fielddescriptionashtml>False</fielddescriptionashtml>
         </properties>
       </field>
-      <field column="SeoSettingsSecurity" enabled="true" guid="44b3a3b4-740e-4991-aee6-0d84ad067775" visible="true" order="4">
+      <field column="SeoSettingsSecurity" enabled="true" guid="6cdef016-3826-424b-907f-81012efbef75" visible="true" order="4">
         <settings>
           <controlname>Kentico.Administration.TextArea</controlname>
           <CopyButtonVisible>False</CopyButtonVisible>
