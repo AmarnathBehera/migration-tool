@@ -84,6 +84,7 @@ public class XperiencePageContext : IPageContext
 
         
         var contentTypeName = ctx.WebPage.ContentTypeName;
+        var requestcontext = _httpContextAccessor.HttpContext.Request;
 
         var page = ctx.WebPage;
 
@@ -109,8 +110,9 @@ public class XperiencePageContext : IPageContext
                 {
                     // map your OG fields here
                     MetadataOGTitle = item.TryGetValue("MetadataOGTitle", out string? ogTitle) ? ogTitle : null,
-                    MetadataOGDescription = item.TryGetValue("MetadataOGDescription", out string? ogDesc) ? ogDesc : null
-                    
+                    MetadataOGDescription = item.TryGetValue("MetadataOGDescription", out string? ogDesc) ? ogDesc : null,
+                    Url = $"{requestcontext?.Scheme}://{requestcontext?.Host}" + requestcontext.Path
+
                 },
 
                 SEOItemsDto = new SearchAndSEODto

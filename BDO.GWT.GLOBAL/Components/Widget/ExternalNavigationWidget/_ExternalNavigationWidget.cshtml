@@ -1,7 +1,18 @@
-﻿@model BDO.GWT.Core.ExternalNavigationData
+﻿@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Core.ExternalNavigationData
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
 
-<li>
-    <a href="@Model.Link.URL" target="@Model.openInNewTab">
-        @Model.Link.Title
-    </a>
-</li>
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+
+@(await ReactService.RenderComponentAsync(
+    pageId,
+    ReactComponentType.ExternalNavigationWidget,
+    ReactComponentType.ExternalNavigationWidgetGUID,
+    Model,
+    Context.RequestAborted))

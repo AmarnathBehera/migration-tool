@@ -1,4 +1,6 @@
-﻿namespace BDO.GWT.Web.Core.LiveSite.Data;
+﻿using BDO.GWT.Web.Core.DTOs;
+
+namespace BDO.GWT.Web.Core.LiveSite.Data;
 
 public class ViewGlobalLocationsData 
 {
@@ -11,6 +13,7 @@ public class ViewGlobalLocationsData
     public string Theme { get; set; } = null!;
     
     public string Layout { get; set; } = null!;
+    public ButtonDto Button { get; set; } = null!;
 
     public string? ButtonTitle { get; set; }
 

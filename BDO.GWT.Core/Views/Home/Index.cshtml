@@ -1,0 +1,39 @@
+﻿@using BDO.GWT.Web.LiveSite.Constants
+@using BDO.GWT.Web.LiveSite.Data
+@using BDO.GWT.Web.LiveSite.Services
+
+@model BDO.GWT.Web.LiveSite.DTOs.Pages.HomeDto
+
+@inject IReactService ReactService
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<h2>Home Page</h2>
+
+@(await ReactService.RenderComponentAsync(ReactComponentType.HomeHero, "2b6450db-bb51-4e3d-8d2b-a53956ced30c", new { homeHero = Model.HomeHeroSlides }, Context.RequestAborted))
+
+<div class="elevated">
+    @(await ReactService.RenderComponentAsync(ReactComponentType.TrendingTopics, "787fa982-047e-4dd8-833a-437616beef3f", new { data = Model.TrendingTopics }, Context.RequestAborted))
+    
+    @(await ReactService.RenderComponentAsync(ReactComponentType.Accordion, "eb8adb96-24dd-4a60-8ab8-af1d1dc32f23", new AccordionData
+    {
+        AccordionItems =
+        [
+            new AccordionItem
+            {
+                Content = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+            },
+            new AccordionItem
+            {
+                Content = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+            },
+        ],
+    }, Context.RequestAborted))
+</div>
