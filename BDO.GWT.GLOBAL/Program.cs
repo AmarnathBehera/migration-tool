@@ -75,36 +75,23 @@ builder.Services.AddXperience();
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddAdminExternalAuthenticationProvider(
-    builder => builder.AddMicrosoftIdentityWebApp(options =>
+    authBuilder => authBuilder.AddMicrosoftIdentityWebApp(options =>
     {
 
         options.Domain = "";
 
-        options.TenantId = "44f4e7a6-4821-44d7-b286-cd90436c6975";
+        options.TenantId = builder.Configuration["AzureAd:TenantId"];
 
-        options.ClientId = "422caa30-f1da-461f-99d5-39f2413edf07";
+        options.ClientId = builder.Configuration["AzureAd:ClientId"];
+
+        // Add the credentials used to prove your application's identity,
+        options.ClientSecret = builder.Configuration["AzureAd:ClientSecret"];
 
         options.Instance = "https://login.microsoftonline.com/";
 
         options.CallbackPath = new PathString("/signin-oidc");
 
         options.ResponseType = OpenIdConnectResponseType.Code;
-
-
-        // Add the credentials used to prove your application's identity,
-        // either a certificate OR a client secret.
-        options.ClientSecret = "jjm8Q~y-tfGYE5xMRE3JKKdTibZlkWsv_c-GVco-";
-
-        ////// Certificate
-        //options.ClientCertificates = new List<CertificateDescription>
-        //{
-        //    // Replace the examples of certificate descriptions with your own
-
-        //    // Certificate from Azure Key Vault
-        //    CertificateDescription.FromKeyVault("https://keyvault-name.vault.azure.net/", "certificate-name"),
-        //    // Certificate from a local file
-        //   CertificateDescription.FromPath("path_to_certificate.pfx","certificate_password")
-        //};
     }),
     options =>
     {
