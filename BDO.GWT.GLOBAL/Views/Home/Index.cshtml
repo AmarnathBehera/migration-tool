@@ -1,8 +1,20 @@
-﻿@model BDO.GWT.Core.DTOs.HomeDto
-@using BDO
+﻿@using BDO
 @using Kentico.Content.Web.Mvc
 @using Kentico.PageBuilder.Web.Mvc
+@using BDO.GWT.Common.Core.LiveSite.Data
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using CMS.Websites
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Core.DTOs.HomeDto
 
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
 @{
     Layout = "_Layout";
 
@@ -17,12 +29,20 @@
     };
 }
 
-@if (Model != null)
-{
-    <h2>@Model.MetaData.MetaTitle</h2>
-}
+
 
 <div>
+    @(await ReactService.RenderComponentAsync(
+    pageId,
+    ReactComponentType.HomeHero,
+    ReactComponentType.HomeHeroGUID,
+    new {
+    homeHero = Model.HomeHeroSlides,
+    },
+    Context.RequestAborted))
+</div>
+
+@* <div>
     @if (Model?.HomeHeroSlides?.Any() == true)
     {
         var firstSlide = Model.HomeHeroSlides.FirstOrDefault();
@@ -33,9 +53,9 @@
             <img src="@Url.Content(firstSlide.ThumbnailImageURL)" alt="@(firstSlide.ThumbnailImageAltText ?? "Thumbnail image")" />
         }
     }
-</div>
+</div> *@
 
-<div>
+@* <div>
 
     @await Html.Kentico().EditableAreaAsync(
     "mainContent", // Unique identifier
@@ -44,4 +64,15 @@
 
             AllowedWidgets = widgetsList
         })
+</div> *@
+
+            <div class="elevated">
+                 @await Html.Kentico().EditableAreaAsync(
+    "mainContent", // Unique identifier
+        new EditableAreaOptions
+        {
+
+            AllowedWidgets = widgetsList
+        })
+   
 </div>

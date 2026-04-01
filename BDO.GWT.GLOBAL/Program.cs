@@ -2,6 +2,7 @@
 using BDO.GWT.Common;
 using Kentico.Membership;
 using Kentico.Web.Mvc;
+using BDO.GWT.Common.Options;
 using BDO.GWT.Core;
 using BDO.GWT.Domain.Services;
 using BDO.GWT.Xperience.LiveSite.Services;
@@ -39,6 +40,25 @@ builder.Services.AddKentico(features =>
     features.UseEmailMarketing();
 });
 
+
+builder.Services.Configure<WebEncoderOptions>(options =>
+{
+    options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All);
+});
+
+//builder.Services.AddDomain();
+
+//builder.Services.AddWeb();
+
+//builder.Services.AddLiveSite();
+
+//builder.Services.AddLiveSiteInfrastructure();
+builder.Services.Configure<ReactOptions>(
+    builder.Configuration.GetSection("ReactOptions"));
+builder.Services.Configure<ReactCachingOptions>(
+    builder.Configuration.GetSection("ReactCachingOptions"));
+
+builder.Services.AddXperience();
 
 builder.Services.Configure<WebEncoderOptions>(options =>
 {
@@ -117,8 +137,6 @@ app.UseAuthentication();
 // app.UseAuthentication();
 
 app.UseKentico();
-
-// app.UseAuthorization();
 
 app.Kentico().MapRoutes();
 

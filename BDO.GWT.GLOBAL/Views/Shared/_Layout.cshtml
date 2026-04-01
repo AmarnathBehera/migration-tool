@@ -1,3 +1,6 @@
+
+﻿@using BDO.GWT.Core.Services
+@using BDO.GWT.Global.Components.ViewComponents
 ﻿@using BDO.GWT.Global.Components.ViewComponents
 @using BDO.GWT.Web.Core.LiveSite.Components.ViewComponents
 @using BDO.GWT.Xperience
@@ -5,22 +8,40 @@
 @using Kentico.Activities.Web.Mvc
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using Kentico.PageBuilder.Web.Mvc
-@using BDO.GWT.Core.Services
 @inject IPageContext PageContext
 @inject ICultureContext CultureContext
+@inject IReactService ReactService
 <!DOCTYPE html>
-<html lang="@(CultureContext.CurrentLanguageTag.ToString())" dir="@(CultureContext.IsCurrentCultureRtl ? "rtl" : "ltr")" class="scroll-smooth"">
+<html lang="@(CultureContext.CurrentLanguageTag.ToString())" dir="@(CultureContext.IsCurrentCultureRtl ? "rtl" : "ltr")" class="scroll-smooth" ">
 <head id="head">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="UTF-8" />
     @{
         var metaDataSeoDto = await PageContext.GetCurrentPageMetadataAsync();
     }
-    
+
     <title>@metaDataSeoDto.MetaData.MetaTitle</title>
     <meta name="description" content="@metaDataSeoDto.MetaData.MetaDescription" />
+    <meta name="keywords" content="@metaDataSeoDto.MetaData.MetaDescription" />
     <partial name="_Favicon.cshtml" />
-    <!-- ✅ Page Builder Styles (IMPORTANT FIX) -->
+   
+    @if (metaDataSeoDto.OGMetaData.MetadataOGTitle != null)
+    {
+        <meta property="og:title" content="@metaDataSeoDto.OGMetaData.MetadataOGTitle">
+    }
+    @if (metaDataSeoDto.OGMetaData.MetadataOGDescription != null)
+    {
+        <meta property="og:description" content="@metaDataSeoDto.OGMetaData.MetadataOGDescription">
+    }
+    @if (metaDataSeoDto.MetaData.MetaCanonical != null)
+    {
+        <link rel="canonical" href="@metaDataSeoDto.MetaData.MetaCanonical" />
+    }
+    else
+    {
+        <link rel="canonical" href="@metaDataSeoDto.OGMetaData.Url" />
+    }
+    <meta property="og:type" content="website">
     @Html.Kentico().PageBuilderStyles()
     @(await Component.InvokeAsync<ScriptsHead>())
     @(await Component.InvokeAsync<StartScriptsHead>())
@@ -30,90 +51,36 @@
     @(await Component.InvokeAsync<MarketoMunchkincode>())
     @Html.Kentico().ActivityLoggingScriptV2()
     @RenderSection("styles", required: false)
-    <style>
-        /* Footer Styles */
-        .site-footer {
-            background: #333;
-            color: white;
-            font-family: Arial, Helvetica, sans-serif;
-            margin-top: 40px;
-            padding: 40px 0;
-        }
 
-            .site-footer .footer-container {
-                max-width: 1200px;
-                margin: auto;
-                display: flex;
-                justify-content: space-between;
-                flex-wrap: wrap;
-            }
-
-            /* Left Links */
-            .site-footer .footer-links {
-                min-width: 250px;
-            }
-
-                .site-footer .footer-links ul {
-                    list-style: none;
-                    padding: 0;
-                    margin: 0;
-                    line-height: 2;
-                }
-
-                .site-footer .footer-links a {
-                    color: white;
-                    text-decoration: none;
-                }
-
-                    .site-footer .footer-links a:hover {
-                        text-decoration: underline;
-                    }
-
-            /* Social + Copyright */
-            .site-footer .footer-social {
-                text-align: right;
-                min-width: 250px;
-            }
-
-            .site-footer .social-links a {
-                color: white;
-                margin-right: 15px;
-                text-decoration: none;
-                font-weight: bold;
-            }
-
-                .site-footer .social-links a:hover {
-                    text-decoration: underline;
-                }
-
-            .site-footer .footer-copy {
-                font-size: 14px;
-                color: #ccc;
-                margin-top: 10px;
-            }
-
-
-            .site-footer .footer-social {
-                text-align: left;
-                margin-top: 20px;
-            }
-
-        }
-    </style>
 
     @Html.Kentico().ActivityLoggingScriptV2()
-   
+
+    @await RenderSectionAsync("Styles", required: false)
+    <link rel="stylesheet" href="/dist/master.css" asp-append-version="true" />
+    <page-builder-styles />
 </head>
 
 <body>
     @await (Component.InvokeAsync<ScriptsTopBody>())
     @RenderSection("styles", required: false)
-    @await(Component.InvokeAsync<Header>())
+    @await (Component.InvokeAsync<Header>())
+    @(await Component.InvokeAsync<ScriptsHead>())
 
     @RenderBody()
+
+   
+   
+    <script src="/dist/vendor.bundle.js" asp-append-version="true" data-cookieconsent="ignore"></script>
+    <script src="/dist/master.bundle.js" asp-append-version="true" data-cookieconsent="ignore"></script>
+
+    
+    @await (Component.InvokeAsync<ScriptsBottomBody>())
+
 @(await Component.InvokeAsync<Footer>())
 @await Html.Kentico().PageBuilderScriptsAsync()
 @await (Component.InvokeAsync<ScriptsBottomBody>())
 
+    @(ReactService.RenderCombinedScript())
 </body>
 </html>
+

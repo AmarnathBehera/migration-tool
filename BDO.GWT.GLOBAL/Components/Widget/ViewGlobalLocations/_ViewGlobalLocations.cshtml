@@ -1,20 +1,26 @@
 ﻿@using BDO.GWT.Web.Core.LiveSite.Data
 @model ViewGlobalLocationsData
+@using BDO.GWT.Common.Core.LiveSite.Data
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using CMS.Websites
+@using Kentico.Content.Web.Mvc
 
-<section class="global-locations-section @Model.Theme" style="margin-top:@Model.TopMargin; margin-bottom:@Model.BottomMargin;">
 
-    <div class="container text-center">
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
 
-@* Title *@
-@if (!string.IsNullOrEmpty(Model.Title))
-{
-            <h2 class="section-title">@Model.Title</h2>
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
 }
 
-@* Description *@
-@if (!string.IsNullOrEmpty(Model.Description))
-{
-            <p class="section-description">@Model.Description</p>
-}
-
-@* Button *@
+@(await ReactService.RenderComponentAsync(
+    pageId,
+    ReactComponentType.ViewGlobalLocations,
+    ReactComponentType.ViewGlobalLocationsWidgetGUID,
+     new
+     {
+         data = Model,
+     },
+    Context.RequestAborted))
