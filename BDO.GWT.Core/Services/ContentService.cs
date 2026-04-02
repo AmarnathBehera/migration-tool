@@ -1,5 +1,6 @@
 ﻿namespace BDO.GWT.Core
 {
+    using BDO.GWT.Core.DTOs.Base;
     using CMS.ContentEngine;
     using CMS.Helpers;
     using CMS.Websites;
@@ -233,10 +234,9 @@
             if (parentGuid == 0)
                 throw new ArgumentException("Parent GUID must be provided", nameof(parentGuid));
 
-            // Use RetrievePages<TSource, TResult> overload
             var childPages = await _contentRetriever.RetrievePages<TPage>(
-                new RetrievePagesParameters(),                  // basic parameters
-                query =>
+                new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
+            query =>
                 {
                     // Filter by parent GUID
                     query.Where(w => w.WhereEquals("WebPageItemParentID", parentGuid))
@@ -248,8 +248,34 @@
 
             return childPages;
         }
+
+        public Task<IEnumerable<TPage>> GetPagesAsync<TPage>(
+      RetrievePagesParameters parameters,
+      Action<RetrievePagesQueryParameters> queryAction,
+      RetrievalCacheSettings cacheSettings,
+      CancellationToken cancellationToken
+  ) where TPage : class, IWebPageFieldsSource
+        {
+            // Call the extension method here
+            return _contentRetriever.RetrievePages<TPage>(
+                parameters,
+                queryAction,
+                cacheSettings,
+                cancellationToken
+            );
+        }
+
+
+        public Task<IEnumerable<T>> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
+        {
+            return _contentRetriever.RetrievePages<T>(cancellationToken);
+        }
+
+        public Task<IEnumerable<T>> RetrievePagesAsync<T>(RetrievePagesParameters parameters, CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
+        {
+            return _contentRetriever.RetrievePages<T>(parameters, cancellationToken);
+        }
     }
 }
-
 
 

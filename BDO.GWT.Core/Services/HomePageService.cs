@@ -6,20 +6,15 @@ using CMS.ContentEngine;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
-using Org.BouncyCastle.Security;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mime;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BDO.GWT.Core;
 
 public interface IHomePageService
 {
-    Task<HomeDto> GetHomePageDtoAsync(HomePage page, CancellationToken cancellationToken = default);
+    Task<HomeDto?> GetHomePageDtoAsync(HomePage? page, CancellationToken cancellationToken = default);
     Task<string?> GetHomePageUrl(CancellationToken cancellationToken);
+    
+    Task<IEnumerable<HomeHeroSlideDto?>?> RetrieveHomeHeroSlidesDtoAsync(HomePage? homePage, CancellationToken cancellationToken);
 }
 
 
@@ -29,19 +24,17 @@ public class HomePageService : IHomePageService
     private readonly IContentService _contentRetriever;
     private readonly IContentQueryExecutor _executor;
     private readonly IWebPageDataContextRetriever _webPageDataContextRetriever;
-    private readonly IContentRetriever _contentretriever;
     private readonly IWebsiteChannelContext _websiteChannelContext;
     public HomePageService(IContentService pageRetriever, IContentQueryExecutor executor,
-        IWebPageDataContextRetriever webPageDataContextRetriever, IContentRetriever contentretriever, IWebsiteChannelContext websiteChannelContext)
+        IWebPageDataContextRetriever webPageDataContextRetriever, IWebsiteChannelContext websiteChannelContext)
     {
         _contentRetriever = pageRetriever;
         _executor = executor;
         _webPageDataContextRetriever = webPageDataContextRetriever;
-        _contentretriever = contentretriever;
         _websiteChannelContext = websiteChannelContext;
     }
 
-    public async Task<HomeDto> GetHomePageDtoAsync(HomePage page, CancellationToken cancellationToken = default)
+    public async Task<HomeDto?> GetHomePageDtoAsync(HomePage? page, CancellationToken cancellationToken = default)
     {
 
         var webPageContext = _webPageDataContextRetriever.Retrieve();
@@ -130,7 +123,7 @@ public class HomePageService : IHomePageService
 
     public async Task<string?> GetHomePageUrl(CancellationToken cancellationToken)
     {
-        var homePage = await _contentretriever.RetrievePages<HomePage>(cancellationToken);
+        var homePage = await _contentRetriever.RetrievePagesAsync<HomePage>(cancellationToken);
 
         if (homePage == null)
         {
@@ -147,7 +140,7 @@ public class HomePageService : IHomePageService
     {
         try
         {
-            var homeHeroSlides = await _contentretriever.RetrievePages<HomeHeroSlide>(new RetrievePagesParameters
+            var homeHeroSlides = await _contentRetriever.RetrievePagesAsync<HomeHeroSlide>(new RetrievePagesParameters
             {
                 LinkedItemsMaxLevel = 3
             }, cancellationToken);
@@ -180,9 +173,6 @@ public class HomePageService : IHomePageService
         {
             return null;
         }
-       
-
-       
     }
 }
 
