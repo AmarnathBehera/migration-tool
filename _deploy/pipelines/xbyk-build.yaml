@@ -34,11 +34,11 @@ stages:
               dotnet build $(cmsAppProjectFile)
               --configuration $(buildConfiguration)
               --no-restore
-            displayName: 'Build $(cmsAppProjectFile)'
+            displayName: 'Run dotnet build'
 
       - job: Test
         condition: false # Temporarily disable tests until they are fixed
-        displayName: 'Run Tests for XbyK CMS App'
+        displayName: 'Test XbyK CMS App'
         dependsOn: Build
         pool:
           vmImage: 'ubuntu-latest'
