@@ -1,0 +1,23 @@
+variable "Octopus.Azure.Account" {
+    type = "AzureAccount"
+
+    value "octopus-npe-gwt-oidc" {
+        description = ""
+    }
+
+    value "octopus-gwt-prd" {
+        description = ""
+        environment = ["production"]
+    }
+}
+
+variable "deploy.octopus.workerPool" {
+    type = "WorkerPool"
+
+    value "gwt-npe-worker-pool" {}
+
+    value "gwt-prd-worker-pool" {
+        description = ""
+        environment = ["production"]
+    }
+}

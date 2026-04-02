@@ -1,0 +1,14 @@
+﻿@using BDO.GWT.Core.DTOs.Cookieboot
+@model CookiebotDTO
+
+@if (Model.EnableCookiebot)
+{
+    @if (!string.IsNullOrEmpty(Model.CustomCookiebotScript))
+    {
+        @Html.Raw(Model.CustomCookiebotScript)
+    }
+    else if (!string.IsNullOrEmpty(Model.CookieID))
+    {
+        <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="@Model.CookieID" data-blockingmode="auto" type="text/javascript"></script>
+    }
+}

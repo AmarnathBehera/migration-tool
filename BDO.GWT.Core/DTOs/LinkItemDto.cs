@@ -1,6 +1,6 @@
-﻿
+﻿using CMS.Websites;
 
-namespace BDO.GWT.Core;
+namespace BDO.GWT.Core.DTOs;
 
     public class LinkItemDto
     {

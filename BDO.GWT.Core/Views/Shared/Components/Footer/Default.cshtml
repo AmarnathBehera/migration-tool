@@ -1,0 +1,12 @@
+﻿@using BDO.GWT.Web.LiveSite.Constants
+@using BDO.GWT.Web.LiveSite.Services
+
+@model BDO.GWT.Web.LiveSite.DTOs.FooterDto
+
+@inject IReactService ReactService
+
+@(await ReactService.RenderComponentAsync(ReactComponentType.Footer, "f832c031-0a99-4d8a-b8c7-f3343dddcfc2", new { footerSettings = Model }, options =>
+{
+    options.ContainerClass = "footer__wrapper";
+}, 
+Context.RequestAborted))

@@ -1,0 +1,78 @@
+﻿@using BDO
+@using Kentico.Content.Web.Mvc
+@using Kentico.PageBuilder.Web.Mvc
+@using BDO.GWT.Common.Core.LiveSite.Data
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using CMS.Websites
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Core.DTOs.HomeDto
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+
+
+    var widgetsList = new[]
+    {
+        ComponentIdentifiers.ExternalNavigation,
+        ComponentIdentifiers.Imagewithtext,
+        ComponentIdentifiers.QuoteCard,
+        ComponentIdentifiers.TiledLink,
+        ComponentIdentifiers.Globallocation
+    };
+}
+
+
+
+<div>
+    @(await ReactService.RenderComponentAsync(
+    pageId,
+    ReactComponentType.HomeHero,
+    ReactComponentType.HomeHeroGUID,
+    new {
+    homeHero = Model.HomeHeroSlides,
+    },
+    Context.RequestAborted))
+</div>
+
+@* <div>
+    @if (Model?.HomeHeroSlides?.Any() == true)
+    {
+        var firstSlide = Model.HomeHeroSlides.FirstOrDefault();
+        if (!string.IsNullOrEmpty(firstSlide?.MobileImageURL))
+        {
+            <img src="@Url.Content(firstSlide.MobileImageURL)" alt="@(firstSlide.MobileImageAltText ?? "Hero image")" />
+            <img src="@Url.Content(firstSlide.ImageURL)" alt="@(firstSlide.ImageAltText ?? "Image image")" />
+            <img src="@Url.Content(firstSlide.ThumbnailImageURL)" alt="@(firstSlide.ThumbnailImageAltText ?? "Thumbnail image")" />
+        }
+    }
+</div> *@
+
+@* <div>
+
+    @await Html.Kentico().EditableAreaAsync(
+    "mainContent", // Unique identifier
+        new EditableAreaOptions
+        {
+
+            AllowedWidgets = widgetsList
+        })
+</div> *@
+
+            <div class="elevated">
+                 @await Html.Kentico().EditableAreaAsync(
+    "mainContent", // Unique identifier
+        new EditableAreaOptions
+        {
+
+            AllowedWidgets = widgetsList
+        })
+   
+</div>

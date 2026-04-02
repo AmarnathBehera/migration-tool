@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="HomePage"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class HomePage : IWebPageFieldsSource
+	public partial class HomePage : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -36,33 +36,9 @@ namespace BDO
 
 
 		/// <summary>
-		/// MetadataTitle.
+		/// DocumentName.
 		/// </summary>
-		public string MetadataTitle { get; set; }
-
-
-		/// <summary>
-		/// MetadataDescription.
-		/// </summary>
-		public string MetadataDescription { get; set; }
-
-
-		/// <summary>
-		/// MetadataTeaserImage.
-		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataTeaserImage { get; set; }
-
-
-		/// <summary>
-		/// MetadataTeaserImageAltText.
-		/// </summary>
-		public string MetadataTeaserImageAltText { get; set; }
-
-
-		/// <summary>
-		/// MetadataCanonical.
-		/// </summary>
-		public string MetadataCanonical { get; set; }
+		public string DocumentName { get; set; }
 
 
 		/// <summary>
@@ -114,8 +90,32 @@ namespace BDO
 
 
 		/// <summary>
-		/// DocumentName.
+		/// MetadataTitle.
 		/// </summary>
-		public string DocumentName { get; set; }
+		public string MetadataTitle { get; set; }
+
+
+		/// <summary>
+		/// MetadataDescription.
+		/// </summary>
+		public string MetadataDescription { get; set; }
+
+
+		/// <summary>
+		/// MetadataTeaserImage.
+		/// </summary>
+		public IEnumerable<IContentItemFieldsSource> MetadataTeaserImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataTeaserImageAltText.
+		/// </summary>
+		public string MetadataTeaserImageAltText { get; set; }
+
+
+		/// <summary>
+		/// MetadataCanonical.
+		/// </summary>
+		public string MetadataCanonical { get; set; }
 	}
 }

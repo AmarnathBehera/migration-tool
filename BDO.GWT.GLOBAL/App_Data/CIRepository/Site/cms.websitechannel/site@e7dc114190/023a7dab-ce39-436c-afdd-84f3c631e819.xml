@@ -6,7 +6,11 @@
     <ObjectType>cms.channel</ObjectType>
   </WebsiteChannelChannelID>
   <WebsiteChannelDefaultCookieLevel>0</WebsiteChannelDefaultCookieLevel>
+<<<<<<< HEAD
   <WebsiteChannelDomain>localhost:56246</WebsiteChannelDomain>
+=======
+  <WebsiteChannelDomain>localhost:12393</WebsiteChannelDomain>
+>>>>>>> Content-page-fields-to-reusable-field-schema
   <WebsiteChannelGUID>023a7dab-ce39-436c-afdd-84f3c631e819</WebsiteChannelGUID>
   <WebsiteChannelPrimaryContentLanguageID>
     <CodeName>en-GB</CodeName>

@@ -1,0 +1,86 @@
+
+﻿@using BDO.GWT.Core.Services
+@using BDO.GWT.Global.Components.ViewComponents
+﻿@using BDO.GWT.Global.Components.ViewComponents
+@using BDO.GWT.Web.Core.LiveSite.Components.ViewComponents
+@using BDO.GWT.Xperience
+@using GWTXbyKWeb.Components.ViewComponents
+@using Kentico.Activities.Web.Mvc
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Kentico.PageBuilder.Web.Mvc
+@inject IPageContext PageContext
+@inject ICultureContext CultureContext
+@inject IReactService ReactService
+<!DOCTYPE html>
+<html lang="@(CultureContext.CurrentLanguageTag.ToString())" dir="@(CultureContext.IsCurrentCultureRtl ? "rtl" : "ltr")" class="scroll-smooth" ">
+<head id="head">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    @{
+        var metaDataSeoDto = await PageContext.GetCurrentPageMetadataAsync();
+    }
+
+    <title>@metaDataSeoDto.MetaData.MetaTitle</title>
+    <meta name="description" content="@metaDataSeoDto.MetaData.MetaDescription" />
+    <meta name="keywords" content="@metaDataSeoDto.MetaData.MetaDescription" />
+    <partial name="_Favicon.cshtml" />
+   
+    @if (metaDataSeoDto.OGMetaData.MetadataOGTitle != null)
+    {
+        <meta property="og:title" content="@metaDataSeoDto.OGMetaData.MetadataOGTitle">
+    }
+    @if (metaDataSeoDto.OGMetaData.MetadataOGDescription != null)
+    {
+        <meta property="og:description" content="@metaDataSeoDto.OGMetaData.MetadataOGDescription">
+    }
+    @if (metaDataSeoDto.MetaData.MetaCanonical != null)
+    {
+        <link rel="canonical" href="@metaDataSeoDto.MetaData.MetaCanonical" />
+    }
+    else
+    {
+        <link rel="canonical" href="@metaDataSeoDto.OGMetaData.Url" />
+    }
+    <meta property="og:type" content="website">
+    @Html.Kentico().PageBuilderStyles()
+    @(await Component.InvokeAsync<ScriptsHead>())
+    @(await Component.InvokeAsync<StartScriptsHead>())
+    @await (Component.InvokeAsync<Cookiebot>())
+
+    @(await Component.InvokeAsync<ScriptsWhenCookiesAccepted>())
+    @(await Component.InvokeAsync<MarketoMunchkincode>())
+    @Html.Kentico().ActivityLoggingScriptV2()
+    @RenderSection("styles", required: false)
+
+
+    @Html.Kentico().ActivityLoggingScriptV2()
+
+    @await RenderSectionAsync("Styles", required: false)
+    <link rel="stylesheet" href="/dist/master.css" asp-append-version="true" />
+    <page-builder-styles />
+</head>
+
+<body>
+    @await (Component.InvokeAsync<ScriptsTopBody>())
+    @RenderSection("styles", required: false)
+    @await (Component.InvokeAsync<Header>())
+    @(await Component.InvokeAsync<ScriptsHead>())
+
+    @RenderBody()
+
+   
+   
+    <script src="/dist/vendor.bundle.js" asp-append-version="true" data-cookieconsent="ignore"></script>
+    <script src="/dist/master.bundle.js" asp-append-version="true" data-cookieconsent="ignore"></script>
+
+    
+    @await (Component.InvokeAsync<ScriptsBottomBody>())
+
+@(await Component.InvokeAsync<Footer>())
+@await Html.Kentico().PageBuilderScriptsAsync()
+@await (Component.InvokeAsync<ScriptsBottomBody>())
+
+    @(ReactService.RenderCombinedScript())
+</body>
+</html>
+

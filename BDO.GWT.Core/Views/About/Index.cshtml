@@ -1,0 +1,46 @@
+﻿@using BDO.GWT.Domain.Constants
+@using BDO.GWT.Web.LiveSite.Constants
+@using BDO.GWT.Web.LiveSite.Services
+
+@inject IPageBuilderService PageBuilderService
+@inject IReactService ReactService
+
+@{
+    var widgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.Accordion,
+        //ComponentIdentifiers.Widgets.BannerWithIcons,
+        //ComponentIdentifiers.Widgets.CommunityInvolvement,
+        //ComponentIdentifiers.Widgets.DescriptionText,
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.ImageWithText,
+        ComponentIdentifiers.Widgets.KeyContacts,
+        //ComponentIdentifiers.Widgets.PurposeIcon,
+        ComponentIdentifiers.Widgets.RelatedContacts,
+        ComponentIdentifiers.Widgets.TiledLinkSection,
+        //ComponentIdentifiers.Widgets.TwitterCarousel,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+    };
+
+    var advancedWidgetsList = new[]
+    {
+        //ComponentIdentifiers.Widgets.BusinessStrategiesMenu,
+        //ComponentIdentifiers.Widgets.CustomContent,
+        //ComponentIdentifiers.Widgets.FeaturedBusinessSolutions,
+        //ComponentIdentifiers.Widgets.FeaturedCaseStudies,
+        //ComponentIdentifiers.Widgets.FeaturedEvent,
+        ComponentIdentifiers.Widgets.TabAccordion,
+    };
+}
+
+@section Styles {
+    @PageBuilderService.GetPageBuilderStyles(Html)
+}
+
+@(await ReactService.RenderComponentAsync(ReactComponentType.Hero, "f2f86159-debc-4875-aa44-4db76d9fa24c", new { data = Model.Hero }, Context.RequestAborted))
+
+@await Html.PartialAsync("_LocalNavigation")
+
+@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
+
+@PageBuilderService.GetPageBuilderScripts(Html)

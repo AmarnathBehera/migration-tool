@@ -1,0 +1,26 @@
+﻿@using BDO.GWT.Web.Core.LiveSite.Data
+@model ViewGlobalLocationsData
+@using BDO.GWT.Common.Core.LiveSite.Data
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using CMS.Websites
+@using Kentico.Content.Web.Mvc
+
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+
+@(await ReactService.RenderComponentAsync(
+    pageId,
+    ReactComponentType.ViewGlobalLocations,
+    ReactComponentType.ViewGlobalLocationsWidgetGUID,
+     new
+     {
+         data = Model,
+     },
+    Context.RequestAborted))
