@@ -41,6 +41,18 @@
     {
         <link rel="canonical" href="@metaDataSeoDto.OGMetaData.Url" />
     }
+    @if (metaDataSeoDto.SEOItemsDto.MetadataNoindex && metaDataSeoDto.SEOItemsDto.MetadataNofollow)
+    {
+        <meta name="robots" content="noindex,nofollow">
+    }
+    else if (metaDataSeoDto.SEOItemsDto.MetadataNoindex)
+    {
+        <meta name="robots" content="noindex">
+    }
+    else if (metaDataSeoDto.SEOItemsDto.MetadataNofollow)
+    {
+        <meta name="robots" content="nofollow">
+    }
     <meta property="og:type" content="website">
     @Html.Kentico().PageBuilderStyles()
     @(await Component.InvokeAsync<ScriptsHead>())
