@@ -8,7 +8,7 @@ variables:
   dotnetVersion: '10.x'
   
   # XbyK App project files
-  cmsAppProjectFile: 'BDO.GWT.GLOBAL/GWTXbyKWeb.csproj'
+  cmsAppProjectFile: '$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.csproj'
 
 stages:
   - stage: BuildAndTest
@@ -16,7 +16,7 @@ stages:
     jobs:
       - job: Build
         condition: true
-        displayName: 'Build XbyK CMS App DotNet project'
+        displayName: 'Build XbyK CMS App'
         pool:
           vmImage: 'ubuntu-latest'
         steps:
@@ -38,7 +38,7 @@ stages:
 
       - job: Test
         condition: false # Temporarily disable tests until they are fixed
-        displayName: 'Run Tests for XbyK CMS App DotNet project'
+        displayName: 'Run Tests for XbyK CMS App'
         dependsOn: Build
         pool:
           vmImage: 'ubuntu-latest'
