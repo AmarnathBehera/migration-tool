@@ -73,7 +73,7 @@ builder.Services.AddScoped<IContentService, ContentService>();
 
 builder.Services.AddXperience();
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddXperienceCommunityLocalization();
 builder.Services.AddAdminExternalAuthenticationProvider(
     authBuilder => authBuilder.AddMicrosoftIdentityWebApp(options =>
     {
