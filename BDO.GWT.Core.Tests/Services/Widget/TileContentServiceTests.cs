@@ -1,6 +1,5 @@
 ﻿using BDO.GWT.Core.Services.Widget;
 using BDO.GWT.Core.DTOs;
-using BDO.GWT.Core.Tests.Helpers;
 using CMS.ContentEngine;
 using Kentico.Content.Web.Mvc;
 using Moq;
