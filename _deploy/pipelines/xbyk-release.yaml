@@ -61,7 +61,7 @@ stages:
             name: SetGitVersionVars
             displayName: Export GitVersion variables
 
-      - job: Build-cmsApp
+      - job: BuildCmsApp
         condition: true
         displayName: 'Build XbyK CMS App and package'
         dependsOn: SetVersion
@@ -106,7 +106,7 @@ stages:
               targetPath: '$(octopusPackageOutput)'
               artifact: drop
 
-      - job: Build-mvcApp
+      - job: BuildMvcApp
         condition: false
         displayName: 'Build XbyK MVC App and package'
         dependsOn: SetVersion
