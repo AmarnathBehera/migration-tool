@@ -22,7 +22,7 @@ variables:
   # XbyK App Deploy packages
   cmsAppProjectFile: 'BDO.GWT.GLOBAL/GWTXbyKWeb.csproj'
   cmsAppPackageId: 'GWT.XbyK.CMS.Deploy'
-  # mvcAppPackageId: 'GWT.XbyK.Mvc.Deploy'
+  mvcAppPackageId: 'GWT.XbyK.Mvc.Deploy'
   # reactAppPackageId: 'GWT.XbyK.React.Deploy'
   # synAppPackageId: 'GWT.XbyK.Sync.Deploy'
   # apiAppPackageId: 'GWT.XbyK.API.Deploy'
@@ -62,6 +62,7 @@ stages:
             displayName: Export GitVersion variables
 
       - job: Build-cmsApp
+        condition: true
         displayName: 'Build XbyK CMS App and package'
         dependsOn: SetVersion
         pool:
@@ -74,11 +75,56 @@ stages:
               version: '$(dotnetVersion)'
               installationPath: $(Agent.ToolsDirectory)/dotnet
 
-          - script: dotnet restore $(projectFile)
+          - script: dotnet restore $(cmsAppProjectFile)
             displayName: 'Restore NuGet packages'
 
           - script: >
-              dotnet build $(projectFile)
+              dotnet build $(cmsAppProjectFile)
+              --configuration $(buildConfiguration)
+              --no-restore
+            displayName: 'Build $(cmsAppProjectFile)'
+
+          - script: >
+              dotnet publish $(cmsAppProjectFile)
+              --configuration $(buildConfiguration)
+              --no-build
+              --output $(publishOutput)
+            displayName: 'Publish $(cmsAppProjectFile)'
+
+          - task: ArchiveFiles@2
+            displayName: 'Create deployment package'
+            inputs:
+              rootFolderOrFile: '$(publishOutput)'
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: '$(octopusPackageOutput)/$(cmsAppPackageId).$(Build.BuildNumber).zip'
+              replaceExistingArchive: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish package artifact'
+            inputs:
+              targetPath: '$(octopusPackageOutput)'
+              artifact: drop
+
+      - job: Build-mvcApp
+        condition: false
+        displayName: 'Build XbyK MVC App and package'
+        dependsOn: SetVersion
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Use .NET $(dotnetVersion)'
+            inputs:
+              packageType: 'sdk'
+              version: '$(dotnetVersion)'
+              installationPath: $(Agent.ToolsDirectory)/dotnet
+
+          - script: dotnet restore $(mvcAppProjectFile)
+            displayName: 'Restore NuGet packages'
+
+          - script: >
+              dotnet build $(mvcAppProjectFile)
               --configuration $(buildConfiguration)
               --no-restore
             displayName: 'Build $(projectFile)'
@@ -96,7 +142,7 @@ stages:
               rootFolderOrFile: '$(publishOutput)'
               includeRootFolder: false
               archiveType: zip
-              archiveFile: '$(octopusPackageOutput)/$(packageId).$(Build.BuildNumber).zip'
+              archiveFile: '$(octopusPackageOutput)/$(mvcAppPackageId).$(Build.BuildNumber).zip'
               replaceExistingArchive: true
 
           - task: PublishPipelineArtifact@1
@@ -134,7 +180,9 @@ stages:
             inputs:
               OctoConnectedServiceName: "Octopus Cloud"
               Space: "$(octopusSpaceName)"
-              PackageIds: "$(packageId)"
+              PackageIds: |
+                $(cmsAppPackageId)
+              #  $(mvcAppPackageId)
               PackageVersion: "$(Build.BuildNumber)"
               Replace: OverwriteExisting
 

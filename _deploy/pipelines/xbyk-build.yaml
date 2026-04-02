@@ -27,14 +27,14 @@ stages:
               version: '$(dotnetVersion)'
               installationPath: $(Agent.ToolsDirectory)/dotnet
 
-          - script: dotnet restore $(projectFile)
+          - script: dotnet restore $(cmsAppProjectFile)
             displayName: 'Restore NuGet packages'
 
           - script: >
-              dotnet build $(projectFile)
+              dotnet build $(cmsAppProjectFile)
               --configuration $(buildConfiguration)
               --no-restore
-            displayName: 'Build $(projectFile)'
+            displayName: 'Build $(cmsAppProjectFile)'
 
       - job: Test
         condition: false # Temporarily disable tests until they are fixed
