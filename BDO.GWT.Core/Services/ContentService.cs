@@ -1,6 +1,6 @@
 ﻿namespace BDO.GWT.Core
 {
-    using BDO.GWT.Core.DTOs.Base;
+    
     using CMS.ContentEngine;
     using CMS.Helpers;
     using CMS.Websites;

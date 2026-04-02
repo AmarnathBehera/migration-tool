@@ -1,6 +1,5 @@
 ﻿namespace BDO.GWT.Core
 {
-    using BDO.GWT.Core.DTOs.Base;
     using CMS.ContentEngine;
     using CMS.Websites;
     using Kentico.Content.Web.Mvc;
