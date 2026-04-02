@@ -6,13 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="kentico.xperience.webapp" Version="31.1.2" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="ContentTypes\" />
-	</ItemGroup>
-
-	
+  <ItemGroup>
+    <PackageReference Include="Kentico.Xperience.Admin" Version="31.2.3" />
+	<ProjectReference Include="..\BDO.GWT.Common\BDO.GWT.Common.csproj" />
+  </ItemGroup>
 </Project>

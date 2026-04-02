@@ -8,17 +8,24 @@ trigger:
   branches:
     include:
       - main
+      - development
       - 'Release/*'
 
 variables:
   buildConfiguration: 'Release'
   dotnetVersion: '10.x'
-  projectFile: 'GWTXbyKWeb.csproj'
-  packageId: 'GWT.XbyK.Deploy.Web'
   publishOutput: '$(Build.ArtifactStagingDirectory)/publish'
   octopusSpaceName: 'GWT'
   octopusProjectName: 'XbyK Web'
   octopusPackageOutput: '$(Build.ArtifactStagingDirectory)/packages'
+
+  # XbyK App Deploy packages
+  cmsAppProjectFile: '$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.csproj'
+  cmsAppPackageId: 'GWT.XbyK.CMS.Deploy'
+  mvcAppPackageId: 'GWT.XbyK.Mvc.Deploy'
+  # reactAppPackageId: 'GWT.XbyK.React.Deploy'
+  # synAppPackageId: 'GWT.XbyK.Sync.Deploy'
+  # apiAppPackageId: 'GWT.XbyK.API.Deploy'
 
 stages:
   - stage: Build
@@ -54,8 +61,9 @@ stages:
             name: SetGitVersionVars
             displayName: Export GitVersion variables
 
-      - job: Build
-        displayName: 'Build XbyK Web and package'
+      - job: Build-cmsApp
+        condition: true
+        displayName: 'Build XbyK CMS App and package'
         dependsOn: SetVersion
         pool:
           vmImage: 'ubuntu-latest'
@@ -67,21 +75,21 @@ stages:
               version: '$(dotnetVersion)'
               installationPath: $(Agent.ToolsDirectory)/dotnet
 
-          - script: dotnet restore $(projectFile)
+          - script: dotnet restore $(cmsAppProjectFile)
             displayName: 'Restore NuGet packages'
 
           - script: >
-              dotnet build $(projectFile)
+              dotnet build $(cmsAppProjectFile)
               --configuration $(buildConfiguration)
               --no-restore
-            displayName: 'Build $(projectFile)'
+            displayName: 'Build $(cmsAppProjectFile)'
 
           - script: >
-              dotnet publish $(projectFile)
+              dotnet publish $(cmsAppProjectFile)
               --configuration $(buildConfiguration)
               --no-build
               --output $(publishOutput)
-            displayName: 'Publish $(projectFile)'
+            displayName: 'Publish $(cmsAppProjectFile)'
 
           - task: ArchiveFiles@2
             displayName: 'Create deployment package'
@@ -89,7 +97,52 @@ stages:
               rootFolderOrFile: '$(publishOutput)'
               includeRootFolder: false
               archiveType: zip
-              archiveFile: '$(octopusPackageOutput)/$(packageId).$(Build.BuildNumber).zip'
+              archiveFile: '$(octopusPackageOutput)/$(cmsAppPackageId).$(Build.BuildNumber).zip'
+              replaceExistingArchive: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish package artifact'
+            inputs:
+              targetPath: '$(octopusPackageOutput)'
+              artifact: drop
+
+      - job: Build-mvcApp
+        condition: false
+        displayName: 'Build XbyK MVC App and package'
+        dependsOn: SetVersion
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Use .NET $(dotnetVersion)'
+            inputs:
+              packageType: 'sdk'
+              version: '$(dotnetVersion)'
+              installationPath: $(Agent.ToolsDirectory)/dotnet
+
+          - script: dotnet restore $(mvcAppProjectFile)
+            displayName: 'Restore NuGet packages'
+
+          - script: >
+              dotnet build $(mvcAppProjectFile)
+              --configuration $(buildConfiguration)
+              --no-restore
+            displayName: 'Build $(mvcAppProjectFile)'
+
+          - script: >
+              dotnet publish $(mvcAppProjectFile)
+              --configuration $(buildConfiguration)
+              --no-build
+              --output $(publishOutput)
+            displayName: 'Publish $(mvcAppProjectFile)'
+
+          - task: ArchiveFiles@2
+            displayName: 'Create deployment package'
+            inputs:
+              rootFolderOrFile: '$(publishOutput)'
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: '$(octopusPackageOutput)/$(mvcAppPackageId).$(Build.BuildNumber).zip'
               replaceExistingArchive: true
 
           - task: PublishPipelineArtifact@1
@@ -127,7 +180,9 @@ stages:
             inputs:
               OctoConnectedServiceName: "Octopus Cloud"
               Space: "$(octopusSpaceName)"
-              PackageIds: "$(packageId)"
+              PackageIds: |
+                $(cmsAppPackageId)
+              #  $(mvcAppPackageId)
               PackageVersion: "$(Build.BuildNumber)"
               Replace: OverwriteExisting
 

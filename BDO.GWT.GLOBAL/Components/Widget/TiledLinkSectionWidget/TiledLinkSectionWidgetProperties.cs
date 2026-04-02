@@ -1,0 +1,56 @@
+﻿using CMS.ContentEngine;
+using Kentico.Components.Web.Mvc.FormComponents;
+using Kentico.Forms.Web.Mvc;
+using Kentico.PageBuilder.Web.Mvc;
+using Kentico.Xperience.Admin.Base;
+using Kentico.Xperience.Admin.Base.FormAnnotations;
+using Kentico.Xperience.Admin.Base.Forms;
+using Kentico.Xperience.Admin.Websites.FormAnnotations;
+using System.Collections.Generic;
+
+namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWidget;
+
+public class TiledLinkSectionWidgetProperties : IWidgetProperties
+{
+
+    [TextInputComponent(Label = "Title", ExplanationText = "Title that will be shown over tiled link section widget.", Order = 0)]
+    public string? Title { get; set; }
+
+    [TextInputComponent(Label = "Description", ExplanationText = "Description that will be shown over tiled link section widget but under title.", Order = 1)]
+    public string? Description { get; set; }
+
+  
+    [ContentItemSelectorComponent(MigratedMediaFile.CONTENT_TYPE_NAME, Label = "Image", Order = 2)]
+    public IEnumerable<ContentItemReference> BackgroundImages { get; set; } = new List<ContentItemReference>();
+
+
+    [TextInputComponent(Label = "Background image alt text", Order = 3)]
+    public string BackgroundImageAltText { get; set; } = "";
+
+    //[DropDownComponent(Label = "Tile page type", Order = 4, Options = "HomePage,Test")]
+    //public string TilePageType { get; set; }
+ 
+    [ContentItemSelectorComponent(new string[] { HomePage.CONTENT_TYPE_NAME }, Label = "Tile pages", Order = 5)]
+    public IEnumerable<ContentItemReference> TilePages { get; set; } = new List<ContentItemReference>();
+
+
+    [RadioGroupComponent(Label = "Light / Dark theme", Order = 6 ,Options = "light;Light theme\r\ndark;Dark theme")]
+     public string Theme { get; set; } = "light";
+
+    [TextInputComponent(Label = "See all link text", Order = 7)]
+    public string? SeeAllLinkText { get; set; }
+
+    [TextInputComponent(Label = "See all link URL", Order = 8)]
+    [UrlValidationRule(AllowRelativeUrl = true, AllowFragmentUrl = true)]
+    [ExcludeFromAiraTranslation]
+    public string? SeeAllLinkURL { get; set; }
+
+    [DropDownComponent(Label = "See all link URL target", Order = 9,Options = "_self;Same tab\n_blank;New tab")]
+    public string SeeAllLinkURLTarget { get; set; } = "_self";
+
+    [DropDownComponent(Label = "Top margin", Order = 10, Options = "0px;None\n20px\n40px\n60px\n80px")]
+     public string? TopMargin { get; set; }
+
+    [DropDownComponent(Label = "Bottom margin", Order = 11, Options = "0px;None\n20px\n40px\n60px\n80px")]
+     public string? BottomMargin { get; set; }
+}

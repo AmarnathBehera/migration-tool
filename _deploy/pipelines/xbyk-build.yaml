@@ -6,7 +6,9 @@ name: XbyK Web Build and Test
 variables:
   buildConfiguration: 'Release'
   dotnetVersion: '10.x'
-  projectFile: 'GWTXbyKWeb.csproj'
+  
+  # XbyK App project files
+  cmsAppProjectFile: '$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.csproj'
 
 stages:
   - stage: BuildAndTest
@@ -14,7 +16,7 @@ stages:
     jobs:
       - job: Build
         condition: true
-        displayName: 'Build XbyK Web DotNet project'
+        displayName: 'Build XbyK CMS App'
         pool:
           vmImage: 'ubuntu-latest'
         steps:
@@ -25,18 +27,18 @@ stages:
               version: '$(dotnetVersion)'
               installationPath: $(Agent.ToolsDirectory)/dotnet
 
-          - script: dotnet restore $(projectFile)
+          - script: dotnet restore $(cmsAppProjectFile)
             displayName: 'Restore NuGet packages'
 
           - script: >
-              dotnet build $(projectFile)
+              dotnet build $(cmsAppProjectFile)
               --configuration $(buildConfiguration)
               --no-restore
-            displayName: 'Build $(projectFile)'
+            displayName: 'Build $(cmsAppProjectFile)'
 
       - job: Test
         condition: false # Temporarily disable tests until they are fixed
-        displayName: 'Run Tests for XbyK Web DotNet project'
+        displayName: 'Run Tests for XbyK CMS App'
         dependsOn: Build
         pool:
           vmImage: 'ubuntu-latest'
@@ -48,5 +50,5 @@ stages:
               installationPath: $(Agent.ToolsDirectory)/dotnet
 
           - script: |
-              dotnet test GWTXbyKWeb.Tests.csproj --configuration $(buildConfiguration) --no-build
+              dotnet test $(cmsAppProjectFile).Tests.csproj --configuration $(buildConfiguration) --no-build
             displayName: 'Run Tests'
