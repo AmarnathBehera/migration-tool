@@ -11,7 +11,7 @@ namespace BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
 
        public string? Url { get; set; }
 
-       public IEnumerable<IContentItemFieldsSource> MetadataOGImage { get; set; }
+       public string? MetadataOGImage { get; set; }
 
         public bool MetadataOGTwitterImageSizeCheckbox { get; set; }
 

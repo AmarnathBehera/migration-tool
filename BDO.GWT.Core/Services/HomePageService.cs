@@ -95,7 +95,10 @@ public class HomePageService : IHomePageService
             {
                 MetadataOGTitle = homePage.MetadataOGTitle,
                 MetadataOGDescription = homePage.MetadataOGDescription,
-                MetadataOGImage = homePage.MetadataOGImage,
+                MetadataOGImage = homePage?.MetadataOGImage?
+                 .FirstOrDefault()?
+                 .ContentAttachmentAsset?
+                 .Url,
                 MetadataOGTwitterImage = homePage.MetadataOGTwitterImage,
                 MetadataOGTwitterImageSizeCheckbox = homePage.MetadataOGTwitterImageSizeCheckbox
             },
