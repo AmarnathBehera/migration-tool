@@ -1,0 +1,19 @@
+# XbyK Validation Pipeline
+# This pipeline is responsible for validating the XbyK project by running secret scanning and other checks
+
+name: $(Date:yyyyMMdd).$(Rev:r)
+
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  repositories:
+    - repository: pipelines-shared
+      type: git
+      name: Azure Environment/pipelines-shared
+      ref: refs/heads/main
+
+jobs:
+  - template: .pipelines/templates/jobs/secretScanning.yml@pipelines-shared
