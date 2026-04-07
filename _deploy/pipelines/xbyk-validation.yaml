@@ -17,7 +17,6 @@ resources:
 
 stages:
   - stage: Validation
-    displayName: Validation Stage
-
-jobs:
-  - template: .pipelines/templates/jobs/secretScanning.yml@pipelines-shared
+    displayName: "Validation Stage"
+    jobs:
+      - template: .pipelines/templates/jobs/secretScanning.yml@pipelines-shared
