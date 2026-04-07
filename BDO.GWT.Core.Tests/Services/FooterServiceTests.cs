@@ -1,7 +1,5 @@
-﻿using AngleSharp.Dom;
-using BDO.GWT.Core.DTOs.Footer;
+﻿using BDO.GWT.Core.DTOs.Footer;
 using BDO.GWT.Core.Services.Footer;
-using BDO.GWT.Core.ValueObjects;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 using Moq;
@@ -130,7 +128,7 @@ namespace BDO.GWT.Core.Tests.Services
         [Test]
         public void GetAsync_WhenDependencyThrows_ExceptionIsPropagated()
         {
-            _contentServiceMock.Setup(x => x.GetItemsAsync<FooterLinks>()).ThrowsAsync(new Exception());
+            _contentServiceMock.Setup(x => x.GetItemsChannelAsync<FooterLinks>()).ThrowsAsync(new Exception());
 
             Assert.ThrowsAsync<Exception>(async () =>
                 await _service.GetAsync(CancellationToken.None));

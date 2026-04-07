@@ -9,7 +9,7 @@ using Kentico.PageBuilder.Web.Mvc.Internal;
 using Microsoft.AspNetCore.Http;
 using Moq;
 
-namespace BDO.GWT.Core.Tests.Services
+namespace BDO.GWT.GLOBAL.Tests.Services
 {
     public class XperiencePageContextTests
     {

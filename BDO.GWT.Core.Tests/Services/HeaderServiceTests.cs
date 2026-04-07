@@ -4,7 +4,6 @@ using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Services.Header;
 using CMS.Websites;
 using CMS.Websites.Routing;
-using GreenDonut;
 using Kentico.Content.Web.Mvc;
 using Moq;
 
@@ -113,7 +112,6 @@ namespace BDO.GWT.Core.Tests.Services
     .GetMethod("GetLogoPageLinkAsync",
                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
 
-            // Cast to Task<string>
             var task = (Task<string>)method.Invoke(_service, new object[] { CancellationToken.None })!;
             var result = await task;
 

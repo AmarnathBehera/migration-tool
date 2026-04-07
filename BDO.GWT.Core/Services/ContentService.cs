@@ -1,6 +1,5 @@
 ﻿namespace BDO.GWT.Core
 {
-    
     using CMS.ContentEngine;
     using CMS.Helpers;
     using CMS.Websites;
@@ -60,7 +59,26 @@
 
             return results.ToList().AsReadOnly();
         }
+        public async Task<IReadOnlyList<T>> GetItemsChannelAsync<T>(
+     Action<ContentItemQueryBuilder>? configure = null,
+     CancellationToken cancellationToken = default)
+     where T : class
+        {
+            var builder = new ContentItemQueryBuilder();
 
+            builder.ForContentType(GetContentTypeName<T>(), subquery =>
+            {
+                subquery.Where(w =>
+                    w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
+            });
+            configure?.Invoke(builder);
+
+            var queryOptions = BuildQueryExecutionOptions();
+
+            var results = await _executor.GetMappedResult<T>(builder, queryOptions, cancellationToken);
+
+            return results.ToList().AsReadOnly();
+        }
         /// <inheritdoc />
         public async Task<T?> GetItemAsync<T>(
             Guid contentItemGuid,
@@ -266,14 +284,14 @@
         }
 
 
-        public Task<IEnumerable<T>> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
+        public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
         {
-            return _contentRetriever.RetrievePages<T>(cancellationToken);
+            return _contentRetriever.RetrievePages<T?>(cancellationToken);
         }
 
-        public Task<IEnumerable<T>> RetrievePagesAsync<T>(RetrievePagesParameters parameters, CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
+        public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(RetrievePagesParameters parameters, CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
         {
-            return _contentRetriever.RetrievePages<T>(parameters, cancellationToken);
+            return _contentRetriever.RetrievePages<T?>(parameters, cancellationToken);
         }
     }
 }

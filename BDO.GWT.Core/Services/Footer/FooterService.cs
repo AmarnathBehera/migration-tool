@@ -107,7 +107,7 @@ public class FooterService : IFooterService
 
     private async Task<IEnumerable<FooterLinkDto?>> GetFooterLinks()
     {
-        var footerLinksPages = (await _contentService.GetItemsAsync<FooterLinks>())?.Take(8).ToList() ?? new List<FooterLinks>();
+        var footerLinksPages = (await _contentService.GetItemsChannelAsync<FooterLinks>())?.Take(8).ToList() ?? new List<FooterLinks>();
         var footerPages = new List<FooterLinkDto>();
 
         var allGuids = footerLinksPages
@@ -143,7 +143,7 @@ public class FooterService : IFooterService
 
     private async Task<IEnumerable<SocialButtonDto?>> GetSocialLinks()
     {
-        var socialLinksPages = (await _contentService.GetItemsAsync<SocialLinks>())?.Take(8) ?? Enumerable.Empty<SocialLinks>();
+        var socialLinksPages = (await _contentService.GetItemsChannelAsync<SocialLinks>())?.Take(8) ?? Enumerable.Empty<SocialLinks>();
         int order = 1;
 
         return socialLinksPages

@@ -28,6 +28,11 @@
             CancellationToken cancellationToken = default)
             where T : class;
 
+        Task<IReadOnlyList<T>> GetItemsChannelAsync<T>(
+            Action<ContentItemQueryBuilder>? configure = null,
+            CancellationToken cancellationToken = default)
+            where T : class;
+
         /// <summary>
         /// Returns a single content item of the specified type by its GUID,
         /// or null if not found.
@@ -76,8 +81,8 @@
   ) where TPage : class, IWebPageFieldsSource;
 
 
-        public Task<IEnumerable<T>> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
-        public Task<IEnumerable<T>> RetrievePagesAsync<T>(RetrievePagesParameters parameters, CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
+        public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
+        public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(RetrievePagesParameters parameters, CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
 
     }
 }
