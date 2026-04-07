@@ -15,5 +15,9 @@ resources:
       name: Azure Environment/pipelines-shared
       ref: refs/heads/main
 
+stages:
+  - stage: Validation
+    displayName: Validation Stage
+
 jobs:
   - template: .pipelines/templates/jobs/secretScanning.yml@pipelines-shared
