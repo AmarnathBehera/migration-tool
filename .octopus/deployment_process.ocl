@@ -12,7 +12,7 @@ step "deploy-cms-app-service" {
             Octopus.Action.Package.DownloadOnTentacle = "False"
             Octopus.Action.Package.FeedId = "octopus-server-built-in"
             Octopus.Action.Package.JsonConfigurationVariablesTargets = "appsettings.json"
-            Octopus.Action.Package.PackageId = "GWT.XbyK.Deploy.Web"
+            Octopus.Action.Package.PackageId = "GWT.XbyK.CMS.Deploy"
             OctopusUseBundledTooling = "False"
         }
         worker_pool_variable = "deploy.octopus.workerPool"
@@ -20,7 +20,7 @@ step "deploy-cms-app-service" {
         packages {
             acquisition_location = "Server"
             feed = "octopus-server-built-in"
-            package_id = "GWT.XbyK.Deploy.Web"
+            package_id = "GWT.XbyK.CMS.Deploy"
             properties = {
                 SelectionMode = "immediate"
             }
