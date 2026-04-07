@@ -7,14 +7,6 @@ using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ExternalNavigationWidge
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ImageWithTextWidget;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
-[assembly: RegisterWidget(
-    ComponentIdentifiers.ExternalNavigation,
-    typeof(ExternalNavigationWidget),
-    "ExternalNavigationWidget",
-    typeof(ExternalNavigationWidgetProperties),
-    AllowCache = true,
-    IconClass = "icon-xml-tag"
-)]
 
 namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ExternalNavigationWidget;
 public class ExternalNavigationWidget : ViewComponent

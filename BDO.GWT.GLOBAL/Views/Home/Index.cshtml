@@ -21,11 +21,11 @@
 
     var widgetsList = new[]
     {
-        ComponentIdentifiers.ExternalNavigation,
-        ComponentIdentifiers.Imagewithtext,
-        ComponentIdentifiers.QuoteCard,
-        ComponentIdentifiers.TiledLink,
-        ComponentIdentifiers.Globallocation
+        ComponentIdentifiers.Widgets.ExternalNavigation,
+        ComponentIdentifiers.Widgets.Imagewithtext,
+        ComponentIdentifiers.Widgets.QuoteCard,
+        ComponentIdentifiers.Widgets.TiledLink,
+        ComponentIdentifiers.Widgets.Globallocation
     };
 }
 
@@ -42,29 +42,6 @@
     Context.RequestAborted))
 </div>
 
-@* <div>
-    @if (Model?.HomeHeroSlides?.Any() == true)
-    {
-        var firstSlide = Model.HomeHeroSlides.FirstOrDefault();
-        if (!string.IsNullOrEmpty(firstSlide?.MobileImageURL))
-        {
-            <img src="@Url.Content(firstSlide.MobileImageURL)" alt="@(firstSlide.MobileImageAltText ?? "Hero image")" />
-            <img src="@Url.Content(firstSlide.ImageURL)" alt="@(firstSlide.ImageAltText ?? "Image image")" />
-            <img src="@Url.Content(firstSlide.ThumbnailImageURL)" alt="@(firstSlide.ThumbnailImageAltText ?? "Thumbnail image")" />
-        }
-    }
-</div> *@
-
-@* <div>
-
-    @await Html.Kentico().EditableAreaAsync(
-    "mainContent", // Unique identifier
-        new EditableAreaOptions
-        {
-
-            AllowedWidgets = widgetsList
-        })
-</div> *@
 
             <div class="elevated">
                  @await Html.Kentico().EditableAreaAsync(

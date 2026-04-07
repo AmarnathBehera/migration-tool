@@ -8,14 +8,6 @@ using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
-[assembly: RegisterWidget(
-    ComponentIdentifiers.Globallocation,
-    typeof(ViewGlobalLocationsWidget),
-    "View Global Location",
-    typeof(ViewGlobalLocationsWidgetProperties),
-    AllowCache = true,
-    IconClass = "icon-xml-tag"
-)]
 namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ViewGlobalLocations;
 
 public class ViewGlobalLocationsWidget : ViewComponent

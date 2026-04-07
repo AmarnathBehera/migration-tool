@@ -28,7 +28,7 @@ builder.Services.AddKentico(features =>
 {
     features.UsePageBuilder(new PageBuilderOptions
     {
-        DefaultSectionIdentifier = ComponentIdentifiers.Simple,
+        DefaultSectionIdentifier = ComponentIdentifiers.Sections.Container,
         RegisterDefaultSection = true,
         ContentTypeNames = new[]
         {

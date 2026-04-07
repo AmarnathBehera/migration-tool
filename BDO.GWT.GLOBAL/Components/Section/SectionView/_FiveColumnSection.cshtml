@@ -1,0 +1,31 @@
+@using BDO
+@using BDO.GWT.GLOBAL.Services
+@using BDO.GWT.Xperience.LiveSite.Components.Section
+@using Kentico.PageBuilder.Web.Mvc
+@addTagHelper Kentico.Content.Web.Mvc.WidgetZoneTagHelper, Kentico.Content.Web.Mvc
+@model ComponentViewModel<SectionWithGapProperties>
+@inject IPageBuilderSectionService PageBuilderSectionService
+
+@{
+    var allowedWidgets = PageBuilderSectionService.GetAllowedWidgets(ComponentIdentifiers.Sections.FiveColumns);
+}
+
+<div class="section-container @Model.Properties.ContainerPadding">
+    <div class="section-container--items section-container--five @Model.Properties.SectionsGap">
+        <div>
+            <widget-zone allowed-widgets="allowedWidgets" />
+        </div>
+        <div>
+            <widget-zone allowed-widgets="allowedWidgets" />
+        </div>
+        <div>
+            <widget-zone allowed-widgets="allowedWidgets" />
+        </div>
+        <div>
+            <widget-zone allowed-widgets="allowedWidgets" />
+        </div>
+        <div>
+            <widget-zone allowed-widgets="allowedWidgets" />
+        </div>
+    </div>
+</div>

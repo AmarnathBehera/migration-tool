@@ -1,0 +1,23 @@
+﻿.section-container--four {
+    grid-template-columns: none;
+    grid-template-rows: none
+}
+
+@media (min-width:976px) {
+    .section-container--four {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-rows: repeat(1, minmax(0, 1fr))
+    }
+}
+
+.section-container--five {
+    grid-template-columns: none;
+    grid-template-rows: none
+}
+
+@media (min-width:976px) {
+    .section-container--five {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        grid-template-rows: repeat(1, minmax(0, 1fr))
+    }
+}
