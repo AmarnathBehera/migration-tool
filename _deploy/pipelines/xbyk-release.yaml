@@ -3,7 +3,7 @@
 
 name: XbyK Web Publish and Release
 
-# Trigger on main and Release/* branches
+# Trigger on main, development and Release/* branches
 trigger:
   branches:
     include:
@@ -22,7 +22,7 @@ variables:
   # XbyK App Deploy packages
   cmsAppProjectFile: '$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.csproj'
   cmsAppPackageId: 'GWT.XbyK.CMS.Deploy'
-  mvcAppPackageId: 'GWT.XbyK.Mvc.Deploy'
+  mvcAppPackageId: 'GWT.XbyK.MVC.Deploy'
   # reactAppPackageId: 'GWT.XbyK.React.Deploy'
   # synAppPackageId: 'GWT.XbyK.Sync.Deploy'
   # apiAppPackageId: 'GWT.XbyK.API.Deploy'
