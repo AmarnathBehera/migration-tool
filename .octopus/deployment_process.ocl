@@ -7,6 +7,20 @@ step "deploy-cms-app-service" {
     action {
         action_type = "Octopus.AzureAppService"
         properties = {
+            Octopus.Action.Azure.AppSettings = <<-EOT
+                [
+                  {
+                    "name": "AzureAd__TenantId",
+                    "value": "#{appsettings.azureTenantId}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureAd__ClientId",
+                    "value": "#{appsettings.clientId}",
+                    "slotSetting": false
+                  }
+                ]
+                EOT
             Octopus.Action.Azure.ConnectionStrings = <<-EOT
                 [
                    {
