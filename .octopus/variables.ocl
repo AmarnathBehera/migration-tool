@@ -21,3 +21,7 @@ variable "deploy.octopus.workerPool" {
         environment = ["production"]
     }
 }
+
+variable "appsettings.connectionString" {
+    value "Server=bdo-dbs-gwt-xbyk-#{environment.abbreviation}-eur-we.database.windows.net;Authentication=Active Directory Managed Identity;TrustServerCertificate=False;Encrypt=True;" {}
+}
