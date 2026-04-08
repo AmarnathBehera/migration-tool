@@ -36,8 +36,8 @@ stages:
               projectName: "GWT.XbyK.Web"
               projectKey: "bdo_GWT.XbyK.Web"
 
-          - task: NuGetToolInstaller@1
-          - task: NuGetCommand@2
+          - task: DotNetCoreCLI@2
+            displayName: Restore CMS Web App
             inputs:
               command: "restore"
               restoreSolution: "$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.sln"
