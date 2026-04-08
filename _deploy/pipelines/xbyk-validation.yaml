@@ -40,28 +40,22 @@ stages:
           - task: NuGetCommand@2
             inputs:
               command: "restore"
-              restoreSolution: |
-                $(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.csproj
-                $(Build.SourcesDirectory)/BDO.GWT.Core/BDO.GWT.Core.csproj
-                $(Build.SourcesDirectory)/BDO.GWT.Common/BDO.GWT.Common.csproj
+              restoreSolution: "$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.sln"
               feedsToUse: "select"
 
           - task: DotNetCoreCLI@2
             displayName: Build CMS Web App
             inputs:
               command: "build"
-              projects: "$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.csproj"
+              projects: "$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.sln"
 
           - task: DotNetCoreCLI@2
-            displayName: Publish CMS Web App as package
+            displayName: "Test CMS Web App with Code Coverage"
             inputs:
-              command: "publish"
-              publishWebProjects: false
-              projects: "$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.csproj"
-              arguments: "--configuration Release -o $(Build.ArtifactStagingDirectory)/site"
-              zipAfterPublish: false
-              modifyOutputPath: false  
-
+            command: "test"
+            projects: "$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.sln"
+            arguments: '--collect "Code Coverage"'
+            
           - task: SonarCloudAnalyze@1
             displayName: "Run SonarCloud Analysis"
 
