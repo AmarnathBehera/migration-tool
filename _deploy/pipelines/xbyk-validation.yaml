@@ -30,7 +30,7 @@ stages:
           - task: SonarCloudPrepare@4
             displayName: "Prepare SonarCloud Analysis"
             inputs:
-              SonarCloud: "GWT.XbyK - SonarQube Cloud"
+              SonarCloud: "GWT.XbyK.Web - SonarQube Cloud"
               organization: "vsts-sonarcloud41751"
               scannerMode: "dotnet"
               projectName: "GWT.XbyK.Web"
