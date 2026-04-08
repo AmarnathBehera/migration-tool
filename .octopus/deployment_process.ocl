@@ -11,12 +11,12 @@ step "deploy-cms-app-service" {
                 [
                   {
                     "name": "AzureAd__TenantId",
-                    "value": "#{appsettings.azureTenantId}",
+                    "value": "#{appsettings.azureAdTenantId}",
                     "slotSetting": false
                   },
                   {
                     "name": "AzureAd__ClientId",
-                    "value": "#{appsettings.clientId}",
+                    "value": "#{appsettings.azureAdClientId}",
                     "slotSetting": false
                   }
                 ]
