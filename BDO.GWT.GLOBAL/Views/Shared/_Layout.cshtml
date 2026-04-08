@@ -1,8 +1,6 @@
 
 ﻿@using BDO.GWT.Core.Services
 @using BDO.GWT.Global.Components.ViewComponents
-﻿@using BDO.GWT.Global.Components.ViewComponents
-@using BDO.GWT.Web.Core.LiveSite.Components.ViewComponents
 @using BDO.GWT.Xperience
 @using GWTXbyKWeb.Components.ViewComponents
 @using Kentico.Activities.Web.Mvc
@@ -75,7 +73,6 @@
 
     
     @await (Component.InvokeAsync<ScriptsBottomBody>())
-
 @(await Component.InvokeAsync<Footer>())
 @await Html.Kentico().PageBuilderScriptsAsync()
 @await (Component.InvokeAsync<ScriptsBottomBody>())
