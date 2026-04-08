@@ -24,8 +24,8 @@ step "deploy-cms-app-service" {
             Octopus.Action.Azure.ConnectionStrings = <<-EOT
                 [
                    {
-                      "name": "AcmeDB",
-                      "value": "#{Acme.Database.ConnectionString}",
+                      "name": "CMSConnectionString",
+                      "value": "#{appsettings.CMSConnectionString}",
                       "type": "SQLAzure",
                       "slotSetting": false
                    }
