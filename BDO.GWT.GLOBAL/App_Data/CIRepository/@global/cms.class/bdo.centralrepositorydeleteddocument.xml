@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <CodeNameColumn>DeletedDocumentSiteName</CodeNameColumn>
+      <GUIDColumn>DeletedDocumentGuid</GUIDColumn>
+      <LastModifiedColumn>DeletedDocumentLastModified</LastModifiedColumn>
+      <NameSpace>BDO.GWT.SharedXperience</NameSpace>
+      <ObjectType>bdo.centralrepository_deleteddocument</ObjectType>
+      <SiteIDColumn>DeletedDocumentSiteID</SiteIDColumn>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassConnectionString>CMSConnectionString</ClassConnectionString>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassDisplayName>Deleted Document</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="DeletedDocumentID" columntype="integer" guid="ec1ff08a-cade-4a4b-82df-b7c8113bc5f1" isPK="true">
+        <properties>
+          <fieldcaption>DeletedDocumentID</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="DeletedDocumentGuid" columntype="guid" guid="0928db12-ea77-4d8c-8273-dc729ece31d8">
+        <properties>
+          <fieldcaption>GUID</fieldcaption>
+        </properties>
+      </field>
+      <field column="DeletedDocumentPageType" columnsize="100" columntype="text" guid="ea5f4ff6-4c36-4796-a0cf-87ae768353cc" />
+      <field column="DeletedDocumentLastModified" columnprecision="7" columntype="datetime" guid="59255af1-0450-44c2-8690-e0262c3d3433">
+        <properties>
+          <fieldcaption>Last modified</fieldcaption>
+        </properties>
+      </field>
+      <field column="DeletedDocumentSiteID" columntype="integer" guid="b1a09512-e4ff-49c2-b933-7a26184392f5" />
+      <field column="DeletedDocumentSiteName" columnsize="100" columntype="text" guid="fd7f897a-82da-4979-9fff-a2919ee12d0e" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>1a7be163-50af-497c-9f29-67a5913bc28a</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.CentralRepositoryDeletedDocument</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.CentralRepository</CodeName>
+    <GUID>3b072c5a-9e8a-47e2-b789-a31f5e4a2642</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_CentralRepositoryDeletedDocuments</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

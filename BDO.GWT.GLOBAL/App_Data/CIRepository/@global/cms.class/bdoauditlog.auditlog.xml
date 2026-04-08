@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <GUIDColumn>AuditLogGuid</GUIDColumn>
+      <NameSpace>BDOAuditLog</NameSpace>
+      <ObjectType>bdoauditlog.auditlog</ObjectType>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassConnectionString>CMSConnectionString</ClassConnectionString>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassDisplayName>Audit log</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="AuditLogID" columntype="integer" guid="5c42b847-6725-45eb-98d6-c21455b12169" isPK="true">
+        <properties>
+          <fieldcaption>AuditLogID</fieldcaption>
+        </properties>
+      </field>
+      <field column="AuditLogGuid" columntype="guid" guid="d4ad66d0-98ec-4e3f-b97e-4946af46403b">
+        <properties>
+          <fieldcaption>GUID</fieldcaption>
+        </properties>
+      </field>
+      <field column="Time" columnprecision="7" columntype="datetime" guid="c7d4e6dd-eb4a-402f-a2e2-e23030f047c0" />
+      <field column="Username" columnsize="200" columntype="text" guid="65269628-3b38-4f5e-87e2-e830ae482e06" />
+      <field allowempty="true" column="UserId" columntype="integer" guid="545667e6-43c1-41da-8801-68b97c612436" refobjtype="cms.user" reftype="Required" />
+      <field column="IPAddress" columnsize="100" columntype="text" guid="9c52706b-c8ff-4389-865e-95e3c430086e" />
+      <field column="Source" columnsize="200" columntype="text" guid="fa3a3825-6a02-43e1-819b-ab8824c4cbeb" />
+      <field column="Action" columnsize="6" columntype="text" guid="fcfc8546-271a-4d5d-88db-f357c21e7eac" />
+      <field allowempty="true" column="ObjectIdentifier" columnsize="200" columntype="text" guid="5f855b11-93b3-4294-aba9-0cbd403f49ac" />
+      <field column="Description" columntype="longtext" guid="f7d0a9d4-0004-4366-a5be-fcd4934ac37f" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>8fd325e6-d4a6-4766-9773-0072ffd4d5af</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDOAuditLog.AuditLog</ClassName>
+  <ClassResourceID>
+    <CodeName>BDOAuditLog</CodeName>
+    <GUID>0c50b41b-19d0-49fc-8e07-c8d878998278</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDOAuditLog_AuditLog</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

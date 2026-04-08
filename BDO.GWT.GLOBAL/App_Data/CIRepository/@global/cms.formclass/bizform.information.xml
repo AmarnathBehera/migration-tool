@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.formclass>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassDisplayName>Information</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="InformationID" columntype="integer" guid="ec71a216-51bb-413f-9e39-1f321b4a7b29" isPK="true">
+        <properties>
+          <fieldcaption>InformationID</fieldcaption>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.TextInput</componentidentifier>
+        </settings>
+      </field>
+      <field column="FormInserted" columnprecision="7" columntype="datetime" guid="58c901e8-72d2-4b99-96e0-2ea7994ab2ac" system="true">
+        <properties>
+          <fieldcaption>Form inserted</fieldcaption>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.TextInput</componentidentifier>
+        </settings>
+      </field>
+      <field column="FormUpdated" columnprecision="7" columntype="datetime" guid="ba899420-9ae2-4b73-bbb0-53efb9b37ebe" system="true">
+        <properties>
+          <fieldcaption>Form updated</fieldcaption>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.TextInput</componentidentifier>
+        </settings>
+      </field>
+      <field allowempty="true" column="TextArea" columntype="longtext" enabled="true" guid="b33d16c1-b593-4cfe-a9fc-f1eda42e0447" visible="true">
+        <properties>
+          <defaultvalue>
+            <![CDATA[{% CurrentUser.LastName |(identity)GlobalAdministrator|(hash)c0c6df6557c4192b1d81439be04572f906b2f5d8eebcfb3e16adf32267d7a34b%}]]>
+          </defaultvalue>
+          <fieldcaption>Name</fieldcaption>
+          <smart>False</smart>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.TextArea</componentidentifier>
+        </settings>
+      </field>
+      <field allowempty="true" column="TextInput" columnsize="500" columntype="text" enabled="true" guid="169d8a01-2a83-46dc-9363-363068e8dd74" visible="true">
+        <properties>
+          <defaultvalue>
+            <![CDATA[{% RequestContext.CurrentURL |(identity)GlobalAdministrator|(hash)7bc07f8b5f7c965f5a1f887ffba8b26690de73fe2dcacfd9b72338f15906e56c%}]]>
+          </defaultvalue>
+          <fieldcaption>page url</fieldcaption>
+          <smart>False</smart>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.TextInput</componentidentifier>
+        </settings>
+      </field>
+      <field allowempty="true" column="TextInput_1" columnsize="500" columntype="text" enabled="true" guid="21659b2c-5e88-4ac0-a200-0cb5802a147f" visible="true">
+        <properties>
+          <defaultvalue>
+            <![CDATA[{%CurrentSite.SiteName|(identity)GlobalAdministrator|(hash)564b54bfb56f9c47142fb928359fb225bfa33a4161efc97fd1d0cec3abbe278a%}]]>
+          </defaultvalue>
+          <fieldcaption>Text input</fieldcaption>
+          <smart>False</smart>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.TextInput</componentidentifier>
+        </settings>
+      </field>
+      <field allowempty="true" column="TextInput_2" columnsize="500" columntype="text" enabled="true" guid="33f84cd9-b1d4-4d7c-b5c3-d5932be92cb5" visible="true">
+        <properties>
+          <defaultvalue>
+            <![CDATA[{% Path[“path”] |(identity)GlobalAdministrator|(hash)98191984ab57e134e2152551a7f48fb261bbf5378e2a111cec045baf01fca1e1%}]]>
+          </defaultvalue>
+          <fieldcaption>Text input</fieldcaption>
+          <smart>False</smart>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.TextInput</componentidentifier>
+          <Placeholder>PH</Placeholder>
+        </settings>
+      </field>
+      <field allowempty="true" column="EmailInput" columnsize="500" columntype="text" enabled="true" guid="d60053d3-da51-4926-8259-471e7aeee5aa" visible="true">
+        <properties>
+          <defaultvalue>
+            <![CDATA[{%RequestContext.CurrentURL|(identity)GlobalAdministrator|(hash)d7f62f90d081b891b195244a3632d8a220737521812b66f6492ecda7ca5e7469%}@bdo.in]]>
+          </defaultvalue>
+          <fieldcaption>Email</fieldcaption>
+          <smart>False</smart>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.EmailInput</componentidentifier>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>fc58abae-be0b-4117-862c-5265d421bc6a</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BizForm.Information</ClassName>
+  <ClassTableName>Form_Site_Information</ClassTableName>
+  <ClassType>Form</ClassType>
+  <ClassXmlSchema>
+<![CDATA[
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Form_Site_Information">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="InformationID" msdata:ReadOnly="true" msdata:AutoIncrement="true" type="xs:int" />
+              <xs:element name="FormInserted" type="xs:dateTime" />
+              <xs:element name="FormUpdated" type="xs:dateTime" />
+              <xs:element name="TextArea" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="TextInput" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="500" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="TextInput_1" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="500" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="TextInput_2" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="500" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="EmailInput" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="500" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//Form_Site_Information" />
+      <xs:field xpath="InformationID" />
+    </xs:unique>
+  </xs:element>
+</xs:schema>
+]]>
+  </ClassXmlSchema>
+</cms.formclass>

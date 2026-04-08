@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <CodeNameColumn>Codename</CodeNameColumn>
+      <GUIDColumn>EventRegistrationGUID</GUIDColumn>
+      <LastModifiedColumn>EventRegistrationLastModified</LastModifiedColumn>
+      <NameSpace>BDO.GWT.SharedXperience.BDOEvent</NameSpace>
+      <ObjectType>bdo.eventregistration</ObjectType>
+      <SiteIDColumn>SiteID</SiteIDColumn>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassDisplayName>Event registration</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="EventRegistrationID" columntype="integer" guid="245610d5-ecd3-4490-abd7-58f5996989a5" isPK="true">
+        <properties>
+          <fieldcaption>EventRegistrationID</fieldcaption>
+        </properties>
+      </field>
+      <field column="Codename" columnsize="200" columntype="text" enabled="true" guid="9e2fa87f-8e63-483b-a0b6-994f1d733f42" />
+      <field column="EventGUID" columntype="guid" guid="737df0a8-4f10-4bb0-8be7-f3f2cb724c26" />
+      <field column="Status" columnsize="20" columntype="text" enabled="true" guid="4b8cbfde-6b37-4063-8999-a8739b9ef7ec">
+        <properties>
+          <defaultvalue>registered</defaultvalue>
+          <fieldcaption>Status</fieldcaption>
+        </properties>
+      </field>
+      <field column="UserGUID" columntype="guid" guid="8d4f460b-3713-4579-8009-664bbae76139" />
+      <field column="EventRegistrationGUID" columntype="guid" guid="bb8a09d9-fa7c-47aa-a344-1c13297aa74b">
+        <properties>
+          <fieldcaption>GUID</fieldcaption>
+        </properties>
+      </field>
+      <field column="EventRegistrationLastModified" columnprecision="7" columntype="datetime" guid="f9eb426a-b3ac-4ba6-95ff-f63adf411a91">
+        <properties>
+          <fieldcaption>Last modified</fieldcaption>
+        </properties>
+      </field>
+      <field column="SiteID" columntype="integer" guid="e897bc5e-1e49-42c8-9449-9da77ae33b20">
+        <properties>
+          <defaultvalue ismacro="true">
+            <![CDATA[{% SiteContext.CurrentSiteID |(identity)GlobalAdministrator|(hash)4c87ec20da5d5500e604b06d4130c645fd7e8066c52863f4ef486c2f60f05d7c%}]]>
+          </defaultvalue>
+        </properties>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>e8732d5d-c5b3-4a17-89ed-bf763cabe077</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.EventRegistration</ClassName>
+  <ClassResourceID>
+    <CodeName>BDOEvents</CodeName>
+    <GUID>27297757-9153-4d3a-9af2-8e5f5629e4be</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_EventRegistration</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<bdo.globalsettingskey>
+  <GlobalSettingsKeyDisplayName>Script in top of BODY</GlobalSettingsKeyDisplayName>
+  <GlobalSettingsKeyName>BDO_ScriptintopofBODY</GlobalSettingsKeyName>
+  <GlobalSettingsKeyNote>BDO_ScriptintopofBODY</GlobalSettingsKeyNote>
+  <GlobalSettingsKeyValue>
+<![CDATA[
+<style>  
+.btn--tertiary {
+text-transform: none!important;
+}
+
+.office-card__get-directions{
+display:none!important;
+}
+
+/*
+.deals-landing__grid-card-img-container{
+    height: 12rem!important;
+}
+
+.deals-landing__grid-card-img{
+    max-height: 12rem!important;
+}
+*/
+
+
+</style>
+]]>
+  </GlobalSettingsKeyValue>
+</bdo.globalsettingskey>

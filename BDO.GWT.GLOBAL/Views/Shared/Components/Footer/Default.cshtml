@@ -1,0 +1,29 @@
+﻿@using BDO.GWT.Common.Core.LiveSite.Data
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using CMS.Websites
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Core.DTOs.Footer.FooterDto
+@inject IReactService ReactService
+
+
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+
+
+@(await ReactService.RenderComponentAsync(
+    pageId,
+    ReactComponentType.Footer,
+    ReactComponentType.FooterGUID,
+    new {
+   footerSettings = Model,
+},
+options =>
+{
+    options.ContainerClass = "footer__wrapper";
+}, 
+    Context.RequestAborted))

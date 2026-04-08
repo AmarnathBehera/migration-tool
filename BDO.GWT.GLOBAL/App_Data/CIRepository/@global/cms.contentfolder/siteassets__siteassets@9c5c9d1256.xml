@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentfolder>
+  <ContentFolderCreatedWhen>2026-02-26 11:51:31Z</ContentFolderCreatedWhen>
+  <ContentFolderDisplayName>Site assets</ContentFolderDisplayName>
+  <ContentFolderGUID>4128062e-4a08-587c-9852-17b765599af6</ContentFolderGUID>
+  <ContentFolderName>SiteAssets</ContentFolderName>
+  <ContentFolderParentFolderID>
+    <CodeName>Root</CodeName>
+    <GUID>9d6509a4-a231-4837-8f1c-81a90705f988</GUID>
+    <ObjectType>cms.contentfolder</ObjectType>
+  </ContentFolderParentFolderID>
+  <ContentFolderTreePath>/SiteAssets</ContentFolderTreePath>
+  <ContentFolderWorkspaceID>
+    <CodeName>KenticoDefault</CodeName>
+    <GUID>43f674d6-540d-4f91-8c19-608b5bddb2f2</GUID>
+    <ObjectType>cms.workspace</ObjectType>
+  </ContentFolderWorkspaceID>
+</cms.contentfolder>

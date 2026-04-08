@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <GUIDColumn>UserApiPermissionGuid</GUIDColumn>
+      <LastModifiedColumn>UserApiPermissionLastModified</LastModifiedColumn>
+      <NameSpace>BDOAPIPermissions</NameSpace>
+      <ObjectType>bdoapipermissions.userapipermission</ObjectType>
+      <SiteIDColumn>SiteID</SiteIDColumn>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassDisplayName>User API Permission</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="UserApiPermissionID" columntype="integer" guid="2f88b9cf-c2c7-441d-9a6e-e9875d52fd8d" isPK="true">
+        <properties>
+          <fieldcaption>UserApiPermissionID</fieldcaption>
+        </properties>
+      </field>
+      <field column="UserID" columntype="integer" guid="11ffd14f-2342-48e1-94e0-23bad2d2f846" refobjtype="cms.user" reftype="Required" />
+      <field column="SiteID" columntype="integer" guid="7f898ca9-c978-4408-94e2-60f080cea51c" refobjtype="cms.site" reftype="Required" />
+      <field allowempty="true" column="ApiMethodGroupID" columntype="integer" guid="31469cc0-aedf-49b5-8e61-af006c25fba3" />
+      <field column="AllowRead" columntype="boolean" guid="3d0683f7-a551-4631-a899-610025e1d22b">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+        </properties>
+      </field>
+      <field column="AllowManage" columntype="boolean" guid="5e7e9cf2-838e-4204-b855-7531378ec1c1">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+        </properties>
+      </field>
+      <field column="UserApiPermissionGuid" columntype="guid" guid="6b027cc1-00e0-449c-b396-944ef3fc8119">
+        <properties>
+          <fieldcaption>GUID</fieldcaption>
+        </properties>
+      </field>
+      <field column="UserApiPermissionLastModified" columnprecision="7" columntype="datetime" guid="c15f027e-9aea-4032-9624-27c9f657ce2c">
+        <properties>
+          <fieldcaption>Last modified</fieldcaption>
+        </properties>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>929505ad-53f9-41f4-9986-73c90bc922df</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDOAPIPermissions.UserApiPermission</ClassName>
+  <ClassResourceID>
+    <CodeName>BDOAPIPermissions</CodeName>
+    <GUID>ef797d1f-920e-408e-bd16-d8b0a82f2d57</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDOAPIPermissions_UserApiPermission</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

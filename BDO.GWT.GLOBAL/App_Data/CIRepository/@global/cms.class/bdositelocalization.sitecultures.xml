@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <CodeNameColumn>SiteCultureCode</CodeNameColumn>
+      <DisplayNameColumn>SiteCultureCode</DisplayNameColumn>
+      <GUIDColumn>SiteCulturesGuid</GUIDColumn>
+      <LastModifiedColumn>SiteCulturesLastModified</LastModifiedColumn>
+      <NameSpace>BDOSiteLocalization</NameSpace>
+      <ObjectType>bdositelocalization.sitecultures</ObjectType>
+      <SiteIDColumn>SiteCultureSiteID</SiteIDColumn>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassDisplayName>Site Cultures</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="SiteCulturesID" columntype="integer" guid="00681d81-ae63-42d0-b49c-64919a6aebc9" isPK="true">
+        <properties>
+          <fieldcaption>SiteCulturesID</fieldcaption>
+        </properties>
+      </field>
+      <field column="SiteCultureCode" columnsize="20" columntype="text" enabled="true" guid="d6d36c96-636f-4725-bdc9-1b2c44c7c48f">
+        <properties>
+          <fieldcaption>Site culture</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="SiteDescription" columnsize="200" columntype="text" enabled="true" guid="8491e3d5-8928-494c-a048-3a1fbd6bd43f">
+        <properties>
+          <fieldcaption>Description</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="SiteCultureVisible" columntype="boolean" enabled="true" guid="67257766-f53a-49c4-9246-401793aea5a9">
+        <properties>
+          <defaultvalue>false</defaultvalue>
+          <fieldcaption>Visible</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="SelectorAbbreviation" columnsize="10" columntype="text" enabled="true" guid="a4ef38cb-b78a-431c-9392-daa98fded0f3">
+        <properties>
+          <fieldcaption>Language selector text</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="SelectorLongForm" columnsize="50" columntype="text" enabled="true" guid="7b17311e-04a4-4184-a1d1-3d2aae5e082e">
+        <properties>
+          <fieldcaption>Language selector long form text</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="SiteFont" columnsize="200" columntype="text" guid="84867c27-8215-4b95-a3e5-85a8451702c2" />
+      <field allowempty="true" column="SiteCultureSiteID" columntype="integer" guid="12932409-6f52-44b0-b99c-5d1d06f47ccf">
+        <properties>
+          <defaultvalue ismacro="true">
+            <![CDATA[{% CMSContext.CurrentSiteID |(identity)GlobalAdministrator|(hash)3cec82ed94fba5d13dde58d20ac5ad686a17c021e036a5b94649411e83fb5201%}]]>
+          </defaultvalue>
+        </properties>
+      </field>
+      <field allowempty="true" column="SiteCultureItemOrder" columntype="integer" guid="90a631ba-ea12-482b-910f-78645e082b6a" />
+      <field column="SiteCulturesGuid" columntype="guid" guid="43eedad6-ab3d-41c1-b5b1-dcd7394eca1f">
+        <properties>
+          <fieldcaption>GUID</fieldcaption>
+        </properties>
+      </field>
+      <field column="SiteCulturesLastModified" columnprecision="7" columntype="datetime" guid="b36b01cf-648e-4e00-a470-9c94d2bb1394">
+        <properties>
+          <fieldcaption>Last modified</fieldcaption>
+        </properties>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>f69acbf8-f096-4002-b55e-a1dd876af1df</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDOSiteLocalization.SiteCultures</ClassName>
+  <ClassResourceID>
+    <CodeName>BDOSiteLocalization</CodeName>
+    <GUID>c5e6ad4e-2dad-4956-a30f-4f66cd901460</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDOSiteLocalization_SiteCultures</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

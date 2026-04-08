@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <GUIDColumn>GDPRContactGuid</GUIDColumn>
+      <LastModifiedColumn>GDPRContactLastModified</LastModifiedColumn>
+      <NameSpace>BDO.GWT.SharedXperience.BDOGdpr</NameSpace>
+      <ObjectType>bdo.gdpr_contact</ObjectType>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassDisplayName>BDO GDPR Contact</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="GDPRContactID" columntype="integer" guid="00f5fe17-9530-41fa-ad9c-9c1771cdbbec" isPK="true">
+        <properties>
+          <fieldcaption>GDPRContactID</fieldcaption>
+        </properties>
+      </field>
+      <field column="GDPRContactGuid" columntype="guid" guid="c2f970f5-af83-4fce-a3b2-dba7c763a14f">
+        <properties>
+          <fieldcaption>GUID</fieldcaption>
+        </properties>
+      </field>
+      <field column="GDPRContactLastModified" columnprecision="7" columntype="datetime" guid="01858758-7185-45c3-8ce1-700122057c47">
+        <properties>
+          <fieldcaption>Last modified</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="EmailAddress" columnsize="200" columntype="text" enabled="true" guid="a45962f0-e758-42b7-8619-8526d541c430">
+        <properties>
+          <fieldcaption>Email address</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="LastModifiedBy" columnsize="200" columntype="text" guid="7c5f6c8f-df04-4f43-9182-eca3c4e68078" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>d685acf7-b42a-44da-8168-ad48e6f81e24</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.GDPRContact</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.GDPR</CodeName>
+    <GUID>a1e42e8b-94c8-4b92-9720-bf63c9259b9c</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_GDPRContact</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

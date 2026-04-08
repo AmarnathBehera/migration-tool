@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <CodeNameColumn>SubIndustryCodeName</CodeNameColumn>
+      <DisplayNameColumn>SubIndustryName</DisplayNameColumn>
+      <GUIDColumn>SubIndustryGuid</GUIDColumn>
+      <LastModifiedColumn>SubIndustryLastModified</LastModifiedColumn>
+      <NameSpace>BDODealCards</NameSpace>
+      <ObjectType>bdodealcards.subindustry</ObjectType>
+      <SiteIDColumn>SubIndustrySiteID</SiteIDColumn>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassDisplayName>Sub-Industry</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="SubIndustryID" columntype="integer" guid="09a1fa29-1566-47ec-965d-8acc7d388bb4" isPK="true">
+        <properties>
+          <fieldcaption>SubIndustryID</fieldcaption>
+        </properties>
+      </field>
+      <field column="SubIndustryName" columnsize="200" columntype="text" enabled="true" guid="38d81a65-f23e-426e-81a5-9e6e77e65250">
+        <properties>
+          <fieldcaption>Name</fieldcaption>
+        </properties>
+      </field>
+      <field column="SubIndustryCodeName" columnsize="200" columntype="text" enabled="true" guid="0b526029-02f3-4f47-8331-95208187d470" isunique="true">
+        <properties>
+          <fieldcaption>Code name</fieldcaption>
+        </properties>
+      </field>
+      <field column="SubIndustryCultureCode" columnsize="200" columntype="text" enabled="true" guid="874068b6-3a4f-4a99-9607-47accc3a31d5">
+        <properties>
+          <fieldcaption>Language</fieldcaption>
+        </properties>
+      </field>
+      <field column="SubIndustryRelated" columnsize="200" columntype="text" enabled="true" guid="fe49ba20-2ab4-48e8-a6a4-f24d16dcace1">
+        <properties>
+          <fieldcaption>Industry</fieldcaption>
+        </properties>
+      </field>
+      <field column="SubIndustrySiteID" columntype="integer" guid="2018e499-d865-4370-bdc1-07a864f42a6c" refobjtype="cms.site" reftype="Required">
+        <properties>
+          <defaultvalue ismacro="true">{% CurrentSiteID %}</defaultvalue>
+        </properties>
+      </field>
+      <field column="SubIndustryGuid" columntype="guid" guid="dd108b5c-8066-4e5f-b8a9-25f5fbd35d86" isunique="true">
+        <properties>
+          <fieldcaption>GUID</fieldcaption>
+        </properties>
+      </field>
+      <field column="SubIndustryLastModified" columnprecision="7" columntype="datetime" guid="899ac6ef-f991-4094-a7f2-6ecd0c308a42">
+        <properties>
+          <fieldcaption>Last modified</fieldcaption>
+        </properties>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>5c0dbfed-c7d7-46b5-b475-037ed4f5bfea</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDODealCards.SubIndustry</ClassName>
+  <ClassResourceID>
+    <CodeName>BDODealCards</CodeName>
+    <GUID>d048fe85-f2b8-4793-a660-dfd2106c7dd5</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDODealCards_SubIndustry</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

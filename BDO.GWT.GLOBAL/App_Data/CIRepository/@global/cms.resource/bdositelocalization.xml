@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.resource>
+  <ResourceDescription>Manage site cultures, and site translations</ResourceDescription>
+  <ResourceDisplayName>BDO Site Localization</ResourceDisplayName>
+  <ResourceGUID>c5e6ad4e-2dad-4956-a30f-4f66cd901460</ResourceGUID>
+  <ResourceIsInDevelopment>False</ResourceIsInDevelopment>
+  <ResourceName>BDOSiteLocalization</ResourceName>
+</cms.resource>

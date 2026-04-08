@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.resource>
+  <ResourceDescription>
+    <![CDATA[Performs actions when releasing a new version of BDO]]>
+  </ResourceDescription>
+  <ResourceDisplayName>BDO Release</ResourceDisplayName>
+  <ResourceGUID>1c4398ec-bb67-415a-9f2f-045af7db7671</ResourceGUID>
+  <ResourceIsInDevelopment>False</ResourceIsInDevelopment>
+  <ResourceName>BDORelease</ResourceName>
+</cms.resource>

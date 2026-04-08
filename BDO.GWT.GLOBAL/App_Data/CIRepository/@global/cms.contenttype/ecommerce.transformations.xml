@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>E-commerce - Transformations</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="bce8153b-bf36-4ffe-98c3-0f0bc76746e3" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="5d82cc2d-d2d1-4676-8ce2-4e5dfc62727a" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="75e7a6ff-4c41-4b75-ac63-a4be23f643cd" isunique="true" system="true" />
+      <field column="DocumentName" columnprecision="0" columnsize="100" columntype="text" enabled="true" guid="79696d09-2a46-550d-af78-664649617887" visible="true">
+        <properties>
+          <fieldcaption>Page Name</fieldcaption>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>7539c21d-cde0-4d71-ab9f-12de5ddec092</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>icon-folder-o</ClassIconClass>
+  <ClassName>Ecommerce.Transformations</ClassName>
+  <ClassShortName>EcommerceTransformations0n3s75eb</ClassShortName>
+  <ClassTableName>Ecommerce_Transformations</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.form>
+  <FormAccess>0</FormAccess>
+  <FormBuilderLayout>
+    <![CDATA[{ "editableAreas": [ { "identifier": "DefaultFormBuilderArea", "sections": [ { "identifier": "00000000-0000-0000-0000-000000000000", "type": "Kentico.DefaultSection", "zones": [ { "identifier": "b939d174-eb0e-4466-97f1-cd299eb0d389", "formComponents": [ { "identifier": "97c4f802-4b08-4878-8a6e-3201922c106d" }, { "identifier": "fcf843be-67b8-4727-bc71-3cb2131a8c60" }, { "identifier": "cc48787d-aee3-4e04-aefc-7a3e29c99ca6" }, { "identifier": "a4ba7e02-659b-4634-8c88-0a2c36d67419" }, { "identifier": "096c6b75-0b88-418f-a494-60e04d4d9725" }, { "identifier": "237be4df-f997-403d-a5b7-5c35d1f883d8" }, { "identifier": "15a15d20-40ac-4c08-9c0b-b71630776cb4" } ] } ], "properties": null } ] } ] }]]>
+  </FormBuilderLayout>
+  <FormClassID>
+    <CodeName>bizform.BDO_EventNoded50b2573512a464fbd2ffed8c7099489</CodeName>
+    <GUID>6a62ab34-3a08-44eb-96e3-3fb317a79ce5</GUID>
+    <ObjectType>cms.formclass</ObjectType>
+  </FormClassID>
+  <FormDisplayName>29/12/2025-29/12/2025 tax webinar</FormDisplayName>
+  <FormGUID>7f21e873-2edb-41f5-a104-3288d43b1892</FormGUID>
+  <FormItems>0</FormItems>
+  <FormLogActivity>True</FormLogActivity>
+  <FormName>BDO_EventNoded50b2573512a464fbd2ffed8c7099489</FormName>
+</cms.form>

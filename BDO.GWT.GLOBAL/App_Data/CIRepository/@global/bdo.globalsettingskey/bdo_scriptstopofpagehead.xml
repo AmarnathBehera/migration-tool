@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<bdo.globalsettingskey>
+  <GlobalSettingsKeyDisplayName>Scripts –Top of Page Head:</GlobalSettingsKeyDisplayName>
+  <GlobalSettingsKeyName>BDO_ScriptsTopofPageHead</GlobalSettingsKeyName>
+  <GlobalSettingsKeyNote>
+    <![CDATA[No cookie-dependent scripts are allowed. Only cookie-less solutions may be added in this field. Adding any script that requires cookies is strictly prohibited and constitutes a violation of the Privacy Policy and GDPR.]]>
+  </GlobalSettingsKeyNote>
+  <GlobalSettingsKeyValue>
+<![CDATA[
+<!--fusedeck-->
+<script>
+(function (f, u, s, e_, d, e, c, k, n_) {
+    try{
+        var cos = document.cookie.split(';');
+        for (var i = 0; i < cos.length; i++) {var co = cos[i].trim().split('=');if (co[0] == 'fdTrackingType'+e) {c = co[1];}if (co[0] == 'fdEnvId') {k = co[1];}}
+        f[d] = f[d] || [];window.addEventListener("load",function(){fdWinLoaded=!0});
+        var p = u.getElementsByTagName(s)[0]; var sc = u.createElement(s); sc.async = true;
+        sc.src = e_ + '?p=' + e + '&l=' + (d != null ? d : '') + (c != null ? '&c=' + c : '') + (k != null ? '&e=' + k : '') + '&h=' + encodeURIComponent(location.href) + (n_ != null ? '&a=' + encodeURIComponent(n_) : '');
+        p.parentNode.insertBefore(sc, p);
+    }catch(e){}
+})(window, document, 'script', 'https://io.fusedeck.net/d/tm.js', null, '6hy7B8jMqj', null, null, null);
+</script>
+<!-- End fusedeck-->
+]]>
+  </GlobalSettingsKeyValue>
+</bdo.globalsettingskey>

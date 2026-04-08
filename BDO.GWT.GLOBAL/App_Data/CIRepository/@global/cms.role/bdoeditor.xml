@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.role>
+  <RoleDisplayName>BDO Editor</RoleDisplayName>
+  <RoleGUID>ff7506b5-ad25-446b-8ca3-e398bf85e5bb</RoleGUID>
+  <RoleName>BDOEditor</RoleName>
+</cms.role>

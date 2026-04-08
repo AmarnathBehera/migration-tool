@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<bdo.globalsettingskey>
+  <GlobalSettingsKeyDisplayName>BDO_ScriptHead</GlobalSettingsKeyDisplayName>
+  <GlobalSettingsKeyName>BDO_ScriptHead</GlobalSettingsKeyName>
+  <GlobalSettingsKeyNote>BDO_ScriptHead</GlobalSettingsKeyNote>
+  <GlobalSettingsKeyValue>
+<![CDATA[
+
+<script src="/_content/Kentico.Content.Web.Rcl/Scripts/jquery-3.5.1.js"></script>
+
+<meta name="google-site-verification" content="zKrur4poPQpc2utk_t64hJI8iZkjs8Cl0q31VpTgCys" />
+
+<!-- Facebook Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1351532121525074');
+fbq('track', 'PageView');
+</script>
+
+]]>
+  </GlobalSettingsKeyValue>
+</bdo.globalsettingskey>
