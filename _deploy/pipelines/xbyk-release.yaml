@@ -16,7 +16,7 @@ variables:
   dotnetVersion: '10.x'
   publishOutput: '$(Build.ArtifactStagingDirectory)/publish'
   octopusSpaceName: 'GWT'
-  octopusProjectName: 'XbyK Web'
+  octopusProjectName: 'GWT XbyK Web'
   octopusPackageOutput: '$(Build.ArtifactStagingDirectory)/packages'
 
   # XbyK App Deploy packages
