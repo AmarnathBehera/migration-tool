@@ -52,10 +52,10 @@ stages:
           - task: DotNetCoreCLI@2
             displayName: "Test CMS Web App with Code Coverage"
             inputs:
-            command: "test"
-            projects: "$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.sln"
-            arguments: '--collect "Code Coverage"'
-            
+              command: "test"
+              projects: "$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.sln"
+              arguments: '--collect "Code Coverage"'
+
           - task: SonarCloudAnalyze@1
             displayName: "Run SonarCloud Analysis"
 
