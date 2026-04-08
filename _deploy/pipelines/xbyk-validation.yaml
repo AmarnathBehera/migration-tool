@@ -27,7 +27,7 @@ stages:
           - checkout: self
             fetchDepth: 0
 
-          - task: SonarCloudPrepare@3
+          - task: SonarCloudPrepare@4
             displayName: "Prepare SonarCloud Analysis"
             inputs:
               SonarCloud: "GWT.XbyK - SonarQube Cloud"
@@ -40,26 +40,26 @@ stages:
             displayName: Restore CMS Web App
             inputs:
               command: "restore"
-              restoreSolution: "$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.sln"
+              restoreSolution: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
               feedsToUse: "select"
 
           - task: DotNetCoreCLI@2
             displayName: Build CMS Web App
             inputs:
               command: "build"
-              projects: "$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.sln"
+              projects: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
 
           - task: DotNetCoreCLI@2
             displayName: "Test CMS Web App with Code Coverage"
             inputs:
               command: "test"
-              projects: "$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.sln"
+              projects: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
               arguments: '--collect "Code Coverage"'
 
-          - task: SonarCloudAnalyze@1
+          - task: SonarCloudAnalyze@4
             displayName: "Run SonarCloud Analysis"
 
-          - task: SonarCloudPublish@1
+          - task: SonarCloudPublish@4
             displayName: "Publish SonarCloud Results"
             inputs:
               pollingTimeoutSec: 300
