@@ -20,3 +20,52 @@ stages:
     displayName: "Validation Stage"
     jobs:
       - template: .pipelines/templates/jobs/secretScanning.yml@pipelines-shared
+
+      - job: SonarQube
+        displayName: "SonarQube Cloud Analysis"
+        steps:
+          - checkout: self
+            fetchDepth: 0
+
+          - task: SonarCloudPrepare@3
+            displayName: "Prepare SonarCloud Analysis"
+            inputs:
+              SonarCloud: "SonarCloud Connection"
+              organization: "vsts-sonarcloud41751"
+              scannerMode: "dotnet"
+              projectName: "GWT.XbyK.Web"
+              projectKey: "bdo_GWT.XbyK.Web"
+
+          - task: NuGetToolInstaller@1
+          - task: NuGetCommand@2
+            inputs:
+              command: "restore"
+              restoreSolution: |
+                $(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.csproj
+                $(Build.SourcesDirectory)/BDO.GWT.Core/BDO.GWT.Core.csproj
+                $(Build.SourcesDirectory)/BDO.GWT.Common/BDO.GWT.Common.csproj
+              feedsToUse: "select"
+
+          - task: DotNetCoreCLI@2
+            displayName: Build CMS Web App
+            inputs:
+              command: "build"
+              projects: "$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.csproj"
+
+          - task: DotNetCoreCLI@2
+            displayName: Publish CMS Web App as package
+            inputs:
+              command: "publish"
+              publishWebProjects: false
+              projects: "$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.csproj"
+              arguments: "--configuration Release -o $(Build.ArtifactStagingDirectory)/site"
+              zipAfterPublish: false
+              modifyOutputPath: false  
+
+          - task: SonarCloudAnalyze@1
+            displayName: "Run SonarCloud Analysis"
+
+          - task: SonarCloudPublish@1
+            displayName: "Publish SonarCloud Results"
+            inputs:
+              pollingTimeoutSec: 300
