@@ -41,7 +41,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataOGImage.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataOGImage { get; set; }
+		public IEnumerable<ContentAttachment> MetadataOGImage { get; set; }
 
 
 		/// <summary>
