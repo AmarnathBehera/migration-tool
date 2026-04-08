@@ -20,3 +20,46 @@ stages:
     displayName: "Validation Stage"
     jobs:
       - template: .pipelines/templates/jobs/secretScanning.yml@pipelines-shared
+
+      - job: SonarQube
+        displayName: "SonarQube Cloud Analysis"
+        steps:
+          - checkout: self
+            fetchDepth: 0
+
+          - task: SonarCloudPrepare@4
+            displayName: "Prepare SonarCloud Analysis"
+            inputs:
+              SonarCloud: "GWT.XbyK - SonarQube Cloud"
+              organization: "vsts-sonarcloud41751"
+              scannerMode: "dotnet"
+              projectName: "GWT.XbyK.Web"
+              projectKey: "bdo_GWT.XbyK.Web"
+
+          - task: DotNetCoreCLI@2
+            displayName: Restore CMS Web App
+            inputs:
+              command: "restore"
+              restoreSolution: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
+              feedsToUse: "select"
+
+          - task: DotNetCoreCLI@2
+            displayName: Build CMS Web App
+            inputs:
+              command: "build"
+              projects: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
+
+          - task: DotNetCoreCLI@2
+            displayName: "Test CMS Web App with Code Coverage"
+            inputs:
+              command: "test"
+              projects: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
+              arguments: '--collect "Code Coverage"'
+
+          - task: SonarCloudAnalyze@4
+            displayName: "Run SonarCloud Analysis"
+
+          - task: SonarCloudPublish@4
+            displayName: "Publish SonarCloud Results"
+            inputs:
+              pollingTimeoutSec: 300
