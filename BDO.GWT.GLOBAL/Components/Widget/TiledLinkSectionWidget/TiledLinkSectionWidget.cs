@@ -16,15 +16,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-[assembly: RegisterWidget(
-    ComponentIdentifiers.TiledLink,
-    typeof(TiledLinkSectionWidget),
-    "Tiled Link Widget",
-    typeof(TiledLinkSectionWidgetProperties),
-    AllowCache = true,
-    IconClass = "icon-xml-tag"
-)]
-
 namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWidget
 {
     public class TiledLinkSectionWidget : ViewComponent

@@ -1,8 +1,0 @@
-﻿@using BDO.GWT.Web.LiveSite.Constants
-@using BDO.GWT.Web.LiveSite.Services
-
-@model BDO.GWT.Web.LiveSite.DTOs.HeaderDto
-
-@inject IReactService ReactService
-
-@(await ReactService.RenderComponentAsync(ReactComponentType.Header, "57e7c880-cb14-435d-b222-f823f2ffa93b", new { headerDetails = Model }, Context.RequestAborted))

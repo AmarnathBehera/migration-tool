@@ -7,7 +7,7 @@ namespace BDO.GWT.Core.Services
 {
     public interface IWebsiteCulturesService
     {
-        public Task<IEnumerable<CultureDto>> GetWebsiteCulturesAsync();
+        public Task<IEnumerable<CultureDto?>> GetWebsiteCulturesAsync();
         public string GetDisplayName(IWebsiteChannelContext websiteChannel);
 
 
@@ -15,7 +15,7 @@ namespace BDO.GWT.Core.Services
 
     public class WebsiteCulturesService : IWebsiteCulturesService
     {
-        public Task<IEnumerable<CultureDto>> GetWebsiteCulturesAsync()
+        public Task<IEnumerable<CultureDto?>> GetWebsiteCulturesAsync()
         {
             var provider = new ContentLanguageInfoProvider();
 
@@ -40,7 +40,7 @@ namespace BDO.GWT.Core.Services
                 };
             }).ToList();
 
-            return Task.FromResult<IEnumerable<CultureDto>>(cultureDtos);
+            return Task.FromResult<IEnumerable<CultureDto?>>(cultureDtos);
         }
         public string GetDisplayName(IWebsiteChannelContext websiteChannel)
         {

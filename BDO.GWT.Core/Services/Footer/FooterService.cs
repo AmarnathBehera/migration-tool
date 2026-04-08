@@ -8,21 +8,19 @@ namespace BDO.GWT.Core.Services.Footer;
 
 public interface IFooterService
 {
-    Task<FooterDto> GetAsync(CancellationToken cancellationToken);
+    Task<FooterDto?> GetAsync(CancellationToken cancellationToken);
 }
 
 public class FooterService : IFooterService
 {
     private readonly IContentService _contentService;
-    private readonly IContentRetriever _contentRetriever;
 
-    public FooterService(IContentService contentService, IContentRetriever contentRetriever)
+    public FooterService(IContentService contentService)
     {
         _contentService = contentService;
-        _contentRetriever = contentRetriever;
     }
 
-    public async Task<FooterDto> GetAsync(CancellationToken cancellationToken)
+    public async Task<FooterDto?> GetAsync(CancellationToken cancellationToken)
     {
         var mandatoryFooterLinks = await GetMandatoryFooterLinkDtosAsync(cancellationToken);
 
@@ -75,12 +73,13 @@ public class FooterService : IFooterService
     private async Task<List<FooterLinkDto>> GetMandatoryFooterLinkDtosAsync(CancellationToken cancellationToken)
     {
         string rootPath = "/";
-        var pages = (await _contentRetriever.RetrievePages<FooterPages>(
-            new RetrievePagesParameters { PathMatch = PathMatch.Children(rootPath, 1) },
-            query => query.OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
-            RetrievalCacheSettings.CacheDisabled,
-            cancellationToken
-        ))?.ToList() ?? new List<FooterPages>();
+
+        var pages = (await _contentService.GetPagesAsync<FooterPages>(
+        new RetrievePagesParameters { PathMatch = PathMatch.Children(rootPath, 1) },
+        query => query.OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
+        RetrievalCacheSettings.CacheDisabled,
+        cancellationToken
+    ))?.ToList() ?? new List<FooterPages>();
 
         var allGuids = pages
             .Where(p => p.FooterLink != null)
@@ -106,9 +105,9 @@ public class FooterService : IFooterService
         return result;
     }
 
-    private async Task<IEnumerable<FooterLinkDto>> GetFooterLinks()
+    private async Task<IEnumerable<FooterLinkDto?>> GetFooterLinks()
     {
-        var footerLinksPages = (await _contentService.GetItemsAsync<FooterLinks>())?.Take(8).ToList() ?? new List<FooterLinks>();
+        var footerLinksPages = (await _contentService.GetItemsChannelAsync<FooterLinks>())?.Take(8).ToList() ?? new List<FooterLinks>();
         var footerPages = new List<FooterLinkDto>();
 
         var allGuids = footerLinksPages
@@ -142,9 +141,9 @@ public class FooterService : IFooterService
         return footerPages;
     }
 
-    private async Task<IEnumerable<SocialButtonDto>> GetSocialLinks()
+    private async Task<IEnumerable<SocialButtonDto?>> GetSocialLinks()
     {
-        var socialLinksPages = (await _contentService.GetItemsAsync<SocialLinks>())?.Take(8) ?? Enumerable.Empty<SocialLinks>();
+        var socialLinksPages = (await _contentService.GetItemsChannelAsync<SocialLinks>())?.Take(8) ?? Enumerable.Empty<SocialLinks>();
         int order = 1;
 
         return socialLinksPages

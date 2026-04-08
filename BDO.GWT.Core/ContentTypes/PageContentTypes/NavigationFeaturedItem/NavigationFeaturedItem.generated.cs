@@ -57,5 +57,11 @@ namespace BDO
 		/// FeaturedImageAltText.
 		/// </summary>
 		public string FeaturedImageAltText { get; set; }
+
+
+		/// <summary>
+		/// FeaturedImageFile.
+		/// </summary>
+		public IEnumerable<ContentAttachment> FeaturedImageFile { get; set; }
 	}
 }

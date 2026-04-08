@@ -1,13 +1,12 @@
 ﻿namespace BDO.GWT.Core
 {
-    using BDO.GWT.Core.ValueObjects;
     using CMS.ContentEngine;
-    using CMS.Websites;    
+    using CMS.Websites;
+    using Kentico.Content.Web.Mvc;
     using System;
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
-    using static BDO.GWT.Core.ContentService;
 
     public interface IContentReadOnlyQuery
     {
@@ -25,6 +24,11 @@
         /// T is usually a generated XbyK content model (e.g., HomePage, Insight, Deals).
         /// </summary>
         Task<IReadOnlyList<T>> GetItemsAsync<T>(
+            Action<ContentItemQueryBuilder>? configure = null,
+            CancellationToken cancellationToken = default)
+            where T : class;
+
+        Task<IReadOnlyList<T>> GetItemsChannelAsync<T>(
             Action<ContentItemQueryBuilder>? configure = null,
             CancellationToken cancellationToken = default)
             where T : class;
@@ -68,6 +72,17 @@
        int parentGuid,
        CancellationToken cancellationToken = default)
        where TPage : IWebPageFieldsSource;
+
+        Task<IEnumerable<TPage>> GetPagesAsync<TPage>(
+      RetrievePagesParameters parameters,
+      Action<RetrievePagesQueryParameters> queryAction,
+      RetrievalCacheSettings cacheSettings,
+      CancellationToken cancellationToken = default
+  ) where TPage : class, IWebPageFieldsSource;
+
+
+        public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
+        public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(RetrievePagesParameters parameters, CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
 
     }
 }
