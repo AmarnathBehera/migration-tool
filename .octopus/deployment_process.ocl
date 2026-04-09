@@ -25,7 +25,7 @@ step "deploy-cms-app-service" {
                 [
                    {
                       "name": "CMSConnectionString",
-                      "value": "#{appsettings.CMSConnectionString}",
+                      "value": "#{appsettings.sqlConnectionString}",
                       "type": "SQLAzure",
                       "slotSetting": false
                    }
@@ -79,7 +79,7 @@ step "deploy-mvc-app-service" {
                 [
                    {
                       "name": "MVCConnectionString",
-                      "value": "#{appsettings.MVCConnectionString}",
+                      "value": "#{appsettings.sqlConnectionString}",
                       "type": "SQLAzure",
                       "slotSetting": false
                    }
