@@ -64,7 +64,7 @@ stages:
 
           - script: |
               echo "Derived FullSemVer: $(GitVersion_FullSemVer)"
-              newBuildNumber=$(echo "$(GitVersion_FullSemVer)" | sed 's/+/-/g')
+              newBuildNumber=$(echo "$(GitVersion_FullSemVer)" | sed 's/+/\./g')
               echo "##vso[build.updatebuildnumber]$newBuildNumber"
             displayName: Update build number
 
