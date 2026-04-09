@@ -29,7 +29,7 @@ resources:
     - repository: GWT.XbyK.ReactServer
       type: git
       name: "Global Website/GWT.XbyK.ReactServer"
-      ref: fix/888975-xbyk-poc
+      ref: main
 
 variables:
   buildConfiguration: "Release"
