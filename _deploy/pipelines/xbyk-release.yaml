@@ -9,20 +9,34 @@ trigger:
     include:
       - main
       - development
-      - 'Release/*'
+      - "Release/*"
+
+resources:
+  repositories:
+    - repository: GWT.XbyK.UI
+      type: git
+      name: "Global Website/GWT.XbyK.UI"
+      ref: main
+
+    - repository: GWT.XbyK.ReactServer
+      type: git
+      name: "Global Website/GWT.XbyK.ReactServer"
+      ref: fix/888975-xbyk-poc
 
 variables:
-  buildConfiguration: 'Release'
-  dotnetVersion: '10.x'
-  publishOutput: '$(Build.ArtifactStagingDirectory)/publish'
-  octopusSpaceName: 'GWT'
-  octopusProjectName: 'GWT XbyK Web'
-  octopusPackageOutput: '$(Build.ArtifactStagingDirectory)/packages'
+  buildConfiguration: "Release"
+  dotnetVersion: "10.x"
+  publishOutput: "$(Build.ArtifactStagingDirectory)/publish"
+  octopusSpaceName: "GWT"
+  octopusProjectName: "GWT XbyK Web"
+  octopusPackageOutput: "$(Build.ArtifactStagingDirectory)/packages"
+
+  # Solution file name (used with $(Build.SourcesDirectory) in single-checkout jobs)
+  solutionFile: "GWTXbyKWeb.slnx"
 
   # XbyK App Deploy packages
-  cmsAppProjectFile: '$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.csproj'
-  cmsAppPackageId: 'GWT.XbyK.CMS.Deploy'
-  mvcAppPackageId: 'GWT.XbyK.MVC.Deploy'
+  cmsAppPackageId: "GWT.XbyK.CMS.Deploy"
+  mvcAppPackageId: "GWT.XbyK.MVC.Deploy"
   # reactAppPackageId: 'GWT.XbyK.React.Deploy'
   # synAppPackageId: 'GWT.XbyK.Sync.Deploy'
   # apiAppPackageId: 'GWT.XbyK.API.Deploy'
@@ -62,94 +76,132 @@ stages:
             displayName: Export GitVersion variables
 
       - job: BuildCmsApp
-        condition: true
-        displayName: 'Build XbyK CMS App and package'
+        displayName: "Build and package XbyK CMS App"
         dependsOn: SetVersion
         pool:
-          vmImage: 'ubuntu-latest'
+          vmImage: "ubuntu-latest"
         steps:
+          - checkout: self
+
           - task: UseDotNet@2
-            displayName: 'Use .NET $(dotnetVersion)'
+            displayName: "Use .NET $(dotnetVersion)"
             inputs:
-              packageType: 'sdk'
-              version: '$(dotnetVersion)'
+              packageType: "sdk"
+              version: "$(dotnetVersion)"
               installationPath: $(Agent.ToolsDirectory)/dotnet
 
-          - script: dotnet restore $(cmsAppProjectFile)
-            displayName: 'Restore NuGet packages'
+          - task: NuGetAuthenticate@1
+            displayName: "Authenticate NuGet"
+
+          - script: dotnet restore $(Build.SourcesDirectory)/$(solutionFile)
+            displayName: "Restore NuGet packages"
 
           - script: >
-              dotnet build $(cmsAppProjectFile)
+              dotnet build $(Build.SourcesDirectory)/$(solutionFile)
               --configuration $(buildConfiguration)
               --no-restore
-            displayName: 'Build $(cmsAppProjectFile)'
+            displayName: "Build solution"
 
           - script: >
-              dotnet publish $(cmsAppProjectFile)
+              dotnet publish $(Build.SourcesDirectory)/$(solutionFile)
               --configuration $(buildConfiguration)
               --no-build
               --output $(publishOutput)
-            displayName: 'Publish $(cmsAppProjectFile)'
+            displayName: "Publish solution"
 
           - task: ArchiveFiles@2
-            displayName: 'Create deployment package'
+            displayName: "Create CMS deployment package"
             inputs:
-              rootFolderOrFile: '$(publishOutput)'
+              rootFolderOrFile: "$(publishOutput)"
               includeRootFolder: false
               archiveType: zip
-              archiveFile: '$(octopusPackageOutput)/$(cmsAppPackageId).$(Build.BuildNumber).zip'
+              archiveFile: "$(octopusPackageOutput)/$(cmsAppPackageId).$(Build.BuildNumber).zip"
               replaceExistingArchive: true
 
           - task: PublishPipelineArtifact@1
-            displayName: 'Publish package artifact'
+            displayName: "Publish CMS package artifact"
             inputs:
-              targetPath: '$(octopusPackageOutput)'
-              artifact: drop
+              targetPath: "$(octopusPackageOutput)"
+              artifact: drop-cms
 
       - job: BuildMvcApp
-        condition: false
-        displayName: 'Build XbyK MVC App and package'
+        displayName: "Build and package XbyK MVC App"
         dependsOn: SetVersion
         pool:
-          vmImage: 'ubuntu-latest'
+          vmImage: "ubuntu-latest"
+        variables:
+          # In multi-checkout mode, 'self' is placed in a subdirectory named after the repository
+          selfSourcesDirectory: "$(Build.SourcesDirectory)/GWT.XbyK.Web"
         steps:
+          - checkout: self
+          - checkout: GWT.XbyK.UI
+
           - task: UseDotNet@2
-            displayName: 'Use .NET $(dotnetVersion)'
+            displayName: "Use .NET $(dotnetVersion)"
             inputs:
-              packageType: 'sdk'
-              version: '$(dotnetVersion)'
+              packageType: "sdk"
+              version: "$(dotnetVersion)"
               installationPath: $(Agent.ToolsDirectory)/dotnet
 
-          - script: dotnet restore $(mvcAppProjectFile)
-            displayName: 'Restore NuGet packages'
+          - task: NuGetAuthenticate@1
+            displayName: "Authenticate NuGet"
+
+          - script: dotnet restore $(selfSourcesDirectory)/$(solutionFile)
+            displayName: "Restore NuGet packages"
+
+          - task: NodeTool@0
+            displayName: "Install Node.js"
+            inputs:
+              versionSpec: "22.x"
+
+          - task: Npm@1
+            displayName: "Install GWT.XbyK.UI dependencies"
+            inputs:
+              command: "install"
+              workingDir: "$(Build.SourcesDirectory)/GWT.XbyK.UI"
+
+          - task: Npm@1
+            displayName: "Build GWT.XbyK.UI assets"
+            inputs:
+              command: "custom"
+              workingDir: "$(Build.SourcesDirectory)/GWT.XbyK.UI"
+              customCommand: "run build:production"
 
           - script: >
-              dotnet build $(mvcAppProjectFile)
+              dotnet build $(selfSourcesDirectory)/$(solutionFile)
               --configuration $(buildConfiguration)
               --no-restore
-            displayName: 'Build $(mvcAppProjectFile)'
+            displayName: "Build solution"
 
           - script: >
-              dotnet publish $(mvcAppProjectFile)
+              dotnet publish $(selfSourcesDirectory)/$(solutionFile)
               --configuration $(buildConfiguration)
               --no-build
               --output $(publishOutput)
-            displayName: 'Publish $(mvcAppProjectFile)'
+            displayName: "Publish solution"
+
+          - task: CopyFiles@2
+            displayName: "Copy UI assets to MVC wwwroot"
+            inputs:
+              SourceFolder: "$(Build.SourcesDirectory)/GWT.XbyK.UI/wwwroot/dist"
+              Contents: "**"
+              TargetFolder: "$(publishOutput)/wwwroot/dist"
+              OverWrite: true
 
           - task: ArchiveFiles@2
-            displayName: 'Create deployment package'
+            displayName: "Create MVC deployment package"
             inputs:
-              rootFolderOrFile: '$(publishOutput)'
+              rootFolderOrFile: "$(publishOutput)"
               includeRootFolder: false
               archiveType: zip
-              archiveFile: '$(octopusPackageOutput)/$(mvcAppPackageId).$(Build.BuildNumber).zip'
+              archiveFile: "$(octopusPackageOutput)/$(mvcAppPackageId).$(Build.BuildNumber).zip"
               replaceExistingArchive: true
 
           - task: PublishPipelineArtifact@1
-            displayName: 'Publish package artifact'
+            displayName: "Publish MVC package artifact"
             inputs:
-              targetPath: '$(octopusPackageOutput)'
-              artifact: drop
+              targetPath: "$(octopusPackageOutput)"
+              artifact: drop-mvc
 
   - stage: Publish
     displayName: Publish to Octopus
@@ -165,14 +217,18 @@ stages:
           vmImage: ubuntu-latest
         steps:
           - download: current
-            artifact: drop
+            artifact: drop-cms
+          - download: current
+            artifact: drop-mvc
 
           - task: OctopusPush@7
             displayName: Push Packages to Octopus
             inputs:
               OctoConnectedServiceName: "Octopus Cloud"
               Space: "$(octopusSpaceName)"
-              Packages: "$(Pipeline.Workspace)/drop/*.zip"
+              Packages: |
+                $(Pipeline.Workspace)/drop-cms/*.zip
+                $(Pipeline.Workspace)/drop-mvc/*.zip
               Replace: "true"
 
           - task: OctopusBuildInformation@7
@@ -182,7 +238,7 @@ stages:
               Space: "$(octopusSpaceName)"
               PackageIds: |
                 $(cmsAppPackageId)
-              #  $(mvcAppPackageId)
+                $(mvcAppPackageId)
               PackageVersion: "$(Build.BuildNumber)"
               Replace: OverwriteExisting
 
