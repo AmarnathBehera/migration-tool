@@ -4,51 +4,74 @@
 name: XbyK Web Build and Test
 
 variables:
-  buildConfiguration: 'Release'
-  dotnetVersion: '10.x'
-  
+  buildConfiguration: "Release"
+  dotnetVersion: "10.x"
+
   # XbyK App project files
-  cmsAppProjectFile: '$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.csproj'
+  cmsAppProjectFile: "$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.csproj"
 
 stages:
   - stage: BuildAndTest
     displayName: Build and Test
     jobs:
+      - job: SetVersion
+        displayName: Set Version
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - checkout: self
+            fetchDepth: 0
+
+          - task: gitversion-setup@4
+            displayName: Install GitVersion
+            inputs:
+              versionSpec: "6.4.x"
+
+          - task: gitversion-execute@4
+            name: SetVersion
+            displayName: Run GitVersion
+
+          - script: |
+              echo "Derived FullSemVer: $(GitVersion_FullSemVer)"
+              newBuildNumber=$(echo "$(GitVersion_FullSemVer)" | sed 's/+/\./g')
+              echo "##vso[build.updatebuildnumber]$newBuildNumber"
+            displayName: Update build number
+
       - job: Build
         condition: true
-        displayName: 'Build XbyK CMS App'
+        displayName: "Build XbyK CMS App"
         pool:
-          vmImage: 'ubuntu-latest'
+          vmImage: "ubuntu-latest"
         steps:
           - task: UseDotNet@2
-            displayName: 'Use .NET $(dotnetVersion)'
+            displayName: "Use .NET $(dotnetVersion)"
             inputs:
-              packageType: 'sdk'
-              version: '$(dotnetVersion)'
+              packageType: "sdk"
+              version: "$(dotnetVersion)"
               installationPath: $(Agent.ToolsDirectory)/dotnet
 
           - script: dotnet restore $(cmsAppProjectFile)
-            displayName: 'Restore NuGet packages'
+            displayName: "Restore NuGet packages"
 
           - script: >
               dotnet build $(cmsAppProjectFile)
               --configuration $(buildConfiguration)
               --no-restore
-            displayName: 'Run dotnet build'
+            displayName: "Run dotnet build"
 
       - job: Test
         condition: false # Temporarily disable tests until they are fixed
-        displayName: 'Test XbyK CMS App'
+        displayName: "Test XbyK CMS App"
         dependsOn: Build
         pool:
-          vmImage: 'ubuntu-latest'
+          vmImage: "ubuntu-latest"
         steps:
           - task: UseDotNet@2
             inputs:
-              packageType: 'sdk'
-              version: '$(dotnetVersion)'
+              packageType: "sdk"
+              version: "$(dotnetVersion)"
               installationPath: $(Agent.ToolsDirectory)/dotnet
 
           - script: |
               dotnet test $(cmsAppProjectFile).Tests.csproj --configuration $(buildConfiguration) --no-build
-            displayName: 'Run Tests'
+            displayName: "Run Tests"
