@@ -7,6 +7,30 @@ step "deploy-cms-app-service" {
     action {
         action_type = "Octopus.AzureAppService"
         properties = {
+            Octopus.Action.Azure.AppSettings = <<-EOT
+                [
+                  {
+                    "name": "AzureAd__TenantId",
+                    "value": "#{appsettings.azureAdTenantId}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureAd__ClientId",
+                    "value": "#{appsettings.azureAdClientId}",
+                    "slotSetting": false
+                  }
+                ]
+                EOT
+            Octopus.Action.Azure.ConnectionStrings = <<-EOT
+                [
+                   {
+                      "name": "CMSConnectionString",
+                      "value": "#{appsettings.CMSConnectionString}",
+                      "type": "SQLAzure",
+                      "slotSetting": false
+                   }
+                ]
+                EOT
             Octopus.Action.Azure.DeploymentType = "Package"
             Octopus.Action.EnabledFeatures = "Octopus.Features.ConfigurationVariables,Octopus.Features.JsonConfigurationVariables,Octopus.Features.ConfigurationTransforms,Octopus.Features.SubstituteInFiles"
             Octopus.Action.Package.DownloadOnTentacle = "False"
