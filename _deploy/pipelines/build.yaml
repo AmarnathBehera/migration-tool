@@ -39,7 +39,7 @@ stages:
 
       - job: Build
         condition: true
-        displayName: "Build XbyK CMS App"
+        displayName: "Build and Test XbyK CMS App"
         pool:
           vmImage: "ubuntu-latest"
         steps:
@@ -50,28 +50,22 @@ stages:
               version: "$(dotnetVersion)"
               installationPath: $(Agent.ToolsDirectory)/dotnet
 
-          - script: dotnet restore $(cmsAppProjectFile)
-            displayName: "Restore NuGet packages"
-
-          - script: >
-              dotnet build $(cmsAppProjectFile)
-              --configuration $(buildConfiguration)
-              --no-restore
-            displayName: "Run dotnet build"
-
-      - job: Test
-        condition: false # Temporarily disable tests until they are fixed
-        displayName: "Test XbyK CMS App"
-        dependsOn: Build
-        pool:
-          vmImage: "ubuntu-latest"
-        steps:
-          - task: UseDotNet@2
+          - task: DotNetCoreCLI@2
+            displayName: Restore CMS Web App
             inputs:
-              packageType: "sdk"
-              version: "$(dotnetVersion)"
-              installationPath: $(Agent.ToolsDirectory)/dotnet
+              command: "restore"
+              restoreSolution: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
+              feedsToUse: "select"
 
-          - script: |
-              dotnet test $(cmsAppProjectFile).Tests.csproj --configuration $(buildConfiguration) --no-build
-            displayName: "Run Tests"
+          - task: DotNetCoreCLI@2
+            displayName: Build CMS Web App
+            inputs:
+              command: "build"
+              projects: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
+
+          - task: DotNetCoreCLI@2
+            displayName: "Test CMS Web App with Code Coverage"
+            inputs:
+              command: "test"
+              projects: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
+              arguments: '--collect "Code Coverage"'
