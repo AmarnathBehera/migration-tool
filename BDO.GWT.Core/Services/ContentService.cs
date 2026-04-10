@@ -59,7 +59,26 @@
 
             return results.ToList().AsReadOnly();
         }
+        public async Task<IReadOnlyList<T>> GetItemsChannelAsync<T>(
+     Action<ContentItemQueryBuilder>? configure = null,
+     CancellationToken cancellationToken = default)
+     where T : class
+        {
+            var builder = new ContentItemQueryBuilder();
 
+            builder.ForContentType(GetContentTypeName<T>(), subquery =>
+            {
+                subquery.Where(w =>
+                    w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
+            });
+            configure?.Invoke(builder);
+
+            var queryOptions = BuildQueryExecutionOptions();
+
+            var results = await _executor.GetMappedResult<T>(builder, queryOptions, cancellationToken);
+
+            return results.ToList().AsReadOnly();
+        }
         /// <inheritdoc />
         public async Task<T?> GetItemAsync<T>(
             Guid contentItemGuid,
@@ -233,10 +252,9 @@
             if (parentGuid == 0)
                 throw new ArgumentException("Parent GUID must be provided", nameof(parentGuid));
 
-            // Use RetrievePages<TSource, TResult> overload
             var childPages = await _contentRetriever.RetrievePages<TPage>(
-                new RetrievePagesParameters(),                  // basic parameters
-                query =>
+                new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
+            query =>
                 {
                     // Filter by parent GUID
                     query.Where(w => w.WhereEquals("WebPageItemParentID", parentGuid))
@@ -248,8 +266,34 @@
 
             return childPages;
         }
+
+        public Task<IEnumerable<TPage>> GetPagesAsync<TPage>(
+      RetrievePagesParameters parameters,
+      Action<RetrievePagesQueryParameters> queryAction,
+      RetrievalCacheSettings cacheSettings,
+      CancellationToken cancellationToken
+  ) where TPage : class, IWebPageFieldsSource
+        {
+            // Call the extension method here
+            return _contentRetriever.RetrievePages<TPage>(
+                parameters,
+                queryAction,
+                cacheSettings,
+                cancellationToken
+            );
+        }
+
+
+        public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
+        {
+            return _contentRetriever.RetrievePages<T?>(cancellationToken);
+        }
+
+        public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(RetrievePagesParameters parameters, CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
+        {
+            return _contentRetriever.RetrievePages<T?>(parameters, cancellationToken);
+        }
     }
 }
-
 
 

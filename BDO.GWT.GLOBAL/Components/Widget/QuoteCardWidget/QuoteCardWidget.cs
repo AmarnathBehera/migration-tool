@@ -8,14 +8,6 @@ using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.QuoteCardWidget;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
 
-[assembly: RegisterWidget(
-    ComponentIdentifiers.QuoteCard,
-    typeof(QuoteCardWidget),
-    "Quote Card Widget",
-    typeof(QuoteCardWidgetProperties),
-    AllowCache = true,
-    IconClass = "icon-xml-tag"
-)]
 namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.QuoteCardWidget;
 
 public class QuoteCardWidget : ViewComponent

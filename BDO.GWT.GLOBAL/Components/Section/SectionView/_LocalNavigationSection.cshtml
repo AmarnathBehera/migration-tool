@@ -1,0 +1,13 @@
+@using BDO
+@using BDO.GWT.Xperience.LiveSite.Components.Section
+@using Kentico.PageBuilder.Web.Mvc
+@using Kentico.Web.Mvc
+@addTagHelper Kentico.Content.Web.Mvc.WidgetZoneTagHelper, Kentico.Content.Web.Mvc
+@model Kentico.PageBuilder.Web.Mvc.ComponentViewModel<BaseSectionProperties>
+@inject IPageBuilderService PageBuilder
+
+<nav id="local-nav" class="local-navigation" aria-label="secondary navigation">
+    <ul style="@(Context.Kentico().PageBuilder().EditMode ? "display:block; padding-top:50px;" : "")">
+        @await PageBuilder.AddWidgets(new[] { ComponentIdentifiers.Widgets.ExternalNavigation }).AddIdentifier("local-nav").BuildWidgetZoneAsync(Html, new List<string> { ComponentIdentifiers.Widgets.ExternalNavigation }, default)
+    </ul>
+</nav>

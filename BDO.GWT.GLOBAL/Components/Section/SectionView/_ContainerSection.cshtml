@@ -1,0 +1,15 @@
+﻿@using BDO
+@using BDO.GWT.GLOBAL.Services
+@using BDO.GWT.Xperience.LiveSite.Components.Section
+@using Kentico.PageBuilder.Web.Mvc
+@addTagHelper Kentico.Content.Web.Mvc.WidgetZoneTagHelper, Kentico.Content.Web.Mvc
+@model Kentico.PageBuilder.Web.Mvc.ComponentViewModel<BaseSectionProperties>
+@inject IPageBuilderSectionService PageBuilderSectionService
+
+@{
+    var allowedWidgets = PageBuilderSectionService.GetAllowedWidgets(ComponentIdentifiers.Sections.Container);
+}
+
+<div class="section-container @Model.Properties.ContainerPadding">
+    <widget-zone allowed-widgets="allowedWidgets" />
+</div>

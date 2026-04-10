@@ -36,7 +36,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.ConfigureOptions<SEOOptionsSetup>();
         serviceCollection.AddScoped<IReactService, ReactService>();
         serviceCollection.AddSingleton<IReactCachingService, ReactCachingService>();
-         serviceCollection.AddScoped<IPageContext, XperiencePageContext>();
+        serviceCollection.AddScoped<IPageContext, XperiencePageContext>();
+        serviceCollection.AddScoped<IPageBuilderSectionService, PageBuilderSectionService>();
         serviceCollection.AddScoped<ITileContentService, TileContentService>();
 
     }

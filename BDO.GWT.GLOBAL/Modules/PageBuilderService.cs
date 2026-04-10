@@ -26,8 +26,8 @@ public class PageBuilderService : IPageBuilderService
     {
         _widgets.AddRange(new[]
         {
-            ComponentIdentifiers.Imagewithtext,
-            ComponentIdentifiers.ExternalNavigation
+            ComponentIdentifiers.Widgets.Imagewithtext,
+            ComponentIdentifiers.Widgets.ExternalNavigation
         });
         return this;
     }
@@ -83,7 +83,7 @@ public class PageBuilderService : IPageBuilderService
         {
             options.AllowedSections =
             [
-                ComponentIdentifiers.Simple
+                ComponentIdentifiers.Sections.Container
             ];
         }
 

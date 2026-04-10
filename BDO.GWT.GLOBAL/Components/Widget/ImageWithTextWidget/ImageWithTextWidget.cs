@@ -5,15 +5,6 @@ using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ImageWithTextWidget;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
 
-[assembly: RegisterWidget(
-    ComponentIdentifiers.Imagewithtext,
-    typeof(ImageWithTextWidget),
-    "ImageWithText",
-    typeof(ImageWithTextWidgetProperties),
-    AllowCache = true,
-    IconClass = "icon-xml-tag"
-)]
-
 namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ImageWithTextWidget;
 
 public class ImageWithTextWidget : ViewComponent

@@ -11,7 +11,7 @@ namespace BDO.GWT.Core.Services.Header;
 
 public interface IHeaderService
 {
-    Task<HeaderDto> GetAsync(IContentService contentservice, CancellationToken cancellationToken);
+    Task<HeaderDto?> GetAsync(IContentService contentservice, CancellationToken cancellationToken);
 }
 
 public class HeaderService : IHeaderService
@@ -136,7 +136,7 @@ public class HeaderService : IHeaderService
 
             var secondLevelDtos = await BuildSecondLevelAsync(first.SystemFields?.WebPageItemID ?? 0, cancellationToken);
 
-            var featuredDtos = await BuildFeaturedLevelAsync(first.SystemFields?.WebPageItemID ?? 0);
+            var featuredDtos = await BuildFeaturedLevelAsync(first.SystemFields?.WebPageItemID ?? 0, cancellationToken);
 
             megaMenu.Add(new FirstLevelMenuItemDto
             {
@@ -203,7 +203,7 @@ public class HeaderService : IHeaderService
         return thirdLevelDtos;
     }
 
-    private async Task<List<FeaturedMenuItemDto>> BuildFeaturedLevelAsync(int parentId)
+    private async Task<List<FeaturedMenuItemDto>> BuildFeaturedLevelAsync(int parentId, CancellationToken cancellationToken)
     {
         var featuredItems = (await _contentService.GetChildPagesByParentGuidAsync<NavigationFeaturedItem>(parentId))?.ToList()
                             ?? new List<NavigationFeaturedItem>();
@@ -219,22 +219,22 @@ public class HeaderService : IHeaderService
                 : Enumerable.Empty<IWebPageFieldsSource>();
 
 
-            //string imageUrl = string.Empty;
-            //if (featured.FeaturedImageFile != null)
-            //{
-            //    var firstAttachment = featured.FeaturedImageFile.FirstOrDefault();
-            //    if (firstAttachment?.LegacyAttachmentAsset != null)
-            //    {
-            //        imageUrl = firstAttachment.LegacyAttachmentAsset.Url ?? string.Empty;
-            //    }
-            //}
+            string imageUrl = string.Empty;
+            if (featured.FeaturedImageFile != null)
+            {
+                var firstAttachment = featured.FeaturedImageFile.FirstOrDefault();
+                if (firstAttachment?.ContentAttachmentAsset != null)
+                {
+                    imageUrl = firstAttachment.ContentAttachmentAsset.Url ?? string.Empty;
+                }
+            }
 
             featuredDtos.Add(new FeaturedMenuItemDto
             {
                 Title = featured.Title ?? string.Empty,
                 Description = featured.Description ?? string.Empty,
                 URL = selectedPagesFeatured.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty,
-             //   ImageURL = imageUrl,
+                ImageURL = imageUrl,
                 ImageAltText = featured.FeaturedImageAltText,
             });
         }

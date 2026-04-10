@@ -10,6 +10,7 @@
     <PackageReference Include="kentico.xperience.azurestorage" Version="31.2.3" />
     <PackageReference Include="kentico.xperience.imageprocessing" Version="31.2.3" />
 	<PackageReference Include="Microsoft.Identity.Web" Version="4.3.0" />
+	<PackageReference Include="XperienceCommunity.Localization" Version="2.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BDO.GWT.Core\BDO.GWT.Core.csproj" />
