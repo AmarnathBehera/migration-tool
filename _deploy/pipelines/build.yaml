@@ -4,7 +4,13 @@
 name: $(Date:yyyyMMdd).$(Rev:r)
 
 trigger:
-  - main
+  branches:
+    include:
+      - "*"
+  paths:
+    exclude:
+      - _deploy/**
+      - .octopus/**
 
 variables:
   buildConfiguration: "Release"
