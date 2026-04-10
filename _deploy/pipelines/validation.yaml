@@ -3,7 +3,8 @@
 
 name: $(Date:yyyyMMdd).$(Rev:r)
 
-trigger: none
+trigger:
+  - main
 
 pool:
   vmImage: ubuntu-latest
@@ -30,9 +31,11 @@ stages:
           - task: SonarCloudPrepare@4
             displayName: "Prepare SonarCloud Analysis"
             inputs:
-              SonarCloud: "GWT.XbyK - SonarQube Cloud"
+              SonarCloud: "GWT.XbyK.Web - SonarQube Cloud"
               organization: "vsts-sonarcloud41751"
               scannerMode: "dotnet"
+              configMode: file
+              configFile: "sonar-project.properties"
               projectName: "GWT.XbyK.Web"
               projectKey: "bdo_GWT.XbyK.Web"
 
