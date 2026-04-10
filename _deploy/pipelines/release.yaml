@@ -2,7 +2,7 @@
 # This pipeline is triggered by successful completion of the 'Build and Test' pipelines in the GWT.XbyK.Web, GWT.XbyK.UI, and GWT.XbyK.ReactServer repositories for main and release branches.
 # Pipeline can be executed manually also.
 
-name: GWT.XbyK Release pipeline
+name: $(Date:yyyyMMdd).$(Rev:r)
 
 trigger: none
 

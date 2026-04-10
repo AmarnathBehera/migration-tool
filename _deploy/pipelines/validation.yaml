@@ -20,28 +20,6 @@ stages:
   - stage: Validation
     displayName: "Validation Stage"
     jobs:
-      - job: SetVersion
-        displayName: Set Version
-        pool:
-          vmImage: ubuntu-latest
-        steps:
-          - checkout: self
-            fetchDepth: 0
-
-          - task: gitversion-setup@4
-            displayName: Install GitVersion
-            inputs:
-              versionSpec: "6.4.x"
-
-          - task: gitversion-execute@4
-            name: SetVersion
-            displayName: Run GitVersion
-
-          - script: |
-              echo "Derived FullSemVer: $(GitVersion_FullSemVer)"
-              newBuildNumber=$(echo "$(GitVersion_FullSemVer)" | sed 's/+/\./g')
-              echo "##vso[build.updatebuildnumber]$newBuildNumber"
-            displayName: Update build number
       - template: .pipelines/templates/jobs/secretScanning.yml@pipelines-shared
 
       - job: SonarQube
