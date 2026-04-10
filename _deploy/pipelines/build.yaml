@@ -3,12 +3,12 @@
 
 name: $(Date:yyyyMMdd).$(Rev:r)
 
+trigger:
+  - main
+
 variables:
   buildConfiguration: "Release"
   dotnetVersion: "10.x"
-
-  # XbyK App project files
-  cmsAppProjectFile: "$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.csproj"
 
 stages:
   - stage: BuildAndTest
