@@ -56,8 +56,13 @@ variables:
     value: "10.x"
   - name: publishOutput
     value: "$(Build.ArtifactStagingDirectory)/publish"
-  - name: solutionFile
-    value: "GWTXbyKWeb.slnx"
+
+  # Project file paths; relative to the repository root, used for dotnet build/publish and to determine which projects to package for Octopus Deploy.
+  # In multi-repo checkout scenarios, the repository root is the subdirectory named after the repository (e.g. $(Build.SourcesDirectory)/GWT.XbyK.Web/)
+  - name: cmsProjectFilePath
+    value: "BDO.GWT.GLOBAL/GWTXbyKWeb.csproj"
+  - name: mvcProjectFilePath
+    value: "BDO.GWT.GLOBAL/GWTXbyKWeb.csproj"
 
   # Octopus Deploy variables
   - name: octopusSpaceName
@@ -150,17 +155,17 @@ stages:
           - task: NuGetAuthenticate@1
             displayName: "Authenticate NuGet"
 
-          - script: dotnet restore $(Build.SourcesDirectory)/$(solutionFile)
+          - script: dotnet restore $(Build.SourcesDirectory)/$(cmsProjectFile)
             displayName: "Restore NuGet packages"
 
           - script: >
-              dotnet build $(Build.SourcesDirectory)/$(solutionFile)
+              dotnet build $(Build.SourcesDirectory)/$(cmsProjectFile)
               --configuration $(buildConfiguration)
               --no-restore
             displayName: "Build solution"
 
           - script: >
-              dotnet publish $(Build.SourcesDirectory)/$(solutionFile)
+              dotnet publish $(Build.SourcesDirectory)/$(cmsProjectFile)
               --configuration $(buildConfiguration)
               --no-build
               --output $(publishOutput)
@@ -202,7 +207,7 @@ stages:
           - task: NuGetAuthenticate@1
             displayName: "Authenticate NuGet"
 
-          - script: dotnet restore $(selfSourcesDirectory)/$(solutionFile)
+          - script: dotnet restore $(selfSourcesDirectory)/$(mvcProjectFilePath)
             displayName: "Restore NuGet packages"
 
           - task: UseNode@1
@@ -224,13 +229,13 @@ stages:
               customCommand: "run build:production"
 
           - script: >
-              dotnet build $(selfSourcesDirectory)/$(solutionFile)
+              dotnet build $(selfSourcesDirectory)/$(mvcProjectFilePath)
               --configuration $(buildConfiguration)
               --no-restore
             displayName: "Build solution"
 
           - script: >
-              dotnet publish $(selfSourcesDirectory)/$(solutionFile)
+              dotnet publish $(selfSourcesDirectory)/$(mvcProjectFilePath)
               --configuration $(buildConfiguration)
               --no-build
               --output $(publishOutput)
