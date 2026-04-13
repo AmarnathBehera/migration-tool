@@ -11,10 +11,9 @@
 
 using System;
 using System.Collections.Generic;
-using BDO;
 using CMS.Websites;
 
-namespace bdo
+namespace BDO
 {
 	/// <summary>
 	/// Defines a contract for content types with the <see cref="IHero"/> reusable schema assigned.
