@@ -1,0 +1,25 @@
+﻿@using BDO
+@using Kentico.Content.Web.Mvc
+@using Kentico.PageBuilder.Web.Mvc
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using CMS.Websites
+@using Kentico.Content.Web.Mvc 
+
+@model BDO.GWT.Core.DTOs.StatusCodePageDto;
+@* @inject IReactService ReactService   *@
+
+@{
+    var metaDataSeoDto = Model.MetaDataSEOItems;
+    Layout = null;
+}
+
+ @* @(await ReactService.RenderComponentAsync(
+    0,
+    ReactComponentType.ErrorPageContent,
+    ReactComponentType.ErrorPageContentGUID,
+    Model,
+    Context.RequestAborted))  *@
+
+    @Model.Title
+    @Model.Description
