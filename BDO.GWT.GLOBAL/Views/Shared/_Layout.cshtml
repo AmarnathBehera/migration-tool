@@ -57,6 +57,7 @@
     @(await Component.InvokeAsync<ScriptsHead>())
     @(await Component.InvokeAsync<StartScriptsHead>())
     @await (Component.InvokeAsync<Cookiebot>())
+    @await (Component.InvokeAsync<Cookiebanner>())
 
     @(await Component.InvokeAsync<ScriptsWhenCookiesAccepted>())
     @(await Component.InvokeAsync<MarketoMunchkincode>())

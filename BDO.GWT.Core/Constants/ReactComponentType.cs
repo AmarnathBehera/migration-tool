@@ -23,6 +23,7 @@ public static class ReactComponentType
     public const string QuoteCardWidget = "QuoteCardWidget";
     public const string ExternalNavigationWidget = "ExternalNavigationWidget";
     public const string TiledLinkSectionWidget = "TiledLinkSectionWidget";
+    public const string CookieBanner = "CookieBanner";
     
 
     //Below are the guid constants for the above components.
@@ -34,6 +35,7 @@ public static class ReactComponentType
     public const string ViewGlobalLocationsWidgetGUID = "0a440ca7-fc48-42d2-8fd1-cbf788de9281";
     public const string TiledLinkSectionWidgetGUID = "7e23aa59-e26e-447f-b12c-9eb0f62fa3f9";
     public const string HomeHeroGUID = "24ddec1e-4616-4488-9351-7f0f8b8d690f";
+    public const string CookieBannerGUID = "6e906e0a-6d90-4776-8e90-ff2bdcaa4213";
 
 }
 
@@ -51,7 +53,7 @@ public static class ReactComponentType
 
 //
 
-//6e906e0a-6d90-4776-8e90-ff2bdcaa4213
+
 
 //60875e95-b88e-4db3-b4bf-7c2926a2485c
 

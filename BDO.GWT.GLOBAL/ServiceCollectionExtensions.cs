@@ -8,6 +8,7 @@ using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Xperience;
 using GWTXbyKWeb.Components.Services.SEOOptions;
 using Microsoft.Extensions.DependencyInjection;
+using BDO.GWT.Web.Core.LiveSite.Services;
 
 namespace BDO.GWT.Common;
 
@@ -33,6 +34,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IWebsiteContext, WebsiteContext>();
         serviceCollection.AddScoped<IHeaderService, HeaderService>();
         serviceCollection.AddScoped<IFooterService, FooterService>();
+        serviceCollection.AddScoped<ICookieBannerService, CookieBannerService>();
         serviceCollection.ConfigureOptions<SEOOptionsSetup>();
         serviceCollection.AddScoped<IReactService, ReactService>();
         serviceCollection.AddSingleton<IReactCachingService, ReactCachingService>();
