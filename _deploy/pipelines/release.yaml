@@ -155,17 +155,17 @@ stages:
           - task: NuGetAuthenticate@1
             displayName: "Authenticate NuGet"
 
-          - script: dotnet restore $(Build.SourcesDirectory)/$(cmsProjectFile)
+          - script: dotnet restore $(Build.SourcesDirectory)/$(cmsProjectFilePath)
             displayName: "Restore NuGet packages"
 
           - script: >
-              dotnet build $(Build.SourcesDirectory)/$(cmsProjectFile)
+              dotnet build $(Build.SourcesDirectory)/$(cmsProjectFilePath)
               --configuration $(buildConfiguration)
               --no-restore
             displayName: "Build solution"
 
           - script: >
-              dotnet publish $(Build.SourcesDirectory)/$(cmsProjectFile)
+              dotnet publish $(Build.SourcesDirectory)/$(cmsProjectFilePath)
               --configuration $(buildConfiguration)
               --no-build
               --output $(publishOutput)
