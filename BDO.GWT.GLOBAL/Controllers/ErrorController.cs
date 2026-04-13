@@ -16,7 +16,7 @@ namespace BDO.GWT.Core.Services;
 
 
 [Route("Error/{code:int}")]
-public class ErrorController : MvcController
+public class ErrorController : Controller
 {
     private readonly IErrorService _errorService;
 
