@@ -19,6 +19,11 @@ step "deploy-cms-app-service" {
                     "value": "#{appsettings.azureAdClientId}",
                     "slotSetting": false
                   }
+                    {
+                    "name": "AzureAd__ClientSecret",
+                    "value": "#{appsettings.azureAdClientSecret}",
+                    "slotSetting": false
+                  }
                 ]
                 EOT
             Octopus.Action.Azure.ConnectionStrings = <<-EOT
