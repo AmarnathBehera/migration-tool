@@ -25,7 +25,7 @@ step "deploy-cms-app-service" {
                 [
                    {
                       "name": "CMSConnectionString",
-                      "value": "#{appsettings.sqlConnectionString}",
+                      "value": "#{appsettings.CMSConnectionString}",
                       "type": "SQLAzure",
                       "slotSetting": false
                    }
@@ -78,8 +78,8 @@ step "deploy-mvc-app-service" {
             Octopus.Action.Azure.ConnectionStrings = <<-EOT
                 [
                    {
-                      "name": "MVCConnectionString",
-                      "value": "#{appsettings.sqlConnectionString}",
+                      "name": "CMSConnectionString",
+                      "value": "#{appsettings.CMSConnectionString}",
                       "type": "SQLAzure",
                       "slotSetting": false
                    }
@@ -99,6 +99,60 @@ step "deploy-mvc-app-service" {
             acquisition_location = "Server"
             feed = "octopus-server-built-in"
             package_id = "GWT.XbyK.MVC.Deploy"
+            properties = {
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
+step "deploy-react-app-service" {
+    name = "Deploy React App Service"
+    properties = {
+        Octopus.Action.TargetRoles = "xbyk-react-webapp"
+    }
+
+    action {
+        action_type = "Octopus.AzureAppService"
+        properties = {
+            Octopus.Action.Azure.AppSettings = <<-EOT
+                [
+                  {
+                    "name": "AzureAd__TenantId",
+                    "value": "#{appsettings.azureAdTenantId}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureAd__ClientId",
+                    "value": "#{appsettings.azureAdClientId}",
+                    "slotSetting": false
+                  }
+                ]
+                EOT
+            Octopus.Action.Azure.ConnectionStrings = <<-EOT
+                [
+                   {
+                      "name": "CMSConnectionString",
+                      "value": "#{appsettings.CMSConnectionString}",
+                      "type": "SQLAzure",
+                      "slotSetting": false
+                   }
+                ]
+                EOT
+            Octopus.Action.Azure.DeploymentType = "Package"
+            Octopus.Action.EnabledFeatures = "Octopus.Features.ConfigurationVariables,Octopus.Features.JsonConfigurationVariables,Octopus.Features.ConfigurationTransforms,Octopus.Features.SubstituteInFiles"
+            Octopus.Action.Package.DownloadOnTentacle = "False"
+            Octopus.Action.Package.FeedId = "octopus-server-built-in"
+            Octopus.Action.Package.JsonConfigurationVariablesTargets = "appsettings.json"
+            Octopus.Action.Package.PackageId = "GWT.XbyK.React.Deploy"
+            OctopusUseBundledTooling = "False"
+        }
+        worker_pool_variable = "deploy.octopus.workerPool"
+
+        packages {
+            acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = "GWT.XbyK.React.Deploy"
             properties = {
                 SelectionMode = "immediate"
             }
