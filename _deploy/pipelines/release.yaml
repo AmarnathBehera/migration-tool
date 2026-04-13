@@ -45,9 +45,9 @@ variables:
   # Pipeline Variables
   - group: gwt.xbyk
   - name: triggeringRepo
-    value: "$(Build.TriggeredBy.DefinitionName)"
+    value: $[ resources.triggeringAlias ]
   - name: triggeringBranch
-    value: "$(Build.TriggeredBy.BranchName)"
+    value: $[ coalesce(resources.pipeline.XbyKWebBuildTest.sourceBranch, resources.pipeline.XbyKUIBuildTest.sourceBranch, resources.pipeline.XbyKReactServerBuildTest.sourceBranch, '') ]
 
   # Dotnet Build variables
   - name: buildConfiguration
@@ -92,12 +92,30 @@ stages:
           - checkout: none
 
           - script: |
-              # Determine which GWT repo triggered the build (if any) to include in version suffix for traceability
-              case "$(Build.TriggeredBy.DefinitionName)" in
-                *Web*)         repo="web" ;;
-                *UI*)          repo="ui" ;;
-                *ReactServer*) repo="reactserver" ;;
-                *)             repo="manual" ;;
+              # Determine which GWT repo triggered the build (if any) to include in version suffix for traceability.
+              # resources.triggeringAlias is the alias from the resources.pipelines block (e.g. XbyKWebBuildTest).
+              # It is empty for manual runs. Build.TriggeredBy.* variables are NOT populated for YAML resource triggers.
+              case "$RESOURCES_TRIGGERINGALIAS" in
+                *Web*)
+                  repo="web"
+                  triggerBranch="$RESOURCES_PIPELINE_XBYKWEBBUILDTEST_SOURCEBRANCH"
+                  triggerRunId="$RESOURCES_PIPELINE_XBYKWEBBUILDTEST_RUNID"
+                  ;;
+                *UI*)
+                  repo="ui"
+                  triggerBranch="$RESOURCES_PIPELINE_XBYKUIBUILDTEST_SOURCEBRANCH"
+                  triggerRunId="$RESOURCES_PIPELINE_XBYKUIBUILDTEST_RUNID"
+                  ;;
+                *ReactServer*)
+                  repo="reactserver"
+                  triggerBranch="$RESOURCES_PIPELINE_XYKREACTSERVERBUILDTEST_SOURCEBRANCH"
+                  triggerRunId="$RESOURCES_PIPELINE_XYKREACTSERVERBUILDTEST_RUNID"
+                  ;;
+                *)
+                  repo="manual"
+                  triggerBranch=""
+                  triggerRunId=""
+                  ;;
               esac
 
               # Use GWT Project Variable group 'gwt.xbyk' to determine versioning and build numbering strategy.
@@ -116,10 +134,10 @@ stages:
               fi
 
               # Resolve triggering details
-              if [ -z "$(Build.TriggeredBy.DefinitionName)" ]; then
-                  triggerDetails="Manual run by $(Build.RequestedFor)"
+              if [ -z "$RESOURCES_TRIGGERINGALIAS" ]; then
+                triggerDetails="Manual run by $(Build.RequestedFor)"
               else
-                triggerDetails="$(Build.TriggeredBy.DefinitionName) / $(Build.TriggeredBy.BranchName) / Build: $(Build.TriggeredBy.BuildId)"
+                triggerDetails="$RESOURCES_TRIGGERINGALIAS / $triggerBranch / Build: $triggerRunId"
               fi
 
               echo "##vso[task.setvariable variable=triggerDetails;isOutput=true]$triggerDetails"
