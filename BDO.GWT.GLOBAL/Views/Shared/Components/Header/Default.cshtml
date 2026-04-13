@@ -15,12 +15,14 @@
     var pageId = pageContext.WebPage.WebPageItemID;
 }
 
-
-@(await ReactService.RenderComponentAsync(
-    pageId,
-    ReactComponentType.Header,
-    ReactComponentType.HeaderGUID,
-    new {
-    headerDetails = Model,
-},
-    Context.RequestAborted))
+@if (Model != null && pageId != 0)
+{
+    @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.Header,
+        ReactComponentType.HeaderGUID,
+        new {
+        headerDetails = Model,
+    },
+        Context.RequestAborted))
+}
