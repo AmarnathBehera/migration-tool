@@ -123,13 +123,8 @@ step "deploy-react-app-service" {
             Octopus.Action.Azure.AppSettings = <<-EOT
                 [
                   {
-                    "name": "WEBSITE_HEALTHCHECK_MAXPINGFAILURES",
-                    "value": "10",
-                    "slotSetting": false
-                  },
-                  {
-                    "name": "WEBSITE_RUN_FROM_PACKAGE",
-                    "value": "1",
+                    "name": "WEBSITE_WARMUP_PATH",
+                    "value": "/healthz",
                     "slotSetting": false
                   },
                   {
