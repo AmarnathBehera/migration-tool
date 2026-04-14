@@ -22,16 +22,18 @@
     }
 }
 
-
+@if (Model != null && pageId != 0)
+{
 @(await ReactService.RenderComponentAsync(
     pageId,
     ReactComponentType.Footer,
     ReactComponentType.FooterGUID,
     new {
-   footerSettings = Model,
+    footerSettings = Model,
 },
 options =>
 {
     options.ContainerClass = "footer__wrapper";
 }, 
-    Context.RequestAborted))
+Context.RequestAborted))
+}
