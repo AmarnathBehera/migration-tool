@@ -1,6 +1,4 @@
-﻿
-using bdo;
-using BDO.GWT.Domain.Core.Constants;
+﻿using BDO.GWT.Domain.Core.Constants;
 using BDO.GWT.Web.Core.DTOs;
 using System.Threading;
 using System.Threading.Tasks;

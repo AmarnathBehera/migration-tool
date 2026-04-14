@@ -1,7 +1,9 @@
 ﻿using BDO;
 using BDO.GWT.Core;
+using BDO.GWT.Core.Bases;
 using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Controllers;
+using BDO.GWT.Web.Core.LiveSite.Controllers;
 using BDO.GWT.Web.Core.Services;
 using Kentico.Content.Web.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc;
@@ -11,21 +13,18 @@ using System.Threading.Tasks;
 
 namespace BDO.GWT.Web.Core.LiveSite.Controllers;
 
-public class ContactController : Controller
+public class ContactController : PageController
 {
-    private readonly XperiencePageContext _contactPageContext;
     private readonly IContactPageService _contactPageService;
 
-    public ContactController(XperiencePageContext contactPageContext, IContactPageService contactPageService)
+    public ContactController(IContactPageService contactPageService)
     {
-        _contactPageContext = contactPageContext;
         _contactPageService = contactPageService;
     }
 
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        var page = await _contactPageContext.GetCurrentPageAsync();
-        var pageDto = await _contactPageService.GetContactPageDtoAsync(page, cancellationToken);
+        var pageDto = await _contactPageService.GetContactPageDtoAsync(null, cancellationToken);
 
         return View("~/Views/FormPage/Index.cshtml", pageDto);
     }

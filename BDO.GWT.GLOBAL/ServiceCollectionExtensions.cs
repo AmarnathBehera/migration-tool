@@ -3,12 +3,13 @@ using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Services.Footer;
 using BDO.GWT.Core.Services.Header;
 using BDO.GWT.Core.Services.Widget;
-using BDO.GWT.Web.Services;
 using BDO.GWT.GLOBAL.Services;
+using BDO.GWT.Web.Core.LiveSite.Services;
+using BDO.GWT.Web.Core.Services;
+using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience;
 using GWTXbyKWeb.Components.Services.SEOOptions;
 using Microsoft.Extensions.DependencyInjection;
-using BDO.GWT.Web.Core.LiveSite.Services;
 
 namespace BDO.GWT.Common;
 
@@ -31,6 +32,9 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddHttpClient();
 
         serviceCollection.AddScoped<GlobalSettingsService>();
+        serviceCollection.AddScoped<IContactPageService, ContactPageService>();
+        serviceCollection.AddScoped<IHeroService, HeroService>();
+        serviceCollection.AddScoped<XperiencePageContext>();
         serviceCollection.AddScoped<IWebsiteContext, WebsiteContext>();
         serviceCollection.AddScoped<IHeaderService, HeaderService>();
         serviceCollection.AddScoped<IFooterService, FooterService>();
