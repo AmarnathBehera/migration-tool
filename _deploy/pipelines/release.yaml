@@ -33,6 +33,7 @@ resources:
         branches:
           include:
             - main
+            - "Release/*"
 
     - pipeline: XbyKReactServerBuildTest
       source: "GWT.XbyK.ReactServer\\GWT.XbyK.ReactServer - Build and Test"
@@ -40,6 +41,7 @@ resources:
         branches:
           include:
             - main
+            - "Release/*"
 
 variables:
   # Pipeline Variables
