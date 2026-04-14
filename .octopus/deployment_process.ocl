@@ -123,13 +123,18 @@ step "deploy-react-app-service" {
             Octopus.Action.Azure.AppSettings = <<-EOT
                 [
                   {
-                    "name": "AzureAd__TenantId",
-                    "value": "#{appsettings.azureAdTenantId}",
+                    "name": "WEBSITE_HEALTHCHECK_MAXPINGFAILURES",
+                    "value": "10",
                     "slotSetting": false
                   },
                   {
-                    "name": "AzureAd__ClientId",
-                    "value": "#{appsettings.azureAdClientId}",
+                    "name": "WEBSITE_RUN_FROM_PACKAGE",
+                    "value": "1",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "WEBSITES_CONTAINER_START_TIME_LIMIT",
+                    "value": "600",
                     "slotSetting": false
                   }
                 ]
