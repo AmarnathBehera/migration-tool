@@ -7,7 +7,7 @@
 @model BDO.GWT.Core.DTOs.Footer.FooterDto
 @inject IReactService ReactService
 
-@inject IEventLoggingXbyK EventLoggingXbyK
+@inject IEventLogging EventLogging
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
 
 @{
@@ -26,7 +26,7 @@
                 EventDescription = "Footer rendered without Kentico web page context.",
                 EventUrl = Context?.Request?.Path.Value
             };
-            EventLoggingXbyK.LogEvent(data);
+            EventLogging.LogEvent(data);
             
         }
     }
