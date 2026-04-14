@@ -73,7 +73,7 @@ builder.Services.AddScoped<IPageBuilderService, PageBuilderService>();
 builder.Services.AddScoped<IContentService, ContentService>();
 builder.Services.AddScoped<IErrorService, ErrorService>();
 builder.Services.AddScoped<IStatusCodePageService, StatusCodePageService>();
-builder.Services.AddScoped(typeof(IEventLogging), typeof(EventLogging));
+builder.Services.AddScoped<IEventLogging, EventLogging>();
 
 
 
