@@ -11,8 +11,15 @@
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
 
 @{
-    var pageContext = WebPageDataContextRetriever.Retrieve();
-    var pageId = pageContext.WebPage.WebPageItemID;
+    var pageId = (int?)ViewData["PageId"] ?? 0;
+    if (pageId == null || pageId == 0){
+        try
+        {
+            var pageContext = WebPageDataContextRetriever.Retrieve();
+            pageId = pageContext.WebPage.WebPageItemID;
+        }
+        catch (InvalidOperationException) { }
+    }
 }
 
 

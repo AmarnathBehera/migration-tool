@@ -29,13 +29,13 @@ public class ErrorController : MvcController
     {
         var statusCodeReExecuteFeature = HttpContext.Features.Get<IStatusCodeReExecuteFeature>();
 
-        var statusCodePageDto = await _errorService.GetStatusCodePageDtoAsync(statusCodeReExecuteFeature, cancellationToken);
+        var statusCodePage = await _errorService.GetStatusCodePageAsync(statusCodeReExecuteFeature, cancellationToken);
 
-        if (statusCodePageDto is null)
+        if (statusCodePage is null)
         {
             return StatusCode(code);
         }
 
-        return View(statusCodePageDto);
+        return View(statusCodePage);
     }
 }

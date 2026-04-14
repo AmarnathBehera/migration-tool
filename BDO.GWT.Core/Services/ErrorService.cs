@@ -14,7 +14,7 @@ namespace BDO.GWT.Core.Services;
 
 public interface IErrorService
 {
-    Task<StatusCodePageDto?> GetStatusCodePageDtoAsync(
+    Task<StatusCode?> GetStatusCodePageAsync(
         IStatusCodeReExecuteFeature? statusCodeReExecuteFeature,
         CancellationToken cancellationToken);
 }
@@ -36,7 +36,7 @@ public class ErrorService : IErrorService
         _webPageDataContextInitializer = webPageDataContextInitializer;
     }
 
-    public async Task<StatusCodePageDto?> GetStatusCodePageDtoAsync(
+    public async Task<StatusCode?> GetStatusCodePageAsync(
         IStatusCodeReExecuteFeature? statusCodeReExecuteFeature,
         CancellationToken cancellationToken)
     {
@@ -56,9 +56,9 @@ public class ErrorService : IErrorService
 
         //_webPageDataContextInitializer.Initialize(statusCodePage);
 
-        var dto = _statusCodePageService.GetStatusCodePageDto(statusCodePage);
+        //var dto = _statusCodePageService.GetStatusCodePageDto(statusCodePage);
 
-        return dto;
+        return statusCodePage;
     }
 
     private async Task<StatusCode?> RetrieveStatusCodePageAsync(
