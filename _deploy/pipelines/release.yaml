@@ -1,0 +1,392 @@
+# GWT.XbyK Release pipeline
+# This pipeline is triggered by successful completion of the 'Build and Test' pipelines in the GWT.XbyK.Web, GWT.XbyK.UI, and GWT.XbyK.ReactServer repositories for main and release branches.
+# Pipeline can be executed manually also.
+
+name: $(Date:yyyyMMdd).$(Rev:r)
+
+trigger: none
+
+resources:
+  repositories:
+    - repository: GWT.XbyK.UI
+      type: git
+      name: "Global Website/GWT.XbyK.UI"
+      ref: main
+
+    - repository: GWT.XbyK.ReactServer
+      type: git
+      name: "Global Website/GWT.XbyK.ReactServer"
+      ref: main
+
+  pipelines:
+    - pipeline: XbyKWebBuildTest
+      source: "GWT.XbyK.Web\\GWT.XbyK.Web - Build and Test"
+      trigger:
+        branches:
+          include:
+            - main
+            - "Release/*"
+
+    - pipeline: XbyKUIBuildTest
+      source: "GWT.XbyK.UI\\GWT.XbyK.UI - Build and Test"
+      trigger:
+        branches:
+          include:
+            - main
+
+    - pipeline: XbyKReactServerBuildTest
+      source: "GWT.XbyK.ReactServer\\GWT.XbyK.ReactServer - Build and Test"
+      trigger:
+        branches:
+          include:
+            - main
+
+variables:
+  # Pipeline Variables
+  - group: gwt.xbyk
+  - name: triggeringRepo
+    value: "$(Build.TriggeredBy.DefinitionName)"
+  - name: triggeringBranch
+    value: "$(Build.TriggeredBy.BranchName)"
+
+  # Dotnet Build variables
+  - name: buildConfiguration
+    value: "Release"
+  - name: dotnetVersion
+    value: "10.x"
+  - name: publishOutput
+    value: "$(Build.ArtifactStagingDirectory)/publish"
+  - name: solutionFile
+    value: "GWTXbyKWeb.slnx"
+
+  # Octopus Deploy variables
+  - name: octopusSpaceName
+    value: "GWT"
+  - name: octopusProjectName
+    value: "GWT XbyK Web"
+  - name: octopusPackageOutput
+    value: "$(Build.ArtifactStagingDirectory)/packages"
+  - name: cmsAppPackageId
+    value: "GWT.XbyK.CMS.Deploy"
+  - name: mvcAppPackageId
+    value: "GWT.XbyK.MVC.Deploy"
+  - name: reactAppPackageId
+    value: "GWT.XbyK.React.Deploy"
+  # - name: synAppPackageId
+  #   value: "GWT.XbyK.Sync.Deploy"
+  # - name: apiAppPackageId
+  #   value: "GWT.XbyK.API.Deploy"
+
+stages:
+  - stage: Versioning
+    displayName: "Set Version"
+    jobs:
+      - job: SetVersion
+        displayName: "Set Build Number and Release Version"
+        steps:
+          - checkout: none
+
+          - script: |
+              # Determine which GWT repo triggered the build (if any) to include in version suffix for traceability
+              case "$(Build.TriggeredBy.DefinitionName)" in
+                *Web*)         repo="web" ;;
+                *UI*)          repo="ui" ;;
+                *ReactServer*) repo="reactserver" ;;
+                *)             repo="manual" ;;
+              esac
+
+              # Use GWT Project Variable group 'gwt.xbyk' to determine versioning and build numbering strategy.
+              if [ "$(currentVersion)" = "$(stableVersion)" ]; then
+                isStable=true
+                channel="Stable"
+                suffix="stable"
+                releaseNumber="$(stableVersion)"
+                newBuildNumber="$(stableVersion)-$(Build.BuildId)-${suffix}-${repo}"
+              else
+                isStable=false
+                channel="Pre-Release"
+                suffix="ci"
+                releaseNumber="$(currentVersion)-$(Build.BuildId)-${suffix}-${repo}"
+                newBuildNumber="${releaseNumber}"
+              fi
+
+              # Resolve triggering details
+              if [ -z "$(Build.TriggeredBy.DefinitionName)" ]; then
+                  triggerDetails="Manual run by $(Build.RequestedFor)"
+              else
+                triggerDetails="$(Build.TriggeredBy.DefinitionName) / $(Build.TriggeredBy.BranchName) / Build: $(Build.TriggeredBy.BuildId)"
+              fi
+
+              echo "##vso[task.setvariable variable=triggerDetails;isOutput=true]$triggerDetails"
+              echo "##vso[build.updatebuildnumber]$newBuildNumber"
+              echo "##vso[task.setvariable variable=releaseNumber;isOutput=true]$releaseNumber"
+              echo "##vso[task.setvariable variable=octopusChannel;isOutput=true]$channel"
+              echo "##vso[task.setvariable variable=isStable;isOutput=true]$isStable"
+            name: setVersion
+            displayName: "Set release version"
+
+  - stage: Build
+    displayName: Build
+    dependsOn: Versioning
+    variables:
+      releaseNumber: $[ stageDependencies.Versioning.SetVersion.outputs['setVersion.releaseNumber'] ]
+      octopusChannel: $[ stageDependencies.Versioning.SetVersion.outputs['setVersion.octopusChannel'] ]
+      isStable: $[ stageDependencies.Versioning.SetVersion.outputs['setVersion.isStable'] ]
+
+    jobs:
+      - job: BuildCmsApp
+        displayName: "Build and package XbyK CMS App"
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - checkout: self
+          - task: UseDotNet@2
+            displayName: "Use .NET $(dotnetVersion)"
+            inputs:
+              packageType: "sdk"
+              version: "$(dotnetVersion)"
+              installationPath: $(Agent.ToolsDirectory)/dotnet
+
+          - task: NuGetAuthenticate@1
+            displayName: "Authenticate NuGet"
+
+          - script: dotnet restore $(Build.SourcesDirectory)/$(solutionFile)
+            displayName: "Restore NuGet packages"
+
+          - script: >
+              dotnet build $(Build.SourcesDirectory)/$(solutionFile)
+              --configuration $(buildConfiguration)
+              --no-restore
+            displayName: "Build solution"
+
+          - script: >
+              dotnet publish $(Build.SourcesDirectory)/$(solutionFile)
+              --configuration $(buildConfiguration)
+              --no-build
+              --output $(publishOutput)
+            displayName: "Publish solution"
+
+          - task: ArchiveFiles@2
+            displayName: "Create CMS deployment package"
+            inputs:
+              rootFolderOrFile: "$(publishOutput)"
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: "$(octopusPackageOutput)/$(cmsAppPackageId).$(Build.BuildNumber).zip"
+              replaceExistingArchive: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish CMS package artifact"
+            inputs:
+              targetPath: "$(octopusPackageOutput)"
+              artifact: drop-cms
+
+      - job: BuildMvcApp
+        displayName: "Build and package XbyK MVC App"
+        pool:
+          vmImage: "ubuntu-latest"
+        variables:
+          # In multi-checkout mode, 'self' is placed in a subdirectory named after the repository
+          selfSourcesDirectory: "$(Build.SourcesDirectory)/GWT.XbyK.Web"
+        steps:
+          - checkout: self
+          - checkout: GWT.XbyK.UI
+
+          - task: UseDotNet@2
+            displayName: "Use .NET $(dotnetVersion)"
+            inputs:
+              packageType: "sdk"
+              version: "$(dotnetVersion)"
+              installationPath: $(Agent.ToolsDirectory)/dotnet
+
+          - task: NuGetAuthenticate@1
+            displayName: "Authenticate NuGet"
+
+          - script: dotnet restore $(selfSourcesDirectory)/$(solutionFile)
+            displayName: "Restore NuGet packages"
+
+          - task: UseNode@1
+            displayName: "Install Node.js"
+            inputs:
+              version: "22.x"
+
+          - task: Npm@1
+            displayName: "Install GWT.XbyK.UI dependencies"
+            inputs:
+              command: "install"
+              workingDir: "$(Build.SourcesDirectory)/GWT.XbyK.UI"
+
+          - task: Npm@1
+            displayName: "Build GWT.XbyK.UI assets"
+            inputs:
+              command: "custom"
+              workingDir: "$(Build.SourcesDirectory)/GWT.XbyK.UI"
+              customCommand: "run build:production"
+
+          - script: >
+              dotnet build $(selfSourcesDirectory)/$(solutionFile)
+              --configuration $(buildConfiguration)
+              --no-restore
+            displayName: "Build solution"
+
+          - script: >
+              dotnet publish $(selfSourcesDirectory)/$(solutionFile)
+              --configuration $(buildConfiguration)
+              --no-build
+              --output $(publishOutput)
+            displayName: "Publish solution"
+
+          - task: CopyFiles@2
+            displayName: "Copy UI assets to MVC wwwroot"
+            inputs:
+              SourceFolder: "$(Build.SourcesDirectory)/GWT.XbyK.UI/wwwroot/dist"
+              Contents: "**"
+              TargetFolder: "$(publishOutput)/wwwroot/dist"
+              OverWrite: true
+
+          - task: ArchiveFiles@2
+            displayName: "Create MVC deployment package"
+            inputs:
+              rootFolderOrFile: "$(publishOutput)"
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: "$(octopusPackageOutput)/$(mvcAppPackageId).$(Build.BuildNumber).zip"
+              replaceExistingArchive: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish MVC package artifact"
+            inputs:
+              targetPath: "$(octopusPackageOutput)"
+              artifact: drop-mvc
+
+      - job: BuildReactApp
+        displayName: "Build and package XbyK React SSR App"
+        steps:
+          - checkout: GWT.XbyK.ReactServer
+            fetchDepth: 0
+          - checkout: GWT.XbyK.UI
+            fetchDepth: 0
+
+          - task: UseNode@1
+            displayName: "Install Node.js 22"
+            inputs:
+              version: "22.x"
+
+          - task: Npm@1
+            displayName: "Install GWT-ReactServer dependencies"
+            inputs:
+              command: "install"
+              workingDir: "$(Build.SourcesDirectory)/GWT.XbyK.ReactServer"
+
+          - task: Npm@1
+            displayName: "Install GWT-UI dependencies"
+            inputs:
+              command: "install"
+              workingDir: "$(Build.SourcesDirectory)/GWT.XbyK.UI"
+
+          - task: Npm@1
+            displayName: "Build React SSR App"
+            inputs:
+              command: "custom"
+              workingDir: "$(Build.SourcesDirectory)/GWT.XbyK.ReactServer"
+              customCommand: "run build"
+          # The Fastify node has dependencies that are required at runtime, so we need to include the node_modules in the package. We copy them to the build output folder before packaging.
+          - task: CopyFiles@2
+            displayName: "Copy Node.js metadata files to build directory"
+            inputs:
+              SourceFolder: "$(Build.SourcesDirectory)/GWT.XbyK.ReactServer"
+              Contents: |
+                node_modules/**
+              TargetFolder: "$(Build.SourcesDirectory)/GWT.XbyK.ReactServer/build"
+              OverWrite: true
+
+          - task: ArchiveFiles@2
+            displayName: "Package XbyK React SSR App"
+            inputs:
+              rootFolderOrFile: "$(Build.SourcesDirectory)/GWT.XbyK.ReactServer/build"
+              includeRootFolder: false
+              archiveType: "zip"
+              archiveFile: "$(Build.ArtifactStagingDirectory)/packages/$(reactAppPackageId).$(Build.BuildNumber).zip"
+              replaceExistingArchive: true
+              verbose: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish XbyK React App package artifact"
+            inputs:
+              targetPath: "$(octopusPackageOutput)"
+              artifact: drop-react
+
+  - stage: Publish
+    displayName: Publish to Octopus
+    dependsOn: [Versioning, Build]
+    variables:
+      releaseNumber: $[ stageDependencies.Versioning.SetVersion.outputs['setVersion.releaseNumber'] ]
+      octopusChannel: $[ stageDependencies.Versioning.SetVersion.outputs['setVersion.octopusChannel'] ]
+      isStable: $[ stageDependencies.Versioning.SetVersion.outputs['setVersion.isStable'] ]
+      triggerDetails: $[ stageDependencies.Versioning.SetVersion.outputs['setVersion.triggerDetails'] ]
+    jobs:
+      - job: Publish
+        displayName: Publish to Octopus
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - download: current
+            displayName: "Download CMS package artifact"
+            artifact: drop-cms
+          - download: current
+            displayName: "Download MVC package artifact"
+            artifact: drop-mvc
+          - download: current
+            displayName: "Download React App package artifact"
+            artifact: drop-react
+
+          - task: OctopusPush@7
+            displayName: Push Packages to Octopus
+            inputs:
+              OctoConnectedServiceName: "Octopus Cloud"
+              Space: "$(octopusSpaceName)"
+              Packages: |
+                $(Pipeline.Workspace)/drop-cms/*.zip
+                $(Pipeline.Workspace)/drop-mvc/*.zip
+                $(Pipeline.Workspace)/drop-react/*.zip
+              Replace: "true"
+
+          - task: OctopusBuildInformation@7
+            displayName: Push Package Build Information to Octopus
+            inputs:
+              OctoConnectedServiceName: "Octopus Cloud"
+              Space: "$(octopusSpaceName)"
+              PackageIds: |
+                $(cmsAppPackageId)
+                $(mvcAppPackageId)
+                $(reactAppPackageId)
+              PackageVersion: "$(Build.BuildNumber)"
+              Replace: OverwriteExisting
+
+          # Create release on 'Pre-Release' channel for main branch, and 'Stable' channel for Release/* branches
+          - task: OctopusCreateRelease@7
+            displayName: Create Octopus Release on Pre-Release Channel
+            condition: and(succeeded(), ne(variables['isStable'], 'true'))
+            continueOnError: true
+            inputs:
+              OctoConnectedServiceName: "Octopus Cloud"
+              Space: "$(octopusSpaceName)"
+              Project: "$(octopusProjectName)"
+              ReleaseNumber: "$(Build.BuildNumber)"
+              Channel: "Pre-Release"
+              DefaultPackageVersion: "$(Build.BuildNumber)"
+              GitRef: main
+              ReleaseNotes: "**Triggered by:** $(triggerDetails)<br>**Last GWT.XbyK.Web Commit:** $(Build.SourceVersionMessage)<br>**Build Reason:** $(Build.Reason)<br>**Link:** $(Build.Repository.Uri)"
+
+          - task: OctopusCreateRelease@7
+            displayName: Create Octopus Release on Stable Channel
+            condition: and(succeeded(), eq(variables['isStable'], 'true'))
+            inputs:
+              OctoConnectedServiceName: "Octopus Cloud"
+              Space: "$(octopusSpaceName)"
+              Project: "$(octopusProjectName)"
+              ReleaseNumber: "$(Build.BuildNumber)"
+              Channel: "Stable"
+              DefaultPackageVersion: "$(Build.BuildNumber)"
+              GitRef: main
+              ReleaseNotes: "**Triggered by:** $(triggerDetails)<br>**Last GWT.XbyK.Web Commit Msg:** $(Build.SourceVersionMessage)<br>**Build Reason:** $(Build.Reason)<br>**Link:** $(Build.Repository.Uri)"
