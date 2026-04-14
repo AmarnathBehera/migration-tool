@@ -1,14 +1,8 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.Core.DTOs;
 using CMS.Core;
-using CMS.DataEngine;
-using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BDO.GWT.Core.Services;
 
@@ -22,18 +16,14 @@ public interface IErrorService
 public class ErrorService : IErrorService
 {
     private readonly IContentService _contentRetriever;
-    private readonly IStatusCodePageService _statusCodePageService;
-    private readonly IWebPageDataContextInitializer _webPageDataContextInitializer;
+
 
 
     public ErrorService(
-        IContentService contentRetriever,
-        IStatusCodePageService statusCodePageService,
-        IWebPageDataContextInitializer webPageDataContextInitializer)
+        IContentService contentRetriever
+)
     {
         _contentRetriever = contentRetriever;
-        _statusCodePageService = statusCodePageService;
-        _webPageDataContextInitializer = webPageDataContextInitializer;
     }
 
     public async Task<StatusCode?> GetStatusCodePageAsync(
@@ -53,10 +43,6 @@ public class ErrorService : IErrorService
         {
             return null;
         }
-
-        //_webPageDataContextInitializer.Initialize(statusCodePage);
-
-        //var dto = _statusCodePageService.GetStatusCodePageDto(statusCodePage);
 
         return statusCodePage;
     }
