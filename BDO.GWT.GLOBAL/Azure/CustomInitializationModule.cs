@@ -1,4 +1,5 @@
-﻿using CMS;
+﻿using BDO;
+using CMS;
 using CMS.Core;
 using CMS.DataEngine;
 using CMS.IO;
@@ -7,6 +8,7 @@ using Kentico.Xperience.AzureStorage;
 
 
 [assembly: RegisterModule(typeof(CustomInitializationModule))]
+namespace BDO;
 
 public class CustomInitializationModule : Module
 {
@@ -21,13 +23,13 @@ public class CustomInitializationModule : Module
         var configuration = CMS.Core.Service.Resolve<Microsoft.Extensions.Configuration.IConfiguration>();
         var assetsProvider = AzureStorageProvider.Create();
         assetsProvider.CustomRootPath = configuration["CMSAzureRootContainer"];
-        MapPathsToNewAzureStorageProviderForAllSites(assetsProvider.CustomRootPath, new[]
-         {
+        MapPathsToNewAzureStorageProviderForAllSites(assetsProvider.CustomRootPath,
+         [
                 "~/<siteCodeName>/media/",
                 "~/<siteCodeName>/files/",
                 "~/<siteCodeName>/metafiles/",
                 "~/<siteCodeName>/BizFormFiles/",
-            });
+           ]);
 
         assetsProvider.PublicExternalFolderObject = false;
         StorageHelper.MapStoragePath("~/assets/contentitems", assetsProvider);

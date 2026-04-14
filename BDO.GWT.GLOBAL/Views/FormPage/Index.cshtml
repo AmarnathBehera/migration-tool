@@ -14,15 +14,6 @@
 @{
     Layout = "_Layout";
 
-
-    var widgetsList = new[]
-    {
-        ComponentIdentifiers.Widgets.ExternalNavigation,
-        ComponentIdentifiers.Widgets.Imagewithtext,
-        ComponentIdentifiers.Widgets.QuoteCard,
-        ComponentIdentifiers.Widgets.TiledLink,
-        ComponentIdentifiers.Widgets.Globallocation
-    };
 }
 
 @(await ReactService.RenderComponentAsync(

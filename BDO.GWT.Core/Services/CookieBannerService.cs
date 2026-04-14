@@ -26,7 +26,7 @@ public class CookieBannerService : ICookieBannerService
 
         return new CookieBannerDto
         {
-            DefaultCookieValue = ((int)defaultCookieConsentLevel).ToString(),
+            DefaultCookieValue = (defaultCookieConsentLevel).ToString(),
         };
     }
 }

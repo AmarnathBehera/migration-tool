@@ -42,12 +42,6 @@ public class ContactPageService : IContactPageService
      cancellationToken);
         var ContactPage = results.FirstOrDefault();
 
-        if (ContactPage is null)
-        {
-            return null;
-        }
-
-
         return new FormPageDto
         {
             MetaData = new MetaDataDto
