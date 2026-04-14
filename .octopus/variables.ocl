@@ -30,6 +30,6 @@ variable "appsettings.azureAdTenantId" {
     value "44f4e7a6-4821-44d7-b286-cd90436c6975" {}
 }
 
-variable "appsettings.sqlConnectionString" {
+variable "appsettings.CMSConnectionString" {
     value "Server=bdo-dbs-gwt-xbyk-#{environment.abbreviation}-eur-we.database.windows.net;Database=bdo-db-gwt-xbyk-#{environment.abbreviation}-eur-we;Authentication=Active Directory Managed Identity;TrustServerCertificate=False;Encrypt=True;" {}
 }
