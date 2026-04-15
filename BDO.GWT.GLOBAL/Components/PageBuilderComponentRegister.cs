@@ -2,7 +2,7 @@
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ExternalNavigationWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ImageWithTextWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.QuoteCardWidget;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.RichTextWidget;
+using BDO.GWT.Web.Widgets.RichTextWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ViewGlobalLocations;
 using BDO.GWT.Xperience.LiveSite.Components.Section;

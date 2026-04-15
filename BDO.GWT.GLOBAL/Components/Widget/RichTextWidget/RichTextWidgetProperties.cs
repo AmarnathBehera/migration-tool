@@ -3,7 +3,7 @@ using Kentico.Xperience.Admin.Base.FormAnnotations;
 using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
 
-namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.RichTextWidget;
+namespace BDO.GWT.Web.Widgets.RichTextWidget;
 
 public class RichTextWidgetProperties : Kentico.Components.Web.Mvc.Widgets.Internal.RichTextWidgetProperties
 {

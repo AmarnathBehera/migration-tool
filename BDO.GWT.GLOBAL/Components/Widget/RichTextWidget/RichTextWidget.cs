@@ -1,7 +1,7 @@
 ﻿using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.RichTextWidget;
+namespace BDO.GWT.Web.Widgets.RichTextWidget;
 
 public class RichTextWidget : ViewComponent
 {

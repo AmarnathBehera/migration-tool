@@ -1,6 +1,5 @@
 ﻿using BDO;
 using BDO.GWT.Web.Controllers;
-using GWTXbyKWeb.Controllers;
 using Kentico.Content.Web.Mvc.Routing;
 using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 
