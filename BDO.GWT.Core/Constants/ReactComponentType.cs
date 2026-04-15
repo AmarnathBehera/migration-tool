@@ -38,7 +38,7 @@ public static class ReactComponentType
     public const string TrendingTopicsGUID = "787fa982-047e-4dd8-833a-437616beef3f";
     public const string AccordionGUID = "eb8adb96-24dd-4a60-8ab8-af1d1dc32f23";
     public const string BreadcrumbsGUID = "77248460-7937-4255-a9fe-7340a4d1f464";
-
+    public const string ErrorPageContentGUID = "6e906e0a-6d90-4776-8e90-ff2bdcaa4213";
 }
 
 
@@ -55,7 +55,7 @@ public static class ReactComponentType
 
 //
 
-//6e906e0a-6d90-4776-8e90-ff2bdcaa4213
+//
 
 //60875e95-b88e-4db3-b4bf-7c2926a2485c
 
