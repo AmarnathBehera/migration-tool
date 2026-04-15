@@ -5,6 +5,7 @@ using BDO.GWT.Core.Services.Header;
 using BDO.GWT.Core.Services.Widget;
 using BDO.GWT.Web.Services;
 using BDO.GWT.GLOBAL.Services;
+using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Xperience;
 using GWTXbyKWeb.Components.Services.SEOOptions;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +40,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IPageContext, XperiencePageContext>();
         serviceCollection.AddScoped<IPageBuilderSectionService, PageBuilderSectionService>();
         serviceCollection.AddScoped<ITileContentService, TileContentService>();
+        serviceCollection.AddScoped<IHeroService, HeroService>();
+        serviceCollection.AddScoped(typeof(IAboutPageService<>), typeof(AboutPageService<>));
 
     }
 

@@ -32,7 +32,9 @@ builder.Services.AddKentico(features =>
         RegisterDefaultSection = true,
         ContentTypeNames = new[]
         {
-          "BDO.HomePage"
+          "BDO.HomePage",
+          "BDO.SectionAbout",
+          "BDO.AboutPage"
        }
     }); features.UseActivityTracking();
     features.UseWebPageRouting();

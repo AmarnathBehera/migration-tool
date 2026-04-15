@@ -10,6 +10,7 @@ using Kentico.Content.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Http;
+using Org.BouncyCastle.Crypto;
 using System;
 using System.Linq;
 using System.Threading;
@@ -25,7 +26,7 @@ public class XperiencePageContext : IPageContext
     private readonly IPageBuilderDataContextRetriever _pageBuilderDataContextRetriever;
     private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly IContentQueryExecutor _queryExecutor;
-
+    
 
     public XperiencePageContext(
         IHttpContextAccessor httpContextAccessor,
@@ -62,11 +63,16 @@ public class XperiencePageContext : IPageContext
         if (!_webPageDataContextRetriever.TryRetrieve(out var ctx))
             return null;
 
-        // Cast if the context data already is T (e.g. passed through routing)
-        if (ctx.WebPage is T typedPage)
-            return typedPage;
+        var query = new ContentItemQueryBuilder()
+            .ForContentType(ctx.WebPage.ContentTypeName, q => q
+                .ForWebsite(ctx.WebPage.WebsiteChannelName)
+                .TopN(1)
+                .WithLinkedItems(1))
+            .InLanguage(ctx.WebPage.LanguageName);
 
-        return null;
+        var result = await _queryExecutor.GetMappedWebPageResult<T>(query);
+
+        return result.FirstOrDefault();
     }
 
 
