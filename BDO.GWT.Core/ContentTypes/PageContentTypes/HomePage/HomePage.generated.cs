@@ -56,7 +56,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataOGImage.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataOGImage { get; set; }
+		public IEnumerable<ContentAttachment> MetadataOGImage { get; set; }
 
 
 		/// <summary>
@@ -117,5 +117,11 @@ namespace BDO
 		/// MetadataCanonical.
 		/// </summary>
 		public string MetadataCanonical { get; set; }
+
+
+		/// <summary>
+		/// MetadataKeywords.
+		/// </summary>
+		public string MetadataKeywords { get; set; }
 	}
 }
