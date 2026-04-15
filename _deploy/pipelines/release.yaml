@@ -56,8 +56,6 @@ variables:
     value: "10.x"
   - name: publishOutput
     value: "$(Build.ArtifactStagingDirectory)/publish"
-  - name: solutionFile
-    value: "GWTXbyKWeb.slnx"
 
   # Project file paths; relative to the repository root, used for dotnet build/publish and to determine which projects to package for Octopus Deploy.
   # In multi-repo checkout scenarios, the repository root is the subdirectory named after the repository (e.g. $(Build.SourcesDirectory)/GWT.XbyK.Web/)
