@@ -69,13 +69,8 @@ step "deploy-mvc-app-service" {
             Octopus.Action.Azure.AppSettings = <<-EOT
                 [
                   {
-                    "name": "AzureAd__TenantId",
-                    "value": "#{appsettings.azureAdTenantId}",
-                    "slotSetting": false
-                  },
-                  {
-                    "name": "AzureAd__ClientId",
-                    "value": "#{appsettings.azureAdClientId}",
+                    "name": "ReactOptions__ServerUrl",
+                    "value": "#{appsettings.reactAppService}",
                     "slotSetting": false
                   }
                 ]
@@ -120,20 +115,6 @@ step "deploy-react-app-service" {
     action {
         action_type = "Octopus.AzureAppService"
         properties = {
-            Octopus.Action.Azure.AppSettings = <<-EOT
-                [
-                  {
-                    "name": "WEBSITE_WARMUP_PATH",
-                    "value": "/healthz",
-                    "slotSetting": false
-                  },
-                  {
-                    "name": "WEBSITES_CONTAINER_START_TIME_LIMIT",
-                    "value": "600",
-                    "slotSetting": false
-                  }
-                ]
-                EOT
             Octopus.Action.Azure.ConnectionStrings = <<-EOT
                 [
                    {
