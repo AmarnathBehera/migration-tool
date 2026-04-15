@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.Web.Core.LiveSite.Controllers;
+namespace BDO.GWT.Web.Controllers;
 
 public abstract class AboutController<TPage> : PageController
     where TPage : class, IHero, IOGMetadataFields, ISearchAndSEO, IMetadata, IWebPageFieldsSource, new()

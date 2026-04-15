@@ -34,6 +34,7 @@ public static class ReactComponentType
     public const string ViewGlobalLocationsWidgetGUID = "0a440ca7-fc48-42d2-8fd1-cbf788de9281";
     public const string TiledLinkSectionWidgetGUID = "7e23aa59-e26e-447f-b12c-9eb0f62fa3f9";
     public const string HomeHeroGUID = "24ddec1e-4616-4488-9351-7f0f8b8d690f";
+    public const string HeroGUID = "f8a3b2c1-d4e5-4f6a-b7c8-d9e0f1a2b3c4";
 
 }
 
