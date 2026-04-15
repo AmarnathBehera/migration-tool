@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<cms.resource>
-  <ResourceDisplayName>BDO Audit Log</ResourceDisplayName>
-  <ResourceGUID>0c50b41b-19d0-49fc-8e07-c8d878998278</ResourceGUID>
-  <ResourceIsInDevelopment>False</ResourceIsInDevelopment>
-  <ResourceName>BDOAuditLog</ResourceName>
-</cms.resource>
