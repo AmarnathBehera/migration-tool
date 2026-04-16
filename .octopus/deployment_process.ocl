@@ -23,6 +23,11 @@ step "deploy-cms-app-service" {
                     "name": "AzureAd__ClientSecret",
                     "value": "#{appsettings.azureAdClientSecret}",
                     "slotSetting": false
+                  },
+                  {
+                    "name": "ReactOptions__ServerUrl",
+                    "value": "#{appsettings.reactAppService}",
+                    "slotSetting": false
                   }
                 ]
                 EOT
