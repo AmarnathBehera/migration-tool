@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<cms.resource>
-  <ResourceDescription>Allows to set permissions for API users.</ResourceDescription>
-  <ResourceDisplayName>BDO API permissions</ResourceDisplayName>
-  <ResourceGUID>ef797d1f-920e-408e-bd16-d8b0a82f2d57</ResourceGUID>
-  <ResourceIsInDevelopment>False</ResourceIsInDevelopment>
-  <ResourceName>BDOAPIPermissions</ResourceName>
-</cms.resource>

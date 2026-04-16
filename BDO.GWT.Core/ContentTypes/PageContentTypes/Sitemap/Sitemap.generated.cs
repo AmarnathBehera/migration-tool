@@ -63,5 +63,11 @@ namespace BDO
 		/// MetadataCanonical.
 		/// </summary>
 		public string MetadataCanonical { get; set; }
+
+
+		/// <summary>
+		/// MetadataKeywords.
+		/// </summary>
+		public string MetadataKeywords { get; set; }
 	}
 }

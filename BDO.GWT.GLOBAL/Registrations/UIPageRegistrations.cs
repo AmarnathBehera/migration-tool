@@ -10,7 +10,7 @@ using Kentico.Xperience.Admin.Base;
     uiPageType: typeof(GlobalSettingsListingPage),
     name: "Global settings",
     templateName: TemplateNames.LISTING,
-    order: 0)]
+      order: 0)]
 
 [assembly: UIPage(
     parentType: typeof(ProjectSettingsApplication),

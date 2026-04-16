@@ -1,6 +1,4 @@
-﻿
-
-using BDO;
+﻿using BDO;
 using BDO.GWT.Core;
 using BDO.GWT.Web.Controllers;
 using Kentico.Content.Web.Mvc.Routing;
