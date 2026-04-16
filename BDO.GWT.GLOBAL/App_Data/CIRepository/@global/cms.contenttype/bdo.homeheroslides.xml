@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Home Hero Slides</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="fb786773-023d-4069-899a-40570adebfe8" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="472b4b67-70ad-4d76-b381-0ba1af80802b" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="d1bdda8e-10e2-4d99-93be-c3f322396a18" isunique="true" system="true" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>3fe070b6-8000-439b-b528-68f75988cc60</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.HomeHeroSlides</ClassName>
+  <ClassShortName>BDOHomeHeroSlides</ClassShortName>
+  <ClassTableName>BDO_HomeHeroSlides</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>
