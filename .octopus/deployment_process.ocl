@@ -10,6 +10,26 @@ step "deploy-cms-app-service" {
             Octopus.Action.Azure.AppSettings = <<-EOT
                 [
                   {
+                    "name": "CMSAzureCDNEndpoint",
+                    "value": "#{appsettings.CMSAzureCDNEndpoint}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureAccountName",
+                    "value": "#{appsettings.CMSAzureAccountName}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureSharedKey",
+                    "value": "#{appsettings.CMSAzureSharedKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSHashStringSalt",
+                    "value": "#{appsettings.CMSHashStringSalt}",
+                    "slotSetting": false
+                  },  
+                  {
                     "name": "AzureAd__TenantId",
                     "value": "#{appsettings.azureAdTenantId}",
                     "slotSetting": false
@@ -73,6 +93,26 @@ step "deploy-mvc-app-service" {
         properties = {
             Octopus.Action.Azure.AppSettings = <<-EOT
                 [
+                  {
+                    "name": "CMSAzureCDNEndpoint",
+                    "value": "#{appsettings.CMSAzureCDNEndpoint}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureAccountName",
+                    "value": "#{appsettings.CMSAzureAccountName}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureSharedKey",
+                    "value": "#{appsettings.CMSAzureSharedKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSHashStringSalt",
+                    "value": "#{appsettings.CMSHashStringSalt}",
+                    "slotSetting": false
+                  },
                   {
                     "name": "ReactOptions__ServerUrl",
                     "value": "#{appsettings.reactAppService}",
