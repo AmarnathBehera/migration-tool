@@ -37,3 +37,11 @@ variable "appsettings.CMSConnectionString" {
 variable "appsettings.reactAppService" {
     value "https://bdo-web-gwt-xbyk-react-#{environment.abbreviation}-eur-we.azurewebsites.net" {}
 }
+
+variable "appsettings.CMSAzureAccountName" {
+    value "bdosagwtpri#{environment.abbreviation}eurwe" {}
+}
+
+variable "appsettings.CMSAzureCDNEndpoint" {
+    value "https://media-#{environment.abbreviation}.gwt.bdo.global" {}
+}

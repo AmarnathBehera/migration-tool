@@ -46,8 +46,6 @@ resources:
 variables:
   # Pipeline Variables
   - group: gwt.xbyk
-  - name: triggeringRepo
-    value: $[ resources.triggeringAlias ]
 
   # Dotnet Build variables
   - name: buildConfiguration
@@ -94,8 +92,10 @@ stages:
           - script: |
               # Determine which GWT repo triggered the build and updates package details and release notes accordingly.
               # This allows a single release pipeline for multi-repo development and a single Octopus Deploy project for deployment.
+              # $(Resources.TriggeringAlias) is a predefined variable set to the pipeline resource alias (e.g. XbyKWebBuildTest)
+              # when Build.Reason=ResourceTrigger. It is empty for manual runs.
 
-              case "$(triggeringRepo)" in
+              case "$(Resources.TriggeringAlias)" in
                 *Web*)
                   repo="web"
                   triggerBranch="$RESOURCES_PIPELINE_XBYKWEBBUILDTEST_SOURCEBRANCH"
@@ -134,10 +134,10 @@ stages:
               fi
 
               # Resolve triggering details
-              if [ -z "$(triggeringRepo)" ]; then
+              if [ -z "$(Resources.TriggeringAlias)" ]; then
                 triggerDetails="Manual run by $(Build.RequestedFor)"
               else
-                triggerDetails="$(triggeringRepo) / $triggerBranch / Build: $triggerRunId"
+                triggerDetails="$(Resources.TriggeringAlias) / $triggerBranch / Build: $triggerRunId"
               fi
 
               echo "##vso[task.setvariable variable=triggerDetails;isOutput=true]$triggerDetails"
