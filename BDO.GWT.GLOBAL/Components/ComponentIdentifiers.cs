@@ -21,6 +21,8 @@
             public const string SocialMediaButtons = WidgetPrefix + "SocialMediaButtons";
 
             public const string RichText = WidgetPrefix + "RichText";
+
+            public const string AccordionWidget = WidgetPrefix + "AccordionWidget";
         }
 
         //sections
