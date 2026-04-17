@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.NavigationFirstLevelItem</CodeName>
+    <GUID>ec3497bc-0c55-4929-b71d-45676bf4dbe7</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.NavigationFeaturedItem">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.NavigationFeaturedItem</CodeName>
+        <GUID>c37981b7-d491-49fd-b6ad-d06c01b9efee</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.NavigationSecondLevelItem">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.NavigationSecondLevelItem</CodeName>
+        <GUID>0cfd100d-8dcc-4f68-8e08-ec6e2a837afb</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

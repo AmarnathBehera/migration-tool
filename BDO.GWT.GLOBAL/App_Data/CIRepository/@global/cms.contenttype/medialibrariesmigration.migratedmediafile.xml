@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Reusable</ClassContentTypeType>
+  <ClassDisplayName>Migrated media item</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="d36f0872-b141-44de-98bb-d0e32343a60d" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="ab329e22-aa37-4e39-b224-dec4885bae4a" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="081e9506-eae0-4995-a54e-a548aa552132" isunique="true" system="true" />
+      <field column="MediaFile" columntype="contentitemasset" enabled="true" guid="b308a2eb-6f0e-455d-b72d-81d75bf63733" visible="true">
+        <properties>
+          <fieldcaption>File</fieldcaption>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.ContentItemAssetUploader</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="MediaFileDescription" columntype="longtext" enabled="true" guid="7cacc1dd-c19c-48ba-8482-dba78008378c" visible="true">
+        <properties>
+          <fieldcaption>Description</fieldcaption>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextArea</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>e55cd441-d890-458d-b5fc-f0d8bc2e06ec</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>MediaLibrariesMigration.MigratedMediaFile</ClassName>
+  <ClassShortName>MediaLibrariesMigrationMigratedMediaFileGs4z6zap</ClassShortName>
+  <ClassTableName>MediaLibrariesMigration_MigratedMediaFile</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

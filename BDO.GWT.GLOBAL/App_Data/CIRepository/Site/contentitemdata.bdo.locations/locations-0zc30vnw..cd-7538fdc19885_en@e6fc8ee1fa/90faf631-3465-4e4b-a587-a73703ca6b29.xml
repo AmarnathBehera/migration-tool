@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.locations>
+  <ContentItemDataCommonDataID>
+    <GUID>3039ff56-e87d-4539-9acd-7538fdc19885</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Locations-0zc30vnw</CodeName>
+      <GUID>9cbccd2b-4bad-4638-b093-7456a83a5639</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>90faf631-3465-4e4b-a587-a73703ca6b29</ContentItemDataGUID>
+</contentitemdata.bdo.locations>
