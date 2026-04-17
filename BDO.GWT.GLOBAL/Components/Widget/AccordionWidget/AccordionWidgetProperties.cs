@@ -1,24 +1,24 @@
 ﻿using Kentico.Components.Web.Mvc.FormComponents;
 using Kentico.Forms.Web.Mvc;
+using Kentico.Xperience.Admin.Base.FormAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BDO.GWT.Web.Widgets.AccordionWidget;
 
 public class AccordionWidgetProperties : BaseWidgetProperties
 {
-    [EditingComponent(TextInputComponent.IDENTIFIER, Order = 0, Label = "Accordion heading")]
+    [TextInputComponent(Label = "Accordion heading", Order = 0)]
     public string Heading { get; set; } = null!;
 
-    [EditingComponent(RichTextComponent.IDENTIFIER, Order = 1, Label = "Accordion content")]
+    [RichTextEditorComponent(Order = 1,Label = "Accordion content")]
     public string Content { get; set; } = null!;
 
-    [EditingComponent(TextInputComponent.IDENTIFIER, Order = 2, Label = "Deep link ID")]
+    [TextInputComponent(Label = "Deep link ID", Order = 2)]
     public string? DeepLinkID { get; set; }
 
-    [EditingComponent(DropDownComponent.IDENTIFIER, Label = "Top margin", Order = 3)]
-    [EditingComponentProperty(nameof(DropDownProperties.DataSource), "0px;None\r\n20px\r\n40px\r\n60px\r\n80px")]
-    public string TopMargin { get; set; } = null!;
+    [DropDownComponent(Label = "Top margin", Order = 4, Options = "0px;None\n20px\n40px\n60px\n80px")]
+    public string? TopMargin { get; set; }
 
-    [EditingComponent(DropDownComponent.IDENTIFIER, Label = "Bottom margin", Order = 4)]
-    [EditingComponentProperty(nameof(DropDownProperties.DataSource), "0px;None\r\n20px\r\n40px\r\n60px\r\n80px")]
-    public string BottomMargin { get; set; } = null!;
+    [DropDownComponent(Label = "Bottom margin", Order = 5, Options = "0px;None\n20px\n40px\n60px\n80px")]
+    public string? BottomMargin { get; set; }
 }

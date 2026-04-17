@@ -40,6 +40,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IPageContext, XperiencePageContext>();
         serviceCollection.AddScoped<IPageBuilderSectionService, PageBuilderSectionService>();
         serviceCollection.AddScoped<ITileContentService, TileContentService>();
+        serviceCollection.AddScoped<IButtonUrlRetriever, ButtonUrlRetriever>();
         serviceCollection.AddScoped<IHeroService, HeroService>();
         serviceCollection.AddScoped(typeof(IAboutPageService<>), typeof(AboutPageService<>));
 
