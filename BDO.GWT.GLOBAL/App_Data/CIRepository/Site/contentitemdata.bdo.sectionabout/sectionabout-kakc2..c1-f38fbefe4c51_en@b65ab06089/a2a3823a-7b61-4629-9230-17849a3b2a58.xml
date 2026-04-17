@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.sectionabout>
+  <ContentItemDataCommonDataID>
+    <GUID>5cb64c6e-3c59-4279-afc1-f38fbefe4c51</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>SectionAbout-kakc2el1</CodeName>
+      <GUID>dd419d54-c3c8-4cc8-8bfc-a05f5c8c0821</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>a2a3823a-7b61-4629-9230-17849a3b2a58</ContentItemDataGUID>
+</contentitemdata.bdo.sectionabout>
