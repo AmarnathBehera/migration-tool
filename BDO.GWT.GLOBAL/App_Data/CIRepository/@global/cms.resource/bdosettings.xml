@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.resource>
+  <ResourceDescription>Custom settings</ResourceDescription>
+  <ResourceDisplayName>BDO Settings</ResourceDisplayName>
+  <ResourceGUID>90803d98-9e0c-4de8-a610-d65ac36aea23</ResourceGUID>
+  <ResourceIsInDevelopment>False</ResourceIsInDevelopment>
+  <ResourceName>BDOSettings</ResourceName>
+</cms.resource>
