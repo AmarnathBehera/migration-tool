@@ -3,6 +3,7 @@
 public static class ReactComponentType
 {
     public const string Accordion = "AccordionWidget";
+    public const string ButtonWidget = "ButtonWidget";
     public const string Breadcrumbs = "Breadcrumbs";
     public const string DealDetails = "DealDetails";
     public const string DealsCardsGrid = "DealsCardsGrid";
@@ -28,6 +29,7 @@ public static class ReactComponentType
 
     //Below are the guid constants for the above components.
     public const string QuoteCardWidgetGUID = "5c570fe5-fc60-4efd-b7eb-7da977e486ab";
+    public const string ButtonWidgetGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
     public const string ImageWithTextWidgetGUID = "186b5e99-3a30-4c5e-bdff-9c5d40ac08a4";
     public const string ExternalNavigationWidgetGUID = "77688626-8511-4f2f-a7f4-eee7c65148c0";
     public const string HeaderGUID = "66b09d21-9d99-43fc-b210-575a0905e17d";
@@ -60,7 +62,7 @@ public static class ReactComponentType
 
 
 
-//614b9a3d-18d7-43f4-9f8f-a4bc99e99841
+//
 
 //3fdef59e-4ab3-4047-abb8-c7b52408adc2
 

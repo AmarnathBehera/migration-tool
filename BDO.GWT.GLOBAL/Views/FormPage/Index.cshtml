@@ -14,6 +14,15 @@
 @{
     Layout = "_Layout";
 
+    var widgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.Button,
+        // ComponentIdentifiers.Widgets.FlexibleBanner,
+         ComponentIdentifiers.Widgets.Form,
+        // ComponentIdentifiers.Widgets.RichText,
+        // ComponentIdentifiers.Widgets.ViewGlobalLocations,
+    };
+
 }
 
 @(await ReactService.RenderComponentAsync(
@@ -38,10 +47,14 @@
 
     </div>
     <div>
-        @* @await PageBuilderService.AddIdentifier("topArea").AddWidgets(widgetsList).BuildEditableAreaAsync(Html) *@
+        
+            @await Html.Kentico().EditableAreaAsync(
+            "mainContent", // Unique identifier
+                        new EditableAreaOptions
+                        {
+
+                            AllowedWidgets = widgetsList
+                        })
     </div>
 </div>
-
-@* @await PageBuilderService.AddIdentifier("bottomArea").AddWidgets(widgetsList).BuildEditableAreaAsync(Html)
-
-@PageBuilderService.GetPageBuilderScripts(Html) *@
+ 

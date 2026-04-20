@@ -97,9 +97,10 @@ public class ContactPageService : IContactPageService
                 WebPageUrlPathContentLanguageID = contactPage?.SystemFields?.WebPageUrlPathContentLanguageID ?? 0,
                 WebPageItemParentID = contactPage?.SystemFields?.WebPageItemParentID ?? 0
             },
+            Title = contactPage.DescriptionTitle,
+            Description = contactPage.DescriptionBody,
 
-
-           Hero = await _heroService.GetHeroDtoAsync(contactPage, cancellationToken) 
+            Hero = await _heroService.GetHeroDtoAsync(contactPage, cancellationToken) 
     
     };
     }
