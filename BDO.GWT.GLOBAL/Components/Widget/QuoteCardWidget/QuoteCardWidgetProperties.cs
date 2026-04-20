@@ -15,7 +15,7 @@ public class QuoteCardWidgetProperties : IWidgetProperties
     [RichTextEditorComponent(Order = 1, Label = "Subheading")]
     public string? Subheading { get; set; }
 
-    [ContentItemSelectorComponent(MigratedMediaFile.CONTENT_TYPE_NAME,
+    [ContentItemSelectorComponent(ContentAttachment.CONTENT_TYPE_NAME,
     Label = "Image",
     Order = 2,
     ExplanationText = "Recommended size depends on usage but a 3:2 aspect ratio works well for most instances.")]

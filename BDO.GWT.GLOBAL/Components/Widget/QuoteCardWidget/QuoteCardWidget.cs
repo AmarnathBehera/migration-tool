@@ -1,5 +1,4 @@
 ﻿using BDO;
-
 using BDO.GWT.Common.Core.LiveSite.Data;
 using BDO.GWT.Core;
 using BDO.GWT.Core.DTOs;
@@ -41,8 +40,11 @@ public class QuoteCardWidget : ViewComponent
                 .Select(x => x.Identifier)
                 .ToList();
 
-            buttonUrl = await _buttonUrlRetriever
-                .GetTilePagesAsync(guids, cancellationToken);
+             if (guids.Any())
+            {
+                buttonUrl = await _buttonUrlRetriever
+                    .GetTilePagesAsync(guids, cancellationToken);
+            }
         }
 
 
@@ -74,7 +76,7 @@ public class QuoteCardWidget : ViewComponent
         return View("~/Components/Widget/QuoteCardWidget/_QuoteCardWidget.cshtml", dto);
     }
 
-    private async Task<string?> GetImageUrlAsync(
+    private async Task<string> GetImageUrlAsync(
         QuoteCardWidgetProperties properties,
         CancellationToken cancellationToken)
     {
@@ -85,11 +87,11 @@ public class QuoteCardWidget : ViewComponent
             return null;
         }
 
-        var result = await _contentRetriever.RetrieveContentByGuids<MigratedMediaFile>(
+        var result = await _contentRetriever.RetrieveContentByGuids<ContentAttachment>(
             new[] { imageRef.Identifier },
             cancellationToken
         );
 
-        return result.FirstOrDefault()?.MediaFile?.Url;
+        return result.FirstOrDefault()?.ContentAttachmentAsset?.Url;
     }
 }
