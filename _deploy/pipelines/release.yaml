@@ -33,6 +33,7 @@ resources:
         branches:
           include:
             - main
+            - "Release/*"
 
     - pipeline: XbyKReactServerBuildTest
       source: "GWT.XbyK.ReactServer\\GWT.XbyK.ReactServer - Build and Test"
@@ -40,14 +41,11 @@ resources:
         branches:
           include:
             - main
+            - "Release/*"
 
 variables:
   # Pipeline Variables
   - group: gwt.xbyk
-  - name: triggeringRepo
-    value: "$(Build.TriggeredBy.DefinitionName)"
-  - name: triggeringBranch
-    value: "$(Build.TriggeredBy.BranchName)"
 
   # Dotnet Build variables
   - name: buildConfiguration
@@ -56,8 +54,13 @@ variables:
     value: "10.x"
   - name: publishOutput
     value: "$(Build.ArtifactStagingDirectory)/publish"
-  - name: solutionFile
-    value: "GWTXbyKWeb.slnx"
+
+  # Project file paths; relative to the repository root, used for dotnet build/publish and to determine which projects to package for Octopus Deploy.
+  # In multi-repo checkout scenarios, the repository root is the subdirectory named after the repository (e.g. $(Build.SourcesDirectory)/GWT.XbyK.Web/)
+  - name: cmsProjectFilePath
+    value: "BDO.GWT.GLOBAL/GWTXbyKWeb.csproj"
+  - name: mvcProjectFilePath
+    value: "BDO.GWT.GLOBAL/GWTXbyKWeb.csproj"
 
   # Octopus Deploy variables
   - name: octopusSpaceName
@@ -87,12 +90,32 @@ stages:
           - checkout: none
 
           - script: |
-              # Determine which GWT repo triggered the build (if any) to include in version suffix for traceability
-              case "$(Build.TriggeredBy.DefinitionName)" in
-                *Web*)         repo="web" ;;
-                *UI*)          repo="ui" ;;
-                *ReactServer*) repo="reactserver" ;;
-                *)             repo="manual" ;;
+              # Determine which GWT repo triggered the build and updates package details and release notes accordingly.
+              # This allows a single release pipeline for multi-repo development and a single Octopus Deploy project for deployment.
+              # $(Resources.TriggeringAlias) is a predefined variable set to the pipeline resource alias (e.g. XbyKWebBuildTest)
+              # when Build.Reason=ResourceTrigger. It is empty for manual runs.
+
+              case "$(Resources.TriggeringAlias)" in
+                *Web*)
+                  repo="web"
+                  triggerBranch="$RESOURCES_PIPELINE_XBYKWEBBUILDTEST_SOURCEBRANCH"
+                  triggerRunId="$RESOURCES_PIPELINE_XBYKWEBBUILDTEST_RUNID"
+                  ;;
+                *UI*)
+                  repo="ui"
+                  triggerBranch="$RESOURCES_PIPELINE_XBYKUIBUILDTEST_SOURCEBRANCH"
+                  triggerRunId="$RESOURCES_PIPELINE_XBYKUIBUILDTEST_RUNID"
+                  ;;
+                *ReactServer*)
+                  repo="reactserver"
+                  triggerBranch="$RESOURCES_PIPELINE_XYKREACTSERVERBUILDTEST_SOURCEBRANCH"
+                  triggerRunId="$RESOURCES_PIPELINE_XYKREACTSERVERBUILDTEST_RUNID"
+                  ;;
+                *)
+                  repo="manual"
+                  triggerBranch=""
+                  triggerRunId=""
+                  ;;
               esac
 
               # Use GWT Project Variable group 'gwt.xbyk' to determine versioning and build numbering strategy.
@@ -111,10 +134,10 @@ stages:
               fi
 
               # Resolve triggering details
-              if [ -z "$(Build.TriggeredBy.DefinitionName)" ]; then
-                  triggerDetails="Manual run by $(Build.RequestedFor)"
+              if [ -z "$(Resources.TriggeringAlias)" ]; then
+                triggerDetails="Manual run by $(Build.RequestedFor)"
               else
-                triggerDetails="$(Build.TriggeredBy.DefinitionName) / $(Build.TriggeredBy.BranchName) / Build: $(Build.TriggeredBy.BuildId)"
+                triggerDetails="$(Resources.TriggeringAlias) / $triggerBranch / Build: $triggerRunId"
               fi
 
               echo "##vso[task.setvariable variable=triggerDetails;isOutput=true]$triggerDetails"
@@ -150,17 +173,17 @@ stages:
           - task: NuGetAuthenticate@1
             displayName: "Authenticate NuGet"
 
-          - script: dotnet restore $(Build.SourcesDirectory)/$(solutionFile)
+          - script: dotnet restore $(Build.SourcesDirectory)/$(cmsProjectFilePath)
             displayName: "Restore NuGet packages"
 
           - script: >
-              dotnet build $(Build.SourcesDirectory)/$(solutionFile)
+              dotnet build $(Build.SourcesDirectory)/$(cmsProjectFilePath)
               --configuration $(buildConfiguration)
               --no-restore
             displayName: "Build solution"
 
           - script: >
-              dotnet publish $(Build.SourcesDirectory)/$(solutionFile)
+              dotnet publish $(Build.SourcesDirectory)/$(cmsProjectFilePath)
               --configuration $(buildConfiguration)
               --no-build
               --output $(publishOutput)
@@ -202,7 +225,7 @@ stages:
           - task: NuGetAuthenticate@1
             displayName: "Authenticate NuGet"
 
-          - script: dotnet restore $(selfSourcesDirectory)/$(solutionFile)
+          - script: dotnet restore $(selfSourcesDirectory)/$(mvcProjectFilePath)
             displayName: "Restore NuGet packages"
 
           - task: UseNode@1
@@ -224,13 +247,13 @@ stages:
               customCommand: "run build:production"
 
           - script: >
-              dotnet build $(selfSourcesDirectory)/$(solutionFile)
+              dotnet build $(selfSourcesDirectory)/$(mvcProjectFilePath)
               --configuration $(buildConfiguration)
               --no-restore
             displayName: "Build solution"
 
           - script: >
-              dotnet publish $(selfSourcesDirectory)/$(solutionFile)
+              dotnet publish $(selfSourcesDirectory)/$(mvcProjectFilePath)
               --configuration $(buildConfiguration)
               --no-build
               --output $(publishOutput)
