@@ -43,6 +43,7 @@ public static class ReactComponentType
     public const string BreadcrumbsGUID = "77248460-7937-4255-a9fe-7340a4d1f464";
     public const string CookieBannerGUID = "6e906e0a-6d90-4776-8e90-ff2bdcaa4213";
 
+    public const string ErrorPageContentGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
 }
 
 
@@ -60,6 +61,7 @@ public static class ReactComponentType
 //
 
 
+//
 
 
 //

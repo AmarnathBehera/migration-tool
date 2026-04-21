@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.Footer</CodeName>
+    <GUID>1305ff4f-d94c-47a9-9250-7505a9dc5f7a</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.FooterPages">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.FooterPages</CodeName>
+        <GUID>87a001b5-2f24-4964-8c80-6cd3fd7ad7ce</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.SocialPages">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.SocialPages</CodeName>
+        <GUID>afbd8222-11b6-424b-acec-3e96023413bf</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

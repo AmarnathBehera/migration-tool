@@ -3,13 +3,13 @@
   <ClassDisplayName>Cookiebot</ClassDisplayName>
   <ClassFormDefinition>
     <form>
-      <field column="CookiebotID" columntype="integer" enabled="true" guid="664ab231-d9b2-4c47-9008-b6295580e0d1" isPK="true" />
-      <field column="EnableCookiebot" columnprecision="0" columntype="boolean" enabled="true" guid="2e8eb269-8971-4eec-9c75-37ff9fedda68" />
-      <field column="CookieID" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="fc283928-a6c6-41ae-962e-534fba5ea178" />
-      <field column="CustomCookiebotScript" columnprecision="0" columntype="longtext" enabled="true" guid="4c200dbf-5d27-4eeb-a2e9-867d373f7270" />
+      <field column="CookiebotID" columntype="integer" enabled="true" guid="cf532231-40f3-41ef-80b2-e08d4635dc45" isPK="true" />
+      <field column="EnableCookiebot" columnprecision="0" columntype="boolean" enabled="true" guid="b2b4d059-6e29-4a92-8106-256e5e489bf8" />
+      <field column="CookieID" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="2ac54063-1ed6-47ac-b986-6967d0f81063" />
+      <field column="CustomCookiebotScript" columnprecision="0" columntype="longtext" enabled="true" guid="c5ec9283-3719-485e-9f61-ace645b985a1" />
     </form>
   </ClassFormDefinition>
-  <ClassGUID>620d4bbd-6d3c-4e83-8411-c56072b93dd9</ClassGUID>
+  <ClassGUID>e884d8e0-a6d1-4029-81c4-d0c0863b0759</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
   <ClassName>BDO.Cookiebot</ClassName>
   <ClassResourceID>

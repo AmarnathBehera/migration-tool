@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.homepage>
+  <ContentItemDataCommonDataID>
+    <GUID>bd64f700-c0af-4fcb-a44c-ee67f24bdf40</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Home-viaisaxf</CodeName>
+      <GUID>4fe3f64e-eda7-4b88-b0e7-855bd6af75bb</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>fd2485f0-b69c-4759-8138-3911d0ccce32</ContentItemDataGUID>
+  <DocumentName>Home</DocumentName>
+</contentitemdata.bdo.homepage>

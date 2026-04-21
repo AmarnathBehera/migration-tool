@@ -4,15 +4,15 @@
   <ClassDisplayName>Sitemap</ClassDisplayName>
   <ClassFormDefinition>
     <form>
-      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="db4a48d7-9aa1-4571-a7f8-a53675931a8f" isPK="true" />
-      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="1e3a6825-e4f6-47bc-9577-8cf8a9f2bc2b" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
-      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="3186a922-4174-453b-aa46-c92453e2793c" isunique="true" system="true" />
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="887a2d74-b7ff-45b9-a3a4-73bcd4837e02" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="3072a9f1-6156-4e8a-86e2-ac57e7cda3d6" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="5eacc3f1-6187-40f9-9009-fff00f0429a7" isunique="true" system="true" />
       <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
         <properties />
       </schema>
     </form>
   </ClassFormDefinition>
-  <ClassGUID>f1ba6e54-383e-4b25-934d-ca199f8d26d2</ClassGUID>
+  <ClassGUID>21077305-a3ad-4889-a673-6eb9724c13cc</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
   <ClassName>BDO.Sitemap</ClassName>
   <ClassShortName>BDOSitemap</ClassShortName>
