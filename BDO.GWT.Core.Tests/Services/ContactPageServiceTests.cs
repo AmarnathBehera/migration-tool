@@ -51,12 +51,15 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<Contact>());
 
-            var result = await _service.GetContactPageDtoAsync(null, CancellationToken.None);
+            var result = await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
 
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.TypeOf<FormPageDto>());
-            Assert.That(result.MetaData, Is.Null);
-            Assert.That(result.BaseContent, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result, Is.TypeOf<FormPageDto>());
+                Assert.That(result.MetaData, Is.Null);
+                Assert.That(result.BaseContent, Is.Null);
+            }   );
         }
 
         [Test]
@@ -68,9 +71,9 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<Action<RetrievePagesQueryParameters>>(),
                     It.IsAny<RetrievalCacheSettings>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync((IEnumerable<Contact>?)null);
+                .ReturnsAsync((IEnumerable<Contact>)null!);
 
-            var result = await _service.GetContactPageDtoAsync(null, CancellationToken.None);
+            var result = await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result.MetaData, Is.Null);
@@ -93,7 +96,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             SetupContentService(contactPage);
 
-            var result = await _service.GetContactPageDtoAsync(null, CancellationToken.None);
+            var result = await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -121,7 +124,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             SetupContentService(contactPage);
 
-            var result = await _service.GetContactPageDtoAsync(null, CancellationToken.None);
+            var result = await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -143,7 +146,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             SetupContentService(contactPage);
 
-            var result = await _service.GetContactPageDtoAsync(null, CancellationToken.None);
+            var result = await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -169,7 +172,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             SetupContentService(contactPage);
 
-            var result = await _service.GetContactPageDtoAsync(null, CancellationToken.None);
+            var result = await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -205,7 +208,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             SetupContentService(contactPage);
 
-            var result = await _service.GetContactPageDtoAsync(null, CancellationToken.None);
+            var result = await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -242,7 +245,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             SetupContentService(contactPage);
 
-            var result = await _service.GetContactPageDtoAsync(null, CancellationToken.None);
+            var result = await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -267,7 +270,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             SetupContentService(contactPage);
 
-            var result = await _service.GetContactPageDtoAsync(null, CancellationToken.None);
+            var result = await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -291,7 +294,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             SetupContentService(contactPage);
 
-            var result = await _service.GetContactPageDtoAsync(null, CancellationToken.None);
+            var result = await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -322,7 +325,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             SetupContentService(contactPage);
 
-            var result = await _service.GetContactPageDtoAsync(null, CancellationToken.None);
+            var result = await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
