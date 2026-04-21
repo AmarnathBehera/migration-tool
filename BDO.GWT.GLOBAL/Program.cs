@@ -15,11 +15,13 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.WebEncoders;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 
@@ -33,7 +35,8 @@ builder.Services.AddKentico(features =>
         RegisterDefaultSection = true,
         ContentTypeNames = new[]
         {
-          "BDO.HomePage"
+          "BDO.HomePage",
+          "BDO.Contact"
        }
     }); features.UseActivityTracking();
     features.UseWebPageRouting();
@@ -41,7 +44,11 @@ builder.Services.AddKentico(features =>
     features.UseEmailMarketing();
 });
 
-
+builder.Configuration.AddInMemoryCollection(
+    builder.Configuration
+        .GetSection("AzureStorageProviderSettings")
+        .GetChildren().ToDictionary(x => x.Key, x => x.Value)
+);
 builder.Services.Configure<WebEncoderOptions>(options =>
 {
     options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All);
