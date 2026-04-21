@@ -42,9 +42,9 @@ public class ContactPageService : IContactPageService
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken);
 
-        var contactPage = results?.FirstOrDefault();
+        var ContactPage = results?.FirstOrDefault();
 
-        if (contactPage == null)
+        if (ContactPage == null)
         {
             return new FormPageDto(); // or throw exception if required
         }
