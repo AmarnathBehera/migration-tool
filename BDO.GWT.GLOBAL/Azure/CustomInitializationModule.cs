@@ -15,6 +15,14 @@ namespace BDO;
 
 public class CustomInitializationModule : Module
 {
+    private static readonly string[] ChannelStoragePathTemplates =
+    [
+       "~/<siteCodeName>/media/",
+        "~/<siteCodeName>/files/",
+        "~/<siteCodeName>/metafiles/",
+        "~/<siteCodeName>/BizFormFiles/",
+    ];
+
     public CustomInitializationModule()
         : base("CustomInit")
     {
@@ -31,17 +39,12 @@ public class CustomInitializationModule : Module
             return;
 
         var customRootPath = configuration["AzureStorageProviderSettings:CMSAzureRootContainer"];
-        MapPathsForAllChannels(customRootPath, new[]
-       {
-            "~/<siteCodeName>/media/",
-            "~/<siteCodeName>/files/",
-            "~/<siteCodeName>/metafiles/",
-            "~/<siteCodeName>/BizFormFiles/",
-        });
+        MapPathsForAllChannels(customRootPath, ChannelStoragePathTemplates);
+
         MapPathToAzureStorageProvider(customRootPath, "~/assets/contentitems");
 
     }
-    private void MapPathsForAllChannels(string? customRootPath, string[] pathsToMap)
+    private void MapPathsForAllChannels(string customRootPath, string[] pathsToMap)
     {
         var channels = ChannelInfo.Provider.Get()
             .WhereEquals("ChannelType", "Website").ToList();
@@ -68,7 +71,7 @@ public class CustomInitializationModule : Module
             }
         }
     }
-    private static void MapPathToAzureStorageProvider(string? customRootPath, string pathToMap)
+    private static void MapPathToAzureStorageProvider(string customRootPath, string pathToMap)
     {
        
         var storageProvider = AzureStorageProvider.Create();
