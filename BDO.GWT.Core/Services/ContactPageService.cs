@@ -8,7 +8,7 @@ namespace BDO.GWT.Web.Core.Services;
 
 public interface IContactPageService
 {
-    Task<FormPageDto> GetContactPageDtoAsync(Contact page, CancellationToken cancellationToken);
+    Task<FormPageDto> GetContactPageDtoAsync(Contact? page, CancellationToken cancellationToken);
 }
 
 public class ContactPageService : IContactPageService
@@ -27,7 +27,7 @@ public class ContactPageService : IContactPageService
         _websiteChannelContext = websiteChannelContext;
     }
 
-    public async Task<FormPageDto> GetContactPageDtoAsync(Contact page, CancellationToken cancellationToken)
+    public async Task<FormPageDto> GetContactPageDtoAsync(Contact? page, CancellationToken cancellationToken)
     {
         var results = await _contentRetriever.GetPagesAsync<Contact>(
             new RetrievePagesParameters
