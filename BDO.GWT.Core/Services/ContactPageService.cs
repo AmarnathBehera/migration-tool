@@ -49,8 +49,16 @@ public class ContactPageService : IContactPageService
             return new FormPageDto(); // or throw exception if required
         }
 
+        var sys = ContactPage.SystemFields;
+
         return new FormPageDto
         {
+            Title = ContactPage.DescriptionTitle,
+            Description = ContactPage.DescriptionBody,
+            FormType = ContactPage.FormType,
+            Form = ContactPage.Form,
+            EmbedCode = ContactPage.EmbedCode,
+
             MetaData = new MetaDataDto
             {
                 MetaTitle = ContactPage.MetadataTitle,
@@ -78,31 +86,30 @@ public class ContactPageService : IContactPageService
 
             BaseContent = new BaseContent
             {
-                ContentItemID = ContactPage.SystemFields.ContentItemID,
-                ContentItemGUID = ContactPage.SystemFields.ContentItemGUID,
-                ContentItemName = ContactPage.SystemFields.ContentItemName,
-                ContentItemContentTypeID = ContactPage.SystemFields.ContentItemContentTypeID,
-                ContentItemIsSecured = ContactPage.SystemFields.ContentItemIsSecured,
-                //ContentItemCommonDataVersionStatus = homePage.SystemFields.ContentItemCommonDataVersionStatus,
-                ContentItemCommonDataContentLanguageID = ContactPage.SystemFields.ContentItemCommonDataContentLanguageID,
-                ContentItemCommonDataFirstPublishedWhen = ContactPage.SystemFields.ContentItemCommonDataFirstPublishedWhen,
-                ContentItemCommonDataLastPublishedWhen = ContactPage.SystemFields.ContentItemCommonDataLastPublishedWhen
+                ContentItemID = sys?.ContentItemID ?? 0,
+                ContentItemGUID = sys?.ContentItemGUID ?? Guid.Empty,
+                ContentItemName = sys?.ContentItemName,
+                ContentItemContentTypeID = sys?.ContentItemContentTypeID ?? 0,
+                ContentItemIsSecured = sys?.ContentItemIsSecured ?? false,
+                ContentItemCommonDataContentLanguageID = sys?.ContentItemCommonDataContentLanguageID ?? 0,
+                ContentItemCommonDataFirstPublishedWhen = sys?.ContentItemCommonDataFirstPublishedWhen ?? default,
+                ContentItemCommonDataLastPublishedWhen = sys?.ContentItemCommonDataLastPublishedWhen ?? default
             },
 
             BaseWebPage = new BaseWebPage
             {
-                WebPageItemGUID = ContactPage.SystemFields.WebPageItemGUID,
-                WebPageItemID = ContactPage.SystemFields.WebPageItemID,
-                WebPageItemName = ContactPage.SystemFields.WebPageItemName,
-                WebPageItemWebsiteChannelID = ContactPage.SystemFields.WebPageItemWebsiteChannelId,
-                WebPageUrlPath = ContactPage.SystemFields.WebPageUrlPath,
-                WebPageItemOrder = ContactPage.SystemFields.WebPageItemOrder,
-                WebPageItemTreePath = ContactPage.SystemFields.WebPageItemTreePath,
-                WebPageUrlPathContentLanguageID = ContactPage.SystemFields.WebPageUrlPathContentLanguageID,
-                WebPageItemParentID = ContactPage.SystemFields.WebPageItemParentID
+                WebPageItemGUID = sys?.WebPageItemGUID ?? Guid.Empty,
+                WebPageItemID = sys?.WebPageItemID ?? 0,
+                WebPageItemName = sys?.WebPageItemName,
+                WebPageItemWebsiteChannelID = sys?.WebPageItemWebsiteChannelId ?? 0,
+                WebPageUrlPath = sys?.WebPageUrlPath,
+                WebPageItemOrder = sys?.WebPageItemOrder ?? 0,
+                WebPageItemTreePath = sys?.WebPageItemTreePath,
+                WebPageUrlPathContentLanguageID = sys?.WebPageUrlPathContentLanguageID ?? 0,
+                WebPageItemParentID = sys?.WebPageItemParentID ?? 0
             },
+
             Hero = await _heroService.GetHeroDtoAsync(ContactPage, cancellationToken),
-            
         };
     }
 }
