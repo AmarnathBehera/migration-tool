@@ -17,7 +17,7 @@ public class ButtonWidgetProperties : IWidgetProperties
     [TextInputComponent(Label = "Button link", Order = 1)]
     [UrlValidationRule(AllowRelativeUrl = true, AllowFragmentUrl = true)]
     [ExcludeFromAiraTranslation]
-    public string Link { get; set; }
+    public string? Link { get; set; }
 
     [DropDownComponent(Label = "Link targe", Order = 2, Options = "_self;Same tab\n_blank;New tab")]
     public string Target { get; set; } = "_self";

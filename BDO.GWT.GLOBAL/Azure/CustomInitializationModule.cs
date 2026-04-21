@@ -9,7 +9,6 @@ using Kentico.Xperience.AzureStorage;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
 
-
 [assembly: RegisterModule(typeof(CustomInitializationModule))]
 namespace BDO;
 
@@ -17,7 +16,7 @@ public class CustomInitializationModule : Module
 {
     private static readonly string[] ChannelStoragePathTemplates =
     [
-       "~/<siteCodeName>/media/",
+        "~/<siteCodeName>/media/",
         "~/<siteCodeName>/files/",
         "~/<siteCodeName>/metafiles/",
         "~/<siteCodeName>/BizFormFiles/",
@@ -40,15 +39,13 @@ public class CustomInitializationModule : Module
 
         var customRootPath = configuration["AzureStorageProviderSettings:CMSAzureRootContainer"];
         MapPathsForAllChannels(customRootPath, ChannelStoragePathTemplates);
-
         MapPathToAzureStorageProvider(customRootPath, "~/assets/contentitems");
-
     }
-    private void MapPathsForAllChannels(string customRootPath, string[] pathsToMap)
+
+    private static void MapPathsForAllChannels(string customRootPath, string[] pathsToMap)
     {
         var channels = ChannelInfo.Provider.Get()
             .WhereEquals("ChannelType", "Website").ToList();
-            
 
         if (channels.Count == 0)
         {
@@ -71,9 +68,9 @@ public class CustomInitializationModule : Module
             }
         }
     }
+
     private static void MapPathToAzureStorageProvider(string customRootPath, string pathToMap)
     {
-       
         var storageProvider = AzureStorageProvider.Create();
         storageProvider.CustomRootPath = customRootPath;
         storageProvider.PublicExternalFolderObject = false;
@@ -81,5 +78,3 @@ public class CustomInitializationModule : Module
         StorageHelper.MapStoragePath(pathToMap, storageProvider);
     }
 }
-
-

@@ -106,11 +106,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
         [Test]
         public void Invoke_WithNullTextAndLink_MapsNullToModel()
         {
-            var properties = new ButtonWidgetProperties
-            {
-                Text = null,
-                Link = null
-            };
+            var properties = new ButtonWidgetProperties();
 
             var result = _widget.Invoke(BuildComponentViewModel(properties)) as ViewViewComponentResult;
             var model = result?.ViewData?.Model as ButtonData;
