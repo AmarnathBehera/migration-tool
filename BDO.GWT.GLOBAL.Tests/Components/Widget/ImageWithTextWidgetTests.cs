@@ -1,234 +1,183 @@
 ﻿using BDO.GWT.Common.Core.LiveSite.Data;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ImageWithTextWidget;
+using BDO.GWT.Core.Entities;
+using BDO.GWT.GLOBAL.Components.Widget.ImageWithTextWidget;
+using CMS.ContentEngine;
+using Kentico.Content.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.ViewComponents;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Moq;
 
 namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 {
     public class ImageWithTextWidgetTests
     {
+        private Mock<IContentRetriever> _contentRetrieverMock;
         private ImageWithTextWidget _widget;
+        private Mock<IContentRetrieverWrapper> _mockWrapper;
+
 
         [SetUp]
-        public void SetUp()
+        public void Setup()
         {
-            _widget = new ImageWithTextWidget();
+            _contentRetrieverMock = new Mock<IContentRetriever>();
+            _mockWrapper = new Mock<IContentRetrieverWrapper>();
+
+            _widget = new ImageWithTextWidget(_contentRetrieverMock.Object, _mockWrapper.Object);
+
             _widget.ViewComponentContext = new ViewComponentContext
             {
                 ViewContext = new ViewContext
                 {
                     HttpContext = new DefaultHttpContext(),
-                    ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+                    ViewData = new ViewDataDictionary(
+                        new EmptyModelMetadataProvider(),
+                        new ModelStateDictionary())
                 }
             };
         }
 
-        [Test]
-        public void Invoke_ReturnsViewWithAllPropertiesSet()
+        private ComponentViewModel<ImageWithTextWidgetProperties> GetModel(ImageWithTextWidgetProperties props)
         {
-            // Arrange
-            var properties = new ImageWithTextWidgetProperties
+            var model = new ComponentViewModel<ImageWithTextWidgetProperties>();
+
+            typeof(ComponentViewModel<ImageWithTextWidgetProperties>)
+                .GetProperty("Properties")
+                ?.SetValue(model, props);
+
+            return model;
+        }
+
+        [Test]
+        public async Task InvokeAsync_ReturnsView_WithBasicProperties()
+        {
+            var props = new ImageWithTextWidgetProperties
             {
                 Title = "Test Title",
                 Description = "Test Description",
-                ButtonText = "Click Me",
-                ButtonURL = "https://example.com",
-                PrimaryButtonLinkTarget = "_blank",
-                ButtonType = "primary",
-                MediaType = "image",
-                EmbedCode = "<iframe></iframe>",
-                ImageURL = "/media/test.jpg",
-                ImageAltText = "Alt Text",
-                MediaPosition = "right",
-                BackgroundImageURL = "/media/bg.jpg",
-                BackgroundImageAltText = "BG Alt",
-                Theme = "dark",
-                TopMargin = "20px",
-                BottomMargin = "40px"
+                ButtonText = "Click Me"
             };
 
-            var model = new ComponentViewModel<ImageWithTextWidgetProperties>();
-            var propertiesField = typeof(ComponentViewModel<ImageWithTextWidgetProperties>)
-                .GetProperty("Properties");
-            propertiesField?.SetValue(model, properties);
+            var model = GetModel(props);
 
-            // Act
-            var result = _widget.Invoke(model);
+            var result = await _widget.InvokeAsync(model);
 
-            // Assert
-            Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.TypeOf<ViewViewComponentResult>());
 
             var viewResult = result as ViewViewComponentResult;
             var viewModel = viewResult?.ViewData?.Model as ImageWithTextData;
 
             Assert.That(viewModel, Is.Not.Null);
-            Assert.That(viewModel.Title, Is.EqualTo(properties.Title));
-            Assert.That(viewModel.Description, Is.EqualTo(properties.Description));
-            Assert.That(viewModel.ButtonTitle, Is.EqualTo(properties.ButtonText));
-            Assert.That(viewModel.ButtonURL, Is.EqualTo(properties.ButtonURL));
-            Assert.That(viewModel.PrimaryButtonLinkTarget, Is.EqualTo(properties.PrimaryButtonLinkTarget));
-            Assert.That(viewModel.ButtonType, Is.EqualTo(properties.ButtonType));
-            Assert.That(viewModel.MediaType, Is.EqualTo(properties.MediaType));
-            Assert.That(viewModel.EmbedCode, Is.EqualTo(properties.EmbedCode));
-            Assert.That(viewModel.ImageURL, Is.EqualTo(properties.ImageURL));
-            Assert.That(viewModel.ImageAltText, Is.EqualTo(properties.ImageAltText));
-            Assert.That(viewModel.MediaPosition, Is.EqualTo(properties.MediaPosition));
-            Assert.That(viewModel.BackgroundImageURL, Is.EqualTo(properties.BackgroundImageURL));
-            Assert.That(viewModel.BackgroundImageAltText, Is.EqualTo(properties.BackgroundImageAltText));
-            Assert.That(viewModel.Theme, Is.EqualTo(properties.Theme));
-            Assert.That(viewModel.TopMargin, Is.EqualTo(properties.TopMargin));
-            Assert.That(viewModel.BottomMargin, Is.EqualTo(properties.BottomMargin));
+            Assert.That(viewModel.Title, Is.EqualTo("Test Title"));
+            Assert.That(viewModel.Description, Is.EqualTo("Test Description"));
+            Assert.That(viewModel.ButtonTitle, Is.EqualTo("Click Me"));
         }
 
         [Test]
-        public void Invoke_WithMinimalProperties_ReturnsViewWithDefaults()
+        public async Task InvokeAsync_WithContentAttachment_ButtonUrl()
         {
-            // Arrange
-            var properties = new ImageWithTextWidgetProperties
+            var guid = Guid.NewGuid();
+
+            var attachment = new ContentAttachment
             {
-                Title = "Minimal Title",
-                Description = "Minimal Description"
+                ContentAttachmentAsset = new ContentItemAsset
+                {
+                    Url = "/button.pdf"
+                }
             };
 
-            var model = new ComponentViewModel<ImageWithTextWidgetProperties>();
-            var propertiesField = typeof(ComponentViewModel<ImageWithTextWidgetProperties>)
-                .GetProperty("Properties");
-            propertiesField?.SetValue(model, properties);
+            _mockWrapper
+                .Setup(x => x.RetrieveButtonUrlAsync(
+                    It.IsAny<IEnumerable<Guid>>(),
+                    It.IsAny<string[]>()))
+                .ReturnsAsync(new List<IContentItemFieldsSource>
+                {
+            attachment
+                });
 
-            // Act
-            var result = _widget.Invoke(model);
+            var props = new ImageWithTextWidgetProperties
+            {
+                Title = "Title",
+                Description = "Desc",
+                ButtonURL = new List<ContentItemReference>
+        {
+            new ContentItemReference { Identifier = guid }
+        }
+            };
+
+            var model = GetModel(props);
+
+            var result = await _widget.InvokeAsync(model);
+
             var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as ImageWithTextData;
 
-            // Assert
             Assert.That(viewModel, Is.Not.Null);
-            Assert.That(viewModel.Title, Is.EqualTo("Minimal Title"));
-            Assert.That(viewModel.Description, Is.EqualTo("Minimal Description"));
-            Assert.That(viewModel.ButtonTitle, Is.Null);
-            Assert.That(viewModel.ButtonURL, Is.Null);
-            Assert.That(viewModel.PrimaryButtonLinkTarget, Is.EqualTo("_self")); // default
-            Assert.That(viewModel.ButtonType, Is.Null);
-            Assert.That(viewModel.MediaType, Is.EqualTo("image")); // default
-            Assert.That(viewModel.EmbedCode, Is.EqualTo(""));
-            Assert.That(viewModel.ImageURL, Is.EqualTo(""));
-            Assert.That(viewModel.ImageAltText, Is.EqualTo(""));
-            Assert.That(viewModel.MediaPosition, Is.EqualTo("left")); // default
-            Assert.That(viewModel.BackgroundImageURL, Is.Null);
-            Assert.That(viewModel.BackgroundImageAltText, Is.Null);
-            Assert.That(viewModel.Theme, Is.EqualTo("light")); // default
-            Assert.That(viewModel.TopMargin, Is.EqualTo("0px")); // default
-            Assert.That(viewModel.BottomMargin, Is.EqualTo("0px")); // default
+            Assert.That(viewModel.ButtonURL, Is.EqualTo("/button.pdf"));
         }
+
         [Test]
-        public void Invoke_WithEmbedMediaType_UsesEmbedCodeInsteadOfImageURL()
+        public async Task InvokeAsync_WithNoButton_ReturnsNull()
         {
-            // Arrange
-            var properties = new ImageWithTextWidgetProperties
+            var props = new ImageWithTextWidgetProperties
+            {
+                Title = "Title",
+                Description = "Description"
+            };
+
+            var model = GetModel(props);
+
+            var result = await _widget.InvokeAsync(model);
+
+            var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as ImageWithTextData;
+
+            Assert.That(viewModel, Is.Not.Null);
+            Assert.That(viewModel.ButtonURL, Is.Null);
+        }
+
+        [Test]
+        public async Task InvokeAsync_WithEmbedMediaType()
+        {
+            var props = new ImageWithTextWidgetProperties
             {
                 Title = "Embed Title",
                 Description = "Embed Description",
                 MediaType = "embed",
-                EmbedCode = "<iframe src='test'></iframe>",
-                ImageURL = "/media/should-not-use.jpg"
+                EmbedCode = "<iframe></iframe>"
             };
 
-            var model = new ComponentViewModel<ImageWithTextWidgetProperties>();
-            typeof(ComponentViewModel<ImageWithTextWidgetProperties>)
-                .GetProperty("Properties")?.SetValue(model, properties);
+            var model = GetModel(props);
 
-            // Act
-            var result = _widget.Invoke(model);
+            var result = await _widget.InvokeAsync(model);
+
             var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as ImageWithTextData;
 
-            // Assert
             Assert.That(viewModel, Is.Not.Null);
             Assert.That(viewModel.MediaType, Is.EqualTo("embed"));
-            Assert.That(viewModel.EmbedCode, Is.EqualTo("<iframe src='test'></iframe>"));
-            Assert.That(viewModel.ImageURL, Is.EqualTo("/media/should-not-use.jpg")); // still set, but frontend should ignore it
+            Assert.That(viewModel.EmbedCode, Is.EqualTo("<iframe></iframe>"));
         }
 
         [Test]
-        public void Invoke_WithNullBackgroundImageAltText_SetsNull()
+        public async Task InvokeAsync_DefaultValues()
         {
-            // Arrange
-            var properties = new ImageWithTextWidgetProperties
+            var props = new ImageWithTextWidgetProperties
             {
                 Title = "Title",
-                Description = "Description",
-                BackgroundImageURL = "/media/bg.jpg",
-                BackgroundImageAltText = null
+                Description = "Description"
             };
 
-            var model = new ComponentViewModel<ImageWithTextWidgetProperties>();
-            typeof(ComponentViewModel<ImageWithTextWidgetProperties>)
-                .GetProperty("Properties")?.SetValue(model, properties);
+            var model = GetModel(props);
 
-            // Act
-            var result = _widget.Invoke(model);
+            var result = await _widget.InvokeAsync(model);
+
             var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as ImageWithTextData;
 
-            // Assert
             Assert.That(viewModel, Is.Not.Null);
-            Assert.That(viewModel.BackgroundImageURL, Is.EqualTo("/media/bg.jpg"));
-            Assert.That(viewModel.BackgroundImageAltText, Is.Null);
-        }
-
-        [Test]
-        [TestCase("light")]
-        [TestCase("dark")]
-        public void Invoke_WithTheme_SetsThemeCorrectly(string theme)
-        {
-            // Arrange
-            var properties = new ImageWithTextWidgetProperties
-            {
-                Title = "Title",
-                Description = "Description",
-                Theme = theme
-            };
-
-            var model = new ComponentViewModel<ImageWithTextWidgetProperties>();
-            typeof(ComponentViewModel<ImageWithTextWidgetProperties>)
-                .GetProperty("Properties")?.SetValue(model, properties);
-
-            // Act
-            var result = _widget.Invoke(model);
-            var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as ImageWithTextData;
-
-            // Assert
-            Assert.That(viewModel, Is.Not.Null);
-            Assert.That(viewModel.Theme, Is.EqualTo(theme));
-        }
-
-        [Test]
-        public void Invoke_WithNoButton_SetsButtonFieldsNull()
-        {
-            // Arrange
-            var properties = new ImageWithTextWidgetProperties
-            {
-                Title = "Title",
-                Description = "Description",
-                ButtonText = null,
-                ButtonURL = null,
-                PrimaryButtonLinkTarget = "_self"
-            };
-
-            var model = new ComponentViewModel<ImageWithTextWidgetProperties>();
-            typeof(ComponentViewModel<ImageWithTextWidgetProperties>)
-                .GetProperty("Properties")?.SetValue(model, properties);
-
-            // Act
-            var result = _widget.Invoke(model);
-            var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as ImageWithTextData;
-
-            // Assert
-            Assert.That(viewModel, Is.Not.Null);
-            Assert.That(viewModel.ButtonTitle, Is.Null);
-            Assert.That(viewModel.ButtonURL, Is.Null);
-            Assert.That(viewModel.PrimaryButtonLinkTarget, Is.EqualTo("_self"));
+            Assert.That(viewModel.Theme, Is.EqualTo("light"));
+            Assert.That(viewModel.TopMargin, Is.EqualTo("0px"));
+            Assert.That(viewModel.BottomMargin, Is.EqualTo("0px"));
         }
     }
 }

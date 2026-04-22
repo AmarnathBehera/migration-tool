@@ -1,14 +1,13 @@
 ﻿using BDO;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ExternalNavigationWidget;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ImageWithTextWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.QuoteCardWidget;
 using BDO.GWT.Web.Widgets.RichTextWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ViewGlobalLocations;
 using BDO.GWT.Xperience.LiveSite.Components.Section;
 using Kentico.PageBuilder.Web.Mvc;
-using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 using BDO.GWT.Web.Widgets.AccordionWidget;
+using BDO.GWT.GLOBAL.Components.Widget.ImageWithTextWidget;
 
 // Widgets
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.Imagewithtext,typeof(ImageWithTextWidget),"ImageWithText",typeof(ImageWithTextWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
