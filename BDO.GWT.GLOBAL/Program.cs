@@ -37,7 +37,7 @@ builder.Services.AddKentico(features =>
         {
           "BDO.HomePage",
           "BDO.SectionAbout",
-          "BDO.AboutPage"
+          "BDO.AboutPage",
           "BDO.HomePage",
           "BDO.Contact"
        }

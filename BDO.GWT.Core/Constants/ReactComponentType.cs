@@ -43,7 +43,6 @@ public static class ReactComponentType
     public const string AccordionGUID = "eb8adb96-24dd-4a60-8ab8-af1d1dc32f23";
     public const string BreadcrumbsGUID = "77248460-7937-4255-a9fe-7340a4d1f464";
     public const string CookieBannerGUID = "6e906e0a-6d90-4776-8e90-ff2bdcaa4213";
-    public const string HeroGUID = "f8a3b2c1-d4e5-4f6a-b7c8-d9e0f1a2b3c4";
     public const string AccordionWidgetGUID = "60875e95-b88e-4db3-b4bf-7c2926a2485c";
 
     public const string ErrorPageContentGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
