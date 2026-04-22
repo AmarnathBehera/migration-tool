@@ -25,9 +25,11 @@ public class QuoteCardWidgetProperties : IWidgetProperties
     public string? ImageAltText { get; set; }
 
     [RichTextEditorComponent(Order = 4, Label = "Quote text", ExplanationText = "Recommended quote text length is under 100 words.")]
+    [RequiredValidationRule]
     public string QuoteText { get; set; } = null!;
 
     [TextInputComponent(Label = "Quote’s author", Order = 5)]
+    [RequiredValidationRule]
     public string QuotesAuthor { get; set; } = null!;
 
     [TextInputComponent(Label = "Author’s job title", Order = 6)]

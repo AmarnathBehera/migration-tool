@@ -8,9 +8,12 @@ namespace BDO.GWT.Web.Widgets.AccordionWidget;
 public class AccordionWidgetProperties : BaseWidgetProperties
 {
     [TextInputComponent(Label = "Accordion heading", Order = 0)]
+    [RequiredValidationRule]
     public string Heading { get; set; } = null!;
 
     [RichTextEditorComponent(Order = 1,Label = "Accordion content")]
+    [RequiredValidationRule]
+
     public string Content { get; set; } = null!;
 
     [TextInputComponent(Label = "Deep link ID", Order = 2)]
