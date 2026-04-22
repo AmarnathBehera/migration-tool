@@ -1,0 +1,68 @@
+# XbyK Validation Pipeline
+# This pipeline is responsible for validating the XbyK project by running secret scanning and other checks
+
+name: $(Date:yyyyMMdd).$(Rev:r)
+
+trigger:
+  - main
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  repositories:
+    - repository: pipelines-shared
+      type: git
+      name: Azure Environment/pipelines-shared
+      ref: refs/heads/main
+
+stages:
+  - stage: Validation
+    displayName: "Validation Stage"
+    jobs:
+      - template: .pipelines/templates/jobs/secretScanning.yml@pipelines-shared
+
+      - job: SonarQube
+        displayName: "SonarQube Cloud Analysis"
+        steps:
+          - checkout: self
+            fetchDepth: 0
+
+          - task: SonarCloudPrepare@4
+            displayName: "Prepare SonarCloud Analysis"
+            inputs:
+              SonarCloud: "GWT.XbyK.Web - SonarQube Cloud"
+              organization: "vsts-sonarcloud41751"
+              scannerMode: "dotnet"
+              configMode: file
+              configFile: "sonar-project.properties"
+              projectName: "GWT.XbyK.Web"
+              projectKey: "bdo_GWT.XbyK.Web"
+
+          - task: DotNetCoreCLI@2
+            displayName: Restore CMS Web App
+            inputs:
+              command: "restore"
+              restoreSolution: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
+              feedsToUse: "select"
+
+          - task: DotNetCoreCLI@2
+            displayName: Build CMS Web App
+            inputs:
+              command: "build"
+              projects: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
+
+          - task: DotNetCoreCLI@2
+            displayName: "Test CMS Web App with Code Coverage"
+            inputs:
+              command: "test"
+              projects: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
+              arguments: '--collect "Code Coverage"'
+
+          - task: SonarCloudAnalyze@4
+            displayName: "Run SonarCloud Analysis"
+
+          - task: SonarCloudPublish@4
+            displayName: "Publish SonarCloud Results"
+            inputs:
+              pollingTimeoutSec: 300

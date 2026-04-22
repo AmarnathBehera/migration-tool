@@ -32,14 +32,17 @@
 
 
 <div>
-    @(await ReactService.RenderComponentAsync(
-    pageId,
-    ReactComponentType.HomeHero,
-    ReactComponentType.HomeHeroGUID,
-    new {
-    homeHero = Model.HomeHeroSlides,
-    },
-    Context.RequestAborted))
+    @if (Model != null && pageId != 0)
+    {
+        @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.HomeHero,
+        ReactComponentType.HomeHeroGUID,
+        new {
+        homeHero = Model.HomeHeroSlides,
+        },
+        Context.RequestAborted))
+    }
 </div>
 
 

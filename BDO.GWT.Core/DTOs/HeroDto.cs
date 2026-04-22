@@ -1,4 +1,6 @@
-﻿namespace BDO.GWT.Web.Core.DTOs;
+﻿using CMS.Websites;
+
+namespace BDO.GWT.Web.Core.DTOs;
 
 public class HeroDto
 {
@@ -20,9 +22,9 @@ public class HeroDto
 
     public string? CtaButtonText { get; set; }
 
-    public string? CtaButtonUrl { get; set; }
+    public IEnumerable<IWebPageFieldsSource>? CtaButtonUrl { get; set; }
 
-    public string? CtaButtonUrlTarget { get; set; }
+    public IEnumerable<IWebPageFieldsSource>? CtaButtonUrlTarget { get; set; }
 
     public string? WidgetID { get; set; }
 }

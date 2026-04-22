@@ -3,6 +3,7 @@
 public static class ReactComponentType
 {
     public const string Accordion = "AccordionWidget";
+    public const string ButtonWidget = "ButtonWidget";
     public const string Breadcrumbs = "Breadcrumbs";
     public const string DealDetails = "DealDetails";
     public const string DealsCardsGrid = "DealsCardsGrid";
@@ -23,11 +24,13 @@ public static class ReactComponentType
     public const string QuoteCardWidget = "QuoteCardWidget";
     public const string ExternalNavigationWidget = "ExternalNavigationWidget";
     public const string TiledLinkSectionWidget = "TiledLinkSectionWidget";
+    public const string CookieBanner = "CookieBanner";
     public const string AccordionWidget = "AccordionWidget";
     
 
     //Below are the guid constants for the above components.
     public const string QuoteCardWidgetGUID = "5c570fe5-fc60-4efd-b7eb-7da977e486ab";
+    public const string ButtonWidgetGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
     public const string ImageWithTextWidgetGUID = "186b5e99-3a30-4c5e-bdff-9c5d40ac08a4";
     public const string ExternalNavigationWidgetGUID = "77688626-8511-4f2f-a7f4-eee7c65148c0";
     public const string HeaderGUID = "66b09d21-9d99-43fc-b210-575a0905e17d";
@@ -35,9 +38,15 @@ public static class ReactComponentType
     public const string ViewGlobalLocationsWidgetGUID = "0a440ca7-fc48-42d2-8fd1-cbf788de9281";
     public const string TiledLinkSectionWidgetGUID = "7e23aa59-e26e-447f-b12c-9eb0f62fa3f9";
     public const string HomeHeroGUID = "24ddec1e-4616-4488-9351-7f0f8b8d690f";
+    public const string HeroGUID = "f2f86159-debc-4875-aa44-4db76d9fa24c";
+    public const string TrendingTopicsGUID = "787fa982-047e-4dd8-833a-437616beef3f";
+    public const string AccordionGUID = "eb8adb96-24dd-4a60-8ab8-af1d1dc32f23";
+    public const string BreadcrumbsGUID = "77248460-7937-4255-a9fe-7340a4d1f464";
+    public const string CookieBannerGUID = "6e906e0a-6d90-4776-8e90-ff2bdcaa4213";
     public const string HeroGUID = "f8a3b2c1-d4e5-4f6a-b7c8-d9e0f1a2b3c4";
     public const string AccordionWidgetGUID = "60875e95-b88e-4db3-b4bf-7c2926a2485c";
 
+    public const string ErrorPageContentGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
 }
 
 
@@ -54,8 +63,11 @@ public static class ReactComponentType
 
 
 
-//6e906e0a-6d90-4776-8e90-ff2bdcaa4213
 
+//
+
+
+//
 //614b9a3d-18d7-43f4-9f8f-a4bc99e99841
 
 //3fdef59e-4ab3-4047-abb8-c7b52408adc2

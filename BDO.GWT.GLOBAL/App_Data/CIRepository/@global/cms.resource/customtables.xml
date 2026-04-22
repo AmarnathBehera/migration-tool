@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<cms.resource>
-  <ResourceDescription>Container resource for migrated custom tables</ResourceDescription>
-  <ResourceDisplayName>Custom tables</ResourceDisplayName>
-  <ResourceGUID>57395aea-28d2-5b71-b780-62cd7e70849e</ResourceGUID>
-  <ResourceIsInDevelopment>False</ResourceIsInDevelopment>
-  <ResourceName>customtables</ResourceName>
-</cms.resource>

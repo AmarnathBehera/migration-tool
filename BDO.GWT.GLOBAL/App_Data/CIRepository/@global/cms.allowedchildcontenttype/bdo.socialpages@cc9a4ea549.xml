@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.SocialPages</CodeName>
+    <GUID>afbd8222-11b6-424b-acec-3e96023413bf</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.SocialLinks">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.SocialLinks</CodeName>
+        <GUID>a9883aac-c952-45c7-a327-59d8eab46a3f</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

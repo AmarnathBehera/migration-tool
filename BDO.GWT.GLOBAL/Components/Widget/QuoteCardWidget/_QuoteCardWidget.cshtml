@@ -13,9 +13,12 @@
     var pageId = pageContext.WebPage.WebPageItemID;
 }
 
-@(await ReactService.RenderComponentAsync(
+@if (Model != null && pageId != 0)
+{
+    @(await ReactService.RenderComponentAsync(
     pageId,
     ReactComponentType.QuoteCardWidget,
     ReactComponentType.QuoteCardWidgetGUID,
     Model,
     Context.RequestAborted))
+}

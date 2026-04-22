@@ -1,0 +1,39 @@
+﻿@using BDO.GWT.Common.Core.LiveSite.Data
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using CMS.Core
+@using CMS.Websites
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Web.Core.DTOs.CookieBannerDto
+@inject IReactService ReactService
+@inject IEventLogging EventLogging
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageId = (int?)ViewData["PageId"] ?? 0;
+    if (pageId == 0)
+    {
+        try
+        {
+            var pageContext = WebPageDataContextRetriever.Retrieve();
+            pageId = pageContext.WebPage.WebPageItemID;
+        }
+        catch (InvalidOperationException)
+        {
+            EventLogData data = new EventLogData(EventTypeEnum.Information, "Footer Component", "FOOTER_PAGE_CONTEXT_MISSING")
+            {
+                EventDescription = "Footer rendered without Kentico web page context.",
+                EventUrl = Context?.Request?.Path.Value
+            };
+            EventLogging.LogEvent(data);
+
+        }
+    }
+}
+
+
+@(await ReactService.RenderComponentAsync(
+    pageId,
+    ReactComponentType.CookieBanner,
+    ReactComponentType.CookieBannerGUID,
+    Model,Context.RequestAborted))

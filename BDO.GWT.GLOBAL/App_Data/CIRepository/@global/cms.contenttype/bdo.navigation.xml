@@ -17,16 +17,16 @@
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
-      <field column="TopMenu" columnprecision="0" columntype="webpages" enabled="true" guid="43823144-ee28-40ec-8c27-14a50cba0003" visible="true">
+      <field column="TopMenu" columnprecision="0" columntype="webpages" enabled="true" guid="adf73ed4-de42-40fd-a4bb-04c56032d8ee" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Top Menu</fieldcaption>
+          <fieldcaption>TopMenu</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
         </properties>
         <settings>
           <controlname>Kentico.Administration.WebPageSelector</controlname>
           <MaximumPages>5</MaximumPages>
-          <Sortable>False</Sortable>
+          <Sortable>True</Sortable>
         </settings>
       </field>
     </form>

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.homeheroslide>
+  <ContentItemDataCommonDataID>
+    <GUID>92a171bb-a08d-4371-8f91-2a1763a31872</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>HeroImage3-zcm0hinp</CodeName>
+      <GUID>db03da0d-419c-49c2-8459-0b919c955953</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>c1da43f1-ce29-4d4b-870d-f1d0277e5eac</ContentItemDataGUID>
+  <Description>
+    <![CDATA[Helping you tackle the pressing issues your business is facing. Uniquely built to provide exceptional service, always and everywhere. This is a 7 word sentence.]]>
+  </Description>
+  <Image>
+    <![CDATA[[{"Identifier":"a019b9a5-d97e-4b10-a90d-9e07acf32de9"}]]]>
+  </Image>
+  <Image_Mobile>
+    <![CDATA[[{"Identifier":"a019b9a5-d97e-4b10-a90d-9e07acf32de9"}]]]>
+  </Image_Mobile>
+  <Image_MobileAltText>hero</Image_MobileAltText>
+  <Image_Thumbnail>
+    <![CDATA[[{"Identifier":"6abc9894-ec4e-4b3c-a6b2-d8085d899852"}]]]>
+  </Image_Thumbnail>
+  <Image_ThumbnailAltText>hero</Image_ThumbnailAltText>
+  <ImageAltText>hero</ImageAltText>
+  <Title>India Union Budget 2026-27 - An Overview</Title>
+</contentitemdata.bdo.homeheroslide>
