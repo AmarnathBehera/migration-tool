@@ -1,17 +1,27 @@
 ﻿using BDO;
 using CMS;
+using CMS.ContentEngine;
 using CMS.Core;
 using CMS.DataEngine;
 using CMS.IO;
 using CMS.Websites.Routing;
 using Kentico.Xperience.AzureStorage;
-
+using Microsoft.Extensions.Configuration;
+using System.Linq;
 
 [assembly: RegisterModule(typeof(CustomInitializationModule))]
 namespace BDO;
 
 public class CustomInitializationModule : Module
 {
+    private static readonly string[] ChannelStoragePathTemplates =
+    [
+        "~/<siteCodeName>/media/",
+        "~/<siteCodeName>/files/",
+        "~/<siteCodeName>/metafiles/",
+        "~/<siteCodeName>/BizFormFiles/",
+    ];
+
     public CustomInitializationModule()
         : base("CustomInit")
     {
@@ -20,43 +30,51 @@ public class CustomInitializationModule : Module
     protected override void OnInit()
     {
         base.OnInit();
-        var configuration = CMS.Core.Service.Resolve<Microsoft.Extensions.Configuration.IConfiguration>();
-        var assetsProvider = AzureStorageProvider.Create();
-        assetsProvider.CustomRootPath = configuration["CMSAzureRootContainer"];
-        MapPathsToNewAzureStorageProviderForAllSites(assetsProvider.CustomRootPath,
-         [
-                "~/<siteCodeName>/media/",
-                "~/<siteCodeName>/files/",
-                "~/<siteCodeName>/metafiles/",
-                "~/<siteCodeName>/BizFormFiles/",
-           ]);
+        var configuration = Service.Resolve<IConfiguration>();
 
-        assetsProvider.PublicExternalFolderObject = false;
-        StorageHelper.MapStoragePath("~/assets/contentitems", assetsProvider);
+        var cdnEndpoint = configuration["AzureStorageProviderSettings:CMSAzureCDNEndpoint"];
+        var legacyAssembly = configuration["AzureStorageProviderSettings:CMSStorageProviderAssembly"];
+        if (!string.IsNullOrEmpty(legacyAssembly) || string.IsNullOrWhiteSpace(cdnEndpoint))
+            return;
+
+        var customRootPath = configuration["AzureStorageProviderSettings:CMSAzureRootContainer"];
+        MapPathsForAllChannels(customRootPath, ChannelStoragePathTemplates);
+        MapPathToAzureStorageProvider(customRootPath, "~/assets/contentitems");
     }
-    public static void MapPathsToNewAzureStorageProviderForAllSites(string customRootPath, string[] pathsToMap)
-    {
-        var channelContext = Service.Resolve<IWebsiteChannelContext>();
-        var channel = channelContext.WebsiteChannelName;
 
-        foreach (var pathToMap in pathsToMap)
+    private static void MapPathsForAllChannels(string customRootPath, string[] pathsToMap)
+    {
+        var channels = ChannelInfo.Provider.Get()
+            .WhereEquals("ChannelType", "Website").ToList();
+
+        if (channels.Count == 0)
         {
-            MapPathToNewAzureStorageProvider(customRootPath, pathToMap.Replace("<siteCodeName>", channel));
+            Service.Resolve<IEventLogService>().LogWarning(
+                "AzureInitializationModule",
+                "INIT",
+                "No website channels found during Azure Storage path mapping."
+            );
+            return;
         }
 
+        foreach (var channel in channels)
+        {
+            foreach (var path in pathsToMap)
+            {
+                MapPathToAzureStorageProvider(
+                    customRootPath,
+                    path.Replace("<siteCodeName>", channel.ChannelName.ToLower())
+                );
+            }
+        }
     }
 
-    private static void MapPathToNewAzureStorageProvider(string customRootPath, string pathToMap)
+    private static void MapPathToAzureStorageProvider(string customRootPath, string pathToMap)
     {
-        bool sharedstorage = false;
-        var storageProvider = new StorageProvider("KitAzure", "BDO.GWT.AzureStorageProvider", sharedstorage)
-        {
-            CustomRootPath = customRootPath,
-            PublicExternalFolderObject = true,
-        };
+        var storageProvider = AzureStorageProvider.Create();
+        storageProvider.CustomRootPath = customRootPath;
+        storageProvider.PublicExternalFolderObject = false;
 
         StorageHelper.MapStoragePath(pathToMap, storageProvider);
     }
 }
-
-

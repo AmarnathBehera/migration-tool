@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.homeheroslide>
+  <ContentItemDataCommonDataID>
+    <GUID>d7a6b2b0-f612-4e1f-8fd9-649985c2dce1</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>HeroImage2-y0dq3t3e</CodeName>
+      <GUID>d8365f27-0ffb-4675-94e7-6d18c0389148</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>5d7e3936-5649-4ce1-bff1-6452f024e29f</ContentItemDataGUID>
+  <CTAButtonText>Click</CTAButtonText>
+  <Description>Key Insights and Emerging Trends from India</Description>
+  <Image>
+    <![CDATA[[{"Identifier":"bce117b0-d414-4bf5-8455-b1a2c3837676"}]]]>
+  </Image>
+  <Image_Mobile>
+    <![CDATA[[{"Identifier":"bce117b0-d414-4bf5-8455-b1a2c3837676"}]]]>
+  </Image_Mobile>
+  <Image_MobileAltText>Hero</Image_MobileAltText>
+  <Image_Thumbnail>
+    <![CDATA[[{"Identifier":"bce117b0-d414-4bf5-8455-b1a2c3837676"}]]]>
+  </Image_Thumbnail>
+  <Image_ThumbnailAltText>hero2</Image_ThumbnailAltText>
+  <ImageAltText>Hero</ImageAltText>
+  <Title>The Indian Tiffin</Title>
+</contentitemdata.bdo.homeheroslide>

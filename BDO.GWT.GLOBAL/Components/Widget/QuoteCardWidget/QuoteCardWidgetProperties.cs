@@ -1,57 +1,56 @@
-﻿using Kentico.Components.Web.Mvc.FormComponents;
+﻿using CMS.ContentEngine;
+using Kentico.Components.Web.Mvc.FormComponents;
 using Kentico.Forms.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
+using Kentico.Xperience.Admin.Base.FormAnnotations;
+using System.Collections.Generic;
 
 namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.QuoteCardWidget;
 
 public class QuoteCardWidgetProperties : IWidgetProperties
 {
-    [EditingComponent(TextInputComponent.IDENTIFIER, Order = 0, Label = "Heading")]
-    public string? Heading { get; set; }
+    [TextInputComponent(Label = "Heading", Order = 0)]
+    public string Heading { get; set; }
 
-    [EditingComponent(RichTextComponent.IDENTIFIER, Order = 1, Label = "Subheading")]
-    public string? Subheading { get; set; }
+    [RichTextEditorComponent(Order = 1, Label = "Subheading")]
+    public string Subheading { get; set; }
 
-    [EditingComponent(UrlSelector.IDENTIFIER, Label = "Image", Order = 2, ExplanationText = "Recommended size depends on usage but a 3:2 aspect ratio works well for most instances.")]
-    [EditingComponentProperty(nameof(UrlSelectorProperties.Tabs), ContentSelectorTabs.Media)]
-    public string? Image { get; set; }
+    [ContentItemSelectorComponent(ContentAttachment.CONTENT_TYPE_NAME,
+    Label = "Image",
+    Order = 2,
+    ExplanationText = "Recommended size depends on usage but a 3:2 aspect ratio works well for most instances.")]
+    public IEnumerable<ContentItemReference> Image { get; set; } = new List<ContentItemReference>();
+  
+    [TextInputComponent(Label = "Image alt text", Order = 3)]
+    public string ImageAltText { get; set; }
 
-    [EditingComponent(TextInputComponent.IDENTIFIER, Order = 3, Label = "Image alt text")]
-    public string? ImageAltText { get; set; }
-
-    [EditingComponent(RichTextComponent.IDENTIFIER, Order = 4, Label = "Quote text", ExplanationText = "Recommended quote text length is under 100 words.")]
-    [EditingComponentProperty(nameof(RichTextComponentProperties.ConfigurationName), "quoteText")]
+    [RichTextEditorComponent(Order = 4, Label = "Quote text", ExplanationText = "Recommended quote text length is under 100 words.")]
+    [RequiredValidationRule]
     public string QuoteText { get; set; } = null!;
 
-    [EditingComponent(TextInputComponent.IDENTIFIER, Order = 5, Label = "Quote’s author")]
+    [TextInputComponent(Label = "Quote’s author", Order = 5)]
+    [RequiredValidationRule]
     public string QuotesAuthor { get; set; } = null!;
 
-    [EditingComponent(TextInputComponent.IDENTIFIER, Order = 6, Label = "Author’s job title")]
-    public string? AuthorsJobTitle { get; set; }
+    [TextInputComponent(Label = "Author’s job title", Order = 6)]
+    public string AuthorsJobTitle { get; set; }
 
-    [EditingComponent(TextInputComponent.IDENTIFIER, Order = 7, Label = "Button text")]
-    public string? ButtonText { get; set; } = null!;
+    [TextInputComponent(Label = "Button text", Order = 7)]
+    public string ButtonText { get; set; } = null!;
 
-    [EditingComponent(UrlSelector.IDENTIFIER, Order = 8, Label = "Button url")]
-    public string? ButtonUrl { get; set; } = null!;
+    [ContentItemSelectorComponent(new string[] { HomePage.CONTENT_TYPE_NAME, Navigation.CONTENT_TYPE_NAME }, Label = "Button URL", Order = 8)]
+    public IEnumerable<ContentItemReference> ButtonUrl { get; set; } = new List<ContentItemReference>();
 
-    [EditingComponent(DropDownComponent.IDENTIFIER, Label = "Primary Button link target", Order = 9)]
-    [EditingComponentProperty(
-   nameof(DropDownProperties.DataSource),
-   "_self;Same tab\r\n_blank;New tab"
-)]
+    [DropDownComponent(Label = "Primary Button link target", Order = 9, Options = "_self;Same tab\r\n_blank;New tab")]
+
     public string PrimaryButtonLinkTarget { get; set; } = "_self";
 
-    [EditingComponent(RadioButtonsComponent.IDENTIFIER, Order = 10, ExplanationText = "The quote layout will adjust based on the selected text font. Please note that on mobile, the font size is reduced by 2px.", Label = "Quote text")]
-    [EditingComponentProperty(nameof(RadioButtonsProperties.DataSource), "small;Small\r\nstandard;Standard\r\nlarge;Large")]
+    [RadioGroupComponent(Label = "Quote text", Order = 10, Options = "small;Small\r\nmedium;Medium\r\nlarge;Large")]
     public string Size { get; set; } = "standard";
 
-    [EditingComponent(DropDownComponent.IDENTIFIER, Label = "Top margin", Order = 11)]
-    [EditingComponentProperty(nameof(DropDownProperties.DataSource), "0px;None\r\n20px\r\n40px\r\n60px\r\n80px")]
-    public string TopMargin { get; set; } = null!;
+    [DropDownComponent(Label = "Top margin", Order = 11, Options = "0px;None\n20px\n40px\n60px\n80px")]
+    public string TopMargin { get; set; }
 
-    [EditingComponent(DropDownComponent.IDENTIFIER, Label = "Bottom margin", Order = 12)]
-    [EditingComponentProperty(nameof(DropDownProperties.DataSource), "0px;None\r\n20px\r\n40px\r\n60px\r\n80px")]
-    public string BottomMargin { get; set; } = null!;
+    [DropDownComponent(Label = "Bottom margin", Order = 12, Options = "0px;None\n20px\n40px\n60px\n80px")]
+    public string BottomMargin { get; set; }
 }
-

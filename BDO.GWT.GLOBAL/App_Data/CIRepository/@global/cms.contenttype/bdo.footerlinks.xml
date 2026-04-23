@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>FooterLinks</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="e102242a-df39-41a5-af45-2fe78d4aa4df" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="a55f7f1d-359d-4548-afc4-95ba2844d950" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="a4f5d026-25ac-45f8-aef2-60e78f0f59a1" isunique="true" system="true" />
+      <field column="Title" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="fb5256bf-f341-439f-9238-85fa4fd5c618" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="TargetURL" columnprecision="0" columntype="contentitemreference" enabled="true" guid="7cc45a72-c4a7-4b52-a60f-28bb58d59814" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>TargetURL</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["ca36fdc4-756f-4f9e-afdf-bdf19fc50427","afbf6f00-540b-44f1-b40b-ea7975a6185e","21077305-a3ad-4889-a673-6eb9724c13cc","74635906-cb04-4ffd-9936-9dcde92c7f58"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field column="OpenInNewTab" columnprecision="0" columntype="boolean" enabled="true" guid="94de1f74-ccbc-454c-8dc3-68ce3b9f3f96" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>OpenInNewTab</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>c6cd8339-5d73-4c39-826b-1b372eb404ee</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.FooterLinks</ClassName>
+  <ClassShortName>BDOFooterLinks</ClassShortName>
+  <ClassTableName>BDO_FooterLinks</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

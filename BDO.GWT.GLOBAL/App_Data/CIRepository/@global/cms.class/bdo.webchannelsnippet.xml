@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <CodeNameColumn>WebChannelCodeName</CodeNameColumn>
+      <DisplayNameColumn>WebChannelSnippetDisplayName</DisplayNameColumn>
+      <ObjectType>BDO.WebChannelSnippet</ObjectType>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassDisplayName>Web channel snippet</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="WebChannelSnippetID" columntype="integer" enabled="true" guid="a969acad-c0b2-4b86-bbed-df2f712c4b66" isPK="true" />
+      <field allowempty="true" column="WebChannelSnippetType" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6609ea4e-416f-4832-8ef6-4758b7ee545b" />
+      <field allowempty="true" column="WebChannelSnippetCode" columnprecision="0" columnsize="2000" columntype="text" enabled="true" guid="4087e8c1-e529-432d-9a19-4b4180016425" />
+      <field column="WebChannelSnippetWebChannelSettingsID" columnprecision="0" columntype="integer" enabled="true" guid="fcb17088-e34b-4669-966d-8c2a5e8286f0" refobjtype="bdo.webchannelsettings" reftype="Required">
+        <properties>
+          <defaultvalue>0</defaultvalue>
+        </properties>
+      </field>
+      <field column="WebChannelSnippetDisplayName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="46b81926-07df-42e1-9649-02b0d8dd9726" />
+      <field column="WebChannelSnippetCodeName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7660276b-bc84-4e67-bc28-f33bedcd0e06" />
+      <field column="WebChannelCodeName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="b3d72b7f-3b17-4ba2-9197-de64cbd59013" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>b8d0d5cb-4b0a-48fa-a8a4-54dc06ee7bfa</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.WebChannelSnippet</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_WebChannelSnippet</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>
