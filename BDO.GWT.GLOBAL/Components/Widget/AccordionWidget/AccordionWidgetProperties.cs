@@ -17,11 +17,11 @@ public class AccordionWidgetProperties : BaseWidgetProperties
     public string Content { get; set; } = null!;
 
     [TextInputComponent(Label = "Deep link ID", Order = 2)]
-    public string? DeepLinkID { get; set; }
+    public string DeepLinkID { get; set; }
 
     [DropDownComponent(Label = "Top margin", Order = 4, Options = "0px;None\n20px\n40px\n60px\n80px")]
-    public string? TopMargin { get; set; }
+    public string TopMargin { get; set; }
 
     [DropDownComponent(Label = "Bottom margin", Order = 5, Options = "0px;None\n20px\n40px\n60px\n80px")]
-    public string? BottomMargin { get; set; }
+    public string BottomMargin { get; set; }
 }

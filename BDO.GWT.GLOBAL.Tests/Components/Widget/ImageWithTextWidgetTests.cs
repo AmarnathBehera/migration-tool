@@ -40,7 +40,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             };
         }
 
-        private ComponentViewModel<ImageWithTextWidgetProperties> GetModel(ImageWithTextWidgetProperties props)
+        private static ComponentViewModel<ImageWithTextWidgetProperties> GetModel(ImageWithTextWidgetProperties props)
         {
             var model = new ComponentViewModel<ImageWithTextWidgetProperties>();
 
@@ -70,10 +70,13 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var viewResult = result as ViewViewComponentResult;
             var viewModel = viewResult?.ViewData?.Model as ImageWithTextData;
 
-            Assert.That(viewModel, Is.Not.Null);
-            Assert.That(viewModel.Title, Is.EqualTo("Test Title"));
-            Assert.That(viewModel.Description, Is.EqualTo("Test Description"));
-            Assert.That(viewModel.ButtonTitle, Is.EqualTo("Click Me"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(viewModel, Is.Not.Null);
+                Assert.That(viewModel.Title, Is.EqualTo("Test Title"));
+                Assert.That(viewModel.Description, Is.EqualTo("Test Description"));
+                Assert.That(viewModel.ButtonTitle, Is.EqualTo("Click Me"));
+            });
         }
 
         [Test]
@@ -154,9 +157,12 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 
             var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as ImageWithTextData;
 
-            Assert.That(viewModel, Is.Not.Null);
-            Assert.That(viewModel.MediaType, Is.EqualTo("embed"));
-            Assert.That(viewModel.EmbedCode, Is.EqualTo("<iframe></iframe>"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(viewModel, Is.Not.Null);
+                Assert.That(viewModel.MediaType, Is.EqualTo("embed"));
+                Assert.That(viewModel.EmbedCode, Is.EqualTo("<iframe></iframe>"));
+            });
         }
 
         [Test]
@@ -174,10 +180,13 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 
             var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as ImageWithTextData;
 
-            Assert.That(viewModel, Is.Not.Null);
-            Assert.That(viewModel.Theme, Is.EqualTo("light"));
-            Assert.That(viewModel.TopMargin, Is.EqualTo("0px"));
-            Assert.That(viewModel.BottomMargin, Is.EqualTo("0px"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(viewModel, Is.Not.Null);
+                Assert.That(viewModel.Theme, Is.EqualTo("light"));
+                Assert.That(viewModel.TopMargin, Is.EqualTo("0px"));
+                Assert.That(viewModel.BottomMargin, Is.EqualTo("0px"));
+            });
         }
     }
 }

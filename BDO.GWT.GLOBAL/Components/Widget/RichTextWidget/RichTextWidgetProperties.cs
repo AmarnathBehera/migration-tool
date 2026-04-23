@@ -11,11 +11,11 @@ public class RichTextWidgetProperties : Kentico.Components.Web.Mvc.Widgets.Inter
     [RegularExpression(
     @"^[a-z0-9'-]*$",
     ErrorMessage = "Characters are not allowed.")]
-    public string? WidgetID { get; set; }
+    public string WidgetID { get; set; }
 
     [DropDownComponent(Label = "Top margin", Order = 2, Options = "0px;None\n20px\n40px\n60px\n80px")]
-    public string? TopMargin { get; set; }
+    public string TopMargin { get; set; }
 
     [DropDownComponent(Label = "Bottom margin", Order = 3, Options = "0px;None\n20px\n40px\n60px\n80px")]
-    public string? BottomMargin { get; set; }
+    public string BottomMargin { get; set; }
 }

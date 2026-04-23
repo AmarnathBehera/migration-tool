@@ -11,5 +11,5 @@ public abstract class BaseWidgetProperties : IWidgetProperties
         [RegularExpression(
         @"^[a-z0-9'-]*$",
         ErrorMessage = "Characters are not allowed.")]
-    public string? WidgetID { get; set; }
+    public string WidgetID { get; set; }
 }

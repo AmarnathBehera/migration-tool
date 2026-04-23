@@ -70,7 +70,7 @@ public class XperiencePageContext : IPageContext
                 .WithLinkedItems(1))
             .InLanguage(ctx.WebPage.LanguageName);
 
-        var result = await _queryExecutor.GetMappedWebPageResult<T>(query);
+        var result = await _queryExecutor.GetMappedWebPageResult<T>(query, cancellationToken: cancellationToken);
 
         return result.FirstOrDefault();
     }

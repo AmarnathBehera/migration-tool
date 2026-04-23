@@ -22,7 +22,7 @@ namespace BDO.GWT.Core.Services.Widget
 
         public async Task<List<LinkItemDto>> GetTilePagesAsync(List<Guid> guids, CancellationToken cancellationToken)
         {
-            if (guids == null || !guids.Any())
+            if (guids == null || guids.Count == 0)
             {
                 return new List<LinkItemDto>();
             }

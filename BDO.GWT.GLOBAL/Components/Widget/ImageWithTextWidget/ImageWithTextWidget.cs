@@ -22,6 +22,11 @@ public class ImageWithTextWidget : ViewComponent
 
     public async Task<ViewViewComponentResult> InvokeAsync(ComponentViewModel<ImageWithTextWidgetProperties> model)
     {
+        if (model is null)
+        {
+            return View("~/Components/Widget/ImageWithTextWidget/_ImageWithTextWidget.cshtml", new ImageWithTextData());
+        }
+
         var imageurl = model?.Properties?.ImageURL?.Any() == true
             ? await _contentRetriever.RetrieveContentByGuids<ContentAttachment>(
                 model.Properties.ImageURL.Select(i => i.Identifier).ToList(),
@@ -34,16 +39,14 @@ public class ImageWithTextWidget : ViewComponent
                 new RetrieveContentParameters { LinkedItemsMaxLevel = 3 })
             : Enumerable.Empty<ContentAttachment>();
 
-
         var contentTypes = new[] { ContentAttachment.CONTENT_TYPE_NAME, SocialLinks.CONTENT_TYPE_NAME };
 
         var buttonurl = model?.Properties?.ButtonURL?.Any() == true
             ? await _wrapper.RetrieveButtonUrlAsync(
-                model?.Properties?.ButtonURL.Select(i => i.Identifier).ToList(),
+                model.Properties.ButtonURL.Select(i => i.Identifier).ToList(),
                 contentTypes
                 )
             : Enumerable.Empty<IContentItemFieldsSource>();
-
 
         string url = null;
 
@@ -57,9 +60,6 @@ public class ImageWithTextWidget : ViewComponent
         {
             url = social.Url;
         }
-
-
-
 
         var dto = new ImageWithTextData
         {

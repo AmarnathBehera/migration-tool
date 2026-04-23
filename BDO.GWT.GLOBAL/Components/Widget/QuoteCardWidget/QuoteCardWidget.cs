@@ -31,22 +31,26 @@ public class QuoteCardWidget : ViewComponent
     {
         var cancellationToken = HttpContext.RequestAborted;
 
+        if (model == null)
+        {
+            return View("~/Components/Widget/QuoteCardWidget/_QuoteCardWidget.cshtml", new QuoteCardData());
+        }
+
         var buttonUrl = new List<LinkItemDto>();
 
-        if (model?.Properties?.ButtonUrl != null && model.Properties.ButtonUrl.Any())
+        if (model.Properties?.ButtonUrl != null && model.Properties.ButtonUrl.Any())
         {
             var guids = model.Properties.ButtonUrl
                 .Where(x => x.Identifier != Guid.Empty)
                 .Select(x => x.Identifier)
                 .ToList();
 
-             if (guids.Any())
+            if (guids.Count > 0)
             {
                 buttonUrl = await _buttonUrlRetriever
                     .GetTilePagesAsync(guids, cancellationToken);
             }
         }
-
 
         var imageUrl = await GetImageUrlAsync(model.Properties, cancellationToken);
 
