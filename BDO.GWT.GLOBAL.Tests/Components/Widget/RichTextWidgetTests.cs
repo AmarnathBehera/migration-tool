@@ -56,10 +56,10 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var viewModel = viewResult?.ViewData?.Model as ComponentViewModel<RichTextWidgetProperties>;
 
             // Assert
-            Assert.That(viewResult, Is.Not.Null);
-            Assert.That(viewModel, Is.Not.Null);
             Assert.Multiple(() =>
             {
+                Assert.That(viewResult, Is.Not.Null);
+                Assert.That(viewModel, Is.Not.Null);
                 Assert.That(viewModel!.Properties.WidgetID, Is.EqualTo("rich-text-1"));
                 Assert.That(viewModel!.Properties.TopMargin, Is.EqualTo("20px"));
                 Assert.That(viewModel!.Properties.BottomMargin, Is.EqualTo("40px"));
@@ -79,10 +79,10 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var viewModel = viewResult?.ViewData?.Model as ComponentViewModel<RichTextWidgetProperties>;
 
             // Assert
-            Assert.That(viewResult, Is.Not.Null);
-            Assert.That(viewModel, Is.Not.Null);
             Assert.Multiple(() =>
             {
+                Assert.That(viewResult, Is.Not.Null);
+                Assert.That(viewModel, Is.Not.Null);
                 Assert.That(viewModel!.Properties.WidgetID, Is.Null);
                 Assert.That(viewModel!.Properties.TopMargin, Is.Null);
                 Assert.That(viewModel!.Properties.BottomMargin, Is.Null);
@@ -100,9 +100,9 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var viewResult = result as ViewViewComponentResult;
 
             // Assert
-            Assert.That(viewResult, Is.Not.Null);
             Assert.Multiple(() =>
             {
+                Assert.That(viewResult, Is.Not.Null);
                 Assert.That(viewResult!.ViewName, Is.EqualTo("~/Components/Widget/RichTextWidget/_RichTextWidget.cshtml"));
             });
         }
