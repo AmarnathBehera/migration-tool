@@ -1,4 +1,5 @@
 ﻿using BDO.GWT.Core;
+using BDO.GWT.Core.Data;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.DTOs.Pages;
 using BDO.GWT.Web.Core.Services;
@@ -28,8 +29,16 @@ namespace BDO.GWT.Core.Tests.Services
                 .Returns(1);
 
             _heroServiceMock
-                .Setup(x => x.GetHeroDtoAsync(It.IsAny<IHero>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new HeroDto());
+                .Setup(x => x.GetHeroDtoAsync(It.IsAny<HeroData>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((HeroData data, CancellationToken _) => new HeroDto
+                {
+                    Layout = data.Layout,
+                    Title = data.Title,
+                    Description = data.Description,
+                    CtaButtonType = data.CallToActionButtonType,
+                    CtaButtonText = data.CallToActionButtonText,
+                    CtaButtonUrlTarget = data.CtaButtonUrlTarget,
+                });
 
             _service = new ContactPageService(
                 _contentServiceMock.Object,
@@ -59,7 +68,7 @@ namespace BDO.GWT.Core.Tests.Services
                 Assert.That(result, Is.TypeOf<FormPageDto>());
                 Assert.That(result.MetaData, Is.Null);
                 Assert.That(result.BaseContent, Is.Null);
-            }   );
+            });
         }
 
         [Test]
@@ -306,21 +315,13 @@ namespace BDO.GWT.Core.Tests.Services
         [Test]
         public async Task GetContactPageDtoAsync_MapsHeroDto_FromHeroService()
         {
-            var expectedHero = new HeroDto
-            {
-                Title = "Hero Title",
-                Description = "Hero Desc",
-                Layout = "Default"
-            };
-
-            _heroServiceMock
-                .Setup(x => x.GetHeroDtoAsync(It.IsAny<IHero>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(expectedHero);
-
             var contactPage = new Contact
             {
                 DescriptionTitle = "Title",
-                DescriptionBody = "Body"
+                DescriptionBody = "Body",
+                HeroTitle = "Hero Title",
+                HeroDescription = "Hero Desc",
+                HeroLayout = "Default"
             };
 
             SetupContentService(contactPage);
@@ -411,13 +412,13 @@ namespace BDO.GWT.Core.Tests.Services
             SetupContentService(contactPage);
 
             _heroServiceMock
-                .Setup(x => x.GetHeroDtoAsync(It.IsAny<IHero>(), token))
+                .Setup(x => x.GetHeroDtoAsync(It.IsAny<HeroData>(), token))
                 .ReturnsAsync(new HeroDto());
 
             await _service.GetContactPageDtoAsync(null, token);
 
             _heroServiceMock.Verify(
-                x => x.GetHeroDtoAsync(It.IsAny<IHero>(), token),
+                x => x.GetHeroDtoAsync(It.IsAny<HeroData>(), token),
                 Times.Once
             );
         }

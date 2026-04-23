@@ -1,10 +1,5 @@
-﻿
-using BDO;
-using BDO.GWT.Common.Core.LiveSite.Data;
-using BDO.GWT.Core;
+﻿using BDO.GWT.Core;
 using BDO.GWT.Core.DTOs;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ExternalNavigationWidget;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ImageWithTextWidget;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
 

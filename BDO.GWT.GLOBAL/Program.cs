@@ -36,6 +36,9 @@ builder.Services.AddKentico(features =>
         ContentTypeNames = new[]
         {
           "BDO.HomePage",
+          "BDO.SectionAbout",
+          "BDO.AboutPage",
+          "BDO.HomePage",
           "BDO.Contact"
        }
     }); features.UseActivityTracking();

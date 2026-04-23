@@ -1,5 +1,7 @@
 ﻿using BDO.GWT.Core;
+using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
+using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.DTOs.Pages;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
@@ -109,7 +111,19 @@ public class ContactPageService : IContactPageService
                 WebPageItemParentID = sys?.WebPageItemParentID ?? 0
             },
 
-            Hero = await _heroService.GetHeroDtoAsync(ContactPage, cancellationToken),
+            Hero = await _heroService.GetHeroDtoAsync(new HeroData
+            {
+                Layout = ContactPage.HeroLayout,
+                Title = ContactPage.HeroTitle,
+                Description = ContactPage.HeroDescription,
+                BackgroundImage = ContactPage.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string bgUrl ? Link.Parse(bgUrl) : null,
+                BackgroundImageAltText = ContactPage.HeroBackgroundImageAltText,
+                MobileBackgroundImage = ContactPage.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string mobileUrl ? Link.Parse(mobileUrl) : null,
+                MobileBackgroundImageAltText = ContactPage.HeroBackgroundImage_MobileAltText,
+                CallToActionButtonType = ContactPage.HeroCallToActionButtonType,
+                CallToActionButtonText = ContactPage.HeroCallToActionButtonText,
+                CallToActionButtonUrl = ContactPage.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath is string ctaPath ? Link.Parse(ctaPath) : null,
+            }, cancellationToken),
         };
     }
 }

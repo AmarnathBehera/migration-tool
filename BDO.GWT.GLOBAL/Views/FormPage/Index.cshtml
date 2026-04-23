@@ -19,7 +19,8 @@
         ComponentIdentifiers.Widgets.Button,
         // ComponentIdentifiers.Widgets.FlexibleBanner,
          ComponentIdentifiers.Widgets.Form,
-        // ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.Imagewithtext,
         // ComponentIdentifiers.Widgets.ViewGlobalLocations,
     };
 
@@ -36,8 +37,8 @@
 
 
 
-<div class="section-container section-container--items section-container--two-thirds gap--xl py-20">
-    <div class="contact-form-container">
+<div>
+    <div>
         @* @ReactHelper.RenderComponent(Html, "ContactPageDescriptionText", Model) *@
 
         @if (Model.FormType != null && Model.FormType == "embedCode")
