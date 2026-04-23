@@ -27,13 +27,13 @@ public class ImageWithTextWidget : ViewComponent
             return View("~/Components/Widget/ImageWithTextWidget/_ImageWithTextWidget.cshtml", new ImageWithTextData());
         }
 
-        var imageurl = model?.Properties?.ImageURL?.Any() == true
+        var imageurl = model.Properties?.ImageURL?.Any() == true
             ? await _contentRetriever.RetrieveContentByGuids<ContentAttachment>(
                 model.Properties.ImageURL.Select(i => i.Identifier).ToList(),
                 new RetrieveContentParameters { LinkedItemsMaxLevel = 3 })
             : Enumerable.Empty<ContentAttachment>();
 
-        var backgroundimageurl = model?.Properties?.BackgroundImageURL?.Any() == true
+        var backgroundimageurl = model.Properties?.BackgroundImageURL?.Any() == true
             ? await _contentRetriever.RetrieveContentByGuids<ContentAttachment>(
                 model.Properties.BackgroundImageURL.Select(i => i.Identifier).ToList(),
                 new RetrieveContentParameters { LinkedItemsMaxLevel = 3 })
@@ -41,7 +41,7 @@ public class ImageWithTextWidget : ViewComponent
 
         var contentTypes = new[] { ContentAttachment.CONTENT_TYPE_NAME, SocialLinks.CONTENT_TYPE_NAME };
 
-        var buttonurl = model?.Properties?.ButtonURL?.Any() == true
+        var buttonurl = model.Properties?.ButtonURL?.Any() == true
             ? await _wrapper.RetrieveButtonUrlAsync(
                 model.Properties.ButtonURL.Select(i => i.Identifier).ToList(),
                 contentTypes

@@ -59,14 +59,14 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as AccordionData;
 
             // Assert
+            Assert.That(viewModel, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.That(viewModel, Is.Not.Null);
-                Assert.That(viewModel.TopMargin, Is.EqualTo("20px"));
-                Assert.That(viewModel.BottomMargin, Is.EqualTo("40px"));
-                Assert.That(viewModel.WidgetID, Is.EqualTo("accordion-widget-1"));
+                Assert.That(viewModel!.TopMargin, Is.EqualTo("20px"));
+                Assert.That(viewModel!.BottomMargin, Is.EqualTo("40px"));
+                Assert.That(viewModel!.WidgetID, Is.EqualTo("accordion-widget-1"));
 
-                var item = viewModel.AccordionItems.Single();
+                var item = viewModel!.AccordionItems.Single();
                 Assert.That(item.Title, Is.EqualTo("Test Heading"));
                 Assert.That(item.Content, Is.EqualTo("<p>Test Content</p>"));
                 Assert.That(item.Id, Is.EqualTo("test-id"));
@@ -89,14 +89,14 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as AccordionData;
 
             // Assert
+            Assert.That(viewModel, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.That(viewModel, Is.Not.Null);
-                Assert.That(viewModel.TopMargin, Is.Null);
-                Assert.That(viewModel.BottomMargin, Is.Null);
-                Assert.That(viewModel.WidgetID, Is.Null);
+                Assert.That(viewModel!.TopMargin, Is.Null);
+                Assert.That(viewModel!.BottomMargin, Is.Null);
+                Assert.That(viewModel!.WidgetID, Is.Null);
 
-                var item = viewModel.AccordionItems.Single();
+                var item = viewModel!.AccordionItems.Single();
                 Assert.That(item.Title, Is.EqualTo("Minimal Heading"));
                 Assert.That(item.Content, Is.EqualTo("Minimal Content"));
                 Assert.That(item.Id, Is.Null);

@@ -70,12 +70,12 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var viewResult = result as ViewViewComponentResult;
             var viewModel = viewResult?.ViewData?.Model as ImageWithTextData;
 
+            Assert.That(viewModel, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.That(viewModel, Is.Not.Null);
-                Assert.That(viewModel.Title, Is.EqualTo("Test Title"));
-                Assert.That(viewModel.Description, Is.EqualTo("Test Description"));
-                Assert.That(viewModel.ButtonTitle, Is.EqualTo("Click Me"));
+                Assert.That(viewModel!.Title, Is.EqualTo("Test Title"));
+                Assert.That(viewModel!.Description, Is.EqualTo("Test Description"));
+                Assert.That(viewModel!.ButtonTitle, Is.EqualTo("Click Me"));
             });
         }
 
@@ -157,11 +157,11 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 
             var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as ImageWithTextData;
 
+            Assert.That(viewModel, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.That(viewModel, Is.Not.Null);
-                Assert.That(viewModel.MediaType, Is.EqualTo("embed"));
-                Assert.That(viewModel.EmbedCode, Is.EqualTo("<iframe></iframe>"));
+                Assert.That(viewModel!.MediaType, Is.EqualTo("embed"));
+                Assert.That(viewModel!.EmbedCode, Is.EqualTo("<iframe></iframe>"));
             });
         }
 
@@ -180,12 +180,12 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 
             var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as ImageWithTextData;
 
+            Assert.That(viewModel, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.That(viewModel, Is.Not.Null);
-                Assert.That(viewModel.Theme, Is.EqualTo("light"));
-                Assert.That(viewModel.TopMargin, Is.EqualTo("0px"));
-                Assert.That(viewModel.BottomMargin, Is.EqualTo("0px"));
+                Assert.That(viewModel!.Theme, Is.EqualTo("light"));
+                Assert.That(viewModel!.TopMargin, Is.EqualTo("0px"));
+                Assert.That(viewModel!.BottomMargin, Is.EqualTo("0px"));
             });
         }
     }

@@ -72,11 +72,11 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var result = await _widget.InvokeAsync(BuildModel(properties));
             var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as QuoteCardData;
 
+            Assert.That(viewModel, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.That(viewModel, Is.Not.Null);
-                Assert.That(viewModel.Data.QuoteText, Is.EqualTo("A great quote."));
-                Assert.That(viewModel.Data.QuotesAuthor, Is.EqualTo("John Doe"));
+                Assert.That(viewModel!.Data.QuoteText, Is.EqualTo("A great quote."));
+                Assert.That(viewModel!.Data.QuotesAuthor, Is.EqualTo("John Doe"));
             });
         }
 
@@ -107,20 +107,20 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var result = await _widget.InvokeAsync(BuildModel(properties));
             var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as QuoteCardData;
 
+            Assert.That(viewModel, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.That(viewModel, Is.Not.Null);
-                Assert.That(viewModel.Data.Heading, Is.EqualTo("Test Heading"));
-                Assert.That(viewModel.Data.SubHeading, Is.EqualTo("<p>Test Subheading</p>"));
-                Assert.That(viewModel.Data.ImageAltText, Is.EqualTo("Alt text"));
-                Assert.That(viewModel.Data.QuoteText, Is.EqualTo("Quote body"));
-                Assert.That(viewModel.Data.QuotesAuthor, Is.EqualTo("Jane Smith"));
-                Assert.That(viewModel.Data.AuthorsJobTitle, Is.EqualTo("CEO"));
-                Assert.That(viewModel.Data.Button.Title, Is.EqualTo("Learn More"));
-                Assert.That(viewModel.Data.Button.Target, Is.EqualTo("_blank"));
-                Assert.That(viewModel.Data.Size, Is.EqualTo("large"));
-                Assert.That(viewModel.TopMargin, Is.EqualTo("40px"));
-                Assert.That(viewModel.BottomMargin, Is.EqualTo("20px"));
+                Assert.That(viewModel!.Data.Heading, Is.EqualTo("Test Heading"));
+                Assert.That(viewModel!.Data.SubHeading, Is.EqualTo("<p>Test Subheading</p>"));
+                Assert.That(viewModel!.Data.ImageAltText, Is.EqualTo("Alt text"));
+                Assert.That(viewModel!.Data.QuoteText, Is.EqualTo("Quote body"));
+                Assert.That(viewModel!.Data.QuotesAuthor, Is.EqualTo("Jane Smith"));
+                Assert.That(viewModel!.Data.AuthorsJobTitle, Is.EqualTo("CEO"));
+                Assert.That(viewModel!.Data.Button.Title, Is.EqualTo("Learn More"));
+                Assert.That(viewModel!.Data.Button.Target, Is.EqualTo("_blank"));
+                Assert.That(viewModel!.Data.Size, Is.EqualTo("large"));
+                Assert.That(viewModel!.TopMargin, Is.EqualTo("40px"));
+                Assert.That(viewModel!.BottomMargin, Is.EqualTo("20px"));
             });
         }
 
@@ -150,10 +150,10 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var result = await _widget.InvokeAsync(BuildModel(properties));
             var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as QuoteCardData;
 
+            Assert.That(viewModel, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.That(viewModel, Is.Not.Null);
-                Assert.That(viewModel.Data.Button.URL, Is.EqualTo(expectedUrl));
+                Assert.That(viewModel!.Data.Button.URL, Is.EqualTo(expectedUrl));
             });
         }
 
@@ -171,10 +171,10 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var result = await _widget.InvokeAsync(BuildModel(properties));
             var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as QuoteCardData;
 
+            Assert.That(viewModel, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.That(viewModel, Is.Not.Null);
-                Assert.That(viewModel.Data.Button.URL, Is.Null);
+                Assert.That(viewModel!.Data.Button.URL, Is.Null);
             });
             _buttonUrlRetrieverMock.Verify(
                 x => x.GetTilePagesAsync(It.IsAny<List<Guid>>(), It.IsAny<CancellationToken>()),
@@ -232,10 +232,10 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var result = await _widget.InvokeAsync(BuildModel(properties));
             var viewResult = result as ViewViewComponentResult;
 
+            Assert.That(viewResult, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.That(viewResult, Is.Not.Null);
-                Assert.That(viewResult.ViewName, Is.EqualTo("~/Components/Widget/QuoteCardWidget/_QuoteCardWidget.cshtml"));
+                Assert.That(viewResult!.ViewName, Is.EqualTo("~/Components/Widget/QuoteCardWidget/_QuoteCardWidget.cshtml"));
             });
         }
 
@@ -251,11 +251,11 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var result = await _widget.InvokeAsync(BuildModel(properties));
             var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as QuoteCardData;
 
+            Assert.That(viewModel, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.That(viewModel, Is.Not.Null);
-                Assert.That(viewModel.Data.Size, Is.EqualTo("standard"));
-                Assert.That(viewModel.Data.Button.Target, Is.EqualTo("_self"));
+                Assert.That(viewModel!.Data.Size, Is.EqualTo("standard"));
+                Assert.That(viewModel!.Data.Button.Target, Is.EqualTo("_self"));
             });
         }
     }
