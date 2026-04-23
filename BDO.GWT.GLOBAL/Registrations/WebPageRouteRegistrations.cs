@@ -14,6 +14,24 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     ContentTypeNames = new[] { "BDO.HomePage" },
     IconClass = "xp-market")]
 
+[assembly: RegisterWebPageRoute(AboutPage.CONTENT_TYPE_NAME, typeof(AboutPageController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: AboutPage.CONTENT_TYPE_NAME,
+    name: "About Page Content Type Template",
+    customViewName: "~/Views/About/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.AboutPage" },
+    IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(SectionAbout.CONTENT_TYPE_NAME, typeof(SectionAboutController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: SectionAbout.CONTENT_TYPE_NAME,
+    name: "Section About Content Type Template",
+    customViewName: "~/Views/About/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SectionAbout" },
+    IconClass = "xp-market")]
+
 [assembly: RegisterWebPageRoute(Contact.CONTENT_TYPE_NAME, typeof(ContactController))]
 [assembly: RegisterPageTemplate(
     identifier: Contact.CONTENT_TYPE_NAME,

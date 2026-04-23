@@ -1,9 +1,11 @@
 ﻿using BDO.GWT.Common.Options;
+using BDO.GWT.Core.Entities;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Services.Footer;
 using BDO.GWT.Core.Services.Header;
 using BDO.GWT.Core.Services.Widget;
 using BDO.GWT.GLOBAL.Services;
+using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
@@ -45,6 +47,10 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IPageContext, XperiencePageContext>();
         serviceCollection.AddScoped<IPageBuilderSectionService, PageBuilderSectionService>();
         serviceCollection.AddScoped<ITileContentService, TileContentService>();
+        serviceCollection.AddScoped<IButtonUrlRetriever, ButtonUrlRetriever>();
+        serviceCollection.AddScoped<IContentRetrieverWrapper, ContentRetrieverWrapper>();
+        serviceCollection.AddScoped<IHeroService, HeroService>();
+        serviceCollection.AddScoped(typeof(IAboutPageService<>), typeof(AboutPageService<>));
 
     }
 

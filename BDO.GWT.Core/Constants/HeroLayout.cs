@@ -1,4 +1,4 @@
-﻿namespace BDO.GWT.Domain.Core.Constants;
+﻿namespace BDO.GWT.Core.Constants;
 
 public static class HeroLayout
 {
