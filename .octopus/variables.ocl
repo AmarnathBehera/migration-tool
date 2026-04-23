@@ -39,9 +39,9 @@ variable "appsettings.reactAppService" {
 }
 
 variable "appsettings.CMSAzureAccountName" {
-    value "bdosagwtpri#{environment.abbreviation}eurwe" {}
+    value "bdosagwtxbyk#{environment.abbreviation}eurwe" {}
 }
 
 variable "appsettings.CMSAzureCDNEndpoint" {
-    value "https://media-#{environment.abbreviation}.gwt.bdo.global" {}
+    value "https://bdosagwtxbyk#{environment.abbreviation}eurwe.blob.core.windows.net" {}
 }
