@@ -51,7 +51,7 @@ step "deploy-cms-app-service" {
                   },
                   {
                     "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                    "value": "appsettings.appInsightsCMSConnectionString",
+                    "value": "#{appsettings.appInsightsCMSConnectionString}",
                     "slotSetting": false
                   },
                   {
@@ -131,7 +131,7 @@ step "deploy-mvc-app-service" {
                   },
                   {
                     "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                    "value": "appsettings.appInsightsMVCConnectionString",
+                    "value": "#{appsettings.appInsightsMVCConnectionString}",
                     "slotSetting": false
                   },
                   {
@@ -185,7 +185,7 @@ step "deploy-react-app-service" {
                 [
                   {
                     "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                    "value": "appsettings.appInsightsReactConnectionString",
+                    "value": "#{appsettings.appInsightsReactConnectionString}",
                     "slotSetting": false
                   },
                   {
