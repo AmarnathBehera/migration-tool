@@ -63,3 +63,15 @@ variable "appsettings.CMSHashStringSalt" {
         environment = ["development"]
     }
 }
+
+variable "appsettings.appInsightsCMSConnectionString" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ai-gwt-xbyk-cms-#{environment.abbreviation}-eur-we-connectionstring)" {}
+}
+
+variable "appsettings.appInsightsMVCConnectionString" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ai-gwt-xbyk-mvc-#{environment.abbreviation}-eur-we-connectionstring)" {}
+}
+
+variable "appsettings.appInsightsReactConnectionString" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ai-gwt-xbyk-react-#{environment.abbreviation}-eur-we-connectionstring)" {}
+}
