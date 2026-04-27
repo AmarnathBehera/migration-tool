@@ -166,6 +166,9 @@ stages:
         displayName: "Build and package XbyK CMS App"
         pool:
           vmImage: "ubuntu-latest"
+        variables:
+          # In multi-checkout mode, 'self' is placed in a subdirectory named after the repository
+          selfSourcesDirectory: "$(Build.SourcesDirectory)/GWT.XbyK.Web"
         steps:
           - checkout: self
           - checkout: GWT.XbyK.UI
