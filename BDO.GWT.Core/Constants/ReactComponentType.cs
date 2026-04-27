@@ -45,7 +45,6 @@ public static class ReactComponentType
     public const string CookieBannerGUID = "6e906e0a-6d90-4776-8e90-ff2bdcaa4213";
     public const string AccordionWidgetGUID = "60875e95-b88e-4db3-b4bf-7c2926a2485c";
 
-    public const string ErrorPageContentGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
 }
 
 
@@ -63,10 +62,8 @@ public static class ReactComponentType
 
 
 
-//
 
 
-//
 //614b9a3d-18d7-43f4-9f8f-a4bc99e99841
 
 //3fdef59e-4ab3-4047-abb8-c7b52408adc2
