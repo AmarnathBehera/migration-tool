@@ -48,7 +48,18 @@ step "deploy-cms-app-service" {
                     "name": "ReactOptions__ServerUrl",
                     "value": "#{appsettings.reactAppService}",
                     "slotSetting": false
+                  },
+                  {
+                    "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                    "value": "appsettings.appInsightsCMSConnectionString",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+                    "value": "~3",
+                    "slotSetting": false
                   }
+                  
                 ]
                 EOT
             Octopus.Action.Azure.ConnectionStrings = <<-EOT
@@ -117,6 +128,16 @@ step "deploy-mvc-app-service" {
                     "name": "ReactOptions__ServerUrl",
                     "value": "#{appsettings.reactAppService}",
                     "slotSetting": false
+                  },
+                  {
+                    "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                    "value": "appsettings.appInsightsMVCConnectionString",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+                    "value": "~3",
+                    "slotSetting": false
                   }
                 ]
                 EOT
@@ -160,6 +181,20 @@ step "deploy-react-app-service" {
     action {
         action_type = "Octopus.AzureAppService"
         properties = {
+            Octopus.Action.Azure.AppSettings = <<-EOT
+                [
+                  {
+                    "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                    "value": "appsettings.appInsightsReactConnectionString",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+                    "value": "~3",
+                    "slotSetting": false
+                  }
+                ]
+                EOT
             Octopus.Action.Azure.ConnectionStrings = <<-EOT
                 [
                    {
