@@ -45,3 +45,21 @@ variable "appsettings.CMSAzureAccountName" {
 variable "appsettings.CMSAzureCDNEndpoint" {
     value "https://bdosagwtxbyk#{environment.abbreviation}eurwe.blob.core.windows.net" {}
 }
+
+variable "appsettings.azureAdClientSecret" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-dev-eur;SecretName=gwt-xbyk-cms-app-secret)" {
+        environment = ["development"]
+    }
+}
+
+variable "appsettings.CMSAzureSharedKey" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-dev-eur;SecretName=gwt-xbyk-storage-account-shared-key)" {
+        environment = ["development"]
+    }
+}
+
+variable "appsettings.CMSHashStringSalt" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-dev-eur;SecretName=gwt-xbyk-cms-hashStringSalt)" {
+        environment = ["development"]
+    }
+}
