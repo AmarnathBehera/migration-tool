@@ -36,11 +36,10 @@ builder.Services.AddKentico(features =>
         RegisterDefaultSection = true,
         ContentTypeNames = new[]
         {
-          "BDO.HomePage",
-          "BDO.SectionAbout",
-          "BDO.AboutPage",
-          "BDO.HomePage",
-          "BDO.Contact",
+          HomePage.CONTENT_TYPE_NAME,
+          SectionAbout.CONTENT_TYPE_NAME,
+          AboutPage.CONTENT_TYPE_NAME,
+          Contact.CONTENT_TYPE_NAME,
           Person.CONTENT_TYPE_NAME,
           Locations.CONTENT_TYPE_NAME,
           LocationCity.CONTENT_TYPE_NAME
