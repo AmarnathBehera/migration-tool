@@ -36,7 +36,7 @@ const styles = {
         color: '#cb2929',
         marginRight: '2px',
     } as React.CSSProperties,
-    select: (invalid?: boolean) => ({
+    select: (invalid = false) => ({
         width: '100%',
         padding: '10px 36px 10px 16px',
         border: '1px solid #525252',
@@ -75,7 +75,6 @@ const styles = {
 };
 
 export const BDOSQLDropdown = (props: CustomDropdownProps) => {
-    const [focused, setFocused] = React.useState(false);
     const displayLabel = props.fieldLabel || props.label;
 
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -95,8 +94,6 @@ export const BDOSQLDropdown = (props: CustomDropdownProps) => {
             <select
                 value={props.value ?? ''}
                 onChange={handleChange}
-                onFocus={() => setFocused(true)}
-                onBlur={() => setFocused(false)}
                 style={styles.select(props.invalid)}
             >
                 <option value="">

@@ -1,12 +1,15 @@
 ﻿using System.Threading.Tasks;
 using Kentico.Xperience.Admin.Base.FormAnnotations;
 using Kentico.Xperience.Admin.Base.Forms;
+using BDO.GWT.GLOBAL.Components.FormComponents.CustomDropdown;
 
 [assembly: RegisterFormComponent(
     CustomDropdownComponent.IDENTIFIER,
     typeof(CustomDropdownComponent),
     "SQL Dropdown"
 )]
+
+namespace BDO.GWT.GLOBAL.Components.FormComponents.CustomDropdown;
 
 // ✅ [ComponentAttribute] links the attribute class to this component
 [ComponentAttribute(typeof(CustomDropdownComponentAttribute))]
@@ -36,7 +39,6 @@ public class CustomDropdownComponent
         else
         {
             clientProperties.Options = [];
-
         }
 
         // Explicitly pass the label from the base class
