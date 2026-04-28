@@ -1,29 +1,28 @@
 ﻿using BDO;
 using BDO.GWT.Common;
+using Kentico.Membership;
+using Kentico.Web.Mvc;
 using BDO.GWT.Common.Options;
 using BDO.GWT.Core;
-using BDO.GWT.Core.Services;
 using BDO.GWT.Domain.Services;
 using BDO.GWT.Xperience.LiveSite.Services;
 using Kentico.Activities.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
-using Kentico.Membership;
 using Kentico.OnlineMarketing.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
-using Kentico.Web.Mvc;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.WebEncoders;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -124,16 +123,6 @@ var app = builder.Build();
 
 app.InitKentico();
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error/500");
-
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
-app.UseStatusCodePagesWithReExecute("/Error/{0}");
-
 app.UseStaticFiles();
 
 app.UseCookiePolicy();
@@ -143,6 +132,12 @@ app.UseAuthentication();
 app.UseKentico();
 
 app.Kentico().MapRoutes();
+
+app.MapControllerRoute(
+   name: "error",
+   pattern: "error/{code}",
+   defaults: new { controller = "HttpErrors", action = "Error" }
+);
 
 app.MapControllerRoute(
     name: "default",
