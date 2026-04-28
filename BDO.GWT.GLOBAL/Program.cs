@@ -73,8 +73,6 @@ builder.Services.AddContentServices();
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddScoped<IPageBuilderService, PageBuilderService>();
 builder.Services.AddScoped<IContentService, ContentService>();
-builder.Services.AddScoped<IErrorService, ErrorService>();
-builder.Services.AddScoped<IEventLogging, EventLogging>();
 builder.Services.AddXperience();
 builder.Services.AddControllersWithViews();
 builder.Services.AddXperienceCommunityLocalization();
