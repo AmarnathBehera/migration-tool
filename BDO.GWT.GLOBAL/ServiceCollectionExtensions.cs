@@ -51,6 +51,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IContentRetrieverWrapper, ContentRetrieverWrapper>();
         serviceCollection.AddScoped<IHeroService, HeroService>();
         serviceCollection.AddScoped(typeof(IAboutPageService<>), typeof(AboutPageService<>));
+        serviceCollection.AddTransient<DropdownScriptExecutor>();
 
     }
 

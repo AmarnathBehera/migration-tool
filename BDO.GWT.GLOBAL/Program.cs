@@ -83,7 +83,6 @@ builder.Services.AddScoped<IPageBuilderService, PageBuilderService>();
 builder.Services.AddScoped<IContentService, ContentService>();
 builder.Services.AddScoped<IErrorService, ErrorService>();
 builder.Services.AddScoped<IEventLogging, EventLogging>();
-
 builder.Services.AddXperience();
 builder.Services.AddControllersWithViews();
 builder.Services.AddXperienceCommunityLocalization();
@@ -126,7 +125,7 @@ builder.Services.Configure<AdminIdentityOptions>(options =>
 });
 
 // Add Application Insights telemetry
-builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
+//builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
 var app = builder.Build();
 
