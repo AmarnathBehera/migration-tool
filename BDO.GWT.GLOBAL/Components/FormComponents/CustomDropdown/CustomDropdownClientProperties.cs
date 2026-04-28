@@ -12,5 +12,5 @@ public class CustomDropdownOption
 public class CustomDropdownClientProperties : FormComponentClientProperties<string>
 {
     public IEnumerable<CustomDropdownOption> Options { get; set; } = [];
-    public string? FieldLabel { get; set; }
+    public string FieldLabel { get; set; }
 }
