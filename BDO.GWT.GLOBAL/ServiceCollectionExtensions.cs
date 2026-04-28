@@ -51,7 +51,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IHeroService, HeroService>();
         serviceCollection.AddScoped(typeof(IAboutPageService<>), typeof(AboutPageService<>));
         serviceCollection.AddScoped<IBreadcrumbsService, BreadcrumbsService>();
-
+        serviceCollection.AddScoped<IFormBuilderService, FormBuilderService>();
+        serviceCollection.AddTransient<DropdownScriptExecutor>();
     }
 
 }

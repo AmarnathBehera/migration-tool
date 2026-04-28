@@ -423,6 +423,171 @@ namespace BDO.GWT.Core.Tests.Services
             );
         }
 
+        // ── Form fields mapping ──────────────────────────────────────────────
+
+        [Test]
+        public async Task GetContactPageDtoAsync_MapsFormFieldsCorrectly()
+        {
+            var contactPage = new Contact
+            {
+                DescriptionTitle = "Title",
+                DescriptionBody = "Body",
+                FormType = "HubSpot",
+                Form = "contact-form-id",
+                EmbedCode = "<script>embed</script>"
+            };
+
+            SetupContentService(contactPage);
+
+            var result = await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.FormType, Is.EqualTo("HubSpot"));
+                Assert.That(result.Form, Is.EqualTo("contact-form-id"));
+                Assert.That(result.EmbedCode, Is.EqualTo("<script>embed</script>"));
+            });
+        }
+
+        [Test]
+        public async Task GetContactPageDtoAsync_FormFields_AreNull_WhenNotSet()
+        {
+            var contactPage = new Contact
+            {
+                DescriptionTitle = "Title",
+                DescriptionBody = "Body"
+            };
+
+            SetupContentService(contactPage);
+
+            var result = await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.FormType, Is.Null);
+                Assert.That(result.Form, Is.Null);
+                Assert.That(result.EmbedCode, Is.Null);
+            });
+        }
+
+        // ── Exception propagation ────────────────────────────────────────────
+
+        [Test]
+        public void GetContactPageDtoAsync_WhenContentServiceThrows_ExceptionPropagates()
+        {
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<Contact>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("DB error"));
+
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await _service.GetContactPageDtoAsync(null!, CancellationToken.None));
+        }
+
+        [Test]
+        public void GetContactPageDtoAsync_WhenHeroServiceThrows_ExceptionPropagates()
+        {
+            var contactPage = new Contact
+            {
+                DescriptionTitle = "Title",
+                DescriptionBody = "Body"
+            };
+
+            SetupContentService(contactPage);
+
+            _heroServiceMock
+                .Setup(x => x.GetHeroDtoAsync(It.IsAny<HeroData>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("Hero error"));
+
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await _service.GetContactPageDtoAsync(null!, CancellationToken.None));
+        }
+
+        // ── LinkedItemsMaxLevel parameter ────────────────────────────────────
+
+        [Test]
+        public async Task GetContactPageDtoAsync_UsesLinkedItemsMaxLevel5()
+        {
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<Contact>(
+                    It.Is<RetrievePagesParameters>(p => p.LinkedItemsMaxLevel == 5),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<Contact>());
+
+            await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
+
+            _contentServiceMock.Verify(
+                x => x.GetPagesAsync<Contact>(
+                    It.Is<RetrievePagesParameters>(p => p.LinkedItemsMaxLevel == 5),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
+        // ── Multiple results returns first ───────────────────────────────────
+
+        [Test]
+        public async Task GetContactPageDtoAsync_WhenMultipleResults_UsesFirstPage()
+        {
+            var first = new Contact { DescriptionTitle = "First", DescriptionBody = "Body1" };
+            var second = new Contact { DescriptionTitle = "Second", DescriptionBody = "Body2" };
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<Contact>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<Contact> { first, second });
+
+            var result = await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
+
+            Assert.That(result.Title, Is.EqualTo("First"));
+        }
+
+        // ── Hero data mapping to HeroData ────────────────────────────────────
+
+        [Test]
+        public async Task GetContactPageDtoAsync_PassesCorrectHeroData_ToHeroService()
+        {
+            var contactPage = new Contact
+            {
+                DescriptionTitle = "Title",
+                DescriptionBody = "Body",
+                HeroLayout = "FullWidth",
+                HeroTitle = "Welcome",
+                HeroDescription = "Hello World",
+                HeroCallToActionButtonType = "Primary",
+                HeroCallToActionButtonText = "Click Me"
+            };
+
+            SetupContentService(contactPage);
+
+            HeroData? capturedData = null;
+            _heroServiceMock
+                .Setup(x => x.GetHeroDtoAsync(It.IsAny<HeroData>(), It.IsAny<CancellationToken>()))
+                .Callback<HeroData, CancellationToken>((data, _) => capturedData = data)
+                .ReturnsAsync(new HeroDto());
+
+            await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(capturedData, Is.Not.Null);
+                Assert.That(capturedData!.Layout, Is.EqualTo("FullWidth"));
+                Assert.That(capturedData.Title, Is.EqualTo("Welcome"));
+                Assert.That(capturedData.Description, Is.EqualTo("Hello World"));
+                Assert.That(capturedData.CallToActionButtonType, Is.EqualTo("Primary"));
+                Assert.That(capturedData.CallToActionButtonText, Is.EqualTo("Click Me"));
+            });
+        }
+
         // ── Helper ───────────────────────────────────────────────────────────
 
         private void SetupContentService(Contact contactPage)
