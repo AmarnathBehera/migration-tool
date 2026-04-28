@@ -204,6 +204,91 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             Assert.ThrowsAsync<Exception>(async () =>
                 await _controller.Index(CancellationToken.None));
         }
+
+        [Test]
+        public void Index_WhenServiceThrowsOperationCanceled_ExceptionIsPropagated()
+        {
+            _contactPageServiceMock
+                .Setup(s => s.GetContactPageDtoAsync(null, It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new OperationCanceledException());
+
+            Assert.ThrowsAsync<OperationCanceledException>(async () =>
+                await _controller.Index(CancellationToken.None));
+        }
+
+        [Test]
+        public async Task Index_ReturnsFormPageDto_WithFormFields()
+        {
+            var expectedDto = new FormPageDto
+            {
+                FormType = "HubSpot",
+                Form = "contact-form-id",
+                EmbedCode = "<script>embed</script>"
+            };
+
+            _contactPageServiceMock
+                .Setup(s => s.GetContactPageDtoAsync(null, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(expectedDto);
+
+            var result = await _controller.Index(CancellationToken.None) as ViewResult;
+            var model = result?.Model as FormPageDto;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(model, Is.Not.Null);
+                Assert.That(model!.FormType, Is.EqualTo("HubSpot"));
+                Assert.That(model.Form, Is.EqualTo("contact-form-id"));
+                Assert.That(model.EmbedCode, Is.EqualTo("<script>embed</script>"));
+            });
+        }
+
+        [Test]
+        public async Task Index_ReturnsFormPageDto_WithNullOptionalFields()
+        {
+            var expectedDto = new FormPageDto
+            {
+                Title = "Contact",
+                FormType = null,
+                Form = null,
+                EmbedCode = null,
+                MetaData = null,
+                SearchAndSEO = null,
+                OGMetaData = null
+            };
+
+            _contactPageServiceMock
+                .Setup(s => s.GetContactPageDtoAsync(null, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(expectedDto);
+
+            var result = await _controller.Index(CancellationToken.None) as ViewResult;
+            var model = result?.Model as FormPageDto;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(model, Is.Not.Null);
+                Assert.That(model!.Title, Is.EqualTo("Contact"));
+                Assert.That(model.FormType, Is.Null);
+                Assert.That(model.Form, Is.Null);
+                Assert.That(model.EmbedCode, Is.Null);
+                Assert.That(model.MetaData, Is.Null);
+                Assert.That(model.SearchAndSEO, Is.Null);
+                Assert.That(model.OGMetaData, Is.Null);
+            });
+        }
+
+        [Test]
+        public async Task Index_ModelIsExactSameInstance_ReturnedByService()
+        {
+            var expectedDto = new FormPageDto();
+
+            _contactPageServiceMock
+                .Setup(s => s.GetContactPageDtoAsync(null, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(expectedDto);
+
+            var result = await _controller.Index(CancellationToken.None) as ViewResult;
+
+            Assert.That(result!.Model, Is.SameAs(expectedDto));
+        }
     }
 }
 

@@ -49,6 +49,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ITileContentService, TileContentService>();
         serviceCollection.AddScoped<IButtonUrlRetriever, ButtonUrlRetriever>();
         serviceCollection.AddScoped<IContentRetrieverWrapper, ContentRetrieverWrapper>();
+        serviceCollection.AddScoped<IFormBuilderService, FormBuilderService>();
         serviceCollection.AddScoped<IHeroService, HeroService>();
         serviceCollection.AddScoped(typeof(IAboutPageService<>), typeof(AboutPageService<>));
         serviceCollection.AddTransient<DropdownScriptExecutor>();
