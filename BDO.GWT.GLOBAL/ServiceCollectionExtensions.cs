@@ -50,6 +50,13 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IContentRetrieverWrapper, ContentRetrieverWrapper>();
         serviceCollection.AddScoped<IHeroService, HeroService>();
         serviceCollection.AddScoped(typeof(IAboutPageService<>), typeof(AboutPageService<>));
+        serviceCollection.AddScoped<ISectionPeoplePageService, SectionPeoplePageService>();
+        serviceCollection.AddScoped<ICardsService, CardsService>();
+        serviceCollection.AddScoped<IPeopleCardsService, PeopleCardsService>();
+        serviceCollection.AddScoped<IPersonPageService, PersonPageService>();
+        serviceCollection.AddScoped<ILocationCityPageService, LocationCityPageService>();
+        serviceCollection.AddScoped<ILocationsPageService, LocationsPageService>();
+
         serviceCollection.AddScoped<IBreadcrumbsService, BreadcrumbsService>();
         serviceCollection.AddScoped<IFormBuilderService, FormBuilderService>();
         serviceCollection.AddTransient<DropdownScriptExecutor>();

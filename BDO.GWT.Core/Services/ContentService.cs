@@ -293,6 +293,26 @@
         {
             return _contentRetriever.RetrievePages<T?>(parameters, cancellationToken);
         }
+        public string GetFallbackMetadataDescription(string? metaDescription, string? metaOGDescription)
+        {
+            var metaDesc = metaDescription;
+
+            if (string.IsNullOrEmpty(metaDesc))
+            {
+                metaDesc = metaOGDescription;
+            }
+
+            return metaDesc ?? string.Empty;
+        }
+        public string GetCurrentSiteLogoImageUrlAsync()
+        {
+            return "https://cdn.bdo.global/images/bdo_logo/1.0.0/bdo_logo_color.png";
+        }
+
+        public string GetCurrentSiteLegalNameAsync()
+        {
+            return _websiteChannelContext.WebsiteChannelName;
+        }
     }
 }
 

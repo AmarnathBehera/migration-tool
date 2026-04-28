@@ -24,6 +24,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using XperienceCommunity.MultiChoiceFormControl.Admin.Helpers.Components.MultiChoice;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +40,10 @@ builder.Services.AddKentico(features =>
           "BDO.SectionAbout",
           "BDO.AboutPage",
           "BDO.HomePage",
-          "BDO.Contact"
+          "BDO.Contact",
+          Person.CONTENT_TYPE_NAME,
+          Locations.CONTENT_TYPE_NAME,
+          LocationCity.CONTENT_TYPE_NAME
        }
     }); features.UseActivityTracking();
     features.UseWebPageRouting();
@@ -116,9 +120,6 @@ builder.Services.Configure<AdminIdentityOptions>(options =>
     options.AuthenticationOptions.Mode = AdminAuthenticationMode.MaintainForms;
 
 });
-
-// Add Application Insights telemetry
-builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
 var app = builder.Build();
 

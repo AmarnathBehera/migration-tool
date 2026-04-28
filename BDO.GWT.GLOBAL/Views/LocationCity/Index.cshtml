@@ -1,0 +1,78 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using BDO.GWT.Web.Core.LiveSite.Services
+@using Kentico.Content.Web.Mvc
+@model (BDO.GWT.Core.DTOs.Pages.LocationCityDto LocationCityDto, BDO.GWT.Core.DTOs.SchemaMarkups.FinancialServiceSchemaMarkupDto LocationCitySchemaMarkupDto)
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+
+
+    var widgetsList = new[]
+    {
+        // ComponentIdentifiers.Widgets.EditorsPick,
+        // ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.Imagewithtext,
+        // ComponentIdentifiers.Widgets.KeyContacts,
+        // ComponentIdentifiers.Widgets.RelatedContacts,
+        ComponentIdentifiers.Widgets.TiledLink,
+        ComponentIdentifiers.Widgets.Globallocation,
+    };
+
+    var advancedWidgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.Globallocation
+       // ComponentIdentifiers.Widgets.Accordion
+    };
+}
+
+ @* @section SchemaMarkup { 
+    @Html.Raw(this.Model.LocationCitySchemaMarkupDto.ToSchemaMarkupJsString())
+ }  *@
+
+@* @section Styles {
+    @PageBuilderService.GetPageBuilderStyles(Html)
+} *@
+
+@if (Model.LocationCityDto != null && pageId != 0)
+    {
+         @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.Hero,
+        ReactComponentType.HeroGUID,
+        new {
+        data = Model.LocationCityDto.Hero,
+        },
+        Context.RequestAborted))
+
+        @(await ReactService.RenderComponentAsync(
+        pageId,
+        "LocationsCity",
+        ReactComponentType.LocationsCityGUID,
+        this.Model.LocationCityDto.MainContent,
+        Context.RequestAborted))
+    }
+ @await Html.Kentico().EditableAreaAsync(
+    "mainContent", // Unique identifier
+        new EditableAreaOptions
+        {
+            AllowedWidgets = widgetsList
+        })
+@await Html.Kentico().EditableAreaAsync(
+    "mainContent", // Unique identifier
+        new EditableAreaOptions
+        {
+            AllowedWidgets = advancedWidgetsList
+        })
+
+
+@* @await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html)
+
+@PageBuilderService.GetPageBuilderScripts(Html) *@

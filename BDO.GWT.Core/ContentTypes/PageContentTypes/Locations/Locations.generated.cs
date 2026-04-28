@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="Locations"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class Locations : IWebPageFieldsSource, IMetadata
+	public partial class Locations : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -33,6 +33,114 @@ namespace BDO
 		/// </summary>
 		[SystemField]
 		public WebPageFields SystemFields { get; set; }
+
+
+		/// <summary>
+		/// DescriptionTitle.
+		/// </summary>
+		public string DescriptionTitle { get; set; }
+
+
+		/// <summary>
+		/// DescriptionBody.
+		/// </summary>
+		public string DescriptionBody { get; set; }
+
+
+		/// <summary>
+		/// LocationsTitle.
+		/// </summary>
+		public string LocationsTitle { get; set; }
+
+
+		/// <summary>
+		/// BannerContent.
+		/// </summary>
+		public string BannerContent { get; set; }
+
+
+		/// <summary>
+		/// BannerBackgroundImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> BannerBackgroundImage { get; set; }
+
+
+		/// <summary>
+		/// BannerTheme.
+		/// </summary>
+		public string BannerTheme { get; set; }
+
+
+		/// <summary>
+		/// BannerButtonType.
+		/// </summary>
+		public string BannerButtonType { get; set; }
+
+
+		/// <summary>
+		/// BannerButtonText.
+		/// </summary>
+		public string BannerButtonText { get; set; }
+
+
+		/// <summary>
+		/// BannerButtonURL.
+		/// </summary>
+		public IEnumerable<WebPageRelatedItem> BannerButtonURL { get; set; }
+
+
+		/// <summary>
+		/// BannerButtonLinkTarget.
+		/// </summary>
+		public string BannerButtonLinkTarget { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGTitle.
+		/// </summary>
+		public string MetadataOGTitle { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGDescription.
+		/// </summary>
+		public string MetadataOGDescription { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> MetadataOGImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGTwitterImageSizeCheckbox.
+		/// </summary>
+		public bool MetadataOGTwitterImageSizeCheckbox { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGTwitterImage.
+		/// </summary>
+		public IEnumerable<IContentItemFieldsSource> MetadataOGTwitterImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataNofollow.
+		/// </summary>
+		public bool MetadataNofollow { get; set; }
+
+
+		/// <summary>
+		/// MetadataNoindex.
+		/// </summary>
+		public bool MetadataNoindex { get; set; }
+
+
+		/// <summary>
+		/// IncludeInSitemap.
+		/// </summary>
+		public bool IncludeInSitemap { get; set; }
 
 
 		/// <summary>
@@ -50,7 +158,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataTeaserImage.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataTeaserImage { get; set; }
+		public IEnumerable<ContentAttachment> MetadataTeaserImage { get; set; }
 
 
 		/// <summary>
@@ -69,5 +177,65 @@ namespace BDO
 		/// MetadataKeywords.
 		/// </summary>
 		public string MetadataKeywords { get; set; }
+
+
+		/// <summary>
+		/// HeroLayout.
+		/// </summary>
+		public string HeroLayout { get; set; }
+
+
+		/// <summary>
+		/// HeroTitle.
+		/// </summary>
+		public string HeroTitle { get; set; }
+
+
+		/// <summary>
+		/// HeroDescription.
+		/// </summary>
+		public string HeroDescription { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> HeroBackgroundImage { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImageAltText.
+		/// </summary>
+		public string HeroBackgroundImageAltText { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImage_Mobile.
+		/// </summary>
+		public IEnumerable<ContentAttachment> HeroBackgroundImage_Mobile { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImage_MobileAltText.
+		/// </summary>
+		public string HeroBackgroundImage_MobileAltText { get; set; }
+
+
+		/// <summary>
+		/// HeroCallToActionButtonType.
+		/// </summary>
+		public string HeroCallToActionButtonType { get; set; }
+
+
+		/// <summary>
+		/// HeroCallToActionButtonText.
+		/// </summary>
+		public string HeroCallToActionButtonText { get; set; }
+
+
+		/// <summary>
+		/// HeroCallToActionButtonUrl.
+		/// </summary>
+		public IEnumerable<IWebPageFieldsSource> HeroCallToActionButtonUrl { get; set; }
 	}
 }

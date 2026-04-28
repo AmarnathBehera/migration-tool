@@ -84,5 +84,9 @@
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(RetrievePagesParameters parameters, CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
 
+        public string GetFallbackMetadataDescription(string? metaDescription, string? metaOGDescription);
+        public string GetCurrentSiteLogoImageUrlAsync();
+
+        public string GetCurrentSiteLegalNameAsync();
     }
 }
