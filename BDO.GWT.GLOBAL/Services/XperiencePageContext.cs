@@ -1,9 +1,8 @@
-﻿using BDO.GWT.Core.DTOs;
+﻿using BDO.GWT.Core;
+using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
 using BDO.GWT.Core.Services;
-using CMS.Base;
 using CMS.ContentEngine;
-using CMS.Helpers.Internal;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
@@ -15,7 +14,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-
 namespace BDO.GWT.GLOBAL.Services;
 
 public class XperiencePageContext : IPageContext
@@ -25,24 +23,26 @@ public class XperiencePageContext : IPageContext
     private readonly IPageBuilderDataContextRetriever _pageBuilderDataContextRetriever;
     private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly IContentQueryExecutor _queryExecutor;
-
+    private readonly IContentRetriever _contentRetriever;
 
     public XperiencePageContext(
         IHttpContextAccessor httpContextAccessor,
         IWebPageDataContextRetriever webPageDataContextRetriever,
-        IPageBuilderDataContextRetriever pageBuilderDataContextRetriever, IWebsiteChannelContext websiteChannelContext,
-        IContentQueryExecutor queryExecutor)
+        IPageBuilderDataContextRetriever pageBuilderDataContextRetriever,
+        IWebsiteChannelContext websiteChannelContext,
+        IContentQueryExecutor queryExecutor,
+        IContentRetriever contentRetriever)
     {
         _httpContextAccessor = httpContextAccessor;
         _webPageDataContextRetriever = webPageDataContextRetriever;
         _pageBuilderDataContextRetriever = pageBuilderDataContextRetriever;
         _websiteChannelContext = websiteChannelContext;
         _queryExecutor = queryExecutor;
+        _contentRetriever = contentRetriever;
     }
 
     public bool IsInPreviewMode => _websiteChannelContext.IsPreview;
 
-    
     public bool IsInPageBuilderMode
     {
         get
@@ -54,80 +54,111 @@ public class XperiencePageContext : IPageContext
         }
     }
 
-    
-    // Returning null gracefully here — wire up IContentQueryExecutor for typed models.
     public async Task<T?> GetCurrentPageAsync<T>(CancellationToken cancellationToken = default)
         where T : class
     {
         if (!_webPageDataContextRetriever.TryRetrieve(out var ctx))
             return null;
 
-        // Cast if the context data already is T (e.g. passed through routing)
         if (ctx.WebPage is T typedPage)
             return typedPage;
 
         return null;
     }
 
-
-    // Pull from the WebPageItemInfo fields that are available.
-    public async Task<MetaDataSEOItemsDto> GetCurrentPageMetadataAsync(CancellationToken cancellationToken = default)
+    public async Task<MetaDataSEOItemsDto?> GetCurrentPageMetadataAsync(CancellationToken cancellationToken = default)
     {
-       
         var canRetrieve = _webPageDataContextRetriever.TryRetrieve(out var ctx);
 
-        
         if (!canRetrieve || ctx.WebPage == null)
+            return null;
+
+        var webPageItemId = ctx.WebPage.WebPageItemID;
+        var request = _httpContextAccessor.HttpContext?.Request;
+
+       
+        var pages = await _contentRetriever.RetrieveAllPages<IWebPageFieldsSource>(
+            new RetrieveAllPagesParameters
+            {
+                LinkedItemsMaxLevel = 5
+            },
+            query =>
+            {
+                query.Where(w =>
+                    w.WhereEquals("WebPageItemID", webPageItemId)
+                     .WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID)
+                );
+            },
+            cacheSettings: RetrievalCacheSettings.CacheDisabled,
+            configureModel: (container, p) => Task.FromResult(p),
+            cancellationToken: cancellationToken
+        );
+
+        
+        var page = pages?.Select(p =>
         {
-            return new MetaDataSEOItemsDto();
+            var result = new MetaDataSEOItemsDto();
+
+            if (p is IMetadata metadata)
+            {
+                result.MetaData = new MetaDataDto
+                {
+                    MetaTitle = metadata.MetadataTitle,
+                    MetaDescription = metadata.MetadataDescription,
+                    MetaTeaserImageAltText = metadata.MetadataTeaserImageAltText,
+                    MetaCanonical = metadata.MetadataCanonical,
+                    
+                };
+            }
+
+            if (p is IOGMetadataFields ogMetadata)
+            {
+                result.OGMetaData = new OGMetaDataDto
+                {
+                    MetadataOGTitle = ogMetadata.MetadataOGTitle,
+                    MetadataOGDescription = ogMetadata.MetadataOGDescription,
+                    MetadataOGImage = ogMetadata.MetadataOGImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+                   
+                };
+            }
+
+            if (p is ISearchAndSEO seo)
+            {
+                result.SEOItemsDto = new SearchAndSEODto
+                {
+                    IncludeInSitemap = seo.IncludeInSitemap,
+                    MetadataNofollow = seo.MetadataNofollow,
+                    MetadataNoindex = seo.MetadataNoindex
+                };
+            }
+
+            return result;
+
+        }).FirstOrDefault();
+
+        if (page == null)
+            return null;
+
+        
+        if (request != null && page.OGMetaData != null)
+        {
+            var baseUri = new Uri($"{request.Scheme}://{request.Host}/");
+            page.OGMetaData.Url = new Uri(baseUri, request.Path.Value ?? "/").ToString();
+
+            if (!string.IsNullOrEmpty(page.OGMetaData.MetadataOGImage))
+            {
+                var imageUrl = page.OGMetaData.MetadataOGImage;
+
+
+                if (imageUrl.StartsWith("~/"))
+                {
+                    imageUrl = imageUrl.Substring(2);
+                }
+
+                page.OGMetaData.MetadataOGImage = new Uri(baseUri, imageUrl).ToString();
+            }
         }
 
-        
-        var contentTypeName = ctx.WebPage.ContentTypeName;
-        var requestcontext = _httpContextAccessor.HttpContext.Request;
-
-        var page = ctx.WebPage;
-
-        var query = new ContentItemQueryBuilder()
-              .ForContentType(ctx.WebPage.ContentTypeName, q => q
-                .ForWebsite(ctx.WebPage.WebsiteChannelName)         
-              .TopN(1))
-              .InLanguage(ctx.WebPage.LanguageName);
-
-        var result = await _queryExecutor.GetWebPageResult(
-            query,
-            item => new MetaDataSEOItemsDto
-            {
-                MetaData = new MetaDataDto
-                {
-                    MetaTitle = item.TryGetValue("MetadataTitle", out string? metaTitle) ? metaTitle : null,
-                    MetaDescription = item.TryGetValue("MetadataDescription", out string? metaDesc) ? metaDesc : null,
-                    MetaTeaserImageAltText = item.TryGetValue("MetaTeaserImageAltText", out string? metaTeaserImageAltText) ? metaTeaserImageAltText : null,
-                    MetaCanonical = item.TryGetValue("MetaCanonical", out string? metaCanonical) ? metaCanonical : null
-                },
-
-                OGMetaData = new OGMetaDataDto
-                {
-                    // map your OG fields here
-                    MetadataOGTitle = item.TryGetValue("MetadataOGTitle", out string? ogTitle) ? ogTitle : null,
-                    MetadataOGDescription = item.TryGetValue("MetadataOGDescription", out string? ogDesc) ? ogDesc : null,
-                    Url = $"{requestcontext?.Scheme}://{requestcontext?.Host}" + requestcontext.Path
-
-                },
-
-                SEOItemsDto = new SearchAndSEODto
-            {
-                    // map your SEO fields here
-                    IncludeInSitemap = item.TryGetValue("IncludeInSitemap", out bool includeInSitemap) ? includeInSitemap : false,
-                    MetadataNofollow = item.TryGetValue("MetadataNofollow", out bool metadataNofollow) ? metadataNofollow : false,
-                    MetadataNoindex = item.TryGetValue("MetadataNoindex", out bool metadataNoindex) ? metadataNoindex : false
-                }
-            },
-            new ContentQueryExecutionOptions(),
-            cancellationToken);
-
-       var curPageMeta = result.FirstOrDefault() ?? new MetaDataSEOItemsDto();
-
-        return curPageMeta;
+        return page;
     }
 }
