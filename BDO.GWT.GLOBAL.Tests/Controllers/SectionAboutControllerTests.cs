@@ -1,13 +1,10 @@
-using BDO;
 using BDO.GWT.Core.DTOs;
-using BDO.GWT.Core.Services;
 using BDO.GWT.Web.Controllers;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,16 +12,14 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
 {
     public class SectionAboutControllerTests
     {
-        private Mock<IPageContext> _pageContextMock = null!;
-        private Mock<IAboutPageService<SectionAbout>> _aboutPageServiceMock = null!;
+        private Mock<ISectionAboutPageService> _sectionAboutPageServiceMock = null!;
         private SectionAboutController _controller = null!;
 
         [SetUp]
         public void Setup()
         {
-            _pageContextMock = new Mock<IPageContext>();
-            _aboutPageServiceMock = new Mock<IAboutPageService<SectionAbout>>();
-            _controller = new SectionAboutController(_pageContextMock.Object, _aboutPageServiceMock.Object);
+            _sectionAboutPageServiceMock = new Mock<ISectionAboutPageService>();
+            _controller = new SectionAboutController(_sectionAboutPageServiceMock.Object);
         }
 
         [TearDown]
@@ -34,123 +29,74 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
         }
 
         [Test]
-        public async Task Index_ReturnsViewResult_WithDtoFromService()
+        public async Task Index_ReturnsViewResult_WithAboutDto()
         {
-            var sectionAboutPage = new SectionAbout();
-            var expectedDto = new AboutDto { Hero = new HeroDto { Layout = "Default", Title = "Section About" } };
+            var expectedDto = new AboutDto
+            {
+                Hero = new HeroDto
+                {
+                    Layout = "Hero",
+                    Title = "Section About Title",
+                    Description = "Section About Description",
+                    BackgroundImage = "/media/bg.jpg",
+                    BackgroundImageAltText = "Background Alt",
+                    MobileBackgroundImage = "/media/mobile.jpg",
+                    MobileBackgroundImageAltText = "Mobile Alt",
+                    CtaButtonType = "Primary",
+                    CtaButtonText = "Learn More",
+                    CtaButtonUrl = "/about"
+                }
+            };
 
-            _pageContextMock
-                .Setup(s => s.GetCurrentPageAsync<SectionAbout>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(sectionAboutPage);
-
-            _aboutPageServiceMock
-                .Setup(s => s.GetAboutDtoAsync(sectionAboutPage, It.IsAny<CancellationToken>()))
+            _sectionAboutPageServiceMock
+                .Setup(s => s.GetAboutDtoAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expectedDto);
 
             var result = await _controller.Index(CancellationToken.None);
 
-            var viewResult = result as ViewResult;
+            Assert.That(result, Is.InstanceOf<ViewResult>());
+            var viewResult = (ViewResult)result;
             Assert.Multiple(() =>
             {
-                Assert.That(viewResult, Is.Not.Null);
-                Assert.That(viewResult?.Model, Is.SameAs(expectedDto));
+                Assert.That(viewResult.ViewName, Is.EqualTo("~/Views/SectionAbout/Index.cshtml"));
+                Assert.That(viewResult.Model, Is.EqualTo(expectedDto));
             });
         }
 
         [Test]
-        public async Task Index_WhenPageContextReturnsNull_ReturnsNotFound()
+        public async Task Index_ReturnsViewResult_WithEmptyAboutDto_WhenServiceReturnsEmpty()
         {
-            _pageContextMock
-                .Setup(s => s.GetCurrentPageAsync<SectionAbout>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync((SectionAbout?)null);
+            var emptyDto = new AboutDto();
+
+            _sectionAboutPageServiceMock
+                .Setup(s => s.GetAboutDtoAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(emptyDto);
 
             var result = await _controller.Index(CancellationToken.None);
 
-            Assert.That(result, Is.TypeOf<NotFoundResult>());
-
-            _aboutPageServiceMock.Verify(
-                s => s.GetAboutDtoAsync(It.IsAny<SectionAbout>(), It.IsAny<CancellationToken>()),
-                Times.Never
-            );
+            Assert.That(result, Is.InstanceOf<ViewResult>());
+            var viewResult = (ViewResult)result;
+            Assert.Multiple(() =>
+            {
+                Assert.That(viewResult.ViewName, Is.EqualTo("~/Views/SectionAbout/Index.cshtml"));
+                Assert.That(viewResult.Model, Is.EqualTo(emptyDto));
+            });
         }
 
         [Test]
-        public async Task Index_PassesCorrectCancellationToken_ToService()
+        public async Task Index_PassesCancellationToken_ToService()
         {
-            var token = new CancellationTokenSource().Token;
-            var sectionAboutPage = new SectionAbout();
+            using var cts = new CancellationTokenSource();
+            var token = cts.Token;
 
-            _pageContextMock
-                .Setup(s => s.GetCurrentPageAsync<SectionAbout>(token))
-                .ReturnsAsync(sectionAboutPage);
-
-            _aboutPageServiceMock
-                .Setup(s => s.GetAboutDtoAsync(sectionAboutPage, token))
-                .ReturnsAsync(new AboutDto { Hero = new HeroDto { Layout = "Default" } });
+            _sectionAboutPageServiceMock
+                .Setup(s => s.GetAboutDtoAsync(token))
+                .ReturnsAsync(new AboutDto())
+                .Verifiable();
 
             await _controller.Index(token);
 
-            _aboutPageServiceMock.Verify(
-                s => s.GetAboutDtoAsync(sectionAboutPage, token),
-                Times.Once
-            );
-        }
-
-        [Test]
-        public async Task Index_ReturnsCorrectViewName()
-        {
-            var sectionAboutPage = new SectionAbout();
-
-            _pageContextMock
-                .Setup(s => s.GetCurrentPageAsync<SectionAbout>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(sectionAboutPage);
-
-            _aboutPageServiceMock
-                .Setup(s => s.GetAboutDtoAsync(sectionAboutPage, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new AboutDto { Hero = new HeroDto { Layout = "Default" } });
-
-            var result = await _controller.Index(CancellationToken.None) as ViewResult;
-
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.ViewName, Is.EqualTo("~/Views/About/Index.cshtml"));
-        }
-
-        [Test]
-        public async Task Index_PassesCorrectPageInstance_ToService()
-        {
-            var sectionAboutPage = new SectionAbout();
-
-            _pageContextMock
-                .Setup(s => s.GetCurrentPageAsync<SectionAbout>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(sectionAboutPage);
-
-            _aboutPageServiceMock
-                .Setup(s => s.GetAboutDtoAsync(sectionAboutPage, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new AboutDto { Hero = new HeroDto { Layout = "Default" } });
-
-            await _controller.Index(CancellationToken.None);
-
-            _aboutPageServiceMock.Verify(
-                s => s.GetAboutDtoAsync(sectionAboutPage, It.IsAny<CancellationToken>()),
-                Times.Once
-            );
-        }
-
-        [Test]
-        public void Index_WhenServiceThrows_ExceptionIsPropagated()
-        {
-            var sectionAboutPage = new SectionAbout();
-
-            _pageContextMock
-                .Setup(s => s.GetCurrentPageAsync<SectionAbout>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(sectionAboutPage);
-
-            _aboutPageServiceMock
-                .Setup(s => s.GetAboutDtoAsync(sectionAboutPage, It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new Exception());
-
-            Assert.ThrowsAsync<Exception>(async () =>
-                await _controller.Index(CancellationToken.None));
+            _sectionAboutPageServiceMock.Verify(s => s.GetAboutDtoAsync(token), Times.Once);
         }
     }
 }
