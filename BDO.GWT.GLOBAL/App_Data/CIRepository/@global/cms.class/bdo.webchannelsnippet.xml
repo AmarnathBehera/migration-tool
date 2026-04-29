@@ -2,7 +2,7 @@
 <cms.class>
   <ClassCodeGenerationSettings>
     <Data>
-      <CodeNameColumn>WebchannelCodeName</CodeNameColumn>
+      <CodeNameColumn>WebChannelCodeName</CodeNameColumn>
       <DisplayNameColumn>WebChannelSnippetDisplayName</DisplayNameColumn>
       <ObjectType>BDO.WebChannelSnippet</ObjectType>
       <UseGuidHashtable>False</UseGuidHashtable>
@@ -23,7 +23,7 @@
       </field>
       <field column="WebChannelSnippetDisplayName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="46b81926-07df-42e1-9649-02b0d8dd9726" />
       <field column="WebChannelSnippetCodeName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7660276b-bc84-4e67-bc28-f33bedcd0e06" />
-      <field column="WebchannelCodeName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7280c1c4-5604-4506-964f-797da87169b5" />
+      <field column="WebChannelCodeName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="b3d72b7f-3b17-4ba2-9197-de64cbd59013" />
     </form>
   </ClassFormDefinition>
   <ClassGUID>b8d0d5cb-4b0a-48fa-a8a4-54dc06ee7bfa</ClassGUID>

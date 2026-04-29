@@ -4,15 +4,15 @@
   <ClassDisplayName>Locations</ClassDisplayName>
   <ClassFormDefinition>
     <form>
-      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="c3da7deb-8f36-4492-bfbf-37ef37fb0317" isPK="true" />
-      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="4d18a7bb-3723-4544-b231-075889e8f8c8" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
-      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="5b2a55ff-2dd9-444f-945f-ded9e649b489" isunique="true" system="true" />
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="21f47719-3b08-4ecb-a265-8087a995092e" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="b217f8de-335e-4f7c-9730-290fdb95aa9d" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="01f7d2ed-e847-473e-8557-139a7890aa33" isunique="true" system="true" />
       <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
         <properties />
       </schema>
     </form>
   </ClassFormDefinition>
-  <ClassGUID>473b3a54-66d4-492b-9133-8460e3d9fbcc</ClassGUID>
+  <ClassGUID>afbf6f00-540b-44f1-b40b-ea7975a6185e</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
   <ClassName>BDO.Locations</ClassName>
   <ClassShortName>BDOLocations</ClassShortName>

@@ -1,7 +1,9 @@
 
+@using BDO.GWT.Core.DTOs
+@using BDO.GWT.Core.DTOs.ReusableFieldsDTOs
 ﻿@using BDO.GWT.Core.Services
+@using BDO.GWT.Core.ViewComponents
 @using BDO.GWT.Global.Components.ViewComponents
-﻿@using BDO.GWT.Global.Components.ViewComponents
 @using BDO.GWT.Web.Core.LiveSite.Components.ViewComponents
 @using BDO.GWT.Xperience
 @using GWTXbyKWeb.Components.ViewComponents
@@ -17,7 +19,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="UTF-8" />
     @{
-        var metaDataSeoDto = await PageContext.GetCurrentPageMetadataAsync();
+        var metaDataSeoDto =
+        ViewData["MetaDataSeoDto"] as MetaDataSEOItemsDto
+        ?? await PageContext.GetCurrentPageMetadataAsync()
+        ?? new MetaDataSEOItemsDto();
+
+        metaDataSeoDto.MetaData ??= new MetaDataDto();
+        metaDataSeoDto.OGMetaData ??= new OGMetaDataDto();
+        metaDataSeoDto.SEOItemsDto ??= new SearchAndSEODto();
+
     }
 
     <title>@metaDataSeoDto.MetaData.MetaTitle</title>
@@ -62,6 +72,7 @@
     @(await Component.InvokeAsync<ScriptsHead>())
     @(await Component.InvokeAsync<StartScriptsHead>())
     @await (Component.InvokeAsync<Cookiebot>())
+    @await (Component.InvokeAsync<Cookiebanner>())
 
     @(await Component.InvokeAsync<ScriptsWhenCookiesAccepted>())
     @(await Component.InvokeAsync<MarketoMunchkincode>())
@@ -82,6 +93,7 @@
     @RenderSection("styles", required: false)
     @await (Component.InvokeAsync<Header>())
     @(await Component.InvokeAsync<ScriptsHead>())
+    @await (Component.InvokeAsync<Breadcrumbs>())
 
     @RenderBody()
 
@@ -92,7 +104,6 @@
 
     
     @await (Component.InvokeAsync<ScriptsBottomBody>())
-
 @(await Component.InvokeAsync<Footer>())
 @await Html.Kentico().PageBuilderScriptsAsync()
 @await (Component.InvokeAsync<ScriptsBottomBody>())

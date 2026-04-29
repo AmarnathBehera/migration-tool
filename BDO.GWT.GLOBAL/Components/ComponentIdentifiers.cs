@@ -8,6 +8,8 @@
         {
             private const string WidgetPrefix = Prefix + "Widget.";
 
+            public const string Button = WidgetPrefix + "Button";
+
             public const string ExternalNavigation = WidgetPrefix + "ExternalNavigation";
 
             public const string Imagewithtext = WidgetPrefix + "ImageWithText";
@@ -19,6 +21,12 @@
             public const string Globallocation = WidgetPrefix + "ViewGlobalLocations";
 
             public const string SocialMediaButtons = WidgetPrefix + "SocialMediaButtons";
+
+            public const string RichText = WidgetPrefix + "RichText";
+
+            public const string AccordionWidget = WidgetPrefix + "AccordionWidget";
+            public const string Form = "Kentico.FormWidget";
+
         }
 
         //sections

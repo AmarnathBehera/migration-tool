@@ -2,7 +2,7 @@
 <cms.resource>
   <ResourceDescription>Localization module data</ResourceDescription>
   <ResourceDisplayName>NITTIN - Xperience Localization</ResourceDisplayName>
-  <ResourceGUID>4bcf18b2-9029-4b99-80f4-b7e59e4d7781</ResourceGUID>
+  <ResourceGUID>5ab00892-5a6c-448a-9df7-7d19a983b65f</ResourceGUID>
   <ResourceIsInDevelopment>False</ResourceIsInDevelopment>
   <ResourceName>XperienceCommunity.Localization</ResourceName>
 </cms.resource>

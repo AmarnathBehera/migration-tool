@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<cms.channel>
-  <ChannelDisplayName>Testchannel</ChannelDisplayName>
-  <ChannelGUID>762cd8de-6e26-4aa8-9180-718b5360638b</ChannelGUID>
-  <ChannelName>Testchannel</ChannelName>
-  <ChannelSize>Standard</ChannelSize>
-  <ChannelType>Website</ChannelType>
-</cms.channel>

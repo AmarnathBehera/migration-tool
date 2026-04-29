@@ -1,8 +1,9 @@
-﻿using System;
+﻿using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
+using CMS.Websites;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
-using BDO.GWT.Core.DTOs;
 namespace BDO.GWT.Core.Services
 {
     public interface IPageContext
@@ -11,6 +12,9 @@ namespace BDO.GWT.Core.Services
         Task<MetaDataSEOItemsDto> GetCurrentPageMetadataAsync(CancellationToken cancellationToken = default);
         bool IsInPreviewMode { get; }
         bool IsInPageBuilderMode { get; }
+        Task<BaseWebPage> GetCurrentPageBasePropertiesAsync(CancellationToken cancellationToken = default);
+        Task<IWebPageFieldsSource> GetAnyPageByWebPageItemId(int webPageItemId, CancellationToken cancellationToken);
+        Task<string?> GetPageTitleByWebPageItemId(int webPageItemId, CancellationToken cancellationToken);
     }
-   
+
 }

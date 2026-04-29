@@ -1,1 +1,12 @@
 # Use this file to catalogue false positives for GitLeaks.
+
+# Added bdo-gwt-xbyk-cms-dev Entra App secret into appsettings.json; secret has been removed and rotated.
+41a4d414985be42a3badc9a1d3b26df1a41bc572:BDO.GWT.GLOBAL/appsettings.json:azure-ad-client-secret:25
+7d807e75fc3e5b3c72a5ef567dc43aebdce7516e:BDO.GWT.GLOBAL/appsettings.json:azure-ad-client-secret:25
+27322b5140893441681282510f71424283929bd3:BDO.GWT.GLOBAL/Program.cs:azure-ad-client-secret:75
+65c2579742b263cf5c150cee620327162e5e0cec:BDO.GWT.GLOBAL/Program.cs:azure-ad-client-secret:52
+00c03e3da28e03f5450454a81ace0d25c36f03ab:BDO.GWT.GLOBAL/Program.cs:generic-api-key:50
+e976c09ac3b67e8d9aeb1734effd16b32121c8d5:BDO.GWT.GLOBAL/appsettings.json:azure-ad-client-secret:35
+
+# Added storage account shared key into appsettings.json; key has been removed and rotated.
+e976c09ac3b67e8d9aeb1734effd16b32121c8d5:BDO.GWT.GLOBAL/appsettings.json:generic-api-key:15

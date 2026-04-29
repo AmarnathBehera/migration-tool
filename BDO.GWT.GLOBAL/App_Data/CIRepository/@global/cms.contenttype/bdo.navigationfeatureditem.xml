@@ -39,14 +39,28 @@
           <Sortable>False</Sortable>
         </settings>
       </field>
-      <field column="FeaturedImageAltText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="80a89765-c97c-48ab-8f89-8fb9730a8df5" visible="true">
+      <field column="FeaturedImageAltText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="211e5471-217b-49da-b3ad-b2e7112b350c" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Image alt text</fieldcaption>
+          <fieldcaption>Featured Image Alt Text</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
         </properties>
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="FeaturedImageFile" columnprecision="0" columntype="contentitemreference" enabled="true" guid="ea7325ac-ba9d-4fe2-9fcd-a426781d0705" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>FeaturedImageFile</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
     </form>

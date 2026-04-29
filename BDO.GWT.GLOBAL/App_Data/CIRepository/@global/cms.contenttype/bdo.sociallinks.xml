@@ -4,10 +4,10 @@
   <ClassDisplayName>SocialLinks</ClassDisplayName>
   <ClassFormDefinition>
     <form>
-      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="ac56deb1-c73f-4f65-bd4a-f2282daf70eb" isPK="true" />
-      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="66936455-616a-41bc-b838-8f4e310f563f" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
-      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="a3b8bb0a-5e25-4fb1-8432-37e66977fc77" isunique="true" system="true" />
-      <field column="Alttext" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="1b1518e9-5734-446c-ae07-055f076598f6" visible="true">
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="dbbc728c-8fa5-4095-8a84-53ea50f78199" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="8f870eeb-8d48-47ec-abf1-690456c40491" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="bb0598c4-c56b-4923-82cd-1a96f1c9ed6d" isunique="true" system="true" />
+      <field column="Alttext" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7914513e-1e9e-4081-8786-75e7055187f0" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Alttext</fieldcaption>
@@ -17,20 +17,20 @@
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
-      <field column="AriaLabel" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="2e6a0f06-a175-4d16-a373-d5a13a3f3e4d" visible="true">
+      <field column="AriaLabel" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="a1168726-9416-4657-ace8-c952eb7b063e" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Aria-Label</fieldcaption>
+          <fieldcaption>AriaLabel</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
         </properties>
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
-      <field column="Icontype" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="840d5dac-e409-404d-8da1-1db702eb2872" visible="true">
+      <field column="Icontype" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="ee45f457-0bfe-4840-9712-dc98fda30dbe" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Icon type</fieldcaption>
+          <fieldcaption>Icon Type</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
         </properties>
         <settings>
@@ -47,7 +47,7 @@ linkedin;LinkedIn
           <OptionsValueSeparator>;</OptionsValueSeparator>
         </settings>
       </field>
-      <field column="Url" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="c9b8296d-9550-49aa-a285-63ed169f8d27" visible="true">
+      <field column="Url" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="cf481497-8c70-47c7-b18f-1250dad74036" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Url</fieldcaption>
@@ -59,7 +59,7 @@ linkedin;LinkedIn
       </field>
     </form>
   </ClassFormDefinition>
-  <ClassGUID>464907cb-9fcf-4b70-b838-9c3a229c59af</ClassGUID>
+  <ClassGUID>a9883aac-c952-45c7-a327-59d8eab46a3f</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
   <ClassName>BDO.SocialLinks</ClassName>
   <ClassShortName>BDOSocialLinks</ClassShortName>

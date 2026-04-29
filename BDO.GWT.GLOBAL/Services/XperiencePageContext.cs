@@ -9,6 +9,7 @@ using Kentico.Content.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Http;
+using Org.BouncyCastle.Crypto;
 using System;
 using System.Linq;
 using System.Threading;
@@ -60,10 +61,16 @@ public class XperiencePageContext : IPageContext
         if (!_webPageDataContextRetriever.TryRetrieve(out var ctx))
             return null;
 
-        if (ctx.WebPage is T typedPage)
-            return typedPage;
+        var query = new ContentItemQueryBuilder()
+            .ForContentType(ctx.WebPage.ContentTypeName, q => q
+                .ForWebsite(ctx.WebPage.WebsiteChannelName)
+                .TopN(1)
+                .WithLinkedItems(1))
+            .InLanguage(ctx.WebPage.LanguageName);
 
-        return null;
+        var result = await _queryExecutor.GetMappedWebPageResult<T>(query, cancellationToken: cancellationToken);
+
+        return result.FirstOrDefault();
     }
 
     public async Task<MetaDataSEOItemsDto?> GetCurrentPageMetadataAsync(CancellationToken cancellationToken = default)
@@ -161,4 +168,106 @@ public class XperiencePageContext : IPageContext
 
         return page;
     }
+
+
+    /// <summary>
+    /// Gets the current page's parent ID and tree path.
+    /// Used to figure out where the page sits in the content tree,
+    /// </summary>
+    public async Task<BaseWebPage> GetCurrentPageBasePropertiesAsync(CancellationToken cancellationToken = default)
+    {
+        var canRetrieve = _webPageDataContextRetriever.TryRetrieve(out var ctx);
+        if (!canRetrieve || ctx.WebPage == null)
+        {
+            return new BaseWebPage();
+        }
+        var query = new ContentItemQueryBuilder()
+
+              .ForContentType(ctx.WebPage.ContentTypeName, q => q
+                .ForWebsite(ctx.WebPage.WebsiteChannelName)
+              .TopN(1))
+              .InLanguage(ctx.WebPage.LanguageName);
+
+        var result = await _queryExecutor.GetWebPageResult(
+          query,
+          item => new BaseWebPage
+          {
+              WebPageItemParentID = item.WebPageItemParentID,
+              WebPageItemTreePath = item.WebPageItemTreePath
+          },
+
+          new ContentQueryExecutionOptions(),
+          cancellationToken);
+        var curPageMeta = result.FirstOrDefault() ?? new BaseWebPage();
+        return curPageMeta;
+    }
+
+
+
+    /// <summary>
+    /// Fetches any page by its ID, regardless of content type.
+    /// Returns null if not found.
+    /// </summary>
+    public async Task<IWebPageFieldsSource> GetAnyPageByWebPageItemId(int webPageItemId, CancellationToken cancellationToken)
+    {
+        var options = new ContentQueryExecutionOptions
+        {
+            ForPreview = _websiteChannelContext.IsPreview,
+            IncludeSecuredItems = false
+        };
+
+        var builder = new ContentItemQueryBuilder()
+     .ForContentTypes(config => config
+         .ForWebsite(_websiteChannelContext.WebsiteChannelName)
+     )
+     .Parameters(q => q
+         .Where(w => w.WhereEquals(
+             nameof(IWebPageContentQueryDataContainer.WebPageItemID),
+             webPageItemId))
+         .TopN(1)
+     );
+
+        var results = await _queryExecutor.GetMappedWebPageResult<IWebPageFieldsSource>(builder, options, cancellationToken);
+        return results.FirstOrDefault();
+    }
+
+
+    /// <summary>
+    /// Gets the display title for a page by its ID.
+    /// Falls back through Title → MetadataTitle → internal page name.
+    /// </summary>
+    public async Task<string> GetPageTitleByWebPageItemId(int webPageItemId, CancellationToken cancellationToken)
+    {
+        var builder = new ContentItemQueryBuilder()
+            .ForContentTypes(config => config
+                .ForWebsite(_websiteChannelContext.WebsiteChannelName)
+            )
+            .Parameters(q => q
+                .Where(w => w.WhereEquals(
+                    nameof(IWebPageContentQueryDataContainer.WebPageItemID), webPageItemId))
+                .TopN(1)
+            );
+
+        var results = await _queryExecutor.GetWebPageResult(
+            builder,
+            item =>
+            {
+                if (item.TryGetValue("Title", out string title) && !string.IsNullOrEmpty(title))
+                {
+                    return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(title.ToLower());
+                }
+
+                if (item.TryGetValue("MetadataTitle", out string metaTitle) && !string.IsNullOrEmpty(metaTitle))
+                {
+                    return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(metaTitle.ToLower());
+                }
+
+                return item.WebPageItemName;
+            },
+            new ContentQueryExecutionOptions { ForPreview = _websiteChannelContext.IsPreview },
+            cancellationToken);
+
+        return results.FirstOrDefault();
+    }
+
 }

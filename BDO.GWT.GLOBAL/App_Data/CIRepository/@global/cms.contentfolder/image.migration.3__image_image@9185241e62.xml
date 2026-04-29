@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentfolder>
+  <ContentFolderCreatedByUserID>
+    <CodeName>administrator</CodeName>
+    <GUID>6415b8ce-8072-4bcd-8e48-9d7178b826b7</GUID>
+    <ObjectType>cms.user</ObjectType>
+  </ContentFolderCreatedByUserID>
+  <ContentFolderCreatedWhen>2026-03-24 09:21:39Z</ContentFolderCreatedWhen>
+  <ContentFolderDisplayName>image</ContentFolderDisplayName>
+  <ContentFolderGUID>f1452b83-e1d9-448b-af98-44e0910f60e0</ContentFolderGUID>
+  <ContentFolderModifiedByUserID>
+    <CodeName>administrator</CodeName>
+    <GUID>6415b8ce-8072-4bcd-8e48-9d7178b826b7</GUID>
+    <ObjectType>cms.user</ObjectType>
+  </ContentFolderModifiedByUserID>
+  <ContentFolderName>image.migration.3</ContentFolderName>
+  <ContentFolderParentFolderID>
+    <CodeName>Image.migration.2</CodeName>
+    <GUID>4907edb8-2e44-4750-b7e6-ae722ee70f2e</GUID>
+    <ObjectType>cms.contentfolder</ObjectType>
+  </ContentFolderParentFolderID>
+  <ContentFolderTreePath>/image/image</ContentFolderTreePath>
+  <ContentFolderWorkspaceID>
+    <CodeName>MediaLibrariesMigration.Workspace</CodeName>
+    <GUID>a4273e1e-cbf6-49ef-9312-18eb4bc1ae8c</GUID>
+    <ObjectType>cms.workspace</ObjectType>
+  </ContentFolderWorkspaceID>
+</cms.contentfolder>

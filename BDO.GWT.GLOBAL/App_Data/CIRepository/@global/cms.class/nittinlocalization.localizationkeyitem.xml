@@ -3,18 +3,18 @@
   <ClassDisplayName>Localization Key</ClassDisplayName>
   <ClassFormDefinition>
     <form>
-      <field column="LocalizationKeyItemId" columntype="integer" enabled="true" guid="1c3ba5f4-b8dc-4199-9721-6b1dd1d810ac" isPK="true" />
-      <field column="LocalizationKeyItemGuid" columnprecision="0" columntype="guid" enabled="true" guid="645011ab-8a82-4093-bd22-aef969b9a112" visible="true" />
-      <field column="LocalizationKeyItemName" columnprecision="0" columnsize="300" columntype="text" enabled="true" guid="b7263281-7e67-494b-a053-cacddbe702c1" visible="true" />
-      <field allowempty="true" column="LocalizationKeyItemDescription" columnprecision="0" columntype="longtext" enabled="true" guid="7b974e05-fa8e-46f9-87c5-7b1b69b1dd6b" visible="true" />
+      <field column="LocalizationKeyItemId" columntype="integer" enabled="true" guid="28a4ea2e-3a53-460d-87a8-5eed90dac03b" isPK="true" />
+      <field column="LocalizationKeyItemGuid" columnprecision="0" columntype="guid" enabled="true" guid="4bc146ed-73f6-48cc-8bb1-05b822dc12ae" visible="true" />
+      <field column="LocalizationKeyItemName" columnprecision="0" columnsize="300" columntype="text" enabled="true" guid="c144724f-e442-46cd-bae2-7c3a6224dfdc" visible="true" />
+      <field allowempty="true" column="LocalizationKeyItemDescription" columnprecision="0" columntype="longtext" enabled="true" guid="c9d98fb2-0f6d-4509-a7c8-6b070b5d734a" visible="true" />
     </form>
   </ClassFormDefinition>
-  <ClassGUID>df464344-84ea-4d71-a666-517940a524d2</ClassGUID>
+  <ClassGUID>a09e1145-68d2-4b80-976d-67e12af9072e</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
   <ClassName>NittinLocalization.LocalizationKeyItem</ClassName>
   <ClassResourceID>
     <CodeName>XperienceCommunity.Localization</CodeName>
-    <GUID>4bcf18b2-9029-4b99-80f4-b7e59e4d7781</GUID>
+    <GUID>5ab00892-5a6c-448a-9df7-7d19a983b65f</GUID>
     <ObjectType>cms.resource</ObjectType>
   </ClassResourceID>
   <ClassTableName>NittinLocalization_LocalizationKeyItem</ClassTableName>

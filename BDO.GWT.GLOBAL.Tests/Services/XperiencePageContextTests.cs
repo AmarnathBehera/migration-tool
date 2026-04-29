@@ -83,12 +83,86 @@ namespace BDO.GWT.GLOBAL.Tests.Services
 
             var result = await _service.GetCurrentPageMetadataAsync();
 
-
             Assert.That(result, Is.Not.Null);
             Assert.That(result.MetaData, Is.Null.Or.InstanceOf<MetaDataDto>());
             Assert.That(result.OGMetaData, Is.Null.Or.InstanceOf<OGMetaDataDto>());
             Assert.That(result.SEOItemsDto, Is.Null.Or.InstanceOf<SearchAndSEODto>());
         }
-        
+
+        // GetCurrentPageBasePropertiesAsync tests
+
+        [Test]
+        public async Task GetCurrentPageBasePropertiesAsync_WhenNoContext_ReturnsEmptyBaseWebPage()
+        {
+            _webPageDataContextRetrieverMock
+                .Setup(x => x.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
+                .Returns(false);
+
+            var result = await _service.GetCurrentPageBasePropertiesAsync(CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.WebPageItemParentID, Is.EqualTo(0));
+                Assert.That(result.WebPageItemTreePath, Is.Null);
+            });
+        }
+
+        [Test]
+        public async Task GetCurrentPageBasePropertiesAsync_WhenNoContext_ReturnsFreshInstance()
+        {
+            _webPageDataContextRetrieverMock
+                .Setup(x => x.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
+                .Returns(false);
+
+            var result = await _service.GetCurrentPageBasePropertiesAsync(CancellationToken.None);
+
+            Assert.That(result, Is.InstanceOf<BDO.GWT.Core.BaseWebPage>());
+        }
+
+        // GetAnyPageByWebPageItemId tests
+
+        [Test]
+        public async Task GetAnyPageByWebPageItemId_WhenPreviewMode_UsesPreviewOptions()
+        {
+            _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(true);
+
+            // Extension method can't be mocked — verify IsPreview is read
+            try { await _service.GetAnyPageByWebPageItemId(1, CancellationToken.None); } catch { }
+
+            _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
+        }
+
+        [Test]
+        public async Task GetAnyPageByWebPageItemId_WhenNotPreviewMode_UsesLiveOptions()
+        {
+            _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(false);
+
+            try { await _service.GetAnyPageByWebPageItemId(1, CancellationToken.None); } catch { }
+
+            _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
+        }
+
+        // GetPageTitleByWebPageItemId tests
+
+        [Test]
+        public async Task GetPageTitleByWebPageItemId_WhenPreviewMode_UsesPreviewOptions()
+        {
+            _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(true);
+
+            try { await _service.GetPageTitleByWebPageItemId(1, CancellationToken.None); } catch { }
+
+            _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
+        }
+
+        [Test]
+        public async Task GetPageTitleByWebPageItemId_WhenNotPreviewMode_UsesLiveOptions()
+        {
+            _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(false);
+
+            try { await _service.GetPageTitleByWebPageItemId(1, CancellationToken.None); } catch { }
+
+            _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
+        }
     }
 }

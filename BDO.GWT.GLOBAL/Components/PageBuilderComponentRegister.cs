@@ -1,12 +1,14 @@
 ﻿using BDO;
+using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ButtonWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ExternalNavigationWidget;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ImageWithTextWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.QuoteCardWidget;
+using BDO.GWT.Web.Widgets.RichTextWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ViewGlobalLocations;
 using BDO.GWT.Xperience.LiveSite.Components.Section;
 using Kentico.PageBuilder.Web.Mvc;
-using Kentico.PageBuilder.Web.Mvc.PageTemplates;
+using BDO.GWT.Web.Widgets.AccordionWidget;
+using BDO.GWT.GLOBAL.Components.Widget.ImageWithTextWidget;
 
 // Widgets
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.Imagewithtext,typeof(ImageWithTextWidget),"ImageWithText",typeof(ImageWithTextWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
@@ -14,6 +16,9 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.ExternalNavigation,typeof(ExternalNavigationWidget),"ExternalNavigationWidget",typeof(ExternalNavigationWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.TiledLink,typeof(TiledLinkSectionWidget),"Tiled Link Widget",typeof(TiledLinkSectionWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.Globallocation,typeof(ViewGlobalLocationsWidget),"View Global Location",typeof(ViewGlobalLocationsWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.RichText,typeof(RichTextWidget), "Rich Text", typeof(RichTextWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.AccordionWidget,typeof(AccordionWidget), "Accordion Widget", typeof(AccordionWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.Button, typeof(ButtonWidget), "Button", typeof(ButtonWidgetProperties), AllowCache = true, IconClass = "icon-xml-tag")]
 
 // Sections
 [assembly: RegisterSection(identifier: ComponentIdentifiers.Sections.Container,name: "Container",propertiesType: typeof(BaseSectionProperties),customViewName: "~/Components/Section/SectionView/_ContainerSection.cshtml")]
