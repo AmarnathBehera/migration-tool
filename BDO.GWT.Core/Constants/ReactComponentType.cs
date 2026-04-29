@@ -26,7 +26,8 @@ public static class ReactComponentType
     public const string TiledLinkSectionWidget = "TiledLinkSectionWidget";
     public const string CookieBanner = "CookieBanner";
     public const string AccordionWidget = "AccordionWidget";
-    
+    public const string ContactPageDescriptionText = "ContactPageDescriptionText";
+
 
     //Below are the guid constants for the above components.
     public const string QuoteCardWidgetGUID = "5c570fe5-fc60-4efd-b7eb-7da977e486ab";
@@ -44,7 +45,8 @@ public static class ReactComponentType
     public const string BreadcrumbsGUID = "77248460-7937-4255-a9fe-7340a4d1f464";
     public const string CookieBannerGUID = "6e906e0a-6d90-4776-8e90-ff2bdcaa4213";
     public const string AccordionWidgetGUID = "60875e95-b88e-4db3-b4bf-7c2926a2485c";
-
+    public const string ContactPageDescriptionTextGUID = "cd1bc3e5-c6b6-4212-9fab-a86bdc570462";
+    public const string ErrorPageContentGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
 }
 
 
@@ -66,9 +68,9 @@ public static class ReactComponentType
 
 //614b9a3d-18d7-43f4-9f8f-a4bc99e99841
 
-//3fdef59e-4ab3-4047-abb8-c7b52408adc2
+//
 
-//cd1bc3e5-c6b6-4212-9fab-a86bdc570462
+//
 
 //7d6afe7a-e672-43d4-b9e8-aad67c339c56
 

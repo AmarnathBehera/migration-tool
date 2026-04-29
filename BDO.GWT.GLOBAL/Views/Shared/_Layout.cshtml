@@ -1,5 +1,6 @@
 
 ﻿@using BDO.GWT.Core.Services
+@using BDO.GWT.Core.ViewComponents
 @using BDO.GWT.Global.Components.ViewComponents
 @using BDO.GWT.Web.Core.LiveSite.Components.ViewComponents
 @using BDO.GWT.Xperience
@@ -78,6 +79,7 @@
     @RenderSection("styles", required: false)
     @await (Component.InvokeAsync<Header>())
     @(await Component.InvokeAsync<ScriptsHead>())
+    @await (Component.InvokeAsync<Breadcrumbs>())
 
     @RenderBody()
 

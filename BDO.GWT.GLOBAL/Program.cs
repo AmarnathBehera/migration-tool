@@ -56,13 +56,6 @@ builder.Services.Configure<WebEncoderOptions>(options =>
     options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All);
 });
 
-//builder.Services.AddDomain();
-
-//builder.Services.AddWeb();
-
-//builder.Services.AddLiveSite();
-
-//builder.Services.AddLiveSiteInfrastructure();
 builder.Services.Configure<ReactOptions>(
     builder.Configuration.GetSection("ReactOptions"));
 builder.Services.Configure<ReactCachingOptions>(
@@ -80,7 +73,6 @@ builder.Services.AddContentServices();
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddScoped<IPageBuilderService, PageBuilderService>();
 builder.Services.AddScoped<IContentService, ContentService>();
-
 builder.Services.AddXperience();
 builder.Services.AddControllersWithViews();
 builder.Services.AddXperienceCommunityLocalization();
@@ -134,7 +126,6 @@ app.UseStaticFiles();
 app.UseCookiePolicy();
 
 app.UseAuthentication();
-// app.UseAuthentication();
 
 app.UseKentico();
 

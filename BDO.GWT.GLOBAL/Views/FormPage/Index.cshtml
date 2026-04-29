@@ -3,6 +3,7 @@
 @using BDO.GWT.Core.Services
 @using BDO.GWT.Xperience.LiveSite.Services
 @using Kentico.Content.Web.Mvc
+@inject IFormBuilderService FormBuilder
 @inject IReactService ReactService
 @model BDO.GWT.Web.Core.DTOs.Pages.FormPageDto
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
@@ -26,6 +27,7 @@
 
 }
 
+
 @(await ReactService.RenderComponentAsync(
     pageId,
     ReactComponentType.Hero,
@@ -35,27 +37,39 @@
        data = Model.Hero,
     }, Context.RequestAborted))
 
-
-
-<div>
-    <div>
-        @* @ReactHelper.RenderComponent(Html, "ContactPageDescriptionText", Model) *@
+<div class="section-container section-container--items section-container--two-thirds gap--xl py-20">
+    <div class="contact-form-container">
+        @(await ReactService.RenderComponentAsync(
+                pageId,
+                ReactComponentType.ContactPageDescriptionText,
+                ReactComponentType.ContactPageDescriptionTextGUID,
+                Model, Context.RequestAborted))
 
         @if (Model.FormType != null && Model.FormType == "embedCode")
         {
             @Html.Raw(Model.EmbedCode)
         }
 
+        @if (Model.FormType != null && Model.FormType == "form")
+        {
+            @await FormBuilder.GetFormBuilderWidget(Html, Model.Form)
+        }
+   
     </div>
     <div>
-        
-            @await Html.Kentico().EditableAreaAsync(
-            "mainContent", // Unique identifier
-                        new EditableAreaOptions
-                        {
-
-                            AllowedWidgets = widgetsList
-                        })
+        @await Html.Kentico().EditableAreaAsync(
+        "topArea", // Unique identifier
+                new EditableAreaOptions
+                {
+                  AllowedWidgets = widgetsList
+                })
     </div>
 </div>
+@await Html.Kentico().EditableAreaAsync(
+        "bottomArea", // Unique identifier
+                new EditableAreaOptions
+                {
+                  AllowedWidgets = widgetsList
+                })
+
  
