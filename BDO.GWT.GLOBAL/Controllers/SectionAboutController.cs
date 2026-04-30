@@ -1,12 +1,25 @@
 ﻿using BDO.GWT.Core.Services;
 using BDO.GWT.Web.Core.Services;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BDO.GWT.Web.Controllers
 {
-    public class SectionAboutController : AboutController<SectionAbout>
+    public class SectionAboutController : Controller
     {
-        public SectionAboutController(IPageContext sectionAboutContext, IAboutPageService<SectionAbout> aboutPageService) : base(sectionAboutContext, aboutPageService)
+        private readonly ISectionAboutPageService _sectionAboutPageService;
+
+        public SectionAboutController(ISectionAboutPageService aboutPageService)
         {
+            _sectionAboutPageService = aboutPageService;
+        }
+
+        public async Task<IActionResult> Index(CancellationToken cancellationToken)
+        {
+            var pageDto = await _sectionAboutPageService.GetAboutDtoAsync(cancellationToken);
+
+            return View("~/Views/SectionAbout/Index.cshtml", pageDto);
         }
     }
-}
+}   

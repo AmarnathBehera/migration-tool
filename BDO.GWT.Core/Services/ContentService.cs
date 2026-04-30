@@ -313,6 +313,11 @@
         {
             return _websiteChannelContext.WebsiteChannelName;
         }
+
+        public async Task<T?> RetrieveCurrentPageAsync<T>(RetrieveCurrentPageParameters parameters, CancellationToken cancellationToken = default) where T : class
+        {
+            return await _contentRetriever.RetrieveCurrentPage<T>(parameters, cancellationToken);
+        }
     }
 }
 

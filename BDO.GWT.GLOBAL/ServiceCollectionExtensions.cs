@@ -49,7 +49,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IButtonUrlRetriever, ButtonUrlRetriever>();
         serviceCollection.AddScoped<IContentRetrieverWrapper, ContentRetrieverWrapper>();
         serviceCollection.AddScoped<IHeroService, HeroService>();
-        serviceCollection.AddScoped(typeof(IAboutPageService<>), typeof(AboutPageService<>));
+        serviceCollection.AddScoped<ISectionAboutPageService, SectionAboutPageService>();
+        serviceCollection.AddScoped<IAboutPageService, AboutPageService>();
         serviceCollection.AddScoped<ISectionPeoplePageService, SectionPeoplePageService>();
         serviceCollection.AddScoped<ICardsService, CardsService>();
         serviceCollection.AddScoped<IPeopleCardsService, PeopleCardsService>();

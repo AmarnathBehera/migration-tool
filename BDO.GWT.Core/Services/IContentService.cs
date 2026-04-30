@@ -88,5 +88,6 @@
         public string GetCurrentSiteLogoImageUrlAsync();
 
         public string GetCurrentSiteLegalNameAsync();
+        Task<T?> RetrieveCurrentPageAsync<T>(RetrieveCurrentPageParameters parameters, CancellationToken cancellationToken = default) where T : class;
     }
 }
