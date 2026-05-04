@@ -313,6 +313,10 @@
         {
             return _websiteChannelContext.WebsiteChannelName;
         }
+        public int GetCurrentSiteIDAsync()
+        {
+            return _websiteChannelContext.WebsiteChannelID;
+        }
 
         public async Task<T?> RetrieveCurrentPageAsync<T>(RetrieveCurrentPageParameters parameters, CancellationToken cancellationToken = default) where T : class
         {

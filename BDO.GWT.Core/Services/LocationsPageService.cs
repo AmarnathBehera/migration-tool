@@ -98,8 +98,6 @@ public class LocationsPageService : ILocationsPageService
            cancellationToken
        )).ToList();
 
-        var urlByPageNodeId = page.GetUrl().RelativePath;
-
         var locationsList = new List<LocalLocationsDto>
         {new LocalLocationsDto
         {

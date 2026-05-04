@@ -88,6 +88,9 @@
         public string GetCurrentSiteLogoImageUrlAsync();
 
         public string GetCurrentSiteLegalNameAsync();
+
+        public int GetCurrentChannelID();
         Task<T?> RetrieveCurrentPageAsync<T>(RetrieveCurrentPageParameters parameters, CancellationToken cancellationToken = default) where T : class;
+
     }
 }

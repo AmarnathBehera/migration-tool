@@ -6,10 +6,10 @@
 @using Kentico.Xperience.Admin.Base.Forms
 @model (BDO.GWT.Core.DTOs.Pages.PersonDto PersonDto, BDO.GWT.Core.DTOs.SchemaMarkups.PersonSchemaMarkupDto PersonSchemaMarkupDto)
 @using System.Collections.Generic
-
 @using Kentico.PageBuilder.Web.Mvc
 @using Kentico.Web.Mvc
 
+@inject IFormBuilderService FormBuilder
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
 
@@ -34,12 +34,6 @@
         ComponentIdentifiers.Widgets.RichText,
         //ComponentIdentifiers.Widgets.HTML,
     };
-    var widgetProperties2 = new FormWidgetProperties()
-    {
-        SelectedForm = new List<ObjectRelatedItem>() { new ObjectRelatedItem { ObjectCodeName = "bdo_contactpeoplewithemail" } },
-        AfterSubmitMode = FormAfterSubmitModeConstants.DISPLAY_MESSAGE,
-        AfterSubmitDisplayText = "Thank you for your input!"
-    };
 }
 
 @* @section SchemaMarkup {
@@ -57,46 +51,22 @@
         new { data = Model.PersonDto },
         Context.RequestAborted))
 
-
 @if (this.Model.PersonDto.ParentEnableForm && this.Model.PersonDto.EnableForm)
 {
     <div class="section-container section-container--md">
         <div class="ktc-default-section">
-            @await Html.Kentico().RenderStandaloneWidgetAsync(SystemComponentIdentifiers.FORM_WIDGET_IDENTIFIER, widgetProperties2);
-            @* @await Component.InvokeAsync("Form", new { formName = "bdo_contactpeoplewithemail" })
-            @Html.Raw("bdo_contactpeoplewithemail") *@
+            @await FormBuilder.GetFormBuilderWidget(Html, "bdo_contactpeoplewithemail")
         </div>
     </div>
 }
-<p> form ends here</p>
-<div class="elevated">
+<div>
 @await Html.Kentico().EditableAreaAsync(
 "mainContent", // Unique identifier
     new EditableAreaOptions
     {
-
         AllowedWidgets = widgetsList
     })
     </div>
 @* @await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html)
 
 @PageBuilderService.GetPageBuilderScripts(Html) *@
-
-
-
-
-
-
-@{
-    // Prepares properties for the Form widget
-    var widgetProperties = new FormWidgetProperties()
-    {
-        SelectedForm = new List<ObjectRelatedItem>() { new ObjectRelatedItem { ObjectCodeName = "FormCodeName" } },
-        AfterSubmitMode = FormAfterSubmitModeConstants.DISPLAY_MESSAGE,
-        AfterSubmitDisplayText = "Thank you for your input!"
-    };
-}
-
-
-@* Renders the Form widget *@
-@await Html.Kentico().RenderStandaloneWidgetAsync(SystemComponentIdentifiers.FORM_WIDGET_IDENTIFIER, widgetProperties);

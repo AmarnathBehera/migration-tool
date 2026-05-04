@@ -1,4 +1,6 @@
-﻿using BDO.GWT.Core.Services;
+﻿using BDO.GWT.Core;
+using BDO.GWT.Core.Services;
+using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,18 +9,19 @@ namespace BDO.GWT.Web.Controllers;
 
 public class LocationsController : Controller
 {
+    private readonly IContentService _contentService;
     private readonly ILocationsPageService _locationsPageService;
-    private readonly IPageContext _locationsPageContext;
 
-    public LocationsController(ILocationsPageService locationsPageService,IPageContext locationsPageContext)
+    public LocationsController(IContentService contentService, ILocationsPageService locationsPageService)
     {
+        _contentService = contentService;
         _locationsPageService = locationsPageService;
-        _locationsPageContext = locationsPageContext;
     }
 
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        var currentPage = await _locationsPageContext.GetCurrentPageAsync<Locations>(cancellationToken);
+        var currentPage = await _contentService.RetrieveCurrentPageAsync<Locations>(
+            new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
 
         if (currentPage is null)
             return NotFound();
