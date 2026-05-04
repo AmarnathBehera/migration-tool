@@ -11,7 +11,6 @@
 
 using System;
 using System.Collections.Generic;
-using CMS.ContentEngine;
 
 namespace BDO
 {
@@ -41,7 +40,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataTeaserImage.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataTeaserImage { get; set; }
+		public IEnumerable<ContentAttachment> MetadataTeaserImage { get; set; }
 
 
 		/// <summary>
