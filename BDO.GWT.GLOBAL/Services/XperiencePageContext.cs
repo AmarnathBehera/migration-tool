@@ -55,7 +55,7 @@ public class XperiencePageContext : IPageContext
         }
     }
 
-    public async Task<T?> GetCurrentPageAsync<T>(CancellationToken cancellationToken = default)
+    public async Task<T> GetCurrentPageAsync<T>(CancellationToken cancellationToken = default)
         where T : class
     {
         if (!_webPageDataContextRetriever.TryRetrieve(out var ctx))
@@ -73,7 +73,7 @@ public class XperiencePageContext : IPageContext
         return result.FirstOrDefault();
     }
 
-    public async Task<MetaDataSEOItemsDto?> GetCurrentPageMetadataAsync(CancellationToken cancellationToken = default)
+    public async Task<MetaDataSEOItemsDto> GetCurrentPageMetadataAsync(CancellationToken cancellationToken = default)
     {
         var canRetrieve = _webPageDataContextRetriever.TryRetrieve(out var ctx);
 
@@ -81,92 +81,84 @@ public class XperiencePageContext : IPageContext
             return null;
 
         var webPageItemId = ctx.WebPage.WebPageItemID;
-        var request = _httpContextAccessor.HttpContext?.Request;
 
-       
         var pages = await _contentRetriever.RetrieveAllPages<IWebPageFieldsSource>(
-            new RetrieveAllPagesParameters
-            {
-                LinkedItemsMaxLevel = 5
-            },
-            query =>
-            {
-                query.Where(w =>
-                    w.WhereEquals("WebPageItemID", webPageItemId)
-                     .WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID)
-                );
-            },
+            new RetrieveAllPagesParameters { LinkedItemsMaxLevel = 5 },
+            query => query.Where(w =>
+                w.WhereEquals("WebPageItemID", webPageItemId)
+                 .WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID)),
             cacheSettings: RetrievalCacheSettings.CacheDisabled,
             configureModel: (container, p) => Task.FromResult(p),
             cancellationToken: cancellationToken
         );
 
-        
-        var page = pages?.Select(p =>
-        {
-            var result = new MetaDataSEOItemsDto();
-
-            if (p is IMetadata metadata)
-            {
-                result.MetaData = new MetaDataDto
-                {
-                    MetaTitle = metadata.MetadataTitle,
-                    MetaDescription = metadata.MetadataDescription,
-                    MetaTeaserImageAltText = metadata.MetadataTeaserImageAltText,
-                    MetaCanonical = metadata.MetadataCanonical,
-                    
-                };
-            }
-
-            if (p is IOGMetadataFields ogMetadata)
-            {
-                result.OGMetaData = new OGMetaDataDto
-                {
-                    MetadataOGTitle = ogMetadata.MetadataOGTitle,
-                    MetadataOGDescription = ogMetadata.MetadataOGDescription,
-                    MetadataOGImage = ogMetadata.MetadataOGImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
-                   
-                };
-            }
-
-            if (p is ISearchAndSEO seo)
-            {
-                result.SEOItemsDto = new SearchAndSEODto
-                {
-                    IncludeInSitemap = seo.IncludeInSitemap,
-                    MetadataNofollow = seo.MetadataNofollow,
-                    MetadataNoindex = seo.MetadataNoindex
-                };
-            }
-
-            return result;
-
-        }).FirstOrDefault();
+        var page = pages?.Select(MapToMetaDataSEOItemsDto).FirstOrDefault();
 
         if (page == null)
             return null;
 
-        
-        if (request != null && page.OGMetaData != null)
-        {
-            var baseUri = new Uri($"{request.Scheme}://{request.Host}/");
-            page.OGMetaData.Url = new Uri(baseUri, request.Path.Value ?? "/").ToString();
-
-            if (!string.IsNullOrEmpty(page.OGMetaData.MetadataOGImage))
-            {
-                var imageUrl = page.OGMetaData.MetadataOGImage;
-
-
-                if (imageUrl.StartsWith("~/"))
-                {
-                    imageUrl = imageUrl.Substring(2);
-                }
-
-                page.OGMetaData.MetadataOGImage = new Uri(baseUri, imageUrl).ToString();
-            }
-        }
+        var request = _httpContextAccessor.HttpContext?.Request;
+        if (request != null)
+            ResolveOGMetaDataUrls(page, request);
 
         return page;
+    }
+
+    private static MetaDataSEOItemsDto MapToMetaDataSEOItemsDto(IWebPageFieldsSource p)
+    {
+        var result = new MetaDataSEOItemsDto();
+
+        if (p is IMetadata metadata)
+        {
+            result.MetaData = new MetaDataDto
+            {
+                MetaTitle = metadata.MetadataTitle,
+                MetaDescription = metadata.MetadataDescription,
+                MetaTeaserImageAltText = metadata.MetadataTeaserImageAltText,
+                MetaCanonical = metadata.MetadataCanonical,
+            };
+        }
+
+        if (p is IOGMetadataFields ogMetadata)
+        {
+            result.OGMetaData = new OGMetaDataDto
+            {
+                MetadataOGTitle = ogMetadata.MetadataOGTitle,
+                MetadataOGDescription = ogMetadata.MetadataOGDescription,
+                MetadataOGImage = ogMetadata.MetadataOGImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+            };
+        }
+
+        if (p is ISearchAndSEO seo)
+        {
+            result.SEOItemsDto = new SearchAndSEODto
+            {
+                IncludeInSitemap = seo.IncludeInSitemap,
+                MetadataNofollow = seo.MetadataNofollow,
+                MetadataNoindex = seo.MetadataNoindex
+            };
+        }
+
+        return result;
+    }
+
+    private static void ResolveOGMetaDataUrls(MetaDataSEOItemsDto page, HttpRequest request)
+    {
+        if (page.OGMetaData == null)
+            return;
+
+        var baseUri = new Uri($"{request.Scheme}://{request.Host}/");
+        page.OGMetaData.Url = new Uri(baseUri, request.Path.Value ?? "/").ToString();
+
+        if (string.IsNullOrEmpty(page.OGMetaData.MetadataOGImage))
+            return;
+
+        var imageUrl = page.OGMetaData.MetadataOGImage;
+
+        if (imageUrl.StartsWith("~/"))
+            imageUrl = imageUrl.Substring(2);
+
+        page.OGMetaData.MetadataOGImage = new Uri(baseUri, imageUrl).ToString();
     }
 
 
