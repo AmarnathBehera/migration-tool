@@ -59,6 +59,7 @@ builder.Services.Configure<WebEncoderOptions>(options =>
 {
     options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All);
 });
+builder.Services.AddTransient<IMultiChoiceOptionsProviderActivator, MultiChoiceOptionsProviderActivator>();
 
 builder.Services.Configure<ReactOptions>(
     builder.Configuration.GetSection("ReactOptions"));
