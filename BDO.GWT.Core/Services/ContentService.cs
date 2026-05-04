@@ -313,7 +313,7 @@
         {
             return _websiteChannelContext.WebsiteChannelName;
         }
-        public int GetCurrentSiteIDAsync()
+        public int GetCurrentChannelID()
         {
             return _websiteChannelContext.WebsiteChannelID;
         }
