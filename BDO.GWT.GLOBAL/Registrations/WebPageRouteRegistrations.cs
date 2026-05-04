@@ -39,3 +39,10 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     customViewName: "~/Views/FormPage/Index.cshtml",
     ContentTypeNames = new[] { "BDO.Contact" },
     IconClass = "xp-market")]
+[assembly: RegisterWebPageRoute(SectionIndustries.CONTENT_TYPE_NAME, typeof(SectionIndustriesController))]
+[assembly: RegisterPageTemplate(
+    identifier: SectionIndustries.CONTENT_TYPE_NAME,
+    name: "Home Page Content Type Template",
+    customViewName: "~/Views/SectionIndustries/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SectionIndustries" },
+    IconClass = "xp-market")]

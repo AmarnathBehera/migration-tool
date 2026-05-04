@@ -39,7 +39,8 @@ builder.Services.AddKentico(features =>
           "BDO.SectionAbout",
           "BDO.AboutPage",
           "BDO.HomePage",
-          "BDO.Contact"
+          "BDO.Contact",
+          "BDO.SectionIndustries"
        }
     }); features.UseActivityTracking();
     features.UseWebPageRouting();
@@ -118,7 +119,7 @@ builder.Services.Configure<AdminIdentityOptions>(options =>
 });
 
 // Add Application Insights telemetry
-builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
+//builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
 var app = builder.Build();
 

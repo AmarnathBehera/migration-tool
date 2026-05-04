@@ -27,6 +27,7 @@ public static class ReactComponentType
     public const string CookieBanner = "CookieBanner";
     public const string AccordionWidget = "AccordionWidget";
     public const string ContactPageDescriptionText = "ContactPageDescriptionText";
+    public const string MultiLinksCardsGrid = "MultiLinksCardsGrid";
 
 
     //Below are the guid constants for the above components.
@@ -47,6 +48,7 @@ public static class ReactComponentType
     public const string AccordionWidgetGUID = "60875e95-b88e-4db3-b4bf-7c2926a2485c";
     public const string ContactPageDescriptionTextGUID = "cd1bc3e5-c6b6-4212-9fab-a86bdc570462";
     public const string ErrorPageContentGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
+    public const string MultiLinksCardsGridGUID = "a1c3e5b7-d9f2-4a6c-8e0b-1f3a5c7e9d2b";
 }
 
 
