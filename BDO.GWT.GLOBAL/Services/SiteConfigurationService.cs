@@ -1,13 +1,14 @@
 ﻿using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Entities;
-using BDO.GWT.Core.Helpers;
 using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Services;
 using CMS.ContentEngine;
+using CMS.DataEngine;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using XperienceCommunity.Localization;
 
 namespace BDO.GWT.Web.Core.Services;
 
@@ -32,15 +33,27 @@ public class SiteConfigurationService : ISiteConfigurationService
             "cms.culturesite|all",
         ];
 
-    private readonly ICachingService _cachingService;
+    private readonly ICachingService _cachingService;   
     private readonly IContentQueryExecutor _executor;
     private readonly ISiteContext _siteContext;
+    private readonly IInfoProvider<LocalizationKeyInfo> _localizationKeyProvider;
+    private readonly IInfoProvider<LocalizationTranslationItemInfo> _localizationTranslationProvider;
+    private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageProvider;
 
-    public SiteConfigurationService(ICachingService cachingService, IContentQueryExecutor executor, ISiteContext siteContext)
+    public SiteConfigurationService(
+        ICachingService cachingService,
+        IContentQueryExecutor executor,
+        ISiteContext siteContext,
+        IInfoProvider<LocalizationKeyInfo> localizationKeyProvider,
+        IInfoProvider<LocalizationTranslationItemInfo> localizationTranslationProvider,
+        IInfoProvider<ContentLanguageInfo> contentLanguageProvider)
     {
         _cachingService = cachingService;
         _executor = executor;
         _siteContext = siteContext;
+        _localizationKeyProvider = localizationKeyProvider;
+        _localizationTranslationProvider = localizationTranslationProvider;
+        _contentLanguageProvider = contentLanguageProvider;
     }
 
     public string? GetCachedSiteConfigurationHash()
@@ -73,7 +86,7 @@ public class SiteConfigurationService : ISiteConfigurationService
         };
 
         var calculatedHash = await _cachingService.LoadAsync(
-            async _ => await ObjectHelper.CalculateObjectHashAsync(result),
+            async _ => await BDO.GWT.Core.Helpers.ObjectHelper.CalculateObjectHashAsync(result),
             cacheKey: GetSiteConfigurationHashCacheKey(_siteContext.CurrentSiteID),
             cacheDependencies,
             cancellationToken);
@@ -85,11 +98,37 @@ public class SiteConfigurationService : ISiteConfigurationService
 
     public async Task<IEnumerable<LocalizationResource>> GetLocalizationValuesAsync()
     {
-        var queryBuilder = new ContentItemQueryBuilder()
-            .ForContentType(LocalizationContentType);
+        var keys = (await _localizationKeyProvider.Get().GetEnumerableTypedResultAsync()).ToList();
+        var translations = (await _localizationTranslationProvider.Get().GetEnumerableTypedResultAsync()).ToList();
+        var languages = (await _contentLanguageProvider.Get().GetEnumerableTypedResultAsync()).ToList();
 
-        var result = await _executor.GetMappedResult<LocalizationResource>(queryBuilder);
+        var localizationKeys = keys
+            .Select(k => new LocalizationKey
+            {
+                LocalizationKeyItemId = k.LocalizationKeyItemId,
+                LocalizationKeyItemGuid = k.LocalizationKeyItemGuid,
+                LocalizationKeyItemName = k.LocalizationKeyItemName,
+                LocalizationKeyItemDescription = k.LocalizationKeyItemDescription,
+            })
+            .ToList();
 
-        return result;
+        return languages
+            .Select(language => new LocalizationResource
+            {
+                CultureCode = language.ContentLanguageCultureFormat,
+                LocalizationKey = localizationKeys,
+                LocalizationValue = translations
+                    .Where(t => t.LocalizationTranslationItemContentLanguageId == language.ContentLanguageID)
+                    .Select(t => new LocalizationValue
+                    {
+                        LocalizationTranslationItemID = t.LocalizationTranslationItemID,
+                        LocalizationTranslationItemGuid = t.LocalizationTranslationItemGuid,
+                        LocalizationTranslationItemLocalizationKeyItemId = t.LocalizationTranslationItemLocalizationKeyItemId,
+                        LocalizationTranslationItemContentLanguageId = t.LocalizationTranslationItemContentLanguageId,
+                        LocalizationTranslationItemText = t.LocalizationTranslationItemText,
+                    })
+                    .ToList(),
+            })
+            .ToList();
     }
 }
