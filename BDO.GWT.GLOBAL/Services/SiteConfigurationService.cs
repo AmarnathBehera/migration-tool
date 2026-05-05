@@ -36,10 +36,11 @@ public class SiteConfigurationService : ISiteConfigurationService
     private readonly IContentQueryExecutor _executor;
     private readonly ISiteContext _siteContext;
 
-    public SiteConfigurationService(ICachingService cachingService, IContentQueryExecutor executor)
+    public SiteConfigurationService(ICachingService cachingService, IContentQueryExecutor executor, ISiteContext siteContext)
     {
         _cachingService = cachingService;
         _executor = executor;
+        _siteContext = siteContext;
     }
 
     public string? GetCachedSiteConfigurationHash()
