@@ -1,14 +1,9 @@
-﻿using BDO.GWT.Core.Constants;
-using BDO.GWT.Core.DTOs;
+﻿using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Entities;
-using BDO.GWT.Core.Services;
+using BDO.GWT.Core.Helpers;
 using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Services;
 using CMS.ContentEngine;
-using CMS.DataEngine;
-using Microsoft.AspNetCore.Http.Extensions;
-using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -25,6 +20,18 @@ public interface ISiteConfigurationService
 
 public class SiteConfigurationService : ISiteConfigurationService
 {
+    private const string LocalizationContentType = "XperienceCommunity.Localization";
+
+    private static string[] cacheDependencies =
+        [
+            "cms.resourcestring|all",
+            "cms.culture|all",
+            "cms.resourcetranslation|all",
+            "cms.resourcestring|all",
+            "bdositelocalization.sitetranslation|all",
+            "cms.culturesite|all",
+        ];
+
     private readonly ICachingService _cachingService;
     private readonly IContentQueryExecutor _executor;
     private readonly ISiteContext _siteContext;
@@ -78,7 +85,7 @@ public class SiteConfigurationService : ISiteConfigurationService
     public async Task<IEnumerable<LocalizationResource>> GetLocalizationValuesAsync()
     {
         var queryBuilder = new ContentItemQueryBuilder()
-            .ForContentType("XperienceCommunity.Localization");
+            .ForContentType(LocalizationContentType);
 
         var result = await _executor.GetMappedResult<LocalizationResource>(queryBuilder);
 
