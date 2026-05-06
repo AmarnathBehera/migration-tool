@@ -1,29 +1,41 @@
-﻿using BDO.GWT.Core.Data;
+﻿using BDO.GWT.Core;
+using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.ValueObjects;
+using CMS.Websites.Routing;
+using Kentico.Content.Web.Mvc;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace BDO.GWT.Web.Core.Services;
 
-public interface IAboutPageService<in TPage> where TPage : class, IHero
+public interface IAboutPageService
 {
-    Task<AboutDto> GetAboutDtoAsync(TPage page, CancellationToken cancellationToken);
+    public Task<AboutDto> GetAboutDtoAsync(CancellationToken cancellationToken);
 }
 
-public class AboutPageService<TPage> : IAboutPageService<TPage>
-    where TPage : class, IHero
+public class AboutPageService : IAboutPageService
 {
     private readonly IHeroService _heroService;
+    private readonly IContentService _contentService;
 
-    public AboutPageService(IHeroService heroService)
+    public AboutPageService(IHeroService heroService, IContentService contentService)
     {
         _heroService = heroService;
+        _contentService = contentService;
     }
 
-    public async Task<AboutDto> GetAboutDtoAsync(TPage page, CancellationToken cancellationToken)
+    public async Task<AboutDto> GetAboutDtoAsync(CancellationToken cancellationToken)
     {
+        var page = await _contentService.RetrieveCurrentPageAsync<AboutPage>(
+                   new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
+
+        if (page == null)
+        {
+            return new AboutDto();
+        }
+
         var bgImageUrl = page.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
         var mobileImageUrl = page.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
         var ctaUrlPath = page.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath;

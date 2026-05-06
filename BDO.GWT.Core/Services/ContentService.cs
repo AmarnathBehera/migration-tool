@@ -293,6 +293,11 @@
         {
             return _contentRetriever.RetrievePages<T?>(parameters, cancellationToken);
         }
+
+        public async Task<T?> RetrieveCurrentPageAsync<T>(RetrieveCurrentPageParameters parameters, CancellationToken cancellationToken = default) where T : class
+        {
+            return await _contentRetriever.RetrieveCurrentPage<T>(parameters, cancellationToken);
+        }
     }
 }
 

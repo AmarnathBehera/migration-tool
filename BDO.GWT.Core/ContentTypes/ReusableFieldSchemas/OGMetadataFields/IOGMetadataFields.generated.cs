@@ -11,7 +11,6 @@
 
 using System;
 using System.Collections.Generic;
-using CMS.ContentEngine;
 
 namespace BDO
 {
@@ -53,6 +52,6 @@ namespace BDO
 		/// <summary>
 		/// MetadataOGTwitterImage.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataOGTwitterImage { get; set; }
+		public IEnumerable<ContentAttachment> MetadataOGTwitterImage { get; set; }
 	}
 }
