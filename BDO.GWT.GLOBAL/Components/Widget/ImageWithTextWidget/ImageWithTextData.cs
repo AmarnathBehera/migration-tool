@@ -35,4 +35,5 @@ public class ImageWithTextData : BaseWidgetData
     public string TopMargin { get; set; } = null!;
 
     public string BottomMargin { get; set; } = null!;
+    public string WidgetID { get; set; } = null!;
 }

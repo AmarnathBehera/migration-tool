@@ -20,7 +20,7 @@ public class TiledLinkSectionData
     public string? BackgroundImageAltText { get; set; }
 
     public string Theme { get; set; } = null!;
-    public int WidgetID { get; set; }
+    public string WidgetID { get; set; }
 
     public string? SeeAllLinkText { get; set; }
 
@@ -31,5 +31,6 @@ public class TiledLinkSectionData
     public string TopMargin { get; set; } = null!;
 
     public string BottomMargin { get; set; } = null!;
+
     public List<TilePageDto> TileNodeGuids { get; set; }
 }
