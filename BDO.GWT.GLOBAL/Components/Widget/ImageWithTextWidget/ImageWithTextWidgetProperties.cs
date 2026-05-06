@@ -38,7 +38,7 @@ public class ImageWithTextWidgetProperties : IWidgetProperties
     [DropDownComponent(Label = "Primary Button link target", Order = 6, Options = "_self;Same tab\r\n_blank;New tab")]  // ← was 4, duplicate fixed
     public string PrimaryButtonLinkTarget { get; set; } = "_self";
 
-    [RadioGroupComponent(Label = "Button type", Order = 5, Options = "primary;Primary\r\nsecondary;Secondary\r\ntertiary;Tertiary")]
+    [RadioGroupComponent(Label = "Button type", Order = 5, Options = "None;None\r\nprimary;Primary\r\nsecondary;Secondary\r\ntertiary;Tertiary")]
     public string? ButtonType { get; set; }
 
     [RadioGroupComponent(Label = "Image or embed code", Order = 8, Options = "image;Image\r\nembed;Embed code")]
