@@ -13,7 +13,7 @@ namespace BDO.GWT.Web.Core.Services;
 
 public interface ISectionIndustriesService
 {
-    Task<MultiLinkPageDto> GetSectionIndustriesDtoAsync(CancellationToken cancellationToken);
+    Task<SectionIndustriesPageDto> GetSectionIndustriesDtoAsync(CancellationToken cancellationToken);
 }
 
 public class SectionIndustriesService : ISectionIndustriesService
@@ -29,7 +29,7 @@ public class SectionIndustriesService : ISectionIndustriesService
         _contentService = contentService;
     }
 
-    public async Task<MultiLinkPageDto> GetSectionIndustriesDtoAsync(CancellationToken cancellationToken)
+    public async Task<SectionIndustriesPageDto> GetSectionIndustriesDtoAsync(CancellationToken cancellationToken)
     {
         
         var page = await _contentService.RetrieveCurrentPageAsync<SectionIndustries>(
@@ -38,7 +38,7 @@ public class SectionIndustriesService : ISectionIndustriesService
 
         if (page == null)
         {
-            return new MultiLinkPageDto();
+            return new SectionIndustriesPageDto();
         }
 
       
@@ -125,7 +125,7 @@ public class SectionIndustriesService : ISectionIndustriesService
             CallToActionButtonUrl = ctaUrlPath != null ? Link.Parse(ctaUrlPath) : null,
         };
 
-        return new MultiLinkPageDto
+        return new SectionIndustriesPageDto
         {
             Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
             MultiLinksCardsGrid = new MultiLinkCardsGridDto

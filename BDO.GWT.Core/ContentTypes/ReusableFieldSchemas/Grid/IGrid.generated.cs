@@ -26,20 +26,20 @@ namespace BDO
 
 
 		/// <summary>
-		/// GridTitle1.
+		/// GridTitle.
 		/// </summary>
-		public string GridTitle1 { get; set; }
+		public string GridTitle { get; set; }
 
 
 		/// <summary>
-		/// GridSummary1.
+		/// GridSummary.
 		/// </summary>
-		public string GridSummary1 { get; set; }
+		public string GridSummary { get; set; }
 
 
 		/// <summary>
-		/// ShowMultiLinks1.
+		/// ShowMultiLinks.
 		/// </summary>
-		public bool ShowMultiLinks1 { get; set; }
+		public bool ShowMultiLinks { get; set; }
 	}
 }

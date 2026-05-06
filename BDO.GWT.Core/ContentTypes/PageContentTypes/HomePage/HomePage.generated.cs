@@ -36,12 +36,6 @@ namespace BDO
 
 
 		/// <summary>
-		/// DocumentName.
-		/// </summary>
-		public string DocumentName { get; set; }
-
-
-		/// <summary>
 		/// MetadataOGTitle.
 		/// </summary>
 		public string MetadataOGTitle { get; set; }
