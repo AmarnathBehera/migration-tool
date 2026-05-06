@@ -54,7 +54,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IBreadcrumbsService, BreadcrumbsService>();
         serviceCollection.AddScoped<IFormBuilderService, FormBuilderService>();
         serviceCollection.AddScoped<ISectionIndustriesService, SectionIndustriesService>();
-        serviceCollection.AddScoped<IIndustryCategoryPageService, IndustryCategoryPageService>();
+        //serviceCollection.AddScoped<IIndustryCategoryPageService, IndustryCategoryPageService>();
+        serviceCollection.AddScoped<ISectionServicesService, SectionServicesService>();
         serviceCollection.AddTransient<DropdownScriptExecutor>();
     }
 
