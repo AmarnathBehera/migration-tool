@@ -18,7 +18,7 @@ public class SiteConfigurationController : Controller
     }
 
     [HttpGet]
-    public async Task<ActionResult<SiteConfigurationDto>> GetSiteConfiguration([FromQuery] string? hash, CancellationToken cancellationToken)
+    public async Task<ActionResult<SiteConfigurationDto>> GetSiteConfiguration([FromQuery] string hash, CancellationToken cancellationToken)
     {
         var cachedSiteConfiguration = _siteConfigurationService.GetCachedSiteConfigurationHash();
 

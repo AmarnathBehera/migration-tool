@@ -16,13 +16,11 @@ public interface ISiteConfigurationService
 {
     Task<SiteConfigurationDto> GetSiteConfigurationDtoAsync(CancellationToken cancellationToken);
 
-    string? GetCachedSiteConfigurationHash();
+    string GetCachedSiteConfigurationHash();
 }
 
 public class SiteConfigurationService : ISiteConfigurationService
 {
-    private const string LocalizationContentType = "XperienceCommunity.Localization";
-
     private static string[] cacheDependencies =
         [
             "cms.resourcestring|all",
@@ -33,8 +31,7 @@ public class SiteConfigurationService : ISiteConfigurationService
             "cms.culturesite|all",
         ];
 
-    private readonly ICachingService _cachingService;   
-    private readonly IContentQueryExecutor _executor;
+    private readonly ICachingService _cachingService;
     private readonly ISiteContext _siteContext;
     private readonly IInfoProvider<LocalizationKeyInfo> _localizationKeyProvider;
     private readonly IInfoProvider<LocalizationTranslationItemInfo> _localizationTranslationProvider;
@@ -49,14 +46,13 @@ public class SiteConfigurationService : ISiteConfigurationService
         IInfoProvider<ContentLanguageInfo> contentLanguageProvider)
     {
         _cachingService = cachingService;
-        _executor = executor;
         _siteContext = siteContext;
         _localizationKeyProvider = localizationKeyProvider;
         _localizationTranslationProvider = localizationTranslationProvider;
         _contentLanguageProvider = contentLanguageProvider;
     }
 
-    public string? GetCachedSiteConfigurationHash()
+    public string GetCachedSiteConfigurationHash()
     {
         return _cachingService.TryGetCachedObject<string>(GetSiteConfigurationHashCacheKey(_siteContext.CurrentSiteID), out var hash) ? hash : null;
     }
