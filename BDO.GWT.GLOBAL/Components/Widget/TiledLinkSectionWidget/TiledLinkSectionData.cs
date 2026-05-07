@@ -1,5 +1,6 @@
 ﻿
 using AngleSharp.Dom;
+using BDO.GWT.Core;
 using BDO.GWT.Core.DTOs;
 using CMS.ContentEngine;
 using Kentico.Xperience.Admin.Base;
@@ -9,7 +10,7 @@ using System.Linq;
 
 namespace BDO.GWT.Web.Core.LiveSite.Data;
 
-public class TiledLinkSectionData 
+public class TiledLinkSectionData : BaseWidgetData
 {
     public string? Title { get; set; }
 
@@ -20,7 +21,6 @@ public class TiledLinkSectionData
     public string? BackgroundImageAltText { get; set; }
 
     public string Theme { get; set; } = null!;
-    public string WidgetID { get; set; }
 
     public string? SeeAllLinkText { get; set; }
 

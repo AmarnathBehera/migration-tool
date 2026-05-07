@@ -62,6 +62,7 @@ public class QuoteCardWidget : ViewComponent
         {
             TopMargin = model.Properties.TopMargin,
             BottomMargin = model.Properties.BottomMargin,
+            WidgetID = model.Properties.WidgetID,
             Data = new QuoteCard
             {
                 AuthorsJobTitle = model.Properties.AuthorsJobTitle,
@@ -78,7 +79,6 @@ public class QuoteCardWidget : ViewComponent
                 SubHeading = model.Properties.Subheading,
                 QuoteText = model.Properties.QuoteText,
                 QuotesAuthor = model.Properties.QuotesAuthor,
-                WidgetID = model.Properties.WidgetID,
             }
         };
 
