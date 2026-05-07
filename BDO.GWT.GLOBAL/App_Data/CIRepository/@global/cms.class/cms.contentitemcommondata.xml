@@ -1,0 +1,644 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Content item common data</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemCommonDataID" columntype="integer" enabled="true" guid="dcc7d6bf-4c35-4414-9ed7-76f89bf9960d" isPK="true" system="true" />
+      <field column="ContentItemCommonDataGUID" columnprecision="0" columntype="guid" enabled="true" guid="8faf5ded-4735-4a11-a8ba-da6e5cfe71b5" system="true" />
+      <field column="ContentItemCommonDataContentItemID" columnprecision="0" columntype="integer" enabled="true" guid="91fc5540-0504-4301-a196-d9cc050499f6" refobjtype="cms.contentitem" reftype="Required" system="true">
+        <properties>
+          <defaultvalue>0</defaultvalue>
+        </properties>
+      </field>
+      <field column="ContentItemCommonDataContentLanguageID" columnprecision="0" columntype="integer" enabled="true" guid="66a47fdf-75d6-4bd6-b99d-f37a816b8676" refobjtype="cms.contentlanguage" reftype="Required" system="true" />
+      <field column="ContentItemCommonDataVersionStatus" columnprecision="0" columntype="integer" enabled="true" guid="a26f89d5-5e71-4e55-97e9-0f121c2ec231" system="true" />
+      <field column="ContentItemCommonDataIsLatest" columnprecision="0" columntype="boolean" enabled="true" guid="8fda7834-4aeb-4f2d-9ba9-cb3861e56b62" system="true" />
+      <field allowempty="true" column="ContentItemCommonDataVisualBuilderWidgets" columnprecision="0" columntype="longtext" enabled="true" guid="b67cbb13-d340-42bf-bb5b-e479bf31f509" system="true" />
+      <field allowempty="true" column="ContentItemCommonDataVisualBuilderTemplateConfiguration" columnprecision="0" columntype="longtext" enabled="true" guid="0d5a573b-759a-4dd7-a86b-be2ef2f5bac4" system="true" />
+      <field allowempty="true" column="ContentItemCommonDataFirstPublishedWhen" columnprecision="7" columntype="datetime" enabled="true" guid="1318327e-9a4c-47e7-be2e-3da0fe99c15e" system="true" />
+      <field allowempty="true" column="ContentItemCommonDataLastPublishedWhen" columnprecision="7" columntype="datetime" enabled="true" guid="169ce320-e362-4b70-b4dd-cc055082c254" system="true" />
+      <schema guid="34bc2c94-d4b6-4c53-a6f4-9b9520a24493" name="CallToAction">
+        <properties>
+          <fieldcaption>Call To Action</fieldcaption>
+        </properties>
+      </schema>
+      <field allowempty="true" column="ShowCallToAction" columnprecision="0" columntype="boolean" enabled="true" guid="c421d214-2626-465b-bcba-e47779e94277" visible="true">
+        <properties>
+          <defaultvalue>True</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show call to action</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>34bc2c94-d4b6-4c53-a6f4-9b9520a24493</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="CallToActionDescription" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="08a85af9-2973-434e-a407-390b5d0baa72" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Call to action description</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>34bc2c94-d4b6-4c53-a6f4-9b9520a24493</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="CallToActionButtonText" columnprecision="0" columnsize="50" columntype="text" enabled="true" guid="a86ab114-d05c-4712-bfbb-596b783b56a0" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Call to action button text</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>34bc2c94-d4b6-4c53-a6f4-9b9520a24493</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="CallToActionButtonUrl" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="4750e82f-065b-43eb-856a-3545e517cf53" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Call to action button URL</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>34bc2c94-d4b6-4c53-a6f4-9b9520a24493</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <schema guid="b760a373-943b-4321-ac39-d5067101ff82" name="Sidebar">
+        <properties>
+          <fieldcaption>Sidebar</fieldcaption>
+        </properties>
+      </schema>
+      <field allowempty="true" column="ShowSidebar" columnprecision="0" columntype="boolean" enabled="true" guid="fc426928-e950-4e8b-b5d4-3d186b253a19" visible="true">
+        <properties>
+          <defaultvalue>True</defaultvalue>
+          <explanationtext>Should the sidebar be shown?</explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show sidebar</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>b760a373-943b-4321-ac39-d5067101ff82</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This field is required</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="OGMetadataFields">
+        <properties>
+          <fieldcaption>OG Metadata Fields</fieldcaption>
+        </properties>
+      </schema>
+      <field allowempty="true" column="MetadataOGTitle" columnprecision="0" columnsize="60" columntype="text" enabled="true" guid="096b6509-812b-44ca-ab54-e159e232cacb" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>OG metadata title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>15e80c44-954e-403a-8fc9-1ae3d222cbf3</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataOGDescription" columnprecision="0" columnsize="500" columntype="text" enabled="true" guid="4aed11c8-4de7-4a53-84d7-dd01cbfc28b0" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>OG metadata description</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>15e80c44-954e-403a-8fc9-1ae3d222cbf3</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextArea</controlname>
+          <CopyButtonVisible>False</CopyButtonVisible>
+          <MaxRowsNumber>5</MaxRowsNumber>
+          <MinRowsNumber>3</MinRowsNumber>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataOGImage" columnprecision="0" columntype="contentitemreference" enabled="true" guid="dbd04cc6-8897-4a92-bfc4-6b4c8b55ddc3" visible="true">
+        <properties>
+          <explanationtext>
+            <![CDATA[Please use the following:<br /><strong>Image dimension</strong>: we are recommending the following dimensions 1200px wide by 630px high (please note that different social media platforms may be optimized for different image sizes and may resize and crop images when sharing)<br /><strong>Type</strong>: JPG, PNG, GIF<br /><strong>Quality</strong>: 72dpi<br /><strong>Size</strong>: 2MB maximum]]>
+          </explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>OG metadata image</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>15e80c44-954e-403a-8fc9-1ae3d222cbf3</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataOGTwitterImageSizeCheckbox" columnprecision="0" columntype="boolean" enabled="true" guid="848e6a79-1bdb-45c3-a8b5-f14e93759341" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Use small image for Twitter (1:1)</fieldcaption>
+          <fielddescription>Use small image for Twitter (1:1)</fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>15e80c44-954e-403a-8fc9-1ae3d222cbf3</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataOGTwitterImage" columnprecision="0" columntype="contentitemreference" enabled="true" guid="dc521dd3-04d0-4ea2-bbbe-d64e03afa5f1" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Twitter OG metadata image</fieldcaption>
+          <fielddescription>Used only for Twitter images with aspect ratio 1:1</fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>15e80c44-954e-403a-8fc9-1ae3d222cbf3</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["205639d0-5385-472a-bd1a-ba685cf3915d","bb17604c-c134-4faa-a401-2727cad93707","4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="SearchAndSEO">
+        <properties>
+          <fieldcaption>
+            <![CDATA[Search & SEO]]>
+          </fieldcaption>
+        </properties>
+      </schema>
+      <field allowempty="true" column="MetadataNofollow" columnprecision="0" columntype="boolean" enabled="true" guid="149ece32-70d6-4c3b-872d-6d72b5adb4a1" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Nofollow</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>a1394d11-ac3a-40b9-8162-d117c5ff85fe</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataNoindex" columnprecision="0" columntype="boolean" enabled="true" guid="4ee400a8-7026-40ce-b65c-75996f32d141" visible="true">
+        <properties>
+          <explanationtext>Do not allow search engine to index this page</explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Noindex</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>a1394d11-ac3a-40b9-8162-d117c5ff85fe</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="IncludeInSitemap" columnprecision="0" columntype="boolean" enabled="true" guid="f2fb7268-9fe8-4f46-b1f5-dbaba4c26e9b" visible="true">
+        <properties>
+          <defaultvalue>True</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Include page in the sitemap</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>a1394d11-ac3a-40b9-8162-d117c5ff85fe</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="Metadata">
+        <properties>
+          <fieldcaption>Metadata</fieldcaption>
+        </properties>
+      </schema>
+      <field allowempty="true" column="MetadataTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="d5b501e2-f5bf-4190-869f-ce6716a063ed" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>8b79d460-a816-437b-83fe-597bcc6fe7cf</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This input field is required.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+      <field allowempty="true" column="MetadataDescription" columnprecision="0" columntype="richtexthtml" enabled="true" guid="11cdb808-d509-4dc7-828e-a9263999582a" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Description</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>8b79d460-a816-437b-83fe-597bcc6fe7cf</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <ConfigurationName>Kentico.Administration.StructuredContent</ConfigurationName>
+          <controlname>Kentico.Administration.RichTextEditor</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataTeaserImage" columnprecision="0" columntype="contentitemreference" enabled="true" guid="8f060a96-d942-4969-ac2e-83ebdfce3762" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Teaser image</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>8b79d460-a816-437b-83fe-597bcc6fe7cf</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3","bb17604c-c134-4faa-a401-2727cad93707","205639d0-5385-472a-bd1a-ba685cf3915d"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataTeaserImageAltText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="22db8fa7-f80e-443f-97b8-4ccc3cea32e9" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Teaser image alt text</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>8b79d460-a816-437b-83fe-597bcc6fe7cf</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This input field is required.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+      <field allowempty="true" column="MetadataCanonical" columnprecision="0" columnsize="2000" columntype="text" enabled="true" guid="cdd314fa-bacd-468e-b191-6aae02c8a259" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Canonical link</fieldcaption>
+          <fielddescription>
+            <![CDATA[link to the original page where the content from this page is copied from]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>8b79d460-a816-437b-83fe-597bcc6fe7cf</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataKeywords" columnprecision="0" columnsize="500" columntype="text" enabled="true" guid="36fd7abb-6141-44fb-9d1a-7e09458c054a" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>MetadataKeywords</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>8b79d460-a816-437b-83fe-597bcc6fe7cf</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextArea</controlname>
+          <CopyButtonVisible>False</CopyButtonVisible>
+          <MaxRowsNumber>5</MaxRowsNumber>
+          <MinRowsNumber>3</MinRowsNumber>
+        </settings>
+      </field>
+      <schema guid="6bf9af2e-ee19-461b-a071-2b6541b36653" name="WhereShouldThisPageAppear">
+        <properties>
+          <fieldcaption>Where should this page appear?</fieldcaption>
+        </properties>
+      </schema>
+      <field allowempty="true" column="ContentType" columnprecision="0" columntype="contentitemreference" enabled="true" guid="be3b48ec-7eb2-4b5a-8cc7-71c3d28100f1" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Type</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>6bf9af2e-ee19-461b-a071-2b6541b36653</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["2fbc3346-16df-4d75-a048-f3a714cd5592"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="MicrositeMasterPages" columnprecision="0" columntype="contentitemreference" enabled="true" guid="400c9ac4-aa2f-489a-b108-1142b44e444d" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Microsite master pages</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>6bf9af2e-ee19-461b-a071-2b6541b36653</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["2fbc3346-16df-4d75-a048-f3a714cd5592"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="MicrositePages" columnprecision="0" columntype="contentitemreference" enabled="true" guid="79e9ed9b-8f59-48c9-9453-412000eebf2a" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Microsite Pages</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>6bf9af2e-ee19-461b-a071-2b6541b36653</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["2fbc3346-16df-4d75-a048-f3a714cd5592"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataRssCategory" columnprecision="0" columntype="contentitemreference" enabled="true" guid="0812bf9e-e5ce-4d05-8d8a-924dccea9402" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>RSS category</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>6bf9af2e-ee19-461b-a071-2b6541b36653</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["2fbc3346-16df-4d75-a048-f3a714cd5592"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataRssImage" columnprecision="0" columntype="contentitemreference" enabled="true" guid="21b470dc-cce7-4bef-a3aa-7c5140fbc3dc" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>RSS Image</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>6bf9af2e-ee19-461b-a071-2b6541b36653</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["205639d0-5385-472a-bd1a-ba685cf3915d","4e214df1-edd5-4441-a0b7-53849526b1d3","bb17604c-c134-4faa-a401-2727cad93707"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <schema guid="e87987a6-ebfd-4d15-981c-fbaacdfbf6bc" name="AuthorInformation">
+        <properties>
+          <fieldcaption>Author Information</fieldcaption>
+        </properties>
+      </schema>
+      <field allowempty="true" column="PeopleSort" columnprecision="0" columntype="longtext" enabled="true" guid="20832203-8dc3-45ed-8d1f-91a674169ed5" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>People sort</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>e87987a6-ebfd-4d15-981c-fbaacdfbf6bc</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextArea</controlname>
+          <CopyButtonVisible>False</CopyButtonVisible>
+          <MaxRowsNumber>5</MaxRowsNumber>
+          <MinRowsNumber>3</MinRowsNumber>
+        </settings>
+      </field>
+      <field allowempty="true" column="RelatedExternalPeople" columnprecision="0" columntype="contentitemreference" enabled="true" guid="64bd6111-d34a-4f6e-a97e-ed8aa8fd0b74" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Related external people</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>e87987a6-ebfd-4d15-981c-fbaacdfbf6bc</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["2fbc3346-16df-4d75-a048-f3a714cd5592"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="Hero">
+        <properties>
+          <fieldcaption>Hero</fieldcaption>
+        </properties>
+      </schema>
+      <field allowempty="true" column="HeroLayout" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="65a5d2d3-a567-4630-888c-2e2603cc103c" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Layout</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>b3326bf5-1ba7-415e-9366-fab20a18b931</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.RadioGroup</controlname>
+          <Inline>False</Inline>
+          <Options>
+<![CDATA[
+bannerImage;Banner with Image
+banner;Banner
+hero;Hero
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This is the Required field.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+      <field allowempty="true" column="HeroTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="cd060bd8-87ef-47d9-9ba7-edd62fccf3df" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>b3326bf5-1ba7-415e-9366-fab20a18b931</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="HeroDescription" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="97ec022f-cbd2-45ba-96d7-b9ec467638bd" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Description</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>b3326bf5-1ba7-415e-9366-fab20a18b931</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextArea</controlname>
+          <CopyButtonVisible>False</CopyButtonVisible>
+          <MaxRowsNumber>5</MaxRowsNumber>
+          <MinRowsNumber>3</MinRowsNumber>
+        </settings>
+      </field>
+      <field allowempty="true" column="HeroBackgroundImage" columnprecision="0" columntype="contentitemreference" enabled="true" guid="6e10753f-0d29-4f6c-a16e-63f0d38e4f02" visible="true">
+        <properties>
+          <explanationtext>Recommended size: 1440x400</explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Image</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>b3326bf5-1ba7-415e-9366-fab20a18b931</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This is the Required field.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+      <field allowempty="true" column="HeroBackgroundImageAltText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="3472c1fb-77ac-49f5-92b2-0552c894c4b5" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Image alt text</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>b3326bf5-1ba7-415e-9366-fab20a18b931</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This is the Required field.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+      <field allowempty="true" column="HeroBackgroundImage_Mobile" columnprecision="0" columntype="contentitemreference" enabled="true" guid="6fc08044-a87a-465e-b463-77a25b10ecba" visible="true">
+        <properties>
+          <explanationtext>Recommended size: 720x1280</explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Mobile image</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>b3326bf5-1ba7-415e-9366-fab20a18b931</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This is the Required field.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+      <field allowempty="true" column="HeroBackgroundImage_MobileAltText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7c21ff98-88e4-4e63-9096-2ce889834c98" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Mobile image alt text</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>b3326bf5-1ba7-415e-9366-fab20a18b931</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This is the Required field.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+      <field allowempty="true" column="HeroCallToActionButtonType" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="231b08ef-4bc3-41f2-b9db-83005ec0e362" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>CTA button type</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>b3326bf5-1ba7-415e-9366-fab20a18b931</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.RadioGroup</controlname>
+          <Inline>False</Inline>
+          <Options>
+<![CDATA[
+none;None
+primary;Primary
+secondary;Secondary
+tertiary;Tertiary
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+      </field>
+      <field allowempty="true" column="HeroCallToActionButtonText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6e0db96c-5446-4f08-9735-9ddc7375b0c2" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>CTA button text</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>b3326bf5-1ba7-415e-9366-fab20a18b931</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This is the Required field.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+      <field allowempty="true" column="HeroCallToActionButtonUrl" columnprecision="0" columntype="contentitemreference" enabled="true" guid="5dc9513a-4505-4fa1-a628-68fb3901812e" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>CTA button URL</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>b3326bf5-1ba7-415e-9366-fab20a18b931</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["43fcea42-e42d-4773-95dc-b415ea3e7547","31f6383b-697e-4d8f-acec-be459fe4ad01","74635906-cb04-4ffd-9936-9dcde92c7f58","392e5450-56f2-49da-96a0-fc49215599d8"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>a6581fb3-892a-45b4-981a-012ce4b50b43</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>CMS.ContentItemCommonData</ClassName>
+  <ClassResourceID>
+    <CodeName>CMS.ContentEngine</CodeName>
+    <GUID>eb76ebd1-752f-4969-a5b6-1fb984cae224</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>CMS_ContentItemCommonData</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

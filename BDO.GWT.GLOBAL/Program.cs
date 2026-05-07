@@ -11,16 +11,18 @@ using Kentico.Content.Web.Mvc.Routing;
 using Kentico.OnlineMarketing.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.WebEncoders;
+using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.Identity.Web;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.AspNetCore.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,7 +34,11 @@ builder.Services.AddKentico(features =>
         RegisterDefaultSection = true,
         ContentTypeNames = new[]
         {
-          "BDO.HomePage"
+          "BDO.HomePage",
+          "BDO.SectionAbout",
+          "BDO.AboutPage",
+          "BDO.HomePage",
+          "BDO.Contact"
        }
     }); features.UseActivityTracking();
     features.UseWebPageRouting();
@@ -40,19 +46,16 @@ builder.Services.AddKentico(features =>
     features.UseEmailMarketing();
 });
 
-
+builder.Configuration.AddInMemoryCollection(
+    builder.Configuration
+        .GetSection("AzureStorageProviderSettings")
+        .GetChildren().ToDictionary(x => x.Key, x => x.Value)
+);
 builder.Services.Configure<WebEncoderOptions>(options =>
 {
     options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All);
 });
 
-//builder.Services.AddDomain();
-
-//builder.Services.AddWeb();
-
-//builder.Services.AddLiveSite();
-
-//builder.Services.AddLiveSiteInfrastructure();
 builder.Services.Configure<ReactOptions>(
     builder.Configuration.GetSection("ReactOptions"));
 builder.Services.Configure<ReactCachingOptions>(
@@ -70,7 +73,6 @@ builder.Services.AddContentServices();
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddScoped<IPageBuilderService, PageBuilderService>();
 builder.Services.AddScoped<IContentService, ContentService>();
-
 builder.Services.AddXperience();
 builder.Services.AddControllersWithViews();
 builder.Services.AddXperienceCommunityLocalization();
@@ -112,6 +114,9 @@ builder.Services.Configure<AdminIdentityOptions>(options =>
 
 });
 
+// Add Application Insights telemetry
+builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
+
 var app = builder.Build();
 
 app.InitKentico();
@@ -121,7 +126,6 @@ app.UseStaticFiles();
 app.UseCookiePolicy();
 
 app.UseAuthentication();
-// app.UseAuthentication();
 
 app.UseKentico();
 

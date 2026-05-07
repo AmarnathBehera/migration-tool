@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <DisplayNameColumn>GlobalSettingsKeyDisplayName</DisplayNameColumn>
+      <ObjectType>BDO.Globalsettingskey</ObjectType>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassDisplayName>Global Include Custom Scripts </ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="GlobalsettingskeyID" columntype="integer" enabled="true" guid="a8a1abc8-0b73-46fe-84dc-3a7a8a17404f" isPK="true" />
+      <field column="GlobalSettingsKeyValue" columnprecision="0" columnsize="2000" columntype="text" enabled="true" guid="fc8561f8-1c58-4cf9-b9fe-27479ee1d2c3" />
+      <field column="GlobalSettingsKeyName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="9b47db0b-6890-48c2-a279-451a792a9b6e" />
+      <field column="GlobalSettingsKeyDisplayName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="817e0328-10c8-4d34-a1a3-ed8e35b0b524" />
+      <field column="GlobalSettingsKeyNote" columnprecision="0" columnsize="2000" columntype="text" enabled="true" guid="76dd759e-9cc7-43f5-92ee-deed5b884001" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>f393a535-3751-4fe5-bd51-90482f775b9a</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.Globalsettingskey</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_Globalsettingskey</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

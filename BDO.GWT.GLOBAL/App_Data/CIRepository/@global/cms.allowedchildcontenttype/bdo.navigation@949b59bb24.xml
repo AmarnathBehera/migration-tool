@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.Navigation</CodeName>
+    <GUID>bba6a14e-0cf1-44cd-9b10-119588fc6271</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.NavigationFirstLevelItem">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.NavigationFirstLevelItem</CodeName>
+        <GUID>ec3497bc-0c55-4929-b71d-45676bf4dbe7</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

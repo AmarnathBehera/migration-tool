@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.navigationsecondlevelitem>
+  <ContentItemDataCommonDataID>
+    <GUID>3ea6c92c-2d6f-455f-b251-923eebe6743f</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Automotive-unfmh61s</CodeName>
+      <GUID>886e3417-fbad-43a2-8e4f-d9aac6b74df9</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>7f82d0c0-91ab-45c8-9d0e-ed9c1b436f83</ContentItemDataGUID>
+  <TargetURL>
+    <![CDATA[[{"WebPageGuid":"c1ff3f43-b9fc-4694-8a09-1e95c6e7e1fe"}]]]>
+  </TargetURL>
+  <Title>Automotive</Title>
+</contentitemdata.bdo.navigationsecondlevelitem>

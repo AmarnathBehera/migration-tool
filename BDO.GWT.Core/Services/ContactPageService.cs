@@ -1,5 +1,7 @@
 ﻿using BDO.GWT.Core;
+using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
+using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.DTOs.Pages;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
@@ -8,7 +10,7 @@ namespace BDO.GWT.Web.Core.Services;
 
 public interface IContactPageService
 {
-    Task<FormPageDto> GetContactPageDtoAsync(Contact page, CancellationToken cancellationToken);
+    Task<FormPageDto> GetContactPageDtoAsync(Contact? page, CancellationToken cancellationToken);
 }
 
 public class ContactPageService : IContactPageService
@@ -27,7 +29,7 @@ public class ContactPageService : IContactPageService
         _websiteChannelContext = websiteChannelContext;
     }
 
-    public async Task<FormPageDto> GetContactPageDtoAsync(Contact page, CancellationToken cancellationToken)
+    public async Task<FormPageDto> GetContactPageDtoAsync(Contact? page, CancellationToken cancellationToken)
     {
         var results = await _contentRetriever.GetPagesAsync<Contact>(
             new RetrievePagesParameters
@@ -42,65 +44,86 @@ public class ContactPageService : IContactPageService
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken);
 
-        var contactPage = results?.FirstOrDefault();
+        var ContactPage = results?.FirstOrDefault();
 
-        if (contactPage == null)
+        if (ContactPage == null)
         {
             return new FormPageDto(); // or throw exception if required
         }
 
+        var sys = ContactPage.SystemFields;
+
         return new FormPageDto
         {
+            Title = ContactPage.DescriptionTitle,
+            Description = ContactPage.DescriptionBody,
+            FormType = ContactPage.FormType,
+            Form = ContactPage.Form,
+            EmbedCode = ContactPage.EmbedCode,
+
             MetaData = new MetaDataDto
             {
-                MetaTitle = contactPage.MetadataTitle,
-                MetaDescription = contactPage.MetadataDescription,
-                MetaTeaserImageAltText = contactPage.MetadataTeaserImageAltText,
-                MetaCanonical = contactPage.MetadataCanonical
+                MetaTitle = ContactPage.MetadataTitle,
+                MetaDescription = ContactPage.MetadataDescription,
+                MetadataTeaserImage = ContactPage.MetadataTeaserImage,
+                MetaTeaserImageAltText = ContactPage.MetadataTeaserImageAltText,
+                MetaCanonical = ContactPage.MetadataCanonical
             },
 
             SearchAndSEO = new SearchAndSEODto
             {
-                IncludeInSitemap = contactPage.IncludeInSitemap,
-                MetadataNofollow = contactPage.MetadataNofollow,
-                MetadataNoindex = contactPage.MetadataNoindex
+                IncludeInSitemap = ContactPage.IncludeInSitemap,
+                MetadataNofollow = ContactPage.MetadataNofollow,
+                MetadataNoindex = ContactPage.MetadataNoindex
             },
 
             OGMetaData = new OGMetaDataDto
             {
-                MetadataOGTitle = contactPage.MetadataOGTitle,
-                MetadataOGDescription = contactPage.MetadataOGDescription,
-                MetadataOGTwitterImageSizeCheckbox = contactPage.MetadataOGTwitterImageSizeCheckbox
+                MetadataOGTitle = ContactPage.MetadataOGTitle,
+                MetadataOGDescription = ContactPage.MetadataOGDescription,
+                MetadataOGImage = ContactPage.MetadataOGImage,
+                MetadataOGTwitterImage = ContactPage.MetadataOGTwitterImage,
+                MetadataOGTwitterImageSizeCheckbox = ContactPage.MetadataOGTwitterImageSizeCheckbox
             },
 
             BaseContent = new BaseContent
             {
-                ContentItemID = contactPage.SystemFields?.ContentItemID ?? 0,
-                ContentItemGUID = contactPage.SystemFields?.ContentItemGUID ?? Guid.Empty,
-                ContentItemName = contactPage.SystemFields?.ContentItemName,
-                ContentItemContentTypeID = contactPage.SystemFields?.ContentItemContentTypeID ?? 0,
-                ContentItemIsSecured = contactPage.SystemFields?.ContentItemIsSecured ?? false,
-                ContentItemCommonDataContentLanguageID = contactPage.SystemFields?.ContentItemCommonDataContentLanguageID ?? 0,
-                ContentItemCommonDataFirstPublishedWhen = contactPage.SystemFields?.ContentItemCommonDataFirstPublishedWhen,
-                ContentItemCommonDataLastPublishedWhen = contactPage.SystemFields?.ContentItemCommonDataLastPublishedWhen
+                ContentItemID = sys?.ContentItemID ?? 0,
+                ContentItemGUID = sys?.ContentItemGUID ?? Guid.Empty,
+                ContentItemName = sys?.ContentItemName,
+                ContentItemContentTypeID = sys?.ContentItemContentTypeID ?? 0,
+                ContentItemIsSecured = sys?.ContentItemIsSecured ?? false,
+                ContentItemCommonDataContentLanguageID = sys?.ContentItemCommonDataContentLanguageID ?? 0,
+                ContentItemCommonDataFirstPublishedWhen = sys?.ContentItemCommonDataFirstPublishedWhen ?? default,
+                ContentItemCommonDataLastPublishedWhen = sys?.ContentItemCommonDataLastPublishedWhen ?? default
             },
 
             BaseWebPage = new BaseWebPage
             {
-                WebPageItemGUID = contactPage.SystemFields?.WebPageItemGUID ?? Guid.Empty,
-                WebPageItemID = contactPage.SystemFields?.WebPageItemID ?? 0,
-                WebPageItemName = contactPage.SystemFields?.WebPageItemName,
-                WebPageItemWebsiteChannelID = contactPage.SystemFields?.WebPageItemWebsiteChannelId ?? 0,
-                WebPageUrlPath = contactPage.SystemFields?.WebPageUrlPath,
-                WebPageItemOrder = contactPage.SystemFields?.WebPageItemOrder ?? 0,
-                WebPageItemTreePath = contactPage.SystemFields?.WebPageItemTreePath,
-                WebPageUrlPathContentLanguageID = contactPage.SystemFields?.WebPageUrlPathContentLanguageID ?? 0,
-                WebPageItemParentID = contactPage.SystemFields?.WebPageItemParentID ?? 0
+                WebPageItemGUID = sys?.WebPageItemGUID ?? Guid.Empty,
+                WebPageItemID = sys?.WebPageItemID ?? 0,
+                WebPageItemName = sys?.WebPageItemName,
+                WebPageItemWebsiteChannelID = sys?.WebPageItemWebsiteChannelId ?? 0,
+                WebPageUrlPath = sys?.WebPageUrlPath,
+                WebPageItemOrder = sys?.WebPageItemOrder ?? 0,
+                WebPageItemTreePath = sys?.WebPageItemTreePath,
+                WebPageUrlPathContentLanguageID = sys?.WebPageUrlPathContentLanguageID ?? 0,
+                WebPageItemParentID = sys?.WebPageItemParentID ?? 0
             },
 
-
-           Hero = await _heroService.GetHeroDtoAsync(contactPage!, cancellationToken) 
-    
-    };
+            Hero = await _heroService.GetHeroDtoAsync(new HeroData
+            {
+                Layout = ContactPage.HeroLayout,
+                Title = ContactPage.HeroTitle,
+                Description = ContactPage.HeroDescription,
+                BackgroundImage = ContactPage.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string bgUrl ? Link.Parse(bgUrl) : null,
+                BackgroundImageAltText = ContactPage.HeroBackgroundImageAltText,
+                MobileBackgroundImage = ContactPage.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string mobileUrl ? Link.Parse(mobileUrl) : null,
+                MobileBackgroundImageAltText = ContactPage.HeroBackgroundImage_MobileAltText,
+                CallToActionButtonType = ContactPage.HeroCallToActionButtonType,
+                CallToActionButtonText = ContactPage.HeroCallToActionButtonText,
+                CallToActionButtonUrl = ContactPage.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath is string ctaPath ? Link.Parse(ctaPath) : null,
+            }, cancellationToken),
+        };
     }
 }
