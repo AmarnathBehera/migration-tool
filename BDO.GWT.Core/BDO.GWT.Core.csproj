@@ -10,4 +10,8 @@
     <PackageReference Include="Kentico.Xperience.Admin" Version="31.2.3" />
 	<ProjectReference Include="..\BDO.GWT.Common\BDO.GWT.Common.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Helpers\" />
+  </ItemGroup>
 </Project>

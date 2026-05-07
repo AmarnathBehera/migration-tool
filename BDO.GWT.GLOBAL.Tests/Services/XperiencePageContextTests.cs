@@ -4,6 +4,7 @@ using BDO.GWT.GLOBAL.Services;
 using CMS.ContentEngine;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
+using Kentico.Content.Web.Mvc.Routing;
 using Kentico.PageBuilder.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc.Internal;
 using Microsoft.AspNetCore.Http;
@@ -18,6 +19,7 @@ namespace BDO.GWT.GLOBAL.Tests.Services
         private Mock<IPageBuilderDataContextRetriever> _pageBuilderDataContextRetrieverMock;
         private Mock<IWebsiteChannelContext> _websiteChannelContextMock;
         private Mock<IContentQueryExecutor> _queryExecutorMock;
+        private Mock<IContentRetriever> _contentRetrieverMock;
         private XperiencePageContext _service;
 
         [SetUp]
@@ -28,13 +30,15 @@ namespace BDO.GWT.GLOBAL.Tests.Services
             _pageBuilderDataContextRetrieverMock = new Mock<IPageBuilderDataContextRetriever>();
             _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
             _queryExecutorMock = new Mock<IContentQueryExecutor>();
+            _contentRetrieverMock = new Mock<IContentRetriever>();
 
             _service = new XperiencePageContext(
                 _httpContextAccessorMock.Object,
                 _webPageDataContextRetrieverMock.Object,
                 _pageBuilderDataContextRetrieverMock.Object,
                 _websiteChannelContextMock.Object,
-                _queryExecutorMock.Object
+                _queryExecutorMock.Object,
+                _contentRetrieverMock.Object
             );
         }
 
@@ -44,6 +48,14 @@ namespace BDO.GWT.GLOBAL.Tests.Services
             _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(true);
 
             Assert.That(_service.IsInPreviewMode, Is.True);
+        }
+
+        [Test]
+        public void IsInPreviewMode_ReturnsFalse_WhenChannelIsNotPreview()
+        {
+            _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(false);
+
+            Assert.That(_service.IsInPreviewMode, Is.False);
         }
 
         [Test]
@@ -65,6 +77,16 @@ namespace BDO.GWT.GLOBAL.Tests.Services
         }
 
         [Test]
+        public void IsInPageBuilderMode_ReturnsFalse_WhenNotEditMode()
+        {
+            var httpContext = new DefaultHttpContext();
+            _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
+            _pageBuilderDataContextRetrieverMock.Setup(x => x.Retrieve()).Returns(new PageBuilderDataContext { EditMode = false });
+
+            Assert.That(_service.IsInPageBuilderMode, Is.False);
+        }
+
+        [Test]
         public async Task GetCurrentPageAsync_ReturnsNull_WhenNoContext()
         {
             _webPageDataContextRetrieverMock.Setup(x => x.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
@@ -76,20 +98,15 @@ namespace BDO.GWT.GLOBAL.Tests.Services
         }
 
         [Test]
-        public async Task GetCurrentPageMetadataAsync_ReturnsEmptyDto_WhenNoContext()
+        public async Task GetCurrentPageMetadataAsync_ReturnsNull_WhenNoContext()
         {
             _webPageDataContextRetrieverMock.Setup(x => x.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
                 .Returns(false);
 
             var result = await _service.GetCurrentPageMetadataAsync();
 
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.MetaData, Is.Null.Or.InstanceOf<MetaDataDto>());
-            Assert.That(result.OGMetaData, Is.Null.Or.InstanceOf<OGMetaDataDto>());
-            Assert.That(result.SEOItemsDto, Is.Null.Or.InstanceOf<SearchAndSEODto>());
+            Assert.That(result, Is.Null);
         }
-
-        // GetCurrentPageBasePropertiesAsync tests
 
         [Test]
         public async Task GetCurrentPageBasePropertiesAsync_WhenNoContext_ReturnsEmptyBaseWebPage()
@@ -120,14 +137,11 @@ namespace BDO.GWT.GLOBAL.Tests.Services
             Assert.That(result, Is.InstanceOf<BDO.GWT.Core.BaseWebPage>());
         }
 
-        // GetAnyPageByWebPageItemId tests
-
         [Test]
         public async Task GetAnyPageByWebPageItemId_WhenPreviewMode_UsesPreviewOptions()
         {
             _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(true);
 
-            // Extension method can't be mocked — verify IsPreview is read
             try { await _service.GetAnyPageByWebPageItemId(1, CancellationToken.None); } catch { }
 
             _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
@@ -142,8 +156,6 @@ namespace BDO.GWT.GLOBAL.Tests.Services
 
             _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
         }
-
-        // GetPageTitleByWebPageItemId tests
 
         [Test]
         public async Task GetPageTitleByWebPageItemId_WhenPreviewMode_UsesPreviewOptions()

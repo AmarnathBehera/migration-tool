@@ -38,19 +38,37 @@ public class QuoteCardWidgetProperties : IWidgetProperties
     [TextInputComponent(Label = "Button text", Order = 7)]
     public string ButtonText { get; set; } = null!;
 
-    [ContentItemSelectorComponent(new string[] { HomePage.CONTENT_TYPE_NAME, Navigation.CONTENT_TYPE_NAME }, Label = "Button URL", Order = 8)]
-    public IEnumerable<ContentItemReference> ButtonUrl { get; set; } = new List<ContentItemReference>();
+    [DropDownComponent(Label = "URL Source", Order = 8, Options = "content;Content item\r\nmanual;Manual URL")]
+    public string UrlSource { get; set; } = "content";
 
-    [DropDownComponent(Label = "Primary Button link target", Order = 9, Options = "_self;Same tab\r\n_blank;New tab")]
+    [TextInputComponent(Label = "Manual URL", Order = 9)]
+    [VisibleIfEqualTo(nameof(UrlSource), "manual")]
+    public string ManualUrl { get; set; }
+
+    [ContentItemSelectorComponent(
+        contentTypeNames: [HomePage.CONTENT_TYPE_NAME, Navigation.CONTENT_TYPE_NAME],
+        Label = "Button url",
+        Order = 10,
+        MaximumItems = 1)]
+
+    [VisibleIfEqualTo(nameof(UrlSource), "content")]
+    public IEnumerable<ContentItemReference> ButtonUrl { get; set; }
+
+    
+    [DropDownComponent(Label = "Primary Button link target", Order = 11, Options = "_self;Same tab\r\n_blank;New tab")]
 
     public string PrimaryButtonLinkTarget { get; set; } = "_self";
 
-    [RadioGroupComponent(Label = "Quote text", Order = 10, Options = "small;Small\r\nmedium;Medium\r\nlarge;Large")]
+    [RadioGroupComponent(Label = "Quote text", Order = 12, Options = "small;Small\r\nmedium;Medium\r\nlarge;Large")]
     public string Size { get; set; } = "standard";
 
-    [DropDownComponent(Label = "Top margin", Order = 11, Options = "0px;None\n20px\n40px\n60px\n80px")]
+    [DropDownComponent(Label = "Top margin", Order = 13, Options = "0px;None\n20px\n40px\n60px\n80px")]
     public string TopMargin { get; set; }
 
-    [DropDownComponent(Label = "Bottom margin", Order = 12, Options = "0px;None\n20px\n40px\n60px\n80px")]
+    [DropDownComponent(Label = "Bottom margin", Order = 14, Options = "0px;None\n20px\n40px\n60px\n80px")]
     public string BottomMargin { get; set; }
+
+    [TextInputComponent(Label = "Widget ID", Order = 15 ,ExplanationText = "ID should be unique from any other ID on the page. If the ID contains multiple words, words must be joined with a '-' (e.g. three-word-id). No other special characters and no spaces.'")]
+
+    public string WidgetID { get; set; }
 }

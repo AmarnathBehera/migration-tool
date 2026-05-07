@@ -33,6 +33,10 @@
     {
         <meta property="og:description" content="@metaDataSeoDto.OGMetaData.MetadataOGDescription">
     }
+    @if (metaDataSeoDto.OGMetaData.MetadataOGImage != null)
+    {
+        <meta property="og:image" content="@metaDataSeoDto.OGMetaData.MetadataOGImage">
+    }
     @if (metaDataSeoDto.MetaData.MetaCanonical != null)
     {
         <link rel="canonical" href="@metaDataSeoDto.MetaData.MetaCanonical" />

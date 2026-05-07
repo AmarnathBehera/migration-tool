@@ -1,6 +1,7 @@
 ﻿using Kentico.Components.Web.Mvc.FormComponents;
 using Kentico.Forms.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
+using Kentico.Xperience.Admin.Base.FormAnnotations;
 
 
 namespace BDO;
@@ -42,5 +43,9 @@ public class ViewGlobalLocationsWidgetProperties : IWidgetProperties
     [EditingComponent(DropDownComponent.IDENTIFIER, Label = "Bottom margin", Order = 8)]
     [EditingComponentProperty(nameof(DropDownProperties.DataSource), "0px;None\r\n20px\r\n40px\r\n60px\r\n80px")]
     public string BottomMargin { get; set; } = "0px";
+
+    [EditingComponent(TextInputComponent.IDENTIFIER, Label = "Widget ID", Order = 9, ExplanationText = "ID should be unique from any other ID on the page. If the ID contains multiple words, words must be joined with a '-' (e.g. three-word-id). No other special characters and no spaces.'")]
+
+    public string WidgetID { get; set; }
 
 }

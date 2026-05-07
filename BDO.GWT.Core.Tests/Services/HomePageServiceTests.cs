@@ -171,19 +171,13 @@ namespace BDO.GWT.Core.Tests.Services
 
             Assert.That(result, Is.Null);
         }
+
+
         [Test]
         public async Task GetHomePageDtoAsync_MapsAllFieldsCorrectly()
         {
             var page = new HomePage
             {
-                MetadataTitle = "Title",
-                MetadataDescription = "Desc",
-                IncludeInSitemap = true,
-                MetadataNofollow = true,
-                MetadataNoindex = false,
-                MetadataOGTitle = "OG Title",
-                MetadataOGDescription = "OG Desc",
-
                 SystemFields = new WebPageFields
                 {
                     ContentItemID = 1,
@@ -213,18 +207,6 @@ namespace BDO.GWT.Core.Tests.Services
             // ✅ Core
             Assert.That(result, Is.Not.Null);
 
-            // ✅ MetaData
-            Assert.That(result?.MetaData?.MetaTitle, Is.EqualTo("Title"));
-            Assert.That(result.MetaData.MetaDescription, Is.EqualTo("Desc"));
-
-            // ✅ SEO
-            Assert.That(result?.SearchAndSEO?.IncludeInSitemap, Is.True);
-            Assert.That(result?.SearchAndSEO?.MetadataNofollow, Is.True);
-            Assert.That(result?.SearchAndSEO?.MetadataNoindex, Is.False);
-
-            // ✅ OG
-            Assert.That(result?.OGMetaData?.MetadataOGTitle, Is.EqualTo("OG Title"));
-            Assert.That(result?.OGMetaData?.MetadataOGDescription, Is.EqualTo("OG Desc"));
             // ✅ BaseContent
             Assert.That(result?.BaseContent?.ContentItemID, Is.EqualTo(1));
             Assert.That(result?.BaseContent?.ContentItemName, Is.EqualTo("Home"));

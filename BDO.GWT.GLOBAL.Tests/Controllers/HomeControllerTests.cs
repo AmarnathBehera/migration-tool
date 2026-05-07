@@ -57,7 +57,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 {
                     MetaTitle = "Test Meta Title",
                     MetaDescription = "Test Meta Description",
-                    MetadataTeaserImage = new List<CMS.ContentEngine.IContentItemFieldsSource>(),
+                    MetadataTeaserImage = "https://example.com/image.jpg",
                     MetaTeaserImageAltText = "Alt Text",
                     MetaCanonical = "https://example.com"
                 },
@@ -71,8 +71,8 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 {
                     MetadataOGTitle = "OG Title",
                     MetadataOGDescription = "OG Description",
-                    MetadataOGImage = new List<CMS.ContentEngine.IContentItemFieldsSource>(),
-                    MetadataOGTwitterImage = new List<CMS.ContentEngine.IContentItemFieldsSource>(),
+                    MetadataOGImage = "https://example.com/og-image.jpg",
+                    MetadataOGTwitterImage = "https://example.com/twitter-image.jpg",
                     MetadataOGTwitterImageSizeCheckbox = true
                 },
                 BaseContent = new BaseContent

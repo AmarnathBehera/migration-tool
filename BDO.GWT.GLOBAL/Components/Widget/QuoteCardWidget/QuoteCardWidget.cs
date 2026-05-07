@@ -36,19 +36,23 @@ public class QuoteCardWidget : ViewComponent
             return View("~/Components/Widget/QuoteCardWidget/_QuoteCardWidget.cshtml", new QuoteCardData());
         }
 
-        var buttonUrl = new List<LinkItemDto>();
+        string buttonUrl = null;
 
-        if (model.Properties?.ButtonUrl != null && model.Properties.ButtonUrl.Any())
+        if (model.Properties.UrlSource == "manual")                             
         {
-            var guids = model.Properties.ButtonUrl
+            buttonUrl = model.Properties.ManualUrl;
+        }
+        else
+        {
+            var guids = model.Properties.ButtonUrl?
                 .Where(x => x.Identifier != Guid.Empty)
                 .Select(x => x.Identifier)
                 .ToList();
 
-            if (guids.Count > 0)
+            if (guids?.Count > 0)
             {
-                buttonUrl = await _buttonUrlRetriever
-                    .GetTilePagesAsync(guids, cancellationToken);
+                var pages = await _buttonUrlRetriever.GetTilePagesAsync(guids, cancellationToken);
+                buttonUrl = pages.FirstOrDefault()?.URL;
             }
         }
 
@@ -58,13 +62,14 @@ public class QuoteCardWidget : ViewComponent
         {
             TopMargin = model.Properties.TopMargin,
             BottomMargin = model.Properties.BottomMargin,
+            WidgetID = model.Properties.WidgetID,
             Data = new QuoteCard
             {
                 AuthorsJobTitle = model.Properties.AuthorsJobTitle,
                 Button = new LinkItemDto
                 {
                     Title = model.Properties.ButtonText!,
-                    URL = buttonUrl.FirstOrDefault()?.URL,
+                    URL = buttonUrl,
                     Target = model.Properties.PrimaryButtonLinkTarget,
                 },
                 Size = model.Properties.Size,
