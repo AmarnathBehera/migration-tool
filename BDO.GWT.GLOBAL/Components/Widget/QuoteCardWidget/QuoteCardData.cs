@@ -33,4 +33,5 @@ public class QuoteCard
     public string QuoteText { get; set; } = null!;
 
     public string QuotesAuthor { get; set; } = null!;
+
 }
