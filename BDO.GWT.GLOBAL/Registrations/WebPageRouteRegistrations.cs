@@ -1,6 +1,7 @@
 ﻿using BDO;
 using BDO.GWT.Web.Controllers;
 using BDO.GWT.Web.Core.LiveSite.Controllers;
+using GWTXbyKWeb.Controllers;
 using Kentico.Content.Web.Mvc.Routing;
 using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 
@@ -54,4 +55,12 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     name: "Section Services Page Content Type Template",
     customViewName: "~/Views/SectionServices/Index.cshtml",
     ContentTypeNames = new[] { "BDO.SectionServices" },
+    IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(Sub_Service.CONTENT_TYPE_NAME, typeof(SubServiceController))]
+[assembly: RegisterPageTemplate(
+    identifier: Sub_Service.CONTENT_TYPE_NAME,
+    name: "Sub Services Page Content Type Template",
+    customViewName: "~/Views/SubServices/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SubServices" },
     IconClass = "xp-market")]

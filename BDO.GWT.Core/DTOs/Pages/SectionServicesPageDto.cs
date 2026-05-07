@@ -18,4 +18,6 @@ public class SectionServicesPageDto
     public BaseContent? BaseContent { get; set; }
 
     public BaseWebPage? BaseWebPage { get; set; }
+
+   
 }
