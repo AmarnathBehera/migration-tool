@@ -36,7 +36,7 @@ public class QuoteCardWidget : ViewComponent
             return View("~/Components/Widget/QuoteCardWidget/_QuoteCardWidget.cshtml", new QuoteCardData());
         }
 
-        string? buttonUrl = null;
+        string buttonUrl = null;
 
         if (model.Properties.UrlSource == "manual")                             
         {

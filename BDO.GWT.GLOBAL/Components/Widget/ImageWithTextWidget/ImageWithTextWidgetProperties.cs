@@ -17,14 +17,14 @@ public class ImageWithTextWidgetProperties : IWidgetProperties
     public string Description { get; set; } = null!;
 
     [TextInputComponent(Label = "Button text", Order = 2)]
-    public string? ButtonText { get; set; }
+    public string ButtonText { get; set; }
 
     [DropDownComponent(Label = "URL Source", Order = 3, Options = "content;Content item\r\nmanual;Manual URL")]
     public string UrlSource { get; set; } = "content";
 
     [TextInputComponent(Label = "Manual URL", Order = 4)]
     [VisibleIfEqualTo(nameof(UrlSource), "manual")]         
-    public string? ManualUrl { get; set; }                   
+    public string ManualUrl { get; set; }                   
 
     [ContentItemSelectorComponent(
         contentTypeNames: [ContentAttachment.CONTENT_TYPE_NAME, SocialLinks.CONTENT_TYPE_NAME],
@@ -33,7 +33,7 @@ public class ImageWithTextWidgetProperties : IWidgetProperties
         MaximumItems = 1)]
 
     [VisibleIfEqualTo(nameof(UrlSource), "content")]         
-    public IEnumerable<ContentItemReference>? ButtonURL { get; set; } 
+    public IEnumerable<ContentItemReference> ButtonURL { get; set; } 
 
     [DropDownComponent(Label = "Primary Button link target", Order = 6, Options = "_self;Same tab\r\n_blank;New tab")]  // ← was 4, duplicate fixed
     public string PrimaryButtonLinkTarget { get; set; } = "_self";
@@ -46,12 +46,11 @@ public class ImageWithTextWidgetProperties : IWidgetProperties
 
     [TextAreaComponent(Label = "Embed code", Order = 9)]
     [VisibleIfEqualTo(nameof(MediaType), "embed")]
-    public string? EmbedCode { get; set; }                   // ← nullable
+    public string EmbedCode { get; set; }                  
 
     [ContentItemSelectorComponent(ContentAttachment.CONTENT_TYPE_NAME, Label = "Image", Order = 10, MaximumItems = 1)]
     [VisibleIfEqualTo(nameof(MediaType), "image")]
-    // ← RequiredValidationRule removed; conflicts with conditional visibility
-    public IEnumerable<ContentItemReference>? ImageURL { get; set; }   // ← nullable
+    public IEnumerable<ContentItemReference> ImageURL { get; set; }   
 
     [TextInputComponent(Label = "Image alt text", Order = 11)]
     [VisibleIfEqualTo(nameof(MediaType), "image")]
@@ -66,7 +65,7 @@ public class ImageWithTextWidgetProperties : IWidgetProperties
         ExplanationText = "Recommended size depends on usage.",
         Order = 13,
         MaximumItems = 1)]
-    public IEnumerable<ContentItemReference>? BackgroundImageURL { get; set; }  // ← nullable
+    public IEnumerable<ContentItemReference> BackgroundImageURL { get; set; }  // ← nullable
 
     [TextInputComponent(Label = "Background image alt text", Order = 14)]
     [VisibleIfNotEmpty(nameof(BackgroundImageURL))]
