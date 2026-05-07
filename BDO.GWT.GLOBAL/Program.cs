@@ -76,8 +76,6 @@ builder.Services.AddContentServices();
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddScoped<IPageBuilderService, PageBuilderService>();
 builder.Services.AddScoped<IContentService, ContentService>();
-builder.Services.AddScoped<IErrorService, ErrorService>();
-builder.Services.AddScoped<IEventLogging, EventLogging>();
 builder.Services.AddScoped<ICachingService, CachingService>();
 builder.Services.AddScoped<ISiteContext, SiteContext>();
 builder.Services.AddScoped<ISiteConfigurationService, SiteConfigurationService>();
