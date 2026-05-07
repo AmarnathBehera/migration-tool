@@ -20,7 +20,7 @@ public class TiledLinkSectionWidgetProperties : IWidgetProperties
     public string? Description { get; set; }
 
   
-    [ContentItemSelectorComponent(MigratedMediaFile.CONTENT_TYPE_NAME, Label = "Image", Order = 2)]
+    [ContentItemSelectorComponent(MigratedMediaFile.CONTENT_TYPE_NAME, Label = "Background Image", Order = 2)]
     public IEnumerable<ContentItemReference> BackgroundImages { get; set; } = new List<ContentItemReference>();
 
 
@@ -53,4 +53,8 @@ public class TiledLinkSectionWidgetProperties : IWidgetProperties
 
     [DropDownComponent(Label = "Bottom margin", Order = 11, Options = "0px;None\n20px\n40px\n60px\n80px")]
      public string? BottomMargin { get; set; }
+
+    [TextInputComponent(Label = "Widget ID", Order = 12, ExplanationText = "ID should be unique from any other ID on the page. If the ID contains multiple words, words must be joined with a '-' (e.g. three-word-id). No other special characters and no spaces.'")]
+
+    public string WidgetID { get; set; }
 }
