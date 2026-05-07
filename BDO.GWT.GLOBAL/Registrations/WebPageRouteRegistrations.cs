@@ -41,6 +41,9 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     IconClass = "xp-market")]
 
 [assembly: RegisterWebPageRoute(SectionIndustries.CONTENT_TYPE_NAME, typeof(SectionIndustriesController))]
+[assembly: RegisterWebPageRoute(IndustryCategory.CONTENT_TYPE_NAME, typeof(IndustryCategoryController))]
+[assembly: RegisterWebPageRoute(Industry.CONTENT_TYPE_NAME, typeof(IndustryController))]
+//[assembly: RegisterWebPageRoute(IndustryService.CONTENT_TYPE_NAME, typeof(IndustryServiceController))]
 [assembly: RegisterPageTemplate(
     identifier: SectionIndustries.CONTENT_TYPE_NAME,
     name: "Section Industries Page Content Type Template",
