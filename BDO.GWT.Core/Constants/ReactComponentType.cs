@@ -28,6 +28,7 @@ public static class ReactComponentType
     public const string AccordionWidget = "AccordionWidget";
     public const string ContactPageDescriptionText = "ContactPageDescriptionText";
     public const string MultiLinksCardsGrid = "MultiLinksCardsGrid";
+    public const string IndustryPrimary = "IndustryPrimary";
 
 
     //Below are the guid constants for the above components.
@@ -49,6 +50,7 @@ public static class ReactComponentType
     public const string ContactPageDescriptionTextGUID = "cd1bc3e5-c6b6-4212-9fab-a86bdc570462";
     public const string ErrorPageContentGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
     public const string MultiLinksCardsGridGUID = "a1c3e5b7-d9f2-4a6c-8e0b-1f3a5c7e9d2b";
+    public const string IndustryPrimaryGUID = "7d6afe7a-e672-43d4-b9e8-aad67c339c56";
 }
 
 
@@ -58,25 +60,7 @@ public static class ReactComponentType
 
 
 
-
-
-
-
-
-
-
-
-//
-
-
-//
 //614b9a3d-18d7-43f4-9f8f-a4bc99e99841
-
-//
-
-//
-
-//7d6afe7a-e672-43d4-b9e8-aad67c339c56
 
 //6c835a07-d2f7-4041-8c19-0513d2b31b88
 
