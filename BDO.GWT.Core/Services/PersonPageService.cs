@@ -27,18 +27,6 @@ public class PersonPageService : IPersonPageService
 {
     private readonly IHttpClientFactory _httpClientFactory;
     //private readonly IAuthoredContentService _authoredContentService;
-    //private readonly IPageRetriever<IndustryCategory> _industryCategoryPageRetriever;
-    //private readonly IPageRetriever<LocationCity> _locationCityPageRetriever;
-    //private readonly IPageRetriever<LocationOffice> _locationOfficePageRetriever;
-    //private readonly IPageRetriever<Person> _personPageRetriever;
-    //private readonly IPageRetriever<ServiceArea> _serviceAreaPageRetriever;
-    //private readonly IPageRetriever<SectionPeoplePage> _sectionPeoplePageRetriever;
-    //private readonly IPageRetriever<SpecialtiesCategory> _specialtiesCategoryPageRetriever;
-    //private readonly IPageUrlRetriever _pageUrlRetriever;
-    //private readonly IRetriever<Credential> _credentialsRetriever;
-    //private readonly IRetriever<Site> _siteRetriever;
-    //private readonly ISettingsService _settingsService;
-    private readonly IPageContext _pageContext;
     private readonly IContentService _contentService;
     private readonly ICultureContext _cultureContext;
     private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
@@ -46,9 +34,8 @@ public class PersonPageService : IPersonPageService
     private HttpClient? _httpClient;
 
     public PersonPageService(
-        //IAuthoredContentService authoredContentService,
         IHttpClientFactory httpClientFactory,
-        IPageContext pageContext,
+        //IAuthoredContentSection authoredContentService,
         IContentService contentService,
         ICultureContext cultureContext,
         ITaxonomyTagRetriever taxonomyTagRetriever
@@ -56,7 +43,6 @@ public class PersonPageService : IPersonPageService
     {
         //_authoredContentService = authoredContentService;
         _httpClientFactory = httpClientFactory;
-        _pageContext = pageContext;
         _contentService = contentService;
         _cultureContext = cultureContext;
         _taxonomyTagRetriever = taxonomyTagRetriever;
@@ -71,7 +57,7 @@ public class PersonPageService : IPersonPageService
         //personDto.SpecialtiesCategoryNames = await GetSpecialtiesCategoriesNamesAsync(page, cancellationToken);
         //personDto.ServiceAreaNames = await GetServiceAreaNamesAsync(page, cancellationToken);
         personDto.OfficeLocations = await GetLocationLinkItemsAsync(page, cancellationToken);
-       // personDto.AuthoredContent = await _authoredContentService.GetAuthoredContentDtoAsync(page, cancellationToken);
+        //personDto.AuthoredContent = await _authoredContentService.GetAuthoredContentDtoAsync(page, cancellationToken);
 
         return personDto;
     }
@@ -82,7 +68,7 @@ public class PersonPageService : IPersonPageService
            new RetrievePagesParameters { },
            query => query
                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
-               .Where(w => w.WhereEquals("ContentItemID", personGuid)),
+               .Where(w => w.WhereEquals("ContentItemGUID", personGuid)),
            RetrievalCacheSettings.CacheDisabled,
            cancellationToken
        )).FirstOrDefault();
@@ -239,7 +225,7 @@ public class PersonPageService : IPersonPageService
             TeaserImageAltText = person.MetadataTeaserImageAltText,
             Summary = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(person.MetadataDescription),
             JobTitle = person.PersonJobTitle,
-            VCardUrl = person.EnableVCard ? $"/vcard/{person.SystemFields.WebPageItemGUID}":null,//.PageGUID}" : null,
+            VCardUrl = person.EnableVCard ? $"/vcard/{person.SystemFields.ContentItemGUID}":null,
             FacebookUrl = person.Facebook,
             TwitterUrl = person.Twitter,
             LinkedInUrl = person.LinkedIn,

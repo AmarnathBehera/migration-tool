@@ -13,8 +13,6 @@
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
 
-
-
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
     var pageId = pageContext.WebPage.WebPageItemID;
@@ -36,15 +34,7 @@
     };
 }
 
-@* @section SchemaMarkup {
-    @Html.Raw(this.Model.PersonSchemaMarkupDto.ToSchemaMarkupJsString())
-} *@
-
-@* @section Styles {
-    @PageBuilderService.GetPageBuilderStyles(Html)
-} *@
-
-   @(await ReactService.RenderComponentAsync(
+@(await ReactService.RenderComponentAsync(
         pageId,
         ReactComponentType.PeopleBio,
         ReactComponentType.PeopleBioGUID,
@@ -60,13 +50,10 @@
     </div>
 }
 <div>
-@await Html.Kentico().EditableAreaAsync(
-"mainContent", // Unique identifier
-    new EditableAreaOptions
-    {
-        AllowedWidgets = widgetsList
-    })
-    </div>
-@* @await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html)
-
-@PageBuilderService.GetPageBuilderScripts(Html) *@
+    @await Html.Kentico().EditableAreaAsync(
+    "mainContent",
+        new EditableAreaOptions
+        {
+            AllowedWidgets = widgetsList
+        })
+</div>

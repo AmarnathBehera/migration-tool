@@ -24,14 +24,6 @@
     };
 }
 
-@* @section SchemaMarkup {
-    @Html.Raw(this.Model.LocationsSchemaMarkupDto.ToSchemaMarkupJsString())
-} *@
-
-@* @section Styles {
-    @PageBuilderService.GetPageBuilderStyles(Html)
-} *@
-
  @if (Model.LocationsDto != null && pageId != 0)
     {
         @(await ReactService.RenderComponentAsync(
@@ -61,12 +53,8 @@
 
     }
  @await Html.Kentico().EditableAreaAsync(
-    "mainContent", // Unique identifier
+    "mainContent", 
         new EditableAreaOptions
         {
             AllowedWidgets = widgetsList
         })
-
-@* @await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html)
-
-@PageBuilderService.GetPageBuilderScripts(Html) *@
