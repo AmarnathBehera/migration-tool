@@ -6,7 +6,7 @@ using System.Text;
 
 namespace BDO.GWT.Core.DTOs
 {
-    public class ServicesAreaAndServicePageDto
+    public class ServicesAreaPageDto
     {
         public MetaDataDto? MetaData { get; set; }
         public HeroDto Hero { get; set; } = null!;
@@ -14,7 +14,18 @@ namespace BDO.GWT.Core.DTOs
         public bool ShowSideNavigation { get; set; }
 
         public string Title { get; set; } = null!;
+        public string Description { get; set; }
 
+        public SideBoxDto? Sidebox { get; set; }
+    }
+
+    public class ServicePageDto
+    {
+        public MetaDataDto? MetaData { get; set; }
+        public HeroDto Hero { get; set; } = null!;
+
+        public bool ShowSideNavigation { get; set; }
+  
         public SideBoxDto? Sidebox { get; set; }
     }
 }

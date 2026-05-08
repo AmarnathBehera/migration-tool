@@ -60,6 +60,8 @@ public static class ServiceCollectionExtensions
         //serviceCollection.AddScoped<IIndustryCategoryPageService, IndustryCategoryPageService>();
         serviceCollection.AddScoped<ISectionServicesService, SectionServicesService>();
         serviceCollection.AddScoped<ISubServicesPageService, SubServicesPageService>();
+        serviceCollection.AddScoped<IServiceAreaAndServicePageService, ServiceAreaAndServicePageService>();
+        serviceCollection.AddScoped<IBusinessLinePageService, BusinessLinePageService>();
         serviceCollection.AddTransient<DropdownScriptExecutor>();
     }
 

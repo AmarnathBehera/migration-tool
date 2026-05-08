@@ -67,3 +67,27 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     customViewName: "~/Views/SubServices/Index.cshtml",
     ContentTypeNames = new[] { "BDO.SubServices" },
     IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(Service.CONTENT_TYPE_NAME, typeof(ServicePageController))]
+[assembly: RegisterPageTemplate(
+    identifier: Service.CONTENT_TYPE_NAME,
+    name: "Services Page Content Type Template",
+    customViewName: "~/Views/ServicePage/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.Service" },
+    IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(ServiceArea.CONTENT_TYPE_NAME, typeof(ServiceAreaController))]
+[assembly: RegisterPageTemplate(
+    identifier: ServiceArea.CONTENT_TYPE_NAME,
+    name: "Service Area Page Content Type Template",
+    customViewName: "~/Views/ServiceArea/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.ServiceArea" },
+    IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(BusinessLine.CONTENT_TYPE_NAME, typeof(BusinessLineController))]
+[assembly: RegisterPageTemplate(
+    identifier: BusinessLine.CONTENT_TYPE_NAME,
+    name: "Business Line Page Content Type Template",
+    customViewName: "~/Views/BusinessLine/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.BusinessLine" },
+    IconClass = "xp-market")]

@@ -41,71 +41,71 @@ public class SectionServicesService : ISectionServicesService
             return new SectionServicesPageDto();
         }
 
-      
-        //var serviceCategories = await _contentService.GetChildPagesByParentGuidAsync<ServiceCategory>(
-        //    page.SystemFields.WebPageItemID,
-        //    cancellationToken);
 
-        //var orderedCategories = serviceCategories
-        //    .OrderBy(ic => ic.SystemFields.WebPageItemOrder)
-        //    .ToList();
+        var serviceCategories = await _contentService.GetChildPagesByParentGuidAsync<BusinessLine>(
+            page.SystemFields.WebPageItemID,
+            cancellationToken);
 
-        //var categoryIds = orderedCategories
-        //    .Select(ic => ic.SystemFields.WebPageItemID)
-        //    .ToList();
+        var orderedCategories = serviceCategories
+            .OrderBy(ic => ic.SystemFields.WebPageItemOrder)
+            .ToList();
 
-        //var allServices = new List<Service>();
+        var categoryIds = orderedCategories
+            .Select(ic => ic.SystemFields.WebPageItemID)
+            .ToList();
 
-        //if (categoryIds.Any())
-        //{
-        //    var servicesResult = await _contentService.GetPagesAsync<Service>(
-        //        new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
-        //        query => query.Where(w => w.WhereIn(
-        //            nameof(IWebPageContentQueryDataContainer.WebPageItemParentID),
-        //            categoryIds))
-        //            .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
-        //        RetrievalCacheSettings.CacheDisabled,
-        //        cancellationToken);
+        var allServices = new List<BusinessLine>();
 
-        //    allServices = servicesResult
-        //        .OrderBy(i => i.SystemFields.WebPageItemOrder)
-        //        .ToList();
-        //}
+        if (categoryIds.Any())
+        {
+            var servicesResult = await _contentService.GetPagesAsync<BusinessLine>(
+                new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
+                query => query.Where(w => w.WhereIn(
+                    nameof(IWebPageContentQueryDataContainer.WebPageItemParentID),
+                    categoryIds))
+                    .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
+                RetrievalCacheSettings.CacheDisabled,
+                cancellationToken);
 
-        //var serviceUrls = allServices
-        //    .Select(service => (
-        //        ParentID: service.SystemFields.WebPageItemParentID, 
-        //        Name: service.MetadataTitle,
-        //        Url: service.GetUrl().RelativePath
-                
-        //    ))
-        //    .ToList();
+            allServices = servicesResult
+                .OrderBy(i => i.SystemFields.WebPageItemOrder)
+                .ToList();
+        }
 
-        //var cards = orderedCategories
-        //    .Select(ic =>
-        //    {
-        //        var imageUrl = ic.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+        var serviceUrls = allServices
+            .Select(service => (
+                ParentID: service.SystemFields.WebPageItemParentID,
+                Name: service.MetadataTitle,
+                Url: service.GetUrl().RelativePath
 
-        //        var readMoreLinks = serviceUrls
-        //            .Where(u => u.ParentID == ic.SystemFields.WebPageItemID)
-        //            .Select(u => new LinkItemDto
-        //            {
-        //                Title = u.Name,
-        //                URL = u.Url
-        //            })
-        //            .ToArray();
+            ))
+            .ToList();
 
-        //        return new MultiLinkCardDto
-        //        {
-        //            Title = ic.MetadataTitle,
-        //            Description = ic.MetadataDescription,
-        //            ImageURL = imageUrl,
-        //            ImageAltText = ic.MetadataTeaserImageAltText,
-        //            Url = ic.GetUrl().RelativePath,
-        //            ReadMoreLinks = readMoreLinks,  
-        //        };
-        //    })
-        //    .ToArray();
+        var cards = orderedCategories
+            .Select(ic =>
+            {
+                var imageUrl = ic.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+
+                var readMoreLinks = serviceUrls
+                    .Where(u => u.ParentID == ic.SystemFields.WebPageItemID)
+                    .Select(u => new LinkItemDto
+                    {
+                        Title = u.Name,
+                        URL = u.Url
+                    })
+                    .ToArray();
+
+                return new MultiLinkCardDto
+                {
+                    Title = ic.MetadataTitle,
+                    Description = ic.MetadataDescription,
+                    ImageURL = imageUrl,
+                    ImageAltText = ic.MetadataTeaserImageAltText,
+                    Url = ic.GetUrl().RelativePath,
+                    ReadMoreLinks = readMoreLinks,
+                };
+            })
+            .ToArray();
 
         var bgImageUrl = page.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
         var mobileImageUrl = page.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
@@ -132,7 +132,7 @@ public class SectionServicesService : ISectionServicesService
             {
                 Title = page.GridTitle,
                 Description = page.GridSummary,
-                //Cards = cards,
+                Cards = cards,
                 IsMultiLinks = page.ShowMultiLinks,
             },
         };
