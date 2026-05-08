@@ -51,7 +51,6 @@ public class SectionPeoplePageService : ISectionPeoplePageService
     {
         var bgImageUrl = page.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
         var mobileImageUrl = page.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
-        var ctaUrlPath = page.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath;
         var filters = string.IsNullOrWhiteSpace(page.PeopleListFilters)
     ? new HashSet<string>()
     : page.PeopleListFilters

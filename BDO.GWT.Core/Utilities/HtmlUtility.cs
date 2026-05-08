@@ -78,19 +78,15 @@ public static class HtmlUtility
 
     private static bool IsTildeWithinHtmlAttribute(ReadOnlySpan<char> substring)
     {
-        if (substring.EndsWith("=", StringComparison.Ordinal))
+        if (substring.EndsWith("=", StringComparison.Ordinal)
+            && substring.TrimEnd(new[] { '=' }).TrimEnd(null).EndsWithAny(StringComparison.OrdinalIgnoreCase, UrlTypeHtmlAttributes))
         {
-            if (substring.TrimEnd(new[] { '=' }).TrimEnd(null).EndsWithAny(StringComparison.OrdinalIgnoreCase, UrlTypeHtmlAttributes))
-            {
-                return true;
-            }
+            return true;
         }
-        else if (substring.EndsWith("(", StringComparison.Ordinal))
+        else if (substring.EndsWith("(", StringComparison.Ordinal)
+            && substring.TrimEnd(new[] { '(' }).TrimEnd(null).EndsWith("url", StringComparison.OrdinalIgnoreCase))
         {
-            if (substring.TrimEnd(new[] { '(' }).TrimEnd(null).EndsWith("url", StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
+            return true;
         }
 
         return false;

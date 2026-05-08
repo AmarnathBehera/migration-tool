@@ -26,7 +26,6 @@ public interface IPersonPageService
 public class PersonPageService : IPersonPageService
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    //private readonly IAuthoredContentService _authoredContentService;
     private readonly IContentService _contentService;
     private readonly ICultureContext _cultureContext;
     private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
@@ -35,13 +34,11 @@ public class PersonPageService : IPersonPageService
 
     public PersonPageService(
         IHttpClientFactory httpClientFactory,
-        //IAuthoredContentSection authoredContentService,
         IContentService contentService,
         ICultureContext cultureContext,
         ITaxonomyTagRetriever taxonomyTagRetriever
         )
     {
-        //_authoredContentService = authoredContentService;
         _httpClientFactory = httpClientFactory;
         _contentService = contentService;
         _cultureContext = cultureContext;
@@ -52,19 +49,15 @@ public class PersonPageService : IPersonPageService
     {
         var personDto = await MapBasicFieldsAsync(page, cancellationToken);
 
-        personDto.Credentials = await GetCredentialNamesAsync(page, cancellationToken);
-        //personDto.IndustryCategoryNames = await GetIndustryCategoryNamesAsync(page, cancellationToken);
-        //personDto.SpecialtiesCategoryNames = await GetSpecialtiesCategoriesNamesAsync(page, cancellationToken);
-        //personDto.ServiceAreaNames = await GetServiceAreaNamesAsync(page, cancellationToken);
+        personDto.Credentials = await GetCredentialNamesAsync(page);
         personDto.OfficeLocations = await GetLocationLinkItemsAsync(page, cancellationToken);
-        //personDto.AuthoredContent = await _authoredContentService.GetAuthoredContentDtoAsync(page, cancellationToken);
 
         return personDto;
     }
 
     public async Task<VCardData?> GeneratePersonVCardAsync(Guid personGuid, string? source = null, CancellationToken cancellationToken = default)
     {
-        var person=(await _contentService.GetPagesAsync<Person>(
+        var person = (await _contentService.GetPagesAsync<Person>(
            new RetrievePagesParameters { },
            query => query
                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
@@ -81,7 +74,7 @@ public class PersonPageService : IPersonPageService
 
         var photoUrl = photoLink.FirstOrDefault()?.ContentAttachmentAsset.Url;
         var (photoMediaType, photoData) = await RetrieveImageBinaryAsync(photoUrl, cancellationToken);
-        var (logoMediaType, logoData) = await RetrieveImageBinaryAsync("https://cdn.bdo.global/images/bdo_logo/1.0.0/bdo_logo_color.png", cancellationToken);
+        var (logoMediaType, logoData) = await RetrieveImageBinaryAsync(_contentService.GetCurrentSiteLogoImageUrlAsync(), cancellationToken);
 
         var offices = await _contentService.RetrievePagesAsync<LocationOffice>(
         new RetrievePagesParameters
@@ -127,22 +120,24 @@ public class PersonPageService : IPersonPageService
         },
         cancellationToken
     );
-        var locations = offices?.Join(cities, x => x.SystemFields.WebPageItemParentID, x => x.SystemFields.WebPageItemID, (office, city) => ("WORK", new VCardLocationData
-        {
-            Address = office?.LocationAddressLine1,
-            SecondAddress = office?.LocationAddressLine2,
-            City = city?.MetadataTitle,
-            //State = city?.RegionName,
-            Zip = office?.LocationZip,
-            Country = office?.LocationCountry,
-        }));
-
-        var showEmailInVCard = true;
+        var locations = offices?.Join(
+    cities ?? Enumerable.Empty<LocationCity?>(),
+    x => x?.SystemFields.WebPageItemParentID ?? 0,
+    x => x?.SystemFields.WebPageItemID ?? 0,
+    (office, city) => ("WORK", new VCardLocationData
+    {
+        Address = office?.LocationAddressLine1,
+        SecondAddress = office?.LocationAddressLine2,
+        City = city?.MetadataTitle,
+        //State = city?.RegionName,
+        Zip = office?.LocationZip,
+        Country = office?.LocationCountry,
+    }));
 
         var vCard = new VCardData
         {
-            FullName = await GetPersonDisplayNameAsync(person),
-            EMail = showEmailInVCard == true ? person.PersonEmail : string.Empty,
+            FullName = GetPersonDisplayNameAsync(person),
+            EMail = person.PersonEmail ?? string.Empty,
             Title = person.PersonJobTitle,
             TelephoneNumbers = new List<(string? Type, string? Number)>
             {
@@ -196,8 +191,8 @@ public class PersonPageService : IPersonPageService
             Url = person.GetUrl().AbsoluteUrl,
             Name = person.MetadataTitle,
             JobTitle = person.PersonJobTitle,
-            Description = _contentService.GetFallbackMetadataDescription(person.MetadataDescription,person.MetadataOGDescription),
-            Image = person.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url ?? string.Empty,//.ToHtmlCompatibleString(),
+            Description = _contentService.GetFallbackMetadataDescription(person.MetadataDescription, person.MetadataOGDescription),
+            Image = person.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url ?? string.Empty,
             SameAs = socialProfiles,
             WorksFor = new OrganizationSchemaMarkupDto
             {
@@ -206,9 +201,9 @@ public class PersonPageService : IPersonPageService
             },
         };
     }
-    
+
     private async Task<PersonDto> MapBasicFieldsAsync(Person person, CancellationToken cancellationToken)
-    {        
+    {
         var sectionPeople = (await _contentService.GetPagesAsync<SectionPeoplePage>(
            new RetrievePagesParameters { },
            query => query
@@ -220,12 +215,12 @@ public class PersonPageService : IPersonPageService
 
         return new PersonDto
         {
-            DisplayName = await GetPersonDisplayNameAsync(person),
-            TeaserImageUrl = person.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url ?? string.Empty,//.ToHtmlCompatibleString(),
+            DisplayName = GetPersonDisplayNameAsync(person),
+            TeaserImageUrl = person.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url ?? string.Empty,
             TeaserImageAltText = person.MetadataTeaserImageAltText,
             Summary = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(person.MetadataDescription),
             JobTitle = person.PersonJobTitle,
-            VCardUrl = person.EnableVCard ? $"/vcard/{person.SystemFields.ContentItemGUID}":null,
+            VCardUrl = person.EnableVCard ? $"/vcard/{person.SystemFields.ContentItemGUID}" : null,
             FacebookUrl = person.Facebook,
             TwitterUrl = person.Twitter,
             LinkedInUrl = person.LinkedIn,
@@ -238,11 +233,11 @@ public class PersonPageService : IPersonPageService
             ParentEnableForm = sectionPeople?.EnableForm ?? false
         };
     }
-    public async Task<string> GetPersonDisplayNameAsync(Person person)
+    public static string GetPersonDisplayNameAsync(Person person)
     {
         return string.IsNullOrEmpty(person.PersonSurnamePrefixes) ? $"{person.PersonFirstName} {person.PersonLastName}" : $"{person.PersonFirstName} {person.PersonSurnamePrefixes} {person.PersonLastName}";
     }
-    private async Task<IEnumerable<string>> GetCredentialNamesAsync(Person person, CancellationToken cancellationToken = default)
+    private async Task<IEnumerable<string>> GetCredentialNamesAsync(Person person)
     {
         return (await _taxonomyTagRetriever.GetTaxonomyTagByGUIDs(person.PersonCredentials, _cultureContext.CurrentLanguageTag)).Select(x => x.Name);
     }
@@ -268,11 +263,10 @@ public class PersonPageService : IPersonPageService
             },
             cancellationToken
         );
-
         var locationOfficesNodeParentIds = locationOffices?
             .Where(x => x is not null && x.SystemFields.WebPageItemParentID > 0)
-            .DistinctBy(x => x.SystemFields.WebPageItemParentID)
-            .Select(x => x.SystemFields.WebPageItemParentID)
+            .DistinctBy(x => x!.SystemFields.WebPageItemParentID)
+            .Select(x => x!.SystemFields.WebPageItemParentID)
             .ToArray();
 
         var locationCities = await _contentService.RetrievePagesAsync<LocationCity>(
@@ -329,7 +323,12 @@ public class PersonPageService : IPersonPageService
         {
             var response = await client.GetAsync(url, cancellationToken);
 
-            var format = response?.Content?.Headers?.ContentType?.MediaType;
+            if (response?.Content is null)
+            {
+                return (null, null);
+            }
+
+            var format = response.Content.Headers?.ContentType?.MediaType;
 
             return (format, await response.Content.ReadAsByteArrayAsync(cancellationToken));
         }

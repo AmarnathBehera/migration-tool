@@ -1,6 +1,4 @@
 ﻿using CMS.Websites;
-using Kentico.Content.Web.Mvc;
-using static BDO.GWT.Core.Constants.ResourceStringKey.LiveSite;
 
 namespace BDO.GWT.Core.Helpers;
 
@@ -19,27 +17,25 @@ public class PersonHelper : IPersonHelper
     public async Task<PersonEmailInfo> GetPersonPageEmailId(string personTitle, string url, string culture)
     {
         string name;
-        //var people = await _contentService.GetItemsAsync<Person>(builder =>
-        //{
-        //    builder.InLanguage(culture);
+        var people = await _contentService.GetItemsAsync<Person>(builder =>
+        {
+            builder.InLanguage(culture);
 
-        //    builder.Parameters(p => p
-        //        .Where(w => w.WhereEquals("WebPageItemPath", url))
-        //        .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
-        //    );
-        //});
-        var people = new List<Person> {  };
-        var person = people.FirstOrDefault();
+            builder.Parameters(p => p
+                .Where(w => w.WhereEquals("WebPageItemPath", url))
+                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
+            );
+        });
+        var person = people.Count > 0 ? people[0] : null;
 
         if (person == null)
         {
             var fallbackPeople = await _contentService.GetItemsAsync<Person>(builder =>
             {
-                //builder.InLanguage(culture);
-
+                builder.InLanguage(culture);
                 builder.Parameters(p => p
                     .Where(w => w.WhereEquals("MetadataTitle", personTitle))
-                    //.OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
+                    .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
                 );
             });
 

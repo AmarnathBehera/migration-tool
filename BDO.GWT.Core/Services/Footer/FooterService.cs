@@ -136,7 +136,7 @@ public class FooterService : IFooterService
                 OpenInNewTab = link?.OpenInNewTab ?? false,
                 Order = order++,
                 Title = link?.Title ?? string.Empty,
-                URL = guid != Guid.Empty && pageUrlMap.ContainsKey(guid) ? pageUrlMap[guid] : string.Empty
+                URL = guid != Guid.Empty && pageUrlMap.TryGetValue(guid, out var url) ? url : string.Empty
             });
         }
         return footerPages;

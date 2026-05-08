@@ -1,6 +1,6 @@
 ﻿namespace BDO.GWT.Core.Retrievers;
 
-public enum PathTypeEnum
+public enum PathType
 {
     /// <summary>
     /// Path used as it is (no additional modification).

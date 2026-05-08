@@ -12,7 +12,7 @@ public interface ITaxonomyTagRetriever
         HashSet<string>? filterTagNames = null,
         CancellationToken cancellationToken = default);
     Task<TaxonomyData?> GetTagAsync(string taxonomyName, string value, string culture);
-    Task<TagInfo> GetTaxonomyTagByNameAsync(string tagName,CancellationToken cancellationToken = default);
+    Task<TagInfo> GetTaxonomyTagByNameAsync(string tagName);
     Task<IEnumerable<TaxonomyTag>> GetTaxonomyTagByGUIDs(IEnumerable<TagReference> tagGuids, string languageName);
 }
 public class TaxonomyTagRetriever : ITaxonomyTagRetriever
@@ -34,7 +34,8 @@ public class TaxonomyTagRetriever : ITaxonomyTagRetriever
     {
         var taxonomyData = await _taxonomyRetriever.RetrieveTaxonomy(
             taxonomyName,
-            languageName);
+            languageName,
+            cancellationToken);
 
         if (taxonomyData is null)
         {
@@ -54,9 +55,7 @@ public class TaxonomyTagRetriever : ITaxonomyTagRetriever
         var taxonomy = await _taxonomyRetriever.RetrieveTaxonomy(taxonomyName, culture);
         return taxonomy;
     }
-    public async Task<TagInfo> GetTaxonomyTagByNameAsync(
-        string tagName,
-        CancellationToken cancellationToken = default)
+    public async Task<TagInfo> GetTaxonomyTagByNameAsync(string tagName)
     {
         var taxonomyItems = await _tagProvider.GetAsync(tagName);
         if (taxonomyItems == null)

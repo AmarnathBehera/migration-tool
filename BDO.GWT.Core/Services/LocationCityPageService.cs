@@ -7,10 +7,6 @@ using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.Services;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
-using System.Collections.Generic;
-using System.Linq;  
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BDO.GWT.Core.Services;
 
@@ -24,31 +20,13 @@ public class LocationCityPageService : ILocationCityPageService
 {
     private readonly IHeroService _heroService;
     private readonly IContentService _contentService;
-    //private readonly IPageRetriever<LocationOffice> _locationOfficePageRetriever;
-    //private readonly ICurrentSiteHelper _currentSiteHelper;
-    //private readonly IPageUrlService _pageUrlService;
-    //private readonly IRetriever<Site> _siteRetriever;
-    //private readonly ISiteContext _siteContext;
-    private readonly IPageContext _pageContext;
 
     public LocationCityPageService(
         IHeroService heroService,
-        IContentService contentService,
-        //IPageRetriever<LocationOffice> locationOfficePageRetriever,
-        //ICurrentSiteHelper currentSiteHelper,
-        //IPageUrlService pageUrlService,
-        //IRetriever<Site> siteRetriever,
-        //ISiteContext siteContext,
-        IPageContext pageContext)
+        IContentService contentService)
     {
-        //_locationOfficePageRetriever = locationOfficePageRetriever;
         _heroService = heroService;
         _contentService = contentService;
-        //_currentSiteHelper = currentSiteHelper;
-        //_pageUrlService = pageUrlService;
-        //_siteRetriever = siteRetriever;
-        //_siteContext = siteContext;
-        _pageContext = pageContext;
     }
 
     public async Task<LocationCityDto> GetLocationCityDtoAsync(LocationCity page, CancellationToken cancellationToken)

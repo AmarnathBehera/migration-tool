@@ -7,12 +7,10 @@ using CMS.EmailEngine;
 using CMS.EmailLibrary;
 using CMS.Helpers;
 using CMS.OnlineForms;
-using ImageMagick;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 [assembly: RegisterModule(typeof(FormHandlerModule))]
 
@@ -45,7 +43,6 @@ public class FormHandlerModule : Module
         {
             return;
         }
-        string formDisplayName = formInfo.FormDisplayName;
         string formName = formInfo.FormName; // code name (optional)
 
         switch (formName?.ToLowerInvariant())
@@ -76,7 +73,6 @@ public class FormHandlerModule : Module
         var scopeFactory = Service.Resolve<IServiceScopeFactory>();
 
         using var scope = scopeFactory.CreateScope();
-        var serviceProvider = scope.ServiceProvider;
 
             if (formDataItem == null)
             {

@@ -54,7 +54,7 @@ public class PeopleCardsService : IPeopleCardsService
     }
 
     public async Task<PaginationDto<PersonCardDto>> GetFilteredItemsAsync(
- SectionPeoplePage sectionPeople,
+ SectionPeoplePage page,
  CardsQuery cardsQuery,
  Action<ContentItemQueryBuilder>? decorateQuery,
  Func<Person, bool> isFeatured,
@@ -74,7 +74,7 @@ public class PeopleCardsService : IPeopleCardsService
                 query.Where(w =>
                 {
                     w.WhereEquals("ContentItemChannelID", _contentService.GetCurrentChannelID());
-                    w.WhereEquals("WebPageItemParentID", sectionPeople.SystemFields.WebPageItemID);
+                    w.WhereEquals("WebPageItemParentID", page.SystemFields.WebPageItemID);
                     foreach (var filter in filterWhereExpressions)
                     {
                         filter(w);
@@ -92,9 +92,9 @@ public class PeopleCardsService : IPeopleCardsService
             },
             cancellationToken
         );
-        var peopleArray = people?.ToArray() ?? Array.Empty<Person>();
+        var peopleArray = people?.OfType<Person>().ToArray() ?? Array.Empty<Person>();
 
-        var cardDtos = await CreatePeopleCardDtosAsync(peopleArray, cancellationToken);
+        var cardDtos = await CreatePeopleCardDtosAsync(peopleArray);
 
         return new PaginationDto<PersonCardDto>
         {
@@ -105,8 +105,6 @@ public class PeopleCardsService : IPeopleCardsService
     private async Task<List<Action<WhereParameters>>> GetFilterParameterWhereExpressionsAsync(
      IDictionary<string, string> filterParameterValueByName)
     {
-        string culture = _cultureContext.CurrentLanguageTag;
-
         var filters = new List<Action<WhereParameters>>();
 
         foreach (var (filterName, filterValue) in filterParameterValueByName)
@@ -124,23 +122,6 @@ public class PeopleCardsService : IPeopleCardsService
                 {
                     continue;
                 }
-                //Expression<Func<Person, bool>>? whereExpression = filterName switch
-                //{
-                //    //FilterParameterName.BusinessLine => await BuildBusinessLineWhereExpression(page.NodeAliasPath),
-                //    //FilterParameterName.ServiceArea => await BuildServiceAreaWhereExpression(page.NodeAliasPath),
-                //    //FilterParameterName.Service => await BuildServiceWhereExpression(page.NodeAliasPath),
-                //    //FilterParameterName.SubService => x => x.MetadataSubServices.Contains(page.SystemFields.WebPageItemID),
-                //    //FilterParameterName.IndustryCategory => await BuildIndustryCategoryWhereExpression(page.NodeAliasPath),
-                //    //FilterParameterName.IndustryPage => await BuildIndustryWhereExpression(page.NodeAliasPath),
-                //    //FilterParameterName.IndustryService => x => x.MetadataIndustryServices.Contains(page.SystemFields.WebPageItemID),
-                //    //FilterParameterName.SpecialtyCategory => await BuildSpecialtyCategoryWhereExpression(page.NodeAliasPath),
-                //    //FilterParameterName.SpecialtyArea => await BuildSpecialtyAreaWhereExpression(page.NodeAliasPath),
-                //    //FilterParameterName.Specialty => x => x.MetadataSpecialtiesPages.Contains(page.SystemFields.WebPageItemID),
-                //    //FilterParameterName.MicrositeMasterPage => await BuildMicrositeMasterPageWhereExpression(page.NodeAliasPath),
-                //    FilterParameterName.OfficeLocation => x => x.MetadataOfficeLocation.Any(o => o.SystemFields.WebPageItemID == page.SystemFields.WebPageItemID),
-                //    FilterParameterName.City => x => x.MetadataCity.Any(o => o.SystemFields.WebPageItemID == page.SystemFields.WebPageItemID),
-                //    _ => null,
-                //};
                 Action<WhereParameters>? filterAction = filterName switch
                 {
                     FilterParameterName.OfficeLocation => w =>
@@ -166,7 +147,7 @@ public class PeopleCardsService : IPeopleCardsService
                             if (tag == null)
                                 break;
                             var identifiers = new List<Guid> { tag.TagGUID };
-                            if (identifiers.Any())
+                            if (identifiers.Count > 0)
                             {
                                 filters.Add(w =>
                                     w.WhereContainsTags(nameof(Person.PersonCredentials), identifiers));
@@ -180,7 +161,7 @@ public class PeopleCardsService : IPeopleCardsService
                             if (tag == null)
                                 break;
                             var identifiers = new List<Guid> { tag.TagGUID };
-                            if (identifiers.Any())
+                            if (identifiers.Count > 0)
                             {
                                 filters.Add(w =>
                                     w.WhereContainsTags(nameof(Person.MetadataProfileGroups), identifiers));
@@ -194,8 +175,7 @@ public class PeopleCardsService : IPeopleCardsService
         return filters;
     }
     private async Task<PersonCardDto[]> CreatePeopleCardDtosAsync(
-    Person[] people,
-    CancellationToken cancellationToken)
+    Person[] people)
     {
         var dtos = people.Select(person => new PersonCardDto
         {
