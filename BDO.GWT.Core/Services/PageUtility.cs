@@ -10,10 +10,7 @@ using System.Threading.Tasks;
 
 namespace BDO.GWT.Core
 {
-    /// <summary>
-    /// XbyK implementation of <see cref="IPageUtility"/>.
-    /// Wraps <see cref="IContentService"/> to provide reusable page utility operations.
-    /// </summary>
+   
     public class PageUtility : IPageUtility
     {
         private readonly IContentService _contentService;
@@ -22,6 +19,19 @@ namespace BDO.GWT.Core
         {
             _contentService = contentService;
         }
+
+        /// <summary>
+        /// Builds a side navigation box for a page.
+        /// 
+        /// It fetches all child pages under the given parent page, sorts them by their
+        /// display order, and turns each one into a link (title + URL).
+        /// The result is a <see cref="SideBoxDto"/> containing the box heading and the list of links,
+        /// ready to be rendered as a side navigation menu.
+        /// </summary>
+        /// <param name="sideboxTitle">The heading shown at the top of the side box.</param>
+        /// <param name="parentWebPageItemId">The ID of the parent page whose children become the links.</param>
+        /// <param name="titleSelector">A function that picks the link text from each child page.</param>
+        /// <param name="cancellationToken">Token to cancel the operation if needed.</param>
 
         public async Task<SideBoxDto> GetSideboxDtoAsync<TPage>(
             string sideboxTitle,
@@ -49,6 +59,27 @@ namespace BDO.GWT.Core
             };
         }
 
+        /// <summary>
+        /// Builds an array of multi-link cards for a grid section.
+        ///
+        /// Each card represents a <typeparamref name="TCategory"/> page (e.g. an Industry Category).
+        /// Under each card, "Read More" links are populated from its <typeparamref name="TChild"/> pages
+        /// (e.g. individual Industries).
+        ///
+        /// Steps:
+        /// 1. Fetch all category pages under the given parent and sort them by display order.
+        /// 2. Fetch all child pages that belong to any of those categories in one query.
+        /// 3. Match each child back to its parent category using the parent ID.
+        /// 4. Build a card per category, attaching the matched children as "Read More" links.
+        /// </summary>
+        /// <param name="parentWebPageItemId">The ID of the top-level page that owns the categories.</param>
+        /// <param name="cardTitleSelector">Returns the card's title from a category page.</param>
+        /// <param name="cardDescriptionSelector">Returns the card's description from a category page.</param>
+        /// <param name="cardImageUrlSelector">Returns the card's image URL from a category page (nullable).</param>
+        /// <param name="cardImageAltTextSelector">Returns the card image alt text from a category page (nullable).</param>
+        /// <param name="childTitleSelector">Returns the link text for each child page.</param>
+        /// <param name="cancellationToken">Token to cancel the operation if needed.</param>
+
         public async Task<MultiLinkCardDto[]> GetMultiLinkCardsAsync<TCategory, TChild>(
            int parentWebPageItemId,
            Func<TCategory, string> cardTitleSelector,
@@ -60,7 +91,6 @@ namespace BDO.GWT.Core
            where TCategory : class, IWebPageFieldsSource
            where TChild : class, IWebPageFieldsSource
         {
-            // ── 1. Load category pages — direct children of parent ────────────
             var categories = await _contentService.GetChildPagesByParentGuidAsync<TCategory>(
                 parentWebPageItemId,
                 cancellationToken);
@@ -69,7 +99,6 @@ namespace BDO.GWT.Core
                 .OrderBy(c => c.SystemFields.WebPageItemOrder)
                 .ToList();
 
-            // ── 2. Load ALL child pages across all categories in one query ────
             var categoryIds = orderedCategories
                 .Select(c => c.SystemFields.WebPageItemID)
                 .ToList();
@@ -93,7 +122,6 @@ namespace BDO.GWT.Core
                     .ToList();
             }
 
-            // ── 3. Build flat child lookup keyed by ParentID ──────────────────
             var childUrls = allChildren
                 .Select(child => (
                     ParentID: child.SystemFields.WebPageItemParentID,
@@ -102,7 +130,6 @@ namespace BDO.GWT.Core
                 ))
                 .ToList();
 
-            // ── 4. Build one card per category ────────────────────────────────
             var cards = orderedCategories
                 .Select(category =>
                 {

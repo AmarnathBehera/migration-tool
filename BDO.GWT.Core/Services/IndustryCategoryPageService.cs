@@ -98,30 +98,4 @@ public class IndustryCategoryPageService : IIndustryCategoryPageService
             },
         };
     }
-
-    //private async Task<SideBoxDto> GetSideboxDtoAsync<TPage>(
-    // string sideboxTitle,
-    // int parentWebPageItemId,
-    // Func<TPage, string> titleSelector,      
-    // CancellationToken cancellationToken)
-    // where TPage : class, IWebPageFieldsSource
-    //{
-    //    var childPages = await _contentService.GetChildPagesByParentGuidAsync<TPage>(
-    //        parentWebPageItemId,
-    //        cancellationToken);
-
-    //    var linkDtos = childPages
-    //        .OrderBy(p => p.SystemFields.WebPageItemOrder)
-    //        .Select(p => new LinkItemDto
-    //        {
-    //            Title = titleSelector(p),         
-    //            URL = p.GetUrl().RelativePath,
-    //        });
-
-    //    return new SideBoxDto
-    //    {
-    //        Title = sideboxTitle,
-    //        Links = linkDtos,
-    //    };
-    //}
 }

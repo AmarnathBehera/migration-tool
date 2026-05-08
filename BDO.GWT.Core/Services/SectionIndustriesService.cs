@@ -45,74 +45,8 @@ public class SectionIndustriesService : ISectionIndustriesService
         {
             return new SectionIndustriesPageDto();
         }
-
-      
-        //var industryCategories = await _contentService.GetChildPagesByParentGuidAsync<IndustryCategory>(
-        //    page.SystemFields.WebPageItemID,
-        //    cancellationToken);
-
-        //var orderedCategories = industryCategories
-        //    .OrderBy(ic => ic.SystemFields.WebPageItemOrder)
-        //    .ToList();
-
-        //var categoryIds = orderedCategories
-        //    .Select(ic => ic.SystemFields.WebPageItemID)
-        //    .ToList();
-
-        //var allIndustries = new List<Industry>();
-
-        //if (categoryIds.Any())
-        //{
-        //    var industriesResult = await _contentService.GetPagesAsync<Industry>(
-        //        new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
-        //        query => query.Where(w => w.WhereIn(
-        //            nameof(IWebPageContentQueryDataContainer.WebPageItemParentID),
-        //            categoryIds))
-        //            .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
-        //        RetrievalCacheSettings.CacheDisabled,
-        //        cancellationToken);
-
-        //    allIndustries = industriesResult
-        //        .OrderBy(i => i.SystemFields.WebPageItemOrder)
-        //        .ToList();
-        //}
-
-        //var industryUrls = allIndustries
-        //    .Select(industry => (
-        //        ParentID: industry.SystemFields.WebPageItemParentID, 
-        //        Name: industry.MetadataTitle,
-        //        Url: industry.SystemFields.WebPageUrlPath
-
-        //    ))
-        //    .ToList();
-
-        //var cards = orderedCategories
-        //    .Select(ic =>
-        //    {
-        //        var imageUrl = ic.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
-
-        //        var readMoreLinks = industryUrls
-        //            .Where(u => u.ParentID == ic.SystemFields.WebPageItemID)
-        //            .Select(u => new LinkItemDto
-        //            {
-        //                Title = u.Name,
-        //                URL = u.Url
-        //            })
-        //            .ToArray();
-
-        //        return new MultiLinkCardDto
-        //        {
-        //            Title = ic.MetadataTitle,
-        //            Description = ic.MetadataDescription,
-        //            ImageURL = imageUrl,
-        //            ImageAltText = ic.MetadataTeaserImageAltText,
-        //            Url = ic.SystemFields?.WebPageUrlPath,
-        //            ReadMoreLinks = readMoreLinks,  
-        //        };
-        //    })
-        //    .ToArray();
-
-        var cards = await _pageUtility.GetMultiLinkCardsAsync<IndustryCategory, Industry>(
+              
+           var cards = await _pageUtility.GetMultiLinkCardsAsync<IndustryCategory, Industry>(
             parentWebPageItemId: page.SystemFields.WebPageItemID,
             cardTitleSelector: ic => ic.MetadataTitle,
             cardDescriptionSelector: ic => ic.MetadataDescription,
@@ -144,28 +78,6 @@ public class SectionIndustriesService : ISectionIndustriesService
         return new SectionIndustriesPageDto
         {
             Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
-            MetaData = new MetaDataDto
-            {
-                MetaTitle = page.MetadataTitle,
-                MetaDescription = page.MetadataDescription,
-                MetadataTeaserImage = page.MetadataTeaserImage,
-                MetaTeaserImageAltText = page.MetadataTeaserImageAltText,
-                MetaCanonical = page.MetadataCanonical
-            },
-            SearchAndSEO = new SearchAndSEODto
-            {
-                IncludeInSitemap = page.IncludeInSitemap,
-                MetadataNofollow = page.MetadataNofollow,
-                MetadataNoindex = page.MetadataNoindex
-            },
-            OGMetaData = new OGMetaDataDto
-            {
-                MetadataOGTitle = page.MetadataOGTitle,
-                MetadataOGDescription = page.MetadataOGDescription,
-                MetadataOGImage = page.MetadataOGImage,
-                MetadataOGTwitterImage = page.MetadataOGTwitterImage,
-                MetadataOGTwitterImageSizeCheckbox = page.MetadataOGTwitterImageSizeCheckbox
-            },
             MultiLinksCardsGrid = new MultiLinkCardsGridDto
             {
                 Title = page.GridTitle,
