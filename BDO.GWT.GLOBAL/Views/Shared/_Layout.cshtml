@@ -68,6 +68,7 @@
         <meta name="robots" content="nofollow">
     }
     <meta property="og:type" content="website">
+    @* @(await Component.InvokeAsync<HreflangLinks>()) *@
     @Html.Kentico().PageBuilderStyles()
     @(await Component.InvokeAsync<ScriptsHead>())
     @(await Component.InvokeAsync<StartScriptsHead>())
@@ -85,6 +86,7 @@
     @await RenderSectionAsync("Styles", required: false)
     <link rel="stylesheet" href="/dist/master.css" asp-append-version="true" />
     <link rel="stylesheet" href="/Public/Sections/section-column.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/Public/Components/language-switcher.css" asp-append-version="true" />
     <page-builder-styles />
 </head>
 
@@ -92,6 +94,7 @@
     @await (Component.InvokeAsync<ScriptsTopBody>())
     @RenderSection("styles", required: false)
     @await (Component.InvokeAsync<Header>())
+    @* @(await Component.InvokeAsync<LanguageSwitcher>()) *@
     @(await Component.InvokeAsync<ScriptsHead>())
     @await (Component.InvokeAsync<Breadcrumbs>())
 

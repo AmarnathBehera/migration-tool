@@ -5,6 +5,7 @@ using BDO.GWT.Core.Services.Header;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
+using Microsoft.AspNetCore.Http;
 using Moq;
 
 namespace BDO.GWT.Core.Tests.Services
@@ -16,6 +17,8 @@ namespace BDO.GWT.Core.Tests.Services
         private Mock<IHomePageService> _homePageServiceMock = null!;
         private Mock<IWebsiteCulturesService> _websiteCulturesServiceMock = null!;
         private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
+        private Mock<ILocalizedUrlsBuilder> _localizedUrlsBuilderMock = null!;
+        private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
         private HeaderService _service = null!;
 
         [SetUp]
@@ -26,13 +29,17 @@ namespace BDO.GWT.Core.Tests.Services
             _homePageServiceMock = new Mock<IHomePageService>();
             _websiteCulturesServiceMock = new Mock<IWebsiteCulturesService>();
             _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
+            _localizedUrlsBuilderMock = new Mock<ILocalizedUrlsBuilder>();
+            _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
 
             _service = new HeaderService(
                 _contentServiceMock.Object,
                 _contentRetrieverMock.Object,
                 _homePageServiceMock.Object,
                 _websiteCulturesServiceMock.Object,
-                _websiteChannelContextMock.Object
+                _websiteChannelContextMock.Object,
+                _localizedUrlsBuilderMock.Object,
+                _httpContextAccessorMock.Object
             );
         }
 
