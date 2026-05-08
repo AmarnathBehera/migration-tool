@@ -5,16 +5,12 @@ using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Utilities;
-using CMS.Base;
 using CMS.ContentEngine;
 using CMS.Websites;
-using HotChocolate.Types.Pagination;
 using Kentico.Content.Web.Mvc;
 using CMS.DataEngine;
 
 namespace BDO.GWT.Core.Services;
-
-
 public interface IPeopleCardsService
 {
     Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(
@@ -105,14 +101,7 @@ public class PeopleCardsService : IPeopleCardsService
             Data = cardDtos,
             TotalCount = peopleArray.Length
         };
-    } //private static void ApplyCommonFilter(ContentItemQueryBuilder builder)
-    //{
-    //    builder.Parameters(p => p.Where(where =>
-    //    {
-    //        where.WhereEquals(nameof(Person.IsSearchExcluded), false);
-    //        where.Or(or => or.WhereNull(nameof(Person.IsSearchExcluded)));
-    //    }));
-    //}
+    } 
     private async Task<List<Action<WhereParameters>>> GetFilterParameterWhereExpressionsAsync(
      IDictionary<string, string> filterParameterValueByName)
     {

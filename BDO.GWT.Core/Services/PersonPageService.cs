@@ -247,39 +247,6 @@ public class PersonPageService : IPersonPageService
         return (await _taxonomyTagRetriever.GetTaxonomyTagByGUIDs(person.PersonCredentials, _cultureContext.CurrentLanguageTag)).Select(x => x.Name);
     }
 
-    //private async Task<IEnumerable<string>> GetIndustryCategoryNamesAsync(Person person, CancellationToken cancellationToken = default)
-    //{
-    //    return (await _industryCategoryPageRetriever.RetrievePagesAsync(q =>
-    //    {
-    //        q.Where(x => person.MetadataIndustryCategories.Contains(x.NodeID));
-    //        q.OnSite(person.NodeSiteID);
-    //        q.Culture(person.LanguageTag);
-    //        q.Select(x => x.MetadataTitle);
-    //    }, cancellationToken)).Select(x => x.MetadataTitle);
-    //}
-
-    //private async Task<IEnumerable<string>> GetSpecialtiesCategoriesNamesAsync(Person person, CancellationToken cancellationToken = default)
-    //{
-    //    return (await _specialtiesCategoryPageRetriever.RetrievePagesAsync(q =>
-    //    {
-    //        q.Where(x => person.MetadataSpecialtiesCategories.Contains(x.NodeID));
-    //        q.OnSite(person.NodeSiteID);
-    //        q.Culture(person.LanguageTag);
-    //        q.Select(x => x.MetadataTitle);
-    //    }, cancellationToken)).Select(x => x.MetadataTitle);
-    //}
-
-    //private async Task<IEnumerable<string>> GetServiceAreaNamesAsync(Person person, CancellationToken cancellationToken = default)
-    //{
-    //    return (await _serviceAreaPageRetriever.RetrievePagesAsync(q =>
-    //    {
-    //        q.Where(x => person.MetadataServiceAreas.Contains(x.NodeID));
-    //        q.OnSite(person.NodeSiteID);
-    //        q.Culture(person.LanguageTag);
-    //        q.Select(x => x.MetadataTitle);
-    //    }, cancellationToken)).Select(x => x.MetadataTitle);
-    //}
-
     private async Task<IEnumerable<LinkItemDto>> GetLocationLinkItemsAsync(Person person, CancellationToken cancellationToken = default)
     {
         var locationOffices = await _contentService.RetrievePagesAsync<LocationOffice>(

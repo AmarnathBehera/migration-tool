@@ -1,4 +1,5 @@
-﻿using BDO.GWT.Core.Constants;
+﻿using BDO.GWT.Common.Core.Exceptions;
+using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
@@ -32,23 +33,17 @@ public class SectionPeoplePageService : ISectionPeoplePageService
 
     #endregion
 
-  //  private readonly IFilteringHelper _filteringHelper;
     private readonly IHeroService _heroService;
     private readonly IContentService _contentRetriever;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly IPeopleCardsService _peopleCardsService;
-    //private readonly IPageCardsService<Person, PersonCardDto> _peopleCardsService;
-    //  private readonly IPageRetriever<SectionPeoplePage> _sectionPeoplePageRetriever;
 
     public SectionPeoplePageService(
         IContentService pageRetriever,
         IHeroService heroService,
-        IWebsiteChannelContext websiteChannelContext,
         IPeopleCardsService peopleCardsService)
     {
         _contentRetriever = pageRetriever;
         _heroService = heroService;
-        _websiteChannelContext = websiteChannelContext;
         _peopleCardsService = peopleCardsService;
     }
 
@@ -80,7 +75,7 @@ public class SectionPeoplePageService : ISectionPeoplePageService
         {
             Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
             Filters = page.PeopleListFilteringEnabled ? await _peopleCardsService.CreateFiltersAsync(filters, null, cancellationToken) : null,
-            FilteringTooltipEnabled = true,//await _filteringHelper.IsFilteringTooltipEnabledAsync(page.PeopleListFilteringEnabled, cancellationToken),
+            FilteringTooltipEnabled = true,
             SortBy = page.PeopleListOrderingEnabled ? CreateOrderingDto(page.PeopleListDefaultOrder) : null,
             PageSize = 20,
             ApiEndpoint = $"People/{page.SystemFields.ContentItemGUID}/Get",
@@ -102,7 +97,7 @@ public class SectionPeoplePageService : ISectionPeoplePageService
 
         if (sectionPeople is null)
         {
-           // throw new MissingSectionPageException($"'{nameof(SectionPeoplePage)} page with GUID '{pageGuid}' not found.");
+            throw new MissingSectionPageException($"'{nameof(SectionPeoplePage)} page with GUID '{pageGuid}' not found.");
         }
 
         var paginationDto = await _peopleCardsService.GetFilteredItemsAsync(sectionPeople,cardsQuery, null, _ => false, cancellationToken);
@@ -114,12 +109,9 @@ public class SectionPeoplePageService : ISectionPeoplePageService
     {
         var orderOptions = new[]
         {
-            FilterDtoUtility.CreateOptionDto("SortLastNameAtoZ", LastNameAtoZOptionValue),
-            FilterDtoUtility.CreateOptionDto("SortLastNameZtoA", LastNameZtoAOptionValue),
-            FilterDtoUtility.CreateOptionDto("SortNodeOrder", NodeOrderOptionValue),
-            //FilterDtoUtility.CreateOptionDto(ResourceStringKey.LiveSite.People.SortLastNameAtoZ, LastNameAtoZOptionValue),
-            //FilterDtoUtility.CreateOptionDto(ResourceStringKey.LiveSite.People.SortLastNameZtoA, LastNameZtoAOptionValue),
-            //FilterDtoUtility.CreateOptionDto(ResourceStringKey.LiveSite.People.SortNodeOrder, NodeOrderOptionValue),
+            FilterDtoUtility.CreateOptionDto(ResourceStringKey.LiveSite.People.SortLastNameAtoZ, LastNameAtoZOptionValue),
+            FilterDtoUtility.CreateOptionDto(ResourceStringKey.LiveSite.People.SortLastNameZtoA, LastNameZtoAOptionValue),
+            FilterDtoUtility.CreateOptionDto(ResourceStringKey.LiveSite.People.SortNodeOrder, NodeOrderOptionValue),
         };
 
         var orderingDto = FilterDtoUtility.CreateFilterItemDto("select", OrderFilterName, OrderFilterName, defaultOrder, orderOptions);
