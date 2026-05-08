@@ -1,11 +1,16 @@
 ﻿using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data;
+using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.DTOs.Pages;
+using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.Services;
+using CMS.Websites;
 using CMS.Websites.Routing;
+using Kentico.Content.Web.Mvc;
 
 namespace BDO.GWT.Core.Services;
 
@@ -13,7 +18,7 @@ public interface ISectionPeoplePageService
 {
     Task<SectionPeopleDto> GetSectionPeoplePageDtoAsync(SectionPeoplePage page, CancellationToken cancellationToken);
 
-   // Task<PaginationDto<PersonCardDto>> GetSectionPeoplePersonPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken);
+    Task<PaginationDto<PersonCardDto>> GetSectionPeoplePersonPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken);
 }
 
 public class SectionPeoplePageService : ISectionPeoplePageService
@@ -84,19 +89,26 @@ public class SectionPeoplePageService : ISectionPeoplePageService
         return dto;
     }
 
-    //public async Task<PaginationDto<PersonCardDto>> GetSectionPeoplePersonPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken)
-    //{
-    //    var sectionPeople = await _sectionPeoplePageRetriever.RetrievePageAsync(pageGuid, cancellationToken);
+    public async Task<PaginationDto<PersonCardDto>> GetSectionPeoplePersonPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken)
+    {
+        var sectionPeople = (await _contentRetriever.GetPagesAsync<SectionPeoplePage>(
+           new RetrievePagesParameters { },
+           query => query
+               .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
+               .Where(w => w.WhereEquals("ContentItemGUID", pageGuid)),
+           RetrievalCacheSettings.CacheDisabled,
+           cancellationToken
+       )).FirstOrDefault();
 
-    //    if (sectionPeople is null)
-    //    {
-    //        throw new MissingSectionPageException($"'{nameof(SectionPeoplePage)} page with GUID '{pageGuid}' not found.");
-    //    }
+        if (sectionPeople is null)
+        {
+           // throw new MissingSectionPageException($"'{nameof(SectionPeoplePage)} page with GUID '{pageGuid}' not found.");
+        }
 
-    //    var paginationDto = await _peopleCardsService.GetFilteredItemsAsync(cardsQuery, q => q.Path(sectionPeople.NodeAliasPath, PathTypeEnum.Children), _ => false, cancellationToken);
+        var paginationDto = await _peopleCardsService.GetFilteredItemsAsync(sectionPeople,cardsQuery, null, _ => false, cancellationToken);
 
-    //    return paginationDto;
-    //}
+        return paginationDto;
+    }
 
     private static FilterItemDto<OptionDto> CreateOrderingDto(string defaultOrder)
     {

@@ -1,6 +1,7 @@
 ﻿using BDO.GWT.Common.Options;
 using BDO.GWT.Core.Entities;
 using BDO.GWT.Core.Helpers;
+using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Services.Footer;
 using BDO.GWT.Core.Services.Header;
@@ -59,6 +60,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IPersonHelper, PersonHelper>();
         serviceCollection.AddScoped<ILocationCityPageService, LocationCityPageService>();
         serviceCollection.AddScoped<ILocationsPageService, LocationsPageService>();
+        serviceCollection.AddScoped<ITaxonomyTagRetriever, TaxonomyTagRetriever>();
 
         serviceCollection.AddScoped<IBreadcrumbsService, BreadcrumbsService>();
         serviceCollection.AddScoped<IFormBuilderService, FormBuilderService>();

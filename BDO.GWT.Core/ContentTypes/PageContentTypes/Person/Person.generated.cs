@@ -96,6 +96,30 @@ namespace BDO
 
 
 		/// <summary>
+		/// PersonCredentials.
+		/// </summary>
+		public IEnumerable<TagReference> PersonCredentials { get; set; }
+
+
+		/// <summary>
+		/// MetadataCity.
+		/// </summary>
+		public IEnumerable<LocationCity> MetadataCity { get; set; }
+
+
+		/// <summary>
+		/// MetadataOfficeLocation.
+		/// </summary>
+		public IEnumerable<LocationOffice> MetadataOfficeLocation { get; set; }
+
+
+		/// <summary>
+		/// MetadataProfileGroups.
+		/// </summary>
+		public IEnumerable<TagReference> MetadataProfileGroups { get; set; }
+
+
+		/// <summary>
 		/// Facebook.
 		/// </summary>
 		public string Facebook { get; set; }
@@ -140,7 +164,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataOGTwitterImage.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataOGTwitterImage { get; set; }
+		public IEnumerable<ContentAttachment> MetadataOGTwitterImage { get; set; }
 
 
 		/// <summary>

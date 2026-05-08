@@ -36,12 +36,6 @@ namespace BDO
 
 
 		/// <summary>
-		/// DocumentName.
-		/// </summary>
-		public string DocumentName { get; set; }
-
-
-		/// <summary>
 		/// MetadataOGTitle.
 		/// </summary>
 		public string MetadataOGTitle { get; set; }
@@ -68,7 +62,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataOGTwitterImage.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataOGTwitterImage { get; set; }
+		public IEnumerable<ContentAttachment> MetadataOGTwitterImage { get; set; }
 
 
 		/// <summary>

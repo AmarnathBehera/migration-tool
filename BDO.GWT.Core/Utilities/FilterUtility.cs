@@ -1,8 +1,5 @@
-﻿
-using BDO.GWT.Core.Constants;
+﻿using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data;
-using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
-using System.Linq;
 
 namespace BDO.GWT.Core.Utilities;
 
@@ -10,9 +7,12 @@ public static class FilterUtility
 {
     private static readonly IDictionary<string, FilterParameterData> FilterParameterDataByName = new Dictionary<string, FilterParameterData>
     {
-        [FilterParameterName.Credential] = new("Credential", "Credential", typeof(AboutPage), FilterParameterType.Page),
-        [FilterParameterName.BusinessLine] = new("Service (Business Line)", "BusinessLine", typeof(HomePage), FilterParameterType.Page),
-        [FilterParameterName.IndustryCategory] = new("Industry (Industry Category)", "IndustryCategory", typeof(AboutPage), FilterParameterType.Page),
+        [FilterParameterName.OfficeLocation] = new("Office (Office Location)", ResourceStringKey.LiveSite.Filters.LocationOffice, typeof(LocationOffice), FilterParameterType.Page),
+        [FilterParameterName.City] = new("City (City)", ResourceStringKey.LiveSite.Filters.City, typeof(LocationCity), FilterParameterType.Page),
+        [FilterParameterName.Person] = new("Author (Person)", ResourceStringKey.LiveSite.Filters.Author, typeof(Person), FilterParameterType.Page),
+        [FilterParameterName.ProfileGroup] = new(Taxonomies.ProfileGroup, ResourceStringKey.LiveSite.Filters.ProfileGroup, typeof(ProfileGroup), FilterParameterType.Taxonomy),
+        [FilterParameterName.Credential] = new(Taxonomies.Credential, ResourceStringKey.LiveSite.Filters.Credential, typeof(Credentials), FilterParameterType.Taxonomy),
+
 
         //[FilterParameterName.BusinessIssue] = new("Topic (Business Issue)", ResourceStringKey.LiveSite.Filters.BusinessIssue, typeof(BusinessIssue), FilterParameterType.Entity),
         //[FilterParameterName.BusinessLine] = new("Service (Business Line)", ResourceStringKey.LiveSite.Filters.BusinessLine, typeof(BusinessLine), FilterParameterType.Page),

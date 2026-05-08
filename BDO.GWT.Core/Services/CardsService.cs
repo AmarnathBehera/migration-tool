@@ -1,83 +1,38 @@
 ﻿using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Utilities;
-using CMS.ContentEngine;
 using CMS.Websites.Routing;
-using Kentico.Content.Web.Mvc;
-using System.Linq.Expressions;
+using static BDO.GWT.Core.Constants.ResourceStringKey.LiveSite;
 
 namespace BDO.GWT.Core.Services;
 
 public interface ICardsService
 {
-    //void AddFilterQueryDecorator<TPageFilter>(Action<IMultiTypePageQuery<Page>> decorateFilterQuery)
-    //    where TPageFilter : Page;
-
     Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(HashSet<string> filterParameterNames, string? nodeAliasPath, CancellationToken cancellationToken);
 
-    //Task<Expression<Func<T, bool>>?> BuildPageGroupFilterExpressionAsync<T>(string nodeAliasPathPrefix, params (Type Type, Expression<Func<T, ICollection<int>>> Property)[] parameters)
-    //    where T : Page;
 }
 
 public class CardsService : ICardsService
 {
     private readonly IContentService _contentService;
     private readonly IWebsiteChannelContext _websiteChannelContext;
-
-    //private readonly Dictionary<Type, Action<IMultiTypePageQuery<Page>>> _pageFilterQueryDecoratorsByFilterPageType = new();
-    //private readonly IChildPageHelper _childPageHelper;
-    //private readonly ICultureContext _cultureContext;
-    //private readonly IMultiTypePageRetriever _multiTypePageRetriever;
-    //private readonly IRetriever<BusinessIssue> _businessIssueRetriever;
-    //private readonly IRetriever<CareerEmploymentType> _careerEmploymentTypeRetriever;
-    //private readonly IRetriever<CareerJobTitle> _careerJobTitleRetriever;
-    //private readonly IRetriever<CareerLevel> _careerLevelRetriever;
-    //private readonly IRetriever<CareerType> _careerTypeRetriever;
-    //private readonly IRetriever<ContentType> _contentTypeRetriever;
-    //private readonly IRetriever<Credential> _credentialRetriever;
-    //private readonly IRetriever<DealType> _dealTypeRetriever;
-    //private readonly IRetriever<EventType> _eventTypeRetriever;
-    //private readonly IRetriever<GlobalDealType> _globalDealTypeRetriever;
-    //private readonly IRetriever<GlobalIndustry> _globalIndustryRetriever;
-    //private readonly IRetriever<GlobalSubIndustry> _globalSubIndustryRetriever;
-    //private readonly IRetriever<ProfileGroup> _profileGroupRetriever;
-    //private readonly IRetriever<IndustryEntity> _industryEntityRetriever;
-    //private readonly IRetriever<SubIndustry> _subIndustryRetriever;
+    private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
+    private readonly ICultureContext _cultureContext;
 
     public CardsService(
         IContentService contentService,
-        IWebsiteChannelContext websiteChannelContext
+        IWebsiteChannelContext websiteChannelContext,
+        ITaxonomyTagRetriever taxonomyTagRetriever,
+        ICultureContext cultureContext
         )
-    //IChildPageHelper childPageHelper, ICultureContext cultureContext, IMultiTypePageRetriever multiTypePageRetriever, IRetriever<BusinessIssue> businessIssueRetriever, IRetriever<CareerEmploymentType> careerEmploymentTypeRetriever, IRetriever<CareerJobTitle> careerJobTitleRetriever, IRetriever<CareerLevel> careerLevelRetriever, IRetriever<CareerType> careerTypeRetriever, IRetriever<ContentType> contentTypeRetriever, IRetriever<Credential> credentialRetriever, IRetriever<DealType> dealTypeRetriever, IRetriever<EventType> eventTypeRetriever, IRetriever<GlobalDealType> globalDealTypeRetriever, IRetriever<GlobalIndustry> globalIndustryRetriever, IRetriever<GlobalSubIndustry> globalSubIndustryRetriever, IRetriever<IndustryEntity> industryEntityRetriever, IRetriever<ProfileGroup> profileGroupRetriever, IRetriever<SubIndustry> subIndustryRetriever)
     {
         _contentService = contentService;
         _websiteChannelContext = websiteChannelContext;
-        //_childPageHelper = childPageHelper;
-        //_cultureContext = cultureContext;
-        //_multiTypePageRetriever = multiTypePageRetriever;
-        //_businessIssueRetriever = businessIssueRetriever;
-        //_careerEmploymentTypeRetriever = careerEmploymentTypeRetriever;
-        //_careerJobTitleRetriever = careerJobTitleRetriever;
-        //_careerLevelRetriever = careerLevelRetriever;
-        //_careerTypeRetriever = careerTypeRetriever;
-        //_contentTypeRetriever = contentTypeRetriever;
-        //_credentialRetriever = credentialRetriever;
-        //_dealTypeRetriever = dealTypeRetriever;
-        //_eventTypeRetriever = eventTypeRetriever;
-        //_globalDealTypeRetriever = globalDealTypeRetriever;
-        //_globalIndustryRetriever = globalIndustryRetriever;
-        //_globalSubIndustryRetriever = globalSubIndustryRetriever;
-        //_industryEntityRetriever = industryEntityRetriever;
-        //_profileGroupRetriever = profileGroupRetriever;
-        //_subIndustryRetriever = subIndustryRetriever;
+        _taxonomyTagRetriever = taxonomyTagRetriever;
+        _cultureContext = cultureContext;
     }
-
-    //public void AddFilterQueryDecorator<TPageFilter>(Action<IMultiTypePageQuery<Page>> decorateFilterQuery)
-    //    where TPageFilter : Page
-    //{
-    //    _pageFilterQueryDecoratorsByFilterPageType.Add(typeof(TPageFilter), decorateFilterQuery);
-    //}
 
     public async Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(HashSet<string> filterParameterNames, string? nodeAliasPath, CancellationToken cancellationToken)
     {
@@ -95,8 +50,9 @@ public class CardsService : ICardsService
             var options = filterParameterData.FilterParameterType switch
             {
                 FilterParameterType.Page => await BuildOptionsForPageFilterAsync(filterParameterData, cancellationToken),
-               // FilterParameterType.Entity => await BuildOptionsForEntityFilterAsync(filterParameterData, cancellationToken),
-               // FilterParameterType.Field => await BuildOptionsForFieldFilterAsync(filterParameterData, filterParameterName, nodeAliasPath, cancellationToken),
+                // FilterParameterType.Entity => await BuildOptionsForEntityFilterAsync(filterParameterData, cancellationToken),
+                // FilterParameterType.Field => await BuildOptionsForFieldFilterAsync(filterParameterData, filterParameterName, nodeAliasPath, cancellationToken),
+                FilterParameterType.Taxonomy => await BuildOptionsForTaxonomyFilterAsync(filterParameterData, filterParameterName, cancellationToken),
                 _ => throw new NotSupportedException($"Filter parameter type {filterParameterData.FilterParameterType} is not supported."),
             };
 
@@ -261,6 +217,26 @@ public class CardsService : ICardsService
     //    return options;
     //}
 
+    private async Task<OptionDto[]> BuildOptionsForTaxonomyFilterAsync(FilterParameterData filterParameterData, string filterParameterName, CancellationToken cancellationToken)
+    {
+        var tags = await _taxonomyTagRetriever.GetTaxonomyTagsAsync(
+            filterParameterData.AdminDisplayName, 
+            _cultureContext.CurrentLanguageTag, 
+            null, 
+            cancellationToken);
+
+        var options = tags
+            .Select(tag => new OptionDto
+            {
+                Value = tag.Name ,
+                Label = tag.Name
+            })
+            .Where(x => !string.IsNullOrWhiteSpace(x.Value))
+            .OrderBy(x => x.Label)
+            .ToArray();
+
+        return options;
+    }
     //private async Task<OptionDto[]> CreateMetadataEntityOptionsAsync<TEntity>(IRetriever<TEntity> retriever, CancellationToken cancellationToken) where TEntity : DomainEntity, IMetadataEntity
     //{
     //    var entities = await retriever.RetrieveEntitiesAsync(q =>

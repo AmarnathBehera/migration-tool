@@ -104,7 +104,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataOGTwitterImage.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataOGTwitterImage { get; set; }
+		public IEnumerable<ContentAttachment> MetadataOGTwitterImage { get; set; }
 
 
 		/// <summary>

@@ -257,7 +257,7 @@
             query =>
                 {
                     // Filter by parent GUID
-                    query.Where(w => w.WhereEquals("WebPageItemParentID", parentGuid))
+                    query//.Where(w => w.WhereEquals("WebPageItemParentID", parentGuid))
                          .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder));
                 },
                 cacheSettings: RetrievalCacheSettings.CacheDisabled, // Use the predefined disabled cache
@@ -293,6 +293,17 @@
         {
             return _contentRetriever.RetrievePages<T?>(parameters, cancellationToken);
         }
+        public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(
+          RetrievePagesParameters parameters,
+          Action<RetrievePagesQueryParameters> queryAction,
+          CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
+        {
+            return _contentRetriever.RetrievePages<T?>(
+                parameters,
+                queryAction,
+                RetrievalCacheSettings.CacheDisabled,
+                cancellationToken);
+        }
         public string GetFallbackMetadataDescription(string? metaDescription, string? metaOGDescription)
         {
             var metaDesc = metaDescription;
@@ -321,6 +332,53 @@
         public async Task<T?> RetrieveCurrentPageAsync<T>(RetrieveCurrentPageParameters parameters, CancellationToken cancellationToken = default) where T : class
         {
             return await _contentRetriever.RetrieveCurrentPage<T>(parameters, cancellationToken);
+        }
+
+        public async Task<IWebPageFieldsSource?> GetPageByTypeAndNameAsync(
+     Type type,
+     string pageName,
+     CancellationToken cancellationToken = default)
+        {
+            var contentTypeName = GetContentTypeName(type);
+            var builder = new ContentItemQueryBuilder()
+                .ForContentType(contentTypeName, q => q
+                    .ForWebsite(_websiteChannelContext.WebsiteChannelName) 
+                )
+                .Parameters(q => q
+                 .Where(w => w.WhereEquals("MetadataTitle", pageName)
+                .Or()
+                .WhereEquals("MetadataOGTitle", pageName)
+                .Or()
+                .WhereEquals("ContentItemName", pageName))
+                .TopN(1)
+                );
+
+            var result = await _executor.GetMappedWebPageResult<IWebPageFieldsSource>(
+                builder,
+                new ContentQueryExecutionOptions
+                {
+                    ForPreview = _websiteChannelContext.IsPreview
+                },
+                cancellationToken);
+
+            return result.FirstOrDefault();
+        }
+        private static string GetContentTypeName(Type type)
+        {
+            const string FieldName = "CONTENT_TYPE_NAME";
+
+            var field = type.GetField(FieldName,
+                System.Reflection.BindingFlags.Public |
+                System.Reflection.BindingFlags.Static |
+                System.Reflection.BindingFlags.FlattenHierarchy);
+
+            if (field?.GetValue(null) is string name && !string.IsNullOrWhiteSpace(name))
+            {
+                return name;
+            }
+
+            throw new InvalidOperationException(
+                $"Could not resolve CONTENT_TYPE_NAME for '{type.FullName}'");
         }
     }
 }
