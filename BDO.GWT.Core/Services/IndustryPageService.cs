@@ -59,10 +59,6 @@ public class IndustryPageService : IIndustryPageService
             CallToActionButtonUrl = ctaUrlPath != null ? Link.Parse(ctaUrlPath) : null,
         };
 
-        //SideBoxDto? sidebox = page.ShowSideNavigation
-        //    ? await GetSideboxDtoAsync(page, cancellationToken)
-        //    : null;
-
         SideBoxDto? sidebox = page.ShowSideNavigation
                 ? await _pageUtility.GetSideboxDtoAsync<IndustryService>(
                     page.SideboxTitle,
@@ -103,49 +99,4 @@ public class IndustryPageService : IIndustryPageService
             },
         };
     }
-
-    //private async Task<SideBoxDto> GetSideboxDtoAsync(
-    //    Industry page,
-    //    CancellationToken cancellationToken)
-    //{
-
-    //    var childIndustries = await _contentService.GetChildPagesByParentGuidAsync<IndustryService>(
-    //        page.SystemFields.WebPageItemID,
-    //        cancellationToken);
-
-    //    var orderedIndustries = childIndustries
-    //        .OrderBy(i => i.SystemFields.WebPageItemOrder)
-    //        .ToList();
-
-
-    //    if (!orderedIndustries.Any())
-    //    {
-    //        var siblingIndustries = await _contentService.GetChildPagesByParentGuidAsync<IndustryService>(
-    //            page.SystemFields.WebPageItemParentID,
-    //            cancellationToken);
-
-    //        orderedIndustries = siblingIndustries
-    //            .OrderBy(i => i.SystemFields.WebPageItemOrder)
-    //            .ToList();
-
-    //        if (orderedIndustries.Count == 1)
-    //        {
-    //            orderedIndustries = new List<IndustryService>();
-    //        }
-    //    }
-
-
-    //    var linkDtos = orderedIndustries
-    //        .Select(industry => new LinkItemDto
-    //        {
-    //            Title = industry.MetadataTitle,
-    //            URL = industry.GetUrl().RelativePath,
-    //        });
-
-    //    return new SideBoxDto
-    //    {
-    //        Title = page.SideboxTitle,
-    //        Links = linkDtos,
-    //    };
-    //}
 }

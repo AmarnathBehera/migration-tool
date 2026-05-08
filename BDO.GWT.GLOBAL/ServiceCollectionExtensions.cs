@@ -56,8 +56,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ISectionIndustriesService, SectionIndustriesService>();
         serviceCollection.AddScoped<IIndustryCategoryPageService, IndustryCategoryPageService>();
         serviceCollection.AddScoped<IIndustryPageService, IndustryPageService>();
-        //serviceCollection.AddScoped<IIndustryServicePageService, IndustryServicePageService>();
-        //serviceCollection.AddScoped<IIndustryCategoryPageService, IndustryCategoryPageService>();
+        serviceCollection.AddScoped<IIndustryServicePageService, IndustryServicePageService>();
+        serviceCollection.AddScoped<IIndustryCategoryPageService, IndustryCategoryPageService>();
         serviceCollection.AddScoped<ISectionServicesService, SectionServicesService>();
         serviceCollection.AddTransient<DropdownScriptExecutor>();
     }

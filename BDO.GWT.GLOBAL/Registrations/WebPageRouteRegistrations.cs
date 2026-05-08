@@ -43,13 +43,8 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 [assembly: RegisterWebPageRoute(SectionIndustries.CONTENT_TYPE_NAME, typeof(SectionIndustriesController))]
 [assembly: RegisterWebPageRoute(IndustryCategory.CONTENT_TYPE_NAME, typeof(IndustryCategoryController))]
 [assembly: RegisterWebPageRoute(Industry.CONTENT_TYPE_NAME, typeof(IndustryController))]
-//[assembly: RegisterWebPageRoute(IndustryService.CONTENT_TYPE_NAME, typeof(IndustryServiceController))]
-[assembly: RegisterPageTemplate(
-    identifier: SectionIndustries.CONTENT_TYPE_NAME,
-    name: "Section Industries Page Content Type Template",
-    customViewName: "~/Views/SectionIndustries/Index.cshtml",
-    ContentTypeNames = new[] { "BDO.SectionIndustries" },
-    IconClass = "xp-market")]
+[assembly: RegisterWebPageRoute(IndustryService.CONTENT_TYPE_NAME, typeof(IndustryServiceController))]
+
 
 [assembly: RegisterWebPageRoute(SectionServices.CONTENT_TYPE_NAME, typeof(SectionServicesController))]
 [assembly: RegisterPageTemplate(
