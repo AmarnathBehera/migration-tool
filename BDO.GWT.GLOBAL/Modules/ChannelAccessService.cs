@@ -16,7 +16,7 @@ public interface IChannelAccessService
     /// Returns accessible WebChannelSettingsIDs for the current user.
     /// Returns null if user is global admin (access to everything).
     /// </summary>
-    Task<ICollection<int>?> GetAccessibleWebChannelSettingsIdsAsync();
+    Task<ICollection<int>> GetAccessibleWebChannelSettingsIdsAsync();
 
     Task<bool> CanAccessAsync(int webChannelSettingsId);
 }
@@ -46,7 +46,7 @@ public class ChannelAccessService : IChannelAccessService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    private UserInfo? GetCurrentUser()
+    private UserInfo GetCurrentUser()
     {
         var userName = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
         if (string.IsNullOrEmpty(userName))
@@ -55,7 +55,7 @@ public class ChannelAccessService : IChannelAccessService
         return _userInfoProvider.Get(userName);
     }
 
-    public async Task<ICollection<int>?> GetAccessibleWebChannelSettingsIdsAsync()
+    public async Task<ICollection<int>> GetAccessibleWebChannelSettingsIdsAsync()
     {
         var currentUser = GetCurrentUser();
         if (currentUser == null)
@@ -75,7 +75,7 @@ public class ChannelAccessService : IChannelAccessService
             .Select(ur => ur.RoleID)
             .ToList();
 
-        if (!userRoleIds.Any())
+        if (userRoleIds.Count == 0)
             return Array.Empty<int>();
 
         // Get role names for this user
@@ -98,7 +98,7 @@ public class ChannelAccessService : IChannelAccessService
             .Select(ch => ch.ChannelID)
             .ToList();
 
-        if (!accessibleChannelIds.Any())
+        if (accessibleChannelIds.Count == 0)
             return Array.Empty<int>();
 
         return _webChannelSettingsProvider.Get()

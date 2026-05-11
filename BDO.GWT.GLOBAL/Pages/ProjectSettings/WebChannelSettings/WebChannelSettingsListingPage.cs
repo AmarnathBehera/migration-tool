@@ -47,7 +47,7 @@ public class WebChannelSettingsListingPage : ListingPage
             // then .Add() on the IList<QueryModifier>
             PageConfiguration.QueryModifiers.Add(new QueryModifier((query, _) =>
             {
-                if (idList.Any())
+                if (idList.Count!=0)
                 {
                     // Show only channels this user has access to
                     return query.WhereIn(
@@ -89,7 +89,7 @@ public class WebChannelSettingsListingPage : ListingPage
 
     private void EnsureChannelSetting(List<WebChannelSettingsInfo> currentChannelSettings, ChannelInfo channel)
     {
-        if (!currentChannelSettings.Any())
+        if (currentChannelSettings.Count() == 0)
         {
             var newSetting = new WebChannelSettingsInfo
             {
@@ -101,7 +101,7 @@ public class WebChannelSettingsListingPage : ListingPage
         }
     }
 
-    private void EnsureChannelSettingDisplayName(ChannelInfo channel, WebChannelSettingsInfo? currentChannelSetting)
+    private void EnsureChannelSettingDisplayName(ChannelInfo channel, WebChannelSettingsInfo currentChannelSetting)
     {
         if (currentChannelSetting != null &&
             !channel.ChannelDisplayName.Equals(currentChannelSetting.WebChannelSettingsChannelDisplayName))
@@ -111,14 +111,14 @@ public class WebChannelSettingsListingPage : ListingPage
         }
     }
 
-    private void EnsureSeoSettings(WebChannelSettingsInfo? currentChannelSetting, IEnumerable<SEOSettingsInfo> seoSettings)
+    private void EnsureSeoSettings(WebChannelSettingsInfo currentChannelSetting, IEnumerable<SEOSettingsInfo> seoSettings)
     {
         int? webChannelSettingsId = currentChannelSetting?.WebChannelSettingsID;
         var currentSeoSettings = seoSettings
             .Where(s => s.SeoSettingsWebChannelSettingID == webChannelSettingsId)
             .ToList();
 
-        if (!currentSeoSettings.Any() && webChannelSettingsId != null)
+        if (currentSeoSettings.Count() == 0 && webChannelSettingsId != null)
         {
             seoSettingsInfoProvider.Set(new SEOSettingsInfo
             {
