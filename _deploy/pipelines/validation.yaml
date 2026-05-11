@@ -37,7 +37,7 @@ stages:
               projectName: "GWT.XbyK.Web"
               extraProperties: |
                 sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**,**/.deploy/**,**/.octopus/**,**/*.bacpac,**/TestResults/**
-                sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/**/coverage.opencover.xml
+                sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/**/coverage.opencover.xml
 
           - task: DotNetCoreCLI@2
             displayName: Restore CMS Web App
