@@ -76,12 +76,12 @@ public class HomePageService : IHomePageService
         }
 
         var homeHeroSlides = await RetrieveHomeHeroSlidesDtoAsync(homePage, cancellationToken);
-        //var trendingTopics = await RetrieveTrendingTopicsDtoAsync(homePage, cancellationToken);
+        var trendingTopics = await RetrieveTrendingTopicsDtoAsync(cancellationToken);
 
         return new HomeDto
         {
             HomeHeroSlides = homeHeroSlides,
-            //TrendingTopics = trendingTopics
+            TrendingTopics = trendingTopics,
            
             BaseContent = new BaseContent
             {
@@ -163,6 +163,74 @@ public class HomePageService : IHomePageService
         {
             return null;
         }
+    }
+
+    private async Task<TrendingTopicsDto?> RetrieveTrendingTopicsDtoAsync(CancellationToken cancellationToken = default)
+    {
+        var trendingTopicsPage = await _contentRetriever.RetrievePagesAsync<TrendingTopics>(cancellationToken);
+
+        if (trendingTopicsPage is null)
+        {
+            return null;
+        }
+
+        var trendingTopicPagesResult = await _contentRetriever.RetrievePagesAsync<TrendingTopic>(new RetrievePagesParameters
+        {
+            LinkedItemsMaxLevel = 3
+        },
+         cancellationToken);
+
+        if (trendingTopicPagesResult is null)
+        {
+            return null;
+        }
+
+        var trendingTopicPages = trendingTopicPagesResult.ToArray();
+
+        var trendingTopicTabDtos = await Task.WhenAll(trendingTopicPages.Select(async x => new TrendingTopicTabDto
+          {
+                Title = x.Title,
+                ReadMoreLink = x.CTANodeGuid?.FirstOrDefault()?.SystemFields?.WebPageUrlPath,
+                ImageURL = x.ImageUrl.FirstOrDefault()?.ContentAttachmentAsset.Url,
+                ImageAltText = x.ImageAltText,
+                Items = x.FeaturedItems.Select(item => item switch
+                    {
+                        Contact contact => new TrendingTopicItemDto
+                    {
+                        Title = contact.MetadataTitle,
+                        Description = contact.MetadataDescription,
+                            ReadMoreLink = contact.SystemFields?.WebPageUrlPath,
+
+
+                    },
+
+                    LegalPage legal => new TrendingTopicItemDto
+                    {
+                        Title = legal.MetadataTitle,
+                        Description = legal.MetadataDescription,
+                        ReadMoreLink = legal.SystemFields?.WebPageUrlPath
+                    },
+
+                    _ => new TrendingTopicItemDto
+                    {
+                       Title = item.SystemFields?.WebPageItemName,
+                       ReadMoreLink = item.SystemFields?.WebPageUrlPath
+                    }
+
+
+
+                 }).ToList(),
+
+
+              }));
+
+          var dto = new TrendingTopicsDto
+          {
+             Heading = trendingTopicsPage.FirstOrDefault()?.Heading,
+             Tabs = trendingTopicTabDtos,
+          };
+
+          return dto;
     }
 }
 
