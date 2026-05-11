@@ -87,27 +87,27 @@ public class SectionIndustriesService : ISectionIndustriesService
             },
             BaseContent = new BaseContent
             {
-                ContentItemID = page?.SystemFields?.ContentItemID ?? 0,
-                ContentItemGUID = page?.SystemFields?.ContentItemGUID ?? Guid.Empty,
-                ContentItemName = page?.SystemFields?.ContentItemName,
-                ContentItemContentTypeID = page?.SystemFields?.ContentItemContentTypeID ?? 0,
-                ContentItemIsSecured = page?.SystemFields?.ContentItemIsSecured ?? false,
-                ContentItemCommonDataContentLanguageID = page?.SystemFields?.ContentItemCommonDataContentLanguageID ?? 0,
-                ContentItemCommonDataFirstPublishedWhen = page?.SystemFields?.ContentItemCommonDataFirstPublishedWhen ?? default,
-                ContentItemCommonDataLastPublishedWhen = page?.SystemFields?.ContentItemCommonDataLastPublishedWhen ?? default,
+                ContentItemID = page.SystemFields.ContentItemID,
+                ContentItemGUID = page.SystemFields.ContentItemGUID,
+                ContentItemName = page.SystemFields.ContentItemName,
+                ContentItemContentTypeID = page.SystemFields.ContentItemContentTypeID,
+                ContentItemIsSecured = page.SystemFields.ContentItemIsSecured,
+                ContentItemCommonDataContentLanguageID = page.SystemFields.ContentItemCommonDataContentLanguageID,
+                ContentItemCommonDataFirstPublishedWhen = page.SystemFields.ContentItemCommonDataFirstPublishedWhen,
+                ContentItemCommonDataLastPublishedWhen = page.SystemFields.ContentItemCommonDataLastPublishedWhen,
 
             },
             BaseWebPage = new BaseWebPage
             {
-                WebPageItemGUID = page?.SystemFields?.WebPageItemGUID ?? Guid.Empty,
-                WebPageItemID = page?.SystemFields?.WebPageItemID ?? 0,
-                WebPageItemName = page?.SystemFields?.WebPageItemName,
-                WebPageItemWebsiteChannelID = page?.SystemFields?.WebPageItemWebsiteChannelId ?? 0,
-                WebPageUrlPath = page?.SystemFields?.WebPageUrlPath,
-                WebPageItemOrder = page?.SystemFields?.WebPageItemOrder ?? 0,
-                WebPageItemTreePath = page?.SystemFields?.WebPageItemTreePath,
-                WebPageUrlPathContentLanguageID = page?.SystemFields?.WebPageUrlPathContentLanguageID ?? 0,
-                WebPageItemParentID = page?.SystemFields?.WebPageItemParentID ?? 0
+                WebPageItemGUID = page.SystemFields.WebPageItemGUID,
+                WebPageItemID = page.SystemFields.WebPageItemID,
+                WebPageItemName = page.SystemFields.WebPageItemName,
+                WebPageItemWebsiteChannelID = page.SystemFields.WebPageItemWebsiteChannelId,
+                WebPageUrlPath = page.SystemFields.WebPageUrlPath,
+                WebPageItemOrder = page.SystemFields.WebPageItemOrder,
+                WebPageItemTreePath = page.SystemFields.WebPageItemTreePath,
+                WebPageUrlPathContentLanguageID = page.SystemFields.WebPageUrlPathContentLanguageID,
+                WebPageItemParentID = page.SystemFields.WebPageItemParentID
             },
         };
     }

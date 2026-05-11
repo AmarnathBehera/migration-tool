@@ -105,7 +105,7 @@ namespace BDO.GWT.Core
 
             var allChildren = new List<TChild>();
 
-            if (categoryIds.Any())
+            if (categoryIds.Count > 0)
             {
                 var childResult = await _contentService.GetPagesAsync<TChild>(
                     new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },

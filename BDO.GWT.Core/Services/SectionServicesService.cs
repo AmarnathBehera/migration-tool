@@ -56,7 +56,7 @@ public class SectionServicesService : ISectionServicesService
 
         var allServices = new List<BusinessLine>();
 
-        if (categoryIds.Any())
+        if (categoryIds.Count > 0)
         {
             var servicesResult = await _contentService.GetPagesAsync<BusinessLine>(
                 new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
