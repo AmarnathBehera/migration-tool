@@ -1,4 +1,5 @@
-﻿using CMS.Websites;
+﻿using CMS.ContentEngine;
+using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Moq;
@@ -215,6 +216,207 @@ namespace BDO.GWT.Core.Tests.Services
             Assert.That(result?.BaseWebPage?.WebPageItemID, Is.EqualTo(10));
             Assert.That(result?.BaseWebPage?.WebPageUrlPath, Is.EqualTo("/home"));
             Assert.That(result?.BaseWebPage?.WebPageItemParentID, Is.EqualTo(5));
+        }
+
+        [Test]
+        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsNull_WhenTrendingTopicsPageIsNull()
+        {
+            _contentServiceMock
+                .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
+                .ReturnsAsync((IEnumerable<TrendingTopics>)null);
+
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
+
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsNull_WhenTrendingTopicPagesIsNull()
+        {
+            _contentServiceMock
+                .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<TrendingTopics> { new TrendingTopics { Heading = "Topics" } });
+
+            _contentServiceMock
+                .Setup(x => x.RetrievePagesAsync<TrendingTopic>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync((IEnumerable<TrendingTopic>)null);
+
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
+
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_WithContactFeaturedItem()
+        {
+            _contentServiceMock
+                .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<TrendingTopics>
+                {
+                    new TrendingTopics { Heading = "Trending" }
+                });
+
+            var contactItem = new Contact
+            {
+                MetadataTitle = "Contact Title",
+                MetadataDescription = "Contact Desc",
+                SystemFields = new WebPageFields { WebPageUrlPath = "/contact" }
+            };
+
+            var trendingTopics = new List<TrendingTopic>
+            {
+                new TrendingTopic
+                {
+                    Title = "Tab1",
+                    ImageAltText = "Alt1",
+                    ImageUrl = new List<ContentAttachment>
+                    {
+                        new ContentAttachment
+                        {
+                            ContentAttachmentAsset = new ContentItemAsset { Url = "/img.png" }
+                        }
+                    },
+                    CTANodeGuid = new List<IWebPageFieldsSource>
+                    {
+                        new Contact { SystemFields = new WebPageFields { WebPageUrlPath = "/read-more" } }
+                    },
+                    FeaturedItems = new List<IWebPageFieldsSource> { contactItem }
+                }
+            };
+
+            _contentServiceMock
+                .Setup(x => x.RetrievePagesAsync<TrendingTopic>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(trendingTopics);
+
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Heading, Is.EqualTo("Trending"));
+            Assert.That(result.Tabs.Count(), Is.EqualTo(1));
+
+            var tab = result.Tabs.First();
+            Assert.That(tab.Title, Is.EqualTo("Tab1"));
+            Assert.That(tab.ImageURL, Is.EqualTo("/img.png"));
+            Assert.That(tab.ImageAltText, Is.EqualTo("Alt1"));
+            Assert.That(tab.ReadMoreLink, Is.EqualTo("/read-more"));
+            Assert.That(tab.Items.Count, Is.EqualTo(1));
+            Assert.That(tab.Items[0].Title, Is.EqualTo("Contact Title"));
+            Assert.That(tab.Items[0].Description, Is.EqualTo("Contact Desc"));
+            Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/contact"));
+        }
+
+        [Test]
+        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_WithLegalPageFeaturedItem()
+        {
+            _contentServiceMock
+                .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<TrendingTopics>
+                {
+                    new TrendingTopics { Heading = "Trending" }
+                });
+
+            var legalItem = new LegalPage
+            {
+                MetadataTitle = "Legal Title",
+                MetadataDescription = "Legal Desc",
+                SystemFields = new WebPageFields { WebPageUrlPath = "/legal" }
+            };
+
+            var trendingTopics = new List<TrendingTopic>
+            {
+                new TrendingTopic
+                {
+                    Title = "Tab2",
+                    ImageAltText = "Alt2",
+                    ImageUrl = new List<ContentAttachment>(),
+                    CTANodeGuid = new List<IWebPageFieldsSource>(),
+                    FeaturedItems = new List<IWebPageFieldsSource> { legalItem }
+                }
+            };
+
+            _contentServiceMock
+                .Setup(x => x.RetrievePagesAsync<TrendingTopic>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(trendingTopics);
+
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
+
+            Assert.That(result, Is.Not.Null);
+            var tab = result.Tabs.First();
+            Assert.That(tab.Items[0].Title, Is.EqualTo("Legal Title"));
+            Assert.That(tab.Items[0].Description, Is.EqualTo("Legal Desc"));
+            Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/legal"));
+        }
+
+        [Test]
+        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_WithUnknownFeaturedItem()
+        {
+            _contentServiceMock
+                .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<TrendingTopics>
+                {
+                    new TrendingTopics { Heading = "Trending" }
+                });
+
+            var unknownItem = new Mock<IWebPageFieldsSource>();
+            unknownItem.Setup(x => x.SystemFields).Returns(new WebPageFields
+            {
+                WebPageItemName = "Unknown Page",
+                WebPageUrlPath = "/unknown"
+            });
+
+            var trendingTopics = new List<TrendingTopic>
+            {
+                new TrendingTopic
+                {
+                    Title = "Tab3",
+                    ImageAltText = "Alt3",
+                    ImageUrl = new List<ContentAttachment>(),
+                    CTANodeGuid = new List<IWebPageFieldsSource>(),
+                    FeaturedItems = new List<IWebPageFieldsSource> { unknownItem.Object }
+                }
+            };
+
+            _contentServiceMock
+                .Setup(x => x.RetrievePagesAsync<TrendingTopic>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(trendingTopics);
+
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
+
+            Assert.That(result, Is.Not.Null);
+            var tab = result.Tabs.First();
+            Assert.That(tab.Items[0].Title, Is.EqualTo("Unknown Page"));
+            Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/unknown"));
+        }
+
+        [Test]
+        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsEmptyTabs_WhenNoTrendingTopicPages()
+        {
+            _contentServiceMock
+                .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<TrendingTopics>
+                {
+                    new TrendingTopics { Heading = "Trending" }
+                });
+
+            _contentServiceMock
+                .Setup(x => x.RetrievePagesAsync<TrendingTopic>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<TrendingTopic>());
+
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Heading, Is.EqualTo("Trending"));
+            Assert.That(result.Tabs.Count(), Is.EqualTo(0));
         }
     }
 }

@@ -15,6 +15,10 @@ public interface IHomePageService
     Task<string?> GetHomePageUrl(CancellationToken cancellationToken);
 
     Task<IEnumerable<HomeHeroSlideDto?>?> RetrieveHomeHeroSlidesDtoAsync(HomePage? homePage, CancellationToken cancellationToken);
+
+    Task<TrendingTopicsDto?> RetrieveTrendingTopicsDtoAsync(CancellationToken cancellationToken = default);
+
+
 }
 
 public class HomePageService : IHomePageService
@@ -37,23 +41,7 @@ public class HomePageService : IHomePageService
 
     public async Task<HomeDto?> GetHomePageDtoAsync(HomePage? page, CancellationToken cancellationToken = default)
     {
-
-        //var webPageContext = _webPageDataContextRetriever.Retrieve();
-        //var channelName = webPageContext.WebPage.WebsiteChannelName;
-
-        //var queryBuilder = new ContentItemQueryBuilder()
-        //    .ForContentType(HomePage.CONTENT_TYPE_NAME, config => config
-        //        .ForWebsite(channelName)          // ← filters by current channel
-        //        .TopN(1));
-
-        //var options = new ContentQueryExecutionOptions
-        //{
-        //    ForPreview = _websiteChannelContext.IsPreview
-
-        //};
-
-        //var results = await _executor.GetMappedWebPageResult<HomePage>(
-        //    queryBuilder, options, cancellationToken);
+       
 
         var results = await _contentRetriever.GetPagesAsync<HomePage>(
      new RetrievePagesParameters
@@ -165,7 +153,7 @@ public class HomePageService : IHomePageService
         }
     }
 
-    private async Task<TrendingTopicsDto?> RetrieveTrendingTopicsDtoAsync(CancellationToken cancellationToken = default)
+    public async Task<TrendingTopicsDto?> RetrieveTrendingTopicsDtoAsync(CancellationToken cancellationToken = default)
     {
         var trendingTopicsPage = await _contentRetriever.RetrievePagesAsync<TrendingTopics>(cancellationToken);
 
