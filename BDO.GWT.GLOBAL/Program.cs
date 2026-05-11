@@ -24,6 +24,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using BDO.GWT.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -121,7 +122,7 @@ builder.Services.Configure<AdminIdentityOptions>(options =>
 });
 
 // Add Application Insights telemetry
-builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
+//builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
 var app = builder.Build();
 

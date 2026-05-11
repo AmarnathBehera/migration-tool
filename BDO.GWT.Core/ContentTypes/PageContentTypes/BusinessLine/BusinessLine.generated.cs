@@ -48,6 +48,30 @@ namespace BDO
 
 
 		/// <summary>
+		/// TileIcon.
+		/// </summary>
+		public IEnumerable<Icon> TileIcon { get; set; }
+
+
+		/// <summary>
+		/// ComingSoon.
+		/// </summary>
+		public bool ComingSoon { get; set; }
+
+
+		/// <summary>
+		/// ContentTitle.
+		/// </summary>
+		public string ContentTitle { get; set; }
+
+
+		/// <summary>
+		/// ContentBody.
+		/// </summary>
+		public string ContentBody { get; set; }
+
+
+		/// <summary>
 		/// MetadataOGTitle.
 		/// </summary>
 		public string MetadataOGTitle { get; set; }

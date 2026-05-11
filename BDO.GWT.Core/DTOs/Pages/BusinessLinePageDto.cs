@@ -8,7 +8,9 @@ namespace BDO.GWT.Core.DTOs
 {
     public class BusinessLinePageDto
     {
+        public string Title { get; set; } = null!;
 
+        public string BodyContent { get; set; } = null!;
         public MetaDataDto? MetaData { get; set; }
         public HeroDto Hero { get; set; } = null!;
 
@@ -16,6 +18,7 @@ namespace BDO.GWT.Core.DTOs
 
         public string TileIcon { get; set; } = null!;
         public bool ComingSoon { get; set; }
+       
 
         public SideBoxDto? Sidebox { get; set; }
     }

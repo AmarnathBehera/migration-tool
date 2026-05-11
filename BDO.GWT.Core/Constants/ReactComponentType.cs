@@ -30,7 +30,9 @@ public static class ReactComponentType
     public const string MultiLinksCardsGrid = "MultiLinksCardsGrid";
     public const string IndustryPrimary = "IndustryPrimary";
     public const string ServiceContent = "ServiceContent";
+    public const string SideBoxNavigation = "SideBoxNavigation";
     
+
 
     //Below are the guid constants for the above components.
     public const string QuoteCardWidgetGUID = "5c570fe5-fc60-4efd-b7eb-7da977e486ab";
@@ -53,6 +55,7 @@ public static class ReactComponentType
     public const string MultiLinksCardsGridGUID = "a1c3e5b7-d9f2-4a6c-8e0b-1f3a5c7e9d2b";
     public const string IndustryPrimaryGUID = "7d6afe7a-e672-43d4-b9e8-aad67c339c56";
     public const string ServiceContentGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
+    public const string SideBoxNavigationGUID = "6c835a07-d2f7-4041-8c19-0513d2b31b88";
 }
 
 
@@ -64,7 +67,7 @@ public static class ReactComponentType
 
 
 
-//6c835a07-d2f7-4041-8c19-0513d2b31b88
+//
 
 //c4403ffb-12e9-4f20-86de-3379bc0514f0
 
