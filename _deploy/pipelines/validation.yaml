@@ -36,7 +36,7 @@ stages:
               projectKey: "bdo_GWT.XbyK.Web"
               projectName: "GWT.XbyK.Web"
               extraProperties: |
-                sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**,**/.deploy/**,**/.octopus/**,**/*.bacpac,**/TestResults/**
+                sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**,**/.deploy/**,**/.octopus/**,**/*.bacpac
                 sonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
 
           - task: DotNetCoreCLI@2
