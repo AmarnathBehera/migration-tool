@@ -45,7 +45,12 @@ builder.Services.AddKentico(features =>
           Contact.CONTENT_TYPE_NAME,
           Person.CONTENT_TYPE_NAME,
           Locations.CONTENT_TYPE_NAME,
-          LocationCity.CONTENT_TYPE_NAME
+          LocationCity.CONTENT_TYPE_NAME,
+          SectionIndustries.CONTENT_TYPE_NAME,
+          IndustryCategory.CONTENT_TYPE_NAME,
+          Industry.CONTENT_TYPE_NAME,
+          IndustryService.CONTENT_TYPE_NAME,
+          Sub_Service.CONTENT_TYPE_NAME
        }
     }); features.UseActivityTracking();
     features.UseWebPageRouting();
