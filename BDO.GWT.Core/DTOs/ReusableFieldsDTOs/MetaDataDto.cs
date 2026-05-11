@@ -11,7 +11,7 @@ public class MetaDataDto
 
     public string? MetaDescription { get; set; }
 
-    public IEnumerable<IContentItemFieldsSource> MetadataTeaserImage { get; set; }
+     public string?  MetadataTeaserImage { get; set; }
 
     public string? MetaTeaserImageAltText { get; set; }
 

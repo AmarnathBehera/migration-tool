@@ -61,31 +61,6 @@ public class ContactPageService : IContactPageService
             Form = ContactPage.Form,
             EmbedCode = ContactPage.EmbedCode,
 
-            MetaData = new MetaDataDto
-            {
-                MetaTitle = ContactPage.MetadataTitle,
-                MetaDescription = ContactPage.MetadataDescription,
-                MetadataTeaserImage = ContactPage.MetadataTeaserImage,
-                MetaTeaserImageAltText = ContactPage.MetadataTeaserImageAltText,
-                MetaCanonical = ContactPage.MetadataCanonical
-            },
-
-            SearchAndSEO = new SearchAndSEODto
-            {
-                IncludeInSitemap = ContactPage.IncludeInSitemap,
-                MetadataNofollow = ContactPage.MetadataNofollow,
-                MetadataNoindex = ContactPage.MetadataNoindex
-            },
-
-            OGMetaData = new OGMetaDataDto
-            {
-                MetadataOGTitle = ContactPage.MetadataOGTitle,
-                MetadataOGDescription = ContactPage.MetadataOGDescription,
-                MetadataOGImage = ContactPage.MetadataOGImage,
-                MetadataOGTwitterImage = ContactPage.MetadataOGTwitterImage,
-                MetadataOGTwitterImageSizeCheckbox = ContactPage.MetadataOGTwitterImageSizeCheckbox
-            },
-
             BaseContent = new BaseContent
             {
                 ContentItemID = sys?.ContentItemID ?? 0,

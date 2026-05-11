@@ -25,6 +25,7 @@ public class ViewGlobalLocationsWidget : ViewComponent
             Layout = model.Properties.Layout,
             TopMargin = model.Properties.TopMargin,
             BottomMargin = model.Properties.BottomMargin,
+            WidgetID=model.Properties.WidgetID,
             Button = new ButtonDto
             {
                 Title = model.Properties.ButtonText,

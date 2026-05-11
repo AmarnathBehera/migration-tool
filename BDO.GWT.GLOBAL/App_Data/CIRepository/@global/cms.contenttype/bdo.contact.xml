@@ -62,16 +62,19 @@ embedCode;Embed Code
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
-          <controlname>Kentico.Administration.DropDownSelector</controlname>
-          <Options>
-<![CDATA[
-select FormName, FormDisplayName from CMS_Form
-WHERE FormSiteID = {%CurrentSite.SiteID#%}
-ORDER BY FormDisplayName
-]]>
-          </Options>
-          <OptionsValueSeparator>;</OptionsValueSeparator>
+          <controlname>BDO.SQLDropdown</controlname>
+          <Script>select  * from cms_form</Script>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>form</Value>
+              <CaseSensitive>false</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <field allowempty="true" column="EmbedCode" columnprecision="0" columnsize="1000" columntype="text" enabled="true" guid="3417bd73-bbae-4a70-bae5-887dfc474345" visible="true">
         <properties>
@@ -86,6 +89,16 @@ ORDER BY FormDisplayName
           <MaxRowsNumber>5</MaxRowsNumber>
           <MinRowsNumber>3</MinRowsNumber>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>embedCode</Value>
+              <CaseSensitive>false</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
         <properties />
