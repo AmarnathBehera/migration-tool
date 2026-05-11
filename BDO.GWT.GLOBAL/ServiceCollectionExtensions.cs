@@ -11,6 +11,8 @@ using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience;
+using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
+using CMS.Core;
 using GWTXbyKWeb.Components.Services.SEOOptions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -65,6 +67,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IBreadcrumbsService, BreadcrumbsService>();
         serviceCollection.AddScoped<IFormBuilderService, FormBuilderService>();
         serviceCollection.AddTransient<DropdownScriptExecutor>();
+        serviceCollection.AddScoped<IChannelAccessService, ChannelAccessService>();
     }
 
 }
