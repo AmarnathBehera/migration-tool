@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Section People Page</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="14adb558-8117-4547-9dad-316d7e5edcb1" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="32e11883-474d-4311-a4a4-036893ab5774" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="6a39bb0a-c711-4193-a178-71d7184525c5" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
+        <properties />
+      </schema>
+      <field allowempty="true" column="PeopleListFilteringEnabled" columnprecision="0" columntype="boolean" enabled="true" guid="7d6df737-6384-465e-b9ea-4bd693f01c04" visible="true">
+        <properties>
+          <defaultvalue>True</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Enable filtering</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="PeopleListFilters" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="20e79f3e-dbbc-445b-9fd1-71a6671d79bb" visible="true">
+        <properties>
+          <defaultvalue>credential;businessLine;industryCategory</defaultvalue>
+          <explanationtext>
+            <![CDATA[Filters that visitor will be able to filter people by.]]>
+          </explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Filters</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>
+            <![CDATA[XperienceCommunity.Multichoiceformcontrol.MultiChoice]]>
+          </controlname>
+          <Options>
+<![CDATA[
+credential;Credential
+profileGroup;Profile Group
+businessLine;Service (Business Line)
+serviceArea;Service Area
+service;Service
+subService;Sub-Service
+industryCategory;Industry (Industry Category)
+industryPage;Industry
+industryService;Industry Service
+specialtyCategory;Specialty (Specialty Category)
+specialtyArea;Specialty Area
+specialty;Specialty
+micrositeMasterPage;Microsite (Microsite Master Page)
+officeLocation;Office (Office Location)
+City
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>PeopleListFilteringEnabled</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="PeopleListOrderingEnabled" columnprecision="0" columntype="boolean" enabled="true" guid="c264a6d5-f309-4ed5-a4e4-d813aaeb73da" visible="true">
+        <properties>
+          <defaultvalue>True</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Enable ordering</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="PeopleListDefaultOrder" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="8aadff88-99fa-4e53-9368-a734b3594306" visible="true">
+        <properties>
+          <defaultvalue>asc</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Default order</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.RadioGroup</controlname>
+          <Inline>False</Inline>
+          <Options>
+<![CDATA[
+asc;Last name A-Z
+desc;Last name Z-A
+nodeorder;Node Order
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>PeopleListOrderingEnabled</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <schema guid="c7c96373-2939-43c4-ac0f-85b345f6c005" name="c7c96373-2939-43c4-ac0f-85b345f6c005">
+        <properties />
+      </schema>
+      <field column="EnableForm" columnprecision="0" columntype="boolean" enabled="true" guid="44536387-2d3f-4c3c-b1a4-344f2ee36397" visible="true">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Enable Contact Form in all bio pages</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field column="DisplayEmailAddressInPersonPage" columnprecision="0" columntype="boolean" enabled="true" guid="403132b5-d0fe-4de5-9d5f-741fcf8c6585" visible="true">
+        <properties>
+          <defaultvalue>True</defaultvalue>
+          <explanationtext>
+            <![CDATA[If Display Email is not checked, the email will not show]]>
+          </explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Display email address in person page</fieldcaption>
+          <fielddescription>
+            <![CDATA[If the Display Email option is not selected, the email address will remain hidden. This means the system will not show the email on the page or profile. Only users with the option enabled will have their email visible. This helps control privacy and prevent unwanted exposure. To make the email visible, ensure the Display Email checkbox is checked.]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field column="DisplayFullEmailAddress" columnprecision="0" columntype="boolean" enabled="true" guid="ab07f2b2-c5c6-4238-8867-f9960b347f84" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Display full email address</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>a15c3744-bd53-4359-b3a8-9fd52bd0c611</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-users</ClassIconClass>
+  <ClassName>BDO.SectionPeoplePage</ClassName>
+  <ClassShortName>BDOSectionPeoplePage</ClassShortName>
+  <ClassTableName>BDO_SectionPeoplePage</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>
