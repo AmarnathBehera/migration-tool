@@ -7,7 +7,7 @@ namespace BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents;
 
 public class MonthYearProperties : FormComponentProperties<DateTime?>
 {
-    public MonthYearProperties() : base(FieldDataType.DateTime)
+    public MonthYearProperties() : base(FieldDataType.DateTime, size: 0)
     {
     }
 
