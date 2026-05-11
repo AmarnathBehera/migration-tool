@@ -36,8 +36,6 @@ stages:
               scannerMode: "dotnet"
               configMode: file
               configFile: "sonar-project.properties"
-              projectName: "GWT.XbyK.Web"
-              projectKey: "bdo_GWT.XbyK.Web"
 
           - task: DotNetCoreCLI@2
             displayName: Restore CMS Web App
