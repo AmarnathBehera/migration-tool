@@ -1,8 +1,6 @@
-﻿#nullable enable
-using CMS.DataEngine;
+﻿using CMS.DataEngine;
 using CMS.DataProtection;
 using Kentico.Forms.Web.Mvc;
-using Kentico.OnlineMarketing.Web.Mvc;
 using System;
 using System.Linq;
 
@@ -25,12 +23,12 @@ public class ConsentAgreement : FormComponent<ConsentAgreementProperties, string
 
     public string Label => GetConsentText() ?? "";
 
-    public override string? GetValue() => !Value ? null : "True";
+    public override string GetValue() => Value ? "True" : null;
 
-    public override void SetValue(string? value) =>
-        Value = value != null && value.Equals("True", StringComparison.OrdinalIgnoreCase);
+    public override void SetValue(string value) =>
+        Value = "True".Equals(value, StringComparison.OrdinalIgnoreCase);
 
-    private string? GetConsentText()
+    private string GetConsentText()
     {
         return consentInfoProvider
             .Get()
