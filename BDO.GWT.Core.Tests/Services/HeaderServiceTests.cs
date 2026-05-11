@@ -46,8 +46,12 @@ namespace BDO.GWT.Core.Tests.Services
         [Test]
         public void GetAsync_WhenExceptionThrown_PropagatesException()
         {
-            _websiteCulturesServiceMock
-                .Setup(x => x.GetWebsiteCulturesAsync())
+            _httpContextAccessorMock
+                .SetupGet(x => x.HttpContext)
+                .Returns(new DefaultHttpContext());
+
+            _localizedUrlsBuilderMock
+                .Setup(x => x.BuildAsync(It.IsAny<HttpContext>()))
                 .ThrowsAsync(new Exception());
 
             Assert.ThrowsAsync<Exception>(async () =>
@@ -63,12 +67,34 @@ namespace BDO.GWT.Core.Tests.Services
                 .Setup(x => x.GetHomePageUrl(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(fakeHomePageUrl);
 
-            _websiteCulturesServiceMock
-                .Setup(x => x.GetWebsiteCulturesAsync())
-                .ReturnsAsync(new List<CultureDto>
+            _httpContextAccessorMock
+                .SetupGet(x => x.HttpContext)
+                .Returns(new DefaultHttpContext());
+
+            _localizedUrlsBuilderMock
+                .Setup(x => x.BuildAsync(It.IsAny<HttpContext>()))
+                .ReturnsAsync(new List<LocalizedUrl>
                 {
-                    new() { ShortName = "en", Name = "English" },
-                    new() { ShortName = "lt", Name = "Lithuanian" }
+                    new()
+                    {
+                        LanguageName = "en",
+                        CultureFormat = "en-US",
+                        DisplayName = "English",
+                        ShortCode = "EN",
+                        RelativeUrl = "/en/home",
+                        AbsoluteUrl = "https://localhost/en/home",
+                        IsDefault = true,
+                        IsActive = true,
+                    },
+                    new()
+                    {
+                        LanguageName = "lt",
+                        CultureFormat = "lt-LT",
+                        DisplayName = "Lithuanian",
+                        ShortCode = "LT",
+                        RelativeUrl = "/lt/home",
+                        AbsoluteUrl = "https://localhost/lt/home",
+                    },
                 });
 
             _websiteCulturesServiceMock
@@ -92,9 +118,12 @@ namespace BDO.GWT.Core.Tests.Services
 
                 // Cultures
                 Assert.That(headerDto.Cultures.ElementAt(0).Name, Is.EqualTo("English"));
-                Assert.That(headerDto.Cultures.ElementAt(0).ShortName, Is.EqualTo("en"));
+                Assert.That(headerDto.Cultures.ElementAt(0).ShortName, Is.EqualTo("EN"));
+                Assert.That(headerDto.Cultures.ElementAt(0).Url, Is.EqualTo("/en/home"));
+
                 Assert.That(headerDto.Cultures.ElementAt(1).Name, Is.EqualTo("Lithuanian"));
-                Assert.That(headerDto.Cultures.ElementAt(1).ShortName, Is.EqualTo("lt"));
+                Assert.That(headerDto.Cultures.ElementAt(1).ShortName, Is.EqualTo("LT"));
+                Assert.That(headerDto.Cultures.ElementAt(1).Url, Is.EqualTo("/lt/home"));
 
                 // Mega menu
                 Assert.That(headerDto.MegaMenuItems, Is.Not.Null.And.Not.Empty);

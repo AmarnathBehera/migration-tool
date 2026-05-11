@@ -3,10 +3,7 @@ using BDO.GWT.Core.DTOs.Header;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
-using MailKit;
 using Microsoft.AspNetCore.Http;
-using System.ComponentModel;
-using static BDO.GWT.Core.ContentService;
 
 namespace BDO.GWT.Core.Services.Header;
 
@@ -97,12 +94,7 @@ public class HeaderService : IHeaderService
         {
             Name = u.DisplayName,
             ShortName = u.ShortCode,
-            //LanguageTag = u.LanguageName,
-            //CultureFormat = u.CultureFormat,
             Url = u.RelativeUrl,
-            //AbsoluteUrl = u.AbsoluteUrl,
-            //IsDefault = u.IsDefault,
-            //IsActive = u.IsActive,
         }).ToList();
     }
 
