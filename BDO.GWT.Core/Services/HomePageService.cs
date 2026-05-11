@@ -82,31 +82,7 @@ public class HomePageService : IHomePageService
         {
             HomeHeroSlides = homeHeroSlides,
             //TrendingTopics = trendingTopics
-            MetaData = new MetaDataDto
-            {
-                MetaTitle = homePage.MetadataTitle,
-                MetaDescription = homePage.MetadataDescription,
-                MetadataTeaserImage = homePage.MetadataTeaserImage,
-                MetaTeaserImageAltText = homePage.MetadataTeaserImageAltText,
-                MetaCanonical = homePage.MetadataCanonical
-            },
-
-            SearchAndSEO = new SearchAndSEODto
-            {
-                IncludeInSitemap = homePage.IncludeInSitemap,
-                MetadataNofollow = homePage.MetadataNofollow,
-                MetadataNoindex = homePage.MetadataNoindex
-            },
-
-            OGMetaData = new OGMetaDataDto
-            {
-                MetadataOGTitle = homePage.MetadataOGTitle,
-                MetadataOGDescription = homePage.MetadataOGDescription,
-                MetadataOGImage = homePage.MetadataOGImage,
-                MetadataOGTwitterImage = homePage.MetadataOGTwitterImage,
-                MetadataOGTwitterImageSizeCheckbox = homePage.MetadataOGTwitterImageSizeCheckbox
-            },
-
+           
             BaseContent = new BaseContent
             {
                 ContentItemID = homePage.SystemFields.ContentItemID,

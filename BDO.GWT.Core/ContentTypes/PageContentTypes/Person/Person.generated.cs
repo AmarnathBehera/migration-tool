@@ -96,15 +96,27 @@ namespace BDO
 
 
 		/// <summary>
+		/// PersonCredentials.
+		/// </summary>
+		public IEnumerable<TagReference> PersonCredentials { get; set; }
+
+
+		/// <summary>
 		/// MetadataCity.
 		/// </summary>
-		public string MetadataCity { get; set; }
+		public IEnumerable<LocationCity> MetadataCity { get; set; }
 
 
 		/// <summary>
 		/// MetadataOfficeLocation.
 		/// </summary>
-		public string MetadataOfficeLocation { get; set; }
+		public IEnumerable<LocationOffice> MetadataOfficeLocation { get; set; }
+
+
+		/// <summary>
+		/// MetadataProfileGroups.
+		/// </summary>
+		public IEnumerable<TagReference> MetadataProfileGroups { get; set; }
 
 
 		/// <summary>

@@ -1,14 +1,18 @@
 ﻿using BDO.GWT.Common.Options;
 using BDO.GWT.Core.Entities;
+using BDO.GWT.Core.Helpers;
+using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Services.Footer;
 using BDO.GWT.Core.Services.Header;
 using BDO.GWT.Core.Services.Widget;
 using BDO.GWT.GLOBAL.Services;
-using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Core.LiveSite.Services;
+using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience;
+using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
+using CMS.Core;
 using GWTXbyKWeb.Components.Services.SEOOptions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -51,6 +55,15 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IHeroService, HeroService>();
         serviceCollection.AddScoped<ISectionAboutPageService, SectionAboutPageService>();
         serviceCollection.AddScoped<IAboutPageService, AboutPageService>();
+        serviceCollection.AddScoped<ISectionPeoplePageService, SectionPeoplePageService>();
+        serviceCollection.AddScoped<ICardsService, CardsService>();
+        serviceCollection.AddScoped<IPeopleCardsService, PeopleCardsService>();
+        serviceCollection.AddScoped<IPersonPageService, PersonPageService>();
+        serviceCollection.AddScoped<IPersonHelper, PersonHelper>();
+        serviceCollection.AddScoped<ILocationCityPageService, LocationCityPageService>();
+        serviceCollection.AddScoped<ILocationsPageService, LocationsPageService>();
+        serviceCollection.AddScoped<ITaxonomyTagRetriever, TaxonomyTagRetriever>();
+
         serviceCollection.AddScoped<IBreadcrumbsService, BreadcrumbsService>();
         serviceCollection.AddScoped<IFormBuilderService, FormBuilderService>();
         serviceCollection.AddScoped<ISectionIndustriesService, SectionIndustriesService>();
@@ -63,6 +76,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IServiceAreaAndServicePageService, ServiceAreaAndServicePageService>();
         serviceCollection.AddScoped<IBusinessLinePageService, BusinessLinePageService>();
         serviceCollection.AddTransient<DropdownScriptExecutor>();
+        serviceCollection.AddScoped<IChannelAccessService, ChannelAccessService>();
     }
 
 }

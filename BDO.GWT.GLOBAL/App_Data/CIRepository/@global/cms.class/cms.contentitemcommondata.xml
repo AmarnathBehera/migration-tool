@@ -163,7 +163,7 @@
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["205639d0-5385-472a-bd1a-ba685cf3915d","bb17604c-c134-4faa-a401-2727cad93707","4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
@@ -178,6 +178,9 @@
       </schema>
       <field allowempty="true" column="MetadataNofollow" columnprecision="0" columntype="boolean" enabled="true" guid="149ece32-70d6-4c3b-872d-6d72b5adb4a1" visible="true">
         <properties>
+          <explanationtext>
+            <![CDATA[Do not allow search engine bots to follow links on this page]]>
+          </explanationtext>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Nofollow</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
@@ -256,7 +259,7 @@
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3","bb17604c-c134-4faa-a401-2727cad93707","205639d0-5385-472a-bd1a-ba685cf3915d"]]]>
+            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
@@ -613,6 +616,16 @@ tertiary;Tertiary
             </RuleValues>
           </ValidationRuleConfiguration>
         </validationrulesdata>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.NotEqualsString</Identifier>
+            <Properties>
+              <PropertyName>HeroCallToActionButtonType</PropertyName>
+              <Value>none</Value>
+              <CaseSensitive>false</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <field allowempty="true" column="HeroCallToActionButtonUrl" columnprecision="0" columntype="contentitemreference" enabled="true" guid="5dc9513a-4505-4fa1-a628-68fb3901812e" visible="true">
         <properties>
@@ -628,6 +641,354 @@ tertiary;Tertiary
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.NotEqualsString</Identifier>
+            <Properties>
+              <PropertyName>HeroCallToActionButtonType</PropertyName>
+              <Value>none</Value>
+              <CaseSensitive>false</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <schema guid="c7c96373-2939-43c4-ac0f-85b345f6c005" name="AuthoredContentSection">
+        <properties>
+          <fieldcaption>Authored Content Section</fieldcaption>
+        </properties>
+      </schema>
+      <field allowempty="true" column="ShowAuthoredInsights" columnprecision="0" columntype="boolean" enabled="true" guid="a6ffd60b-8d26-4a22-b5b8-7a2e6276ada9" visible="true">
+        <properties>
+          <defaultvalue>True</defaultvalue>
+          <explanationtext>
+            <![CDATA[When enabled, an individual's insights, news and deals will automatically appear as authored content.]]>
+          </explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show authored content</fieldcaption>
+          <fielddescription>
+            <![CDATA[Controls the visibility of authored content section in person pages.]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>c7c96373-2939-43c4-ac0f-85b345f6c005</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="AuthoredInsightsTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="2a3d29f9-bee6-4f88-9cfb-1285a76936b9" visible="true">
+        <properties>
+          <defaultvalue>Authored Content</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Title</fieldcaption>
+          <fielddescription>
+            <![CDATA[Title that will be shown over authored content carousel.]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>c7c96373-2939-43c4-ac0f-85b345f6c005</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowAuthoredInsights</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="AuthoredInsightsDescription" columnprecision="0" columntype="longtext" enabled="true" guid="074072af-84ee-4c38-9417-e4a0e3bf3040" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Description</fieldcaption>
+          <fielddescription>
+            <![CDATA[Description that will be shown over authored insights carousel but under title.]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>c7c96373-2939-43c4-ac0f-85b345f6c005</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowAuthoredInsights</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="AuthoredInsightsBackgroundImageUrl" columnprecision="0" columntype="contentitemreference" enabled="true" guid="924cfab9-a4b2-43f7-bab6-fa3b10a68ca2" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Background image</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>c7c96373-2939-43c4-ac0f-85b345f6c005</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowAuthoredInsights</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="DisplayedAuthoredContentPageTypes" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="fcd8ec94-db81-43c4-9596-d5f197fb3092" visible="true">
+        <properties>
+          <defaultvalue>
+            <![CDATA[BlogPost;Deal;Insight;NewsArticle;MicrositeMasterPage;MicrositePage]]>
+          </defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Displayed authored content page types</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>c7c96373-2939-43c4-ac0f-85b345f6c005</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>
+            <![CDATA[XperienceCommunity.Multichoiceformcontrol.MultiChoice]]>
+          </controlname>
+          <Options>
+<![CDATA[
+BlogPost;Blog Post
+Deal
+Insight
+NewsArticle;News Article
+MicrositeMasterPage;Microsite Master Page
+MicrositePage;Microsite Page
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowAuthoredInsights</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <schema guid="f652f54b-8be8-4f2c-9e40-7dd3ab5dd149" name="ItemList">
+        <properties>
+          <fieldcaption>Item List</fieldcaption>
+        </properties>
+      </schema>
+      <field allowempty="true" column="ItemListTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="a9051b56-e946-4399-aea6-56707a9c51f7" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Item list title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>f652f54b-8be8-4f2c-9e40-7dd3ab5dd149</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="ItemListDescription" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="b8efbbdb-0d9e-4f2a-9ce3-6afe12bc7cb5" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Item list description</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>f652f54b-8be8-4f2c-9e40-7dd3ab5dd149</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="ItemListFilteringEnabled" columnprecision="0" columntype="boolean" enabled="true" guid="86735151-38d3-4941-bb06-2accb5de1622" visible="true">
+        <properties>
+          <defaultvalue>True</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Enable filtering</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>f652f54b-8be8-4f2c-9e40-7dd3ab5dd149</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="ItemListAdvancedSearchDescription" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7b79d957-f01c-4472-85a7-c0ed4c57fa98" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Advanced search description</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>f652f54b-8be8-4f2c-9e40-7dd3ab5dd149</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="ItemListAdvancedSearchLinkText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="70adb6ad-c0f7-469e-8337-7f304e2bef59" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Advanced search link text</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>f652f54b-8be8-4f2c-9e40-7dd3ab5dd149</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="ItemListAdvancedSearchLinkUrl" columnprecision="0" columntype="contentitemreference" enabled="true" guid="ee7244b0-b59c-4d8c-ae08-09dffd0c5444" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Advanced search link URL</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>f652f54b-8be8-4f2c-9e40-7dd3ab5dd149</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3","31f6383b-697e-4d8f-acec-be459fe4ad01"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <schema guid="c7c96373-2939-43c4-ac0f-85b345f6c005" name="AuthoredContentSection">
+        <properties>
+          <fieldcaption>Authored Content Section</fieldcaption>
+        </properties>
+      </schema>
+      <field allowempty="true" column="ShowAuthoredInsights" columnprecision="0" columntype="boolean" enabled="true" guid="a6ffd60b-8d26-4a22-b5b8-7a2e6276ada9" visible="true">
+        <properties>
+          <defaultvalue>True</defaultvalue>
+          <explanationtext>
+            <![CDATA[When enabled, an individual's insights, news and deals will automatically appear as authored content.]]>
+          </explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show authored content</fieldcaption>
+          <fielddescription>
+            <![CDATA[Controls the visibility of authored content section in person pages.]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>c7c96373-2939-43c4-ac0f-85b345f6c005</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="AuthoredInsightsTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="2a3d29f9-bee6-4f88-9cfb-1285a76936b9" visible="true">
+        <properties>
+          <defaultvalue>Authored Content</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Title</fieldcaption>
+          <fielddescription>
+            <![CDATA[Title that will be shown over authored content carousel.]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>c7c96373-2939-43c4-ac0f-85b345f6c005</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowAuthoredInsights</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="AuthoredInsightsDescription" columnprecision="0" columntype="longtext" enabled="true" guid="074072af-84ee-4c38-9417-e4a0e3bf3040" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Description</fieldcaption>
+          <fielddescription>
+            <![CDATA[Description that will be shown over authored insights carousel but under title.]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>c7c96373-2939-43c4-ac0f-85b345f6c005</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowAuthoredInsights</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="AuthoredInsightsBackgroundImageUrl" columnprecision="0" columntype="contentitemreference" enabled="true" guid="924cfab9-a4b2-43f7-bab6-fa3b10a68ca2" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Background image</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>c7c96373-2939-43c4-ac0f-85b345f6c005</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowAuthoredInsights</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="DisplayedAuthoredContentPageTypes" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="fcd8ec94-db81-43c4-9596-d5f197fb3092" visible="true">
+        <properties>
+          <defaultvalue>
+            <![CDATA[BlogPost;Deal;Insight;NewsArticle;MicrositeMasterPage;MicrositePage]]>
+          </defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Displayed authored content page types</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>c7c96373-2939-43c4-ac0f-85b345f6c005</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>
+            <![CDATA[XperienceCommunity.Multichoiceformcontrol.MultiChoice]]>
+          </controlname>
+          <Options>
+<![CDATA[
+BlogPost;Blog Post
+Deal
+Insight
+NewsArticle;News Article
+MicrositeMasterPage;Microsite Master Page
+MicrositePage;Microsite Page
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowAuthoredInsights</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
     </form>
   </ClassFormDefinition>

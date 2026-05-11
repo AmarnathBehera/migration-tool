@@ -1,0 +1,38 @@
+﻿@using BDO
+@using Kentico.Content.Web.Mvc
+@using Kentico.PageBuilder.Web.Mvc
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using CMS.Websites
+@model BDO.GWT.Core.DTOs.Pages.SectionPeopleDto
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+}
+
+<div>
+    @if (Model != null && pageId != 0)
+    {
+        @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.Hero,
+        ReactComponentType.HeroGUID,
+        new {
+        data = Model.Hero,
+        },
+        Context.RequestAborted))
+
+         @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.PeopleAdvancedGrid,
+        ReactComponentType.PeopleAdvancedGridGUID,Model,
+        Context.RequestAborted))
+    }
+</div>
