@@ -62,7 +62,6 @@ stages:
                 --no-build
                 --configuration Release
                 --collect:"XPlat Code Coverage"
-                --results-directory "$(Build.SourcesDirectory)/TestResults"
                 --settings "$(Build.SourcesDirectory)/coverlet.runsettings"
               publishTestResults: true
 
