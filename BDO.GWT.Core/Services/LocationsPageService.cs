@@ -7,14 +7,7 @@ using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
 using CMS.Websites;
-using CMS.Websites.Routing;
-using ImageMagick;
 using Kentico.Content.Web.Mvc;
-using Org.BouncyCastle.Crypto;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BDO.GWT.Core.Services;
 
@@ -108,7 +101,7 @@ public class LocationsPageService : ILocationsPageService
                                    .Where(g => g != Guid.Empty)
                                    .ToList() ?? new List<Guid>();
 
-        var SelectedPages = UrlsId.Any()
+        var SelectedPages = UrlsId.Count > 0
             ? await _contentService.GetItemsByGUIDAsync(UrlsId)
             : Enumerable.Empty<IWebPageFieldsSource>();
 
