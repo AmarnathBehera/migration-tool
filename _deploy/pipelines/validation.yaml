@@ -35,7 +35,7 @@ stages:
               organization: "vsts-sonarcloud41751"
               scannerMode: "dotnet"
               configMode: file
-              configFile: "sonar-project.properties"
+              configFile: "$(Build.SourcesDirectory)/sonar-project.properties"
 
           - task: DotNetCoreCLI@2
             displayName: Restore CMS Web App
