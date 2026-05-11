@@ -91,6 +91,8 @@ builder.Services.AddScoped<IEventLogging, EventLogging>();
 builder.Services.AddScoped<ICachingService, CachingService>();
 builder.Services.AddScoped<ISiteContext, SiteContext>();
 builder.Services.AddScoped<ISiteConfigurationService, SiteConfigurationService>();
+builder.Services.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddXperience();
 builder.Services.AddControllersWithViews();
 builder.Services.AddXperienceCommunityLocalization();
@@ -131,6 +133,9 @@ builder.Services.Configure<AdminIdentityOptions>(options =>
     options.AuthenticationOptions.Mode = AdminAuthenticationMode.MaintainForms;
 
 });
+
+// Add Application Insights telemetry
+builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
 var app = builder.Build();
 
