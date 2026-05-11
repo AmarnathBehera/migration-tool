@@ -1,0 +1,57 @@
+﻿@using BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents
+@using Kentico.Forms.Web.Mvc
+@using System.Linq.Expressions
+@model BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents.SecurityCode
+
+@{
+    var formId = Html.IdFor((Expression<Func<SecurityCode, string>>)(x => x.Value))
+                     .ToString().Split('_')[0];
+}
+
+@if (Model.IsV3)
+{
+    <!-- reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js?render=@Model.PublicKeyV3"></script>
+    <script>
+        function attachRecaptchaToSubmitButton(event) {
+            event.preventDefault();
+            grecaptcha.ready(function () {
+                var actionName = event.target.id.replace(/[-\d]+/g, '') + '_submit';
+                grecaptcha.execute('@Model.PublicKeyV3', { action: actionName }).then(function (token) {
+                    var tokenInput = document.createElement('input');
+                    tokenInput.type = 'hidden';
+                    tokenInput.name = 'g-recaptcha-response';
+                    tokenInput.value = token;
+                    event.target.appendChild(tokenInput);
+
+                    var recaptchaAction = document.createElement('input');
+                    recaptchaAction.type = 'hidden';
+                    recaptchaAction.name = 'g-recaptcha-action';
+                    recaptchaAction.value = actionName;
+                    event.target.appendChild(recaptchaAction);
+
+                    // ✅ XbyK: renamed from window.kentico.updatableFormHelper.submitForm
+                    window.kentico.formBuilder.submitForm(event);
+                });
+            });
+        }
+
+        function attachScriptToForm() {
+            var form = document.querySelector('[id="@formId"]');
+            form.setAttribute('onsubmit',
+                form.getAttribute('onsubmit').replace(
+                    'window.kentico.formBuilder.submitForm(event);',
+                    'attachRecaptchaToSubmitButton(event);'
+                )
+            );
+        }
+
+        attachScriptToForm();
+    </script>
+}
+else
+{
+    <!-- reCAPTCHA v2 -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <div class="g-recaptcha" data-sitekey="@Model.PublicKey"></div>
+}

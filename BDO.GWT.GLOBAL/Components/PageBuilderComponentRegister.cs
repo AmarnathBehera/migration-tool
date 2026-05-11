@@ -1,14 +1,17 @@
 ﻿using BDO;
+using BDO.GWT.GLOBAL.Components.Widget.ImageWithTextWidget;
+using BDO.GWT.Web.Widgets.AccordionWidget;
+using BDO.GWT.Web.Widgets.RichTextWidget;
+using BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents;
+using BDO.GWT.Xperience.Core.LiveSite.Components.FormSections.FormSectionProperties;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ButtonWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ExternalNavigationWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.QuoteCardWidget;
-using BDO.GWT.Web.Widgets.RichTextWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ViewGlobalLocations;
 using BDO.GWT.Xperience.LiveSite.Components.Section;
+using Kentico.Forms.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
-using BDO.GWT.Web.Widgets.AccordionWidget;
-using BDO.GWT.GLOBAL.Components.Widget.ImageWithTextWidget;
 
 // Widgets
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.Imagewithtext,typeof(ImageWithTextWidget),"ImageWithText",typeof(ImageWithTextWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
@@ -29,3 +32,44 @@ using BDO.GWT.GLOBAL.Components.Widget.ImageWithTextWidget;
 [assembly: RegisterSection(identifier: ComponentIdentifiers.Sections.FourColumns,name: "Four Columns: Even", propertiesType: typeof(SectionWithGapProperties),customViewName: "~/Components/Section/SectionView/_FourColumnSection.cshtml")]
 [assembly: RegisterSection(identifier: ComponentIdentifiers.Sections.FiveColumns,name: "Five Columns: Even", propertiesType: typeof(SectionWithGapProperties),customViewName: "~/Components/Section/SectionView/_FiveColumnSection.cshtml")]
 [assembly: RegisterSection(identifier: ComponentIdentifiers.Sections.LocalNavigation,name: "Local Navigation", propertiesType: typeof(BaseSectionProperties),customViewName: "~/Components/Section/SectionView/_LocalNavigationSection.cshtml")]
+
+
+// Register BaseFormSection
+[assembly: RegisterFormSection(ComponentIdentifiers.FormSections.TwoColumns, "Two Columns: Even", customViewName: "~/Components/FormSections/Views/_TwoColumnFormSection.cshtml", PropertiesType = typeof(FormSectionWithGapProperties), IconClass = "icon-l-cols-2")]
+
+
+//custom form component
+[assembly: RegisterFormComponent(
+    TextBoxReload.IDENTIFIER,
+    typeof(TextBoxReload),
+    "Text Box Reload",
+    Description = "Custom text box with reload support",
+    IconClass = "icon-l-text",
+    ViewName = "~/Components/FormComponents/TextBoxReload/TextBoxReload.cshtml"
+)]
+
+[assembly: RegisterFormComponent(
+    ConsentAgreement.IDENTIFIER,
+    typeof(ConsentAgreement),
+    "BDO Consent Agreement",
+    Description = "{$" + ComponentIdentifiers.FormComponents.ConsentAgreement + ".Description$}",
+    IconClass = "icon-cb-check-preview",
+    ViewName = "~/Components/FormComponents/ConsentAgreement/ConsentAgreement.cshtml"
+)]
+[assembly: RegisterFormComponent(
+    SecurityCode.IDENTIFIER,
+    typeof(SecurityCode),
+    "Security Code",
+    IsAvailableInFormBuilderEditor = true,
+    ViewName = "~/Components/FormComponents/SecurityCode/_SecurityCode.cshtml",
+    Description = "{$" + ComponentIdentifiers.FormComponents.SecurityCode + ".Description$}",
+    IconClass = "icon-cb-check-preview")]
+
+[assembly: RegisterFormComponent(
+    MonthYear.IDENTIFIER,
+    typeof(MonthYear),
+    "Month Year",
+    IsAvailableInFormBuilderEditor = true,
+    ViewName = "~/Components/FormComponents/MonthYear/_MonthYear.cshtml",
+    Description = "{$" + ComponentIdentifiers.FormComponents.MonthYear + ".Description$}",
+    IconClass = "icon-cb-check-preview")]
