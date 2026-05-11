@@ -58,7 +58,8 @@ public class PersonPageService : IPersonPageService
     public async Task<VCardData?> GeneratePersonVCardAsync(Guid personGuid, string? source = null, CancellationToken cancellationToken = default)
     {
         var person = (await _contentService.GetPagesAsync<Person>(
-           new RetrievePagesParameters { },
+           new RetrievePagesParameters {
+               LinkedItemsMaxLevel = 1 },
            query => query
                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
                .Where(w => w.WhereEquals("ContentItemGUID", personGuid)),
