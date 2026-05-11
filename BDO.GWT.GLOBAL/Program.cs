@@ -27,6 +27,7 @@ using XperienceCommunity.MultiChoiceFormControl.Admin.Helpers.Components.MultiCh
 
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using BDO.GWT.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
