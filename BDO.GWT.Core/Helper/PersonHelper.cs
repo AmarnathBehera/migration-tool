@@ -39,7 +39,7 @@ public class PersonHelper : IPersonHelper
                 );
             });
 
-            var fallback = fallbackPeople.FirstOrDefault();
+            var fallback = fallbackPeople.Count > 0 ? fallbackPeople[0] : null;
             name = fallback?.PersonFirstName ?? string.Empty;
 
             if (!string.IsNullOrWhiteSpace(fallback?.PersonSurnamePrefixes))
@@ -57,15 +57,15 @@ public class PersonHelper : IPersonHelper
 
         name = person.PersonFirstName ?? string.Empty;
 
-        if (!string.IsNullOrWhiteSpace(person?.PersonSurnamePrefixes))
+        if (!string.IsNullOrWhiteSpace(person.PersonSurnamePrefixes))
             name += " " + person.PersonSurnamePrefixes;
 
-        if (!string.IsNullOrWhiteSpace(person?.PersonLastName))
+        if (!string.IsNullOrWhiteSpace(person.PersonLastName))
             name += " " + person.PersonLastName;
 
         return new PersonEmailInfo
         {
-            Email = person?.PersonEmail ?? string.Empty,
+            Email = person.PersonEmail ?? string.Empty,
             Name = name
         };
     }

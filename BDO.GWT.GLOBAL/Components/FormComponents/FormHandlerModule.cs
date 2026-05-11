@@ -130,7 +130,7 @@ public class FormHandlerModule : Module
 
             var email = new EmailMessage
             {
-                From = emailTemplateInfo.GetStringValue("TemplateFrom", ""), // safer
+                From = emailTemplateInfo.GetStringValue("TemplateFrom", ""),
                 Recipients = personInfo.Email,
                 Subject = Convert.ToString(formDataItem.GetValue("title")),
                 Body = body,
@@ -148,11 +148,10 @@ public class FormHandlerModule : Module
         if (string.IsNullOrWhiteSpace(nodeAliasPath))
             return string.Empty;
 
-        // Removes leading culture like /en-gb
         return Regex.Replace(nodeAliasPath, @"^/[a-z]{2}-[a-z]{2}", "");
     }
 
-    private static PersonEmailInfo? GetPersonEmailSafely(string personTitle, string pathWithoutCulture, string culture)
+    private static PersonEmailInfo GetPersonEmailSafely(string personTitle, string pathWithoutCulture, string culture)
     {
         var scopeFactory = Service.Resolve<IServiceScopeFactory>();
 

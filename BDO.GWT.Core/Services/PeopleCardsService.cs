@@ -114,65 +114,54 @@ public class PeopleCardsService : IPeopleCardsService
             if (filterData == null)
                 continue;
 
-            if (filterData.FilterParameterType == FilterParameterType.Page)
+            var filter = filterData.FilterParameterType switch
             {
-                var page = await _contentService.GetPageByTypeAndNameAsync(filterData.EntityType, filterValue);
+                FilterParameterType.Page => await GetPageFilterAsync(filterName, filterValue),
+                FilterParameterType.Taxonomy => await GetTaxonomyFilterAsync(filterName, filterValue),
+                _ => null,
+            };
 
-                if (page is null)
-                {
-                    continue;
-                }
-                Action<WhereParameters>? filterAction = filterName switch
-                {
-                    FilterParameterName.OfficeLocation => w =>
-                        w.WhereContains(nameof(Person.MetadataOfficeLocation), page.SystemFields.ContentItemGUID.ToString()),
-                    FilterParameterName.City => w =>
-                        w.WhereContains(nameof(Person.MetadataCity), page.SystemFields.ContentItemGUID.ToString()),
-                    _ => null,
-                };
-
-
-                if (filterAction is not null)
-                {
-                    filters.Add(filterAction);
-                }
-            }
-            else if (filterData.FilterParameterType == FilterParameterType.Taxonomy)
+            if (filter is not null)
             {
-                switch (filterName)
-                {
-                    case FilterParameterName.Credential:
-                        {
-                            var tag = await _taxonomyTagRetriever.GetTaxonomyTagByNameAsync(filterValue);
-                            if (tag == null)
-                                break;
-                            var identifiers = new List<Guid> { tag.TagGUID };
-                            if (identifiers.Count > 0)
-                            {
-                                filters.Add(w =>
-                                    w.WhereContainsTags(nameof(Person.PersonCredentials), identifiers));
-                            }
-                            break;
-                        }
-
-                    case FilterParameterName.ProfileGroup:
-                        {
-                            var tag = await _taxonomyTagRetriever.GetTaxonomyTagByNameAsync(filterValue);
-                            if (tag == null)
-                                break;
-                            var identifiers = new List<Guid> { tag.TagGUID };
-                            if (identifiers.Count > 0)
-                            {
-                                filters.Add(w =>
-                                    w.WhereContainsTags(nameof(Person.MetadataProfileGroups), identifiers));
-                            }
-                            break;
-                        }
-                }
+                filters.Add(filter);
             }
         }
 
         return filters;
+    }
+
+    private async Task<Action<WhereParameters>?> GetPageFilterAsync(string filterName, string filterValue)
+    {
+        var page = await _contentService.GetPageByTypeAndNameAsync(
+            FilterUtility.GetFilterParameterData(filterName)!.EntityType, filterValue);
+
+        if (page is null)
+            return null;
+
+        var guid = page.SystemFields.ContentItemGUID.ToString();
+
+        return filterName switch
+        {
+            FilterParameterName.OfficeLocation => w => w.WhereContains(nameof(Person.MetadataOfficeLocation), guid),
+            FilterParameterName.City => w => w.WhereContains(nameof(Person.MetadataCity), guid),
+            _ => null,
+        };
+    }
+
+    private async Task<Action<WhereParameters>?> GetTaxonomyFilterAsync(string filterName, string filterValue)
+    {
+        var tag = await _taxonomyTagRetriever.GetTaxonomyTagByNameAsync(filterValue);
+        if (tag == null)
+            return null;
+
+        var identifiers = new List<Guid> { tag.TagGUID };
+
+        return filterName switch
+        {
+            FilterParameterName.Credential => w => w.WhereContainsTags(nameof(Person.PersonCredentials), identifiers),
+            FilterParameterName.ProfileGroup => w => w.WhereContainsTags(nameof(Person.MetadataProfileGroups), identifiers),
+            _ => null,
+        };
     }
     private async Task<PersonCardDto[]> CreatePeopleCardDtosAsync(
     Person[] people)

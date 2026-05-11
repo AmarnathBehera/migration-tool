@@ -98,7 +98,7 @@ public class PersonPageService : IPersonPageService
         },
         cancellationToken
         );
-        var parentNodeIDsOfOffices = offices?.Select(y => y.SystemFields.WebPageItemParentID).Where(id => id > 0).ToArray();
+        var parentNodeIDsOfOffices = offices?.Where(y => y is not null).Select(y => y!.SystemFields.WebPageItemParentID).Where(id => id > 0).ToArray();
 
         var cities = await _contentService.RetrievePagesAsync<LocationCity>(
         new RetrievePagesParameters

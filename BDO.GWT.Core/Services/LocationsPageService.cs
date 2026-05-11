@@ -1,5 +1,4 @@
-﻿
-using BDO.GWT.Core.Data;
+﻿using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.DTOs.SchemaMarkups;
@@ -9,7 +8,9 @@ using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
 using CMS.Websites;
 using CMS.Websites.Routing;
+using ImageMagick;
 using Kentico.Content.Web.Mvc;
+using Org.BouncyCastle.Crypto;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -25,36 +26,21 @@ public interface ILocationsPageService
 
 public class LocationsPageService : ILocationsPageService
 {
-    //private readonly IPageRetriever<LocationCity> _locationCityPageRetriever;
-    //private readonly IPageUrlService _pageUrlService;
     private readonly IHeroService _heroService;
     private readonly IContentService _contentService;
-    //private readonly ICurrentSiteHelper _currentSiteHelper;
-    //private readonly IRetriever<Site> _siteRetriever;
-    //private readonly ISiteContext _siteContext;
 
     public LocationsPageService(
-        //IPageRetriever<LocationCity> locationCityPageRetriever,
         IHeroService heroService,
         IContentService contentService
-        //IPageUrlService pageUrlService,
-        //ICurrentSiteHelper currentSiteHelper,
-        //IRetriever<Site> siteRetriever,
-        //ISiteContext siteContext
         )
     {
-        //_locationCityPageRetriever = locationCityPageRetriever;
-        //_pageUrlService = pageUrlService;
         _heroService = heroService;
         _contentService = contentService;
-        //_currentSiteHelper = currentSiteHelper;
-        //_siteRetriever = siteRetriever;
-        //_siteContext = siteContext;
     }
 
     public async Task<LocationsDto> GetLocationsDtoAsync(Locations page, CancellationToken cancellationToken)
     {
-        var locationsDto = MapBasicFields(page);
+        var locationsDto = await MapBasicFields(page);
         locationsDto.MainContent.Locations = await RetrieveLocationList(page, cancellationToken);
         var bgImageUrl = page.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
         var mobileImageUrl = page.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
@@ -81,7 +67,7 @@ public class LocationsPageService : ILocationsPageService
             Url = page.GetUrl().AbsoluteUrl,
             Name = page.MetadataTitle,
             Description = page.MetadataDescription,
-            Image = page.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url,//ToHtmlCompatibleString(),
+            Image = page.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url,
             Logo = _contentService.GetCurrentSiteLogoImageUrlAsync() ?? string.Empty,
             LegalName = _contentService.GetCurrentSiteLegalNameAsync() ?? string.Empty
         };
@@ -116,8 +102,16 @@ public class LocationsPageService : ILocationsPageService
         return locationsList;
     }
 
-    private static LocationsDto MapBasicFields(Locations page)
+    private async Task<LocationsDto> MapBasicFields(Locations page)
     {
+        var UrlsId = page.BannerButtonURL?.Select(u => u?.WebPageGuid ?? Guid.Empty)
+                                   .Where(g => g != Guid.Empty)
+                                   .ToList() ?? new List<Guid>();
+
+        var SelectedPages = UrlsId.Any()
+            ? await _contentService.GetItemsByGUIDAsync(UrlsId)
+            : Enumerable.Empty<IWebPageFieldsSource>();
+
         return new LocationsDto
         {
             MainContent = new LocationsMainDto
@@ -134,7 +128,7 @@ public class LocationsPageService : ILocationsPageService
                 PrimaryButton = page.BannerButtonURL is not null && page.BannerButtonText is not null ? new ButtonDto
                 {
                     Title = page.BannerButtonText,
-                   // URL = page.BannerButtonURL.FirstOrDefault(),//ToHtmlCompatibleString(),
+                    URL= SelectedPages.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty,
                     Target = page.BannerButtonLinkTarget,
                     Type = page.BannerButtonType,
                 } : null,
