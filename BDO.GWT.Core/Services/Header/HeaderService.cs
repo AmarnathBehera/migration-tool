@@ -251,9 +251,9 @@ public class HeaderService : IHeaderService
 
 
             string imageUrl = string.Empty;
-            if (featured.FeaturedImageFile != null)
+            if (featured.Image != null)
             {
-                var firstAttachment = featured.FeaturedImageFile.FirstOrDefault();
+                var firstAttachment = featured.Image.FirstOrDefault();
                 if (firstAttachment?.ContentAttachmentAsset != null)
                 {
                     imageUrl = firstAttachment.ContentAttachmentAsset.Url ?? string.Empty;
@@ -266,7 +266,7 @@ public class HeaderService : IHeaderService
                 Description = featured.Description ?? string.Empty,
                 URL = selectedPagesFeatured.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty,
                 ImageURL = imageUrl,
-                ImageAltText = featured.FeaturedImageAltText,
+                ImageAltText = featured.ImageAltText,
             });
         }
 

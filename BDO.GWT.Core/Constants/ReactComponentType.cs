@@ -15,6 +15,7 @@ public static class ReactComponentType
     public const string HomeHero = "HomeHero";
     public const string InsightDetails = "InsightDetails";
     public const string PeopleGrid = "PeopleGrid";
+    public const string PeopleBio = "PeopleBio";
     public const string NewsCarousel = "NewsCarousel";
     public const string PeopleAdvancedGrid = "PeopleAdvancedGrid";
     public const string SocialMedia = "SocialMedia";
@@ -26,6 +27,10 @@ public static class ReactComponentType
     public const string TiledLinkSectionWidget = "TiledLinkSectionWidget";
     public const string CookieBanner = "CookieBanner";
     public const string AccordionWidget = "AccordionWidget";
+    public const string LocalLocationsList = "LocalLocationsList";
+    public const string FlexibleBanner = "FlexibleBanner";
+    public const string LocationsCity = "LocationsCity";
+
     public const string ContactPageDescriptionText = "ContactPageDescriptionText";
 
 
@@ -45,6 +50,12 @@ public static class ReactComponentType
     public const string BreadcrumbsGUID = "77248460-7937-4255-a9fe-7340a4d1f464";
     public const string CookieBannerGUID = "6e906e0a-6d90-4776-8e90-ff2bdcaa4213";
     public const string AccordionWidgetGUID = "60875e95-b88e-4db3-b4bf-7c2926a2485c";
+    public const string PeopleAdvancedGridGUID = "10805e95-b81e-4db3-b4bf-7c2926a2485c";
+    public const string PeopleBioGUID = "11195e95-b81e-4db3-b4bf-7c2926a2485c";
+    public const string LocalLocationsListGUID = "11095e95-C43e-4db3-b4bf-7c2926a2485c";
+    public const string FlexibleBannerGUID = "12085e95-b81e-4db3-b4bf-7c2926a2485E";
+    public const string LocationsCityGUID = "13085e95-b81e-4db3-b4bf-7c2926a2485c";
+
     public const string ContactPageDescriptionTextGUID = "cd1bc3e5-c6b6-4212-9fab-a86bdc570462";
     public const string ErrorPageContentGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
 }
