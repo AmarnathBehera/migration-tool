@@ -29,15 +29,17 @@ stages:
             fetchDepth: 0
 
           - task: SonarCloudPrepare@4
-            displayName: "Prepare SonarCloud Analysis"
             inputs:
               SonarCloud: "GWT.XbyK.Web - SonarQube Cloud"
               organization: "vsts-sonarcloud41751"
               scannerMode: "dotnet"
-              configMode: file
-              configFile: "$(Build.SourcesDirectory)/sonar-project.properties"
               projectKey: "bdo_GWT.XbyK.Web"
               projectName: "GWT.XbyK.Web"
+              extraProperties: |
+                sonar.sources=BDO.GWT.Common,BDO.GWT.Core,BDO.GWT.GLOBAL,BDO.GWT.Web.LiveSite
+                sonar.tests=BDO.GWT.Core.Tests,BDO.GWT.GLOBAL.Tests
+                sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**,**/.deploy/**,**/.octopus/**,**/*.bacpac,**/TestResults/**
+                sonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
 
           - task: DotNetCoreCLI@2
             displayName: Restore CMS Web App
