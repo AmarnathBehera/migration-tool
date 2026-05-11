@@ -18,7 +18,6 @@ namespace BDO.GWT.Web.Controllers
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
             var pageDto = await _sectionIndustriesService.GetSectionIndustriesDtoAsync(cancellationToken);
-            var json = JsonConvert.SerializeObject(pageDto, Formatting.Indented);
 
             return View("~/Views/SectionIndustries/Index.cshtml", pageDto);
         }

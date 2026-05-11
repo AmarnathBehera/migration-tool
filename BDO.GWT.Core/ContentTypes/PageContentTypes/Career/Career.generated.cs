@@ -102,6 +102,18 @@ namespace BDO
 
 
 		/// <summary>
+		/// CareerJobTitle.
+		/// </summary>
+		public IEnumerable<TagReference> CareerJobTitle { get; set; }
+
+
+		/// <summary>
+		/// MetadataOfficeLocation.
+		/// </summary>
+		public string MetadataOfficeLocation { get; set; }
+
+
+		/// <summary>
 		/// ShowCallToAction.
 		/// </summary>
 		public bool ShowCallToAction { get; set; }

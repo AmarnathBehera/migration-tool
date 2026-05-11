@@ -3,9 +3,7 @@ using BDO.GWT.Core.DTOs.Header;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
-using MailKit;
-using System.ComponentModel;
-using static BDO.GWT.Core.ContentService;
+using Microsoft.AspNetCore.Http;
 
 namespace BDO.GWT.Core.Services.Header;
 
@@ -21,13 +19,25 @@ public class HeaderService : IHeaderService
     public readonly IHomePageService _homePageService;
     private readonly IWebsiteCulturesService _websiteCulturesService;
     private readonly IWebsiteChannelContext _websiteChannel;
-    public HeaderService(IContentService contentService, IContentRetriever contentRetriever, IHomePageService homePageService, IWebsiteCulturesService websiteCulturesService, IWebsiteChannelContext websiteChannel)
+    private readonly ILocalizedUrlsBuilder _localizedUrlsBuilder;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public HeaderService(
+        IContentService contentService,
+        IContentRetriever contentRetriever,
+        IHomePageService homePageService,
+        IWebsiteCulturesService websiteCulturesService,
+        IWebsiteChannelContext websiteChannel,
+        ILocalizedUrlsBuilder localizedUrlsBuilder,
+        IHttpContextAccessor httpContextAccessor)
     {
         _contentService = contentService;
         _contentRetriever = contentRetriever;
         _homePageService = homePageService;
         _websiteCulturesService = websiteCulturesService;
         _websiteChannel = websiteChannel;
+        _localizedUrlsBuilder = localizedUrlsBuilder;
+        _httpContextAccessor = httpContextAccessor;
     }
     public async Task<HeaderDto> GetAsync(IContentService contentservice, CancellationToken cancellationToken)
     {
@@ -72,7 +82,20 @@ public class HeaderService : IHeaderService
 
     private async Task<IEnumerable<CultureDto>> GetCultureDtosAsync(CancellationToken cancellationToken)
     {
-        return await _websiteCulturesService.GetWebsiteCulturesAsync() ?? Enumerable.Empty<CultureDto>();
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext is null)
+        {
+            return Enumerable.Empty<CultureDto>();
+        }
+
+        var localizedUrls = await _localizedUrlsBuilder.BuildAsync(httpContext);
+
+        return localizedUrls.Select(u => new CultureDto
+        {
+            Name = u.DisplayName,
+            ShortName = u.ShortCode,
+            Url = u.RelativeUrl,
+        }).ToList();
     }
 
     private async Task<(IEnumerable<LinkItemDto> TopMenu, LinkItemDto? Contact)> BuildTopMenuAsync(CancellationToken cancellationToken)
@@ -220,9 +243,9 @@ public class HeaderService : IHeaderService
 
 
             string imageUrl = string.Empty;
-            if (featured.FeaturedImageFile != null)
+            if (featured.Image != null)
             {
-                var firstAttachment = featured.FeaturedImageFile.FirstOrDefault();
+                var firstAttachment = featured.Image.FirstOrDefault();
                 if (firstAttachment?.ContentAttachmentAsset != null)
                 {
                     imageUrl = firstAttachment.ContentAttachmentAsset.Url ?? string.Empty;
@@ -235,7 +258,7 @@ public class HeaderService : IHeaderService
                 Description = featured.Description ?? string.Empty,
                 URL = selectedPagesFeatured.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty,
                 ImageURL = imageUrl,
-                ImageAltText = featured.FeaturedImageAltText,
+                ImageAltText = featured.ImageAltText,
             });
         }
 

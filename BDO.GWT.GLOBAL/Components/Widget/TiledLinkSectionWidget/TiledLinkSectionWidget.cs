@@ -69,7 +69,7 @@ namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWid
 
                 TopMargin = model.Properties?.TopMargin,
                 BottomMargin = model.Properties?.BottomMargin,
-
+                WidgetID = model.Properties.WidgetID,
                 TileNodeGuids = tilePages
             };
 

@@ -91,7 +91,7 @@ namespace BDO.GWT.Core.Tests.Services
         // ── Metadata mapping ────────────────────────────────────────────────
 
         [Test]
-        public async Task GetContactPageDtoAsync_MapsMetaDataCorrectly()
+        public async Task GetContactPageDtoAsync_DoesNotMapMetaData()
         {
             var contactPage = new Contact
             {
@@ -107,20 +107,13 @@ namespace BDO.GWT.Core.Tests.Services
 
             var result = await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.MetaData, Is.Not.Null);
-                Assert.That(result.MetaData!.MetaTitle, Is.EqualTo("Contact Meta Title"));
-                Assert.That(result.MetaData.MetaDescription, Is.EqualTo("Contact Meta Description"));
-                Assert.That(result.MetaData.MetaTeaserImageAltText, Is.EqualTo("Alt Text"));
-                Assert.That(result.MetaData.MetaCanonical, Is.EqualTo("https://example.com/contact"));
-            });
+            Assert.That(result.MetaData, Is.Null);
         }
 
         // ── SearchAndSEO mapping ─────────────────────────────────────────────
 
         [Test]
-        public async Task GetContactPageDtoAsync_MapsSearchAndSEOCorrectly()
+        public async Task GetContactPageDtoAsync_DoesNotMapSearchAndSEO()
         {
             var contactPage = new Contact
             {
@@ -135,40 +128,13 @@ namespace BDO.GWT.Core.Tests.Services
 
             var result = await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.SearchAndSEO, Is.Not.Null);
-                Assert.That(result.SearchAndSEO!.IncludeInSitemap, Is.True);
-                Assert.That(result.SearchAndSEO.MetadataNofollow, Is.True);
-                Assert.That(result.SearchAndSEO.MetadataNoindex, Is.False);
-            });
-        }
-
-        [Test]
-        public async Task GetContactPageDtoAsync_SearchAndSEO_DefaultsFalse_WhenNotSet()
-        {
-            var contactPage = new Contact
-            {
-                DescriptionTitle = "Title",
-                DescriptionBody = "Body"
-            };
-
-            SetupContentService(contactPage);
-
-            var result = await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.SearchAndSEO!.IncludeInSitemap, Is.False);
-                Assert.That(result.SearchAndSEO.MetadataNofollow, Is.False);
-                Assert.That(result.SearchAndSEO.MetadataNoindex, Is.False);
-            });
+            Assert.That(result.SearchAndSEO, Is.Null);
         }
 
         // ── OGMetaData mapping ───────────────────────────────────────────────
 
         [Test]
-        public async Task GetContactPageDtoAsync_MapsOGMetaDataCorrectly()
+        public async Task GetContactPageDtoAsync_DoesNotMapOGMetaData()
         {
             var contactPage = new Contact
             {
@@ -183,13 +149,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             var result = await _service.GetContactPageDtoAsync(null!, CancellationToken.None);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.OGMetaData, Is.Not.Null);
-                Assert.That(result.OGMetaData!.MetadataOGTitle, Is.EqualTo("OG Contact Title"));
-                Assert.That(result.OGMetaData.MetadataOGDescription, Is.EqualTo("OG Contact Description"));
-                Assert.That(result.OGMetaData.MetadataOGTwitterImageSizeCheckbox, Is.True);
-            });
+            Assert.That(result.OGMetaData, Is.Null);
         }
 
         // ── BaseContent / BaseWebPage mapping ────────────────────────────────

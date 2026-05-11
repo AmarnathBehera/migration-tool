@@ -8,6 +8,11 @@
 
   <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Admin" Version="31.2.3" />
+    <PackageReference Include="XperienceCommunity.MultiChoiceFormControl" Version="1.0.0" />
 	<ProjectReference Include="..\BDO.GWT.Common\BDO.GWT.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Helpers\" />
   </ItemGroup>
 </Project>

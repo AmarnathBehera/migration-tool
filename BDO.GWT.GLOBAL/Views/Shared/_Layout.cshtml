@@ -43,6 +43,10 @@
     {
         <meta property="og:description" content="@metaDataSeoDto.OGMetaData.MetadataOGDescription">
     }
+    @if (metaDataSeoDto.OGMetaData.MetadataOGImage != null)
+    {
+        <meta property="og:image" content="@metaDataSeoDto.OGMetaData.MetadataOGImage">
+    }
     @if (metaDataSeoDto.MetaData.MetaCanonical != null)
     {
         <link rel="canonical" href="@metaDataSeoDto.MetaData.MetaCanonical" />
@@ -64,6 +68,7 @@
         <meta name="robots" content="nofollow">
     }
     <meta property="og:type" content="website">
+    @* @(await Component.InvokeAsync<HreflangLinks>()) *@
     @Html.Kentico().PageBuilderStyles()
     @(await Component.InvokeAsync<ScriptsHead>())
     @(await Component.InvokeAsync<StartScriptsHead>())
@@ -88,6 +93,7 @@
     @await (Component.InvokeAsync<ScriptsTopBody>())
     @RenderSection("styles", required: false)
     @await (Component.InvokeAsync<Header>())
+    @* @(await Component.InvokeAsync<LanguageSwitcher>()) *@
     @(await Component.InvokeAsync<ScriptsHead>())
     @await (Component.InvokeAsync<Breadcrumbs>())
 

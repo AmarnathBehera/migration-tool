@@ -4,6 +4,9 @@ using BDO.GWT.Common.Options;
 using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Domain.Services;
+using BDO.GWT.GLOBAL.Services;
+using BDO.GWT.Web.Core.Services;
+using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience.LiveSite.Services;
 using Kentico.Activities.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
@@ -24,7 +27,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
-using BDO.GWT.Core.Services;
+using XperienceCommunity.MultiChoiceFormControl.Admin.Helpers.Components.MultiChoice;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,14 +39,18 @@ builder.Services.AddKentico(features =>
         RegisterDefaultSection = true,
         ContentTypeNames = new[]
         {
-          "BDO.HomePage",
-          "BDO.SectionAbout",
-          "BDO.AboutPage",
-          "BDO.HomePage",
-          "BDO.Contact",
-          "BDO.SectionIndustries",
-          "BDO.SubServicesPage"
-          
+          HomePage.CONTENT_TYPE_NAME,
+          SectionAbout.CONTENT_TYPE_NAME,
+          AboutPage.CONTENT_TYPE_NAME,
+          Contact.CONTENT_TYPE_NAME,
+          Person.CONTENT_TYPE_NAME,
+          Locations.CONTENT_TYPE_NAME,
+          LocationCity.CONTENT_TYPE_NAME,
+          SectionIndustries.CONTENT_TYPE_NAME,
+          IndustryCategory.CONTENT_TYPE_NAME,
+          Industry.CONTENT_TYPE_NAME,
+          IndustryService.CONTENT_TYPE_NAME,
+          Sub_Service.CONTENT_TYPE_NAME
        }
     }); features.UseActivityTracking();
     features.UseWebPageRouting();
@@ -60,6 +67,7 @@ builder.Services.Configure<WebEncoderOptions>(options =>
 {
     options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All);
 });
+builder.Services.AddTransient<IMultiChoiceOptionsProviderActivator, MultiChoiceOptionsProviderActivator>();
 
 builder.Services.Configure<ReactOptions>(
     builder.Configuration.GetSection("ReactOptions"));
@@ -80,6 +88,11 @@ builder.Services.AddScoped<IPageBuilderService, PageBuilderService>();
 builder.Services.AddScoped<IContentService, ContentService>();
 builder.Services.AddScoped<IErrorService, ErrorService>();
 builder.Services.AddScoped<IEventLogging, EventLogging>();
+builder.Services.AddScoped<ICachingService, CachingService>();
+builder.Services.AddScoped<ISiteContext, SiteContext>();
+builder.Services.AddScoped<ISiteConfigurationService, SiteConfigurationService>();
+builder.Services.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddXperience();
 builder.Services.AddControllersWithViews();
 builder.Services.AddXperienceCommunityLocalization();

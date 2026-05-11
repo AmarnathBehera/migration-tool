@@ -14,7 +14,7 @@ namespace BDO.GWT.Core.DTOs
         public bool ShowSideNavigation { get; set; }
 
         public string Title { get; set; } = null!;
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public SideBoxDto? Sidebox { get; set; }
     }

@@ -44,7 +44,7 @@ namespace BDO
 		/// <summary>
 		/// TargetURL.
 		/// </summary>
-		public IEnumerable<WebPageRelatedItem> TargetURL { get; set; }
+		public IEnumerable<IWebPageFieldsSource> TargetURL { get; set; }
 
 
 		/// <summary>

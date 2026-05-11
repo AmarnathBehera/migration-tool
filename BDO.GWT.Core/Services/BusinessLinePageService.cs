@@ -7,6 +7,7 @@ using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.Services;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
+using BDO.GWT.Core.Utilities;
 
 namespace BDO.GWT.Core.Services
 {
