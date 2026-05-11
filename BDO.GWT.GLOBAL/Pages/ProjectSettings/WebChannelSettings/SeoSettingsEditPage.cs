@@ -11,6 +11,7 @@ public class SeoSettingsEditPage : InfoEditPage<SEOSettingsInfo>
 {
     private readonly IInfoProvider<SEOSettingsInfo> seoSettingsInfoProvider;
     private readonly IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider;
+    private readonly IChannelAccessService channelAccessService;
 
     [PageParameter(typeof(IntPageModelBinder))]
     public int WebChannelSettingsId { get; set; }
@@ -18,23 +19,24 @@ public class SeoSettingsEditPage : InfoEditPage<SEOSettingsInfo>
     [PageParameter(typeof(IntPageModelBinder))]
     public override int ObjectId
     {
-        // Retrieves the SEO settings ID based on the WebChannelSettingsId.
         get => seoSettingsInfoProvider.Get()
                 .WhereEquals(nameof(SEOSettingsInfo.SeoSettingsWebChannelSettingID), WebChannelSettingsId)
                 .FirstOrDefault()?
                 .SEOSettingsID ?? 0;
-        // The UI will try to set the ObjectID to value of the parent WebChannelSettingsId, so we have to ignore that.
         set { }
     }
 
-    public SeoSettingsEditPage(IFormComponentMapper formComponentMapper,
+    public SeoSettingsEditPage(
+        IFormComponentMapper formComponentMapper,
         IFormDataBinder formDataBinder,
         IInfoProvider<SEOSettingsInfo> seoSettingsInfoProvider,
-        IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider)
-             : base(formComponentMapper, formDataBinder)
+        IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider,
+        IChannelAccessService channelAccessService)
+            : base(formComponentMapper, formDataBinder)
     {
         this.seoSettingsInfoProvider = seoSettingsInfoProvider;
         this.webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
+        this.channelAccessService = channelAccessService;
     }
 
     private string WebChannelSettingsDisplayName =>
@@ -44,13 +46,25 @@ public class SeoSettingsEditPage : InfoEditPage<SEOSettingsInfo>
             .FirstOrDefault()?
             .WebChannelSettingsChannelDisplayName ?? "Web channel settings";
 
-    public override Task ConfigurePage()
+    public override async Task ConfigurePage()
     {
+        // ✅ Guard: block access if user has no permission for this channel
+        bool canAccess = await channelAccessService.CanAccessAsync(WebChannelSettingsId);
+        if (!canAccess)
+        {
+            // ✅ Correct way to block in XbyK — hide the submit button
+            // and show nothing by returning before base.ConfigurePage()
+            PageConfiguration.SubmitConfiguration.Visible = false;
+            PageConfiguration.Headline = "Access Denied";
+            return;
+        }
+
         PageConfiguration.UIFormName = "seosettingsedit";
-        return base.ConfigurePage();
+        await base.ConfigurePage();
     }
 
-    protected override async Task<ICommandResponse> GetSubmitSuccessResponse(SEOSettingsInfo savedInfoObject, ICollection<IFormItem> items)
+    protected override async Task<ICommandResponse> GetSubmitSuccessResponse(
+        SEOSettingsInfo savedInfoObject, ICollection<IFormItem> items)
     {
         var result = new EditPageSuccessFormSubmissionResult()
         {
@@ -60,6 +74,7 @@ public class SeoSettingsEditPage : InfoEditPage<SEOSettingsInfo>
             RefetchAll = RefetchAll
         };
 
-        return ResponseFrom(result).AddSuccessMessage(LocalizationService?.GetString("base.forms.saved"));
+        return ResponseFrom(result)
+            .AddSuccessMessage(LocalizationService?.GetString("base.forms.saved"));
     }
 }
