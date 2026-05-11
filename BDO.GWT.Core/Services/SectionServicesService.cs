@@ -54,11 +54,11 @@ public class SectionServicesService : ISectionServicesService
             .Select(ic => ic.SystemFields.WebPageItemID)
             .ToList();
 
-        var allServices = new List<BusinessLine>();
+        var allServices = new List<ServiceArea>();
 
         if (categoryIds.Count > 0)
         {
-            var servicesResult = await _contentService.GetPagesAsync<BusinessLine>(
+            var servicesResult = await _contentService.GetPagesAsync<ServiceArea>(
                 new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
                 query => query.Where(w => w.WhereIn(
                     nameof(IWebPageContentQueryDataContainer.WebPageItemParentID),

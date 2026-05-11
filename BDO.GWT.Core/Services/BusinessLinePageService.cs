@@ -60,7 +60,7 @@ namespace BDO.GWT.Core.Services
             };
 
             SideBoxDto? sidebox = currentPage.ShowSideNavigation
-                       ? await _pageUtility.GetSideboxDtoAsync<BusinessLine>(
+                       ? await _pageUtility.GetSideboxDtoAsync<ServiceArea>(
                            currentPage.SideNavigationTitle,
                            currentPage.SystemFields.WebPageItemParentID,
                            serviceArea => serviceArea.MetadataTitle,
