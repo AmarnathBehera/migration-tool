@@ -39,9 +39,11 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             var actionResult = await _controller.GetSiteConfiguration(hash, CancellationToken.None);
 
             // Assert
-            Assert.That(actionResult.Result, Is.InstanceOf<StatusCodeResult>());
-            var statusCodeResult = (StatusCodeResult)actionResult.Result!;
-            Assert.That(statusCodeResult.StatusCode, Is.EqualTo(StatusCodes.Status304NotModified));
+            Assert.Multiple(() =>
+            {
+                Assert.That(actionResult.Result, Is.InstanceOf<StatusCodeResult>());
+                Assert.That(((StatusCodeResult)actionResult.Result!).StatusCode, Is.EqualTo(StatusCodes.Status304NotModified));
+            });
 
             _siteConfigurationServiceMock.Verify(
                 x => x.GetSiteConfigurationDtoAsync(It.IsAny<CancellationToken>()),
@@ -76,8 +78,11 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             var actionResult = await _controller.GetSiteConfiguration(requestHash, CancellationToken.None);
 
             // Assert
-            Assert.That(actionResult.Value, Is.SameAs(dto));
-            Assert.That(actionResult.Result, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(actionResult.Value, Is.SameAs(dto));
+                Assert.That(actionResult.Result, Is.Null);
+            });
 
             _siteConfigurationServiceMock.Verify(
                 x => x.GetSiteConfigurationDtoAsync(It.IsAny<CancellationToken>()),
@@ -96,7 +101,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
 
             _siteConfigurationServiceMock
                 .Setup(x => x.GetCachedSiteConfigurationHash())
-                .Returns((string?)null);
+                .Returns((string)null!);
 
             _siteConfigurationServiceMock
                 .Setup(x => x.GetSiteConfigurationDtoAsync(It.IsAny<CancellationToken>()))
@@ -122,7 +127,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
 
             _siteConfigurationServiceMock
                 .Setup(x => x.GetCachedSiteConfigurationHash())
-                .Returns((string?)null);
+                .Returns((string)null!);
 
             _siteConfigurationServiceMock
                 .Setup(x => x.GetSiteConfigurationDtoAsync(token))
@@ -147,7 +152,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             // Arrange
             _siteConfigurationServiceMock
                 .Setup(x => x.GetCachedSiteConfigurationHash())
-                .Returns((string?)null);
+                .Returns((string)null!);
 
             _siteConfigurationServiceMock
                 .Setup(x => x.GetSiteConfigurationDtoAsync(It.IsAny<CancellationToken>()))
