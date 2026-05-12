@@ -60,18 +60,22 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents.MonthYear
             _component.Year = 2020;
 
             _component.SetValue(null);
-
-            Assert.That(_component.Month, Is.EqualTo(0));
-            Assert.That(_component.Year, Is.EqualTo(0));
+            Assert.Multiple(() =>
+            {
+                Assert.That(_component.Month, Is.EqualTo(0));
+                Assert.That(_component.Year, Is.EqualTo(0));
+            });
         }
 
         [Test]
         public void SetValue_WithDate_SetsMonthAndYear()
         {
             _component.SetValue(new DateTime(2026, 5, 12));
-
-            Assert.That(_component.Month, Is.EqualTo(5));
-            Assert.That(_component.Year, Is.EqualTo(2026));
+            Assert.Multiple(() =>
+            {
+                Assert.That(_component.Month, Is.EqualTo(5));
+                Assert.That(_component.Year, Is.EqualTo(2026));
+            });
         }
 
         [Test]
