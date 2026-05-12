@@ -64,9 +64,9 @@ namespace BDO.GWT.Core.Services
                                currentPage.SideNavigationTitle,
                                currentPage.SystemFields.WebPageItemID,
                                currentPage.SystemFields.WebPageItemParentID,
-                               serviceArea => serviceArea.MetadataTitle,
+                           serviceArea => serviceArea.MetadataTitle,
                                sibling => sibling.MetadataTitle,
-                               cancellationToken)
+                           cancellationToken)
                        : null;
 
             return new BusinessLinePageDto

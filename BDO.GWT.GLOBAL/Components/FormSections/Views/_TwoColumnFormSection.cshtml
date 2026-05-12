@@ -1,0 +1,13 @@
+﻿@using Kentico.Forms.Web.Mvc
+@model FormSectionViewModel<BDO.GWT.Xperience.Core.LiveSite.Components.FormSections.FormSectionProperties.FormSectionWithGapProperties>
+
+<div class="section-container @Model.Properties.ContainerPadding">
+    <div class="section-container--items section-container--half @Model.Properties.SectionsGap">
+        <div>
+            @await Html.Kentico().FormZoneAsync()
+        </div>
+        <div>
+            @await Html.Kentico().FormZoneAsync()
+        </div>
+    </div>
+</div>

@@ -2,7 +2,7 @@
 {
     public static class ComponentIdentifiers
     {
-         private const string Prefix = "BDO.";
+        private const string Prefix = "BDO.";
         // Widgets
         public static class Widgets
         {
@@ -52,6 +52,28 @@
 
             public const string LocalNavigation = SectionPrefix + "LocalNavigation";
         }
-    }
+        public static class FormSections
+        {
+            public const string DefaultSection = "Kentico.DefaultSection";
+            private const string FormSectionPrefix = Prefix + "FormSection.";
+            public const string TwoColumns = FormSectionPrefix + "TwoColumns";
+          
+        }
+        public static class FormComponents
+        {
+            private const string FormComponentPrefix = Prefix + "FormComponent.";
 
+            public const string TextBoxReload = FormComponentPrefix + "TextBoxReload";
+
+            public const string ConsentAgreement = FormComponentPrefix + "BDOConsentAgreement";
+
+            public const string SecurityCode = FormComponentPrefix + "SecurityCode";
+
+            public const string MonthYear = FormComponentPrefix + "MonthYear";
+
+            public const string OrderedPageSelector = FormComponentPrefix + "OrderedPageSelector";
+        }
+
+
+    }
 }

@@ -18,7 +18,7 @@ namespace BDO.GWT.Core.DTOs
 
         public string TileIcon { get; set; } = null!;
         public bool ComingSoon { get; set; }
-       
+
 
         public SideBoxDto? Sidebox { get; set; }
     }

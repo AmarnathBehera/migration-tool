@@ -120,12 +120,6 @@ namespace BDO
 
 
 		/// <summary>
-		/// MetadataKeywords.
-		/// </summary>
-		public string MetadataKeywords { get; set; }
-
-
-		/// <summary>
 		/// HeroLayout.
 		/// </summary>
 		public string HeroLayout { get; set; }

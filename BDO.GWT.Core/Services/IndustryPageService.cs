@@ -66,8 +66,8 @@ public class IndustryPageService : IIndustryPageService
              siblingParentWebPageItemId: page.SystemFields.WebPageItemParentID, // fallback: sibling Industry
              childTitleSelector: child => child.MetadataTitle,
              siblingTitleSelector: sibling => sibling.MetadataTitle,
-             cancellationToken)
-         : null;
+                    cancellationToken)
+                : null;
 
         return new IndustryDto
         {

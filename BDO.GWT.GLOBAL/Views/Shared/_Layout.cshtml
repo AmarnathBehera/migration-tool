@@ -1,6 +1,4 @@
 
-@using BDO.GWT.Core.DTOs
-@using BDO.GWT.Core.DTOs.ReusableFieldsDTOs
 ﻿@using BDO.GWT.Core.Services
 @using BDO.GWT.Core.ViewComponents
 @using BDO.GWT.Global.Components.ViewComponents
@@ -19,20 +17,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="UTF-8" />
     @{
-        var metaDataSeoDto =
-        ViewData["MetaDataSeoDto"] as MetaDataSEOItemsDto
-        ?? await PageContext.GetCurrentPageMetadataAsync()
-        ?? new MetaDataSEOItemsDto();
-
-        metaDataSeoDto.MetaData ??= new MetaDataDto();
-        metaDataSeoDto.OGMetaData ??= new OGMetaDataDto();
-        metaDataSeoDto.SEOItemsDto ??= new SearchAndSEODto();
-
+        var metaDataSeoDto = await PageContext.GetCurrentPageMetadataAsync();
     }
 
-    <title>@metaDataSeoDto.MetaData.MetaTitle</title>
-    <meta name="description" content="@metaDataSeoDto.MetaData.MetaDescription" />
-    <meta name="keywords" content="@metaDataSeoDto.MetaData.MetaDescription" />
+    @* <title>@metaDataSeoDto.PageMetaData.PageTitle + " - BDO"</title> *@
+    <title>@(metaDataSeoDto.PageMetaData.PageTitle + " - BDO")</title>
+    <meta name="description" content="@metaDataSeoDto.PageMetaData.PageDescription" />
+    <meta name="keywords" content="@metaDataSeoDto.PageMetaData.PageKeywords" />
     <partial name="_Favicon.cshtml" />
    
     @if (metaDataSeoDto.OGMetaData.MetadataOGTitle != null)

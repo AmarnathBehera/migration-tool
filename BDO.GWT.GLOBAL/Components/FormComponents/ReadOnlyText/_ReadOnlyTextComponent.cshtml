@@ -1,0 +1,40 @@
+﻿@using Kentico.Forms.Web.Mvc
+@using Kentico.Web.Mvc
+@model BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents.ReadOnlyTextComponent
+
+@{
+    var htmlAttributes = ViewData.Kentico().GetEditorHtmlAttributes();
+
+    if (htmlAttributes.ContainsKey("class"))
+    {
+        htmlAttributes["class"] += " filled-in";
+    }
+    else
+    {
+        htmlAttributes["class"] = "filled-in";
+    }
+
+    htmlAttributes["readonly"] = "";
+
+    // ✅ Replace HttpUtility.HtmlDecode (System.Web) with Net.WebUtility (works in .NET Core)
+    Model.Value = System.Net.WebUtility.HtmlDecode(Model.Value);
+}
+
+@if (Model.Properties.Multiline)
+{
+    <div class="ktc-form-control" style="height: 200px; overflow: scroll; overflow-y: scroll; overflow-x: hidden; background-color: #dde0e4; opacity: 0.6">
+        @Html.Raw(Model.Value)
+    </div>
+}
+else
+{
+    <p>
+        <label>
+            @Html.TextBoxFor(m => m.Value, htmlAttributes)
+        </label>
+    </p>
+}
+
+@{
+    htmlAttributes.Remove("readonly");
+}

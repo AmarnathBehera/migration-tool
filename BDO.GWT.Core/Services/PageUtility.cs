@@ -52,14 +52,14 @@ namespace BDO.GWT.Core
                 .ToList();
 
             if (orderedChildren.Any())
-            {
+                {
                 return new SideBoxDto
                 {
                     Title = sideboxTitle,
                     Links = orderedChildren.Select(p => new LinkItemDto
                     {
                         Title = childTitleSelector(p),
-                        URL = p.GetUrl().RelativePath,
+                    URL = p.GetUrl().RelativePath,
                     }),
                 };
             }

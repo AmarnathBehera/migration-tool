@@ -58,7 +58,6 @@ public class SectionServicesService : ISectionServicesService
 
         if (categoryIds.Count > 0)
         {
-            var servicesResult = await _contentService.GetPagesAsync<ServiceArea>(
                 new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
                 query => query.Where(w => w.WhereIn(
                     nameof(IWebPageContentQueryDataContainer.WebPageItemParentID),

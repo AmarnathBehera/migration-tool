@@ -12,5 +12,7 @@ namespace BDO.GWT.Core.DTOs
         public OGMetaDataDto? OGMetaData { get; set; }
 
         public SearchAndSEODto? SEOItemsDto { get; set; }
+
+        public PageMetaDataDto? PageMetaData { get; set; }
     }
 }

@@ -65,8 +65,8 @@ public class IndustryCategoryPageService : IIndustryCategoryPageService
              siblingParentWebPageItemId: page.SystemFields.WebPageItemParentID, 
              childTitleSelector: child => child.MetadataTitle,
              siblingTitleSelector: sibling => sibling.MetadataTitle,
-             cancellationToken)
-         : null;
+                       cancellationToken)
+                   : null;
 
         return new IndustryCategoryDto
         {
