@@ -57,10 +57,12 @@ namespace BDO.GWT.Core.Services
             };
 
             SideBoxDto? sidebox = page.ShowSideNavigation
-                       ? await _pageUtility.GetSideboxDtoAsync<Service>(
+                       ? await _pageUtility.GetSideboxDtoAsync<Service, ServiceArea>(
                            page.SideNavigationTitle,
                            page.SystemFields.WebPageItemID,
+                           page.SystemFields.WebPageItemParentID,
                            service => service.MetadataTitle,
+                           sibling => sibling.MetadataTitle,
                            cancellationToken)
                        : null;
 
@@ -104,10 +106,12 @@ namespace BDO.GWT.Core.Services
             };
 
             SideBoxDto? sidebox = page.ShowSideNavigation
-                       ? await _pageUtility.GetSideboxDtoAsync<Sub_Service>(
+                       ? await _pageUtility.GetSideboxDtoAsync<Sub_Service, Service>(
                            page.SideNavigationTitle,
                            page.SystemFields.WebPageItemID,
+                           page.SystemFields.WebPageItemParentID,
                            service => service.MetadataTitle,
+                           sibling => sibling.MetadataTitle,
                            cancellationToken)
                        : null;
 

@@ -8,12 +8,15 @@ namespace BDO.GWT.Core.services
 {
     public interface IPageUtility
     {
-            Task<SideBoxDto> GetSideboxDtoAsync<TPage>(
-            string sideboxTitle,
-            int parentWebPageItemId,
-            Func<TPage, string> titleSelector,
-            CancellationToken cancellationToken = default)
-            where TPage : class, IWebPageFieldsSource;
+        Task<SideBoxDto> GetSideboxDtoAsync<TChild, TSibling>(
+     string sideboxTitle,
+     int parentWebPageItemId,
+     int siblingParentWebPageItemId,
+     Func<TChild, string> childTitleSelector,
+     Func<TSibling, string> siblingTitleSelector,
+     CancellationToken cancellationToken = default)
+     where TChild : class, IWebPageFieldsSource
+     where TSibling : class, IWebPageFieldsSource;
 
         Task<MultiLinkCardDto[]> GetMultiLinkCardsAsync<TCategory, TChild>(
             int parentWebPageItemId,

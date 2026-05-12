@@ -60,11 +60,13 @@ namespace BDO.GWT.Core.Services
             };
 
             SideBoxDto? sidebox = currentPage.ShowSideNavigation
-                       ? await _pageUtility.GetSideboxDtoAsync<ServiceArea>(
-                           currentPage.SideNavigationTitle,
-                           currentPage.SystemFields.WebPageItemParentID,
-                           serviceArea => serviceArea.MetadataTitle,
-                           cancellationToken)
+                           ? await _pageUtility.GetSideboxDtoAsync<ServiceArea, BusinessLine>(
+                               currentPage.SideNavigationTitle,
+                               currentPage.SystemFields.WebPageItemID,
+                               currentPage.SystemFields.WebPageItemParentID,
+                               serviceArea => serviceArea.MetadataTitle,
+                               sibling => sibling.MetadataTitle,
+                               cancellationToken)
                        : null;
 
             return new BusinessLinePageDto

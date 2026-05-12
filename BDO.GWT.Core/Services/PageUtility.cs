@@ -33,29 +33,58 @@ namespace BDO.GWT.Core
         /// <param name="titleSelector">A function that picks the link text from each child page.</param>
         /// <param name="cancellationToken">Token to cancel the operation if needed.</param>
 
-        public async Task<SideBoxDto> GetSideboxDtoAsync<TPage>(
+        public async Task<SideBoxDto> GetSideboxDtoAsync<TChild, TSibling>(
             string sideboxTitle,
             int parentWebPageItemId,
-            Func<TPage, string> titleSelector,
+            int siblingParentWebPageItemId,
+            Func<TChild, string> childTitleSelector,
+            Func<TSibling, string> siblingTitleSelector,
             CancellationToken cancellationToken = default)
-            where TPage : class, IWebPageFieldsSource
+            where TChild : class, IWebPageFieldsSource
+            where TSibling : class, IWebPageFieldsSource
         {
-            var childPages = await _contentService.GetChildPagesByParentGuidAsync<TPage>(
+            var childPages = await _contentService.GetChildPagesByParentGuidAsync<TChild>(
                 parentWebPageItemId,
                 cancellationToken);
 
-            var linkDtos = childPages
+            var orderedChildren = childPages
                 .OrderBy(p => p.SystemFields.WebPageItemOrder)
-                .Select(p => new LinkItemDto
+                .ToList();
+
+            if (orderedChildren.Any())
+            {
+                return new SideBoxDto
                 {
-                    Title = titleSelector(p),
-                    URL = p.GetUrl().RelativePath,
-                });
+                    Title = sideboxTitle,
+                    Links = orderedChildren.Select(p => new LinkItemDto
+                    {
+                        Title = childTitleSelector(p),
+                        URL = p.GetUrl().RelativePath,
+                    }),
+                };
+            }
+
+            var siblingPages = await _contentService.GetChildPagesByParentGuidAsync<TSibling>(
+                siblingParentWebPageItemId,
+                cancellationToken);
+
+            var orderedSiblings = siblingPages
+                .OrderBy(p => p.SystemFields.WebPageItemOrder)
+                .ToList();
+
+            if (orderedSiblings.Count == 1)
+            {
+                orderedSiblings = new List<TSibling>();
+            }
 
             return new SideBoxDto
             {
                 Title = sideboxTitle,
-                Links = linkDtos,
+                Links = orderedSiblings.Select(p => new LinkItemDto
+                {
+                    Title = siblingTitleSelector(p),
+                    URL = p.GetUrl().RelativePath,
+                }),
             };
         }
 

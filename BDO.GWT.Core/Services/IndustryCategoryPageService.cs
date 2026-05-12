@@ -59,12 +59,14 @@ public class IndustryCategoryPageService : IIndustryCategoryPageService
         };
 
         SideBoxDto? sidebox = page.ShowSideNavigation
-                   ? await _pageUtility.GetSideboxDtoAsync<Industry>(   
-                       page.SideboxTitle,
-                       page.SystemFields.WebPageItemID,
-                       industry => industry.MetadataTitle,
-                       cancellationToken)
-                   : null;
+         ? await _pageUtility.GetSideboxDtoAsync<Industry, IndustryCategory>(
+             sideboxTitle: page.SideboxTitle,
+             parentWebPageItemId: page.SystemFields.WebPageItemID,      
+             siblingParentWebPageItemId: page.SystemFields.WebPageItemParentID, 
+             childTitleSelector: child => child.MetadataTitle,
+             siblingTitleSelector: sibling => sibling.MetadataTitle,
+             cancellationToken)
+         : null;
 
         return new IndustryCategoryDto
         {
