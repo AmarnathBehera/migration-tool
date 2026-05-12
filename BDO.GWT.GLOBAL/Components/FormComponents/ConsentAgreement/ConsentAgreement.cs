@@ -6,9 +6,9 @@ using System.Linq;
 
 namespace BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents;
 
-public class ConsentAgreement : FormComponent<ConsentAgreementProperties, string?>
+public class ConsentAgreement : FormComponent<ConsentAgreementProperties, string>
 {
-    public new const string IDENTIFIER = "BDO.FormComponent.ConsentAgreement";
+    public const string IDENTIFIER = "BDO.FormComponent.ConsentAgreement";
 
     private readonly IInfoProvider<ConsentInfo> consentInfoProvider;
 

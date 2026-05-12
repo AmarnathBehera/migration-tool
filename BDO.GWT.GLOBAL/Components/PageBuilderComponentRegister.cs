@@ -73,3 +73,11 @@ using Kentico.PageBuilder.Web.Mvc;
     ViewName = "~/Components/FormComponents/MonthYear/_MonthYear.cshtml",
     Description = "{$" + ComponentIdentifiers.FormComponents.MonthYear + ".Description$}",
     IconClass = "icon-cb-check-preview")]
+
+[assembly: RegisterFormComponent(
+    ReadOnlyTextComponent.IDENTIFIER,
+    typeof(ReadOnlyTextComponent),
+    "Read Only Text",
+    IsAvailableInFormBuilderEditor = true,
+    ViewName = "~/Components/FormComponents/ReadOnlyText/_ReadOnlyTextComponent.cshtml",
+    IconClass = "icon-cb-check-preview")]
