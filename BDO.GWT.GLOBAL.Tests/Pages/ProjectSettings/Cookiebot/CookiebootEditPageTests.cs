@@ -16,8 +16,11 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings
         {
             var baseType = typeof(CookiebootEditPage).BaseType;
             Assert.That(baseType, Is.Not.Null);
-            Assert.That(baseType!.IsGenericType, Is.True);
-            Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(CookiebotDTO)));
+            Assert.Multiple(() =>
+            {
+                Assert.That(baseType!.IsGenericType, Is.True);
+                Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(CookiebotDTO)));
+            });
         }
 
         [Test]

@@ -14,8 +14,11 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
         {
             var baseType = typeof(SeoSettingsEditPage).BaseType;
             Assert.That(baseType, Is.Not.Null);
-            Assert.That(baseType!.IsGenericType, Is.True);
-            Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(SEOSettingsInfo)));
+            Assert.Multiple(() =>
+            {
+                Assert.That(baseType!.IsGenericType, Is.True);
+                Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(SEOSettingsInfo)));
+            });
         }
 
         [Test]
@@ -79,8 +82,11 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
         {
             var baseType = typeof(WebChannelSettingsEditSection).BaseType;
             Assert.That(baseType, Is.Not.Null);
-            Assert.That(baseType!.IsGenericType, Is.True);
-            Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(WebChannelSettingsInfo)));
+            Assert.Multiple(() =>
+            {
+                Assert.That(baseType!.IsGenericType, Is.True);
+                Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(WebChannelSettingsInfo)));
+            });
         }
     }
 
@@ -186,8 +192,11 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
         {
             var baseType = typeof(WebChannelSnippetEditPage).BaseType;
             Assert.That(baseType, Is.Not.Null);
-            Assert.That(baseType!.IsGenericType, Is.True);
-            Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(WebChannelSnippetInfo)));
+            Assert.Multiple(() =>
+            {
+                Assert.That(baseType!.IsGenericType, Is.True);
+                Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(WebChannelSnippetInfo)));
+            });
         }
 
         [Test]
@@ -229,8 +238,11 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
         {
             var baseType = typeof(WebChannelSnippetEditSection).BaseType;
             Assert.That(baseType, Is.Not.Null);
-            Assert.That(baseType!.IsGenericType, Is.True);
-            Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(WebChannelSnippetInfo)));
+            Assert.Multiple(() =>
+            {
+                Assert.That(baseType!.IsGenericType, Is.True);
+                Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(WebChannelSnippetInfo)));
+            });
         }
     }
 
@@ -271,8 +283,11 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
                 BindingFlags.Instance | BindingFlags.Public);
 
             Assert.That(method, Is.Not.Null);
-            Assert.That(method!.DeclaringType, Is.EqualTo(typeof(WebChannelSnippetListingPage)));
-            Assert.That(method.GetCustomAttribute<PageCommandAttribute>(), Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(method!.DeclaringType, Is.EqualTo(typeof(WebChannelSnippetListingPage)));
+                Assert.That(method.GetCustomAttribute<PageCommandAttribute>(), Is.Not.Null);
+            });
         }
     }
 }

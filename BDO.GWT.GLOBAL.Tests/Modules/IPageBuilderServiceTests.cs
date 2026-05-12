@@ -36,8 +36,12 @@ namespace BDO.GWT.GLOBAL.Tests.Modules
         public void GetPageBuilderScripts_ReturnsHtmlContent()
         {
             var method = typeof(IPageBuilderService).GetMethod(nameof(IPageBuilderService.GetPageBuilderScripts))!;
-            Assert.That(method.ReturnType, Is.EqualTo(typeof(IHtmlContent)));
-            Assert.That(method.GetParameters()[0].ParameterType, Is.EqualTo(typeof(IHtmlHelper)));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(method.ReturnType, Is.EqualTo(typeof(IHtmlContent)));
+                Assert.That(method.GetParameters()[0].ParameterType, Is.EqualTo(typeof(IHtmlHelper)));
+            });
         }
     }
 }

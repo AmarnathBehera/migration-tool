@@ -52,8 +52,11 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.GlobalSettings
         {
             var baseType = typeof(GlobalSettingsEditPage).BaseType;
             Assert.That(baseType, Is.Not.Null);
-            Assert.That(baseType!.IsGenericType, Is.True);
-            Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(GlobalsettingskeyInfo)));
+            Assert.Multiple(() =>
+            {
+                Assert.That(baseType!.IsGenericType, Is.True);
+                Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(GlobalsettingskeyInfo)));
+            });
         }
 
         [Test]
@@ -97,8 +100,11 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.GlobalSettings
         {
             var baseType = typeof(GlobalSettingsEditSection).BaseType;
             Assert.That(baseType, Is.Not.Null);
-            Assert.That(baseType!.IsGenericType, Is.True);
-            Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(GlobalsettingskeyInfo)));
+            Assert.Multiple(() =>
+            {
+                Assert.That(baseType!.IsGenericType, Is.True);
+                Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(GlobalsettingskeyInfo)));
+            });
         }
     }
 

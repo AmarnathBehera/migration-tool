@@ -7,6 +7,13 @@ namespace BDO.GWT.GLOBAL.Tests.Modules
 {
     public class PageBuilderServiceTests
     {
+        private static readonly string[] WidgetsW1W2 = ["w1", "w2"];
+        private static readonly string[] AdvancedWidgetsAw1 = ["aw1"];
+        private static readonly string[] SectionsS1S2 = ["s1", "s2"];
+        private static readonly string[] AdvancedSectionsAs1 = ["as1"];
+        private static readonly string[] SingleA = ["a"];
+        private static readonly string[] SingleS = ["s"];
+
         private Mock<ISettingsService> _settingsService = null!;
         private PageBuilderService _service = null!;
 
@@ -40,41 +47,49 @@ namespace BDO.GWT.GLOBAL.Tests.Modules
         [Test]
         public void AddWidgets_ReturnsSameInstanceAndAppendsWidgets()
         {
-            var returned = _service.AddWidgets(new[] { "w1", "w2" });
+            var returned = _service.AddWidgets(WidgetsW1W2);
 
-            Assert.That(returned, Is.SameAs(_service));
-            var widgets = GetPrivateList(_service, "_widgets");
-            Assert.That(widgets, Is.EqualTo(new[] { "w1", "w2" }));
+            Assert.Multiple(() =>
+            {
+                Assert.That(returned, Is.SameAs(_service));
+                Assert.That(GetPrivateList(_service, "_widgets"), Is.EqualTo(WidgetsW1W2));
+            });
         }
 
         [Test]
         public void AddAdvancedWidgets_ReturnsSameInstanceAndAppendsWidgets()
         {
-            var returned = _service.AddAdvancedWidgets(new[] { "aw1" });
+            var returned = _service.AddAdvancedWidgets(AdvancedWidgetsAw1);
 
-            Assert.That(returned, Is.SameAs(_service));
-            var widgets = GetPrivateList(_service, "_advancedWidgets");
-            Assert.That(widgets, Is.EqualTo(new[] { "aw1" }));
+            Assert.Multiple(() =>
+            {
+                Assert.That(returned, Is.SameAs(_service));
+                Assert.That(GetPrivateList(_service, "_advancedWidgets"), Is.EqualTo(AdvancedWidgetsAw1));
+            });
         }
 
         [Test]
         public void AddSections_ReturnsSameInstanceAndAppendsSections()
         {
-            var returned = _service.AddSections(new[] { "s1", "s2" });
+            var returned = _service.AddSections(SectionsS1S2);
 
-            Assert.That(returned, Is.SameAs(_service));
-            var sections = GetPrivateList(_service, "_sections");
-            Assert.That(sections, Is.EqualTo(new[] { "s1", "s2" }));
+            Assert.Multiple(() =>
+            {
+                Assert.That(returned, Is.SameAs(_service));
+                Assert.That(GetPrivateList(_service, "_sections"), Is.EqualTo(SectionsS1S2));
+            });
         }
 
         [Test]
         public void AddAdvancedSections_ReturnsSameInstanceAndAppendsSections()
         {
-            var returned = _service.AddAdvancedSections(new[] { "as1" });
+            var returned = _service.AddAdvancedSections(AdvancedSectionsAs1);
 
-            Assert.That(returned, Is.SameAs(_service));
-            var sections = GetPrivateList(_service, "_advancedSections");
-            Assert.That(sections, Is.EqualTo(new[] { "as1" }));
+            Assert.Multiple(() =>
+            {
+                Assert.That(returned, Is.SameAs(_service));
+                Assert.That(GetPrivateList(_service, "_advancedSections"), Is.EqualTo(AdvancedSectionsAs1));
+            });
         }
 
         [Test]
@@ -82,8 +97,11 @@ namespace BDO.GWT.GLOBAL.Tests.Modules
         {
             var returned = _service.AddIdentifier("custom-area");
 
-            Assert.That(returned, Is.SameAs(_service));
-            Assert.That(GetIdentifier(_service), Is.EqualTo("custom-area"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(returned, Is.SameAs(_service));
+                Assert.That(GetIdentifier(_service), Is.EqualTo("custom-area"));
+            });
         }
 
         [Test]
@@ -91,9 +109,11 @@ namespace BDO.GWT.GLOBAL.Tests.Modules
         {
             var returned = _service.AddDefaultWidgets();
 
-            Assert.That(returned, Is.SameAs(_service));
-            var widgets = GetPrivateList(_service, "_widgets");
-            Assert.That(widgets, Has.Count.EqualTo(2));
+            Assert.Multiple(() =>
+            {
+                Assert.That(returned, Is.SameAs(_service));
+                Assert.That(GetPrivateList(_service, "_widgets"), Has.Count.EqualTo(2));
+            });
         }
 
         [Test]
@@ -106,14 +126,14 @@ namespace BDO.GWT.GLOBAL.Tests.Modules
         public void AddWidgets_CanBeChained()
         {
             _service
-                .AddWidgets(new[] { "a" })
-                .AddSections(new[] { "s" })
+                .AddWidgets(SingleA)
+                .AddSections(SingleS)
                 .AddIdentifier("zone1");
 
             Assert.Multiple(() =>
             {
-                Assert.That(GetPrivateList(_service, "_widgets"), Is.EqualTo(new[] { "a" }));
-                Assert.That(GetPrivateList(_service, "_sections"), Is.EqualTo(new[] { "s" }));
+                Assert.That(GetPrivateList(_service, "_widgets"), Is.EqualTo(SingleA));
+                Assert.That(GetPrivateList(_service, "_sections"), Is.EqualTo(SingleS));
                 Assert.That(GetIdentifier(_service), Is.EqualTo("zone1"));
             });
         }

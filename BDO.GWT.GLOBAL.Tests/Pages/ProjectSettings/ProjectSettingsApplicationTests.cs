@@ -24,7 +24,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings
             var attributes = typeof(ProjectSettingsApplication)
                 .GetCustomAttributes(typeof(UIPermissionAttribute), inherit: false);
 
-            Assert.That(attributes.Length, Is.EqualTo(4));
+            Assert.That(attributes, Has.Length.EqualTo(4));
         }
     }
 }
