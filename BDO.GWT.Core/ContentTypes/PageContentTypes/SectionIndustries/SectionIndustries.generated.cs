@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="SectionIndustries"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class SectionIndustries : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero
+	public partial class SectionIndustries : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero, IGrid
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -33,24 +33,6 @@ namespace BDO
 		/// </summary>
 		[SystemField]
 		public WebPageFields SystemFields { get; set; }
-
-
-		/// <summary>
-		/// GridTitle.
-		/// </summary>
-		public string GridTitle { get; set; }
-
-
-		/// <summary>
-		/// GridSummary.
-		/// </summary>
-		public string GridSummary { get; set; }
-
-
-		/// <summary>
-		/// ShowMultiLinks.
-		/// </summary>
-		public bool ShowMultiLinks { get; set; }
 
 
 		/// <summary>
@@ -195,5 +177,23 @@ namespace BDO
 		/// HeroCallToActionButtonUrl.
 		/// </summary>
 		public IEnumerable<IWebPageFieldsSource> HeroCallToActionButtonUrl { get; set; }
+
+
+		/// <summary>
+		/// GridTitle.
+		/// </summary>
+		public string GridTitle { get; set; }
+
+
+		/// <summary>
+		/// GridSummary.
+		/// </summary>
+		public string GridSummary { get; set; }
+
+
+		/// <summary>
+		/// ShowMultiLinks.
+		/// </summary>
+		public bool ShowMultiLinks { get; set; }
 	}
 }

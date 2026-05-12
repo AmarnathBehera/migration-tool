@@ -30,7 +30,7 @@ public class CustomInitializationModule : Module
     protected override void OnInit()
     {
         base.OnInit();
-        var configuration = Service.Resolve<IConfiguration>();
+        var configuration = CMS.Core.Service.Resolve<IConfiguration>();
 
         var cdnEndpoint = configuration["AzureStorageProviderSettings:CMSAzureCDNEndpoint"];
         var legacyAssembly = configuration["AzureStorageProviderSettings:CMSStorageProviderAssembly"];
@@ -49,7 +49,7 @@ public class CustomInitializationModule : Module
 
         if (channels.Count == 0)
         {
-            Service.Resolve<IEventLogService>().LogWarning(
+            CMS.Core.Service.Resolve<IEventLogService>().LogWarning(
                 "AzureInitializationModule",
                 "INIT",
                 "No website channels found during Azure Storage path mapping."

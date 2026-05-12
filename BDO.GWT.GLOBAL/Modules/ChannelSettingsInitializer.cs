@@ -25,10 +25,10 @@ public class ChannelSettingsInitializer : Module
         base.OnInit();
 
         // ✅ Resolve services AFTER IoC is initialized
-        _websiteChannelContext = Service.Resolve<IWebsiteChannelContext>();
-        _channelProvider = Service.Resolve<IInfoProvider<WebChannelSettingsInfo>>();
-        _snippetProvider = Service.Resolve<IInfoProvider<WebChannelSnippetInfo>>();
-        _globalProvider = Service.Resolve<IInfoProvider<GlobalsettingskeyInfo>>();
+        _websiteChannelContext = CMS.Core.Service.Resolve<IWebsiteChannelContext>();
+        _channelProvider = CMS.Core.Service.Resolve<IInfoProvider<WebChannelSettingsInfo>>();
+        _snippetProvider = CMS.Core.Service.Resolve<IInfoProvider<WebChannelSnippetInfo>>();
+        _globalProvider = CMS.Core.Service.Resolve<IInfoProvider<GlobalsettingskeyInfo>>();
 
         // ✅ Event when new channel is created
         WebChannelSettingsInfo.TYPEINFO.Events.Insert.After += OnChannelCreated;
