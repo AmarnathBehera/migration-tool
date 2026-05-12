@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="Sitemap"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class Sitemap : IWebPageFieldsSource, IMetadata
+	public partial class Sitemap : IWebPageFieldsSource, IMetadata, IPageMetadata
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -63,5 +63,23 @@ namespace BDO
 		/// MetadataCanonical.
 		/// </summary>
 		public string MetadataCanonical { get; set; }
+
+
+		/// <summary>
+		/// PageTitle.
+		/// </summary>
+		public string PageTitle { get; set; }
+
+
+		/// <summary>
+		/// PageDescription.
+		/// </summary>
+		public string PageDescription { get; set; }
+
+
+		/// <summary>
+		/// PageKeywords.
+		/// </summary>
+		public string PageKeywords { get; set; }
 	}
 }
