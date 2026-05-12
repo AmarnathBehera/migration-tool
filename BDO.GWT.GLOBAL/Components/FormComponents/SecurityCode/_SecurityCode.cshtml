@@ -4,14 +4,12 @@
 @model BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents.SecurityCode
 
 @{
-    var formId = Html.IdFor((Expression<Func<SecurityCode, string>>)(x => x.Value))
-                     .ToString().Split('_')[0];
+    var formId = Html.IdFor((Expression<Func<SecurityCode, string>>)(x => x.Value)).Split('_')[0];
 }
 
 @if (Model.IsV3)
 {
     <!-- reCAPTCHA v3 -->
-    <script src="https://www.google.com/recaptcha/api.js?render=@Model.PublicKeyV3"></script>
     <script>
         function attachRecaptchaToSubmitButton(event) {
             event.preventDefault();
@@ -52,6 +50,5 @@
 else
 {
     <!-- reCAPTCHA v2 -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <div class="g-recaptcha" data-sitekey="@Model.PublicKey"></div>
 }
