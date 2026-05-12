@@ -9,7 +9,6 @@ namespace BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents;
 
 public class SecurityCode : RecaptchaComponent
 {
-    public const string IDENTIFIER = "BDO.FormComponent.SecurityCode";
 
     public SecurityCode(IAppSettingsService appSettingsService, IHttpContextAccessor httpContextAccessor, ILocalizationService localizationService, IWebsiteChannelContext websiteChannelContext, IInfoProvider<WebsiteCaptchaSettingsInfo> captchaSettingInfoProvider) : base(appSettingsService, httpContextAccessor, localizationService, websiteChannelContext, captchaSettingInfoProvider)
     {

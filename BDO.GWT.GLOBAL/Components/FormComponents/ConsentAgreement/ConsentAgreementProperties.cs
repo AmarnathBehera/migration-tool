@@ -5,23 +5,23 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents;
 
-public class ConsentAgreementProperties : FormComponentProperties<string?>
+public class ConsentAgreementProperties : FormComponentProperties<string>
 {
     public ConsentAgreementProperties() : base(FieldDataType.Text, size: 100)
     {
     }
 
     [TextInputComponent(Label = "Options", Order = 0)]
-    public string? Options { get; set; }
+    public string Options { get; set; }
 
     [CheckBoxComponent(Label = "Sort items", Order = 10)]
     public bool SortItems { get; set; }
 
     [TextInputComponent(Label = "Text format", Order = 20)]
-    public string? TextFormat { get; set; }
+    public string TextFormat { get; set; }
 
     [TextInputComponent(Label = "Value format", Order = 30)]
-    public string? ValueFormat { get; set; }
+    public string ValueFormat { get; set; }
 
     [DropDownComponent(
         Label = "Repeat direction",
@@ -36,14 +36,14 @@ public class ConsentAgreementProperties : FormComponentProperties<string?>
         Order = 50,
         Options = "Flow;Flow\r\nTable;Table"
     )]
-    public string? RepeatLayout { get; set; }
+    public string RepeatLayout { get; set; }
 
     [TextInputComponent(Label = "Repeat columns", Order = 60)]
-    public string? RepeatColumns { get; set; }
+    public string RepeatColumns { get; set; }
 
     [TextInputComponent(Label = "Separator", Order = 70)]
-    public string? Separator { get; set; }
+    public string Separator { get; set; }
 
     [TextInputComponent(Label = "Default value", Order = EditingComponentOrder.DEFAULT_VALUE)]
-    public override string? DefaultValue { get; set; }
+    public override string DefaultValue { get; set; }
 }

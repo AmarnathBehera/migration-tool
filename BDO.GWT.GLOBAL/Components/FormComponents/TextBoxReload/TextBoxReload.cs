@@ -9,7 +9,7 @@ public class TextBoxReload : Kentico.Forms.Web.Mvc.FormComponent<TextBoxReloadPr
     public const string IDENTIFIER = "BDO.FormComponent.TextBoxReload";
 
     [BindableProperty]
-    public string? Value { get; set; }
+    public string Value { get; set; }
 
     public override string GetValue() => Value ?? string.Empty;
 

@@ -21,10 +21,10 @@ public class MonthYearProperties : FormComponentProperties<DateTime?>
     public bool CheckRange { get; set; }
 
     [TextInputComponent(Label = "Time zone type", Order = 30)]
-    public string? TimeZoneType { get; set; }
+    public string TimeZoneType { get; set; }
 
     [TextInputComponent(Label = "Time zone", Order = 40)]
-    public string? TimeZone { get; set; }
+    public string TimeZone { get; set; }
 
     [TextInputComponent(Label = "Default value", Order = EditingComponentOrder.DEFAULT_VALUE)]
     public override DateTime? DefaultValue { get; set; }
