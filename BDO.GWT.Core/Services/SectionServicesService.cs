@@ -77,7 +77,7 @@ public class SectionServicesService : ISectionServicesService
             .Select(service => (
                 ParentID: service.SystemFields.WebPageItemParentID,
                 Name: service.MetadataTitle,
-                Url: service.GetUrl().RelativePath
+                Url: service.SystemFields.WebPageUrlPath
 
             ))
             .ToList();
@@ -102,7 +102,7 @@ public class SectionServicesService : ISectionServicesService
                     Description = ic.MetadataDescription,
                     ImageURL = imageUrl,
                     ImageAltText = ic.MetadataTeaserImageAltText,
-                    Url = ic.GetUrl().RelativePath,
+                    Url = ic.SystemFields.WebPageUrlPath,
                     ReadMoreLinks = readMoreLinks,
                 };
             })
