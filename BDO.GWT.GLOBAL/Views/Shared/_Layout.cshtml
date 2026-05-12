@@ -1,5 +1,4 @@
-
-﻿@using BDO.GWT.Core.Services
+@using BDO.GWT.Core.Services
 @using BDO.GWT.Core.ViewComponents
 @using BDO.GWT.Global.Components.ViewComponents
 @using BDO.GWT.Web.Core.LiveSite.Components.ViewComponents
@@ -80,7 +79,7 @@
     <page-builder-styles />
 </head>
 
-<body>
+<body data-lang="@CultureContext.CurrentLanguageTag.ToLowerInvariant()">
     @await (Component.InvokeAsync<ScriptsTopBody>())
     @RenderSection("styles", required: false)
     @await (Component.InvokeAsync<Header>())
