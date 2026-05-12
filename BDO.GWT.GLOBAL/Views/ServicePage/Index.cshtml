@@ -59,6 +59,9 @@
             <aside>
                 @(await ReactService.RenderComponentAsync(
                             pageId,
+                            ReactComponentType.SideBoxNavigation,
+                            ReactComponentType.SideBoxNavigationGUID,
+                            Model.Sidebox,
                             Context.RequestAborted))
             </aside>
         }

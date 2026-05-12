@@ -57,13 +57,14 @@ namespace BDO.GWT.Core.Services
             };
 
             SideBoxDto? sidebox = page.ShowSideNavigation
-                           page.SideNavigationTitle,
-                           page.SystemFields.WebPageItemID,
-                           page.SystemFields.WebPageItemParentID,
-                           service => service.MetadataTitle,
-                           sibling => sibling.MetadataTitle,
-                           cancellationToken)
-                       : null;
+          ? await _pageUtility.GetSideboxDtoAsync<Service, ServiceArea>(
+              sideboxTitle: page.SideNavigationTitle,
+              parentWebPageItemId: page.SystemFields.WebPageItemID,       // look for child IndustryService
+              siblingParentWebPageItemId: page.SystemFields.WebPageItemParentID, // fallback: sibling Industry
+              childTitleSelector: child => child.MetadataTitle,
+              siblingTitleSelector: sibling => sibling.MetadataTitle,
+                     cancellationToken)
+                 : null;
 
             return new ServicesAreaPageDto
             {
@@ -105,13 +106,14 @@ namespace BDO.GWT.Core.Services
             };
 
             SideBoxDto? sidebox = page.ShowSideNavigation
-                           page.SideNavigationTitle,
-                           page.SystemFields.WebPageItemID,
-                           page.SystemFields.WebPageItemParentID,
-                           service => service.MetadataTitle,
-                           sibling => sibling.MetadataTitle,
-                           cancellationToken)
-                       : null;
+                         ? await _pageUtility.GetSideboxDtoAsync<Service, ServiceArea>(
+          sideboxTitle: page.SideNavigationTitle,
+          parentWebPageItemId: page.SystemFields.WebPageItemID,       // look for child IndustryService
+          siblingParentWebPageItemId: page.SystemFields.WebPageItemParentID, // fallback: sibling Industry
+          childTitleSelector: child => child.MetadataTitle,
+          siblingTitleSelector: sibling => sibling.MetadataTitle,
+                 cancellationToken)
+             : null;
 
             return new ServicePageDto
             {
