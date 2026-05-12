@@ -50,7 +50,13 @@ builder.Services.AddKentico(features =>
           IndustryCategory.CONTENT_TYPE_NAME,
           Industry.CONTENT_TYPE_NAME,
           IndustryService.CONTENT_TYPE_NAME,
+          SectionServices.CONTENT_TYPE_NAME,
+          BusinessLine.CONTENT_TYPE_NAME,
+          Service.CONTENT_TYPE_NAME,
+          ServiceArea.CONTENT_TYPE_NAME,
           Sub_Service.CONTENT_TYPE_NAME
+          
+
        }
     }); features.UseActivityTracking();
     features.UseWebPageRouting();
@@ -161,10 +167,10 @@ app.UseKentico();
 
 app.Kentico().MapRoutes();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=About}/{action=Index}/{id?}"
-);
+//app.MapControllerRoute(
+//    name: "default",
+//    pattern: "{controller=About}/{action=Index}/{id?}"
+//);
 app.MapControllerRoute(
     name: "default",
     pattern: $"{{{WebPageRoutingOptions.LANGUAGE_ROUTE_VALUE_KEY}}}/{{controller}}/{{action}}",
