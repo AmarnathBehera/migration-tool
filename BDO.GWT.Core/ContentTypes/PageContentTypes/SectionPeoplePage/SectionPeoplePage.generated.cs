@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="SectionPeoplePage"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class SectionPeoplePage : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero, IAuthoredContentSection
+	public partial class SectionPeoplePage : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero, IAuthoredContentSection, IPageMetadata
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -249,5 +249,23 @@ namespace BDO
 		/// DisplayedAuthoredContentPageTypes.
 		/// </summary>
 		public string DisplayedAuthoredContentPageTypes { get; set; }
+
+
+		/// <summary>
+		/// PageTitle.
+		/// </summary>
+		public string PageTitle { get; set; }
+
+
+		/// <summary>
+		/// PageDescription.
+		/// </summary>
+		public string PageDescription { get; set; }
+
+
+		/// <summary>
+		/// PageKeywords.
+		/// </summary>
+		public string PageKeywords { get; set; }
 	}
 }

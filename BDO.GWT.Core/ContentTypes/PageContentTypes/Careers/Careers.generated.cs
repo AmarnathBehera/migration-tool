@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="Careers"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class Careers : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero, IItemList
+	public partial class Careers : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero, IItemList, IPageMetadata
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -213,5 +213,23 @@ namespace BDO
 		/// ItemListAdvancedSearchLinkUrl.
 		/// </summary>
 		public IEnumerable<IContentItemFieldsSource> ItemListAdvancedSearchLinkUrl { get; set; }
+
+
+		/// <summary>
+		/// PageTitle.
+		/// </summary>
+		public string PageTitle { get; set; }
+
+
+		/// <summary>
+		/// PageDescription.
+		/// </summary>
+		public string PageDescription { get; set; }
+
+
+		/// <summary>
+		/// PageKeywords.
+		/// </summary>
+		public string PageKeywords { get; set; }
 	}
 }

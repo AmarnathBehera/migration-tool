@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="SectionServices"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class SectionServices : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero, IGrid
+	public partial class SectionServices : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero, IGrid, IPageMetadata
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -189,5 +189,23 @@ namespace BDO
 		/// ShowMultiLinks.
 		/// </summary>
 		public bool ShowMultiLinks { get; set; }
+
+
+		/// <summary>
+		/// PageTitle.
+		/// </summary>
+		public string PageTitle { get; set; }
+
+
+		/// <summary>
+		/// PageDescription.
+		/// </summary>
+		public string PageDescription { get; set; }
+
+
+		/// <summary>
+		/// PageKeywords.
+		/// </summary>
+		public string PageKeywords { get; set; }
 	}
 }
