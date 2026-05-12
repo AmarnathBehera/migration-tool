@@ -111,10 +111,11 @@ public class FooterService : IFooterService
         var footerPages = new List<FooterLinkDto>();
 
         var allGuids = footerLinksPages
-            .Where(x => x.TargetURL != null)
-            .SelectMany(x => x.TargetURL?.Select(t => t.WebPageGuid) ?? Enumerable.Empty<Guid>())
-            .Distinct()
-            .ToList();
+      .Where(x => x.TargetURL != null)
+      .SelectMany(x => x.TargetURL?.Select(t => t.SystemFields?.WebPageItemGUID ?? Guid.Empty) ?? Enumerable.Empty<Guid>())
+      .Where(guid => guid != Guid.Empty)
+      .Distinct()
+      .ToList();
 
         var selectedPages = allGuids.Any()
             ? await _contentService.GetItemsByGUIDAsync(allGuids)
@@ -128,14 +129,14 @@ public class FooterService : IFooterService
         int order = 1;
         foreach (var link in footerLinksPages)
         {
-            var guid = link?.TargetURL?.FirstOrDefault()?.WebPageGuid;
+            var guid = link?.TargetURL?.FirstOrDefault()?.SystemFields?.WebPageItemGUID ?? Guid.Empty;
 
             footerPages.Add(new FooterLinkDto
             {
                 OpenInNewTab = link?.OpenInNewTab ?? false,
                 Order = order++,
                 Title = link?.Title ?? string.Empty,
-                URL = guid != null && pageUrlMap.ContainsKey(guid.Value) ? pageUrlMap[guid.Value] : string.Empty
+                URL = guid != Guid.Empty && pageUrlMap.TryGetValue(guid, out var url) ? url : string.Empty
             });
         }
         return footerPages;

@@ -23,9 +23,11 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using XperienceCommunity.MultiChoiceFormControl.Admin.Helpers.Components.MultiChoice;
 
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using BDO.GWT.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,11 +39,18 @@ builder.Services.AddKentico(features =>
         RegisterDefaultSection = true,
         ContentTypeNames = new[]
         {
-          "BDO.HomePage",
-          "BDO.SectionAbout",
-          "BDO.AboutPage",
-          "BDO.HomePage",
-          "BDO.Contact"
+          HomePage.CONTENT_TYPE_NAME,
+          SectionAbout.CONTENT_TYPE_NAME,
+          AboutPage.CONTENT_TYPE_NAME,
+          Contact.CONTENT_TYPE_NAME,
+          Person.CONTENT_TYPE_NAME,
+          Locations.CONTENT_TYPE_NAME,
+          LocationCity.CONTENT_TYPE_NAME,
+          SectionIndustries.CONTENT_TYPE_NAME,
+          IndustryCategory.CONTENT_TYPE_NAME,
+          Industry.CONTENT_TYPE_NAME,
+          IndustryService.CONTENT_TYPE_NAME,
+          Sub_Service.CONTENT_TYPE_NAME
        }
     }); features.UseActivityTracking();
     features.UseWebPageRouting();
@@ -58,6 +67,7 @@ builder.Services.Configure<WebEncoderOptions>(options =>
 {
     options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All);
 });
+builder.Services.AddTransient<IMultiChoiceOptionsProviderActivator, MultiChoiceOptionsProviderActivator>();
 
 builder.Services.Configure<ReactOptions>(
     builder.Configuration.GetSection("ReactOptions"));
@@ -79,6 +89,8 @@ builder.Services.AddScoped<IContentService, ContentService>();
 builder.Services.AddScoped<ICachingService, CachingService>();
 builder.Services.AddScoped<ISiteContext, SiteContext>();
 builder.Services.AddScoped<ISiteConfigurationService, SiteConfigurationService>();
+builder.Services.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddXperience();
 builder.Services.AddControllersWithViews();
 builder.Services.AddXperienceCommunityLocalization();
