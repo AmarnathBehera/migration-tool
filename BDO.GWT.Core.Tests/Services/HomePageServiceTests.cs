@@ -313,9 +313,9 @@ namespace BDO.GWT.Core.Tests.Services
                 Assert.That(tab.ImageAltText, Is.EqualTo("Alt1"));
                 Assert.That(tab.ReadMoreLink, Is.EqualTo("/read-more"));
                 Assert.That(tab.Items, Has.Count.EqualTo(1));
-                Assert.That(tab.Items[0].Title, Is.EqualTo("Industry Title"));
-                Assert.That(tab.Items[0].Description, Is.EqualTo("Industry Desc"));
-                Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/industry"));
+                Assert.That(tab.Items?[0].Title, Is.EqualTo("Industry Title"));
+                Assert.That(tab.Items?[0].Description, Is.EqualTo("Industry Desc"));
+                Assert.That(tab.Items?[0].ReadMoreLink, Is.EqualTo("/industry"));
             });
             
         }
@@ -361,9 +361,9 @@ namespace BDO.GWT.Core.Tests.Services
             var tab = result.Tabs.First();
             Assert.Multiple(() =>
             {
-                Assert.That(tab.Items[0].Title, Is.EqualTo("Service Title"));
-                Assert.That(tab.Items[0].Description, Is.EqualTo("Service Desc"));
-                Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/service"));
+                Assert.That(tab.Items?[0].Title, Is.EqualTo("Service Title"));
+                Assert.That(tab.Items?[0].Description, Is.EqualTo("Service Desc"));
+                Assert.That(tab.Items?[0].ReadMoreLink, Is.EqualTo("/service"));
             });
         }
 
@@ -409,8 +409,8 @@ namespace BDO.GWT.Core.Tests.Services
 
             Assert.Multiple(() =>
             {
-                Assert.That(tab.Items[0].Title, Is.EqualTo("Unknown Page"));
-                Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/unknown"));
+                Assert.That(tab.Items?[0].Title, Is.EqualTo("Unknown Page"));
+                Assert.That(tab.Items?[0].ReadMoreLink, Is.EqualTo("/unknown"));
             });
             
         }
@@ -457,9 +457,9 @@ namespace BDO.GWT.Core.Tests.Services
 
             Assert.Multiple(() =>
             {
-                Assert.That(tab.Items[0].Title, Is.EqualTo("Industry Service Title"));
-                Assert.That(tab.Items[0].Description, Is.EqualTo("Industry Service Desc"));
-                Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/industry-service"));
+                Assert.That(tab.Items?[0].Title, Is.EqualTo("Industry Service Title"));
+                Assert.That(tab.Items?[0].Description, Is.EqualTo("Industry Service Desc"));
+                Assert.That(tab.Items?[0].ReadMoreLink, Is.EqualTo("/industry-service"));
             });
 
             
@@ -507,9 +507,9 @@ namespace BDO.GWT.Core.Tests.Services
             var tab = result.Tabs.First();
             Assert.Multiple(() =>
             {
-                Assert.That(tab.Items[0].Title, Is.EqualTo("Service Area Title"));
-                Assert.That(tab.Items[0].Description, Is.EqualTo("Service Area Desc"));
-                Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/service-area"));
+                Assert.That(tab.Items?[0].Title, Is.EqualTo("Service Area Title"));
+                Assert.That(tab.Items?[0].Description, Is.EqualTo("Service Area Desc"));
+                Assert.That(tab.Items?[0].ReadMoreLink, Is.EqualTo("/service-area"));
             });
 
             
@@ -557,9 +557,9 @@ namespace BDO.GWT.Core.Tests.Services
             var tab = result.Tabs.First();
             Assert.Multiple(() =>
             {
-                Assert.That(tab.Items[0].Title, Is.EqualTo("Sub Service Title"));
-                Assert.That(tab.Items[0].Description, Is.EqualTo("Sub Service Desc"));
-                Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/sub-service"));
+                Assert.That(tab?.Items?[0].Title, Is.EqualTo("Sub Service Title"));
+                Assert.That(tab?.Items?[0].Description, Is.EqualTo("Sub Service Desc"));
+                Assert.That(tab?.Items?[0].ReadMoreLink, Is.EqualTo("/sub-service"));
             });
             
         }
