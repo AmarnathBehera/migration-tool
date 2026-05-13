@@ -180,10 +180,10 @@ public class HomePageService : IHomePageService
         var trendingTopicTabDtos = await Task.WhenAll(trendingTopicPages.Select(async x => new TrendingTopicTabDto
           {
                 Title = x?.Title,
-                ReadMoreLink = x.CTANodeGuid?.FirstOrDefault()?.SystemFields?.WebPageUrlPath,
-                ImageURL = x.ImageUrl.FirstOrDefault()?.ContentAttachmentAsset.Url,
-                ImageAltText = x.ImageAltText,
-                Items = x.FeaturedItems.Select(item => item switch
+                ReadMoreLink = x?.CTANodeGuid?.FirstOrDefault()?.SystemFields?.WebPageUrlPath,
+                ImageURL = x?.ImageUrl.FirstOrDefault()?.ContentAttachmentAsset.Url,
+                ImageAltText = x?.ImageAltText,
+                Items = x?.FeaturedItems?.Select(item => item switch
                     {
                         IndustryService industryService => new TrendingTopicItemDto
                     {
