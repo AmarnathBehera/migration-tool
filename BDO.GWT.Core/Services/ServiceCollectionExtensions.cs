@@ -23,6 +23,7 @@
             services.AddScoped<IHomePageService, HomePageService>();
             services.AddScoped<IHeaderService, HeaderService>();
             services.AddScoped<IWebsiteCulturesService, WebsiteCulturesService>();
+            services.AddHttpContextAccessor();
             services.AddScoped<ICultureContext, CultureContext>();
             //services.AddScoped<IPageMetadataService, PageMetadataService>();
 
