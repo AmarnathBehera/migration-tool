@@ -1,6 +1,7 @@
 ﻿namespace BDO.GWT.Core
 {
     using BDO.GWT.Core;
+    using BDO.GWT.Core.services;
     using BDO.GWT.Core.Services;
     using BDO.GWT.Core.Services.Header;
     using BDO.GWT.Core.ValueObjects;
@@ -18,6 +19,7 @@
             // XbyK infrastructure services are typically already registered by Kentico
             // You just wire your abstraction here.
             services.AddScoped<IContentService, ContentService>();
+            services.AddScoped<IPageUtility, PageUtility>();
             services.AddScoped<IHomePageService, HomePageService>();
             services.AddScoped<IHeaderService, HeaderService>();
             services.AddScoped<IWebsiteCulturesService, WebsiteCulturesService>();

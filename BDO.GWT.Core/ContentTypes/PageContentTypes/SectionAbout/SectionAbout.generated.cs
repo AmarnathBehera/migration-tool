@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="SectionAbout"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class SectionAbout : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero
+	public partial class SectionAbout : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero, IPageMetadata
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -114,12 +114,6 @@ namespace BDO
 
 
 		/// <summary>
-		/// MetadataKeywords.
-		/// </summary>
-		public string MetadataKeywords { get; set; }
-
-
-		/// <summary>
 		/// HeroLayout.
 		/// </summary>
 		public string HeroLayout { get; set; }
@@ -177,5 +171,23 @@ namespace BDO
 		/// HeroCallToActionButtonUrl.
 		/// </summary>
 		public IEnumerable<IWebPageFieldsSource> HeroCallToActionButtonUrl { get; set; }
+
+
+		/// <summary>
+		/// PageTitle.
+		/// </summary>
+		public string PageTitle { get; set; }
+
+
+		/// <summary>
+		/// PageDescription.
+		/// </summary>
+		public string PageDescription { get; set; }
+
+
+		/// <summary>
+		/// PageKeywords.
+		/// </summary>
+		public string PageKeywords { get; set; }
 	}
 }

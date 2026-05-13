@@ -10,7 +10,7 @@ public static class HtmlUtility
     private static readonly string[] UrlTypeHtmlAttributes = { "href", "src", "srcset", "poster" };
 
     [return: NotNullIfNotNull("html")]
-    public static string? RemoveTildeFromUrlTypeHtmlAttributes(string? html)
+    public static string?RemoveTildeFromUrlTypeHtmlAttributes(string? html)
     {
         if (html == null)
         {

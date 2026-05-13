@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="StatusCode"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class StatusCode : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata
+	public partial class StatusCode : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IPageMetadata
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -120,8 +120,20 @@ namespace BDO
 
 
 		/// <summary>
-		/// MetadataKeywords.
+		/// PageTitle.
 		/// </summary>
-		public string MetadataKeywords { get; set; }
+		public string PageTitle { get; set; }
+
+
+		/// <summary>
+		/// PageDescription.
+		/// </summary>
+		public string PageDescription { get; set; }
+
+
+		/// <summary>
+		/// PageKeywords.
+		/// </summary>
+		public string PageKeywords { get; set; }
 	}
 }

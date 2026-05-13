@@ -22,10 +22,6 @@ variable "deploy.octopus.workerPool" {
     }
 }
 
-variable "appsettings.azureAdClientId" {
-    value "7e20a3ed-beed-48cd-91cb-f20f5feffd71" {}
-}
-
 variable "appsettings.azureAdTenantId" {
     value "44f4e7a6-4821-44d7-b286-cd90436c6975" {}
 }
@@ -39,9 +35,37 @@ variable "appsettings.reactAppService" {
 }
 
 variable "appsettings.CMSAzureAccountName" {
-    value "bdosagwtpri#{environment.abbreviation}eurwe" {}
+    value "bdosagwtxbyk#{environment.abbreviation}eurwe" {}
 }
 
 variable "appsettings.CMSAzureCDNEndpoint" {
-    value "https://media-#{environment.abbreviation}.gwt.bdo.global" {}
+    value "https://bdosagwtxbyk#{environment.abbreviation}eurwe.blob.core.windows.net" {}
+}
+
+variable "appsettings.appInsightsCMSConnectionString" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ai-gwt-xbyk-cms-#{environment.abbreviation}-eur-we-connectionstring)" {}
+}
+
+variable "appsettings.appInsightsMVCConnectionString" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ai-gwt-xbyk-mvc-#{environment.abbreviation}-eur-we-connectionstring)" {}
+}
+
+variable "appsettings.appInsightsReactConnectionString" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ai-gwt-xbyk-react-#{environment.abbreviation}-eur-we-connectionstring)" {}
+}
+
+variable "appsettings.azureAdClientId" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-cms-app-id)" {}
+}
+
+variable "appsettings.azureAdClientSecret" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-cms-app-secret)" {}
+}
+
+variable "appsettings.CMSAzureSharedKey" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-storage-account-shared-key)" {}
+}
+
+variable "appsettings.CMSHashStringSalt" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-cms-hashStringSalt)" {}
 }
