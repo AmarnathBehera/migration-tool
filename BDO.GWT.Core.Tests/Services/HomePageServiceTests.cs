@@ -249,7 +249,7 @@ namespace BDO.GWT.Core.Tests.Services
         }
 
         [Test]
-        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_WithContactFeaturedItem()
+        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_WithIndustryFeaturedItem()
         {
             _contentServiceMock
                 .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
@@ -258,11 +258,11 @@ namespace BDO.GWT.Core.Tests.Services
                     new TrendingTopics { Heading = "Trending" }
                 });
 
-            var contactItem = new Contact
+            var contactItem = new Industry
             {
-                MetadataTitle = "Contact Title",
-                MetadataDescription = "Contact Desc",
-                SystemFields = new WebPageFields { WebPageUrlPath = "/contact" }
+                MetadataTitle = "Industry Title",
+                MetadataDescription = "Industry Desc",
+                SystemFields = new WebPageFields { WebPageUrlPath = "/industry" }
             };
 
             var trendingTopics = new List<TrendingTopic>
@@ -280,7 +280,7 @@ namespace BDO.GWT.Core.Tests.Services
                     },
                     CTANodeGuid = new List<IWebPageFieldsSource>
                     {
-                        new Contact { SystemFields = new WebPageFields { WebPageUrlPath = "/read-more" } }
+                        new Industry { SystemFields = new WebPageFields { WebPageUrlPath = "/read-more" } }
                     },
                     FeaturedItems = new List<IWebPageFieldsSource> { contactItem }
                 }
@@ -310,7 +310,7 @@ namespace BDO.GWT.Core.Tests.Services
         }
 
         [Test]
-        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_WithLegalPageFeaturedItem()
+        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_WithServicePageFeaturedItem()
         {
             _contentServiceMock
                 .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
@@ -319,11 +319,11 @@ namespace BDO.GWT.Core.Tests.Services
                     new TrendingTopics { Heading = "Trending" }
                 });
 
-            var legalItem = new LegalPage
+            var legalItem = new Service
             {
-                MetadataTitle = "Legal Title",
-                MetadataDescription = "Legal Desc",
-                SystemFields = new WebPageFields { WebPageUrlPath = "/legal" }
+                MetadataTitle = "Service Title",
+                MetadataDescription = "Service Desc",
+                SystemFields = new WebPageFields { WebPageUrlPath = "/Service" }
             };
 
             var trendingTopics = new List<TrendingTopic>
