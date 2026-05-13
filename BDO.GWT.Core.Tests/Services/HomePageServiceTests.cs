@@ -348,9 +348,12 @@ namespace BDO.GWT.Core.Tests.Services
 
             Assert.That(result, Is.Not.Null);
             var tab = result.Tabs.First();
-            Assert.That(tab.Items[0].Title, Is.EqualTo("Service Title"));
-            Assert.That(tab.Items[0].Description, Is.EqualTo("Service Desc"));
-            Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/service"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(tab.Items[0].Title, Is.EqualTo("Service Title"));
+                Assert.That(tab.Items[0].Description, Is.EqualTo("Service Desc"));
+                Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/service"));
+            });
         }
 
         [Test]
@@ -394,6 +397,143 @@ namespace BDO.GWT.Core.Tests.Services
             var tab = result.Tabs.First();
             Assert.That(tab.Items[0].Title, Is.EqualTo("Unknown Page"));
             Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/unknown"));
+        }
+        [Test]
+        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_WithIndustryServiceFeaturedItem()
+        {
+            _contentServiceMock
+                .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<TrendingTopics>
+                {
+            new TrendingTopics { Heading = "Trending" }
+                });
+
+            var industryServiceItem = new IndustryService
+            {
+                MetadataTitle = "Industry Service Title",
+                MetadataDescription = "<p>Industry Service Desc</p>",
+                SystemFields = new WebPageFields { WebPageUrlPath = "/industry-service" }
+            };
+
+            var trendingTopics = new List<TrendingTopic>
+    {
+        new TrendingTopic
+        {
+            Title = "Industry Service Tab",
+            ImageAltText = "Alt",
+            ImageUrl = new List<ContentAttachment>(),
+            CTANodeGuid = new List<IWebPageFieldsSource>(),
+            FeaturedItems = new List<IWebPageFieldsSource> { industryServiceItem }
+        }
+    };
+
+            _contentServiceMock
+                .Setup(x => x.RetrievePagesAsync<TrendingTopic>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(trendingTopics);
+
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
+
+            Assert.That(result, Is.Not.Null);
+
+            var tab = result.Tabs.First();
+
+            Assert.That(tab.Items[0].Title, Is.EqualTo("Industry Service Title"));
+            Assert.That(tab.Items[0].Description, Is.EqualTo("Industry Service Desc"));
+            Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/industry-service"));
+        }
+
+        [Test]
+        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_WithServiceAreaFeaturedItem()
+        {
+            _contentServiceMock
+                .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<TrendingTopics>
+                {
+            new TrendingTopics { Heading = "Trending" }
+                });
+
+            var serviceAreaItem = new ServiceArea
+            {
+                MetadataTitle = "Service Area Title",
+                MetadataDescription = "<p>Service Area Desc</p>",
+                SystemFields = new WebPageFields { WebPageUrlPath = "/service-area" }
+            };
+
+            var trendingTopics = new List<TrendingTopic>
+    {
+        new TrendingTopic
+        {
+            Title = "Service Area Tab",
+            ImageAltText = "Alt",
+            ImageUrl = new List<ContentAttachment>(),
+            CTANodeGuid = new List<IWebPageFieldsSource>(),
+            FeaturedItems = new List<IWebPageFieldsSource> { serviceAreaItem }
+        }
+    };
+
+            _contentServiceMock
+                .Setup(x => x.RetrievePagesAsync<TrendingTopic>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(trendingTopics);
+
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
+
+            Assert.That(result, Is.Not.Null);
+
+            var tab = result.Tabs.First();
+
+            Assert.That(tab.Items[0].Title, Is.EqualTo("Service Area Title"));
+            Assert.That(tab.Items[0].Description, Is.EqualTo("Service Area Desc"));
+            Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/service-area"));
+        }
+
+        [Test]
+        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_WithSubServiceFeaturedItem()
+        {
+            _contentServiceMock
+                .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<TrendingTopics>
+                {
+            new TrendingTopics { Heading = "Trending" }
+                });
+
+            var subServiceItem = new Sub_Service
+            {
+                MetadataTitle = "Sub Service Title",
+                MetadataDescription = "<p>Sub Service Desc</p>",
+                SystemFields = new WebPageFields { WebPageUrlPath = "/sub-service" }
+            };
+
+            var trendingTopics = new List<TrendingTopic>
+    {
+        new TrendingTopic
+        {
+            Title = "Sub Service Tab",
+            ImageAltText = "Alt",
+            ImageUrl = new List<ContentAttachment>(),
+            CTANodeGuid = new List<IWebPageFieldsSource>(),
+            FeaturedItems = new List<IWebPageFieldsSource> { subServiceItem }
+        }
+    };
+
+            _contentServiceMock
+                .Setup(x => x.RetrievePagesAsync<TrendingTopic>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(trendingTopics);
+
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
+
+            Assert.That(result, Is.Not.Null);
+
+            var tab = result.Tabs.First();
+
+            Assert.That(tab.Items[0].Title, Is.EqualTo("Sub Service Title"));
+            Assert.That(tab.Items[0].Description, Is.EqualTo("Sub Service Desc"));
+            Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/sub-service"));
         }
 
         [Test]
