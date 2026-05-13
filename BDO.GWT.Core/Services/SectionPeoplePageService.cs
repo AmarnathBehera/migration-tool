@@ -88,7 +88,6 @@ public class SectionPeoplePageService : ISectionPeoplePageService
 
     public async Task<PaginationDto<PersonCardDto>> GetSectionPeoplePersonPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken)
     {
-        var lan = _cultureContext.CurrentLanguageTag;
         var sectionPeople = (await _contentRetriever.GetPagesAsync<SectionPeoplePage>(
             new RetrievePagesParameters
             {

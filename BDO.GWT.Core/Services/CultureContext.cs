@@ -49,7 +49,7 @@ public class CultureContext : ICultureContext
 
     private string? GetLanguageFromReferer(HttpContext context)
     {
-        var referer = context.Request.Headers["Referer"].FirstOrDefault();
+        var referer = context.Request.Headers.Referer;
 
         if (string.IsNullOrEmpty(referer) || !Uri.TryCreate(referer, UriKind.Absolute, out var uri))
             return null;
