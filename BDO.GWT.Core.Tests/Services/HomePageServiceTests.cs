@@ -258,7 +258,7 @@ namespace BDO.GWT.Core.Tests.Services
                     new TrendingTopics { Heading = "Trending" }
                 });
 
-            var contactItem = new Industry
+            var IndustryItem = new Industry
             {
                 MetadataTitle = "Industry Title",
                 MetadataDescription = "Industry Desc",
@@ -282,7 +282,7 @@ namespace BDO.GWT.Core.Tests.Services
                     {
                         new Industry { SystemFields = new WebPageFields { WebPageUrlPath = "/read-more" } }
                     },
-                    FeaturedItems = new List<IWebPageFieldsSource> { contactItem }
+                    FeaturedItems = new List<IWebPageFieldsSource> { IndustryItem }
                 }
             };
 
@@ -304,9 +304,9 @@ namespace BDO.GWT.Core.Tests.Services
             Assert.That(tab.ImageAltText, Is.EqualTo("Alt1"));
             Assert.That(tab.ReadMoreLink, Is.EqualTo("/read-more"));
             Assert.That(tab.Items.Count, Is.EqualTo(1));
-            Assert.That(tab.Items[0].Title, Is.EqualTo("Contact Title"));
-            Assert.That(tab.Items[0].Description, Is.EqualTo("Contact Desc"));
-            Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/contact"));
+            Assert.That(tab.Items[0].Title, Is.EqualTo("Industry Title"));
+            Assert.That(tab.Items[0].Description, Is.EqualTo("Industry Desc"));
+            Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/industry"));
         }
 
         [Test]
@@ -319,11 +319,11 @@ namespace BDO.GWT.Core.Tests.Services
                     new TrendingTopics { Heading = "Trending" }
                 });
 
-            var legalItem = new Service
+            var ServiceItem = new Service
             {
                 MetadataTitle = "Service Title",
                 MetadataDescription = "Service Desc",
-                SystemFields = new WebPageFields { WebPageUrlPath = "/Service" }
+                SystemFields = new WebPageFields { WebPageUrlPath = "/service" }
             };
 
             var trendingTopics = new List<TrendingTopic>
@@ -334,7 +334,7 @@ namespace BDO.GWT.Core.Tests.Services
                     ImageAltText = "Alt2",
                     ImageUrl = new List<ContentAttachment>(),
                     CTANodeGuid = new List<IWebPageFieldsSource>(),
-                    FeaturedItems = new List<IWebPageFieldsSource> { legalItem }
+                    FeaturedItems = new List<IWebPageFieldsSource> { ServiceItem }
                 }
             };
 
@@ -348,9 +348,9 @@ namespace BDO.GWT.Core.Tests.Services
 
             Assert.That(result, Is.Not.Null);
             var tab = result.Tabs.First();
-            Assert.That(tab.Items[0].Title, Is.EqualTo("Legal Title"));
-            Assert.That(tab.Items[0].Description, Is.EqualTo("Legal Desc"));
-            Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/legal"));
+            Assert.That(tab.Items[0].Title, Is.EqualTo("Service Title"));
+            Assert.That(tab.Items[0].Description, Is.EqualTo("Service Desc"));
+            Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/service"));
         }
 
         [Test]
