@@ -1,9 +1,8 @@
 ﻿using BDO;
 using BDO.GWT.Common;
-using Kentico.Membership;
-using Kentico.Web.Mvc;
 using BDO.GWT.Common.Options;
 using BDO.GWT.Core;
+using BDO.GWT.Core.Services;
 using BDO.GWT.Domain.Services;
 using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Core.Services;
@@ -11,23 +10,25 @@ using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience.LiveSite.Services;
 using Kentico.Activities.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
+using Kentico.Membership;
 using Kentico.OnlineMarketing.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
+using Kentico.Web.Mvc;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.WebEncoders;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using System;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using XperienceCommunity.MultiChoiceFormControl.Admin.Helpers.Components.MultiChoice;
-
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using BDO.GWT.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -129,14 +130,13 @@ builder.Services.AddAdminExternalAuthenticationProvider(
         options.UserSynchronizationFrequency = UserSynchronizationFrequency.Always;
     }
 );
-
-builder.Services.Configure<AdminIdentityOptions>(options =>
-
+if (builder.Environment.IsDevelopment())
 {
-
-    options.AuthenticationOptions.Mode = AdminAuthenticationMode.MaintainForms;
-
-});
+    builder.Services.Configure<AdminIdentityOptions>(options =>
+    {
+        options.AuthenticationOptions.Mode = AdminAuthenticationMode.MaintainForms;
+    });
+}
 
 // Add Application Insights telemetry
 builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
