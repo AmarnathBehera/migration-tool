@@ -5,8 +5,8 @@ using Kentico.Web.Mvc;
 using BDO.GWT.Common.Options;
 using BDO.GWT.Core;
 using BDO.GWT.Domain.Services;
-using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Core.Services;
+using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience.LiveSite.Services;
 using Kentico.Activities.Web.Mvc;
@@ -50,7 +50,11 @@ builder.Services.AddKentico(features =>
           IndustryCategory.CONTENT_TYPE_NAME,
           Industry.CONTENT_TYPE_NAME,
           IndustryService.CONTENT_TYPE_NAME,
-          Sub_Service.CONTENT_TYPE_NAME
+          Sub_Service.CONTENT_TYPE_NAME,
+          CareerCategory.CONTENT_TYPE_NAME,
+          Career.CONTENT_TYPE_NAME,
+          Careers.CONTENT_TYPE_NAME,
+          SectionCareers.CONTENT_TYPE_NAME
        }
     }); features.UseActivityTracking();
     features.UseWebPageRouting();
@@ -86,6 +90,9 @@ builder.Services.AddContentServices();
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddScoped<IPageBuilderService, PageBuilderService>();
 builder.Services.AddScoped<IContentService, ContentService>();
+
+
+
 builder.Services.AddScoped<ICachingService, CachingService>();
 builder.Services.AddScoped<ISiteContext, SiteContext>();
 builder.Services.AddScoped<ISiteConfigurationService, SiteConfigurationService>();
@@ -132,8 +139,8 @@ builder.Services.Configure<AdminIdentityOptions>(options =>
 
 });
 
-// Add Application Insights telemetry
-builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
+//// Add Application Insights telemetry
+//builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
 var app = builder.Build();
 
@@ -157,7 +164,7 @@ app.MapControllerRoute(
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=About}/{action=Index}/{id?}"
+    pattern: "{controller}/{action}/{id?}"
 );
 app.MapControllerRoute(
     name: "default",

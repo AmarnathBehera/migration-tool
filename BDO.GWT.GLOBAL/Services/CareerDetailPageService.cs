@@ -1,0 +1,161 @@
+﻿using BDO.GWT.Core;
+using BDO.GWT.Core.Data;
+using BDO.GWT.Core.ValueObjects;
+using BDO.GWT.Web.Core.DTOs;
+using CMS.ContentEngine;
+using CMS.Websites.Routing;
+using Kentico.Content.Web.Mvc;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Web;
+
+namespace BDO.GWT.Web.Core.Services;
+
+public interface ICareerDetailPageService
+    {
+        Task<CareerPageDto> GetCareerPageDtoAsync( CancellationToken cancellationToken);
+    }
+    public class CareerDetailPageService : ICareerDetailPageService
+    {
+        private readonly IHeroService _heroService;
+    private readonly IWebPageDataContextRetriever _webPageDataContextRetriever;
+    private readonly IContentRetriever _contentRetriever;
+    private readonly ITaxonomyRetriever _taxonomyRetriever;
+
+
+    public CareerDetailPageService(IHeroService heroService, IWebPageDataContextRetriever webPageDataContextRetriever, IContentRetriever contentRetriever, ITaxonomyRetriever taxonomyRetriever)
+    {
+        _heroService = heroService;
+        _webPageDataContextRetriever = webPageDataContextRetriever;
+        _contentRetriever = contentRetriever;
+        _taxonomyRetriever = taxonomyRetriever;
+
+    }
+
+
+        public async Task<CareerPageDto> GetCareerPageDtoAsync(CancellationToken cancellationToken)
+        {
+        var page = await _contentRetriever.RetrieveCurrentPage<Career>(
+                new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
+
+
+        if (page == null)
+        {
+            return new CareerPageDto();
+        }
+
+        var dto = new CareerPageDto
+        {
+            Hero = await _heroService.GetHeroDtoAsync(new HeroData
+            {
+                Layout = page.HeroLayout,
+                Title = page.HeroTitle,
+                Description = page.HeroDescription,
+                BackgroundImage = page.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string bgUrl ? Link.Parse(bgUrl) : null,
+                BackgroundImageAltText = page.HeroBackgroundImageAltText,
+                MobileBackgroundImage = page.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string mobileUrl ? Link.Parse(mobileUrl) : null,
+                MobileBackgroundImageAltText = page.HeroBackgroundImage_MobileAltText,
+                CallToActionButtonType = page.HeroCallToActionButtonType,
+                CallToActionButtonText = page.HeroCallToActionButtonText,
+                CallToActionButtonUrl = page.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath is string ctaPath ? Link.Parse(ctaPath) : null,
+            }, cancellationToken),
+            Content = await GetContentPageDtoAsync(page, cancellationToken),
+            //Form = page.CareerApplyForm,
+            Sidebar = page.ShowSidebar ? await GetCareerSidebarDtoAsync(page, cancellationToken) : null,
+        };
+ 
+
+            return dto;
+        }
+    
+
+    private async Task<CareerContentDto> GetContentPageDtoAsync(Career careerPage, CancellationToken cancellationToken)
+        {
+
+        var employmentTypeIds = careerPage.CareerEmploymentType?.Select(i => i.Identifier).ToList();
+        var careerLevelIds = careerPage.CareerLevel?.Select(i => i.Identifier).ToList();
+        var jobTitleIds = careerPage.CareerJobTitle?.Select(i => i.Identifier).ToList();
+
+        var employmentTags = await _taxonomyRetriever.RetrieveTags(employmentTypeIds, "en-gb");
+        var careerLevelTags = await _taxonomyRetriever.RetrieveTags(careerLevelIds, "en-gb");
+        var jobTitleTags = await _taxonomyRetriever.RetrieveTags(jobTitleIds, "en-gb");
+
+        var employmentTypeNames = employmentTags.Select(t => t.Name).ToList();
+        var careerLevelNames = careerLevelTags.Select(t => t.Name).ToList();
+        var jobTitleNames = jobTitleTags.Select(t => t.Name).ToList();
+
+        //var locationOfficeNames = (await _locationOfficePageRetriever.RetrievePagesAsync(q =>
+        //{
+        //    q.Where(x => careerPage.MetadataOfficeLocation.Contains(x.NodeID));
+        //}, cancellationToken)).Select(x => x.MetadataTitle).ToArray();
+        //var contactPersonName = (await _personPageRetriever.RetrievePageAsync(q =>
+        //{
+        //    q.Where(x => x.ID == careerPage.CareerContactPeopleID);
+        //    }, cancellationToken))?.MetadataTitle;
+
+        var dto = new CareerContentDto
+            {
+                Title = careerPage.MetadataTitle,
+                JobTitle = jobTitleNames?.FirstOrDefault(),
+                Reference = careerPage.CareerReference,
+            EmploymentType = employmentTypeNames?.FirstOrDefault(),
+                Level = careerLevelNames?.FirstOrDefault(),
+                Locations = ["locationOfficeNames"],
+                Content = careerPage.MetadataDescription,
+            ContactPerson = "contactPersonName",
+        };
+
+            return dto;
+        }
+
+    private async Task<ContentSidebarDto> GetCareerSidebarDtoAsync(Career careerPage, CancellationToken cancellationToken)
+    {
+        var sidebarDto = await GetSidebarDtoAsync(careerPage, cancellationToken);
+
+        sidebarDto.ShowCopyLinkButton = true; // temp
+
+        sidebarDto.PublishDate = careerPage.DocumentPublishFrom;
+
+        //sidebarDto.RelevantContactPeopleTitle = ResourceStringKey.LiveSite.Careers.RelevantContactPeople;
+
+        //sidebarDto.RelevantContactPeople = await GetRelevantContactPersonDtosAsync(careerPage, cancellationToken);
+
+        return sidebarDto;
+    }
+
+    public async Task<ContentSidebarDto> GetSidebarDtoAsync(Career page, CancellationToken cancellationToken)
+    {
+        //var settingValueByKey = await _settingsService.GetCurrentSiteSettingsAsync([
+        //    SettingName.BDO.DisablePrint,
+        //    SettingName.BDO.DisableDownload,
+        //    SettingName.BDO.DisableCopyLink,
+        //], cancellationToken);
+
+        var sidebarDto = new ContentSidebarDto
+        {
+            //ShowPrintButton = (!settingValueByKey.TryGetValue(SettingName.BDO.DisablePrint, out var disablePrint) || disablePrint is not true) && page.ShowPrintButton,
+            //DownloadButtonAttachment = settingValueByKey.TryGetValue(SettingName.BDO.DisableDownload, out var disableDownload) && disableDownload is true
+            //    ? null
+            //    : page.DownloadButtonAttachment?.ToHtmlCompatibleString(),
+            //SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page, cancellationToken) : null,
+            //ShowCopyLinkButton = settingValueByKey.TryGetValue(SettingName.BDO.DisableCopyLink, out var disableCopyLink) && disableCopyLink is not true,
+
+            //Temp
+            ShowPrintButton = page.ShowPrintButton,
+            DownloadButtonAttachment = true
+                ? null
+                : page.DownloadButtonAttachment?.FirstOrDefault()?.ContentAttachmentAsset.Url,
+            //SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page, cancellationToken) : null,
+            ShowCopyLinkButton = true
+        };
+
+        if (sidebarDto.SocialMediaButtons is not null)
+        {
+            sidebarDto.SocialMediaButtons.ShowCopyLinkButton = true; //temp
+        }
+
+        return sidebarDto;
+    }
+
+}

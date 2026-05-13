@@ -1,0 +1,78 @@
+﻿@model BDO.GWT.Web.Core.DTOs.CareersPageDto
+
+@using BDO
+@using BDO.GWT.Core.Constants;
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+
+
+@{
+    var widgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.AccordionWidget,
+        //ComponentIdentifiers.Widgets.BannerWithIcons,
+        //ComponentIdentifiers.Widgets.CommunityInvolvement,
+        //ComponentIdentifiers.Widgets.DescriptionText,
+
+        // widgets_not_there_yet:
+
+        // ComponentIdentifiers.Widgets.EditorsPick,
+        // ComponentIdentifiers.Widgets.Faq,
+        // ComponentIdentifiers.Widgets.Imagewithtext,
+        // ComponentIdentifiers.Widgets.InFocus,
+        // ComponentIdentifiers.Widgets.KeyContacts,
+        // ---------
+
+
+        //ComponentIdentifiers.Widgets.PurposeIcon,
+        //ComponentIdentifiers.Widgets.TwitterCarousel,
+        ComponentIdentifiers.Widgets.Globallocation,
+    };
+}
+
+@* @section Styles {
+    @PageBuilderService.GetPageBuilderStyles(Html)
+} *@
+
+<div>
+    @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.Hero,
+        ReactComponentType.HeroGUID,
+        new
+        {
+            data = Model.Hero,
+        },
+        Context.RequestAborted))
+</div>
+@* 
+@await Html.PartialAsync("_LocalNavigation") *@
+
+
+@await Html.Kentico().EditableAreaAsync(
+"mainContent", // Unique identifier
+                        new EditableAreaOptions
+                        {
+
+                            AllowedWidgets = widgetsList
+                        })
+
+        <div>
+    @(await ReactService.RenderComponentAsync(
+        pageId,
+                "CareersCardsGrid",
+        ReactComponentType.CareersCardsGridGUID,
+        new
+        {
+            data = Model.CardsGrid,
+        },
+        Context.RequestAborted))
+</div>
