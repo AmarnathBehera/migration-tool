@@ -2,7 +2,9 @@
 using BDO.GWT.Core;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
+using BDO.GWT.Core.Utilities;
 using CMS.ContentEngine;
+using CMS.Helpers;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
@@ -183,23 +185,40 @@ public class HomePageService : IHomePageService
                 ImageAltText = x.ImageAltText,
                 Items = x.FeaturedItems.Select(item => item switch
                     {
-                        Contact contact => new TrendingTopicItemDto
+                        IndustryService industryService => new TrendingTopicItemDto
                     {
-                        Title = contact.MetadataTitle,
-                        Description = contact.MetadataDescription,
-                            ReadMoreLink = contact.SystemFields?.WebPageUrlPath,
+                        Title = industryService.MetadataTitle,
+                        Description = HtmlHelper.ExtractTextFromHtml(industryService.MetadataDescription),
+                            ReadMoreLink = industryService.SystemFields?.WebPageUrlPath,
 
 
                     },
 
-                    LegalPage legal => new TrendingTopicItemDto
+                    Industry industry => new TrendingTopicItemDto
                     {
-                        Title = legal.MetadataTitle,
-                        Description = legal.MetadataDescription,
-                        ReadMoreLink = legal.SystemFields?.WebPageUrlPath
+                        Title = industry.MetadataTitle,
+                        Description = HtmlHelper.ExtractTextFromHtml(industry.MetadataDescription),
+                        ReadMoreLink = industry.SystemFields?.WebPageUrlPath
                     },
-
-                    _ => new TrendingTopicItemDto
+                        Service service => new TrendingTopicItemDto
+                        {
+                            Title = service.MetadataTitle,
+                            Description = HtmlHelper.ExtractTextFromHtml(service.MetadataDescription),
+                            ReadMoreLink = service.SystemFields?.WebPageUrlPath
+                        },
+                        ServiceArea serviceArea => new TrendingTopicItemDto
+                        {
+                            Title = serviceArea.MetadataTitle,
+                            Description = HtmlHelper.ExtractTextFromHtml(serviceArea.MetadataDescription),
+                            ReadMoreLink = serviceArea.SystemFields?.WebPageUrlPath
+                        },
+                        Sub_Service sub_Service => new TrendingTopicItemDto
+                        {
+                            Title = sub_Service.MetadataTitle,
+                            Description = HtmlHelper.ExtractTextFromHtml(sub_Service.MetadataDescription),
+                            ReadMoreLink = sub_Service.SystemFields?.WebPageUrlPath
+                        },
+                        _ => new TrendingTopicItemDto
                     {
                        Title = item.SystemFields?.WebPageItemName,
                        ReadMoreLink = item.SystemFields?.WebPageUrlPath
