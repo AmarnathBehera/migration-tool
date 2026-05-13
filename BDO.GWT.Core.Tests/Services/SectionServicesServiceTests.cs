@@ -1,6 +1,4 @@
-using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
-using BDO.GWT.Core.DTOs;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
 using CMS.ContentEngine;
@@ -42,9 +40,12 @@ namespace BDO.GWT.Core.Tests.Services
 
             var result = await _service.GetSectionServicesDtoAsync(CancellationToken.None);
 
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Hero, Is.Null);
-            Assert.That(result.MultiLinksCardsGrid, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Hero, Is.Null);
+                Assert.That(result.MultiLinksCardsGrid, Is.Null);
+            });
         }
 
         [Test]
@@ -66,12 +67,15 @@ namespace BDO.GWT.Core.Tests.Services
 
             var result = await _service.GetSectionServicesDtoAsync(CancellationToken.None);
 
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Hero, Is.Not.Null);
-            Assert.That(result.MultiLinksCardsGrid, Is.Not.Null);
-            Assert.That(result.MultiLinksCardsGrid.Cards, Is.Empty);
-            Assert.That(result.MultiLinksCardsGrid.Title, Is.EqualTo("Grid Title"));
-            Assert.That(result.MultiLinksCardsGrid.Description, Is.EqualTo("Grid Summary"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Hero, Is.Not.Null);
+                Assert.That(result.MultiLinksCardsGrid, Is.Not.Null);
+                Assert.That(result.MultiLinksCardsGrid.Cards, Is.Empty);
+                Assert.That(result.MultiLinksCardsGrid.Title, Is.EqualTo("Grid Title"));
+                Assert.That(result.MultiLinksCardsGrid.Description, Is.EqualTo("Grid Summary"));
+            });
         }
 
         [Test]
@@ -135,12 +139,15 @@ namespace BDO.GWT.Core.Tests.Services
             Assert.That(result.MultiLinksCardsGrid.Cards, Has.Length.EqualTo(1));
 
             var card = result.MultiLinksCardsGrid.Cards![0];
-            Assert.That(card.Title, Is.EqualTo("Category 1"));
-            Assert.That(card.Description, Is.EqualTo("Desc 1"));
-            Assert.That(card.ImageURL, Is.EqualTo("/cat-img.png"));
-            Assert.That(card.ImageAltText, Is.EqualTo("Alt 1"));
-            Assert.That(card.ReadMoreLinks, Has.Length.EqualTo(1));
-            Assert.That(card.ReadMoreLinks[0].Title, Is.EqualTo("Service 1"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(card.Title, Is.EqualTo("Category 1"));
+                Assert.That(card.Description, Is.EqualTo("Desc 1"));
+                Assert.That(card.ImageURL, Is.EqualTo("/cat-img.png"));
+                Assert.That(card.ImageAltText, Is.EqualTo("Alt 1"));
+                Assert.That(card.ReadMoreLinks, Has.Length.EqualTo(1));
+                Assert.That(card.ReadMoreLinks[0].Title, Is.EqualTo("Service 1"));
+            });
         }
 
         [Test]

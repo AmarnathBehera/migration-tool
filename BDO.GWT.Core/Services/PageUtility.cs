@@ -1,12 +1,7 @@
 ﻿using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.services;
-using BDO.GWT.Web.Core.Services;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BDO.GWT.Core
 {
@@ -51,7 +46,7 @@ namespace BDO.GWT.Core
                 .OrderBy(p => p.SystemFields.WebPageItemOrder)
                 .ToList();
 
-            if (orderedChildren.Any())
+            if (orderedChildren.Count > 0)
                 {
                 return new SideBoxDto
                 {
