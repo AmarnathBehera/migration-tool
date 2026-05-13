@@ -54,11 +54,12 @@ public class SectionServicesService : ISectionServicesService
             .Select(ic => ic.SystemFields.WebPageItemID)
             .ToList();
 
-        var allServices = new List<BusinessLine>();
+        var allServices = new List<ServiceArea>();
+
 
         if (categoryIds.Count > 0)
         {
-            var servicesResult = await _contentService.GetPagesAsync<BusinessLine>(
+            var servicesResult = await _contentService.GetPagesAsync<ServiceArea>(
                 new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
                 query => query.Where(w => w.WhereIn(
                     nameof(IWebPageContentQueryDataContainer.WebPageItemParentID),
@@ -76,7 +77,7 @@ public class SectionServicesService : ISectionServicesService
             .Select(service => (
                 ParentID: service.SystemFields.WebPageItemParentID,
                 Name: service.MetadataTitle,
-                Url: service.GetUrl().RelativePath
+                Url: service.SystemFields.WebPageUrlPath
 
             ))
             .ToList();
@@ -101,7 +102,7 @@ public class SectionServicesService : ISectionServicesService
                     Description = ic.MetadataDescription,
                     ImageURL = imageUrl,
                     ImageAltText = ic.MetadataTeaserImageAltText,
-                    Url = ic.GetUrl().RelativePath,
+                    Url = ic.SystemFields.WebPageUrlPath,
                     ReadMoreLinks = readMoreLinks,
                 };
             })

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using BDO.GWT.Core.Extensions;
 
 namespace BDO.GWT.Core.Utilities;
 
@@ -42,3 +45,4 @@ public static class UriUtility
         return null;
     }
 }
+
