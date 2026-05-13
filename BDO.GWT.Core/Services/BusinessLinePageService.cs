@@ -1,10 +1,9 @@
-using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.services;
+using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.Services;
-using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 
 namespace BDO.GWT.Core.Services
@@ -30,46 +29,50 @@ namespace BDO.GWT.Core.Services
 
         public async Task<BusinessLinePageDto> GetBusinessLinePageDtoAsync(CancellationToken cancellationToken = default)
         {
-            var page = await _contentService.RetrieveCurrentPageAsync<BusinessLine>(
+            var currentPage = await _contentService.RetrieveCurrentPageAsync<BusinessLine>(
                 new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 },
                 cancellationToken);
 
-            if (page == null)
+            if (currentPage == null)
             {
                 return new BusinessLinePageDto();
             }
 
-            var bgImageUrl = page.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
-            var mobileImageUrl = page.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
-            var ctaUrlPath = page.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath;
+            var bgImageUrl = currentPage.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+            var mobileImageUrl = currentPage.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+            var ctaUrlPath = currentPage.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath;
 
             var heroData = new HeroData
             {
-                Layout = page.HeroLayout,
-                Title = page.HeroTitle,
-                Description = page.HeroDescription,
+                Layout = currentPage.HeroLayout,
+                Title = currentPage.HeroTitle,
+                Description = currentPage.HeroDescription,
                 BackgroundImage = bgImageUrl != null ? Link.Parse(bgImageUrl) : null,
-                BackgroundImageAltText = page.HeroBackgroundImageAltText,
+                BackgroundImageAltText = currentPage.HeroBackgroundImageAltText,
                 MobileBackgroundImage = mobileImageUrl != null ? Link.Parse(mobileImageUrl) : null,
-                MobileBackgroundImageAltText = page.HeroBackgroundImage_MobileAltText,
-                CallToActionButtonType = page.HeroCallToActionButtonType,
-                CallToActionButtonText = page.HeroCallToActionButtonText,
+                MobileBackgroundImageAltText = currentPage.HeroBackgroundImage_MobileAltText,
+                CallToActionButtonType = currentPage.HeroCallToActionButtonType,
+                CallToActionButtonText = currentPage.HeroCallToActionButtonText,
                 CallToActionButtonUrl = ctaUrlPath != null ? Link.Parse(ctaUrlPath) : null,
             };
 
-            SideBoxDto? sidebox = page.ShowSideNavigation
-                       ? await _pageUtility.GetSideboxDtoAsync<ServiceArea>(
-                           page.SideNavigationTitle,
-                           page.SystemFields.WebPageItemID,
+            SideBoxDto? sidebox = currentPage.ShowSideNavigation
+                           ? await _pageUtility.GetSideboxDtoAsync<ServiceArea, BusinessLine>(
+                               currentPage.SideNavigationTitle,
+                               currentPage.SystemFields.WebPageItemID,
+                               currentPage.SystemFields.WebPageItemParentID,
                            serviceArea => serviceArea.MetadataTitle,
+                               sibling => sibling.MetadataTitle,
                            cancellationToken)
                        : null;
 
             return new BusinessLinePageDto
             {
+                Title = currentPage.ContentTitle,
+                BodyContent = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(currentPage.ContentBody),
                 Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
-                ShowSideNavigation = page.ShowSideNavigation,
-                Sidebox = sidebox,
+                ShowSideNavigation = currentPage.ShowSideNavigation,
+                Sidebox = sidebox
             };
         }
     }

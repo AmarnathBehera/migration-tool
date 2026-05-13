@@ -67,7 +67,7 @@ public class SiteConfigurationService : ISiteConfigurationService
         var localizationResources = await GetLocalizationValuesAsync();
         
         var translations = localizationResources.ToDictionary(
-            resource => resource.CultureCode,
+            resource => resource.CultureCode.ToLower(),
             resource => (IDictionary<string, string>)resource.LocalizationKey.ToDictionary(
                 key => key.LocalizationKeyItemName,
                 key => resource.LocalizationValue

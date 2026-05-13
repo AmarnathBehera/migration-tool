@@ -1,0 +1,23 @@
+﻿@using Kentico.Forms.Web.Mvc
+@using Kentico.Web.Mvc
+@model BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents.TextBoxReload
+
+@{
+    var htmlAttributes = ViewData.Kentico().GetEditorHtmlAttributes();
+
+    if (htmlAttributes.ContainsKey("class"))
+    {
+        htmlAttributes["class"] = htmlAttributes["class"] + " filled-in";
+    }
+    else
+    {
+        htmlAttributes["class"] = "filled-in";
+    }
+}
+
+<p>
+    <label>
+        @Html.TextBoxFor(m => m.Value, htmlAttributes)
+        <span>@Html.DisplayFor(m => m.Value)</span>
+    </label>
+</p>

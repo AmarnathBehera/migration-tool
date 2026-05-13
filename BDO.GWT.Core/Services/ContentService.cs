@@ -275,7 +275,7 @@
             query =>
                 {
                     // Filter by parent GUID
-                    query//.Where(w => w.WhereEquals("WebPageItemParentID", parentGuid))
+                    query.Where(w => w.WhereEquals("WebPageItemParentID", parentGuid))
                          .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder));
                 },
                 cacheSettings: RetrievalCacheSettings.CacheDisabled, // Use the predefined disabled cache

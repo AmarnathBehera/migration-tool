@@ -57,18 +57,20 @@ namespace BDO.GWT.Core.Services
             };
 
             SideBoxDto? sidebox = page.ShowSideNavigation
-                       ? await _pageUtility.GetSideboxDtoAsync<Service>(
-                           page.SideNavigationTitle,
-                           page.SystemFields.WebPageItemID,
-                           service => service.MetadataTitle,
-                           cancellationToken)
-                       : null;
+          ? await _pageUtility.GetSideboxDtoAsync<Service, ServiceArea>(
+              sideboxTitle: page.SideNavigationTitle,
+              parentWebPageItemId: page.SystemFields.WebPageItemID,       // look for child IndustryService
+              siblingParentWebPageItemId: page.SystemFields.WebPageItemParentID, // fallback: sibling Industry
+              childTitleSelector: child => child.MetadataTitle,
+              siblingTitleSelector: sibling => sibling.MetadataTitle,
+                     cancellationToken)
+                 : null;
 
             return new ServicesAreaPageDto
             {
                 Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
                 Title = page.ContentTitle,
-                Description = page.ContentBody,
+                BodyContent = page.ContentBody,
                 ShowSideNavigation = page.ShowSideNavigation,
                 Sidebox = sidebox,
             };
@@ -104,12 +106,14 @@ namespace BDO.GWT.Core.Services
             };
 
             SideBoxDto? sidebox = page.ShowSideNavigation
-                       ? await _pageUtility.GetSideboxDtoAsync<Sub_Service>(
-                           page.SideNavigationTitle,
-                           page.SystemFields.WebPageItemID,
-                           service => service.MetadataTitle,
-                           cancellationToken)
-                       : null;
+                         ? await _pageUtility.GetSideboxDtoAsync<Sub_Service, Service>(
+                        sideboxTitle: page.SideNavigationTitle,
+                        parentWebPageItemId: page.SystemFields.WebPageItemID,       // look for child IndustryService
+                        siblingParentWebPageItemId: page.SystemFields.WebPageItemParentID, // fallback: sibling Industry
+                        childTitleSelector: child => child.MetadataTitle,
+                        siblingTitleSelector: sibling => sibling.MetadataTitle,
+                        cancellationToken)
+             : null;
 
             return new ServicePageDto
             {

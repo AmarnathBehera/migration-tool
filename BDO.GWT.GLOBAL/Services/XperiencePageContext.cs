@@ -6,10 +6,8 @@ using CMS.ContentEngine;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
-using Kentico.Content.Web.Mvc.Routing;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Http;
-using Org.BouncyCastle.Crypto;
 using System;
 using System.Linq;
 using System.Threading;
@@ -136,6 +134,16 @@ public class XperiencePageContext : IPageContext
                 IncludeInSitemap = seo.IncludeInSitemap,
                 MetadataNofollow = seo.MetadataNofollow,
                 MetadataNoindex = seo.MetadataNoindex
+            };
+        }
+
+        if (p is IPageMetadata pageMetaData)
+        {
+            result.PageMetaData = new PageMetaDataDto
+            {
+                PageTitle = pageMetaData.PageTitle,
+                PageDescription = pageMetaData.PageDescription,
+                PageKeywords = pageMetaData.PageKeywords
             };
         }
 
