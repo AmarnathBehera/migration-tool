@@ -139,7 +139,7 @@ builder.Services.Configure<AdminIdentityOptions>(options =>
 });
 
 // Add Application Insights telemetry
-//builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
+builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
 var app = builder.Build();
 
