@@ -4,7 +4,7 @@ namespace BDO.GWT.Core.DTOs;
 
 public class TrendingTopicTabDto
 {
-    public string Title { get; set; } = null!;
+    public string? Title { get; set; } = null!;
 
     public string? ImageURL { get; set; } = null!;
 

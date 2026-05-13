@@ -223,7 +223,7 @@ namespace BDO.GWT.Core.Tests.Services
         {
             _contentServiceMock
                 .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync((IEnumerable<TrendingTopics>)null);
+                .ReturnsAsync((IEnumerable<TrendingTopics>?)null);
 
             var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
 
@@ -241,7 +241,7 @@ namespace BDO.GWT.Core.Tests.Services
                 .Setup(x => x.RetrievePagesAsync<TrendingTopic>(
                     It.IsAny<RetrievePagesParameters>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync((IEnumerable<TrendingTopic>)null);
+                .ReturnsAsync((IEnumerable<TrendingTopic>?)null);
 
             var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
 
@@ -294,19 +294,30 @@ namespace BDO.GWT.Core.Tests.Services
 
             var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
 
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Heading, Is.EqualTo("Trending"));
-            Assert.That(result.Tabs.Count(), Is.EqualTo(1));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result?.Heading, Is.EqualTo("Trending"));
+                Assert.That(result?.Tabs.Count(), Is.EqualTo(1));
+            });
+
+            
 
             var tab = result.Tabs.First();
-            Assert.That(tab.Title, Is.EqualTo("Tab1"));
-            Assert.That(tab.ImageURL, Is.EqualTo("/img.png"));
-            Assert.That(tab.ImageAltText, Is.EqualTo("Alt1"));
-            Assert.That(tab.ReadMoreLink, Is.EqualTo("/read-more"));
-            Assert.That(tab.Items.Count, Is.EqualTo(1));
-            Assert.That(tab.Items[0].Title, Is.EqualTo("Industry Title"));
-            Assert.That(tab.Items[0].Description, Is.EqualTo("Industry Desc"));
-            Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/industry"));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(tab.Title, Is.EqualTo("Tab1"));
+                Assert.That(tab.ImageURL, Is.EqualTo("/img.png"));
+                Assert.That(tab.ImageAltText, Is.EqualTo("Alt1"));
+                Assert.That(tab.ReadMoreLink, Is.EqualTo("/read-more"));
+                Assert.That(tab.Items, Has.Count.EqualTo(1));
+                Assert.That(tab.Items[0].Title, Is.EqualTo("Industry Title"));
+                Assert.That(tab.Items[0].Description, Is.EqualTo("Industry Desc"));
+                Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/industry"));
+            });
+            
         }
 
         [Test]
@@ -395,8 +406,13 @@ namespace BDO.GWT.Core.Tests.Services
 
             Assert.That(result, Is.Not.Null);
             var tab = result.Tabs.First();
-            Assert.That(tab.Items[0].Title, Is.EqualTo("Unknown Page"));
-            Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/unknown"));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(tab.Items[0].Title, Is.EqualTo("Unknown Page"));
+                Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/unknown"));
+            });
+            
         }
         [Test]
         public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_WithIndustryServiceFeaturedItem()
@@ -439,9 +455,14 @@ namespace BDO.GWT.Core.Tests.Services
 
             var tab = result.Tabs.First();
 
-            Assert.That(tab.Items[0].Title, Is.EqualTo("Industry Service Title"));
-            Assert.That(tab.Items[0].Description, Is.EqualTo("Industry Service Desc"));
-            Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/industry-service"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(tab.Items[0].Title, Is.EqualTo("Industry Service Title"));
+                Assert.That(tab.Items[0].Description, Is.EqualTo("Industry Service Desc"));
+                Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/industry-service"));
+            });
+
+            
         }
 
         [Test]
@@ -484,10 +505,14 @@ namespace BDO.GWT.Core.Tests.Services
             Assert.That(result, Is.Not.Null);
 
             var tab = result.Tabs.First();
+            Assert.Multiple(() =>
+            {
+                Assert.That(tab.Items[0].Title, Is.EqualTo("Service Area Title"));
+                Assert.That(tab.Items[0].Description, Is.EqualTo("Service Area Desc"));
+                Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/service-area"));
+            });
 
-            Assert.That(tab.Items[0].Title, Is.EqualTo("Service Area Title"));
-            Assert.That(tab.Items[0].Description, Is.EqualTo("Service Area Desc"));
-            Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/service-area"));
+            
         }
 
         [Test]
@@ -530,10 +555,13 @@ namespace BDO.GWT.Core.Tests.Services
             Assert.That(result, Is.Not.Null);
 
             var tab = result.Tabs.First();
-
-            Assert.That(tab.Items[0].Title, Is.EqualTo("Sub Service Title"));
-            Assert.That(tab.Items[0].Description, Is.EqualTo("Sub Service Desc"));
-            Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/sub-service"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(tab.Items[0].Title, Is.EqualTo("Sub Service Title"));
+                Assert.That(tab.Items[0].Description, Is.EqualTo("Sub Service Desc"));
+                Assert.That(tab.Items[0].ReadMoreLink, Is.EqualTo("/sub-service"));
+            });
+            
         }
 
         [Test]
@@ -554,9 +582,13 @@ namespace BDO.GWT.Core.Tests.Services
 
             var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
 
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Heading, Is.EqualTo("Trending"));
-            Assert.That(result.Tabs.Count(), Is.EqualTo(0));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result?.Heading, Is.EqualTo("Trending"));
+                Assert.That(result?.Tabs.Count(), Is.EqualTo(0));
+            });
+            
         }
     }
 }

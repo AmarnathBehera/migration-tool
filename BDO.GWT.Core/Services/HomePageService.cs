@@ -179,7 +179,7 @@ public class HomePageService : IHomePageService
 
         var trendingTopicTabDtos = await Task.WhenAll(trendingTopicPages.Select(async x => new TrendingTopicTabDto
           {
-                Title = x.Title,
+                Title = x?.Title,
                 ReadMoreLink = x.CTANodeGuid?.FirstOrDefault()?.SystemFields?.WebPageUrlPath,
                 ImageURL = x.ImageUrl.FirstOrDefault()?.ContentAttachmentAsset.Url,
                 ImageAltText = x.ImageAltText,
