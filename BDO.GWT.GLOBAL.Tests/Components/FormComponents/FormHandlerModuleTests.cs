@@ -109,7 +109,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
         public void GetReferrerUrl_ReturnsRefererHeader_WhenPresent()
         {
             var ctx = new DefaultHttpContext();
-            ctx.Request.Headers["Referer"] = "https://example.com/en-gb/people/john-doe";
+            ctx.Request.Headers.Referer = "https://example.com/en-gb/people/john-doe";
 
             _httpContextAccessor.SetupGet(a => a.HttpContext).Returns(ctx);
 

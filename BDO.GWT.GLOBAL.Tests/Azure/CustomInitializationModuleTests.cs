@@ -94,8 +94,11 @@ namespace BDO.GWT.GLOBAL.Tests.Azure
                 "MapPathsForAllChannels", PrivateStatic);
 
             Assert.That(method, Is.Not.Null);
-            Assert.That(method!.IsPrivate, Is.True);
-            Assert.That(method.IsStatic, Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(method!.IsPrivate, Is.True);
+                Assert.That(method.IsStatic, Is.True);
+            });
         }
 
         [Test]
@@ -105,8 +108,11 @@ namespace BDO.GWT.GLOBAL.Tests.Azure
                 "MapPathToAzureStorageProvider", PrivateStatic);
 
             Assert.That(method, Is.Not.Null);
-            Assert.That(method!.IsPrivate, Is.True);
-            Assert.That(method.IsStatic, Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(method!.IsPrivate, Is.True);
+                Assert.That(method.IsStatic, Is.True);
+            });
         }
 
         [Test]
