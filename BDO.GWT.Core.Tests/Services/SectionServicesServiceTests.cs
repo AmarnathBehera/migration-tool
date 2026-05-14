@@ -1,4 +1,6 @@
 using BDO.GWT.Core.Data;
+using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.services;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
 using CMS.ContentEngine;
@@ -12,6 +14,7 @@ namespace BDO.GWT.Core.Tests.Services
     {
         private Mock<IHeroService> _heroServiceMock = null!;
         private Mock<IContentService> _contentServiceMock = null!;
+        private Mock<IPageUtility> _pageUtilityMock = null!;
         private SectionServicesService _service = null!;
 
         [SetUp]
@@ -19,14 +22,27 @@ namespace BDO.GWT.Core.Tests.Services
         {
             _heroServiceMock = new Mock<IHeroService>();
             _contentServiceMock = new Mock<IContentService>();
+            _pageUtilityMock = new Mock<IPageUtility>();
 
             _heroServiceMock
                 .Setup(x => x.GetHeroDtoAsync(It.IsAny<HeroData>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new HeroDto { Title = "Hero" });
 
+            _pageUtilityMock
+                .Setup(x => x.GetMultiLinkCardsAsync<BusinessLine, ServiceArea>(
+                    It.IsAny<int>(),
+                    It.IsAny<Func<BusinessLine, string>>(),
+                    It.IsAny<Func<BusinessLine, string>>(),
+                    It.IsAny<Func<BusinessLine, string?>>(),
+                    It.IsAny<Func<BusinessLine, string?>>(),
+                    It.IsAny<Func<ServiceArea, string>>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Array.Empty<MultiLinkCardDto>());
+
             _service = new SectionServicesService(
                 _heroServiceMock.Object,
-                _contentServiceMock.Object);
+                _contentServiceMock.Object,
+                _pageUtilityMock.Object);
         }
 
         [Test]
@@ -59,12 +75,6 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(page);
 
-            _contentServiceMock
-                .Setup(x => x.GetChildPagesByParentGuidAsync<BusinessLine>(
-                    It.IsAny<int>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Enumerable.Empty<BusinessLine>());
-
             var result = await _service.GetSectionServicesDtoAsync(CancellationToken.None);
 
             Assert.Multiple(() =>
@@ -82,6 +92,17 @@ namespace BDO.GWT.Core.Tests.Services
         public async Task GetSectionServicesDtoAsync_ReturnsMappedCards_WithCategoriesAndServices()
         {
             var page = CreateSectionServicesPage();
+            var cards = new[]
+            {
+                new MultiLinkCardDto
+                {
+                    Title = "Category 1",
+                    Description = "Desc 1",
+                    ImageURL = "/cat-img.png",
+                    ImageAltText = "Alt 1",
+                    ReadMoreLinks = new[] { new LinkItemDto { Title = "Service 1", URL = "/service-1" } }
+                }
+            };
 
             _contentServiceMock
                 .Setup(x => x.RetrieveCurrentPageAsync<SectionServices>(
@@ -89,50 +110,16 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(page);
 
-            var category = new BusinessLine
-            {
-                MetadataTitle = "Category 1",
-                MetadataDescription = "Desc 1",
-                MetadataTeaserImageAltText = "Alt 1",
-                MetadataTeaserImage = new List<ContentAttachment>
-                {
-                    new ContentAttachment
-                    {
-                        ContentAttachmentAsset = new ContentItemAsset { Url = "/cat-img.png" }
-                    }
-                },
-                SystemFields = new WebPageFields
-                {
-                    WebPageItemID = 100,
-                    WebPageItemOrder = 1,
-                    WebPageUrlPath = "/category-1"
-                }
-            };
-
-            _contentServiceMock
-                .Setup(x => x.GetChildPagesByParentGuidAsync<BusinessLine>(
+            _pageUtilityMock
+                .Setup(x => x.GetMultiLinkCardsAsync<BusinessLine, ServiceArea>(
                     It.IsAny<int>(),
+                    It.IsAny<Func<BusinessLine, string>>(),
+                    It.IsAny<Func<BusinessLine, string>>(),
+                    It.IsAny<Func<BusinessLine, string?>>(),
+                    It.IsAny<Func<BusinessLine, string?>>(),
+                    It.IsAny<Func<ServiceArea, string>>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<BusinessLine> { category });
-
-            var serviceArea = new ServiceArea
-            {
-                MetadataTitle = "Service 1",
-                SystemFields = new WebPageFields
-                {
-                    WebPageItemParentID = 100,
-                    WebPageItemOrder = 1,
-                    WebPageUrlPath = "/service-1"
-                }
-            };
-
-            _contentServiceMock
-                .Setup(x => x.GetPagesAsync<ServiceArea>(
-                    It.IsAny<RetrievePagesParameters>(),
-                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                    It.IsAny<RetrievalCacheSettings>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<ServiceArea> { serviceArea });
+                .ReturnsAsync(cards);
 
             var result = await _service.GetSectionServicesDtoAsync(CancellationToken.None);
 
@@ -151,7 +138,7 @@ namespace BDO.GWT.Core.Tests.Services
         }
 
         [Test]
-        public async Task GetSectionServicesDtoAsync_DoesNotQueryServices_WhenNoCategoryIds()
+        public async Task GetSectionServicesDtoAsync_CallsPageUtility_Once()
         {
             var page = CreateSectionServicesPage();
 
@@ -161,21 +148,18 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(page);
 
-            _contentServiceMock
-                .Setup(x => x.GetChildPagesByParentGuidAsync<BusinessLine>(
-                    It.IsAny<int>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Enumerable.Empty<BusinessLine>());
-
             await _service.GetSectionServicesDtoAsync(CancellationToken.None);
 
-            _contentServiceMock.Verify(
-                x => x.GetPagesAsync<ServiceArea>(
-                    It.IsAny<RetrievePagesParameters>(),
-                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                    It.IsAny<RetrievalCacheSettings>(),
+            _pageUtilityMock.Verify(
+                x => x.GetMultiLinkCardsAsync<BusinessLine, ServiceArea>(
+                    It.IsAny<int>(),
+                    It.IsAny<Func<BusinessLine, string>>(),
+                    It.IsAny<Func<BusinessLine, string>>(),
+                    It.IsAny<Func<BusinessLine, string?>>(),
+                    It.IsAny<Func<BusinessLine, string?>>(),
+                    It.IsAny<Func<ServiceArea, string>>(),
                     It.IsAny<CancellationToken>()),
-                Times.Never);
+                Times.Once);
         }
 
         [Test]
@@ -191,12 +175,6 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<RetrieveCurrentPageParameters>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(page);
-
-            _contentServiceMock
-                .Setup(x => x.GetChildPagesByParentGuidAsync<BusinessLine>(
-                    It.IsAny<int>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Enumerable.Empty<BusinessLine>());
 
             await _service.GetSectionServicesDtoAsync(CancellationToken.None);
 
@@ -221,12 +199,6 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(page);
 
-            _contentServiceMock
-                .Setup(x => x.GetChildPagesByParentGuidAsync<BusinessLine>(
-                    It.IsAny<int>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Enumerable.Empty<BusinessLine>());
-
             var result = await _service.GetSectionServicesDtoAsync(CancellationToken.None);
 
             Assert.That(result.MultiLinksCardsGrid.IsMultiLinks, Is.True);
@@ -245,12 +217,6 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<RetrieveCurrentPageParameters>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(page);
-
-            _contentServiceMock
-                .Setup(x => x.GetChildPagesByParentGuidAsync<BusinessLine>(
-                    It.IsAny<int>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Enumerable.Empty<BusinessLine>());
 
             await _service.GetSectionServicesDtoAsync(CancellationToken.None);
 
