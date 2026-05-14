@@ -17,47 +17,78 @@ namespace BDO.GWT.Core.Tests.Services
         public void Setup()
         {
             _contentServiceMock = new Mock<IContentService>();
+
             _channelMock = new Mock<IWebsiteChannelContext>();
             _channelMock
-                 .Setup(x => x.WebsiteChannelID)
-                 .Returns(1);
+                .Setup(x => x.WebsiteChannelID)
+                .Returns(1);
+
             _service = new HomePageService(
                 _contentServiceMock.Object,
-                _channelMock.Object
-            );
+                _channelMock.Object);
         }
 
         [Test]
         public async Task RetrieveHomeHeroSlidesDtoAsync_ReturnsMappedData()
         {
-            var slides = new List<HomeHeroSlide>
+            var homePage = new HomePage
             {
-                new HomeHeroSlide
+                SystemFields = new WebPageFields
                 {
-                    Title = "Slide1",
-                    Description = "Desc1",
-                    CTAButtonText = "Click",
-                    CTAButtonUrl = "/test"
+                    WebPageItemID = 1
+                }
+            };
+
+            var heroSlidesContainer = new HomeHeroSlides
+            {
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 2
                 }
             };
 
             _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<HomeHeroSlide>(
-                    It.IsAny<RetrievePagesParameters>(),
+                .Setup(x => x.GetChildPagesByParentGuidAsync<HomeHeroSlides>(
+                    homePage.SystemFields.WebPageItemID,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<HomeHeroSlides>
+                {
+            heroSlidesContainer
+                });
+
+            var slides = new List<HomeHeroSlide>
+    {
+        new()
+        {
+            Title = "Slide1",
+            Description = "Desc1",
+            CTAButtonText = "Click",
+            CTAButtonUrl = "/test"
+        }
+    };
+
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<HomeHeroSlide>(
+                    heroSlidesContainer.SystemFields.WebPageItemID,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(slides);
 
-            var result = await _service.RetrieveHomeHeroSlidesDtoAsync(new HomePage(), CancellationToken.None);
+            var result = await _service.RetrieveHomeHeroSlidesDtoAsync(
+                homePage,
+                CancellationToken.None);
 
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count(), Is.EqualTo(1));
+            Assert.That(result!.Count(), Is.EqualTo(1));
 
             var item = result.First();
 
-            Assert.That(item?.Title, Is.EqualTo("Slide1"));
-            Assert.That(item?.Description, Is.EqualTo("Desc1"));
-            Assert.That(item?.Button?.Title, Is.EqualTo("Click"));
-            Assert.That(item?.Button?.URL, Is.EqualTo("/test"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(item.Title, Is.EqualTo("Slide1"));
+                Assert.That(item.Description, Is.EqualTo("Desc1"));
+                Assert.That(item.Button?.Title, Is.EqualTo("Click"));
+                Assert.That(item.Button?.URL, Is.EqualTo("/test"));
+            });
         }
 
         [Test]
@@ -69,7 +100,9 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<HomeHeroSlide>());
 
-            var result = await _service.RetrieveHomeHeroSlidesDtoAsync(new HomePage(), CancellationToken.None);
+            var result = await _service.RetrieveHomeHeroSlidesDtoAsync(
+                new HomePage(),
+                CancellationToken.None);
 
             Assert.That(result, Is.Null);
         }
@@ -78,13 +111,15 @@ namespace BDO.GWT.Core.Tests.Services
         public async Task GetHomePageUrl_ReturnsNull_WhenNoData()
         {
             _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<HomePage>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync((IEnumerable<HomePage>)null);
+                .Setup(x => x.RetrievePagesAsync<HomePage>(
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync((IEnumerable<HomePage>)null!);
 
             var result = await _service.GetHomePageUrl(CancellationToken.None);
 
             Assert.That(result, Is.Null);
         }
+
         [Test]
         public async Task RetrieveHomeHeroSlidesDtoAsync_ReturnsNull_OnException()
         {
@@ -94,16 +129,44 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new Exception("Test exception"));
 
-            var result = await _service.RetrieveHomeHeroSlidesDtoAsync(new HomePage(), CancellationToken.None);
+            var result = await _service.RetrieveHomeHeroSlidesDtoAsync(
+                new HomePage(),
+                CancellationToken.None);
 
             Assert.That(result, Is.Null);
         }
+
         [Test]
-        public async Task RetrieveHomeHeroSlidesDtoAsync_PartialData_ReturnsNullButtonAsync()
+        public async Task RetrieveHomeHeroSlidesDtoAsync_PartialData_ReturnsNullButton()
         {
+            var homePage = new HomePage
+            {
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 1
+                }
+            };
+
+            var heroSlidesContainer = new HomeHeroSlides
+            {
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 2
+                }
+            };
+
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<HomeHeroSlides>(
+                    homePage.SystemFields.WebPageItemID,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<HomeHeroSlides>
+                {
+            heroSlidesContainer
+                });
+
             var slides = new List<HomeHeroSlide>
     {
-        new HomeHeroSlide
+        new()
         {
             Title = "Slide1",
             CTAButtonText = "Click",
@@ -112,22 +175,57 @@ namespace BDO.GWT.Core.Tests.Services
     };
 
             _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<HomeHeroSlide>(
-                    It.IsAny<RetrievePagesParameters>(),
+                .Setup(x => x.GetChildPagesByParentGuidAsync<HomeHeroSlide>(
+                    heroSlidesContainer.SystemFields.WebPageItemID,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(slides);
 
-            var result = await _service.RetrieveHomeHeroSlidesDtoAsync(new HomePage(), CancellationToken.None);
+            var result = await _service.RetrieveHomeHeroSlidesDtoAsync(
+                homePage,
+                CancellationToken.None);
 
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.First()?.Button, Is.Null);
+
+            var slide = result!.First();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(slide.Title, Is.EqualTo("Slide1"));
+                Assert.That(slide.Button, Is.Null);
+            });
         }
+
         [Test]
-        public async Task RetrieveHomeHeroSlidesDtoAsync_HandlesNullImages()
+        public async Task RetrieveHomeHeroSlidesDtoAsync_HandlesNullImages_FromRetrievePages()
         {
+            var homePage = new HomePage
+            {
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 1
+                }
+            };
+
+            var heroSlidesContainer = new HomeHeroSlides
+            {
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 2
+                }
+            };
+
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<HomeHeroSlides>(
+                    homePage.SystemFields.WebPageItemID,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<HomeHeroSlides>
+                {
+            heroSlidesContainer
+                });
+
             var slides = new List<HomeHeroSlide>
     {
-        new HomeHeroSlide
+        new()
         {
             Title = "Slide1",
             Image_Mobile = null,
@@ -136,43 +234,56 @@ namespace BDO.GWT.Core.Tests.Services
     };
 
             _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<HomeHeroSlide>(
-                    It.IsAny<RetrievePagesParameters>(),
+                .Setup(x => x.GetChildPagesByParentGuidAsync<HomeHeroSlide>(
+                    heroSlidesContainer.SystemFields.WebPageItemID,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(slides);
 
-            var result = await _service.RetrieveHomeHeroSlidesDtoAsync(new HomePage(), CancellationToken.None);
+            var result = await _service.RetrieveHomeHeroSlidesDtoAsync(
+                homePage,
+                CancellationToken.None);
 
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.First()?.ImageURL, Is.Null);
-        }
-        
-        [Test]
-        public async Task GetHomePageUrl_Throws_WhenEmptyList()
-        {
-            _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<HomePage>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<HomePage>());
 
-            Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await _service.GetHomePageUrl(CancellationToken.None));
+            var slide = result!.First();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(slide.Title, Is.EqualTo("Slide1"));
+                Assert.That(slide.ImageURL, Is.Null);
+                Assert.That(slide.ThumbnailImageURL, Is.Null);
+            });
         }
+
         [Test]
-        public async Task GetHomePageDtoAsync_ReturnsNull_WhenNoHomePage()
+        public async Task GetHomePageUrl_ReturnsNull_WhenNoPageExists()
         {
             _contentServiceMock
-                .Setup(x => x.GetPagesAsync<HomePage>(
-                    It.IsAny<RetrievePagesParameters>(),
-                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                    It.IsAny<RetrievalCacheSettings>(),
+                .Setup(x => x.RetrieveCurrentPageAsync<HomePage>(
+                    It.IsAny<RetrieveCurrentPageParameters>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<HomePage>());
+                .ReturnsAsync((HomePage?)null);
 
-            var result = await _service.GetHomePageDtoAsync(null, CancellationToken.None);
+            var result = await _service.GetHomePageUrl(CancellationToken.None);
 
             Assert.That(result, Is.Null);
         }
 
+        [Test]
+        public async Task GetHomePageDtoAsync_ReturnsNull_WhenNoHomePage()
+        {
+            _contentServiceMock
+                .Setup(x => x.RetrieveCurrentPageAsync<HomePage>(
+                    It.IsAny<RetrieveCurrentPageParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync((HomePage?)null);
+
+            var result = await _service.GetHomePageDtoAsync(
+                null,
+                CancellationToken.None);
+
+            Assert.That(result, Is.Null);
+        }
 
         [Test]
         public async Task GetHomePageDtoAsync_MapsAllFieldsCorrectly()
@@ -190,121 +301,246 @@ namespace BDO.GWT.Core.Tests.Services
             };
 
             _contentServiceMock
-                .Setup(x => x.GetPagesAsync<HomePage>(
-                    It.IsAny<RetrievePagesParameters>(),
-                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                    It.IsAny<RetrievalCacheSettings>(),
+                .Setup(x => x.RetrieveCurrentPageAsync<HomePage>(
+                    It.IsAny<RetrieveCurrentPageParameters>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<HomePage> { page });
+                .ReturnsAsync(page);
 
-            _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<HomeHeroSlide>(
-                    It.IsAny<RetrievePagesParameters>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<HomeHeroSlide>());
+            var result = await _service.GetHomePageDtoAsync(
+                null,
+                CancellationToken.None);
 
-            var result = await _service.GetHomePageDtoAsync(null, CancellationToken.None);
-
-            // ✅ Core
             Assert.That(result, Is.Not.Null);
 
-            // ✅ BaseContent
-            Assert.That(result?.BaseContent?.ContentItemID, Is.EqualTo(1));
-            Assert.That(result?.BaseContent?.ContentItemName, Is.EqualTo("Home"));
-
-            // ✅ BaseWebPage
-            Assert.That(result?.BaseWebPage?.WebPageItemID, Is.EqualTo(10));
-            Assert.That(result?.BaseWebPage?.WebPageUrlPath, Is.EqualTo("/home"));
-            Assert.That(result?.BaseWebPage?.WebPageItemParentID, Is.EqualTo(5));
-        }
-
-        [Test]
-        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsNull_WhenTrendingTopicsPageIsNull()
-        {
-            _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync((IEnumerable<TrendingTopics>?)null);
-
-            var result = await _service.RetrieveTrendingTopicsDtoAsync(new HomePage(), CancellationToken.None);
-
-            Assert.That(result, Is.Null);
-        }
-
-        [Test]
-        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsNull_WhenTrendingTopicPagesIsNull()
-        {
-            _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<TrendingTopics> { new TrendingTopics { Heading = "Topics" } });
-
-            _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<TrendingTopic>(
-                    It.IsAny<RetrievePagesParameters>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync((IEnumerable<TrendingTopic>?)null);
-
-            var result = await _service.RetrieveTrendingTopicsDtoAsync(new HomePage() , CancellationToken.None);
-
-            Assert.That(result, Is.Null);
-        }
-
-        [Test]
-        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_WithIndustryFeaturedItem()
-        {
-            _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<TrendingTopics>
-                {
-                    new TrendingTopics { Heading = "Trending" }
-                });
-
-            var IndustryItem = new Industry
+            Assert.Multiple(() =>
             {
-                MetadataTitle = "Industry Title",
-                MetadataDescription = "Industry Desc",
-                SystemFields = new WebPageFields { WebPageUrlPath = "/industry" }
+                Assert.That(result?.BaseContent?.ContentItemID, Is.EqualTo(1));
+                Assert.That(result?.BaseContent?.ContentItemName, Is.EqualTo("Home"));
+
+                Assert.That(result?.BaseWebPage?.WebPageItemID, Is.EqualTo(10));
+                Assert.That(result?.BaseWebPage?.WebPageUrlPath, Is.EqualTo("/home"));
+                Assert.That(result?.BaseWebPage?.WebPageItemParentID, Is.EqualTo(5));
+            });
+        }
+
+        [Test]
+        public async Task RetrieveHomeHeroSlidesDtoAsync_HandlesNullImages_FromChildPages()
+        {
+            var homePage = new HomePage
+            {
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 1
+                }
             };
 
-            var trendingTopics = new List<TrendingTopic>
+            var slidesContainer = new HomeHeroSlides
             {
-                new TrendingTopic
+                SystemFields = new WebPageFields
                 {
-                    Title = "Tab1",
-                    ImageAltText = "Alt1",
-                    ImageUrl = new List<ContentAttachment>
-                    {
-                        new ContentAttachment
-                        {
-                            ContentAttachmentAsset = new ContentItemAsset { Url = "/img.png" }
-                        }
-                    },
-                    CTANodeGuid = new List<IWebPageFieldsSource>
-                    {
-                        new Industry { SystemFields = new WebPageFields { WebPageUrlPath = "/read-more" } }
-                    },
-                    FeaturedItems = new List<IWebPageFieldsSource> { IndustryItem }
+                    WebPageItemID = 2
                 }
             };
 
             _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<TrendingTopic>(
-                    It.IsAny<RetrievePagesParameters>(),
+                .Setup(x => x.GetChildPagesByParentGuidAsync<HomeHeroSlides>(
+                    1,
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(trendingTopics);
+                .ReturnsAsync(new List<HomeHeroSlides> { slidesContainer });
 
-            var result = await _service.RetrieveTrendingTopicsDtoAsync(new HomePage(), CancellationToken.None);
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<HomeHeroSlide>(
+                    2,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<HomeHeroSlide>
+                {
+                    new()
+                    {
+                        Title = "Slide1",
+                        Image_Mobile = null,
+                        Image_Thumbnail = null
+                    }
+                });
 
+            var result = await _service.RetrieveHomeHeroSlidesDtoAsync(
+                homePage,
+                CancellationToken.None);
+
+            Assert.That(result, Is.Not.Null);
+
+            var slide = result!.First();
 
             Assert.Multiple(() =>
             {
-                Assert.That(result, Is.Not.Null);
+                Assert.That(slide.Title, Is.EqualTo("Slide1"));
+                Assert.That(slide.ImageURL, Is.Null);
+                Assert.That(slide.ThumbnailImageURL, Is.Null);
+            });
+        }
+
+        [Test]
+        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsEmptyDto_WhenTrendingTopicsPageIsNull()
+        {
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopics>(
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync((IEnumerable<TrendingTopics>)null!);
+
+            var homePage = new HomePage
+            {
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 1
+                }
+            };
+
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(
+                homePage,
+                CancellationToken.None);
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result?.Heading, Is.Null);
+            Assert.That(result?.Tabs, Is.Empty);
+        }
+
+        [Test]
+        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsEmptyDto_WhenTrendingTopicPagesIsNull()
+        {
+            var trendingTopicsPage = new TrendingTopics
+            {
+                Heading = "Topics",
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 2
+                }
+            };
+
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopics>(
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<TrendingTopics> { trendingTopicsPage });
+
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopic>(
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync((IEnumerable<TrendingTopic>)null!);
+
+            var homePage = new HomePage
+            {
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 1
+                }
+            };
+
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(
+                homePage,
+                CancellationToken.None);
+
+            Assert.That(result, Is.Not.Null);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result?.Heading, Is.Null);
+                Assert.That(result?.Tabs, Is.Empty);
+            });
+        }
+
+
+        [Test]
+        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_WithIndustryFeaturedItem()
+        {
+            var homePage = new HomePage
+            {
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 1
+                }
+            };
+
+            var trendingTopicsContainer = new TrendingTopics
+            {
+                Heading = "Trending",
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 2
+                }
+            };
+
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopics>(
+                    1,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<TrendingTopics>
+                {
+            trendingTopicsContainer
+                });
+
+            var industryItem = new Industry
+            {
+                MetadataTitle = "Industry Title",
+                MetadataDescription = "Industry Desc",
+                SystemFields = new WebPageFields
+                {
+                    WebPageUrlPath = "/industry"
+                }
+            };
+
+            var trendingTopics = new List<TrendingTopic>
+    {
+        new TrendingTopic
+        {
+            Title = "Tab1",
+            ImageAltText = "Alt1",
+            ImageUrl = new List<ContentAttachment>
+            {
+                new ContentAttachment
+                {
+                    ContentAttachmentAsset = new ContentItemAsset
+                    {
+                        Url = "/img.png"
+                    }
+                }
+            },
+            CTANodeGuid = new List<IWebPageFieldsSource>
+            {
+                new Industry
+                {
+                    SystemFields = new WebPageFields
+                    {
+                        WebPageUrlPath = "/read-more"
+                    }
+                }
+            },
+            FeaturedItems = new List<IWebPageFieldsSource>
+            {
+                industryItem
+            }
+        }
+    };
+
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopic>(
+                    2,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(trendingTopics);
+
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(
+                homePage,
+                CancellationToken.None);
+
+            Assert.That(result, Is.Not.Null);
+
+            Assert.Multiple(() =>
+            {
                 Assert.That(result?.Heading, Is.EqualTo("Trending"));
                 Assert.That(result?.Tabs.Count(), Is.EqualTo(1));
             });
 
-            
-
-            var tab = result.Tabs.First();
+            var tab = result!.Tabs.First();
 
             Assert.Multiple(() =>
             {
@@ -317,48 +553,76 @@ namespace BDO.GWT.Core.Tests.Services
                 Assert.That(tab.Items?[0].Description, Is.EqualTo("Industry Desc"));
                 Assert.That(tab.Items?[0].ReadMoreLink, Is.EqualTo("/industry"));
             });
-            
         }
 
         [Test]
         public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_WithServicePageFeaturedItem()
         {
-            _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<TrendingTopics>
-                {
-                    new TrendingTopics { Heading = "Trending" }
-                });
-
-            var ServiceItem = new Service
+            var homePage = new HomePage
             {
-                MetadataTitle = "Service Title",
-                MetadataDescription = "Service Desc",
-                SystemFields = new WebPageFields { WebPageUrlPath = "/service" }
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 1
+                }
             };
 
-            var trendingTopics = new List<TrendingTopic>
+            var trendingTopicsContainer = new TrendingTopics
             {
-                new TrendingTopic
+                Heading = "Trending",
+                SystemFields = new WebPageFields
                 {
-                    Title = "Tab2",
-                    ImageAltText = "Alt2",
-                    ImageUrl = new List<ContentAttachment>(),
-                    CTANodeGuid = new List<IWebPageFieldsSource>(),
-                    FeaturedItems = new List<IWebPageFieldsSource> { ServiceItem }
+                    WebPageItemID = 2
                 }
             };
 
             _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<TrendingTopic>(
-                    It.IsAny<RetrievePagesParameters>(),
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopics>(
+                    1,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<TrendingTopics>
+                {
+            trendingTopicsContainer
+                });
+
+            var serviceItem = new Service
+            {
+                MetadataTitle = "Service Title",
+                MetadataDescription = "Service Desc",
+                SystemFields = new WebPageFields
+                {
+                    WebPageUrlPath = "/service"
+                }
+            };
+
+            var trendingTopics = new List<TrendingTopic>
+    {
+        new TrendingTopic
+        {
+            Title = "Tab2",
+            ImageAltText = "Alt2",
+            ImageUrl = new List<ContentAttachment>(),
+            CTANodeGuid = new List<IWebPageFieldsSource>(),
+            FeaturedItems = new List<IWebPageFieldsSource>
+            {
+                serviceItem
+            }
+        }
+    };
+
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopic>(
+                    2,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(trendingTopics);
 
-            var result = await _service.RetrieveTrendingTopicsDtoAsync(new HomePage(), CancellationToken.None);
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(
+                homePage,
+                CancellationToken.None);
 
             Assert.That(result, Is.Not.Null);
-            var tab = result.Tabs.First();
+
+            var tab = result!.Tabs.First();
+
             Assert.Multiple(() =>
             {
                 Assert.That(tab.Items?[0].Title, Is.EqualTo("Service Title"));
@@ -370,65 +634,108 @@ namespace BDO.GWT.Core.Tests.Services
         [Test]
         public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_WithUnknownFeaturedItem()
         {
-            _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<TrendingTopics>
-                {
-                    new TrendingTopics { Heading = "Trending" }
-                });
-
-            var unknownItem = new Mock<IWebPageFieldsSource>();
-            unknownItem.Setup(x => x.SystemFields).Returns(new WebPageFields
+            var homePage = new HomePage
             {
-                WebPageItemName = "Unknown Page",
-                WebPageUrlPath = "/unknown"
-            });
-
-            var trendingTopics = new List<TrendingTopic>
-            {
-                new TrendingTopic
+                SystemFields = new WebPageFields
                 {
-                    Title = "Tab3",
-                    ImageAltText = "Alt3",
-                    ImageUrl = new List<ContentAttachment>(),
-                    CTANodeGuid = new List<IWebPageFieldsSource>(),
-                    FeaturedItems = new List<IWebPageFieldsSource> { unknownItem.Object }
+                    WebPageItemID = 1
+                }
+            };
+
+            var trendingTopicsContainer = new TrendingTopics
+            {
+                Heading = "Trending",
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 2
                 }
             };
 
             _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<TrendingTopic>(
-                    It.IsAny<RetrievePagesParameters>(),
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopics>(
+                    homePage.SystemFields.WebPageItemID,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<TrendingTopics> { trendingTopicsContainer });
+
+            var unknownItem = new Mock<IWebPageFieldsSource>();
+
+            unknownItem.Setup(x => x.SystemFields)
+                .Returns(new WebPageFields
+                {
+                    WebPageItemName = "Unknown Page",
+                    WebPageUrlPath = "/unknown"
+                });
+
+            var trendingTopics = new List<TrendingTopic>
+    {
+        new TrendingTopic
+        {
+            Title = "Tab3",
+            ImageAltText = "Alt3",
+            ImageUrl = new List<ContentAttachment>(),
+            CTANodeGuid = new List<IWebPageFieldsSource>(),
+            FeaturedItems = new List<IWebPageFieldsSource>
+            {
+                unknownItem.Object
+            }
+        }
+    };
+
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopic>(
+                    trendingTopicsContainer.SystemFields.WebPageItemID,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(trendingTopics);
 
-            var result = await _service.RetrieveTrendingTopicsDtoAsync(new HomePage(), CancellationToken.None);
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(
+                homePage,
+                CancellationToken.None);
 
             Assert.That(result, Is.Not.Null);
-            var tab = result.Tabs.First();
+
+            var tab = result!.Tabs.First();
 
             Assert.Multiple(() =>
             {
                 Assert.That(tab.Items?[0].Title, Is.EqualTo("Unknown Page"));
                 Assert.That(tab.Items?[0].ReadMoreLink, Is.EqualTo("/unknown"));
             });
-            
         }
+
         [Test]
         public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_WithIndustryServiceFeaturedItem()
         {
-            _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<TrendingTopics>
+            var homePage = new HomePage
+            {
+                SystemFields = new WebPageFields
                 {
-            new TrendingTopics { Heading = "Trending" }
-                });
+                    WebPageItemID = 1
+                }
+            };
+
+            var trendingTopicsContainer = new TrendingTopics
+            {
+                Heading = "Trending",
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 2
+                }
+            };
+
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopics>(
+                    homePage.SystemFields.WebPageItemID,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<TrendingTopics> { trendingTopicsContainer });
 
             var industryServiceItem = new IndustryService
             {
                 MetadataTitle = "Industry Service Title",
                 MetadataDescription = "<p>Industry Service Desc</p>",
-                SystemFields = new WebPageFields { WebPageUrlPath = "/industry-service" }
+                SystemFields = new WebPageFields
+                {
+                    WebPageUrlPath = "/industry-service"
+                }
             };
 
             var trendingTopics = new List<TrendingTopic>
@@ -439,47 +746,77 @@ namespace BDO.GWT.Core.Tests.Services
             ImageAltText = "Alt",
             ImageUrl = new List<ContentAttachment>(),
             CTANodeGuid = new List<IWebPageFieldsSource>(),
-            FeaturedItems = new List<IWebPageFieldsSource> { industryServiceItem }
+            FeaturedItems = new List<IWebPageFieldsSource>
+            {
+                industryServiceItem
+            }
         }
     };
 
             _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<TrendingTopic>(
-                    It.IsAny<RetrievePagesParameters>(),
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopic>(
+                    trendingTopicsContainer.SystemFields.WebPageItemID,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(trendingTopics);
 
-            var result = await _service.RetrieveTrendingTopicsDtoAsync(new HomePage(), CancellationToken.None);
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(
+                homePage,
+                CancellationToken.None);
 
             Assert.That(result, Is.Not.Null);
 
-            var tab = result.Tabs.First();
+            var tab = result!.Tabs.First();
 
             Assert.Multiple(() =>
             {
-                Assert.That(tab.Items?[0].Title, Is.EqualTo("Industry Service Title"));
-                Assert.That(tab.Items?[0].Description, Is.EqualTo("Industry Service Desc"));
-                Assert.That(tab.Items?[0].ReadMoreLink, Is.EqualTo("/industry-service"));
-            });
+                Assert.That(tab.Items?[0].Title,
+                    Is.EqualTo("Industry Service Title"));
 
-            
+                Assert.That(tab.Items?[0].Description,
+                    Is.EqualTo("Industry Service Desc"));
+
+                Assert.That(tab.Items?[0].ReadMoreLink,
+                    Is.EqualTo("/industry-service"));
+            });
         }
 
         [Test]
         public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_WithServiceAreaFeaturedItem()
         {
+            var homePage = new HomePage
+            {
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 1
+                }
+            };
+
+            var trendingTopicsContainer = new TrendingTopics
+            {
+                Heading = "Trending",
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 2
+                }
+            };
+
             _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopics>(
+                    homePage.SystemFields.WebPageItemID,
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<TrendingTopics>
                 {
-            new TrendingTopics { Heading = "Trending" }
+            trendingTopicsContainer
                 });
 
             var serviceAreaItem = new ServiceArea
             {
                 MetadataTitle = "Service Area Title",
                 MetadataDescription = "<p>Service Area Desc</p>",
-                SystemFields = new WebPageFields { WebPageUrlPath = "/service-area" }
+                SystemFields = new WebPageFields
+                {
+                    WebPageUrlPath = "/service-area"
+                }
             };
 
             var trendingTopics = new List<TrendingTopic>
@@ -490,46 +827,77 @@ namespace BDO.GWT.Core.Tests.Services
             ImageAltText = "Alt",
             ImageUrl = new List<ContentAttachment>(),
             CTANodeGuid = new List<IWebPageFieldsSource>(),
-            FeaturedItems = new List<IWebPageFieldsSource> { serviceAreaItem }
+            FeaturedItems = new List<IWebPageFieldsSource>
+            {
+                serviceAreaItem
+            }
         }
     };
 
             _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<TrendingTopic>(
-                    It.IsAny<RetrievePagesParameters>(),
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopic>(
+                    trendingTopicsContainer.SystemFields.WebPageItemID,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(trendingTopics);
 
-            var result = await _service.RetrieveTrendingTopicsDtoAsync(new HomePage(), CancellationToken.None);
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(
+                homePage,
+                CancellationToken.None);
 
             Assert.That(result, Is.Not.Null);
 
-            var tab = result.Tabs.First();
+            var tab = result!.Tabs.First();
+
             Assert.Multiple(() =>
             {
-                Assert.That(tab.Items?[0].Title, Is.EqualTo("Service Area Title"));
-                Assert.That(tab.Items?[0].Description, Is.EqualTo("Service Area Desc"));
-                Assert.That(tab.Items?[0].ReadMoreLink, Is.EqualTo("/service-area"));
-            });
+                Assert.That(tab.Items?[0].Title,
+                    Is.EqualTo("Service Area Title"));
 
-            
+                Assert.That(tab.Items?[0].Description,
+                    Is.EqualTo("Service Area Desc"));
+
+                Assert.That(tab.Items?[0].ReadMoreLink,
+                    Is.EqualTo("/service-area"));
+            });
         }
 
         [Test]
         public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_WithSubServiceFeaturedItem()
         {
+            var homePage = new HomePage
+            {
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 1
+                }
+            };
+
+            var trendingTopicsContainer = new TrendingTopics
+            {
+                Heading = "Trending",
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 2
+                }
+            };
+
             _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopics>(
+                    homePage.SystemFields.WebPageItemID,
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<TrendingTopics>
                 {
-            new TrendingTopics { Heading = "Trending" }
+            trendingTopicsContainer
                 });
 
             var subServiceItem = new Sub_Service
             {
                 MetadataTitle = "Sub Service Title",
                 MetadataDescription = "<p>Sub Service Desc</p>",
-                SystemFields = new WebPageFields { WebPageUrlPath = "/sub-service" }
+                SystemFields = new WebPageFields
+                {
+                    WebPageUrlPath = "/sub-service"
+                }
             };
 
             var trendingTopics = new List<TrendingTopic>
@@ -540,47 +908,78 @@ namespace BDO.GWT.Core.Tests.Services
             ImageAltText = "Alt",
             ImageUrl = new List<ContentAttachment>(),
             CTANodeGuid = new List<IWebPageFieldsSource>(),
-            FeaturedItems = new List<IWebPageFieldsSource> { subServiceItem }
+            FeaturedItems = new List<IWebPageFieldsSource>
+            {
+                subServiceItem
+            }
         }
     };
 
             _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<TrendingTopic>(
-                    It.IsAny<RetrievePagesParameters>(),
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopic>(
+                    trendingTopicsContainer.SystemFields.WebPageItemID,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(trendingTopics);
 
-            var result = await _service.RetrieveTrendingTopicsDtoAsync(new HomePage(), CancellationToken.None);
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(
+                homePage,
+                CancellationToken.None);
 
             Assert.That(result, Is.Not.Null);
 
-            var tab = result.Tabs.First();
+            var tab = result!.Tabs.First();
+
             Assert.Multiple(() =>
             {
-                Assert.That(tab?.Items?[0].Title, Is.EqualTo("Sub Service Title"));
-                Assert.That(tab?.Items?[0].Description, Is.EqualTo("Sub Service Desc"));
-                Assert.That(tab?.Items?[0].ReadMoreLink, Is.EqualTo("/sub-service"));
+                Assert.That(tab.Items?[0].Title,
+                    Is.EqualTo("Sub Service Title"));
+
+                Assert.That(tab.Items?[0].Description,
+                    Is.EqualTo("Sub Service Desc"));
+
+                Assert.That(tab.Items?[0].ReadMoreLink,
+                    Is.EqualTo("/sub-service"));
             });
-            
         }
 
         [Test]
         public async Task RetrieveTrendingTopicsDtoAsync_ReturnsEmptyTabs_WhenNoTrendingTopicPages()
         {
+            var homePage = new HomePage
+            {
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 1
+                }
+            };
+
+            var trendingTopicsContainer = new TrendingTopics
+            {
+                Heading = "Trending",
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 2
+                }
+            };
+
             _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopics>(
+                    homePage.SystemFields.WebPageItemID,
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<TrendingTopics>
                 {
-                    new TrendingTopics { Heading = "Trending" }
+            trendingTopicsContainer
                 });
 
             _contentServiceMock
-                .Setup(x => x.RetrievePagesAsync<TrendingTopic>(
-                    It.IsAny<RetrievePagesParameters>(),
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopic>(
+                    trendingTopicsContainer.SystemFields.WebPageItemID,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<TrendingTopic>());
 
-            var result = await _service.RetrieveTrendingTopicsDtoAsync(new HomePage(), CancellationToken.None);
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(
+                homePage,
+                CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -588,7 +987,13 @@ namespace BDO.GWT.Core.Tests.Services
                 Assert.That(result?.Heading, Is.EqualTo("Trending"));
                 Assert.That(result?.Tabs.Count(), Is.EqualTo(0));
             });
-            
         }
+
+
     }
 }
+
+
+    
+
+
