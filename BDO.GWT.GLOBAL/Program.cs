@@ -157,10 +157,6 @@ app.Kentico().MapRoutes();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=About}/{action=Index}/{id?}"
-);
-app.MapControllerRoute(
-    name: "default",
     pattern: $"{{{WebPageRoutingOptions.LANGUAGE_ROUTE_VALUE_KEY}}}/{{controller}}/{{action}}",
     constraints: new
     {
