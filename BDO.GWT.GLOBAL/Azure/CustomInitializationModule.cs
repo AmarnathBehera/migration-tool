@@ -1,6 +1,5 @@
 ﻿using BDO;
 using CMS;
-using CMS.Base;
 using CMS.Core;
 using CMS.DataEngine;
 using CMS.IO;
@@ -28,11 +27,13 @@ public class CustomInitializationModule : Module
     {
         base.OnInit();
 
-        // ✅ Hook into PostStart — fires after DB is fully ready
-        ApplicationEvents.PostStart.Execute += PostStart_Execute;
+        // Storage path mapping only depends on IConfiguration (no DB access required),
+        // so it can run directly in OnInit. This avoids the obsolete
+        // ApplicationEvents.PostStart hook.
+        InitializeAzureStorageMapping();
     }
 
-    private void PostStart_Execute(object sender, EventArgs e)
+    private static void InitializeAzureStorageMapping()
     {
         try
         {
