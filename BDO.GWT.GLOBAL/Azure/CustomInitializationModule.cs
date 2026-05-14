@@ -1,12 +1,12 @@
 ﻿using BDO;
 using CMS;
-using CMS.ContentEngine;
+using CMS.Base;
 using CMS.Core;
 using CMS.DataEngine;
 using CMS.IO;
 using Kentico.Xperience.AzureStorage;
 using Microsoft.Extensions.Configuration;
-using System.Linq;
+using System;
 using CmsService = CMS.Core.Service;
 
 [assembly: RegisterModule(typeof(CustomInitializationModule))]
@@ -15,14 +15,6 @@ namespace BDO;
 
 public class CustomInitializationModule : Module
 {
-    private static readonly string[] ChannelStoragePathTemplates =
-    [
-        "~/<siteCodeName>/media/",
-        "~/<siteCodeName>/files/",
-        "~/<siteCodeName>/metafiles/",
-        "~/<siteCodeName>/BizFormFiles/",
-    ];
-
     private static readonly string[] GlobalStoragePaths =
     [
         "~/assets/contentitems/",
@@ -36,65 +28,56 @@ public class CustomInitializationModule : Module
     {
         base.OnInit();
 
-        var configuration = CmsService.Resolve<IConfiguration>();
-
-        var legacyAssembly = configuration["AzureStorageProviderSettings:CMSStorageProviderAssembly"];
-        if (!string.IsNullOrEmpty(legacyAssembly))
-            return;
-
-        var cdnEndpoint = configuration["AzureStorageProviderSettings:CMSAzureCDNEndpoint"];
-        if (string.IsNullOrWhiteSpace(cdnEndpoint))
-        {
-            CmsService.Resolve<IEventLogService>().LogWarning(
-                "CustomInitializationModule",
-                "INIT",
-                "Azure CDN endpoint is not configured. Skipping Azure Storage mapping."
-            );
-            return;
-        }
-
-        var customRootPath = configuration["AzureStorageProviderSettings:CMSAzureRootContainer"];
-        var isPublicContainer = bool.TryParse(
-            configuration["AzureStorageProviderSettings:CMSAzurePublicContainer"],
-            out var parsed) && parsed;
-
-        MapPathsForAllChannels(customRootPath, ChannelStoragePathTemplates, isPublicContainer);
-
-        foreach (var path in GlobalStoragePaths)
-        {
-            MapPathToAzureStorageProvider(customRootPath, path, isPublicContainer);
-        }
+        // ✅ Hook into PostStart — fires after DB is fully ready
+        ApplicationEvents.PostStart.Execute += PostStart_Execute;
     }
 
-    private static void MapPathsForAllChannels(
-        string customRootPath,
-        string[] pathsToMap,
-        bool isPublicContainer)
+    private void PostStart_Execute(object sender, EventArgs e)
     {
-        var channels = ChannelInfo.Provider.Get()
-            .WhereEquals("ChannelType", "Website")
-            .ToList();
-
-        if (channels.Count == 0)
+        try
         {
-            CmsService.Resolve<IEventLogService>().LogWarning(
+            var configuration = CmsService.Resolve<IConfiguration>();
+
+            var legacyAssembly = configuration["AzureStorageProviderSettings:CMSStorageProviderAssembly"];
+            if (!string.IsNullOrEmpty(legacyAssembly))
+                return;
+
+            var cdnEndpoint = configuration["AzureStorageProviderSettings:CMSAzureCDNEndpoint"];
+            if (string.IsNullOrWhiteSpace(cdnEndpoint))
+            {
+                CmsService.Resolve<IEventLogService>().LogWarning(
+                    "CustomInitializationModule",
+                    "INIT",
+                    "Azure CDN endpoint is not configured. Skipping Azure Storage mapping."
+                );
+                return;
+            }
+
+            var customRootPath = configuration["AzureStorageProviderSettings:CMSAzureRootContainer"];
+            var isPublicContainer = bool.TryParse(
+                configuration["AzureStorageProviderSettings:CMSAzurePublicContainer"],
+                out var parsed) && parsed;
+
+            // Map global paths only
+            foreach (var path in GlobalStoragePaths)
+            {
+                MapPathToAzureStorageProvider(customRootPath, path, isPublicContainer);
+            }
+
+            CmsService.Resolve<IEventLogService>().LogInformation(
                 "CustomInitializationModule",
                 "INIT",
-                "No website channels found during Azure Storage path mapping."
+                "Azure Storage mapping completed successfully."
             );
-            return;
         }
-
-        foreach (var channel in channels)
+        catch (Exception ex)
         {
-            foreach (var path in pathsToMap)
-            {
-                var resolvedPath = path.Replace(
-                    "<siteCodeName>",
-                    channel.ChannelName.ToLower()
-                );
-                MapPathToAzureStorageProvider(customRootPath, resolvedPath, isPublicContainer);
-            }
+            CmsService.Resolve<IEventLogService>().LogException(
+                "CustomInitializationModule",
+                "INIT",
+                ex,
+                "Failed to initialize Azure Storage mapping."
+            );
         }
     }
 
