@@ -19,10 +19,12 @@
             // XbyK infrastructure services are typically already registered by Kentico
             // You just wire your abstraction here.
             services.AddScoped<IContentService, ContentService>();
+            services.AddScoped<IWebPageUrlResolver, WebPageUrlResolver>();
             services.AddScoped<IPageUtility, PageUtility>();
             services.AddScoped<IHomePageService, HomePageService>();
             services.AddScoped<IHeaderService, HeaderService>();
             services.AddScoped<IWebsiteCulturesService, WebsiteCulturesService>();
+            services.AddHttpContextAccessor();
             services.AddScoped<ICultureContext, CultureContext>();
             //services.AddScoped<IPageMetadataService, PageMetadataService>();
 
