@@ -18,6 +18,7 @@ public class SectionPeoplePageServiceTests
     private Mock<IContentService> _contentServiceMock = null!;
     private Mock<IHeroService> _heroServiceMock = null!;
     private Mock<IPeopleCardsService> _peopleCardsServiceMock = null!;
+    private Mock<ICultureContext> _cultureContextMock = null!;
     private SectionPeoplePageService _service = null!;
 
     [SetUp]
@@ -26,10 +27,12 @@ public class SectionPeoplePageServiceTests
         _contentServiceMock = new Mock<IContentService>();
         _heroServiceMock = new Mock<IHeroService>();
         _peopleCardsServiceMock = new Mock<IPeopleCardsService>();
+        _cultureContextMock = new Mock<ICultureContext>();
         _service = new SectionPeoplePageService(
             _contentServiceMock.Object,
             _heroServiceMock.Object,
-            _peopleCardsServiceMock.Object);
+            _peopleCardsServiceMock.Object,
+            _cultureContextMock.Object);
     }
 
     [Test]

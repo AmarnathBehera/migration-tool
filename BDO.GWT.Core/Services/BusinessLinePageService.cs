@@ -1,13 +1,10 @@
-using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.services;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.Services;
-using CMS.Websites;
 using Kentico.Content.Web.Mvc;
-using BDO.GWT.Core.Utilities;
 
 namespace BDO.GWT.Core.Services
 {

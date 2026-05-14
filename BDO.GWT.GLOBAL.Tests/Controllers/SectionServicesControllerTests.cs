@@ -5,9 +5,6 @@ using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Core.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using NUnit.Framework;
-using System.Threading;
-using System.Threading.Tasks;
 using BDO.GWT.Core;
 
 namespace BDO.GWT.GLOBAL.Tests.Controllers
@@ -40,8 +37,11 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             var result = await _controller.Index(CancellationToken.None);
 
             var viewResult = result as ViewResult;
-            Assert.That(viewResult, Is.Not.Null);
-            Assert.That(viewResult!.ViewName, Is.EqualTo("~/Views/SectionServices/Index.cshtml"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(viewResult, Is.Not.Null);
+                Assert.That(viewResult!.ViewName, Is.EqualTo("~/Views/SectionServices/Index.cshtml"));
+            });
         }
 
         [Test]
@@ -74,10 +74,13 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
 
             var model = viewResult!.Model as SectionServicesPageDto;
             Assert.That(model, Is.Not.Null);
-            Assert.That(model!.Hero.Title, Is.EqualTo("Services Hero"));
-            Assert.That(model.MetaData?.MetaTitle, Is.EqualTo("Meta Title"));
-            Assert.That(model.BaseContent?.ContentItemID, Is.EqualTo(1));
-            Assert.That(model.BaseWebPage?.WebPageUrlPath, Is.EqualTo("/services"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(model!.Hero.Title, Is.EqualTo("Services Hero"));
+                Assert.That(model.MetaData?.MetaTitle, Is.EqualTo("Meta Title"));
+                Assert.That(model.BaseContent?.ContentItemID, Is.EqualTo(1));
+                Assert.That(model.BaseWebPage?.WebPageUrlPath, Is.EqualTo("/services"));
+            });
         }
 
         [Test]
@@ -104,11 +107,14 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
 
             var model = viewResult!.Model as SectionServicesPageDto;
             Assert.That(model, Is.Not.Null);
-            Assert.That(model!.MetaData, Is.Null);
-            Assert.That(model.SearchAndSEO, Is.Null);
-            Assert.That(model.OGMetaData, Is.Null);
-            Assert.That(model.BaseContent, Is.Null);
-            Assert.That(model.BaseWebPage, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(model!.MetaData, Is.Null);
+                Assert.That(model.SearchAndSEO, Is.Null);
+                Assert.That(model.OGMetaData, Is.Null);
+                Assert.That(model.BaseContent, Is.Null);
+                Assert.That(model.BaseWebPage, Is.Null);
+            });
         }
 
         [Test]
