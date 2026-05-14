@@ -56,48 +56,48 @@ namespace BDO.GWT.GLOBAL.Tests.Azure
         }
 
         [Test]
-        public void ChannelStoragePathTemplates_ContainsExpectedKenticoFolders()
+        public void GlobalStoragePaths_ContainsExpectedFolders()
         {
             var field = typeof(CustomInitializationModule)
-                .GetField("ChannelStoragePathTemplates", PrivateStatic);
+                .GetField("GlobalStoragePaths", PrivateStatic);
 
-            Assert.That(field, Is.Not.Null, "Static field 'ChannelStoragePathTemplates' not found.");
+            Assert.That(field, Is.Not.Null, "Static field 'GlobalStoragePaths' not found.");
 
-            var templates = (string[])field!.GetValue(null)!;
+            var paths = (string[])field!.GetValue(null)!;
 
             Assert.Multiple(() =>
             {
-                Assert.That(templates, Is.Not.Null);
-                Assert.That(templates, Has.Length.EqualTo(4));
-                Assert.That(templates, Does.Contain("~/<siteCodeName>/media/"));
-                Assert.That(templates, Does.Contain("~/<siteCodeName>/files/"));
-                Assert.That(templates, Does.Contain("~/<siteCodeName>/metafiles/"));
-                Assert.That(templates, Does.Contain("~/<siteCodeName>/BizFormFiles/"));
+                Assert.That(paths, Is.Not.Null);
+                Assert.That(paths, Has.Length.EqualTo(3));
+                Assert.That(paths, Does.Contain("~/assets/contentitems/"));
+                Assert.That(paths, Does.Contain("~/assets/temp/"));
+                Assert.That(paths, Does.Contain("~/temp/"));
             });
         }
 
         [Test]
-        public void ChannelStoragePathTemplates_AllContainSiteCodeNamePlaceholder()
+        public void GlobalStoragePaths_AllStartWithTilde()
         {
             var field = typeof(CustomInitializationModule)
-                .GetField("ChannelStoragePathTemplates", PrivateStatic);
+                .GetField("GlobalStoragePaths", PrivateStatic);
 
-            var templates = (string[])field!.GetValue(null)!;
+            var paths = (string[])field!.GetValue(null)!;
 
-            Assert.That(templates, Is.All.Contains("<siteCodeName>"));
+            Assert.That(paths, Is.All.StartsWith("~/"));
         }
 
         [Test]
-        public void MapPathsForAllChannels_IsPrivateStatic()
+        public void PostStart_Execute_IsPrivateInstance()
         {
             var method = typeof(CustomInitializationModule).GetMethod(
-                "MapPathsForAllChannels", PrivateStatic);
+                "PostStart_Execute",
+                BindingFlags.Instance | BindingFlags.NonPublic);
 
             Assert.That(method, Is.Not.Null);
             Assert.Multiple(() =>
             {
                 Assert.That(method!.IsPrivate, Is.True);
-                Assert.That(method.IsStatic, Is.True);
+                Assert.That(method.IsStatic, Is.False);
             });
         }
 
