@@ -87,17 +87,17 @@ namespace BDO.GWT.GLOBAL.Tests.Azure
         }
 
         [Test]
-        public void PostStart_Execute_IsPrivateInstance()
+        public void InitializeAzureStorageMapping_IsPrivateStatic()
         {
             var method = typeof(CustomInitializationModule).GetMethod(
-                "PostStart_Execute",
-                BindingFlags.Instance | BindingFlags.NonPublic);
+                "InitializeAzureStorageMapping",
+                PrivateStatic);
 
             Assert.That(method, Is.Not.Null);
             Assert.Multiple(() =>
             {
                 Assert.That(method!.IsPrivate, Is.True);
-                Assert.That(method.IsStatic, Is.False);
+                Assert.That(method.IsStatic, Is.True);
             });
         }
 

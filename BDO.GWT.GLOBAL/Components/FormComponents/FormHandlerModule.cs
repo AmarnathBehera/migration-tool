@@ -1,4 +1,5 @@
-﻿using BDO.GWT.Core;
+﻿using BDO.GWT.Common;
+using BDO.GWT.Core;
 using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents;
 using CMS;
@@ -7,6 +8,7 @@ using CMS.DataEngine;
 using CMS.EmailEngine;
 using CMS.EmailLibrary;
 using CMS.OnlineForms;
+using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +28,7 @@ public partial class FormHandlerModule : Module
     private IHttpContextAccessor _httpContextAccessor;
     private ILogger<FormHandlerModule> _logger;
     private IServiceScopeFactory _scopeFactory;
+    private const string EmailKey = "Email";
 
     public FormHandlerModule() : base("CustomFormHandlers")
     {
@@ -128,9 +131,51 @@ public partial class FormHandlerModule : Module
                 <p><strong>Message:</strong></p>
                 <p>{formDataItem.GetStringValue("description", string.Empty)}</p>";
 
+            string fromEmail;
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var websiteChannelContext = scope.ServiceProvider.GetRequiredService<IWebsiteChannelContext>();
+                var webChannelSettingsInfoProvider = scope.ServiceProvider.GetRequiredService<IInfoProvider<WebChannelSettingsInfo>>();
+                var EmailInfoProvider = scope.ServiceProvider.GetRequiredService<IInfoProvider<EmailInfo>>();
+
+                int currentWebsiteID = websiteChannelContext.WebsiteChannelID;
+                if (currentWebsiteID <= 0)
+                {
+                    _logger.LogWarning("Current website channel ID is not available. Skipping email send.");
+                    return;
+                }
+
+                var currentChannelSettings = webChannelSettingsInfoProvider
+                    .Get()
+                    .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), currentWebsiteID)
+                    .TopN(1)
+                    .FirstOrDefault();
+
+                if (currentChannelSettings == null)
+                {
+                    _logger.LogWarning("No WebChannelSettings found for channel ID {ChannelId}. Skipping email send.", currentWebsiteID);
+                    return;
+                }
+
+                var emailFromValue = EmailInfoProvider.Get()
+                    .WhereEquals(nameof(EmailInfo.DisplayName), EmailKey)
+                    .WhereEquals(nameof(EmailInfo.EmailSettingsWebChannelSettingID), currentChannelSettings.WebChannelSettingsID)
+                    .TopN(1)
+                    .GetEnumerableTypedResult()
+                    .FirstOrDefault()?.FromEmail;
+
+                fromEmail = !string.IsNullOrWhiteSpace(emailFromValue) ? emailFromValue : null;
+            }
+
+            if (string.IsNullOrWhiteSpace(fromEmail))
+            {
+                _logger.LogWarning("No 'From' email configured in EmailInfo settings. Skipping email send.");
+                return;
+            }
+
             var email = new EmailMessage
             {
-                From = "no-reply@yourdomain.com",
+                From = fromEmail,
                 Recipients = person.PersonEmail,
                 Subject = Convert.ToString(formDataItem.GetValue("title")),
                 Body = body,
