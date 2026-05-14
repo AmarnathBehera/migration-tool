@@ -15,12 +15,13 @@ using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 
 [assembly: RegisterModule(typeof(FormHandlerModule))]
 
 namespace BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents;
 
-public class FormHandlerModule : Module
+public partial class FormHandlerModule : Module
 {
     private IHttpContextAccessor _httpContextAccessor;
     private ILogger<FormHandlerModule> _logger;
@@ -41,37 +42,44 @@ public class FormHandlerModule : Module
         BizFormItemEvents.Insert.After += FormItem_InsertAfterHandler;
     }
 
-    private void FormItem_InsertAfterHandler(object sender, BizFormItemEventArgs e)
+    private async void FormItem_InsertAfterHandler(object sender, BizFormItemEventArgs e)
     {
-        BizFormItem formDataItem = e.Item;
-        if (formDataItem == null)
-            return;
-
-        BizFormInfo formInfo = e.Item.BizFormInfo;
-        if (formInfo == null)
-            return;
-
-        switch (formInfo.FormName?.ToLowerInvariant())
+        try
         {
-            case "bdo_contactuswithsaveurl":
-                {
-                    formDataItem.SetValue("Url", GetReferrerUrl());
-                    formDataItem.Update();
-                    break;
-                }
-
-            case "bdo_contactpeoplewithemail":
-                {
-                    SendEmail(formDataItem);
-                    break;
-                }
-
-            default:
+            BizFormItem formDataItem = e.Item;
+            if (formDataItem == null)
                 return;
+
+            BizFormInfo formInfo = e.Item.BizFormInfo;
+            if (formInfo == null)
+                return;
+
+            switch (formInfo.FormName?.ToLowerInvariant())
+            {
+                case "bdo_contactuswithsaveurl":
+                    {
+                        formDataItem.SetValue("Url", GetReferrerUrl());
+                        formDataItem.Update();
+                        break;
+                    }
+
+                case "bdo_contactpeoplewithemail":
+                    {
+                        await SendEmailAsync(formDataItem).ConfigureAwait(false);
+                        break;
+                    }
+
+                default:
+                    return;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to handle form item insert event.");
         }
     }
 
-    private void SendEmail(BizFormItem formDataItem)
+    private async Task SendEmailAsync(BizFormItem formDataItem)
     {
         try
         {
@@ -91,7 +99,7 @@ public class FormHandlerModule : Module
             string pathWithoutCulture = RemoveCultureFromPath(nodeAliasPath);
 
             string[] parts = nodeAliasPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            string culture = parts.Length > 0 && Regex.IsMatch(parts[0], @"^[a-zA-Z]{2}-[a-zA-Z]{2}$")
+            string culture = parts.Length > 0 && CultureRegex().IsMatch(parts[0])
                 ? NormalizeCulture(parts[0])
                 : "en-GB";
 
@@ -99,7 +107,7 @@ public class FormHandlerModule : Module
             if (string.IsNullOrWhiteSpace(personTitle))
                 return;
 
-            var person = GetPersonSafely(pathWithoutCulture, culture);
+            var person = await GetPersonSafelyAsync(pathWithoutCulture, culture).ConfigureAwait(false);
 
             if (person == null || string.IsNullOrWhiteSpace(person.PersonEmail))
                 return;
@@ -132,9 +140,7 @@ public class FormHandlerModule : Module
             using (var scope = _scopeFactory.CreateScope())
             {
                 var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
-                emailService.SendEmail(email)
-                    .GetAwaiter()
-                    .GetResult();
+                await emailService.SendEmail(email).ConfigureAwait(false);
             }
         }
         catch (Exception ex)
@@ -143,7 +149,7 @@ public class FormHandlerModule : Module
         }
     }
 
-    private Person GetPersonSafely(string pathWithoutCulture, string culture)
+    private async Task<Person> GetPersonSafelyAsync(string pathWithoutCulture, string culture)
     {
         try
         {
@@ -153,10 +159,10 @@ public class FormHandlerModule : Module
             using var scope = _scopeFactory.CreateScope();
             var contentService = scope.ServiceProvider.GetRequiredService<IContentService>();
 
-            var people = contentService.RetrievePagesAsync<Person>(
+            var people = await contentService.RetrievePagesAsync<Person>(
                 new RetrievePagesParameters(),
                 query => query.Where(w => w.WhereEquals("WebPageItemTreePath", pathWithoutCulture)).TopN(1),
-                CancellationToken.None).GetAwaiter().GetResult();
+                CancellationToken.None).ConfigureAwait(false);
 
             return people?.FirstOrDefault();
         }
@@ -171,7 +177,7 @@ public class FormHandlerModule : Module
     }
 
     private string GetReferrerUrl()
-        => _httpContextAccessor?.HttpContext?.Request.Headers["Referer"].ToString()
+        => _httpContextAccessor?.HttpContext?.Request.Headers.Referer.ToString()
            ?? string.Empty;
 
     private static string RemoveCultureFromPath(string nodeAliasPath)
@@ -179,8 +185,7 @@ public class FormHandlerModule : Module
         if (string.IsNullOrWhiteSpace(nodeAliasPath))
             return string.Empty;
 
-        return Regex.Replace(nodeAliasPath, @"^/[a-z]{2}-[a-z]{2}", string.Empty,
-            RegexOptions.IgnoreCase);
+        return CulturePrefixRegex().Replace(nodeAliasPath, string.Empty);
     }
 
     private static string NormalizeCulture(string culture)
@@ -191,4 +196,10 @@ public class FormHandlerModule : Module
         var parts = culture.Split('-');
         return $"{parts[0].ToLowerInvariant()}-{parts[1].ToUpperInvariant()}";
     }
+
+    [GeneratedRegex(@"^[a-zA-Z]{2}-[a-zA-Z]{2}$")]
+    private static partial Regex CultureRegex();
+
+    [GeneratedRegex(@"^/[a-z]{2}-[a-z]{2}", RegexOptions.IgnoreCase)]
+    private static partial Regex CulturePrefixRegex();
 }
