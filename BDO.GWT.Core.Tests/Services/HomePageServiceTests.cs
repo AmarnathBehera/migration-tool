@@ -225,7 +225,7 @@ namespace BDO.GWT.Core.Tests.Services
                 .Setup(x => x.RetrievePagesAsync<TrendingTopics>(It.IsAny<CancellationToken>()))
                 .ReturnsAsync((IEnumerable<TrendingTopics>?)null);
 
-            var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(new HomePage(), CancellationToken.None);
 
             Assert.That(result, Is.Null);
         }
@@ -243,7 +243,7 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync((IEnumerable<TrendingTopic>?)null);
 
-            var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(new HomePage() , CancellationToken.None);
 
             Assert.That(result, Is.Null);
         }
@@ -292,7 +292,7 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(trendingTopics);
 
-            var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(new HomePage(), CancellationToken.None);
 
 
             Assert.Multiple(() =>
@@ -355,7 +355,7 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(trendingTopics);
 
-            var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(new HomePage(), CancellationToken.None);
 
             Assert.That(result, Is.Not.Null);
             var tab = result.Tabs.First();
@@ -402,7 +402,7 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(trendingTopics);
 
-            var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(new HomePage(), CancellationToken.None);
 
             Assert.That(result, Is.Not.Null);
             var tab = result.Tabs.First();
@@ -449,7 +449,7 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(trendingTopics);
 
-            var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(new HomePage(), CancellationToken.None);
 
             Assert.That(result, Is.Not.Null);
 
@@ -500,7 +500,7 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(trendingTopics);
 
-            var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(new HomePage(), CancellationToken.None);
 
             Assert.That(result, Is.Not.Null);
 
@@ -550,7 +550,7 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(trendingTopics);
 
-            var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(new HomePage(), CancellationToken.None);
 
             Assert.That(result, Is.Not.Null);
 
@@ -580,7 +580,7 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<TrendingTopic>());
 
-            var result = await _service.RetrieveTrendingTopicsDtoAsync(CancellationToken.None);
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(new HomePage(), CancellationToken.None);
 
             Assert.Multiple(() =>
             {

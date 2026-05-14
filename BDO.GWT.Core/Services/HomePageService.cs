@@ -18,7 +18,7 @@ public interface IHomePageService
 
     Task<IEnumerable<HomeHeroSlideDto?>?> RetrieveHomeHeroSlidesDtoAsync(HomePage? homePage, CancellationToken cancellationToken);
 
-    Task<TrendingTopicsDto?> RetrieveTrendingTopicsDtoAsync(CancellationToken cancellationToken = default);
+    Task<TrendingTopicsDto?> RetrieveTrendingTopicsDtoAsync(HomePage? homePage,CancellationToken cancellationToken = default);
 
 
 }
@@ -45,20 +45,14 @@ public class HomePageService : IHomePageService
     {
        
 
-        var results = await _contentRetriever.GetPagesAsync<HomePage>(
-     new RetrievePagesParameters
+        var homePage = await _contentRetriever.RetrieveCurrentPageAsync<HomePage>(
+     new RetrieveCurrentPageParameters
      {
          LinkedItemsMaxLevel = 1
      },
-     query =>
-     {
-         query.Where(w =>
-             w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
-     },
-     RetrievalCacheSettings.CacheDisabled,
      cancellationToken);
 
-        var homePage = results.FirstOrDefault();
+
 
         if (homePage is null)
         {
@@ -66,8 +60,9 @@ public class HomePageService : IHomePageService
         }
 
         var homeHeroSlides = await RetrieveHomeHeroSlidesDtoAsync(homePage, cancellationToken);
-        var trendingTopics = await RetrieveTrendingTopicsDtoAsync(cancellationToken);
+        var trendingTopics = await RetrieveTrendingTopicsDtoAsync(homePage,cancellationToken);
 
+        
         return new HomeDto
         {
             HomeHeroSlides = homeHeroSlides,
@@ -103,27 +98,47 @@ public class HomePageService : IHomePageService
 
     public async Task<string?> GetHomePageUrl(CancellationToken cancellationToken)
     {
-        var homePage = await _contentRetriever.RetrievePagesAsync<HomePage>(cancellationToken);
+        var homePageUrl = await _contentRetriever.RetrieveCurrentPageAsync<HomePage>(
+            new RetrieveCurrentPageParameters { },cancellationToken
+            );
 
-        if (homePage == null)
+        if (homePageUrl == null)
         {
             return null;
         }
 
-        var homePageUrl = homePage.First().GetUrl().AbsoluteUrl;
+       
 
-        return homePageUrl;
+        return homePageUrl.GetUrl().AbsoluteUrl;
     }
 
 
-    public async Task<IEnumerable<HomeHeroSlideDto?>?> RetrieveHomeHeroSlidesDtoAsync(HomePage homePage, CancellationToken cancellationToken)
+    public async Task<IEnumerable<HomeHeroSlideDto?>?> RetrieveHomeHeroSlidesDtoAsync(HomePage? homePage, CancellationToken cancellationToken)
     {
+        if (homePage == null)
+        {
+            return  Enumerable.Empty<HomeHeroSlideDto>();
+        }
         try
         {
-            var homeHeroSlides = await _contentRetriever.RetrievePagesAsync<HomeHeroSlide>(new RetrievePagesParameters
+            var getHomeHeroContainer = await _contentRetriever.GetChildPagesByParentGuidAsync<HomeHeroSlides>(
+            homePage.SystemFields.WebPageItemID,
+            cancellationToken);
+            var homeHeroContainer = getHomeHeroContainer?.FirstOrDefault();
+
+            if (homeHeroContainer is null)
             {
-                LinkedItemsMaxLevel = 3
-            }, cancellationToken);
+                return Enumerable.Empty<HomeHeroSlideDto>();
+            }
+
+
+            var homeHeroSlides = await _contentRetriever.GetChildPagesByParentGuidAsync<HomeHeroSlide>(
+            homeHeroContainer.SystemFields.WebPageItemID,
+            cancellationToken);
+
+
+
+
 
             if (homeHeroSlides == null || !homeHeroSlides.Any())
             {
@@ -149,30 +164,38 @@ public class HomePageService : IHomePageService
 
             return homeHeroSlidesdto;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return null;
         }
     }
 
-    public async Task<TrendingTopicsDto?> RetrieveTrendingTopicsDtoAsync(CancellationToken cancellationToken = default)
+    public async Task<TrendingTopicsDto?> RetrieveTrendingTopicsDtoAsync(HomePage? homePage,CancellationToken cancellationToken = default)
     {
-        var trendingTopicsPage = await _contentRetriever.RetrievePagesAsync<TrendingTopics>(cancellationToken);
-
-        if (trendingTopicsPage is null)
+        if (homePage is null)
         {
-            return null;
+            return new TrendingTopicsDto();
         }
 
-        var trendingTopicPagesResult = await _contentRetriever.RetrievePagesAsync<TrendingTopic>(new RetrievePagesParameters
+        var trendingTopicsPage = await _contentRetriever.GetChildPagesByParentGuidAsync<TrendingTopics>(
+            homePage.SystemFields.WebPageItemID,
+            cancellationToken);
+        var trendingTopicPage = trendingTopicsPage?.FirstOrDefault();
+
+        if (trendingTopicPage is null)
         {
-            LinkedItemsMaxLevel = 3
-        },
-         cancellationToken);
+            return new TrendingTopicsDto();
+        }
+
+
+        var trendingTopicPagesResult = await _contentRetriever.GetChildPagesByParentGuidAsync<TrendingTopic>(
+        trendingTopicPage.SystemFields.WebPageItemID,
+        cancellationToken);
+        
 
         if (trendingTopicPagesResult is null)
         {
-            return null;
+            return new TrendingTopicsDto();
         }
 
         var trendingTopicPages = trendingTopicPagesResult.ToArray();
@@ -233,7 +256,7 @@ public class HomePageService : IHomePageService
 
           var dto = new TrendingTopicsDto
           {
-             Heading = trendingTopicsPage.FirstOrDefault()?.Heading,
+             Heading = trendingTopicsPage?.FirstOrDefault()?.Heading,
              Tabs = trendingTopicTabDtos,
           };
 
