@@ -10,7 +10,7 @@
 
             public const string Button = WidgetPrefix + "Button";
 
-            public const string ExternalNavigation = WidgetPrefix + "ExternalNavigation";
+            public const string ExternalNavigationWidget = WidgetPrefix + "ExternalNavigation";
 
             public const string Imagewithtext = WidgetPrefix + "ImageWithText";
 
@@ -26,6 +26,8 @@
 
             public const string AccordionWidget = WidgetPrefix + "AccordionWidget";
             public const string Form = "Kentico.FormWidget";
+
+            public const string LocalNavigation = WidgetPrefix + "LocalNavigationItem";
 
         }
 
