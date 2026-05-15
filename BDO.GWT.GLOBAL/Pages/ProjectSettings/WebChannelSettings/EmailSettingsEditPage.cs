@@ -35,6 +35,7 @@ public class EmailEditPage : InfoEditPage<EmailInfo>
             var newEmailInfo = new EmailInfo
             {
                 EmailSettingsWebChannelSettingID = WebChannelSettingsId,
+                DisplayName = $"email_settings_{WebChannelSettingsId}",
                 FromEmail = string.Empty
             };
             EmailInfoProvider.Set(newEmailInfo);
