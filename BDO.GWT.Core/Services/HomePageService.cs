@@ -256,7 +256,7 @@ public class HomePageService : IHomePageService
 
           var dto = new TrendingTopicsDto
           {
-             Heading = trendingTopicsPage.FirstOrDefault().Heading,
+             Heading = trendingTopicsPage?.FirstOrDefault()?.Heading,
              Tabs = trendingTopicTabDtos,
           };
 
