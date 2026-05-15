@@ -27,7 +27,7 @@ namespace BDO
         /// Type information.
         /// </summary>
 #warning "You will need to configure the type info."
-        public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(IInfoProvider<EmailInfo>), OBJECT_TYPE, "BDO.Email", "EmailID", null, null, "EmailID", "EmailID", null, null, null)
+        public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(IInfoProvider<EmailInfo>), OBJECT_TYPE, "BDO.Email", "EmailID", null, null, "DisplayName", "DisplayName", null, null, null)
         {
             TouchCacheDependencies = true,
             DependsOn = new List<ObjectDependency>()
