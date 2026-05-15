@@ -5,7 +5,7 @@ using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
 namespace BDO.GWT.Core.DTOs;
     public class HomeDto
     {
-        public IEnumerable<HomeHeroSlideDto>? HomeHeroSlides { get; set; }
+        public IEnumerable<HomeHeroSlideDto?>? HomeHeroSlides { get; set; }
 
         public TrendingTopicsDto? TrendingTopics { get; set; }
 
