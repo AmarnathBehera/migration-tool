@@ -41,7 +41,9 @@ public class EmailEditPage : InfoEditPage<EmailInfo>
 
             return newEmailInfo.EmailID;
         }
-        set { }
+        // ObjectId is derived from WebChannelSettingsId; the setter is required
+        // by the base contract but the supplied value is intentionally ignored.
+        set => _ = value;
     }
 
     public EmailEditPage(

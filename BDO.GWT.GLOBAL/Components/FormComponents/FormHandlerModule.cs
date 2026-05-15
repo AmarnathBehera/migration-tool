@@ -131,42 +131,7 @@ public partial class FormHandlerModule : Module
                 <p><strong>Message:</strong></p>
                 <p>{formDataItem.GetStringValue("description", string.Empty)}</p>";
 
-            string fromEmail;
-            using (var scope = _scopeFactory.CreateScope())
-            {
-                var websiteChannelContext = scope.ServiceProvider.GetRequiredService<IWebsiteChannelContext>();
-                var webChannelSettingsInfoProvider = scope.ServiceProvider.GetRequiredService<IInfoProvider<WebChannelSettingsInfo>>();
-                var EmailInfoProvider = scope.ServiceProvider.GetRequiredService<IInfoProvider<EmailInfo>>();
-
-                int currentWebsiteID = websiteChannelContext.WebsiteChannelID;
-                if (currentWebsiteID <= 0)
-                {
-                    _logger.LogWarning("Current website channel ID is not available. Skipping email send.");
-                    return;
-                }
-
-                var currentChannelSettings = webChannelSettingsInfoProvider
-                    .Get()
-                    .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), currentWebsiteID)
-                    .TopN(1)
-                    .FirstOrDefault();
-
-                if (currentChannelSettings == null)
-                {
-                    _logger.LogWarning("No WebChannelSettings found for channel ID {ChannelId}. Skipping email send.", currentWebsiteID);
-                    return;
-                }
-
-                var emailFromValue = EmailInfoProvider.Get()
-                    .WhereEquals(nameof(EmailInfo.DisplayName), EmailKey)
-                    .WhereEquals(nameof(EmailInfo.EmailSettingsWebChannelSettingID), currentChannelSettings.WebChannelSettingsID)
-                    .TopN(1)
-                    .GetEnumerableTypedResult()
-                    .FirstOrDefault()?.FromEmail;
-
-                fromEmail = !string.IsNullOrWhiteSpace(emailFromValue) ? emailFromValue : null;
-            }
-
+            string fromEmail = ResolveFromEmailForCurrentChannel();
             if (string.IsNullOrWhiteSpace(fromEmail))
             {
                 _logger.LogWarning("No 'From' email configured in EmailInfo settings. Skipping email send.");
@@ -192,6 +157,40 @@ public partial class FormHandlerModule : Module
         {
             _logger.LogError(ex, "Failed to process contact people form submission.");
         }
+    }
+
+    private string ResolveFromEmailForCurrentChannel()
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var websiteChannelContext = scope.ServiceProvider.GetRequiredService<IWebsiteChannelContext>();
+        var webChannelSettingsInfoProvider = scope.ServiceProvider.GetRequiredService<IInfoProvider<WebChannelSettingsInfo>>();
+        var emailInfoProvider = scope.ServiceProvider.GetRequiredService<IInfoProvider<EmailInfo>>();
+
+        int currentWebsiteID = websiteChannelContext.WebsiteChannelID;
+        if (currentWebsiteID <= 0)
+        {
+            _logger.LogWarning("Current website channel ID is not available. Skipping email send.");
+            return null;
+        }
+
+        var currentChannelSettings = webChannelSettingsInfoProvider
+            .Get()
+            .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), currentWebsiteID)
+            .TopN(1)
+            .FirstOrDefault();
+
+        if (currentChannelSettings == null)
+        {
+            _logger.LogWarning("No WebChannelSettings found for channel ID {ChannelId}. Skipping email send.", currentWebsiteID);
+            return null;
+        }
+
+        return emailInfoProvider.Get()
+            .WhereEquals(nameof(EmailInfo.DisplayName), EmailKey)
+            .WhereEquals(nameof(EmailInfo.EmailSettingsWebChannelSettingID), currentChannelSettings.WebChannelSettingsID)
+            .TopN(1)
+            .GetEnumerableTypedResult()
+            .FirstOrDefault()?.FromEmail;
     }
 
     private async Task<Person> GetPersonSafelyAsync(string pathWithoutCulture, string culture)

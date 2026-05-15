@@ -64,8 +64,11 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
                 BindingFlags.Instance | BindingFlags.Public);
 
             Assert.That(prop, Is.Not.Null);
-            Assert.That(prop!.PropertyType, Is.EqualTo(typeof(int)));
-            Assert.That(prop.GetCustomAttribute<PageParameterAttribute>(), Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(prop!.PropertyType, Is.EqualTo(typeof(int)));
+                Assert.That(prop.GetCustomAttribute<PageParameterAttribute>(), Is.Not.Null);
+            });
         }
 
         [Test]
