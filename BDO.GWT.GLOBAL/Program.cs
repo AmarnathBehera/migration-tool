@@ -131,13 +131,13 @@ builder.Services.AddAdminExternalAuthenticationProvider(
         options.UserSynchronizationFrequency = UserSynchronizationFrequency.Always;
     }
 );
-if (builder.Environment.IsDevelopment())
-{
+//if (builder.Environment.IsDevelopment())
+//{
     builder.Services.Configure<AdminIdentityOptions>(options =>
     {
         options.AuthenticationOptions.Mode = AdminAuthenticationMode.MaintainForms;
     });
-}
+//}
 
 // Add Application Insights telemetry
 builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
@@ -156,10 +156,6 @@ app.UseKentico();
 
 app.Kentico().MapRoutes();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=About}/{action=Index}/{id?}"
-);
 app.MapControllerRoute(
     name: "default",
     pattern: $"{{{WebPageRoutingOptions.LANGUAGE_ROUTE_VALUE_KEY}}}/{{controller}}/{{action}}",
