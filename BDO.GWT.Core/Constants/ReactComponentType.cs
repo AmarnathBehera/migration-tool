@@ -35,7 +35,8 @@ public static class ReactComponentType
     public const string MultiLinksCardsGrid = "MultiLinksCardsGrid";
     public const string IndustryPrimary = "IndustryPrimary";
     public const string ServiceContent = "ServiceContent";
-    
+    public const string CareerDetails = "CareerDetails";
+
 
     //Below are the guid constants for the above components.
     public const string QuoteCardWidgetGUID = "5c570fe5-fc60-4efd-b7eb-7da977e486ab";

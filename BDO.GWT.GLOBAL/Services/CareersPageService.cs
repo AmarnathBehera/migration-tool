@@ -1,4 +1,5 @@
-﻿using BDO.GWT.Core;
+﻿using BDO.GWT.Common.Core.Exceptions;
+using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.ValueObjects;
@@ -17,7 +18,7 @@ namespace BDO.GWT.Web.Core.Services;
 public interface ICareersPageService
 {
     public Task<CareersPageDto> GetCareersPageDtoAsync(CancellationToken cancellationToken);
-    Task<PaginationDto<CareerCardDto>> GetCareerPaginationResultAsync(int pageGuid,  CancellationToken cancellationToken);
+    Task<PaginationDto<CareerCardDto>> GetCareerPaginationResultAsync(Guid pageGuid,  CancellationToken cancellationToken);
 }
     public class CareersPageService:ICareersPageService
     {
@@ -25,13 +26,14 @@ public interface ICareersPageService
     private readonly IHeroService _heroService;
     private readonly IContentService _contentRetriever;
     private readonly IWebsiteChannelContext _websiteChannelContext;
+    private readonly IContentRetriever _retriever;
 
-    public CareersPageService(IHeroService heroService,IContentService contentRetriever, IWebsiteChannelContext websiteChannelContext)
+    public CareersPageService(IHeroService heroService,IContentService contentRetriever, IWebsiteChannelContext websiteChannelContext, IContentRetriever retriever)
     {
         _heroService = heroService;
         _contentRetriever = contentRetriever;
         _websiteChannelContext = websiteChannelContext;
-
+        _retriever = retriever;
     }
     public async Task<CareersPageDto> GetCareersPageDtoAsync(CancellationToken cancellationToken)
     {
@@ -75,25 +77,47 @@ public interface ICareersPageService
         return dto;
     }
 
-    public async Task<PaginationDto<CareerCardDto>> GetCareerPaginationResultAsync(int pageGuid,  CancellationToken cancellationToken)
+    public async Task<PaginationDto<CareerCardDto>> GetCareerPaginationResultAsync(Guid pageGuid,  CancellationToken cancellationToken)
     {
-        var childpages = await _contentRetriever.GetChildPagesByParentGuidAsync<Career>(pageGuid);
+        var careersPage = await _retriever.RetrievePages<Careers>(
+                new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
+            query =>
+            {
 
-        //if (careersPage is null)
-        //{
-        //    throw new MissingSectionPageException($"'{nameof(Blog)} page with GUID '{pageGuid}' not found.");
-        //}
-        var itemdata = childpages.Select(page => new CareerCardDto()
+                query.Where(w => w.WhereEquals("WebPageItemGUID", pageGuid));
+
+            },
+                cacheSettings: RetrievalCacheSettings.CacheDisabled,
+                cancellationToken: cancellationToken
+            );
+
+        var careerPages = await _retriever.RetrievePages<Career>(
+                new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
+            query =>
+            {
+
+                query.Where(w => w.WhereEquals("WebPageItemParentID", careersPage.FirstOrDefault().SystemFields.WebPageItemID));
+                     
+            },
+                cacheSettings: RetrievalCacheSettings.CacheDisabled, 
+                cancellationToken: cancellationToken
+            );
+
+        if (careerPages is null)
+        {
+            throw new MissingSectionPageException($"'{nameof(Career)} page with GUID '{pageGuid}' not found.");
+        }
+        var itemdata = careerPages.Select(page => new CareerCardDto()
         {
             ImageURL = page.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset.Url,
             ImageAltText = page.MetadataTeaserImageAltText,
             Title = page.MetadataTitle,
             JobTitle = page?.MetadataTitle,
-            //Reference = page.CareerReference,
-            //EmploymentType = careerEmploymentTypeById.TryGetValue(career.CareerEmploymentType, out var careerEmploymentType) ? careerEmploymentType.Name : null,
+            Reference = page.CareerReference,
+            //EmploymentType = page.CareerEmploymentType,
             //Level = careerLevelById.TryGetValue(career.CareerLevel, out var careerLevel) ? careerLevel.Name : null,
             //Locations = career.MetadataOfficeLocation.Select(id => locationOfficeNameById.GetValueOrDefault(id)).OfType<string>().ToArray(),
-            //PublishDate = career.PublishFrom,
+            PublishDate = page.DocumentPublishFrom,
             //ApplyURL = relativeUrlByNodeId[career.NodeID].ToHtmlCompatibleString(),
             //JobTitleURL = parentPageUrl is not null && careerJobTitle is not null ? $"{parentPageUrl}?careerJobTitle={careerJobTitle.CodeName}" : null,
         }).ToArray();
@@ -101,7 +125,7 @@ public interface ICareersPageService
         var paginationDto = new PaginationDto<CareerCardDto>
         {
             Data = itemdata,
-            TotalCount = childpages.Count()
+            TotalCount = careerPages.Count()
         };
 
         return paginationDto;
