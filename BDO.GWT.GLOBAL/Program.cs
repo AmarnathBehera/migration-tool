@@ -130,13 +130,13 @@ builder.Services.AddAdminExternalAuthenticationProvider(
         options.UserSynchronizationFrequency = UserSynchronizationFrequency.Always;
     }
 );
-if (builder.Environment.IsDevelopment())
-{
+//if (builder.Environment.IsDevelopment())
+//{
     builder.Services.Configure<AdminIdentityOptions>(options =>
     {
         options.AuthenticationOptions.Mode = AdminAuthenticationMode.MaintainForms;
     });
-}
+//}
 
 // Add Application Insights telemetry
 builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
