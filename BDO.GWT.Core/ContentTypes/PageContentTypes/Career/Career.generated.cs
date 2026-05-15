@@ -36,24 +36,6 @@ namespace BDO
 
 
 		/// <summary>
-		/// ShowPrintButton.
-		/// </summary>
-		public bool ShowPrintButton { get; set; }
-
-
-		/// <summary>
-		/// DownloadButtonAttachment.
-		/// </summary>
-		public IEnumerable<ContentAttachment> DownloadButtonAttachment { get; set; }
-
-
-		/// <summary>
-		/// ShowSocialMediaButtons.
-		/// </summary>
-		public bool ShowSocialMediaButtons { get; set; }
-
-
-		/// <summary>
 		/// DocumentPublishFrom.
 		/// </summary>
 		public DateTime DocumentPublishFrom { get; set; }
@@ -68,7 +50,7 @@ namespace BDO
 		/// <summary>
 		/// CareerApplyForm.
 		/// </summary>
-		public IEnumerable<Guid> CareerApplyForm { get; set; }
+		public string CareerApplyForm { get; set; }
 
 
 		/// <summary>
@@ -110,7 +92,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataOfficeLocation.
 		/// </summary>
-		public string MetadataOfficeLocation { get; set; }
+		public IEnumerable<LocationOffice> MetadataOfficeLocation { get; set; }
 
 
 		/// <summary>
@@ -141,6 +123,24 @@ namespace BDO
 		/// ShowSidebar.
 		/// </summary>
 		public bool ShowSidebar { get; set; }
+
+
+		/// <summary>
+		/// ShowPrintButton.
+		/// </summary>
+		public bool ShowPrintButton { get; set; }
+
+
+		/// <summary>
+		/// DownloadButtonAttachment.
+		/// </summary>
+		public IEnumerable<ContentAttachment> DownloadButtonAttachment { get; set; }
+
+
+		/// <summary>
+		/// ShowSocialMediaButtons.
+		/// </summary>
+		public bool ShowSocialMediaButtons { get; set; }
 
 
 		/// <summary>
