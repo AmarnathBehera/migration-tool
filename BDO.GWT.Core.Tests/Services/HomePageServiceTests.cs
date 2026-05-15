@@ -84,10 +84,10 @@ namespace BDO.GWT.Core.Tests.Services
 
             Assert.Multiple(() =>
             {
-                Assert.That(item.Title, Is.EqualTo("Slide1"));
-                Assert.That(item.Description, Is.EqualTo("Desc1"));
-                Assert.That(item.Button?.Title, Is.EqualTo("Click"));
-                Assert.That(item.Button?.URL, Is.EqualTo("/test"));
+                Assert.That(item?.Title, Is.EqualTo("Slide1"));
+                Assert.That(item?.Description, Is.EqualTo("Desc1"));
+                Assert.That(item?.Button?.Title, Is.EqualTo("Click"));
+                Assert.That(item?.Button?.URL, Is.EqualTo("/test"));
             });
         }
 
@@ -190,8 +190,8 @@ namespace BDO.GWT.Core.Tests.Services
 
             Assert.Multiple(() =>
             {
-                Assert.That(slide.Title, Is.EqualTo("Slide1"));
-                Assert.That(slide.Button, Is.Null);
+                Assert.That(slide?.Title, Is.EqualTo("Slide1"));
+                Assert.That(slide?.Button, Is.Null);
             });
         }
 
@@ -249,9 +249,9 @@ namespace BDO.GWT.Core.Tests.Services
 
             Assert.Multiple(() =>
             {
-                Assert.That(slide.Title, Is.EqualTo("Slide1"));
-                Assert.That(slide.ImageURL, Is.Null);
-                Assert.That(slide.ThumbnailImageURL, Is.Null);
+                Assert.That(slide?.Title, Is.EqualTo("Slide1"));
+                Assert.That(slide?.ImageURL, Is.Null);
+                Assert.That(slide?.ThumbnailImageURL, Is.Null);
             });
         }
 
@@ -372,9 +372,9 @@ namespace BDO.GWT.Core.Tests.Services
 
             Assert.Multiple(() =>
             {
-                Assert.That(slide.Title, Is.EqualTo("Slide1"));
-                Assert.That(slide.ImageURL, Is.Null);
-                Assert.That(slide.ThumbnailImageURL, Is.Null);
+                Assert.That(slide?.Title, Is.EqualTo("Slide1"));
+                Assert.That(slide?.ImageURL, Is.Null);
+                Assert.That(slide?.ThumbnailImageURL, Is.Null);
             });
         }
 
@@ -399,9 +399,13 @@ namespace BDO.GWT.Core.Tests.Services
                 homePage,
                 CancellationToken.None);
 
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result?.Heading, Is.Null);
-            Assert.That(result?.Tabs, Is.Empty);
+            Assert.Multiple(() => {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result?.Heading, Is.Null);
+                Assert.That(result?.Tabs, Is.Empty);
+                }
+            );
+            
         }
 
         [Test]
