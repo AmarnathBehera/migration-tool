@@ -68,7 +68,9 @@ builder.Services.AddKentico(features =>
 builder.Configuration.AddInMemoryCollection(
     builder.Configuration
         .GetSection("AzureStorageProviderSettings")
-        .GetChildren().ToDictionary(x => x.Key, x => x.Value)
+        .GetChildren()
+        .Where(x => x.Value != null)
+        .ToDictionary(x => x.Key, x => x.Value!)
 );
 builder.Services.Configure<WebEncoderOptions>(options =>
 {
@@ -98,7 +100,6 @@ builder.Services.AddScoped<ISiteContext, SiteContext>();
 builder.Services.AddScoped<ISiteConfigurationService, SiteConfigurationService>();
 builder.Services.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddXperience();
 builder.Services.AddControllersWithViews();
 builder.Services.AddXperienceCommunityLocalization();
 builder.Services.AddAdminExternalAuthenticationProvider(
