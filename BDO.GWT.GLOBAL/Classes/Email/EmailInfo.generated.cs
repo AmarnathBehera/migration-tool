@@ -27,7 +27,7 @@ namespace BDO
         /// Type information.
         /// </summary>
 #warning "You will need to configure the type info."
-        public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(IInfoProvider<EmailInfo>), OBJECT_TYPE, "BDO.Email", "EmailID", null, null, "DisplayName", "DisplayName", null, null, null)
+        public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(IInfoProvider<EmailInfo>), OBJECT_TYPE, "BDO.Email", "EmailID", null, null, "CodeName", "CodeName", null, null, null)
         {
             TouchCacheDependencies = true,
             DependsOn = new List<ObjectDependency>()
@@ -78,6 +78,17 @@ namespace BDO
         {
             get => ValidationHelper.GetString(GetValue(nameof(DisplayName)), String.Empty);
             set => SetValue(nameof(DisplayName), value);
+        }
+
+
+        /// <summary>
+        /// Code name.
+        /// </summary>
+        [DatabaseField]
+        public virtual string CodeName
+        {
+            get => ValidationHelper.GetString(GetValue(nameof(CodeName)), String.Empty);
+            set => SetValue(nameof(CodeName), value);
         }
 
 
