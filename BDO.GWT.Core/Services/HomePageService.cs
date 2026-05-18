@@ -2,7 +2,9 @@
 using BDO.GWT.Core;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
+using BDO.GWT.Core.Utilities;
 using CMS.ContentEngine;
+using CMS.Helpers;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
@@ -15,6 +17,10 @@ public interface IHomePageService
     Task<string?> GetHomePageUrl(CancellationToken cancellationToken);
 
     Task<IEnumerable<HomeHeroSlideDto?>?> RetrieveHomeHeroSlidesDtoAsync(HomePage? homePage, CancellationToken cancellationToken);
+
+    Task<TrendingTopicsDto?> RetrieveTrendingTopicsDtoAsync(HomePage? homePage,CancellationToken cancellationToken = default);
+
+
 }
 
 public class HomePageService : IHomePageService
@@ -37,38 +43,16 @@ public class HomePageService : IHomePageService
 
     public async Task<HomeDto?> GetHomePageDtoAsync(HomePage? page, CancellationToken cancellationToken = default)
     {
+       
 
-        //var webPageContext = _webPageDataContextRetriever.Retrieve();
-        //var channelName = webPageContext.WebPage.WebsiteChannelName;
-
-        //var queryBuilder = new ContentItemQueryBuilder()
-        //    .ForContentType(HomePage.CONTENT_TYPE_NAME, config => config
-        //        .ForWebsite(channelName)          // ← filters by current channel
-        //        .TopN(1));
-
-        //var options = new ContentQueryExecutionOptions
-        //{
-        //    ForPreview = _websiteChannelContext.IsPreview
-
-        //};
-
-        //var results = await _executor.GetMappedWebPageResult<HomePage>(
-        //    queryBuilder, options, cancellationToken);
-
-        var results = await _contentRetriever.GetPagesAsync<HomePage>(
-     new RetrievePagesParameters
+        var homePage = await _contentRetriever.RetrieveCurrentPageAsync<HomePage>(
+     new RetrieveCurrentPageParameters
      {
          LinkedItemsMaxLevel = 1
      },
-     query =>
-     {
-         query.Where(w =>
-             w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
-     },
-     RetrievalCacheSettings.CacheDisabled,
      cancellationToken);
 
-        var homePage = results.FirstOrDefault();
+
 
         if (homePage is null)
         {
@@ -76,12 +60,13 @@ public class HomePageService : IHomePageService
         }
 
         var homeHeroSlides = await RetrieveHomeHeroSlidesDtoAsync(homePage, cancellationToken);
-        //var trendingTopics = await RetrieveTrendingTopicsDtoAsync(homePage, cancellationToken);
+        var trendingTopics = await RetrieveTrendingTopicsDtoAsync(homePage,cancellationToken);
 
+        
         return new HomeDto
         {
             HomeHeroSlides = homeHeroSlides,
-            //TrendingTopics = trendingTopics
+            TrendingTopics = trendingTopics,
            
             BaseContent = new BaseContent
             {
@@ -113,27 +98,47 @@ public class HomePageService : IHomePageService
 
     public async Task<string?> GetHomePageUrl(CancellationToken cancellationToken)
     {
-        var homePage = await _contentRetriever.RetrievePagesAsync<HomePage>(cancellationToken);
+        var homePageUrl = await _contentRetriever.RetrieveCurrentPageAsync<HomePage>(
+            new RetrieveCurrentPageParameters { },cancellationToken
+            );
 
-        if (homePage == null)
+        if (homePageUrl == null)
         {
             return null;
         }
 
-        var homePageUrl = homePage.First().GetUrl().AbsoluteUrl;
+       
 
-        return homePageUrl;
+        return homePageUrl.GetUrl().AbsoluteUrl;
     }
 
 
-    public async Task<IEnumerable<HomeHeroSlideDto?>?> RetrieveHomeHeroSlidesDtoAsync(HomePage homePage, CancellationToken cancellationToken)
+    public async Task<IEnumerable<HomeHeroSlideDto?>?> RetrieveHomeHeroSlidesDtoAsync(HomePage? homePage, CancellationToken cancellationToken)
     {
+        if (homePage == null)
+        {
+            return  Enumerable.Empty<HomeHeroSlideDto>();
+        }
         try
         {
-            var homeHeroSlides = await _contentRetriever.RetrievePagesAsync<HomeHeroSlide>(new RetrievePagesParameters
+            var getHomeHeroContainer = await _contentRetriever.GetChildPagesByParentGuidAsync<HomeHeroSlides>(
+            homePage.SystemFields.WebPageItemID,
+            cancellationToken);
+            var homeHeroContainer = getHomeHeroContainer?.FirstOrDefault();
+
+            if (homeHeroContainer is null)
             {
-                LinkedItemsMaxLevel = 3
-            }, cancellationToken);
+                return Enumerable.Empty<HomeHeroSlideDto>();
+            }
+
+
+            var homeHeroSlides = await _contentRetriever.GetChildPagesByParentGuidAsync<HomeHeroSlide>(
+            homeHeroContainer.SystemFields.WebPageItemID,
+            cancellationToken);
+
+
+
+
 
             if (homeHeroSlides == null || !homeHeroSlides.Any())
             {
@@ -159,10 +164,103 @@ public class HomePageService : IHomePageService
 
             return homeHeroSlidesdto;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return null;
         }
+    }
+
+    public async Task<TrendingTopicsDto?> RetrieveTrendingTopicsDtoAsync(HomePage? homePage,CancellationToken cancellationToken = default)
+    {
+        if (homePage is null)
+        {
+            return new TrendingTopicsDto();
+        }
+
+        var trendingTopicsPage = await _contentRetriever.GetChildPagesByParentGuidAsync<TrendingTopics>(
+            homePage.SystemFields.WebPageItemID,
+            cancellationToken);
+        var trendingTopicPage = trendingTopicsPage?.FirstOrDefault();
+
+        if (trendingTopicPage is null)
+        {
+            return new TrendingTopicsDto();
+        }
+
+
+        var trendingTopicPagesResult = await _contentRetriever.GetChildPagesByParentGuidAsync<TrendingTopic>(
+        trendingTopicPage.SystemFields.WebPageItemID,
+        cancellationToken);
+        
+
+        if (trendingTopicPagesResult is null)
+        {
+            return new TrendingTopicsDto();
+        }
+
+        var trendingTopicPages = trendingTopicPagesResult.ToArray();
+
+        var trendingTopicTabDtos = await Task.WhenAll(trendingTopicPages.Select(async x => new TrendingTopicTabDto
+          {
+                Title = x?.Title,
+                ReadMoreLink = x?.CTANodeGuid?.FirstOrDefault()?.SystemFields?.WebPageUrlPath,
+                ImageURL = x?.ImageUrl.FirstOrDefault()?.ContentAttachmentAsset.Url,
+                ImageAltText = x?.ImageAltText,
+                Items = x?.FeaturedItems?.Select(item => item switch
+                    {
+                        IndustryService industryService => new TrendingTopicItemDto
+                    {
+                        Title = industryService.MetadataTitle,
+                        Description = HtmlHelper.ExtractTextFromHtml(industryService.MetadataDescription),
+                            ReadMoreLink = industryService.SystemFields?.WebPageUrlPath,
+
+
+                    },
+
+                    Industry industry => new TrendingTopicItemDto
+                    {
+                        Title = industry.MetadataTitle,
+                        Description = HtmlHelper.ExtractTextFromHtml(industry.MetadataDescription),
+                        ReadMoreLink = industry.SystemFields?.WebPageUrlPath
+                    },
+                        Service service => new TrendingTopicItemDto
+                        {
+                            Title = service.MetadataTitle,
+                            Description = HtmlHelper.ExtractTextFromHtml(service.MetadataDescription),
+                            ReadMoreLink = service.SystemFields?.WebPageUrlPath
+                        },
+                        ServiceArea serviceArea => new TrendingTopicItemDto
+                        {
+                            Title = serviceArea.MetadataTitle,
+                            Description = HtmlHelper.ExtractTextFromHtml(serviceArea.MetadataDescription),
+                            ReadMoreLink = serviceArea.SystemFields?.WebPageUrlPath
+                        },
+                        Sub_Service sub_Service => new TrendingTopicItemDto
+                        {
+                            Title = sub_Service.MetadataTitle,
+                            Description = HtmlHelper.ExtractTextFromHtml(sub_Service.MetadataDescription),
+                            ReadMoreLink = sub_Service.SystemFields?.WebPageUrlPath
+                        },
+                        _ => new TrendingTopicItemDto
+                    {
+                       Title = item.SystemFields?.WebPageItemName,
+                       ReadMoreLink = item.SystemFields?.WebPageUrlPath
+                    }
+
+
+
+                 }).ToList(),
+
+
+              }));
+
+          var dto = new TrendingTopicsDto
+          {
+             Heading = trendingTopicsPage?.FirstOrDefault()?.Heading,
+             Tabs = trendingTopicTabDtos,
+          };
+
+          return dto;
     }
 }
 

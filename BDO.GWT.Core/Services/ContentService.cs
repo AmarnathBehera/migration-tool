@@ -1,5 +1,6 @@
 ﻿namespace BDO.GWT.Core
 {
+    using BDO.GWT.Core.Services;
     using CMS.ContentEngine;
     using CMS.Helpers;
     using CMS.Websites;
@@ -24,6 +25,7 @@
         private readonly IContentRetriever _contentRetriever;
         private readonly IContentQueryExecutor _contentQueryExecutor;
         private readonly IContentQueryModelTypeMapper _contentQueryModelTypeMapper;
+        private readonly ICultureContext _cultureContext;
 
         // Default cache duration – override via constructor / options if needed.
         private static readonly TimeSpan DefaultCacheDuration = TimeSpan.FromMinutes(10);
@@ -34,7 +36,8 @@
             IProgressiveCache cache,
             IContentRetriever contentRetriever,
             IContentQueryExecutor contentQueryExecutor,
-            IContentQueryModelTypeMapper contentQueryModelTypeMapper
+            IContentQueryModelTypeMapper contentQueryModelTypeMapper,
+            ICultureContext cultureContext
             )
         {
             _executor = executor ?? throw new ArgumentNullException(nameof(executor));
@@ -43,6 +46,7 @@
             _contentRetriever = contentRetriever ?? throw new ArgumentNullException(nameof(contentRetriever));
             _contentQueryExecutor = contentQueryExecutor ?? throw new ArgumentNullException(nameof(contentQueryExecutor));
             _contentQueryModelTypeMapper = contentQueryModelTypeMapper ?? throw new ArgumentNullException(nameof(contentQueryModelTypeMapper));
+            _cultureContext = cultureContext;
         }
 
         /// <inheritdoc />
@@ -212,7 +216,8 @@
      Type[] types,
      int WebsiteChannelID,
      CancellationToken cancellationToken = default)
-        {
+
+        { 
             var results = new List<object>();
 
             foreach (var type in types)
@@ -225,10 +230,10 @@
                 {
                     throw new InvalidOperationException($"Cannot execute query for type {type.Name}");
                 }
-
                 Action<ContentItemQueryBuilder> configure = builder =>
                 {
-                    builder.Parameters(p =>
+                    var languageBuilder = builder.InLanguage(_cultureContext.CurrentLanguageTag, useLanguageFallbacks: false);
+                    languageBuilder.Parameters(p =>
                     {
                         p.Where(w => w.WhereEquals("ContentItemChannelID", WebsiteChannelID));
                     });
@@ -275,7 +280,7 @@
             query =>
                 {
                     // Filter by parent GUID
-                    query//.Where(w => w.WhereEquals("WebPageItemParentID", parentGuid))
+                    query.Where(w => w.WhereEquals("WebPageItemParentID", parentGuid))
                          .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder));
                 },
                 cacheSettings: RetrievalCacheSettings.CacheDisabled, // Use the predefined disabled cache

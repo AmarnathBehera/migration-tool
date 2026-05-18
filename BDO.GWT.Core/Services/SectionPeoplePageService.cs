@@ -36,15 +36,18 @@ public class SectionPeoplePageService : ISectionPeoplePageService
     private readonly IHeroService _heroService;
     private readonly IContentService _contentRetriever;
     private readonly IPeopleCardsService _peopleCardsService;
+    private readonly ICultureContext _cultureContext;
 
     public SectionPeoplePageService(
         IContentService pageRetriever,
         IHeroService heroService,
-        IPeopleCardsService peopleCardsService)
+        IPeopleCardsService peopleCardsService,
+        ICultureContext cultureContext)
     {
         _contentRetriever = pageRetriever;
         _heroService = heroService;
         _peopleCardsService = peopleCardsService;
+        _cultureContext = cultureContext;
     }
 
     public async Task<SectionPeopleDto> GetSectionPeoplePageDtoAsync(SectionPeoplePage page, CancellationToken cancellationToken)
@@ -86,7 +89,11 @@ public class SectionPeoplePageService : ISectionPeoplePageService
     public async Task<PaginationDto<PersonCardDto>> GetSectionPeoplePersonPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken)
     {
         var sectionPeople = (await _contentRetriever.GetPagesAsync<SectionPeoplePage>(
-           new RetrievePagesParameters { },
+            new RetrievePagesParameters
+            {
+                LanguageName = _cultureContext.CurrentLanguageTag, 
+                UseLanguageFallbacks = false
+            },
            query => query
                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
                .Where(w => w.WhereEquals("ContentItemGUID", pageGuid)),

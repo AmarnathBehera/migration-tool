@@ -60,10 +60,12 @@ public class IndustryPageService : IIndustryPageService
         };
 
         SideBoxDto? sidebox = page.ShowSideNavigation
-                ? await _pageUtility.GetSideboxDtoAsync<IndustryService>(
-                    page.SideboxTitle,
-                    page.SystemFields.WebPageItemID,
-                    industryServices => industryServices.MetadataTitle,
+         ? await _pageUtility.GetSideboxDtoAsync<IndustryService, Industry>(
+             sideboxTitle: page.SideboxTitle,
+             parentWebPageItemId: page.SystemFields.WebPageItemID,       // look for child IndustryService
+             siblingParentWebPageItemId: page.SystemFields.WebPageItemParentID, // fallback: sibling Industry
+             childTitleSelector: child => child.MetadataTitle,
+             siblingTitleSelector: sibling => sibling.MetadataTitle,
                     cancellationToken)
                 : null;
 

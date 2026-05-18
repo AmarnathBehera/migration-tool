@@ -1,12 +1,7 @@
 ﻿using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.services;
-using BDO.GWT.Web.Core.Services;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BDO.GWT.Core
 {
@@ -14,10 +9,12 @@ namespace BDO.GWT.Core
     public class PageUtility : IPageUtility
     {
         private readonly IContentService _contentService;
+        private readonly IWebPageUrlResolver _urlResolver;
 
-        public PageUtility(IContentService contentService)
+        public PageUtility(IContentService contentService, IWebPageUrlResolver urlResolver)
         {
             _contentService = contentService;
+            _urlResolver = urlResolver;
         }
 
         /// <summary>
@@ -33,29 +30,58 @@ namespace BDO.GWT.Core
         /// <param name="titleSelector">A function that picks the link text from each child page.</param>
         /// <param name="cancellationToken">Token to cancel the operation if needed.</param>
 
-        public async Task<SideBoxDto> GetSideboxDtoAsync<TPage>(
+        public async Task<SideBoxDto> GetSideboxDtoAsync<TChild, TSibling>(
             string sideboxTitle,
             int parentWebPageItemId,
-            Func<TPage, string> titleSelector,
+            int siblingParentWebPageItemId,
+            Func<TChild, string> childTitleSelector,
+            Func<TSibling, string> siblingTitleSelector,
             CancellationToken cancellationToken = default)
-            where TPage : class, IWebPageFieldsSource
+            where TChild : class, IWebPageFieldsSource
+            where TSibling : class, IWebPageFieldsSource
         {
-            var childPages = await _contentService.GetChildPagesByParentGuidAsync<TPage>(
+            var childPages = await _contentService.GetChildPagesByParentGuidAsync<TChild>(
                 parentWebPageItemId,
                 cancellationToken);
 
-            var linkDtos = childPages
+            var orderedChildren = childPages
                 .OrderBy(p => p.SystemFields.WebPageItemOrder)
-                .Select(p => new LinkItemDto
+                .ToList();
+
+            if (orderedChildren.Count > 0)
                 {
-                    Title = titleSelector(p),
-                    URL = p.GetUrl().RelativePath,
-                });
+                return new SideBoxDto
+                {
+                    Title = sideboxTitle,
+                    Links = orderedChildren.Select(p => new LinkItemDto
+                    {
+                        Title = childTitleSelector(p),
+                        URL = _urlResolver.GetRelativePath(p),
+                    }),
+                };
+            }
+
+            var siblingPages = await _contentService.GetChildPagesByParentGuidAsync<TSibling>(
+                siblingParentWebPageItemId,
+                cancellationToken);
+
+            var orderedSiblings = siblingPages
+                .OrderBy(p => p.SystemFields.WebPageItemOrder)
+                .ToList();
+
+            if (orderedSiblings.Count == 1)
+            {
+                orderedSiblings = new List<TSibling>();
+            }
 
             return new SideBoxDto
             {
                 Title = sideboxTitle,
-                Links = linkDtos,
+                Links = orderedSiblings.Select(p => new LinkItemDto
+                {
+                    Title = siblingTitleSelector(p),
+                    URL = _urlResolver.GetRelativePath(p),
+                }),
             };
         }
 
@@ -126,7 +152,7 @@ namespace BDO.GWT.Core
                 .Select(child => (
                     ParentID: child.SystemFields.WebPageItemParentID,
                     Title: childTitleSelector(child),
-                    Url: child.SystemFields.WebPageUrlPath
+                    Url: _urlResolver.GetRelativePath(child)
                 ))
                 .ToList();
 
@@ -148,7 +174,7 @@ namespace BDO.GWT.Core
                         Description = cardDescriptionSelector(category),
                         ImageURL = cardImageUrlSelector(category),
                         ImageAltText = cardImageAltTextSelector(category),
-                        Url = category.SystemFields.WebPageUrlPath,
+                        Url = _urlResolver.GetRelativePath(category),
                         ReadMoreLinks = readMoreLinks,
                     };
                 })

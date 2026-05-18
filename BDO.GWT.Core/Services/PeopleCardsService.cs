@@ -65,10 +65,11 @@ public class PeopleCardsService : IPeopleCardsService
         var order = cardsQuery.Order?.ToLower() ?? "asc";
 
         var people = await _contentService.RetrievePagesAsync<Person>(
-             new RetrievePagesParameters
-             {
-                 LanguageName = _cultureContext.CurrentLanguageTag
-             },
+               new RetrievePagesParameters
+               {
+                   LanguageName = _cultureContext.CurrentLanguageTag,
+                   UseLanguageFallbacks = false 
+               },
             query =>
             {
                 query.Where(w =>
