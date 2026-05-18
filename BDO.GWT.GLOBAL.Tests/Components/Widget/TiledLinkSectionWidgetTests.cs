@@ -1,5 +1,6 @@
-﻿using BDO.GWT.Core.Services.Widget;
-using BDO.GWT.Web.Core.LiveSite.Data;
+﻿using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.Services.Widget;
+using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWidget;
 using CMS.ContentEngine;
 using Kentico.Content.Web.Mvc;
@@ -31,8 +32,10 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
                 _tileContentServiceMock.Object
             );
 
-            _httpContext = new DefaultHttpContext();
-            _httpContext.RequestAborted = CancellationToken.None;
+            _httpContext = new DefaultHttpContext
+            {
+                RequestAborted = CancellationToken.None
+            };
 
             _widget.ViewComponentContext = new ViewComponentContext
             {
@@ -47,70 +50,103 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             };
         }
 
+        private static ComponentViewModel<TiledLinkSectionWidgetProperties> CreateModel(
+            TiledLinkSectionWidgetProperties properties)
+        {
+            var model = new ComponentViewModel<TiledLinkSectionWidgetProperties>();
+            typeof(ComponentViewModel<TiledLinkSectionWidgetProperties>)
+                .GetProperty("Properties")?.SetValue(model, properties);
+            return model;
+        }
+
         [Test]
-        public async Task InvokeAsync_WithNullOrEmptyProperties_UsesDefaults()
+        public async Task InvokeAsync_WithEmptyProperties_UsesDefaults()
         {
             // Arrange
             var properties = new TiledLinkSectionWidgetProperties
             {
-                TilePages = null
+                TilePagesIndustry = null,
+                TilePagesService = null
             };
-            var model = new ComponentViewModel<TiledLinkSectionWidgetProperties>();
-            typeof(ComponentViewModel<TiledLinkSectionWidgetProperties>)
-                .GetProperty("Properties")?.SetValue(model, properties);
+            var model = CreateModel(properties);
 
             // Act
             var result = await _widget.InvokeAsync(model);
-            var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as TiledLinkSectionData;
+            var dto = (result as ViewViewComponentResult)?.ViewData?.Model as TiledLinkSectionDto;
 
             // Assert defaults
-            Assert.That(viewModel, Is.Not.Null);
-            Assert.That(viewModel.Title, Is.Null);
-            Assert.That(viewModel.Description, Is.Null);
-            Assert.That(viewModel.BackgroundImageMediaFileGuid, Is.Null);
-            Assert.That(viewModel.BackgroundImageAltText, Is.Null.Or.Empty);
-            Assert.That(viewModel.TileNodeGuids, Is.Empty);
-            Assert.That(viewModel.Theme, Is.EqualTo("light")); // default
-            Assert.That(viewModel.SeeAllLinkText, Is.Null);
-            Assert.That(viewModel.SeeAllLinkURLTarget, Is.EqualTo("_self")); // default
-            Assert.That(viewModel.TopMargin, Is.Null);
-            Assert.That(viewModel.BottomMargin, Is.Null);
+            Assert.That(dto, Is.Not.Null);
+            Assert.That(dto.Title, Is.Null);
+            Assert.That(dto.Description, Is.Null);
+            Assert.That(dto.BackgroundImageURL, Is.Null);
+            Assert.That(dto.BackgroundImageAltText, Is.Null.Or.Empty);
+            Assert.That(dto.Items, Is.Empty);
+            Assert.That(dto.Theme, Is.EqualTo("light")); // default
+            Assert.That(dto.SeeAllLink, Is.Null);
+            Assert.That(dto.TopMargin, Is.Null);
+            Assert.That(dto.BottomMargin, Is.Null);
+            Assert.That(dto.WidgetID, Is.Null);
+
+            _tileContentServiceMock.Verify(
+                s => s.GetTilePagesAsync(It.IsAny<List<Guid>>(), It.IsAny<CancellationToken>()),
+                Times.Never);
         }
 
         [Test]
         public async Task InvokeAsync_WithAllProperties_SetsEverythingCorrectly()
         {
             // Arrange
+            var industryGuid = Guid.NewGuid();
+            var tilePages = new List<TilePageDto>
+            {
+                new() { Title = "Tile 1" }
+            };
+
+            _tileContentServiceMock
+                .Setup(s => s.GetTilePagesAsync(
+                    It.Is<List<Guid>>(g => g.Contains(industryGuid)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(tilePages);
+
             var properties = new TiledLinkSectionWidgetProperties
             {
                 Title = "Test Title",
                 Description = "Test Description",
+                BackgroundImageAltText = "Alt text",
+                TilePageType = "Industry",
+                TilePagesIndustry = new List<ContentItemReference>
+                {
+                    new() { Identifier = industryGuid }
+                },
                 Theme = "dark",
                 SeeAllLinkText = "See All",
                 SeeAllLinkURL = "/all",
                 SeeAllLinkURLTarget = "_blank",
                 TopMargin = "20px",
                 BottomMargin = "40px",
-                TilePages = new List<ContentItemReference>()
+                WidgetID = "tiled-link-section"
             };
 
-            var model = new ComponentViewModel<TiledLinkSectionWidgetProperties>();
-            typeof(ComponentViewModel<TiledLinkSectionWidgetProperties>)
-                .GetProperty("Properties")?.SetValue(model, properties);
+            var model = CreateModel(properties);
 
             // Act
             var result = await _widget.InvokeAsync(model);
-            var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as TiledLinkSectionData;
+            var dto = (result as ViewViewComponentResult)?.ViewData?.Model as TiledLinkSectionDto;
 
             // Assert
-            Assert.That(viewModel, Is.Not.Null);
-            Assert.That(viewModel.Title, Is.EqualTo("Test Title"));
-            Assert.That(viewModel.Description, Is.EqualTo("Test Description"));
-            Assert.That(viewModel.Theme, Is.EqualTo("dark"));
-            Assert.That(viewModel.SeeAllLinkText, Is.EqualTo("See All"));
-            Assert.That(viewModel.SeeAllLinkURLTarget, Is.EqualTo("_blank"));
-            Assert.That(viewModel.TopMargin, Is.EqualTo("20px"));
-            Assert.That(viewModel.BottomMargin, Is.EqualTo("40px"));
+            Assert.That(dto, Is.Not.Null);
+            Assert.That(dto.Title, Is.EqualTo("Test Title"));
+            Assert.That(dto.Description, Is.EqualTo("Test Description"));
+            Assert.That(dto.BackgroundImageAltText, Is.EqualTo("Alt text"));
+            Assert.That(dto.Theme, Is.EqualTo("dark"));
+            Assert.That(dto.Items, Is.EqualTo(tilePages));
+            Assert.That(dto.SeeAllLink, Is.Not.Null);
+            Assert.That(dto.SeeAllLink!.Title, Is.EqualTo("See All"));
+            Assert.That(dto.SeeAllLink.URL, Is.EqualTo("/all"));
+            Assert.That(dto.SeeAllLink.Target, Is.EqualTo("_blank"));
+            Assert.That(dto.TopMargin, Is.EqualTo("20px"));
+            Assert.That(dto.BottomMargin, Is.EqualTo("40px"));
+            Assert.That(dto.WidgetID, Is.EqualTo("tiled-link-section"));
         }
     }
 }
