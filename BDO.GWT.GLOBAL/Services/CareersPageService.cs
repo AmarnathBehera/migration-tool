@@ -40,7 +40,7 @@ public interface ICareersPageService
         var pages = await _contentRetriever.GetPagesAsync<Careers>(
             new RetrievePagesParameters
             {
-                LinkedItemsMaxLevel = 5
+                LinkedItemsMaxLevel = 1
             },
             query =>
             {
@@ -80,7 +80,7 @@ public interface ICareersPageService
     public async Task<PaginationDto<CareerCardDto>> GetCareerPaginationResultAsync(Guid pageGuid,  CancellationToken cancellationToken)
     {
         var careersPage = await _retriever.RetrievePages<Careers>(
-                new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
+                new RetrievePagesParameters { LinkedItemsMaxLevel = 2 },
             query =>
             {
 
@@ -116,7 +116,7 @@ public interface ICareersPageService
             Reference = page.CareerReference,
             //EmploymentType = page.CareerEmploymentType,
             //Level = careerLevelById.TryGetValue(career.CareerLevel, out var careerLevel) ? careerLevel.Name : null,
-            //Locations = career.MetadataOfficeLocation.Select(id => locationOfficeNameById.GetValueOrDefault(id)).OfType<string>().ToArray(),
+            Locations = page.MetadataOfficeLocation.Select(i => i.MetadataTitle).ToArray(),
             PublishDate = page.DocumentPublishFrom,
             //ApplyURL = relativeUrlByNodeId[career.NodeID].ToHtmlCompatibleString(),
             //JobTitleURL = parentPageUrl is not null && careerJobTitle is not null ? $"{parentPageUrl}?careerJobTitle={careerJobTitle.CodeName}" : null,

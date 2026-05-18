@@ -3,6 +3,7 @@ using BDO.GWT.Core.Data;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.DTOs;
 using CMS.ContentEngine;
+using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using System.Linq;
@@ -61,7 +62,7 @@ public interface ICareerDetailPageService
                 CallToActionButtonUrl = page.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath is string ctaPath ? Link.Parse(ctaPath) : null,
             }, cancellationToken),
             Content = await GetContentPageDtoAsync(page, cancellationToken),
-            //Form = page.CareerApplyForm,
+            Form = page.CareerApplyForm,
             Sidebar = page.ShowSidebar ? await GetCareerSidebarDtoAsync(page, cancellationToken) : null,
         };
  
@@ -85,14 +86,10 @@ public interface ICareerDetailPageService
         var careerLevelNames = careerLevelTags.Select(t => t.Name).ToList();
         var jobTitleNames = jobTitleTags.Select(t => t.Name).ToList();
 
-        //var locationOfficeNames = (await _locationOfficePageRetriever.RetrievePagesAsync(q =>
-        //{
-        //    q.Where(x => careerPage.MetadataOfficeLocation.Contains(x.NodeID));
-        //}, cancellationToken)).Select(x => x.MetadataTitle).ToArray();
-        //var contactPersonName = (await _personPageRetriever.RetrievePageAsync(q =>
-        //{
-        //    q.Where(x => x.ID == careerPage.CareerContactPeopleID);
-        //    }, cancellationToken))?.MetadataTitle;
+        var locationOfficeNames = careerPage.MetadataOfficeLocation.Select(i=> i.MetadataTitle).ToArray();
+
+
+        var contactPersonName = careerPage.CareerContactPeopleID.FirstOrDefault();
 
         var dto = new CareerContentDto
             {
@@ -101,9 +98,9 @@ public interface ICareerDetailPageService
                 Reference = careerPage.CareerReference,
             EmploymentType = employmentTypeNames?.FirstOrDefault(),
                 Level = careerLevelNames?.FirstOrDefault(),
-                Locations = ["locationOfficeNames"],
+                Locations = locationOfficeNames,
                 Content = careerPage.MetadataDescription,
-            ContactPerson = "contactPersonName",
+            ContactPerson = contactPersonName.MetadataTitle,
         };
 
             return dto;
@@ -119,7 +116,17 @@ public interface ICareerDetailPageService
 
         //sidebarDto.RelevantContactPeopleTitle = ResourceStringKey.LiveSite.Careers.RelevantContactPeople;
 
-        //sidebarDto.RelevantContactPeople = await GetRelevantContactPersonDtosAsync(careerPage, cancellationToken);
+        sidebarDto.RelevantContactPeople = careerPage.MetadataRelevantContactPerson.Select(i => new SidebarPersonDto
+        {
+            FullName = i.PersonFirstName + i.PersonLastName,
+            Image = new ImageDto { Url = i.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url, AltText = i.MetadataTeaserImageAltText },
+            JobTitle = i.PersonJobTitle,
+            Url = i.GetUrl().RelativePath
+
+
+
+        }).ToArray();
+
 
         return sidebarDto;
     }

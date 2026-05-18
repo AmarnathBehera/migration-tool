@@ -56,13 +56,13 @@ namespace BDO
 		/// <summary>
 		/// CareerContactPeopleID.
 		/// </summary>
-		public string CareerContactPeopleID { get; set; }
+		public IEnumerable<Person> CareerContactPeopleID { get; set; }
 
 
 		/// <summary>
 		/// MetadataRelevantContactPerson.
 		/// </summary>
-		public string MetadataRelevantContactPerson { get; set; }
+		public IEnumerable<Person> MetadataRelevantContactPerson { get; set; }
 
 
 		/// <summary>

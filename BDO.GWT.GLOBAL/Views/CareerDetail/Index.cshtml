@@ -7,6 +7,7 @@
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IFormBuilderService FormBuilder
 
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
@@ -53,11 +54,7 @@
         },
         Context.RequestAborted))
 </div>
-@Model.Content.EmploymentType
-@Model.Content.JobTitle
-@Model.Content.Content
-@Model.Content.Level
-@Model.Content.Title
+
 
 @* 
 @await Html.PartialAsync("_LocalNavigation") *@
@@ -68,17 +65,16 @@
                         pageId,
                         ReactComponentType.CareerDetails,
                         ReactComponentType.CareerDetailsGUID,
-                        new
-                        {
-                            data = Model.Content,
-                        },
+
+                            Model.Content,
+
                         Context.RequestAborted))
 
                         
             @if (!string.IsNullOrEmpty(Model.Form))
             {
                 <div class="career-form-container">
-                    @* @await FormBuilder.GetFormBuilderWidget(Html, Model.Form) *@
+                    @await FormBuilder.GetFormBuilderWidget(Html, Model.Form)
                 </div>
             }
         </div>
@@ -89,10 +85,9 @@
                     pageId,
                     "CareerSidebar",
                     ReactComponentType.CareerSidebarGUID,
-                    new
-                    {
-                        data = Model.Sidebar,
-                    },
+
+                        Model.Sidebar,
+
                     Context.RequestAborted))
             </div>
         }
