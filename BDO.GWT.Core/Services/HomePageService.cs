@@ -2,6 +2,7 @@
 using BDO.GWT.Core;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
+using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Utilities;
 using CMS.ContentEngine;
 using CMS.Helpers;
@@ -27,18 +28,12 @@ public class HomePageService : IHomePageService
 {
 
     private readonly IContentService _contentRetriever;
-    //private readonly IContentQueryExecutor _executor;
-    //private readonly IWebPageDataContextRetriever _webPageDataContextRetriever;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
-    public HomePageService(IContentService pageRetriever, 
-        //IContentQueryExecutor executor,
-        //IWebPageDataContextRetriever webPageDataContextRetriever, 
-        IWebsiteChannelContext websiteChannelContext)
+    private readonly ICultureContext _cultureContext;
+    public HomePageService(IContentService pageRetriever,
+        ICultureContext cultureContext)
     {
         _contentRetriever = pageRetriever;
-        //_executor = executor;
-        //_webPageDataContextRetriever = webPageDataContextRetriever;
-        _websiteChannelContext = websiteChannelContext;
+        _cultureContext = cultureContext;
     }
 
     public async Task<HomeDto?> GetHomePageDtoAsync(HomePage? page, CancellationToken cancellationToken = default)
@@ -98,20 +93,29 @@ public class HomePageService : IHomePageService
 
     public async Task<string?> GetHomePageUrl(CancellationToken cancellationToken)
     {
-        var homePageUrl = await _contentRetriever.RetrieveCurrentPageAsync<HomePage>(
-            new RetrieveCurrentPageParameters { },cancellationToken
-            );
+        var homePages = await _contentRetriever.RetrievePagesAsync<HomePage>(
+           new RetrievePagesParameters
+           {
+               LanguageName = _cultureContext.CurrentLanguageTag,
+           }, query =>
+           {
+               query.Where(w =>
+               {
+                   w.WhereEquals("ContentItemChannelID", _contentRetriever.GetCurrentChannelID());
+               });
+           },
+               cancellationToken
+        );
 
-        if (homePageUrl == null)
+        var homePage = homePages?.FirstOrDefault();
+
+        if (homePage == null)
         {
             return null;
         }
 
-       
-
-        return homePageUrl.GetUrl().AbsoluteUrl;
+        return homePage.GetUrl().AbsoluteUrl;
     }
-
 
     public async Task<IEnumerable<HomeHeroSlideDto?>?> RetrieveHomeHeroSlidesDtoAsync(HomePage? homePage, CancellationToken cancellationToken)
     {
