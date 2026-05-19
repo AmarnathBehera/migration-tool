@@ -31,20 +31,9 @@ public class CareerPageService  : ICareerPageService
 
     public async Task<CareerDto> GetCareerDtoAsync(CancellationToken cancellationToken)
     {
-        var pages = await _contentRetriever.GetPagesAsync<SectionCareers>(
-            new RetrievePagesParameters
-            {
-                LinkedItemsMaxLevel = 5
-            },
-            query =>
-            {
-                query.Where(w =>
-                    w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
-            },
-            RetrievalCacheSettings.CacheDisabled,
-            cancellationToken);
+        var page = await _contentRetriever.RetrieveCurrentPageAsync<SectionCareers>(new RetrieveCurrentPageParameters { },cancellationToken);
 
-        var careerpage = pages?.FirstOrDefault();
+        var careerpage = page;
 
         if (careerpage == null)
         {

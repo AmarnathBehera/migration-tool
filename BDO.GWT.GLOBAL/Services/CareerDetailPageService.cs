@@ -153,7 +153,7 @@ public interface ICareerDetailPageService
             DownloadButtonAttachment = true
                 ? null
                 : page.DownloadButtonAttachment?.FirstOrDefault()?.ContentAttachmentAsset.Url,
-            //SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page, cancellationToken) : null,
+            //SocialMediaButtons = page.ShowSocialMediaButtons ? await GetSocialMediaButtonsDto(page, cancellationToken) : null,
             ShowCopyLinkButton = true
         };
 
