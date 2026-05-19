@@ -1,4 +1,4 @@
-﻿using BDO.GWT.Common.Core.Exceptions;
+﻿using BDO.GWT.Common.Exceptions;
 using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;

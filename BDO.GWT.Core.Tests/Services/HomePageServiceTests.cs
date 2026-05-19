@@ -1,6 +1,6 @@
-﻿using CMS.ContentEngine;
+﻿using BDO.GWT.Core.Services;
+using CMS.ContentEngine;
 using CMS.Websites;
-using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Moq;
 
@@ -9,7 +9,7 @@ namespace BDO.GWT.Core.Tests.Services
     public class HomePageServiceTests
     {
         private Mock<IContentService> _contentServiceMock;
-        private Mock<IWebsiteChannelContext> _channelMock;
+        private Mock<ICultureContext> _cultureContextMock;
 
         private HomePageService _service;
 
@@ -18,14 +18,14 @@ namespace BDO.GWT.Core.Tests.Services
         {
             _contentServiceMock = new Mock<IContentService>();
 
-            _channelMock = new Mock<IWebsiteChannelContext>();
-            _channelMock
-                .Setup(x => x.WebsiteChannelID)
-                .Returns(1);
+            _cultureContextMock = new Mock<ICultureContext>();
+            _cultureContextMock
+                .Setup(x => x.CurrentLanguageTag)
+                .Returns("en-US");
 
             _service = new HomePageService(
                 _contentServiceMock.Object,
-                _channelMock.Object);
+                _cultureContextMock.Object);
         }
 
         [Test]
@@ -999,5 +999,6 @@ namespace BDO.GWT.Core.Tests.Services
 
 
     
+
 
 
