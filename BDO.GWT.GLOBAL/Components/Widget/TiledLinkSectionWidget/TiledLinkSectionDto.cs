@@ -1,4 +1,5 @@
-﻿using BDO.GWT.Core.DTOs;
+﻿#nullable enable
+using BDO.GWT.Core.DTOs;
 using System;
 using System.Collections.Generic;
 
@@ -14,15 +15,15 @@ public class TiledLinkSectionDto
 
     public string? BackgroundImageAltText { get; set; }
 
-    public List<TilePageDto> Items { get; set; }
+    public List<TilePageDto> Items { get; set; } = new();
 
     public string Theme { get; set; } = null!;
 
     public LinkItemDto? SeeAllLink { get; set; }
 
-    public string TopMargin { get; set; } = null!;
+    public string? TopMargin { get; set; }
 
-    public string BottomMargin { get; set; } = null!;
+    public string? BottomMargin { get; set; }
 
     public string? WidgetID { get; set; }
 }

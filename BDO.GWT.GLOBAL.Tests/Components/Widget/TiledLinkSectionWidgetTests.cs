@@ -76,16 +76,19 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 
             // Assert defaults
             Assert.That(dto, Is.Not.Null);
-            Assert.That(dto.Title, Is.Null);
-            Assert.That(dto.Description, Is.Null);
-            Assert.That(dto.BackgroundImageURL, Is.Null);
-            Assert.That(dto.BackgroundImageAltText, Is.Null.Or.Empty);
-            Assert.That(dto.Items, Is.Empty);
-            Assert.That(dto.Theme, Is.EqualTo("light")); // default
-            Assert.That(dto.SeeAllLink, Is.Null);
-            Assert.That(dto.TopMargin, Is.Null);
-            Assert.That(dto.BottomMargin, Is.Null);
-            Assert.That(dto.WidgetID, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(dto!.Title, Is.Null);
+                Assert.That(dto.Description, Is.Null);
+                Assert.That(dto.BackgroundImageURL, Is.Null);
+                Assert.That(dto.BackgroundImageAltText, Is.Null.Or.Empty);
+                Assert.That(dto.Items, Is.Empty);
+                Assert.That(dto.Theme, Is.EqualTo("light")); // default
+                Assert.That(dto.SeeAllLink, Is.Null);
+                Assert.That(dto.TopMargin, Is.Null);
+                Assert.That(dto.BottomMargin, Is.Null);
+                Assert.That(dto.WidgetID, Is.Null);
+            });
 
             _tileContentServiceMock.Verify(
                 s => s.GetTilePagesAsync(It.IsAny<List<Guid>>(), It.IsAny<CancellationToken>()),
@@ -135,18 +138,21 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 
             // Assert
             Assert.That(dto, Is.Not.Null);
-            Assert.That(dto.Title, Is.EqualTo("Test Title"));
-            Assert.That(dto.Description, Is.EqualTo("Test Description"));
-            Assert.That(dto.BackgroundImageAltText, Is.EqualTo("Alt text"));
-            Assert.That(dto.Theme, Is.EqualTo("dark"));
-            Assert.That(dto.Items, Is.EqualTo(tilePages));
-            Assert.That(dto.SeeAllLink, Is.Not.Null);
-            Assert.That(dto.SeeAllLink!.Title, Is.EqualTo("See All"));
-            Assert.That(dto.SeeAllLink.URL, Is.EqualTo("/all"));
-            Assert.That(dto.SeeAllLink.Target, Is.EqualTo("_blank"));
-            Assert.That(dto.TopMargin, Is.EqualTo("20px"));
-            Assert.That(dto.BottomMargin, Is.EqualTo("40px"));
-            Assert.That(dto.WidgetID, Is.EqualTo("tiled-link-section"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(dto!.Title, Is.EqualTo("Test Title"));
+                Assert.That(dto.Description, Is.EqualTo("Test Description"));
+                Assert.That(dto.BackgroundImageAltText, Is.EqualTo("Alt text"));
+                Assert.That(dto.Theme, Is.EqualTo("dark"));
+                Assert.That(dto.Items, Is.EqualTo(tilePages));
+                Assert.That(dto.SeeAllLink, Is.Not.Null);
+                Assert.That(dto.SeeAllLink!.Title, Is.EqualTo("See All"));
+                Assert.That(dto.SeeAllLink.URL, Is.EqualTo("/all"));
+                Assert.That(dto.SeeAllLink.Target, Is.EqualTo("_blank"));
+                Assert.That(dto.TopMargin, Is.EqualTo("20px"));
+                Assert.That(dto.BottomMargin, Is.EqualTo("40px"));
+                Assert.That(dto.WidgetID, Is.EqualTo("tiled-link-section"));
+            });
         }
     }
 }

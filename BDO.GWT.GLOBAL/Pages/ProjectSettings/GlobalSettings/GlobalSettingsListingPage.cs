@@ -12,17 +12,15 @@ public class GlobalSettingsListingPage : ListingPage
 
     public override async Task ConfigurePage()
     {
-       
-            System.Collections.Generic.IList<ColumnConfiguration> columnConfigurations = PageConfiguration.ColumnConfigurations
-                        .AddColumn(nameof(GlobalsettingskeyInfo.GlobalSettingsKeyDisplayName), "Display name")
-                        .AddColumn(nameof(GlobalsettingskeyInfo.GlobalSettingsKeyValue), "Value")
-                        .AddColumn(nameof(GlobalsettingskeyInfo.GlobalSettingsKeyNote), "Note")
-                        .AddColumn(nameof(GlobalsettingskeyInfo.GlobalSettingsKeyName), "Code name");
+        PageConfiguration.ColumnConfigurations
+            .AddColumn(nameof(GlobalsettingskeyInfo.GlobalSettingsKeyDisplayName), "Display name")
+            .AddColumn(nameof(GlobalsettingskeyInfo.GlobalSettingsKeyValue), "Value")
+            .AddColumn(nameof(GlobalsettingskeyInfo.GlobalSettingsKeyNote), "Note")
+            .AddColumn(nameof(GlobalsettingskeyInfo.GlobalSettingsKeyName), "Code name");
 
-            PageConfiguration.AddEditRowAction<GlobalSettingsEditSection>();
-            PageConfiguration.TableActions.AddDeleteAction(nameof(Delete));
-            await base.ConfigurePage();
-        
+        PageConfiguration.AddEditRowAction<GlobalSettingsEditSection>();
+        PageConfiguration.TableActions.AddDeleteAction(nameof(Delete));
+        await base.ConfigurePage();
     }
 
     // Ensure only a user with permissions to delete can perform the delete action.

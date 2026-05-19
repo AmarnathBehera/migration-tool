@@ -67,7 +67,7 @@ namespace BDO.GWT.Core.Services.Widget
               ? HtmlHelper.ExtractTextFromHtml(rawDescription) : null;
 
 
-                string url = null;
+                string? url = null;
 
                 if (item is IWebPageFieldsSource webPage)
                 {
@@ -82,7 +82,7 @@ namespace BDO.GWT.Core.Services.Widget
                     ReadMoreLink = new LinkItemDto
                     {
                         Title = ResourceStringKey.LiveSite.ReadMore,
-                        URL = url,
+                        URL = url ?? string.Empty,
                     },
                 });
             }
