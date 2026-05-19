@@ -8,9 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings
-{
-    public class CookiebootEditPage : ModelEditPage<CookiebotDTO>
+namespace BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
+[UIEvaluatePermission("Administrator")]
+ public class CookiebootEditPage : ModelEditPage<CookiebotDTO>
     {
         private readonly IInfoProvider<CookiebotInfo> provider;
         private CookiebotDTO model;
@@ -116,4 +116,3 @@ namespace BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings
             return response;
         }
     }
-}

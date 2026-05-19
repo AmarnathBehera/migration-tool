@@ -63,11 +63,26 @@ using Kentico.Xperience.Admin.Base;
 
 [assembly: UIPage(
     parentType: typeof(WebChannelSettingsEditSection),
+    slug: "Email",
+    uiPageType: typeof(EmailEditPage),
+    name: "Email settings",
+    templateName: TemplateNames.EDIT,
+    order: 6)]
+[assembly: UIPage(
+    parentType: typeof(WebChannelSettingsEditSection),
+    slug: "General",
+    uiPageType: typeof(GeneralSettingsEditPage),
+    name: "General Settings",
+    templateName: TemplateNames.EDIT,
+    order: 6)]
+
+[assembly: UIPage(
+    parentType: typeof(WebChannelSettingsEditSection),
     slug: "edit",
     uiPageType: typeof(SeoSettingsEditPage),
     name: "SEO settings",
     templateName: TemplateNames.EDIT,
-    order: 0)]
+    order: 5)]
 
 [assembly: UIPage(
     parentType: typeof(WebChannelSettingsEditSection),
