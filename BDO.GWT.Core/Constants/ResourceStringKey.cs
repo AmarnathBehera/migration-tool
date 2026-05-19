@@ -10,6 +10,7 @@ public static class ResourceStringKey
     public static class LiveSite
     {
         public const string LiveSitePrefix = BDOPrefix + "LiveSite.";
+        public const string ReadMore = LiveSitePrefix + "ReadMore";
 
         public static class Filters
         {
