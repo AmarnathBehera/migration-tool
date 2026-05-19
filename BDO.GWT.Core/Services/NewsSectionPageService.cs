@@ -1,0 +1,129 @@
+﻿using BDO.GWT.Common.Exceptions;
+using BDO.GWT.Core.Data;
+using BDO.GWT.Core.Data.Queries;
+using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.Cards;
+using BDO.GWT.Core.DTOs.Pages;
+using BDO.GWT.Core.Helpers;
+using BDO.GWT.Core.ValueObjects;
+using BDO.GWT.Web.Core.Services;
+using CMS.Websites;
+using Kentico.Content.Web.Mvc;
+
+namespace BDO.GWT.Core.Services;
+
+public interface INewsSectionPageService
+{
+    Task<NewsSectionDto> GetNewsSectionDtoAsync(SectionNews currentPage, CancellationToken cancellationToken);
+
+    Task<PaginationDto<ContentPageCardDto>> GetNewsArticlePaginationResultAsync(CardsQuery cardsQuery, CancellationToken cancellationToken);
+}
+
+public class NewsSectionPageService : INewsSectionPageService
+{
+    private readonly IFilteringHelper _filteringHelper;
+    private readonly IHeroService _heroService;
+    private readonly INewsArticleCardsService _newsArticleCardsService;
+    private readonly IContentService _contentService;
+    private readonly ICultureContext _cultureContext;
+
+    public NewsSectionPageService(IFilteringHelper filteringHelper, IHeroService heroService,
+       INewsArticleCardsService newsArticleCardsService, 
+        IContentService contentService, ICultureContext cultureContext)
+    {
+        _filteringHelper = filteringHelper;
+        _heroService = heroService;
+        _newsArticleCardsService = newsArticleCardsService;
+        _contentService = contentService;
+        _cultureContext = cultureContext;
+    }
+
+    public async Task<NewsSectionDto> GetNewsSectionDtoAsync(SectionNews currentPage, CancellationToken cancellationToken)
+    {
+        var bgImageUrl = currentPage.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+        var mobileImageUrl = currentPage.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+        var heroData = new HeroData
+        {
+            Layout = currentPage.HeroLayout,
+            Title = currentPage.HeroTitle,
+            Description = currentPage.HeroDescription,
+            BackgroundImage = bgImageUrl != null ? Link.Parse(bgImageUrl) : null,
+            BackgroundImageAltText = currentPage.HeroBackgroundImageAltText,
+            MobileBackgroundImage = mobileImageUrl != null ? Link.Parse(mobileImageUrl) : null,
+            MobileBackgroundImageAltText = currentPage.HeroBackgroundImage_MobileAltText,
+            CallToActionButtonType = currentPage.HeroCallToActionButtonType,
+            CallToActionButtonText = currentPage.HeroCallToActionButtonText,
+        };
+        var dto = new NewsSectionDto
+        {
+            Title = currentPage.PageTitle,
+            Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
+            CardsGrid = await GetNewsArticleCardsGridDtoAsync(currentPage, cancellationToken),
+        };
+
+        return dto;
+    }
+
+    public async Task<PaginationDto<ContentPageCardDto>> GetNewsArticlePaginationResultAsync(CardsQuery cardsQuery, CancellationToken cancellationToken)
+    {
+        var featuredNewsArticlePageIds = await GetFeaturedNewsArticlePageIdsAsync(cancellationToken);
+
+        var paginationDto = await _newsArticleCardsService.GetFilteredItemsAsync(
+            cardsQuery,
+            null,
+            newsArticle => featuredNewsArticlePageIds.Contains(newsArticle.SystemFields.WebPageItemID),
+            cancellationToken
+            );
+
+        return paginationDto;
+    }
+
+    private async Task<ISet<int>> GetFeaturedNewsArticlePageIdsAsync(CancellationToken cancellationToken)
+    {
+        var newsSection = (await _contentService.GetPagesAsync<SectionNews>(
+            new RetrievePagesParameters
+            {
+                LinkedItemsMaxLevel=2,
+                LanguageName = _cultureContext.CurrentLanguageTag,
+                UseLanguageFallbacks = false
+            },
+           query => query
+               .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
+               //.Where(w => w.WhereEquals("ContentItemGUID", pageGuid)),
+           RetrievalCacheSettings.CacheDisabled,
+           cancellationToken
+       )).FirstOrDefault();
+
+        if (newsSection == null)
+        {
+            throw new MissingSectionPageException($"'No pages have been found of type '{nameof(SectionNews)}'.");
+        }
+        var featuredNewsArticlePageIds = newsSection.ItemListFeaturedItems.Select(x => x.SystemFields.WebPageItemID).ToHashSet();
+
+        return featuredNewsArticlePageIds;
+    }
+
+    private async Task<CardsGridDto> GetNewsArticleCardsGridDtoAsync(SectionNews currentPage, CancellationToken cancellationToken)
+    {
+        var filters = string.IsNullOrWhiteSpace(currentPage.ItemListFilters)
+    ? new HashSet<string>()
+    : currentPage.ItemListFilters
+        .Split(';', StringSplitOptions.RemoveEmptyEntries)
+        .Select(x => x.Trim())
+        .ToHashSet();
+        var newsArticleCardsGridDto = new CardsGridDto
+        {
+            Title = currentPage.ItemListTitle,
+            Description = currentPage.ItemListDescription,
+            Filters = currentPage.ItemListFilteringEnabled ? await _newsArticleCardsService.CreateFiltersAsync(filters, null, cancellationToken) : null,
+            FilteringTooltipEnabled = await _filteringHelper.IsFilteringTooltipEnabledAsync(currentPage.ItemListFilteringEnabled, cancellationToken),
+            ApiEndpointName = "NewsSectionPage",
+            PageSize = 20,
+            AdvancedSearchPrelinkText = currentPage.ItemListAdvancedSearchDescription,
+            AdvancedSearchLinkText = currentPage.ItemListAdvancedSearchLinkText,
+            //AdvancedSearchLink = currentPage.ItemListAdvancedSearchLinkUrl?.ToHtmlCompatibleString(),
+        };
+
+        return newsArticleCardsGridDto;
+    }
+}

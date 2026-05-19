@@ -63,6 +63,14 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ILocationCityPageService, LocationCityPageService>();
         serviceCollection.AddScoped<ILocationsPageService, LocationsPageService>();
         serviceCollection.AddScoped<ITaxonomyTagRetriever, TaxonomyTagRetriever>();
+        serviceCollection.AddScoped<INewsSectionPageService, NewsSectionPageService>();
+        serviceCollection.AddScoped<INewsGroupPageService, NewsGroupPageService>();
+        serviceCollection.AddScoped<INewsArticleService, NewsArticleService>();
+        serviceCollection.AddScoped<INewsArticleCardsService, NewsArticleCardsService>();
+        serviceCollection.AddScoped<ISidebarService, SidebarService>();
+        serviceCollection.AddScoped<ISocialMediaButtonsService, SocialMediaButtonsService>();
+        serviceCollection.AddScoped<IExternalPeopleHelper, ExternalPeopleHelper>();
+        serviceCollection.AddScoped<IFilteringHelper, FilteringHelper>();
 
         serviceCollection.AddScoped<IBreadcrumbsService, BreadcrumbsService>();
         serviceCollection.AddScoped<IFormBuilderService, FormBuilderService>();
