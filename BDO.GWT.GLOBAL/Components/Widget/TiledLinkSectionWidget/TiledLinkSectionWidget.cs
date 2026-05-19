@@ -66,7 +66,7 @@ namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWid
             {
                 Title = model.Properties?.Title,
                 Description = model.Properties?.Description,
-                BackgroundImageURL = image?.MediaFile?.Url,
+                BackgroundImageURL = image?.ContentAttachmentAsset?.Url,
                 BackgroundImageAltText = model.Properties?.BackgroundImageAltText,
                 Items = tilePages,
                 Theme = model.Properties?.Theme,
@@ -88,7 +88,7 @@ namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWid
             );
         }
 
-        private async Task<MigratedMediaFile> GetImage(
+        private async Task<ContentAttachment> GetImage(
             TiledLinkSectionWidgetProperties properties,
             CancellationToken cancellationToken)
         {
@@ -99,7 +99,7 @@ namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWid
                 return null;
             }
 
-            var result = await _contentRetriever.RetrieveContentByGuids<MigratedMediaFile>(
+            var result = await _contentRetriever.RetrieveContentByGuids<ContentAttachment>(
                 new[] { imageGuid.Identifier },
                 cancellationToken
             );
