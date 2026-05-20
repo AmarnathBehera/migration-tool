@@ -20,6 +20,6 @@ public class LocalNavigationWidget : ViewComponent
             }
         };
 
-        return View("~/Components/Widgets/LocalNavigationWidget/_LocalNavigationWidget.cshtml", dto);
+        return View("~/Components/Widget/LocalNavigationWidget/_LocalNavigationWidget.cshtml", dto);
     }
 }

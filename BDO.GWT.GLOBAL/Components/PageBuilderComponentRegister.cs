@@ -17,13 +17,13 @@ using Kentico.PageBuilder.Web.Mvc;
 // Widgets
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.Imagewithtext,typeof(ImageWithTextWidget),"ImageWithText",typeof(ImageWithTextWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.QuoteCard,typeof(QuoteCardWidget),"Quote Card Widget",typeof(QuoteCardWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
-[assembly: RegisterWidget(ComponentIdentifiers.Widgets.ExternalNavigationWidget,typeof(ExternalNavigationWidget),"External Navigation Item",typeof(ExternalNavigationWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.ExternalNavigation,typeof(ExternalNavigationWidget),"External Navigation Item",typeof(ExternalNavigationWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.TiledLink,typeof(TiledLinkSectionWidget),"Tiled Link Widget",typeof(TiledLinkSectionWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.Globallocation,typeof(ViewGlobalLocationsWidget),"View Global Location",typeof(ViewGlobalLocationsWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.RichText,typeof(RichTextWidget), "Rich Text", typeof(RichTextWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.AccordionWidget,typeof(AccordionWidget), "Accordion Widget", typeof(AccordionWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.Button, typeof(ButtonWidget), "Button", typeof(ButtonWidgetProperties), AllowCache = true, IconClass = "icon-xml-tag")]
-[assembly: RegisterWidget(ComponentIdentifiers.Widgets.LocalNavigation, typeof(LocalNavigationWidget), "Local Navigation Item", typeof(LocalNavigationWidgetProperties), AllowCache = true, IconClass = "icon-xml-tag")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.LocalNavigation, typeof(LocalNavigationWidget), "Local Navigation Item", typeof(LocalNavigationWidgetProperties), AllowCache = true, IconClass = "icon-chain")]
 
 // Sections
 [assembly: RegisterSection(identifier: ComponentIdentifiers.Sections.Container,name: "Container",propertiesType: typeof(BaseSectionProperties),customViewName: "~/Components/Section/SectionView/_ContainerSection.cshtml")]

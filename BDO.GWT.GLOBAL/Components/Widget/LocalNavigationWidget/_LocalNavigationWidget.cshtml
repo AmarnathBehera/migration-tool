@@ -9,13 +9,14 @@
     var pageContext = WebPageDataContextRetriever.Retrieve();
     var pageId = pageContext.WebPage.WebPageItemID;
 }
-
+<li>
 @if (Model != null && pageId != 0)
 {
     @(await ReactService.RenderComponentAsync(
         pageId,
-            ReactComponentType.LocalNavigationItem,
+                "LocalNavigationItem",
             ReactComponentType.LocalNavigationItemGUID,
         Model,
         Context.RequestAborted))
 }
+</li>

@@ -42,10 +42,13 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
                         Is.EqualTo("~/Components/Widget/ExternalNavigationWidget/_ExternalNavigationWidget.cshtml"));
 
             var dto = viewResult?.ViewData?.Model as ExternalNavigationData;
-            Assert.That(dto, Is.Not.Null);
-            Assert.That(dto.Link.Title, Is.EqualTo("Go to Google"));
-            Assert.That(dto.Link.URL, Is.EqualTo("https://www.google.com"));
-            Assert.That(dto.openInNewTab, Is.EqualTo("_blank"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(dto, Is.Not.Null);
+                Assert.That(dto.Link.Title, Is.EqualTo("Go to Google"));
+                Assert.That(dto.Link.URL, Is.EqualTo("https://www.google.com"));
+                Assert.That(dto.openInNewTab, Is.EqualTo("_blank"));
+            });
         }
         [Test]
         public void Invoke_WithDefaultPrimaryButtonLinkTarget_ShouldUseSelf()
@@ -89,10 +92,13 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var dto = (result as ViewViewComponentResult)?.ViewData?.Model as ExternalNavigationData;
 
             // Assert
-            Assert.That(dto, Is.Not.Null);
-            Assert.That(dto.Link.Title, Is.EqualTo(string.Empty));
-            Assert.That(dto.Link.URL, Is.EqualTo(string.Empty));
-            Assert.That(dto.openInNewTab, Is.EqualTo("_self")); // default
+            Assert.Multiple(() =>
+            {
+                Assert.That(dto, Is.Not.Null);
+                Assert.That(dto.Link.Title, Is.EqualTo(string.Empty));
+                Assert.That(dto.Link.URL, Is.EqualTo(string.Empty));
+                Assert.That(dto.openInNewTab, Is.EqualTo("_self")); 
+            });
         }
     }
 }
