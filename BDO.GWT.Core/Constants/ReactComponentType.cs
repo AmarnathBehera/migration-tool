@@ -36,6 +36,8 @@ public static class ReactComponentType
     public const string IndustryPrimary = "IndustryPrimary";
     public const string ServiceContent = "ServiceContent";
     public const string SideBoxNavigation = "SideBoxNavigation";
+    public const string LocalNavigationItem = "LocalNavigationItem";
+    
     public const string KeyTakeAways = "KeyTakeAwaysWidget";
 
 
@@ -68,6 +70,7 @@ public static class ReactComponentType
     public const string IndustryPrimaryGUID = "7d6afe7a-e672-43d4-b9e8-aad67c339c56";
     public const string ServiceContentGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
     public const string SideBoxNavigationGUID = "6c835a07-d2f7-4041-8c19-0513d2b31b88";
+    public const string LocalNavigationItemGUID = "c4403ffb-12e9-4f20-86de-3379bc0514f0";
     public const string KeyTakeAwaysGUID = "c4403ffb-12e9-4f20-86de-3379bc0514f0";
 }
 
