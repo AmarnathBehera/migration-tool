@@ -95,9 +95,9 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             Assert.Multiple(() =>
             {
                 Assert.That(dto, Is.Not.Null);
-                Assert.That(dto.Link.Title, Is.EqualTo(string.Empty));
-                Assert.That(dto.Link.URL, Is.EqualTo(string.Empty));
-                Assert.That(dto.openInNewTab, Is.EqualTo("_self")); 
+                Assert.That(dto?.Link.Title, Is.EqualTo(string.Empty));
+                Assert.That(dto?.Link.URL, Is.EqualTo(string.Empty));
+                Assert.That(dto?.openInNewTab, Is.EqualTo("_self")); 
             });
         }
     }
