@@ -5,8 +5,8 @@
 @using BDO.GWT.Core.Constants
 @using BDO.GWT.Core.Services
 @using CMS.Websites
-@using Kentico.Content.Web.Mvc
 @model BDO.GWT.Core.DTOs.HomeDto
+@inject IPageBuilderService PageBuilderService
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
@@ -40,19 +40,30 @@
         ReactComponentType.HomeHeroGUID,
         new {
         homeHero = Model.HomeHeroSlides,
+
         },
         Context.RequestAborted))
     }
 </div>
+<div class="elevated">
+    @if (Model != null && pageId != 0)
+    {
+        @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.TrendingTopics,
+        ReactComponentType.TrendingTopicsGUID,
+        new {
+        data = Model.TrendingTopics
+        },
+        Context.RequestAborted))
+    }
 
+    @PageBuilderService.GetPageBuilderStyles(Html)
 
-            <div class="elevated">
-                 @await Html.Kentico().EditableAreaAsync(
-    "mainContent", // Unique identifier
+    @await Html.Kentico().EditableAreaAsync(
+        "mainContent",
         new EditableAreaOptions
         {
-
             AllowedWidgets = widgetsList
         })
-   
 </div>

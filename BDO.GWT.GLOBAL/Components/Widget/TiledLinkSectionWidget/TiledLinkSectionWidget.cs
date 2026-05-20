@@ -2,6 +2,7 @@
 using BDO.GWT.Core;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Services.Widget;
+using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.LiveSite.Data;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWidget;
 using CMS.ContentEngine;
@@ -38,9 +39,19 @@ namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWid
 
             var tilePages = new List<TilePageDto>();
 
-            if (model?.Properties?.TilePages != null && model.Properties.TilePages.Any())
+            if (model?.Properties?.TilePagesIndustry != null && model.Properties.TilePagesIndustry.Any())
             {
-                var guids = model.Properties.TilePages
+                var guids = model.Properties.TilePagesIndustry
+                    .Where(x => x.Identifier != Guid.Empty)
+                    .Select(x => x.Identifier)
+                    .ToList();
+
+                tilePages = await _tileContentService
+                    .GetTilePagesAsync(guids, cancellationToken);
+            }
+            if (model?.Properties?.TilePagesService != null && model.Properties.TilePagesService.Any())
+            {
+                var guids = model.Properties.TilePagesService
                     .Where(x => x.Identifier != Guid.Empty)
                     .Select(x => x.Identifier)
                     .ToList();
@@ -49,37 +60,35 @@ namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWid
                     .GetTilePagesAsync(guids, cancellationToken);
             }
 
-            
-            var image = await GetImage(model.Properties, cancellationToken);
 
-            
-            var data = new TiledLinkSectionData
+            var image = await GetImage(model.Properties, cancellationToken);
+            var dto = new TiledLinkSectionDto
             {
                 Title = model.Properties?.Title,
                 Description = model.Properties?.Description,
-
-                BackgroundImageMediaFileGuid = image?.MediaFile?.Url,
+                BackgroundImageURL = image?.ContentAttachmentAsset?.Url,
                 BackgroundImageAltText = model.Properties?.BackgroundImageAltText,
-
+                Items = tilePages,
                 Theme = model.Properties?.Theme,
-
-                SeeAllLinkText = model.Properties?.SeeAllLinkText,
-                SeeAllLinkUrl = model.Properties?.SeeAllLinkURL,
-                SeeAllLinkURLTarget = model.Properties?.SeeAllLinkURLTarget,
-
+                SeeAllLink = model.Properties.SeeAllLinkText != null && model.Properties.SeeAllLinkURL != null ? new LinkItemDto
+                {
+                    Title = model.Properties.SeeAllLinkText,
+                    URL = model.Properties.SeeAllLinkURL,
+                    Target = model.Properties.SeeAllLinkURLTarget,
+                } : null,
                 TopMargin = model.Properties?.TopMargin,
                 BottomMargin = model.Properties?.BottomMargin,
                 WidgetID = model.Properties.WidgetID,
-                TileNodeGuids = tilePages
             };
+
 
             return View(
                 "~/Components/Widget/TiledLinkSectionWidget/_TiledLinkSectionWidget.cshtml",
-                data
+                dto
             );
         }
 
-        private async Task<MigratedMediaFile> GetImage(
+        private async Task<ContentAttachment> GetImage(
             TiledLinkSectionWidgetProperties properties,
             CancellationToken cancellationToken)
         {
@@ -90,7 +99,7 @@ namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWid
                 return null;
             }
 
-            var result = await _contentRetriever.RetrieveContentByGuids<MigratedMediaFile>(
+            var result = await _contentRetriever.RetrieveContentByGuids<ContentAttachment>(
                 new[] { imageGuid.Identifier },
                 cancellationToken
             );
@@ -99,3 +108,5 @@ namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWid
         }
     }
 }
+
+

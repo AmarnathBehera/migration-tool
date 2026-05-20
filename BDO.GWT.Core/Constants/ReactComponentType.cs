@@ -24,7 +24,7 @@ public static class ReactComponentType
     public const string ImageWithTextWidget = "ImageWithTextWidget";
     public const string QuoteCardWidget = "QuoteCardWidget";
     public const string ExternalNavigationWidget = "ExternalNavigationWidget";
-    public const string TiledLinkSectionWidget = "TiledLinkSectionWidget";
+    public const string TiledLinkSectionWidget = "TiledLinkSection";
     public const string CookieBanner = "CookieBanner";
     public const string AccordionWidget = "AccordionWidget";
     public const string LocalLocationsList = "LocalLocationsList";

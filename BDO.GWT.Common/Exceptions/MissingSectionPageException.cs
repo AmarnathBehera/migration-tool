@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BDO.GWT.Common.Core.Exceptions;
+namespace BDO.GWT.Common.Exceptions;
 
 public class MissingSectionPageException : Exception
 {

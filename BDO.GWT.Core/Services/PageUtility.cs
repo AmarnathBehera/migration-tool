@@ -9,10 +9,12 @@ namespace BDO.GWT.Core
     public class PageUtility : IPageUtility
     {
         private readonly IContentService _contentService;
+        private readonly IWebPageUrlResolver _urlResolver;
 
-        public PageUtility(IContentService contentService)
+        public PageUtility(IContentService contentService, IWebPageUrlResolver urlResolver)
         {
             _contentService = contentService;
+            _urlResolver = urlResolver;
         }
 
         /// <summary>
@@ -54,7 +56,7 @@ namespace BDO.GWT.Core
                     Links = orderedChildren.Select(p => new LinkItemDto
                     {
                         Title = childTitleSelector(p),
-                    URL = p.GetUrl().RelativePath,
+                        URL = _urlResolver.GetRelativePath(p),
                     }),
                 };
             }
@@ -78,7 +80,7 @@ namespace BDO.GWT.Core
                 Links = orderedSiblings.Select(p => new LinkItemDto
                 {
                     Title = siblingTitleSelector(p),
-                    URL = p.GetUrl().RelativePath,
+                    URL = _urlResolver.GetRelativePath(p),
                 }),
             };
         }
@@ -150,7 +152,7 @@ namespace BDO.GWT.Core
                 .Select(child => (
                     ParentID: child.SystemFields.WebPageItemParentID,
                     Title: childTitleSelector(child),
-                    Url: child.SystemFields.WebPageUrlPath
+                    Url: _urlResolver.GetRelativePath(child)
                 ))
                 .ToList();
 
@@ -172,7 +174,7 @@ namespace BDO.GWT.Core
                         Description = cardDescriptionSelector(category),
                         ImageURL = cardImageUrlSelector(category),
                         ImageAltText = cardImageAltTextSelector(category),
-                        Url = category.SystemFields.WebPageUrlPath,
+                        Url = _urlResolver.GetRelativePath(category),
                         ReadMoreLinks = readMoreLinks,
                     };
                 })

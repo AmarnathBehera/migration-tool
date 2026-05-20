@@ -276,7 +276,7 @@
                 throw new ArgumentException("Parent GUID must be provided", nameof(parentGuid));
 
             var childPages = await _contentRetriever.RetrievePages<TPage>(
-                new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
+                new RetrievePagesParameters { LinkedItemsMaxLevel = 3 },
             query =>
                 {
                     // Filter by parent GUID
