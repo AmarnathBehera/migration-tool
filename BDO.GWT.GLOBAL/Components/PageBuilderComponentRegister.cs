@@ -1,5 +1,6 @@
 ﻿using BDO;
 using BDO.GWT.GLOBAL.Components.Widget.ImageWithTextWidget;
+using BDO.GWT.GLOBAL.Components.Widget.KeyTakeawaysWidget;
 using BDO.GWT.Web.Widgets.AccordionWidget;
 using BDO.GWT.Web.Widgets.RichTextWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents;
@@ -22,6 +23,7 @@ using Kentico.PageBuilder.Web.Mvc;
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.RichText,typeof(RichTextWidget), "Rich Text", typeof(RichTextWidgetProperties),AllowCache = true,IconClass = "icon-l-text")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.AccordionWidget,typeof(AccordionWidget), "Accordion Widget", typeof(AccordionWidgetProperties),AllowCache = true,IconClass = "icon-accordion")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.Button, typeof(ButtonWidget), "Button", typeof(ButtonWidgetProperties), AllowCache = true, IconClass = "icon-button")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.KeyTakeaways,typeof(KeyTakeawaysWidget),"Key Takeaways",typeof(KeyTakeawaysWidgetProperties),AllowCache = true,IconClass ="icon-list-bullets")]
 
 // Sections
 [assembly: RegisterSection(identifier: ComponentIdentifiers.Sections.Container,name: "Container",propertiesType: typeof(BaseSectionProperties),customViewName: "~/Components/Section/SectionView/_ContainerSection.cshtml")]

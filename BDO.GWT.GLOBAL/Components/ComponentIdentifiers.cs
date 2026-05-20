@@ -25,7 +25,12 @@
             public const string RichText = WidgetPrefix + "RichText";
 
             public const string AccordionWidget = WidgetPrefix + "AccordionWidget";
+
             public const string Form = "Kentico.FormWidget";
+
+            public const string LocalNavigation = WidgetPrefix + "LocalNavigation";
+
+            public const string KeyTakeaways = WidgetPrefix + "KeyTakeaways";
 
         }
 
