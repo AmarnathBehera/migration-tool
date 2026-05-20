@@ -14,11 +14,6 @@ namespace BDO.GWT.Global.Components.ViewComponents
         private readonly IHeaderService _headerService;
         private readonly IContentService _contentService;
         private readonly IEventLogService _eventLogService;
-        public Header(IHeaderService headerService, IContentService contentService)
-        {
-            _headerService = headerService;
-            _contentService = contentService;
-        }
 
         public Header(IHeaderService headerService, IContentService contentService,IEventLogService eventLogService)
         {
