@@ -1,5 +1,6 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
+using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.DTOs;
 using CMS.ContentEngine;
@@ -23,14 +24,16 @@ public interface ICareerDetailPageService
     private readonly IWebPageDataContextRetriever _webPageDataContextRetriever;
     private readonly IContentRetriever _contentRetriever;
     private readonly ITaxonomyRetriever _taxonomyRetriever;
+    private readonly ICultureContext _cultureContext;
 
 
-    public CareerDetailPageService(IHeroService heroService, IWebPageDataContextRetriever webPageDataContextRetriever, IContentRetriever contentRetriever, ITaxonomyRetriever taxonomyRetriever)
+    public CareerDetailPageService(IHeroService heroService, IWebPageDataContextRetriever webPageDataContextRetriever, IContentRetriever contentRetriever, ITaxonomyRetriever taxonomyRetriever, ICultureContext cultureContext)
     {
         _heroService = heroService;
         _webPageDataContextRetriever = webPageDataContextRetriever;
         _contentRetriever = contentRetriever;
         _taxonomyRetriever = taxonomyRetriever;
+        _cultureContext = cultureContext;
 
     }
 
@@ -73,14 +76,16 @@ public interface ICareerDetailPageService
 
     private async Task<CareerContentDto> GetContentPageDtoAsync(Career careerPage, CancellationToken cancellationToken)
         {
+        var languageTag = _cultureContext.CurrentLanguageTag;
+
 
         var employmentTypeIds = careerPage.CareerEmploymentType?.Select(i => i.Identifier).ToList();
         var careerLevelIds = careerPage.CareerLevel?.Select(i => i.Identifier).ToList();
         var jobTitleIds = careerPage.CareerJobTitle?.Select(i => i.Identifier).ToList();
 
-        var employmentTags = await _taxonomyRetriever.RetrieveTags(employmentTypeIds, "en-gb");
-        var careerLevelTags = await _taxonomyRetriever.RetrieveTags(careerLevelIds, "en-gb");
-        var jobTitleTags = await _taxonomyRetriever.RetrieveTags(jobTitleIds, "en-gb");
+        var employmentTags = await _taxonomyRetriever.RetrieveTags(employmentTypeIds, languageTag);
+        var careerLevelTags = await _taxonomyRetriever.RetrieveTags(careerLevelIds, languageTag);
+        var jobTitleTags = await _taxonomyRetriever.RetrieveTags(jobTitleIds, languageTag);
 
         var employmentTypeNames = employmentTags.Select(t => t.Name).ToList();
         var careerLevelNames = careerLevelTags.Select(t => t.Name).ToList();
