@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="NewsGroup"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class NewsGroup : IWebPageFieldsSource
+	public partial class NewsGroup : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IPageMetadata
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -45,5 +45,101 @@ namespace BDO
 		/// Description.
 		/// </summary>
 		public string Description { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGTitle.
+		/// </summary>
+		public string MetadataOGTitle { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGDescription.
+		/// </summary>
+		public string MetadataOGDescription { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> MetadataOGImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGTwitterImageSizeCheckbox.
+		/// </summary>
+		public bool MetadataOGTwitterImageSizeCheckbox { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGTwitterImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> MetadataOGTwitterImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataNofollow.
+		/// </summary>
+		public bool MetadataNofollow { get; set; }
+
+
+		/// <summary>
+		/// MetadataNoindex.
+		/// </summary>
+		public bool MetadataNoindex { get; set; }
+
+
+		/// <summary>
+		/// IncludeInSitemap.
+		/// </summary>
+		public bool IncludeInSitemap { get; set; }
+
+
+		/// <summary>
+		/// MetadataTitle.
+		/// </summary>
+		public string MetadataTitle { get; set; }
+
+
+		/// <summary>
+		/// MetadataDescription.
+		/// </summary>
+		public string MetadataDescription { get; set; }
+
+
+		/// <summary>
+		/// MetadataTeaserImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> MetadataTeaserImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataTeaserImageAltText.
+		/// </summary>
+		public string MetadataTeaserImageAltText { get; set; }
+
+
+		/// <summary>
+		/// MetadataCanonical.
+		/// </summary>
+		public string MetadataCanonical { get; set; }
+
+
+		/// <summary>
+		/// PageTitle.
+		/// </summary>
+		public string PageTitle { get; set; }
+
+
+		/// <summary>
+		/// PageDescription.
+		/// </summary>
+		public string PageDescription { get; set; }
+
+
+		/// <summary>
+		/// PageKeywords.
+		/// </summary>
+		public string PageKeywords { get; set; }
 	}
 }

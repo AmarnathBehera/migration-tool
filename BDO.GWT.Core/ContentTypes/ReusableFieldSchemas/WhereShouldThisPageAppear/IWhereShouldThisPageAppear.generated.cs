@@ -11,6 +11,7 @@
 
 using System;
 using System.Collections.Generic;
+using CMS.Websites;
 using CMS.ContentEngine;
 
 namespace BDO
@@ -33,15 +34,39 @@ namespace BDO
 
 
 		/// <summary>
-		/// MicrositeMasterPages.
+		/// MetadataServices.
 		/// </summary>
-		public IEnumerable<MicrositePlaceholder> MicrositeMasterPages { get; set; }
+		public IEnumerable<Service> MetadataServices { get; set; }
+
+
+		/// <summary>
+		/// MetadataServiceAreas.
+		/// </summary>
+		public IEnumerable<IWebPageFieldsSource> MetadataServiceAreas { get; set; }
+
+
+		/// <summary>
+		/// MetadataIndustryCategories.
+		/// </summary>
+		public IEnumerable<IndustryCategory> MetadataIndustryCategories { get; set; }
+
+
+		/// <summary>
+		/// MetadataIndustries.
+		/// </summary>
+		public IEnumerable<Industry> MetadataIndustries { get; set; }
 
 
 		/// <summary>
 		/// MicrositePages.
 		/// </summary>
 		public IEnumerable<MicrositePlaceholder> MicrositePages { get; set; }
+
+
+		/// <summary>
+		/// MicrositeMasterPages.
+		/// </summary>
+		public IEnumerable<MicrositePlaceholder> MicrositeMasterPages { get; set; }
 
 
 		/// <summary>
