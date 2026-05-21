@@ -31,7 +31,7 @@
 
 
 
-<div>
+
     @if (Model != null && pageId != 0)
     {
         @(await ReactService.RenderComponentAsync(
@@ -44,7 +44,7 @@
         },
         Context.RequestAborted))
     }
-</div>
+
 <div class="elevated">
     @if (Model != null && pageId != 0)
     {

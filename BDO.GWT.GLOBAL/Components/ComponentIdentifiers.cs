@@ -27,6 +27,8 @@
             public const string AccordionWidget = WidgetPrefix + "AccordionWidget";
             public const string Form = "Kentico.FormWidget";
 
+            public const string LocalNavigation = WidgetPrefix + "LocalNavigation";
+
         }
 
         //sections
