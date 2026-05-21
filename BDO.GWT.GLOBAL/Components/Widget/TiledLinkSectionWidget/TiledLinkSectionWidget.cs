@@ -39,9 +39,7 @@ namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWid
 
             var tilePages = new List<TilePageDto>();
 
-            if (model?.Properties?.TilePageType == "Industry"
-                && model?.Properties?.TilePagesIndustry != null
-                && model.Properties.TilePagesIndustry.Any())
+            if (model?.Properties?.TilePageType == "Industry" && model.Properties.TilePagesIndustry.Any())
             {
                 
                     var guids = model.Properties.TilePagesIndustry
@@ -53,9 +51,7 @@ namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWid
                         .GetTilePagesAsync(guids, cancellationToken);
                 
             }
-            else if (model?.Properties?.TilePageType == "Service" 
-                && model.Properties.TilePagesService != null 
-                && model.Properties.TilePagesService.Any())
+            else if (model?.Properties?.TilePageType == "Service" && model.Properties.TilePagesService.Any())
             {
                 var guids = model.Properties.TilePagesService
                     .Where(x => x.Identifier != Guid.Empty)
