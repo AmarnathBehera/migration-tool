@@ -13,13 +13,13 @@ namespace BDO.GWT.Global.Components.ViewComponents
     {
         private readonly IHeaderService _headerService;
         private readonly IContentService _contentService;
-        private readonly IEventLogService _eventLogService;
+        //private readonly IEventLogService _eventLogService;
 
         public Header(IHeaderService headerService, IContentService contentService,IEventLogService eventLogService)
         {
             _headerService = headerService;
             _contentService = contentService;
-            _eventLogService = eventLogService;
+            //_eventLogService = eventLogService;
         }
 
         public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken)

@@ -45,9 +45,9 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             Assert.Multiple(() =>
             {
                 Assert.That(dto, Is.Not.Null);
-                Assert.That(dto.Link.Title, Is.EqualTo("Go to Google"));
-                Assert.That(dto.Link.URL, Is.EqualTo("https://www.google.com"));
-                Assert.That(dto.openInNewTab, Is.EqualTo("_blank"));
+                Assert.That(dto!.Link.Title, Is.EqualTo("Go to Google"));
+                Assert.That(dto!.Link.URL, Is.EqualTo("https://www.google.com"));
+                Assert.That(dto!.openInNewTab, Is.EqualTo("_blank"));
             });
         }
         [Test]
