@@ -26,8 +26,7 @@ namespace GWTXbyKWeb.Controllers
             if (page is null)
                 return NotFound();
             var pageDto = await _sectionEventsService.GetSectionEventsDtoAsync(page, cancellationToken);
-
-            return View(pageDto);
+            return View("~/Views/SectionEvent/Index.cshtml", pageDto);
         }
 
     }
