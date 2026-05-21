@@ -248,7 +248,7 @@ public class HeaderService : IHeaderService
                 var firstAttachment = featured.Image.FirstOrDefault();
                 if (firstAttachment?.ContentAttachmentAsset != null)
                 {
-                    imageUrl = firstAttachment.ContentAttachmentAsset.Url.ToString() ?? string.Empty;
+                    imageUrl = firstAttachment.ContentAttachmentAsset.Url ?? string.Empty;
                 }
             }
 

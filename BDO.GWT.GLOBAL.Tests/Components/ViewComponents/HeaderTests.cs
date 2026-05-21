@@ -2,6 +2,7 @@
 using BDO.GWT.Core.DTOs.Header;
 using BDO.GWT.Core.Services.Header;
 using BDO.GWT.Global.Components.ViewComponents;
+using CMS.Core;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Moq;
 
@@ -11,6 +12,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
     {
         private Mock<IHeaderService> _headerServiceMock = null!;
         private Mock<IContentService> _contentServiceMock = null!;
+        private Mock<IEventLogService> _eventLogServiceMock = null!;
         private Header _component = null!;
 
         [SetUp]
@@ -18,7 +20,8 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
         {
             _headerServiceMock = new Mock<IHeaderService>();
             _contentServiceMock = new Mock<IContentService>();
-            _component = new Header(_headerServiceMock.Object, _contentServiceMock.Object);
+            _eventLogServiceMock = new Mock<IEventLogService>();
+            _component = new Header(_headerServiceMock.Object, _contentServiceMock.Object, _eventLogServiceMock.Object);
         }
 
         [Test]
