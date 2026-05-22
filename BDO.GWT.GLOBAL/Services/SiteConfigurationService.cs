@@ -4,6 +4,7 @@ using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Services;
 using CMS.ContentEngine;
 using CMS.DataEngine;
+using CMS.Websites;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -29,6 +30,8 @@ public class SiteConfigurationService : ISiteConfigurationService
             "cms.resourcestring|all",
             "bdositelocalization.sitetranslation|all",
             "cms.culturesite|all",
+            "bdo.webchannelsettings|all",
+            "bdo.generalsetting|all",
         ];
 
     private readonly ICachingService _cachingService;
@@ -36,6 +39,9 @@ public class SiteConfigurationService : ISiteConfigurationService
     private readonly IInfoProvider<LocalizationKeyInfo> _localizationKeyProvider;
     private readonly IInfoProvider<LocalizationTranslationItemInfo> _localizationTranslationProvider;
     private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageProvider;
+    private readonly IInfoProvider<WebChannelSettingsInfo> _webChannelSettingsProvider;
+    private readonly IInfoProvider<GeneralSettingInfo> _generalSettingProvider;
+    private readonly IInfoProvider<WebsiteChannelInfo> _websiteChannelProvider;
 
     public SiteConfigurationService(
         ICachingService cachingService,
@@ -43,13 +49,19 @@ public class SiteConfigurationService : ISiteConfigurationService
         ISiteContext siteContext,
         IInfoProvider<LocalizationKeyInfo> localizationKeyProvider,
         IInfoProvider<LocalizationTranslationItemInfo> localizationTranslationProvider,
-        IInfoProvider<ContentLanguageInfo> contentLanguageProvider)
+        IInfoProvider<ContentLanguageInfo> contentLanguageProvider,
+        IInfoProvider<WebChannelSettingsInfo> webChannelSettingsProvider,
+        IInfoProvider<GeneralSettingInfo> generalSettingProvider,
+        IInfoProvider<WebsiteChannelInfo> websiteChannelProvider)
     {
         _cachingService = cachingService;
         _siteContext = siteContext;
         _localizationKeyProvider = localizationKeyProvider;
         _localizationTranslationProvider = localizationTranslationProvider;
         _contentLanguageProvider = contentLanguageProvider;
+        _webChannelSettingsProvider = webChannelSettingsProvider;
+        _generalSettingProvider = generalSettingProvider;
+        _websiteChannelProvider = websiteChannelProvider;
     }
 
     public string GetCachedSiteConfigurationHash()
@@ -78,7 +90,8 @@ public class SiteConfigurationService : ISiteConfigurationService
 
         var result = new SiteConfigurationDto
         {
-            Translations = translations
+            Translations = translations,
+            SiteSettings = GetSiteSettings()
         };
 
         var calculatedHash = await _cachingService.LoadAsync(
@@ -90,6 +103,43 @@ public class SiteConfigurationService : ISiteConfigurationService
         result.Hash = calculatedHash;
 
         return result;              
+    }
+
+    private SiteSettingsDto GetSiteSettings()
+    {
+        var settings = new SiteSettingsDto();
+
+        var websiteChannel = _websiteChannelProvider.Get()
+            .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelID), _siteContext.CurrentSiteID)
+            .TopN(1)
+            .FirstOrDefault();
+
+        if (websiteChannel == null)
+        {
+            return settings;
+        }
+
+        var webChannelSettings = _webChannelSettingsProvider.Get()
+            .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), websiteChannel.WebsiteChannelChannelID)
+            .TopN(1)
+            .FirstOrDefault();
+
+        if (webChannelSettings == null)
+        {
+            return settings;
+        }
+
+        var generalSetting = _generalSettingProvider.Get()
+            .WhereEquals(nameof(GeneralSettingInfo.GeneralSettingsWebChannelSettingID), webChannelSettings.WebChannelSettingsID)
+            .TopN(1)
+            .FirstOrDefault();
+
+        if (generalSetting != null)
+        {
+            settings.ExternalLinkWarningEnabled = generalSetting.Enableexternallinkwarning;
+        }
+
+        return settings;
     }
 
     public async Task<IEnumerable<LocalizationResource>> GetLocalizationValuesAsync()
