@@ -1,5 +1,5 @@
-﻿using AngleSharp.Dom;
-using BDO.GWT.Common.Core.Exceptions;
+﻿
+using BDO.GWT.Common.Exceptions;
 using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
@@ -242,7 +242,7 @@ public class CareersPageService : ICareersPageService
         string languageTag,
         CancellationToken cancellationToken)
     {
-        // TagReference has an Identifier property of type Guid
+
         var identifiers = tagReferences?
             .Select(t => t.Identifier)
             .ToList();
@@ -276,7 +276,7 @@ public class CareersPageService : ICareersPageService
             Title = page.ItemListTitle,
             Description = page.ItemListDescription,
             Filters = filters,
-            FilteringTooltipEnabled = true,
+            FilteringTooltipEnabled = true, //temp
             PageSize = 20,
             ApiEndpointName = $"Careers/{page.SystemFields.WebPageItemGUID}/Get",
             AdvancedSearchPrelinkText = page.ItemListAdvancedSearchDescription,

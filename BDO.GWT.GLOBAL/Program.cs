@@ -28,6 +28,7 @@ using XperienceCommunity.MultiChoiceFormControl.Admin.Helpers.Components.MultiCh
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using BDO.GWT.Core.Services;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +51,8 @@ builder.Services.AddKentico(features =>
           IndustryCategory.CONTENT_TYPE_NAME,
           Industry.CONTENT_TYPE_NAME,
           IndustryService.CONTENT_TYPE_NAME,
+          SectionServices.CONTENT_TYPE_NAME,
+          BusinessLine.CONTENT_TYPE_NAME,
           Sub_Service.CONTENT_TYPE_NAME,
           CareerCategory.CONTENT_TYPE_NAME,
           Career.CONTENT_TYPE_NAME,
@@ -65,7 +68,9 @@ builder.Services.AddKentico(features =>
 builder.Configuration.AddInMemoryCollection(
     builder.Configuration
         .GetSection("AzureStorageProviderSettings")
-        .GetChildren().ToDictionary(x => x.Key, x => x.Value)
+        .GetChildren()
+        .Where(x => x.Value != null)
+        .ToDictionary(x => x.Key, x => x.Value!)
 );
 builder.Services.Configure<WebEncoderOptions>(options =>
 {
@@ -130,17 +135,16 @@ builder.Services.AddAdminExternalAuthenticationProvider(
         options.UserSynchronizationFrequency = UserSynchronizationFrequency.Always;
     }
 );
-
-builder.Services.Configure<AdminIdentityOptions>(options =>
-
+if (builder.Environment.IsDevelopment())
 {
+    builder.Services.Configure<AdminIdentityOptions>(options =>
+    {
+        options.AuthenticationOptions.Mode = AdminAuthenticationMode.MaintainForms;
+    });
+}
 
-    options.AuthenticationOptions.Mode = AdminAuthenticationMode.MaintainForms;
-
-});
-
-//// Add Application Insights telemetry
-//builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
+// Add Application Insights telemetry
+builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
 var app = builder.Build();
 
@@ -156,16 +160,6 @@ app.UseKentico();
 
 app.Kentico().MapRoutes();
 
-app.MapControllerRoute(
-   name: "error",
-   pattern: "error/{code}",
-   defaults: new { controller = "HttpErrors", action = "Error" }
-);
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller}/{action}/{id?}"
-);
 app.MapControllerRoute(
     name: "default",
     pattern: $"{{{WebPageRoutingOptions.LANGUAGE_ROUTE_VALUE_KEY}}}/{{controller}}/{{action}}",
