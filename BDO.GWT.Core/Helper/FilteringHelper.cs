@@ -7,8 +7,8 @@ public interface IFilteringHelper
 }
 public class FilteringHelper : IFilteringHelper
 {
-    private readonly SettingService _settingService;
-    public FilteringHelper(SettingService settingService)
+    private readonly ISettingService _settingService;
+    public FilteringHelper(ISettingService settingService)
     {
         _settingService = settingService;
     }

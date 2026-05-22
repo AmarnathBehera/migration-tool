@@ -5,6 +5,7 @@ namespace BDO.GWT.Core.Services;
 public interface ISettingService
 {
     Task<IEnumerable<PrintorShareInfo>?> GetPrintorShareInfo();
+    Task<IEnumerable<FilteringInfo>?> GetFilteringInfo();
 }
 
 public class SettingService : ISettingService

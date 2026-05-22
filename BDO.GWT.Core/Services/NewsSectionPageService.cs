@@ -11,11 +11,9 @@ using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 
 namespace BDO.GWT.Core.Services;
-
 public interface INewsSectionPageService
 {
     Task<NewsSectionDto> GetNewsSectionDtoAsync(SectionNews currentPage, CancellationToken cancellationToken);
-
     Task<PaginationDto<ContentPageCardDto>> GetNewsArticlePaginationResultAsync(CardsQuery cardsQuery, CancellationToken cancellationToken);
 }
 
@@ -37,7 +35,6 @@ public class NewsSectionPageService : INewsSectionPageService
         _contentService = contentService;
         _cultureContext = cultureContext;
     }
-
     public async Task<NewsSectionDto> GetNewsSectionDtoAsync(SectionNews currentPage, CancellationToken cancellationToken)
     {
         var bgImageUrl = currentPage.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
@@ -65,7 +62,6 @@ public class NewsSectionPageService : INewsSectionPageService
 
         return dto;
     }
-
     public async Task<PaginationDto<ContentPageCardDto>> GetNewsArticlePaginationResultAsync(CardsQuery cardsQuery, CancellationToken cancellationToken)
     {
         var featuredNewsArticlePageIds = await GetFeaturedNewsArticlePageIdsAsync(cancellationToken);
@@ -91,7 +87,6 @@ public class NewsSectionPageService : INewsSectionPageService
             },
            query => query
                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
-               //.Where(w => w.WhereEquals("ContentItemGUID", pageGuid)),
            RetrievalCacheSettings.CacheDisabled,
            cancellationToken
        )).FirstOrDefault();

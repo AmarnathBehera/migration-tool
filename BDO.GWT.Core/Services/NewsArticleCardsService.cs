@@ -179,7 +179,7 @@ public class NewsArticleCardsService : INewsArticleCardsService
                 ImageAltText = contentPage.ImageFileAltText,
                 //Type = await contentPage.GetTypeNameAsync(_contentTypeRetriever, cancellationToken),
                 Title = contentPage.MetadataTitle,
-               // Date = contentPage.PublishFrom ?? contentPage.CreationDate,
+                Date = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen ?? contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen,
                 UpdatedOnDate = contentPage.UpdatedOn == DateTime.MinValue ? null : contentPage.UpdatedOn,
                 Description = HtmlHelper.ExtractTextFromHtml(contentPage.MetadataDescription),
                 ReadMoreLink = new LinkItemDto

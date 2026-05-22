@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="Blog"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class Blog : IWebPageFieldsSource
+	public partial class Blog : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero, IItemList, IPageMetadata
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -33,5 +33,209 @@ namespace BDO
 		/// </summary>
 		[SystemField]
 		public WebPageFields SystemFields { get; set; }
+
+
+		/// <summary>
+		/// BlogPostListFilters.
+		/// </summary>
+		public string BlogPostListFilters { get; set; }
+
+
+		/// <summary>
+		/// BlogPostListFeaturedItems.
+		/// </summary>
+		public IEnumerable<WebPageRelatedItem> BlogPostListFeaturedItems { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGTitle.
+		/// </summary>
+		public string MetadataOGTitle { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGDescription.
+		/// </summary>
+		public string MetadataOGDescription { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> MetadataOGImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGTwitterImageSizeCheckbox.
+		/// </summary>
+		public bool MetadataOGTwitterImageSizeCheckbox { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGTwitterImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> MetadataOGTwitterImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataNofollow.
+		/// </summary>
+		public bool MetadataNofollow { get; set; }
+
+
+		/// <summary>
+		/// MetadataNoindex.
+		/// </summary>
+		public bool MetadataNoindex { get; set; }
+
+
+		/// <summary>
+		/// IncludeInSitemap.
+		/// </summary>
+		public bool IncludeInSitemap { get; set; }
+
+
+		/// <summary>
+		/// MetadataTitle.
+		/// </summary>
+		public string MetadataTitle { get; set; }
+
+
+		/// <summary>
+		/// MetadataDescription.
+		/// </summary>
+		public string MetadataDescription { get; set; }
+
+
+		/// <summary>
+		/// MetadataTeaserImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> MetadataTeaserImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataTeaserImageAltText.
+		/// </summary>
+		public string MetadataTeaserImageAltText { get; set; }
+
+
+		/// <summary>
+		/// MetadataCanonical.
+		/// </summary>
+		public string MetadataCanonical { get; set; }
+
+
+		/// <summary>
+		/// HeroLayout.
+		/// </summary>
+		public string HeroLayout { get; set; }
+
+
+		/// <summary>
+		/// HeroTitle.
+		/// </summary>
+		public string HeroTitle { get; set; }
+
+
+		/// <summary>
+		/// HeroDescription.
+		/// </summary>
+		public string HeroDescription { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> HeroBackgroundImage { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImageAltText.
+		/// </summary>
+		public string HeroBackgroundImageAltText { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImage_Mobile.
+		/// </summary>
+		public IEnumerable<ContentAttachment> HeroBackgroundImage_Mobile { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImage_MobileAltText.
+		/// </summary>
+		public string HeroBackgroundImage_MobileAltText { get; set; }
+
+
+		/// <summary>
+		/// HeroCallToActionButtonType.
+		/// </summary>
+		public string HeroCallToActionButtonType { get; set; }
+
+
+		/// <summary>
+		/// HeroCallToActionButtonText.
+		/// </summary>
+		public string HeroCallToActionButtonText { get; set; }
+
+
+		/// <summary>
+		/// HeroCallToActionButtonUrl.
+		/// </summary>
+		public IEnumerable<IWebPageFieldsSource> HeroCallToActionButtonUrl { get; set; }
+
+
+		/// <summary>
+		/// ItemListTitle.
+		/// </summary>
+		public string ItemListTitle { get; set; }
+
+
+		/// <summary>
+		/// ItemListDescription.
+		/// </summary>
+		public string ItemListDescription { get; set; }
+
+
+		/// <summary>
+		/// ItemListFilteringEnabled.
+		/// </summary>
+		public bool ItemListFilteringEnabled { get; set; }
+
+
+		/// <summary>
+		/// ItemListAdvancedSearchDescription.
+		/// </summary>
+		public string ItemListAdvancedSearchDescription { get; set; }
+
+
+		/// <summary>
+		/// ItemListAdvancedSearchLinkText.
+		/// </summary>
+		public string ItemListAdvancedSearchLinkText { get; set; }
+
+
+		/// <summary>
+		/// ItemListAdvancedSearchLinkUrl.
+		/// </summary>
+		public IEnumerable<IContentItemFieldsSource> ItemListAdvancedSearchLinkUrl { get; set; }
+
+
+		/// <summary>
+		/// PageTitle.
+		/// </summary>
+		public string PageTitle { get; set; }
+
+
+		/// <summary>
+		/// PageDescription.
+		/// </summary>
+		public string PageDescription { get; set; }
+
+
+		/// <summary>
+		/// PageKeywords.
+		/// </summary>
+		public string PageKeywords { get; set; }
 	}
 }
