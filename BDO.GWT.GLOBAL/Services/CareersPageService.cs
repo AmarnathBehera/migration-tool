@@ -1,4 +1,5 @@
-﻿using BDO.GWT.Common.Core.Exceptions;
+﻿using AngleSharp.Dom;
+using BDO.GWT.Common.Core.Exceptions;
 using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
@@ -33,6 +34,7 @@ public class CareersPageService : ICareersPageService
     private readonly ICultureContext _cultureContext;
     private readonly ITaxonomyRetriever _taxonomyRetriever;
     private readonly ICardsService _cardsService;
+    private readonly IWebPageUrlRetriever _webPageUrlRetriever;
 
     public CareersPageService(
         IHeroService heroService,
@@ -41,7 +43,8 @@ public class CareersPageService : ICareersPageService
         IContentRetriever retriever,
         ITaxonomyRetriever taxonomyRetriever,
         ICultureContext cultureContext,
-        ICardsService cardsService)
+        ICardsService cardsService,
+        IWebPageUrlRetriever webPageUrlRetriever)
     {
         _heroService = heroService;
         _contentRetriever = contentRetriever;
@@ -50,6 +53,7 @@ public class CareersPageService : ICareersPageService
         _taxonomyRetriever = taxonomyRetriever;
         _cultureContext = cultureContext;
         _cardsService = cardsService;
+        _webPageUrlRetriever = webPageUrlRetriever;
     }
 
     public async Task<CareersPageDto> GetCareersPageDtoAsync(CancellationToken cancellationToken)
@@ -107,8 +111,17 @@ public class CareersPageService : ICareersPageService
         }
 
         var careerPages = await _retriever.RetrievePages<Career>(
-            new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
-            q => q.Where(w => w.WhereEquals("WebPageItemParentID", careersPage.SystemFields.WebPageItemID)),
+            new RetrievePagesParameters
+            {
+                LinkedItemsMaxLevel = 1,
+                LanguageName = _cultureContext.CurrentLanguageTag,
+                UseLanguageFallbacks = false
+            },
+            q => q.Where(w =>
+            {
+                w.WhereEquals("ContentItemChannelID", _contentRetriever.GetCurrentChannelID());
+                w.WhereEquals("WebPageItemParentID", careersPage.SystemFields.WebPageItemID);
+            }),
             cacheSettings: RetrievalCacheSettings.CacheDisabled,
             cancellationToken: cancellationToken);
 
@@ -181,42 +194,40 @@ public class CareersPageService : ICareersPageService
 
         var pagedCards = filteredArray
             .Skip((currentPage - 1) * pageSize)
-            .Take(pageSize);
+            .Take(pageSize)
+            .ToArray();
+        var careerspageurl = await GetLanguageSafeUrlAsync(careersPage, cancellationToken);
 
-
-        var itemData = pagedCards.Select(c => new CareerCardDto
+        var itemData = await Task.WhenAll(pagedCards.Select(async c =>
         {
-            ImageURL = c.Page.HeroBackgroundImage?
-                .FirstOrDefault()?
-                .ContentAttachmentAsset?
-                .Url,
+            var sys = c.Page.SystemFields;
+            var absolutepageurl = await GetLanguageSafeUrlAsync(c.Page, cancellationToken);
+            
 
-            ImageAltText = c.Page.MetadataTeaserImageAltText,
+            return new CareerCardDto
+            {
+                ImageURL = c.Page.HeroBackgroundImage?
+                                    .FirstOrDefault()?
+                                    .ContentAttachmentAsset?
+                                    .Url,
+                ImageAltText = c.Page.MetadataTeaserImageAltText,
+                Title = c.Page.MetadataTitle,
+                JobTitle = c.JobTitleNames.FirstOrDefault() ?? c.Page.MetadataTitle,
+                Reference = c.Page.CareerReference,
+                EmploymentType = c.EmploymentTypeNames.FirstOrDefault(),
+                Level = c.CareerLevelNames.FirstOrDefault(),
+                Locations = c.Page.MetadataOfficeLocation?
+                                    .Select(i => i.MetadataTitle)
+                                    .ToArray(),
+                PublishDate = c.Page.DocumentPublishFrom,
+                ApplyURL = absolutepageurl,
+                JobTitleURL =
+                    careersPage.MetadataTitle is not null && c.Page.CareerJobTitle is not null
+                        ? $"{careerspageurl}?careerJobTitle={c.JobTitleNames.FirstOrDefault()}"
+                        : null,
+            };
+        }));
 
-            Title = c.Page.MetadataTitle,
-
-            JobTitle = c.JobTitleNames.FirstOrDefault() ?? c.Page.MetadataTitle,
-
-            Reference = c.Page.CareerReference,
-
-            EmploymentType = c.EmploymentTypeNames.FirstOrDefault(),
-
-            Level = c.CareerLevelNames.FirstOrDefault(),
-
-            Locations = c.Page.MetadataOfficeLocation?
-                .Select(i => i.MetadataTitle)
-                .ToArray(),
-
-            PublishDate = c.Page.DocumentPublishFrom,
-
-            ApplyURL = c.Page.GetUrl().AbsoluteUrl,
-
-            JobTitleURL =
-                careersPage.MetadataTitle is not null && c.Page.CareerJobTitle is not null
-                    ? $"{careersPage.GetUrl().AbsoluteUrl}?careerJobTitle={c.JobTitleNames.FirstOrDefault()}"
-                    : null,
-
-        }).ToArray();
 
         return new PaginationDto<CareerCardDto>
         {
@@ -274,5 +285,17 @@ public class CareersPageService : ICareersPageService
         };
 
         return insightCardsGridDto;
+    }
+
+    private async Task<string> GetLanguageSafeUrlAsync(
+    IWebPageFieldsSource page,
+    CancellationToken cancellationToken)
+    {
+        var url = await _webPageUrlRetriever.Retrieve(
+            page,
+            _cultureContext.CurrentLanguageTag,
+            cancellationToken);
+
+        return url.AbsoluteUrl;
     }
 }
