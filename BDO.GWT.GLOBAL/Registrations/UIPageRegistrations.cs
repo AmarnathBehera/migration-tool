@@ -122,3 +122,11 @@ using Kentico.Xperience.Admin.Base;
     name: "Print Or Share settings",
     templateName: TemplateNames.EDIT,
     order: 7)]
+
+[assembly: UIPage(
+    parentType: typeof(WebChannelSettingsEditSection),
+    slug: "filtering-or-share",
+    uiPageType: typeof(FilteringEditPage),
+    name: "Filtering settings",
+    templateName: TemplateNames.EDIT,
+    order: 8)]
