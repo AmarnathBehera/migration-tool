@@ -19,7 +19,6 @@
         var metaDataSeoDto = await PageContext.GetCurrentPageMetadataAsync();
     }
 
-    @* <title>@metaDataSeoDto.PageMetaData.PageTitle + " - BDO"</title> *@
     <title>@(metaDataSeoDto.PageMetaData.PageTitle + " - BDO")</title>
     <meta name="description" content="@metaDataSeoDto.PageMetaData.PageDescription" />
     <meta name="keywords" content="@metaDataSeoDto.PageMetaData.PageKeywords" />
@@ -72,7 +71,7 @@
 
 
     @Html.Kentico().ActivityLoggingScriptV2()
-
+    <partial name="_DefaultStylesheets.cshtml" />
     @await RenderSectionAsync("Styles", required: false)
     <link rel="stylesheet" href="/dist/master.css" asp-append-version="true" />
     <link rel="stylesheet" href="/Public/Sections/section-column.css" asp-append-version="true" />
@@ -95,7 +94,7 @@
     <script src="/dist/master.bundle.js" asp-append-version="true" data-cookieconsent="ignore"></script>
 
     
-    @await (Component.InvokeAsync<ScriptsBottomBody>())
+@await (Component.InvokeAsync<ScriptsBottomBody>())
 @(await Component.InvokeAsync<Footer>())
 @await Html.Kentico().PageBuilderScriptsAsync()
 @await (Component.InvokeAsync<ScriptsBottomBody>())

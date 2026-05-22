@@ -10,18 +10,23 @@ step "deploy-cms-app-service" {
             Octopus.Action.Azure.AppSettings = <<-EOT
                 [
                   {
-                    "name": "CMSAzureCDNEndpoint",
+                    "name": "AzureStorageProviderSettings__CMSAzureCDNEndpoint",
                     "value": "#{appsettings.CMSAzureCDNEndpoint}",
                     "slotSetting": false
                   },
                   {
-                    "name": "CMSAzureAccountName",
+                    "name": "AzureStorageProviderSettings__CMSAzureAccountName",
                     "value": "#{appsettings.CMSAzureAccountName}",
                     "slotSetting": false
                   },
                   {
-                    "name": "CMSAzureSharedKey",
+                    "name": "AzureStorageProviderSettings__CMSAzureSharedKey",
                     "value": "#{appsettings.CMSAzureSharedKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureStorageProviderSettings__CMSAzureRootContainer",
+                    "value": "cmslibrary",
                     "slotSetting": false
                   },
                   {
@@ -99,18 +104,23 @@ step "deploy-mvc-app-service" {
             Octopus.Action.Azure.AppSettings = <<-EOT
                 [
                   {
-                    "name": "CMSAzureCDNEndpoint",
+                    "name": "AzureStorageProviderSettings__CMSAzureCDNEndpoint",
                     "value": "#{appsettings.CMSAzureCDNEndpoint}",
                     "slotSetting": false
                   },
                   {
-                    "name": "CMSAzureAccountName",
+                    "name": "AzureStorageProviderSettings__CMSAzureAccountName",
                     "value": "#{appsettings.CMSAzureAccountName}",
                     "slotSetting": false
                   },
                   {
-                    "name": "CMSAzureSharedKey",
+                    "name": "AzureStorageProviderSettings__CMSAzureSharedKey",
                     "value": "#{appsettings.CMSAzureSharedKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureStorageProviderSettings__CMSAzureRootContainer",
+                    "value": "cmslibrary",
                     "slotSetting": false
                   },
                   {

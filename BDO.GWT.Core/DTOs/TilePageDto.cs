@@ -6,7 +6,12 @@ namespace BDO.GWT.Core.DTOs
 {
     public class TilePageDto
     {
-        public string Title { get; set; }
-        public string Url { get; set; }
+        public string? IconUrl { get; set; }
+
+        public string Title { get; set; } = null!;
+
+        public string? Description { get; set; }
+
+        public LinkItemDto ReadMoreLink { get; set; } = null!;
     }
 }

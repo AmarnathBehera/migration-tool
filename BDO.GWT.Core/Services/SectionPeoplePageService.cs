@@ -1,4 +1,4 @@
-﻿using BDO.GWT.Common.Core.Exceptions;
+﻿using BDO.GWT.Common.Exceptions;
 using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
@@ -54,6 +54,7 @@ public class SectionPeoplePageService : ISectionPeoplePageService
     {
         var bgImageUrl = page.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
         var mobileImageUrl = page.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+        var ctaUrlPath = page.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath;
         var filters = string.IsNullOrWhiteSpace(page.PeopleListFilters)
     ? new HashSet<string>()
     : page.PeopleListFilters
@@ -72,6 +73,7 @@ public class SectionPeoplePageService : ISectionPeoplePageService
             MobileBackgroundImageAltText = page.HeroBackgroundImage_MobileAltText,
             CallToActionButtonType = page.HeroCallToActionButtonType,
             CallToActionButtonText = page.HeroCallToActionButtonText,
+            CallToActionButtonUrl = ctaUrlPath != null ? Link.Parse(ctaUrlPath) : null,
         };
         var dto = new SectionPeopleDto
         {
