@@ -132,3 +132,12 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     IconClass = "xp-market")]
 
 [assembly: RegisterWebPageRoute(SectionEvents.CONTENT_TYPE_NAME, typeof(SectionEventsController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: EventRegistrationForm.CONTENT_TYPE_NAME,
+    name: "Events Registration form Content Type Template",
+    customViewName: "~/Views/FormPage/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.EventRegistrationForm" },
+    IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(EventRegistrationForm.CONTENT_TYPE_NAME, typeof(EventRegistrationFormController))]

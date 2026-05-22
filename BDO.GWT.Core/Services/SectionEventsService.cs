@@ -70,7 +70,15 @@ public class SectionEventsService : ISectionEventsService
         {
             Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
             FilteringTooltipEnabled = true,
+            Title = page.EventsWebinarsListTitle,
+            Description = page.EventsWebinarsListDescription,
+            //Filters = page.EventsWebinarsListFilteringEnabled ? await _eventWebinarCardsService.CreateFiltersAsync(page.EventsWebinarsListFilters, null, cancellationToken) : null,
+            //FilteringTooltipEnabled = await _filteringHelper.IsFilteringTooltipEnabledAsync(page.EventsWebinarsListFilteringEnabled, cancellationToken),
             PageSize = 20,
+            AdvancedSearchPrelinkText = page.EventsWebinarsListAdvancedSearchDescription,
+            AdvancedSearchLinkText = page.EventsWebinarsListAdvancedSearchLinkText,
+           // AdvancedSearchLink = page.EventsWebinarsListAdvancedSearchLinkUrl?.ToHtmlCompatibleString(),
+
         };
 
         return dto;

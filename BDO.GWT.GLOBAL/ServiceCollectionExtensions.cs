@@ -64,6 +64,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ILocationsPageService, LocationsPageService>();
         serviceCollection.AddScoped<ITaxonomyTagRetriever, TaxonomyTagRetriever>();
         serviceCollection.AddScoped<ISectionEventsService, SectionEventsService>();
+        serviceCollection.AddScoped<IEventRegistrationFormPageService, EventRegistrationFormPageService>();
 
         serviceCollection.AddScoped<IBreadcrumbsService, BreadcrumbsService>();
         serviceCollection.AddScoped<IFormBuilderService, FormBuilderService>();

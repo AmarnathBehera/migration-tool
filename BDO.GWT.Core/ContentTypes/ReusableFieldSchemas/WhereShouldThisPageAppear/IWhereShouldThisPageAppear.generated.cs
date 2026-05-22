@@ -11,8 +11,8 @@
 
 using System;
 using System.Collections.Generic;
-using CMS.Websites;
 using CMS.ContentEngine;
+using CMS.Websites;
 
 namespace BDO
 {
@@ -30,7 +30,7 @@ namespace BDO
 		/// <summary>
 		/// ContentType.
 		/// </summary>
-		public IEnumerable<MicrositePlaceholder> ContentType { get; set; }
+		public IEnumerable<TagReference> ContentType { get; set; }
 
 
 		/// <summary>

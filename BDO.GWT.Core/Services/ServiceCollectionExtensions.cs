@@ -20,6 +20,7 @@
             // You just wire your abstraction here.
             services.AddScoped<IContentService, ContentService>();
             services.AddScoped<IWebPageUrlResolver, WebPageUrlResolver>();
+            services.AddScoped<IPageUrlService, PageUrlService>();
             services.AddScoped<IPageUtility, PageUtility>();
             services.AddScoped<IHomePageService, HomePageService>();
             services.AddScoped<IHeaderService, HeaderService>();
