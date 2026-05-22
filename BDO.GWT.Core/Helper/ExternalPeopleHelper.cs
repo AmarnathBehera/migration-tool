@@ -39,7 +39,7 @@ public class ExternalPeopleHelper : IExternalPeopleHelper
                                     .Where(g => g != Guid.Empty)
                                     .ToList() ?? new List<Guid>();
 
-            var externalPersonUrlsSelectedPages = externalPersonUrls.Any()
+            var externalPersonUrlsSelectedPages = externalPersonUrls.Count > 0
                 ? await _contentService.GetItemsByGUIDAsync(externalPersonUrls)
                 : Enumerable.Empty<IWebPageFieldsSource>();
 
@@ -79,9 +79,9 @@ public class ExternalPeopleHelper : IExternalPeopleHelper
     {
         var setting = await _settingsService.GetUsePersonPageTitleInfo();
 
-        var usePersonPageTitle = (bool?)setting?.FirstOrDefault()?.UsePageTitleToDisplayPersonName ?? false;
+        var usePersonPageTitle = setting?.FirstOrDefault()?.UsePageTitleToDisplayPersonName ?? false;
 
-        if (usePersonPageTitle is true)
+        if (usePersonPageTitle)
         {
             return externalPerson.MetadataTitle;
         }

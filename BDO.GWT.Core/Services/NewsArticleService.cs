@@ -51,7 +51,7 @@ public class NewsArticleService : INewsArticleService
         var sidebarDto = await _sidebarService.GetSidebarDtoAsync(contentPage, cancellationToken);
 
         sidebarDto.ShowCopyLinkButton = await GetShowCopyLinkOptionFromSectionPageAsync(contentPage, sidebarDto.ShowCopyLinkButton, cancellationToken);
-        //sidebarDto.TypeName = await contentPage.GetTypeNameAsync(_contentTypeRetriever, cancellationToken);
+        sidebarDto.TypeName = contentPage.ContentType.FirstOrDefault()?.Identifier.ToString();
         sidebarDto.PublishDate = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen ?? contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen;
         sidebarDto.UpdatedDate = contentPage.UpdatedOn == DateTime.MinValue ? null : contentPage.UpdatedOn;
         sidebarDto.RelevantContactPeopleTitle = ResourceStringKey.LiveSite.Insights.Authors;
@@ -149,15 +149,6 @@ public class NewsArticleService : INewsArticleService
 
     private static CallToActionDto? GetCallToActionDto(NewsArticle contentPage)
     {
-        //if (contentPage is Insight insight)
-        //{
-        //    return PageHelper.GetCallToActionDto(
-        //        insight.CallToActionDescription,
-        //        insight.CallToActionButtonText,
-        //        insight.CallToActionButtonUrl,
-        //        insight.CallToActionPosition
-        //    );
-        //}
         return contentPage.ShowSidebar
             ? PageHelper.GetCallToActionDto(contentPage.CallToActionDescription, contentPage.CallToActionButtonText, contentPage.CallToActionButtonUrl, null)
             : null;
@@ -168,22 +159,9 @@ public class NewsArticleService : INewsArticleService
         if (contentPage == null)
             return showCopyLinkButton;
 
-        if (contentPage is NewsArticle)
-        {
-            var newsSectionPage = (await _contentService.RetrievePagesAsync<SectionNews>(cancellationToken))?.FirstOrDefault()
-                ?? throw new MissingSectionPageException($"No pages have been found of type '{nameof(SectionNews)}'.");
+        var newsSectionPage = (await _contentService.RetrievePagesAsync<SectionNews>(cancellationToken))?.FirstOrDefault()
+            ?? throw new MissingSectionPageException($"No pages have been found of type '{nameof(SectionNews)}'.");
 
-            return newsSectionPage.ShowCopyUrlButtonInNewsArticle && showCopyLinkButton;
-        }
-
-        if (contentPage is BlogPost)
-        {
-            var blogSectionPage = (await _contentService.RetrievePagesAsync<SectionBlogs>(cancellationToken))?.FirstOrDefault()
-                ?? throw new MissingSectionPageException($"No pages have been found of type '{nameof(SectionBlogs)}'.");
-
-            return blogSectionPage.ShowCopyUrlButtonInBlogPage && showCopyLinkButton;
-        }
-
-        return showCopyLinkButton;
+        return newsSectionPage.ShowCopyUrlButtonInNewsArticle && showCopyLinkButton;
     }
 }

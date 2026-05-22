@@ -171,18 +171,13 @@ public class NewsArticleCardsService : INewsArticleCardsService
         foreach (var contentPage in contentPages)
         {
             bool isComingSoon = false;
-
-            //if (contentPage is Insight insightPage)
-            //{
-            //    isComingSoon = insightPage.ComingSoon;
-            //}
             var card = new ContentPageCardDto
             {
                 IsFeatured = isPageFeatured(contentPage),
                 ImageURL = contentPage.ImageFile.FirstOrDefault()?.ContentAttachmentAsset.Url,
                 isComingSoon = isComingSoon,
                 ImageAltText = contentPage.ImageFileAltText,
-                //Type = await contentPage.GetTypeNameAsync(_contentTypeRetriever, cancellationToken),
+                Type = contentPage.ContentType.FirstOrDefault()?.Identifier.ToString(),
                 Title = contentPage.MetadataTitle,
                 Date = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen ?? contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen,
                 UpdatedOnDate = contentPage.UpdatedOn == DateTime.MinValue ? null : contentPage.UpdatedOn,
