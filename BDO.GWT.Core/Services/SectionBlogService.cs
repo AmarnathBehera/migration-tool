@@ -77,7 +77,7 @@ public class SectionBlogService : ISectionBlogService
             MultiLinksCardsGrid = new MultiLinkCardsGridDto
             {
                 Title = page.MetadataTitle,
-                //Description = page.GridSummary,
+                Description = page.MetadataDescription,
                 Cards = cards,
                 //IsMultiLinks = page.ShowMultiLinks,
             },
