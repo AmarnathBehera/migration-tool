@@ -63,6 +63,10 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 {
                     ["en"] = new Dictionary<string, string> { ["greeting"] = "Hello" },
                 },
+                SiteSettings = new SiteSettingsDto
+                {
+                    ExternalLinkWarningEnabled = true,
+                },
                 Hash = cachedHash,
             };
 
@@ -81,6 +85,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             Assert.Multiple(() =>
             {
                 Assert.That(actionResult.Value, Is.SameAs(dto));
+                Assert.That(actionResult.Value!.SiteSettings.ExternalLinkWarningEnabled, Is.True);
                 Assert.That(actionResult.Result, Is.Null);
             });
 
@@ -96,6 +101,10 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             var dto = new SiteConfigurationDto
             {
                 Translations = new Dictionary<string, IDictionary<string, string>>(),
+                SiteSettings = new SiteSettingsDto
+                {
+                    ExternalLinkWarningEnabled = false,
+                },
                 Hash = "fresh-hash",
             };
 
@@ -111,7 +120,11 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             var actionResult = await _controller.GetSiteConfiguration("any-hash", CancellationToken.None);
 
             // Assert
-            Assert.That(actionResult.Value, Is.SameAs(dto));
+            Assert.Multiple(() =>
+            {
+                Assert.That(actionResult.Value, Is.SameAs(dto));
+                Assert.That(actionResult.Value!.SiteSettings.ExternalLinkWarningEnabled, Is.False);
+            });
 
             _siteConfigurationServiceMock.Verify(
                 x => x.GetSiteConfigurationDtoAsync(It.IsAny<CancellationToken>()),
@@ -134,6 +147,10 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 .ReturnsAsync(new SiteConfigurationDto
                 {
                     Translations = new Dictionary<string, IDictionary<string, string>>(),
+                    SiteSettings = new SiteSettingsDto
+                    {
+                        ExternalLinkWarningEnabled = false,
+                    },
                     Hash = "h",
                 });
 

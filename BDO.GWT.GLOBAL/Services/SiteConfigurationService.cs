@@ -20,6 +20,18 @@ public interface ISiteConfigurationService
     string GetCachedSiteConfigurationHash();
 }
 
+/// <summary>
+/// Groups the <see cref="IInfoProvider{T}"/> dependencies required by
+/// <see cref="SiteConfigurationService"/> to keep its constructor concise.
+/// </summary>
+public sealed record SiteConfigurationProviders(
+    IInfoProvider<LocalizationKeyInfo> LocalizationKey,
+    IInfoProvider<LocalizationTranslationItemInfo> LocalizationTranslation,
+    IInfoProvider<ContentLanguageInfo> ContentLanguage,
+    IInfoProvider<WebChannelSettingsInfo> WebChannelSettings,
+    IInfoProvider<GeneralSettingInfo> GeneralSetting,
+    IInfoProvider<WebsiteChannelInfo> WebsiteChannel);
+
 public class SiteConfigurationService : ISiteConfigurationService
 {
     private static string[] cacheDependencies =
@@ -36,32 +48,17 @@ public class SiteConfigurationService : ISiteConfigurationService
 
     private readonly ICachingService _cachingService;
     private readonly ISiteContext _siteContext;
-    private readonly IInfoProvider<LocalizationKeyInfo> _localizationKeyProvider;
-    private readonly IInfoProvider<LocalizationTranslationItemInfo> _localizationTranslationProvider;
-    private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageProvider;
-    private readonly IInfoProvider<WebChannelSettingsInfo> _webChannelSettingsProvider;
-    private readonly IInfoProvider<GeneralSettingInfo> _generalSettingProvider;
-    private readonly IInfoProvider<WebsiteChannelInfo> _websiteChannelProvider;
+    private readonly SiteConfigurationProviders _providers;
 
     public SiteConfigurationService(
         ICachingService cachingService,
         IContentQueryExecutor executor,
         ISiteContext siteContext,
-        IInfoProvider<LocalizationKeyInfo> localizationKeyProvider,
-        IInfoProvider<LocalizationTranslationItemInfo> localizationTranslationProvider,
-        IInfoProvider<ContentLanguageInfo> contentLanguageProvider,
-        IInfoProvider<WebChannelSettingsInfo> webChannelSettingsProvider,
-        IInfoProvider<GeneralSettingInfo> generalSettingProvider,
-        IInfoProvider<WebsiteChannelInfo> websiteChannelProvider)
+        SiteConfigurationProviders providers)
     {
         _cachingService = cachingService;
         _siteContext = siteContext;
-        _localizationKeyProvider = localizationKeyProvider;
-        _localizationTranslationProvider = localizationTranslationProvider;
-        _contentLanguageProvider = contentLanguageProvider;
-        _webChannelSettingsProvider = webChannelSettingsProvider;
-        _generalSettingProvider = generalSettingProvider;
-        _websiteChannelProvider = websiteChannelProvider;
+        _providers = providers;
     }
 
     public string GetCachedSiteConfigurationHash()
@@ -109,7 +106,7 @@ public class SiteConfigurationService : ISiteConfigurationService
     {
         var settings = new SiteSettingsDto();
 
-        var websiteChannel = _websiteChannelProvider.Get()
+        var websiteChannel = _providers.WebsiteChannel.Get()
             .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelID), _siteContext.CurrentSiteID)
             .TopN(1)
             .FirstOrDefault();
@@ -119,7 +116,7 @@ public class SiteConfigurationService : ISiteConfigurationService
             return settings;
         }
 
-        var webChannelSettings = _webChannelSettingsProvider.Get()
+        var webChannelSettings = _providers.WebChannelSettings.Get()
             .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), websiteChannel.WebsiteChannelChannelID)
             .TopN(1)
             .FirstOrDefault();
@@ -129,7 +126,7 @@ public class SiteConfigurationService : ISiteConfigurationService
             return settings;
         }
 
-        var generalSetting = _generalSettingProvider.Get()
+        var generalSetting = _providers.GeneralSetting.Get()
             .WhereEquals(nameof(GeneralSettingInfo.GeneralSettingsWebChannelSettingID), webChannelSettings.WebChannelSettingsID)
             .TopN(1)
             .FirstOrDefault();
@@ -144,9 +141,9 @@ public class SiteConfigurationService : ISiteConfigurationService
 
     public async Task<IEnumerable<LocalizationResource>> GetLocalizationValuesAsync()
     {
-        var keys = (await _localizationKeyProvider.Get().GetEnumerableTypedResultAsync()).ToList();
-        var translations = (await _localizationTranslationProvider.Get().GetEnumerableTypedResultAsync()).ToList();
-        var languages = (await _contentLanguageProvider.Get().GetEnumerableTypedResultAsync()).ToList();
+        var keys = (await _providers.LocalizationKey.Get().GetEnumerableTypedResultAsync()).ToList();
+        var translations = (await _providers.LocalizationTranslation.Get().GetEnumerableTypedResultAsync()).ToList();
+        var languages = (await _providers.ContentLanguage.Get().GetEnumerableTypedResultAsync()).ToList();
 
         var localizationKeys = keys
             .Select(k => new LocalizationKey
