@@ -3,6 +3,7 @@ using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.Helpers;
+using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Utilities;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
@@ -17,15 +18,21 @@ public class NewsArticleService : INewsArticleService
     private readonly ISidebarService _sidebarService;
     private readonly IContentService _contentService;
     private readonly IExternalPeopleHelper _externalPeopleHelper;
+    private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
+    private readonly ICultureContext _cultureContext;
 
     public NewsArticleService(
         ISidebarService sidebarService,
         IContentService contentService,
-        IExternalPeopleHelper externalPeopleHelper)
+        IExternalPeopleHelper externalPeopleHelper,
+        ITaxonomyTagRetriever taxonomyTagRetriever,
+        ICultureContext cultureContext)
     {
         _sidebarService = sidebarService;
         _contentService = contentService;
         _externalPeopleHelper = externalPeopleHelper;
+        _taxonomyTagRetriever = taxonomyTagRetriever;
+        _cultureContext = cultureContext;
     }
     public async Task<ContentPageDto> GetContentPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken)
     {
@@ -50,8 +57,11 @@ public class NewsArticleService : INewsArticleService
     {
         var sidebarDto = await _sidebarService.GetSidebarDtoAsync(contentPage, cancellationToken);
 
+        var tags = await _taxonomyTagRetriever.GetTaxonomyTagByGUIDs(contentPage.ContentType, _cultureContext.CurrentLanguageTag);
+        var type = tags?.FirstOrDefault()?.Title;
+
         sidebarDto.ShowCopyLinkButton = await GetShowCopyLinkOptionFromSectionPageAsync(contentPage, sidebarDto.ShowCopyLinkButton, cancellationToken);
-        sidebarDto.TypeName = contentPage.ContentType.FirstOrDefault()?.Identifier.ToString();
+        sidebarDto.TypeName = type;
         sidebarDto.PublishDate = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen ?? contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen;
         sidebarDto.UpdatedDate = contentPage.UpdatedOn == DateTime.MinValue ? null : contentPage.UpdatedOn;
         sidebarDto.RelevantContactPeopleTitle = ResourceStringKey.LiveSite.Insights.Authors;

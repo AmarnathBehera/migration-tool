@@ -165,11 +165,13 @@ public class NewsArticleCardsService : INewsArticleCardsService
             _ => null,
         };
     }
-    public static Task<List<ContentPageCardDto>> GetContentPageCardListAsync(ICollection<NewsArticle> contentPages, string languageTag, Func<NewsArticle, bool> isPageFeatured, CancellationToken cancellationToken)
+    public async Task<List<ContentPageCardDto>> GetContentPageCardListAsync(ICollection<NewsArticle> contentPages, string languageTag, Func<NewsArticle, bool> isPageFeatured, CancellationToken cancellationToken)
     {
         var cards = new List<ContentPageCardDto>();
         foreach (var contentPage in contentPages)
         {
+            var tags = await _taxonomyTagRetriever.GetTaxonomyTagByGUIDs(contentPage.ContentType, _cultureContext.CurrentLanguageTag);
+            var type = tags?.FirstOrDefault()?.Title;
             bool isComingSoon = false;
             var card = new ContentPageCardDto
             {
@@ -177,7 +179,7 @@ public class NewsArticleCardsService : INewsArticleCardsService
                 ImageURL = contentPage.ImageFile.FirstOrDefault()?.ContentAttachmentAsset.Url,
                 isComingSoon = isComingSoon,
                 ImageAltText = contentPage.ImageFileAltText,
-                Type = contentPage.ContentType.FirstOrDefault()?.Identifier.ToString(),
+                Type = type,
                 Title = contentPage.MetadataTitle,
                 Date = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen ?? contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen,
                 UpdatedOnDate = contentPage.UpdatedOn == DateTime.MinValue ? null : contentPage.UpdatedOn,
@@ -190,6 +192,6 @@ public class NewsArticleCardsService : INewsArticleCardsService
             };
             cards.Add(card);
         }
-        return Task.FromResult(cards);
+        return cards;
     }
 }
