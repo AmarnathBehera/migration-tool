@@ -97,6 +97,7 @@ builder.Services.AddScoped<IPageBuilderService, PageBuilderService>();
 builder.Services.AddScoped<IContentService, ContentService>();
 builder.Services.AddScoped<ICachingService, CachingService>();
 builder.Services.AddScoped<ISiteContext, SiteContext>();
+builder.Services.AddScoped<SiteConfigurationProviders>();
 builder.Services.AddScoped<ISiteConfigurationService, SiteConfigurationService>();
 builder.Services.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
 builder.Services.AddHttpContextAccessor();
