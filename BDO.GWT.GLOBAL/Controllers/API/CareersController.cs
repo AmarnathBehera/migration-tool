@@ -27,7 +27,7 @@ public class CareersController: ControllerBase
     {
         query.Filters = RequestQueryUtility.ExtractFilterQueryParameters(Request.Query);
 
-        var result = await _careersPageService.GetCareerPaginationResultAsync(pageGuid, cancellationToken);
+        var result = await _careersPageService.GetCareerPaginationResultAsync(pageGuid, query, cancellationToken);
 
         return Ok(result);
     }

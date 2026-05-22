@@ -12,6 +12,9 @@ public static class FilterUtility
         [FilterParameterName.Person] = new("Author (Person)", ResourceStringKey.LiveSite.Filters.Author, typeof(Person), FilterParameterType.Page),
         [FilterParameterName.ProfileGroup] = new(Taxonomies.ProfileGroup, ResourceStringKey.LiveSite.Filters.ProfileGroup, typeof(ProfileGroup), FilterParameterType.Taxonomy),
         [FilterParameterName.Credential] = new(Taxonomies.Credential, ResourceStringKey.LiveSite.Filters.Credential, typeof(Credentials), FilterParameterType.Taxonomy),
+        [FilterParameterName.CareerEmploymentType] = new(Taxonomies.CareerEmploymentType, ResourceStringKey.LiveSite.Filters.CareerEmploymentType, typeof(CareerEmploymentType), FilterParameterType.Taxonomy),
+        [FilterParameterName.CareerJobTitle] = new(Taxonomies.CareerJobTitle, ResourceStringKey.LiveSite.Filters.CareerJobTitle, typeof(CareerJobTitle), FilterParameterType.Taxonomy),
+        [FilterParameterName.CareerLevel] = new(Taxonomies.CareerLevel, ResourceStringKey.LiveSite.Filters.CareerLevel, typeof(CareerLevel), FilterParameterType.Taxonomy)
     };
     public static FilterParameterData? GetFilterParameterData(string filterParameterName)
     {

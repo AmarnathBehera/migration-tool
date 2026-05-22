@@ -83,6 +83,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ICareerCategoryPageService , CareerCategoryPageService>();
 
         serviceCollection.AddScoped<IChannelAccessService, ChannelAccessService>();
+        serviceCollection.AddScoped<ISocialMediaButtonsService, SocialMediaButtonsService>();
     }
 
 }

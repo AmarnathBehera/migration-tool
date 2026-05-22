@@ -1,5 +1,4 @@
-﻿
-using BDO.GWT.Core.Data.Queries;
+﻿using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.GLOBAL.Tests.Utilities;
 using BDO.GWT.Web.Core.DTOs;
@@ -16,7 +15,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace BDO.GWT.GLOBAL.Tests.Controllers.API;
-
 
 public class CareersControllerUnitTests
 {
@@ -56,6 +54,8 @@ public class CareersControllerUnitTests
         // Arrange
         var pageGuid = Guid.NewGuid();
 
+        var query = new CardsQuery();
+
         var paginationDto = new PaginationDto<CareerCardDto>
         {
             Data = new[]
@@ -69,10 +69,9 @@ public class CareersControllerUnitTests
         _mockService
             .Setup(x => x.GetCareerPaginationResultAsync(
                 It.IsAny<Guid>(),
+                It.IsAny<CardsQuery>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(paginationDto);
-
-        var query = new CardsQuery();
 
         // Act
         var result = await _controller.Get(
@@ -91,6 +90,7 @@ public class CareersControllerUnitTests
 
         _mockService.Verify(x => x.GetCareerPaginationResultAsync(
                 It.Is<Guid>(g => g == pageGuid),
+                It.Is<CardsQuery>(q => q == query),
                 It.IsAny<CancellationToken>()),
             Times.Once);
     }
@@ -101,6 +101,8 @@ public class CareersControllerUnitTests
         // Arrange
         var pageGuid = Guid.NewGuid();
 
+        var query = new CardsQuery();
+
         var emptyDto = new PaginationDto<CareerCardDto>
         {
             Data = Array.Empty<CareerCardDto>(),
@@ -110,10 +112,9 @@ public class CareersControllerUnitTests
         _mockService
             .Setup(x => x.GetCareerPaginationResultAsync(
                 It.IsAny<Guid>(),
+                It.IsAny<CardsQuery>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(emptyDto);
-
-        var query = new CardsQuery();
 
         // Act
         var result = await _controller.Get(
@@ -132,6 +133,7 @@ public class CareersControllerUnitTests
 
         _mockService.Verify(x => x.GetCareerPaginationResultAsync(
                 It.Is<Guid>(g => g == pageGuid),
+                It.Is<CardsQuery>(q => q == query),
                 It.IsAny<CancellationToken>()),
             Times.Once);
     }

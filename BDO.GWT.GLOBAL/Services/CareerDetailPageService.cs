@@ -1,8 +1,10 @@
 ﻿using BDO.GWT.Core;
+using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.DTOs;
+using BDO.GWT.Web.Core.LiveSite.Services;
 using CMS.ContentEngine;
 using CMS.Websites;
 using CMS.Websites.Routing;
@@ -25,15 +27,17 @@ public interface ICareerDetailPageService
     private readonly IContentRetriever _contentRetriever;
     private readonly ITaxonomyRetriever _taxonomyRetriever;
     private readonly ICultureContext _cultureContext;
+    private readonly ISocialMediaButtonsService _socialMediaButtonsService;
 
 
-    public CareerDetailPageService(IHeroService heroService, IWebPageDataContextRetriever webPageDataContextRetriever, IContentRetriever contentRetriever, ITaxonomyRetriever taxonomyRetriever, ICultureContext cultureContext)
+    public CareerDetailPageService(IHeroService heroService, IWebPageDataContextRetriever webPageDataContextRetriever, IContentRetriever contentRetriever, ITaxonomyRetriever taxonomyRetriever, ICultureContext cultureContext, ISocialMediaButtonsService socialMediaButtonsService)
     {
         _heroService = heroService;
         _webPageDataContextRetriever = webPageDataContextRetriever;
         _contentRetriever = contentRetriever;
         _taxonomyRetriever = taxonomyRetriever;
         _cultureContext = cultureContext;
+        _socialMediaButtonsService = socialMediaButtonsService;
 
     }
 
@@ -105,7 +109,7 @@ public interface ICareerDetailPageService
                 Level = careerLevelNames?.FirstOrDefault(),
                 Locations = locationOfficeNames,
                 Content = careerPage.MetadataDescription,
-            ContactPerson = contactPersonName.MetadataTitle,
+            ContactPerson = contactPersonName?.MetadataTitle,
         };
 
             return dto;
@@ -117,9 +121,9 @@ public interface ICareerDetailPageService
 
         sidebarDto.ShowCopyLinkButton = true; // temp
 
-        sidebarDto.PublishDate = careerPage.DocumentPublishFrom;
+        sidebarDto.PublishDate = careerPage.DocumentPublishFrom; 
 
-        //sidebarDto.RelevantContactPeopleTitle = ResourceStringKey.LiveSite.Careers.RelevantContactPeople;
+        sidebarDto.RelevantContactPeopleTitle = ResourceStringKey.LiveSite.Careers.RelevantContactPeople;
 
         sidebarDto.RelevantContactPeople = careerPage.MetadataRelevantContactPerson.Select(i => new SidebarPersonDto
         {
@@ -158,7 +162,7 @@ public interface ICareerDetailPageService
             DownloadButtonAttachment = true
                 ? null
                 : page.DownloadButtonAttachment?.FirstOrDefault()?.ContentAttachmentAsset.Url,
-            //SocialMediaButtons = page.ShowSocialMediaButtons ? await GetSocialMediaButtonsDto(page, cancellationToken) : null,
+            SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page, cancellationToken) : null,
             ShowCopyLinkButton = true
         };
 
