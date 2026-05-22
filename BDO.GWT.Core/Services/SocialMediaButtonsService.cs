@@ -13,8 +13,8 @@ public interface ISocialMediaButtonsService
 
 public class SocialMediaButtonsService : ISocialMediaButtonsService
 {
-    private readonly ISettingsService _settingsService;
-    public SocialMediaButtonsService(ISettingsService settingsService)
+    private readonly ISettingService _settingsService;
+    public SocialMediaButtonsService(ISettingService settingsService)
     {
         _settingsService = settingsService;
     }
@@ -26,35 +26,28 @@ public class SocialMediaButtonsService : ISocialMediaButtonsService
 
         var encodedPageUrl = HttpUtility.UrlEncode(pageUrl);
 
-        //var settingValueByKey = await _settingsService.GetCurrentChannelSettingsAsync([
-        //    SettingName.BDO.DisableCopyLink,
-        //    SettingName.BDO.DisableEmail,
-        //    SettingName.BDO.DisableFacebook,
-        //    SettingName.BDO.DisableTwitter,
-        //    SettingName.BDO.DisableLinkedIn,
-        //    SettingName.BDO.SocialSharing.FacebookAppID,
-        //    SettingName.BDO.SocialSharing.TwitterHandle,
-        //], cancellationToken);
+        var settings = await _settingsService.GetPrintorShareInfo();
+        var settingInfo = settings?.FirstOrDefault();
 
         var dto = new SocialMediaButtonsDto
         {
-            //EmailButtonUrl = settingValueByKey.TryGetValue(SettingName.BDO.DisableEmail, out var disableEmail) && disableEmail is true
-            //    ? null
-            //    : ConstructEmailButtonUrl(encodedPageTitle, encodedPageUrl),
+            EmailButtonUrl = settingInfo?.DisableEmail is true
+            ? null
+            : ConstructEmailButtonUrl(encodedPageTitle, encodedPageUrl),
 
-            //FacebookButtonUrl = settingValueByKey.TryGetValue(SettingName.BDO.DisableFacebook, out var disableFacebook) && disableFacebook is true
-            //    ? null
-            //    : ConstructFacebookButtonUrl(settingValueByKey, encodedPageTitle, encodedPageUrl),
+            FacebookButtonUrl = settingInfo?.DisableFacebook is true
+            ? null
+            : ConstructFacebookButtonUrl(encodedPageTitle, encodedPageUrl),
 
-            //TwitterButtonUrl = settingValueByKey.TryGetValue(SettingName.BDO.DisableTwitter, out var disableTwitter) && disableTwitter is true
-            //    ? null
-            //    : ConstructTwitterButtonUrl(settingValueByKey, encodedPageTitle, encodedPageUrl),
+            TwitterButtonUrl = settingInfo?.DisableTwitter is true
+            ? null
+            : ConstructTwitterButtonUrl(encodedPageTitle, encodedPageUrl),
 
-            //LinkedInUrl = settingValueByKey.TryGetValue(SettingName.BDO.DisableLinkedIn, out var disableLinkedIn) && disableLinkedIn is true
-            //    ? null
-            //    : ConstructLinkedInButtonUrl(encodedPageTitle, encodedPageUrl),
+            LinkedInUrl = settingInfo?.DisableLinkedIn is true
+            ? null
+            : ConstructLinkedInButtonUrl(encodedPageTitle, encodedPageUrl),
 
-            //ShowCopyLinkButton = settingValueByKey.TryGetValue(SettingName.BDO.DisableCopyLink, out var disableCopyLink) && disableCopyLink is false,
+            ShowCopyLinkButton = settingInfo?.DisableCopyLinkButton is not true,
         };
 
         return dto;
@@ -65,18 +58,18 @@ public class SocialMediaButtonsService : ISocialMediaButtonsService
         return $"mailto:?subject={SanitizeEmailSubject(encodedPageTitle)}&body={encodedPageUrl}";
     }
 
-    private static string? ConstructFacebookButtonUrl(IDictionary<string, object?> settingValueByKey, string encodedPageTitle, string encodedPageUrl)
+    private static string? ConstructFacebookButtonUrl(string encodedPageTitle, string encodedPageUrl)
     {
-        return settingValueByKey.TryGetValue(SettingName.BDO.SocialSharing.FacebookAppID, out var facebookAppID)
-            ? $"https://www.facebook.com/dialog/feed?app_id={facebookAppID}&display=popup&caption={encodedPageTitle}&link={encodedPageUrl}&redirect_uri={encodedPageUrl}"
-            : null;
+        // TODO: FacebookAppID is no longer available from PrintorShareInfo.
+        // A separate settings source is needed to provide this value.
+        return $"https://www.facebook.com/dialog/feed?display=popup&caption={encodedPageTitle}&link={encodedPageUrl}&redirect_uri={encodedPageUrl}";
     }
 
-    private static string? ConstructTwitterButtonUrl(IDictionary<string, object?> settingValueByKey, string encodedPageTitle, string encodedPageUrl)
+    private static string? ConstructTwitterButtonUrl(string encodedPageTitle, string encodedPageUrl)
     {
-        return settingValueByKey.TryGetValue(SettingName.BDO.SocialSharing.TwitterHandle, out var twitterHandle)
-            ? $"https://twitter.com/intent/tweet?text={encodedPageTitle}&url={encodedPageUrl}&via={twitterHandle}"
-            : null;
+        // TODO: TwitterHandle is no longer available from PrintorShareInfo.
+        // A separate settings source is needed to provide this value.
+        return $"https://twitter.com/intent/tweet?text={encodedPageTitle}&url={encodedPageUrl}";
     }
 
     private static string ConstructLinkedInButtonUrl(string encodedPageTitle, string encodedPageUrl)

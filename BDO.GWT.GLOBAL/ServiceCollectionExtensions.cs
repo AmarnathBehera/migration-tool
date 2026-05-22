@@ -71,6 +71,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ISocialMediaButtonsService, SocialMediaButtonsService>();
         serviceCollection.AddScoped<IExternalPeopleHelper, ExternalPeopleHelper>();
         serviceCollection.AddScoped<IFilteringHelper, FilteringHelper>();
+        serviceCollection.AddScoped<ISettingService, SettingService>();
 
         serviceCollection.AddScoped<IBreadcrumbsService, BreadcrumbsService>();
         serviceCollection.AddScoped<IFormBuilderService, FormBuilderService>();

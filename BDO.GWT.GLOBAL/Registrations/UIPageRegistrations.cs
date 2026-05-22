@@ -1,5 +1,4 @@
 ﻿using BDO.GWT.Xperience;
-using BDO.GWT.Xperience.Admin.Pages.ProjectSettings;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.GlobalSettings;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using Kentico.Xperience.Admin.Base;
@@ -18,7 +17,7 @@ using Kentico.Xperience.Admin.Base;
     uiPageType: typeof(CookiebootEditPage),
     name: "Cookiebot",
     templateName: TemplateNames.EDIT,
-    order: 0)]
+    order: 1)]
 
 
 [assembly: UIPage(
@@ -115,3 +114,11 @@ using Kentico.Xperience.Admin.Base;
     name: "Create snippet",
     templateName: TemplateNames.EDIT,
     order: 20)]
+
+[assembly: UIPage(
+    parentType: typeof(WebChannelSettingsEditSection),
+    slug: "print-or-share",          
+    uiPageType: typeof(PrintorShareEditPage),
+    name: "Print Or Share settings",
+    templateName: TemplateNames.EDIT,
+    order: 7)]

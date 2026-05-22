@@ -42,6 +42,7 @@ public class NewsSectionPageService : INewsSectionPageService
     {
         var bgImageUrl = currentPage.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
         var mobileImageUrl = currentPage.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+        var ctaUrlPath = currentPage.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath;
         var heroData = new HeroData
         {
             Layout = currentPage.HeroLayout,
@@ -53,6 +54,7 @@ public class NewsSectionPageService : INewsSectionPageService
             MobileBackgroundImageAltText = currentPage.HeroBackgroundImage_MobileAltText,
             CallToActionButtonType = currentPage.HeroCallToActionButtonType,
             CallToActionButtonText = currentPage.HeroCallToActionButtonText,
+            CallToActionButtonUrl = ctaUrlPath != null ? Link.Parse(ctaUrlPath) : null,
         };
         var dto = new NewsSectionDto
         {
