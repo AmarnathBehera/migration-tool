@@ -1,4 +1,5 @@
 ﻿using BDO;
+using BDO.GWT.GLOBAL.Components.Widget.FaqWidget;
 using BDO.GWT.GLOBAL.Components.Widget.ImageWithTextWidget;
 using BDO.GWT.GLOBAL.Components.Widget.LocalNavigationWidget;
 using BDO.GWT.Web.Widgets.AccordionWidget;
@@ -24,6 +25,7 @@ using Kentico.PageBuilder.Web.Mvc;
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.AccordionWidget,typeof(AccordionWidget), "Accordion Widget", typeof(AccordionWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.Button, typeof(ButtonWidget), "Button", typeof(ButtonWidgetProperties), AllowCache = true, IconClass = "icon-xml-tag")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.LocalNavigation, typeof(LocalNavigationWidget), "Local Navigation Item", typeof(LocalNavigationWidgetProperties), AllowCache = true, IconClass = "icon-chain")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.FaqWidget, typeof(FaqWidget), "FAQ Widget", typeof(FaqWidgetProperties), AllowCache = true, IconClass = "icon-bubbles")]
 
 // Sections
 [assembly: RegisterSection(identifier: ComponentIdentifiers.Sections.Container,name: "Container",propertiesType: typeof(BaseSectionProperties),customViewName: "~/Components/Section/SectionView/_ContainerSection.cshtml")]
