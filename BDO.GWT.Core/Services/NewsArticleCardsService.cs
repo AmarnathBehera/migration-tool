@@ -165,7 +165,7 @@ public class NewsArticleCardsService : INewsArticleCardsService
             _ => null,
         };
     }
-    public async Task<List<ContentPageCardDto>> GetContentPageCardListAsync(ICollection<NewsArticle> contentPages, string languageTag, Func<NewsArticle, bool> isPageFeatured, CancellationToken cancellationToken)
+    public static Task<List<ContentPageCardDto>> GetContentPageCardListAsync(ICollection<NewsArticle> contentPages, string languageTag, Func<NewsArticle, bool> isPageFeatured, CancellationToken cancellationToken)
     {
         var cards = new List<ContentPageCardDto>();
         foreach (var contentPage in contentPages)
@@ -190,6 +190,6 @@ public class NewsArticleCardsService : INewsArticleCardsService
             };
             cards.Add(card);
         }
-        return cards;
+        return Task.FromResult(cards);
     }
 }
