@@ -123,3 +123,12 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     customViewName: "~/Views/LocationCity/Index.cshtml",
     ContentTypeNames = new[] { "BDO.LocationCity" },
     IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(SectionBlogs.CONTENT_TYPE_NAME, typeof(SectionBlogsController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: SectionBlogs.CONTENT_TYPE_NAME,
+    name: "Section Blogs Content Type Template",
+    customViewName: "~/Views/SectionBlogs/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SectionBlogs" },
+    IconClass = "xp-market")]

@@ -77,6 +77,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IBusinessLinePageService, BusinessLinePageService>();
         serviceCollection.AddTransient<DropdownScriptExecutor>();
         serviceCollection.AddScoped<IChannelAccessService, ChannelAccessService>();
+        serviceCollection.AddScoped<ISectionBlogService, SectionBlogService>();
     }
 
 }
