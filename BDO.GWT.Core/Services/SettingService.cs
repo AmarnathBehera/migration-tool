@@ -6,23 +6,27 @@ public interface ISettingService
 {
     Task<IEnumerable<PrintorShareInfo>?> GetPrintorShareInfo();
     Task<IEnumerable<FilteringInfo>?> GetFilteringInfo();
+    Task<IEnumerable<OurPeopleInfo>?> GetUsePersonPageTitleInfo();
 }
 
 public class SettingService : ISettingService
 {
     public readonly IInfoProvider<PrintorShareInfo> _PrintorShareinfoProvider;
     public readonly IInfoProvider<FilteringInfo> _FilteringinfoProvider;
+    public readonly IInfoProvider<OurPeopleInfo> _ourpeopleinfoProvider;
     private readonly IInfoProvider<WebChannelSettingsInfo> _webChannelSettingsInfoProvider;
     private readonly IContentService _contentService;
     
     public SettingService(
         IInfoProvider<PrintorShareInfo> PrintorShareinfoProvider,
         IInfoProvider<FilteringInfo> FilteringinfoProvider,
-    IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider,
+        IInfoProvider<OurPeopleInfo> ourpeopleinfoProvider,
+        IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider,
         IContentService contentService)
     {
         _PrintorShareinfoProvider = PrintorShareinfoProvider;
         _FilteringinfoProvider = FilteringinfoProvider;
+        _ourpeopleinfoProvider = ourpeopleinfoProvider;
         _webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
         _contentService = contentService;
     }
@@ -65,5 +69,19 @@ public class SettingService : ISettingService
             .GetEnumerableTypedResultAsync();
 
         return filteringData;
+    }
+    public async Task<IEnumerable<OurPeopleInfo>?> GetUsePersonPageTitleInfo()
+    {
+        var channelSetting = await GetCurrentChannelSettingAsync();
+
+        if (channelSetting == null)
+        {
+            return null;
+        }
+        var peopleData = await _ourpeopleinfoProvider.Get()
+            .WhereEquals(nameof(OurPeopleInfo.PeopleSettingsWebChannelSettingID), channelSetting.WebChannelSettingsID)
+            .GetEnumerableTypedResultAsync();
+
+        return peopleData;
     }
 }

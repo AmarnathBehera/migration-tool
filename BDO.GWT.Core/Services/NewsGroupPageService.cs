@@ -36,13 +36,13 @@ public class NewsGroupPageService : INewsGroupPageService
            cancellationToken
        )).ToArray();
      
-       // var orderedNewsArticles = newsArticles.OrderByDescending(x => x.PublishFrom);
+       var orderedNewsArticles = newsArticles.OrderByDescending(x => x.SystemFields.ContentItemCommonDataLastPublishedWhen);
 
-        var result = newsArticles.Select(newsArticle => new NewsGroupItemDto
+        var result = orderedNewsArticles.Select(newsArticle => new NewsGroupItemDto
         {
             Title = newsArticle.MetadataTitle,
             URL = newsArticle.GetUrl().RelativePath,
-           // PublishFrom = newsArticle.PublishFrom,
+            PublishFrom = newsArticle.SystemFields.ContentItemCommonDataLastPublishedWhen,
         }).ToArray();
 
         return result;

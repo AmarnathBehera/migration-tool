@@ -125,8 +125,16 @@ using Kentico.Xperience.Admin.Base;
 
 [assembly: UIPage(
     parentType: typeof(WebChannelSettingsEditSection),
-    slug: "filtering-or-share",
+    slug: "filtering",
     uiPageType: typeof(FilteringEditPage),
     name: "Filtering settings",
     templateName: TemplateNames.EDIT,
     order: 8)]
+
+[assembly: UIPage(
+    parentType: typeof(WebChannelSettingsEditSection),
+    slug: "our-people",
+    uiPageType: typeof(OurPeopleInfoEditPage),
+    name: "Our People settings",
+    templateName: TemplateNames.EDIT,
+    order: 9)]

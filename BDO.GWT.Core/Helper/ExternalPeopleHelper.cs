@@ -1,4 +1,5 @@
 ﻿using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.Services;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 
@@ -13,29 +14,48 @@ public interface IExternalPeopleHelper
 public class ExternalPeopleHelper : IExternalPeopleHelper
 {
     private readonly IContentService _contentService;
+    private readonly ISettingService _settingsService;
 
-    public ExternalPeopleHelper(IContentService contentService)
+    public ExternalPeopleHelper(IContentService contentService, ISettingService settingsService)
     {
         _contentService = contentService;
+        _settingsService = settingsService;
     }
 
     public async Task<SidebarExternalPersonDto[]> GetSidebarExternalPeopleDtosAsync(List<Guid> externalPeopleNodeGuids, CancellationToken cancellationToken)
     {
-        var externalPeople = (await _contentService.GetPagesAsync<MicrositePlaceholder>(
+        var externalPeople = await _contentService.GetPagesAsync<ExternalPerson>(
            new RetrievePagesParameters { LinkedItemsMaxLevel = 2 },
            query => query
                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
                .Where(w => w.WhereIn("ContentItemGUID", externalPeopleNodeGuids)),
            RetrievalCacheSettings.CacheDisabled,
            cancellationToken
-       ));
+       );
 
-        var dtos = await Task.WhenAll(externalPeople.Select(async externalPerson => new SidebarExternalPersonDto
+        var dtos = await Task.WhenAll(externalPeople.Select(async externalPerson =>
         {
-            Image = null, // TODO: Map from Person properties
-            FullName = "name",//await GetDisplayNameAsync(externalPerson),
-            JobTitle = "tesxt",//externalPerson.PersonJobTitle,
-            Url = null, // TODO: Map from Person properties
+            var externalPersonUrls = externalPerson.Url?.Select(u => u?.WebPageGuid ?? Guid.Empty)
+                                    .Where(g => g != Guid.Empty)
+                                    .ToList() ?? new List<Guid>();
+
+            var externalPersonUrlsSelectedPages = externalPersonUrls.Any()
+                ? await _contentService.GetItemsByGUIDAsync(externalPersonUrls)
+                : Enumerable.Empty<IWebPageFieldsSource>();
+
+            var imageFile = externalPerson.ImageFile.FirstOrDefault();
+
+            return new SidebarExternalPersonDto
+            {
+                Image = imageFile != null ? new ImageDto
+                {
+                    Url = imageFile.ContentAttachmentAsset.Url,
+                    AltText = externalPerson.ImageFileAltText
+                } : null,
+                FullName = await GetDisplayNameAsync(externalPerson),
+                JobTitle = externalPerson.JobTitle,
+                Url = externalPersonUrlsSelectedPages.FirstOrDefault()?.SystemFields?.WebPageUrlPath ?? string.Empty
+            };
         }));
 
         return dtos;
@@ -43,7 +63,7 @@ public class ExternalPeopleHelper : IExternalPeopleHelper
 
     public async Task<List<string>> GetExternalPeopleDisplayNames(List<Guid> externalPeopleNodeGuids, CancellationToken cancellationToken)
     {
-        var externalPeople = (await _contentService.GetPagesAsync<Person>(
+        var externalPeople = (await _contentService.GetPagesAsync<ExternalPerson>(
            new RetrievePagesParameters { LinkedItemsMaxLevel = 2 },
            query => query
                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
@@ -55,20 +75,17 @@ public class ExternalPeopleHelper : IExternalPeopleHelper
 
         return names.ToList();
     }
-    public async Task<string> GetDisplayNameAsync(Person externalPerson)
+    public async Task<string> GetDisplayNameAsync(ExternalPerson externalPerson)
     {
-        //var setting = await settingsService.GetCurrentSiteSettingAsync(SettingName.BDO.UsePersonPageTitle, cancellationToken);
+        var setting = await _settingsService.GetUsePersonPageTitleInfo();
 
-        //var usePersonPageTitle = (bool?)setting?.Value;
+        var usePersonPageTitle = (bool?)setting?.FirstOrDefault()?.UsePageTitleToDisplayPersonName ?? false;
 
-        //if (usePersonPageTitle is true)
-        //{
-        //    return Title;
-        //}
+        if (usePersonPageTitle is true)
+        {
+            return externalPerson.MetadataTitle;
+        }
 
-       // return string.IsNullOrEmpty(SurnamePrefixes) ? $"{FirstName} {LastName}" : $"{FirstName} {SurnamePrefixes} {LastName}";
-        return string.IsNullOrEmpty(externalPerson.PersonSurnamePrefixes) 
-            ? $"{externalPerson.PersonFirstName} {externalPerson.PersonLastName}" 
-            : $"{externalPerson.PersonFirstName} {externalPerson.PersonSurnamePrefixes} {externalPerson.PersonLastName}";
+        return string.IsNullOrEmpty(externalPerson.SurnamePrefixes) ? $"{externalPerson.FirstName} {externalPerson.LastName}" : $"{externalPerson.FirstName} {externalPerson.SurnamePrefixes} {externalPerson.LastName}";
     }
 }

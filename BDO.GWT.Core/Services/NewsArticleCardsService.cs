@@ -73,15 +73,20 @@ public class NewsArticleCardsService : INewsArticleCardsService
                });
            },
            cancellationToken
-       );
+       ) ?? [];
        
         var orderedNewsArticles = newsArticles
+            .Where(x => x is not null)
+            .Cast<NewsArticle>()
             .OrderByDescending(isFeatured)
             .ToArray();
 
+        var currentPage = cardsQuery.CurrentPage ?? 1;
+        var pageSize = cardsQuery.PageSize ?? 10;
+
         var paginatedPages = orderedNewsArticles
-            .Skip((cardsQuery.CurrentPage.Value - 1) * cardsQuery.PageSize.Value)
-            .Take(cardsQuery.PageSize.Value)
+            .Skip((currentPage - 1) * pageSize)
+            .Take(pageSize)
             .ToArray();
 
         var itemDtos = await GetContentPageCardListAsync(paginatedPages, _cultureContext.CurrentLanguageTag, isFeatured, cancellationToken);
