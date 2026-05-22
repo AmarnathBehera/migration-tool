@@ -36,6 +36,7 @@ public class LocationCityPageService : ILocationCityPageService
         locationCityDto.MainContent.OfficeCards = ToOfficeCards(offices, page);
         var bgImageUrl = page.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
         var mobileImageUrl = page.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+        var ctaUrlPath = page.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath;
         var heroData = new HeroData
         {
             Layout = page.HeroLayout,
@@ -47,6 +48,7 @@ public class LocationCityPageService : ILocationCityPageService
             MobileBackgroundImageAltText = page.HeroBackgroundImage_MobileAltText,
             CallToActionButtonType = page.HeroCallToActionButtonType,
             CallToActionButtonText = page.HeroCallToActionButtonText,
+            CallToActionButtonUrl = ctaUrlPath != null ? Link.Parse(ctaUrlPath) : null,
         };
         locationCityDto.Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken);
         return locationCityDto;
