@@ -60,15 +60,11 @@ public class SocialMediaButtonsService : ISocialMediaButtonsService
 
     private static string? ConstructFacebookButtonUrl(string encodedPageTitle, string encodedPageUrl)
     {
-        // TODO: FacebookAppID is no longer available from PrintorShareInfo.
-        // A separate settings source is needed to provide this value.
         return $"https://www.facebook.com/dialog/feed?display=popup&caption={encodedPageTitle}&link={encodedPageUrl}&redirect_uri={encodedPageUrl}";
     }
 
     private static string? ConstructTwitterButtonUrl(string encodedPageTitle, string encodedPageUrl)
     {
-        // TODO: TwitterHandle is no longer available from PrintorShareInfo.
-        // A separate settings source is needed to provide this value.
         return $"https://twitter.com/intent/tweet?text={encodedPageTitle}&url={encodedPageUrl}";
     }
 

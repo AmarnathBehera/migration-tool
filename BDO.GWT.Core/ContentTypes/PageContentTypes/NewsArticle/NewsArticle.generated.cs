@@ -164,7 +164,19 @@ namespace BDO
 		/// <summary>
 		/// ContentType.
 		/// </summary>
-		public IEnumerable<MicrositePlaceholder> ContentType { get; set; }
+		public IEnumerable<TagReference> ContentType { get; set; }
+
+
+		/// <summary>
+		/// MetadataRssImage.
+		/// </summary>
+		public IEnumerable<IContentItemFieldsSource> MetadataRssImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataBusinessLine.
+		/// </summary>
+		public IEnumerable<BusinessLine> MetadataBusinessLine { get; set; }
 
 
 		/// <summary>
@@ -207,12 +219,6 @@ namespace BDO
 		/// MetadataRssCategory.
 		/// </summary>
 		public IEnumerable<MicrositePlaceholder> MetadataRssCategory { get; set; }
-
-
-		/// <summary>
-		/// MetadataRssImage.
-		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataRssImage { get; set; }
 
 
 		/// <summary>

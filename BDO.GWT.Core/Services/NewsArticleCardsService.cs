@@ -3,9 +3,11 @@ using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
+using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Utilities;
 using CMS.ContentEngine;
 using CMS.Websites;
+using HotChocolate.Data.Filters;
 using Kentico.Content.Web.Mvc;
 
 namespace BDO.GWT.Core.Services;
@@ -23,19 +25,20 @@ public interface INewsArticleCardsService
 public class NewsArticleCardsService : INewsArticleCardsService
 {
     private readonly ICardsService _cardsService;
-    //private readonly IChildPageHelper _childPageHelper;
-    //private readonly IContentPageCardHelper<NewsArticle> _newsArticleCardHelper;
     private readonly ICultureContext _cultureContext;
     private readonly IContentService _contentService;
+    private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
 
-    public NewsArticleCardsService(ICardsService cardsService,
-       // IChildPageHelper childPageHelper,
-        ICultureContext cultureContext, IContentService contentService )
+    public NewsArticleCardsService(
+        ICardsService cardsService,
+        ICultureContext cultureContext,
+        IContentService contentService,
+        ITaxonomyTagRetriever taxonomyTagRetriever)
     {
         _cardsService = cardsService;
-        //_childPageHelper = childPageHelper;
         _cultureContext = cultureContext;
         _contentService = contentService;
+        _taxonomyTagRetriever = taxonomyTagRetriever;
     }
 
     public async Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(HashSet<string> filters, string? nodeAliasPath, CancellationToken cancellationToken)
@@ -74,28 +77,23 @@ public class NewsArticleCardsService : INewsArticleCardsService
        
         var orderedNewsArticles = newsArticles
             .OrderByDescending(isFeatured)
-            //.ThenByDescending(x => x.PublishFrom ?? x.CreationDate)
             .ToArray();
 
-        //var paginatedNewsArticles = PaginationHelper.PaginatePages(orderedNewsArticles, cardsQuery)
-        //    .ToArray();
+        var paginatedPages = orderedNewsArticles
+            .Skip((cardsQuery.CurrentPage.Value - 1) * cardsQuery.PageSize.Value)
+            .Take(cardsQuery.PageSize.Value)
+            .ToArray();
 
-        var itemDtos = await GetContentPageCardListAsync(orderedNewsArticles, _cultureContext.CurrentLanguageTag, isFeatured, cancellationToken);
+        var itemDtos = await GetContentPageCardListAsync(paginatedPages, _cultureContext.CurrentLanguageTag, isFeatured, cancellationToken);
 
         var paginationDto = new PaginationDto<ContentPageCardDto>
         {
             Data = itemDtos.ToArray(),
-            TotalCount = orderedNewsArticles.Length,
+            TotalCount = paginatedPages.Length,
         };
 
         return paginationDto;
     }
-
-    //private static void ApplyCommonFilter(IPageQuery<NewsArticle> pageQuery)
-    //{
-    //    pageQuery.Where(x => x.IsSearchExcluded == false || x.IsSearchExcluded == null);
-    //}
-
     private async Task<List<Action<WhereParameters>>> GetFilterParameterWhereExpressionsAsync(IDictionary<string, string> filterParameterValueByName)
     {
         var whereExpressions = new List<Action<WhereParameters>>();
@@ -112,6 +110,7 @@ public class NewsArticleCardsService : INewsArticleCardsService
             var filter = filterParameterData.FilterParameterType switch
             {
                 FilterParameterType.Page => await GetPageFilterAsync(filterParameterName, filterParameterValue),
+                FilterParameterType.Taxonomy => await GetTaxonomyFilterAsync(filterParameterName, filterParameterValue),
                 _ => null,
             };
 
@@ -136,79 +135,31 @@ public class NewsArticleCardsService : INewsArticleCardsService
 
         return filterName switch
         {
-            //FilterParameterName.BusinessLine => await BuildBusinessLineWhereExpression(page.NodeAliasPath),
-            //FilterParameterName.ServiceArea => await BuildServiceAreaWhereExpression(page.NodeAliasPath),
+            FilterParameterName.BusinessLine => x => x.WhereContains(nameof(NewsArticle.MetadataBusinessLine), guid),
+            FilterParameterName.ServiceArea => x => x.WhereContains(nameof(NewsArticle.MetadataServiceAreas), guid),
             FilterParameterName.Service => x => x.WhereContains(nameof(NewsArticle.MetadataServices), guid),
-            //FilterParameterName.IndustryCategory => await BuildIndustryCategoryWhereExpression(page.NodeAliasPath),
+            FilterParameterName.IndustryCategory => x => x.WhereContains(nameof(NewsArticle.MetadataIndustryCategories), guid),
             FilterParameterName.IndustryPage => x => x.WhereContains(nameof(NewsArticle.MetadataIndustries), guid),
-            //FilterParameterName.MicrositeMasterPage => await BuildMicrositeMasterPageWhereExpression(page.NodeAliasPath),
+            FilterParameterName.MicrositeMasterPage => x => x.WhereContains(nameof(NewsArticle.MicrositeMasterPages), guid),
+            FilterParameterName.MicrositePage => x => x.WhereContains(nameof(NewsArticle.MicrositePages), guid),
             _ => null,
         };
     }
 
-    //private async Task<Expression<Func<NewsArticle, bool>>?> BuildBusinessLineWhereExpression(string nodeAliasPathPrefix)
-    //{
-    //    var nodeIdsByPageType = await _childPageHelper.GetDescendantNodeIdsByPageType([
-    //        typeof(BusinessLine),
-    //        typeof(ServiceArea),
-    //        typeof(Service),
-    //    ], nodeAliasPathPrefix);
+    private async Task<Action<WhereParameters>?> GetTaxonomyFilterAsync(string filterName, string filterValue)
+    {
+        var tag = await _taxonomyTagRetriever.GetTaxonomyTagByNameAsync(filterValue);
+        if (tag == null)
+            return null;
 
-    //    var businessLineNodeIds = PageTypeUtility.GetPageTypeNodeIds<BusinessLine>(nodeIdsByPageType);
-    //    var serviceAreaNodeIds = PageTypeUtility.GetPageTypeNodeIds<ServiceArea>(nodeIdsByPageType);
-    //    var serviceNodeIds = PageTypeUtility.GetPageTypeNodeIds<Service>(nodeIdsByPageType);
+        var identifiers = new List<Guid> { tag.TagGUID };
 
-    //    return x =>
-    //        x.MetadataBusinessLines.Intersect(businessLineNodeIds).Any() ||
-    //        x.MetadataServiceAreas.Intersect(serviceAreaNodeIds).Any() ||
-    //        x.MetadataServices.Intersect(serviceNodeIds).Any();
-    //}
-
-    //private async Task<Expression<Func<NewsArticle, bool>>> BuildServiceAreaWhereExpression(string pageNodeAliasPath)
-    //{
-    //    var nodeIdsByPageType = await _childPageHelper.GetDescendantNodeIdsByPageType([
-    //        typeof(ServiceArea),
-    //        typeof(Service),
-    //    ], pageNodeAliasPath);
-
-    //    var serviceAreaNodeIds = PageTypeUtility.GetPageTypeNodeIds<ServiceArea>(nodeIdsByPageType);
-    //    var serviceNodeIds = PageTypeUtility.GetPageTypeNodeIds<Service>(nodeIdsByPageType);
-
-    //    return x =>
-    //        x.MetadataServiceAreas.Intersect(serviceAreaNodeIds).Any() ||
-    //        x.MetadataServices.Intersect(serviceNodeIds).Any();
-    //}
-
-    //private async Task<Expression<Func<NewsArticle, bool>>?> BuildIndustryCategoryWhereExpression(string nodeAliasPathPrefix)
-    //{
-    //    var nodeIdsByPageType = await _childPageHelper.GetDescendantNodeIdsByPageType([
-    //        typeof(IndustryCategory),
-    //        typeof(Industry),
-    //    ], nodeAliasPathPrefix);
-
-    //    var industryCategoryNodeIds = PageTypeUtility.GetPageTypeNodeIds<IndustryCategory>(nodeIdsByPageType);
-    //    var industryNodeIds = PageTypeUtility.GetPageTypeNodeIds<Industry>(nodeIdsByPageType);
-
-    //    return x =>
-    //        x.MetadataIndustryCategories.Intersect(industryCategoryNodeIds).Any() ||
-    //        x.MetadataIndustries.Intersect(industryNodeIds).Any();
-    //}
-
-    //private async Task<Expression<Func<NewsArticle, bool>>?> BuildMicrositeMasterPageWhereExpression(string nodeAliasPathPrefix)
-    //{
-    //    var nodeIdsByPageType = await _childPageHelper.GetDescendantNodeIdsByPageType([
-    //        typeof(MicrositeMasterPage),
-    //        typeof(MicrositePage),
-    //    ], nodeAliasPathPrefix);
-
-    //    var micrositeMasterPageNodeIds = PageTypeUtility.GetPageTypeNodeIds<MicrositeMasterPage>(nodeIdsByPageType);
-    //    var micrositePageNodeIds = PageTypeUtility.GetPageTypeNodeIds<MicrositePage>(nodeIdsByPageType);
-
-    //    return x =>
-    //        x.MicrositeMasterPages.Intersect(micrositeMasterPageNodeIds).Any() ||
-    //        x.MicrositePages.Intersect(micrositePageNodeIds).Any();
-    //}
-
+        return filterName switch
+        {
+            FilterParameterName.ContentType => w => w.WhereContainsTags(nameof(NewsArticle.ContentType), identifiers),
+            _ => null,
+        };
+    }
     public async Task<List<ContentPageCardDto>> GetContentPageCardListAsync(ICollection<NewsArticle> contentPages, string languageTag, Func<NewsArticle, bool> isPageFeatured, CancellationToken cancellationToken)
     {
         var cards = new List<ContentPageCardDto>();
