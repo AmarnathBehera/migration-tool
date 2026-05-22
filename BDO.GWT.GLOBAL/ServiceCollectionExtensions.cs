@@ -63,6 +63,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ILocationCityPageService, LocationCityPageService>();
         serviceCollection.AddScoped<ILocationsPageService, LocationsPageService>();
         serviceCollection.AddScoped<ITaxonomyTagRetriever, TaxonomyTagRetriever>();
+        serviceCollection.AddScoped<IFaqService, FaqService>();
         serviceCollection.AddScoped<INewsSectionPageService, NewsSectionPageService>();
         serviceCollection.AddScoped<INewsGroupPageService, NewsGroupPageService>();
         serviceCollection.AddScoped<INewsArticleService, NewsArticleService>();

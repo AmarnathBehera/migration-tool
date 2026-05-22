@@ -39,17 +39,19 @@ namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWid
 
             var tilePages = new List<TilePageDto>();
 
-            if (model?.Properties?.TilePagesIndustry != null && model.Properties.TilePagesIndustry.Any())
+            if (model?.Properties?.TilePageType == "Industry" && model.Properties.TilePagesIndustry.Any())
             {
-                var guids = model.Properties.TilePagesIndustry
+                
+                    var guids = model.Properties.TilePagesIndustry
                     .Where(x => x.Identifier != Guid.Empty)
                     .Select(x => x.Identifier)
                     .ToList();
 
-                tilePages = await _tileContentService
-                    .GetTilePagesAsync(guids, cancellationToken);
+                    tilePages = await _tileContentService
+                        .GetTilePagesAsync(guids, cancellationToken);
+                
             }
-            if (model?.Properties?.TilePagesService != null && model.Properties.TilePagesService.Any())
+            else if (model?.Properties?.TilePageType == "Service" && model.Properties.TilePagesService.Any())
             {
                 var guids = model.Properties.TilePagesService
                     .Where(x => x.Identifier != Guid.Empty)
@@ -59,7 +61,6 @@ namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWid
                 tilePages = await _tileContentService
                     .GetTilePagesAsync(guids, cancellationToken);
             }
-
 
             var image = await GetImage(model.Properties, cancellationToken);
             var dto = new TiledLinkSectionDto
