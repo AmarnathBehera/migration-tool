@@ -26,15 +26,13 @@ public class CareerDetailControllerUnitTests
     public void OneTimeSetUp()
     {
         _controller = new CareerDetailController(
-            _mockService.Object,
-            _mockPageContext.Object);
+            _mockService.Object);
     }
 
     [TearDown]
     public void TearDown()
     {
         _mockService.Reset();
-        _mockPageContext.Reset();
     }
 
     [OneTimeTearDown]
