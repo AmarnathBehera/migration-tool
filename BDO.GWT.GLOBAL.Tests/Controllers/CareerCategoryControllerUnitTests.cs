@@ -6,7 +6,7 @@ using BDO.GWT.Web.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
-namespace BDO.GWT.Web.Core.LiveSite.Tests.Controllers;
+namespace BDO.GWT.GLOBAL.Tests.Controllers;
 
 
 public class CareerCategoryControllerUnitTests

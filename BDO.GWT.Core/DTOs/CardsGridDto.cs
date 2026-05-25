@@ -1,6 +1,6 @@
-﻿using BDO.GWT.Core.DTOs;
+﻿
 
-namespace BDO.GWT.Web.Core.DTOs;
+namespace BDO.GWT.Core.DTOs;
 
 public class CardsGridDto : IFilterableComponentDto
 {

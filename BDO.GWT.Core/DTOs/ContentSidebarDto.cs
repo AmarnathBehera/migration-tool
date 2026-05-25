@@ -1,7 +1,6 @@
-﻿using BDO.GWT.Web.Core.DTOs;
-using System;
+﻿
 
-namespace BDO.GWT.Web.Core.DTOs;
+namespace BDO.GWT.Core.DTOs;
 
 public class ContentSidebarDto : ISidebarDto
 {

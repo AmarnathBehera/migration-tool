@@ -1,18 +1,20 @@
-﻿using BDO.GWT.Core;
+﻿using BDO.GWT.Common.Exceptions;
+using BDO.GWT.Core;
 using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data;
+using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.DTOs;
-using BDO.GWT.Web.Core.LiveSite.Services;
+
 using CMS.ContentEngine;
 using CMS.Websites;
-using CMS.Websites.Routing;
+
 using Kentico.Content.Web.Mvc;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
+
 
 namespace BDO.GWT.Web.Core.Services;
 
@@ -28,9 +30,10 @@ public interface ICareerDetailPageService
     private readonly ITaxonomyRetriever _taxonomyRetriever;
     private readonly ICultureContext _cultureContext;
     private readonly ISocialMediaButtonsService _socialMediaButtonsService;
+    private readonly ISettingService _settingsService;
+    private readonly IContentService _contentService;
 
-
-    public CareerDetailPageService(IHeroService heroService, IWebPageDataContextRetriever webPageDataContextRetriever, IContentRetriever contentRetriever, ITaxonomyRetriever taxonomyRetriever, ICultureContext cultureContext, ISocialMediaButtonsService socialMediaButtonsService)
+    public CareerDetailPageService(IHeroService heroService, IWebPageDataContextRetriever webPageDataContextRetriever, IContentRetriever contentRetriever, ITaxonomyRetriever taxonomyRetriever, ICultureContext cultureContext, ISocialMediaButtonsService socialMediaButtonsService, ISettingService settingsService, IContentService contentService)
     {
         _heroService = heroService;
         _webPageDataContextRetriever = webPageDataContextRetriever;
@@ -38,7 +41,8 @@ public interface ICareerDetailPageService
         _taxonomyRetriever = taxonomyRetriever;
         _cultureContext = cultureContext;
         _socialMediaButtonsService = socialMediaButtonsService;
-
+        _settingsService = settingsService;
+        _contentService = contentService;   
     }
 
 
@@ -119,7 +123,7 @@ public interface ICareerDetailPageService
     {
         var sidebarDto = await GetSidebarDtoAsync(careerPage, cancellationToken);
 
-        sidebarDto.ShowCopyLinkButton = true; // temp
+        sidebarDto.ShowCopyLinkButton = await GetShowCopyLinkOptionFromSectionPageAsync(careerPage,sidebarDto.ShowCopyLinkButton,cancellationToken); 
 
         sidebarDto.PublishDate = careerPage.DocumentPublishFrom; 
 
@@ -142,36 +146,47 @@ public interface ICareerDetailPageService
 
     public async Task<ContentSidebarDto> GetSidebarDtoAsync(Career page, CancellationToken cancellationToken)
     {
-        //var settingValueByKey = await _settingsService.GetCurrentSiteSettingsAsync([
-        //    SettingName.BDO.DisablePrint,
-        //    SettingName.BDO.DisableDownload,
-        //    SettingName.BDO.DisableCopyLink,
-        //], cancellationToken);
+        var settings = await _settingsService.GetPrintorShareInfo();
+        var settingInfo = settings?.FirstOrDefault();
+
 
         var sidebarDto = new ContentSidebarDto
         {
-            //ShowPrintButton = (!settingValueByKey.TryGetValue(SettingName.BDO.DisablePrint, out var disablePrint) || disablePrint is not true) && page.ShowPrintButton,
-            //DownloadButtonAttachment = settingValueByKey.TryGetValue(SettingName.BDO.DisableDownload, out var disableDownload) && disableDownload is true
-            //    ? null
-            //    : page.DownloadButtonAttachment?.ToHtmlCompatibleString(),
-            //SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page, cancellationToken) : null,
-            //ShowCopyLinkButton = settingValueByKey.TryGetValue(SettingName.BDO.DisableCopyLink, out var disableCopyLink) && disableCopyLink is not true,
 
-            //Temp
-            ShowPrintButton = page.ShowPrintButton,
-            DownloadButtonAttachment = true
+            ShowPrintButton = settingInfo.DisablePrint is not true && page.ShowPrintButton,
+            DownloadButtonAttachment = settingInfo.DisableDownload is true 
                 ? null
                 : page.DownloadButtonAttachment?.FirstOrDefault()?.ContentAttachmentAsset.Url,
-            SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page, cancellationToken) : null,
-            ShowCopyLinkButton = true
+            SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page,page.PageTitle, cancellationToken) : null,
+            ShowCopyLinkButton = settingInfo.DisableCopyLinkButton
         };
 
         if (sidebarDto.SocialMediaButtons is not null)
         {
-            sidebarDto.SocialMediaButtons.ShowCopyLinkButton = true; //temp
+            sidebarDto.SocialMediaButtons.ShowCopyLinkButton = null; 
         }
 
         return sidebarDto;
     }
+
+    private async Task<bool> GetShowCopyLinkOptionFromSectionPageAsync(Career careerPage, bool showCopyLinkButton, CancellationToken cancellationToken)
+    {
+        var careers = await _contentService.RetrievePagesAsync<Careers>(new RetrievePagesParameters { },query => query.Where(w => w.WhereEquals("WebPageItemID",careerPage.SystemFields.WebPageItemParentID)), cancellationToken);
+
+        if (careers is null)
+        {
+            throw new MissingSectionPageException($"'No pages have been found of type '{nameof(Careers)}'.");
+        }
+
+        var sectionCareers = await _contentService.RetrievePagesAsync<SectionCareers>(new RetrievePagesParameters { }, query => query.Where(w => w.WhereEquals("WebPageItemID", careers.FirstOrDefault().SystemFields.WebPageItemParentID)), cancellationToken);
+
+        if (sectionCareers is null)
+        {
+            throw new MissingSectionPageException($"'No pages have been found of type '{nameof(SectionCareers)}'.");
+        }
+
+        return sectionCareers.FirstOrDefault().ShowCopyUrlButtonInJobOpportunity && showCopyLinkButton;
+    }
+
 
 }
