@@ -1,0 +1,53 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Core.DTOs.Pages.ContentPageDto
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+    var widgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.AccordionWidget,
+        //ComponentIdentifiers.Widgets.DescriptionText,
+        //ComponentIdentifiers.Widgets.EditorsPick,
+        //ComponentIdentifiers.Widgets.FeaturedEvent,
+        //ComponentIdentifiers.Widgets.FeaturedBusinessSolutions,
+        //ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.Imagewithtext,
+        // ComponentIdentifiers.Widgets.KeyContacts,
+        // ComponentIdentifiers.Widgets.KeyTakeaways,
+        // ComponentIdentifiers.Widgets.RelatedContacts,
+        //ComponentIdentifiers.Widgets.PurposeIcon,
+        //ComponentIdentifiers.Widgets.SubscriptionButton,
+        //ComponentIdentifiers.Widgets.TwitterCarousel,
+    };
+}
+
+
+@* @await Html.PartialAsync("~/Views/ContentPage/_Hero.cshtml") *@
+
+@* @await Html.PartialAsync("_LocalNavigation") *@
+
+@(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.InsightDetails,
+        ReactComponentType.InsightDetailsGUID,
+        new { data = Model },
+        Context.RequestAborted))
+<div>
+    @await Html.Kentico().EditableAreaAsync(
+    "mainContent",
+        new EditableAreaOptions
+        {
+            AllowedWidgets = widgetsList
+        })
+</div>
+

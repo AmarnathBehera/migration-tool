@@ -36,6 +36,18 @@ namespace BDO
 
 
 		/// <summary>
+		/// ItemListFilters.
+		/// </summary>
+		public string ItemListFilters { get; set; }
+
+
+		/// <summary>
+		/// ItemListFeaturedItems.
+		/// </summary>
+		public IEnumerable<NewsArticle> ItemListFeaturedItems { get; set; }
+
+
+		/// <summary>
 		/// ShowCopyUrlButtonInNewsArticle.
 		/// </summary>
 		public bool ShowCopyUrlButtonInNewsArticle { get; set; }

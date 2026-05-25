@@ -38,7 +38,7 @@ namespace BDO
 		/// <summary>
 		/// CareerListFilters.
 		/// </summary>
-		public IEnumerable<TagReference> CareerListFilters { get; set; }
+		public string CareerListFilters { get; set; }
 
 
 		/// <summary>
