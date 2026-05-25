@@ -8,6 +8,8 @@ using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Moq;
 
 namespace BDO.GWT.GLOBAL.Tests.Services;
@@ -18,6 +20,9 @@ public class PeopleCardsServiceTests
     private Mock<IContentService> _contentServiceMock = null!;
     private Mock<ITaxonomyTagRetriever> _taxonomyTagRetrieverMock = null!;
     private Mock<ICultureContext> _cultureContextMock = null!;
+    private Mock<ISettingService> _settingServiceMock = null!;
+    private Mock<IUrlHelperFactory> _urlHelperFactoryMock = null!;
+    private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
     private PeopleCardsService _service = null!;
 
     [SetUp]
@@ -27,14 +32,23 @@ public class PeopleCardsServiceTests
         _contentServiceMock = new Mock<IContentService>();
         _taxonomyTagRetrieverMock = new Mock<ITaxonomyTagRetriever>();
         _cultureContextMock = new Mock<ICultureContext>();
+        _settingServiceMock = new Mock<ISettingService>();
+        _urlHelperFactoryMock = new Mock<IUrlHelperFactory>();
+        _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
 
         _cultureContextMock.Setup(c => c.CurrentLanguageTag).Returns("en");
+
+        var httpContext = new DefaultHttpContext();
+        _httpContextAccessorMock.Setup(a => a.HttpContext).Returns(httpContext);
 
         _service = new PeopleCardsService(
             _cardsServiceMock.Object,
             _contentServiceMock.Object,
             _taxonomyTagRetrieverMock.Object,
-            _cultureContextMock.Object);
+            _cultureContextMock.Object,
+            _settingServiceMock.Object,
+            _urlHelperFactoryMock.Object,
+            _httpContextAccessorMock.Object);
     }
 
     [Test]
