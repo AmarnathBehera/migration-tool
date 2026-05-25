@@ -157,6 +157,14 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     ContentTypeNames = new[] { "BDO.CareerCategory" },
     IconClass = "xp-l-grid-2-2")]
 
+[assembly: RegisterWebPageRoute(CareerContent.CONTENT_TYPE_NAME, typeof(CareerContentController))]
+[assembly: RegisterPageTemplate(
+    identifier: CareerContent.CONTENT_TYPE_NAME,
+    name: "Career Content Page Content Type Template",
+    customViewName: "~/Views/CareerContent/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.CareerContent" },
+    IconClass = "xp-l-grid-2-2")]
+
 [assembly: RegisterWebPageRoute(SectionNews.CONTENT_TYPE_NAME, typeof(NewsSectionController))]
 
 [assembly: RegisterPageTemplate(

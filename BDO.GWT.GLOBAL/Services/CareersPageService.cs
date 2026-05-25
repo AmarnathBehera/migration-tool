@@ -35,7 +35,7 @@ public class CareersPageService : ICareersPageService
     private readonly ITaxonomyRetriever _taxonomyRetriever;
     private readonly ICardsService _cardsService;
     private readonly IWebPageUrlRetriever _webPageUrlRetriever;
-
+    private readonly ISettingService _settingsService;
     public CareersPageService(
         IHeroService heroService,
         IContentService contentRetriever,
@@ -44,7 +44,8 @@ public class CareersPageService : ICareersPageService
         ITaxonomyRetriever taxonomyRetriever,
         ICultureContext cultureContext,
         ICardsService cardsService,
-        IWebPageUrlRetriever webPageUrlRetriever)
+        IWebPageUrlRetriever webPageUrlRetriever,
+        ISettingService settingsService)
     {
         _heroService = heroService;
         _contentRetriever = contentRetriever;
@@ -54,6 +55,7 @@ public class CareersPageService : ICareersPageService
         _cultureContext = cultureContext;
         _cardsService = cardsService;
         _webPageUrlRetriever = webPageUrlRetriever;
+        _settingsService = settingsService;
     }
 
     public async Task<CareersPageDto> GetCareersPageDtoAsync(CancellationToken cancellationToken)
@@ -206,13 +208,13 @@ public class CareersPageService : ICareersPageService
 
             return new CareerCardDto
             {
-                ImageURL = c.Page.HeroBackgroundImage?
+                ImageURL = c.Page.MetadataTeaserImage?
                                     .FirstOrDefault()?
                                     .ContentAttachmentAsset?
-                                    .Url,
+                                    .Url.Replace("~",""),
                 ImageAltText = c.Page.MetadataTeaserImageAltText,
                 Title = c.Page.MetadataTitle,
-                JobTitle = c.JobTitleNames.FirstOrDefault() ?? c.Page.MetadataTitle,
+                JobTitle = c.JobTitleNames.FirstOrDefault(),
                 Reference = c.Page.CareerReference,
                 EmploymentType = c.EmploymentTypeNames.FirstOrDefault(),
                 Level = c.CareerLevelNames.FirstOrDefault(),
@@ -254,6 +256,8 @@ public class CareersPageService : ICareersPageService
 
     private async Task<CardsGridDto> GetCardsGridDtoAsync(Careers page, CancellationToken cancellationToken)
     {
+        var settings = await _settingsService.GetFilteringInfo();
+        var settingInfo = settings?.FirstOrDefault();
 
         FilterItemDto<OptionDto>[]? filters = null;
 
@@ -276,7 +280,7 @@ public class CareersPageService : ICareersPageService
             Title = page.ItemListTitle,
             Description = page.ItemListDescription,
             Filters = filters,
-            FilteringTooltipEnabled = true, //temp
+            FilteringTooltipEnabled = page.ItemListFilteringEnabled && settingInfo.Showtooltip , 
             PageSize = 20,
             ApiEndpointName = $"Careers/{page.SystemFields.WebPageItemGUID}/Get",
             AdvancedSearchPrelinkText = page.ItemListAdvancedSearchDescription,
