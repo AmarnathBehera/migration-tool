@@ -1,34 +1,34 @@
 ﻿using BDO;
 using BDO.GWT.Common;
-using Kentico.Membership;
-using Kentico.Web.Mvc;
 using BDO.GWT.Common.Options;
 using BDO.GWT.Core;
+using BDO.GWT.Core.Services;
 using BDO.GWT.Domain.Services;
-using BDO.GWT.Web.Core.Services;
 using BDO.GWT.GLOBAL.Services;
+using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience.LiveSite.Services;
 using Kentico.Activities.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
+using Kentico.Membership;
 using Kentico.OnlineMarketing.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
+using Kentico.Web.Mvc;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.WebEncoders;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using System;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using XperienceCommunity.MultiChoiceFormControl.Admin.Helpers.Components.MultiChoice;
-
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using BDO.GWT.Core.Services;
-using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,11 +53,16 @@ builder.Services.AddKentico(features =>
           IndustryService.CONTENT_TYPE_NAME,
           SectionServices.CONTENT_TYPE_NAME,
           BusinessLine.CONTENT_TYPE_NAME,
+          Service.CONTENT_TYPE_NAME,
+          ServiceArea.CONTENT_TYPE_NAME,
           Sub_Service.CONTENT_TYPE_NAME,
-          CareerCategory.CONTENT_TYPE_NAME,
+          SectionCareers.CONTENT_TYPE_NAME,
           Career.CONTENT_TYPE_NAME,
           Careers.CONTENT_TYPE_NAME,
-          SectionCareers.CONTENT_TYPE_NAME
+          CareerCategory.CONTENT_TYPE_NAME,
+          CareerContent.CONTENT_TYPE_NAME
+
+
        }
     }); features.UseActivityTracking();
     features.UseWebPageRouting();
@@ -95,15 +100,11 @@ builder.Services.AddContentServices();
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddScoped<IPageBuilderService, PageBuilderService>();
 builder.Services.AddScoped<IContentService, ContentService>();
-
-
-
 builder.Services.AddScoped<ICachingService, CachingService>();
 builder.Services.AddScoped<ISiteContext, SiteContext>();
 builder.Services.AddScoped<ISiteConfigurationService, SiteConfigurationService>();
 builder.Services.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddXperience();
 builder.Services.AddControllersWithViews();
 builder.Services.AddXperienceCommunityLocalization();
 builder.Services.AddAdminExternalAuthenticationProvider(
