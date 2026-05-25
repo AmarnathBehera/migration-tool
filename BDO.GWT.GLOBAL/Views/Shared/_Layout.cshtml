@@ -11,7 +11,7 @@
 @inject ICultureContext CultureContext
 @inject IReactService ReactService
 <!DOCTYPE html>
-<html lang="@(CultureContext.CurrentLanguageTag.ToString())" dir="@(CultureContext.IsCurrentCultureRtl ? "rtl" : "ltr")" class="scroll-smooth" ">
+<html lang="@CultureContext.CurrentLanguageTag" dir="@(CultureContext.IsCurrentCultureRtl ? "rtl" : "ltr")" class="scroll-smooth">
 <head id="head">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="UTF-8" />
