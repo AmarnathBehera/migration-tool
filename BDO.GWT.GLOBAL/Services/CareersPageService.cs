@@ -245,7 +245,7 @@ public class CareersPageService : ICareersPageService
             .Select(t => t.Identifier)
             .ToList();
 
-        return identifiers?.Count() != 0
+        return identifiers?.Count != 0
             ? await _taxonomyRetriever.RetrieveTags(identifiers, languageTag, cancellationToken)
             : Enumerable.Empty<Tag>();
     }
@@ -266,7 +266,7 @@ public class CareersPageService : ICareersPageService
                 .Where(f => !string.IsNullOrEmpty(f))
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-            if (filterHashSet.Count() != 0)
+            if (filterHashSet.Count != 0)
             {
                 filters = await _cardsService.CreateFiltersAsync(filterHashSet, null, cancellationToken);
             }

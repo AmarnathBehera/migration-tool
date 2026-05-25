@@ -165,7 +165,7 @@ public interface ICareerDetailPageService
                 .ContentAttachmentAsset
                 .Url,
             SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page,page.PageTitle, cancellationToken) : null,
-            ShowCopyLinkButton = settingInfo.DisableCopyLinkButton
+            ShowCopyLinkButton = settingInfo?.DisableCopyLinkButton == true
         };
 
         if (sidebarDto.SocialMediaButtons is not null)
@@ -188,11 +188,13 @@ public interface ICareerDetailPageService
 
         var sectionCareers = await _contentService.RetrievePagesAsync<SectionCareers>(new RetrievePagesParameters { }, query => query.Where(w => w.WhereEquals("WebPageItemID", careerspage.SystemFields.WebPageItemParentID)), cancellationToken);
 
-        if (sectionCareers is null)
+        var sectionCareer = sectionCareers.FirstOrDefault();
+
+        if (sectionCareer is null)
         {
             throw new MissingSectionPageException($"'No pages have been found of type '{nameof(SectionCareers)}'.");
         }
-        var sectionCareer = sectionCareers?.FirstOrDefault();
+        
 
         return sectionCareer.ShowCopyUrlButtonInJobOpportunity && showCopyLinkButton;
     }
