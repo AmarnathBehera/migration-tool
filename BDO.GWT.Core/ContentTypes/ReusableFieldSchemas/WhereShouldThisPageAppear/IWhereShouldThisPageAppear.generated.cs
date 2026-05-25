@@ -12,6 +12,7 @@
 using System;
 using System.Collections.Generic;
 using CMS.ContentEngine;
+using CMS.Websites;
 
 namespace BDO
 {
@@ -29,13 +30,43 @@ namespace BDO
 		/// <summary>
 		/// ContentType.
 		/// </summary>
-		public IEnumerable<MicrositePlaceholder> ContentType { get; set; }
+		public IEnumerable<TagReference> ContentType { get; set; }
 
 
 		/// <summary>
-		/// MicrositeMasterPages.
+		/// MetadataRssImage.
 		/// </summary>
-		public IEnumerable<MicrositePlaceholder> MicrositeMasterPages { get; set; }
+		public IEnumerable<IContentItemFieldsSource> MetadataRssImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataBusinessLine.
+		/// </summary>
+		public IEnumerable<BusinessLine> MetadataBusinessLine { get; set; }
+
+
+		/// <summary>
+		/// MetadataServices.
+		/// </summary>
+		public IEnumerable<Service> MetadataServices { get; set; }
+
+
+		/// <summary>
+		/// MetadataServiceAreas.
+		/// </summary>
+		public IEnumerable<IWebPageFieldsSource> MetadataServiceAreas { get; set; }
+
+
+		/// <summary>
+		/// MetadataIndustryCategories.
+		/// </summary>
+		public IEnumerable<IndustryCategory> MetadataIndustryCategories { get; set; }
+
+
+		/// <summary>
+		/// MetadataIndustries.
+		/// </summary>
+		public IEnumerable<Industry> MetadataIndustries { get; set; }
 
 
 		/// <summary>
@@ -45,14 +76,14 @@ namespace BDO
 
 
 		/// <summary>
-		/// MetadataRssCategory.
+		/// MicrositeMasterPages.
 		/// </summary>
-		public IEnumerable<MicrositePlaceholder> MetadataRssCategory { get; set; }
+		public IEnumerable<MicrositePlaceholder> MicrositeMasterPages { get; set; }
 
 
 		/// <summary>
-		/// MetadataRssImage.
+		/// MetadataRssCategory.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataRssImage { get; set; }
+		public IEnumerable<MicrositePlaceholder> MetadataRssCategory { get; set; }
 	}
 }
