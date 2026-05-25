@@ -9,6 +9,11 @@ using CMS.ContentEngine;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 using CMS.DataEngine;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Routing;
 
 namespace BDO.GWT.Core.Services;
 public interface IPeopleCardsService
@@ -32,17 +37,27 @@ public class PeopleCardsService : IPeopleCardsService
     private readonly IContentService _contentService;
     private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
     private readonly ICultureContext _cultureContext;
+    private readonly ISettingService _settingService;
+    private readonly IUrlHelperFactory _urlHelperFactory;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public PeopleCardsService(
         ICardsService cardsService,
         IContentService contentService,
         ITaxonomyTagRetriever taxonomyTagRetriever,
-        ICultureContext cultureContext)
+        ICultureContext cultureContext,
+        ISettingService settingService,
+        IUrlHelperFactory urlHelperFactory,
+        IHttpContextAccessor httpContextAccessor
+        )
     {
         _cardsService = cardsService;
         _contentService = contentService;
         _taxonomyTagRetriever = taxonomyTagRetriever;
         _cultureContext = cultureContext;
+        _settingService = settingService;
+        _urlHelperFactory = urlHelperFactory;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(
@@ -165,21 +180,39 @@ public class PeopleCardsService : IPeopleCardsService
             _ => null,
         };
     }
-    private async Task<PersonCardDto[]> CreatePeopleCardDtosAsync(
-    Person[] people)
+    private async Task<PersonCardDto[]> CreatePeopleCardDtosAsync(Person[] people)
     {
-        var dtos = people.Select(person => new PersonCardDto
+        var httpContext = _httpContextAccessor.HttpContext!;
+        var actionContext = new ActionContext(httpContext, httpContext.GetRouteData() ?? new RouteData(), new ActionDescriptor());
+        var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
+
+        var dtos = new List<PersonCardDto>();
+        foreach (var person in people)
         {
-            DisplayName = _contentService.GetFallbackMetadataDescription(
-                person.MetadataTitle,
-                person.MetadataOGTitle),
+            dtos.Add(new PersonCardDto
+            {
+                DisplayName = await GetFallbackMetadataDescription(person),
+                TeaserImageUrl = urlHelper.Content(person.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url),
+                TeaserImageAltText = person.MetadataTeaserImageAltText,
+                JobTitle = person.PersonJobTitle,
+                PersonUrl = person.GetUrl().AbsoluteUrl
+            });
+        }
 
-            TeaserImageUrl = person.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
-            TeaserImageAltText = person.MetadataTeaserImageAltText,
-            JobTitle = person.PersonJobTitle,
-            PersonUrl = person.GetUrl().AbsoluteUrl
-        }).ToArray();
+        return dtos.ToArray();
+    }
+    public async Task<string> GetFallbackMetadataDescription(Person person)
+    {
+        var settings = await _settingService.GetUsePersonPageTitleInfo();
 
-        return (dtos);
+        var usePersonPageTitle = settings?.FirstOrDefault()?.UsePageTitleToDisplayPersonName ?? false;
+
+        if (usePersonPageTitle is true)
+        {
+            return person.MetadataTitle;
+        }
+
+        return string.IsNullOrEmpty(person.PersonSurnamePrefixes) ? $"{person.PersonFirstName} {person.PersonLastName}" : $"{person.PersonFirstName} {person.PersonSurnamePrefixes} {person.PersonLastName}";
+
     }
 }
