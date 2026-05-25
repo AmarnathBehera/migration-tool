@@ -67,6 +67,7 @@ public class PeopleCardsService : IPeopleCardsService
         var people = await _contentService.RetrievePagesAsync<Person>(
                new RetrievePagesParameters
                {
+                   LinkedItemsMaxLevel = 2,
                    LanguageName = _cultureContext.CurrentLanguageTag,
                    UseLanguageFallbacks = false 
                },

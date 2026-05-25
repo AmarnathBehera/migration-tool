@@ -30,12 +30,16 @@ public static class ReactComponentType
     public const string LocalLocationsList = "LocalLocationsList";
     public const string FlexibleBanner = "FlexibleBanner";
     public const string LocationsCity = "LocationsCity";
+    public const string FaqWidget = "FaqWidget";
+    public const string CardsGrid = "CardsGrid";
+    public const string RssFeeds = "RssFeeds";
 
     public const string ContactPageDescriptionText = "ContactPageDescriptionText";
     public const string MultiLinksCardsGrid = "MultiLinksCardsGrid";
     public const string IndustryPrimary = "IndustryPrimary";
     public const string ServiceContent = "ServiceContent";
     public const string SideBoxNavigation = "SideBoxNavigation";
+    public const string LocalNavigationItem = "LocalNavigationItem";
     
 
 
@@ -60,6 +64,10 @@ public static class ReactComponentType
     public const string LocalLocationsListGUID = "11095e95-C43e-4db3-b4bf-7c2926a2485c";
     public const string FlexibleBannerGUID = "12085e95-b81e-4db3-b4bf-7c2926a2485E";
     public const string LocationsCityGUID = "13085e95-b81e-4db3-b4bf-7c2926a2485c";
+    public const string FaqWidgetGUID = "c4403ffb-12e9-4f20-86de-3379bc0514f0";
+    public const string CardsGridGUID = "14085e98-b81e-4db3-b4bf-7c2926a2485c";
+    public const string RssFeedsGUID = "15085e95-b81e-4db3-b4bf-7c2926a2485c";
+    public const string InsightDetailsGUID = "16085e95-b81e-4db3-b4bf-7c2926a2485c";
 
     public const string ContactPageDescriptionTextGUID = "cd1bc3e5-c6b6-4212-9fab-a86bdc570462";
     public const string ErrorPageContentGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
@@ -67,6 +75,7 @@ public static class ReactComponentType
     public const string IndustryPrimaryGUID = "7d6afe7a-e672-43d4-b9e8-aad67c339c56";
     public const string ServiceContentGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
     public const string SideBoxNavigationGUID = "6c835a07-d2f7-4041-8c19-0513d2b31b88";
+    public const string LocalNavigationItemGUID = "c4403ffb-12e9-4f20-86de-3379bc0514f0";
 }
 
 
@@ -78,9 +87,7 @@ public static class ReactComponentType
 
 
 
-//
 
-//c4403ffb-12e9-4f20-86de-3379bc0514f0
 
 //9d7a5c92-c4b0-4fe8-8177-e87cbb79abf3
 
