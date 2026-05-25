@@ -26,9 +26,9 @@ namespace BDO
 
 
 		/// <summary>
-		/// PeopleSort.
+		/// RelevantContactPerson.
 		/// </summary>
-		public string PeopleSort { get; set; }
+		public IEnumerable<Person> RelevantContactPerson { get; set; }
 
 
 		/// <summary>

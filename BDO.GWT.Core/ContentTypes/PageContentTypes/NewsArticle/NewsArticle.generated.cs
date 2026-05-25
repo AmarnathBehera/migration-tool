@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="NewsArticle"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class NewsArticle : IWebPageFieldsSource, ICallToAction, ISidebar, IOGMetadataFields, ISearchAndSEO, IMetadata, IWhereShouldThisPageAppear, IAuthorInformation, IImage, IPageMetadata
+	public partial class NewsArticle : IWebPageFieldsSource, ICallToAction, ISidebar, IOGMetadataFields, ISearchAndSEO, IMetadata, IWhereShouldThisPageAppear, IAuthorInformation, IImage, IPageMetadata, IContentPage
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -63,6 +63,24 @@ namespace BDO
 		/// ShowSidebar.
 		/// </summary>
 		public bool ShowSidebar { get; set; }
+
+
+		/// <summary>
+		/// ShowPrintButton.
+		/// </summary>
+		public bool ShowPrintButton { get; set; }
+
+
+		/// <summary>
+		/// DownloadButtonAttachment.
+		/// </summary>
+		public IEnumerable<ContentAttachment> DownloadButtonAttachment { get; set; }
+
+
+		/// <summary>
+		/// ShowSocialMediaButtons.
+		/// </summary>
+		public bool ShowSocialMediaButtons { get; set; }
 
 
 		/// <summary>
@@ -146,25 +164,7 @@ namespace BDO
 		/// <summary>
 		/// ContentType.
 		/// </summary>
-		public IEnumerable<MicrositePlaceholder> ContentType { get; set; }
-
-
-		/// <summary>
-		/// MicrositeMasterPages.
-		/// </summary>
-		public IEnumerable<MicrositePlaceholder> MicrositeMasterPages { get; set; }
-
-
-		/// <summary>
-		/// MicrositePages.
-		/// </summary>
-		public IEnumerable<MicrositePlaceholder> MicrositePages { get; set; }
-
-
-		/// <summary>
-		/// MetadataRssCategory.
-		/// </summary>
-		public IEnumerable<MicrositePlaceholder> MetadataRssCategory { get; set; }
+		public IEnumerable<TagReference> ContentType { get; set; }
 
 
 		/// <summary>
@@ -174,9 +174,57 @@ namespace BDO
 
 
 		/// <summary>
-		/// PeopleSort.
+		/// MetadataBusinessLine.
 		/// </summary>
-		public string PeopleSort { get; set; }
+		public IEnumerable<BusinessLine> MetadataBusinessLine { get; set; }
+
+
+		/// <summary>
+		/// MetadataServices.
+		/// </summary>
+		public IEnumerable<Service> MetadataServices { get; set; }
+
+
+		/// <summary>
+		/// MetadataServiceAreas.
+		/// </summary>
+		public IEnumerable<IWebPageFieldsSource> MetadataServiceAreas { get; set; }
+
+
+		/// <summary>
+		/// MetadataIndustryCategories.
+		/// </summary>
+		public IEnumerable<IndustryCategory> MetadataIndustryCategories { get; set; }
+
+
+		/// <summary>
+		/// MetadataIndustries.
+		/// </summary>
+		public IEnumerable<Industry> MetadataIndustries { get; set; }
+
+
+		/// <summary>
+		/// MicrositePages.
+		/// </summary>
+		public IEnumerable<MicrositePlaceholder> MicrositePages { get; set; }
+
+
+		/// <summary>
+		/// MicrositeMasterPages.
+		/// </summary>
+		public IEnumerable<MicrositePlaceholder> MicrositeMasterPages { get; set; }
+
+
+		/// <summary>
+		/// MetadataRssCategory.
+		/// </summary>
+		public IEnumerable<MicrositePlaceholder> MetadataRssCategory { get; set; }
+
+
+		/// <summary>
+		/// RelevantContactPerson.
+		/// </summary>
+		public IEnumerable<Person> RelevantContactPerson { get; set; }
 
 
 		/// <summary>
@@ -213,5 +261,29 @@ namespace BDO
 		/// PageKeywords.
 		/// </summary>
 		public string PageKeywords { get; set; }
+
+
+		/// <summary>
+		/// ShowTitle.
+		/// </summary>
+		public bool ShowTitle { get; set; }
+
+
+		/// <summary>
+		/// ShowDescription.
+		/// </summary>
+		public bool ShowDescription { get; set; }
+
+
+		/// <summary>
+		/// Content.
+		/// </summary>
+		public string Content { get; set; }
+
+
+		/// <summary>
+		/// UpdatedOn.
+		/// </summary>
+		public DateTime UpdatedOn { get; set; }
 	}
 }

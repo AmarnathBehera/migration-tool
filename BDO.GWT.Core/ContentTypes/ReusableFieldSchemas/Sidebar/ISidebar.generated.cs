@@ -29,5 +29,23 @@ namespace BDO
 		/// ShowSidebar.
 		/// </summary>
 		public bool ShowSidebar { get; set; }
+
+
+		/// <summary>
+		/// ShowPrintButton.
+		/// </summary>
+		public bool ShowPrintButton { get; set; }
+
+
+		/// <summary>
+		/// DownloadButtonAttachment.
+		/// </summary>
+		public IEnumerable<ContentAttachment> DownloadButtonAttachment { get; set; }
+
+
+		/// <summary>
+		/// ShowSocialMediaButtons.
+		/// </summary>
+		public bool ShowSocialMediaButtons { get; set; }
 	}
 }
