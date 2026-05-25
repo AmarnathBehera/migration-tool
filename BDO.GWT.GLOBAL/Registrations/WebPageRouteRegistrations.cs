@@ -156,3 +156,30 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     customViewName: "~/Views/CareerDetail/Index.cshtml",
     ContentTypeNames = new[] { "BDO.CareerCategory" },
     IconClass = "xp-l-grid-2-2")]
+
+[assembly: RegisterWebPageRoute(SectionNews.CONTENT_TYPE_NAME, typeof(NewsSectionController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: SectionNews.CONTENT_TYPE_NAME,
+    name: "News Section Content Type Template",
+    customViewName: "~/Views/NewsSection/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.NewsSection" },
+    IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(NewsGroup.CONTENT_TYPE_NAME, typeof(NewsGroupController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: NewsGroup.CONTENT_TYPE_NAME,
+    name: "News Group Content Type Template",
+    customViewName: "~/Views/NewsGroup/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.NewsGroup" },
+    IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(NewsArticle.CONTENT_TYPE_NAME, typeof(NewsArticleController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: NewsArticle.CONTENT_TYPE_NAME,
+    name: "News Article Content Type Template",
+    customViewName: "~/Views/ContentPage/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.NewsArticle" },
+    IconClass = "xp-market")]

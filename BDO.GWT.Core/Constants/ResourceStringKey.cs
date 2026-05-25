@@ -10,7 +10,12 @@ public static class ResourceStringKey
     public static class LiveSite
     {
         public const string LiveSitePrefix = BDOPrefix + "LiveSite.";
+
+        public const string FilterBy = LiveSitePrefix + "FilterBy";
+
         public const string ReadMore = LiveSitePrefix + "ReadMore";
+
+        public const string SortBy = LiveSitePrefix + "SortBy";
 
         public static class Filters
         {
@@ -73,6 +78,12 @@ public static class ResourceStringKey
             public const string SubService = FiltersPrefix + "SubService";
 
             public const string Year = FiltersPrefix + "Year";
+        }
+        public static class Insights
+        {
+            private const string InsightsPrefix = LiveSitePrefix + "Insights.";
+
+            public const string Authors = InsightsPrefix + "Authors";
         }
         public static class People
         {
