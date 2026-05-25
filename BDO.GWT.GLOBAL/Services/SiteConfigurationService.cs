@@ -2,6 +2,7 @@
 using BDO.GWT.Core.Entities;
 using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Services;
+using BDO.GWT.Xperience.Core.Services;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 using System.Collections.Generic;

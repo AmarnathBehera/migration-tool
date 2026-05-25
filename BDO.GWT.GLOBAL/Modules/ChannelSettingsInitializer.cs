@@ -108,7 +108,7 @@ public class ChannelSettingsInitializer : Module
             var snippet = new WebChannelSnippetInfo
             {
                 WebChannelSnippetDisplayName = global.GlobalSettingsKeyDisplayName,
-                WebchannelCodeName= combinedCodeName,
+                WebChannelCodeName= combinedCodeName,
                 WebChannelSnippetCodeName = global.GlobalSettingsKeyName,
                 WebChannelSnippetCode = global.GlobalSettingsKeyValue,
                 WebChannelSnippetWebChannelSettingsID = channel.WebChannelSettingsID,
