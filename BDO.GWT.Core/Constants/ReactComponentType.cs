@@ -33,6 +33,7 @@ public static class ReactComponentType
     public const string FaqWidget = "FaqWidget";
     public const string CardsGrid = "CardsGrid";
     public const string RssFeeds = "RssFeeds";
+    public const string EventsWebinarsDetails = "EventsWebinarsDetails";
 
     public const string ContactPageDescriptionText = "ContactPageDescriptionText";
     public const string MultiLinksCardsGrid = "MultiLinksCardsGrid";
@@ -76,6 +77,7 @@ public static class ReactComponentType
     public const string ServiceContentGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
     public const string SideBoxNavigationGUID = "6c835a07-d2f7-4041-8c19-0513d2b31b88";
     public const string LocalNavigationItemGUID = "c4403ffb-12e9-4f20-86de-3379bc0514f0";
+    public const string EventsWebinarsDetailsGUID = "9d7a5c92-c4b0-4fe8-8177-e87cbb79abf3";
 }
 
 
@@ -89,7 +91,7 @@ public static class ReactComponentType
 
 
 
-//9d7a5c92-c4b0-4fe8-8177-e87cbb79abf3
+//
 
 //906561a1-8778-4812-843a-018e44488577
 

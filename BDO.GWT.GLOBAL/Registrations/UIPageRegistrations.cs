@@ -140,3 +140,26 @@ using Kentico.Xperience.Admin.Base;
     name: "Create snippet",
     templateName: TemplateNames.EDIT,
     order: 20)]
+[assembly: UIPage(
+    parentType: typeof(WebChannelSettingsEditSection),
+    slug: "print-or-share",
+    uiPageType: typeof(PrintorShareEditPage),
+    name: "Print Or Share settings",
+    templateName: TemplateNames.EDIT,
+    order: 7)]
+
+[assembly: UIPage(
+    parentType: typeof(WebChannelSettingsEditSection),
+    slug: "filtering",
+    uiPageType: typeof(FilteringEditPage),
+    name: "Filtering settings",
+    templateName: TemplateNames.EDIT,
+    order: 8)]
+
+[assembly: UIPage(
+    parentType: typeof(WebChannelSettingsEditSection),
+    slug: "our-people",
+    uiPageType: typeof(OurPeopleInfoEditPage),
+    name: "Our People settings",
+    templateName: TemplateNames.EDIT,
+    order: 9)]

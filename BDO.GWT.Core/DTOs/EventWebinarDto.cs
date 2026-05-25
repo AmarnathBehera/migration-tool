@@ -1,4 +1,6 @@
-﻿using BDO.GWT.Web.Core.DTOs;
+﻿using BDO.GWT.Core;
+using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
+using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.DTOs.Pages;
 using System.Collections.Generic;
 
@@ -6,6 +8,16 @@ namespace BDO.GWT.Web.Core.LiveSite.DTOs.Pages;
 
 public class EventWebinarDto
 {
+    public MetaDataDto? MetaData { get; set; }
+    public SearchAndSEODto? SearchAndSEO { get; set; }
+
+    public OGMetaDataDto? OGMetaData { get; set; }
+
+    public BaseContent? BaseContent { get; set; }
+
+    public BaseWebPage? BaseWebPage { get; set; }
+    public HeroDto Hero { get; set; } = null!;
+
     public string? Title { get; set; }
 
     public string? Description { get; set; }

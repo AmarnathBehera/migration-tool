@@ -140,7 +140,7 @@ public class NewsArticleCardsService : INewsArticleCardsService
 
         return filterName switch
         {
-            FilterParameterName.BusinessLine => x => x.WhereContains(nameof(NewsArticle.MetadataBusinessLine), guid),
+           // FilterParameterName.BusinessLine => x => x.WhereContains(nameof(NewsArticle.MetadataBusinessLine), guid),
             FilterParameterName.ServiceArea => x => x.WhereContains(nameof(NewsArticle.MetadataServiceAreas), guid),
             FilterParameterName.Service => x => x.WhereContains(nameof(NewsArticle.MetadataServices), guid),
             FilterParameterName.IndustryCategory => x => x.WhereContains(nameof(NewsArticle.MetadataIndustryCategories), guid),

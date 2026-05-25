@@ -57,7 +57,8 @@ builder.Services.AddKentico(features =>
           Service.CONTENT_TYPE_NAME,
           ServiceArea.CONTENT_TYPE_NAME,
           Sub_Service.CONTENT_TYPE_NAME,
-          EventRegistrationForm.CONTENT_TYPE_NAME
+          EventRegistrationForm.CONTENT_TYPE_NAME,
+          Event.CONTENT_TYPE_NAME
 
        }
     }); features.UseActivityTracking();
