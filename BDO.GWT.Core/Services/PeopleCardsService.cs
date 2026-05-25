@@ -207,7 +207,7 @@ public class PeopleCardsService : IPeopleCardsService
 
         var usePersonPageTitle = settings?.FirstOrDefault()?.UsePageTitleToDisplayPersonName ?? false;
 
-        if (usePersonPageTitle is true)
+        if (usePersonPageTitle)
         {
             return person.MetadataTitle;
         }
