@@ -29,24 +29,16 @@
     };
 }
 
-@section SchemaMarkup {
-    @Html.Raw(this.Model.SchemaMarkup.ToSchemaMarkupJsString())
-}
-
-
 
 @await PageBuilderService.AddIdentifier("heroSection").AddWidgets(new[] { ComponentIdentifiers.Widgets.RichText }).BuildEditableAreaAsync(Html, Context.RequestAborted)
 
-@await Html.PartialAsync("_LocalNavigation")
-
+@* @await Html.PartialAsync("_LocalNavigation")
+ *@
 @(await ReactService.RenderComponentAsync(
         pageId,
         ReactComponentType.EventsWebinarsDetails,
         ReactComponentType.EventsWebinarsDetailsGUID,
-        new
-        {
-            data = Model,
-        },
+        Model.Page,
         Context.RequestAborted))
 
 @await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)

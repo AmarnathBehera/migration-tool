@@ -58,7 +58,8 @@ builder.Services.AddKentico(features =>
           ServiceArea.CONTENT_TYPE_NAME,
           Sub_Service.CONTENT_TYPE_NAME,
           EventRegistrationForm.CONTENT_TYPE_NAME,
-          Event.CONTENT_TYPE_NAME
+          Event.CONTENT_TYPE_NAME,
+          Webinar.CONTENT_TYPE_NAME
 
        }
     }); features.UseActivityTracking();
@@ -133,16 +134,16 @@ builder.Services.AddAdminExternalAuthenticationProvider(
         options.UserSynchronizationFrequency = UserSynchronizationFrequency.Always;
     }
 );
-//if (builder.Environment.IsDevelopment())
-//{
+if (builder.Environment.IsDevelopment())
+{
     builder.Services.Configure<AdminIdentityOptions>(options =>
     {
         options.AuthenticationOptions.Mode = AdminAuthenticationMode.MaintainForms;
     });
-//}
+}
 
 // Add Application Insights telemetry
-//builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
+builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
 var app = builder.Build();
 
