@@ -21,11 +21,11 @@ public class CareerPageService  : ICareerPageService
 {
     private readonly IHeroService _heroService;
     private readonly IContentService _contentRetriever;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
-    public CareerPageService(IHeroService heroService, IContentService contentService, IWebsiteChannelContext websiteChannelContext) { 
+
+    public CareerPageService(IHeroService heroService, IContentService contentService) { 
         _heroService = heroService;
         _contentRetriever = contentService;
-        _websiteChannelContext = websiteChannelContext;
+
     
     }
 

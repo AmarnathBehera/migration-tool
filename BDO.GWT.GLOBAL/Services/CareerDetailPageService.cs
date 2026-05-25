@@ -25,7 +25,7 @@ public interface ICareerDetailPageService
     public class CareerDetailPageService : ICareerDetailPageService
     {
         private readonly IHeroService _heroService;
-    private readonly IWebPageDataContextRetriever _webPageDataContextRetriever;
+
     private readonly IContentRetriever _contentRetriever;
     private readonly ITaxonomyRetriever _taxonomyRetriever;
     private readonly ICultureContext _cultureContext;
@@ -33,10 +33,10 @@ public interface ICareerDetailPageService
     private readonly ISettingService _settingsService;
     private readonly IContentService _contentService;
 
-    public CareerDetailPageService(IHeroService heroService, IWebPageDataContextRetriever webPageDataContextRetriever, IContentRetriever contentRetriever, ITaxonomyRetriever taxonomyRetriever, ICultureContext cultureContext, ISocialMediaButtonsService socialMediaButtonsService, ISettingService settingsService, IContentService contentService)
+    public CareerDetailPageService(IHeroService heroService, IContentRetriever contentRetriever, ITaxonomyRetriever taxonomyRetriever, ICultureContext cultureContext, ISocialMediaButtonsService socialMediaButtonsService, ISettingService settingsService, IContentService contentService)
     {
         _heroService = heroService;
-        _webPageDataContextRetriever = webPageDataContextRetriever;
+
         _contentRetriever = contentRetriever;
         _taxonomyRetriever = taxonomyRetriever;
         _cultureContext = cultureContext;
@@ -91,9 +91,9 @@ public interface ICareerDetailPageService
         var careerLevelIds = careerPage.CareerLevel?.Select(i => i.Identifier).ToList();
         var jobTitleIds = careerPage.CareerJobTitle?.Select(i => i.Identifier).ToList();
 
-        var employmentTags = await _taxonomyRetriever.RetrieveTags(employmentTypeIds, languageTag);
-        var careerLevelTags = await _taxonomyRetriever.RetrieveTags(careerLevelIds, languageTag);
-        var jobTitleTags = await _taxonomyRetriever.RetrieveTags(jobTitleIds, languageTag);
+        var employmentTags = await _taxonomyRetriever.RetrieveTags(employmentTypeIds, languageTag, cancellationToken);
+        var careerLevelTags = await _taxonomyRetriever.RetrieveTags(careerLevelIds, languageTag, cancellationToken);
+        var jobTitleTags = await _taxonomyRetriever.RetrieveTags(jobTitleIds, languageTag, cancellationToken);
 
         var employmentTypeNames = employmentTags.Select(t => t.Name).ToList();
         var careerLevelNames = careerLevelTags.Select(t => t.Name).ToList();
@@ -107,10 +107,10 @@ public interface ICareerDetailPageService
         var dto = new CareerContentDto
             {
                 Title = careerPage.MetadataTitle,
-                JobTitle = jobTitleNames?.FirstOrDefault(),
+                JobTitle = jobTitleNames.FirstOrDefault(),
                 Reference = careerPage.CareerReference,
-            EmploymentType = employmentTypeNames?.FirstOrDefault(),
-                Level = careerLevelNames?.FirstOrDefault(),
+            EmploymentType = employmentTypeNames.FirstOrDefault(),
+                Level = careerLevelNames.FirstOrDefault(),
                 Locations = locationOfficeNames,
                 Content = careerPage.MetadataDescription,
             ContactPerson = contactPersonName?.MetadataTitle,
@@ -153,10 +153,17 @@ public interface ICareerDetailPageService
         var sidebarDto = new ContentSidebarDto
         {
 
-            ShowPrintButton = settingInfo.DisablePrint is not true && page.ShowPrintButton,
-            DownloadButtonAttachment = settingInfo.DisableDownload is true 
-                ? null
-                : page.DownloadButtonAttachment?.FirstOrDefault()?.ContentAttachmentAsset.Url,
+            ShowPrintButton =
+        settingInfo?.DisablePrint is not true
+        && page.ShowPrintButton,
+
+            DownloadButtonAttachment =
+        settingInfo?.DisableDownload == true
+            ? null
+            : page.DownloadButtonAttachment?
+                .FirstOrDefault()?
+                .ContentAttachmentAsset
+                .Url,
             SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page,page.PageTitle, cancellationToken) : null,
             ShowCopyLinkButton = settingInfo.DisableCopyLinkButton
         };
@@ -177,15 +184,17 @@ public interface ICareerDetailPageService
         {
             throw new MissingSectionPageException($"'No pages have been found of type '{nameof(Careers)}'.");
         }
+        var careerspage = careers.FirstOrDefault();
 
-        var sectionCareers = await _contentService.RetrievePagesAsync<SectionCareers>(new RetrievePagesParameters { }, query => query.Where(w => w.WhereEquals("WebPageItemID", careers.FirstOrDefault().SystemFields.WebPageItemParentID)), cancellationToken);
+        var sectionCareers = await _contentService.RetrievePagesAsync<SectionCareers>(new RetrievePagesParameters { }, query => query.Where(w => w.WhereEquals("WebPageItemID", careerspage.SystemFields.WebPageItemParentID)), cancellationToken);
 
         if (sectionCareers is null)
         {
             throw new MissingSectionPageException($"'No pages have been found of type '{nameof(SectionCareers)}'.");
         }
+        var sectionCareer = sectionCareers?.FirstOrDefault();
 
-        return sectionCareers.FirstOrDefault().ShowCopyUrlButtonInJobOpportunity && showCopyLinkButton;
+        return sectionCareer.ShowCopyUrlButtonInJobOpportunity && showCopyLinkButton;
     }
 
 

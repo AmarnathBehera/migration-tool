@@ -10,13 +10,13 @@ namespace BDO.GWT.Web.Controllers;
 public  class CareerDetailController : PageController 
 {
     private readonly ICareerDetailPageService _careerDetailPageService;
-    private readonly IPageContext _careerdetailcontext;
 
 
-    public CareerDetailController(ICareerDetailPageService careerDetailPageService, IPageContext careerdetailcontext)
+
+    public CareerDetailController(ICareerDetailPageService careerDetailPageService)
     {
         _careerDetailPageService = careerDetailPageService;
-        _careerdetailcontext = careerdetailcontext;
+
 
     }
 

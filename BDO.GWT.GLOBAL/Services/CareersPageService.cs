@@ -29,18 +29,16 @@ public class CareersPageService : ICareersPageService
 {
     private readonly IHeroService _heroService;
     private readonly IContentService _contentRetriever;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
-    private readonly IContentRetriever _retriever;
     private readonly ICultureContext _cultureContext;
     private readonly ITaxonomyRetriever _taxonomyRetriever;
     private readonly ICardsService _cardsService;
     private readonly IWebPageUrlRetriever _webPageUrlRetriever;
     private readonly ISettingService _settingsService;
+    private static readonly char[] FilterSeparators = [',', ';', '\n', '\r'];
     public CareersPageService(
         IHeroService heroService,
         IContentService contentRetriever,
-        IWebsiteChannelContext websiteChannelContext,
-        IContentRetriever retriever,
+
         ITaxonomyRetriever taxonomyRetriever,
         ICultureContext cultureContext,
         ICardsService cardsService,
@@ -49,8 +47,6 @@ public class CareersPageService : ICareersPageService
     {
         _heroService = heroService;
         _contentRetriever = contentRetriever;
-        _websiteChannelContext = websiteChannelContext;
-        _retriever = retriever;
         _taxonomyRetriever = taxonomyRetriever;
         _cultureContext = cultureContext;
         _cardsService = cardsService;
@@ -98,7 +94,7 @@ public class CareersPageService : ICareersPageService
         CancellationToken cancellationToken)
     {
 
-        var careersPages = await _retriever.RetrievePages<Careers>(
+        var careersPages = await _contentRetriever.GetPagesAsync<Careers>(
             new RetrievePagesParameters { LinkedItemsMaxLevel = 2 },
             q => q.Where(w => w.WhereEquals("WebPageItemGUID", pageGuid)),
             cacheSettings: RetrievalCacheSettings.CacheDisabled,
@@ -112,7 +108,7 @@ public class CareersPageService : ICareersPageService
                 $"Careers page with GUID '{pageGuid}' not found.");
         }
 
-        var careerPages = await _retriever.RetrievePages<Career>(
+        var careerPages = await _contentRetriever.GetPagesAsync<Career>(
             new RetrievePagesParameters
             {
                 LinkedItemsMaxLevel = 1,
@@ -202,7 +198,7 @@ public class CareersPageService : ICareersPageService
 
         var itemData = await Task.WhenAll(pagedCards.Select(async c =>
         {
-            var sys = c.Page.SystemFields;
+
             var absolutepageurl = await GetLanguageSafeUrlAsync(c.Page, cancellationToken);
             
 
@@ -240,7 +236,7 @@ public class CareersPageService : ICareersPageService
 
 
     private async Task<IEnumerable<Tag>> ResolveTagsAsync(
-        IEnumerable<TagReference>? tagReferences,
+        IEnumerable<TagReference> tagReferences,
         string languageTag,
         CancellationToken cancellationToken)
     {
@@ -249,7 +245,7 @@ public class CareersPageService : ICareersPageService
             .Select(t => t.Identifier)
             .ToList();
 
-        return identifiers?.Any() == true
+        return identifiers?.Count() != 0
             ? await _taxonomyRetriever.RetrieveTags(identifiers, languageTag, cancellationToken)
             : Enumerable.Empty<Tag>();
     }
@@ -259,17 +255,18 @@ public class CareersPageService : ICareersPageService
         var settings = await _settingsService.GetFilteringInfo();
         var settingInfo = settings?.FirstOrDefault();
 
-        FilterItemDto<OptionDto>[]? filters = null;
+
+        FilterItemDto<OptionDto>[] filters = null;
 
         if (page.ItemListFilteringEnabled && !string.IsNullOrWhiteSpace(page.CareerListFilters))
         {
             var filterHashSet = page.CareerListFilters
-                .Split(new[] { ',', ';', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                .Split(FilterSeparators, StringSplitOptions.RemoveEmptyEntries)
                 .Select(f => f.Trim())
                 .Where(f => !string.IsNullOrEmpty(f))
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-            if (filterHashSet.Any())
+            if (filterHashSet.Count() != 0)
             {
                 filters = await _cardsService.CreateFiltersAsync(filterHashSet, null, cancellationToken);
             }
@@ -280,7 +277,7 @@ public class CareersPageService : ICareersPageService
             Title = page.ItemListTitle,
             Description = page.ItemListDescription,
             Filters = filters,
-            FilteringTooltipEnabled = page.ItemListFilteringEnabled && settingInfo.Showtooltip , 
+            FilteringTooltipEnabled = page.ItemListFilteringEnabled && settingInfo?.Showtooltip == true , 
             PageSize = 20,
             ApiEndpointName = $"Careers/{page.SystemFields.WebPageItemGUID}/Get",
             AdvancedSearchPrelinkText = page.ItemListAdvancedSearchDescription,
