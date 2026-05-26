@@ -9,6 +9,10 @@ using BDO.GWT.Web.Core.Services;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 using Moq;
+using NUnit.Framework;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BDO.GWT.Core.Tests.Services
 {
@@ -17,6 +21,7 @@ namespace BDO.GWT.Core.Tests.Services
         private Mock<IHeroService> _heroServiceMock = null!;
         private Mock<IContentService> _contentServiceMock = null!;
         private Mock<IPageUtility> _pageUtilityMock = null!;
+        private Mock<IWebPageUrlResolver> _urlResolverMock = null!;
         private BusinessLinePageService _service = null!;
 
         [SetUp]
@@ -25,6 +30,11 @@ namespace BDO.GWT.Core.Tests.Services
             _heroServiceMock = new Mock<IHeroService>();
             _contentServiceMock = new Mock<IContentService>();
             _pageUtilityMock = new Mock<IPageUtility>();
+            _urlResolverMock = new Mock<IWebPageUrlResolver>();
+
+            _urlResolverMock
+                .Setup(x => x.GetAbsoluteUrl(It.IsAny<IWebPageFieldsSource>()))
+                .Returns("https://example.com/test");
 
             _heroServiceMock
                 .Setup(x => x.GetHeroDtoAsync(It.IsAny<HeroData>(), It.IsAny<CancellationToken>()))
@@ -33,7 +43,8 @@ namespace BDO.GWT.Core.Tests.Services
             _service = new BusinessLinePageService(
                 _heroServiceMock.Object,
                 _contentServiceMock.Object,
-                _pageUtilityMock.Object);
+                _pageUtilityMock.Object,
+                _urlResolverMock.Object);
         }
 
         [Test]
@@ -174,13 +185,61 @@ namespace BDO.GWT.Core.Tests.Services
                 Times.Never);
         }
 
+        [Test]
+        public async Task GetServicesPrimarySchemaMarkupDto_ReturnsSchemaMarkup()
+        {
+            _contentServiceMock
+                .Setup(x => x.GetCurrentSiteLegalNameAsync())
+                .Returns("BDO Legal Name");
+            _contentServiceMock
+                .Setup(x => x.GetCurrentSiteLogoImageUrlAsync())
+                .Returns("https://example.com/logo.png");
+
+            var pageDto = new BusinessLinePageDto
+            {
+                Url = "https://example.com/services/tax",
+                MetaData = new DTOs.ReusableFieldsDTOs.MetaDataDto
+                {
+                    MetaTitle = "Tax Services",
+                    MetaDescription = "Tax services description"
+                }
+            };
+
+            var result = await _service.GetServicesPrimarySchemaMarkupDto(pageDto, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Name, Is.EqualTo("BDO Legal Name"));
+                Assert.That(result.AlternateName, Is.EqualTo("BDO"));
+                Assert.That(result.Url, Is.EqualTo("https://example.com/services/tax"));
+                Assert.That(result.Logo, Is.EqualTo("https://example.com/logo.png"));
+                Assert.That(result.Description, Is.EqualTo("Tax services description"));
+                Assert.That(result.DisambiguatingDescription, Is.EqualTo("Tax Services"));
+            });
+        }
+
         private static BusinessLine CreateBusinessLinePage(bool showSideNavigation)
         {
             return new BusinessLine
             {
                 SystemFields = new WebPageFields
                 {
+                    ContentItemID = 1,
+                    ContentItemGUID = Guid.NewGuid(),
+                    ContentItemName = "Test Business Line",
+                    ContentItemContentTypeID = 100,
+                    ContentItemIsSecured = false,
+                    ContentItemCommonDataContentLanguageID = 1,
+                    ContentItemCommonDataFirstPublishedWhen = new DateTime(2024, 1, 1),
+                    ContentItemCommonDataLastPublishedWhen = new DateTime(2024, 6, 1),
+                    WebPageItemGUID = Guid.NewGuid(),
                     WebPageItemID = 1,
+                    WebPageItemName = "Test Business Line Page",
+                    WebPageItemWebsiteChannelId = 1,
+                    WebPageUrlPath = "/services/test",
+                    WebPageItemOrder = 1,
+                    WebPageItemTreePath = "/services/test",
+                    WebPageUrlPathContentLanguageID = 1,
                     WebPageItemParentID = 2
                 },
                 ContentTitle = "Test Title",

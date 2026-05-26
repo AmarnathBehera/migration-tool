@@ -7,5 +7,8 @@ namespace BDO.GWT.Core
     {
         public string GetRelativePath(IWebPageFieldsSource page) =>
             page.GetUrl().RelativePath;
+
+        public string GetAbsoluteUrl(IWebPageFieldsSource page) =>
+            page.GetUrl().AbsoluteUrl;
     }
 }

@@ -43,6 +43,10 @@ public static class FilterUtility
         //[FilterParameterName.SubService] = new("Sub-Service", ResourceStringKey.LiveSite.Filters.SubService, typeof(SubService), FilterParameterType.Page),
         //[FilterParameterName.Year] = new("Year", ResourceStringKey.LiveSite.Filters.Year, typeof(IDealPage), FilterParameterType.Field),
        
+        [FilterParameterName.Credential] = new(Taxonomies.Credential, ResourceStringKey.LiveSite.Filters.Credential, typeof(Credentials), FilterParameterType.Taxonomy),
+        [FilterParameterName.CareerEmploymentType] = new(Taxonomies.CareerEmploymentType, ResourceStringKey.LiveSite.Filters.CareerEmploymentType, typeof(CareerEmploymentType), FilterParameterType.Taxonomy),
+        [FilterParameterName.CareerJobTitle] = new(Taxonomies.CareerJobTitle, ResourceStringKey.LiveSite.Filters.CareerJobTitle, typeof(CareerJobTitle), FilterParameterType.Taxonomy),
+        [FilterParameterName.CareerLevel] = new(Taxonomies.CareerLevel, ResourceStringKey.LiveSite.Filters.CareerLevel, typeof(CareerLevel), FilterParameterType.Taxonomy)
     };
     public static FilterParameterData? GetFilterParameterData(string filterParameterName)
     {

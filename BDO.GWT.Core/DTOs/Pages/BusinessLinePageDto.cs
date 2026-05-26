@@ -21,5 +21,7 @@ namespace BDO.GWT.Core.DTOs
 
 
         public SideBoxDto? Sidebox { get; set; }
+
+        public string? Url { get; set; }
     }
 }

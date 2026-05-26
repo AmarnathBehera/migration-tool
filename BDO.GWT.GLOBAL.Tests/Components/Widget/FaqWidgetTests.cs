@@ -199,7 +199,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
         }
 
         [Test]
-        public async Task InvokeAsync_DoesNotCallGetFaqSchemaOrgAsync()
+        public async Task InvokeAsync_CallsGetFaqSchemaOrgAsync()
         {
             var properties = new FaqWidgetProperties { Layout = "cards" };
 
@@ -207,11 +207,15 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
                 .Setup(s => s.GetFaqAsync(It.IsAny<BDO.GWT.Core.Data.FaqData>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new FaqDto { Layout = "cards", Topics = [] });
 
+            _faqServiceMock
+                .Setup(s => s.GetFaqSchemaOrgAsync(It.IsAny<FaqDto>()))
+                .Returns(new BDO.GWT.Core.DTOs.SchemaMarkups.FaqSchemaMarkupDto());
+
             var model = CreateModel(properties);
 
             await _widget.InvokeAsync(model);
 
-            _faqServiceMock.Verify(s => s.GetFaqSchemaOrgAsync(It.IsAny<FaqDto>()), Times.Never);
+            _faqServiceMock.Verify(s => s.GetFaqSchemaOrgAsync(It.IsAny<FaqDto>()), Times.Once);
         }
 
         [Test]
