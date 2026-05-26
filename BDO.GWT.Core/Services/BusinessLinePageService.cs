@@ -1,9 +1,11 @@
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.SchemaMarkups;
 using BDO.GWT.Core.services;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.Services;
+using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 
 namespace BDO.GWT.Core.Services
@@ -11,6 +13,8 @@ namespace BDO.GWT.Core.Services
     public interface IBusinessLinePageService
     {
         Task<BusinessLinePageDto> GetBusinessLinePageDtoAsync(CancellationToken cancellationToken = default);
+
+        Task<ServiceSchemaMarkupDto> GetServicesPrimarySchemaMarkupDto(BusinessLinePageDto pageDto, CancellationToken cancellationToken = default);
     }
 
     public class BusinessLinePageService : IBusinessLinePageService
@@ -18,13 +22,31 @@ namespace BDO.GWT.Core.Services
         private readonly IHeroService _heroService;
         private readonly IContentService _contentService;
         private readonly IPageUtility _pageUtility;
+        private readonly IWebPageUrlResolver _urlResolver;
 
         public BusinessLinePageService(IHeroService heroService,
-            IContentService contentService, IPageUtility pageUtility)
+            IContentService contentService, IPageUtility pageUtility,
+            IWebPageUrlResolver urlResolver)
         {
             _heroService = heroService;
             _contentService = contentService;
             _pageUtility = pageUtility;
+            _urlResolver = urlResolver;
+        }
+
+        public Task<ServiceSchemaMarkupDto> GetServicesPrimarySchemaMarkupDto(BusinessLinePageDto pageDto, CancellationToken cancellationToken = default)
+        {
+            var schemaMarkupDto = new ServiceSchemaMarkupDto
+            {
+                Name = _contentService.GetCurrentSiteLegalNameAsync(),
+                AlternateName = "BDO",
+                Url = pageDto.Url,
+                Logo = _contentService.GetCurrentSiteLogoImageUrlAsync(),
+                Description = pageDto.MetaData?.MetaDescription,
+                DisambiguatingDescription = pageDto.MetaData?.MetaTitle,
+            };
+
+            return Task.FromResult(schemaMarkupDto);
         }
 
         public async Task<BusinessLinePageDto> GetBusinessLinePageDtoAsync(CancellationToken cancellationToken = default)
@@ -72,7 +94,13 @@ namespace BDO.GWT.Core.Services
                 BodyContent = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(currentPage.ContentBody),
                 Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
                 ShowSideNavigation = currentPage.ShowSideNavigation,
-                Sidebox = sidebox
+                Sidebox = sidebox,
+                Url = _urlResolver.GetAbsoluteUrl(currentPage),
+                MetaData = new DTOs.ReusableFieldsDTOs.MetaDataDto
+                {
+                    MetaTitle = currentPage.MetadataTitle,
+                    MetaDescription = currentPage.MetadataDescription,
+                }
             };
         }
     }

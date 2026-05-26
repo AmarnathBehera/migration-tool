@@ -1,4 +1,5 @@
 ﻿using BDO.GWT.Core.Data;
+using BDO.GWT.Core.Extensions;
 using BDO.GWT.Core.Services.Widget;
 using BDO.GWT.GLOBAL.Components.Widget.FaqWidget;
 using Kentico.PageBuilder.Web.Mvc;
@@ -35,6 +36,10 @@ public class FaqWidget : ViewComponent
 
 
         var dto = await _faqService.GetFaqAsync(data, cancellationToken);
+        var faqSchema = _faqService.GetFaqSchemaOrgAsync(dto);
+
+        HttpContext.AddLdJsonSchema(faqSchema);
+
 
         return View("~/Components/Widget/FaqWidget/_FaqWidget.cshtml", dto);
     }

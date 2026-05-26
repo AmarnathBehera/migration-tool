@@ -5,6 +5,7 @@ using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience.Core.Services;
 using CMS.ContentEngine;
 using CMS.DataEngine;
+using CMS.Websites;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -20,6 +21,18 @@ public interface ISiteConfigurationService
     string GetCachedSiteConfigurationHash();
 }
 
+/// <summary>
+/// Groups the <see cref="IInfoProvider{T}"/> dependencies required by
+/// <see cref="SiteConfigurationService"/> to keep its constructor concise.
+/// </summary>
+public sealed record SiteConfigurationProviders(
+    IInfoProvider<LocalizationKeyInfo> LocalizationKey,
+    IInfoProvider<LocalizationTranslationItemInfo> LocalizationTranslation,
+    IInfoProvider<ContentLanguageInfo> ContentLanguage,
+    IInfoProvider<WebChannelSettingsInfo> WebChannelSettings,
+    IInfoProvider<GeneralSettingInfo> GeneralSetting,
+    IInfoProvider<WebsiteChannelInfo> WebsiteChannel);
+
 public class SiteConfigurationService : ISiteConfigurationService
 {
     private static string[] cacheDependencies =
@@ -30,27 +43,23 @@ public class SiteConfigurationService : ISiteConfigurationService
             "cms.resourcestring|all",
             "bdositelocalization.sitetranslation|all",
             "cms.culturesite|all",
+            "bdo.webchannelsettings|all",
+            "bdo.generalsetting|all",
         ];
 
     private readonly ICachingService _cachingService;
     private readonly ISiteContext _siteContext;
-    private readonly IInfoProvider<LocalizationKeyInfo> _localizationKeyProvider;
-    private readonly IInfoProvider<LocalizationTranslationItemInfo> _localizationTranslationProvider;
-    private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageProvider;
+    private readonly SiteConfigurationProviders _providers;
 
     public SiteConfigurationService(
         ICachingService cachingService,
         IContentQueryExecutor executor,
         ISiteContext siteContext,
-        IInfoProvider<LocalizationKeyInfo> localizationKeyProvider,
-        IInfoProvider<LocalizationTranslationItemInfo> localizationTranslationProvider,
-        IInfoProvider<ContentLanguageInfo> contentLanguageProvider)
+        SiteConfigurationProviders providers)
     {
         _cachingService = cachingService;
         _siteContext = siteContext;
-        _localizationKeyProvider = localizationKeyProvider;
-        _localizationTranslationProvider = localizationTranslationProvider;
-        _contentLanguageProvider = contentLanguageProvider;
+        _providers = providers;
     }
 
     public string GetCachedSiteConfigurationHash()
@@ -79,7 +88,8 @@ public class SiteConfigurationService : ISiteConfigurationService
 
         var result = new SiteConfigurationDto
         {
-            Translations = translations
+            Translations = translations,
+            SiteSettings = GetSiteSettings()
         };
 
         var calculatedHash = await _cachingService.LoadAsync(
@@ -93,11 +103,48 @@ public class SiteConfigurationService : ISiteConfigurationService
         return result;              
     }
 
+    private SiteSettingsDto GetSiteSettings()
+    {
+        var settings = new SiteSettingsDto();
+
+        var websiteChannel = _providers.WebsiteChannel.Get()
+            .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelID), _siteContext.CurrentSiteID)
+            .TopN(1)
+            .FirstOrDefault();
+
+        if (websiteChannel == null)
+        {
+            return settings;
+        }
+
+        var webChannelSettings = _providers.WebChannelSettings.Get()
+            .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), websiteChannel.WebsiteChannelChannelID)
+            .TopN(1)
+            .FirstOrDefault();
+
+        if (webChannelSettings == null)
+        {
+            return settings;
+        }
+
+        var generalSetting = _providers.GeneralSetting.Get()
+            .WhereEquals(nameof(GeneralSettingInfo.GeneralSettingsWebChannelSettingID), webChannelSettings.WebChannelSettingsID)
+            .TopN(1)
+            .FirstOrDefault();
+
+        if (generalSetting != null)
+        {
+            settings.ExternalLinkWarningEnabled = generalSetting.Enableexternallinkwarning;
+        }
+
+        return settings;
+    }
+
     public async Task<IEnumerable<LocalizationResource>> GetLocalizationValuesAsync()
     {
-        var keys = (await _localizationKeyProvider.Get().GetEnumerableTypedResultAsync()).ToList();
-        var translations = (await _localizationTranslationProvider.Get().GetEnumerableTypedResultAsync()).ToList();
-        var languages = (await _contentLanguageProvider.Get().GetEnumerableTypedResultAsync()).ToList();
+        var keys = (await _providers.LocalizationKey.Get().GetEnumerableTypedResultAsync()).ToList();
+        var translations = (await _providers.LocalizationTranslation.Get().GetEnumerableTypedResultAsync()).ToList();
+        var languages = (await _providers.ContentLanguage.Get().GetEnumerableTypedResultAsync()).ToList();
 
         var localizationKeys = keys
             .Select(k => new LocalizationKey
