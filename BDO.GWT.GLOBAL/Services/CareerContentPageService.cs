@@ -1,5 +1,6 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
+using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.DTOs;
 using CMS.Websites.Routing;

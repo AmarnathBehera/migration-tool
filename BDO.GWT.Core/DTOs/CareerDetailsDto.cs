@@ -2,7 +2,7 @@
 using System;
 namespace BDO.GWT.Web.Core.DTOs;
 
-public abstract class CareerDetailsDto
+public class CareerDetailsDto
 {
     public string Title { get; set; } = null!;
 

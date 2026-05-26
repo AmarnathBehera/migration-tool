@@ -1,4 +1,5 @@
-﻿using BDO.GWT.GLOBAL.Tests.Utilities;
+﻿using BDO.GWT.Core.DTOs;
+using BDO.GWT.GLOBAL.Tests.Utilities;
 using BDO.GWT.Web.Controllers;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;

@@ -209,12 +209,12 @@ public class CareersPageService : ICareersPageService
                                     .ContentAttachmentAsset?
                                     .Url.Replace("~",""),
                 ImageAltText = c.Page.MetadataTeaserImageAltText,
-                Title = c.Page.MetadataTitle,
-                JobTitle = c.JobTitleNames.FirstOrDefault(),
-                Reference = c.Page.CareerReference,
-                EmploymentType = c.EmploymentTypeNames.FirstOrDefault(),
-                Level = c.CareerLevelNames.FirstOrDefault(),
-                Locations = c.Page.MetadataOfficeLocation?
+                    Title = c.Page.MetadataTitle,
+                    JobTitle = c.JobTitleNames.FirstOrDefault(),
+                    Reference = c.Page.CareerReference,
+                    EmploymentType = c.EmploymentTypeNames.FirstOrDefault(),
+                    Level = c.CareerLevelNames.FirstOrDefault(),
+                    Locations = c.Page.MetadataOfficeLocation?
                                     .Select(i => i.MetadataTitle)
                                     .ToArray(),
                 PublishDate = c.Page.DocumentPublishFrom,

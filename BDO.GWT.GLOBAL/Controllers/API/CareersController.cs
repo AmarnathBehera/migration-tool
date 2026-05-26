@@ -1,6 +1,7 @@
 ﻿using BDO.GWT.Core.API.Utilities;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.LiveSite.Filters;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
