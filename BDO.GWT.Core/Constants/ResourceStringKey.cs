@@ -95,5 +95,11 @@ public static class ResourceStringKey
 
             public const string SortNodeOrder = PeoplePrefix + "SortNodeOrder";
         }
+        public static class Careers
+        {
+            private const string CareersPrefix = LiveSitePrefix + "Careers.";
+
+            public const string RelevantContactPeople = CareersPrefix + "RelevantContactPeople";
+        }
     }
 }
