@@ -55,7 +55,7 @@ public class NewsArticleService : INewsArticleService
 
     public async Task<ContentSidebarDto> GetContentPageSidebarDto(NewsArticle contentPage, CancellationToken cancellationToken)
     {
-        var sidebarDto = await _sidebarService.GetSidebarDtoAsync(contentPage, cancellationToken);
+        var sidebarDto = await _sidebarService.GetNewsSidebarDtoAsync(contentPage, cancellationToken);
 
         var tags = await _taxonomyTagRetriever.GetTaxonomyTagByGUIDs(contentPage.ContentType, _cultureContext.CurrentLanguageTag);
         var type = tags?.FirstOrDefault()?.Title;

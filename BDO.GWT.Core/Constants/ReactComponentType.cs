@@ -76,6 +76,7 @@ public static class ReactComponentType
     public const string ServiceContentGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
     public const string SideBoxNavigationGUID = "6c835a07-d2f7-4041-8c19-0513d2b31b88";
     public const string LocalNavigationItemGUID = "c4403ffb-12e9-4f20-86de-3379bc0514f0";
+    public const string DealDetailsGUID = "9ba2033f-9c72-4922-88c2-22f911be95c2";
 }
 
 
