@@ -1,5 +1,6 @@
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Web.Controllers;
+using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using Moq;

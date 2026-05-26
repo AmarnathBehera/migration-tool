@@ -3,8 +3,10 @@ using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.services;
 using BDO.GWT.Core.ValueObjects;
+using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
 using CMS.Websites;
+using Kentico.Content.Web.Mvc;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -115,12 +117,12 @@ public class SectionBlogServiceTests
                 It.IsAny<int>(),
                 It.IsAny<System.Func<Blog, string>>(),
                 It.IsAny<System.Func<Blog, string>>(),
-                It.IsAny<System.Func<Blog, string>>(),
+                It.IsAny<System.Func<Blog, string>>(),  
                 It.IsAny<System.Func<Blog, string>>(),
                 It.IsAny<System.Func<BlogContributors, string>>(),
                 It.IsAny<System.Func<Contact, string>>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<MultiLinkCardDto>());
+            .ReturnsAsync(Array.Empty<MultiLinkCardDto>());
 
         _heroServiceMock
             .Setup(x => x.GetHeroDtoAsync(It.IsAny<HeroData>(), It.IsAny<CancellationToken>()))
@@ -160,7 +162,7 @@ public class SectionBlogServiceTests
                 It.IsAny<System.Func<BlogContributors, string>>(),
                 It.IsAny<System.Func<Contact, string>>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(expectedCards);
+            .ReturnsAsync(expectedCards.ToArray());
 
         _heroServiceMock
             .Setup(x => x.GetHeroDtoAsync(It.IsAny<HeroData>(), It.IsAny<CancellationToken>()))
@@ -198,7 +200,7 @@ public class SectionBlogServiceTests
                 It.IsAny<System.Func<BlogContributors, string>>(),
                 It.IsAny<System.Func<Contact, string>>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<MultiLinkCardDto>());
+            .ReturnsAsync(Array.Empty<MultiLinkCardDto>());
 
         _heroServiceMock
             .Setup(x => x.GetHeroDtoAsync(It.IsAny<HeroData>(), It.IsAny<CancellationToken>()))
@@ -237,7 +239,7 @@ public class SectionBlogServiceTests
                 It.IsAny<System.Func<BlogContributors, string>>(),
                 It.IsAny<System.Func<Contact, string>>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<MultiLinkCardDto>());
+            .ReturnsAsync(Array.Empty<MultiLinkCardDto>());
 
         _heroServiceMock
             .Setup(x => x.GetHeroDtoAsync(
@@ -272,7 +274,7 @@ public class SectionBlogServiceTests
         page.Setup(x => x.HeroCallToActionButtonText).Returns("Learn More");
         page.Setup(x => x.HeroBackgroundImage).Returns(new List<ContentAttachment>());
         page.Setup(x => x.HeroBackgroundImage_Mobile).Returns(new List<ContentAttachment>());
-        page.Setup(x => x.HeroCallToActionButtonUrl).Returns(new List<WebPageRelatedItem>());
+        page.Setup(x => x.HeroCallToActionButtonUrl).Returns(new List<IWebPageFieldsSource>());
         page.Setup(x => x.MetadataTitle).Returns("Test Page Title");
         page.Setup(x => x.MetadataDescription).Returns("Test Page Description");
         page.Setup(x => x.SystemFields).Returns(new WebPageFields { WebPageItemID = 123 });

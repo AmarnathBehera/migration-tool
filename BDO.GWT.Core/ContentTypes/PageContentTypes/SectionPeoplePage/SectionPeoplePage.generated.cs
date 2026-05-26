@@ -78,12 +78,6 @@ namespace BDO
 
 
 		/// <summary>
-		/// dropdown.
-		/// </summary>
-		public IEnumerable<WebPageRelatedItem> dropdown { get; set; }
-
-
-		/// <summary>
 		/// MetadataOGTitle.
 		/// </summary>
 		public string MetadataOGTitle { get; set; }
