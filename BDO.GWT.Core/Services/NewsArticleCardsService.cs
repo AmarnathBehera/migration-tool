@@ -9,6 +9,11 @@ using CMS.ContentEngine;
 using CMS.Websites;
 using HotChocolate.Data.Filters;
 using Kentico.Content.Web.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Routing;
 
 namespace BDO.GWT.Core.Services;
 
@@ -28,17 +33,23 @@ public class NewsArticleCardsService : INewsArticleCardsService
     private readonly ICultureContext _cultureContext;
     private readonly IContentService _contentService;
     private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
+    private readonly IUrlHelperFactory _urlHelperFactory;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public NewsArticleCardsService(
         ICardsService cardsService,
         ICultureContext cultureContext,
         IContentService contentService,
-        ITaxonomyTagRetriever taxonomyTagRetriever)
+        ITaxonomyTagRetriever taxonomyTagRetriever,
+        IUrlHelperFactory urlHelperFactory,
+        IHttpContextAccessor httpContextAccessor)
     {
         _cardsService = cardsService;
         _cultureContext = cultureContext;
         _contentService = contentService;
         _taxonomyTagRetriever = taxonomyTagRetriever;
+        _urlHelperFactory=urlHelperFactory;
+        _httpContextAccessor=httpContextAccessor;
     }
 
     public async Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(HashSet<string> filters, string? nodeAliasPath, CancellationToken cancellationToken)
@@ -57,7 +68,7 @@ public class NewsArticleCardsService : INewsArticleCardsService
         var newsArticles = await _contentService.RetrievePagesAsync<NewsArticle>(
               new RetrievePagesParameters
               {
-                  LinkedItemsMaxLevel=2,
+                  LinkedItemsMaxLevel= 4,
                   LanguageName = _cultureContext.CurrentLanguageTag,
                   UseLanguageFallbacks = false
               },
@@ -167,6 +178,10 @@ public class NewsArticleCardsService : INewsArticleCardsService
     }
     public async Task<List<ContentPageCardDto>> GetContentPageCardListAsync(ICollection<NewsArticle> contentPages, string languageTag, Func<NewsArticle, bool> isPageFeatured, CancellationToken cancellationToken)
     {
+        var httpContext = _httpContextAccessor.HttpContext!;
+        var actionContext = new ActionContext(httpContext, httpContext.GetRouteData() ?? new RouteData(), new ActionDescriptor());
+        var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
+
         var cards = new List<ContentPageCardDto>();
         foreach (var contentPage in contentPages)
         {
@@ -176,7 +191,7 @@ public class NewsArticleCardsService : INewsArticleCardsService
             var card = new ContentPageCardDto
             {
                 IsFeatured = isPageFeatured(contentPage),
-                ImageURL = contentPage.ImageFile.FirstOrDefault()?.ContentAttachmentAsset.Url,
+                ImageURL = urlHelper.Content(contentPage.ImageFile.FirstOrDefault()?.ContentAttachmentAsset.Url),
                 isComingSoon = isComingSoon,
                 ImageAltText = contentPage.ImageFileAltText,
                 Type = type,

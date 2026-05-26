@@ -8,11 +8,15 @@ namespace BDO.GWT.Core.Constants
     {
         public const string ProfileGroup = "ProfileGroups";
         public const string Credential = "Credentials";
+        public const string Type = "ContentType";
     }
     public static class ProfileGroup
     {
     }
     public static class Credentials
+    {
+    }
+    public static class ContentType
     {
     }
 }
