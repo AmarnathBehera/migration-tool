@@ -1,5 +1,6 @@
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Services;
+using CMS.Websites;
 using Moq;
 
 namespace BDO.GWT.Core.Tests.Services;
@@ -26,11 +27,11 @@ public class SocialMediaButtonsServiceTests
         };
 
         _socialMediaButtonsServiceMock
-            .Setup(x => x.GetSocialMediaButtonsDto(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetSocialMediaButtonsDto(It.IsAny<IWebPageFieldsSource>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedDto);
 
         var result = await _socialMediaButtonsServiceMock.Object.GetSocialMediaButtonsDto(
-            new NewsArticle(), CancellationToken.None);
+            new NewsArticle(), "Test Title", CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -55,11 +56,11 @@ public class SocialMediaButtonsServiceTests
         };
 
         _socialMediaButtonsServiceMock
-            .Setup(x => x.GetSocialMediaButtonsDto(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetSocialMediaButtonsDto(It.IsAny<IWebPageFieldsSource>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(dto);
 
         var result = await _socialMediaButtonsServiceMock.Object.GetSocialMediaButtonsDto(
-            new NewsArticle(), CancellationToken.None);
+            new NewsArticle(), "Test Title", CancellationToken.None);
 
         Assert.That(result.EmailButtonUrl, Is.Null);
     }
@@ -70,11 +71,11 @@ public class SocialMediaButtonsServiceTests
         var dto = new SocialMediaButtonsDto { FacebookButtonUrl = null };
 
         _socialMediaButtonsServiceMock
-            .Setup(x => x.GetSocialMediaButtonsDto(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetSocialMediaButtonsDto(It.IsAny<IWebPageFieldsSource>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(dto);
 
         var result = await _socialMediaButtonsServiceMock.Object.GetSocialMediaButtonsDto(
-            new NewsArticle(), CancellationToken.None);
+            new NewsArticle(), "Test Title", CancellationToken.None);
 
         Assert.That(result.FacebookButtonUrl, Is.Null);
     }
@@ -85,11 +86,11 @@ public class SocialMediaButtonsServiceTests
         var dto = new SocialMediaButtonsDto { TwitterButtonUrl = null };
 
         _socialMediaButtonsServiceMock
-            .Setup(x => x.GetSocialMediaButtonsDto(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetSocialMediaButtonsDto(It.IsAny<IWebPageFieldsSource>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(dto);
 
         var result = await _socialMediaButtonsServiceMock.Object.GetSocialMediaButtonsDto(
-            new NewsArticle(), CancellationToken.None);
+            new NewsArticle(), "Test Title", CancellationToken.None);
 
         Assert.That(result.TwitterButtonUrl, Is.Null);
     }
@@ -100,11 +101,11 @@ public class SocialMediaButtonsServiceTests
         var dto = new SocialMediaButtonsDto { LinkedInUrl = null };
 
         _socialMediaButtonsServiceMock
-            .Setup(x => x.GetSocialMediaButtonsDto(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetSocialMediaButtonsDto(It.IsAny<IWebPageFieldsSource>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(dto);
 
         var result = await _socialMediaButtonsServiceMock.Object.GetSocialMediaButtonsDto(
-            new NewsArticle(), CancellationToken.None);
+            new NewsArticle(), "Test Title", CancellationToken.None);
 
         Assert.That(result.LinkedInUrl, Is.Null);
     }
@@ -115,11 +116,11 @@ public class SocialMediaButtonsServiceTests
         var dto = new SocialMediaButtonsDto { ShowCopyLinkButton = false };
 
         _socialMediaButtonsServiceMock
-            .Setup(x => x.GetSocialMediaButtonsDto(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetSocialMediaButtonsDto(It.IsAny<IWebPageFieldsSource>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(dto);
 
         var result = await _socialMediaButtonsServiceMock.Object.GetSocialMediaButtonsDto(
-            new NewsArticle(), CancellationToken.None);
+            new NewsArticle(), "Test Title", CancellationToken.None);
 
         Assert.That(result.ShowCopyLinkButton, Is.False);
     }

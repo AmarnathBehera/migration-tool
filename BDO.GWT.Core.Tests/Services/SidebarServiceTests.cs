@@ -96,7 +96,7 @@ public class SidebarServiceTests
 
         var expectedDto = new SocialMediaButtonsDto { ShowCopyLinkButton = true };
         _socialMediaButtonsServiceMock
-            .Setup(x => x.GetSocialMediaButtonsDto(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetSocialMediaButtonsDto(It.IsAny<NewsArticle>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedDto);
 
         var page = new NewsArticle { ShowSocialMediaButtons = true };
@@ -118,7 +118,7 @@ public class SidebarServiceTests
             .ReturnsAsync((IEnumerable<PrintorShareInfo>?)null);
 
         _socialMediaButtonsServiceMock
-            .Setup(x => x.GetSocialMediaButtonsDto(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetSocialMediaButtonsDto(It.IsAny<NewsArticle>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new SocialMediaButtonsDto());
 
         var page = new NewsArticle { ShowSocialMediaButtons = true };
@@ -126,7 +126,7 @@ public class SidebarServiceTests
         await _service.GetSidebarDtoAsync(page, CancellationToken.None);
 
         _socialMediaButtonsServiceMock.Verify(
-            x => x.GetSocialMediaButtonsDto(page, It.IsAny<CancellationToken>()), Times.Once);
+            x => x.GetSocialMediaButtonsDto(page, It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Test]
@@ -141,6 +141,6 @@ public class SidebarServiceTests
         await _service.GetSidebarDtoAsync(page, CancellationToken.None);
 
         _socialMediaButtonsServiceMock.Verify(
-            x => x.GetSocialMediaButtonsDto(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()), Times.Never);
+            x => x.GetSocialMediaButtonsDto(It.IsAny<NewsArticle>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }

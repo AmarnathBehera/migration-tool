@@ -114,7 +114,7 @@ public class NewsSectionPageService : INewsSectionPageService
 
         var selectedpageid = currentPage.ItemListAdvancedSearchLinkUrl?.FirstOrDefault()?.WebPageGuid;
         var selectedPage = selectedpageid.HasValue
-    ? await _contentRetriever.RetrieveAllPagesByGuids<IWebPageFieldsSource>(new[] { selectedpageid.Value })
+    ? await _contentRetriever.RetrieveAllPagesByGuids<IWebPageFieldsSource>(new[] { selectedpageid.Value }, cancellationToken: cancellationToken)
     : Enumerable.Empty<IWebPageFieldsSource>();
 
         var newsArticleCardsGridDto = new CardsGridDto
