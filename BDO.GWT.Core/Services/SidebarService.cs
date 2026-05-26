@@ -26,7 +26,7 @@ public class SidebarService : ISidebarService
             DownloadButtonAttachment = settingInfo?.DisableDownload is true
                                       ? null
                                       : page.DownloadButtonAttachment?.FirstOrDefault()?.ContentAttachmentAsset.Url,
-            SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page, cancellationToken) : null,
+            SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page,page.PageTitle, cancellationToken) : null,
             ShowCopyLinkButton = settingInfo?.DisableCopyLinkButton is not true,
         };
 

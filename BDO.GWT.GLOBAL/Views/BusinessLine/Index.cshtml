@@ -2,7 +2,8 @@
 @using BDO.GWT.Core.Constants
 @using BDO.GWT.Core.Services
 @using Kentico.Content.Web.Mvc
-@model BDO.GWT.Core.DTOs.BusinessLinePageDto
+@model (BDO.GWT.Core.DTOs.BusinessLinePageDto BusinessLinePageDto, BDO.GWT.Core.DTOs.SchemaMarkups.ServiceSchemaMarkupDto ServiceSchemaMarkupDto)
+
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
@@ -10,6 +11,9 @@
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
     var pageId = pageContext.WebPage.WebPageItemID;
+}
+@section SchemaMarkup {
+    @Html.Raw(this.Model.ServiceSchemaMarkupDto.ToSchemaMarkupJsString())
 }
 @{
     Layout = "_Layout";
@@ -27,7 +31,7 @@
     };
 }
 @{
-    var isSideBoxVisible = Model.Sidebox != null && Model.ShowSideNavigation;
+    var isSideBoxVisible = Model.BusinessLinePageDto.Sidebox != null && Model.BusinessLinePageDto.ShowSideNavigation;
 }
 
 <div>
@@ -37,7 +41,7 @@
         ReactComponentType.HeroGUID,
         new
         {
-            data = Model.Hero,
+            data = Model.BusinessLinePageDto.Hero,
         },
         Context.RequestAborted))
 </div>
@@ -60,7 +64,7 @@
                             pageId,
                             ReactComponentType.SideBoxNavigation,
                             ReactComponentType.SideBoxNavigationGUID,
-                            Model.Sidebox,
+                            Model.BusinessLinePageDto.Sidebox,
                             Context.RequestAborted))
             </aside>
         }

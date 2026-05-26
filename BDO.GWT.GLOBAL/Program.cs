@@ -55,8 +55,13 @@ builder.Services.AddKentico(features =>
           BusinessLine.CONTENT_TYPE_NAME,
           Service.CONTENT_TYPE_NAME,
           ServiceArea.CONTENT_TYPE_NAME,
-          Sub_Service.CONTENT_TYPE_NAME
-          
+          Sub_Service.CONTENT_TYPE_NAME,
+          SectionCareers.CONTENT_TYPE_NAME,
+          Career.CONTENT_TYPE_NAME,
+          Careers.CONTENT_TYPE_NAME,
+          CareerCategory.CONTENT_TYPE_NAME,
+          CareerContent.CONTENT_TYPE_NAME
+
 
        }
     }); features.UseActivityTracking();
@@ -97,6 +102,7 @@ builder.Services.AddScoped<IPageBuilderService, PageBuilderService>();
 builder.Services.AddScoped<IContentService, ContentService>();
 builder.Services.AddScoped<ICachingService, CachingService>();
 builder.Services.AddScoped<ISiteContext, SiteContext>();
+builder.Services.AddScoped<SiteConfigurationProviders>();
 builder.Services.AddScoped<ISiteConfigurationService, SiteConfigurationService>();
 builder.Services.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
 builder.Services.AddHttpContextAccessor();
