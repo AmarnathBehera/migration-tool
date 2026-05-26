@@ -1,4 +1,5 @@
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.SchemaMarkups;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Web.Core.DTOs;
 using GWTXbyKWeb.Controllers;
@@ -19,6 +20,11 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
         public void Setup()
         {
             _businessLinePageServiceMock = new Mock<IBusinessLinePageService>();
+
+            _businessLinePageServiceMock
+                .Setup(x => x.GetServicesPrimarySchemaMarkupDto(It.IsAny<BusinessLinePageDto>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ServiceSchemaMarkupDto());
+
             _controller = new BusinessLineController(_businessLinePageServiceMock.Object);
         }
 
@@ -67,16 +73,16 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             var viewResult = result as ViewResult;
             Assert.That(viewResult, Is.Not.Null);
 
-            var model = viewResult!.Model as BusinessLinePageDto;
+            var model = ((BusinessLinePageDto, ServiceSchemaMarkupDto)?)viewResult!.Model;
             Assert.Multiple(() =>
             {
                 Assert.That(model, Is.Not.Null);
-                Assert.That(model!.Title, Is.EqualTo("Test Business Line"));
-                Assert.That(model.BodyContent, Is.EqualTo("<p>Content</p>"));
-                Assert.That(model.Hero.Title, Is.EqualTo("Hero Title"));
-                Assert.That(model.ShowSideNavigation, Is.True);
-                Assert.That(model.Sidebox, Is.Not.Null);
-                Assert.That(model.Sidebox!.Title, Is.EqualTo("Side Nav"));
+                Assert.That(model!.Value.Item1.Title, Is.EqualTo("Test Business Line"));
+                Assert.That(model.Value.Item1.BodyContent, Is.EqualTo("<p>Content</p>"));
+                Assert.That(model.Value.Item1.Hero.Title, Is.EqualTo("Hero Title"));
+                Assert.That(model.Value.Item1.ShowSideNavigation, Is.True);
+                Assert.That(model.Value.Item1.Sidebox, Is.Not.Null);
+                Assert.That(model.Value.Item1.Sidebox!.Title, Is.EqualTo("Side Nav"));
             });
         }
 
@@ -92,13 +98,13 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             var viewResult = result as ViewResult;
             Assert.That(viewResult, Is.Not.Null);
 
-            var model = viewResult!.Model as BusinessLinePageDto;
+            var model = ((BusinessLinePageDto, ServiceSchemaMarkupDto)?)viewResult!.Model;
             Assert.Multiple(() =>
             {
                 Assert.That(model, Is.Not.Null);
-                Assert.That(model!.Hero, Is.Null);
-                Assert.That(model.Sidebox, Is.Null);
-                Assert.That(model.ShowSideNavigation, Is.False);
+                Assert.That(model!.Value.Item1.Hero, Is.Null);
+                Assert.That(model.Value.Item1.Sidebox, Is.Null);
+                Assert.That(model.Value.Item1.ShowSideNavigation, Is.False);
             });
         }
 
