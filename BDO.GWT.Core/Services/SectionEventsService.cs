@@ -7,6 +7,8 @@ using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
+using BDO.GWT.Domain.Core.Entities;
+using BDO.GWT.Web.Core.DTOs.Cards;
 using BDO.GWT.Web.Core.Services;
 using Kentico.Content.Web.Mvc;
 using System;
@@ -72,7 +74,7 @@ public class SectionEventsService : ISectionEventsService
             FilteringTooltipEnabled = true,
             Title = page.EventsWebinarsListTitle,
             Description = page.EventsWebinarsListDescription,
-            //Filters = page.EventsWebinarsListFilteringEnabled ? await _eventWebinarCardsService.CreateFiltersAsync(page.EventsWebinarsListFilters, null, cancellationToken) : null,
+           // Filters = page.EventsWebinarsListFilteringEnabled ? await _eventWebinarCardsService.CreateFiltersAsync(page.EventsWebinarsListFilters, null, cancellationToken) : null,
             //FilteringTooltipEnabled = await _filteringHelper.IsFilteringTooltipEnabledAsync(page.EventsWebinarsListFilteringEnabled, cancellationToken),
             PageSize = 20,
             AdvancedSearchPrelinkText = page.EventsWebinarsListAdvancedSearchDescription,

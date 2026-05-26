@@ -224,7 +224,7 @@ namespace BDO
 		/// <summary>
 		/// ItemListAdvancedSearchLinkUrl.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> ItemListAdvancedSearchLinkUrl { get; set; }
+		public IEnumerable<WebPageRelatedItem> ItemListAdvancedSearchLinkUrl { get; set; }
 
 
 		/// <summary>

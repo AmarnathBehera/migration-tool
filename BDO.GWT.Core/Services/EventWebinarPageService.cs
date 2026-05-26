@@ -112,7 +112,7 @@ public class EventWebinarPageService : IEventWebinarPageService
             page.EventLocationAddress1,
             page.EventLocationCity,
             page.EventLocationCountry,
-            page.EventType,
+            page.EventType.ToString(),
             cancellationToken);
 
     public async Task<EventWebinarDto> GetWebinarPageDtoAsync(Webinar page, CancellationToken cancellationToken)
@@ -122,7 +122,7 @@ public class EventWebinarPageService : IEventWebinarPageService
             page.EventLocationAddress1,
             page.EventLocationCity,
             page.EventLocationCountry,
-            page.EventType?.Count() == 1 ? page.EventType.First().MetadataTitle : null,
+            page.EventType.ToString(),
             cancellationToken);
 
     public async Task<EventSchemaMarkupDto> GetEventSchemaMarkupDto(Event page, CancellationToken cancellationToken)

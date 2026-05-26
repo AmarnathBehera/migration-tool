@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="BlogPost"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class BlogPost : IWebPageFieldsSource, ICallToAction, ISidebar, IOGMetadataFields, ISearchAndSEO, IMetadata, IWhereShouldThisPageAppear, IAuthorInformation, IImage, IPageMetadata
+	public partial class BlogPost : IWebPageFieldsSource, ICallToAction, ISidebar, IOGMetadataFields, ISearchAndSEO, IMetadata, IAuthorInformation, IImage, IPageMetadata, IContentPage
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -162,60 +162,6 @@ namespace BDO
 
 
 		/// <summary>
-		/// ContentType.
-		/// </summary>
-		public IEnumerable<TagReference> ContentType { get; set; }
-
-
-		/// <summary>
-		/// MetadataServices.
-		/// </summary>
-		public IEnumerable<Service> MetadataServices { get; set; }
-
-
-		/// <summary>
-		/// MetadataServiceAreas.
-		/// </summary>
-		public IEnumerable<IWebPageFieldsSource> MetadataServiceAreas { get; set; }
-
-
-		/// <summary>
-		/// MetadataIndustryCategories.
-		/// </summary>
-		public IEnumerable<IndustryCategory> MetadataIndustryCategories { get; set; }
-
-
-		/// <summary>
-		/// MetadataIndustries.
-		/// </summary>
-		public IEnumerable<Industry> MetadataIndustries { get; set; }
-
-
-		/// <summary>
-		/// MicrositePages.
-		/// </summary>
-		public IEnumerable<MicrositePlaceholder> MicrositePages { get; set; }
-
-
-		/// <summary>
-		/// MicrositeMasterPages.
-		/// </summary>
-		public IEnumerable<MicrositePlaceholder> MicrositeMasterPages { get; set; }
-
-
-		/// <summary>
-		/// MetadataRssCategory.
-		/// </summary>
-		public IEnumerable<MicrositePlaceholder> MetadataRssCategory { get; set; }
-
-
-		/// <summary>
-		/// MetadataRssImage.
-		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataRssImage { get; set; }
-
-
-		/// <summary>
 		/// RelevantContactPerson.
 		/// </summary>
 		public IEnumerable<Person> RelevantContactPerson { get; set; }
@@ -255,5 +201,29 @@ namespace BDO
 		/// PageKeywords.
 		/// </summary>
 		public string PageKeywords { get; set; }
+
+
+		/// <summary>
+		/// ShowTitle.
+		/// </summary>
+		public bool ShowTitle { get; set; }
+
+
+		/// <summary>
+		/// ShowDescription.
+		/// </summary>
+		public bool ShowDescription { get; set; }
+
+
+		/// <summary>
+		/// Content.
+		/// </summary>
+		public string Content { get; set; }
+
+
+		/// <summary>
+		/// UpdatedOn.
+		/// </summary>
+		public DateTime UpdatedOn { get; set; }
 	}
 }
