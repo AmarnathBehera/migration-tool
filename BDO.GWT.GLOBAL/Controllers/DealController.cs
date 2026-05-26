@@ -1,7 +1,4 @@
 ﻿using BDO.GWT.Core.Bases;
-using BDO.GWT.Domain.Core.Entities.Pages;
-using BDO.GWT.Domain.Core.Services;
-using BDO.GWT.Web.Core.LiveSite.Bases;
 using BDO.GWT.Web.Core.LiveSite.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
