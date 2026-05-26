@@ -98,7 +98,7 @@ namespace BDO
 		/// <summary>
 		/// EventType.
 		/// </summary>
-		public IEnumerable<Event> EventType { get; set; }
+		public IEnumerable<TagReference> EventType { get; set; }
 
 
 		/// <summary>
@@ -294,6 +294,18 @@ namespace BDO
 
 
 		/// <summary>
+		/// MetadataRssImage.
+		/// </summary>
+		public IEnumerable<IContentItemFieldsSource> MetadataRssImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataBusinessLine.
+		/// </summary>
+		public IEnumerable<BusinessLine> MetadataBusinessLine { get; set; }
+
+
+		/// <summary>
 		/// MetadataServices.
 		/// </summary>
 		public IEnumerable<Service> MetadataServices { get; set; }
@@ -302,7 +314,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataServiceAreas.
 		/// </summary>
-		public IEnumerable<IWebPageFieldsSource> MetadataServiceAreas { get; set; }
+		public IEnumerable<ServiceArea> MetadataServiceAreas { get; set; }
 
 
 		/// <summary>
@@ -333,12 +345,6 @@ namespace BDO
 		/// MetadataRssCategory.
 		/// </summary>
 		public IEnumerable<MicrositePlaceholder> MetadataRssCategory { get; set; }
-
-
-		/// <summary>
-		/// MetadataRssImage.
-		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataRssImage { get; set; }
 
 
 		/// <summary>

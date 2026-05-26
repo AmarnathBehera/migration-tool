@@ -72,6 +72,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// EventDateOverride.
+		/// </summary>
+		public string EventDateOverride { get; set; }
+
+
+		/// <summary>
 		/// EventIsPrivate.
 		/// </summary>
 		public bool EventIsPrivate { get; set; }
@@ -84,15 +90,15 @@ namespace BDO
 
 
 		/// <summary>
-		/// EventDateOverride.
+		/// AllowRegistration.
 		/// </summary>
-		public string EventDateOverride { get; set; }
+		public bool AllowRegistration { get; set; }
 
 
 		/// <summary>
 		/// EventType.
 		/// </summary>
-		public string EventType { get; set; }
+		public IEnumerable<TagReference> EventType { get; set; }
 
 
 		/// <summary>
@@ -102,21 +108,15 @@ namespace BDO
 
 
 		/// <summary>
-		/// AllowRegistration.
-		/// </summary>
-		public bool AllowRegistration { get; set; }
-
-
-		/// <summary>
-		/// ShowPastEvent.
-		/// </summary>
-		public bool ShowPastEvent { get; set; }
-
-
-		/// <summary>
 		/// DisableAddToCalendar.
 		/// </summary>
 		public bool DisableAddToCalendar { get; set; }
+
+
+		/// <summary>
+		/// RegistrationType.
+		/// </summary>
+		public string RegistrationType { get; set; }
 
 
 		/// <summary>
@@ -138,21 +138,27 @@ namespace BDO
 
 
 		/// <summary>
-		/// CpeCount.
-		/// </summary>
-		public string CpeCount { get; set; }
-
-
-		/// <summary>
 		/// CpeCreditNotes.
 		/// </summary>
 		public string CpeCreditNotes { get; set; }
 
 
 		/// <summary>
+		/// CpeCount.
+		/// </summary>
+		public string CpeCount { get; set; }
+
+
+		/// <summary>
 		/// CpeDescription.
 		/// </summary>
 		public string CpeDescription { get; set; }
+
+
+		/// <summary>
+		/// ShowPastEvent.
+		/// </summary>
+		public bool ShowPastEvent { get; set; }
 
 
 		/// <summary>
@@ -165,48 +171,6 @@ namespace BDO
 		/// EventVideo.
 		/// </summary>
 		public string EventVideo { get; set; }
-
-
-		/// <summary>
-		/// RegistrationType.
-		/// </summary>
-		public string RegistrationType { get; set; }
-
-
-		/// <summary>
-		/// MetadataBusinessIssues.
-		/// </summary>
-		public IEnumerable<BusinessLine> MetadataBusinessIssues { get; set; }
-
-
-		/// <summary>
-		/// MetadataBusinessLines.
-		/// </summary>
-		public IEnumerable<BusinessLine> MetadataBusinessLines { get; set; }
-
-
-		/// <summary>
-		/// MetadataOfficeLocation.
-		/// </summary>
-		public IEnumerable<LocationOffice> MetadataOfficeLocation { get; set; }
-
-
-		/// <summary>
-		/// MetadataSpecialtiesCategories.
-		/// </summary>
-		public IEnumerable<AboutPage> MetadataSpecialtiesCategories { get; set; }
-
-
-		/// <summary>
-		/// MetadataSpecialtiesAreas.
-		/// </summary>
-		public IEnumerable<AboutPage> MetadataSpecialtiesAreas { get; set; }
-
-
-		/// <summary>
-		/// MetadataSpecialtiesPages.
-		/// </summary>
-		public IEnumerable<AboutPage> MetadataSpecialtiesPages { get; set; }
 
 
 		/// <summary>
@@ -294,6 +258,18 @@ namespace BDO
 
 
 		/// <summary>
+		/// MetadataRssImage.
+		/// </summary>
+		public IEnumerable<IContentItemFieldsSource> MetadataRssImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataBusinessLine.
+		/// </summary>
+		public IEnumerable<BusinessLine> MetadataBusinessLine { get; set; }
+
+
+		/// <summary>
 		/// MetadataServices.
 		/// </summary>
 		public IEnumerable<Service> MetadataServices { get; set; }
@@ -302,7 +278,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataServiceAreas.
 		/// </summary>
-		public IEnumerable<IWebPageFieldsSource> MetadataServiceAreas { get; set; }
+		public IEnumerable<ServiceArea> MetadataServiceAreas { get; set; }
 
 
 		/// <summary>
@@ -333,12 +309,6 @@ namespace BDO
 		/// MetadataRssCategory.
 		/// </summary>
 		public IEnumerable<MicrositePlaceholder> MetadataRssCategory { get; set; }
-
-
-		/// <summary>
-		/// MetadataRssImage.
-		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataRssImage { get; set; }
 
 
 		/// <summary>
