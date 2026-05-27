@@ -5,6 +5,7 @@ using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.DTOs.Pages;
+using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
@@ -37,17 +38,20 @@ public class SectionPeoplePageService : ISectionPeoplePageService
     private readonly IContentService _contentRetriever;
     private readonly IPeopleCardsService _peopleCardsService;
     private readonly ICultureContext _cultureContext;
+    private readonly IFilteringHelper _filteringHelper;
 
     public SectionPeoplePageService(
         IContentService pageRetriever,
         IHeroService heroService,
         IPeopleCardsService peopleCardsService,
-        ICultureContext cultureContext)
+        ICultureContext cultureContext,
+        IFilteringHelper filteringHelper)
     {
         _contentRetriever = pageRetriever;
         _heroService = heroService;
         _peopleCardsService = peopleCardsService;
         _cultureContext = cultureContext;
+        _filteringHelper = filteringHelper;
     }
 
     public async Task<SectionPeopleDto> GetSectionPeoplePageDtoAsync(SectionPeoplePage page, CancellationToken cancellationToken)
@@ -79,7 +83,7 @@ public class SectionPeoplePageService : ISectionPeoplePageService
         {
             Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
             Filters = page.PeopleListFilteringEnabled ? await _peopleCardsService.CreateFiltersAsync(filters, null, cancellationToken) : null,
-            FilteringTooltipEnabled = true,
+            FilteringTooltipEnabled = await _filteringHelper.IsFilteringTooltipEnabledAsync(page.PeopleListFilteringEnabled, cancellationToken),
             SortBy = page.PeopleListOrderingEnabled ? CreateOrderingDto(page.PeopleListDefaultOrder) : null,
             PageSize = 20,
             ApiEndpoint = $"People/{page.SystemFields.ContentItemGUID}/Get",

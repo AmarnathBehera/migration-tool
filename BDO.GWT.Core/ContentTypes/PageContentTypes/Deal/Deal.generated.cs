@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using CMS.ContentEngine;
 using CMS.Websites;
+using CMS.MediaLibrary;
 
 namespace BDO
 {
@@ -33,6 +34,97 @@ namespace BDO
 		/// </summary>
 		[SystemField]
 		public WebPageFields SystemFields { get; set; }
+
+
+		/// <summary>
+		/// MetadataShowTitle.
+		/// </summary>
+		public bool MetadataShowTitle { get; set; }
+
+
+		/// <summary>
+		/// DealContent.
+		/// </summary>
+		public string DealContent { get; set; }
+
+
+		/// <summary>
+		/// Industry.
+		/// </summary>
+		public IEnumerable<TagReference> Industry { get; set; }
+
+
+		/// <summary>
+		/// SubIndustry.
+		/// </summary>
+		public IEnumerable<TagReference> SubIndustry { get; set; }
+
+
+		/// <summary>
+		/// DealType.
+		/// </summary>
+		public IEnumerable<TagReference> DealType { get; set; }
+
+
+		/// <summary>
+		/// DateField.
+		/// </summary>
+		public DateTime DateField { get; set; }
+
+
+		/// <summary>
+		/// Size.
+		/// </summary>
+		public IEnumerable<TagReference> Size { get; set; }
+
+
+		/// <summary>
+		/// MetadataOfficeLocation.
+		/// </summary>
+		public string MetadataOfficeLocation { get; set; }
+
+
+		/// <summary>
+		/// ClientName.
+		/// </summary>
+		public string ClientName { get; set; }
+
+
+		/// <summary>
+		/// RelatedDeals.
+		/// </summary>
+		public string RelatedDeals { get; set; }
+
+
+		/// <summary>
+		/// DealMetadataRssCategory.
+		/// </summary>
+		public string DealMetadataRssCategory { get; set; }
+
+
+		/// <summary>
+		/// DealMetadataRssImage.
+		/// </summary>
+		[Obsolete("Media libraries and their APIs are obsolete and will be discontinued in the future. Please migrate all media library files to Content hub and use their corresponding content item APIs.")]
+		public IEnumerable<AssetRelatedItem> DealMetadataRssImage { get; set; }
+
+
+		/// <summary>
+		/// DealShowSocialMediaButtons.
+		/// </summary>
+		public bool DealShowSocialMediaButtons { get; set; }
+
+
+		/// <summary>
+		/// SharingOptIn.
+		/// </summary>
+		public bool SharingOptIn { get; set; }
+
+
+		/// <summary>
+		/// DealCountry.
+		/// </summary>
+		public string DealCountry { get; set; }
 
 
 		/// <summary>
