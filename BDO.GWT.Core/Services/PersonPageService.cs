@@ -29,6 +29,7 @@ public class PersonPageService : IPersonPageService
     private readonly IContentService _contentService;
     private readonly ICultureContext _cultureContext;
     private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
+    private readonly ISettingService _settingsService;
 
     private HttpClient? _httpClient;
 
@@ -36,13 +37,15 @@ public class PersonPageService : IPersonPageService
         IHttpClientFactory httpClientFactory,
         IContentService contentService,
         ICultureContext cultureContext,
-        ITaxonomyTagRetriever taxonomyTagRetriever
+        ITaxonomyTagRetriever taxonomyTagRetriever,
+        ISettingService settingService
         )
     {
         _httpClientFactory = httpClientFactory;
         _contentService = contentService;
         _cultureContext = cultureContext;
         _taxonomyTagRetriever = taxonomyTagRetriever;
+        _settingsService = settingService;
     }
 
     public async Task<PersonDto> GetPersonPageDtoAsync(Person page, CancellationToken cancellationToken = default)
@@ -135,10 +138,14 @@ public class PersonPageService : IPersonPageService
         Country = office?.LocationCountry,
     }));
 
+
+        var settings = await _settingsService.GetUsePersonPageTitleInfo();
+        var showEmailInVCard = settings?.FirstOrDefault()?.DisplayEmailinvCard;
+
         var vCard = new VCardData
         {
             FullName = GetPersonDisplayNameAsync(person),
-            EMail = person.PersonEmail ?? string.Empty,
+            EMail = showEmailInVCard == true ? person.PersonEmail : string.Empty,
             Title = person.PersonJobTitle,
             TelephoneNumbers = new List<(string? Type, string? Number)>
             {
