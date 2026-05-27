@@ -3,6 +3,7 @@ using CMS.ContentEngine;
 using CMS.DataEngine;
 using Kentico.Content.Web.Mvc.Routing;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 
 namespace BDO.GWT.Core.Services;
 
@@ -39,31 +40,25 @@ public class CultureContext : ICultureContext
 
         if (context != null)
         {
-            var refererLanguage = GetLanguageFromReferer(context);
-            if (!string.IsNullOrEmpty(refererLanguage))
-                return refererLanguage;
+            var routeLanguage = GetLanguageFromRoute(context);
+            if (!string.IsNullOrEmpty(routeLanguage))
+            {
+                return routeLanguage;
+            }
         }
 
         return _preferredLanguageRetriever.Get();
     }
 
-    private string? GetLanguageFromReferer(HttpContext context)
+    private string? GetLanguageFromRoute(HttpContext context)
     {
-        var referer = context.Request.Headers.Referer;
-
-        if (string.IsNullOrEmpty(referer) || !Uri.TryCreate(referer, UriKind.Absolute, out var uri))
-            return null;
-
-        var firstSegment = uri.AbsolutePath.Trim('/').Split('/').FirstOrDefault()?.ToLower();
-
-        if (string.IsNullOrEmpty(firstSegment))
-            return null;
+        var routeLanguage = context.GetRouteValue(WebPageRoutingOptions.LANGUAGE_ROUTE_VALUE_KEY)?.ToString()?.ToLowerInvariant();
 
         var knownLanguages = _languageProvider.Get()
             .GetEnumerableTypedResult()
-            .Select(l => l.ContentLanguageName.ToLower())
+            .Select(l => l.ContentLanguageCultureFormat.ToLower())
             .ToHashSet();
 
-        return knownLanguages.Contains(firstSegment) ? firstSegment : null;
+        return !string.IsNullOrEmpty(routeLanguage) && knownLanguages.Contains(routeLanguage) ? routeLanguage : null;
     }
 }

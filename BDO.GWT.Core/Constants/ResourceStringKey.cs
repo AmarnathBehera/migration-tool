@@ -10,7 +10,12 @@ public static class ResourceStringKey
     public static class LiveSite
     {
         public const string LiveSitePrefix = BDOPrefix + "LiveSite.";
+
+        public const string FilterBy = LiveSitePrefix + "FilterBy";
+
         public const string ReadMore = LiveSitePrefix + "ReadMore";
+
+        public const string SortBy = LiveSitePrefix + "SortBy";
 
         public static class Filters
         {
@@ -74,6 +79,12 @@ public static class ResourceStringKey
 
             public const string Year = FiltersPrefix + "Year";
         }
+        public static class Insights
+        {
+            private const string InsightsPrefix = LiveSitePrefix + "Insights.";
+
+            public const string Authors = InsightsPrefix + "Authors";
+        }
         public static class People
         {
             private const string PeoplePrefix = LiveSitePrefix + "People.";
@@ -83,6 +94,12 @@ public static class ResourceStringKey
             public const string SortLastNameZtoA = PeoplePrefix + "SortLastNameZtoA";
 
             public const string SortNodeOrder = PeoplePrefix + "SortNodeOrder";
+        }
+        public static class Careers
+        {
+            private const string CareersPrefix = LiveSitePrefix + "Careers.";
+
+            public const string RelevantContactPeople = CareersPrefix + "RelevantContactPeople";
         }
     }
 }

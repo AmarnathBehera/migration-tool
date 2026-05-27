@@ -21,17 +21,18 @@
 
     var widgetsList = new[]
     {
-        // ComponentIdentifiers.Widgets.ExternalNavigation,
+        ComponentIdentifiers.Widgets.ExternalNavigation,
         ComponentIdentifiers.Widgets.Imagewithtext,
         ComponentIdentifiers.Widgets.QuoteCard,
         ComponentIdentifiers.Widgets.TiledLink,
-        ComponentIdentifiers.Widgets.Globallocation
+        ComponentIdentifiers.Widgets.Globallocation,
+        ComponentIdentifiers.Widgets.LocalNavigation
     };
 }
 
 
 
-<div>
+
     @if (Model != null && pageId != 0)
     {
         @(await ReactService.RenderComponentAsync(
@@ -44,7 +45,7 @@
         },
         Context.RequestAborted))
     }
-</div>
+
 <div class="elevated">
     @if (Model != null && pageId != 0)
     {

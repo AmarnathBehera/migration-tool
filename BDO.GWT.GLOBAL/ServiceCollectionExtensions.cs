@@ -16,6 +16,7 @@ using CMS.Core;
 using GWTXbyKWeb.Components.Services.SEOOptions;
 using Microsoft.Extensions.DependencyInjection;
 
+
 namespace BDO.GWT.Common;
 
 public static class ServiceCollectionExtensions
@@ -63,6 +64,16 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ILocationCityPageService, LocationCityPageService>();
         serviceCollection.AddScoped<ILocationsPageService, LocationsPageService>();
         serviceCollection.AddScoped<ITaxonomyTagRetriever, TaxonomyTagRetriever>();
+        serviceCollection.AddScoped<IFaqService, FaqService>();
+        serviceCollection.AddScoped<INewsSectionPageService, NewsSectionPageService>();
+        serviceCollection.AddScoped<INewsGroupPageService, NewsGroupPageService>();
+        serviceCollection.AddScoped<INewsArticleService, NewsArticleService>();
+        serviceCollection.AddScoped<INewsArticleCardsService, NewsArticleCardsService>();
+        serviceCollection.AddScoped<ISidebarService, SidebarService>();
+        serviceCollection.AddScoped<ISocialMediaButtonsService, SocialMediaButtonsService>();
+        serviceCollection.AddScoped<IExternalPeopleHelper, ExternalPeopleHelper>();
+        serviceCollection.AddScoped<IFilteringHelper, FilteringHelper>();
+        serviceCollection.AddScoped<ISettingService, SettingService>();
 
         serviceCollection.AddScoped<IBreadcrumbsService, BreadcrumbsService>();
         serviceCollection.AddScoped<IFormBuilderService, FormBuilderService>();
@@ -76,7 +87,14 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IServiceAreaAndServicePageService, ServiceAreaAndServicePageService>();
         serviceCollection.AddScoped<IBusinessLinePageService, BusinessLinePageService>();
         serviceCollection.AddTransient<DropdownScriptExecutor>();
+        serviceCollection.AddScoped<ICareerPageService, CareerPageService>();
+        serviceCollection.AddScoped<ICareersPageService, CareersPageService>();
+        serviceCollection.AddScoped<ICareerDetailPageService, CareerDetailPageService>();
+        serviceCollection.AddScoped<ICareerCategoryPageService , CareerCategoryPageService>();
+        serviceCollection.AddScoped<ICareerContentPageService, CareerContentPageService>();
+
         serviceCollection.AddScoped<IChannelAccessService, ChannelAccessService>();
+        serviceCollection.AddScoped<ISocialMediaButtonsService, SocialMediaButtonsService>();
     }
 
 }
