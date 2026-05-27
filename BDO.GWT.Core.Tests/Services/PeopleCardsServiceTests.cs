@@ -94,7 +94,7 @@ public class PeopleCardsServiceTests
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<Person?>());
+            .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
             page, "en", query, null, _ => false, CancellationToken.None);
@@ -120,7 +120,7 @@ public class PeopleCardsServiceTests
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<Person?>());
+            .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
             page, "en", query, null, _ => false, CancellationToken.None);
@@ -142,7 +142,7 @@ public class PeopleCardsServiceTests
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<Person?>());
+            .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
             page, "en", query, null, _ => false, CancellationToken.None);
@@ -181,7 +181,7 @@ public class PeopleCardsServiceTests
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<Person?>());
+            .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
             page, "en", query, null, _ => false, CancellationToken.None);
@@ -210,7 +210,7 @@ public class PeopleCardsServiceTests
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<Person?>());
+            .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
             page, "en", query, null, _ => false, CancellationToken.None);
@@ -243,7 +243,7 @@ public class PeopleCardsServiceTests
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<Person?>());
+            .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
             page, "en", query, null, _ => false, CancellationToken.None);
@@ -277,7 +277,7 @@ public class PeopleCardsServiceTests
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<Person?>());
+            .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
             page, "en", query, null, _ => false, CancellationToken.None);
