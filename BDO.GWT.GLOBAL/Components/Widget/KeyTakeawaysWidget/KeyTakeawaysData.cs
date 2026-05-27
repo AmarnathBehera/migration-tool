@@ -11,7 +11,7 @@ public class KeyTakeawaysData
 
     public string ContentAlignment { get; set; }
 
-    public string? ContentWidth { get; set; }
+    public string ContentWidth { get; set; }
 
     public string TopMargin { get; set; } = null!;
 
