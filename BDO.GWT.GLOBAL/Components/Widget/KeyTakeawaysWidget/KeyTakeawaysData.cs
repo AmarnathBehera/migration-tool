@@ -3,13 +3,13 @@
 
 public class KeyTakeawaysData 
 {
-    public string? Title { get; set; }
+    public string Title { get; set; }
 
-    public string? Content { get; set; }
+    public string Content { get; set; }
 
-    public string? BackgroundColour { get; set; }
+    public string BackgroundColour { get; set; }
 
-    public string? ContentAlignment { get; set; }
+    public string ContentAlignment { get; set; }
 
     public string? ContentWidth { get; set; }
 
