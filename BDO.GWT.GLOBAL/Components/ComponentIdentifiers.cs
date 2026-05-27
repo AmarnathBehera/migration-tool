@@ -32,6 +32,8 @@
 
             public const string LocalNavigation = WidgetPrefix + "LocalNavigation";
 
+            public const string KeyTakeaways = WidgetPrefix + "KeyTakeaways";
+
         }
 
         //sections

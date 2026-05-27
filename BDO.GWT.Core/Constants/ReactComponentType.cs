@@ -42,6 +42,8 @@ public static class ReactComponentType
     public const string LocalNavigationItem = "LocalNavigationItem";
     
     public const string CareerDetails = "CareerDetails";
+    public const string KeyTakeAways = "KeyTakeAwaysWidget";
+
 
 
 
@@ -81,6 +83,7 @@ public static class ReactComponentType
     public const string CareerDetailsGUID = "cd1bc3e5-c6b6-4212-9fab-a86bdc570462";
     public const string CareerSidebarGUID = "7d6afe7a-e672-43d4-b9e8-aad67c339c56";
     public const string LocalNavigationItemGUID = "c4403ffb-12e9-4f20-86de-3379bc0514f0";
+    public const string KeyTakeAwaysGUID = "c4403ffb-12e9-4f20-86de-3379bc0514f0";
 }
 
 
