@@ -95,6 +95,8 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.AddScoped<IChannelAccessService, ChannelAccessService>();
         serviceCollection.AddScoped<ISocialMediaButtonsService, SocialMediaButtonsService>();
+
+        serviceCollection.AddScoped<ISpecialtiesPageService, SpecialtiesPageService>();
     }
 
 }
