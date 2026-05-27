@@ -47,8 +47,6 @@
         data = Model.Hero,
     }, Context.RequestAborted))
 
-<div class="section-container section-container--items section-container--two-thirds gap--xl py-20">
-    <div class="deal-form-container">
         @(await ReactService.RenderComponentAsync(
                 pageId,
                 ReactComponentType.DealDetails,
@@ -60,4 +58,3 @@
                 {
                     AllowedWidgets = widgetsList
                 })
-    </div>
