@@ -23,11 +23,13 @@ public class PeopleController : ControllerBase
     }
 
     [HttpGet("{pageGuid:guid}/[action]")]
-    public async Task<ActionResult<PaginationDto<PersonCardDto>>> Get([FromRoute] Guid pageGuid, [FromQuery] CardsQuery query, CancellationToken cancellationToken)
+    public async Task<ActionResult<PaginationDto<PersonCardDto>>> Get([FromRoute] Guid pageGuid,[FromQuery] CardsQuery query, CancellationToken cancellationToken)
     {
+        var language = RouteData.Values[CultureInjectorAttribute.RouteParameter]?.ToString();
+
         query.Filters = RequestQueryUtility.ExtractFilterQueryParameters(Request.Query);
 
-        var dto = await _sectionPeoplePageService.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, query, cancellationToken);
+        var dto = await _sectionPeoplePageService.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, language, query, cancellationToken);
 
         return Ok(dto);
     }

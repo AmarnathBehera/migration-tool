@@ -25,6 +25,7 @@ public interface IPeopleCardsService
 
     Task<PaginationDto<PersonCardDto>> GetFilteredItemsAsync(
         SectionPeoplePage page,
+        string language,
         CardsQuery cardsQuery,
         Action<ContentItemQueryBuilder>? decorateQuery,
         Func<Person, bool> isFeatured,
@@ -70,6 +71,7 @@ public class PeopleCardsService : IPeopleCardsService
 
     public async Task<PaginationDto<PersonCardDto>> GetFilteredItemsAsync(
  SectionPeoplePage page,
+ string language,
  CardsQuery cardsQuery,
  Action<ContentItemQueryBuilder>? decorateQuery,
  Func<Person, bool> isFeatured,
@@ -79,18 +81,17 @@ public class PeopleCardsService : IPeopleCardsService
 
         var order = cardsQuery.Order?.ToLower() ?? "asc";
 
-        var people = await _contentService.RetrievePagesAsync<Person>(
+        var people = await _contentService.GetPagesAsync<Person>(
                new RetrievePagesParameters
                {
                    LinkedItemsMaxLevel = 2,
-                   LanguageName = _cultureContext.CurrentLanguageTag,
-                   UseLanguageFallbacks = false 
+                   LanguageName = language,
+                   //UseLanguageFallbacks = false 
                },
             query =>
             {
                 query.Where(w =>
                 {
-                    w.WhereEquals("ContentItemChannelID", _contentService.GetCurrentChannelID());
                     w.WhereEquals("WebPageItemParentID", page.SystemFields.WebPageItemID);
                     foreach (var filter in filterWhereExpressions)
                     {
@@ -106,7 +107,7 @@ public class PeopleCardsService : IPeopleCardsService
                 else {
                     query.OrderBy(nameof(Person.SystemFields.WebPageItemID));
                 }
-            },
+            }, RetrievalCacheSettings.CacheDisabled,
             cancellationToken
         );
         var peopleArray = people?.OfType<Person>().ToArray() ?? Array.Empty<Person>();

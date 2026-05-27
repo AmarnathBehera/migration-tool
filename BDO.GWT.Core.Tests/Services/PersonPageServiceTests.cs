@@ -61,11 +61,12 @@ public class PersonPageServiceTests
             .ReturnsAsync(Enumerable.Empty<Tag>());
 
         _contentServiceMock
-            .Setup(s => s.RetrievePagesAsync<LocationOffice>(
+            .Setup(s => s.GetPagesAsync<LocationOffice>(
                 It.IsAny<RetrievePagesParameters>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<LocationOffice?>());
+            .ReturnsAsync(Enumerable.Empty<LocationOffice>());
 
         var result = await _service.GetPersonPageDtoAsync(person, CancellationToken.None);
 
@@ -100,11 +101,12 @@ public class PersonPageServiceTests
             .ReturnsAsync(Enumerable.Empty<Tag>());
 
         _contentServiceMock
-            .Setup(s => s.RetrievePagesAsync<LocationOffice>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<LocationOffice?>());
+                .Setup(x => x.GetPagesAsync<LocationOffice>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync((IEnumerable<LocationOffice>)null!);
 
         var result = await _service.GetPersonPageDtoAsync(person, CancellationToken.None);
 

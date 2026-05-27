@@ -21,7 +21,8 @@ public interface INewsArticleCardsService
 {
     Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(HashSet<string> filters, string? nodeAliasPath, CancellationToken cancellationToken);
     Task<PaginationDto<ContentPageCardDto>> GetFilteredItemsAsync
-        (CardsQuery cardsQuery,
+        (string language,
+        CardsQuery cardsQuery,
         Action<ContentItemQueryBuilder>? decorateQuery,
         Func<NewsArticle, bool> isFeatured,
         CancellationToken cancellationToken);
@@ -58,18 +59,19 @@ public class NewsArticleCardsService : INewsArticleCardsService
     }
 
     public async Task<PaginationDto<ContentPageCardDto>> GetFilteredItemsAsync
-        (CardsQuery cardsQuery,
+        (string language,
+        CardsQuery cardsQuery,
         Action<ContentItemQueryBuilder>? decorateQuery, 
         Func<NewsArticle, bool> isFeatured,
         CancellationToken cancellationToken)
     {
         var filterWhereExpressions = await GetFilterParameterWhereExpressionsAsync(cardsQuery.Filters);
 
-        var newsArticles = await _contentService.RetrievePagesAsync<NewsArticle>(
+        var newsArticles = await _contentService.GetPagesAsync<NewsArticle>(
               new RetrievePagesParameters
               {
                   LinkedItemsMaxLevel= 4,
-                  LanguageName = _cultureContext.CurrentLanguageTag,
+                  LanguageName = language,
                   UseLanguageFallbacks = false
               },
            query =>
@@ -83,6 +85,7 @@ public class NewsArticleCardsService : INewsArticleCardsService
                    }
                });
            },
+                RetrievalCacheSettings.CacheDisabled,
            cancellationToken
        ) ?? [];
        

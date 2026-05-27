@@ -289,6 +289,32 @@
 
             return childPages;
         }
+        public async Task<IEnumerable<TPage>> GetParentPageByParentIDAsync<TPage>(
+     int parentid,
+     CancellationToken cancellationToken = default)
+     where TPage : IWebPageFieldsSource
+        {
+            if (parentid == 0)
+                throw new ArgumentException("Parent ID must be provided", nameof(parentid));
+
+            var childPages = await _contentRetriever.RetrievePages<TPage>(
+                new RetrievePagesParameters { 
+                    LinkedItemsMaxLevel = 3 ,
+                    LanguageName=_cultureContext.CurrentLanguageTag,
+                    UseLanguageFallbacks= false
+                },
+            query =>
+            {
+                // Filter by parent ID
+                query.Where(w => w.WhereEquals("WebPageItemID", parentid))
+                     .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder));
+            },
+                cacheSettings: RetrievalCacheSettings.CacheDisabled, // Use the predefined disabled cache
+                cancellationToken: cancellationToken
+            );
+
+            return childPages;
+        }
 
         public Task<IEnumerable<TPage>> GetPagesAsync<TPage>(
       RetrievePagesParameters parameters,
@@ -305,8 +331,6 @@
                 cancellationToken
             );
         }
-
-
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
         {
             return _contentRetriever.RetrievePages<T?>(cancellationToken);
@@ -315,17 +339,6 @@
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(RetrievePagesParameters parameters, CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
         {
             return _contentRetriever.RetrievePages<T?>(parameters, cancellationToken);
-        }
-        public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(
-          RetrievePagesParameters parameters,
-          Action<RetrievePagesQueryParameters> queryAction,
-          CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
-        {
-            return _contentRetriever.RetrievePages<T?>(
-                parameters,
-                queryAction,
-                RetrievalCacheSettings.CacheDisabled,
-                cancellationToken);
         }
         public string GetFallbackMetadataDescription(string? metaDescription, string? metaOGDescription)
         {
