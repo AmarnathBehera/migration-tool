@@ -289,32 +289,6 @@
 
             return childPages;
         }
-        public async Task<IEnumerable<TPage>> GetParentPageByParentIDAsync<TPage>(
-     int parentid,
-     CancellationToken cancellationToken = default)
-     where TPage : IWebPageFieldsSource
-        {
-            if (parentid == 0)
-                throw new ArgumentException("Parent ID must be provided", nameof(parentid));
-
-            var childPages = await _contentRetriever.RetrievePages<TPage>(
-                new RetrievePagesParameters { 
-                    LinkedItemsMaxLevel = 3 ,
-                    LanguageName=_cultureContext.CurrentLanguageTag,
-                    UseLanguageFallbacks= false
-                },
-            query =>
-            {
-                // Filter by parent ID
-                query.Where(w => w.WhereEquals("WebPageItemID", parentid))
-                     .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder));
-            },
-                cacheSettings: RetrievalCacheSettings.CacheDisabled, // Use the predefined disabled cache
-                cancellationToken: cancellationToken
-            );
-
-            return childPages;
-        }
 
         public Task<IEnumerable<TPage>> GetPagesAsync<TPage>(
       RetrievePagesParameters parameters,
