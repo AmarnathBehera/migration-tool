@@ -69,14 +69,14 @@ public class ExternalPeopleHelper : IExternalPeopleHelper
     }
     public async Task<string> GetDisplayNameAsync(ExternalPerson externalPerson)
     {
-        //var setting = await _settingsService.GetUsePersonPageTitleInfo();
+        var setting = await _settingsService.GetUsePersonPageTitleInfo();
 
-        //var usePersonPageTitle = setting?.FirstOrDefault()?.UsePageTitleToDisplayPersonName ?? false;
+        var usePersonPageTitle = setting?.FirstOrDefault()?.UsePageTitleToDisplayPersonName ?? false;
 
-        //if (usePersonPageTitle)
-        //{
-        //    return externalPerson.MetadataTitle;
-        //}
+        if (usePersonPageTitle)
+        {
+            return externalPerson.MetadataTitle;
+        }
 
         return string.IsNullOrEmpty(externalPerson.SurnamePrefixes) ? $"{externalPerson.FirstName} {externalPerson.LastName}" : $"{externalPerson.FirstName} {externalPerson.SurnamePrefixes} {externalPerson.LastName}";
     }

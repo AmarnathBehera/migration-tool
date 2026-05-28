@@ -212,7 +212,7 @@ public class ExternalPeopleHelperTests
             Assert.That(result[0].FullName, Is.EqualTo("John Doe"));
             Assert.That(result[0].JobTitle, Is.EqualTo("Engineer"));
             Assert.That(result[0].Image, Is.Null);
-            Assert.That(result[0].Url, Is.EqualTo(string.Empty));
+            Assert.That(result[0].Url, Is.Null);
         });
     }
 
@@ -235,7 +235,7 @@ public class ExternalPeopleHelperTests
         var result = await _helper.GetSidebarExternalPeopleDtosAsync(new List<Guid> { Guid.NewGuid() }, CancellationToken.None);
 
         Assert.That(result, Has.Length.EqualTo(1));
-        Assert.That(result[0].Url, Is.EqualTo(string.Empty));
+        Assert.That(result[0].Url, Is.Null);
     }
 
     [Test]
@@ -255,9 +255,9 @@ public class ExternalPeopleHelperTests
             }
         });
 
-        var pageMock = new Mock<IWebPageFieldsSource>();
-        pageMock.SetupGet(p => p.SystemFields)
-            .Returns(new WebPageFields { WebPageUrlPath = "/people/alice" });
+        _contentServiceMock
+            .Setup(x => x.EnsureAbsoluteUrl("/people/alice"))
+            .Returns("/people/alice");
 
         var result = await _helper.GetSidebarExternalPeopleDtosAsync(new List<Guid> { Guid.NewGuid() }, CancellationToken.None);
 
