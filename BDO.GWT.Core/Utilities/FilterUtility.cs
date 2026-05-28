@@ -1,8 +1,5 @@
 ﻿using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data;
-using CMS.EventLog;
-using Kentico.Xperience.Admin.Base;
-using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 
 namespace BDO.GWT.Core.Utilities;
 
@@ -15,8 +12,8 @@ public static class FilterUtility
         //[FilterParameterName.CareerEmploymentType] = new("Employment Type", ResourceStringKey.LiveSite.Filters.CareerEmploymentType, typeof(CareerEmploymentType), FilterParameterType.Entity),
         //[FilterParameterName.CareerJobTitle] = new("Job Title", ResourceStringKey.LiveSite.Filters.CareerJobTitle, typeof(CareerJobTitle), FilterParameterType.Entity),
         //[FilterParameterName.CareerLevel] = new("Level", ResourceStringKey.LiveSite.Filters.CareerLevel, typeof(CareerLevel), FilterParameterType.Entity),
-        //[FilterParameterName.ContentType] = new("Type", ResourceStringKey.LiveSite.Filters.ContentType, typeof(ContentType), FilterParameterType.Entity),
-        //[FilterParameterName.Country] = new("Country", ResourceStringKey.LiveSite.Filters.Country, typeof(IDealPage), FilterParameterType.Field),
+        [FilterParameterName.ContentType] = new(Taxonomies.Type, ResourceStringKey.LiveSite.Filters.ContentType, typeof(ContentType), FilterParameterType.Taxonomy),
+        //[FilterParameterName.Country] = new("industryCategoryCountry", ResourceStringKey.LiveSite.Filters.Country, typeof(IDealPage), FilterParameterType.Field),
         [FilterParameterName.Credential] = new(Taxonomies.Credential, ResourceStringKey.LiveSite.Filters.Credential, typeof(Credentials), FilterParameterType.Taxonomy),
         //[FilterParameterName.DealType] = new("Deal Type", ResourceStringKey.LiveSite.Filters.DealType, typeof(DealType), FilterParameterType.Entity),
         //[FilterParameterName.EventType] = new("Type", ResourceStringKey.LiveSite.Filters.EventType, typeof(EventType), FilterParameterType.Entity),
@@ -43,6 +40,10 @@ public static class FilterUtility
         //[FilterParameterName.SubService] = new("Sub-Service", ResourceStringKey.LiveSite.Filters.SubService, typeof(SubService), FilterParameterType.Page),
         //[FilterParameterName.Year] = new("Year", ResourceStringKey.LiveSite.Filters.Year, typeof(IDealPage), FilterParameterType.Field),
        
+        [FilterParameterName.Credential] = new(Taxonomies.Credential, ResourceStringKey.LiveSite.Filters.Credential, typeof(Credentials), FilterParameterType.Taxonomy),
+        [FilterParameterName.CareerEmploymentType] = new(Taxonomies.CareerEmploymentType, ResourceStringKey.LiveSite.Filters.CareerEmploymentType, typeof(CareerEmploymentType), FilterParameterType.Taxonomy),
+        [FilterParameterName.CareerJobTitle] = new(Taxonomies.CareerJobTitle, ResourceStringKey.LiveSite.Filters.CareerJobTitle, typeof(CareerJobTitle), FilterParameterType.Taxonomy),
+        [FilterParameterName.CareerLevel] = new(Taxonomies.CareerLevel, ResourceStringKey.LiveSite.Filters.CareerLevel, typeof(CareerLevel), FilterParameterType.Taxonomy)
     };
     public static FilterParameterData? GetFilterParameterData(string filterParameterName)
     {

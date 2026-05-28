@@ -305,8 +305,6 @@
                 cancellationToken
             );
         }
-
-
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
         {
             return _contentRetriever.RetrievePages<T?>(cancellationToken);
@@ -315,17 +313,6 @@
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(RetrievePagesParameters parameters, CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
         {
             return _contentRetriever.RetrievePages<T?>(parameters, cancellationToken);
-        }
-        public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(
-          RetrievePagesParameters parameters,
-          Action<RetrievePagesQueryParameters> queryAction,
-          CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
-        {
-            return _contentRetriever.RetrievePages<T?>(
-                parameters,
-                queryAction,
-                RetrievalCacheSettings.CacheDisabled,
-                cancellationToken);
         }
         public string GetFallbackMetadataDescription(string? metaDescription, string? metaOGDescription)
         {

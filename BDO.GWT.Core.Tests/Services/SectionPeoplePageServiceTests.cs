@@ -4,6 +4,7 @@ using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
+using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
@@ -18,6 +19,7 @@ public class SectionPeoplePageServiceTests
     private Mock<IHeroService> _heroServiceMock = null!;
     private Mock<IPeopleCardsService> _peopleCardsServiceMock = null!;
     private Mock<ICultureContext> _cultureContextMock = null!;
+    private Mock<IFilteringHelper> _filteringHelperMock = null!;
     private SectionPeoplePageService _service = null!;
 
     [SetUp]
@@ -27,11 +29,12 @@ public class SectionPeoplePageServiceTests
         _heroServiceMock = new Mock<IHeroService>();
         _peopleCardsServiceMock = new Mock<IPeopleCardsService>();
         _cultureContextMock = new Mock<ICultureContext>();
+        _filteringHelperMock = new Mock<IFilteringHelper>();
         _service = new SectionPeoplePageService(
             _contentServiceMock.Object,
             _heroServiceMock.Object,
             _peopleCardsServiceMock.Object,
-            _cultureContextMock.Object);
+            _cultureContextMock.Object, _filteringHelperMock.Object);
     }
 
     [Test]
@@ -51,10 +54,10 @@ public class SectionPeoplePageServiceTests
             .ReturnsAsync(new List<SectionPeoplePage> { sectionPage });
 
         _peopleCardsServiceMock
-            .Setup(s => s.GetFilteredItemsAsync(sectionPage, cardsQuery, null, It.IsAny<Func<Person, bool>>(), It.IsAny<CancellationToken>()))
+            .Setup(s => s.GetFilteredItemsAsync(sectionPage, It.IsAny<string>(), cardsQuery, null, It.IsAny<Func<Person, bool>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedDto);
 
-        var result = await _service.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, cardsQuery, CancellationToken.None);
+        var result = await _service.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, "en-US", cardsQuery, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -77,6 +80,6 @@ public class SectionPeoplePageServiceTests
             .ReturnsAsync(new List<SectionPeoplePage>());
 
         Assert.ThrowsAsync<MissingSectionPageException>(
-            () => _service.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, new CardsQuery(), CancellationToken.None));
+            () => _service.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, "en-US", new CardsQuery(), CancellationToken.None));
     }
 }
