@@ -62,7 +62,7 @@ namespace BDO
 		/// <summary>
 		/// Url.
 		/// </summary>
-		public IEnumerable<WebPageRelatedItem> Url { get; set; }
+		public string Url { get; set; }
 
 
 		/// <summary>
