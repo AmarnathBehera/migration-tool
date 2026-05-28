@@ -200,7 +200,7 @@ public class ExternalPeopleHelperTests
                 SurnamePrefixes = "",
                 JobTitle = "Engineer",
                 ImageFile = Enumerable.Empty<CMS.ContentEngine.IContentItemFieldsSource>().OfType<ContentAttachment>(),
-                Url = null!
+                Url = string.Empty
             }
         });
 
@@ -214,10 +214,6 @@ public class ExternalPeopleHelperTests
             Assert.That(result[0].Image, Is.Null);
             Assert.That(result[0].Url, Is.EqualTo(string.Empty));
         });
-
-        _contentServiceMock.Verify(
-            x => x.GetItemsByGUIDAsync(It.IsAny<List<Guid>>()),
-            Times.Never);
     }
 
     [Test]
@@ -231,10 +227,7 @@ public class ExternalPeopleHelperTests
                 FirstName = "Jane",
                 LastName = "Smith",
                 JobTitle = "Manager",
-                Url = new[]
-                {
-                    new WebPageRelatedItem { WebPageGuid = Guid.Empty }
-                },
+                Url = string.Empty,
                 ImageFile = Enumerable.Empty<ContentAttachment>()
             }
         });
@@ -243,10 +236,6 @@ public class ExternalPeopleHelperTests
 
         Assert.That(result, Has.Length.EqualTo(1));
         Assert.That(result[0].Url, Is.EqualTo(string.Empty));
-
-        _contentServiceMock.Verify(
-            x => x.GetItemsByGUIDAsync(It.IsAny<List<Guid>>()),
-            Times.Never);
     }
 
     [Test]
@@ -261,10 +250,7 @@ public class ExternalPeopleHelperTests
                 FirstName = "Alice",
                 LastName = "Wonder",
                 JobTitle = "Director",
-                Url = new[]
-                {
-                    new WebPageRelatedItem { WebPageGuid = relatedGuid }
-                },
+                Url = "/people/alice",
                 ImageFile = Enumerable.Empty<ContentAttachment>()
             }
         });
@@ -273,17 +259,10 @@ public class ExternalPeopleHelperTests
         pageMock.SetupGet(p => p.SystemFields)
             .Returns(new WebPageFields { WebPageUrlPath = "/people/alice" });
 
-        _contentServiceMock
-            .Setup(x => x.GetItemsByGUIDAsync(It.Is<List<Guid>>(l => l.Contains(relatedGuid))))
-            .ReturnsAsync(new[] { pageMock.Object });
-
         var result = await _helper.GetSidebarExternalPeopleDtosAsync(new List<Guid> { Guid.NewGuid() }, CancellationToken.None);
 
         Assert.That(result, Has.Length.EqualTo(1));
         Assert.That(result[0].Url, Is.EqualTo("/people/alice"));
 
-        _contentServiceMock.Verify(
-            x => x.GetItemsByGUIDAsync(It.Is<List<Guid>>(l => l.Contains(relatedGuid))),
-            Times.Once);
     }
 }
