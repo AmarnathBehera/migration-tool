@@ -14,7 +14,7 @@ namespace BDO.GWT.Core.Services;
 public interface INewsSectionPageService
 {
     Task<NewsSectionDto> GetNewsSectionDtoAsync(SectionNews currentPage, CancellationToken cancellationToken);
-    Task<PaginationDto<ContentPageCardDto>> GetNewsArticlePaginationResultAsync(CardsQuery cardsQuery, CancellationToken cancellationToken);
+    Task<PaginationDto<ContentPageCardDto>> GetNewsArticlePaginationResultAsync(string language, CardsQuery cardsQuery, CancellationToken cancellationToken);
 }
 
 public class NewsSectionPageService : INewsSectionPageService
@@ -65,11 +65,12 @@ public class NewsSectionPageService : INewsSectionPageService
 
         return dto;
     }
-    public async Task<PaginationDto<ContentPageCardDto>> GetNewsArticlePaginationResultAsync(CardsQuery cardsQuery, CancellationToken cancellationToken)
+    public async Task<PaginationDto<ContentPageCardDto>> GetNewsArticlePaginationResultAsync(string language, CardsQuery cardsQuery, CancellationToken cancellationToken)
     {
         var featuredNewsArticlePageIds = await GetFeaturedNewsArticlePageIdsAsync(cancellationToken);
 
         var paginationDto = await _newsArticleCardsService.GetFilteredItemsAsync(
+            language,
             cardsQuery,
             null,
             newsArticle => featuredNewsArticlePageIds.Contains(newsArticle.SystemFields.WebPageItemID),
@@ -113,7 +114,7 @@ public class NewsSectionPageService : INewsSectionPageService
         .ToHashSet();
 
         var selectedpageid = currentPage.ItemListAdvancedSearchLinkUrl?.FirstOrDefault()?.WebPageGuid;
-        var selectedPage = selectedpageid.HasValue
+        var selectedPage = selectedpageid.HasValue && selectedpageid.Value != Guid.Empty
     ? await _contentRetriever.RetrieveAllPagesByGuids<IWebPageFieldsSource>(new[] { selectedpageid.Value }, cancellationToken: cancellationToken)
     : Enumerable.Empty<IWebPageFieldsSource>();
 

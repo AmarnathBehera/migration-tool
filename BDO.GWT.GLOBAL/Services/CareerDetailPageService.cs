@@ -178,7 +178,7 @@ public interface ICareerDetailPageService
 
     private async Task<bool> GetShowCopyLinkOptionFromSectionPageAsync(Career careerPage, bool showCopyLinkButton, CancellationToken cancellationToken)
     {
-        var careers = await _contentService.RetrievePagesAsync<Careers>(new RetrievePagesParameters { },query => query.Where(w => w.WhereEquals("WebPageItemID",careerPage.SystemFields.WebPageItemParentID)), cancellationToken);
+        var careers = await _contentService.GetPagesAsync<Careers>(new RetrievePagesParameters { },query => query.Where(w => w.WhereEquals("WebPageItemID",careerPage.SystemFields.WebPageItemParentID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
 
         if (careers is null)
         {
@@ -186,7 +186,7 @@ public interface ICareerDetailPageService
         }
         var careerspage = careers.FirstOrDefault();
 
-        var sectionCareers = await _contentService.RetrievePagesAsync<SectionCareers>(new RetrievePagesParameters { }, query => query.Where(w => w.WhereEquals("WebPageItemID", careerspage.SystemFields.WebPageItemParentID)), cancellationToken);
+        var sectionCareers = await _contentService.GetPagesAsync<SectionCareers>(new RetrievePagesParameters { }, query => query.Where(w => w.WhereEquals("WebPageItemID", careerspage.SystemFields.WebPageItemParentID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
 
         var sectionCareer = sectionCareers.FirstOrDefault();
 

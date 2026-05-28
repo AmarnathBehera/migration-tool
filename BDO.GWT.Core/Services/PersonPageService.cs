@@ -80,10 +80,11 @@ public class PersonPageService : IPersonPageService
         var (photoMediaType, photoData) = await RetrieveImageBinaryAsync(photoUrl, cancellationToken);
         var (logoMediaType, logoData) = await RetrieveImageBinaryAsync(_contentService.GetCurrentSiteLogoImageUrlAsync(), cancellationToken);
 
-        var offices = await _contentService.RetrievePagesAsync<LocationOffice>(
+        var offices = await _contentService.GetPagesAsync<LocationOffice>(
         new RetrievePagesParameters
         {
-            LanguageName = _cultureContext.CurrentLanguageTag
+            LanguageName = _cultureContext.CurrentLanguageTag,
+            UseLanguageFallbacks = false
         },
         query =>
         {
@@ -100,14 +101,16 @@ public class PersonPageService : IPersonPageService
                 nameof(LocationOffice.SystemFields.WebPageItemParentID)
             );
         },
+        RetrievalCacheSettings.CacheDisabled,
         cancellationToken
         );
         var parentNodeIDsOfOffices = offices?.Where(y => y is not null).Select(y => y!.SystemFields.WebPageItemParentID).Where(id => id > 0).ToArray();
 
-        var cities = await _contentService.RetrievePagesAsync<LocationCity>(
+        var cities = await _contentService.GetPagesAsync<LocationCity>(
         new RetrievePagesParameters
         {
-            LanguageName = _cultureContext.CurrentLanguageTag
+            LanguageName = _cultureContext.CurrentLanguageTag,
+            UseLanguageFallbacks = false
         },
         query =>
         {
@@ -122,6 +125,7 @@ public class PersonPageService : IPersonPageService
                 nameof(LocationCity.SystemFields.WebPageItemID)
             );
         },
+        RetrievalCacheSettings.CacheDisabled,
         cancellationToken
     );
         var locations = offices?.Join(
@@ -213,7 +217,10 @@ public class PersonPageService : IPersonPageService
     private async Task<PersonDto> MapBasicFieldsAsync(Person person, CancellationToken cancellationToken)
     {
         var sectionPeople = (await _contentService.GetPagesAsync<SectionPeoplePage>(
-           new RetrievePagesParameters { },
+           new RetrievePagesParameters {
+               LanguageName = _cultureContext.CurrentLanguageTag,
+               UseLanguageFallbacks=false,
+           },
            query => query
                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
                .Where(w => w.WhereEquals("WebPageItemID", person.SystemFields.WebPageItemParentID)),
@@ -252,10 +259,11 @@ public class PersonPageService : IPersonPageService
 
     private async Task<IEnumerable<LinkItemDto>> GetLocationLinkItemsAsync(Person person, CancellationToken cancellationToken = default)
     {
-        var locationOffices = await _contentService.RetrievePagesAsync<LocationOffice>(
+        var locationOffices = await _contentService.GetPagesAsync<LocationOffice>(
              new RetrievePagesParameters
              {
-                 LanguageName = _cultureContext.CurrentLanguageTag
+                 LanguageName = _cultureContext.CurrentLanguageTag,
+                 UseLanguageFallbacks = false
              },
             query =>
             {
@@ -268,7 +276,7 @@ public class PersonPageService : IPersonPageService
                     nameof(LocationOffice.MetadataTitle),
                     nameof(LocationOffice.SystemFields.WebPageItemParentID)
                 );
-            },
+            }, RetrievalCacheSettings.CacheDisabled,
             cancellationToken
         );
         var locationOfficesNodeParentIds = locationOffices?
@@ -277,10 +285,11 @@ public class PersonPageService : IPersonPageService
             .Select(x => x!.SystemFields.WebPageItemParentID)
             .ToArray();
 
-        var locationCities = await _contentService.RetrievePagesAsync<LocationCity>(
+        var locationCities = await _contentService.GetPagesAsync<LocationCity>(
              new RetrievePagesParameters
              {
-                 LanguageName = _cultureContext.CurrentLanguageTag
+                 LanguageName = _cultureContext.CurrentLanguageTag,
+                 UseLanguageFallbacks = false
              },
             query =>
             {
@@ -289,7 +298,7 @@ public class PersonPageService : IPersonPageService
                     w.WhereEquals("ContentItemChannelID", _contentService.GetCurrentChannelID());
                     w.WhereIn(nameof(LocationCity.SystemFields.WebPageItemID), locationOfficesNodeParentIds);
                 });
-            },
+            }, RetrievalCacheSettings.CacheDisabled,
             cancellationToken
         );
         var locationCityPageByNodeId = (locationCities ?? Enumerable.Empty<LocationCity?>())

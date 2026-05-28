@@ -20,7 +20,7 @@ public interface ISectionPeoplePageService
 {
     Task<SectionPeopleDto> GetSectionPeoplePageDtoAsync(SectionPeoplePage page, CancellationToken cancellationToken);
 
-    Task<PaginationDto<PersonCardDto>> GetSectionPeoplePersonPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken);
+    Task<PaginationDto<PersonCardDto>> GetSectionPeoplePersonPaginationDtoAsync(Guid pageGuid, string language, CardsQuery cardsQuery, CancellationToken cancellationToken);
 }
 
 public class SectionPeoplePageService : ISectionPeoplePageService
@@ -92,12 +92,12 @@ public class SectionPeoplePageService : ISectionPeoplePageService
         return dto;
     }
 
-    public async Task<PaginationDto<PersonCardDto>> GetSectionPeoplePersonPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken)
+    public async Task<PaginationDto<PersonCardDto>> GetSectionPeoplePersonPaginationDtoAsync(Guid pageGuid, string language, CardsQuery cardsQuery, CancellationToken cancellationToken)
     {
         var sectionPeople = (await _contentRetriever.GetPagesAsync<SectionPeoplePage>(
             new RetrievePagesParameters
             {
-                LanguageName = _cultureContext.CurrentLanguageTag, 
+                LanguageName = language,
                 UseLanguageFallbacks = false
             },
            query => query
@@ -112,7 +112,7 @@ public class SectionPeoplePageService : ISectionPeoplePageService
             throw new MissingSectionPageException($"'{nameof(SectionPeoplePage)} page with GUID '{pageGuid}' not found.");
         }
 
-        var paginationDto = await _peopleCardsService.GetFilteredItemsAsync(sectionPeople,cardsQuery, null, _ => false, cancellationToken);
+        var paginationDto = await _peopleCardsService.GetFilteredItemsAsync(sectionPeople,language,cardsQuery, null, _ => false, cancellationToken);
 
         return paginationDto;
     }
