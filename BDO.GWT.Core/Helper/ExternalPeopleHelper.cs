@@ -35,15 +35,7 @@ public class ExternalPeopleHelper : IExternalPeopleHelper
 
         var dtos = await Task.WhenAll(externalPeople.Select(async externalPerson =>
         {
-            var externalPersonUrls = externalPerson.Url?.Select(u => u?.WebPageGuid ?? Guid.Empty)
-                                    .Where(g => g != Guid.Empty)
-                                    .ToList() ?? new List<Guid>();
-
-            var externalPersonUrlsSelectedPages = externalPersonUrls.Count > 0
-                ? await _contentService.GetItemsByGUIDAsync(externalPersonUrls)
-                : Enumerable.Empty<IWebPageFieldsSource>();
-
-            var imageFile = externalPerson.ImageFile.FirstOrDefault();
+           var imageFile = externalPerson.ImageFile.FirstOrDefault();
 
             return new SidebarExternalPersonDto
             {
@@ -54,7 +46,7 @@ public class ExternalPeopleHelper : IExternalPeopleHelper
                 } : null,
                 FullName = await GetDisplayNameAsync(externalPerson),
                 JobTitle = externalPerson.JobTitle,
-                Url = externalPersonUrlsSelectedPages.FirstOrDefault()?.SystemFields?.WebPageUrlPath ?? string.Empty
+                Url = externalPerson.Url
             };
         }));
 
