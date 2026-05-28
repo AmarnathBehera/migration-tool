@@ -69,6 +69,7 @@ public static class ReactComponentType
     public const string CardsGridGUID = "14085e98-b81e-4db3-b4bf-7c2926a2485c";
     public const string RssFeedsGUID = "15085e95-b81e-4db3-b4bf-7c2926a2485c";
     public const string InsightDetailsGUID = "16085e95-b81e-4db3-b4bf-7c2926a2485c";
+    public const string EventWebinarCardsGridGUID = "906561a1-8778-4812-843a-018e44488577";
 
     public const string ContactPageDescriptionTextGUID = "cd1bc3e5-c6b6-4212-9fab-a86bdc570462";
     public const string ErrorPageContentGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";

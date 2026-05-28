@@ -1,11 +1,13 @@
 // Event.cs
+using BDO.GWT.Domain.Core.Entities;
+using CMS.ContentEngine;
+using CMS.Websites;
 using System;
 using System.Collections.Generic;
-using CMS.ContentEngine;
 
 namespace BDO;
 
-public partial class Event : IEventBase
+public partial class Event : IEventBase, IEventOrWebinar
 {
     public IEnumerable<ContentAttachment> Image
     {
@@ -33,5 +35,45 @@ public partial class Event : IEventBase
     {
         get => [];
         set => _ = value;
+    }
+
+    // ---- IEventOrWebinar explicit implementations ----
+
+    // Event.generated.cs has MetadataBusinessLine (singular IEnumerable<BusinessLine>)
+    IEnumerable<BusinessLine> IEventOrWebinar.MetadataBusinessLines
+    {
+        get => MetadataBusinessLine ?? [];
+        set => MetadataBusinessLine = value;
+    }
+
+    // Event.generated.cs does not have specialties/business-issue/office fields
+    IEnumerable<IWebPageFieldsSource> IEventOrWebinar.MetadataSpecialtiesCategories
+    {
+        get => [];
+        set { }
+    }
+
+    IEnumerable<IWebPageFieldsSource> IEventOrWebinar.MetadataSpecialtiesAreas
+    {
+        get => [];
+        set { }
+    }
+
+    IEnumerable<IWebPageFieldsSource> IEventOrWebinar.MetadataSpecialtiesPages
+    {
+        get => [];
+        set { }
+    }
+
+    IEnumerable<IWebPageFieldsSource> IEventOrWebinar.MetadataBusinessIssues
+    {
+        get => [];
+        set { }
+    }
+
+    IEnumerable<LocationOffice> IEventOrWebinar.MetadataOfficeLocation
+    {
+        get => [];
+        set { }
     }
 }

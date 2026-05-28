@@ -1,47 +1,57 @@
-﻿using System;
+﻿using BDO;
+using CMS.ContentEngine;
+using CMS.Websites;
+using System;
 using System.Collections.Generic;
 
 namespace BDO.GWT.Domain.Core.Entities;
 
-public interface IEventOrWebinar : IOfficeTaggablePage
+/// <summary>
+/// XbyK-native abstraction over BDO.Event and BDO.Webinar.
+/// All reference fields use the real generated page types or TagReference
+/// so that IDs can be resolved via IWebPageFieldsSource.SystemFields.WebPageItemID.
+/// </summary>
+public interface IEventOrWebinar : IWebPageFieldsSource
 {
-    public string MetadataTitle { get; set; }
-    
-    public DateTime EventDateFrom { get; set; }
+    string MetadataTitle { get; set; }
 
-    public DateTime EventDateTo { get; set; }
+    DateTime EventDateFrom { get; set; }
 
-    public bool EventIsPrivate { get; set; }
+    DateTime EventDateTo { get; set; }
 
-    public string? EventLocationCity { get; set; }
+    bool EventIsPrivate { get; set; }
 
-    public string? MetadataDescription { get; set; }
+    string? EventLocationCity { get; set; }
 
-    public List<int> MetadataServices { get; set; }
+    string? MetadataDescription { get; set; }
 
-    public List<int> MetadataBusinessLines { get; set; }
+    // Page-reference fields (resolved via .SystemFields.WebPageItemID)
+    IEnumerable<Service> MetadataServices { get; set; }
 
-    public List<int> MetadataServiceAreas { get; set; }
+    IEnumerable<BusinessLine> MetadataBusinessLines { get; set; }
 
-    public List<int> MetadataSpecialtiesCategories { get; set; }
+    IEnumerable<ServiceArea> MetadataServiceAreas { get; set; }
 
-    public List<int> MetadataSpecialtiesAreas { get; set; }
+    IEnumerable<IWebPageFieldsSource> MetadataSpecialtiesCategories { get; set; }
 
-    public List<int> MetadataSpecialtiesPages { get; set; }
+    IEnumerable<IWebPageFieldsSource> MetadataSpecialtiesAreas { get; set; }
 
-    public List<int> MicrositeMasterPages { get; set; }
+    IEnumerable<IWebPageFieldsSource> MetadataSpecialtiesPages { get; set; }
 
-    public List<int> MicrositePages { get; set; }
+    IEnumerable<MicrositePlaceholder> MicrositeMasterPages { get; set; }
 
-    public List<int> MetadataIndustries { get; set; }
+    IEnumerable<MicrositePlaceholder> MicrositePages { get; set; }
 
-    public List<int> MetadataIndustryCategories { get; set; }
+    IEnumerable<Industry> MetadataIndustries { get; set; }
 
-    public new List<int> MetadataOfficeLocation { get; set; }
+    IEnumerable<IndustryCategory> MetadataIndustryCategories { get; set; }
 
-    public List<int> EventType { get; set; }
+    IEnumerable<LocationOffice> MetadataOfficeLocation { get; set; }
 
-    public List<int> MetadataBusinessIssues { get; set; }
+    // Taxonomy tag references
+    IEnumerable<TagReference> EventType { get; set; }
 
-    public bool ShowPastEvent { get; set; }
+    IEnumerable<IWebPageFieldsSource> MetadataBusinessIssues { get; set; }
+
+    bool ShowPastEvent { get; set; }
 }

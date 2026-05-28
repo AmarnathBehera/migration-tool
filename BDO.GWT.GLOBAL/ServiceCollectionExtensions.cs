@@ -6,12 +6,15 @@ using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Services.Footer;
 using BDO.GWT.Core.Services.Header;
 using BDO.GWT.Core.Services.Widget;
+using BDO.GWT.Domain.Core.Entities;
 using BDO.GWT.GLOBAL.Services;
+using BDO.GWT.Web.Core.DTOs.Cards;
 using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
+using BDO.GWT.Xperience.Core.Services;
 using CMS.Core;
 using GWTXbyKWeb.Components.Services.SEOOptions;
 using Microsoft.Extensions.DependencyInjection;
@@ -73,7 +76,9 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IExternalPeopleHelper, ExternalPeopleHelper>();
         serviceCollection.AddScoped<IFilteringHelper, FilteringHelper>();
         serviceCollection.AddScoped<ISettingService, SettingService>();
+        serviceCollection.AddScoped<ITimeZoneService, TimeZoneService>();
         serviceCollection.AddScoped<ISectionEventsService, SectionEventsService>();
+        serviceCollection.AddScoped<IEventWebinarCardsService, EventWebinarCardsService>(); // ADD THIS
         serviceCollection.AddScoped<IEventRegistrationFormPageService, EventRegistrationFormPageService>();
         serviceCollection.AddScoped<IEventWebinarPageService, EventWebinarPageService>();
 

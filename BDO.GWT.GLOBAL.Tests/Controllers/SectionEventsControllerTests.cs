@@ -74,7 +74,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             var view = (ViewResult)result;
             Assert.Multiple(() =>
             {
-                Assert.That(view.ViewName, Is.EqualTo("~/Views/SectionEvent/Index.cshtml"));
+                Assert.That(view.ViewName, Is.EqualTo("~/Views/SectionEvents/Index.cshtml"));
                 Assert.That(view.Model, Is.SameAs(dto));
             });
         }

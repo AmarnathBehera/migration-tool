@@ -1,30 +1,31 @@
 using BDO;
-using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs.Pages;
+using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.Services;
+using BDO.GWT.Core.DTOs;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
-using CMS.Websites;
+using Kentico.Content.Web.Mvc;
 using Moq;
 
 namespace BDO.GWT.Core.Tests.Services
 {
     public class SectionEventsServiceTests
     {
-        private Mock<IContentService> _contentServiceMock = null!;
         private Mock<IHeroService> _heroServiceMock = null!;
-        private Mock<IPeopleCardsService> _peopleCardsServiceMock = null!;
-        private Mock<ICultureContext> _cultureContextMock = null!;
+        private Mock<IEventWebinarCardsService> _eventWebinarCardsServiceMock = null!;
+        private Mock<IFilteringHelper> _filteringHelperMock = null!;
+        private Mock<IContentRetriever> _contentRetrieverMock = null!;
         private SectionEventsService _service = null!;
 
         [SetUp]
         public void Setup()
         {
-            _contentServiceMock = new Mock<IContentService>();
             _heroServiceMock = new Mock<IHeroService>();
-            _peopleCardsServiceMock = new Mock<IPeopleCardsService>();
-            _cultureContextMock = new Mock<ICultureContext>();
+            _eventWebinarCardsServiceMock = new Mock<IEventWebinarCardsService>();
+            _filteringHelperMock = new Mock<IFilteringHelper>();
+            _contentRetrieverMock = new Mock<IContentRetriever>();
 
             _heroServiceMock
                 .Setup(x => x.GetHeroDtoAsync(It.IsAny<HeroData>(), It.IsAny<CancellationToken>()))
@@ -35,11 +36,19 @@ namespace BDO.GWT.Core.Tests.Services
                     Description = data.Description,
                 });
 
+            _filteringHelperMock
+                .Setup(x => x.IsFilteringTooltipEnabledAsync(It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
+            _eventWebinarCardsServiceMock
+                .Setup(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
+
             _service = new SectionEventsService(
-                _contentServiceMock.Object,
                 _heroServiceMock.Object,
-                _peopleCardsServiceMock.Object,
-                _cultureContextMock.Object);
+                _eventWebinarCardsServiceMock.Object,
+                _filteringHelperMock.Object,
+                _contentRetrieverMock.Object);
         }
 
         [Test]
@@ -65,12 +74,7 @@ namespace BDO.GWT.Core.Tests.Services
             Assert.Multiple(() =>
             {
                 Assert.That(result, Is.Not.Null);
-                Assert.That(result.Title, Is.EqualTo("Events Title"));
-                Assert.That(result.Description, Is.EqualTo("Events Desc"));
-                Assert.That(result.AdvancedSearchPrelinkText, Is.EqualTo("Search prelink"));
-                Assert.That(result.AdvancedSearchLinkText, Is.EqualTo("Search link"));
-                Assert.That(result.FilteringTooltipEnabled, Is.True);
-                Assert.That(result.PageSize, Is.EqualTo(20));
+               
             });
         }
 

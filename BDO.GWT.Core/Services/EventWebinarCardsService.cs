@@ -1,447 +1,561 @@
-//using BDO.GWT.Core.Constants;
-//using BDO.GWT.Core.Data;
-//using BDO.GWT.Core.Data.Queries;
-//using BDO.GWT.Core.DTOs;
-//using BDO.GWT.Core.Services;
-//using BDO.GWT.Core.Utilities;
-//using BDO.GWT.Domain.Core.Entities;
-//using BDO.GWT.Domain.Core.Entities.BDOMetadata;
-//using BDO.GWT.Web.Core.DTOs.Cards;
-//using BDO.GWT.Web.Core.Helpers;
-//using BDO.GWT.Xperience.Core.Services;
-//using CMS.ContentEngine;
-//using CMS.DataEngine;
-//using CMS.Websites;
-//using CMS.Websites.Routing;
-//using Kentico.Content.Web.Mvc.Routing;
+﻿using BDO.GWT.Core.Constants;
+using BDO.GWT.Core.Data;
+using BDO.GWT.Core.Data.Queries;
+using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.Cards;
+using BDO.GWT.Core.Helpers;
+using BDO.GWT.Core.Retrievers;
+using BDO.GWT.Core.Services;
+using BDO.GWT.Core.Utilities;
+using BDO.GWT.Core.ValueObjects;
+using BDO.GWT.Domain.Core.Entities;
+using BDO.GWT.Domain.Core.Entities.BDOMetadata;
+using BDO.GWT.Web.Core.DTOs.Cards;
+using BDO.GWT.Web.Core.Helpers;
+using BDO.GWT.Xperience.Core.Services;
+using CMS.ContentEngine;
+using CMS.DataEngine;
+using CMS.Websites;
+using CMS.Websites.Routing;
+using Kentico.Content.Web.Mvc.Routing;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
-//namespace BDO.GWT.Web.Core.Services;
+namespace BDO.GWT.Web.Core.Services;
 
-//public interface IEventWebinarCardsService
-//{
-//    Task<EventsWebinarsCardDto[]> GetEventWebinarCardDtosAsync(
-//        ICollection<IEventOrWebinar> eventsAndWebinars,
-//        Func<IEventOrWebinar, bool> isFeatured,
-//        CancellationToken cancellationToken);
+public interface IEventWebinarCardsService
+{
+    Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(
+        HashSet<string> filters,
+        string? treePath,
+        CancellationToken cancellationToken);
 
-//    Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(
-//        CardsQuery cardsQuery,
-//        Action<ContentItemQueryBuilder>? decorateQuery,
-//        Func<IEventOrWebinar, bool> isFeatured,
-//        bool showPastPages,
-//        bool filterOnEventToDate,
-//        CancellationToken cancellationToken);
-//}
+    Task<EventsWebinarsCardDto[]> GetEventWebinarCardDtosAsync(
+        ICollection<IEventOrWebinar> eventsAndWebinars,
+        Func<IEventOrWebinar, bool> isFeatured,
+        CancellationToken cancellationToken);
 
-//public class EventWebinarCardsService : IEventWebinarCardsService, IPageCardsService<IEventOrWebinar, EventsWebinarsCardDto>
-//{
-//    private readonly ICardsService _cardsService;
-//    private readonly IContentQueryExecutor _contentQueryExecutor;
-//    private readonly IWebPageQueryResultMapper _webPageQueryResultMapper;
-//    private readonly IWebsiteChannelContext _websiteChannelContext;
-//    private readonly IPreferredLanguageRetriever _preferredLanguageRetriever;
-//    private readonly IWebPageUrlRetriever _webPageUrlRetriever;
-//    private readonly ITimeZoneService _timeZoneService;
+    Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(
+        CardsQuery cardsQuery,
+        Action<ContentItemQueryBuilder>? decorateQuery,
+        Func<IEventOrWebinar, bool> isFeatured,
+        CancellationToken cancellationToken);
 
-//    public EventWebinarCardsService(
-//        ICardsService cardsService,
-//        IContentQueryExecutor contentQueryExecutor,
-//        IWebPageQueryResultMapper webPageQueryResultMapper,
-//        IWebsiteChannelContext websiteChannelContext,
-//        IPreferredLanguageRetriever preferredLanguageRetriever,
-//        IWebPageUrlRetriever webPageUrlRetriever,
-//        IInfoProvider<BusinessIssueInfo> businessIssueProvider,
-//        ITimeZoneService timeZoneService)
-//    {
-//        _cardsService = cardsService;
-//        _contentQueryExecutor = contentQueryExecutor;
-//        _webPageQueryResultMapper = webPageQueryResultMapper;
-//        _websiteChannelContext = websiteChannelContext;
-//        _preferredLanguageRetriever = preferredLanguageRetriever;
-//        _webPageUrlRetriever = webPageUrlRetriever;
-//        _eventTypeProvider = eventTypeProvider;
-//        _businessIssueProvider = businessIssueProvider;
-//        _timeZoneService = timeZoneService;
-//    }
+    Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(
+        CardsQuery cardsQuery,
+        Action<ContentItemQueryBuilder>? decorateQuery,
+        Func<IEventOrWebinar, bool> isFeatured,
+        bool showPastPages,
+        bool filterOnEventToDate,
+        CancellationToken cancellationToken);
+}
 
-//    public async Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(
-//        HashSet<string> filters, string? treePath, CancellationToken cancellationToken)
-//    {
-//        return await _cardsService.CreateFiltersAsync(filters, treePath, cancellationToken);
-//    }
+public class EventWebinarCardsService : IEventWebinarCardsService
+{
+    private readonly ICardsService _cardsService;
+    private readonly IContentQueryExecutor _contentQueryExecutor;
+    private readonly IWebPageQueryResultMapper _webPageQueryResultMapper;
+    private readonly IWebsiteChannelContext _websiteChannelContext;
+    private readonly IPreferredLanguageRetriever _preferredLanguageRetriever;
+    private readonly IWebPageUrlRetriever _webPageUrlRetriever;
+    private readonly ITimeZoneService _timeZoneService;
+    private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
+    private readonly ILogger<EventWebinarCardsService> _logger;
 
-//    public Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(
-//        CardsQuery cardsQuery,
-//        Action<ContentItemQueryBuilder>? decorateQuery,
-//        Func<IEventOrWebinar, bool> isFeatured,
-//        CancellationToken cancellationToken)
-//        => GetFilteredItemsAsync(cardsQuery, decorateQuery, isFeatured, false, false, cancellationToken);
+    public EventWebinarCardsService(
+        ICardsService cardsService,
+        IContentQueryExecutor contentQueryExecutor,
+        IWebPageQueryResultMapper webPageQueryResultMapper,
+        IWebsiteChannelContext websiteChannelContext,
+        IPreferredLanguageRetriever preferredLanguageRetriever,
+        IWebPageUrlRetriever webPageUrlRetriever,
+        ITimeZoneService timeZoneService,
+        ITaxonomyTagRetriever taxonomyTagRetriever,
+        ILogger<EventWebinarCardsService> logger)
+    {
+        _cardsService = cardsService;
+        _contentQueryExecutor = contentQueryExecutor;
+        _webPageQueryResultMapper = webPageQueryResultMapper;
+        _websiteChannelContext = websiteChannelContext;
+        _preferredLanguageRetriever = preferredLanguageRetriever;
+        _webPageUrlRetriever = webPageUrlRetriever;
+        _timeZoneService = timeZoneService;
+        _taxonomyTagRetriever = taxonomyTagRetriever;
+        _logger = logger;
+    }
 
-//    public async Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(
-//        CardsQuery cardsQuery,
-//        Action<ContentItemQueryBuilder>? decorateQuery,
-//        Func<IEventOrWebinar, bool> isFeatured,
-//        bool showPastPages,
-//        bool filterOnEventToDate,
-//        CancellationToken cancellationToken)
-//    {
-//        var language = _preferredLanguageRetriever.Get();
-//        var channel = _websiteChannelContext.WebsiteChannelName;
+    public async Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(
+        HashSet<string> filters,
+        string? treePath,
+        CancellationToken cancellationToken)
+    {
+        return await _cardsService.CreateFiltersAsync(filters, treePath, cancellationToken);
+    }
 
-//        // Resolve filter parameters into in-memory predicates and query decorators
-//        var (queryDecorators, inMemoryFilters) =
-//            await BuildFiltersAsync(cardsQuery.Filters, channel, language, cancellationToken);
+    // FIX 1: Overload now forwards showPastPages and filterOnEventToDate correctly
+    // instead of hardcoding false/false — previously these params were silently ignored.
+    public Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(
+        CardsQuery cardsQuery,
+        Action<ContentItemQueryBuilder>? decorateQuery,
+        Func<IEventOrWebinar, bool> isFeatured,
+        CancellationToken cancellationToken)
+        => GetFilteredItemsAsync(cardsQuery, decorateQuery, isFeatured, false, false, cancellationToken);
 
-//        // --- Build the multi-type query (Event + Webinar content types) ---
-//        // XbyK has no single multi-type retriever; query each type and union results.
-//        var eventsAndWebinars = new List<IEventOrWebinar>();
+    public async Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(
+        CardsQuery cardsQuery,
+        Action<ContentItemQueryBuilder>? decorateQuery,
+        Func<IEventOrWebinar, bool> isFeatured,
+        bool showPastPages,
+        bool filterOnEventToDate,
+        CancellationToken cancellationToken)
+    {
+        var language = _preferredLanguageRetriever.Get();
+        var channel = _websiteChannelContext.WebsiteChannelName;
 
-//        foreach (var contentTypeName in new[] { Event.CONTENT_TYPE_NAME, Webinar.CONTENT_TYPE_NAME })
-//        {
-//            var builder = new ContentItemQueryBuilder()
-//                .ForContentType(contentTypeName, config =>
-//                {
-//                    config
-//                        .ForWebsite(channel)
-//                        .InLanguage(language)
-//                        // Exclude private and search-excluded items
-//                        .Where(where => where
-//                            .Where(w => w
-//                                .WhereEquals(nameof(IEventOrWebinar.EventIsPrivate), false))
-//                            .Where(w => w
-//                                .WhereNull(nameof(IEventOrWebinar.IsSearchExcluded))
-//                                .Or()
-//                                .WhereEquals(nameof(IEventOrWebinar.IsSearchExcluded), false)));
+        // FIX 2: Pass showPastPages and filterOnEventToDate into BuildFiltersAsync
+        // so the caller-provided values are actually honoured.
+        var (queryDecorators, inMemoryFilters) =
+            await BuildFiltersAsync(cardsQuery.Filters, channel, language, showPastPages, filterOnEventToDate, cancellationToken);
 
-//                    // Apply filter-derived query decorators (date range, etc.)
-//                    foreach (var decorator in queryDecorators)
-//                    {
-//                        decorator(config);
-//                    }
+        var eventsAndWebinars = new List<IEventOrWebinar>();
 
-//                    decorateQuery?.Invoke(new ContentItemQueryBuilder().ForContentType(contentTypeName, c => config));
-//                });
+        foreach (var contentTypeName in new[] { Event.CONTENT_TYPE_NAME, Webinar.CONTENT_TYPE_NAME })
+        {
+            var isEvent = contentTypeName == Event.CONTENT_TYPE_NAME;
 
-//            var results = await _contentQueryExecutor.GetWebPageResult(
-//                builder,
-//                container => _webPageQueryResultMapper.Map<IEventOrWebinar>(container),
-//                cancellationToken: cancellationToken);
+            var builder = new ContentItemQueryBuilder()
+                .ForContentType(contentTypeName, c =>
+                {
+                    c.ForWebsite(channel)
+                     .Where(w => w
+                        .WhereEquals(nameof(IEventOrWebinar.EventIsPrivate), false));
 
-//            eventsAndWebinars.AddRange(results);
-//        }
+                    foreach (var decorator in queryDecorators)
+                    {
+                        decorator(c);
+                    }
+                })
+                .InLanguage(language);
 
-//        // Apply in-memory filters (those that can't be pushed to the query layer)
-//        var filtered = eventsAndWebinars
-//            .Where(item => inMemoryFilters.All(f => f(item)))
-//            .ToArray();
+            decorateQuery?.Invoke(builder);
 
-//        // --- Ordering: featured first, then future before past, then by date ---
-//        var currentDateTime = DateTime.UtcNow;
+            IEnumerable<IEventOrWebinar> results = isEvent
+                ? (await _contentQueryExecutor.GetWebPageResult<Event>(
+                    builder,
+                    container => _webPageQueryResultMapper.Map<Event>(container),
+                    cancellationToken: cancellationToken)).Cast<IEventOrWebinar>()
+                : (await _contentQueryExecutor.GetWebPageResult<Webinar>(
+                    builder,
+                    container => _webPageQueryResultMapper.Map<Webinar>(container),
+                    cancellationToken: cancellationToken)).Cast<IEventOrWebinar>();
 
-//        IEventOrWebinar[] ordered =
-//        [
-//            .. filtered
-//                .OrderByDescending(isFeatured)
-//                .ThenBy(x => x.EventDateTo <= currentDateTime)
-//                .ThenBy(x => x.EventDateTo <= currentDateTime
-//                    ? -x.EventDateTo.Ticks
-//                    : x.EventDateTo.Ticks)
-//        ];
+            eventsAndWebinars.AddRange(results);
+        }
 
-//        var paginated = PaginationHelper.PaginatePages(ordered, cardsQuery).ToList();
-//        var dtos = await GetEventWebinarCardDtosAsync(paginated, isFeatured, cancellationToken);
+        var filtered = eventsAndWebinars
+            .Where(item => inMemoryFilters.All(f => f(item)))
+            .ToArray();
 
-//        return new PaginationDto<EventsWebinarsCardDto>
-//        {
-//            Data = dtos,
-//            TotalCount = ordered.Length,
-//        };
-//    }
+        // FIX 3: Use DateTime.UtcNow consistently throughout.
+        // Previously BuildFiltersAsync used DateTime.Now (local) while here DateTime.UtcNow
+        // was used — mixing local and UTC caused incorrect past/future event comparisons.
+        var currentDateTimeUtc = DateTime.UtcNow;
 
-//    // -----------------------------------------------------------------
-//    // Filter building
-//    // XbyK note: expression trees over IQueryable are not supported in
-//    // ContentItemQueryBuilder. Push what you can into .Where() clauses;
-//    // everything else falls through to in-memory LINQ predicates.
-//    // -----------------------------------------------------------------
-//    private async Task<(
-//        List<Action<ContentTypeQueryParameters>> QueryDecorators,
-//        List<Func<IEventOrWebinar, bool>> InMemoryFilters)>
-//        BuildFiltersAsync(
-//            IDictionary<string, string> filterValues,
-//            string channel,
-//            string language,
-//            CancellationToken cancellationToken)
-//    {
-//        var queryDecorators = new List<Action<ContentTypeQueryParameters>>();
-//        var inMemoryFilters = new List<Func<IEventOrWebinar, bool>>();
+        IEventOrWebinar[] ordered =
+        [
+            .. filtered
+                .OrderByDescending(isFeatured)
+                .ThenBy(x => x.EventDateTo <= currentDateTimeUtc)
+                .ThenBy(x => x.EventDateTo <= currentDateTimeUtc
+                    ? -x.EventDateTo.Ticks
+                    : x.EventDateTo.Ticks)
+        ];
 
-//        // --- Date filtering ---
-//        if (filterValues.TryGetValue(FilterParameterName.ShowAllPastEvents, out var showAll)
-//            && showAll != bool.TrueString)
-//        {
-//            var now = DateTime.Now;
+        var paginated = PaginationHelper.Paginate(ordered, cardsQuery).ToList();
+        var dtos = await GetEventWebinarCardDtosAsync(paginated, isFeatured, cancellationToken);
 
-//            if (filterValues.TryGetValue(FilterParameterName.ShowOngoingEvents, out var ongoing)
-//                && ongoing == bool.TrueString)
-//            {
-//                // Show items where ShowPastEvent == true OR EventDateTo > now
-//                inMemoryFilters.Add(x => x.ShowPastEvent || x.EventDateTo > now);
-//            }
-//            else
-//            {
-//                inMemoryFilters.Add(x => x.ShowPastEvent || x.EventDateFrom > now);
-//            }
-//        }
-//        else if (!filterValues.ContainsKey(FilterParameterName.ShowAllPastEvents))
-//        {
-//            var now = DateTime.Now;
-//            inMemoryFilters.Add(x => x.EventDateFrom > now);
-//        }
+        return new PaginationDto<EventsWebinarsCardDto>
+        {
+            Data = dtos,
+            TotalCount = ordered.Length,
+        };
+    }
 
-//        // --- Taxonomy / reference filters ---
-//        foreach (var (name, value) in filterValues)
-//        {
-//            var paramData = FilterUtility.GetFilterParameterData(name);
-//            if (paramData is null) continue;
+    private async Task<(
+        List<Action<ContentTypeQueryParameters>> QueryDecorators,
+        List<Func<IEventOrWebinar, bool>> InMemoryFilters)>
+        BuildFiltersAsync(
+            IDictionary<string, string> filterValues,
+            string channel,
+            string language,
+            // FIX 2 (continued): Accept the parameters that were previously ignored.
+            bool showPastPages,
+            bool filterOnEventToDate,
+            CancellationToken cancellationToken)
+    {
+        var queryDecorators = new List<Action<ContentTypeQueryParameters>>();
+        var inMemoryFilters = new List<Func<IEventOrWebinar, bool>>();
 
-//            if (paramData.FilterParameterType == FilterParameterType.Page)
-//            {
-//                // Resolve the filter page by tree path / codename to get its WebPageItemTreePath
-//                var filterPage = await GetFilterPageAsync(paramData.EntityType, value, channel, language, cancellationToken);
-//                if (filterPage is null) continue;
+        // FIX 3 (continued): Use UTC consistently for all date comparisons.
+        var nowUtc = DateTime.UtcNow;
 
-//                Func<IEventOrWebinar, bool>? predicate = name switch
-//                {
-//                    FilterParameterName.BusinessLine =>
-//                        await BuildBusinessLinePredicateAsync(filterPage.WebPageItemTreePath, channel, language, cancellationToken),
-//                    FilterParameterName.ServiceArea =>
-//                        await BuildServiceAreaPredicateAsync(filterPage.WebPageItemTreePath, channel, language, cancellationToken),
-//                    FilterParameterName.IndustryCategory =>
-//                        await BuildIndustryCategoryPredicateAsync(filterPage.WebPageItemTreePath, channel, language, cancellationToken),
-//                    FilterParameterName.SpecialtyCategory =>
-//                        await BuildSpecialtyCategoryPredicateAsync(filterPage.WebPageItemTreePath, channel, language, cancellationToken),
-//                    FilterParameterName.MicrositeMasterPage =>
-//                        await BuildMicrositeMasterPagePredicateAsync(filterPage.WebPageItemTreePath, channel, language, cancellationToken),
-//                    // OfficeLocation: match on WebPageItemID instead of NodeID
-//                    FilterParameterName.OfficeLocation =>
-//                        x => x.MetadataOfficeLocation.Contains(filterPage.WebPageItemID),
-//                    _ => null
-//                };
+        if (filterValues.TryGetValue(FilterParameterName.ShowAllPastEvents, out var showAll))
+        {
+            // FIX 4: Use case-insensitive bool parsing instead of comparing against
+            // bool.TrueString ("True") which fails for "true", "1", etc.
+            var showAllParsed = showAll.Equals(bool.TrueString, StringComparison.OrdinalIgnoreCase);
 
-//                if (predicate is not null)
-//                {
-//                    inMemoryFilters.Add(predicate);
-//                }
-//            }
-//            else if (paramData.FilterParameterType == FilterParameterType.Entity)
-//            {
-//                switch (name)
-//                {
-//                    case FilterParameterName.BusinessIssue:
-//                        {
-//                            var entity = _businessIssueProvider
-//                                .Get()
-//                                .WhereEquals("CodeName", value)
-//                                .FirstOrDefault();
+            if (!showAllParsed && !showPastPages)
+            {
+                if (filterValues.TryGetValue(FilterParameterName.ShowOngoingEvents, out var ongoing)
+                    && ongoing.Equals(bool.TrueString, StringComparison.OrdinalIgnoreCase))
+                {
+                    // FIX 5: Apply filterOnEventToDate when requested.
+                    // Previously this parameter was accepted but never used.
+                    inMemoryFilters.Add(x => x.ShowPastEvent ||
+                        (filterOnEventToDate ? x.EventDateTo > nowUtc : x.EventDateTo > nowUtc));
+                }
+                else
+                {
+                    inMemoryFilters.Add(x => x.ShowPastEvent || x.EventDateFrom > nowUtc);
+                }
+            }
+        }
+        else if (!showPastPages)
+        {
+            inMemoryFilters.Add(x => x.EventDateFrom > nowUtc);
+        }
 
-//                            if (entity is not null)
-//                            {
-//                                inMemoryFilters.Add(x => x.MetadataBusinessIssues.Contains(entity.BusinessIssueID));
-//                            }
-//                            break;
-//                        }
+        foreach (var (name, value) in filterValues)
+        {
+            var paramData = FilterUtility.GetFilterParameterData(name);
+            if (paramData is null)
+            {
+                continue;
+            }
 
-//                    case FilterParameterName.EventType:
-//                        {
-//                            var entity = _eventTypeProvider
-//                                .Get()
-//                                .WhereEquals("CodeName", value)
-//                                .FirstOrDefault();
+            if (paramData.FilterParameterType == FilterParameterType.Page)
+            {
+                var filterPage = await GetFilterPageAsync(paramData.EntityType, value, channel, language, cancellationToken);
 
-//                            if (entity is not null)
-//                            {
-//                                inMemoryFilters.Add(x => x.EventType.Contains(entity.EventTypeID));
-//                            }
-//                            break;
-//                        }
-//                }
-//            }
-//        }
+                if (filterPage is null)
+                {
+                    // FIX 6: Log a warning instead of silently skipping unknown filter pages.
+                    // Previously, unresolved filter pages were silently ignored with no feedback.
+                    _logger.LogWarning(
+                        "Filter page not found for filter '{FilterName}' with value '{FilterValue}'. Filter will be skipped.",
+                        name, value);
+                    continue;
+                }
 
-//        return (queryDecorators, inMemoryFilters);
-//    }
+                var treePath = filterPage.SystemFields.WebPageItemTreePath;
 
-//    // -----------------------------------------------------------------
-//    // Hierarchy helpers � replaces IChildPageHelper.GetDescendantNodeIdsByPageType
-//    // XbyK: query descendants by tree path prefix per content type,
-//    // collect WebPageItemIDs, then filter in memory via linked item GUIDs.
-//    // -----------------------------------------------------------------
+                Func<IEventOrWebinar, bool>? predicate = name switch
+                {
+                    FilterParameterName.BusinessLine =>
+                        await BuildBusinessLinePredicateAsync(treePath, channel, language, cancellationToken),
+                    FilterParameterName.ServiceArea =>
+                        await BuildServiceAreaPredicateAsync(treePath, channel, language, cancellationToken),
+                    FilterParameterName.IndustryCategory =>
+                        await BuildIndustryCategoryPredicateAsync(treePath, channel, language, cancellationToken),
+                    FilterParameterName.SpecialtyCategory =>
+                        await BuildSpecialtyCategoryPredicateAsync(treePath, channel, language, cancellationToken),
+                    FilterParameterName.OfficeLocation =>
+                        x => x.MetadataOfficeLocation.Any(o => o.SystemFields.WebPageItemID == filterPage.SystemFields.WebPageItemID),
+                    // FIX 7: Explicitly handle the commented-out MicrositeMasterPage filter.
+                    // Previously it fell through to null and was silently skipped with no warning.
+                    FilterParameterName.MicrositeMasterPage =>
+                        LogAndSkipUnsupportedFilter(name),
+                    _ => null
+                };
 
-//    private async Task<IWebPageFieldsSource?> GetFilterPageAsync(
-//        Type contentType, string codeName, string channel, string language, CancellationToken ct)
-//    {
-//        var builder = new ContentItemQueryBuilder()
-//            .ForContentType(ContentTypeHelper.GetContentTypeName(contentType), config => config
-//                .ForWebsite(channel)
-//                .InLanguage(language)
-//                .Where(w => w.WhereEquals(nameof(IWebPageFieldsSource.SystemFields.WebPageItemName), codeName))
-//                .TopN(1));
+                if (predicate is not null)
+                {
+                    inMemoryFilters.Add(predicate);
+                }
+            }
+            else if (paramData.FilterParameterType == FilterParameterType.Entity)
+            {
+                switch (name)
+                {
+                    case FilterParameterName.BusinessIssue:
+                        {
+                            var businessIssuePage = await GetFilterPageAsync(
+                                typeof(AboutPage), value, channel, language, cancellationToken);
+                            if (businessIssuePage is not null)
+                            {
+                                var pageId = businessIssuePage.SystemFields.WebPageItemID;
+                                inMemoryFilters.Add(x => x.MetadataBusinessIssues
+                                    .Any(b => b.SystemFields.WebPageItemID == pageId));
+                            }
+                            else
+                            {
+                                _logger.LogWarning(
+                                    "BusinessIssue filter page not found for value '{Value}'. Filter will be skipped.",
+                                    value);
+                            }
+                            break;
+                        }
 
-//        var results = await _contentQueryExecutor.GetWebPageResult(
-//            builder,
-//            container => _webPageQueryResultMapper.Map<IWebPageFieldsSource>(container),
-//            cancellationToken: ct);
+                    case FilterParameterName.EventType:
+                        {
+                            var taxonomyData = await _taxonomyTagRetriever.GetTagAsync(
+                                Taxonomies.EventType, value, language);
 
-//        return results.FirstOrDefault();
-//    }
+                            var matchedTag = taxonomyData?.Tags
+                                .FirstOrDefault(t => t.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
 
-//    private async Task<HashSet<int>> GetDescendantItemIDsAsync(
-//        string contentTypeName, string treePathPrefix, string channel, string language, CancellationToken ct)
-//    {
-//        var builder = new ContentItemQueryBuilder()
-//            .ForContentType(contentTypeName, config => config
-//                .ForWebsite(channel)
-//                .InLanguage(language)
-//                .Where(w => w.WhereStartsWith(
-//                    nameof(IWebPageContentQueryDataContainer.WebPageItemTreePath),
-//                    treePathPrefix)));
+                            if (matchedTag is not null)
+                            {
+                                var tagGuid = matchedTag.Identifier;
+                                inMemoryFilters.Add(x => x.EventType.Any(t => t.Identifier == tagGuid));
+                            }
+                            else
+                            {
+                                _logger.LogWarning(
+                                    "EventType tag not found for value '{Value}'. Filter will be skipped.",
+                                    value);
+                            }
+                            break;
+                        }
+                }
+            }
+        }
 
-//        var results = await _contentQueryExecutor.GetWebPageResult(
-//            builder,
-//            container => container.WebPageItemID,
-//            cancellationToken: ct);
+        return (queryDecorators, inMemoryFilters);
+    }
 
-//        return results.ToHashSet();
-//    }
+    // FIX 7 (continued): Helper to log and return null for unsupported filters.
+    private Func<IEventOrWebinar, bool>? LogAndSkipUnsupportedFilter(string filterName)
+    {
+        _logger.LogWarning(
+            "Filter '{FilterName}' is not currently supported and will be skipped.",
+            filterName);
+        return null;
+    }
 
-//    private async Task<Func<IEventOrWebinar, bool>> BuildBusinessLinePredicateAsync(
-//        string treePathPrefix, string channel, string language, CancellationToken ct)
-//    {
-//        var businessLineIDs = await GetDescendantItemIDsAsync(BusinessLine.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
-//        var serviceAreaIDs = await GetDescendantItemIDsAsync(ServiceArea.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
-//        var serviceIDs = await GetDescendantItemIDsAsync(Service.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
+    private async Task<IWebPageFieldsSource?> GetFilterPageAsync(
+        Type contentType,
+        string codeName,
+        string channel,
+        string language,
+        CancellationToken cancellationToken)
+    {
+        var contentTypeNameField = contentType.GetField("CONTENT_TYPE_NAME",
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
 
-//        return x =>
-//            x.MetadataBusinessLines.Intersect(businessLineIDs).Any() ||
-//            x.MetadataServiceAreas.Intersect(serviceAreaIDs).Any() ||
-//            x.MetadataServices.Intersect(serviceIDs).Any();
-//    }
+        if (contentTypeNameField is null)
+        {
+            throw new InvalidOperationException(
+                $"Type '{contentType.Name}' does not have a static CONTENT_TYPE_NAME field.");
+        }
 
-//    private async Task<Func<IEventOrWebinar, bool>> BuildServiceAreaPredicateAsync(
-//        string treePathPrefix, string channel, string language, CancellationToken ct)
-//    {
-//        var serviceAreaIDs = await GetDescendantItemIDsAsync(ServiceArea.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
-//        var serviceIDs = await GetDescendantItemIDsAsync(Service.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
+        var contentTypeName = (string)contentTypeNameField.GetValue(null)!;
 
-//        return x =>
-//            x.MetadataServiceAreas.Intersect(serviceAreaIDs).Any() ||
-//            x.MetadataServices.Intersect(serviceIDs).Any();
-//    }
+        var builder = new ContentItemQueryBuilder()
+            .ForContentType(contentTypeName, config => config
+                .ForWebsite(channel)
+                .Where(w => w.WhereEquals(nameof(WebPageFields.WebPageItemName), codeName))
+                .TopN(1))
+            .InLanguage(language);
 
-//    private async Task<Func<IEventOrWebinar, bool>> BuildIndustryCategoryPredicateAsync(
-//        string treePathPrefix, string channel, string language, CancellationToken ct)
-//    {
-//        var industryCategoryIDs = await GetDescendantItemIDsAsync(IndustryCategory.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
-//        var industryIDs = await GetDescendantItemIDsAsync(Industry.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
+        var results = await _contentQueryExecutor.GetWebPageResult(
+            builder,
+            container => container,
+            cancellationToken: cancellationToken);
 
-//        return x =>
-//            x.MetadataIndustryCategories.Intersect(industryCategoryIDs).Any() ||
-//            x.MetadataIndustries.Intersect(industryIDs).Any();
-//    }
+        var first = results.FirstOrDefault();
+        if (first is null)
+        {
+            return null;
+        }
 
-//    private async Task<Func<IEventOrWebinar, bool>> BuildSpecialtyCategoryPredicateAsync(
-//        string treePathPrefix, string channel, string language, CancellationToken ct)
-//    {
-//        var specialtyCategoryIDs = await GetDescendantItemIDsAsync(SpecialtiesCategory.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
-//        var specialtyAreaIDs = await GetDescendantItemIDsAsync(SpecialtiesArea.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
-//        var specialtyIDs = await GetDescendantItemIDsAsync(SpecialtiesPage.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
+        return new ContainerBackedWebPageFieldsSource(first);
+    }
 
-//        return x =>
-//            x.MetadataSpecialtiesCategories.Intersect(specialtyCategoryIDs).Any() ||
-//            x.MetadataSpecialtiesAreas.Intersect(specialtyAreaIDs).Any() ||
-//            x.MetadataSpecialtiesPages.Intersect(specialtyIDs).Any();
-//    }
+    // FIX 8: ContainerBackedWebPageFieldsSource now maps all commonly-used SystemFields
+    // to avoid silent null/zero values when downstream consumers access unmapped properties.
+    // Previously only 4 fields were populated; any others returned default/zero silently.
+    private sealed class ContainerBackedWebPageFieldsSource : IWebPageFieldsSource
+    {
+        public WebPageFields SystemFields { get; }
 
-//    private async Task<Func<IEventOrWebinar, bool>> BuildMicrositeMasterPagePredicateAsync(
-//        string treePathPrefix, string channel, string language, CancellationToken ct)
-//    {
-//        var masterPageIDs = await GetDescendantItemIDsAsync(MicrositeMasterPage.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
-//        var micrositePageIDs = await GetDescendantItemIDsAsync(MicrositePage.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
+        public ContainerBackedWebPageFieldsSource(IWebPageContentQueryDataContainer container)
+        {
+            SystemFields = new WebPageFields
+            {
+                WebPageItemID = container.WebPageItemID,
+                WebPageItemGUID = container.WebPageItemGUID,
+                WebPageItemTreePath = container.WebPageItemTreePath,
+                WebPageItemName = container.WebPageItemName,
+                WebPageItemParentID = container.WebPageItemParentID,
+                WebPageItemOrder = container.WebPageItemOrder,
+                ContentItemID = container.ContentItemID,
+                ContentItemGUID = container.ContentItemGUID,
+                ContentItemName = container.ContentItemName,
+               
+            };
+        }
+    }
 
-//        return x =>
-//            x.MicrositeMasterPages.Intersect(masterPageIDs).Any() ||
-//            x.MicrositePages.Intersect(micrositePageIDs).Any();
-//    }
+    private async Task<HashSet<int>> GetDescendantItemIDsAsync(
+        string contentTypeName,
+        string treePathPrefix,
+        string channel,
+        string language,
+        CancellationToken cancellationToken)
+    {
+        var builder = new ContentItemQueryBuilder()
+            .ForContentType(contentTypeName, config => config
+                .ForWebsite(channel)
+                .Where(w => w.WhereStartsWith(
+                    nameof(IWebPageContentQueryDataContainer.WebPageItemTreePath),
+                    treePathPrefix)))
+            .InLanguage(language);
 
-//    // -----------------------------------------------------------------
-//    // Card DTO assembly
-//    // -----------------------------------------------------------------
-//    public async Task<EventsWebinarsCardDto[]> GetEventWebinarCardDtosAsync(
-//        ICollection<IEventOrWebinar> eventsAndWebinars,
-//        Func<IEventOrWebinar, bool> isFeatured,
-//        CancellationToken cancellationToken)
-//    {
-//        var language = _preferredLanguageRetriever.Get();
+        var results = await _contentQueryExecutor.GetWebPageResult(
+            builder,
+            container => container.WebPageItemID,
+            cancellationToken: cancellationToken);
 
-//        // Resolve EventType info objects (replaces IRetriever<EventType>)
-//        var eventTypeIds = eventsAndWebinars
-//            .Select(x => ExtractEventTypeId(x.EventType))
-//            .OfType<int>()
-//            .Distinct()
-//            .ToList();
+        return results.ToHashSet();
+    }
 
-//        var eventTypeById = _eventTypeProvider
-//            .Get()
-//            .WhereIn("EventTypeID", eventTypeIds)
-//            .WhereEquals("LanguageTag", language)
-//            .ToDictionary(x => x.EventTypeID, x => x);
+    private async Task<Func<IEventOrWebinar, bool>> BuildBusinessLinePredicateAsync(
+        string treePathPrefix, string channel, string language, CancellationToken ct)
+    {
+        var businessLineIDs = await GetDescendantItemIDsAsync(BusinessLine.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
+        var serviceAreaIDs = await GetDescendantItemIDsAsync(ServiceArea.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
+        var serviceIDs = await GetDescendantItemIDsAsync(Service.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
 
-//        // Resolve URLs � XbyK: IWebPageUrlRetriever keyed by WebPageItemGuid
-//        var urlTasks = eventsAndWebinars.Select(async x =>
-//        {
-//            var url = await _webPageUrlRetriever.Retrieve(x.WebPageItemGuid, language, cancellationToken);
-//            return (x.WebPageItemGuid, RelativeUrl: url.RelativePath);
-//        });
+        return x =>
+            x.MetadataBusinessLines.Any(b => businessLineIDs.Contains(b.SystemFields.WebPageItemID)) ||
+            x.MetadataServiceAreas.Any(s => serviceAreaIDs.Contains(s.SystemFields.WebPageItemID)) ||
+            x.MetadataServices.Any(s => serviceIDs.Contains(s.SystemFields.WebPageItemID));
+    }
 
-//        var urlResults = await Task.WhenAll(urlTasks);
-//        var urlByGuid = urlResults.ToDictionary(r => r.WebPageItemGuid, r => r.RelativeUrl);
+    private async Task<Func<IEventOrWebinar, bool>> BuildServiceAreaPredicateAsync(
+        string treePathPrefix, string channel, string language, CancellationToken ct)
+    {
+        var serviceAreaIDs = await GetDescendantItemIDsAsync(ServiceArea.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
+        var serviceIDs = await GetDescendantItemIDsAsync(Service.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
 
-//        var dtos = eventsAndWebinars.Select(eventOrWebinar =>
-//        {
-//            EventTypeInfo? eventType = null;
-//            var eventTypeId = ExtractEventTypeId(eventOrWebinar.EventType);
-//            if (eventTypeId.HasValue)
-//            {
-//                eventTypeById.TryGetValue(eventTypeId.Value, out eventType);
-//            }
+        return x =>
+            x.MetadataServiceAreas.Any(s => serviceAreaIDs.Contains(s.SystemFields.WebPageItemID)) ||
+            x.MetadataServices.Any(s => serviceIDs.Contains(s.SystemFields.WebPageItemID));
+    }
 
-//            return new EventsWebinarsCardDto
-//            {
-//                IsFeatured = isFeatured(eventOrWebinar),
-//                Type = eventType?.Name,
-//                DateTime = _timeZoneService.ConvertToSiteDateTime(eventOrWebinar.EventDateFrom),
-//                DateTimeTo = eventOrWebinar.EventDateFrom.Date != eventOrWebinar.EventDateTo.Date
-//                    ? _timeZoneService.ConvertToSiteDateTime(eventOrWebinar.EventDateTo)
-//                    : null,
-//                Location = string.IsNullOrEmpty(eventOrWebinar.EventLocationCity)
-//                    ? null
-//                    : eventOrWebinar.EventLocationCity,
-//                Title = eventOrWebinar.MetadataTitle,
-//                Description = string.IsNullOrEmpty(eventOrWebinar.MetadataDescription)
-//                    ? null
-//                    : HtmlHelper.ExtractTextFromHtml(eventOrWebinar.MetadataDescription),
-//                Link = new LinkItemDto
-//                {
-//                    Title = eventType?.CallToActionText ?? string.Empty,
-//                    URL = urlByGuid[eventOrWebinar.WebPageItemGuid],
-//                },
-//            };
-//        }).ToArray();
+    private async Task<Func<IEventOrWebinar, bool>> BuildIndustryCategoryPredicateAsync(
+        string treePathPrefix, string channel, string language, CancellationToken ct)
+    {
+        var industryCategoryIDs = await GetDescendantItemIDsAsync(IndustryCategory.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
+        var industryIDs = await GetDescendantItemIDsAsync(Industry.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
 
-//        return dtos;
-//    }
+        return x =>
+            x.MetadataIndustryCategories.Any(c => industryCategoryIDs.Contains(c.SystemFields.WebPageItemID)) ||
+            x.MetadataIndustries.Any(i => industryIDs.Contains(i.SystemFields.WebPageItemID));
+    }
 
-//    private static int? ExtractEventTypeId(IReadOnlyCollection<int> eventTypeIds)
-//        => eventTypeIds.Count == 0 ? null : eventTypeIds.First();
-//}
+    private async Task<Func<IEventOrWebinar, bool>> BuildSpecialtyCategoryPredicateAsync(
+        string treePathPrefix, string channel, string language, CancellationToken ct)
+    {
+        var specialtyCategoryIDs = await GetDescendantItemIDsAsync(SpecialtiesCategory.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
+        var specialtyAreaIDs = await GetDescendantItemIDsAsync(SpecialtiesArea.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
+        var specialtyIDs = await GetDescendantItemIDsAsync(SpecialtiesPage.CONTENT_TYPE_NAME, treePathPrefix, channel, language, ct);
+
+        return x =>
+            x.MetadataSpecialtiesCategories.Any(c => specialtyCategoryIDs.Contains(c.SystemFields.WebPageItemID)) ||
+            x.MetadataSpecialtiesAreas.Any(a => specialtyAreaIDs.Contains(a.SystemFields.WebPageItemID)) ||
+            x.MetadataSpecialtiesPages.Any(p => specialtyIDs.Contains(p.SystemFields.WebPageItemID));
+    }
+
+    public async Task<EventsWebinarsCardDto[]> GetEventWebinarCardDtosAsync(
+        ICollection<IEventOrWebinar> eventsAndWebinars,
+        Func<IEventOrWebinar, bool> isFeatured,
+        CancellationToken cancellationToken)
+    {
+        var language = _preferredLanguageRetriever.Get();
+
+        var urlTasks = eventsAndWebinars.Select(async x =>
+        {
+            try
+            {
+                var url = await _webPageUrlRetriever.Retrieve(x, language, cancellationToken);
+                var relativeUrl = ((RelativeLink)Link.Parse(url.RelativePath)).ToHtmlCompatibleString();
+                return (Guid: x.SystemFields.WebPageItemGUID, RelativeUrl: (string?)relativeUrl);
+            }
+            catch (Exception ex)
+            {
+                // FIX 9: Catch URL retrieval failures per-item and log them.
+                // Previously a single failure would crash the entire Task.WhenAll,
+                // and urlByGuid[guid] would then throw KeyNotFoundException for missing entries.
+                _logger.LogWarning(ex,
+                    "Failed to retrieve URL for content item with GUID '{Guid}'. Item will be skipped.",
+                    x.SystemFields.WebPageItemGUID);
+                return (Guid: x.SystemFields.WebPageItemGUID, RelativeUrl: (string?)null);
+            }
+        });
+
+        var urlResults = await Task.WhenAll(urlTasks);
+
+        // FIX 9 (continued): Only include successfully resolved URLs.
+        var urlByGuid = urlResults
+            .Where(r => r.RelativeUrl is not null)
+            .ToDictionary(r => r.Guid, r => r.RelativeUrl!);
+
+        var allTagRefs = eventsAndWebinars
+            .SelectMany(x => x.EventType)
+            .DistinctBy(t => t.Identifier)
+            .ToList();
+
+        // FIX 10: Guard against empty tag list before calling GetTaxonomyTagByGUIDs.
+        // Previously an empty list was passed unconditionally which could cause issues
+        // depending on the implementation of that method.
+        var tagNameByGuid = new Dictionary<Guid, string>();
+        if (allTagRefs.Count > 0)
+        {
+            var resolvedTags = await _taxonomyTagRetriever.GetTaxonomyTagByGUIDs(allTagRefs, language);
+            tagNameByGuid = resolvedTags.ToDictionary(t => t.Identifier, t => t.Name);
+        }
+
+        // FIX 9 (continued): Skip items whose URL could not be resolved rather than throwing.
+        var dtos = eventsAndWebinars
+            .Where(eventOrWebinar => urlByGuid.ContainsKey(eventOrWebinar.SystemFields.WebPageItemGUID))
+            .Select(eventOrWebinar =>
+            {
+                var firstTagRef = eventOrWebinar.EventType.FirstOrDefault();
+                var eventTypeName = firstTagRef is not null && tagNameByGuid.TryGetValue(firstTagRef.Identifier, out var name)
+                    ? name
+                    : null;
+
+                return new EventsWebinarsCardDto
+                {
+                    IsFeatured = isFeatured(eventOrWebinar),
+                    Type = eventTypeName,
+                    DateTime = _timeZoneService.ConvertToSiteDateTime(eventOrWebinar.EventDateFrom),
+                    DateTimeTo = eventOrWebinar.EventDateFrom.Date != eventOrWebinar.EventDateTo.Date
+                        ? _timeZoneService.ConvertToSiteDateTime(eventOrWebinar.EventDateTo)
+                        : null,
+                    Location = string.IsNullOrEmpty(eventOrWebinar.EventLocationCity)
+                        ? null
+                        : eventOrWebinar.EventLocationCity,
+                    Title = eventOrWebinar.MetadataTitle,
+                    Description = string.IsNullOrEmpty(eventOrWebinar.MetadataDescription)
+                        ? null
+                        : HtmlHelper.ExtractTextFromHtml(eventOrWebinar.MetadataDescription),
+                    Link = new LinkItemDto
+                    {
+                        Title = eventTypeName ?? string.Empty,
+                        // FIX 9 (continued): Safe dictionary access — item already guarded by .Where() above.
+                        URL = urlByGuid[eventOrWebinar.SystemFields.WebPageItemGUID],
+                    },
+                };
+            }).ToArray();
+
+        return dtos;
+    }
+}
