@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace GWTXbyKWeb.Controllers;
 
-public abstract class SpecialtiesPageController : Controller
+public  class SpecialtiesPageController : Controller
 {
 
     private readonly ISpecialtiesPageService _specialtiesPageService;
 
 
-    protected SpecialtiesPageController(ISpecialtiesPageService specialtiesPageService)
+    public SpecialtiesPageController(ISpecialtiesPageService specialtiesPageService)
     {
         _specialtiesPageService = specialtiesPageService;
     }

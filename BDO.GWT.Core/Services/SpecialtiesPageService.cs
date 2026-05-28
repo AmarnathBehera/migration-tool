@@ -67,7 +67,7 @@ namespace BDO.GWT.Core.Services
             };
 
             SideBoxDto? sidebox = currentPage.ShowSideNavigation
-          ? await _pageUtility.GetSideboxDtoAsync<SectionSpecialties, SpecialtiesArea>(
+          ? await _pageUtility.GetSideboxDtoAsync<SectionSpecialties, SpecialtiesPage>(
               sideboxTitle: currentPage.SideNavigationTitle,
               parentWebPageItemId: currentPage.SystemFields.WebPageItemID,       
               siblingParentWebPageItemId: currentPage.SystemFields.WebPageItemParentID, 
