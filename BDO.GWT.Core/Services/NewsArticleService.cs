@@ -116,19 +116,11 @@ public class NewsArticleService : INewsArticleService
                 Image = PageHelper.GetImageDto(internalPerson.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset.Url, internalPerson.ImageFileAltText),
                 FullName = GetInternalPersonDisplayName(internalPerson),
                 JobTitle = internalPerson.JobTitle,
-                Url = internalPerson.GetUrl().RelativePath,
+                Url = _contentService.EnsureAbsoluteUrl(internalPerson.Url)
             };
         }
-        var dtos = new List<SidebarPersonDto>();
-        foreach (var guid in relevantPersonGuids)
-        {
-            if (dtsByGuid.TryGetValue(guid, out var dto))
-            {
-                dtos.Add(dto);
-            }
-        }
-
-        return dtos.ToArray();
+        return relevantPersonGuids.Select(guid => dtsByGuid.TryGetValue(guid, out var dto) ? dto : null)
+                                  .OfType<SidebarPersonDto>().ToArray();
     }
 
     private static string GetPersonDisplayName(Person person)

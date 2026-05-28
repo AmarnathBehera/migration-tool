@@ -96,5 +96,7 @@
      Type type,
      string pageName,
      CancellationToken cancellationToken = default);
+
+       public string? EnsureAbsoluteUrl(string? url);
     }
 }
