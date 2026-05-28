@@ -242,10 +242,10 @@ namespace BDO.GWT.Core.Tests.Services
             Assert.Multiple(() =>
             {
                 Assert.That(result.Address, Is.Not.Null);
-                Assert.That(result.Address.StreetAddress, Is.EqualTo("100 King St Floor 2"));
-                Assert.That(result.Address.PostalCode, Is.EqualTo("EC1A"));
-                Assert.That(result.Address.AddressCountry, Is.EqualTo("GB"));
-                Assert.That(result.Address.AddressLocality, Is.EqualTo("City Meta Title"));
+                Assert.That(result.Address?.StreetAddress, Is.EqualTo("100 King St Floor 2"));
+                Assert.That(result.Address?.PostalCode, Is.EqualTo("EC1A"));
+                Assert.That(result.Address?.AddressCountry, Is.EqualTo("GB"));
+                Assert.That(result.Address?.AddressLocality, Is.EqualTo("City Meta Title"));
             });
         }
 
@@ -282,9 +282,9 @@ namespace BDO.GWT.Core.Tests.Services
             {
                 Assert.That(result.Latitude, Is.Null);
                 Assert.That(result.Longitude, Is.Null);
-                Assert.That(result.Address.StreetAddress, Is.Null);
-                Assert.That(result.Address.PostalCode, Is.Null);
-                Assert.That(result.Address.AddressCountry, Is.Null);
+                Assert.That(result?.Address?.StreetAddress, Is.Null);
+                Assert.That(result?.Address?.PostalCode, Is.Null);
+                Assert.That(result?.Address?.AddressCountry, Is.Null);
             });
         }
 
