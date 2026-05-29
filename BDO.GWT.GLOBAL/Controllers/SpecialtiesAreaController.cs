@@ -1,4 +1,5 @@
-﻿using BDO.GWT.Web.Core.Services;
+﻿using BDO.GWT.Core.Services;
+using BDO.GWT.Web.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;

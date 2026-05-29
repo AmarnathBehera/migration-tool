@@ -5,9 +5,10 @@ using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.services;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
+using BDO.GWT.Web.Core.Services;
 using Kentico.Content.Web.Mvc;
 
-namespace BDO.GWT.Web.Core.Services;
+namespace BDO.GWT.Core.Services;
 
 
 public interface ISpecialtiesAreaPageService {

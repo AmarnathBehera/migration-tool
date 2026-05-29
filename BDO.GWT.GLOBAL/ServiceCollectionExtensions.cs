@@ -98,6 +98,8 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.AddScoped<ISpecialtiesPageService, SpecialtiesPageService>();
         serviceCollection.AddScoped<ISpecialtiesAreaPageService, SpecialtiesAreaPageService>();
+        serviceCollection.AddScoped<ISpecialtiesCategoryPageService, SpecialtiesCategoryPageService>();
+        serviceCollection.AddScoped<ISectionSpecialtiesService, SectionSpecialtiesService>();
     }
 
 }

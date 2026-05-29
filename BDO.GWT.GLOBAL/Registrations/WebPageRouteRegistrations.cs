@@ -210,3 +210,22 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     customViewName: "~/Views/SpecialtiesArea/Index.cshtml",
     ContentTypeNames = new[] { "BDO.SpecialtiesArea" },
     IconClass = "xp-doc")]
+
+
+[assembly: RegisterWebPageRoute(SpecialtiesCategory.CONTENT_TYPE_NAME, typeof(SpecialtiesCategoryController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: SpecialtiesCategory.CONTENT_TYPE_NAME,
+    name: "Specialties Category  Content Type Template",
+    customViewName: "~/Views/SpecialtiesCategory/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SpecialtiesCategory" },
+    IconClass = "xp-doc")]
+
+[assembly: RegisterWebPageRoute(SectionSpecialties.CONTENT_TYPE_NAME, typeof(SectionSpecialtiesController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: SectionSpecialties.CONTENT_TYPE_NAME,
+    name: "Section Specialties Content Type Template",
+    customViewName: "~/Views/SectionSpecialties/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SectionSpecialties" },
+    IconClass = "xp-doc")]

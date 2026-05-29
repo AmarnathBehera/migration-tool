@@ -1,0 +1,72 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Core.DTOs.Pages.SpecialtiesCategoryPageDto
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+
+    var widgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.ExternalNavigation,
+        ComponentIdentifiers.Widgets.Imagewithtext,
+        ComponentIdentifiers.Widgets.QuoteCard,
+        ComponentIdentifiers.Widgets.TiledLink,
+        ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.Globallocation,
+        ComponentIdentifiers.Widgets.AccordionWidget,
+        ComponentIdentifiers.Widgets.FaqWidget
+    };
+}
+
+@(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.Hero,
+        ReactComponentType.HeroGUID,
+        new
+        {
+            data = Model.Hero,
+        },
+        Context.RequestAborted))
+
+@await Html.PartialAsync("_LocalNavigation")
+
+@{
+    var isSideBoxVisible = Model.SideBox is not null && Model.SideBox.Links.Any();
+}
+
+<div class="service-wrapper">
+    <div class="@($"service-wrapper-content{(isSideBoxVisible ? "" : " service-wrapper-content--full")}")">
+        <main>
+
+            @(await ReactService.RenderComponentAsync(
+                        pageId,
+                        ReactComponentType.ServiceContent,
+                        ReactComponentType.ServiceContentGUID,
+                        Model,
+                        Context.RequestAborted))
+            @* @await PageBuilderService.AddIdentifier("topArea").AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html) *@
+        </main>
+        @if (isSideBoxVisible)
+        {
+            <aside>
+                @(await ReactService.RenderComponentAsync(
+                            pageId,
+                            ReactComponentType.SideBoxNavigation,
+                            ReactComponentType.SideBoxNavigationGUID,
+                            Model.SideBox,
+                            Context.RequestAborted))
+            </aside>
+        }
+    </div>
+    @* @await PageBuilderService.AddIdentifier("bottomArea").AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html) *@
+</div>
+
