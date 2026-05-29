@@ -34,13 +34,11 @@ public class DropdownScriptExecutor
                 }
                 else if (columns.Count >= 2)
                 {
-                    // First column = Value, Second column = Text
                     value = row[0]?.ToString() ?? "";
                     text = row[1]?.ToString() ?? "";
                 }
                 else
                 {
-                    // Single column — use it for both Value and Text
                     value = row[0]?.ToString() ?? "";
                     text = value;
                 }
