@@ -20,7 +20,7 @@ namespace BDO.GWT.Core.Services;
 public interface INewsArticleCardsService
 {
     Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(HashSet<string> filters, string? nodeAliasPath, CancellationToken cancellationToken);
-    Task<PaginationDto<ContentPageCardDto>> GetFilteredItemsAsync
+    Task<PaginationDto<NewsPageCardDto>> GetFilteredItemsAsync
         (string language,
         CardsQuery cardsQuery,
         Action<ContentItemQueryBuilder>? decorateQuery,
@@ -58,7 +58,7 @@ public class NewsArticleCardsService : INewsArticleCardsService
         return await _cardsService.CreateFiltersAsync(filters, nodeAliasPath, cancellationToken);
     }
 
-    public async Task<PaginationDto<ContentPageCardDto>> GetFilteredItemsAsync
+    public async Task<PaginationDto<NewsPageCardDto>> GetFilteredItemsAsync
         (string language,
         CardsQuery cardsQuery,
         Action<ContentItemQueryBuilder>? decorateQuery, 
@@ -105,7 +105,7 @@ public class NewsArticleCardsService : INewsArticleCardsService
 
         var itemDtos = await GetContentPageCardListAsync(paginatedPages, _cultureContext.CurrentLanguageTag, isFeatured, cancellationToken);
 
-        var paginationDto = new PaginationDto<ContentPageCardDto>
+        var paginationDto = new PaginationDto<NewsPageCardDto>
         {
             Data = itemDtos.ToArray(),
             TotalCount = paginatedPages.Length,
@@ -179,19 +179,19 @@ public class NewsArticleCardsService : INewsArticleCardsService
             _ => null,
         };
     }
-    public async Task<List<ContentPageCardDto>> GetContentPageCardListAsync(ICollection<NewsArticle> contentPages, string languageTag, Func<NewsArticle, bool> isPageFeatured, CancellationToken cancellationToken)
+    public async Task<List<NewsPageCardDto>> GetContentPageCardListAsync(ICollection<NewsArticle> contentPages, string languageTag, Func<NewsArticle, bool> isPageFeatured, CancellationToken cancellationToken)
     {
         var httpContext = _httpContextAccessor.HttpContext!;
         var actionContext = new ActionContext(httpContext, httpContext.GetRouteData() ?? new RouteData(), new ActionDescriptor());
         var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
 
-        var cards = new List<ContentPageCardDto>();
+        var cards = new List<NewsPageCardDto>();
         foreach (var contentPage in contentPages)
         {
             var tags = await _taxonomyTagRetriever.GetTaxonomyTagByGUIDs(contentPage.ContentType, _cultureContext.CurrentLanguageTag);
             var type = tags?.FirstOrDefault()?.Title;
             bool isComingSoon = false;
-            var card = new ContentPageCardDto
+            var card = new NewsPageCardDto
             {
                 IsFeatured = isPageFeatured(contentPage),
                 ImageURL = urlHelper.Content(contentPage.ImageFile.FirstOrDefault()?.ContentAttachmentAsset.Url),

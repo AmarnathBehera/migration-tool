@@ -387,6 +387,21 @@
                         LinkedItemsMaxLevel = 3
                     });
         }
+
+        public string? EnsureAbsoluteUrl(string? url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+                return url;
+
+            if (!url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+                !url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) &&
+                !url.StartsWith('/'))
+            {
+                return "https://" + url;
+            }
+
+            return url;
+        }
     }
 }
 

@@ -100,5 +100,7 @@
         Task<IEnumerable<IContentItemFieldsSource>> RetrieveButtonUrlAsync(
             IEnumerable<Guid> guids,
             string[] contentTypes);
+
+       public string? EnsureAbsoluteUrl(string? url);
     }
 }

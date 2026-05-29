@@ -12,7 +12,6 @@
 using System;
 using System.Collections.Generic;
 using CMS.ContentEngine;
-using CMS.Websites;
 
 namespace BDO
 {
@@ -54,7 +53,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataServiceAreas.
 		/// </summary>
-		public IEnumerable<IWebPageFieldsSource> MetadataServiceAreas { get; set; }
+		public IEnumerable<ServiceArea> MetadataServiceAreas { get; set; }
 
 
 		/// <summary>

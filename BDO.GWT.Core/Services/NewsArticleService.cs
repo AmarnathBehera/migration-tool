@@ -10,7 +10,7 @@ using Kentico.Content.Web.Mvc;
 
 namespace BDO.GWT.Core.Services;
 public interface INewsArticleService{   
-    Task<ContentPageDto> GetContentPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken);
+    Task<SectionNewsPageDto> GetSectionNewsPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken);
     Task<ContentSidebarDto> GetContentPageSidebarDto(NewsArticle contentPage, CancellationToken cancellationToken);
 }
 public class NewsArticleService : INewsArticleService
@@ -34,9 +34,9 @@ public class NewsArticleService : INewsArticleService
         _taxonomyTagRetriever = taxonomyTagRetriever;
         _cultureContext = cultureContext;
     }
-    public async Task<ContentPageDto> GetContentPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken)
+    public async Task<SectionNewsPageDto> GetSectionNewsPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken)
     {
-        var dto = new ContentPageDto
+        var dto = new SectionNewsPageDto
         {
             Title = contentPage.ShowTitle ? contentPage.MetadataTitle : null,
             Description = contentPage.ShowDescription
@@ -116,19 +116,11 @@ public class NewsArticleService : INewsArticleService
                 Image = PageHelper.GetImageDto(internalPerson.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset.Url, internalPerson.ImageFileAltText),
                 FullName = GetInternalPersonDisplayName(internalPerson),
                 JobTitle = internalPerson.JobTitle,
-                Url = internalPerson.GetUrl().RelativePath,
+                Url = _contentService.EnsureAbsoluteUrl(internalPerson.Url)
             };
         }
-        var dtos = new List<SidebarPersonDto>();
-        foreach (var guid in relevantPersonGuids)
-        {
-            if (dtsByGuid.TryGetValue(guid, out var dto))
-            {
-                dtos.Add(dto);
-            }
-        }
-
-        return dtos.ToArray();
+        return relevantPersonGuids.Select(guid => dtsByGuid.TryGetValue(guid, out var dto) ? dto : null)
+                                  .OfType<SidebarPersonDto>().ToArray();
     }
 
     private static string GetPersonDisplayName(Person person)
