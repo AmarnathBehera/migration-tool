@@ -188,6 +188,6 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 [assembly: RegisterPageTemplate(
     identifier: NewsArticle.CONTENT_TYPE_NAME,
     name: "News Article Content Type Template",
-    customViewName: "~/Views/ContentPage/Index.cshtml",
+    customViewName: "~/Views/NewsArticle/Index.cshtml",
     ContentTypeNames = new[] { "BDO.NewsArticle" },
     IconClass = "xp-market")]

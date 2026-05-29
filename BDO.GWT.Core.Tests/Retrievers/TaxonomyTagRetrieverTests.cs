@@ -17,6 +17,7 @@ namespace BDO.GWT.Core.Tests.Retrievers
         {
             _taxonomyRetrieverMock = new Mock<ITaxonomyRetriever>();
             _tagProviderMock = new Mock<IInfoProvider<TagInfo>>();
+            _tagProviderMock.As<IInfoByNameProvider<TagInfo>>();
 
             _service = new TaxonomyTagRetriever(
                 _taxonomyRetrieverMock.Object,
@@ -155,13 +156,12 @@ namespace BDO.GWT.Core.Tests.Retrievers
         }
 
         [Test]
-        [Ignore("IInfoProvider<T>.GetAsync is an extension method and cannot be mocked with Moq. Wrap IInfoProvider in a custom interface to enable testing.")]
         public async Task GetTaxonomyTagByNameAsync_WhenTagExists_ReturnsTagInfo()
         {
             var tagInfo = new TagInfo();
 
-            _tagProviderMock
-                .Setup(x => x.GetAsync("my-tag"))
+            _tagProviderMock.As<IInfoByNameProvider<TagInfo>>()
+                .Setup(x => x.GetAsync("my-tag", It.IsAny<CancellationToken?>()))
                 .ReturnsAsync(tagInfo);
 
             var result = await _service.GetTaxonomyTagByNameAsync("my-tag");
@@ -170,11 +170,10 @@ namespace BDO.GWT.Core.Tests.Retrievers
         }
 
         [Test]
-        [Ignore("IInfoProvider<T>.GetAsync is an extension method and cannot be mocked with Moq. Wrap IInfoProvider in a custom interface to enable testing.")]
         public async Task GetTaxonomyTagByNameAsync_WhenTagNotFound_ReturnsNull()
         {
-            _tagProviderMock
-                .Setup(x => x.GetAsync(It.IsAny<string>()))
+            _tagProviderMock.As<IInfoByNameProvider<TagInfo>>()
+                .Setup(x => x.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken?>()))
                 .Returns(Task.FromResult<TagInfo>(null!));
 
             var result = await _service.GetTaxonomyTagByNameAsync("non-existing");
@@ -183,16 +182,16 @@ namespace BDO.GWT.Core.Tests.Retrievers
         }
 
         [Test]
-        [Ignore("IInfoProvider<T>.GetAsync is an extension method and cannot be mocked with Moq. Wrap IInfoProvider in a custom interface to enable testing.")]
         public async Task GetTaxonomyTagByNameAsync_CallsProviderWithCorrectName()
         {
-            _tagProviderMock
-                .Setup(x => x.GetAsync(It.IsAny<string>()))
+            var nameProviderMock = _tagProviderMock.As<IInfoByNameProvider<TagInfo>>();
+            nameProviderMock
+                .Setup(x => x.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken?>()))
                 .Returns(Task.FromResult<TagInfo>(null!));
 
             await _service.GetTaxonomyTagByNameAsync("my-tag");
 
-            _tagProviderMock.Verify(x => x.GetAsync("my-tag"), Times.Once);
+            nameProviderMock.Verify(x => x.GetAsync("my-tag", It.IsAny<CancellationToken?>()), Times.Once);
         }
 
         [Test]

@@ -14,7 +14,7 @@ namespace BDO.GWT.Core.Services;
 public interface INewsSectionPageService
 {
     Task<NewsSectionDto> GetNewsSectionDtoAsync(SectionNews currentPage, CancellationToken cancellationToken);
-    Task<PaginationDto<ContentPageCardDto>> GetNewsArticlePaginationResultAsync(string language, CardsQuery cardsQuery, CancellationToken cancellationToken);
+    Task<PaginationDto<NewsPageCardDto>> GetNewsArticlePaginationResultAsync(string language, CardsQuery cardsQuery, CancellationToken cancellationToken);
 }
 
 public class NewsSectionPageService : INewsSectionPageService
@@ -65,7 +65,7 @@ public class NewsSectionPageService : INewsSectionPageService
 
         return dto;
     }
-    public async Task<PaginationDto<ContentPageCardDto>> GetNewsArticlePaginationResultAsync(string language, CardsQuery cardsQuery, CancellationToken cancellationToken)
+    public async Task<PaginationDto<NewsPageCardDto>> GetNewsArticlePaginationResultAsync(string language, CardsQuery cardsQuery, CancellationToken cancellationToken)
     {
         var featuredNewsArticlePageIds = await GetFeaturedNewsArticlePageIdsAsync(cancellationToken);
 

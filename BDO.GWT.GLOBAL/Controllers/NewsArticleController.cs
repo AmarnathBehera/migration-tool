@@ -26,8 +26,8 @@ public class NewsArticleController : Controller
         if (currentPage is null)
             return NotFound();
 
-        var contentPageDto = await _newsArticleService.GetContentPageDtoAsync(currentPage, cancellationToken);
+        var newsPageDto = await _newsArticleService.GetSectionNewsPageDtoAsync(currentPage, cancellationToken);
 
-        return View("~/Views/ContentPage/Index.cshtml", contentPageDto);
+        return View("~/Views/NewsArticle/Index.cshtml", newsPageDto);
     }
 }

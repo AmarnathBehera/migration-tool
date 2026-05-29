@@ -16,9 +16,9 @@ public class NewsArticleServiceTests
     }
 
     [Test]
-    public async Task GetContentPageDtoAsync_ReturnsExpectedDto()
+    public async Task GetSectionNewsPageDtoAsync_ReturnsExpectedDto()
     {
-        var expectedDto = new ContentPageDto
+        var expectedDto = new SectionNewsPageDto
         {
             Title = "News Title",
             Description = "Description",
@@ -31,10 +31,10 @@ public class NewsArticleServiceTests
         };
 
         _newsArticleServiceMock
-            .Setup(x => x.GetContentPageDtoAsync(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetSectionNewsPageDtoAsync(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedDto);
 
-        var result = await _newsArticleServiceMock.Object.GetContentPageDtoAsync(
+        var result = await _newsArticleServiceMock.Object.GetSectionNewsPageDtoAsync(
             new NewsArticle(), CancellationToken.None);
 
         Assert.Multiple(() =>
@@ -48,30 +48,30 @@ public class NewsArticleServiceTests
     }
 
     [Test]
-    public async Task GetContentPageDtoAsync_WhenSidebarNotShown_ReturnsNullSidebar()
+    public async Task GetSectionNewsPageDtoAsync_WhenSidebarNotShown_ReturnsNullSidebar()
     {
-        var dto = new ContentPageDto { Sidebar = null };
+        var dto = new SectionNewsPageDto { Sidebar = null };
 
         _newsArticleServiceMock
-            .Setup(x => x.GetContentPageDtoAsync(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetSectionNewsPageDtoAsync(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(dto);
 
-        var result = await _newsArticleServiceMock.Object.GetContentPageDtoAsync(
+        var result = await _newsArticleServiceMock.Object.GetSectionNewsPageDtoAsync(
             new NewsArticle(), CancellationToken.None);
 
         Assert.That(result.Sidebar, Is.Null);
     }
 
     [Test]
-    public async Task GetContentPageDtoAsync_WhenCallToActionNotShown_ReturnsNullCallToAction()
+    public async Task GetSectionNewsPageDtoAsync_WhenCallToActionNotShown_ReturnsNullCallToAction()
     {
-        var dto = new ContentPageDto { CallToAction = null };
+        var dto = new SectionNewsPageDto { CallToAction = null };
 
         _newsArticleServiceMock
-            .Setup(x => x.GetContentPageDtoAsync(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetSectionNewsPageDtoAsync(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(dto);
 
-        var result = await _newsArticleServiceMock.Object.GetContentPageDtoAsync(
+        var result = await _newsArticleServiceMock.Object.GetSectionNewsPageDtoAsync(
             new NewsArticle(), CancellationToken.None);
 
         Assert.That(result.CallToAction, Is.Null);
@@ -103,17 +103,17 @@ public class NewsArticleServiceTests
     }
 
     [Test]
-    public async Task GetContentPageDtoAsync_InvokedOnce()
+    public async Task GetNewsPageDtoAsync_InvokedOnce()
     {
         _newsArticleServiceMock
-            .Setup(x => x.GetContentPageDtoAsync(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new ContentPageDto());
+            .Setup(x => x.GetSectionNewsPageDtoAsync(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SectionNewsPageDto());
 
         var page = new NewsArticle();
-        await _newsArticleServiceMock.Object.GetContentPageDtoAsync(page, CancellationToken.None);
+        await _newsArticleServiceMock.Object.GetSectionNewsPageDtoAsync(page, CancellationToken.None);
 
         _newsArticleServiceMock.Verify(
-            x => x.GetContentPageDtoAsync(page, It.IsAny<CancellationToken>()), Times.Once);
+            x => x.GetSectionNewsPageDtoAsync(page, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Test]
