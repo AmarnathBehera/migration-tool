@@ -21,23 +21,21 @@ public class ExternalPeopleHelper : IExternalPeopleHelper
         _contentService = contentService;
         _settingsService = settingsService;
     }
-
     public async Task<SidebarExternalPersonDto[]> GetSidebarExternalPeopleDtosAsync(List<Guid> externalPeopleNodeGuids, CancellationToken cancellationToken)
     {
         var externalPeople = await _contentService.GetPagesAsync<ExternalPerson>(
-           new RetrievePagesParameters { LinkedItemsMaxLevel = 2 },
-           query => query
-               .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
-               .Where(w => w.WhereIn("ContentItemGUID", externalPeopleNodeGuids)),
-           RetrievalCacheSettings.CacheDisabled,
-           cancellationToken
-       );
-
-        var dtos = await Task.WhenAll(externalPeople.Select(async externalPerson =>
+            new RetrievePagesParameters { LinkedItemsMaxLevel = 2 },
+            query => query
+                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
+                .Where(w => w.WhereIn("ContentItemGUID", externalPeopleNodeGuids)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken
+        );
+        var dtoMap = new Dictionary<Guid, SidebarExternalPersonDto>();
+        await Task.WhenAll(externalPeople.Select(async externalPerson =>
         {
-           var imageFile = externalPerson.ImageFile.FirstOrDefault();
-
-            return new SidebarExternalPersonDto
+            var imageFile = externalPerson.ImageFile.FirstOrDefault();
+            var dto = new SidebarExternalPersonDto
             {
                 Image = imageFile != null ? new ImageDto
                 {
@@ -48,9 +46,13 @@ public class ExternalPeopleHelper : IExternalPeopleHelper
                 JobTitle = externalPerson.JobTitle,
                 Url = _contentService.EnsureAbsoluteUrl(externalPerson.Url)
             };
+            dtoMap[externalPerson.SystemFields.ContentItemGUID] = dto;
         }));
 
-        return dtos;
+        return externalPeopleNodeGuids
+            .Where(guid => dtoMap.ContainsKey(guid))
+            .Select(guid => dtoMap[guid])
+            .ToArray();
     }
 
     public async Task<List<string>> GetExternalPeopleDisplayNames(List<Guid> externalPeopleNodeGuids, CancellationToken cancellationToken)
