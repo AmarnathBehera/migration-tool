@@ -1,15 +1,17 @@
 ﻿using BDO;
-using BDO.GWT.GLOBAL.Components.Widget.FaqWidget;
-using BDO.GWT.GLOBAL.Components.Widget.ImageWithTextWidget;
 using BDO.GWT.GLOBAL.Components.Widget.LocalNavigationWidget;
 using BDO.GWT.GLOBAL.Components.Widget.KeyTakeawaysWidget;
 using BDO.GWT.Web.Widgets.AccordionWidget;
+using BDO.GWT.Web.Widgets.FaqWidget;
+using BDO.GWT.Web.Widgets.FlexibleBannerWidget;
+using BDO.GWT.Web.Widgets.FlexibleContentWidget;
+using BDO.GWT.Web.Widgets.ImageWithTextWidget;
+using BDO.GWT.Web.Widgets.QuoteCardWidget;
 using BDO.GWT.Web.Widgets.RichTextWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents;
 using BDO.GWT.Xperience.Core.LiveSite.Components.FormSections.FormSectionProperties;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ButtonWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ExternalNavigationWidget;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.QuoteCardWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ViewGlobalLocations;
 using BDO.GWT.Xperience.LiveSite.Components.Section;
@@ -29,6 +31,8 @@ using Kentico.PageBuilder.Web.Mvc;
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.KeyTakeaways, typeof(KeyTakeawaysWidget), "Key Takeaways", typeof(KeyTakeawaysWidgetProperties), AllowCache = true, IconClass = "icon-list-bullets")]
 
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.FaqWidget, typeof(FaqWidget), "FAQ Widget", typeof(FaqWidgetProperties), AllowCache = true, IconClass = "icon-bubbles")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.FlexibleBanner, typeof(FlexibleBannerWidget), "Flexible Banner", typeof(FlexibleBannerWidgetProperties), AllowCache = true, IconClass = "icon-ribbon")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.FlexibleContent, typeof(FlexibleContentWidget), "Flexible Content", typeof(FlexibleContentWidgetProperties), AllowCache = true, IconClass = "icon-newspaper")]
 
 // Sections
 [assembly: RegisterSection(identifier: ComponentIdentifiers.Sections.Container,name: "Container",propertiesType: typeof(BaseSectionProperties),customViewName: "~/Components/Section/SectionView/_ContainerSection.cshtml")]

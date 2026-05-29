@@ -17,6 +17,7 @@ module.exports = {
     externals: {
         'react': 'react',
         'react-dom': 'react-dom',
-        '@kentico/xperience-admin-base': '@kentico/xperience-admin-base'
+        '@kentico/xperience-admin-base': '@kentico/xperience-admin-base',
+        '@kentico/xperience-admin-components': '@kentico/xperience-admin-components'
     }
 };

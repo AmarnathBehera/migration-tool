@@ -374,6 +374,20 @@
             return result.FirstOrDefault();
         }
 
+        public async Task<IEnumerable<IContentItemFieldsSource>> RetrieveButtonUrlAsync(
+            IEnumerable<Guid> guids,
+            string[] contentTypes)
+        {
+            return await _contentRetriever
+                .RetrieveContentOfContentTypesByGuids<IContentItemFieldsSource>(
+                    contentTypes,
+                    guids.ToList(),
+                    new RetrieveContentOfContentTypesParameters
+                    {
+                        LinkedItemsMaxLevel = 3
+                    });
+        }
+
         public string? EnsureAbsoluteUrl(string? url)
         {
             if (string.IsNullOrWhiteSpace(url))
