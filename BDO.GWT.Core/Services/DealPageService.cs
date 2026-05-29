@@ -24,7 +24,7 @@ public class DealPageService : IDealPageService
     private readonly IContentService _contentRetriever;
     private readonly IWebsiteChannelContext _websiteChannelContext;
 
-    public DealPageService(ICultureContext cultureContext, IHeroService heroService, ISidebarService sidebarService, IContentService contentRetriever, IWebsiteChannelContext websiteChannelContext /*IPageRetriever<SectionDeals> dealSectionPageRetriever, IPeopleHelper peopleHelper, IRetriever<DealType> dealTypeRetriever, IRetriever<GlobalDealType> globalDealTypeRetriever, IRetriever<GlobalIndustry> globalIndustryRetriever, IRetriever<GlobalSubIndustry> globalSubIndustryRetriever, IRetriever<IndustryEntity> industryRetriever, IRetriever<SubIndustry> subIndustryRetriever*/)
+    public DealPageService(ICultureContext cultureContext, IHeroService heroService, ISidebarService sidebarService, IContentService contentRetriever, IWebsiteChannelContext websiteChannelContext)
     {
         _heroService = heroService;
         _sidebarService = sidebarService;
@@ -34,7 +34,6 @@ public class DealPageService : IDealPageService
 
     public async Task<DealDto> GetDealPageDtoAsync(CancellationToken cancellationToken)
     {
-        //deal page is expected to be only one per channel, so we take the first one. If there are more than one, it will be a content issue that needs to be fixed.
         var results = await _contentRetriever.GetPagesAsync<Deal>(
            new RetrievePagesParameters
            {
@@ -52,10 +51,8 @@ public class DealPageService : IDealPageService
 
         if (dealPage == null)
         {
-            return new DealDto(); // or throw exception if required
+            return new DealDto();
         }
-
-        var sys = dealPage.SystemFields;
 
         // Map hero data
         var heroData = new HeroData
@@ -81,7 +78,7 @@ public class DealPageService : IDealPageService
             SubIndustryNames = await GetSubIndustryNames(dealPage.SubIndustry, cancellationToken),
             ClientName = dealPage.ClientName,
             Content = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(dealPage.DealContent),
-            Sidebar = dealPage.ShowSidebar ? await GetSidebarDto(dealPage, cancellationToken) : null,
+            Sidebar = dealPage.ShowSidebar ? await _sidebarService.GetDealSidebarDtoAsync(dealPage, cancellationToken) : null,
         };
 
         return dto;
@@ -107,10 +104,5 @@ public class DealPageService : IDealPageService
             .ToList();
 
         return Task.FromResult(names);
-    }
-
-    private Task<ContentSidebarDto> GetSidebarDto(Deal page, CancellationToken cancellationToken)
-    {
-        return _sidebarService.GetDealSidebarDtoAsync(page, cancellationToken);
     }
 }
