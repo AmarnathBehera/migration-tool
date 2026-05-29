@@ -32,6 +32,10 @@
 
             public const string LocalNavigation = WidgetPrefix + "LocalNavigation";
 
+            public const string FlexibleBanner = WidgetPrefix + "FlexibleBanner";
+
+            public const string FlexibleContent = WidgetPrefix + "FlexibleContent";
+
             public const string KeyTakeaways = WidgetPrefix + "KeyTakeaways";
 
         }

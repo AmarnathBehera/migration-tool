@@ -1,5 +1,5 @@
-﻿using BDO.GWT.Common.Core.LiveSite.Data;
-using BDO.GWT.Core.Entities;
+﻿using BDO.GWT.Core.Data.ImageWithTextData;
+using BDO.GWT.Core;
 using CMS.ContentEngine;
 using Kentico.Content.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
@@ -8,16 +8,16 @@ using Microsoft.AspNetCore.Mvc.ViewComponents;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.GLOBAL.Components.Widget.ImageWithTextWidget;
+namespace BDO.GWT.Web.Widgets.ImageWithTextWidget;
 
 public class ImageWithTextWidget : ViewComponent
 {
     private readonly IContentRetriever _contentRetriever;
-    private readonly IContentRetrieverWrapper _wrapper;
-    public ImageWithTextWidget(IContentRetriever contentRetriever, IContentRetrieverWrapper wrapper)
+    private readonly IContentService _contentService;
+    public ImageWithTextWidget(IContentRetriever contentRetriever, IContentService contentService)
     {
         _contentRetriever = contentRetriever;
-        _wrapper = wrapper;
+        _contentService = contentService;
     }
 
     public async Task<ViewViewComponentResult> InvokeAsync(ComponentViewModel<ImageWithTextWidgetProperties> model)
@@ -49,7 +49,7 @@ public class ImageWithTextWidget : ViewComponent
             var contentTypes = new[] { ContentAttachment.CONTENT_TYPE_NAME, SocialLinks.CONTENT_TYPE_NAME };
 
             var buttonurl = model.Properties.ButtonURL?.Any() == true
-                ? await _wrapper.RetrieveButtonUrlAsync(
+                ? await _contentService.RetrieveButtonUrlAsync(
                     model.Properties.ButtonURL.Select(i => i.Identifier).ToList(),
                     contentTypes)
                 : Enumerable.Empty<IContentItemFieldsSource>();

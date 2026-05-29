@@ -96,5 +96,9 @@
      Type type,
      string pageName,
      CancellationToken cancellationToken = default);
+
+        Task<IEnumerable<IContentItemFieldsSource>> RetrieveButtonUrlAsync(
+            IEnumerable<Guid> guids,
+            string[] contentTypes);
     }
 }

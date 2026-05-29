@@ -1,6 +1,6 @@
-﻿using BDO.GWT.Common.Core.LiveSite.Data;
-using BDO.GWT.Core.Entities;
-using BDO.GWT.GLOBAL.Components.Widget.ImageWithTextWidget;
+﻿using BDO.GWT.Core.Data.ImageWithTextData;
+using BDO.GWT.Core;
+using BDO.GWT.Web.Widgets.ImageWithTextWidget;
 using CMS.ContentEngine;
 using Kentico.Content.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
@@ -17,16 +17,16 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
     {
         private Mock<IContentRetriever> _contentRetrieverMock;
         private ImageWithTextWidget _widget;
-        private Mock<IContentRetrieverWrapper> _mockWrapper;
+        private Mock<IContentService> _contentServiceMock;
 
 
         [SetUp]
         public void Setup()
         {
             _contentRetrieverMock = new Mock<IContentRetriever>();
-            _mockWrapper = new Mock<IContentRetrieverWrapper>();
+            _contentServiceMock = new Mock<IContentService>();
 
-            _widget = new ImageWithTextWidget(_contentRetrieverMock.Object, _mockWrapper.Object);
+            _widget = new ImageWithTextWidget(_contentRetrieverMock.Object, _contentServiceMock.Object);
 
             _widget.ViewComponentContext = new ViewComponentContext
             {
@@ -92,7 +92,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
                 }
             };
 
-            _mockWrapper
+            _contentServiceMock
                 .Setup(x => x.RetrieveButtonUrlAsync(
                     It.IsAny<IEnumerable<Guid>>(),
                     It.IsAny<string[]>()))
