@@ -11,6 +11,7 @@ namespace BDO.GWT.Core.Constants
         public const string CareerEmploymentType = "CareeremploymentTypes";
         public const string CareerJobTitle = "Careerjobtitle";
         public const string CareerLevel = "Careerlevels";
+        public const string Type = "ContentType";
     }
     public static class ProfileGroup
     {
@@ -25,6 +26,9 @@ namespace BDO.GWT.Core.Constants
     {
     }
     public static class CareerJobTitle
+    {
+    }
+    public static class ContentType
     {
     }
 }

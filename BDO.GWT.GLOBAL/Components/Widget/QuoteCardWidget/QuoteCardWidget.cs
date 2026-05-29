@@ -1,20 +1,15 @@
-﻿using BDO;
-using BDO.GWT.Common.Core.LiveSite.Data;
-using BDO.GWT.Core;
+﻿using BDO.GWT.Core.Data.QuoteCardData;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Services.Widget;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.QuoteCardWidget;
-using CMS.ContentEngine;
 using Kentico.Content.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.QuoteCardWidget;
+namespace BDO.GWT.Web.Widgets.QuoteCardWidget;
 
 public class QuoteCardWidget : ViewComponent
 {

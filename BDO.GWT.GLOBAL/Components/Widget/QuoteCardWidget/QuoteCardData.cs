@@ -1,7 +1,7 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.Core.DTOs;
 
-namespace BDO.GWT.Common.Core.LiveSite.Data;
+namespace BDO.GWT.Core.Data.QuoteCardData;
 
 public class QuoteCardData : BaseWidgetData
 {
