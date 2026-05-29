@@ -11,15 +11,13 @@ namespace BDO.GWT.Core.DTOs
         
         public MetaDataDto? MetaData { get; set; }
 
-        public string ImageUrl { get; set; } = string.Empty;
+        public ImageDto? ImageDto { get; set; }
+        public ContentSidebarDto? ContentSidebarDto { get; set; }
 
-        public string ImageAltText { get; set; } = string.Empty;
+        public CallToActionDto? CallToAction { get; set; }
         public SearchAndSEODto? SearchAndSEO { get; set; }
 
         public OGMetaDataDto? OGMetaData { get; set; }
 
-        public BaseContent? BaseContent { get; set; }
-
-        public BaseWebPage? BaseWebPage { get; set; }
     }
 }

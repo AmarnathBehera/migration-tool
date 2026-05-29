@@ -8,6 +8,7 @@ using BDO.GWT.Core.Utilities;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 
+
 namespace BDO.GWT.Core.Services;
 public interface INewsArticleService{   
     Task<ContentPageDto> GetContentPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken);
@@ -47,7 +48,7 @@ public class NewsArticleService : INewsArticleService
                 ? await GetContentPageSidebarDto(contentPage, cancellationToken)
                 : null,
             CallToAction = contentPage.ShowCallToAction
-                ? GetCallToActionDto(contentPage)
+                ? PageHelper.GetCallToActionDto(contentPage)
                 : null,
         };
         return dto;
@@ -157,12 +158,7 @@ public class NewsArticleService : INewsArticleService
         return name;
     }
 
-    private static CallToActionDto? GetCallToActionDto(NewsArticle contentPage)
-    {
-        return contentPage.ShowSidebar
-            ? PageHelper.GetCallToActionDto(contentPage.CallToActionDescription, contentPage.CallToActionButtonText, contentPage.CallToActionButtonUrl, null)
-            : null;
-    }
+   
 
     private async Task<bool> GetShowCopyLinkOptionFromSectionPageAsync(NewsArticle contentPage, bool showCopyLinkButton, CancellationToken cancellationToken)
     {
@@ -174,4 +170,18 @@ public class NewsArticleService : INewsArticleService
 
         return newsSectionPage.ShowCopyUrlButtonInNewsArticle && showCopyLinkButton;
     }
+}
+
+public interface ISidebarFields
+{
+    bool ShowSidebar { get; }
+}
+
+public interface ICallToActionFields
+{
+    string? CallToActionDescription { get; }
+    string? CallToActionButtonText { get; }
+    string? CallToActionButtonUrl { get; }
+
+    string? CallToActionPosition { get; }
 }

@@ -35,10 +35,29 @@ public static class PageHelper
             Description = callToActionDescription,
             ButtonTitle = callToActionButtonText,
             ButtonUrl = callToActionButtonLink,
-            Position = callToActionPosition,
+          
         };
 
         return dto;
+    }
+
+    public static CallToActionDto? GetCallToActionDto<T>(T contentPage) where T : ICallToAction, ISidebar
+    {
+        if (contentPage.CallToActionButtonText == null || contentPage.CallToActionButtonUrl == null)
+        {
+            return null;
+        }
+
+        var dto = new CallToActionDto
+        {
+            Description = contentPage.CallToActionDescription,
+            ButtonTitle = contentPage.CallToActionButtonText,
+            ButtonUrl = contentPage.CallToActionButtonUrl
+
+        };
+
+        return dto;
+
     }
 
     public static List<string> GetParentPagesNodeAliasPaths(string nodeAliasPath)
