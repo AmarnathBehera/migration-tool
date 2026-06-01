@@ -11,7 +11,7 @@
 
 using System;
 using System.Collections.Generic;
-using CMS.ContentEngine;
+using CMS.Websites;
 
 namespace BDO
 {
@@ -59,6 +59,6 @@ namespace BDO
 		/// <summary>
 		/// ItemListAdvancedSearchLinkUrl.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> ItemListAdvancedSearchLinkUrl { get; set; }
+		public IEnumerable<WebPageRelatedItem> ItemListAdvancedSearchLinkUrl { get; set; }
 	}
 }

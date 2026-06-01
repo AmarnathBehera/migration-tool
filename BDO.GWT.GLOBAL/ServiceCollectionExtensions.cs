@@ -16,6 +16,7 @@ using CMS.Core;
 using GWTXbyKWeb.Components.Services.SEOOptions;
 using Microsoft.Extensions.DependencyInjection;
 
+
 namespace BDO.GWT.Common;
 
 public static class ServiceCollectionExtensions
@@ -50,8 +51,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IPageContext, XperiencePageContext>();
         serviceCollection.AddScoped<IPageBuilderSectionService, PageBuilderSectionService>();
         serviceCollection.AddScoped<ITileContentService, TileContentService>();
+        serviceCollection.AddScoped<IFlexibleContentService, FlexibleContentService>();
         serviceCollection.AddScoped<IButtonUrlRetriever, ButtonUrlRetriever>();
-        serviceCollection.AddScoped<IContentRetrieverWrapper, ContentRetrieverWrapper>();
         serviceCollection.AddScoped<IHeroService, HeroService>();
         serviceCollection.AddScoped<ISectionAboutPageService, SectionAboutPageService>();
         serviceCollection.AddScoped<IAboutPageService, AboutPageService>();
@@ -86,6 +87,12 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IServiceAreaAndServicePageService, ServiceAreaAndServicePageService>();
         serviceCollection.AddScoped<IBusinessLinePageService, BusinessLinePageService>();
         serviceCollection.AddTransient<DropdownScriptExecutor>();
+        serviceCollection.AddScoped<ICareerPageService, CareerPageService>();
+        serviceCollection.AddScoped<ICareersPageService, CareersPageService>();
+        serviceCollection.AddScoped<ICareerDetailPageService, CareerDetailPageService>();
+        serviceCollection.AddScoped<ICareerCategoryPageService , CareerCategoryPageService>();
+        serviceCollection.AddScoped<ICareerContentPageService, CareerContentPageService>();
+
         serviceCollection.AddScoped<IChannelAccessService, ChannelAccessService>();
         serviceCollection.AddScoped<ISectionBlogService, SectionBlogService>();
     }

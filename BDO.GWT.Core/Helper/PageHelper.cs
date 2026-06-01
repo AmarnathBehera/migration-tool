@@ -1,12 +1,13 @@
 ﻿using BDO.GWT.Common.Exceptions;
+using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.DTOs;
-using BDO.GWT.Core.ValueObjects;
-using System.Text;
+using BDO.GWT.Core.Services;
 
 namespace BDO.GWT.Core.Helpers;
 
 public static class PageHelper
 {
+   
     public static ImageDto? GetImageDto(String? imageLink, string? imageAltText)
     {
         if (imageLink == null)
@@ -23,7 +24,7 @@ public static class PageHelper
         return dto;
     }
 
-    public static CallToActionDto? GetCallToActionDto(string? callToActionDescription, string? callToActionButtonText, String? callToActionButtonLink, string? callToActionPosition)
+    public static CallToActionDto? GetCallToActionDto(string? callToActionDescription, string? callToActionButtonText, String? callToActionButtonLink)
     {
         if (callToActionButtonText == null || callToActionButtonLink == null)
         {
@@ -60,18 +61,23 @@ public static class PageHelper
 
     }
 
-    public static List<string> GetParentPagesNodeAliasPaths(string nodeAliasPath)
-    {
-        var parentPaths = new List<string>();
-        var currentPath = new StringBuilder();
+    //public static async Task<ContentSidebarDto> GetContentPageSidebarDto<T>(T contentPage, CancellationToken cancellationToken) where T : ISidebar, IPageMetadata
+    //{
+    //    var sidebarDto = await _sidebarService.GetSidebarDtoAsync(contentPage, cancellationToken);
 
-        foreach (var part in nodeAliasPath.Split('/').Skip(1))
-        {
-            currentPath.Append('/');
-            currentPath.Append(part);
-            parentPaths.Add(currentPath.ToString());
-        }
+    //    var tags = await _taxonomyTagRetriever.GetTaxonomyTagByGUIDs(contentPage.ContentType, _cultureContext.CurrentLanguageTag);
+    //    var type = tags?.FirstOrDefault()?.Title;
 
-        return parentPaths;
-    }
+    //    sidebarDto.ShowCopyLinkButton = await GetShowCopyLinkOptionFromSectionNewsPageAsync(sidebarDto.ShowCopyLinkButton, cancellationToken);
+    //    sidebarDto.TypeName = type;
+    //    sidebarDto.PublishDate = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen ?? contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen;
+    //    sidebarDto.UpdatedDate = contentPage.UpdatedOn == DateTime.MinValue ? null : contentPage.UpdatedOn;
+    //    sidebarDto.RelevantContactPeopleTitle = ResourceStringKey.LiveSite.Insights.Authors;
+    //    sidebarDto.RelevantContactPeople = await GetContentPageAuthorDtos(contentPage, cancellationToken);
+    //    sidebarDto.RelatedExternalPeople = await _externalPeopleHelper.GetSidebarExternalPeopleDtosAsync(
+    //        contentPage.RelatedExternalPeople.Select(p => p.SystemFields.ContentItemGUID).ToList(),
+    //        cancellationToken);
+
+    //    return sidebarDto;
+    //}
 }

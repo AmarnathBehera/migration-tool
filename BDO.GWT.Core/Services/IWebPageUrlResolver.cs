@@ -5,5 +5,6 @@ namespace BDO.GWT.Core
     public interface IWebPageUrlResolver
     {
         string GetRelativePath(IWebPageFieldsSource page);
+        string GetAbsoluteUrl(IWebPageFieldsSource page);
     }
 }

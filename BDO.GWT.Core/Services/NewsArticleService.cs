@@ -6,13 +6,14 @@ using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Utilities;
 using CMS.Websites;
+using HotChocolate.Resolvers;
 using Kentico.Content.Web.Mvc;
 
 
 namespace BDO.GWT.Core.Services;
 public interface INewsArticleService{   
-    Task<ContentPageDto> GetContentPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken);
-    Task<ContentSidebarDto> GetContentPageSidebarDto(NewsArticle contentPage, CancellationToken cancellationToken);
+    Task<SectionNewsPageDto?> GetSectionNewsPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken);
+    //Task<ContentSidebarDto> GetContentPageSidebarDto<T>(T contentPage, CancellationToken cancellationToken) where T : NewsArticle;
 }
 public class NewsArticleService : INewsArticleService
 {
@@ -35,9 +36,44 @@ public class NewsArticleService : INewsArticleService
         _taxonomyTagRetriever = taxonomyTagRetriever;
         _cultureContext = cultureContext;
     }
-    public async Task<ContentPageDto> GetContentPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken)
+    public async Task<SectionNewsPageDto?> GetSectionNewsPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken)
     {
-        var dto = new ContentPageDto
+        if(contentPage == null)            
+            return null;
+
+        List<Guid> relevantPersonGuids = new List<Guid>();
+        var pageUrl = contentPage.GetUrl().AbsoluteUrl;
+        ContentSidebarDto? sideBarDto = contentPage.ShowSidebar
+                ? await _sidebarService.GetSidebarDtoAsync(contentPage, pageUrl, cancellationToken)
+                : null;
+        
+        if(contentPage.RelevantContactPerson != null)
+        {
+           relevantPersonGuids = contentPage.RelevantContactPerson.Select(p => p.SystemFields.ContentItemGUID).ToList();
+        }
+
+        if (sideBarDto != null)
+        {
+            var publishedDate = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen ?? 
+                contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen;
+            var updatedDate = contentPage.UpdatedOn == DateTime.MinValue ? null : (DateTime?)contentPage.UpdatedOn;
+            sideBarDto = await _sidebarService.GetContentPageSidebarDetails(sideBarDto,cancellationToken, 
+                                                                          relevantPersonGuids, publishedDate, updatedDate);
+
+            sideBarDto.ShowCopyLinkButton = await GetShowCopyLinkOptionFromSectionPageAsync(sideBarDto.ShowCopyLinkButton, cancellationToken);
+
+            if(contentPage.RelatedExternalPeople != null)
+            {
+                sideBarDto.RelatedExternalPeople = await _externalPeopleHelper.GetSidebarExternalPeopleDtosAsync(
+                             contentPage.RelatedExternalPeople.Select(p => p.SystemFields.ContentItemGUID).ToList(),
+                             cancellationToken);
+            }
+
+           
+
+        }
+
+        var dto = new SectionNewsPageDto
         {
             Title = contentPage.ShowTitle ? contentPage.MetadataTitle : null,
             Description = contentPage.ShowDescription
@@ -45,7 +81,7 @@ public class NewsArticleService : INewsArticleService
                 : null,
             Content = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(contentPage.Content),
             Sidebar = contentPage.ShowSidebar
-                ? await GetContentPageSidebarDto(contentPage, cancellationToken)
+                ? sideBarDto
                 : null,
             CallToAction = contentPage.ShowCallToAction
                 ? PageHelper.GetCallToActionDto(contentPage)
@@ -54,83 +90,68 @@ public class NewsArticleService : INewsArticleService
         return dto;
     }
 
-    public async Task<ContentSidebarDto> GetContentPageSidebarDto(NewsArticle contentPage, CancellationToken cancellationToken)
-    {
-        var sidebarDto = await _sidebarService.GetSidebarDtoAsync(contentPage, cancellationToken);
+    //public async Task<ContentSidebarDto> GetContentPageSidebarDto<T>(T contentPage, CancellationToken cancellationToken) where T : NewsArticle
+    //{
+    //    var sidebarDto = await _sidebarService.GetSidebarDtoAsync(contentPage, cancellationToken);
+               
+    //    return sidebarDto;
+    //}
 
-        var tags = await _taxonomyTagRetriever.GetTaxonomyTagByGUIDs(contentPage.ContentType, _cultureContext.CurrentLanguageTag);
-        var type = tags?.FirstOrDefault()?.Title;
+   
+    
 
-        sidebarDto.ShowCopyLinkButton = await GetShowCopyLinkOptionFromSectionPageAsync(contentPage, sidebarDto.ShowCopyLinkButton, cancellationToken);
-        sidebarDto.TypeName = type;
-        sidebarDto.PublishDate = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen ?? contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen;
-        sidebarDto.UpdatedDate = contentPage.UpdatedOn == DateTime.MinValue ? null : contentPage.UpdatedOn;
-        sidebarDto.RelevantContactPeopleTitle = ResourceStringKey.LiveSite.Insights.Authors;
-        sidebarDto.RelevantContactPeople = await GetContentPageAuthorDtos(contentPage, cancellationToken);
-        sidebarDto.RelatedExternalPeople = await _externalPeopleHelper.GetSidebarExternalPeopleDtosAsync(
-            contentPage.RelatedExternalPeople.Select(p => p.SystemFields.ContentItemGUID).ToList(), 
-            cancellationToken);
+    //public async Task<SidebarPersonDto[]> GetContentPageAuthorDtos(NewsArticle contentPage, CancellationToken cancellationToken)
+    //{
+    //    var relevantPersonGuids = contentPage.RelevantContactPerson.Select(p => p.SystemFields.ContentItemGUID).ToList();
 
-        return sidebarDto;
-    }
-    private async Task<SidebarPersonDto[]> GetContentPageAuthorDtos(NewsArticle contentPage, CancellationToken cancellationToken)
-    {
-        var relevantPersonGuids = contentPage.RelevantContactPerson.Select(p => p.SystemFields.ContentItemGUID).ToList();
+    //    var people = (await _contentService.GetPagesAsync<Person>(
+    //       new RetrievePagesParameters { LinkedItemsMaxLevel =2},
+    //       query => query   
+    //           .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
+    //           .Where(w => w.WhereIn("ContentItemGUID", relevantPersonGuids)),
+    //       RetrievalCacheSettings.CacheDisabled,
+    //       cancellationToken
+    //   ))
+    //   .DistinctBy(x => x.SystemFields.ContentItemGUID).ToArray();
 
-        var people = (await _contentService.GetPagesAsync<Person>(
-           new RetrievePagesParameters { LinkedItemsMaxLevel =2},
-           query => query   
-               .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
-               .Where(w => w.WhereIn("ContentItemGUID", relevantPersonGuids)),
-           RetrievalCacheSettings.CacheDisabled,
-           cancellationToken
-       ))
-       .DistinctBy(x => x.SystemFields.ContentItemGUID).ToArray();
+    //    var internalPeople = (await _contentService.GetPagesAsync<InternalPerson>(
+    //       new RetrievePagesParameters { LinkedItemsMaxLevel = 2 },
+    //       query => query
+    //           .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
+    //           .Where(w => w.WhereIn("ContentItemGUID", relevantPersonGuids)),
+    //       RetrievalCacheSettings.CacheDisabled,
+    //       cancellationToken
+    //   ))
+    //   .DistinctBy(x => x.SystemFields.ContentItemGUID).ToArray();
 
-        var internalPeople = (await _contentService.GetPagesAsync<InternalPerson>(
-           new RetrievePagesParameters { LinkedItemsMaxLevel = 2 },
-           query => query
-               .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
-               .Where(w => w.WhereIn("ContentItemGUID", relevantPersonGuids)),
-           RetrievalCacheSettings.CacheDisabled,
-           cancellationToken
-       ))
-       .DistinctBy(x => x.SystemFields.ContentItemGUID).ToArray();
+    //    var dtsByGuid = new Dictionary<Guid, SidebarPersonDto>();
 
-        var dtsByGuid = new Dictionary<Guid, SidebarPersonDto>();
+    //    foreach (var person in people)
+    //    {
+    //        dtsByGuid[person.SystemFields.ContentItemGUID] = new SidebarPersonDto
+    //        {
+    //            Image = PageHelper.GetImageDto(person.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url, person.MetadataTeaserImageAltText),
+    //            FullName = GetPersonDisplayName(person),
+    //            JobTitle = person.PersonJobTitle,
+    //            Url = person.GetUrl().RelativePath,
+    //        };
+    //    }
 
-        foreach (var person in people)
-        {
-            dtsByGuid[person.SystemFields.ContentItemGUID] = new SidebarPersonDto
-            {
-                Image = PageHelper.GetImageDto(person.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url, person.MetadataTeaserImageAltText),
-                FullName = GetPersonDisplayName(person),
-                JobTitle = person.PersonJobTitle,
-                Url = person.GetUrl().RelativePath,
-            };
-        }
+    //    foreach (var internalPerson in internalPeople)
+    //    {
+    //        dtsByGuid[internalPerson.SystemFields.ContentItemGUID] = new SidebarPersonDto
+    //        {
+    //            Image = PageHelper.GetImageDto(internalPerson.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset.Url, internalPerson.ImageFileAltText),
+    //            FullName = GetInternalPersonDisplayName(internalPerson),
+    //            JobTitle = internalPerson.JobTitle,
+    //            Url = _contentService.EnsureAbsoluteUrl(internalPerson.Url)
+    //        };
+    //    }
+    //    return relevantPersonGuids.Select(guid => dtsByGuid.TryGetValue(guid, out var dto) ? dto : null)
+    //                              .OfType<SidebarPersonDto>().ToArray();
+    //}
 
-        foreach (var internalPerson in internalPeople)
-        {
-            dtsByGuid[internalPerson.SystemFields.ContentItemGUID] = new SidebarPersonDto
-            {
-                Image = PageHelper.GetImageDto(internalPerson.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset.Url, internalPerson.ImageFileAltText),
-                FullName = GetInternalPersonDisplayName(internalPerson),
-                JobTitle = internalPerson.JobTitle,
-                Url = internalPerson.GetUrl().RelativePath,
-            };
-        }
-        var dtos = new List<SidebarPersonDto>();
-        foreach (var guid in relevantPersonGuids)
-        {
-            if (dtsByGuid.TryGetValue(guid, out var dto))
-            {
-                dtos.Add(dto);
-            }
-        }
 
-        return dtos.ToArray();
-    }
 
     private static string GetPersonDisplayName(Person person)
     {
@@ -160,10 +181,9 @@ public class NewsArticleService : INewsArticleService
 
    
 
-    private async Task<bool> GetShowCopyLinkOptionFromSectionPageAsync(NewsArticle contentPage, bool showCopyLinkButton, CancellationToken cancellationToken)
+    private async Task<bool> GetShowCopyLinkOptionFromSectionPageAsync( bool showCopyLinkButton, CancellationToken cancellationToken)
     {
-        if (contentPage == null)
-            return showCopyLinkButton;
+        
 
         var newsSectionPage = (await _contentService.RetrievePagesAsync<SectionNews>(cancellationToken))?.FirstOrDefault()
             ?? throw new MissingSectionPageException($"No pages have been found of type '{nameof(SectionNews)}'.");
@@ -172,16 +192,16 @@ public class NewsArticleService : INewsArticleService
     }
 }
 
-public interface ISidebarFields
-{
-    bool ShowSidebar { get; }
-}
+//public interface ISidebarFields
+//{
+//    bool ShowSidebar { get; }
+//}
 
-public interface ICallToActionFields
-{
-    string? CallToActionDescription { get; }
-    string? CallToActionButtonText { get; }
-    string? CallToActionButtonUrl { get; }
+//public interface ICallToActionFields
+//{
+//    string? CallToActionDescription { get; }
+//    string? CallToActionButtonText { get; }
+//    string? CallToActionButtonUrl { get; }
 
-    string? CallToActionPosition { get; }
-}
+//    string? CallToActionPosition { get; }
+//}

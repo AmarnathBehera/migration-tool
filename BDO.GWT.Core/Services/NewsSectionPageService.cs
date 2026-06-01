@@ -14,7 +14,7 @@ namespace BDO.GWT.Core.Services;
 public interface INewsSectionPageService
 {
     Task<NewsSectionDto> GetNewsSectionDtoAsync(SectionNews currentPage, CancellationToken cancellationToken);
-    Task<PaginationDto<ContentPageCardDto>> GetNewsArticlePaginationResultAsync(CardsQuery cardsQuery, CancellationToken cancellationToken);
+    Task<PaginationDto<NewsPageCardDto>> GetNewsArticlePaginationResultAsync(string language, CardsQuery cardsQuery, CancellationToken cancellationToken);
 }
 
 public class NewsSectionPageService : INewsSectionPageService
@@ -24,16 +24,19 @@ public class NewsSectionPageService : INewsSectionPageService
     private readonly INewsArticleCardsService _newsArticleCardsService;
     private readonly IContentService _contentService;
     private readonly ICultureContext _cultureContext;
+    private readonly IContentRetriever _contentRetriever;
 
-    public NewsSectionPageService(IFilteringHelper filteringHelper, IHeroService heroService,
-       INewsArticleCardsService newsArticleCardsService, 
-        IContentService contentService, ICultureContext cultureContext)
+    public NewsSectionPageService(
+        IFilteringHelper filteringHelper, IHeroService heroService,
+       INewsArticleCardsService newsArticleCardsService,IContentService contentService,
+       ICultureContext cultureContext, IContentRetriever contentRetriever)
     {
         _filteringHelper = filteringHelper;
         _heroService = heroService;
         _newsArticleCardsService = newsArticleCardsService;
         _contentService = contentService;
         _cultureContext = cultureContext;
+        _contentRetriever = contentRetriever;
     }
     public async Task<NewsSectionDto> GetNewsSectionDtoAsync(SectionNews currentPage, CancellationToken cancellationToken)
     {
@@ -62,11 +65,12 @@ public class NewsSectionPageService : INewsSectionPageService
 
         return dto;
     }
-    public async Task<PaginationDto<ContentPageCardDto>> GetNewsArticlePaginationResultAsync(CardsQuery cardsQuery, CancellationToken cancellationToken)
+    public async Task<PaginationDto<NewsPageCardDto>> GetNewsArticlePaginationResultAsync(string language, CardsQuery cardsQuery, CancellationToken cancellationToken)
     {
         var featuredNewsArticlePageIds = await GetFeaturedNewsArticlePageIdsAsync(cancellationToken);
 
         var paginationDto = await _newsArticleCardsService.GetFilteredItemsAsync(
+            language,
             cardsQuery,
             null,
             newsArticle => featuredNewsArticlePageIds.Contains(newsArticle.SystemFields.WebPageItemID),
@@ -108,6 +112,12 @@ public class NewsSectionPageService : INewsSectionPageService
         .Split(';', StringSplitOptions.RemoveEmptyEntries)
         .Select(x => x.Trim())
         .ToHashSet();
+
+        var selectedpageid = currentPage.ItemListAdvancedSearchLinkUrl?.FirstOrDefault()?.WebPageGuid;
+        var selectedPage = selectedpageid.HasValue && selectedpageid.Value != Guid.Empty
+    ? await _contentRetriever.RetrieveAllPagesByGuids<IWebPageFieldsSource>(new[] { selectedpageid.Value }, cancellationToken: cancellationToken)
+    : Enumerable.Empty<IWebPageFieldsSource>();
+
         var newsArticleCardsGridDto = new CardsGridDto
         {
             Title = currentPage.ItemListTitle,
@@ -118,7 +128,7 @@ public class NewsSectionPageService : INewsSectionPageService
             PageSize = 20,
             AdvancedSearchPrelinkText = currentPage.ItemListAdvancedSearchDescription,
             AdvancedSearchLinkText = currentPage.ItemListAdvancedSearchLinkText,
-            //AdvancedSearchLink = currentPage.ItemListAdvancedSearchLinkUrl?.ToHtmlCompatibleString(),
+            AdvancedSearchLink= selectedPage.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty,//?.ToHtmlCompatibleString(),
         };
 
         return newsArticleCardsGridDto;

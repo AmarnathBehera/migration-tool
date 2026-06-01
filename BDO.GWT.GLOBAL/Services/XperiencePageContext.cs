@@ -64,7 +64,10 @@ public class XperiencePageContext : IPageContext
                 .ForWebsite(ctx.WebPage.WebsiteChannelName)
                 .TopN(1)
                 .WithLinkedItems(1))
-            .InLanguage(ctx.WebPage.LanguageName);
+            .InLanguage(ctx.WebPage.LanguageName)
+        .Parameters(q => q
+        .Where(w => w.WhereEquals(nameof(WebPageFields.WebPageItemID), ctx.WebPage.WebPageItemID))
+    );
 
         var result = await _queryExecutor.GetMappedWebPageResult<T>(query, cancellationToken: cancellationToken);
 

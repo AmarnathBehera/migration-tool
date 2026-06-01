@@ -133,6 +133,47 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     ContentTypeNames = new[] { "BDO.SectionBlogs" },
     IconClass = "xp-market")]
 
+
+[assembly: RegisterWebPageRoute(SectionCareers.CONTENT_TYPE_NAME, typeof(CareerController))]
+[assembly: RegisterPageTemplate(
+    identifier: SectionCareers.CONTENT_TYPE_NAME,
+    name: "Section Career Page Content Type Template",
+    customViewName: "~/Views/Career/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SectionCareers" },
+    IconClass = "xp-l-grid-2-2")]
+
+[assembly: RegisterWebPageRoute(Careers.CONTENT_TYPE_NAME, typeof(CareersController))]
+[assembly: RegisterPageTemplate(
+    identifier: Careers.CONTENT_TYPE_NAME,
+    name: "Careers Page Content Type Template",
+    customViewName: "~/Views/Careers/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.Careers" },
+    IconClass = "xp-l-grid-2-2")]
+
+[assembly: RegisterWebPageRoute(Career.CONTENT_TYPE_NAME, typeof(CareerDetailController))]
+[assembly: RegisterPageTemplate(
+    identifier: Career.CONTENT_TYPE_NAME,
+    name: "Career Page Content Type Template",
+    customViewName: "~/Views/CareerDetail/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.Career" },
+    IconClass = "xp-l-grid-2-2")]
+
+[assembly: RegisterWebPageRoute(CareerCategory.CONTENT_TYPE_NAME, typeof(CareerCategoryController))]
+[assembly: RegisterPageTemplate(
+    identifier: CareerCategory.CONTENT_TYPE_NAME,
+    name: "Career Page Content Type Template",
+    customViewName: "~/Views/CareerDetail/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.CareerCategory" },
+    IconClass = "xp-l-grid-2-2")]
+
+[assembly: RegisterWebPageRoute(CareerContent.CONTENT_TYPE_NAME, typeof(CareerContentController))]
+[assembly: RegisterPageTemplate(
+    identifier: CareerContent.CONTENT_TYPE_NAME,
+    name: "Career Content Page Content Type Template",
+    customViewName: "~/Views/CareerContent/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.CareerContent" },
+    IconClass = "xp-l-grid-2-2")]
+
 [assembly: RegisterWebPageRoute(SectionNews.CONTENT_TYPE_NAME, typeof(NewsSectionController))]
 
 [assembly: RegisterPageTemplate(
@@ -156,6 +197,6 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 [assembly: RegisterPageTemplate(
     identifier: NewsArticle.CONTENT_TYPE_NAME,
     name: "News Article Content Type Template",
-    customViewName: "~/Views/ContentPage/Index.cshtml",
+    customViewName: "~/Views/NewsArticle/Index.cshtml",
     ContentTypeNames = new[] { "BDO.NewsArticle" },
     IconClass = "xp-market")]

@@ -5,7 +5,7 @@ using Kentico.PageBuilder.Web.Mvc;
 using Kentico.Xperience.Admin.Base.FormAnnotations;
 using System.Collections.Generic;
 
-namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.QuoteCardWidget;
+namespace BDO.GWT.Web.Widgets.QuoteCardWidget;
 
 public class QuoteCardWidgetProperties : IWidgetProperties
 {

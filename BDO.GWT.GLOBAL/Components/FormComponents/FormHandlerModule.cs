@@ -203,9 +203,10 @@ public partial class FormHandlerModule : Module
             using var scope = _scopeFactory.CreateScope();
             var contentService = scope.ServiceProvider.GetRequiredService<IContentService>();
 
-            var people = await contentService.RetrievePagesAsync<Person>(
+            var people = await contentService.GetPagesAsync<Person>(
                 new RetrievePagesParameters(),
                 query => query.Where(w => w.WhereEquals("WebPageItemTreePath", pathWithoutCulture)).TopN(1),
+                RetrievalCacheSettings.CacheDisabled,
                 CancellationToken.None).ConfigureAwait(false);
 
             return people?.FirstOrDefault();

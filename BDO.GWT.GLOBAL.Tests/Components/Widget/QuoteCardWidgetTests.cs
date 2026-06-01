@@ -1,7 +1,7 @@
-using BDO.GWT.Common.Core.LiveSite.Data;
+using BDO.GWT.Core.Data.QuoteCardData;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Services.Widget;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.QuoteCardWidget;
+using BDO.GWT.Web.Widgets.QuoteCardWidget;
 using CMS.ContentEngine;
 using Kentico.Content.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;

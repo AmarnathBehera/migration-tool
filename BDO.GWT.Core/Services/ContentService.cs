@@ -305,8 +305,6 @@
                 cancellationToken
             );
         }
-
-
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
         {
             return _contentRetriever.RetrievePages<T?>(cancellationToken);
@@ -315,17 +313,6 @@
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(RetrievePagesParameters parameters, CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
         {
             return _contentRetriever.RetrievePages<T?>(parameters, cancellationToken);
-        }
-        public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(
-          RetrievePagesParameters parameters,
-          Action<RetrievePagesQueryParameters> queryAction,
-          CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
-        {
-            return _contentRetriever.RetrievePages<T?>(
-                parameters,
-                queryAction,
-                RetrievalCacheSettings.CacheDisabled,
-                cancellationToken);
         }
         public string GetFallbackMetadataDescription(string? metaDescription, string? metaOGDescription)
         {
@@ -385,6 +372,40 @@
                 cancellationToken);
 
             return result.FirstOrDefault();
+        }
+
+        public async Task<IEnumerable<IContentItemFieldsSource>> RetrieveButtonUrlAsync(
+            IEnumerable<Guid> guids,
+            string[] contentTypes)
+        {
+            return await _contentRetriever
+                .RetrieveContentOfContentTypesByGuids<IContentItemFieldsSource>(
+                    contentTypes,
+                    guids.ToList(),
+                    new RetrieveContentOfContentTypesParameters
+                    {
+                        LinkedItemsMaxLevel = 3
+                    });
+        }
+
+        public string? EnsureAbsoluteUrl(string? url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+                return url;
+
+            if (!url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+                !url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) &&
+                !url.StartsWith('/'))
+            {
+                return "https://" + url;
+            }
+
+            return url;
+        }
+
+        public void GetPagesAsync<T>(RetrievePagesParameters retrievePagesParameters, Func<ContentItemQueryBuilder, ContentItemQueryBuilder> func, RetrievalCacheSettings retrievalCacheSettings, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -21,9 +21,12 @@ public class PeopleControllerUnitTests
         _controller = new PeopleController(_sectionPeoplePageServiceMock.Object);
 
         var httpContext = new DefaultHttpContext();
+        var routeData = new Microsoft.AspNetCore.Routing.RouteData();
+        routeData.Values["culturecode"] = "en-gb";
         _controller.ControllerContext = new ControllerContext
         {
-            HttpContext = httpContext
+            HttpContext = httpContext,
+            RouteData = routeData
         };
     }
 
@@ -42,7 +45,7 @@ public class PeopleControllerUnitTests
         };
 
         _sectionPeoplePageServiceMock
-            .Setup(s => s.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+            .Setup(s => s.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, It.IsAny<string>(), It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedDto);
 
         var result = await _controller.Get(pageGuid, query, CancellationToken.None);
@@ -64,7 +67,7 @@ public class PeopleControllerUnitTests
         };
 
         _sectionPeoplePageServiceMock
-            .Setup(s => s.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+            .Setup(s => s.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, It.IsAny<string>(), It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedDto);
 
         var result = await _controller.Get(pageGuid, query, CancellationToken.None);
@@ -86,13 +89,13 @@ public class PeopleControllerUnitTests
         var query = new CardsQuery();
 
         _sectionPeoplePageServiceMock
-            .Setup(s => s.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+            .Setup(s => s.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, It.IsAny<string>(), It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PaginationDto<PersonCardDto> { Data = [] });
 
         await _controller.Get(pageGuid, query, CancellationToken.None);
 
         _sectionPeoplePageServiceMock.Verify(
-            s => s.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()),
+            s => s.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, It.IsAny<string>(), It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -105,7 +108,7 @@ public class PeopleControllerUnitTests
         _controller.HttpContext.Request.QueryString = new QueryString("?filter[location]=US&filter[role]=Partner");
 
         _sectionPeoplePageServiceMock
-            .Setup(s => s.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+            .Setup(s => s.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, It.IsAny<string>(), It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PaginationDto<PersonCardDto> { Data = [] });
 
         var result = await _controller.Get(pageGuid, query, CancellationToken.None);

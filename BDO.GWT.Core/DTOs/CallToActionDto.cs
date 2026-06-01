@@ -11,6 +11,7 @@ public class CallToActionDto
 
 }
 
+//to be used for Insights page where Position field for Call to action is required
 public class CallToActionWithPositionDto
 {
     public CallToActionDto? CallToActionDto { get; set; }
