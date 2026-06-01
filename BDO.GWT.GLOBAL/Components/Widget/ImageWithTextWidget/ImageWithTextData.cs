@@ -1,6 +1,6 @@
 ﻿using BDO.GWT.Core;
 
-namespace BDO.GWT.Common.Core.LiveSite.Data;
+namespace BDO.GWT.Core.Data.ImageWithTextData;
 
 public class ImageWithTextData : BaseWidgetData
 {

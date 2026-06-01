@@ -21,8 +21,9 @@ public class NewsSectionPageController : ControllerBase
         _newsSectionPageService = newsSectionPageService;
     }
 
+
     [HttpGet("[action]")]
-    public async Task<ActionResult<PaginationDto<ContentPageCardDto>>> Get([FromQuery] CardsQuery query, CancellationToken cancellationToken)
+    public async Task<ActionResult<PaginationDto<NewsPageCardDto>>> Get([FromQuery] CardsQuery query, CancellationToken cancellationToken)
     {
         var language = RouteData.Values[CultureInjectorAttribute.RouteParameter]?.ToString();
 

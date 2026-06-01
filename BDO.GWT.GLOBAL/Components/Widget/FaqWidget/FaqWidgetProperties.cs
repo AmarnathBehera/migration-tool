@@ -4,7 +4,7 @@ using Kentico.PageBuilder.Web.Mvc;
 using Kentico.Xperience.Admin.Base.FormAnnotations;
 using System.Collections.Generic;
 
-namespace BDO.GWT.GLOBAL.Components.Widget.FaqWidget;
+namespace BDO.GWT.Web.Widgets.FaqWidget;
 
 public class FaqWidgetProperties : IWidgetProperties
 {
