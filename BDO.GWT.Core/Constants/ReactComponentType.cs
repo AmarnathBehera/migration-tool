@@ -34,6 +34,7 @@ public static class ReactComponentType
     public const string CardsGrid = "CardsGrid";
     public const string RssFeeds = "RssFeeds";
     public const string EventsWebinarsDetails = "EventsWebinarsDetails";
+    public const string FlexibleContentWidget = "FlexibleContentWidget";
 
     public const string ContactPageDescriptionText = "ContactPageDescriptionText";
     public const string MultiLinksCardsGrid = "MultiLinksCardsGrid";
@@ -41,7 +42,7 @@ public static class ReactComponentType
     public const string ServiceContent = "ServiceContent";
     public const string SideBoxNavigation = "SideBoxNavigation";
     public const string LocalNavigationItem = "LocalNavigationItem";
-    
+
     public const string CareerDetails = "CareerDetails";
     public const string KeyTakeAways = "KeyTakeAwaysWidget";
 
@@ -86,7 +87,8 @@ public static class ReactComponentType
     public const string CareerSidebarGUID = "7d6afe7a-e672-43d4-b9e8-aad67c339c56";
     public const string LocalNavigationItemGUID = "c4403ffb-12e9-4f20-86de-3379bc0514f0";
     public const string EventsWebinarsDetailsGUID = "9d7a5c92-c4b0-4fe8-8177-e87cbb79abf3";
-    public const string KeyTakeAwaysGUID = "c4403ffb-12e9-4f20-86de-3379bc0514f0";
+    public const string KeyTakeAwaysGUID = "05a3230a-1a8c-43b2-be13-127d2338d596";
+    public const string FlexibleContentWidgetGUID = "906561a1-8778-4812-843a-018e44488577";
 }
 
 
@@ -102,9 +104,9 @@ public static class ReactComponentType
 
 //
 
-//906561a1-8778-4812-843a-018e44488577
+//
 
-//05a3230a-1a8c-43b2-be13-127d2338d596
+//
 
 //1203d3fb-df5e-4ac9-ae98-e9fc39b18cbc
 

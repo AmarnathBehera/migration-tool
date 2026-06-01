@@ -1,6 +1,4 @@
-﻿using BDO.GWT.Web.Core.LiveSite.DTOs;
-
-namespace BDO.GWT.Core.DTOs;
+﻿namespace BDO.GWT.Core.DTOs;
 
 public class ContentSidebarDto : ISidebarDto
 {

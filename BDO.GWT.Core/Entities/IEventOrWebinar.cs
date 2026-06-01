@@ -6,11 +6,6 @@ using System.Collections.Generic;
 
 namespace BDO.GWT.Domain.Core.Entities;
 
-/// <summary>
-/// XbyK-native abstraction over BDO.Event and BDO.Webinar.
-/// All reference fields use the real generated page types or TagReference
-/// so that IDs can be resolved via IWebPageFieldsSource.SystemFields.WebPageItemID.
-/// </summary>
 public interface IEventOrWebinar : IWebPageFieldsSource
 {
     string MetadataTitle { get; set; }
@@ -25,7 +20,6 @@ public interface IEventOrWebinar : IWebPageFieldsSource
 
     string? MetadataDescription { get; set; }
 
-    // Page-reference fields (resolved via .SystemFields.WebPageItemID)
     IEnumerable<Service> MetadataServices { get; set; }
 
     IEnumerable<BusinessLine> MetadataBusinessLines { get; set; }
@@ -49,9 +43,9 @@ public interface IEventOrWebinar : IWebPageFieldsSource
     IEnumerable<LocationOffice> MetadataOfficeLocation { get; set; }
 
     // Taxonomy tag references
-    IEnumerable<TagReference> EventType { get; set; }
+    IEnumerable<EventType> EventType { get; set; }
 
-    IEnumerable<IWebPageFieldsSource> MetadataBusinessIssues { get; set; }
+    IEnumerable<Businessissues> MetadataBusinessIssues { get; set; }
 
     bool ShowPastEvent { get; set; }
 }

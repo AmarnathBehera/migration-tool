@@ -33,7 +33,7 @@ namespace BDO.GWT.Core.Tests.Services
             var ctor = typeof(EventWebinarPageService).GetConstructors(BindingFlags.Public | BindingFlags.Instance).FirstOrDefault();
             Assert.That(ctor, Is.Not.Null);
             var parameters = ctor!.GetParameters();
-            Assert.That(parameters.Length, Is.GreaterThan(0));
+            Assert.That(parameters, Has.Length.GreaterThan(0));
         }
 
         [Test]

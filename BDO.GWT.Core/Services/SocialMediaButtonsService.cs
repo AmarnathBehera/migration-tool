@@ -9,7 +9,6 @@ namespace BDO.GWT.Core.Services;
 public interface ISocialMediaButtonsService
 {
     Task<SocialMediaButtonsDto> GetSocialMediaButtonsDto(IWebPageFieldsSource page, string pageTitle, CancellationToken cancellationToken);
-    Task<SocialMediaButtonsDto> GetSocialMediaButtonsDto(IWebPageFieldsSource page, string pageTitle, CancellationToken cancellationToken);
     Task<SocialMediaButtonsDto> GetEventSocialMediaButtonsDto(IEventBase page, string pageTitle, CancellationToken cancellationToken);
 }
 
@@ -22,14 +21,11 @@ public class SocialMediaButtonsService : ISocialMediaButtonsService
         _settingsService = settingsService;
     }
 
+
     public async Task<SocialMediaButtonsDto> GetSocialMediaButtonsDto(
-        IWebPageFieldsSource page,
-        string pageTitle,
-        CancellationToken cancellationToken)
-      public async Task<SocialMediaButtonsDto> GetSocialMediaButtonsDto(
-        IWebPageFieldsSource page,
-        string pageTitle,
-        CancellationToken cancellationToken)
+      IWebPageFieldsSource page,
+      string pageTitle,
+      CancellationToken cancellationToken)
     {
         var encodedPageTitle = HttpUtility.UrlEncode(pageTitle);
         var pageUrl = page.GetUrl().AbsoluteUrl;
@@ -101,7 +97,6 @@ public class SocialMediaButtonsService : ISocialMediaButtonsService
     private static string? ConstructFacebookButtonUrl(string encodedPageTitle, string encodedPageUrl)
         => $"https://www.facebook.com/dialog/feed?display=popup&caption={encodedPageTitle}&link={encodedPageUrl}";
 
-        => $"https://www.facebook.com/dialog/feed?display=popup&caption={encodedPageTitle}&link={encodedPageUrl}&redirect_uri={encodedPageUrl}";
 
     private static string? ConstructTwitterButtonUrl(string encodedPageTitle, string encodedPageUrl)
         => $"https://twitter.com/intent/tweet?text={encodedPageTitle}&url={encodedPageUrl}";

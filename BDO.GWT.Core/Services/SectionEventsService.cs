@@ -1,4 +1,5 @@
 ﻿using BDO;
+using BDO.GWT.Common.Exceptions;
 using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
@@ -6,19 +7,17 @@ using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.ValueObjects;
-using BDO.GWT.Web.Core.DTOs.Cards;
 using BDO.GWT.Web.Core.Services;
+using CMS.Websites;
 using Kentico.Content.Web.Mvc;
-
 namespace BDO.GWT.Core.Services;
 
 public interface ISectionEventsService
 {
-    Task<SectionEventsDTO> GetSectionEventsDtoAsync(SectionEvents page, CancellationToken cancellationToken);
+    Task<SectionEventsDto> GetEventsSectionDtoAsync(SectionEvents page, CancellationToken cancellationToken);
 
-    Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(
-        CardsQuery cardsQuery,
-        CancellationToken cancellationToken);
+    Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(CardsQuery query, CancellationToken cancellationToken);
+
 }
 
 public class SectionEventsService : ISectionEventsService
@@ -26,25 +25,34 @@ public class SectionEventsService : ISectionEventsService
     private readonly IFilteringHelper _filteringHelper;
     private readonly IHeroService _heroService;
     private readonly IEventWebinarCardsService _eventWebinarCardsService;
+    private readonly IContentService _contentService;
+    private readonly ICultureContext _cultureContext;
     private readonly IContentRetriever _contentRetriever;
+
 
     public SectionEventsService(
         IHeroService heroService,
         IEventWebinarCardsService eventWebinarCardsService,
         IFilteringHelper filteringHelper,
-        IContentRetriever contentRetriever)
+        IContentService contentService,
+        ICultureContext cultureContext, IContentRetriever contentRetriever)
     {
-        _heroService = heroService ?? throw new ArgumentNullException(nameof(heroService));
-        _eventWebinarCardsService = eventWebinarCardsService ?? throw new ArgumentNullException(nameof(eventWebinarCardsService));
-        _filteringHelper = filteringHelper ?? throw new ArgumentNullException(nameof(filteringHelper));
-        _contentRetriever = contentRetriever ?? throw new ArgumentNullException(nameof(contentRetriever));
+        _heroService = heroService;
+        _eventWebinarCardsService = eventWebinarCardsService;
+        _filteringHelper = filteringHelper;
+        _contentService = contentService;
+        _cultureContext = cultureContext;
+        _contentRetriever = contentRetriever;
     }
 
-    public async Task<SectionEventsDTO> GetSectionEventsDtoAsync(SectionEvents page, CancellationToken cancellationToken)
+    public async Task<SectionEventsDto> GetEventsSectionDtoAsync(SectionEvents page, CancellationToken cancellationToken)
     {
-        
+
         var bgImageUrl = page.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
         var mobileImageUrl = page.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+        var selectedpageid = page.EventsWebinarsListAdvancedSearchLinkUrl?.FirstOrDefault()?.WebPageGuid;
+        var selectedPage = selectedpageid.HasValue && selectedpageid.Value != Guid.Empty ? await _contentRetriever.RetrieveAllPagesByGuids<IWebPageFieldsSource>(new[] { selectedpageid.Value }, cancellationToken: cancellationToken)
+    : Enumerable.Empty<IWebPageFieldsSource>();
         var filters = string.IsNullOrWhiteSpace(page.EventsWebinarsListFilters)
         ? new HashSet<string>()
          : page.EventsWebinarsListFilters
@@ -72,11 +80,12 @@ public class SectionEventsService : ISectionEventsService
             PageSize = 20,
             AdvancedSearchPrelinkText = page.EventsWebinarsListAdvancedSearchDescription,
             AdvancedSearchLinkText = page.EventsWebinarsListAdvancedSearchLinkText,
-            AdvancedSearchLink = (page.EventsWebinarsListAdvancedSearchLinkUrl?.FirstOrDefault() as MediaLink)?.LegacyMediaLinkURL,
-        };
-       
+            AdvancedSearchLink = selectedPage.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty,
 
-        var dto = new SectionEventsDTO
+        };
+
+
+        var dto = new SectionEventsDto
         {
             Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
             CardsGrid = cardsGridDto,
@@ -84,40 +93,49 @@ public class SectionEventsService : ISectionEventsService
 
         return dto;
     }
-
-    public async Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(
-        CardsQuery cardsQuery,
-        CancellationToken cancellationToken)
+    public async Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(CardsQuery query, CancellationToken cancellationToken)
     {
-        var eventsSection = await RetrieveSectionEventsPageAsync(cancellationToken);
+        var result = await RetrieveSectionEventsPageAsync(cancellationToken);
+        var featuredPageIds = result.FeaturedPageIds;
+        var showPastEvents = result.ShowPastEvents;
 
-        var featuredPageIds = eventsSection?.EventsWebinarsListFeaturedPages
-            ?.Select(p => p.SystemFields.ContentItemID)
-            .Where(id => id != 0)
-            .ToHashSet() ?? [];
-
-        cardsQuery.Filters ??= new Dictionary<string, string>();
-        cardsQuery.Filters[FilterParameterName.ShowAllPastEvents] =
-            (eventsSection?.ShowPastEvents ?? false).ToString();
+        query.Filters.Add(FilterParameterName.ShowAllPastEvents, showPastEvents.ToString());
 
         var paginationDto = await _eventWebinarCardsService.GetFilteredItemsAsync(
-            cardsQuery,
-            decorateQuery: null,
-            isFeatured: eventOrWebinar =>
-                featuredPageIds.Contains(eventOrWebinar.SystemFields.ContentItemID),
-            cancellationToken);
-
+           query,
+           null,
+           eventOrWebinar => featuredPageIds.Contains(eventOrWebinar.SystemFields.WebPageItemID),
+           showPastEvents,
+           false,
+           cancellationToken
+           );
         return paginationDto;
     }
 
-    private async Task<SectionEvents?> RetrieveSectionEventsPageAsync(CancellationToken cancellationToken)
-    {
-        var results = await _contentRetriever.RetrievePages<SectionEvents>(
-            new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
-            query => query.TopN(1),
-            RetrievalCacheSettings.CacheDisabled,
-            cancellationToken);
 
-        return results?.FirstOrDefault();
+    private async Task<(HashSet<int> FeaturedPageIds, bool ShowPastEvents)> RetrieveSectionEventsPageAsync(CancellationToken cancellationToken)
+    {
+        var eventsSection = (await _contentService.GetPagesAsync<SectionEvents>(
+           new RetrievePagesParameters
+           {
+               LinkedItemsMaxLevel = 2,
+               LanguageName = _cultureContext.CurrentLanguageTag,
+               UseLanguageFallbacks = false
+           },
+           query => query
+               .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
+           RetrievalCacheSettings.CacheDisabled,
+           cancellationToken
+         )).FirstOrDefault();
+
+        if (eventsSection == null)
+        {
+            throw new MissingSectionPageException($"No pages have been found of type '{nameof(SectionEvents)}'.");
+        }
+        var featuredPageIds = eventsSection.EventsWebinarsListFeaturedPages
+            .Select(x => x.SystemFields.WebPageItemID)
+            .ToHashSet();
+
+        return (featuredPageIds, eventsSection.ShowPastEvents);
     }
 }

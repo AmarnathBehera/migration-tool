@@ -1,6 +1,6 @@
 ﻿using BDO.GWT.Core;
+using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
-using BDO.GWT.Web.Core.DTOs.Pages;
 using BDO.GWT.Web.Core.LiveSite.Controllers;
 using BDO.GWT.Web.Core.Services;
 using Microsoft.AspNetCore.Mvc;

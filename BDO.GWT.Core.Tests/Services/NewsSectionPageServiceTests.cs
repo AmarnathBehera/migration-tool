@@ -55,12 +55,12 @@ public class NewsSectionPageServiceTests
     [Test]
     public async Task GetNewsArticlePaginationResultAsync_ReturnsPaginationDto()
     {
-        var expectedDto = new PaginationDto<ContentPageCardDto>
+        var expectedDto = new PaginationDto<NewsPageCardDto>
         {
             Data = new[]
             {
-                new ContentPageCardDto { Title = "Article 1" },
-                new ContentPageCardDto { Title = "Article 2" }
+                new NewsPageCardDto { Title = "Article 1" },
+                new NewsPageCardDto { Title = "Article 2" }
             },
             TotalCount = 2
         };
@@ -82,9 +82,9 @@ public class NewsSectionPageServiceTests
     [Test]
     public async Task GetNewsArticlePaginationResultAsync_WhenNoArticles_ReturnsEmptyPagination()
     {
-        var emptyDto = new PaginationDto<ContentPageCardDto>
+        var emptyDto = new PaginationDto<NewsPageCardDto>
         {
-            Data = Array.Empty<ContentPageCardDto>(),
+            Data = Array.Empty<NewsPageCardDto>(),
             TotalCount = 0
         };
 
@@ -126,7 +126,7 @@ public class NewsSectionPageServiceTests
     {
         _newsSectionPageServiceMock
             .Setup(x => x.GetNewsArticlePaginationResultAsync(It.IsAny<string>(), It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PaginationDto<ContentPageCardDto> { Data = [], TotalCount = 0 });
+            .ReturnsAsync(new PaginationDto<NewsPageCardDto> { Data = [], TotalCount = 0 });
 
         var cardsQuery = new CardsQuery();
         await _newsSectionPageServiceMock.Object.GetNewsArticlePaginationResultAsync(

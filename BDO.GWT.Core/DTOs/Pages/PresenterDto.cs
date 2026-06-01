@@ -1,4 +1,4 @@
-﻿namespace BDO.GWT.Web.Core.DTOs.Pages;
+﻿namespace BDO.GWT.Core.DTOs;
 
 public class PresenterDto
 {

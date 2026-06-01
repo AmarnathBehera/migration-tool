@@ -1,7 +1,7 @@
 ﻿using BDO.GWT.Core.DTOs;
 using System;
 
-namespace BDO.GWT.Web.Core.DTOs.Cards;
+namespace BDO.GWT.Core.DTOs;
 
 public class EventsWebinarsCardDto
 {

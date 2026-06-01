@@ -1,9 +1,7 @@
 ﻿using BDO.GWT.Core;
+using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
 using BDO.GWT.Web.Core.DTOs;
-using BDO.GWT.Web.Core.DTOs.Pages;
-using System.Collections.Generic;
-
 namespace BDO.GWT.Web.Core.LiveSite.DTOs.Pages;
 
 public class EventWebinarDto

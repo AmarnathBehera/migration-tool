@@ -91,35 +91,20 @@ namespace BDO
 
 		/// <summary>
 		/// AllowRegistration.
-		/// EventDateOverride.
 		/// </summary>
 		public bool AllowRegistration { get; set; }
-		public string EventDateOverride { get; set; }
 
 
 		/// <summary>
 		/// EventType.
 		/// </summary>
-		public IEnumerable<TagReference> EventType { get; set; }
-		public string EventType { get; set; }
+		public IEnumerable<EventType> EventType { get; set; }
 
 
 		/// <summary>
 		/// DisablePrintAndShare.
 		/// </summary>
 		public bool DisablePrintAndShare { get; set; }
-
-
-		/// <summary>
-		/// AllowRegistration.
-		/// </summary>
-		public bool AllowRegistration { get; set; }
-
-
-		/// <summary>
-		/// ShowPastEvent.
-		/// </summary>
-		public bool ShowPastEvent { get; set; }
 
 
 		/// <summary>
@@ -166,18 +151,14 @@ namespace BDO
 
 		/// <summary>
 		/// CpeDescription.
-		/// CpeCreditNotes.
 		/// </summary>
 		public string CpeDescription { get; set; }
-		public string CpeCreditNotes { get; set; }
 
 
 		/// <summary>
 		/// ShowPastEvent.
-		/// CpeDescription.
 		/// </summary>
 		public bool ShowPastEvent { get; set; }
-		public string CpeDescription { get; set; }
 
 
 		/// <summary>
@@ -195,13 +176,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataBusinessIssues.
 		/// </summary>
-		public IEnumerable<BusinessLine> MetadataBusinessIssues { get; set; }
-
-
-		/// <summary>
-		/// MetadataBusinessLines.
-		/// </summary>
-		public IEnumerable<BusinessLine> MetadataBusinessLines { get; set; }
+		public IEnumerable<Businessissues> MetadataBusinessIssues { get; set; }
 
 
 		/// <summary>
@@ -213,19 +188,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataSpecialtiesCategories.
 		/// </summary>
-		public IEnumerable<AboutPage> MetadataSpecialtiesCategories { get; set; }
-
-
-		/// <summary>
-		/// MetadataSpecialtiesAreas.
-		/// </summary>
-		public IEnumerable<AboutPage> MetadataSpecialtiesAreas { get; set; }
-
-
-		/// <summary>
-		/// MetadataSpecialtiesPages.
-		/// </summary>
-		public IEnumerable<AboutPage> MetadataSpecialtiesPages { get; set; }
+		public IEnumerable<SpecialtiesCategory> MetadataSpecialtiesCategories { get; set; }
 
 
 		/// <summary>
@@ -309,7 +272,7 @@ namespace BDO
 		/// <summary>
 		/// ContentType.
 		/// </summary>
-		public IEnumerable<TagReference> ContentType { get; set; }
+		public IEnumerable<Contenttypes> ContentType { get; set; }
 
 
 		/// <summary>
@@ -334,7 +297,6 @@ namespace BDO
 		/// MetadataServiceAreas.
 		/// </summary>
 		public IEnumerable<ServiceArea> MetadataServiceAreas { get; set; }
-		public IEnumerable<IWebPageFieldsSource> MetadataServiceAreas { get; set; }
 
 
 		/// <summary>

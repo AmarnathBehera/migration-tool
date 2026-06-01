@@ -1,16 +1,12 @@
 ﻿using BDO.GWT.Common.Core.Helpers;
 using BDO.GWT.Core;
-using BDO.GWT.Core.Data;
+using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.SchemaMarkups;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Utilities;
-using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.DTOs;
-using BDO.GWT.Web.Core.DTOs.Pages;
 using BDO.GWT.Web.Core.DTOs.SchemaMarkups;
 using BDO.GWT.Web.Core.LiveSite.DTOs.Pages;
-using BDO.GWT.Xperience.Core.Services;
-using CMS.Core;
 using CMS.DataEngine;
 using CMS.Helpers;
 using CMS.Websites;
@@ -21,7 +17,6 @@ using Ical.Net.DataTypes;
 using Ical.Net.Serialization;
 using Kentico.Content.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
-using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -38,45 +33,32 @@ public interface IEventWebinarPageService
     Task<string?> GenerateOutlookWebinarCardContent(Guid pageGuid, string? source, CancellationToken cancellationToken);
 }
 
-public class EventWebinarPageService : IEventWebinarPageService
+public partial class EventWebinarPageService : IEventWebinarPageService
 {
     private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly IInfoProvider<EventsWebinarsInfo> _eventInfoProvider;
     private readonly IInfoProvider<GlobalEventsnWebinarsInfo> _globalEventInfoProvider;
     private readonly IPreferredLanguageRetriever _preferredLanguageRetriever;
-    private readonly IHeroService _heroService;
     private readonly IContentService _contentRetriever;
-    private readonly IPageUrlService _pageUrlService;
-    private readonly ISettingsService _settingsService;
-    private readonly ISiteContext _siteContext;
-    private readonly IServiceScopeFactory _scopeFactory;
     private readonly IWebPageUrlRetriever _pageUrlRetriever;
     private readonly ISocialMediaButtonsService _socialMediaButtonsService;
 
     public EventWebinarPageService(
         IContentService contentRetriever,
-        IPageUrlService pageUrlService,
-        ISettingsService settingsService,
         IWebsiteChannelContext websiteChannelContext,
-        IServiceScopeFactory scopeFactory,
         IWebPageUrlRetriever pageUrlRetriever,
         IInfoProvider<EventsWebinarsInfo> eventInfoProvider,
         IInfoProvider<GlobalEventsnWebinarsInfo> globalEventInfoProvider,
         IPreferredLanguageRetriever preferredLanguageRetriever,
-        ISocialMediaButtonsService socialMediaButtonsService,
-        IHeroService heroService)
+        ISocialMediaButtonsService socialMediaButtonsService)
     {
         _contentRetriever = contentRetriever;
-        _pageUrlService = pageUrlService;
-        _settingsService = settingsService;
         _websiteChannelContext = websiteChannelContext;
-        _scopeFactory = scopeFactory;
         _pageUrlRetriever = pageUrlRetriever;
         _eventInfoProvider = eventInfoProvider;
         _globalEventInfoProvider = globalEventInfoProvider;
         _preferredLanguageRetriever = preferredLanguageRetriever;
         _socialMediaButtonsService = socialMediaButtonsService;
-        _heroService = heroService;
     }
 
     public async Task<string?> GenerateOutlookEventCardContent(Guid pageGuid, string? source, CancellationToken cancellationToken)
@@ -127,7 +109,7 @@ public class EventWebinarPageService : IEventWebinarPageService
 
     public async Task<EventSchemaMarkupDto> GetEventSchemaMarkupDto(Event page, CancellationToken cancellationToken)
     {
-        var basicData = await GetEventBaseSchemaMarkupDto(page, cancellationToken);
+        var basicData = await GetEventBaseSchemaMarkupDto(page);
 
         if (basicData?.Location?.Address != null)
         {
@@ -136,12 +118,12 @@ public class EventWebinarPageService : IEventWebinarPageService
             basicData.Location.Address.AddressCountry = page.EventLocationCountry;
         }
 
-        return basicData;
+        return basicData!;
     }
 
     public async Task<EventSchemaMarkupDto> GetWebinarSchemaMarkupDto(Webinar page, CancellationToken cancellationToken)
     {
-        var basicData = await GetEventBaseSchemaMarkupDto(page, cancellationToken);
+        var basicData = await GetEventBaseSchemaMarkupDto(page);
 
         if (basicData?.Location?.Address != null)
         {
@@ -150,10 +132,10 @@ public class EventWebinarPageService : IEventWebinarPageService
             basicData.Location.Address.AddressCountry = page.EventLocationCountry;
         }
 
-        return basicData;
+        return basicData!;
     }
 
-    private Task<EventSchemaMarkupDto> GetEventBaseSchemaMarkupDto(IEventBase page, CancellationToken cancellationToken)
+    private Task<EventSchemaMarkupDto> GetEventBaseSchemaMarkupDto(IEventBase page)
     {
         var pageUrl = ((IWebPageFieldsSource)page).GetUrl().AbsoluteUrl;
         var imageUrl = page.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
@@ -299,7 +281,7 @@ public class EventWebinarPageService : IEventWebinarPageService
 
         if (formPage is not null)
         {
-            var url = await _pageUrlRetriever.Retrieve(formPage, _preferredLanguageRetriever.Get());
+            var url = await _pageUrlRetriever.Retrieve(formPage, _preferredLanguageRetriever.Get(), cancellationToken);
             registrationButtonUrl = url?.AbsoluteUrl;
         }
 
@@ -318,7 +300,6 @@ public class EventWebinarPageService : IEventWebinarPageService
 
         var (_, displayLocationTitle) = EventnWebinarSetting();
 
-        // ✅ Fetch presenter child pages — same pattern as K13
         var presenterPages = await _contentRetriever.GetPagesAsync<Presenter>(
             new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
             query => query
@@ -376,7 +357,7 @@ public class EventWebinarPageService : IEventWebinarPageService
             CpeDescription = page.CpeEvent
                 ? HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(page.CpeDescription)
                 : null,
-            // ✅ Now populated instead of empty list
+
             Presenters = presenters,
             DisablePrintAndShare = page.DisablePrintAndShare,
             SocialMediaButtons = await _socialMediaButtonsService.GetEventSocialMediaButtonsDto(page, page.MetadataTitle, cancellationToken),
@@ -422,10 +403,13 @@ public class EventWebinarPageService : IEventWebinarPageService
         sb.Append(!string.IsNullOrEmpty(locationZip) ? locationZip : "");
 
         var location = sb.ToString();
-        location = Regex.Replace(location.Trim(), @"\\n$", "");
+        location = TrailingEscapedNewlineRegex().Replace(location.Trim(), "");
         location = location.Replace("  ", " ");
         return location;
     }
+
+    [GeneratedRegex(@"\\n$")]
+    private static partial Regex TrailingEscapedNewlineRegex();
 
     private (string MinutesToTrigger, bool DisplayLocationInSidebar) EventnWebinarSetting()
     {
@@ -440,10 +424,10 @@ public class EventWebinarPageService : IEventWebinarPageService
         bool inheritFromGlobal = currentChannelSettings == null
             || ValidationHelper.GetBoolean(currentChannelSettings.GetValue("InheritFromGlobal"), false);
 
-        if (!inheritFromGlobal && currentChannelSettings != null)
+        if (!inheritFromGlobal)
         {
             return (
-                currentChannelSettings.Minutestotriggercalendarreminder.ToString(),
+                currentChannelSettings!.Minutestotriggercalendarreminder.ToString(),
                 currentChannelSettings.Displaylocationtitleinasidebar
             );
         }

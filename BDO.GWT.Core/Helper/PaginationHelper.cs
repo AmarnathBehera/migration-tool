@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace BDO.GWT.Web.Core.Helpers;
 
-public class PaginationHelper
+public static class PaginationHelper
 {
     public static IEnumerable<TPage> PaginatePages<TPage>(IEnumerable<TPage> pages, IPaginationQuery paginationQuery)
         where TPage : IPage

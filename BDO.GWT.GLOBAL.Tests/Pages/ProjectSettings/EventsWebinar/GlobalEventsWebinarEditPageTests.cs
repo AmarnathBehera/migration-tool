@@ -1,6 +1,5 @@
 using System.Reflection;
-using BDO;
-using BDO.GWT.Core.DTOs.GlobalEventsWebinar;
+using BDO.GWT.Core.DTOs;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.DataEngine;
 using Kentico.Xperience.Admin.Base.Forms;
@@ -19,7 +18,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.EventsWebinar
             Assert.Multiple(() =>
             {
                 Assert.That(baseType!.IsGenericType, Is.True);
-                Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(GlobalEventsWebinarDTO)));
+                Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(GlobalEventsWebinarDto)));
             });
         }
 
@@ -57,7 +56,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.EventsWebinar
                 BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly);
 
             Assert.That(prop, Is.Not.Null);
-            Assert.That(prop!.PropertyType, Is.EqualTo(typeof(GlobalEventsWebinarDTO)));
+            Assert.That(prop!.PropertyType, Is.EqualTo(typeof(GlobalEventsWebinarDto)));
         }
 
         [Test]

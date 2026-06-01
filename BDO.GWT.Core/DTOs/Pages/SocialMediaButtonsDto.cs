@@ -1,4 +1,4 @@
-﻿namespace BDO.GWT.Web.Core.LiveSite.DTOs;
+﻿namespace BDO.GWT.Core.DTOs;
 
 public class SocialMediaButtonsDto
 {

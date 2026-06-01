@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BDO.GWT.Core.DTOs.GlobalEventsWebinar
+namespace BDO.GWT.Core.DTOs
 {
-    public class GlobalEventsWebinarDTO
+    public class GlobalEventsWebinarDto
     {
         [CheckBoxComponent(Label = "Display location title in a sidebar", Order = 1)]
         public bool Displaylocationtitleinasidebar { get; set; }

@@ -56,12 +56,12 @@ public class NewsArticleCardsServiceTests
     [Test]
     public async Task GetFilteredItemsAsync_ReturnsPaginationDto()
     {
-        var expectedDto = new PaginationDto<ContentPageCardDto>
+        var expectedDto = new PaginationDto<NewsPageCardDto>
         {
             Data = new[]
             {
-                new ContentPageCardDto { Title = "Article 1" },
-                new ContentPageCardDto { Title = "Article 2" }
+                new NewsPageCardDto { Title = "Article 1" },
+                new NewsPageCardDto { Title = "Article 2" }
             },
             TotalCount = 2
         };
@@ -89,9 +89,9 @@ public class NewsArticleCardsServiceTests
     [Test]
     public async Task GetFilteredItemsAsync_WhenNoItems_ReturnsEmptyPagination()
     {
-        var emptyDto = new PaginationDto<ContentPageCardDto>
+        var emptyDto = new PaginationDto<NewsPageCardDto>
         {
-            Data = Array.Empty<ContentPageCardDto>(),
+            Data = Array.Empty<NewsPageCardDto>(),
             TotalCount = 0
         };
 
@@ -138,7 +138,7 @@ public class NewsArticleCardsServiceTests
                 It.IsAny<Action<ContentItemQueryBuilder>?>(),
                 It.IsAny<Func<NewsArticle, bool>>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PaginationDto<ContentPageCardDto> { Data = [], TotalCount = 0 });
+            .ReturnsAsync(new PaginationDto<NewsPageCardDto> { Data = [], TotalCount = 0 });
 
         var cardsQuery = new CardsQuery();
         await _newsArticleCardsServiceMock.Object.GetFilteredItemsAsync(

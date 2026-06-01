@@ -98,7 +98,7 @@ namespace BDO
 		/// <summary>
 		/// PersonCredentials.
 		/// </summary>
-		public IEnumerable<TagReference> PersonCredentials { get; set; }
+		public IEnumerable<Credentials> PersonCredentials { get; set; }
 
 
 		/// <summary>
@@ -116,7 +116,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataProfileGroups.
 		/// </summary>
-		public IEnumerable<TagReference> MetadataProfileGroups { get; set; }
+		public IEnumerable<ProfileGroups> MetadataProfileGroups { get; set; }
 
 
 		/// <summary>

@@ -14,15 +14,11 @@ public interface IPage : INode
 
     public DateTime? PublishTo { get; set; }
 
-    //public LanguageTag LanguageTag { get; set; }
-
     public bool? IsSearchExcluded { get; set; }
 
     public bool ShowInMenu { get; set; }
 
     public bool ShowInSitemap { get; set; }
-
-    //public Link? RedirectOnUnpublish { get; set; }
 
     public DateTime? LastModificationDate { get; set; }
 

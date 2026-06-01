@@ -80,7 +80,7 @@ namespace BDO
 		/// <summary>
 		/// EventsWebinarsListAdvancedSearchLinkUrl.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> EventsWebinarsListAdvancedSearchLinkUrl { get; set; }
+		public IEnumerable<WebPageRelatedItem> EventsWebinarsListAdvancedSearchLinkUrl { get; set; }
 
 
 		/// <summary>

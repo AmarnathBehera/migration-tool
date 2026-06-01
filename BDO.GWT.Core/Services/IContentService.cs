@@ -83,12 +83,12 @@
 
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(RetrievePagesParameters parameters, CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
-        
+
         public string GetFallbackMetadataDescription(string? metaDescription, string? metaOGDescription);
         public string GetCurrentSiteLogoImageUrlAsync();
 
         public string GetCurrentSiteLegalNameAsync();
-
+        public string GetCurrentLanguage();
         public int GetCurrentChannelID();
         Task<T?> RetrieveCurrentPageAsync<T>(RetrieveCurrentPageParameters parameters, CancellationToken cancellationToken = default) where T : class;
 
@@ -96,5 +96,11 @@
      Type type,
      string pageName,
      CancellationToken cancellationToken = default);
+
+        Task<IEnumerable<IContentItemFieldsSource>> RetrieveButtonUrlAsync(
+            IEnumerable<Guid> guids,
+            string[] contentTypes);
+
+        public string? EnsureAbsoluteUrl(string? url);
     }
 }

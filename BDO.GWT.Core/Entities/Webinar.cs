@@ -31,49 +31,41 @@ public partial class Webinar : IEventBase, IEventOrWebinar
 
     public string? RelatedContentDateOverride => EventDateOverride;
 
-    public IEnumerable<TagReference> Insights
-    {
-        get => [];
-        set => _ = value;
-    }
 
-    // ---- IEventOrWebinar explicit implementations ----
-
-    // Webinar.generated.cs uses MetadataBusinessLines (plural, IEnumerable<BusinessLine>)
     IEnumerable<BusinessLine> IEventOrWebinar.MetadataBusinessLines
     {
-        get => MetadataBusinessLines ?? [];
-        set => MetadataBusinessLines = value;
+        get => [];
+        set { }
     }
 
     // Webinar.generated.cs stores these as IEnumerable<AboutPage> — expose as IWebPageFieldsSource
     IEnumerable<IWebPageFieldsSource> IEventOrWebinar.MetadataSpecialtiesCategories
     {
-        get => MetadataSpecialtiesCategories?.Cast<IWebPageFieldsSource>() ?? [];
-        set => MetadataSpecialtiesCategories = value?.Cast<AboutPage>() ?? [];
+        get => [];
+        set { }
     }
 
     IEnumerable<IWebPageFieldsSource> IEventOrWebinar.MetadataSpecialtiesAreas
     {
-        get => MetadataSpecialtiesAreas?.Cast<IWebPageFieldsSource>() ?? [];
-        set => MetadataSpecialtiesAreas = value?.Cast<AboutPage>() ?? [];
+        get => [];
+        set { }
     }
 
     IEnumerable<IWebPageFieldsSource> IEventOrWebinar.MetadataSpecialtiesPages
     {
-        get => MetadataSpecialtiesPages?.Cast<IWebPageFieldsSource>() ?? [];
-        set => MetadataSpecialtiesPages = value?.Cast<AboutPage>() ?? [];
+        get => [];
+        set { }
     }
 
-    IEnumerable<IWebPageFieldsSource> IEventOrWebinar.MetadataBusinessIssues
+    IEnumerable<Businessissues> IEventOrWebinar.MetadataBusinessIssues
     {
-        get => MetadataBusinessIssues?.Cast<IWebPageFieldsSource>() ?? [];
-        set => MetadataBusinessIssues = value?.Cast<AboutPage>() ?? [];
+        get => [];
+        set { }
     }
 
     IEnumerable<LocationOffice> IEventOrWebinar.MetadataOfficeLocation
     {
-        get => MetadataOfficeLocation ?? [];
-        set => MetadataOfficeLocation = value;
+        get => [];
+        set { }
     }
 }

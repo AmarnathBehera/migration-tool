@@ -1,12 +1,10 @@
 ﻿
 using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
+using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.ValueObjects;
-using BDO.GWT.Web.Core.DTOs.Pages;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BDO.GWT.Web.Core.Services;
 
@@ -25,7 +23,7 @@ public class EventRegistrationFormPageService : IEventRegistrationFormPageServic
         IHeroService heroService,
         IWebsiteChannelContext websiteChannelContext)
     {
-         _contentRetriever = pageRetriever;
+        _contentRetriever = pageRetriever;
         _heroService = heroService;
         _websiteChannelContext = websiteChannelContext;
     }

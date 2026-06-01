@@ -1,0 +1,169 @@
+﻿using System.Reflection;
+using BDO;
+using BDO.GWT.Core.Data;
+using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.Retrievers;
+using BDO.GWT.Core.Services;
+using BDO.GWT.Domain.Core.Entities;
+using BDO.GWT.Web.Core.Services;
+using BDO.GWT.Xperience.Core.Services;
+using CMS.ContentEngine;
+using CMS.Websites;
+using CMS.Websites.Routing;
+using Kentico.Content.Web.Mvc;
+using Kentico.Content.Web.Mvc.Routing;
+using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
+
+namespace BDO.GWT.Core.Tests.Services
+{
+    public class EventWebinarCardsServiceTests
+    {
+        private Mock<ICardsService> _cardsServiceMock = null!;
+        private Mock<IContentQueryExecutor> _queryExecutorMock = null!;
+        private Mock<IContentQueryModelTypeMapper> _typeMapperMock = null!;
+        private Mock<IContentService> _contentServiceMock = null!;
+        private Mock<IWebsiteChannelContext> _channelContextMock = null!;
+        private Mock<IWebPageUrlRetriever> _urlRetrieverMock = null!;
+        private Mock<ITimeZoneService> _timeZoneServiceMock = null!;
+        private EventWebinarCardsService _service = null!;
+
+        [SetUp]
+        public void Setup()
+        {
+            _cardsServiceMock = new Mock<ICardsService>();
+            _queryExecutorMock = new Mock<IContentQueryExecutor>();
+            _typeMapperMock = new Mock<IContentQueryModelTypeMapper>();
+            _contentServiceMock = new Mock<IContentService>();
+            _channelContextMock = new Mock<IWebsiteChannelContext>();
+            _urlRetrieverMock = new Mock<IWebPageUrlRetriever>();
+            _timeZoneServiceMock = new Mock<ITimeZoneService>();
+
+            _channelContextMock.Setup(x => x.WebsiteChannelID).Returns(1);
+            _channelContextMock.Setup(x => x.WebsiteChannelName).Returns("Test");
+            _timeZoneServiceMock
+                .Setup(x => x.ConvertToSiteDateTime(It.IsAny<DateTime>()))
+                .Returns<DateTime>(d => d);
+
+            _service = new EventWebinarCardsService(
+                _cardsServiceMock.Object,
+                _queryExecutorMock.Object,
+                _typeMapperMock.Object,
+                _contentServiceMock.Object,
+                _channelContextMock.Object,
+                _urlRetrieverMock.Object,
+                _timeZoneServiceMock.Object
+                );
+        }
+
+
+        [Test]
+        public void Service_ImplementsInterface()
+        {
+            Assert.That(typeof(IEventWebinarCardsService).IsAssignableFrom(typeof(EventWebinarCardsService)), Is.True);
+        }
+
+        [Test]
+        public void Interface_DeclaresExpectedMembers()
+        {
+            var t = typeof(IEventWebinarCardsService);
+            Assert.Multiple(() =>
+            {
+                Assert.That(t.GetMethod(nameof(IEventWebinarCardsService.CreateFiltersAsync)), Is.Not.Null);
+                Assert.That(t.GetMethod(nameof(IEventWebinarCardsService.GetEventWebinarCardDtosAsync)), Is.Not.Null);
+                Assert.That(t.GetMethod(nameof(IEventWebinarCardsService.GetFilteredItemsAsync)), Is.Not.Null);
+            });
+        }
+
+        [Test]
+        public void Service_HasExpectedConstructor()
+        {
+            var ctor = typeof(EventWebinarCardsService).GetConstructors(BindingFlags.Public | BindingFlags.Instance).FirstOrDefault();
+            Assert.That(ctor, Is.Not.Null);
+            Assert.That(ctor!.GetParameters(), Has.Length.GreaterThan(0));
+        }
+
+        // ── CreateFiltersAsync ──────────────────────────────────────────────
+
+        [Test]
+        public async Task CreateFiltersAsync_DelegatesTo_CardsService()
+        {
+            var filters = new HashSet<string> { "eventType" };
+            var expected = new[]
+            {
+                new FilterItemDto<OptionDto> { Name = "eventType", Type = "select", Options = Array.Empty<OptionDto>() }
+            };
+
+            _cardsServiceMock
+                .Setup(x => x.CreateFiltersAsync(filters, "/path", It.IsAny<CancellationToken>()))
+                .ReturnsAsync(expected);
+
+            var result = await _service.CreateFiltersAsync(filters, "/path", CancellationToken.None);
+
+            Assert.That(result, Is.SameAs(expected));
+            _cardsServiceMock.Verify(
+                x => x.CreateFiltersAsync(filters, "/path", It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
+        [Test]
+        public void CreateFiltersAsync_PropagatesException()
+        {
+            _cardsServiceMock
+                .Setup(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("boom"));
+
+            Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _service.CreateFiltersAsync(new HashSet<string>(), null, CancellationToken.None));
+        }
+
+        [Test]
+        public async Task CreateFiltersAsync_PassesCancellationToken()
+        {
+            using var cts = new CancellationTokenSource();
+            var token = cts.Token;
+
+            _cardsServiceMock
+                .Setup(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), token))
+                .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
+
+            await _service.CreateFiltersAsync(new HashSet<string>(), null, token);
+
+            _cardsServiceMock.Verify(
+                x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), token),
+                Times.Once);
+        }
+
+        // ── GetEventWebinarCardDtosAsync ────────────────────────────────────
+
+        [Test]
+        public async Task GetEventWebinarCardDtosAsync_ReturnsEmpty_WhenInputIsEmpty()
+        {
+            var result = await _service.GetEventWebinarCardDtosAsync(
+                new List<IEventOrWebinar>(),
+                _ => false,
+                CancellationToken.None);
+
+            Assert.That(result, Is.Empty);
+        }
+
+        [Test]
+        public async Task GetEventWebinarCardDtosAsync_SkipsItems_WhenUrlRetrievalFails()
+        {
+            var item = new Mock<IEventOrWebinar>();
+            item.Setup(x => x.SystemFields).Returns(new WebPageFields { WebPageItemGUID = Guid.NewGuid() });
+            item.Setup(x => x.MetadataTitle).Returns("Title");
+
+            _urlRetrieverMock
+                .Setup(x => x.Retrieve(It.IsAny<IWebPageFieldsSource>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("url fail"));
+
+            var result = await _service.GetEventWebinarCardDtosAsync(
+                new List<IEventOrWebinar> { item.Object },
+                _ => false,
+                CancellationToken.None);
+
+            Assert.That(result, Is.Empty);
+        }
+    }
+}

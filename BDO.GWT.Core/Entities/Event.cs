@@ -1,4 +1,5 @@
 // Event.cs
+using BDO.GWT.Core.Constants;
 using BDO.GWT.Domain.Core.Entities;
 using CMS.ContentEngine;
 using CMS.Websites;
@@ -31,49 +32,47 @@ public partial class Event : IEventBase, IEventOrWebinar
 
     public string? RelatedContentDateOverride => EventDateOverride;
 
-    public IEnumerable<TagReference> Insights
-    {
-        get => [];
-        set => _ = value;
-    }
 
-    // ---- IEventOrWebinar explicit implementations ----
 
-    // Event.generated.cs has MetadataBusinessLine (singular IEnumerable<BusinessLine>)
+
     IEnumerable<BusinessLine> IEventOrWebinar.MetadataBusinessLines
     {
         get => MetadataBusinessLine ?? [];
         set => MetadataBusinessLine = value;
     }
-
+    IEnumerable<EventType> IEventOrWebinar.EventType
+    {
+        get => [];
+        set => _ = value;
+    }
     // Event.generated.cs does not have specialties/business-issue/office fields
     IEnumerable<IWebPageFieldsSource> IEventOrWebinar.MetadataSpecialtiesCategories
     {
         get => [];
-        set { }
+        set => _ = value;
     }
 
     IEnumerable<IWebPageFieldsSource> IEventOrWebinar.MetadataSpecialtiesAreas
     {
         get => [];
-        set { }
+        set => _ = value;
     }
 
     IEnumerable<IWebPageFieldsSource> IEventOrWebinar.MetadataSpecialtiesPages
     {
         get => [];
-        set { }
+        set => _ = value;
     }
-
-    IEnumerable<IWebPageFieldsSource> IEventOrWebinar.MetadataBusinessIssues
+    IEnumerable<Businessissues> IEventOrWebinar.MetadataBusinessIssues
     {
         get => [];
-        set { }
+        set => _ = value;
     }
 
     IEnumerable<LocationOffice> IEventOrWebinar.MetadataOfficeLocation
     {
         get => [];
-        set { }
+        set => _ = value;
     }
+
 }

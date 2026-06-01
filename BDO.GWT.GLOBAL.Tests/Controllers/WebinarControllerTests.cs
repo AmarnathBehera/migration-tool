@@ -57,8 +57,11 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
 
             var result = await _controller.Index(CancellationToken.None);
 
-            Assert.That(result, Is.InstanceOf<ViewResult>());
-            Assert.That(((ViewResult)result).ViewName, Is.EqualTo("~/Views/EventWebinar/Index.cshtml"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.InstanceOf<ViewResult>());
+                Assert.That(((ViewResult)result).ViewName, Is.EqualTo("~/Views/EventWebinar/Index.cshtml"));
+            });
         }
 
         [Test]
