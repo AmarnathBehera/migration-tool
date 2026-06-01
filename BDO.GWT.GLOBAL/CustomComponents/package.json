@@ -1,0 +1,30 @@
+{
+  "name": "@bdo/custom-components",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Custom React components (form controls, widgets) for the BDO Xperience by Kentico admin UI.",
+  "scripts": {
+    "build": "webpack --mode=production",
+    "dev": "webpack --mode=development --watch",
+    "clean": "node -e \"require('fs').rmSync('../wwwroot/Admin/adminresources/bdo.custom.components',{recursive:true,force:true})\""
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@kentico/xperience-admin-base": "^31.5.2",
+    "autoprefixer": "^10.5.0",
+    "css-loader": "^6.11.0",
+    "css-minimizer-webpack-plugin": "^8.0.0",
+    "mini-css-extract-plugin": "^2.10.2",
+    "postcss": "^8.5.15",
+    "postcss-loader": "^7.3.4",
+    "style-loader": "^3.3.4",
+    "tailwindcss": "^3.4.19",
+    "ts-loader": "^9.5.0",
+    "typescript": "^5.3.0",
+    "webpack": "^5.90.0",
+    "webpack-cli": "^5.1.0"
+  }
+}
