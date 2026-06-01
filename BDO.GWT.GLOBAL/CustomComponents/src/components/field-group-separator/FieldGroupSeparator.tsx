@@ -1,7 +1,7 @@
 import React from 'react';
 import type { FieldGroupSeparatorProps } from '@model/fieldGroupSeparator';
 
-export const FieldGroupSeparator = (props: FieldGroupSeparatorProps = {} as FieldGroupSeparatorProps) => {
+export const FieldGroupSeparator = (props: FieldGroupSeparatorProps = {}) => {
     const label = (props && props.label) ? String(props.label) : '';
     const explanationText = (props && props.explanationText) ? String(props.explanationText) : '';
 
