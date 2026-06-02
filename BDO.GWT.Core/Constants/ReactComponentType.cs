@@ -34,7 +34,7 @@ public static class ReactComponentType
     public const string CardsGrid = "CardsGrid";
     public const string RssFeeds = "RssFeeds";
     public const string EventsWebinarsDetails = "EventsWebinarsDetails";
-    public const string FlexibleContentWidget = "FlexibleContentWidget";
+    public const string FlexibleContentWidget = "TrendingTopicsCarouselWidget";
 
     public const string ContactPageDescriptionText = "ContactPageDescriptionText";
     public const string MultiLinksCardsGrid = "MultiLinksCardsGrid";

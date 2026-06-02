@@ -1,7 +1,5 @@
 ﻿using Kentico.Xperience.Admin.Base.FormAnnotations;
-using System;
-using System.Collections.Generic;
-using System.Text;
+
 
 namespace BDO.GWT.Core.DTOs
 {

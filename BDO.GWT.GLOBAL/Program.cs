@@ -62,7 +62,7 @@ builder.Services.AddKentico(features =>
           Careers.CONTENT_TYPE_NAME,
           CareerCategory.CONTENT_TYPE_NAME,
           CareerContent.CONTENT_TYPE_NAME,
-
+          SectionEvents.CONTENT_TYPE_NAME,
           Sub_Service.CONTENT_TYPE_NAME,
           EventRegistrationForm.CONTENT_TYPE_NAME,
           Event.CONTENT_TYPE_NAME,

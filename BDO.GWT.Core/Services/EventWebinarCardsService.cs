@@ -183,8 +183,7 @@ public class EventWebinarCardsService : IEventWebinarCardsService
             {
                 if (!showPastPages)
                 {
-                    var isPast = x.EventDateTo <= currentDateTimeUtc;
-                    return showPastPages ? isPast : !isPast;
+                    return x.EventDateTo > currentDateTimeUtc;
                 }
                 return true;
             });
@@ -195,8 +194,8 @@ public class EventWebinarCardsService : IEventWebinarCardsService
             .OrderByDescending(isFeatured)
             .ThenBy(x => x.EventDateTo <= currentDateTimeUtc)
             .ThenBy(x => x.EventDateTo <= currentDateTimeUtc
-                ? DateTime.MaxValue.Ticks - x.EventDateTo.Ticks // past: newest first
-                : x.EventDateTo.Ticks)                          // upcoming: soonest first
+                ? DateTime.MaxValue.Ticks - x.EventDateTo.Ticks 
+                : x.EventDateTo.Ticks)                         
         ];
 
         var paginated = PaginationHelper.Paginate(ordered, cardsQuery).ToList();
