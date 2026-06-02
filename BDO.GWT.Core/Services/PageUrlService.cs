@@ -75,9 +75,8 @@ public class PageUrlService : IPageUrlService
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-
-        var pageUrl = await _webPageUrlRetriever.Retrieve(webPageItemId, languageTag)
-            ?? throw new InvalidOperationException(
+        var pageUrl = await _webPageUrlRetriever.Retrieve(webPageItemId, languageTag, cancellationToken: cancellationToken)
+        ?? throw new InvalidOperationException(
                 $"Page URL of page (WebPageItemID: {webPageItemId}, Language: {languageTag}) not found.");
 
         return ToRelativeLink(pageUrl.RelativePath);
@@ -124,7 +123,7 @@ public class PageUrlService : IPageUrlService
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var pageUrl = await _webPageUrlRetriever.Retrieve(webPageItemId, languageTag);
+            var pageUrl = await _webPageUrlRetriever.Retrieve(webPageItemId, languageTag, cancellationToken: cancellationToken);
 
             if (pageUrl is null)
             {
@@ -148,7 +147,7 @@ public class PageUrlService : IPageUrlService
 
         foreach (var languageTag in languageTags.Distinct(StringComparer.OrdinalIgnoreCase))
         {
-            var pageUrl = await _webPageUrlRetriever.Retrieve(webPageItemId, languageTag);
+            var pageUrl = await _webPageUrlRetriever.Retrieve(webPageItemId, languageTag, cancellationToken: cancellationToken);
 
             if (pageUrl is null)
             {
