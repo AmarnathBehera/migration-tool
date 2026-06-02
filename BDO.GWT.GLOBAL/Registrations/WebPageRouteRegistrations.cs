@@ -229,7 +229,7 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     customViewName: "~/Views/SectionSpecialties/Index.cshtml",
     ContentTypeNames = new[] { "BDO.SectionSpecialties" },
     IconClass = "xp-doc")]
-    IconClass = "xp-market")]
+  
 
 [assembly: RegisterPageTemplate(
     identifier: SectionEvents.CONTENT_TYPE_NAME,
