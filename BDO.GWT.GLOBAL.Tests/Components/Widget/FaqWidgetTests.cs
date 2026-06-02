@@ -1,7 +1,6 @@
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Services.Widget;
-using BDO.GWT.GLOBAL.Components.Widget.FaqWidget;
-using BDO.GWT.Web.Widgets.AccordionWidget;
+using BDO.GWT.Web.Widgets.FaqWidget;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;

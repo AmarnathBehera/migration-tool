@@ -1,14 +1,13 @@
 ﻿using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Extensions;
 using BDO.GWT.Core.Services.Widget;
-using BDO.GWT.GLOBAL.Components.Widget.FaqWidget;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.Web.Widgets.AccordionWidget;
+namespace BDO.GWT.Web.Widgets.FaqWidget;
 
 public class FaqWidget : ViewComponent
 {

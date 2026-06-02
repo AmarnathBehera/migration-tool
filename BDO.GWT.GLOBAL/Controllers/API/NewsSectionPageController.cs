@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace BDO.GWT.Web.Controllers;
 
+[ApiController]
 [Route($"api/{{{CultureInjectorAttribute.RouteParameter}}}/[controller]")]
 public class NewsSectionPageController : ControllerBase
 {
@@ -20,12 +21,15 @@ public class NewsSectionPageController : ControllerBase
         _newsSectionPageService = newsSectionPageService;
     }
 
+
     [HttpGet("[action]")]
-    public async Task<ActionResult<PaginationDto<ContentPageCardDto>>> Get([FromQuery] CardsQuery query, CancellationToken cancellationToken)
+    public async Task<ActionResult<PaginationDto<NewsPageCardDto>>> Get([FromQuery] CardsQuery query, CancellationToken cancellationToken)
     {
+        var language = RouteData.Values[CultureInjectorAttribute.RouteParameter]?.ToString();
+
         query.Filters = RequestQueryUtility.ExtractFilterQueryParameters(Request.Query);
 
-        var result = await _newsSectionPageService.GetNewsArticlePaginationResultAsync(query, cancellationToken);
+        var result = await _newsSectionPageService.GetNewsArticlePaginationResultAsync(language, query, cancellationToken);
 
         return Ok(result);
     }

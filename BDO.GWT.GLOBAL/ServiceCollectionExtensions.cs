@@ -51,8 +51,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IPageContext, XperiencePageContext>();
         serviceCollection.AddScoped<IPageBuilderSectionService, PageBuilderSectionService>();
         serviceCollection.AddScoped<ITileContentService, TileContentService>();
+        serviceCollection.AddScoped<IFlexibleContentService, FlexibleContentService>();
         serviceCollection.AddScoped<IButtonUrlRetriever, ButtonUrlRetriever>();
-        serviceCollection.AddScoped<IContentRetrieverWrapper, ContentRetrieverWrapper>();
         serviceCollection.AddScoped<IHeroService, HeroService>();
         serviceCollection.AddScoped<ISectionAboutPageService, SectionAboutPageService>();
         serviceCollection.AddScoped<IAboutPageService, AboutPageService>();

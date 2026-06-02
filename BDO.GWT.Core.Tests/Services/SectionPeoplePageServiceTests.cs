@@ -54,10 +54,10 @@ public class SectionPeoplePageServiceTests
             .ReturnsAsync(new List<SectionPeoplePage> { sectionPage });
 
         _peopleCardsServiceMock
-            .Setup(s => s.GetFilteredItemsAsync(sectionPage, cardsQuery, null, It.IsAny<Func<Person, bool>>(), It.IsAny<CancellationToken>()))
+            .Setup(s => s.GetFilteredItemsAsync(sectionPage, It.IsAny<string>(), cardsQuery, null, It.IsAny<Func<Person, bool>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedDto);
 
-        var result = await _service.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, cardsQuery, CancellationToken.None);
+        var result = await _service.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, "en-US", cardsQuery, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -80,6 +80,6 @@ public class SectionPeoplePageServiceTests
             .ReturnsAsync(new List<SectionPeoplePage>());
 
         Assert.ThrowsAsync<MissingSectionPageException>(
-            () => _service.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, new CardsQuery(), CancellationToken.None));
+            () => _service.GetSectionPeoplePersonPaginationDtoAsync(pageGuid, "en-US", new CardsQuery(), CancellationToken.None));
     }
 }

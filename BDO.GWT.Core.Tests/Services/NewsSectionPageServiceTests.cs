@@ -55,22 +55,22 @@ public class NewsSectionPageServiceTests
     [Test]
     public async Task GetNewsArticlePaginationResultAsync_ReturnsPaginationDto()
     {
-        var expectedDto = new PaginationDto<ContentPageCardDto>
+        var expectedDto = new PaginationDto<NewsPageCardDto>
         {
             Data = new[]
             {
-                new ContentPageCardDto { Title = "Article 1" },
-                new ContentPageCardDto { Title = "Article 2" }
+                new NewsPageCardDto { Title = "Article 1" },
+                new NewsPageCardDto { Title = "Article 2" }
             },
             TotalCount = 2
         };
 
         _newsSectionPageServiceMock
-            .Setup(x => x.GetNewsArticlePaginationResultAsync(It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetNewsArticlePaginationResultAsync(It.IsAny<string>(), It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedDto);
 
         var result = await _newsSectionPageServiceMock.Object.GetNewsArticlePaginationResultAsync(
-            new CardsQuery(), CancellationToken.None);
+            "en", new CardsQuery(), CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -82,18 +82,18 @@ public class NewsSectionPageServiceTests
     [Test]
     public async Task GetNewsArticlePaginationResultAsync_WhenNoArticles_ReturnsEmptyPagination()
     {
-        var emptyDto = new PaginationDto<ContentPageCardDto>
+        var emptyDto = new PaginationDto<NewsPageCardDto>
         {
-            Data = Array.Empty<ContentPageCardDto>(),
+            Data = Array.Empty<NewsPageCardDto>(),
             TotalCount = 0
         };
 
         _newsSectionPageServiceMock
-            .Setup(x => x.GetNewsArticlePaginationResultAsync(It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetNewsArticlePaginationResultAsync(It.IsAny<string>(), It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(emptyDto);
 
         var result = await _newsSectionPageServiceMock.Object.GetNewsArticlePaginationResultAsync(
-            new CardsQuery(), CancellationToken.None);
+            "en", new CardsQuery(), CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -125,14 +125,14 @@ public class NewsSectionPageServiceTests
     public async Task GetNewsArticlePaginationResultAsync_InvokedOnce()
     {
         _newsSectionPageServiceMock
-            .Setup(x => x.GetNewsArticlePaginationResultAsync(It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PaginationDto<ContentPageCardDto> { Data = [], TotalCount = 0 });
+            .Setup(x => x.GetNewsArticlePaginationResultAsync(It.IsAny<string>(), It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PaginationDto<NewsPageCardDto> { Data = [], TotalCount = 0 });
 
         var cardsQuery = new CardsQuery();
         await _newsSectionPageServiceMock.Object.GetNewsArticlePaginationResultAsync(
-            cardsQuery, CancellationToken.None);
+            "en", cardsQuery, CancellationToken.None);
 
         _newsSectionPageServiceMock.Verify(
-            x => x.GetNewsArticlePaginationResultAsync(cardsQuery, It.IsAny<CancellationToken>()), Times.Once);
+            x => x.GetNewsArticlePaginationResultAsync(It.IsAny<string>(), cardsQuery, It.IsAny<CancellationToken>()), Times.Once);
     }
 }
