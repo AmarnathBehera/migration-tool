@@ -3,8 +3,7 @@ using CMS.ContentEngine;
 using CMS.Websites;
 using System;
 using System.Collections.Generic;
-
-namespace BDO;
+namespace BDO.GWT.Core.Entities;
 
 public interface IEventBase
 {
@@ -55,6 +54,7 @@ public interface IEventBase
     string MetadataTitle { get; set; }
     string MetadataDescription { get; set; }
     IEnumerable<ContentAttachment> MetadataTeaserImage { get; set; }
+    string MetadataTeaserImageAltText { get; set; }
 
     // Privacy
     bool EventIsPrivate { get; set; }

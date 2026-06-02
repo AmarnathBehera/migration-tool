@@ -122,6 +122,7 @@ public class EventWebinarCardsService : IEventWebinarCardsService
             FilterParameterName.BusinessLine => x => x.WhereContains(nameof(IEventOrWebinar.MicrositeMasterPages), guid),
             FilterParameterName.SpecialtyCategory => x => x.WhereContains(nameof(IEventOrWebinar.MetadataSpecialtiesCategories), guid),
             FilterParameterName.OfficeLocation => x => x.WhereContains(nameof(IEventOrWebinar.MetadataOfficeLocation), guid),
+            FilterParameterName.ShowAllPastEvents => x => x.WhereContains(nameof(IEventOrWebinar.ShowPastEvent), guid),
 
             _ => null,
         };
@@ -170,9 +171,9 @@ public class EventWebinarCardsService : IEventWebinarCardsService
 
         await Task.WhenAll(eventsTask, webinarsTask);
 
-        var eventsAndWebinars = new List<IEventOrWebinar>();
-        eventsAndWebinars.AddRange(eventsTask.Result.Cast<IEventOrWebinar>());
-        eventsAndWebinars.AddRange(webinarsTask.Result.Cast<IEventOrWebinar>());
+        var eventsAndWebinars = eventsTask.Result.Select(e => (IEventOrWebinar)new EventWrapper(e))
+        .Concat(webinarsTask.Result.Select(w => (IEventOrWebinar)new WebinarWrapper(w)))
+        .ToList();
 
         var currentDateTimeUtc = DateTime.UtcNow;
         var filtered = eventsAndWebinars
@@ -186,8 +187,6 @@ public class EventWebinarCardsService : IEventWebinarCardsService
                 return showPastPages ? isPast : !isPast;
             });
 
-        // Order: featured first, then upcoming events (soonest first),
-        // then past events (most recent first).
         IEventOrWebinar[] ordered =
         [
             .. filtered

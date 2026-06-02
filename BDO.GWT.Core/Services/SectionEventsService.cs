@@ -52,7 +52,7 @@ public class SectionEventsService : ISectionEventsService
         var mobileImageUrl = page.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
         var selectedpageid = page.EventsWebinarsListAdvancedSearchLinkUrl?.FirstOrDefault()?.WebPageGuid;
         var selectedPage = selectedpageid.HasValue && selectedpageid.Value != Guid.Empty ? await _contentRetriever.RetrieveAllPagesByGuids<IWebPageFieldsSource>(new[] { selectedpageid.Value }, cancellationToken: cancellationToken)
-    : Enumerable.Empty<IWebPageFieldsSource>();
+        : Enumerable.Empty<IWebPageFieldsSource>();
         var filters = string.IsNullOrWhiteSpace(page.EventsWebinarsListFilters)
         ? new HashSet<string>()
          : page.EventsWebinarsListFilters
@@ -84,9 +84,38 @@ public class SectionEventsService : ISectionEventsService
 
         };
 
+        var sys = page.SystemFields;
 
         var dto = new SectionEventsDto
         {
+            Title = page.EventsWebinarsListTitle,
+            Description = page.EventsWebinarsListDescription,
+          
+
+            BaseContent = new BaseContent
+            {
+                ContentItemID = sys?.ContentItemID ?? 0,
+                ContentItemGUID = sys?.ContentItemGUID ?? Guid.Empty,
+                ContentItemName = sys?.ContentItemName,
+                ContentItemContentTypeID = sys?.ContentItemContentTypeID ?? 0,
+                ContentItemIsSecured = sys?.ContentItemIsSecured ?? false,
+                ContentItemCommonDataContentLanguageID = sys?.ContentItemCommonDataContentLanguageID ?? 0,
+                ContentItemCommonDataFirstPublishedWhen = sys?.ContentItemCommonDataFirstPublishedWhen ?? default,
+                ContentItemCommonDataLastPublishedWhen = sys?.ContentItemCommonDataLastPublishedWhen ?? default
+            },
+
+            BaseWebPage = new BaseWebPage
+            {
+                WebPageItemGUID = sys?.WebPageItemGUID ?? Guid.Empty,
+                WebPageItemID = sys?.WebPageItemID ?? 0,
+                WebPageItemName = sys?.WebPageItemName,
+                WebPageItemWebsiteChannelID = sys?.WebPageItemWebsiteChannelId ?? 0,
+                WebPageUrlPath = sys?.WebPageUrlPath,
+                WebPageItemOrder = sys?.WebPageItemOrder ?? 0,
+                WebPageItemTreePath = sys?.WebPageItemTreePath,
+                WebPageUrlPathContentLanguageID = sys?.WebPageUrlPathContentLanguageID ?? 0,
+                WebPageItemParentID = sys?.WebPageItemParentID ?? 0
+            },
             Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
             CardsGrid = cardsGridDto,
         };

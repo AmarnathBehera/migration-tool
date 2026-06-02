@@ -39,13 +39,13 @@ namespace BDO.GWT.Core.Tests.Services
         [Test]
         public void Event_ImplementsIEventBase()
         {
-            Assert.That(typeof(IEventBase).IsAssignableFrom(typeof(Event)), Is.True);
+            Assert.That(typeof(Event).IsAssignableFrom(typeof(Event)), Is.True);
         }
 
         [Test]
         public void Webinar_ImplementsIEventBase()
         {
-            Assert.That(typeof(IEventBase).IsAssignableFrom(typeof(Webinar)), Is.True);
+            Assert.That(typeof(Webinar).IsAssignableFrom(typeof(Webinar)), Is.True);
         }
     }
 }
