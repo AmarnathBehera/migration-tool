@@ -2,12 +2,12 @@
 using BDO.GWT.Common;
 using BDO.GWT.Common.Options;
 using BDO.GWT.Core;
+using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Domain.Services;
 using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
-using BDO.GWT.Xperience.Core.Services;
 using BDO.GWT.Xperience.LiveSite.Services;
 using Kentico.Activities.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
@@ -39,36 +39,7 @@ builder.Services.AddKentico(features =>
     {
         DefaultSectionIdentifier = ComponentIdentifiers.Sections.Container,
         RegisterDefaultSection = true,
-        ContentTypeNames = new[]
-        {
-          HomePage.CONTENT_TYPE_NAME,
-          SectionAbout.CONTENT_TYPE_NAME,
-          AboutPage.CONTENT_TYPE_NAME,
-          Contact.CONTENT_TYPE_NAME,
-          Person.CONTENT_TYPE_NAME,
-          Locations.CONTENT_TYPE_NAME,
-          LocationCity.CONTENT_TYPE_NAME,
-          SectionIndustries.CONTENT_TYPE_NAME,
-          IndustryCategory.CONTENT_TYPE_NAME,
-          Industry.CONTENT_TYPE_NAME,
-          IndustryService.CONTENT_TYPE_NAME,
-          SectionServices.CONTENT_TYPE_NAME,
-          BusinessLine.CONTENT_TYPE_NAME,
-          Service.CONTENT_TYPE_NAME,
-          ServiceArea.CONTENT_TYPE_NAME,
-          Sub_Service.CONTENT_TYPE_NAME,
-          SectionCareers.CONTENT_TYPE_NAME,
-          Career.CONTENT_TYPE_NAME,
-          Careers.CONTENT_TYPE_NAME,
-          CareerCategory.CONTENT_TYPE_NAME,
-          CareerContent.CONTENT_TYPE_NAME,
-          SectionEvents.CONTENT_TYPE_NAME,
-          Sub_Service.CONTENT_TYPE_NAME,
-          EventRegistrationForm.CONTENT_TYPE_NAME,
-          Event.CONTENT_TYPE_NAME,
-          Webinar.CONTENT_TYPE_NAME
-
-       }
+        ContentTypeNames = PageBuilderContentTypes.ContentTypes
     }); features.UseActivityTracking();
     features.UseWebPageRouting();
     features.UseEmailStatisticsLogging();

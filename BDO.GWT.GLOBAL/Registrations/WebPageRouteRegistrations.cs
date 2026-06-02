@@ -192,6 +192,45 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     ContentTypeNames = new[] { "BDO.NewsArticle" },
     IconClass = "xp-market")]
 
+
+[assembly: RegisterWebPageRoute(SpecialtiesPage.CONTENT_TYPE_NAME, typeof(SpecialtiesPageController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: SpecialtiesPage.CONTENT_TYPE_NAME,
+    name: "Specialties Page  Content Type Template",
+    customViewName: "~/Views/SpecialtiesPage/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SpecialtiesPage" },
+    IconClass = "xp-rectangle-a")]
+
+[assembly: RegisterWebPageRoute(SpecialtiesArea.CONTENT_TYPE_NAME, typeof(SpecialtiesAreaController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: SpecialtiesArea.CONTENT_TYPE_NAME,
+    name: "Specialties Area  Content Type Template",
+    customViewName: "~/Views/SpecialtiesArea/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SpecialtiesArea" },
+    IconClass = "xp-doc")]
+
+
+[assembly: RegisterWebPageRoute(SpecialtiesCategory.CONTENT_TYPE_NAME, typeof(SpecialtiesCategoryController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: SpecialtiesCategory.CONTENT_TYPE_NAME,
+    name: "Specialties Category  Content Type Template",
+    customViewName: "~/Views/SpecialtiesCategory/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SpecialtiesCategory" },
+    IconClass = "xp-doc")]
+
+[assembly: RegisterWebPageRoute(SectionSpecialties.CONTENT_TYPE_NAME, typeof(SectionSpecialtiesController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: SectionSpecialties.CONTENT_TYPE_NAME,
+    name: "Section Specialties Content Type Template",
+    customViewName: "~/Views/SectionSpecialties/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SectionSpecialties" },
+    IconClass = "xp-doc")]
+    IconClass = "xp-market")]
+
 [assembly: RegisterPageTemplate(
     identifier: SectionEvents.CONTENT_TYPE_NAME,
     name: "Section Events Content Type Template",
