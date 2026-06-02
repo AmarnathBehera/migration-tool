@@ -62,3 +62,11 @@
     </div>
     @* @await PageBuilderService.AddIdentifier("bottomArea").AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html) *@
 </div>
+<div>
+    @await Html.Kentico().EditableAreaAsync(
+        "mainContent",
+        new EditableAreaOptions
+        {
+            AllowedWidgets = widgetsList
+        })
+</div>

@@ -1,24 +1,19 @@
-﻿using BDO;
-using BDO.GWT.Core;
-using BDO.GWT.Core.Data;
+﻿using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.services;
-using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.Services;
 using Kentico.Content.Web.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace BDO.GWT.Core.Services
-{
+
+namespace BDO.GWT.Core.Services;
+
     public interface ISpecialtiesPageService{
         Task<SpecialtiesPageDto> GetSpecialtiesPageDtoAsync( CancellationToken cancellationToken);
     }
 
-}
+
     public class SpecialtiesPageService: ISpecialtiesPageService
     {
         private readonly IHeroService _heroService;

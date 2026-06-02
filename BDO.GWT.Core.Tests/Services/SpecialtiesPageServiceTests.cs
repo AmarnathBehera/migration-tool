@@ -83,9 +83,14 @@ public class SpecialtiesPageServiceTests
 
         var result = await _service.GetSpecialtiesPageDtoAsync(CancellationToken.None);
 
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result.Hero, Is.Null);
-        Assert.That(result.SideBox, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Hero, Is.Null);
+            Assert.That(result.SideBox, Is.Null);
+        });
+
+        
 
         _heroServiceMock.Verify(
             x => x.GetHeroDtoAsync(It.IsAny<HeroData>(), It.IsAny<CancellationToken>()),

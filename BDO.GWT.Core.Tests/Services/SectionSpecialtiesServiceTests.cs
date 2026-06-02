@@ -103,9 +103,13 @@ public class SectionSpecialtiesServiceTests
 
         var result = await _service.GetSectionSpecialtiesDtoAsync(CancellationToken.None);
 
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result.Hero, Is.Null);
-        Assert.That(result.MultiLinksCardsGrid, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Hero, Is.Null);
+            Assert.That(result.MultiLinksCardsGrid, Is.Null);
+        });
+
     }
 
     // =========================================================================
