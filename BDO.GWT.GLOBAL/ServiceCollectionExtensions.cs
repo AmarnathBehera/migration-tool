@@ -95,6 +95,7 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.AddScoped<IChannelAccessService, ChannelAccessService>();
         serviceCollection.AddScoped<ISectionBlogService, SectionBlogService>();
+        serviceCollection.AddScoped<IBlogPostPageService, BlogPostPageService>();
     }
 
 }
