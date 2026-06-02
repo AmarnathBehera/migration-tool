@@ -14,11 +14,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TabAccordionWidget;
+namespace BDO.GWT.Web.Components.Widget.TabAccordionWidget;
 
 public class TabAccordionWidget : ViewComponent
 {
     private readonly IContentRetriever _contentRetriever;
+
 
     public TabAccordionWidget(IContentRetriever contentRetriever)
     {
@@ -29,11 +30,19 @@ public class TabAccordionWidget : ViewComponent
     {
         var cancellationToken = HttpContext.RequestAborted;
 
+        List<System.Guid> guids = model.Properties.PageType switch
+        {
+            "Service" => model.Properties.ServicePages.Select(p => p.WebPageGuid).ToList(),
+            "Industry" => model.Properties.IndustryPages.Select(p => p.WebPageGuid).ToList(),
+            "Microsite" => model.Properties.MicrositePages.Select(p => p.WebPageGuid).ToList(),
+            _ => new List<System.Guid>()
+        };
+
         var data = new TabAccordionData
         {
             Title = model.Properties.Title,
             Layout = model.Properties.Layout,
-            PageGuids = model.Properties.Pages.Select(i => i.Identifier).ToList() ?? new List<Guid>(),
+            PageGuids = guids,
             TopMargin = model.Properties.TopMargin,
             BottomMargin = model.Properties.BottomMargin,
             WidgetID = model.Properties.WidgetID,
@@ -62,6 +71,7 @@ public class TabAccordionWidget : ViewComponent
     private async Task<TabAccordionItemDto[]> GetTabAccordionItemDtosAsync(IEnumerable<Guid> pageGuids, CancellationToken cancellationToken)
     {
         var pages = await _contentRetriever.RetrieveAllPagesByGuids<IWebPageFieldsSource>(
+            
             pageGuids,cancellationToken);
 
         return pages.Select(p => new TabAccordionItemDto

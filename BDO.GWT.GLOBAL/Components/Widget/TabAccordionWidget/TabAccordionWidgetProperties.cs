@@ -1,5 +1,6 @@
 ﻿
 using CMS.ContentEngine;
+using CMS.Websites;
 using Kentico.Forms.Web.Mvc;
 using Kentico.Xperience.Admin.Base.FormAnnotations;
 using Kentico.Xperience.Admin.Websites.FormAnnotations;
@@ -21,8 +22,17 @@ public class TabAccordionWidgetProperties : BaseWidgetProperties
     [DropDownComponent(Label = "Page type", ExplanationText = "Type of pages which will be shown as tabs or accordion items.", Order = 2, Options = "Industry\r\nService\r\nMicrosite")]
     public string PageType { get; set; } = "Industry";
 
-    [ContentItemSelectorComponent([Industry.CONTENT_TYPE_NAME, Service.CONTENT_TYPE_NAME], Label = "Tab / accordion items", ExplanationText = "For tab layout recommendation is to have maximum 4 items as it works best from responsiveness perspective.", Order = 3)]
-    public IEnumerable<ContentItemReference> Pages { get; set; } = Enumerable.Empty<ContentItemReference>();
+    [WebPageSelectorComponent(TreePath = "/services", MaximumPages = 0,Order =3)]
+    [VisibleIfEqualTo(nameof(PageType),"Service")]
+    public IEnumerable<WebPageRelatedItem> ServicePages { get; set; } = new List<WebPageRelatedItem>();
+
+    [WebPageSelectorComponent(TreePath = "/industry", MaximumPages = 0,Order =3)]
+    [VisibleIfEqualTo(nameof(PageType), "Industry")]
+    public IEnumerable<WebPageRelatedItem> IndustryPages { get; set; } = new List<WebPageRelatedItem>();
+
+    [WebPageSelectorComponent(TreePath = "/microsites", MaximumPages = 0, Order = 3)]
+    [VisibleIfEqualTo(nameof(PageType), "Microsite")]
+    public IEnumerable<WebPageRelatedItem> MicrositePages { get; set; } = new List<WebPageRelatedItem>();
 
 
     [DropDownComponent(Label = "Top margin", Order = 4, Options = "0px;None\r\n20px\r\n40px\r\n60px\r\n80px")]

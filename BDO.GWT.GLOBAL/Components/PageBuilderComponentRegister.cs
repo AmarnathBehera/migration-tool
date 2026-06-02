@@ -17,7 +17,7 @@ using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ViewGlobalLocations;
 using BDO.GWT.Xperience.LiveSite.Components.Section;
 using Kentico.Forms.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TabAccordionWidget;
+using BDO.GWT.Web.Components.Widget.TabAccordionWidget;
 using BDO.GWT.Web.Widgets.TabAccordionWidget;
 
 // Widgets
