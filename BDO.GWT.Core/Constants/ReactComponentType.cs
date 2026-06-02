@@ -85,6 +85,7 @@ public static class ReactComponentType
     public const string CareerSidebarGUID = "7d6afe7a-e672-43d4-b9e8-aad67c339c56";
     public const string LocalNavigationItemGUID = "c4403ffb-12e9-4f20-86de-3379bc0514f0";
     public const string KeyTakeAwaysGUID = "c4403ffb-12e9-4f20-86de-3379bc0514f0";
+    public const string ContentTabAccordionGUID = "eeb2b6b7-f2df-411b-b55f-c7aac9b22093";
 }
 
 
