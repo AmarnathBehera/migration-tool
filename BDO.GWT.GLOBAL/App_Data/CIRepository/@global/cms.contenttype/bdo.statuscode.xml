@@ -27,6 +27,9 @@
       <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
         <properties />
       </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
     </form>
   </ClassFormDefinition>
   <ClassGUID>a7bec4dd-14be-4451-84ef-8183386feebf</ClassGUID>

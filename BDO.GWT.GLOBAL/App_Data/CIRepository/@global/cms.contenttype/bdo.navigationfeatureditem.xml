@@ -39,20 +39,10 @@
           <Sortable>False</Sortable>
         </settings>
       </field>
-      <field column="FeaturedImageAltText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="211e5471-217b-49da-b3ad-b2e7112b350c" visible="true">
+      <field allowempty="true" column="Image" columnprecision="0" columntype="contentitemreference" enabled="true" guid="ea7325ac-ba9d-4fe2-9fcd-a426781d0705" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Featured Image Alt Text</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-        </properties>
-        <settings>
-          <controlname>Kentico.Administration.TextInput</controlname>
-        </settings>
-      </field>
-      <field allowempty="true" column="FeaturedImageFile" columnprecision="0" columntype="contentitemreference" enabled="true" guid="ea7325ac-ba9d-4fe2-9fcd-a426781d0705" visible="true">
-        <properties>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>FeaturedImageFile</fieldcaption>
+          <fieldcaption>Image</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
         </properties>
         <settings>
@@ -61,6 +51,17 @@
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field column="ImageAltText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="211e5471-217b-49da-b3ad-b2e7112b350c" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Image Alt Text</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
     </form>
