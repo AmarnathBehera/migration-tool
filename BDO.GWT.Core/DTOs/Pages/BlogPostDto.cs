@@ -31,6 +31,6 @@ namespace BDO.GWT.Core.DTOs
         public string? RssFeedUrl { get; set; }
         public string? RssImageUrl { get; set; }
 
-        public DateTime? UpdatedOn { get; set; }
+        
     }
 }

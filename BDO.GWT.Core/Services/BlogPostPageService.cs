@@ -59,9 +59,7 @@ public class BlogPostPageService : IBlogPostPageService
             {
                  Url = imageFileUrl ?? string.Empty,
                  AltText = blogpostPage.ImageFileAltText ?? string.Empty,
-            },
-            UpdatedOn = blogpostPage.UpdatedOn == DateTime.MinValue ? blogpostPage.SystemFields.ContentItemCommonDataLastPublishedWhen 
-                                                                    : blogpostPage.UpdatedOn,
+            },                                                                   
             ShowSidebar = blogpostPage.ShowSidebar,
             ShowTitle = blogpostPage.ShowTitle,
             ShowDescription = blogpostPage.ShowDescription,
@@ -69,11 +67,6 @@ public class BlogPostPageService : IBlogPostPageService
             Content = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(blogpostPage.Content) ?? string.Empty,
 
         };
-
-        
-        
-            
-        
 
             //getting sidebar data if ShowSidebar is true
         ContentSidebarDto? sideBarObj = BlogPostDtoObj.ShowSidebar
