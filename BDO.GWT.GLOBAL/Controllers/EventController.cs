@@ -1,8 +1,4 @@
-﻿
-using BDO.GWT.Core;
-using BDO.GWT.Web.Core.DTOs.Pages;
-using BDO.GWT.Web.Core.LiveSite.DTOs.Pages;
-using BDO.GWT.Web.Core.LiveSite.Services;
+﻿using BDO.GWT.Core;
 using BDO.GWT.Web.Core.Services;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;

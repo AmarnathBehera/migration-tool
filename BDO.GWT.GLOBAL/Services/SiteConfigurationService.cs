@@ -75,7 +75,7 @@ public class SiteConfigurationService : ISiteConfigurationService
     public async Task<SiteConfigurationDto> GetSiteConfigurationDtoAsync(CancellationToken cancellationToken)
     {
         var localizationResources = await GetLocalizationValuesAsync();
-        
+
         var translations = localizationResources.ToDictionary(
             resource => resource.CultureCode.ToLower(),
             resource => (IDictionary<string, string>)resource.LocalizationKey.ToDictionary(
@@ -100,7 +100,7 @@ public class SiteConfigurationService : ISiteConfigurationService
 
         result.Hash = calculatedHash;
 
-        return result;              
+        return result;
     }
 
     private SiteSettingsDto GetSiteSettings()

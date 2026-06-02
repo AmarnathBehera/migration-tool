@@ -1,17 +1,12 @@
 ﻿using BDO;
 using BDO.GWT.Core;
-using BDO.GWT.Core.Data.Queries;
-using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Services;
-using BDO.GWT.Domain.Core.Entities;
-using BDO.GWT.Web.Core.DTOs.Cards;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace GWTXbyKWeb.Controllers;
-
 
 public class SectionEventsController : Controller
 {
@@ -26,8 +21,9 @@ public class SectionEventsController : Controller
         _sectionEventsService = sectionEventsService;
     }
 
-   
+
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
+
     {
         var page = await _contentService.RetrieveCurrentPageAsync<SectionEvents>(
             new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 },
@@ -38,11 +34,11 @@ public class SectionEventsController : Controller
             return NotFound();
         }
 
-        var pageDto = await _sectionEventsService.GetSectionEventsDtoAsync(page, cancellationToken);
+        var pageDto = await _sectionEventsService.GetEventsSectionDtoAsync(page, cancellationToken);
 
         return View("~/Views/SectionEvents/Index.cshtml", pageDto);
     }
 
-   
-   
+
+
 }

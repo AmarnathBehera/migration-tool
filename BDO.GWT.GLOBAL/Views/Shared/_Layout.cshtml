@@ -91,16 +91,16 @@
 
     @RenderBody()
 
-   
-   
+
+
     <script src="/dist/vendor.bundle.js" asp-append-version="true" data-cookieconsent="ignore"></script>
     <script src="/dist/master.bundle.js" asp-append-version="true" data-cookieconsent="ignore"></script>
 
-    
-@await (Component.InvokeAsync<ScriptsBottomBody>())
-@(await Component.InvokeAsync<Footer>())
-@await Html.Kentico().PageBuilderScriptsAsync()
-@await (Component.InvokeAsync<ScriptsBottomBody>())
+
+    @await (Component.InvokeAsync<ScriptsBottomBody>())
+    @(await Component.InvokeAsync<Footer>())
+    @await Html.Kentico().PageBuilderScriptsAsync()
+    @await (Component.InvokeAsync<ScriptsBottomBody>())
 
     @(ReactService.RenderCombinedScript())
 </body>

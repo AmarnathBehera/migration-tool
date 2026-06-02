@@ -17,7 +17,7 @@ public class ChannelSettingsInitializer : Module
 
     public ChannelSettingsInitializer() : base("ChannelSettingsInitializer")
     {
-       
+
     }
 
     protected override void OnInit()
@@ -108,7 +108,7 @@ public class ChannelSettingsInitializer : Module
             var snippet = new WebChannelSnippetInfo
             {
                 WebChannelSnippetDisplayName = global.GlobalSettingsKeyDisplayName,
-                WebChannelCodeName= combinedCodeName,
+                WebChannelCodeName = combinedCodeName,
                 WebChannelSnippetCodeName = global.GlobalSettingsKeyName,
                 WebChannelSnippetCode = global.GlobalSettingsKeyValue,
                 WebChannelSnippetWebChannelSettingsID = channel.WebChannelSettingsID,

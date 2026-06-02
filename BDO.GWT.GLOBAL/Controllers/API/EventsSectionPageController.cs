@@ -1,13 +1,9 @@
-﻿
-
-
-using BDO.GWT.Core.API.Utilities;
+﻿using BDO.GWT.Core.API.Utilities;
 using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.LiveSite.Filters;
 using BDO.GWT.Core.Services;
-using BDO.GWT.Web.Core.DTOs.Cards;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;

@@ -35,14 +35,14 @@ public class EventsWebinarEditPage : InfoEditPage<EventsWebinarsInfo>
             {
                 EventnWebinarWebChannelSettingID = WebChannelSettingsId,
                 Displaylocationtitleinasidebar = false,
-                Minutestotriggercalendarreminder= 0,
+                Minutestotriggercalendarreminder = 0,
 
             };
             EventsWebinarInfoProvider.Set(newEventnwebinarInfo);
 
             return newEventnwebinarInfo.EventsWebinarsID;
         }
-       
+
         set => _ = value;
     }
 
@@ -72,7 +72,7 @@ public class EventsWebinarEditPage : InfoEditPage<EventsWebinarsInfo>
         bool canAccess = await channelAccessService.CanAccessAsync(WebChannelSettingsId);
         if (!canAccess)
         {
-           
+
             PageConfiguration.SubmitConfiguration.Visible = false;
             PageConfiguration.Headline = "Access Denied";
             return;

@@ -2,7 +2,7 @@
 @using BDO.GWT.Core.Constants
 @using BDO.GWT.Core.Services
 @using Kentico.Content.Web.Mvc
-@model BDO.GWT.Core.DTOs.Pages.SectionEventsDTO
+@model BDO.GWT.Core.DTOs.Pages.SectionEventsDto
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
@@ -36,7 +36,7 @@
     pageId,
     ReactComponentType.EventWebinarCardsGrid,
     ReactComponentType.EventWebinarCardsGridGUID,
-    Model,
+    Model.CardsGrid,
     Context.RequestAborted))
 
 @await Html.Kentico().EditableAreaAsync(

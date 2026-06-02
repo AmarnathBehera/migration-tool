@@ -8,7 +8,6 @@ using BDO.GWT.Core.Services.Header;
 using BDO.GWT.Core.Services.Widget;
 using BDO.GWT.Domain.Core.Entities;
 using BDO.GWT.GLOBAL.Services;
-using BDO.GWT.Web.Core.DTOs.Cards;
 using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
@@ -98,7 +97,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ICareerPageService, CareerPageService>();
         serviceCollection.AddScoped<ICareersPageService, CareersPageService>();
         serviceCollection.AddScoped<ICareerDetailPageService, CareerDetailPageService>();
-        serviceCollection.AddScoped<ICareerCategoryPageService , CareerCategoryPageService>();
+        serviceCollection.AddScoped<ICareerCategoryPageService, CareerCategoryPageService>();
         serviceCollection.AddScoped<ICareerContentPageService, CareerContentPageService>();
 
         serviceCollection.AddScoped<IChannelAccessService, ChannelAccessService>();
