@@ -172,11 +172,10 @@ public class SpecialtiesPageServiceTests
             .ReturnsAsync(new HeroDto());
 
         _pageUtilityMock
-            .Setup(x => x.GetSideboxDtoAsync<SectionSpecialties, SpecialtiesPage>(
+            .Setup(x => x.GetSideboxDtoAsync<SpecialtiesPage>(
                 It.IsAny<string>(),
                 It.IsAny<int>(),
                 It.IsAny<int>(),
-                It.IsAny<System.Func<SectionSpecialties, string>>(),
                 It.IsAny<System.Func<SpecialtiesPage, string>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(sideBox);
@@ -232,11 +231,10 @@ public class SpecialtiesPageServiceTests
             .ReturnsAsync(new HeroDto());
 
         _pageUtilityMock
-            .Setup(x => x.GetSideboxDtoAsync<SectionSpecialties, SpecialtiesPage>(
+            .Setup(x => x.GetSideboxDtoAsync<SpecialtiesPage>(
                 It.IsAny<string>(),
                 It.IsAny<int>(),
                 It.IsAny<int>(),
-                It.IsAny<System.Func<SectionSpecialties, string>>(),
                 It.IsAny<System.Func<SpecialtiesPage, string>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new SideBoxDto());
@@ -244,11 +242,10 @@ public class SpecialtiesPageServiceTests
         await _service.GetSpecialtiesPageDtoAsync(CancellationToken.None);
 
         _pageUtilityMock.Verify(
-            x => x.GetSideboxDtoAsync<SectionSpecialties, SpecialtiesPage>(
+            x => x.GetSideboxDtoAsync<SpecialtiesPage>(
                 It.IsAny<string>(),
                 It.IsAny<int>(),
                 It.IsAny<int>(),
-                It.IsAny<System.Func<SectionSpecialties, string>>(),
                 It.IsAny<System.Func<SpecialtiesPage, string>>(),
                 It.IsAny<CancellationToken>()),
             Times.Once);
@@ -275,11 +272,10 @@ public class SpecialtiesPageServiceTests
         await _service.GetSpecialtiesPageDtoAsync(CancellationToken.None);
 
         _pageUtilityMock.Verify(
-            x => x.GetSideboxDtoAsync<SectionSpecialties, SpecialtiesPage>(
+            x => x.GetSideboxDtoAsync<SpecialtiesPage>(
                 "Custom Navigation",
                 page.SystemFields.WebPageItemID,
                 page.SystemFields.WebPageItemParentID,
-                It.IsAny<System.Func<SectionSpecialties, string>>(),
                 It.IsAny<System.Func<SpecialtiesPage, string>>(),
                 It.IsAny<CancellationToken>()),
             Times.Once);
@@ -433,11 +429,10 @@ public class SpecialtiesPageServiceTests
             .ReturnsAsync(hero);
 
         _pageUtilityMock
-            .Setup(x => x.GetSideboxDtoAsync<SectionSpecialties, SpecialtiesPage>(
+            .Setup(x => x.GetSideboxDtoAsync<SpecialtiesPage>(
                 It.IsAny<string>(),
                 It.IsAny<int>(),
                 It.IsAny<int>(),
-                It.IsAny<System.Func<SectionSpecialties, string>>(),
                 It.IsAny<System.Func<SpecialtiesPage, string>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(sidebox);
@@ -503,11 +498,11 @@ public class SpecialtiesPageServiceTests
         await _service.GetSpecialtiesPageDtoAsync(CancellationToken.None);
 
         _pageUtilityMock.Verify(
-            x => x.GetSideboxDtoAsync<SectionSpecialties, SpecialtiesPage>(
+            x => x.GetSideboxDtoAsync<SpecialtiesPage>(
                 It.IsAny<string>(),
                 999,
                 777,
-                It.IsAny<System.Func<SectionSpecialties, string>>(),
+
                 It.IsAny<System.Func<SpecialtiesPage, string>>(),
                 It.IsAny<CancellationToken>()),
             Times.Once);
