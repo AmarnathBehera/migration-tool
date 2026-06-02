@@ -1,8 +1,7 @@
-﻿using BDO;
-using CMS.ContentEngine;
+﻿using CMS.ContentEngine;
 using CMS.Websites;
 
-namespace BDO.GWT.Domain.Core.Entities;
+namespace BDO.GWT.Core.DTOs;
 
 public interface IEventOrWebinar : IWebPageFieldsSource
 {

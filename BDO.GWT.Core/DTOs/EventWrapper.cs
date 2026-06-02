@@ -1,6 +1,6 @@
 ﻿using CMS.Websites;
 
-namespace BDO.GWT.Domain.Core.Entities;
+namespace BDO.GWT.Core.DTOs;
 
 public class EventWrapper : IEventOrWebinar
 {

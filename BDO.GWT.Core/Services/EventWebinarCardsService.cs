@@ -6,7 +6,7 @@ using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
-using BDO.GWT.Domain.Core.Entities;
+using BDO.GWT.Core.Entities;
 using BDO.GWT.Web.Core.Helpers;
 using BDO.GWT.Xperience.Core.Services;
 using CMS.ContentEngine;
@@ -147,7 +147,7 @@ public class EventWebinarCardsService : IEventWebinarCardsService
                 {
                     c.ForWebsite(channel)
                      .Where(w => w.WhereEquals(nameof(IEventOrWebinar.EventIsPrivate), false));
-
+                     
                     foreach (var decorator in filterWhereExpressions)
                     {
                         c.Where(decorator);
@@ -158,6 +158,7 @@ public class EventWebinarCardsService : IEventWebinarCardsService
             decorateQuery?.Invoke(builder);
             return builder;
         }
+
 
         var eventsTask = _contentQueryExecutor.GetWebPageResult<Event>(
             BuildQuery(Event.CONTENT_TYPE_NAME),
@@ -180,11 +181,12 @@ public class EventWebinarCardsService : IEventWebinarCardsService
             .Where(x => x is not null)
             .Where(x =>
             {
-                if (!filterOnEventToDate)
-                    return true;
-
-                var isPast = x.EventDateTo <= currentDateTimeUtc;
-                return showPastPages ? isPast : !isPast;
+                if (!showPastPages)
+                {
+                    var isPast = x.EventDateTo <= currentDateTimeUtc;
+                    return showPastPages ? isPast : !isPast;
+                }
+                return true;
             });
 
         IEventOrWebinar[] ordered =

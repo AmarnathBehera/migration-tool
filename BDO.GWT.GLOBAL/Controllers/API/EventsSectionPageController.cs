@@ -26,7 +26,7 @@ public class EventsSectionPageController : ControllerBase
         query.Filters = RequestQueryUtility.ExtractFilterQueryParameters(Request.Query);
 
         query.Filters.Add(FilterParameterName.ShowOngoingEvents, bool.TrueString);
-
+         
         var items = await _eventsSectionPageService.GetFilteredItemsAsync(query, cancellationToken);
 
         return Ok(items);
