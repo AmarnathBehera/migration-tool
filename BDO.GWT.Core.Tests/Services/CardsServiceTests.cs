@@ -24,17 +24,13 @@ public class CardsServiceTests
     {
         _contentServiceMock = new Mock<IContentService>();
         _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
-        _taxonomyTagRetrieverMock = new Mock<ITaxonomyTagRetriever>();
-        _cultureContextMock = new Mock<ICultureContext>();
-
-        _cultureContextMock.Setup(c => c.CurrentLanguageTag).Returns("en");
+       
         _websiteChannelContextMock.Setup(c => c.WebsiteChannelID).Returns(1);
 
         _service = new CardsService(
             _contentServiceMock.Object,
-            _websiteChannelContextMock.Object,
-            _taxonomyTagRetrieverMock.Object,
-            _cultureContextMock.Object);
+            _websiteChannelContextMock.Object
+            );
     }
 
     [Test]
