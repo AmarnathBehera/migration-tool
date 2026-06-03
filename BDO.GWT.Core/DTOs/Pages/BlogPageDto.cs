@@ -3,23 +3,22 @@ using BDO.GWT.Web.Core.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using BDO.GWT.Core.Data;
 
 namespace BDO.GWT.Core.DTOs
 {
+    //Dto used for Blog page
+    // CardsGrid used to display blogs
+    //CardsGrid has API endpoint to fetch blogs on intial load and on filter change
     public class BlogPageDto
     {
-        public HeroDto Hero { get; set; } = null!;
+        public string Title { get; set; } = null!;
 
-        public ItemListDto ItemList {  get; set; }   = null!;
+        public HeroData Hero { get; set; } = null!;
 
-        public MetaDataDto? MetaData { get; set; }
+        public bool EnableFilters { get; set; } = false;
 
-        public SearchAndSEODto? SearchAndSEO { get; set; }
+        public CardsGridDto CardsGrid { get; set; } = null!;
 
-        public OGMetaDataDto? OGMetaData { get; set; }
-
-        public BaseContent? BaseContent { get; set; }
-
-        public BaseWebPage? BaseWebPage { get; set; }
     }
 }
