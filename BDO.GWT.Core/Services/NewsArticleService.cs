@@ -19,21 +19,15 @@ public class NewsArticleService : INewsArticleService
     private readonly ISidebarService _sidebarService;
     private readonly IContentService _contentService;
     private readonly IExternalPeopleHelper _externalPeopleHelper;
-    private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
-    private readonly ICultureContext _cultureContext;
-
     public NewsArticleService(
         ISidebarService sidebarService,
         IContentService contentService,
-        IExternalPeopleHelper externalPeopleHelper,
-        ITaxonomyTagRetriever taxonomyTagRetriever,
-        ICultureContext cultureContext)
+        IExternalPeopleHelper externalPeopleHelper)
     {
         _sidebarService = sidebarService;
         _contentService = contentService;
         _externalPeopleHelper = externalPeopleHelper;
-        _taxonomyTagRetriever = taxonomyTagRetriever;
-        _cultureContext = cultureContext;
+    
     }
     public async Task<SectionNewsPageDto> GetSectionNewsPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken)
     {

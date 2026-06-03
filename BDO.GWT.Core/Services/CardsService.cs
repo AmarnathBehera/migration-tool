@@ -17,20 +17,14 @@ public class CardsService : ICardsService
 {
     private readonly IContentService _contentService;
     private readonly IWebsiteChannelContext _websiteChannelContext;
-    private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
-    private readonly ICultureContext _cultureContext;
 
     public CardsService(
         IContentService contentService,
-        IWebsiteChannelContext websiteChannelContext,
-        ITaxonomyTagRetriever taxonomyTagRetriever,
-        ICultureContext cultureContext
+        IWebsiteChannelContext websiteChannelContext
         )
     {
         _contentService = contentService;
         _websiteChannelContext = websiteChannelContext;
-        _taxonomyTagRetriever = taxonomyTagRetriever;
-        _cultureContext = cultureContext;
     }
 
     public async Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(HashSet<string> filterParameterNames, string? nodeAliasPath, CancellationToken cancellationToken)

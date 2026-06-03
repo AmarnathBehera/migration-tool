@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 
-public class DropdownScriptExecutor
+namespace BDO.GWT.GLOBAL.Components.FormComponents.CustomDropdown
+{
+    public class DropdownScriptExecutor
 {
     public Task<IEnumerable<CustomDropdownOption>> ExecuteAsync(string sql)
     {
