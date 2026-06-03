@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>SpecialtiesArea-soz8hxme</CodeName>
+    <GUID>79215a26-190d-49e9-902c-0a47f64b66b5</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-27 10:07:17Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>f15cc349-4ca4-4e9e-bccd-f7ad29a58121</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-28 09:28:56Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <HeroBackgroundImage_MobileAltText />
+  <HeroBackgroundImageAltText />
+  <HeroCallToActionButtonText />
+  <HeroCallToActionButtonType>none</HeroCallToActionButtonType>
+  <HeroLayout>banner</HeroLayout>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataDescription>
+    <![CDATA[<p>Description of the page Specialties Title</p>]]>
+  </MetadataDescription>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTeaserImageAltText />
+  <MetadataTitle>Specialties Area Title</MetadataTitle>
+</cms.contentitemcommondata>

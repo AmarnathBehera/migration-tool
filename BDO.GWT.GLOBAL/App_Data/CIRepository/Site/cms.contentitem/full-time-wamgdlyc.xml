@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitem>
+  <ContentItemChannelID>
+    <CodeName>Site</CodeName>
+    <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+    <ObjectType>cms.channel</ObjectType>
+  </ContentItemChannelID>
+  <ContentItemContentTypeID>
+    <CodeName>BDO.CareerEmploymentTypes</CodeName>
+    <GUID>1616dcd8-526f-453e-8959-aa2fbb6a194d</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </ContentItemContentTypeID>
+  <ContentItemGUID>4d0e5a52-d044-4287-8740-2380dd9a2fb5</ContentItemGUID>
+  <ContentItemIsReusable>False</ContentItemIsReusable>
+  <ContentItemIsSecured>False</ContentItemIsSecured>
+  <ContentItemName>Full-time-wamgdlyc</ContentItemName>
+</cms.contentitem>

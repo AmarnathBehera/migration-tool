@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.rsscategories>
+  <CodeName>LapeRSSCategory</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>2c1f44a3-1761-4d15-a74c-14168b70e257</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>LapeRSSCategory-rk5ezi65</CodeName>
+      <GUID>a1301c2c-8875-4445-afb6-5f0d97e62a83</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>4f3841c1-6ebf-464b-93d8-f0c45c476fb7</ContentItemDataGUID>
+  <Name>Lape RSS Category</Name>
+</contentitemdata.bdo.rsscategories>

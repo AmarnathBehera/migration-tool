@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>CRContentSharing</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="CRContentSharingID" columntype="integer" enabled="true" guid="21164fbe-6081-4d75-b010-087c0e94b41b" isPK="true" />
+      <field column="DefaultInsightInstructions" columnprecision="0" columntype="richtexthtml" enabled="true" guid="5c05b656-cdc8-46ec-ab1d-0ce75417fc82" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>0000c704-4053-4f81-b772-cc15a390803d</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.CRContentSharing</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_CRContentSharing</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

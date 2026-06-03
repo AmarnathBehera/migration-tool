@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>ExternalContributor-2-2o1zm6xw</CodeName>
+    <GUID>879e1abc-f8e1-4774-9ed9-9a8948eaa5d1</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-28 05:52:20Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>2834e3a0-5d22-42eb-9617-bc2119ce3334</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-28 05:52:20Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTitle>External Contributor 2</MetadataTitle>
+</cms.contentitemcommondata>

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.blog>
+  <BlogPostListFilters>
+    <![CDATA[person;businessIssue;businessLine;IndustryCategory;keywords]]>
+  </BlogPostListFilters>
+  <ContentItemDataCommonDataID>
+    <GUID>216e94b8-827b-4444-8299-84d5b9739663</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>CMSTechBlog-rfgnjijk</CodeName>
+      <GUID>5f4f2e5b-6f14-4d65-915a-686fd1066725</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>5a1a499f-daa0-49da-a1d8-a60f90d9e416</ContentItemDataGUID>
+</contentitemdata.bdo.blog>

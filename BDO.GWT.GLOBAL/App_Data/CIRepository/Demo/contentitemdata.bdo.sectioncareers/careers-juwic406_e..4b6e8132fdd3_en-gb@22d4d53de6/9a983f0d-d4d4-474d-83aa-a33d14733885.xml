@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.sectioncareers>
+  <ContentItemDataCommonDataID>
+    <GUID>e6b3fcfd-e6b9-4701-8e19-4b6e8132fdd3</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Careers-juwic406</CodeName>
+      <GUID>63978d61-9537-4bf0-bdd8-315ecd81616e</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>9a983f0d-d4d4-474d-83aa-a33d14733885</ContentItemDataGUID>
+  <ShowCopyUrlButtonInJobOpportunity>False</ShowCopyUrlButtonInJobOpportunity>
+</contentitemdata.bdo.sectioncareers>

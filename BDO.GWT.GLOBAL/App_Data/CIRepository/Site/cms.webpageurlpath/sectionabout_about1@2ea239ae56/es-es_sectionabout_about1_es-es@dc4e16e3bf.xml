@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageurlpath>
+  <WebPageUrlPath>es-es/SectionAbout/about1</WebPageUrlPath>
+  <WebPageUrlPathContentLanguageID>
+    <CodeName>es-es</CodeName>
+    <GUID>ee380e62-f7ff-416a-88c1-646fe247d5f3</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </WebPageUrlPathContentLanguageID>
+  <WebPageUrlPathGUID>df7508cb-b5f0-4f20-83d1-c421e5ac9040</WebPageUrlPathGUID>
+  <WebPageUrlPathHash>
+    <![CDATA[23E58D31097F50037DDB3993F33E0AC480994F024BD67D9AECEAD94CDA1CFD88]]>
+  </WebPageUrlPathHash>
+  <WebPageUrlPathIsCanonical>True</WebPageUrlPathIsCanonical>
+  <WebPageUrlPathIsDraft>False</WebPageUrlPathIsDraft>
+  <WebPageUrlPathIsLatest>True</WebPageUrlPathIsLatest>
+  <WebPageUrlPathType>0</WebPageUrlPathType>
+  <WebPageUrlPathWebPageItemID>
+    <CodeName>About1-1m2mxgqg</CodeName>
+    <GUID>5c171a99-3c8a-47f0-817c-baa22617d136</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageUrlPathWebPageItemID>
+  <WebPageUrlPathWebsiteChannelID>
+    <GUID>97ffcb4b-7969-4019-9e7d-e39462ccd229</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Site</CodeName>
+      <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageUrlPathWebsiteChannelID>
+</cms.webpageurlpath>

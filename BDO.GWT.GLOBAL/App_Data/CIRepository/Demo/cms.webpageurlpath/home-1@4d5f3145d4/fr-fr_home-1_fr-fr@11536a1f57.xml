@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageurlpath>
+  <WebPageUrlPath>fr-fr/Home-1</WebPageUrlPath>
+  <WebPageUrlPathContentLanguageID>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </WebPageUrlPathContentLanguageID>
+  <WebPageUrlPathGUID>a4434bfd-ca76-4e8b-a739-91024cc7a415</WebPageUrlPathGUID>
+  <WebPageUrlPathHash>
+    <![CDATA[EAC87CD7A745366645E45FACF9B88530CFA3F22FB50823D0C799095E897B6BA9]]>
+  </WebPageUrlPathHash>
+  <WebPageUrlPathIsCanonical>True</WebPageUrlPathIsCanonical>
+  <WebPageUrlPathIsDraft>False</WebPageUrlPathIsDraft>
+  <WebPageUrlPathIsLatest>True</WebPageUrlPathIsLatest>
+  <WebPageUrlPathType>0</WebPageUrlPathType>
+  <WebPageUrlPathWebPageItemID>
+    <CodeName>Home-1-0w5gt0ff</CodeName>
+    <GUID>e0dcee90-6c27-48a3-8b7a-6e9ae5737444</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageUrlPathWebPageItemID>
+  <WebPageUrlPathWebsiteChannelID>
+    <GUID>5ea050ab-8837-4f4f-91ff-59d581302cfe</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Demo</CodeName>
+      <GUID>7f5fa031-6e78-4286-8227-fe393248a477</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageUrlPathWebsiteChannelID>
+</cms.webpageurlpath>

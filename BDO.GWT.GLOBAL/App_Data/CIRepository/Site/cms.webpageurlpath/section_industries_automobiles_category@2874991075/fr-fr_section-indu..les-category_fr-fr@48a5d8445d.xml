@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageurlpath>
+  <WebPageUrlPath>fr-fr/section-Industries/Automobiles-category</WebPageUrlPath>
+  <WebPageUrlPathContentLanguageID>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </WebPageUrlPathContentLanguageID>
+  <WebPageUrlPathGUID>14bfd464-4991-41ab-8f15-987b3c5b3710</WebPageUrlPathGUID>
+  <WebPageUrlPathHash>
+    <![CDATA[3D04E1FBCD1D1C928DF786520C7EFE71D7A7CDB70E753DBFEE351A118021D5AD]]>
+  </WebPageUrlPathHash>
+  <WebPageUrlPathIsCanonical>True</WebPageUrlPathIsCanonical>
+  <WebPageUrlPathIsDraft>False</WebPageUrlPathIsDraft>
+  <WebPageUrlPathIsLatest>True</WebPageUrlPathIsLatest>
+  <WebPageUrlPathType>0</WebPageUrlPathType>
+  <WebPageUrlPathWebPageItemID>
+    <CodeName>AutomobilesCategory-bfgsgylq</CodeName>
+    <GUID>12d03954-127d-41a5-a0f2-c69ec98959d5</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageUrlPathWebPageItemID>
+  <WebPageUrlPathWebsiteChannelID>
+    <GUID>97ffcb4b-7969-4019-9e7d-e39462ccd229</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Site</CodeName>
+      <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageUrlPathWebsiteChannelID>
+</cms.webpageurlpath>

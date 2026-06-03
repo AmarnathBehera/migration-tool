@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageitem>
+  <WebPageItemContentItemID>
+    <CodeName>Topic2-kejdqh7h</CodeName>
+    <GUID>6adbd138-41e9-429a-8605-e958dcb58e7a</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </WebPageItemContentItemID>
+  <WebPageItemGUID>d7b42ccd-b582-46dd-8b3d-a0426f2d411c</WebPageItemGUID>
+  <WebPageItemName>Topic2-kejdqh7h</WebPageItemName>
+  <WebPageItemOrder>2</WebPageItemOrder>
+  <WebPageItemParentID>
+    <CodeName>Faq2Folder-upryd18a</CodeName>
+    <GUID>bc7aef97-d3ca-4a37-be90-11a75557adeb</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageItemParentID>
+  <WebPageItemTreePath>/Section_Widget_Content/Faq_2_folder/topic2</WebPageItemTreePath>
+  <WebPageItemWebsiteChannelID>
+    <GUID>97ffcb4b-7969-4019-9e7d-e39462ccd229</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Site</CodeName>
+      <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageItemWebsiteChannelID>
+</cms.webpageitem>

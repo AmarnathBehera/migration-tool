@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>BDOIndoreOffice2-7j4m32bt</CodeName>
+    <GUID>94133ced-2ef1-4178-b8d5-eb950909760a</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-04-30 07:31:01Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>e00ba6ac-0da4-437b-bda0-dd35aae98576</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-04-30 07:31:01Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataBusinessIssuesTG />
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTeaserImageAltText>BDO Indore Office 2</MetadataTeaserImageAltText>
+  <MetadataTitle>BDO Indore Office2</MetadataTitle>
+</cms.contentitemcommondata>

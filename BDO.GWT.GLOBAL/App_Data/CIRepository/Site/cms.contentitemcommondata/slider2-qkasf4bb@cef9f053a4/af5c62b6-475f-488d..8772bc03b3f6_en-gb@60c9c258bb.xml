@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>Slider2-qkasf4bb</CodeName>
+    <GUID>bda7c108-240d-46b4-a6c6-d11b75966d9b</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-14 05:53:55Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>af5c62b6-475f-488d-b4d3-8772bc03b3f6</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-14 05:53:55Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <MetadataBusinessIssuesTG />
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>68e87402-374e-4c27-967a-0f50f2b09ec0</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>020c221f-4d5f-4062-85e6-9743d0b3506e</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>af5c62b6-475f-488d-b4d3-8772bc03b3f6</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Slider2-h62jk9sn</CodeName>
+        <GUID>868a3a80-0614-4062-9800-a1aa598cf8f0</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>3b334dd4-6f77-4de1-9dde-176a6b25299d</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>b05afd7b-31ce-4cbf-9484-072401c67867</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>af5c62b6-475f-488d-b4d3-8772bc03b3f6</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Slider2-h62jk9sn</CodeName>
+        <GUID>868a3a80-0614-4062-9800-a1aa598cf8f0</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>ad0848c2-020b-4f0d-aff8-878dab506683</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>68953da0-5408-404b-9ca2-48d5cdd92f99</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>af5c62b6-475f-488d-b4d3-8772bc03b3f6</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Slider2-h62jk9sn</CodeName>
+        <GUID>868a3a80-0614-4062-9800-a1aa598cf8f0</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

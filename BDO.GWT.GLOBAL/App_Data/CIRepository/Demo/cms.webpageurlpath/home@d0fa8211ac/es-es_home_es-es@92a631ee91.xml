@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageurlpath>
+  <WebPageUrlPath>es-es/Home</WebPageUrlPath>
+  <WebPageUrlPathContentLanguageID>
+    <CodeName>es-es</CodeName>
+    <GUID>ee380e62-f7ff-416a-88c1-646fe247d5f3</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </WebPageUrlPathContentLanguageID>
+  <WebPageUrlPathGUID>290c4366-2168-4ee7-90f6-f145fca0cbad</WebPageUrlPathGUID>
+  <WebPageUrlPathHash>
+    <![CDATA[2983A233C429B8836BD0FE10C0150ACFD651460EBA744F1A59344EDD63F63607]]>
+  </WebPageUrlPathHash>
+  <WebPageUrlPathIsCanonical>True</WebPageUrlPathIsCanonical>
+  <WebPageUrlPathIsDraft>False</WebPageUrlPathIsDraft>
+  <WebPageUrlPathIsLatest>True</WebPageUrlPathIsLatest>
+  <WebPageUrlPathType>0</WebPageUrlPathType>
+  <WebPageUrlPathWebPageItemID>
+    <CodeName>Home-viaisaxf</CodeName>
+    <GUID>9096b814-2358-43a4-b10e-a49d42b4e75a</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageUrlPathWebPageItemID>
+  <WebPageUrlPathWebsiteChannelID>
+    <GUID>5ea050ab-8837-4f4f-91ff-59d581302cfe</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Demo</CodeName>
+      <GUID>7f5fa031-6e78-4286-8227-fe393248a477</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageUrlPathWebsiteChannelID>
+</cms.webpageurlpath>

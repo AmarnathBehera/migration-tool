@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.SectionSpecialties</CodeName>
+    <GUID>4cbaa98f-42c8-4bf3-9bd4-21805730b520</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.SpecialtiesCategory">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.SpecialtiesCategory</CodeName>
+        <GUID>ddc2c96a-2502-4adf-8b89-5ec17af92366</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

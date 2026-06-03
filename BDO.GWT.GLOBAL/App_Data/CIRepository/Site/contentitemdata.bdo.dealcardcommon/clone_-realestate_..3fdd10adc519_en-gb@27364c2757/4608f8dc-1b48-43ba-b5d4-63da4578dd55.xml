@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.dealcardcommon>
+  <CodeName>RealEstate.Hr-HR</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>30083ddb-2648-4f7a-9f92-3fdd10adc519</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Clone_-RealEstate_hr-HR-h3mrxwn5</CodeName>
+      <GUID>a93cb6b1-7e34-4c67-9ecc-8549ac84e74a</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>4608f8dc-1b48-43ba-b5d4-63da4578dd55</ContentItemDataGUID>
+  <Language>hr-HR</Language>
+  <Name>Real Estate</Name>
+</contentitemdata.bdo.dealcardcommon>

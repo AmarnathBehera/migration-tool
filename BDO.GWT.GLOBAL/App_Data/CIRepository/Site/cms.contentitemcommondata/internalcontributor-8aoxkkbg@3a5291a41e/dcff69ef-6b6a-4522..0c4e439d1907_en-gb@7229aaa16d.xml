@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>InternalContributor-8aoxkkbg</CodeName>
+    <GUID>7b5e364e-3e2b-4084-b4a1-a608f6a37159</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-28 05:44:24Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>dcff69ef-6b6a-4522-87c0-0c4e439d1907</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-28 10:05:10Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ImageFile>
+    <![CDATA[[{"Identifier":"8ad29274-7718-4b10-8dd0-8011ef0be8d4"}]]]>
+  </ImageFile>
+  <ImageFileAltText>Image alt text</ImageFileAltText>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTeaserImageAltText />
+  <MetadataTitle>Internal Contributor 1</MetadataTitle>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>279701fd-47c3-4ddf-9fbc-ea555ed99a63</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>04943a85-9c99-4afc-bac7-12cf8f6e01e4</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>dcff69ef-6b6a-4522-87c0-0c4e439d1907</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Banner-e7tri4da</CodeName>
+        <GUID>8ad29274-7718-4b10-8dd0-8011ef0be8d4</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>Featured-fohwo2so</CodeName>
+    <GUID>9ea865e8-f4bd-4c14-862e-90c80d743311</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-04-01 07:16:42Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>25ceefec-a898-496f-bec2-889898a9a29d</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-20 07:44:17Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <MetadataBusinessIssuesTG />
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>ea7325ac-ba9d-4fe2-9fcd-a426781d0705</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>52df30c8-39c4-4c5a-bcd1-8341540c7b0d</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>25ceefec-a898-496f-bec2-889898a9a29d</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Navigation-jfz63pmg</CodeName>
+        <GUID>f121ba2c-8ef6-4eec-a66f-f3a3cdb3b549</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>916edcfc-66d4-475a-98f0-f0bdd1011ec6</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>b897884d-8e9c-4d5f-a8d4-02e3ae0ff51e</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>25ceefec-a898-496f-bec2-889898a9a29d</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>AutomobilesCategory-bfgsgylq</CodeName>
+        <GUID>8578ac71-0655-4603-8ea1-858ac2460051</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

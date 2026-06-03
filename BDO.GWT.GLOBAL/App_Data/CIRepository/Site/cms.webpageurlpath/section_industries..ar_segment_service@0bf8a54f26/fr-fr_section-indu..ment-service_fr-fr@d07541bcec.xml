@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageurlpath>
+  <WebPageUrlPath>
+    <![CDATA[fr-fr/section-Industries/Automobiles-category/Hybrid-automobiles/Regular-segment-service]]>
+  </WebPageUrlPath>
+  <WebPageUrlPathContentLanguageID>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </WebPageUrlPathContentLanguageID>
+  <WebPageUrlPathGUID>6bc4993f-ce18-407a-949c-5e238f69bf6e</WebPageUrlPathGUID>
+  <WebPageUrlPathHash>
+    <![CDATA[7CDF574BC78764FE5792B1BB5D1C90D34568A9C3E28F59387CABE40CC16CD85F]]>
+  </WebPageUrlPathHash>
+  <WebPageUrlPathIsCanonical>True</WebPageUrlPathIsCanonical>
+  <WebPageUrlPathIsDraft>False</WebPageUrlPathIsDraft>
+  <WebPageUrlPathIsLatest>True</WebPageUrlPathIsLatest>
+  <WebPageUrlPathType>0</WebPageUrlPathType>
+  <WebPageUrlPathWebPageItemID>
+    <CodeName>RegularSegmentService-o0qvgdhp</CodeName>
+    <GUID>682a8058-3416-4c01-a1b6-8dc249934122</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageUrlPathWebPageItemID>
+  <WebPageUrlPathWebsiteChannelID>
+    <GUID>97ffcb4b-7969-4019-9e7d-e39462ccd229</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Site</CodeName>
+      <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageUrlPathWebsiteChannelID>
+</cms.webpageurlpath>

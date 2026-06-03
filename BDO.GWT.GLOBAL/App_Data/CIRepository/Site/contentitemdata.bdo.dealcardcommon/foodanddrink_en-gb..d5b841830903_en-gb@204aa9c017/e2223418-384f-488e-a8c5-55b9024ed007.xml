@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.dealcardcommon>
+  <CodeName>BusinessServices.En-GBFoodAndDrink.En.GB</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>bb9d7255-c9d8-41ae-b0fc-d5b841830903</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>FoodAndDrink_en-GB-gtofr9qv</CodeName>
+      <GUID>a6bf414c-3869-467d-99ce-a6056bcf5819</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>e2223418-384f-488e-a8c5-55b9024ed007</ContentItemDataGUID>
+  <Language>en-GB</Language>
+  <Name>Food and Drink</Name>
+</contentitemdata.bdo.dealcardcommon>

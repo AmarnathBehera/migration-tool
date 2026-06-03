@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitem>
+  <ContentItemChannelID>
+    <CodeName>Site</CodeName>
+    <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+    <ObjectType>cms.channel</ObjectType>
+  </ContentItemChannelID>
+  <ContentItemContentTypeID>
+    <CodeName>BDO.NavigationFeaturedItem</CodeName>
+    <GUID>c37981b7-d491-49fd-b6ad-d06c01b9efee</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </ContentItemContentTypeID>
+  <ContentItemGUID>9d132814-daf5-4c75-bb81-47b1d85ca69c</ContentItemGUID>
+  <ContentItemIsReusable>False</ContentItemIsReusable>
+  <ContentItemIsSecured>False</ContentItemIsSecured>
+  <ContentItemName>Featured-s3l9hbw4</ContentItemName>
+</cms.contentitem>

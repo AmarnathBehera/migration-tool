@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitem>
+  <ContentItemChannelID>
+    <CodeName>Site</CodeName>
+    <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+    <ObjectType>cms.channel</ObjectType>
+  </ContentItemChannelID>
+  <ContentItemContentTypeID>
+    <CodeName>BDO.ContentTypesFolder</CodeName>
+    <GUID>8b1ae0d6-31df-4491-959e-a6b8d86bb7a9</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </ContentItemContentTypeID>
+  <ContentItemGUID>92131374-6eb3-4a5a-8ca2-c47be57f1144</ContentItemGUID>
+  <ContentItemIsReusable>False</ContentItemIsReusable>
+  <ContentItemIsSecured>False</ContentItemIsSecured>
+  <ContentItemName>ContentTypes-q3d6m23n</ContentItemName>
+</cms.contentitem>

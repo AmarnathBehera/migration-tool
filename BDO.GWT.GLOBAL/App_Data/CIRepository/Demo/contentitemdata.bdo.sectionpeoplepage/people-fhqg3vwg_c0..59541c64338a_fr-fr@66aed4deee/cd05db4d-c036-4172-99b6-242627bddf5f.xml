@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.sectionpeoplepage>
+  <ContentItemDataCommonDataID>
+    <GUID>c0dd8280-dc9c-4014-8b43-59541c64338a</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>People-fhqg3vwg</CodeName>
+      <GUID>788bcb5e-745d-40e1-92fa-9161a8b09018</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>cd05db4d-c036-4172-99b6-242627bddf5f</ContentItemDataGUID>
+  <DisplayEmailAddressInPersonPage>True</DisplayEmailAddressInPersonPage>
+  <DisplayFullEmailAddress>False</DisplayFullEmailAddress>
+  <EnableForm>True</EnableForm>
+  <PeopleListDefaultOrder>asc</PeopleListDefaultOrder>
+  <PeopleListFilteringEnabled>True</PeopleListFilteringEnabled>
+  <PeopleListFilters>
+    <![CDATA[certificat;ligneAffaires;catégorieIndustrie]]>
+  </PeopleListFilters>
+  <PeopleListOrderingEnabled>True</PeopleListOrderingEnabled>
+</contentitemdata.bdo.sectionpeoplepage>

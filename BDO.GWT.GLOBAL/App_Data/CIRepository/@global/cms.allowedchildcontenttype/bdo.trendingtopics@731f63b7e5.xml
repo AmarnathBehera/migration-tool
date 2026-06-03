@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.TrendingTopics</CodeName>
+    <GUID>679d9478-6cee-46a5-98d7-0777bfcfceba</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.TrendingTopic">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.TrendingTopic</CodeName>
+        <GUID>fb32f974-a837-4685-b43e-b49db033d0d9</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

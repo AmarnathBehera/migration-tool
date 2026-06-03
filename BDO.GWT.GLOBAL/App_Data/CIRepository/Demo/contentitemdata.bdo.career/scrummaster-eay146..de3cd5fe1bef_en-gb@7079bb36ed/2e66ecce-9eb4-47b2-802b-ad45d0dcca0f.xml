@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.career>
+  <CareerEmploymentType>
+    <![CDATA[[{"Identifier":"6a0047a7-737b-462d-9d9b-4cfc7310f177"}]]]>
+  </CareerEmploymentType>
+  <CareerJobTitle>
+    <![CDATA[[{"Identifier":"56d936c2-60ae-4007-ba4f-b57aa753a0a3"}]]]>
+  </CareerJobTitle>
+  <CareerLevel>
+    <![CDATA[[{"Identifier":"1f26b5c1-6c78-456b-a158-e17f20283ebb"}]]]>
+  </CareerLevel>
+  <ContentItemDataCommonDataID>
+    <GUID>f0d5c636-21db-42ec-b67c-de3cd5fe1bef</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>ScrumMaster-eay146aj</CodeName>
+      <GUID>4e15d3be-a772-49fa-b4a6-281a8aaa33ed</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>2e66ecce-9eb4-47b2-802b-ad45d0dcca0f</ContentItemDataGUID>
+  <DocumentPublishFrom>2026-05-03 05:25:36Z</DocumentPublishFrom>
+  <MetadataOfficeLocation>
+    <![CDATA[[{"Identifier":"94133ced-2ef1-4178-b8d5-eb950909760a"}]]]>
+  </MetadataOfficeLocation>
+</contentitemdata.bdo.career>

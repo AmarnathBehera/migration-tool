@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.navigationfirstlevelitem>
+  <ContentItemDataCommonDataID>
+    <GUID>43c18b4e-fb88-46b1-bf25-b8444aba7594</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Insights-g9aungd4</CodeName>
+      <GUID>c7fefde8-d66d-4db3-a2af-bc66f994525b</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>759ca0ae-0fc5-4039-9e62-bf63be9b069a</ContentItemDataGUID>
+  <TargetURL>
+    <![CDATA[[{"WebPageGuid":"e728e7af-962b-4c37-bd80-c4b935dbe1af"}]]]>
+  </TargetURL>
+  <Title>About Us</Title>
+</contentitemdata.bdo.navigationfirstlevelitem>

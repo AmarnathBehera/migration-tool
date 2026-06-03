@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageurlpath>
+  <WebPageUrlPath>section-Industries/industries-category/industry1</WebPageUrlPath>
+  <WebPageUrlPathContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </WebPageUrlPathContentLanguageID>
+  <WebPageUrlPathGUID>37d69422-c487-4f80-991b-4a0774151a37</WebPageUrlPathGUID>
+  <WebPageUrlPathHash>
+    <![CDATA[9754C51C9F6C292A787DB9F91050E6F1AF1CB86EBBCEA4E1A842506503586A93]]>
+  </WebPageUrlPathHash>
+  <WebPageUrlPathIsCanonical>True</WebPageUrlPathIsCanonical>
+  <WebPageUrlPathIsDraft>False</WebPageUrlPathIsDraft>
+  <WebPageUrlPathIsLatest>True</WebPageUrlPathIsLatest>
+  <WebPageUrlPathType>0</WebPageUrlPathType>
+  <WebPageUrlPathWebPageItemID>
+    <CodeName>Industry1-da3gbyhm</CodeName>
+    <GUID>3e22944a-610c-48bb-93cb-2b05751b3bed</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageUrlPathWebPageItemID>
+  <WebPageUrlPathWebsiteChannelID>
+    <GUID>5ea050ab-8837-4f4f-91ff-59d581302cfe</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Demo</CodeName>
+      <GUID>7f5fa031-6e78-4286-8227-fe393248a477</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageUrlPathWebsiteChannelID>
+</cms.webpageurlpath>

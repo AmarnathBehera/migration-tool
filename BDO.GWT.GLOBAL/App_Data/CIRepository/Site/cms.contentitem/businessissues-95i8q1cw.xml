@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitem>
+  <ContentItemChannelID>
+    <CodeName>Site</CodeName>
+    <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+    <ObjectType>cms.channel</ObjectType>
+  </ContentItemChannelID>
+  <ContentItemContentTypeID>
+    <CodeName>BDO.BusinessIssuesFolder</CodeName>
+    <GUID>ec9f8d4b-f38b-4552-a3c3-958bff31a01e</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </ContentItemContentTypeID>
+  <ContentItemGUID>15726c28-86e5-4703-bd14-abce26dc3c3e</ContentItemGUID>
+  <ContentItemIsReusable>False</ContentItemIsReusable>
+  <ContentItemIsSecured>False</ContentItemIsSecured>
+  <ContentItemName>BusinessIssues-95i8q1cw</ContentItemName>
+</cms.contentitem>

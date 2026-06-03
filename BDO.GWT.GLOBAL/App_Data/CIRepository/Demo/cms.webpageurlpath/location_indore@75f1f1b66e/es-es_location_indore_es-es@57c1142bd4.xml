@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageurlpath>
+  <WebPageUrlPath>es-es/Location/Indore</WebPageUrlPath>
+  <WebPageUrlPathContentLanguageID>
+    <CodeName>es-es</CodeName>
+    <GUID>ee380e62-f7ff-416a-88c1-646fe247d5f3</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </WebPageUrlPathContentLanguageID>
+  <WebPageUrlPathGUID>2909f9c6-2501-476c-ab68-254677d1f82c</WebPageUrlPathGUID>
+  <WebPageUrlPathHash>
+    <![CDATA[F1DCCD3266FE19657BBB4FE29945255B1B7A51B1C144C90DFA1959DE84E9CDBE]]>
+  </WebPageUrlPathHash>
+  <WebPageUrlPathIsCanonical>True</WebPageUrlPathIsCanonical>
+  <WebPageUrlPathIsDraft>False</WebPageUrlPathIsDraft>
+  <WebPageUrlPathIsLatest>True</WebPageUrlPathIsLatest>
+  <WebPageUrlPathType>0</WebPageUrlPathType>
+  <WebPageUrlPathWebPageItemID>
+    <CodeName>Indore-5qjfeox9</CodeName>
+    <GUID>55021b98-0b90-4d1f-9786-4b91c57d68bd</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageUrlPathWebPageItemID>
+  <WebPageUrlPathWebsiteChannelID>
+    <GUID>5ea050ab-8837-4f4f-91ff-59d581302cfe</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Demo</CodeName>
+      <GUID>7f5fa031-6e78-4286-8227-fe393248a477</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageUrlPathWebsiteChannelID>
+</cms.webpageurlpath>

@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>CareerCategory-cyi4iixr</CodeName>
+    <GUID>d9506378-7982-46dd-b381-b1deb1bb8f9a</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-13 07:45:02Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>3238de43-15ec-4718-ae36-9a6673e2d3c6</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-13 07:45:02Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderTemplateConfiguration>
+    <![CDATA[{"identifier":"BDO.CareerCategory","properties":null,"fieldIdentifiers":null}]]>
+  </ContentItemCommonDataVisualBuilderTemplateConfiguration>
+  <HeroBackgroundImage>
+    <![CDATA[[{"Identifier":"078727b4-6ce9-4297-bade-0d7c92ee4800"}]]]>
+  </HeroBackgroundImage>
+  <HeroBackgroundImage_Mobile>
+    <![CDATA[[{"Identifier":"078727b4-6ce9-4297-bade-0d7c92ee4800"}]]]>
+  </HeroBackgroundImage_Mobile>
+  <HeroBackgroundImage_MobileAltText>alt</HeroBackgroundImage_MobileAltText>
+  <HeroBackgroundImageAltText>alt text</HeroBackgroundImageAltText>
+  <HeroCallToActionButtonText>Click</HeroCallToActionButtonText>
+  <HeroCallToActionButtonType>tertiary</HeroCallToActionButtonType>
+  <HeroDescription>faegregfv</HeroDescription>
+  <HeroLayout>hero</HeroLayout>
+  <HeroTitle>Title</HeroTitle>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataBusinessIssuesTG />
+  <MetadataDescription>
+    <![CDATA[<p>agehytdjtdhgfgf</p>]]>
+  </MetadataDescription>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTitle>Career  CAT Title</MetadataTitle>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6e10753f-0d29-4f6c-a16e-63f0d38e4f02</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>6cb99903-e4c1-42ef-9e5b-bdba371f4594</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>3238de43-15ec-4718-ae36-9a6673e2d3c6</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>TestImg2-vw09i5er</CodeName>
+        <GUID>078727b4-6ce9-4297-bade-0d7c92ee4800</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6fc08044-a87a-465e-b463-77a25b10ecba</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>60776916-299f-45bd-90cf-4479da8da918</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>3238de43-15ec-4718-ae36-9a6673e2d3c6</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>TestImg2-vw09i5er</CodeName>
+        <GUID>078727b4-6ce9-4297-bade-0d7c92ee4800</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

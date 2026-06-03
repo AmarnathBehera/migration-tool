@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.career>
+  <CareerEmploymentType>
+    <![CDATA[[{"Identifier":"5d4adcda-e8d9-4841-b6a3-f2e06fbc3eac"}]]]>
+  </CareerEmploymentType>
+  <CareerJobTitle>
+    <![CDATA[[{"Identifier":"6d5f0f9c-a676-4344-a353-6c494facaa63"}]]]>
+  </CareerJobTitle>
+  <CareerLevel>
+    <![CDATA[[{"Identifier":"e8e88879-51c1-478b-b31f-1b37023146e9"}]]]>
+  </CareerLevel>
+  <ContentItemDataCommonDataID>
+    <GUID>363a4cdb-67d1-4827-8104-9ed41da2242f</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Auditor-4rr07eq4</CodeName>
+      <GUID>d391b75f-0db8-48bb-bb40-0d4ee85ac03c</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>ed18815d-09ce-4a50-97cb-c9a49f08d111</ContentItemDataGUID>
+  <DocumentPublishFrom>2026-05-18 11:11:51Z</DocumentPublishFrom>
+  <MetadataOfficeLocation>
+    <![CDATA[[{"Identifier":"81c108dc-968f-45ed-a242-4f85b8d35f28"}]]]>
+  </MetadataOfficeLocation>
+</contentitemdata.bdo.career>

@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.careeremploymenttypes>
+  <CodeName>Full-time</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>6792e157-70bf-4df4-bb8a-ca5479a30192</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Full-time-wamgdlyc</CodeName>
+      <GUID>4d0e5a52-d044-4287-8740-2380dd9a2fb5</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>6adaae81-c2af-4468-aaf8-b2f08ab6ffb5</ContentItemDataGUID>
+  <Name>Full-time</Name>
+</contentitemdata.bdo.careeremploymenttypes>

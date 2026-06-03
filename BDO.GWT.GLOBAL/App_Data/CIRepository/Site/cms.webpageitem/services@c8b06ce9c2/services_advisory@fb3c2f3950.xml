@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageitem>
+  <WebPageItemContentItemID>
+    <CodeName>Advisory-aa1jply2</CodeName>
+    <GUID>c2d3be33-0962-424c-bcb2-3b1754d28c4f</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </WebPageItemContentItemID>
+  <WebPageItemGUID>ddfab0ae-ac3b-4fe2-9c82-d2c24707800d</WebPageItemGUID>
+  <WebPageItemName>Advisory-aa1jply2</WebPageItemName>
+  <WebPageItemOrder>1</WebPageItemOrder>
+  <WebPageItemParentID>
+    <CodeName>Services-bdo6y535</CodeName>
+    <GUID>eb985bb1-4396-4fad-8dbb-ac92722ef2a7</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageItemParentID>
+  <WebPageItemTreePath>/Services/Advisory</WebPageItemTreePath>
+  <WebPageItemWebsiteChannelID>
+    <GUID>97ffcb4b-7969-4019-9e7d-e39462ccd229</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Site</CodeName>
+      <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageItemWebsiteChannelID>
+</cms.webpageitem>

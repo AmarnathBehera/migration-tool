@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.dealcardcommon>
+  <CodeName>BusinessServices.En-GB</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>cce085fb-6887-4280-b450-42a4de98d06d</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>BusinessServices-ot2hkpuy</CodeName>
+      <GUID>b876e030-11f9-4287-a9d2-1b78db7e7b66</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>eb41c91f-a7d2-44a6-b080-5fe02c6837ce</ContentItemDataGUID>
+  <Language>en-GB</Language>
+  <Name>Business Services</Name>
+</contentitemdata.bdo.dealcardcommon>

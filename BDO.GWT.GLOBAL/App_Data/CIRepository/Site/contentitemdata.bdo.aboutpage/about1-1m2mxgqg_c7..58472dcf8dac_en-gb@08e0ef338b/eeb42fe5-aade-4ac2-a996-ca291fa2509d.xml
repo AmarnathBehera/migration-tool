@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.aboutpage>
+  <ContentItemDataCommonDataID>
+    <GUID>c7fb379b-013b-4dc0-a94a-58472dcf8dac</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>About1-1m2mxgqg</CodeName>
+      <GUID>05c599af-20bb-4908-87ff-863b14bfab5d</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>eeb42fe5-aade-4ac2-a996-ca291fa2509d</ContentItemDataGUID>
+</contentitemdata.bdo.aboutpage>

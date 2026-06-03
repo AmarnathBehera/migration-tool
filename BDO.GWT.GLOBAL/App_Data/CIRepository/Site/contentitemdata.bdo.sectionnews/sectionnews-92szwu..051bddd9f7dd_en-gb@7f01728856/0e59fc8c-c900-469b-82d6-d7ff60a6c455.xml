@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.sectionnews>
+  <ContentItemDataCommonDataID>
+    <GUID>ff6a0a7c-f549-4c2f-bb62-051bddd9f7dd</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>SectionNews-92szwux8</CodeName>
+      <GUID>bd8f6dab-9041-4fd7-adf0-363a58ca5bbd</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>0e59fc8c-c900-469b-82d6-d7ff60a6c455</ContentItemDataGUID>
+  <ItemListFeaturedItems>
+    <![CDATA[[{"Identifier":"7c765d5f-9c80-4b1b-a32b-b648364bcf67"}]]]>
+  </ItemListFeaturedItems>
+  <ItemListFilters>
+    <![CDATA[contentType;businessLine;industryCategory;serviceArea;micrositeMasterPage]]>
+  </ItemListFilters>
+  <ShowCopyUrlButtonInNewsArticle>True</ShowCopyUrlButtonInNewsArticle>
+</contentitemdata.bdo.sectionnews>

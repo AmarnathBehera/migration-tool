@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageitem>
+  <WebPageItemContentItemID>
+    <CodeName>SectionWidgetContent-dspmzorr</CodeName>
+    <GUID>200ff018-a477-44bc-be81-6a6da5549cee</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </WebPageItemContentItemID>
+  <WebPageItemGUID>9cfa72bc-8c51-44f8-9f3e-47ddd092bea4</WebPageItemGUID>
+  <WebPageItemName>SectionWidgetContent-dspmzorr</WebPageItemName>
+  <WebPageItemOrder>8</WebPageItemOrder>
+  <WebPageItemTreePath>/Section_Widget_Content</WebPageItemTreePath>
+  <WebPageItemWebsiteChannelID>
+    <GUID>97ffcb4b-7969-4019-9e7d-e39462ccd229</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Site</CodeName>
+      <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageItemWebsiteChannelID>
+</cms.webpageitem>

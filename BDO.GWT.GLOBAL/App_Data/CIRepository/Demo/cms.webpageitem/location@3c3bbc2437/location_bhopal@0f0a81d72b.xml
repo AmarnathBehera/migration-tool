@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageitem>
+  <WebPageItemContentItemID>
+    <CodeName>Bhopal-tges1kru</CodeName>
+    <GUID>08bc4996-b445-4eaf-8290-f48b0a05a39d</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </WebPageItemContentItemID>
+  <WebPageItemGUID>5d9cdf3c-3400-4e69-9371-5c4598e853db</WebPageItemGUID>
+  <WebPageItemName>Bhopal-tges1kru</WebPageItemName>
+  <WebPageItemOrder>2</WebPageItemOrder>
+  <WebPageItemParentID>
+    <CodeName>Location-ii09qdjy</CodeName>
+    <GUID>49450735-052e-4771-ba20-b7f7b6df3160</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageItemParentID>
+  <WebPageItemTreePath>/Location/Bhopal</WebPageItemTreePath>
+  <WebPageItemWebsiteChannelID>
+    <GUID>5ea050ab-8837-4f4f-91ff-59d581302cfe</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Demo</CodeName>
+      <GUID>7f5fa031-6e78-4286-8227-fe393248a477</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageItemWebsiteChannelID>
+</cms.webpageitem>

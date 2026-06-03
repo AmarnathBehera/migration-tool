@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.homeheroslides>
+  <ContentItemDataCommonDataID>
+    <GUID>7971ee80-550b-4141-9c7a-2880407a0bce</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>HomeSilder-zykhj7lt</CodeName>
+      <GUID>e4e08817-8d9c-4156-ae07-c06cc39cd946</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>2e395c11-e8b8-4ce6-8a51-ddcbce73f5e6</ContentItemDataGUID>
+</contentitemdata.bdo.homeheroslides>

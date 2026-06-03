@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.careercontent>
+  <ContentItemDataCommonDataID>
+    <GUID>5c7a62c1-ba52-43b3-9f1e-684ba35918bd</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Content1-t2sq67wa</CodeName>
+      <GUID>ce0f7741-2472-4ed7-aa37-4f6d90182659</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>8bd2c676-7fb4-449a-8191-d4ec32b76d76</ContentItemDataGUID>
+</contentitemdata.bdo.careercontent>

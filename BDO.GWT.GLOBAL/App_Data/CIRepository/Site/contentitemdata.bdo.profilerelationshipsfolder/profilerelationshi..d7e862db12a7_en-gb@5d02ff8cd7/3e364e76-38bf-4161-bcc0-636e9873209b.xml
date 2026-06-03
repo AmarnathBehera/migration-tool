@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.profilerelationshipsfolder>
+  <ContentItemDataCommonDataID>
+    <GUID>caaf12b0-5f84-4fa3-b8aa-d7e862db12a7</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>ProfileRelationship-jnlxf8pn</CodeName>
+      <GUID>03ca837d-9116-474e-a211-5adf1c643580</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>3e364e76-38bf-4161-bcc0-636e9873209b</ContentItemDataGUID>
+  <Title>Profile Relationship</Title>
+</contentitemdata.bdo.profilerelationshipsfolder>

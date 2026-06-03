@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.eventtypefolder>
+  <ContentItemDataCommonDataID>
+    <GUID>35e89611-9f23-46b0-b07f-8e759583fdd4</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>EventTypes-2saczxx2</CodeName>
+      <GUID>bd76e181-7090-4432-b9cd-151ccea53da7</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>aa629de1-d75c-46dc-9a48-ed60a85e6063</ContentItemDataGUID>
+  <Title>Event Types</Title>
+</contentitemdata.bdo.eventtypefolder>

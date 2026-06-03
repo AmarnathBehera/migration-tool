@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.dealcardcommon>
+  <CodeName>Retail_Consumer.Hr-HR</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>e9f31071-9fff-437b-bd06-3d0fae9a59ad</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Retail_Consumer_hr-HR-gbjrv9zv</CodeName>
+      <GUID>1a2f855a-4b77-427b-9b1b-2960003198ac</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>f9a3abbb-9342-40ce-9f02-aa230d5dd33f</ContentItemDataGUID>
+  <Language>hr-HR</Language>
+  <Name>
+    <![CDATA[Retail & Consumer]]>
+  </Name>
+</contentitemdata.bdo.dealcardcommon>

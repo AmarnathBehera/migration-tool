@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.homepage>
+  <ContentItemDataCommonDataID>
+    <GUID>291645d5-23fc-46da-b882-7d16b7ddb1f3</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Home-3-7whdizra</CodeName>
+      <GUID>f6426374-d86a-4e8e-bbbb-81c3d5cd84ff</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>a90454fb-f157-4ccd-99ed-46c1fbbf9c0f</ContentItemDataGUID>
+</contentitemdata.bdo.homepage>

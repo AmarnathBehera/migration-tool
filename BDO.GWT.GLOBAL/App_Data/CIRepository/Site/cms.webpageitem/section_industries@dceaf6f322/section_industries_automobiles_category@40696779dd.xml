@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageitem>
+  <WebPageItemContentItemID>
+    <CodeName>AutomobilesCategory-bfgsgylq</CodeName>
+    <GUID>8578ac71-0655-4603-8ea1-858ac2460051</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </WebPageItemContentItemID>
+  <WebPageItemGUID>12d03954-127d-41a5-a0f2-c69ec98959d5</WebPageItemGUID>
+  <WebPageItemName>AutomobilesCategory-bfgsgylq</WebPageItemName>
+  <WebPageItemOrder>2</WebPageItemOrder>
+  <WebPageItemParentID>
+    <CodeName>SectionIndustries-2ouqb8uz</CodeName>
+    <GUID>0ee248d8-993d-4e7f-92b0-bcea4a976a9b</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageItemParentID>
+  <WebPageItemTreePath>/section_Industries/Automobiles_category</WebPageItemTreePath>
+  <WebPageItemWebsiteChannelID>
+    <GUID>97ffcb4b-7969-4019-9e7d-e39462ccd229</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Site</CodeName>
+      <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageItemWebsiteChannelID>
+</cms.webpageitem>

@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>CMSTechBlogGroup-8kskanuc</CodeName>
+    <GUID>95c34b99-9673-416c-89a8-3fe68c0252ea</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-22 09:22:19Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>e417fdb9-b427-47e2-b6ae-d81931269777</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-22 09:22:19Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <MetadataBusinessIssuesTG />
+  <MetadataDescription>
+    <![CDATA[<p>CMS tech Blog Group</p>]]>
+  </MetadataDescription>
+  <MetadataTitle>CMS tech Blog Group</MetadataTitle>
+  <PageTitle>CMS tech Blog Group</PageTitle>
+</cms.contentitemcommondata>

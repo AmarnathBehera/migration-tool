@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageitem>
+  <WebPageItemContentItemID>
+    <CodeName>FaqTopic-ann67xh4</CodeName>
+    <GUID>f7911004-01fc-4492-9a91-26a8d00a1175</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </WebPageItemContentItemID>
+  <WebPageItemGUID>3fa5f849-081f-49fc-80d1-f41fc74c8a27</WebPageItemGUID>
+  <WebPageItemName>FaqTopic-ann67xh4</WebPageItemName>
+  <WebPageItemOrder>1</WebPageItemOrder>
+  <WebPageItemParentID>
+    <CodeName>FaqFolder-4j5tyn0c</CodeName>
+    <GUID>11db5b83-a7d3-439f-85dc-15c953b48a50</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageItemParentID>
+  <WebPageItemTreePath>/Section_Widget_Content/faq_folder/faq_topic</WebPageItemTreePath>
+  <WebPageItemWebsiteChannelID>
+    <GUID>5ea050ab-8837-4f4f-91ff-59d581302cfe</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Demo</CodeName>
+      <GUID>7f5fa031-6e78-4286-8227-fe393248a477</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageItemWebsiteChannelID>
+</cms.webpageitem>

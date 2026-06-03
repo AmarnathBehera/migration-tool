@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Trending topic</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="da4f30f3-28f6-4406-803b-4c3fbbf60a7a" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="37584812-55a2-45e5-9398-24ee0780ea61" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="09c429cc-15f7-416e-9a72-8fab2a91a96c" isunique="true" system="true" />
+      <field column="Title" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="8ecd46fe-228e-4bbf-a987-e370c267c97e" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="ImageUrl" columnprecision="0" columntype="contentitemreference" enabled="true" guid="a111de9b-d346-495c-b4c4-19d27bc79f8f" visible="true">
+        <properties>
+          <explanationtext>Image recommended size: 535x535 pixels.</explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Image</fieldcaption>
+          <fielddescription>Image recommended size: 535x535 pixels.</fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This input field is required.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+      <field column="ImageAltText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="2cf6093b-fb2f-437b-8975-0439112ddaf4" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Image alt text</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="CTANodeGuid" columnprecision="0" columntype="contentitemreference" enabled="true" guid="f94867ad-51c2-4bcd-86d3-9a32ef03f86d" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>CTA Link</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["74635906-cb04-4ffd-9936-9dcde92c7f58","ca36fdc4-756f-4f9e-afdf-bdf19fc50427"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="FeaturedItems" columnprecision="0" columntype="contentitemreference" enabled="true" guid="db6af4f7-b992-4fa8-b263-cf9f94c0e3b7" visible="true">
+        <properties>
+          <explanationtext>
+            <![CDATA[Only 3 selected items will be displayed<br/><b>Available page types:</b><br/>'Event', 'Industry Service', 'Industry', 'Insight', 'Microsite - Master Page', 'Microsite - Page', 'Service Area', 'Service', 'Sub-Service', 'Deal']]>
+          </explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Featured items (3)</fieldcaption>
+          <fielddescription>Only 3 selected items will be displayed</fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["b3459cfa-8a48-48e5-af1f-eca5d79dd087","1ddec4b5-dabe-4e5d-a38a-1cf710c59244","62753fae-0b4b-4b11-9497-a975271396e4","28ba1415-0ac5-40c2-bb50-ec5ee5532674","3c5bfaa6-f77c-46a6-947b-87ab1bb8404b"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>3</MaximumItems>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>fb32f974-a837-4685-b43e-b49db033d0d9</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-book-opened</ClassIconClass>
+  <ClassName>BDO.TrendingTopic</ClassName>
+  <ClassShortName>BDOTrendingTopic</ClassShortName>
+  <ClassTableName>BDO_TrendingTopic</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>

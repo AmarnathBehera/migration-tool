@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitem>
+  <ContentItemChannelID>
+    <CodeName>Site</CodeName>
+    <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+    <ObjectType>cms.channel</ObjectType>
+  </ContentItemChannelID>
+  <ContentItemContentTypeID>
+    <CodeName>BDO.SectionEvents</CodeName>
+    <GUID>afb8a1ec-5001-46e6-8e98-4b9e28995e48</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </ContentItemContentTypeID>
+  <ContentItemGUID>f355ee08-a523-44ae-98d0-814f5b96b708</ContentItemGUID>
+  <ContentItemIsReusable>False</ContentItemIsReusable>
+  <ContentItemIsSecured>False</ContentItemIsSecured>
+  <ContentItemName>Event-bjnzn3l1</ContentItemName>
+</cms.contentitem>

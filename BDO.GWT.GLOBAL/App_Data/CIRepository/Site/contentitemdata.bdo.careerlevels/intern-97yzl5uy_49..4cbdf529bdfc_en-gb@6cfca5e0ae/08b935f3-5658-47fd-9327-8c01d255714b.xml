@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.careerlevels>
+  <CodeName>Intern</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>49b10a88-c1e9-4a77-92d1-4cbdf529bdfc</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Intern-97yzl5uy</CodeName>
+      <GUID>686580eb-8593-466b-bfc7-8c80c9c36af0</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>08b935f3-5658-47fd-9327-8c01d255714b</ContentItemDataGUID>
+  <Name>Intern</Name>
+</contentitemdata.bdo.careerlevels>

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.businessline>
+  <ComingSoon>False</ComingSoon>
+  <ContentBody>
+    <![CDATA[<p data-pasted="true">Our Advisory services operate as two distinct practices; a Deals practice and a Consulting, Risk and Outsourcing practice.</p><p>&nbsp;</p>]]>
+  </ContentBody>
+  <ContentItemDataCommonDataID>
+    <GUID>74246a77-a091-4b65-9ced-07fdcda3f246</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Advisory-aa1jply2</CodeName>
+      <GUID>c2d3be33-0962-424c-bcb2-3b1754d28c4f</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>2aee38eb-e94f-40c8-8d94-6e2f271f8669</ContentItemDataGUID>
+  <ContentTitle>Our Advirosy Service</ContentTitle>
+  <ShowSideNavigation>False</ShowSideNavigation>
+</contentitemdata.bdo.businessline>

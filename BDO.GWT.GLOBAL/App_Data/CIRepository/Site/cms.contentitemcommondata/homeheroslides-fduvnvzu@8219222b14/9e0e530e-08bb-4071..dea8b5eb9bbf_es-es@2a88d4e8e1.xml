@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>HomeHeroSlides-fduvnvzu</CodeName>
+    <GUID>5cadc92a-c06e-4c5b-9244-86b8eeea6050</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>es-es</CodeName>
+    <GUID>ee380e62-f7ff-416a-88c1-646fe247d5f3</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-14 08:53:38Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>9e0e530e-08bb-4071-a786-dea8b5eb9bbf</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-14 08:53:38Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderTemplateConfiguration />
+  <ContentItemCommonDataVisualBuilderWidgets />
+  <MetadataBusinessIssuesTG />
+</cms.contentitemcommondata>

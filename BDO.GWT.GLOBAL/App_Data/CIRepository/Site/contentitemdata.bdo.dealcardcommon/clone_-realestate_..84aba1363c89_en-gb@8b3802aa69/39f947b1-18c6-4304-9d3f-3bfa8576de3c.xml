@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.dealcardcommon>
+  <CodeName>RealEstate.En-GB</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>ff1b3dc1-df40-4279-b673-84aba1363c89</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Clone_-RealEstate_en-GB-k22ve738</CodeName>
+      <GUID>8fced0e5-9116-4eef-91b0-2a110f766178</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>39f947b1-18c6-4304-9d3f-3bfa8576de3c</ContentItemDataGUID>
+  <Language>en-GB</Language>
+  <Name>Real Estate</Name>
+</contentitemdata.bdo.dealcardcommon>

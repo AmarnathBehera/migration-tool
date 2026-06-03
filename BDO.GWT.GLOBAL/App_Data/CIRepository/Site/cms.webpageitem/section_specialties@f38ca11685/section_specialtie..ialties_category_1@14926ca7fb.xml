@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageitem>
+  <WebPageItemContentItemID>
+    <CodeName>SpecialtiesCategory1-qr1h8ci2</CodeName>
+    <GUID>65b9c5ab-7c50-4650-b18e-5c4998012ad0</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </WebPageItemContentItemID>
+  <WebPageItemGUID>89e9bb4f-4c34-43e9-b390-e8b82d4c4daa</WebPageItemGUID>
+  <WebPageItemName>SpecialtiesCategory1-qr1h8ci2</WebPageItemName>
+  <WebPageItemOrder>1</WebPageItemOrder>
+  <WebPageItemParentID>
+    <CodeName>SectionSpecialties-zwd12egm</CodeName>
+    <GUID>2b40e0b6-b926-47ba-a6e7-6595d4d01779</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageItemParentID>
+  <WebPageItemTreePath>/Section_Specialties/Specialties_Category_1</WebPageItemTreePath>
+  <WebPageItemWebsiteChannelID>
+    <GUID>97ffcb4b-7969-4019-9e7d-e39462ccd229</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Site</CodeName>
+      <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageItemWebsiteChannelID>
+</cms.webpageitem>

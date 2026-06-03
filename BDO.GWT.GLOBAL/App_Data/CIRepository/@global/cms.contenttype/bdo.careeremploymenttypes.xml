@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Career employment types</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="5a0ba224-2b48-4223-850f-0dcab3c47889" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="37be0d76-b597-4456-ace6-51a71b5360ed" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="33960684-9bbb-4d66-9ea8-ec28303de7f2" isunique="true" system="true" />
+      <field column="Name" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="26d7bea5-af90-4521-b034-84d8f5a852e4" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Name</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field column="CodeName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="98abce29-76df-440a-9fb6-557e7d6d810f" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Code name</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>1616dcd8-526f-453e-8959-aa2fbb6a194d</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-l-list-title</ClassIconClass>
+  <ClassName>BDO.CareerEmploymentTypes</ClassName>
+  <ClassShortName>BDOCareerEmploymentTypes</ClassShortName>
+  <ClassTableName>BDO_CareerEmploymentTypes</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

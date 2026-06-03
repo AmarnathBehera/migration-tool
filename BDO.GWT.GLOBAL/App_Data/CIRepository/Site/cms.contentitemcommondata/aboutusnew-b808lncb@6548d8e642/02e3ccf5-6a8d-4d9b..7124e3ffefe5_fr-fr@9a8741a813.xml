@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>AboutUsNew-b808lncb</CodeName>
+    <GUID>61600655-5a00-4d9c-812e-493fba542b2f</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-26 13:28:01Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>02e3ccf5-6a8d-4d9b-9c9d-7124e3ffefe5</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-26 13:28:01Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderTemplateConfiguration>
+    <![CDATA[{"identifier":"BDO.SectionAbout","properties":null,"fieldIdentifiers":{}}]]>
+  </ContentItemCommonDataVisualBuilderTemplateConfiguration>
+  <HeroBackgroundImage>
+    <![CDATA[[{"Identifier":"b671cb9c-aa4b-4173-b9b0-2cbe26343998"}]]]>
+  </HeroBackgroundImage>
+  <HeroBackgroundImage_Mobile>
+    <![CDATA[[{"Identifier":"b671cb9c-aa4b-4173-b9b0-2cbe26343998"}]]]>
+  </HeroBackgroundImage_Mobile>
+  <HeroBackgroundImage_MobileAltText>
+    <![CDATA[à propos]]>
+  </HeroBackgroundImage_MobileAltText>
+  <HeroBackgroundImageAltText>
+    <![CDATA[À propos de nous]]>
+  </HeroBackgroundImageAltText>
+  <HeroCallToActionButtonText>
+    <![CDATA[À propos de nous]]>
+  </HeroCallToActionButtonText>
+  <HeroCallToActionButtonType>primary</HeroCallToActionButtonType>
+  <HeroCallToActionButtonUrl>
+    <![CDATA[[{"Identifier":"6d326e61-2b5a-4015-ae6b-7011b5631cce"}]]]>
+  </HeroCallToActionButtonUrl>
+  <HeroDescription>
+    <![CDATA[À propos de nous]]>
+  </HeroDescription>
+  <HeroLayout>hero</HeroLayout>
+  <HeroTitle>
+    <![CDATA[À propos de nous]]>
+  </HeroTitle>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataBusinessIssuesTG />
+  <MetadataCanonical />
+  <MetadataDescription>
+    <![CDATA[<p>À propos de nous</p>]]>
+  </MetadataDescription>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGDescription>
+    <![CDATA[à propos description méta OG]]>
+  </MetadataOGDescription>
+  <MetadataOGImage>
+    <![CDATA[[{"Identifier":"b671cb9c-aa4b-4173-b9b0-2cbe26343998"}]]]>
+  </MetadataOGImage>
+  <MetadataOGTitle>
+    <![CDATA[à propos titre méta OG]]>
+  </MetadataOGTitle>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTeaserImage>
+    <![CDATA[[{"Identifier":"b671cb9c-aa4b-4173-b9b0-2cbe26343998"}]]]>
+  </MetadataTeaserImage>
+  <MetadataTeaserImageAltText>alt</MetadataTeaserImageAltText>
+  <MetadataTitle>
+    <![CDATA[À propos de nous]]>
+  </MetadataTitle>
+  <PageDescription>
+    <![CDATA[description de la page à propos de nous]]>
+  </PageDescription>
+  <PageKeywords>
+    <![CDATA[à propos, aboutbdo, à propos de nous]]>
+  </PageKeywords>
+  <PageTitle>
+    <![CDATA[À propos de nous]]>
+  </PageTitle>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6e10753f-0d29-4f6c-a16e-63f0d38e4f02</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>c63d98a0-adc8-4f4b-90ba-221569ee8f44</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>02e3ccf5-6a8d-4d9b-9c9d-7124e3ffefe5</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Test-37mg2apy</CodeName>
+        <GUID>b671cb9c-aa4b-4173-b9b0-2cbe26343998</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>5dc9513a-4505-4fa1-a628-68fb3901812e</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>d6015dff-b5e5-4943-bb26-cf37080f2871</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>02e3ccf5-6a8d-4d9b-9c9d-7124e3ffefe5</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Home2-7646d432</CodeName>
+        <GUID>6d326e61-2b5a-4015-ae6b-7011b5631cce</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>dbd04cc6-8897-4a92-bfc4-6b4c8b55ddc3</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>607bf595-7a5a-410a-803c-7308070f846c</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>02e3ccf5-6a8d-4d9b-9c9d-7124e3ffefe5</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Test-37mg2apy</CodeName>
+        <GUID>b671cb9c-aa4b-4173-b9b0-2cbe26343998</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6fc08044-a87a-465e-b463-77a25b10ecba</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>63677b41-7213-43ae-ae0e-ecf2998d15c1</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>02e3ccf5-6a8d-4d9b-9c9d-7124e3ffefe5</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Test-37mg2apy</CodeName>
+        <GUID>b671cb9c-aa4b-4173-b9b0-2cbe26343998</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>8f060a96-d942-4969-ac2e-83ebdfce3762</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>e2a20772-c536-436d-b7a8-752372a48184</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>02e3ccf5-6a8d-4d9b-9c9d-7124e3ffefe5</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Test-37mg2apy</CodeName>
+        <GUID>b671cb9c-aa4b-4173-b9b0-2cbe26343998</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

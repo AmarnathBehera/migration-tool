@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.legalpage>
+  <ContentItemDataCommonDataID>
+    <GUID>349613b5-ff54-49f9-bc70-135ae6ab9716</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Legal-jklsv6mt</CodeName>
+      <GUID>f5a358f7-1d3b-48c8-8e67-439fdbe5549e</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>b5773055-db85-46f4-8bb6-e3a5cfadce4f</ContentItemDataGUID>
+</contentitemdata.bdo.legalpage>

@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>AutomobilesCategory-bfgsgylq</CodeName>
+    <GUID>8578ac71-0655-4603-8ea1-858ac2460051</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-20 08:12:47Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>6f3ab0a6-08f1-4627-bbd2-285eb96ff27b</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-20 08:12:47Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderWidgets>
+    <![CDATA[{"editableAreas":[{"identifier":"mainContent","sections":[{"identifier":"0420701a-7f61-4cf6-b0b7-edd3f48b3c6e","type":"BDO.Section.Container","properties":{"containerPadding":"section-container"},"zones":[{"identifier":"184317b5-b947-41e9-a46e-0db74489fef0","widgets":[{"identifier":"7ac6208d-779f-4cf6-8ec8-3918d6ea9e68","type":"BDO.Widget.AccordionWidget","variants":[{"identifier":"02985dd4-ce0d-4e73-9ee6-4cf838d0cdd2","properties":{"heading":"Ceci est le widget accordéon 1","content":"<p>Voici le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon&nbsp;</p>","deepLinkID":null,"topMargin":"20px","bottomMargin":"20px","widgetID":null},"fieldIdentifiers":{"heading":"e8c352e9-645c-403e-860a-fc94788edbc4","content":"d2c88e7b-ad69-4455-9243-a4ca21f2334b","deepLinkID":"884ddb3a-e462-4253-aac1-a9bae9693cad","topMargin":"cb335978-d528-4a82-9182-79681a7a186b","bottomMargin":"596d4338-8679-49df-a1bb-1db0bd967243","widgetID":"207c5584-89cd-48c7-8a6e-69eb0c8b5aa7"}}]}]}],"fieldIdentifiers":{"containerPadding":"dae7f5cf-2711-4d7c-90be-f1ace98f7b75"}}]}]}]]>
+  </ContentItemCommonDataVisualBuilderWidgets>
+  <HeroBackgroundImage>
+    <![CDATA[[{"Identifier":"4d8e152e-ddc5-4ee3-97fc-eb02d5bc56d0"}]]]>
+  </HeroBackgroundImage>
+  <HeroBackgroundImage_Mobile>
+    <![CDATA[[{"Identifier":"4d8e152e-ddc5-4ee3-97fc-eb02d5bc56d0"}]]]>
+  </HeroBackgroundImage_Mobile>
+  <HeroBackgroundImage_MobileAltText>alt</HeroBackgroundImage_MobileAltText>
+  <HeroBackgroundImageAltText>alt</HeroBackgroundImageAltText>
+  <HeroCallToActionButtonText>Texte du bouton CTA</HeroCallToActionButtonText>
+  <HeroCallToActionButtonType>primary</HeroCallToActionButtonType>
+  <HeroDescription>
+    <![CDATA[Description hero de la catégorie Automobile]]>
+  </HeroDescription>
+  <HeroLayout>hero</HeroLayout>
+  <HeroTitle>
+    <![CDATA[Titre hero de la catégorie Automobile]]>
+  </HeroTitle>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataBusinessIssuesTG />
+  <MetadataCanonical>
+    <![CDATA[Lien canonique de la catégorie Automobile]]>
+  </MetadataCanonical>
+  <MetadataDescription>
+    <![CDATA[<p>Description des métadonnées de la catégorie Automobile</p>]]>
+  </MetadataDescription>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGDescription>
+    <![CDATA[Catégorie Automobile]]>
+  </MetadataOGDescription>
+  <MetadataOGTitle>
+    <![CDATA[Catégorie Automobile]]>
+  </MetadataOGTitle>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTeaserImageAltText />
+  <MetadataTitle>
+    <![CDATA[Titre des métadonnées de la catégorie Automobile]]>
+  </MetadataTitle>
+  <PageDescription />
+  <PageKeywords />
+  <PageTitle />
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6e10753f-0d29-4f6c-a16e-63f0d38e4f02</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>482c6dc7-e478-498c-af9d-7f799d9a6ee6</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>6f3ab0a6-08f1-4627-bbd2-285eb96ff27b</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>TeaserImage-5ars0prc</CodeName>
+        <GUID>4d8e152e-ddc5-4ee3-97fc-eb02d5bc56d0</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6fc08044-a87a-465e-b463-77a25b10ecba</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>b73cc4c4-4cef-4ab1-915f-d7428ceb3c00</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>6f3ab0a6-08f1-4627-bbd2-285eb96ff27b</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>TeaserImage-5ars0prc</CodeName>
+        <GUID>4d8e152e-ddc5-4ee3-97fc-eb02d5bc56d0</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

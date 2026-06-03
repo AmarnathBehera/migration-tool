@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.careeremploymenttypes>
+  <CodeName>Internship</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>26f7a2a8-36e8-4eab-8b77-a2820688d79f</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Internship-2p0q0w4p</CodeName>
+      <GUID>eb46f882-0343-4c42-9a17-ae6f78081439</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>7792a8d3-6a74-4a5a-bbab-4435a4352515</ContentItemDataGUID>
+  <Name>Internship</Name>
+</contentitemdata.bdo.careeremploymenttypes>

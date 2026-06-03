@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.newsarticle>
+  <ContentItemDataCommonDataID>
+    <GUID>2b3f3529-251f-4728-abe0-05f164e6eb8f</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>NewsArticle-2-ctp0xwjq</CodeName>
+      <GUID>843da36d-67b8-4e6f-ade2-b07eee44b51f</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>65e200ca-26a1-4f81-865e-a447903d570a</ContentItemDataGUID>
+</contentitemdata.bdo.newsarticle>

@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.trendingtopic>
+  <ContentItemDataCommonDataID>
+    <GUID>1c5ac0f8-4688-4db2-9e38-4ab2f83ce397</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Trending1-91vhkzjt</CodeName>
+      <GUID>68a62791-9c90-4ea8-84c6-842f908038f7</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>8d635caf-93be-47a5-99ec-c358d11de6d2</ContentItemDataGUID>
+  <CTANodeGuid>
+    <![CDATA[[{"Identifier":"f5a358f7-1d3b-48c8-8e67-439fdbe5549e"}]]]>
+  </CTANodeGuid>
+  <FeaturedItems>
+    <![CDATA[[{"Identifier":"e162873c-fabb-4a8c-a990-7d8957baaf06"},{"Identifier":"0ac92623-7f64-4ad1-9143-c79cb70f1185"},{"Identifier":"752964eb-3a6a-4d62-aac7-6054d9b184aa"}]]]>
+  </FeaturedItems>
+  <ImageAltText>test</ImageAltText>
+  <ImageUrl>
+    <![CDATA[[{"Identifier":"3a84359b-2454-4ca0-bb33-0e10c41093fd"}]]]>
+  </ImageUrl>
+  <Title>Trending1</Title>
+</contentitemdata.bdo.trendingtopic>

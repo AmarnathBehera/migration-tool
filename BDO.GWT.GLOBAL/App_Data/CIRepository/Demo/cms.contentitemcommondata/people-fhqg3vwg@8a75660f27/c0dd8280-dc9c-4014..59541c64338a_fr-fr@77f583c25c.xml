@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <AuthoredInsightsDescription>
+    <![CDATA[Description contenu rédigé]]>
+  </AuthoredInsightsDescription>
+  <AuthoredInsightsTitle>
+    <![CDATA[Contenu Rédigé]]>
+  </AuthoredInsightsTitle>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>People-fhqg3vwg</CodeName>
+    <GUID>788bcb5e-745d-40e1-92fa-9161a8b09018</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-04-30 11:34:55Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>c0dd8280-dc9c-4014-8b43-59541c64338a</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-04-30 11:34:55Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderTemplateConfiguration>
+    <![CDATA[{"identifier":"BDO.SectionPeoplePage","properties":null,"fieldIdentifiers":{}}]]>
+  </ContentItemCommonDataVisualBuilderTemplateConfiguration>
+  <DisplayedAuthoredContentPageTypes>
+    <![CDATA[ArticleBlog;Affaire;Analyse;ArticleActualité;PagePrincipaleMicrosite;PageMicrosite]]>
+  </DisplayedAuthoredContentPageTypes>
+  <HeroBackgroundImage>
+    <![CDATA[[{"Identifier":"1eb9b3b8-44c8-49d4-a7ff-93f5845fcdcb"}]]]>
+  </HeroBackgroundImage>
+  <HeroBackgroundImage_Mobile>
+    <![CDATA[[{"Identifier":"1eb9b3b8-44c8-49d4-a7ff-93f5845fcdcb"}]]]>
+  </HeroBackgroundImage_Mobile>
+  <HeroBackgroundImage_MobileAltText>d</HeroBackgroundImage_MobileAltText>
+  <HeroBackgroundImageAltText>texte alt img</HeroBackgroundImageAltText>
+  <HeroCallToActionButtonText>Texte bouton CTA</HeroCallToActionButtonText>
+  <HeroCallToActionButtonType>aucun</HeroCallToActionButtonType>
+  <HeroDescription>Description</HeroDescription>
+  <HeroLayout>
+    <![CDATA[imageBannière]]>
+  </HeroLayout>
+  <HeroTitle>
+    <![CDATA[Héros]]>
+  </HeroTitle>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataBusinessIssuesTG />
+  <MetadataCanonical>Lien canonique</MetadataCanonical>
+  <MetadataDescription>
+    <![CDATA[<p>Description</p>]]>
+  </MetadataDescription>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGDescription />
+  <MetadataOGTitle>
+    <![CDATA[Titre méta OG]]>
+  </MetadataOGTitle>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTeaserImageAltText>
+    <![CDATA[texte alternatif de l'image]]>
+  </MetadataTeaserImageAltText>
+  <MetadataTitle>Personnes</MetadataTitle>
+  <ShowAuthoredInsights>True</ShowAuthoredInsights>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6e10753f-0d29-4f6c-a16e-63f0d38e4f02</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>f9c7b328-1969-4a09-9a91-5830ff4c2584</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>c0dd8280-dc9c-4014-8b43-59541c64338a</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Tst-z9ciupcg</CodeName>
+        <GUID>1eb9b3b8-44c8-49d4-a7ff-93f5845fcdcb</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6fc08044-a87a-465e-b463-77a25b10ecba</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>72c3f59f-e377-4373-8a64-ac7070bd4bfc</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>c0dd8280-dc9c-4014-8b43-59541c64338a</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Tst-z9ciupcg</CodeName>
+        <GUID>1eb9b3b8-44c8-49d4-a7ff-93f5845fcdcb</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

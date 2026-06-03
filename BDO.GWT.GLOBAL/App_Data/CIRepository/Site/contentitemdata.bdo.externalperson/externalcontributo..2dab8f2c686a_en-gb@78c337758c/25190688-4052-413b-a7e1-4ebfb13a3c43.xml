@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.externalperson>
+  <ContentItemDataCommonDataID>
+    <GUID>ccb63580-cbd8-4a17-8a19-2dab8f2c686a</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>ExternalContributor-1-woq5gzgo</CodeName>
+      <GUID>4a1bdcc5-3164-4b06-9678-fcf383eaa834</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>25190688-4052-413b-a7e1-4ebfb13a3c43</ContentItemDataGUID>
+  <FirstName>Mark Ext</FirstName>
+  <JobTitle>Associate Consultant</JobTitle>
+  <LastName>Bowman</LastName>
+  <SurnamePrefixes>D</SurnamePrefixes>
+  <Url />
+</contentitemdata.bdo.externalperson>

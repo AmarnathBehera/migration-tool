@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.InternalPeopleFolder</CodeName>
+    <GUID>cfd788ec-5c57-4de4-b0f7-7f27497fda19</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.InternalPerson">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.InternalPerson</CodeName>
+        <GUID>f868347c-a9e1-459c-aa63-06b98c5fb82e</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

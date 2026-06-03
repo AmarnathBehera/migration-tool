@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>Hero1-wntgulxx</CodeName>
+    <GUID>1a0bd7b9-2689-40ad-9335-ead62ce4860e</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-04 08:27:35Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>cb76672d-27cf-4f25-a6f2-856926b1474c</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-04 08:27:35Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <MetadataBusinessIssuesTG />
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>68e87402-374e-4c27-967a-0f50f2b09ec0</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>a6082c32-c316-451a-bfdf-448f5b6662af</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>cb76672d-27cf-4f25-a6f2-856926b1474c</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Image1-wb9ia8gx</CodeName>
+        <GUID>81c364c4-3689-44d5-af07-51435aefcf4b</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>3b334dd4-6f77-4de1-9dde-176a6b25299d</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>b9d8cf6c-2444-49b4-95d8-9491571dcfe2</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>cb76672d-27cf-4f25-a6f2-856926b1474c</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Image1-wb9ia8gx</CodeName>
+        <GUID>81c364c4-3689-44d5-af07-51435aefcf4b</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>ad0848c2-020b-4f0d-aff8-878dab506683</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>cf2aae06-f788-4199-b198-8f30a86e25e9</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>cb76672d-27cf-4f25-a6f2-856926b1474c</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Image1-wb9ia8gx</CodeName>
+        <GUID>81c364c4-3689-44d5-af07-51435aefcf4b</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

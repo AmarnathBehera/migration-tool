@@ -1,0 +1,181 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <CallToActionButtonText>Call to action button text</CallToActionButtonText>
+  <CallToActionButtonUrl>Call to action button URL</CallToActionButtonUrl>
+  <CallToActionDescription>Call to action description</CallToActionDescription>
+  <Content>Content</Content>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>NewsArticle-1-kqu3kb7x</CodeName>
+    <GUID>7c765d5f-9c80-4b1b-a32b-b648364bcf67</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-18 06:08:58Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>baf17810-ae32-4d3e-bda8-090b6cb6fd6a</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-26 07:09:53Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderTemplateConfiguration>
+    <![CDATA[{"identifier":"BDO.NewsArticle","properties":null,"fieldIdentifiers":null}]]>
+  </ContentItemCommonDataVisualBuilderTemplateConfiguration>
+  <ContentType>
+    <![CDATA[[{"Identifier":"4449a799-6933-426f-8be3-3de6c2134518"}]]]>
+  </ContentType>
+  <DownloadButtonAttachment>
+    <![CDATA[[{"Identifier":"8ad29274-7718-4b10-8dd0-8011ef0be8d4"}]]]>
+  </DownloadButtonAttachment>
+  <ImageFile>
+    <![CDATA[[{"Identifier":"8ad29274-7718-4b10-8dd0-8011ef0be8d4"}]]]>
+  </ImageFile>
+  <ImageFileAltText>Image alt text</ImageFileAltText>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataBusinessIssuesTG />
+  <MetadataBusinessLine>
+    <![CDATA[[{"Identifier":"e3b2249b-b34a-42ca-b14a-5fa52a6e7aea"}]]]>
+  </MetadataBusinessLine>
+  <MetadataCanonical>Canonical link</MetadataCanonical>
+  <MetadataDescription>
+    <![CDATA[<p>desc</p>]]>
+  </MetadataDescription>
+  <MetadataIndustries>
+    <![CDATA[[{"Identifier":"01209c5e-2cac-478f-887b-06f8226e333d"}]]]>
+  </MetadataIndustries>
+  <MetadataIndustryCategories>
+    <![CDATA[[{"Identifier":"8578ac71-0655-4603-8ea1-858ac2460051"}]]]>
+  </MetadataIndustryCategories>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGTitle>OG metadata title</MetadataOGTitle>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataServiceAreas>
+    <![CDATA[[{"Identifier":"e162873c-fabb-4a8c-a990-7d8957baaf06"}]]]>
+  </MetadataServiceAreas>
+  <MetadataServices>[]</MetadataServices>
+  <MetadataTeaserImage>
+    <![CDATA[[{"Identifier":"8ad29274-7718-4b10-8dd0-8011ef0be8d4"}]]]>
+  </MetadataTeaserImage>
+  <MetadataTeaserImageAltText>image alt text</MetadataTeaserImageAltText>
+  <MetadataTitle>News Article -1</MetadataTitle>
+  <PageKeywords>Page keywords</PageKeywords>
+  <PageTitle>news Page title</PageTitle>
+  <RelevantContactPerson>
+    <![CDATA[[{"Identifier":"50dfbcc8-1d25-4fb1-814b-5c1591ceffc1"}]]]>
+  </RelevantContactPerson>
+  <ShowCallToAction>True</ShowCallToAction>
+  <ShowDescription>True</ShowDescription>
+  <ShowPrintButton>True</ShowPrintButton>
+  <ShowSidebar>True</ShowSidebar>
+  <ShowSocialMediaButtons>True</ShowSocialMediaButtons>
+  <ShowTitle>True</ShowTitle>
+  <UpdatedOn>2026-05-14 01:32:04Z</UpdatedOn>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>b5fa2859-bdb5-4f4b-ba1b-63adbc84e8b5</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>1290d4df-3ac0-4c9e-9b23-6b335cba72d6</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>baf17810-ae32-4d3e-bda8-090b6cb6fd6a</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>AutomobilesCategory-bfgsgylq</CodeName>
+        <GUID>8578ac71-0655-4603-8ea1-858ac2460051</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>147446c5-3568-450a-a57c-72f6e905010e</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>25f8b0c0-2d6b-4e93-8fe9-276f578a752b</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>baf17810-ae32-4d3e-bda8-090b6cb6fd6a</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>AuditAndAssurance-i2ay961q</CodeName>
+        <GUID>e3b2249b-b34a-42ca-b14a-5fa52a6e7aea</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>8f060a96-d942-4969-ac2e-83ebdfce3762</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>cb01141c-ee15-4273-ba28-06fc82392c03</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>baf17810-ae32-4d3e-bda8-090b6cb6fd6a</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Banner-e7tri4da</CodeName>
+        <GUID>8ad29274-7718-4b10-8dd0-8011ef0be8d4</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>dbc6334d-546b-4e60-9f0f-a1a93f8d3445</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>b7c61847-4ad1-4b7a-95dd-2bc46e1dc1c5</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>baf17810-ae32-4d3e-bda8-090b6cb6fd6a</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Person1-bpio06jd</CodeName>
+        <GUID>50dfbcc8-1d25-4fb1-814b-5c1591ceffc1</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>f69f347a-f277-430e-88e8-d02c88705c9c</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>2e484a36-ab29-4d00-a5dd-533983b0ba5e</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>baf17810-ae32-4d3e-bda8-090b6cb6fd6a</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Banner-e7tri4da</CodeName>
+        <GUID>8ad29274-7718-4b10-8dd0-8011ef0be8d4</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>bb2a5c0a-6346-4f19-83b2-daf3791d52ed</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>94699e81-1c1d-4f7a-887c-e980cc2d7972</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>baf17810-ae32-4d3e-bda8-090b6cb6fd6a</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>PersonalTaxServices-oom5ii1e</CodeName>
+        <GUID>e162873c-fabb-4a8c-a990-7d8957baaf06</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>5ac98c4b-a529-46c3-a227-e690ef7766ec</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>1efff0d4-cfdf-44b4-8456-2251ca90fb0c</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>baf17810-ae32-4d3e-bda8-090b6cb6fd6a</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>HybridAutomobiles-u3ka4el3</CodeName>
+        <GUID>01209c5e-2cac-478f-887b-06f8226e333d</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>279701fd-47c3-4ddf-9fbc-ea555ed99a63</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>005061ed-4c23-4818-9904-72a52f781464</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>baf17810-ae32-4d3e-bda8-090b6cb6fd6a</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Banner-e7tri4da</CodeName>
+        <GUID>8ad29274-7718-4b10-8dd0-8011ef0be8d4</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

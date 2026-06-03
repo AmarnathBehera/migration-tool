@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>Home2-7646d432</CodeName>
+    <GUID>6d326e61-2b5a-4015-ae6b-7011b5631cce</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-13 17:23:31Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>3ea2a8f4-d9b7-470c-84ec-16f0a186df3f</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-13 17:23:31Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderTemplateConfiguration>
+    <![CDATA[{"identifier":"BDO.HomePage","properties":null,"fieldIdentifiers":{}}]]>
+  </ContentItemCommonDataVisualBuilderTemplateConfiguration>
+  <ContentItemCommonDataVisualBuilderWidgets>
+    <![CDATA[{"editableAreas":[{"identifier":"mainContent","sections":[{"identifier":"b36b855e-cb98-46c8-a134-a95791cef401","type":"BDO.Section.Container","properties":{"containerPadding":"section-container"},"zones":[{"identifier":"0115b01d-8976-497c-a3af-ebf0f5c5b720","widgets":[{"identifier":"2ea8c908-ece9-4218-8f06-07f302cb5859","type":"BDO.Widget.QuoteCard","variants":[{"identifier":"3cb73082-bab1-413f-a8e4-d4b80ab16a4e","properties":{"heading":null,"subheading":null,"image":[],"imageAltText":null,"quoteText":null,"quotesAuthor":null,"authorsJobTitle":null,"buttonText":null,"urlSource":"content","manualUrl":null,"buttonUrl":null,"primaryButtonLinkTarget":"_self","size":"standard","topMargin":null,"bottomMargin":null,"widgetID":null},"fieldIdentifiers":{"heading":"4787e306-1628-43f5-b191-602806bb7faa","subheading":"4587d41d-23ec-4502-960e-a0a03818d742","image":"0ddd069c-5a2c-45fd-9c10-ca4d09e33a10","imageAltText":"e1f009b4-f12a-4bfa-93c0-2173f704c4a6","quoteText":"78eded1d-9d94-445f-8ad0-8c53b34e4c4b","quotesAuthor":"4618374a-98fc-4029-ac48-5a040bfe702f","authorsJobTitle":"181d5db3-5510-4ef7-abca-46902f9067b6","buttonText":"4e0eaf17-b7e1-4788-adff-06ac5fbc957f","urlSource":"fa4b0670-f129-415b-b2db-cd2e22963bcd","manualUrl":"7f91fbc5-649c-4fcc-8c39-9197058446c1","buttonUrl":"022446f7-e902-4674-aece-4ae1eeb6379c","primaryButtonLinkTarget":"f7fe6797-2277-4277-b766-d007a9db0e0e","size":"0d781697-27c2-4207-8fed-16707ca15f9c","topMargin":"2c6daf2a-c230-4629-a609-24b9b0840b7a","bottomMargin":"e9d49160-c38e-4b72-852b-e560661e8854","widgetID":"6f36936b-094d-40d1-87a2-59abe9f8d9bd"}}]},{"identifier":"a51950ab-fe22-4835-a50f-714a49b499ef","type":"BDO.Widget.ExternalNavigation","variants":[{"identifier":"44396119-6d75-4a41-8c7c-8216f8b9041e","properties":{"linkText":"External navigation","externalLink":"https://www.sanrio.com/collections/hello-kitty","primaryButtonLinkTarget":"_self"},"fieldIdentifiers":{"linkText":"a0744149-a840-4def-9f97-cc1a799cb7e0","externalLink":"fb554019-c40c-439f-a8da-443727a036f4","primaryButtonLinkTarget":"7770c4f3-554e-4523-8fc9-8c84d9b61d82"}}]}]}],"fieldIdentifiers":{"containerPadding":"41ef1129-3d16-4767-b1d2-c387140720d4"}},{"identifier":"d3f24c8f-8bb7-4312-a8ac-3b3e1f79683b","type":"BDO.Section.Container","properties":{"containerPadding":"section-container"},"zones":[{"identifier":"ad669af7-a39b-4135-931a-aea2c2997ea1","widgets":[]}],"fieldIdentifiers":{"containerPadding":"3c6a9a74-a921-4945-9c90-72281a096271"}},{"identifier":"c9d22e25-efc6-48fa-b946-7f2bce8c77db","type":"BDO.Section.Container","properties":{"containerPadding":"section-container"},"zones":[{"identifier":"ca370f66-2a7b-4a52-b702-c0168b954316","widgets":[{"identifier":"43df3293-464c-4c8f-ac4c-051a93eafa90","type":"BDO.Widget.ImageWithText","variants":[{"identifier":"d4637620-57e1-45fa-b302-534ad50d92eb","properties":{"title":"image with text","description":"<p>image with text</p>","buttonText":"image with text","urlSource":"content","manualUrl":null,"buttonURL":[{"identifier":"cf1ea38d-818f-4fef-86a6-77375e4e7243"}],"primaryButtonLinkTarget":"_self","buttonType":"primary","mediaType":"image","embedCode":null,"imageURL":[{"identifier":"5766b5af-03e5-47d3-8ceb-3ae03808d60c"}],"imageAltText":"Alt","mediaPosition":"left","backgroundImageURL":null,"backgroundImageAltText":"","theme":"light","topMargin":"0px","bottomMargin":"0px","widgetID":null},"fieldIdentifiers":{"title":"07df0de8-dc74-4d67-a29f-d87278876bad","description":"3f195074-27a4-42a8-a905-bc2b8be11a0f","buttonText":"556a8d52-a2fd-41ae-841e-c5f331588188","buttonURL":"58c7352e-e47c-4939-b9f8-5bc144fd62cc","primaryButtonLinkTarget":"c42165c6-8a1a-47bc-bd7d-e96a30d5ab7d","buttonType":"2c2f7e10-21f5-4f9d-8199-0a03f4b3cd17","mediaType":"eff5d93e-6c98-43be-9109-1041362a74c1","embedCode":"8a3ec1e1-f4b5-49fd-ab18-3eaa02d20908","imageURL":"82a44e45-4285-43d7-8519-d2c1ddf4734a","imageAltText":"f2b349d1-1979-4bdd-894e-7bd2b145aeea","mediaPosition":"58248b41-df95-418f-b63b-0826e5ba6bd3","backgroundImageURL":"642e2a4d-fe68-4fa7-b9b7-5ebf4af9e33c","backgroundImageAltText":"abeb2b2c-89d5-45fa-b85d-e85195bc8685","theme":"79f7e35a-027b-43bc-9421-79901714908c","topMargin":"32df4456-2502-4423-80be-97aebfbf0d00","bottomMargin":"30d869f4-3a57-47f3-94bf-11cbcc326689","urlSource":"9b215e41-8d9d-4037-ace6-9913d221b7c7","manualUrl":"23747e0a-8f38-4424-a1ec-be14583c3b30","widgetID":"747fb6ea-3cae-4df4-bac3-9897707ed22c"}}]},{"identifier":"7c57c883-d193-4db8-8472-2f052af6ce2a","type":"BDO.Widget.ImageWithText","variants":[{"identifier":"9ff215f7-7bf2-473c-82bd-2be36351f065","properties":{"title":"About us ","description":"<p>About us this is test</p>","buttonText":"test","urlSource":"content","manualUrl":"test","buttonURL":[{"identifier":"cf1ea38d-818f-4fef-86a6-77375e4e7243"}],"primaryButtonLinkTarget":"_self","buttonType":"primary","mediaType":"image","embedCode":null,"imageURL":[{"identifier":"2b767e8f-a873-47c6-abb5-18ebf0707336"}],"imageAltText":"About","mediaPosition":"left","backgroundImageURL":null,"backgroundImageAltText":"","theme":"light","topMargin":"0px","bottomMargin":"0px","widgetID":null},"fieldIdentifiers":{"title":"85d59449-dfc7-4ccb-bd27-8f554c105c08","description":"33309dcc-a94a-4156-8c90-57f4d8b17173","buttonText":"4e5bad61-e2f7-457d-8af3-4af75077efe0","buttonURL":"83739652-7df3-4b38-aab3-4ad09620a334","primaryButtonLinkTarget":"572b6ea6-4e62-4d21-b225-3da5a6bc1fbe","buttonType":"9eeb94e9-b4d5-4d10-bb45-4f8febacd7ae","mediaType":"14dfaf5e-4358-4a74-885d-0c96d1ea9917","embedCode":"9ddd1451-149a-4e85-8705-a71fc7ed3c32","imageURL":"0ab0f26e-eda5-4172-b280-da18783df09d","imageAltText":"fa5109b8-fb19-4de0-a846-8ebec626f6b5","mediaPosition":"d6c96513-729d-4610-8a8a-b9f551f0699e","backgroundImageURL":"409680e5-93a2-4ab2-8f58-8c3d96793ee8","backgroundImageAltText":"439e755f-1e5a-441d-9096-5eb813dd3cd1","theme":"1eed1498-97db-4b84-94e9-eacce3c7d36b","topMargin":"c4bb029b-9e5f-478d-b37d-bc8a65ac2878","bottomMargin":"7d942b56-9679-4927-93d9-c5fe3f058aab","urlSource":"1b2dce30-9265-48bb-94c3-b4b6826cd9d3","manualUrl":"14168222-a400-40b8-9eff-a2e7d00c7879","widgetID":"2c5724bf-6120-4256-8621-042090101795"}}]},{"identifier":"75f68a49-3f05-4c00-8ae5-85cf9250bccb","type":"BDO.Widget.QuoteCard","variants":[{"identifier":"a22fbe42-761c-4977-a82a-df26694ab73c","properties":{"heading":"Quote Card Widget","subheading":"<p>Quote Card Widget</p>","image":[{"identifier":"2b767e8f-a873-47c6-abb5-18ebf0707336"}],"imageAltText":"Quote Card Widget","quoteText":"<p>Quote Card Widget</p>","quotesAuthor":"Quote Card Widget","authorsJobTitle":"Quote Card Widget","buttonText":"Quote Card Widget","urlSource":"manual","manualUrl":"test","buttonUrl":[{"identifier":"6d326e61-2b5a-4015-ae6b-7011b5631cce"}],"primaryButtonLinkTarget":"_self","size":"small","topMargin":"40px","bottomMargin":"80px","widgetID":null},"fieldIdentifiers":{"heading":"9bf10973-f1cd-4078-a4c0-44b58649c09e","subheading":"2ebcbaf8-e2f1-4158-b2da-b593bedb3c33","image":"45cd43d1-647d-45f3-8227-f17e4c854920","imageAltText":"b3e63c58-5e12-4353-95b0-7560a34c3ae2","quoteText":"69520ab8-cac5-4f2f-9855-e3e88827d208","quotesAuthor":"b7404fd4-5aa2-4ef6-9b0d-f47d54569353","authorsJobTitle":"705b94df-a05b-455d-a7c4-0ff93f9252e5","buttonText":"acd6cfa2-e4b9-4e3f-8b51-7e41e7f440e5","urlSource":"1cd6ec28-9e5f-475f-9711-79e98de162ca","manualUrl":"f7932aaa-a138-4aa0-8a7c-f60f6435ad6a","buttonUrl":"62643527-f830-4b0b-88cd-6b0a3f7a0204","primaryButtonLinkTarget":"7b0af3b7-affb-4573-9bd7-4104b7b3c3ca","size":"659c8fdc-4fac-4e14-8300-58368951b27a","topMargin":"f8dbf43e-b625-4393-b6d1-8db7e67e93bd","bottomMargin":"88d42378-aa32-4dd9-9f51-49bca507f917","widgetID":"82104e6e-2e24-4c56-8805-922f986406ba"}}]},{"identifier":"19fe7b95-24f8-4ceb-b698-6fb8f63808d1","type":"BDO.Widget.ImageWithText","variants":[{"identifier":"0f4b2095-ae6c-4ba4-b4e8-eec4ee858252","properties":{"title":null,"description":null,"buttonText":null,"urlSource":"content","manualUrl":null,"buttonURL":null,"primaryButtonLinkTarget":"_self","buttonType":null,"mediaType":"image","embedCode":null,"imageURL":null,"imageAltText":"","mediaPosition":"left","backgroundImageURL":null,"backgroundImageAltText":"","theme":"light","topMargin":"0px","bottomMargin":"0px","widgetID":null},"fieldIdentifiers":{"title":"9d6a73d1-7586-45ca-b47e-ba6dc49f9dac","description":"01b58446-763a-4a0c-84b7-d663d67d1e80","buttonText":"67efea46-783a-4d2f-951a-189aa5cd930a","urlSource":"3b03d096-c672-462a-a550-917727008318","manualUrl":"0ce17de7-4d9b-4280-b4c4-a3c482223d29","buttonURL":"2407ea36-7070-48fc-9cea-2b9af569c67d","primaryButtonLinkTarget":"9cd80204-31f6-4d97-ab3f-1d2d509d8190","buttonType":"0e043983-f879-4e87-b159-f5054461f7b6","mediaType":"2f56c23d-60fa-44dd-aba1-0c37597837b8","embedCode":"b75ef2a2-2c86-44d2-83b1-072f3589a5a5","imageURL":"1a99d0ef-aa1f-4e73-9af6-544d2aefb212","imageAltText":"0837cfef-5e2a-4ef6-8bda-97a63cf749b3","mediaPosition":"e6e5c3db-7819-48ea-bd75-351487562910","backgroundImageURL":"feccf86e-ad0b-4049-9fcc-2710143be26c","backgroundImageAltText":"12e8aea9-ddd7-44be-9b22-7be5e033a462","theme":"4b91c898-f794-4392-8b7e-f01bb052d1f2","topMargin":"e07ac7b7-66c1-4ad4-94ed-7bb7471a1533","bottomMargin":"97fe3ec0-2567-43ee-b384-0c2511f2dcc8","widgetID":"a3226f9c-706e-4323-b20b-0cd5a3f7cec7"}}]},{"identifier":"9866cfc5-bed1-4a3b-aa7d-1027b855e81d","type":"BDO.Widget.TiledLinkSection","variants":[{"identifier":"a29040dc-57a2-4e7c-a4a1-d7eb9c346d93","properties":{"title":null,"description":null,"backgroundImages":[],"backgroundImageAltText":"","tilePages":[],"theme":"light","seeAllLinkText":null,"seeAllLinkURL":null,"seeAllLinkURLTarget":"_self","topMargin":null,"bottomMargin":null,"widgetID":null},"fieldIdentifiers":{"title":"a5ea1762-95e9-40fb-831c-9cee65fa951e","description":"e6151ec9-4f45-41cf-b424-7909de3da726","backgroundImages":"a17b72a6-ff98-4c02-9cba-5bd9239461c1","backgroundImageAltText":"f13edff4-332d-49d0-8148-4fca11be3d62","tilePages":"f9b8962d-a7fb-45fc-9371-e61dddaca6e9","theme":"51bb0b60-8529-4bc7-9793-66345ce18298","seeAllLinkText":"37d32f31-7a92-4865-9bfc-41ada5fc6522","seeAllLinkURL":"6d5e0008-86b9-4966-a859-164b95fc3dc9","seeAllLinkURLTarget":"5c4224cf-c4fa-42a8-8d3a-fee629024a73","topMargin":"57bc2f19-8db0-48ac-865b-b41d179f7a3f","bottomMargin":"6aa36203-4b85-425a-85b6-75775c626434","widgetID":"496b3b09-47bf-4cff-a3e9-d3650e3b8ead"}}]}]}],"fieldIdentifiers":{"containerPadding":"7289e981-3f8d-4e7e-b128-4886c2986a62"}}]}]}]]>
+  </ContentItemCommonDataVisualBuilderWidgets>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataBusinessIssuesTG />
+  <MetadataCanonical>home</MetadataCanonical>
+  <MetadataDescription>
+    <![CDATA[<p>home</p>]]>
+  </MetadataDescription>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGDescription />
+  <MetadataOGTitle />
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTitle>home</MetadataTitle>
+  <PageDescription>
+<![CDATA[
+Home Page desc
+
+]]>
+  </PageDescription>
+  <PageKeywords>home, homepage</PageKeywords>
+  <PageTitle>HomePage</PageTitle>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>83739652-7df3-4b38-aab3-4ad09620a334</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>4439174d-7e2d-4616-abcc-6837c0743c5b</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>3ea2a8f4-d9b7-470c-84ec-16f0a186df3f</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Facebook-679wzvra</CodeName>
+        <GUID>cf1ea38d-818f-4fef-86a6-77375e4e7243</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>58c7352e-e47c-4939-b9f8-5bc144fd62cc</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>3f06c258-7019-4a52-819b-7d64aff85806</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>3ea2a8f4-d9b7-470c-84ec-16f0a186df3f</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Facebook-679wzvra</CodeName>
+        <GUID>cf1ea38d-818f-4fef-86a6-77375e4e7243</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>62643527-f830-4b0b-88cd-6b0a3f7a0204</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>ebb2ed92-be9b-4960-b8d8-b4dd3575d6c8</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>3ea2a8f4-d9b7-470c-84ec-16f0a186df3f</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Home2-7646d432</CodeName>
+        <GUID>6d326e61-2b5a-4015-ae6b-7011b5631cce</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>82a44e45-4285-43d7-8519-d2c1ddf4734a</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>5b00d649-0d66-4b8b-a851-7b45f445c794</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>3ea2a8f4-d9b7-470c-84ec-16f0a186df3f</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Aboutpage-18tpzr8j</CodeName>
+        <GUID>5766b5af-03e5-47d3-8ceb-3ae03808d60c</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>0ab0f26e-eda5-4172-b280-da18783df09d</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>0a61c7e2-ee5b-4290-bd68-e83e0d8586e4</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>3ea2a8f4-d9b7-470c-84ec-16f0a186df3f</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Industry-ewlx0vcd</CodeName>
+        <GUID>2b767e8f-a873-47c6-abb5-18ebf0707336</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>45cd43d1-647d-45f3-8227-f17e4c854920</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>b204266b-ed07-4a66-8cf7-28db921f8ac2</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>3ea2a8f4-d9b7-470c-84ec-16f0a186df3f</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Industry-ewlx0vcd</CodeName>
+        <GUID>2b767e8f-a873-47c6-abb5-18ebf0707336</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

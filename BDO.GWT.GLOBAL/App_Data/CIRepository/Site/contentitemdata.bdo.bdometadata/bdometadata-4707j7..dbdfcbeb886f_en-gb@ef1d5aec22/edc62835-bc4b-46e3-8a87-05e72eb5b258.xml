@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.bdometadata>
+  <ContentItemDataCommonDataID>
+    <GUID>1925403a-8319-4184-a3c1-dbdfcbeb886f</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>BDOMetadata-4707j7w6</CodeName>
+      <GUID>058052c1-eb2b-4530-aaf4-2018f87ba8b3</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>edc62835-bc4b-46e3-8a87-05e72eb5b258</ContentItemDataGUID>
+</contentitemdata.bdo.bdometadata>

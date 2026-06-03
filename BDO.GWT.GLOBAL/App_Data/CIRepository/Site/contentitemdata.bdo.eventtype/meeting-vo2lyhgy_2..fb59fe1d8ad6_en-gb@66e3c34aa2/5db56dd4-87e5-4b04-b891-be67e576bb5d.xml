@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.eventtype>
+  <Calltoactiontext>Register</Calltoactiontext>
+  <CodeName>Meeting.GWT_TST.ar-DZ</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>2545a5ff-c9d0-4eb1-ba91-fb59fe1d8ad6</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Meeting-vo2lyhgy</CodeName>
+      <GUID>ecb0414c-c520-4558-ad79-281fc1cd577f</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>5db56dd4-87e5-4b04-b891-be67e576bb5d</ContentItemDataGUID>
+  <Name>Meeting</Name>
+</contentitemdata.bdo.eventtype>

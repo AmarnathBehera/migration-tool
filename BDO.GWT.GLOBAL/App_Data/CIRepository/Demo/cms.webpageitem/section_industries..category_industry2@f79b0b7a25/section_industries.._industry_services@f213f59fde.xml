@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageitem>
+  <WebPageItemContentItemID>
+    <CodeName>IndustryServices-yev5568a</CodeName>
+    <GUID>dae0ea68-0440-4ad0-b991-9a69d6d7692f</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </WebPageItemContentItemID>
+  <WebPageItemGUID>8375583a-52c4-4b5a-96b9-61702867baa2</WebPageItemGUID>
+  <WebPageItemName>IndustryServices-yev5568a</WebPageItemName>
+  <WebPageItemOrder>1</WebPageItemOrder>
+  <WebPageItemParentID>
+    <CodeName>Industry2-uhwpm1an</CodeName>
+    <GUID>d0fcb68e-d634-468c-a3f9-6438cd3f348d</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageItemParentID>
+  <WebPageItemTreePath>
+    <![CDATA[/section_Industries/industries_category/industry2/industry_services]]>
+  </WebPageItemTreePath>
+  <WebPageItemWebsiteChannelID>
+    <GUID>5ea050ab-8837-4f4f-91ff-59d581302cfe</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Demo</CodeName>
+      <GUID>7f5fa031-6e78-4286-8227-fe393248a477</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageItemWebsiteChannelID>
+</cms.webpageitem>

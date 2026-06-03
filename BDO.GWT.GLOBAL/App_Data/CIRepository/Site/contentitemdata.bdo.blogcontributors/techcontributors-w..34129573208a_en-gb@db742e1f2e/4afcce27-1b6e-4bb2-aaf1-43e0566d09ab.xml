@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.blogcontributors>
+  <AuthoredBlogDescription>Tech Contributors</AuthoredBlogDescription>
+  <AuthoredBlogsBackgroundImageUrl>
+    <![CDATA[[{"Identifier":"868a3a80-0614-4062-9800-a1aa598cf8f0"}]]]>
+  </AuthoredBlogsBackgroundImageUrl>
+  <AuthoredBlogTitle>Tech Contributors</AuthoredBlogTitle>
+  <ContentItemDataCommonDataID>
+    <GUID>980324a0-25cf-469a-b9dd-34129573208a</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>TechContributors-wex1z1fr</CodeName>
+      <GUID>dd30e642-249f-4563-8fda-eb440c0a938b</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>4afcce27-1b6e-4bb2-aaf1-43e0566d09ab</ContentItemDataGUID>
+  <PeopleListDefaultOrder>asc</PeopleListDefaultOrder>
+  <ShowAuthoredBlogs>True</ShowAuthoredBlogs>
+</contentitemdata.bdo.blogcontributors>

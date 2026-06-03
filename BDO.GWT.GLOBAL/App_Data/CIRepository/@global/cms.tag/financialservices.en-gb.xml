@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.tag>
+  <TagDescription />
+  <TagGUID>7d57cde3-88f0-4dbe-b4c0-b93ad3f9fb1b</TagGUID>
+  <TagMetadata>
+    <![CDATA[{"Translations":{"8517e6d4-6f93-4003-9e15-e30e302d68e9":{"Title":null,"Description":null},"ee380e62-f7ff-416a-88c1-646fe247d5f3":{"Title":null,"Description":null}}}]]>
+  </TagMetadata>
+  <TagName>FinancialServices.En-GB</TagName>
+  <TagOrder>6</TagOrder>
+  <TagTaxonomyID>
+    <CodeName>globalIndustry</CodeName>
+    <GUID>f803b21f-ee55-4715-b348-882acd851bf8</GUID>
+    <ObjectType>cms.taxonomy</ObjectType>
+  </TagTaxonomyID>
+  <TagTitle>Financial Services</TagTitle>
+</cms.tag>

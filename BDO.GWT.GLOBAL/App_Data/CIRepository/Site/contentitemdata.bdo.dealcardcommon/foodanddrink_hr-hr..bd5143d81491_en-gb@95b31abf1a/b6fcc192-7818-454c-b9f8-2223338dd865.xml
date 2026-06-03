@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.dealcardcommon>
+  <CodeName>BusinessServices.Hr-HRFoodAndDrink.Hr-HR</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>bb838a1d-eb52-4d10-8c91-bd5143d81491</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>FoodAndDrink_hr-HR-bz1m2c2i</CodeName>
+      <GUID>13230a8f-9d5d-4657-94b9-8fbfddf0f4ea</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>b6fcc192-7818-454c-b9f8-2223338dd865</ContentItemDataGUID>
+  <Language>hr-HR</Language>
+  <Name>Food and Drink</Name>
+</contentitemdata.bdo.dealcardcommon>

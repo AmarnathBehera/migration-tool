@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>SectionNews-92szwux8</CodeName>
+    <GUID>bd8f6dab-9041-4fd7-adf0-363a58ca5bbd</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-26 13:28:18Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>f5763fe6-b17a-475b-ac74-b79e13bf5957</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-27 11:40:22Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <HeroBackgroundImage>
+    <![CDATA[[{"Identifier":"fa9c4269-333f-48c9-8e2d-303bd69c6f33"}]]]>
+  </HeroBackgroundImage>
+  <HeroBackgroundImage_Mobile>
+    <![CDATA[[{"Identifier":"8ad29274-7718-4b10-8dd0-8011ef0be8d4"}]]]>
+  </HeroBackgroundImage_Mobile>
+  <HeroBackgroundImage_MobileAltText>texte alternatif image mobile</HeroBackgroundImage_MobileAltText>
+  <HeroBackgroundImageAltText>texte alt img</HeroBackgroundImageAltText>
+  <HeroCallToActionButtonText>Texte bouton CTA</HeroCallToActionButtonText>
+  <HeroCallToActionButtonType>secondaire</HeroCallToActionButtonType>
+  <HeroCallToActionButtonUrl>
+    <![CDATA[[{"Identifier":"7a9f9a11-f50e-49e8-9b18-8eac7d54941a"}]]]>
+  </HeroCallToActionButtonUrl>
+  <HeroDescription>
+    <![CDATA[description du héros]]>
+  </HeroDescription>
+  <HeroLayout>
+    <![CDATA[imageBannière]]>
+  </HeroLayout>
+  <HeroTitle>
+    <![CDATA[Héros]]>
+  </HeroTitle>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <ItemListAdvancedSearchDescription>
+    <![CDATA[Description de la recherche avancée]]>
+  </ItemListAdvancedSearchDescription>
+  <ItemListAdvancedSearchLinkText>
+    <![CDATA[Texte du lien de recherche avancée]]>
+  </ItemListAdvancedSearchLinkText>
+  <ItemListAdvancedSearchLinkUrl>
+    <![CDATA[[{"Identifier":"6d326e61-2b5a-4015-ae6b-7011b5631cce"}]]]>
+  </ItemListAdvancedSearchLinkUrl>
+  <ItemListDescription>
+    <![CDATA[Description de la liste d'éléments]]>
+  </ItemListDescription>
+  <ItemListFilteringEnabled>True</ItemListFilteringEnabled>
+  <ItemListTitle>
+    <![CDATA[Titre de la liste d'éléments]]>
+  </ItemListTitle>
+  <MetadataBusinessIssuesTG />
+  <MetadataCanonical>Lien canonique</MetadataCanonical>
+  <MetadataDescription>
+    <![CDATA[<p>Description de la section Actualités</p>]]>
+  </MetadataDescription>
+  <MetadataNofollow>True</MetadataNofollow>
+  <MetadataNoindex>True</MetadataNoindex>
+  <MetadataOGDescription>
+    <![CDATA[Description méta OG]]>
+  </MetadataOGDescription>
+  <MetadataOGTitle>
+    <![CDATA[Titre méta OG]]>
+  </MetadataOGTitle>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTeaserImage>
+    <![CDATA[[{"Identifier":"fa9c4269-333f-48c9-8e2d-303bd69c6f33"}]]]>
+  </MetadataTeaserImage>
+  <MetadataTeaserImageAltText>
+    <![CDATA[texte alternatif de l'image]]>
+  </MetadataTeaserImageAltText>
+  <MetadataTitle>
+    <![CDATA[Section Actualités]]>
+  </MetadataTitle>
+  <PageDescription>
+<![CDATA[
+Titre de la page actualités
+description
+]]>
+  </PageDescription>
+  <PageKeywords />
+  <PageTitle>
+    <![CDATA[Titre de la page actualités]]>
+  </PageTitle>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>ee7244b0-b59c-4d8c-ae08-09dffd0c5444</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>5f519f35-abfb-46ee-af66-62f64d6c8b00</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>f5763fe6-b17a-475b-ac74-b79e13bf5957</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Home2-7646d432</CodeName>
+        <GUID>6d326e61-2b5a-4015-ae6b-7011b5631cce</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6e10753f-0d29-4f6c-a16e-63f0d38e4f02</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>28d20bd1-6e9a-450b-85b0-53975152e0db</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>f5763fe6-b17a-475b-ac74-b79e13bf5957</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>New-xjx20apj</CodeName>
+        <GUID>fa9c4269-333f-48c9-8e2d-303bd69c6f33</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>5dc9513a-4505-4fa1-a628-68fb3901812e</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>8151fe84-883d-4113-91bf-101cb9faeefe</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>f5763fe6-b17a-475b-ac74-b79e13bf5957</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Contact-5axvy7uu</CodeName>
+        <GUID>7a9f9a11-f50e-49e8-9b18-8eac7d54941a</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6fc08044-a87a-465e-b463-77a25b10ecba</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>82c97437-1ee1-434a-b628-637be1e563de</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>f5763fe6-b17a-475b-ac74-b79e13bf5957</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Banner-e7tri4da</CodeName>
+        <GUID>8ad29274-7718-4b10-8dd0-8011ef0be8d4</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>8f060a96-d942-4969-ac2e-83ebdfce3762</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>fa46e649-f15d-4784-a29b-b81658bb1bcb</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>f5763fe6-b17a-475b-ac74-b79e13bf5957</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>New-xjx20apj</CodeName>
+        <GUID>fa9c4269-333f-48c9-8e2d-303bd69c6f33</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>baaa6698-1e7c-4fe7-a5f4-bb950a677a77</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>c7ff13e0-a087-4e7a-ab8f-063e99c449cb</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>f5763fe6-b17a-475b-ac74-b79e13bf5957</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>NewsArticle-1-kqu3kb7x</CodeName>
+        <GUID>7c765d5f-9c80-4b1b-a32b-b648364bcf67</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

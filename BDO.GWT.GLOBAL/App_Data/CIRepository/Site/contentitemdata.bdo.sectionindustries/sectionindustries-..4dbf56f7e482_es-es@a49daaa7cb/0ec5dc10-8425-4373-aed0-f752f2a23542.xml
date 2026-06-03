@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.sectionindustries>
+  <ContentItemDataCommonDataID>
+    <GUID>2f782605-7651-4df0-ab2e-4dbf56f7e482</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>SectionIndustries-2ouqb8uz</CodeName>
+      <GUID>2d1e4a1c-f699-4b84-84b6-7c293359a5cb</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>0ec5dc10-8425-4373-aed0-f752f2a23542</ContentItemDataGUID>
+</contentitemdata.bdo.sectionindustries>

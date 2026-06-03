@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitem>
+  <ContentItemChannelID>
+    <CodeName>Demo</CodeName>
+    <GUID>7f5fa031-6e78-4286-8227-fe393248a477</GUID>
+    <ObjectType>cms.channel</ObjectType>
+  </ContentItemChannelID>
+  <ContentItemContentTypeID>
+    <CodeName>BDO.IndustryCategory</CodeName>
+    <GUID>23d38e4a-908a-4b31-9ae2-2fbaeaed4940</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </ContentItemContentTypeID>
+  <ContentItemGUID>e835da20-63bc-492f-a9e8-afca0621bf71</ContentItemGUID>
+  <ContentItemIsReusable>False</ContentItemIsReusable>
+  <ContentItemIsSecured>False</ContentItemIsSecured>
+  <ContentItemName>IndustriesCategory-fdams8ru</ContentItemName>
+</cms.contentitem>

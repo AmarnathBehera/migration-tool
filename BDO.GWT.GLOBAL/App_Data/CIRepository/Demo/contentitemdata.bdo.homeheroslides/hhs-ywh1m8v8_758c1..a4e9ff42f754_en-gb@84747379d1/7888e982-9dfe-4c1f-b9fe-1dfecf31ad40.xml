@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.homeheroslides>
+  <ContentItemDataCommonDataID>
+    <GUID>758c1a10-c13f-4ebf-b80a-a4e9ff42f754</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>HHS-ywh1m8v8</CodeName>
+      <GUID>1c39c709-be53-4ef5-9dfa-29cb42507158</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>7888e982-9dfe-4c1f-b9fe-1dfecf31ad40</ContentItemDataGUID>
+</contentitemdata.bdo.homeheroslides>

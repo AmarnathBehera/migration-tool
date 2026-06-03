@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.homeheroslides>
+  <ContentItemDataCommonDataID>
+    <GUID>764d612f-9f48-4b57-9e7b-31b13f626b8a</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>HeroSlider-cq3kt36u</CodeName>
+      <GUID>893fc4b4-efe1-47cd-ade0-51242d63059b</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>ccf3c20d-6e76-4b4b-a281-95e5d699a0cd</ContentItemDataGUID>
+</contentitemdata.bdo.homeheroslides>

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.externalperson>
+  <ContentItemDataCommonDataID>
+    <GUID>2834e3a0-5d22-42eb-9617-bc2119ce3334</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>ExternalContributor-2-2o1zm6xw</CodeName>
+      <GUID>879e1abc-f8e1-4774-9ed9-9a8948eaa5d1</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>fa163919-47f9-4bd0-a220-a0da88bc2df7</ContentItemDataGUID>
+  <FirstName>First name -External Contributor 2</FirstName>
+  <JobTitle>Associate Consultant</JobTitle>
+  <LastName>Last name</LastName>
+  <SurnamePrefixes>Surname prefixes</SurnamePrefixes>
+  <Url>External.com</Url>
+</contentitemdata.bdo.externalperson>

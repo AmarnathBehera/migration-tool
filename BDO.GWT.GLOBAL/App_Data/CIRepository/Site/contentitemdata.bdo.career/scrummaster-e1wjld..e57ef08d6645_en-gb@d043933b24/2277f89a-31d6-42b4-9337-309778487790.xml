@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.career>
+  <CareerApplyForm>Tform1</CareerApplyForm>
+  <CareerContactPeopleID>
+    <![CDATA[[{"Identifier":"50dfbcc8-1d25-4fb1-814b-5c1591ceffc1"}]]]>
+  </CareerContactPeopleID>
+  <CareerEmploymentType>
+    <![CDATA[[{"Identifier":"5d4adcda-e8d9-4841-b6a3-f2e06fbc3eac"}]]]>
+  </CareerEmploymentType>
+  <CareerJobTitle>
+    <![CDATA[[{"Identifier":"5c80cdbf-e422-48f3-a974-dfac1a94c0ee"}]]]>
+  </CareerJobTitle>
+  <CareerLevel>
+    <![CDATA[[{"Identifier":"30895033-8c36-49c1-8051-0117dd59ea2f"}]]]>
+  </CareerLevel>
+  <ContentItemDataCommonDataID>
+    <GUID>a8a1ddbe-a7e0-4370-b3e7-e57ef08d6645</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>ScrumMaster-e1wjldph</CodeName>
+      <GUID>2a2c0b93-b23d-47bc-9b01-3c3575ee60d9</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>2277f89a-31d6-42b4-9337-309778487790</ContentItemDataGUID>
+  <DocumentPublishFrom>2026-05-13 07:46:56Z</DocumentPublishFrom>
+  <MetadataOfficeLocation>
+    <![CDATA[[{"Identifier":"c4c41489-5d9d-4df5-9dd9-7a9bfedff053"},{"Identifier":"81c108dc-968f-45ed-a242-4f85b8d35f28"}]]]>
+  </MetadataOfficeLocation>
+  <MetadataRelevantContactPerson>
+    <![CDATA[[{"Identifier":"50dfbcc8-1d25-4fb1-814b-5c1591ceffc1"},{"Identifier":"4f511f67-34af-4089-bd68-c919e2a51707"}]]]>
+  </MetadataRelevantContactPerson>
+</contentitemdata.bdo.career>

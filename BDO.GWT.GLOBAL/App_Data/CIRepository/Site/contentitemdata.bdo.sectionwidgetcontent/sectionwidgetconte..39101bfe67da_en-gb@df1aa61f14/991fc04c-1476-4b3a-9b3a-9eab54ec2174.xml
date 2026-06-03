@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.sectionwidgetcontent>
+  <ContentItemDataCommonDataID>
+    <GUID>b5df99db-4347-41bb-a9d4-39101bfe67da</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>SectionWidgetContent-dspmzorr</CodeName>
+      <GUID>200ff018-a477-44bc-be81-6a6da5549cee</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>991fc04c-1476-4b3a-9b3a-9eab54ec2174</ContentItemDataGUID>
+  <Title>Section Widget Content</Title>
+</contentitemdata.bdo.sectionwidgetcontent>

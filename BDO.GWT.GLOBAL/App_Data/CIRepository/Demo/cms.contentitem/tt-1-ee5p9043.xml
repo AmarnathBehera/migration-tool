@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitem>
+  <ContentItemChannelID>
+    <CodeName>Demo</CodeName>
+    <GUID>7f5fa031-6e78-4286-8227-fe393248a477</GUID>
+    <ObjectType>cms.channel</ObjectType>
+  </ContentItemChannelID>
+  <ContentItemContentTypeID>
+    <CodeName>BDO.TrendingTopic</CodeName>
+    <GUID>fb32f974-a837-4685-b43e-b49db033d0d9</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </ContentItemContentTypeID>
+  <ContentItemGUID>16a0bde0-b6f3-4eb8-ae05-ed46a481110c</ContentItemGUID>
+  <ContentItemIsReusable>False</ContentItemIsReusable>
+  <ContentItemIsSecured>False</ContentItemIsSecured>
+  <ContentItemName>TT-1-ee5p9043</ContentItemName>
+</cms.contentitem>

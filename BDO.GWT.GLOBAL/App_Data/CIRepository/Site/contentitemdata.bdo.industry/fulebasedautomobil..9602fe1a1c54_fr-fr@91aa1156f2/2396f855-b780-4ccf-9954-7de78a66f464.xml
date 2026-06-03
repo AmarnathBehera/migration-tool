@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.industry>
+  <ContentItemDataCommonDataID>
+    <GUID>8cfeaf9d-6c6a-4736-9492-9602fe1a1c54</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>FuleBasedAutomobiles-r3mwkdjx</CodeName>
+      <GUID>0ac92623-7f64-4ad1-9143-c79cb70f1185</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>2396f855-b780-4ccf-9954-7de78a66f464</ContentItemDataGUID>
+  <DescriptionBody>
+    <![CDATA[<div class="size-s____RcdQ" data-pasted="true"><div class="header-container___otyzD"><span class="header-spacing___Gyhiq">Automobiles à carburant</span><div class="button-wrapper___wvgI6"><button class="button___Ky_Bj type-quinary___CtMYa size-xs___YcTbv fill-container___I2NBK icon-only___fwQM4" type="button" aria-label="button" data-testid="editable-header-button"><span class="icon___WmL0F"><div data-testid="xp-edit"><br></div></span></button></div></div></div><div><div class="stack___kfkMm"><div data-testid="Metadata"><div class="form-category___Tjlr1"><br></div></div></div></div>]]>
+  </DescriptionBody>
+  <DescriptionTitle>
+    <![CDATA[Automobiles à carburant]]>
+  </DescriptionTitle>
+  <ShowSideNavigation>True</ShowSideNavigation>
+  <SideboxTitle>Secteurs avec lesquels nous travaillons</SideboxTitle>
+</contentitemdata.bdo.industry>

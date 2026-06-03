@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageitem>
+  <WebPageItemContentItemID>
+    <CodeName>Blogs-7c8j2e1r</CodeName>
+    <GUID>4cb17262-278e-4c1d-8959-b0fb6dc12860</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </WebPageItemContentItemID>
+  <WebPageItemGUID>6c52388d-1e2a-4009-b003-b9ab35119c38</WebPageItemGUID>
+  <WebPageItemName>Blogs-7c8j2e1r</WebPageItemName>
+  <WebPageItemOrder>6</WebPageItemOrder>
+  <WebPageItemTreePath>/Blogs</WebPageItemTreePath>
+  <WebPageItemWebsiteChannelID>
+    <GUID>97ffcb4b-7969-4019-9e7d-e39462ccd229</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Site</CodeName>
+      <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageItemWebsiteChannelID>
+</cms.webpageitem>

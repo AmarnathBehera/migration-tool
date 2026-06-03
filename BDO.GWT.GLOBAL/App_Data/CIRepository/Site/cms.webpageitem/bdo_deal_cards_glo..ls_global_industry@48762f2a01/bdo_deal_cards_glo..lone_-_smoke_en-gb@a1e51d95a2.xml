@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageitem>
+  <WebPageItemContentItemID>
+    <CodeName>Clone_-Smoke_en-GB-f8lk3a2w</CodeName>
+    <GUID>7ce61cd6-5619-4f9a-9e7a-cfe373128803</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </WebPageItemContentItemID>
+  <WebPageItemGUID>eb869839-7068-48cb-b170-e7bd80a56e7b</WebPageItemGUID>
+  <WebPageItemName>Clone_-Smoke_en-GB-f8lk3a2w</WebPageItemName>
+  <WebPageItemOrder>2</WebPageItemOrder>
+  <WebPageItemParentID>
+    <CodeName>GlobalIndustry-trjuglrz</CodeName>
+    <GUID>2b038c7f-7ddd-4d82-b8cd-65c88dc44343</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageItemParentID>
+  <WebPageItemTreePath>
+    <![CDATA[/BDO_Deal_Cards/Global_Deals/Global_Industry/Clone_-_Smoke_en-GB]]>
+  </WebPageItemTreePath>
+  <WebPageItemWebsiteChannelID>
+    <GUID>97ffcb4b-7969-4019-9e7d-e39462ccd229</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Site</CodeName>
+      <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageItemWebsiteChannelID>
+</cms.webpageitem>

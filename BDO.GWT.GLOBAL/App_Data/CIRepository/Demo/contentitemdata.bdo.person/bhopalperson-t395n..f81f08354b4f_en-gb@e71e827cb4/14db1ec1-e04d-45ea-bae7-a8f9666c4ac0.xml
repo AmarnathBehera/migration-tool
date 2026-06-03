@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.person>
+  <ContentItemDataCommonDataID>
+    <GUID>cbb66a3b-ba15-421d-b32e-f81f08354b4f</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>BhopalPerson-t395n6mi</CodeName>
+      <GUID>0be047fd-cc83-4342-9c84-42247a36969e</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>14db1ec1-e04d-45ea-bae7-a8f9666c4ac0</ContentItemDataGUID>
+  <EnableForm>True</EnableForm>
+  <EnableVCard>False</EnableVCard>
+  <Facebook>facebook/link</Facebook>
+  <LinkedIn>linkdin/link</LinkedIn>
+  <MetadataCity>
+    <![CDATA[[{"Identifier":"08bc4996-b445-4eaf-8290-f48b0a05a39d"}]]]>
+  </MetadataCity>
+  <MetadataOfficeLocation>
+    <![CDATA[[{"Identifier":"3e87da83-2d0f-4b55-816c-513abcdc29fb"}]]]>
+  </MetadataOfficeLocation>
+  <PersonDirectDialNumber>0987654321</PersonDirectDialNumber>
+  <PersonEmail>test@GMAIL.COM</PersonEmail>
+  <PersonFirstName>Test</PersonFirstName>
+  <PersonJobTitle>Software Engineer</PersonJobTitle>
+  <PersonLastName>Last</PersonLastName>
+  <PersonPhone>09165289375</PersonPhone>
+  <PersonSurnamePrefixes>surname</PersonSurnamePrefixes>
+  <Twitter>twitter/link</Twitter>
+</contentitemdata.bdo.person>

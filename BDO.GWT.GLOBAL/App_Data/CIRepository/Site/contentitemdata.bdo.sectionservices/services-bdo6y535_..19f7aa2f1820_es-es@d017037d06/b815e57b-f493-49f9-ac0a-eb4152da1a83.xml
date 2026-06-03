@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.sectionservices>
+  <ContentItemDataCommonDataID>
+    <GUID>a69741ac-1b06-454f-b754-19f7aa2f1820</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Services-bdo6y535</CodeName>
+      <GUID>c124bc8c-4ae8-41c3-88a8-84d8e4000dd3</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>b815e57b-f493-49f9-ac0a-eb4152da1a83</ContentItemDataGUID>
+</contentitemdata.bdo.sectionservices>

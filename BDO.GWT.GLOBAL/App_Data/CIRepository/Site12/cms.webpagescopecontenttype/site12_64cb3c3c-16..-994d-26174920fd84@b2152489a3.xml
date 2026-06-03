@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpagescopecontenttype>
+  <Parent>
+    <GUID>2becfb83-05ef-49ce-a7a4-80a29ef430ad</GUID>
+    <ObjectType>cms.webpagescope</ObjectType>
+    <Parent>
+      <GUID>64cb3c3c-162d-4536-994d-26174920fd84</GUID>
+      <ObjectType>cms.websitechannel</ObjectType>
+      <Parent>
+        <CodeName>Site12</CodeName>
+        <GUID>96f4d90b-5bed-4863-9e82-41b4684b351b</GUID>
+        <ObjectType>cms.channel</ObjectType>
+      </Parent>
+    </Parent>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.BDOMetadata">
+      <WebPageScopeContentTypeContentTypeID>
+        <CodeName>BDO.BDOMetadata</CodeName>
+        <GUID>2c656492-e8d0-4305-a99a-d49e17573637</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </WebPageScopeContentTypeContentTypeID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.Businessissues">
+      <WebPageScopeContentTypeContentTypeID>
+        <CodeName>BDO.Businessissues</CodeName>
+        <GUID>252cdc0e-f6a0-424f-bd6b-2584655e66c7</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </WebPageScopeContentTypeContentTypeID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.DealCardCommon">
+      <WebPageScopeContentTypeContentTypeID>
+        <CodeName>BDO.DealCardCommon</CodeName>
+        <GUID>09fd4259-c646-41e1-8363-6ed3c47ed8b2</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </WebPageScopeContentTypeContentTypeID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.DealCards">
+      <WebPageScopeContentTypeContentTypeID>
+        <CodeName>BDO.DealCards</CodeName>
+        <GUID>7b19e49b-0002-4a8a-a4ce-ddc69ce5c526</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </WebPageScopeContentTypeContentTypeID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.EventType">
+      <WebPageScopeContentTypeContentTypeID>
+        <CodeName>BDO.EventType</CodeName>
+        <GUID>ed59f954-8d98-4783-8dfa-bdd81de58862</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </WebPageScopeContentTypeContentTypeID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.Metadatafolder">
+      <WebPageScopeContentTypeContentTypeID>
+        <CodeName>BDO.Metadatafolder</CodeName>
+        <GUID>1bdc9ae4-a4a6-4715-9f06-66bcd88ca24e</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </WebPageScopeContentTypeContentTypeID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.SectionExternalPeople">
+      <WebPageScopeContentTypeContentTypeID>
+        <CodeName>BDO.SectionExternalPeople</CodeName>
+        <GUID>288e0d36-148a-4e54-baa4-7cf382b9bb39</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </WebPageScopeContentTypeContentTypeID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.Webinar">
+      <WebPageScopeContentTypeContentTypeID>
+        <CodeName>BDO.Webinar</CodeName>
+        <GUID>a0c5bc6c-9409-4fe9-8430-697d961328a6</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </WebPageScopeContentTypeContentTypeID>
+    </Binding>
+  </Bindings>
+</cms.webpagescopecontenttype>

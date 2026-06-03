@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>HomeHeroSlide_1-eu8jsqdh</CodeName>
+    <GUID>3c9b3b0f-b60d-4554-8a89-6ed8d2fb310b</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>es-es</CodeName>
+    <GUID>ee380e62-f7ff-416a-88c1-646fe247d5f3</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-14 08:54:19Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>08906b35-e560-4373-a378-bf46830673ba</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-14 09:17:15Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderTemplateConfiguration />
+  <ContentItemCommonDataVisualBuilderWidgets />
+  <MetadataBusinessIssuesTG />
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>68e87402-374e-4c27-967a-0f50f2b09ec0</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>6d0411eb-ed78-4d19-997d-ed176f0f1596</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>08906b35-e560-4373-a378-bf46830673ba</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Grsg-k8rpl1go</CodeName>
+        <GUID>4e6722d0-14db-4e1f-9b7f-78b6b6fda26e</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>3b334dd4-6f77-4de1-9dde-176a6b25299d</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>f70400c7-3462-42fe-bd16-254534dc831d</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>08906b35-e560-4373-a378-bf46830673ba</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Grsg-k8rpl1go</CodeName>
+        <GUID>4e6722d0-14db-4e1f-9b7f-78b6b6fda26e</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>ad0848c2-020b-4f0d-aff8-878dab506683</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>dac0351f-1959-41c2-bb57-aa3c3a659271</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>08906b35-e560-4373-a378-bf46830673ba</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Grsg-k8rpl1go</CodeName>
+        <GUID>4e6722d0-14db-4e1f-9b7f-78b6b6fda26e</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

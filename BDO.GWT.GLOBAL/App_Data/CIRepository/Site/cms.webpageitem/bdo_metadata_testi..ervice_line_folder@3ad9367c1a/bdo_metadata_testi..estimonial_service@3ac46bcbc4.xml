@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageitem>
+  <WebPageItemContentItemID>
+    <CodeName>TestimonialService-87duy99x</CodeName>
+    <GUID>9e684040-e6e2-43c2-997b-99ba8376088c</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </WebPageItemContentItemID>
+  <WebPageItemGUID>6380bd9e-1464-4cfd-860d-54c49258e596</WebPageItemGUID>
+  <WebPageItemName>TestimonialService-87duy99x</WebPageItemName>
+  <WebPageItemOrder>1</WebPageItemOrder>
+  <WebPageItemParentID>
+    <CodeName>TestimonialServiceLineFolder-pvllhc0c</CodeName>
+    <GUID>4ca8aa89-d808-450a-a87b-6b878bb73a86</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageItemParentID>
+  <WebPageItemTreePath>
+    <![CDATA[/BDO_Metadata/Testimonial_Service_line_folder/testimonial_service]]>
+  </WebPageItemTreePath>
+  <WebPageItemWebsiteChannelID>
+    <GUID>97ffcb4b-7969-4019-9e7d-e39462ccd229</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Site</CodeName>
+      <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageItemWebsiteChannelID>
+</cms.webpageitem>

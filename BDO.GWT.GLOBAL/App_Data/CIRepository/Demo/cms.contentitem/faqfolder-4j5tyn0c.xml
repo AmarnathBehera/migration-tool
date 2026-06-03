@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitem>
+  <ContentItemChannelID>
+    <CodeName>Demo</CodeName>
+    <GUID>7f5fa031-6e78-4286-8227-fe393248a477</GUID>
+    <ObjectType>cms.channel</ObjectType>
+  </ContentItemChannelID>
+  <ContentItemContentTypeID>
+    <CodeName>BDO.FaqFolder</CodeName>
+    <GUID>dd24464b-b784-4521-95e8-522c4b12bff0</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </ContentItemContentTypeID>
+  <ContentItemGUID>2d2e38b4-3b70-43d2-b36d-af56faba739b</ContentItemGUID>
+  <ContentItemIsReusable>False</ContentItemIsReusable>
+  <ContentItemIsSecured>False</ContentItemIsSecured>
+  <ContentItemName>FaqFolder-4j5tyn0c</ContentItemName>
+</cms.contentitem>

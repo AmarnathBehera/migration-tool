@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.industryservice>
+  <ContentItemDataCommonDataID>
+    <GUID>7645d6fb-ce93-437a-b530-528c256efae1</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>RegularSegmentService-o0qvgdhp</CodeName>
+      <GUID>c6fcba56-c434-4223-ae0f-a6491d47d884</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>16ae76c4-ac6f-4313-9723-548e2d739df0</ContentItemDataGUID>
+  <DescriptionBody>
+    <![CDATA[<p>&nbsp;Regular segment service Body content Regular segment service Body content Regular segment service Body content Regular segment service Body content Regular segment service Body content Regular segment service Body content Regular segment service Body content Regular segment service Body content Regular segment service Body content Regular segment service Body content Regular segment service Body content Regular segment service Body content Regular segment service Body content Regular segment service Body content Regular segment service Body content Regular segment service Body content Regular segment service Body content Regular segment service Body content Regular segment service Body content&nbsp;</p>]]>
+  </DescriptionBody>
+  <DescriptionTitle>Regular segment service</DescriptionTitle>
+</contentitemdata.bdo.industryservice>

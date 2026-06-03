@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.sectionabout>
+  <ContentItemDataCommonDataID>
+    <GUID>02e3ccf5-6a8d-4d9b-9c9d-7124e3ffefe5</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>AboutUsNew-b808lncb</CodeName>
+      <GUID>61600655-5a00-4d9c-812e-493fba542b2f</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>15074c2e-4e65-4d79-b894-19300eb61ac3</ContentItemDataGUID>
+</contentitemdata.bdo.sectionabout>

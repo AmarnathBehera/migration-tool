@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.homeheroslide>
+  <ContentItemDataCommonDataID>
+    <GUID>af5c62b6-475f-488d-b4d3-8772bc03b3f6</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Slider2-qkasf4bb</CodeName>
+      <GUID>bda7c108-240d-46b4-a6c6-d11b75966d9b</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>321cca03-8918-4447-b6df-60e36a604713</ContentItemDataGUID>
+  <CTAButtonText>click</CTAButtonText>
+  <CTAButtonUrl>/about</CTAButtonUrl>
+  <Description>Slider2</Description>
+  <Image>
+    <![CDATA[[{"Identifier":"868a3a80-0614-4062-9800-a1aa598cf8f0"}]]]>
+  </Image>
+  <Image_Mobile>
+    <![CDATA[[{"Identifier":"868a3a80-0614-4062-9800-a1aa598cf8f0"}]]]>
+  </Image_Mobile>
+  <Image_MobileAltText>slider</Image_MobileAltText>
+  <Image_Thumbnail>
+    <![CDATA[[{"Identifier":"868a3a80-0614-4062-9800-a1aa598cf8f0"}]]]>
+  </Image_Thumbnail>
+  <Image_ThumbnailAltText>test</Image_ThumbnailAltText>
+  <ImageAltText>hero</ImageAltText>
+  <Title>Slider2</Title>
+</contentitemdata.bdo.homeheroslide>

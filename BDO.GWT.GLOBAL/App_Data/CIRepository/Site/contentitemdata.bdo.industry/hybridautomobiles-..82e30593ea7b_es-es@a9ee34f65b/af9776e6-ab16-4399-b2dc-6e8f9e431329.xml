@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.industry>
+  <ContentItemDataCommonDataID>
+    <GUID>b8206ca7-f805-4139-89b2-82e30593ea7b</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>HybridAutomobiles-u3ka4el3</CodeName>
+      <GUID>01209c5e-2cac-478f-887b-06f8226e333d</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>af9776e6-ab16-4399-b2dc-6e8f9e431329</ContentItemDataGUID>
+  <DescriptionBody>
+    <![CDATA[<p>Hybrid automobiles Body content</p>]]>
+  </DescriptionBody>
+  <DescriptionTitle>Hybrid automobiles Title</DescriptionTitle>
+  <ShowSideNavigation>True</ShowSideNavigation>
+  <SideboxTitle>Industries We Work With</SideboxTitle>
+</contentitemdata.bdo.industry>

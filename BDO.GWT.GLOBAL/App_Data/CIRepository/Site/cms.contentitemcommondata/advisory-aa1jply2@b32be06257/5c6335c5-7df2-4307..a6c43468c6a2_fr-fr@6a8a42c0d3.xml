@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>Advisory-aa1jply2</CodeName>
+    <GUID>c2d3be33-0962-424c-bcb2-3b1754d28c4f</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-13 16:32:36Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>5c6335c5-7df2-4307-bfeb-a6c43468c6a2</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-13 16:32:36Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderTemplateConfiguration>
+    <![CDATA[{"identifier":"BDO.BusinessLine","properties":null,"fieldIdentifiers":null}]]>
+  </ContentItemCommonDataVisualBuilderTemplateConfiguration>
+  <ContentItemCommonDataVisualBuilderWidgets />
+  <HeroBackgroundImage>
+    <![CDATA[[{"Identifier":"b6681c19-f9e6-4ce7-9030-8d5f315424dc"}]]]>
+  </HeroBackgroundImage>
+  <HeroBackgroundImage_Mobile>
+    <![CDATA[[{"Identifier":"b6681c19-f9e6-4ce7-9030-8d5f315424dc"}]]]>
+  </HeroBackgroundImage_Mobile>
+  <HeroBackgroundImage_MobileAltText>Advisory</HeroBackgroundImage_MobileAltText>
+  <HeroBackgroundImageAltText>Advisory</HeroBackgroundImageAltText>
+  <HeroCallToActionButtonType>none</HeroCallToActionButtonType>
+  <HeroDescription>Advisory</HeroDescription>
+  <HeroLayout>bannerImage</HeroLayout>
+  <HeroTitle>Advisory</HeroTitle>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataBusinessIssuesTG />
+  <MetadataDescription>
+    <![CDATA[<p>Advisory Advisory</p>]]>
+  </MetadataDescription>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTeaserImage>
+    <![CDATA[[{"Identifier":"b6681c19-f9e6-4ce7-9030-8d5f315424dc"}]]]>
+  </MetadataTeaserImage>
+  <MetadataTeaserImageAltText>Our Advisory</MetadataTeaserImageAltText>
+  <MetadataTitle>Advisory</MetadataTitle>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6e10753f-0d29-4f6c-a16e-63f0d38e4f02</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>ac19bec6-968a-4644-866d-0060a692ead9</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>5c6335c5-7df2-4307-bfeb-a6c43468c6a2</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>SubServiceImage-wiup2coi</CodeName>
+        <GUID>b6681c19-f9e6-4ce7-9030-8d5f315424dc</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6fc08044-a87a-465e-b463-77a25b10ecba</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>f476abe5-be7d-45b6-92fe-e06db0dbb3af</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>5c6335c5-7df2-4307-bfeb-a6c43468c6a2</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>SubServiceImage-wiup2coi</CodeName>
+        <GUID>b6681c19-f9e6-4ce7-9030-8d5f315424dc</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>8f060a96-d942-4969-ac2e-83ebdfce3762</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>c786ba49-0876-48aa-9672-84790bca1249</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>5c6335c5-7df2-4307-bfeb-a6c43468c6a2</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>SubServiceImage-wiup2coi</CodeName>
+        <GUID>b6681c19-f9e6-4ce7-9030-8d5f315424dc</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

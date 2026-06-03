@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Global Locations</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="GlobalLocationID" columntype="integer" enabled="true" guid="0bf2d270-9111-4d23-a367-f69c0062ab79" isPK="true" />
+      <field column="GlobalLocationsTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="e065f10f-6014-438c-b7d0-e37e28c41d4a" />
+      <field column="GlobalLocationsDescription" columnprecision="0" columntype="longtext" enabled="true" guid="6cdb180b-9367-4430-bec9-1f7ab8c6bff9" />
+      <field column="ViewGlobalLocationsBackgroundImage" columnprecision="0" columntype="assets" enabled="true" guid="348b7d59-0478-4b4f-a172-18f1f6098fe5" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>714e052c-cc18-44f2-a160-04ea9d317905</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.GlobalLocation</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_GlobalLocation</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

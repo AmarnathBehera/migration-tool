@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.dealcardcommon>
+  <CodeName>500m-1000m</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>db7b7bd6-cf40-4444-b20e-956ab4eff189</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>500m-1000m-6v4izj7b</CodeName>
+      <GUID>ad590d7b-6122-4df7-a50a-82675a66f25c</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>243eedc1-e30f-45a9-8faf-0a9755341f40</ContentItemDataGUID>
+  <Name>500m-1000m</Name>
+</contentitemdata.bdo.dealcardcommon>

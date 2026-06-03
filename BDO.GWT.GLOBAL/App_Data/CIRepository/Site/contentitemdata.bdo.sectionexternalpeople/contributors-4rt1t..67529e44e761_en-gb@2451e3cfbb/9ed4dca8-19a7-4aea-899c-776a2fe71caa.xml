@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.sectionexternalpeople>
+  <ContentItemDataCommonDataID>
+    <GUID>18f6301a-0c52-4bf4-8069-67529e44e761</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Contributors-4rt1t7pn</CodeName>
+      <GUID>fcddf164-49cd-4978-96aa-b9d1632681dd</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>9ed4dca8-19a7-4aea-899c-776a2fe71caa</ContentItemDataGUID>
+</contentitemdata.bdo.sectionexternalpeople>

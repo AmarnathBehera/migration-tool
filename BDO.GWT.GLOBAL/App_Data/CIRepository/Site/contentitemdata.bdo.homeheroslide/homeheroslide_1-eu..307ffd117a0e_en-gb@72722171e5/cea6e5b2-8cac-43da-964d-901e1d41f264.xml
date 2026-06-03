@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.homeheroslide>
+  <ContentItemDataCommonDataID>
+    <GUID>af70451c-1c28-48c7-9a55-307ffd117a0e</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>HomeHeroSlide_1-eu8jsqdh</CodeName>
+      <GUID>3c9b3b0f-b60d-4554-8a89-6ed8d2fb310b</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>cea6e5b2-8cac-43da-964d-901e1d41f264</ContentItemDataGUID>
+  <Image>
+    <![CDATA[[{"Identifier":"816637d6-790c-4013-9802-fb0de6fff24b"}]]]>
+  </Image>
+  <Image_Mobile>
+    <![CDATA[[{"Identifier":"816637d6-790c-4013-9802-fb0de6fff24b"}]]]>
+  </Image_Mobile>
+  <Image_MobileAltText>alt text</Image_MobileAltText>
+  <Image_Thumbnail>
+    <![CDATA[[{"Identifier":"816637d6-790c-4013-9802-fb0de6fff24b"}]]]>
+  </Image_Thumbnail>
+  <Image_ThumbnailAltText>alt text</Image_ThumbnailAltText>
+  <ImageAltText>alt image text</ImageAltText>
+  <Title>Head 111</Title>
+</contentitemdata.bdo.homeheroslide>

@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.credentials>
+  <CodeName>PhD</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>9d0563b8-bd06-45e6-a9da-9bf706b541fe</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>PhD-ef4k18q2</CodeName>
+      <GUID>b6b591bd-2121-4dd2-9f7e-8fe0dd2ce789</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>7255e207-318d-4a9f-a632-fbc0718ae3c8</ContentItemDataGUID>
+  <Name>PhD</Name>
+</contentitemdata.bdo.credentials>

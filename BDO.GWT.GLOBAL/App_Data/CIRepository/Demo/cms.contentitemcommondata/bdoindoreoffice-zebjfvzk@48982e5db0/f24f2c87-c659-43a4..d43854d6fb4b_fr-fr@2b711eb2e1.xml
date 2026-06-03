@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>BDOIndoreOffice-zebjfvzk</CodeName>
+    <GUID>3e87da83-2d0f-4b55-816c-513abcdc29fb</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-04-30 11:35:48Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>f24f2c87-c659-43a4-aa45-d43854d6fb4b</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-04-30 11:35:48Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataBusinessIssuesTG />
+  <MetadataCanonical />
+  <MetadataDescription>
+    <![CDATA[<p>Bureau BDO Indore</p>]]>
+  </MetadataDescription>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGDescription />
+  <MetadataOGTitle />
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTeaserImageAltText>Bureau BDO Indore</MetadataTeaserImageAltText>
+  <MetadataTitle>Bureau BDO Indore</MetadataTitle>
+</cms.contentitemcommondata>

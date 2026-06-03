@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>CorporateTaxServices-yz5ett2t</CodeName>
+    <GUID>040d1317-3f63-4ee1-acaa-5d3edbc26a87</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>es-es</CodeName>
+    <GUID>ee380e62-f7ff-416a-88c1-646fe247d5f3</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-14 07:45:39Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>a07fc1e3-9900-41d9-ac22-34a1741d3c95</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-14 07:45:39Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderTemplateConfiguration />
+  <ContentItemCommonDataVisualBuilderWidgets />
+  <HeroBackgroundImage>
+    <![CDATA[[{"Identifier":"71cecc4d-d99d-447b-90e0-4414923d8202"}]]]>
+  </HeroBackgroundImage>
+  <HeroBackgroundImage_Mobile>
+    <![CDATA[[{"Identifier":"71cecc4d-d99d-447b-90e0-4414923d8202"}]]]>
+  </HeroBackgroundImage_Mobile>
+  <HeroBackgroundImage_MobileAltText>Services</HeroBackgroundImage_MobileAltText>
+  <HeroBackgroundImageAltText>Services</HeroBackgroundImageAltText>
+  <HeroCallToActionButtonText>Click here</HeroCallToActionButtonText>
+  <HeroCallToActionButtonType>primary</HeroCallToActionButtonType>
+  <HeroCallToActionButtonUrl>
+    <![CDATA[[{"Identifier":"61600655-5a00-4d9c-812e-493fba542b2f"}]]]>
+  </HeroCallToActionButtonUrl>
+  <HeroDescription>Corporate Tax Services</HeroDescription>
+  <HeroLayout>bannerImage</HeroLayout>
+  <HeroTitle>Corporate Tax Services1</HeroTitle>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataBusinessIssuesTG />
+  <MetadataDescription>
+    <![CDATA[<p>Corporate Tax Services Corporate Tax Services</p>]]>
+  </MetadataDescription>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGDescription>test</MetadataOGDescription>
+  <MetadataOGTitle>test</MetadataOGTitle>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTitle>Corporate Tax Services</MetadataTitle>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6e10753f-0d29-4f6c-a16e-63f0d38e4f02</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>eb4053f3-d7fe-4bcf-aa03-5dae29f030ff</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>a07fc1e3-9900-41d9-ac22-34a1741d3c95</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Industry-epmmotfl</CodeName>
+        <GUID>71cecc4d-d99d-447b-90e0-4414923d8202</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>5dc9513a-4505-4fa1-a628-68fb3901812e</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>3430820a-ecc7-49f1-bd93-12ccb076ab13</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>a07fc1e3-9900-41d9-ac22-34a1741d3c95</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>AboutUsNew-b808lncb</CodeName>
+        <GUID>61600655-5a00-4d9c-812e-493fba542b2f</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6fc08044-a87a-465e-b463-77a25b10ecba</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>8e727962-84fd-427d-ba93-d853c7637f74</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>a07fc1e3-9900-41d9-ac22-34a1741d3c95</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Industry-epmmotfl</CodeName>
+        <GUID>71cecc4d-d99d-447b-90e0-4414923d8202</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

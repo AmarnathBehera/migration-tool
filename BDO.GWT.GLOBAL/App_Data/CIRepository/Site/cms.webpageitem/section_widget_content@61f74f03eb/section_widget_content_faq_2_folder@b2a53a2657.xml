@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageitem>
+  <WebPageItemContentItemID>
+    <CodeName>Faq2Folder-upryd18a</CodeName>
+    <GUID>1548ada7-a4fa-49f2-83a2-73a6ce5d1c91</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </WebPageItemContentItemID>
+  <WebPageItemGUID>bc7aef97-d3ca-4a37-be90-11a75557adeb</WebPageItemGUID>
+  <WebPageItemName>Faq2Folder-upryd18a</WebPageItemName>
+  <WebPageItemOrder>3</WebPageItemOrder>
+  <WebPageItemParentID>
+    <CodeName>SectionWidgetContent-dspmzorr</CodeName>
+    <GUID>9cfa72bc-8c51-44f8-9f3e-47ddd092bea4</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageItemParentID>
+  <WebPageItemTreePath>/Section_Widget_Content/Faq_2_folder</WebPageItemTreePath>
+  <WebPageItemWebsiteChannelID>
+    <GUID>97ffcb4b-7969-4019-9e7d-e39462ccd229</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Site</CodeName>
+      <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageItemWebsiteChannelID>
+</cms.webpageitem>

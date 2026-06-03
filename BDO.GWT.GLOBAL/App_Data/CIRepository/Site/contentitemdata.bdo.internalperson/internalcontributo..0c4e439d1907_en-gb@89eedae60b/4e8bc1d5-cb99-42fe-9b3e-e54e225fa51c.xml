@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.internalperson>
+  <ContentItemDataCommonDataID>
+    <GUID>dcff69ef-6b6a-4522-87c0-0c4e439d1907</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>InternalContributor-8aoxkkbg</CodeName>
+      <GUID>7b5e364e-3e2b-4084-b4a1-a608f6a37159</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>4e8bc1d5-cb99-42fe-9b3e-e54e225fa51c</ContentItemDataGUID>
+  <Email>Pooja.Rajak@test</Email>
+  <FirstName>First name Internal Contributor 1</FirstName>
+  <JobTitle>Associate Consultant</JobTitle>
+  <LastName>Last name</LastName>
+  <SurnamePrefixes>Surname prefixes</SurnamePrefixes>
+  <Url>facebook.com</Url>
+</contentitemdata.bdo.internalperson>

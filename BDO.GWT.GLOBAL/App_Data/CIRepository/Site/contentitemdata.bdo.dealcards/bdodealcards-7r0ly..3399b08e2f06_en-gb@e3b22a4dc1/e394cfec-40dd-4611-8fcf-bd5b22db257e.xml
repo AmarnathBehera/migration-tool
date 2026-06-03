@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.dealcards>
+  <ContentItemDataCommonDataID>
+    <GUID>661e6c0f-923a-466c-b139-3399b08e2f06</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>BDODealCards-7r0lyjlq</CodeName>
+      <GUID>3d6fdf81-febd-4d00-9bb2-3c15b6cdcd10</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>e394cfec-40dd-4611-8fcf-bd5b22db257e</ContentItemDataGUID>
+</contentitemdata.bdo.dealcards>

@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.webinar>
+  <AllowRegistration>True</AllowRegistration>
+  <ContentItemDataCommonDataID>
+    <GUID>cb34dca4-c27f-454b-87ee-4a03696a614d</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Webinar-kk15a8jo</CodeName>
+      <GUID>fd65aeac-812d-4096-b89e-6239a782393d</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>9e960e72-d670-4156-a234-903d2fa67160</ContentItemDataGUID>
+  <CpeCount>3</CpeCount>
+  <CpeCreditNotes>33</CpeCreditNotes>
+  <CpeDescription>
+    <![CDATA[<p>Post event description</p>]]>
+  </CpeDescription>
+  <CpeEvent>True</CpeEvent>
+  <CustomBodyText>
+    <![CDATA[<p>Post event description</p>]]>
+  </CustomBodyText>
+  <DisableAddToCalendar>True</DisableAddToCalendar>
+  <DisablePrintAndShare>True</DisablePrintAndShare>
+  <EventAllDay>True</EventAllDay>
+  <EventAttachment>
+    <![CDATA[[{"Identifier":"2b35b74f-95a9-41ab-80b7-c291cd003bb5"}]]]>
+  </EventAttachment>
+  <EventDateFrom>2026-05-21 15:41:08Z</EventDateFrom>
+  <EventDateOverride>Post event description</EventDateOverride>
+  <EventDateTo>2026-05-21 15:41:09Z</EventDateTo>
+  <EventIsPrivate>False</EventIsPrivate>
+  <EventPostDescription>Post event description</EventPostDescription>
+  <EventTimeOverride>Post event description</EventTimeOverride>
+  <EventType>
+    <![CDATA[[{"Identifier":"e12156c9-66bf-4dba-9a00-bd1c92625efd"}]]]>
+  </EventType>
+  <EventVideo>~/</EventVideo>
+  <MetadataOfficeLocation>
+    <![CDATA[[{"Identifier":"d0469110-b346-474e-be03-d6d5cc0834f7"}]]]>
+  </MetadataOfficeLocation>
+  <ProgramLevel>Basic</ProgramLevel>
+  <RegistrationFormLink />
+  <RegistrationType>kentico</RegistrationType>
+  <ShowPastEvent>True</ShowPastEvent>
+  <ShowWebinarTitle>True</ShowWebinarTitle>
+</contentitemdata.bdo.webinar>

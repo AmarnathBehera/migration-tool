@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Blog Contributors</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="11d57a0b-3585-4d53-9bf0-c4f1ce8c3ff2" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="89dfcf54-c691-4689-ad55-4d3c34bbe0d7" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="5c492abf-8dcc-4aed-bde3-9ad845adfd0f" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
+      <field column="PeopleListDefaultOrder" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="b1d4e369-59d5-4ee5-82ea-6770a0dab01b" visible="true">
+        <properties>
+          <defaultvalue>asc</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Default order</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.RadioGroup</controlname>
+          <Inline>False</Inline>
+          <Options>
+<![CDATA[
+asc;Last name A-Z
+desc;Last name Z-A
+nodeorder;Node Order
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+      </field>
+      <field column="ShowAuthoredBlogs" columnprecision="0" columntype="boolean" enabled="true" guid="88cedbed-9b92-438a-bf37-0222eff98dbc" visible="true">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+          <explanationtext>
+            <![CDATA[Controls the visibility of authored blogs section in person pages.]]>
+          </explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show authored blogs</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="AuthoredBlogTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="5b166cf6-5fa8-45ae-af15-2b4db811fc49" visible="true">
+        <properties>
+          <explanationtext>
+            <![CDATA[Title that will be shown over authored blogs carousel.]]>
+          </explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowAuthoredBlogs</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="AuthoredBlogDescription" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="550bddba-1490-4a6d-8e9d-f64261df1524" visible="true">
+        <properties>
+          <explanationtext>
+            <![CDATA[Description that will be shown over authored blogs carousel but under title.]]>
+          </explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Description</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowAuthoredBlogs</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="AuthoredBlogsBackgroundImageUrl" columnprecision="0" columntype="contentitemreference" enabled="true" guid="9c5172dd-45ca-41f4-ad3c-ebb5cfc5e319" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Background image</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowAuthoredBlogs</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>10cf0436-9df3-42cf-9f9e-668addcc802b</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-users</ClassIconClass>
+  <ClassName>BDO.BlogContributors</ClassName>
+  <ClassShortName>BDOBlogContributors</ClassShortName>
+  <ClassTableName>BDO_BlogContributors</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>

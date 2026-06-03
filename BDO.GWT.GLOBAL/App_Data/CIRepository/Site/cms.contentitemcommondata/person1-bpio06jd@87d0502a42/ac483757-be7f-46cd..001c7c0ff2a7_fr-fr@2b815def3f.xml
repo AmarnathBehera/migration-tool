@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>Person1-bpio06jd</CodeName>
+    <GUID>50dfbcc8-1d25-4fb1-814b-5c1591ceffc1</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-12 13:30:57Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>ac483757-be7f-46cd-95c0-001c7c0ff2a7</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-13 05:46:03Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderTemplateConfiguration>
+    <![CDATA[{"identifier":"BDO.Person","properties":null,"fieldIdentifiers":{}}]]>
+  </ContentItemCommonDataVisualBuilderTemplateConfiguration>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataBusinessIssuesTG />
+  <MetadataCanonical />
+  <MetadataDescription />
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGDescription />
+  <MetadataOGTitle />
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTeaserImageAltText />
+  <MetadataTitle>French-test1</MetadataTitle>
+  <PageDescription />
+  <PageKeywords />
+  <PageTitle>
+    <![CDATA[Contenu publié]]>
+  </PageTitle>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>7bf737dd-cca5-4e0f-a32b-894a0106fcd3</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>227a10ac-90ce-48c6-b9da-483a0a2e403f</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>ac483757-be7f-46cd-95c0-001c7c0ff2a7</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>IndoreOffice1-yllsrfqi</CodeName>
+        <GUID>c4c41489-5d9d-4df5-9dd9-7a9bfedff053</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>53f84c7f-474b-404b-984b-b93bc54825f6</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>d4a3d3cd-f2bf-4fed-9da7-cf3d86ce529d</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>ac483757-be7f-46cd-95c0-001c7c0ff2a7</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Indore-ca4o4ad7</CodeName>
+        <GUID>d765cdc6-9b1f-4e8a-9478-6294ba89834a</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

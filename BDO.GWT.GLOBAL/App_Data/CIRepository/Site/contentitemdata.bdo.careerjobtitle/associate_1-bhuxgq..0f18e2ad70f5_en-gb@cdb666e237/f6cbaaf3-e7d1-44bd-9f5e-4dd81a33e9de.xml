@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.careerjobtitle>
+  <CodeName>Associate_1</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>99e60d28-d24f-4581-8125-0f18e2ad70f5</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Associate_1-bhuxgqlr</CodeName>
+      <GUID>8b3ba901-184d-4458-8583-236ba8b347a1</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>f6cbaaf3-e7d1-44bd-9f5e-4dd81a33e9de</ContentItemDataGUID>
+  <Name>Associate (1)</Name>
+</contentitemdata.bdo.careerjobtitle>

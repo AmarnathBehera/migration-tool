@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.industrycategory>
+  <ContentItemDataCommonDataID>
+    <GUID>32a40b01-e942-4ea1-900e-938a4a45b4dc</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>AutomobilesCategory-bfgsgylq</CodeName>
+      <GUID>8578ac71-0655-4603-8ea1-858ac2460051</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>32500c57-fcf1-404a-8d66-5a838b035507</ContentItemDataGUID>
+  <DescriptionBody>
+    <![CDATA[<p>Automobile category Body content</p>]]>
+  </DescriptionBody>
+  <DescriptionTitle>Automobile category Title</DescriptionTitle>
+  <ShowSideNavigation>True</ShowSideNavigation>
+  <SideboxTitle>Industries We Work With</SideboxTitle>
+</contentitemdata.bdo.industrycategory>

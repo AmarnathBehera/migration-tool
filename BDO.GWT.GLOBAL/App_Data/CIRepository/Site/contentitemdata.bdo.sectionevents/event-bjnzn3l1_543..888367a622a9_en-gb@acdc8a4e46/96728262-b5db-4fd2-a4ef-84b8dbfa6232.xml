@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.sectionevents>
+  <ContentItemDataCommonDataID>
+    <GUID>543a3dc4-5d71-44b4-ae2c-888367a622a9</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Event-bjnzn3l1</CodeName>
+      <GUID>f355ee08-a523-44ae-98d0-814f5b96b708</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>96728262-b5db-4fd2-a4ef-84b8dbfa6232</ContentItemDataGUID>
+  <EventsWebinarsListAdvancedSearchDescription>Advanced search description</EventsWebinarsListAdvancedSearchDescription>
+  <EventsWebinarsListAdvancedSearchLinkText>Advanced search link text</EventsWebinarsListAdvancedSearchLinkText>
+  <EventsWebinarsListAdvancedSearchLinkUrl>[]</EventsWebinarsListAdvancedSearchLinkUrl>
+  <EventsWebinarsListDescription>
+    <![CDATA[Events & webinars list description]]>
+  </EventsWebinarsListDescription>
+  <EventsWebinarsListFeaturedPages>
+    <![CDATA[[{"Identifier":"3ef54084-88a0-4bd3-b578-d25a0d9264a5"}]]]>
+  </EventsWebinarsListFeaturedPages>
+  <EventsWebinarsListFilteringEnabled>True</EventsWebinarsListFilteringEnabled>
+  <EventsWebinarsListFilters>
+    <![CDATA[eventType;businessIssue;businessLine;serviceArea;industryCategory;specialtyCategory;micrositeMasterPage;officeLocation]]>
+  </EventsWebinarsListFilters>
+  <EventsWebinarsListTitle>
+    <![CDATA[Events & webinars list title]]>
+  </EventsWebinarsListTitle>
+  <ShowPastEvents>True</ShowPastEvents>
+</contentitemdata.bdo.sectionevents>

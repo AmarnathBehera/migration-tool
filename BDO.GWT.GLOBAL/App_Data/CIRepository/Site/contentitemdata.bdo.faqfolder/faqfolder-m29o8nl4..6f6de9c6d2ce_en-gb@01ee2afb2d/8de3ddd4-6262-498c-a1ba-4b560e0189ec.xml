@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.faqfolder>
+  <ContentItemDataCommonDataID>
+    <GUID>88968557-f7ed-4c19-864e-6f6de9c6d2ce</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>FAQFolder-m29o8nl4</CodeName>
+      <GUID>29b594dc-fc0e-426e-ba46-8439a5615213</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>8de3ddd4-6262-498c-a1ba-4b560e0189ec</ContentItemDataGUID>
+  <Title>FAQ Folder</Title>
+</contentitemdata.bdo.faqfolder>

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.faqtopic>
+  <ContentItemDataCommonDataID>
+    <GUID>908194ea-5888-465f-88c0-6c812ad0a138</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Topic3-1z6di0s6</CodeName>
+      <GUID>2116e0e7-cdf9-441b-a694-4ef3916a86de</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>247d5fd8-f2d5-4b67-b167-6037aedb501a</ContentItemDataGUID>
+  <Title>topic 3</Title>
+</contentitemdata.bdo.faqtopic>

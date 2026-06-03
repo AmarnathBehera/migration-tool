@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.newsgroup>
+  <ContentItemDataCommonDataID>
+    <GUID>c5368556-155a-407c-a856-d67a678928a4</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>NewsGroup-1-hzoghrex</CodeName>
+      <GUID>0f8ab9aa-5201-4386-b542-f4a589948d61</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>5439c704-837a-45e1-afd7-b02e36a907b9</ContentItemDataGUID>
+  <Description>desc</Description>
+  <NewsGroupTitle>Groupe de Nouvelles-1 * Titre</NewsGroupTitle>
+</contentitemdata.bdo.newsgroup>

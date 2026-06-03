@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.faqfolder>
+  <ContentItemDataCommonDataID>
+    <GUID>06ba8914-c19a-452e-84cb-7c2fcfe91aa6</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Test2-sxcoro60</CodeName>
+      <GUID>e98a6c61-2e80-40af-b1dd-0095e22f3c9c</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>0194e5e2-a329-4e99-8eff-c9c310bda719</ContentItemDataGUID>
+  <Separator />
+  <Title>test2</Title>
+</contentitemdata.bdo.faqfolder>

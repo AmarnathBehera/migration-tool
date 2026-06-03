@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.businessissuesfolder>
+  <ContentItemDataCommonDataID>
+    <GUID>c1ed71c5-1fcf-4d06-9d27-c5bee7164bb2</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>BusinessIssues-95i8q1cw</CodeName>
+      <GUID>15726c28-86e5-4703-bd14-abce26dc3c3e</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>ec5416d9-d1ea-454b-a703-484d5b3a6b39</ContentItemDataGUID>
+  <Title>Business issues</Title>
+</contentitemdata.bdo.businessissuesfolder>

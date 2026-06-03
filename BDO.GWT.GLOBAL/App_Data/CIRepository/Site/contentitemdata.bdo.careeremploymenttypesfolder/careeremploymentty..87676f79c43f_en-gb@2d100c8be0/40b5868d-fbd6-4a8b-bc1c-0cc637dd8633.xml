@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.careeremploymenttypesfolder>
+  <ContentItemDataCommonDataID>
+    <GUID>e69e6b25-dfbc-4863-8c21-87676f79c43f</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>CareerEmploymentTypes-xux24cyz</CodeName>
+      <GUID>1d976c78-0a27-4456-8b0c-f5ae57585d9d</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>40b5868d-fbd6-4a8b-bc1c-0cc637dd8633</ContentItemDataGUID>
+  <Title>Career Employment Types</Title>
+</contentitemdata.bdo.careeremploymenttypesfolder>

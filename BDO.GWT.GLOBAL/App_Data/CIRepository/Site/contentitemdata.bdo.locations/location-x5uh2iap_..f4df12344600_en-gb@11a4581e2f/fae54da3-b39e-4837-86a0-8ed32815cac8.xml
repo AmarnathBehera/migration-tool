@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.locations>
+  <BannerButtonLinkTarget>_self</BannerButtonLinkTarget>
+  <BannerButtonType>primary</BannerButtonType>
+  <BannerTheme>light</BannerTheme>
+  <ContentItemDataCommonDataID>
+    <GUID>abdca940-9439-4091-86ad-f4df12344600</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Location-x5uh2iap</CodeName>
+      <GUID>0e55cc8a-172b-4155-995e-7f2faad5f160</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>fae54da3-b39e-4837-86a0-8ed32815cac8</ContentItemDataGUID>
+</contentitemdata.bdo.locations>

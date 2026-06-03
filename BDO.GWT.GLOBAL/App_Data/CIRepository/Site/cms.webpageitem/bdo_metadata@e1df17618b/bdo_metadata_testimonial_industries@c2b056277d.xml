@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageitem>
+  <WebPageItemContentItemID>
+    <CodeName>TestimonialIndustries-xv8y7q0p</CodeName>
+    <GUID>cbd18c8d-305c-4c24-8c4b-5a6b055b6bbe</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </WebPageItemContentItemID>
+  <WebPageItemGUID>ac9ee0c5-9c5e-48ae-b741-5c7457b1e2e3</WebPageItemGUID>
+  <WebPageItemName>TestimonialIndustries-xv8y7q0p</WebPageItemName>
+  <WebPageItemOrder>5</WebPageItemOrder>
+  <WebPageItemParentID>
+    <CodeName>BDOMetadata-4707j7w6</CodeName>
+    <GUID>1010f8ab-0992-4c65-af0a-1184ef077b63</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageItemParentID>
+  <WebPageItemTreePath>/BDO_Metadata/Testimonial_Industries</WebPageItemTreePath>
+  <WebPageItemWebsiteChannelID>
+    <GUID>97ffcb4b-7969-4019-9e7d-e39462ccd229</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Site</CodeName>
+      <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageItemWebsiteChannelID>
+</cms.webpageitem>

@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.person>
+  <ContentItemDataCommonDataID>
+    <GUID>0bf25075-2ded-4555-b278-05200228110a</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Person2-ale79rss</CodeName>
+      <GUID>4f511f67-34af-4089-bd68-c919e2a51707</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>ebfa9d64-8d73-44ca-9f62-668245055c75</ContentItemDataGUID>
+  <EnableForm>True</EnableForm>
+  <EnableVCard>True</EnableVCard>
+  <Facebook>facebook/link</Facebook>
+  <LinkedIn>linkdin/link</LinkedIn>
+  <MetadataCity>
+    <![CDATA[[{"Identifier":"d765cdc6-9b1f-4e8a-9478-6294ba89834a"}]]]>
+  </MetadataCity>
+  <MetadataOfficeLocation>
+    <![CDATA[[{"Identifier":"81c108dc-968f-45ed-a242-4f85b8d35f28"}]]]>
+  </MetadataOfficeLocation>
+  <PersonCredentials>
+    <![CDATA[[{"Identifier":"08ff8465-83af-4322-9b8b-6b79805cb1e6"}]]]>
+  </PersonCredentials>
+  <PersonDirectDialNumber>123456789</PersonDirectDialNumber>
+  <PersonEmail>tdst@ext.bdo.global</PersonEmail>
+  <PersonFirstName>tapasya</PersonFirstName>
+  <PersonJobTitle>Job title</PersonJobTitle>
+  <PersonLastName>mahor</PersonLastName>
+  <PersonMobilePhone>123456789</PersonMobilePhone>
+  <PersonPhone>123456789</PersonPhone>
+  <PersonSurnamePrefixes>singh</PersonSurnamePrefixes>
+  <Twitter>twitter/link</Twitter>
+</contentitemdata.bdo.person>

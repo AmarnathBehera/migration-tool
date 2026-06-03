@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.faqfolder>
+  <ContentItemDataCommonDataID>
+    <GUID>20f2ada1-69e1-473c-9105-6539cb22ed8e</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Faq2Folder-upryd18a</CodeName>
+      <GUID>1548ada7-a4fa-49f2-83a2-73a6ce5d1c91</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>8be42b33-0702-45e7-814d-cf67dc02300f</ContentItemDataGUID>
+  <Title>title faq2</Title>
+</contentitemdata.bdo.faqfolder>

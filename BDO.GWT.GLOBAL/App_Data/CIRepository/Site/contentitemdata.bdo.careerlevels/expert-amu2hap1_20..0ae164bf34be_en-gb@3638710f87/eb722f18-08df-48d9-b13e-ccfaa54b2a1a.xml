@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.careerlevels>
+  <CodeName>Expert</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>20c2c337-3590-4a32-863f-0ae164bf34be</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Expert-amu2hap1</CodeName>
+      <GUID>4e6f5c84-a789-4885-9e54-1d88a1276caa</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>eb722f18-08df-48d9-b13e-ccfaa54b2a1a</ContentItemDataGUID>
+  <Name>Expert</Name>
+</contentitemdata.bdo.careerlevels>

@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>Content1-t2sq67wa</CodeName>
+    <GUID>ce0f7741-2472-4ed7-aa37-4f6d90182659</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-25 10:27:46Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>5c7a62c1-ba52-43b3-9f1e-684ba35918bd</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-25 10:27:46Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <HeroCallToActionButtonText>Click</HeroCallToActionButtonText>
+  <HeroCallToActionButtonType>secondary</HeroCallToActionButtonType>
+  <HeroCallToActionButtonUrl>
+    <![CDATA[[{"Identifier":"05c599af-20bb-4908-87ff-863b14bfab5d"}]]]>
+  </HeroCallToActionButtonUrl>
+  <HeroLayout>banner</HeroLayout>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataBusinessIssuesTG />
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTitle>Career contnet title 1</MetadataTitle>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>5dc9513a-4505-4fa1-a628-68fb3901812e</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>f7515bc5-b407-4238-8483-a5bfc311e8fc</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>5c7a62c1-ba52-43b3-9f1e-684ba35918bd</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>About1-1m2mxgqg</CodeName>
+        <GUID>05c599af-20bb-4908-87ff-863b14bfab5d</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

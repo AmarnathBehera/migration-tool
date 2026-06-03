@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.homeheroslide>
+  <ContentItemDataCommonDataID>
+    <GUID>a830dd9f-a494-43a1-9c91-49194e328e4b</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Slider1-gwvnj2h7</CodeName>
+      <GUID>d1561c27-8060-4406-abd1-dfc3c23c13ee</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>b8b54447-5d92-4139-a1af-48134a6769c1</ContentItemDataGUID>
+  <CTAButtonText>Click</CTAButtonText>
+  <Description>this is test</Description>
+  <Image>
+    <![CDATA[[{"Identifier":"b6681c19-f9e6-4ce7-9030-8d5f315424dc"}]]]>
+  </Image>
+  <Image_Mobile>
+    <![CDATA[[{"Identifier":"b6681c19-f9e6-4ce7-9030-8d5f315424dc"}]]]>
+  </Image_Mobile>
+  <Image_MobileAltText>slider</Image_MobileAltText>
+  <Image_Thumbnail>
+    <![CDATA[[{"Identifier":"b6681c19-f9e6-4ce7-9030-8d5f315424dc"}]]]>
+  </Image_Thumbnail>
+  <Image_ThumbnailAltText>test</Image_ThumbnailAltText>
+  <ImageAltText>hero</ImageAltText>
+  <Title>BDO In</Title>
+</contentitemdata.bdo.homeheroslide>

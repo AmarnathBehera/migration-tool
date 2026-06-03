@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Trending topics</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="7c681e41-fbec-41eb-ac49-b8832a496ae8" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="e085f7c0-c2d1-4d82-ae5c-84205c1a61bd" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="269f0ca9-94f1-4be0-8010-624dba7311d8" isunique="true" system="true" />
+      <field column="Heading" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="de19ca29-9311-4293-8f01-dcdebe8cc0d7" visible="true">
+        <properties>
+          <defaultvalue>Featured topics</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Heading</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>679d9478-6cee-46a5-98d7-0777bfcfceba</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-folder-inverted</ClassIconClass>
+  <ClassName>BDO.TrendingTopics</ClassName>
+  <ClassShortName>BDOTrendingTopics</ClassShortName>
+  <ClassTableName>BDO_TrendingTopics</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

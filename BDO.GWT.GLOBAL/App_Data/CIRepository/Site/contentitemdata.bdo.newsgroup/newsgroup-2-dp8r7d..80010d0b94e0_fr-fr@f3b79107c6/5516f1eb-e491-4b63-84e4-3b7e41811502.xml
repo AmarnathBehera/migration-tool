@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.newsgroup>
+  <ContentItemDataCommonDataID>
+    <GUID>e9975749-b0a8-4024-a625-80010d0b94e0</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>NewsGroup-2-dp8r7dg6</CodeName>
+      <GUID>fdaef9c2-0e00-4564-a854-779c209f474e</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>5516f1eb-e491-4b63-84e4-3b7e41811502</ContentItemDataGUID>
+  <Description />
+  <NewsGroupTitle>Titre du groupe de nouvelles-2 *</NewsGroupTitle>
+</contentitemdata.bdo.newsgroup>

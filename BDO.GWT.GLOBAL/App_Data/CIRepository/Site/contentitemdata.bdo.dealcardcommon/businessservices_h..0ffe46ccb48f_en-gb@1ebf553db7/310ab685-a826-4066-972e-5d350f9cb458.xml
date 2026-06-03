@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.dealcardcommon>
+  <CodeName>BusinessServices.Hr-HR</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>778a8f77-c110-4117-beb3-0ffe46ccb48f</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>BusinessServices_hr-HR-fpzclfvd</CodeName>
+      <GUID>74ef5fd5-8418-4285-b654-fd31f91a9174</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>310ab685-a826-4066-972e-5d350f9cb458</ContentItemDataGUID>
+  <Language>hr-HR</Language>
+  <Name>Business Services</Name>
+</contentitemdata.bdo.dealcardcommon>

@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.locationoffice>
+  <ContentItemDataCommonDataID>
+    <GUID>b3962489-3007-4902-9c4e-0e88fb5df1b2</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>MumbaiOffice-ycdwq63z</CodeName>
+      <GUID>d0469110-b346-474e-be03-d6d5cc0834f7</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>a515a688-a5e8-4b9d-a4b5-9d15fe23f37b</ContentItemDataGUID>
+  <LocationAddressLine1>Mumbai</LocationAddressLine1>
+  <LocationCountry>India</LocationCountry>
+  <LocationEmail>mumbai@bdo.in</LocationEmail>
+  <LocationLatitude>90</LocationLatitude>
+  <LocationLongitude>46</LocationLongitude>
+  <LocationPhone>23467890</LocationPhone>
+  <LocationPOCity>Mumbai office</LocationPOCity>
+  <LocationPOCountry>India</LocationPOCountry>
+  <LocationPOZipDisplayType>afterCity</LocationPOZipDisplayType>
+  <LocationType>1</LocationType>
+  <LocationZip>332456</LocationZip>
+  <LocationZipDisplayType>afterCountry</LocationZipDisplayType>
+</contentitemdata.bdo.locationoffice>

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.trendingtopics>
+  <ContentItemDataCommonDataID>
+    <GUID>21bd149a-62e2-4b98-87f2-65a199d1d444</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>TT-3g5cv5u0</CodeName>
+      <GUID>7bc82097-de3f-4dc5-bc14-85c6f860d728</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>0eab9faa-7aa7-46d4-ade7-d1776a115cf5</ContentItemDataGUID>
+  <Heading>Featured topics</Heading>
+</contentitemdata.bdo.trendingtopics>

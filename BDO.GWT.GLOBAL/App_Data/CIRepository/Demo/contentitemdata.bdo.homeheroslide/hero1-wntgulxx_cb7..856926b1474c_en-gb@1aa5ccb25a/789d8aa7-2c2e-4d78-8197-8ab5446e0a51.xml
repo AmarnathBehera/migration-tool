@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.homeheroslide>
+  <ContentItemDataCommonDataID>
+    <GUID>cb76672d-27cf-4f25-a6f2-856926b1474c</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Hero1-wntgulxx</CodeName>
+      <GUID>1a0bd7b9-2689-40ad-9335-ead62ce4860e</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>789d8aa7-2c2e-4d78-8197-8ab5446e0a51</ContentItemDataGUID>
+  <CTAButtonText>Click</CTAButtonText>
+  <CTAButtonUrl>/About</CTAButtonUrl>
+  <Description>hero Image1</Description>
+  <Image>
+    <![CDATA[[{"Identifier":"81c364c4-3689-44d5-af07-51435aefcf4b"}]]]>
+  </Image>
+  <Image_Mobile>
+    <![CDATA[[{"Identifier":"81c364c4-3689-44d5-af07-51435aefcf4b"}]]]>
+  </Image_Mobile>
+  <Image_MobileAltText>Hero1</Image_MobileAltText>
+  <Image_Thumbnail>
+    <![CDATA[[{"Identifier":"81c364c4-3689-44d5-af07-51435aefcf4b"}]]]>
+  </Image_Thumbnail>
+  <Image_ThumbnailAltText>hero1</Image_ThumbnailAltText>
+  <ImageAltText>Hero</ImageAltText>
+  <Title>Hero Image1</Title>
+</contentitemdata.bdo.homeheroslide>

@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.deal>
+  <ClientName>Test client</ClientName>
+  <ContentItemDataCommonDataID>
+    <GUID>d5b92854-d2a9-464b-adfc-c3f693e3161c</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Deal1-xhtsjkkh</CodeName>
+      <GUID>f5cf0c2d-c5ce-4e6e-9126-19025e8fbac5</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>99f0cc32-1036-4313-8bd5-c14196cd89d8</ContentItemDataGUID>
+  <DateField>2026-05-17 18:30:00Z</DateField>
+  <DealContent>This is a test deal content</DealContent>
+  <DealCountry>India</DealCountry>
+  <DealMetadataRssCategory>Test rss</DealMetadataRssCategory>
+  <DealMetadataRssImage>
+    <![CDATA[[{"Identifier":"dc871086-799f-40e0-b586-f08f4e958e55","Name":"download.jpg","Size":4379,"Dimensions":{"Width":275,"Height":183}}]]]>
+  </DealMetadataRssImage>
+  <DealShowSocialMediaButtons>True</DealShowSocialMediaButtons>
+  <DealType>
+    <![CDATA[[{"Identifier":"1baf8bee-968b-42c8-a1ed-e514fde110a4"},{"Identifier":"74b2cf1e-02e1-4517-b7f6-71bcc5555b85"}]]]>
+  </DealType>
+  <Industry>
+    <![CDATA[[{"Identifier":"34c55725-ad5b-4772-8802-ffca840851c2"},{"Identifier":"5c9da3fe-63eb-4e29-93ce-275c9272622e"},{"Identifier":"e21a9722-d7aa-4d77-8613-34f8ad25b190"}]]]>
+  </Industry>
+  <MetadataOfficeLocation>Mumbai office</MetadataOfficeLocation>
+  <MetadataShowTitle>True</MetadataShowTitle>
+  <SharingOptIn>True</SharingOptIn>
+  <Size>
+    <![CDATA[[{"Identifier":"7847d56d-a2b2-4897-991e-aaa130605964"}]]]>
+  </Size>
+  <SubIndustry>
+    <![CDATA[[{"Identifier":"bced5305-d7cf-4382-912a-94700e2e06d6"},{"Identifier":"72a37aaa-57fa-445b-854c-ec66ac8dc2ea"},{"Identifier":"1249748f-cc8d-4394-ae06-fa1a21127fcb"}]]]>
+  </SubIndustry>
+</contentitemdata.bdo.deal>

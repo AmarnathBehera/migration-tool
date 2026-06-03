@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.event>
+  <AllowRegistration>True</AllowRegistration>
+  <ContentItemDataCommonDataID>
+    <GUID>6a58e50b-2119-4d14-bebe-11f9d7ae4636</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Event_Automation-gvnw5y91</CodeName>
+      <GUID>3ef54084-88a0-4bd3-b578-d25a0d9264a5</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>0a2374b9-769f-4edb-9bff-de3c4238072f</ContentItemDataGUID>
+  <CpeCount />
+  <CpeCreditNotes />
+  <CpeDescription />
+  <CpeEvent>False</CpeEvent>
+  <CustomBodyText>
+    <![CDATA[<p>Calendar custom body text</p>]]>
+  </CustomBodyText>
+  <DisableAddToCalendar>False</DisableAddToCalendar>
+  <DisablePrintAndShare>False</DisablePrintAndShare>
+  <EventAllDay>True</EventAllDay>
+  <EventDateFrom>2026-02-26 18:30:00Z</EventDateFrom>
+  <EventDateOverride />
+  <EventDateTo>2026-02-26 18:30:00Z</EventDateTo>
+  <EventIsPrivate>False</EventIsPrivate>
+  <EventPostDescription>Post event description:</EventPostDescription>
+  <EventTimeOverride>tst</EventTimeOverride>
+  <EventType>
+    <![CDATA[[{"Identifier":"22cebd73-a642-4369-aeeb-1fe733218365"}]]]>
+  </EventType>
+  <EventVideo />
+  <MetadataBusinessIssues>
+    <![CDATA[[{"Identifier":"b370b7f6-0f89-4306-9ff0-f6381799c335"}]]]>
+  </MetadataBusinessIssues>
+  <MetadataOfficeLocation>
+    <![CDATA[[{"Identifier":"81c108dc-968f-45ed-a242-4f85b8d35f28"}]]]>
+  </MetadataOfficeLocation>
+  <MetadataSpecialtiesCategories>
+    <![CDATA[[{"Identifier":"65b9c5ab-7c50-4650-b18e-5c4998012ad0"}]]]>
+  </MetadataSpecialtiesCategories>
+  <ProgramLevel>Overwiev</ProgramLevel>
+  <RegistrationFormLink />
+  <RegistrationType>kentico</RegistrationType>
+  <ShowEventTitle>True</ShowEventTitle>
+  <ShowPastEvent>False</ShowPastEvent>
+</contentitemdata.bdo.event>

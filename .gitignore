@@ -271,8 +271,6 @@ paket-files/
 
 ### Kentico ###
 
-
-BDO.GWT.GLOBAL/App_Data/CIRepository/**/*
 BDO.GWT.GLOBAL/ConnectionStrings.config
 
 # Include some Kentico folders excluded by rules above

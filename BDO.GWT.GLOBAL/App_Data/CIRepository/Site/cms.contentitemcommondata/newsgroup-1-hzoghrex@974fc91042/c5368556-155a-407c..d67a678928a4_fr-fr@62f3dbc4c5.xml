@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>NewsGroup-1-hzoghrex</CodeName>
+    <GUID>0f8ab9aa-5201-4386-b542-f4a589948d61</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-27 08:11:55Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>c5368556-155a-407c-a856-d67a678928a4</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-27 08:11:55Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderTemplateConfiguration>
+    <![CDATA[{"identifier":"BDO.NewsGroup","properties":null,"fieldIdentifiers":{}}]]>
+  </ContentItemCommonDataVisualBuilderTemplateConfiguration>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataCanonical>Lien canonique</MetadataCanonical>
+  <MetadataDescription>
+    <![CDATA[<p>desc</p>]]>
+  </MetadataDescription>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGDescription>desc</MetadataOGDescription>
+  <MetadataOGTitle>Groupe de Nouvelles-1 og</MetadataOGTitle>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTeaserImageAltText />
+  <MetadataTitle>
+    <![CDATA[Titre des métadonnées du Groupe de Nouvelles-1]]>
+  </MetadataTitle>
+  <PageDescription>dwsc</PageDescription>
+  <PageKeywords>
+    <![CDATA[Mots-clés de la page]]>
+  </PageKeywords>
+  <PageTitle>Titre de la page Groupe de Nouvelles-1</PageTitle>
+</cms.contentitemcommondata>

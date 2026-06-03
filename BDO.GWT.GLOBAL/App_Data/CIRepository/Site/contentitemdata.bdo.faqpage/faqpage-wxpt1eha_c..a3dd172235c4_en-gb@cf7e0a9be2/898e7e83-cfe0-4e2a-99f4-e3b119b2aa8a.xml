@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.faqpage>
+  <Answer>
+    <![CDATA[<p>FAQ page answer</p>]]>
+  </Answer>
+  <ContentItemDataCommonDataID>
+    <GUID>c1e2486d-e153-4dc0-90a3-a3dd172235c4</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>FAQPage-wxpt1eha</CodeName>
+      <GUID>414020d9-5c8f-4f04-8f9f-6efa236b5ca6</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>898e7e83-cfe0-4e2a-99f4-e3b119b2aa8a</ContentItemDataGUID>
+  <Question>FAQ page Question</Question>
+  <Title>FAQ page title</Title>
+</contentitemdata.bdo.faqpage>

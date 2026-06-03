@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>SectionIndustries-2ouqb8uz</CodeName>
+    <GUID>2d1e4a1c-f699-4b84-84b6-7c293359a5cb</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>es-es</CodeName>
+    <GUID>ee380e62-f7ff-416a-88c1-646fe247d5f3</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-13 13:48:04Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>2f782605-7651-4df0-ab2e-4dbf56f7e482</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-14 05:33:21Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderTemplateConfiguration />
+  <ContentItemCommonDataVisualBuilderWidgets>
+    <![CDATA[{"editableAreas":[{"identifier":"mainContent","sections":[{"identifier":"8145c9f1-2500-4fe2-86a0-99675be905e2","type":"BDO.Section.Container","properties":{"containerPadding":"section-container"},"zones":[{"identifier":"e2184756-7102-47e9-a3cc-f9dfc5d517aa","widgets":[{"identifier":"85506cc6-5a2d-48e3-8b63-6bd754179c27","type":"BDO.Widget.AccordionWidget","variants":[{"identifier":"252ec4f8-80be-45cd-a21d-34c5b03570be","properties":{"heading":"This is accordion widget","content":"<p>This is accordion widget Accordion content This is accordion widget Accordion content This is accordion widget Accordion content This is accordion widget Accordion content This is accordion widget Accordion content This is accordion widget Accordion content This is accordion widget Accordion content This is accordion widget Accordion content This is accordion widget Accordion content This is accordion widget Accordion content This is accordion widget Accordion content This is accordion widget Accordion content This is accordion widget Accordion content This is accordion widget Accordion content This is accordion widget Accordion content This is accordion widget Accordion content This is accordion widget Accordion content&nbsp;</p>","deepLinkID":null,"topMargin":"20px","bottomMargin":"20px","widgetID":null},"fieldIdentifiers":{"heading":"789222b6-5d39-4d81-8a51-649a5db2fdbc","content":"f4b6d2cd-4d56-41e7-b38f-a3c452828528","deepLinkID":"84c3f80a-6d4e-4471-b6b9-493d503dd72e","topMargin":"49f95c2f-be0f-4e79-a70a-fa5aad280938","bottomMargin":"983a2001-6dae-46b6-b588-dd75fa03bc56","widgetID":"265a23f1-3444-4e12-8f6b-50c4a0243eac"}}]}]}],"fieldIdentifiers":{"containerPadding":"fd98983f-5a82-467b-9219-cee85a19478f"}}]}]}]]>
+  </ContentItemCommonDataVisualBuilderWidgets>
+  <GridSummary>
+    <![CDATA[<p>Grid Summary</p>]]>
+  </GridSummary>
+  <GridTitle>Grid Title</GridTitle>
+  <HeroBackgroundImage>
+    <![CDATA[[{"Identifier":"a84dfc4b-c448-462e-91f3-20a7d11b99e5"}]]]>
+  </HeroBackgroundImage>
+  <HeroBackgroundImage_Mobile>
+    <![CDATA[[{"Identifier":"a84dfc4b-c448-462e-91f3-20a7d11b99e5"}]]]>
+  </HeroBackgroundImage_Mobile>
+  <HeroBackgroundImage_MobileAltText>alt</HeroBackgroundImage_MobileAltText>
+  <HeroBackgroundImageAltText>alt</HeroBackgroundImageAltText>
+  <HeroCallToActionButtonText />
+  <HeroCallToActionButtonType>none</HeroCallToActionButtonType>
+  <HeroDescription>Description</HeroDescription>
+  <HeroLayout>hero</HeroLayout>
+  <HeroTitle>Title</HeroTitle>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataBusinessIssuesTG />
+  <MetadataCanonical />
+  <MetadataDescription>
+    <![CDATA[<p>Description</p>]]>
+  </MetadataDescription>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGDescription />
+  <MetadataOGTitle />
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTeaserImage>[]</MetadataTeaserImage>
+  <MetadataTeaserImageAltText>Description</MetadataTeaserImageAltText>
+  <MetadataTitle>section industries</MetadataTitle>
+  <ShowMultiLinks>True</ShowMultiLinks>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6e10753f-0d29-4f6c-a16e-63f0d38e4f02</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>12217d33-4785-4e92-ac2d-7693991d318f</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>2f782605-7651-4df0-ab2e-4dbf56f7e482</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Test-5uktycwn</CodeName>
+        <GUID>a84dfc4b-c448-462e-91f3-20a7d11b99e5</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6fc08044-a87a-465e-b463-77a25b10ecba</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>c240bcd6-7183-4af4-820d-4e5f85e872ba</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>2f782605-7651-4df0-ab2e-4dbf56f7e482</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Test-5uktycwn</CodeName>
+        <GUID>a84dfc4b-c448-462e-91f3-20a7d11b99e5</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

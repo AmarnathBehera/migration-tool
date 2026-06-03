@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitem>
+  <ContentItemChannelID>
+    <CodeName>Demo</CodeName>
+    <GUID>7f5fa031-6e78-4286-8227-fe393248a477</GUID>
+    <ObjectType>cms.channel</ObjectType>
+  </ContentItemChannelID>
+  <ContentItemContentTypeID>
+    <CodeName>BDO.Industry</CodeName>
+    <GUID>1ddec4b5-dabe-4e5d-a38a-1cf710c59244</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </ContentItemContentTypeID>
+  <ContentItemGUID>617cbf73-566b-4dc6-94b2-7184b9ea8aff</ContentItemGUID>
+  <ContentItemIsReusable>False</ContentItemIsReusable>
+  <ContentItemIsSecured>False</ContentItemIsSecured>
+  <ContentItemName>Industry2-uhwpm1an</ContentItemName>
+</cms.contentitem>

@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.contact>
+  <ContentItemDataCommonDataID>
+    <GUID>90ef8d94-eb4d-4a29-8401-cf8dead94a30</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Contact-5axvy7uu</CodeName>
+      <GUID>7a9f9a11-f50e-49e8-9b18-8eac7d54941a</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>2d5df64f-f108-4535-98bd-5afec64c22fa</ContentItemDataGUID>
+  <DescriptionBody>
+    <![CDATA[<p>hyyyh</p>]]>
+  </DescriptionBody>
+  <DescriptionTitle>contact</DescriptionTitle>
+  <EmbedCode />
+  <Form />
+  <FormType>form</FormType>
+</contentitemdata.bdo.contact>

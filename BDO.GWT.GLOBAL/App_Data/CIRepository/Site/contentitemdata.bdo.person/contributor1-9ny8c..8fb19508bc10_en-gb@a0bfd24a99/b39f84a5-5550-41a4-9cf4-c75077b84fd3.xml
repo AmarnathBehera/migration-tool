@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.person>
+  <ContentItemDataCommonDataID>
+    <GUID>3ef5e7a3-747c-4954-b20d-8fb19508bc10</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Contributor1-9ny8cvtw</CodeName>
+      <GUID>86a96b06-2202-4813-b6b0-fa83939c0efe</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>b39f84a5-5550-41a4-9cf4-c75077b84fd3</ContentItemDataGUID>
+  <EnableForm>True</EnableForm>
+  <EnableVCard>False</EnableVCard>
+  <MetadataCity>
+    <![CDATA[[{"Identifier":"d765cdc6-9b1f-4e8a-9478-6294ba89834a"}]]]>
+  </MetadataCity>
+  <MetadataOfficeLocation>
+    <![CDATA[[{"Identifier":"81c108dc-968f-45ed-a242-4f85b8d35f28"}]]]>
+  </MetadataOfficeLocation>
+  <PersonCredentials>
+    <![CDATA[[{"Identifier":"08ff8465-83af-4322-9b8b-6b79805cb1e6"}]]]>
+  </PersonCredentials>
+  <PersonEmail>test12@test.com</PersonEmail>
+  <PersonFirstName>Contributor</PersonFirstName>
+  <PersonJobTitle>Writer tech</PersonJobTitle>
+  <PersonLastName>TEctttt</PersonLastName>
+  <PersonMobilePhone>32323232</PersonMobilePhone>
+  <PersonSurnamePrefixes>Tech</PersonSurnamePrefixes>
+</contentitemdata.bdo.person>

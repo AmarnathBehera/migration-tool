@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.sub_service>
+  <ContentItemDataCommonDataID>
+    <GUID>71075225-a81d-4c8f-89d3-c4a926aba1ac</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>CorporateSubService-6z16rf2d</CodeName>
+      <GUID>2603f23b-125a-4b51-8b43-874d2146326c</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>9af5e684-f85c-4325-af02-4d8a1a7add46</ContentItemDataGUID>
+</contentitemdata.bdo.sub_service>

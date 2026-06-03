@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.eventtype>
+  <Calltoactiontext>Register</Calltoactiontext>
+  <CodeName>Event.GWT_TST.ar-DZ</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>da9d670d-816b-4d99-9098-802ab049deb9</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Event-qlhrxhdn</CodeName>
+      <GUID>22cebd73-a642-4369-aeeb-1fe733218365</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>184b3a52-a581-4764-8126-5c9e21d0e0c2</ContentItemDataGUID>
+  <Name>Event</Name>
+</contentitemdata.bdo.eventtype>

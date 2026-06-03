@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.businessissues>
+  <CodeName>Digital</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>ddcf536f-2db3-4f2b-ae95-59e4b0a19484</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Digital-1fnctxwd</CodeName>
+      <GUID>b370b7f6-0f89-4306-9ff0-f6381799c335</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>d7f9d6ef-f48e-42a1-bd23-9355f94064f0</ContentItemDataGUID>
+  <Name>Digital</Name>
+</contentitemdata.bdo.businessissues>

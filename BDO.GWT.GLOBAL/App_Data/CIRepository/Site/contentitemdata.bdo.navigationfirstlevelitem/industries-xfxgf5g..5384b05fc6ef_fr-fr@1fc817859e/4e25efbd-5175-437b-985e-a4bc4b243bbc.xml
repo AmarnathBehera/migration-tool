@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.navigationfirstlevelitem>
+  <ContentItemDataCommonDataID>
+    <GUID>108a84e0-b0c8-4fea-92e0-5384b05fc6ef</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Industries-xfxgf5go</CodeName>
+      <GUID>9675f86d-94aa-4aa7-89e0-61cb785e9bd4</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>4e25efbd-5175-437b-985e-a4bc4b243bbc</ContentItemDataGUID>
+  <TargetURL>
+    <![CDATA[[{"WebPageGuid":"cd234cf0-2667-49ec-a718-696e4f5bb1f6"}]]]>
+  </TargetURL>
+  <Title>Secteurs</Title>
+</contentitemdata.bdo.navigationfirstlevelitem>

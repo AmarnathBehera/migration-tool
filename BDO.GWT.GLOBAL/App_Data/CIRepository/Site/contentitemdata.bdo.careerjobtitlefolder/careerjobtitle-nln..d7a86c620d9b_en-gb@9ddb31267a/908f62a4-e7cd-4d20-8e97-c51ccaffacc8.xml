@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.careerjobtitlefolder>
+  <ContentItemDataCommonDataID>
+    <GUID>6f2365f5-8a0f-4908-ae88-d7a86c620d9b</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>CareerJobTitle-nlnj367i</CodeName>
+      <GUID>6083dfe5-7a6e-40b7-b055-209d924a5892</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>908f62a4-e7cd-4d20-8e97-c51ccaffacc8</ContentItemDataGUID>
+  <Title>Career Job Title</Title>
+</contentitemdata.bdo.careerjobtitlefolder>

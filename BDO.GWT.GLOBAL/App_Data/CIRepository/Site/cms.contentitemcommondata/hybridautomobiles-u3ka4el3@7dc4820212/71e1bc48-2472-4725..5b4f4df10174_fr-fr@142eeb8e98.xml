@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>HybridAutomobiles-u3ka4el3</CodeName>
+    <GUID>01209c5e-2cac-478f-887b-06f8226e333d</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-26 13:28:10Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>71e1bc48-2472-4725-ad22-5b4f4df10174</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-26 13:28:10Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderWidgets>
+    <![CDATA[{"editableAreas":[{"identifier":"mainContent","sections":[{"identifier":"ead74b67-da9c-46ba-8a88-191bfa848a93","type":"BDO.Section.Container","properties":{"containerPadding":"conteneur-section"},"zones":[{"identifier":"7edbed9c-3cf1-4d8b-b1b0-e0e103a017e5","widgets":[{"identifier":"ca2cc8d1-b9c4-4915-9960-3c7e27ff2c73","type":"BDO.Widget.AccordionWidget","variants":[{"identifier":"e47dac74-a7b7-4866-bb06-97d3046c2799","properties":{"heading":"Ceci est le widget accordéon1","content":"<p>Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon Ceci est le contenu de l'accordéon du widget accordéon&nbsp;</p>","deepLinkID":null,"topMargin":"20px","bottomMargin":"20px","widgetID":null},"fieldIdentifiers":{"heading":"c429f2a3-9a56-4ef7-ba20-37e936b33e6c","content":"024b53a8-4d14-44c4-b600-0cf67ce98a04","deepLinkID":"cc801709-f47e-49f0-8e7f-275169631066","topMargin":"440d2ec9-de1e-4ab2-8faf-04313a3942be","bottomMargin":"d8eecc45-eab4-491c-a1ad-e55d939a4d7e","widgetID":"7905644f-819a-4f68-96e3-92baf5a829af"}}]}]}],"fieldIdentifiers":{"containerPadding":"f63fd91a-d316-4cb4-9b54-ccf3bbd58a6b"}}]}]}]]>
+  </ContentItemCommonDataVisualBuilderWidgets>
+  <HeroBackgroundImage>
+    <![CDATA[[{"Identifier":"4d8e152e-ddc5-4ee3-97fc-eb02d5bc56d0"}]]]>
+  </HeroBackgroundImage>
+  <HeroBackgroundImage_Mobile>
+    <![CDATA[[{"Identifier":"4d8e152e-ddc5-4ee3-97fc-eb02d5bc56d0"}]]]>
+  </HeroBackgroundImage_Mobile>
+  <HeroBackgroundImage_MobileAltText>alt</HeroBackgroundImage_MobileAltText>
+  <HeroBackgroundImageAltText>alt</HeroBackgroundImageAltText>
+  <HeroCallToActionButtonText>bouton</HeroCallToActionButtonText>
+  <HeroCallToActionButtonType>primary</HeroCallToActionButtonType>
+  <HeroDescription>Automobiles hybrides</HeroDescription>
+  <HeroLayout>hero</HeroLayout>
+  <HeroTitle>Automobiles hybrides</HeroTitle>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataBusinessIssuesTG />
+  <MetadataCanonical>Automobiles hybrides</MetadataCanonical>
+  <MetadataDescription>
+    <![CDATA[<p>Description des automobiles hybrides</p>]]>
+  </MetadataDescription>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGDescription>Automobiles hybrides</MetadataOGDescription>
+  <MetadataOGTitle>Automobiles hybrides</MetadataOGTitle>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTeaserImageAltText />
+  <MetadataTitle>Automobiles hybrides</MetadataTitle>
+  <PageDescription />
+  <PageKeywords />
+  <PageTitle />
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6e10753f-0d29-4f6c-a16e-63f0d38e4f02</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>fd652cd6-bb2a-4036-b89d-451b32e81818</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>71e1bc48-2472-4725-ad22-5b4f4df10174</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>TeaserImage-5ars0prc</CodeName>
+        <GUID>4d8e152e-ddc5-4ee3-97fc-eb02d5bc56d0</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6fc08044-a87a-465e-b463-77a25b10ecba</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>072386bf-93fa-4f67-aa70-ca8319d120be</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>71e1bc48-2472-4725-ad22-5b4f4df10174</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>TeaserImage-5ars0prc</CodeName>
+        <GUID>4d8e152e-ddc5-4ee3-97fc-eb02d5bc56d0</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

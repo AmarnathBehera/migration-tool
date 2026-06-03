@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.industry>
+  <ContentItemDataCommonDataID>
+    <GUID>2f14eb50-f25b-4e39-8003-383a46c4f2ea</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Industry2-uhwpm1an</CodeName>
+      <GUID>617cbf73-566b-4dc6-94b2-7184b9ea8aff</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>2e64ee1d-c363-43a4-a008-c1fc8c68a667</ContentItemDataGUID>
+  <DescriptionBody>
+    <![CDATA[<p><br class="Apple-interchange-newline" data-pasted="true">Body content</p>]]>
+  </DescriptionBody>
+  <DescriptionTitle> Title</DescriptionTitle>
+  <ShowSideNavigation>True</ShowSideNavigation>
+</contentitemdata.bdo.industry>

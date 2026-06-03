@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.careers>
+  <CareerListFilters>
+    <![CDATA[[{"Identifier":"543197dd-b4b0-4468-a63e-ab52907b32fc"},{"Identifier":"33b41d33-c55a-4011-aa33-27794375cc9e"}];careerJobTitle;careerEmploymentType;officeLocation;careerLevel]]>
+  </CareerListFilters>
+  <ContentItemDataCommonDataID>
+    <GUID>81c0bbf8-e39f-4d6d-9ea5-f90921ef9ed5</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>CareerOpportunities-p07vglt0</CodeName>
+      <GUID>044f4928-74e0-4b69-8549-4c378c1d8093</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>6d23cf4c-4666-49ed-a9c7-b7d2ed59ee93</ContentItemDataGUID>
+</contentitemdata.bdo.careers>

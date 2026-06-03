@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.trendingtopic>
+  <ContentItemDataCommonDataID>
+    <GUID>7571753c-7cc8-4206-be07-62e102d5214c</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>TrendingTopic1-mpueet21</CodeName>
+      <GUID>cba5404c-e086-4562-bd34-aca3a039687c</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>ce39b052-d19a-45e0-9472-bd4b008565e1</ContentItemDataGUID>
+  <CTANodeGuid>
+    <![CDATA[[{"Identifier":"f5a358f7-1d3b-48c8-8e67-439fdbe5549e"}]]]>
+  </CTANodeGuid>
+  <FeaturedItems>
+    <![CDATA[[{"Identifier":"5762a156-4389-453d-8dbc-38d2df801615"}]]]>
+  </FeaturedItems>
+  <ImageAltText>alt text</ImageAltText>
+  <ImageUrl>
+    <![CDATA[[{"Identifier":"4e6722d0-14db-4e1f-9b7f-78b6b6fda26e"}]]]>
+  </ImageUrl>
+  <Title>TT 1</Title>
+</contentitemdata.bdo.trendingtopic>

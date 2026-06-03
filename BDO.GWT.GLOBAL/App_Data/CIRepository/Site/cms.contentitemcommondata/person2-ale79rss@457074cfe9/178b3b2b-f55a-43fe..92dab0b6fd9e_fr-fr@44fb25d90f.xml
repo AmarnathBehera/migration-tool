@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>Person2-ale79rss</CodeName>
+    <GUID>4f511f67-34af-4089-bd68-c919e2a51707</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-27 11:42:14Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>178b3b2b-f55a-43fe-946b-92dab0b6fd9e</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-27 11:42:14Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderTemplateConfiguration>
+    <![CDATA[{"identifier":"BDO.Person","properties":null,"fieldIdentifiers":{}}]]>
+  </ContentItemCommonDataVisualBuilderTemplateConfiguration>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataCanonical>Lien canonique</MetadataCanonical>
+  <MetadataDescription>
+    <![CDATA[<p>Description</p>]]>
+  </MetadataDescription>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGDescription />
+  <MetadataOGTitle>
+    <![CDATA[Titre des métadonnées OG]]>
+  </MetadataOGTitle>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTeaserImage>
+    <![CDATA[[{"Identifier":"4b6c876c-68ee-489b-8556-89165592f0ed"}]]]>
+  </MetadataTeaserImage>
+  <MetadataTeaserImageAltText>texte alternatif</MetadataTeaserImageAltText>
+  <MetadataTitle>tapasya</MetadataTitle>
+  <PageDescription />
+  <PageKeywords>
+    <![CDATA[Mots-clés de la page]]>
+  </PageKeywords>
+  <PageTitle>Titre de la page news</PageTitle>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>8f060a96-d942-4969-ac2e-83ebdfce3762</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>e667cbb7-629f-4c29-902e-e1d381c0d153</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>178b3b2b-f55a-43fe-946b-92dab0b6fd9e</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>TestImage-dnb02yao</CodeName>
+        <GUID>4b6c876c-68ee-489b-8556-89165592f0ed</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>7bf737dd-cca5-4e0f-a32b-894a0106fcd3</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>fb0f4554-825e-4780-a26f-dadd34b35685</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>178b3b2b-f55a-43fe-946b-92dab0b6fd9e</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>IndoreOffice2-yyrwq207</CodeName>
+        <GUID>81c108dc-968f-45ed-a242-4f85b8d35f28</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>53f84c7f-474b-404b-984b-b93bc54825f6</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>88738bc9-4484-4d15-9f8d-fdcd1539c452</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>178b3b2b-f55a-43fe-946b-92dab0b6fd9e</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Indore-ca4o4ad7</CodeName>
+        <GUID>d765cdc6-9b1f-4e8a-9478-6294ba89834a</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

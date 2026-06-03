@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.faqtopic>
+  <ContentItemDataCommonDataID>
+    <GUID>b795dd6b-c6b2-48e9-9b91-2d3b1bd680b6</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>FaqTopic-ann67xh4</CodeName>
+      <GUID>f7911004-01fc-4492-9a91-26a8d00a1175</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>73a503e4-56d5-438d-b112-c96c864d7c63</ContentItemDataGUID>
+  <Title>topic</Title>
+</contentitemdata.bdo.faqtopic>

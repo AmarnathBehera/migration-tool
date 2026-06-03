@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.eventregistrationform>
+  <ContentItemDataCommonDataID>
+    <GUID>f690946a-bec5-4c54-ac08-eb3299323bc0</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Home-08giga96</CodeName>
+      <GUID>98492741-e7a7-48b3-8f1f-b8684b09c09f</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>709a1e71-7dbd-486d-8d03-45ae2a15e6e3</ContentItemDataGUID>
+  <EmbedCode />
+  <Form>Tform1</Form>
+  <FormType>form</FormType>
+</contentitemdata.bdo.eventregistrationform>

@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>Person2-ale79rss</CodeName>
+    <GUID>4f511f67-34af-4089-bd68-c919e2a51707</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-14 09:32:47Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>0bf25075-2ded-4555-b278-05200228110a</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-06-02 14:49:25Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderTemplateConfiguration>
+    <![CDATA[{"identifier":"BDO.Person","properties":null,"fieldIdentifiers":null}]]>
+  </ContentItemCommonDataVisualBuilderTemplateConfiguration>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataBusinessIssuesTG />
+  <MetadataCanonical>Canonical link</MetadataCanonical>
+  <MetadataDescription>
+    <![CDATA[<p>Description</p>]]>
+  </MetadataDescription>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGTitle>OG metadata title</MetadataOGTitle>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTeaserImage>
+    <![CDATA[[{"Identifier":"b6681c19-f9e6-4ce7-9030-8d5f315424dc"}]]]>
+  </MetadataTeaserImage>
+  <MetadataTeaserImageAltText>Services</MetadataTeaserImageAltText>
+  <MetadataTitle>tapasya</MetadataTitle>
+  <PageKeywords>Page keywords</PageKeywords>
+  <PageTitle>news Page title</PageTitle>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>8f060a96-d942-4969-ac2e-83ebdfce3762</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>69e172dd-7b5e-4505-b9b8-af860c15e3b5</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>0bf25075-2ded-4555-b278-05200228110a</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>SubServiceImage-wiup2coi</CodeName>
+        <GUID>b6681c19-f9e6-4ce7-9030-8d5f315424dc</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>7bf737dd-cca5-4e0f-a32b-894a0106fcd3</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>daaa92eb-726f-43b7-ad3c-13578331100d</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>0bf25075-2ded-4555-b278-05200228110a</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>IndoreOffice2-yyrwq207</CodeName>
+        <GUID>81c108dc-968f-45ed-a242-4f85b8d35f28</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>53f84c7f-474b-404b-984b-b93bc54825f6</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>8f428f41-d0fa-4946-ae8d-c3164e6dc93c</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>0bf25075-2ded-4555-b278-05200228110a</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Indore-ca4o4ad7</CodeName>
+        <GUID>d765cdc6-9b1f-4e8a-9478-6294ba89834a</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

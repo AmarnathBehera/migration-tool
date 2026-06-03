@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.dealcardcommon>
+  <CodeName>TransactionServices.En-GB</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>2e239a95-e946-43b9-85ba-e53f8c15b835</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>TransactionServices_en-GB-vrre5dik</CodeName>
+      <GUID>7ebf5a0e-2080-4c28-89d1-0cf391b78d43</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>454b5bcf-4fe6-4098-a9a5-207a6e0d0e70</ContentItemDataGUID>
+  <Language>en-GB</Language>
+  <Name>Transaction Services</Name>
+</contentitemdata.bdo.dealcardcommon>

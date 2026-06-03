@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.person>
+  <ContentItemDataCommonDataID>
+    <GUID>ec713ff3-f798-4ad9-8753-f725fca33b1c</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Person1-bpio06jd</CodeName>
+      <GUID>50dfbcc8-1d25-4fb1-814b-5c1591ceffc1</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>29ac3908-0d1d-428d-8d94-0fb9cec7b8a9</ContentItemDataGUID>
+  <EnableForm>True</EnableForm>
+  <EnableVCard>False</EnableVCard>
+  <Facebook>facebook/link</Facebook>
+  <LinkedIn>linkdin/link</LinkedIn>
+  <MetadataCity>
+    <![CDATA[[{"Identifier":"d765cdc6-9b1f-4e8a-9478-6294ba89834a"}]]]>
+  </MetadataCity>
+  <MetadataOfficeLocation>
+    <![CDATA[[{"Identifier":"c4c41489-5d9d-4df5-9dd9-7a9bfedff053"}]]]>
+  </MetadataOfficeLocation>
+  <PersonCredentials>
+    <![CDATA[[{"Identifier":"491ae95a-7329-44dc-9820-01cd2d8d4687"}]]]>
+  </PersonCredentials>
+  <PersonEmail>test@bdo.in</PersonEmail>
+  <PersonFirstName>tapasya</PersonFirstName>
+  <PersonJobTitle>Software Engineer</PersonJobTitle>
+  <PersonLastName>mahor</PersonLastName>
+  <PersonPhone>1234567890</PersonPhone>
+  <PersonSurnamePrefixes>miss</PersonSurnamePrefixes>
+  <Twitter>twitter/link</Twitter>
+</contentitemdata.bdo.person>

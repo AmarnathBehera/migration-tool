@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemlanguagemetadata>
+  <ContentItemLanguageMetadataContentItemID>
+    <CodeName>ScrumMaster-eay146aj</CodeName>
+    <GUID>4e15d3be-a772-49fa-b4a6-281a8aaa33ed</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemLanguageMetadataContentItemID>
+  <ContentItemLanguageMetadataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemLanguageMetadataContentLanguageID>
+  <ContentItemLanguageMetadataCreatedByUserID>
+    <CodeName>administrator</CodeName>
+    <GUID>6415b8ce-8072-4bcd-8e48-9d7178b826b7</GUID>
+    <ObjectType>cms.user</ObjectType>
+  </ContentItemLanguageMetadataCreatedByUserID>
+  <ContentItemLanguageMetadataCreatedWhen>2026-05-03 05:27:28Z</ContentItemLanguageMetadataCreatedWhen>
+  <ContentItemLanguageMetadataDisplayName>Scrum Master</ContentItemLanguageMetadataDisplayName>
+  <ContentItemLanguageMetadataGUID>0dccaf18-8311-4ce3-bf1b-09cf5455cb61</ContentItemLanguageMetadataGUID>
+  <ContentItemLanguageMetadataHasImageAsset>False</ContentItemLanguageMetadataHasImageAsset>
+  <ContentItemLanguageMetadataLatestVersionStatus>2</ContentItemLanguageMetadataLatestVersionStatus>
+  <ContentItemLanguageMetadataModifiedByUserID>
+    <CodeName>administrator</CodeName>
+    <GUID>6415b8ce-8072-4bcd-8e48-9d7178b826b7</GUID>
+    <ObjectType>cms.user</ObjectType>
+  </ContentItemLanguageMetadataModifiedByUserID>
+  <ContentItemTags>
+    <cms.contentitemtag>
+      <ContentItemTagContentItemLanguageMetadataID>
+        <GUID>0dccaf18-8311-4ce3-bf1b-09cf5455cb61</GUID>
+        <ObjectType>cms.contentitemlanguagemetadata</ObjectType>
+      </ContentItemTagContentItemLanguageMetadataID>
+      <ContentItemTagFieldGUID>dd1ff6c8-08f9-40bb-999f-18fd3e4bcc94</ContentItemTagFieldGUID>
+      <ContentItemTagGUID>cfdc8898-5161-4e86-8d5b-b0401346f1b4</ContentItemTagGUID>
+      <ContentItemTagTagGUID>56d936c2-60ae-4007-ba4f-b57aa753a0a3</ContentItemTagTagGUID>
+    </cms.contentitemtag>
+    <cms.contentitemtag>
+      <ContentItemTagContentItemLanguageMetadataID>
+        <GUID>0dccaf18-8311-4ce3-bf1b-09cf5455cb61</GUID>
+        <ObjectType>cms.contentitemlanguagemetadata</ObjectType>
+      </ContentItemTagContentItemLanguageMetadataID>
+      <ContentItemTagFieldGUID>e02f521b-a538-472b-ad1c-23787ebccdcf</ContentItemTagFieldGUID>
+      <ContentItemTagGUID>22ddbb78-830b-48a4-8a5d-6ba4db707ce1</ContentItemTagGUID>
+      <ContentItemTagTagGUID>6a0047a7-737b-462d-9d9b-4cfc7310f177</ContentItemTagTagGUID>
+    </cms.contentitemtag>
+    <cms.contentitemtag>
+      <ContentItemTagContentItemLanguageMetadataID>
+        <GUID>0dccaf18-8311-4ce3-bf1b-09cf5455cb61</GUID>
+        <ObjectType>cms.contentitemlanguagemetadata</ObjectType>
+      </ContentItemTagContentItemLanguageMetadataID>
+      <ContentItemTagFieldGUID>028465c1-ab3c-4a65-a9fd-77c267bac357</ContentItemTagFieldGUID>
+      <ContentItemTagGUID>3209acb4-f158-4cac-bb79-dd6db82abcce</ContentItemTagGUID>
+      <ContentItemTagTagGUID>1f26b5c1-6c78-456b-a158-e17f20283ebb</ContentItemTagTagGUID>
+    </cms.contentitemtag>
+  </ContentItemTags>
+</cms.contentitemlanguagemetadata>

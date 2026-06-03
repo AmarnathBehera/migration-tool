@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.locationcity>
+  <ContentItemDataCommonDataID>
+    <GUID>dbcc38bc-d335-40ba-b30c-88ae2fb6eec8</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Mumbai-e3r8nbre</CodeName>
+      <GUID>dbcdfd80-27fa-4446-8ca9-82a428373d49</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>9a196802-954c-479d-84b7-fca722226c60</ContentItemDataGUID>
+  <SectionTitle>Mumbai</SectionTitle>
+</contentitemdata.bdo.locationcity>

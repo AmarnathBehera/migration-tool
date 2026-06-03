@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>TrendingTopic1-mpueet21</CodeName>
+    <GUID>cba5404c-e086-4562-bd34-aca3a039687c</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-13 10:30:35Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>f3cd3bc0-5d95-4d55-ae5e-6191b023b5d0</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-13 10:30:35Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <MetadataBusinessIssuesTG />
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>a111de9b-d346-495c-b4c4-19d27bc79f8f</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>33e924e2-1989-4597-b4bd-c70367fcc884</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>f3cd3bc0-5d95-4d55-ae5e-6191b023b5d0</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>TestImg3-dp1ojk9i</CodeName>
+        <GUID>3a84359b-2454-4ca0-bb33-0e10c41093fd</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>f94867ad-51c2-4bcd-86d3-9a32ef03f86d</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>a743536b-a664-4e81-bd11-fb2fda55aa9a</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>f3cd3bc0-5d95-4d55-ae5e-6191b023b5d0</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Legal-jklsv6mt</CodeName>
+        <GUID>f5a358f7-1d3b-48c8-8e67-439fdbe5549e</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>db6af4f7-b992-4fa8-b263-cf9f94c0e3b7</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>ff51584c-d141-4f6c-85ad-8ec6c52bea52</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>f3cd3bc0-5d95-4d55-ae5e-6191b023b5d0</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>CorporateTaxInIndustries-urbjhrik</CodeName>
+        <GUID>5762a156-4389-453d-8dbc-38d2df801615</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

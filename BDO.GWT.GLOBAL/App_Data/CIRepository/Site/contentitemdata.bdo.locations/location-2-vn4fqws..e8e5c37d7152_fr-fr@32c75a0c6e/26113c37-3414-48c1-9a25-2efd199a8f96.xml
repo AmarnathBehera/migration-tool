@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.locations>
+  <BannerButtonLinkTarget>_self</BannerButtonLinkTarget>
+  <BannerButtonText />
+  <BannerButtonType>primaire</BannerButtonType>
+  <BannerContent />
+  <BannerTheme>sombre</BannerTheme>
+  <ContentItemDataCommonDataID>
+    <GUID>799f9568-34ce-4bbc-8d11-e8e5c37d7152</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Location-2-vn4fqwsd</CodeName>
+      <GUID>e91309fb-bb55-41f0-b9b0-f0c709977673</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>26113c37-3414-48c1-9a25-2efd199a8f96</ContentItemDataGUID>
+  <DescriptionBody />
+  <DescriptionTitle />
+  <LocationsTitle />
+</contentitemdata.bdo.locations>

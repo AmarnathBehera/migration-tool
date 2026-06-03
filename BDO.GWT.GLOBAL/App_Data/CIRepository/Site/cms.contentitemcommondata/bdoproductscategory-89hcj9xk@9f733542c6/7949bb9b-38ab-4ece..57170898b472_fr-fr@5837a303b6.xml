@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>BdoProductsCategory-89hcj9xk</CodeName>
+    <GUID>7055d08e-5a37-4926-82e1-7a44c8d4daae</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-27 11:42:05Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>7949bb9b-38ab-4ece-a0af-57170898b472</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-27 11:42:05Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <HeroBackgroundImage>
+    <![CDATA[[{"Identifier":"4d8e152e-ddc5-4ee3-97fc-eb02d5bc56d0"}]]]>
+  </HeroBackgroundImage>
+  <HeroBackgroundImage_Mobile>
+    <![CDATA[[{"Identifier":"4d8e152e-ddc5-4ee3-97fc-eb02d5bc56d0"}]]]>
+  </HeroBackgroundImage_Mobile>
+  <HeroBackgroundImage_MobileAltText>
+    <![CDATA[Catégorie de produits Bdo]]>
+  </HeroBackgroundImage_MobileAltText>
+  <HeroBackgroundImageAltText>
+    <![CDATA[Catégorie de produits Bdo]]>
+  </HeroBackgroundImageAltText>
+  <HeroCallToActionButtonText />
+  <HeroCallToActionButtonType>none</HeroCallToActionButtonType>
+  <HeroDescription>
+    <![CDATA[Catégorie de produits Bdo]]>
+  </HeroDescription>
+  <HeroLayout>hero</HeroLayout>
+  <HeroTitle>
+    <![CDATA[Catégorie de produits Bdo]]>
+  </HeroTitle>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataCanonical>
+    <![CDATA[Catégorie de produits Bdo]]>
+  </MetadataCanonical>
+  <MetadataDescription>
+    <![CDATA[<p>Catégorie de produits Bdo</p>]]>
+  </MetadataDescription>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGDescription>
+    <![CDATA[Catégorie de produits Bdo]]>
+  </MetadataOGDescription>
+  <MetadataOGTitle>
+    <![CDATA[Catégorie de produits Bdo]]>
+  </MetadataOGTitle>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTeaserImageAltText />
+  <MetadataTitle>
+    <![CDATA[Catégorie de produits Bdo]]>
+  </MetadataTitle>
+  <PageDescription />
+  <PageKeywords />
+  <PageTitle />
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6e10753f-0d29-4f6c-a16e-63f0d38e4f02</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>549aa89e-0e09-4599-8eda-64c7bb336fd2</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>7949bb9b-38ab-4ece-a0af-57170898b472</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>TeaserImage-5ars0prc</CodeName>
+        <GUID>4d8e152e-ddc5-4ee3-97fc-eb02d5bc56d0</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6fc08044-a87a-465e-b463-77a25b10ecba</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>81e27571-135a-4928-94cc-175ad62311e6</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>7949bb9b-38ab-4ece-a0af-57170898b472</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>TeaserImage-5ars0prc</CodeName>
+        <GUID>4d8e152e-ddc5-4ee3-97fc-eb02d5bc56d0</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

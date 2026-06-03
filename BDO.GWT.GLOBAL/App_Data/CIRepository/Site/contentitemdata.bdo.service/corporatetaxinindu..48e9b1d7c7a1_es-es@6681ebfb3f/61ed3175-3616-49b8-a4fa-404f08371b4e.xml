@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.service>
+  <ContentItemDataCommonDataID>
+    <GUID>62e8756f-8070-4b0e-a73d-48e9b1d7c7a1</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>CorporateTaxInIndustries-urbjhrik</CodeName>
+      <GUID>5762a156-4389-453d-8dbc-38d2df801615</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>61ed3175-3616-49b8-a4fa-404f08371b4e</ContentItemDataGUID>
+  <ShowSideNavigation>True</ShowSideNavigation>
+  <SideNavigationTitle>Sub services</SideNavigationTitle>
+</contentitemdata.bdo.service>

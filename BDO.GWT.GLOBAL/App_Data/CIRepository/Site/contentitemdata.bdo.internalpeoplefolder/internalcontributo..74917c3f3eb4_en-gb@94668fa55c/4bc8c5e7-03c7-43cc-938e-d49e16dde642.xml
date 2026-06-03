@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.internalpeoplefolder>
+  <ContentItemDataCommonDataID>
+    <GUID>11c0f69f-fdf9-4672-bc2e-74917c3f3eb4</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>InternalContributorFolder-1-t4zml01h</CodeName>
+      <GUID>9c2cf3ca-163f-4801-bb1c-6fe40f5b2ce4</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>4bc8c5e7-03c7-43cc-938e-d49e16dde642</ContentItemDataGUID>
+</contentitemdata.bdo.internalpeoplefolder>

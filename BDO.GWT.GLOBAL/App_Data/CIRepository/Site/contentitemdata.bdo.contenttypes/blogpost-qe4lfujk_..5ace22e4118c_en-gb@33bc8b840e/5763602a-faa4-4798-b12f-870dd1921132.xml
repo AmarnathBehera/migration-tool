@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.contenttypes>
+  <CodeName>Blog Post</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>25dc1ee1-51f0-4aec-a7fc-5ace22e4118c</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>BlogPost-qe4lfujk</CodeName>
+      <GUID>921b7580-393b-4320-89fa-e19afff4212d</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>5763602a-faa4-4798-b12f-870dd1921132</ContentItemDataGUID>
+  <Name>Blog Post</Name>
+</contentitemdata.bdo.contenttypes>

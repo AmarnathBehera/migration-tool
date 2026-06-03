@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.trendingtopics>
+  <ContentItemDataCommonDataID>
+    <GUID>9ee6f7bc-848c-40ca-b66c-d0bddc16fac7</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Trending-zqhlmqh1</CodeName>
+      <GUID>616f1845-4e8b-4e5a-a375-28d6dad000c1</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>c5afe27c-5e7e-4b7a-99a1-eb744391b321</ContentItemDataGUID>
+  <Heading>Featured topics</Heading>
+</contentitemdata.bdo.trendingtopics>

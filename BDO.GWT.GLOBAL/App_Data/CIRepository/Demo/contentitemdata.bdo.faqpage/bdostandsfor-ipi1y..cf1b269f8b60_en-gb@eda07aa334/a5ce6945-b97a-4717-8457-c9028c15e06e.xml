@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.faqpage>
+  <ContentItemDataCommonDataID>
+    <GUID>459b2d59-e041-4b20-9226-cf1b269f8b60</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>BdoStandsFor-ipi1ysd8</CodeName>
+      <GUID>e83c8f22-6690-4afb-882a-57ee89fc900a</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>a5ce6945-b97a-4717-8457-c9028c15e06e</ContentItemDataGUID>
+  <Question>BDO stands for Binder Dijker Otte</Question>
+  <Title>bdo stands for?</Title>
+</contentitemdata.bdo.faqpage>

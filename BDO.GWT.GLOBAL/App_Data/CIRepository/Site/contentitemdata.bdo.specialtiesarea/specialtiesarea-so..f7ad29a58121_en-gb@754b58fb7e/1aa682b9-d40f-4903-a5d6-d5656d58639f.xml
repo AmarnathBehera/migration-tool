@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.specialtiesarea>
+  <ContentBody>
+    <![CDATA[<p>Content Body is this on that is the page which is called Specialties Area.</p>]]>
+  </ContentBody>
+  <ContentItemDataCommonDataID>
+    <GUID>f15cc349-4ca4-4e9e-bccd-f7ad29a58121</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>SpecialtiesArea-soz8hxme</CodeName>
+      <GUID>79215a26-190d-49e9-902c-0a47f64b66b5</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>1aa682b9-d40f-4903-a5d6-d5656d58639f</ContentItemDataGUID>
+  <ContentTitle>ContentTitle</ContentTitle>
+  <ShowSideNavigation>True</ShowSideNavigation>
+</contentitemdata.bdo.specialtiesarea>

@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.trendingtopic>
+  <ContentItemDataCommonDataID>
+    <GUID>629318eb-142d-4014-84c9-355488b9ad1c</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>TT-57z8gvi6</CodeName>
+      <GUID>3403b1f7-3a26-44f2-9755-e6a60b7c3c2f</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>18221804-36ed-4ff8-83af-2056349d1f40</ContentItemDataGUID>
+  <FeaturedItems>
+    <![CDATA[[{"Identifier":"5762a156-4389-453d-8dbc-38d2df801615"},{"Identifier":"0ac92623-7f64-4ad1-9143-c79cb70f1185"}]]]>
+  </FeaturedItems>
+  <ImageAltText>alt text</ImageAltText>
+  <ImageUrl>
+    <![CDATA[[{"Identifier":"078727b4-6ce9-4297-bade-0d7c92ee4800"}]]]>
+  </ImageUrl>
+  <Title>TT!tttt</Title>
+</contentitemdata.bdo.trendingtopic>

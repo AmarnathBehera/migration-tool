@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.profilegroups>
+  <CodeName>GlobalOffice</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>8c78cfc3-fd1a-4206-85ba-71e87e261ee7</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>GlobalOffice-qa20ts9d</CodeName>
+      <GUID>2725ea82-bea4-4a8c-a269-4db6ef90a3af</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>dfe6fc7f-043d-4e34-a485-8e3f8b1c0246</ContentItemDataGUID>
+  <Name>Global Office</Name>
+</contentitemdata.bdo.profilegroups>

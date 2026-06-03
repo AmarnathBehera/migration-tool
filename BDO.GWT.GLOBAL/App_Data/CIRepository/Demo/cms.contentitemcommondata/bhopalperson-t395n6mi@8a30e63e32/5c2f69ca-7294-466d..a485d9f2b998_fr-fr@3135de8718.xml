@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>BhopalPerson-t395n6mi</CodeName>
+    <GUID>0be047fd-cc83-4342-9c84-42247a36969e</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-04-30 11:35:51Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>5c2f69ca-7294-466d-8234-a485d9f2b998</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-04-30 11:35:51Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderTemplateConfiguration>
+    <![CDATA[{"identifier":"BDO.Person","properties":null,"fieldIdentifiers":{}}]]>
+  </ContentItemCommonDataVisualBuilderTemplateConfiguration>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataBusinessIssuesTG />
+  <MetadataCanonical>Lien canonique</MetadataCanonical>
+  <MetadataDescription />
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGDescription />
+  <MetadataOGTitle>
+    <![CDATA[Titre méta OG]]>
+  </MetadataOGTitle>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTeaserImageAltText>
+    <![CDATA[texte alternatif de l'image]]>
+  </MetadataTeaserImageAltText>
+  <MetadataTitle>Personne Inder</MetadataTitle>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>7bf737dd-cca5-4e0f-a32b-894a0106fcd3</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>f7bf8aa7-e0cd-4bc3-8e69-3f6721226d99</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>5c2f69ca-7294-466d-8234-a485d9f2b998</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>BDOIndoreOffice-zebjfvzk</CodeName>
+        <GUID>3e87da83-2d0f-4b55-816c-513abcdc29fb</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>53f84c7f-474b-404b-984b-b93bc54825f6</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>1e926671-59e4-445d-a231-48050739e8f7</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>5c2f69ca-7294-466d-8234-a485d9f2b998</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Bhopal-tges1kru</CodeName>
+        <GUID>08bc4996-b445-4eaf-8290-f48b0a05a39d</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

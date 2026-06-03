@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.specialtiescategory>
+  <ContentBody>
+    <![CDATA[<p>fWGERGEFFDagvre re frvr&nbsp; &nbsp;GR GSR G R GA</p>]]>
+  </ContentBody>
+  <ContentItemDataCommonDataID>
+    <GUID>206717b9-fdff-4f0f-a6ea-e48ed260e3cd</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>SpecialtiesCategory1-qr1h8ci2</CodeName>
+      <GUID>65b9c5ab-7c50-4650-b18e-5c4998012ad0</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>a5c3331c-b7c4-479a-b7ad-e967acb200db</ContentItemDataGUID>
+  <ContentTitle>Hero titlle</ContentTitle>
+  <ShowSideNavigation>True</ShowSideNavigation>
+  <SideNavigationTitle>Side Nav</SideNavigationTitle>
+</contentitemdata.bdo.specialtiescategory>

@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>SectionAbout-kakc2el1</CodeName>
+    <GUID>dd419d54-c3c8-4cc8-8bfc-a05f5c8c0821</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-04-14 08:25:04Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>5cb64c6e-3c59-4279-afc1-f38fbefe4c51</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-04-14 09:45:09Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ContentItemCommonDataVisualBuilderTemplateConfiguration>
+    <![CDATA[{"identifier":"BDO.SectionAbout","properties":null,"fieldIdentifiers":{}}]]>
+  </ContentItemCommonDataVisualBuilderTemplateConfiguration>
+  <ContentItemCommonDataVisualBuilderWidgets>
+    <![CDATA[{"editableAreas":[{"identifier":"mainContent","sections":[{"identifier":"f61a9622-569e-44f3-937a-5c79c6db3d6c","type":"BDO.Section.Container","properties":{"containerPadding":"section-container"},"zones":[{"identifier":"633884b0-105d-497d-9bd4-a5428740baa1","widgets":[]}],"fieldIdentifiers":{"containerPadding":"33590b31-26d9-438d-97ba-47609d4aa5a3"}},{"identifier":"511e7827-b3b7-467d-aaa8-be5663f1d8b0","type":"Kentico.DefaultSection","properties":null,"zones":[{"identifier":"3ea6d60b-0170-4a2e-918a-47041922a01f","widgets":[{"identifier":"5fa7cabe-ace6-4eaf-bb9a-c2f4f208d046","type":"BDO.Widget.QuoteCard","variants":[{"identifier":"06cacb6d-dc3d-4bfb-9ea6-163ab6d12827","properties":{"heading":"QuoteHeading","subheading":"<p>subheading</p>","image":null,"imageAltText":"alt","quoteText":"<p>alt</p>","quotesAuthor":" Nelson Mandela","authorsJobTitle":"Employee","buttonText":"button","buttonUrl":"~/","primaryButtonLinkTarget":"_self","size":"standard","topMargin":"0px","bottomMargin":"0px"},"fieldIdentifiers":{"heading":"f3efbf0c-09ef-40b8-be70-3cb247ef1f54","subheading":"1ac1edd4-56d9-47e0-9f2a-9d9c89752469","image":"3d650daa-4bf7-40df-8f59-e23075c098bd","imageAltText":"551675c1-2a82-410b-8796-e67e94222d94","quoteText":"f6f1cf21-e985-43e4-b929-5dd1a52aee1b","quotesAuthor":"ba4502db-fde5-4aab-9899-fae38bf38e4b","authorsJobTitle":"5fec4bd7-018a-4613-a2de-99aa6922017e","buttonText":"6169bb29-9118-450c-8d11-ffdc3db7f15c","buttonUrl":"73d8c653-e83c-4f1a-b316-90a97c3524a7","primaryButtonLinkTarget":"ab78e7aa-9627-4b7e-bfb1-0d222fd683df","size":"8c109da7-512f-4391-942e-0fe8b09ffca4","topMargin":"b41a08e7-d53e-4cbd-b1c2-f6f91efeb4c1","bottomMargin":"f6609c7d-1661-4bbf-bbc8-38132af4973a"}}]}]}],"fieldIdentifiers":{}}]}]}]]>
+  </ContentItemCommonDataVisualBuilderWidgets>
+  <HeroBackgroundImage>
+    <![CDATA[[{"Identifier":"5766b5af-03e5-47d3-8ceb-3ae03808d60c"}]]]>
+  </HeroBackgroundImage>
+  <HeroBackgroundImage_Mobile>
+    <![CDATA[[{"Identifier":"5766b5af-03e5-47d3-8ceb-3ae03808d60c"}]]]>
+  </HeroBackgroundImage_Mobile>
+  <HeroBackgroundImage_MobileAltText>alt</HeroBackgroundImage_MobileAltText>
+  <HeroBackgroundImageAltText>alt</HeroBackgroundImageAltText>
+  <HeroCallToActionButtonText>button</HeroCallToActionButtonText>
+  <HeroCallToActionButtonType>primary</HeroCallToActionButtonType>
+  <HeroCallToActionButtonUrl>
+    <![CDATA[[{"Identifier":"9e55f4d1-ae50-4f38-98e4-019e4cc98b9a"}]]]>
+  </HeroCallToActionButtonUrl>
+  <HeroDescription>desc</HeroDescription>
+  <HeroLayout>hero</HeroLayout>
+  <HeroTitle>title</HeroTitle>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataBusinessIssuesTG />
+  <MetadataCanonical />
+  <MetadataDescription>
+    <![CDATA[<p>metadataDesc</p>]]>
+  </MetadataDescription>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGDescription />
+  <MetadataOGTitle />
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTeaserImage>
+    <![CDATA[[{"Identifier":"5766b5af-03e5-47d3-8ceb-3ae03808d60c"}]]]>
+  </MetadataTeaserImage>
+  <MetadataTeaserImageAltText>alt</MetadataTeaserImageAltText>
+  <MetadataTitle>metadataTitle</MetadataTitle>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6e10753f-0d29-4f6c-a16e-63f0d38e4f02</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>f7b81c5c-6762-4732-85ba-bbe3dfd57578</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>5cb64c6e-3c59-4279-afc1-f38fbefe4c51</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Aboutpage-18tpzr8j</CodeName>
+        <GUID>5766b5af-03e5-47d3-8ceb-3ae03808d60c</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6fc08044-a87a-465e-b463-77a25b10ecba</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>5d0721ee-140f-4c6b-b922-6405418c7e15</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>5cb64c6e-3c59-4279-afc1-f38fbefe4c51</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Aboutpage-18tpzr8j</CodeName>
+        <GUID>5766b5af-03e5-47d3-8ceb-3ae03808d60c</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>8f060a96-d942-4969-ac2e-83ebdfce3762</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>c7579229-dfe7-4b95-b411-e989f2d60638</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>5cb64c6e-3c59-4279-afc1-f38fbefe4c51</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Aboutpage-18tpzr8j</CodeName>
+        <GUID>5766b5af-03e5-47d3-8ceb-3ae03808d60c</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

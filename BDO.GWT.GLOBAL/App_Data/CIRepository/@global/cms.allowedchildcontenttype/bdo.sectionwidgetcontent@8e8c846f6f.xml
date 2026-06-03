@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.SectionWidgetContent</CodeName>
+    <GUID>20666944-2e37-4b36-80b4-0d36b38c8bb9</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.FaqFolder">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.FaqFolder</CodeName>
+        <GUID>dd24464b-b784-4521-95e8-522c4b12bff0</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

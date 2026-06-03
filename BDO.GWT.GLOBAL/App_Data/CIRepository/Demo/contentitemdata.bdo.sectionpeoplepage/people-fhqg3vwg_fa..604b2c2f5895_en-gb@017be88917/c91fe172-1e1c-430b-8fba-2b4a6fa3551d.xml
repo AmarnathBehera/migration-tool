@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.sectionpeoplepage>
+  <ContentItemDataCommonDataID>
+    <GUID>fa06fa2a-98ef-4c91-ac31-604b2c2f5895</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>People-fhqg3vwg</CodeName>
+      <GUID>788bcb5e-745d-40e1-92fa-9161a8b09018</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>c91fe172-1e1c-430b-8fba-2b4a6fa3551d</ContentItemDataGUID>
+  <DisplayEmailAddressInPersonPage>True</DisplayEmailAddressInPersonPage>
+  <DisplayFullEmailAddress>False</DisplayFullEmailAddress>
+  <EnableForm>True</EnableForm>
+  <PeopleListDefaultOrder>asc</PeopleListDefaultOrder>
+  <PeopleListFilteringEnabled>True</PeopleListFilteringEnabled>
+  <PeopleListFilters>credential;businessLine;industryCategory</PeopleListFilters>
+  <PeopleListOrderingEnabled>True</PeopleListOrderingEnabled>
+</contentitemdata.bdo.sectionpeoplepage>

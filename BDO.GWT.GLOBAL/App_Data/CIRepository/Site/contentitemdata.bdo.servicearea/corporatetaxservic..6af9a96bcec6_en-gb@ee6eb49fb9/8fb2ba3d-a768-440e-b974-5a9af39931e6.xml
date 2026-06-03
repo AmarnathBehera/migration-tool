@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.servicearea>
+  <ContentBody>
+    <![CDATA[<p>Corporate Tax Services</p>]]>
+  </ContentBody>
+  <ContentItemDataCommonDataID>
+    <GUID>118f902c-6c4e-4b26-b9c4-6af9a96bcec6</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>CorporateTaxServices-yz5ett2t</CodeName>
+      <GUID>040d1317-3f63-4ee1-acaa-5d3edbc26a87</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>8fb2ba3d-a768-440e-b974-5a9af39931e6</ContentItemDataGUID>
+  <ContentTitle>Corporate Tax Services1</ContentTitle>
+  <ShowSideNavigation>True</ShowSideNavigation>
+  <SideNavigationTitle>Our Service Area</SideNavigationTitle>
+</contentitemdata.bdo.servicearea>

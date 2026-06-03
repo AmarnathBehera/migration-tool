@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.sectionblogs>
+  <ContentItemDataCommonDataID>
+    <GUID>ee7cd03d-0f08-4cb1-acb0-2c3394eaa677</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Blogs-7c8j2e1r</CodeName>
+      <GUID>4cb17262-278e-4c1d-8959-b0fb6dc12860</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>3d73b8b1-374a-4aa3-aeac-dcc2e1d9dc22</ContentItemDataGUID>
+  <ShowCopyUrlButtonInBlogPage>False</ShowCopyUrlButtonInBlogPage>
+</contentitemdata.bdo.sectionblogs>

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.testimonialclienttypesfolder>
+  <ContentItemDataCommonDataID>
+    <GUID>04d311c4-d4db-4b1a-a610-4e7d7095e612</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>TestimonialClientTypes-fevj2cz7</CodeName>
+      <GUID>f3c4e5c3-8cbd-4afc-a3c8-1f98b968905d</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>045c4645-c55b-49ce-92b0-c16dd7621fa7</ContentItemDataGUID>
+  <Title>Testimonial Client Types</Title>
+</contentitemdata.bdo.testimonialclienttypesfolder>

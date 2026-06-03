@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>Slider1-gwvnj2h7</CodeName>
+    <GUID>d1561c27-8060-4406-abd1-dfc3c23c13ee</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-11 07:10:59Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>3c07143a-a395-428b-a618-4808cec51c35</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-11 07:10:59Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <MetadataBusinessIssuesTG />
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>68e87402-374e-4c27-967a-0f50f2b09ec0</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>89b7b4f1-87f2-4401-bfda-10bcba39000d</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>3c07143a-a395-428b-a618-4808cec51c35</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>SubServiceImage-wiup2coi</CodeName>
+        <GUID>b6681c19-f9e6-4ce7-9030-8d5f315424dc</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>3b334dd4-6f77-4de1-9dde-176a6b25299d</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>8f5d7672-dd48-4997-9878-47ee0a59e7e0</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>3c07143a-a395-428b-a618-4808cec51c35</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>SubServiceImage-wiup2coi</CodeName>
+        <GUID>b6681c19-f9e6-4ce7-9030-8d5f315424dc</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>ad0848c2-020b-4f0d-aff8-878dab506683</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>24606a67-b407-4418-8d9d-1973379e90c8</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>3c07143a-a395-428b-a618-4808cec51c35</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>SubServiceImage-wiup2coi</CodeName>
+        <GUID>b6681c19-f9e6-4ce7-9030-8d5f315424dc</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.specialtiescategory>
+  <ContentBody>
+    <![CDATA[<p data-start="0" data-end="541" data-pasted="true">Artificial Intelligence (AI) is transforming the way people live, work, and interact with technology. From voice assistants and recommendation systems to self-driving vehicles and advanced healthcare tools, AI is becoming an essential part of modern life. It enables machines to simulate human intelligence by learning from data, identifying patterns, and making decisions with minimal human intervention. Businesses across industries are adopting AI to improve efficiency, automate repetitive tasks, and provide better customer experiences.</p><p data-start="543" data-end="1026">One of the biggest advantages of AI is its ability to process large amounts of information quickly and accurately. In healthcare, AI helps doctors detect diseases earlier and recommend personalized treatments. In finance, it is used for fraud detection and risk analysis. Retail companies use AI-powered analytics to understand customer behavior and optimize inventory management. Educational platforms are also leveraging AI to create personalized learning experiences for students.</p>]]>
+  </ContentBody>
+  <ContentItemDataCommonDataID>
+    <GUID>aabad12a-813a-4584-88ae-10efb50580ac</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>SpecialtiesCategory-nheqy8gi</CodeName>
+      <GUID>5c39ef8c-84d7-4943-a1f4-22f8f95a32dc</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>97ad4552-c0a6-4a6d-b129-7effb5acb385</ContentItemDataGUID>
+  <ContentTitle>Hero titlle</ContentTitle>
+  <ShowSideNavigation>True</ShowSideNavigation>
+  <SideNavigationTitle>Side Nav</SideNavigationTitle>
+</contentitemdata.bdo.specialtiescategory>

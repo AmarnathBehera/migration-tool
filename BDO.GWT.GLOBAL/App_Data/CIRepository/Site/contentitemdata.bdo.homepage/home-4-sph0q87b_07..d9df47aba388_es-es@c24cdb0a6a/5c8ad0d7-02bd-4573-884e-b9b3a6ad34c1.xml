@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.homepage>
+  <ContentItemDataCommonDataID>
+    <GUID>07e8fd72-e2a3-48e2-a912-d9df47aba388</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Home-4-sph0q87b</CodeName>
+      <GUID>cb89ba7b-3cec-439b-bc8e-3436819e7125</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>5c8ad0d7-02bd-4573-884e-b9b3a6ad34c1</ContentItemDataGUID>
+</contentitemdata.bdo.homepage>

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.internalperson>
+  <ContentItemDataCommonDataID>
+    <GUID>947ec8f5-a9d9-481a-a4d7-a79bd19af4f6</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>InternalContributor-2-yovk9fk7</CodeName>
+      <GUID>9e24d7fc-bc00-4ee1-9114-d89981a67b06</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>1087515c-966e-4342-989f-d8dc4c94ab8a</ContentItemDataGUID>
+  <Email>InternalContributor@test</Email>
+  <FirstName>First name-Internal Contributor 2</FirstName>
+  <JobTitle>Associate Consultant</JobTitle>
+  <LastName>Last name</LastName>
+  <SurnamePrefixes>Surname prefixes</SurnamePrefixes>
+  <Url>https://facebook.com</Url>
+</contentitemdata.bdo.internalperson>

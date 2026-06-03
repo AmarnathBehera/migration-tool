@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.locationoffice>
+  <ContentItemDataCommonDataID>
+    <GUID>e00ba6ac-0da4-437b-bda0-dd35aae98576</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>BDOIndoreOffice2-7j4m32bt</CodeName>
+      <GUID>94133ced-2ef1-4178-b8d5-eb950909760a</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>17d3d7b9-cdd2-45a4-9b18-1f7efad50136</ContentItemDataGUID>
+  <LocationAddressLine1>BDO Indore Office</LocationAddressLine1>
+  <LocationCountry>India</LocationCountry>
+  <LocationEmail>tst@GMAIL.COM</LocationEmail>
+  <LocationLatitude>90</LocationLatitude>
+  <LocationLongitude>46</LocationLongitude>
+  <LocationPhone>1234567890</LocationPhone>
+  <LocationPOCountry>India</LocationPOCountry>
+  <LocationPOZipDisplayType>afterCity</LocationPOZipDisplayType>
+  <LocationType>1</LocationType>
+  <LocationZip>4567899</LocationZip>
+  <LocationZipDisplayType>afterCity</LocationZipDisplayType>
+</contentitemdata.bdo.locationoffice>

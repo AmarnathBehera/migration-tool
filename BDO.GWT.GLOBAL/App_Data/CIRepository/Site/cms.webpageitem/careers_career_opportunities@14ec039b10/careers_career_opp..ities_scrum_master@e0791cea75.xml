@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.webpageitem>
+  <WebPageItemContentItemID>
+    <CodeName>ScrumMaster-e1wjldph</CodeName>
+    <GUID>2a2c0b93-b23d-47bc-9b01-3c3575ee60d9</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </WebPageItemContentItemID>
+  <WebPageItemGUID>e415ea48-8beb-432a-9751-f883efb5aac0</WebPageItemGUID>
+  <WebPageItemName>ScrumMaster-e1wjldph</WebPageItemName>
+  <WebPageItemOrder>3</WebPageItemOrder>
+  <WebPageItemParentID>
+    <CodeName>CareerOpportunities-p07vglt0</CodeName>
+    <GUID>d908216d-0f2e-4e54-9782-5c74b46007e6</GUID>
+    <ObjectType>cms.webpageitem</ObjectType>
+  </WebPageItemParentID>
+  <WebPageItemTreePath>/Careers/Career_Opportunities/Scrum_Master</WebPageItemTreePath>
+  <WebPageItemWebsiteChannelID>
+    <GUID>97ffcb4b-7969-4019-9e7d-e39462ccd229</GUID>
+    <ObjectType>cms.websitechannel</ObjectType>
+    <Parent>
+      <CodeName>Site</CodeName>
+      <GUID>a6f357f0-9285-41dd-83a5-725eeb377ec5</GUID>
+      <ObjectType>cms.channel</ObjectType>
+    </Parent>
+  </WebPageItemWebsiteChannelID>
+</cms.webpageitem>

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.blogpostgroup>
+  <ContentItemDataCommonDataID>
+    <GUID>e417fdb9-b427-47e2-b6ae-d81931269777</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>CMSTechBlogGroup-8kskanuc</CodeName>
+      <GUID>95c34b99-9673-416c-89a8-3fe68c0252ea</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>08beef71-1ee4-43ff-a82c-03aad82d2260</ContentItemDataGUID>
+</contentitemdata.bdo.blogpostgroup>

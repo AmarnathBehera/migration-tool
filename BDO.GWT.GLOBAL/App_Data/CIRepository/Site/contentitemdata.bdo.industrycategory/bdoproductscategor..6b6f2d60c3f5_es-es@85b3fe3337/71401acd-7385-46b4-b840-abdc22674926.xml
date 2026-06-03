@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.industrycategory>
+  <ContentItemDataCommonDataID>
+    <GUID>076d2c2e-9c21-4cbe-b121-6b6f2d60c3f5</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>BdoProductsCategory-89hcj9xk</CodeName>
+      <GUID>7055d08e-5a37-4926-82e1-7a44c8d4daae</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>71401acd-7385-46b4-b840-abdc22674926</ContentItemDataGUID>
+  <DescriptionBody>
+    <![CDATA[<p>Bdo products category</p>]]>
+  </DescriptionBody>
+  <DescriptionTitle>Bdo products category</DescriptionTitle>
+  <ShowSideNavigation>True</ShowSideNavigation>
+  <SideboxTitle>Industries We Work With</SideboxTitle>
+</contentitemdata.bdo.industrycategory>

@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.locationoffice>
+  <ContentItemDataCommonDataID>
+    <GUID>7ae785f5-15c5-4b46-9247-6cbd05dbe92a</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>IndoreOffice1-yllsrfqi</CodeName>
+      <GUID>c4c41489-5d9d-4df5-9dd9-7a9bfedff053</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>83bbe9cb-0ead-4cd2-98cb-fc9cc45a1185</ContentItemDataGUID>
+  <LocationAddressLine1>Indore</LocationAddressLine1>
+  <LocationAddressLine2 />
+  <LocationCountry>Inde</LocationCountry>
+  <LocationEmail>mumbai@bdo.in</LocationEmail>
+  <LocationFax />
+  <LocationLatitude>90</LocationLatitude>
+  <LocationLongitude>46</LocationLongitude>
+  <LocationPhone>23467890</LocationPhone>
+  <LocationPOBoxNumber />
+  <LocationPOCity>Bureau de Mumbai</LocationPOCity>
+  <LocationPOCountry>Inde</LocationPOCountry>
+  <LocationPOZip />
+  <LocationPOZipDisplayType>
+    <![CDATA[aprèsVille]]>
+  </LocationPOZipDisplayType>
+  <LocationType>1</LocationType>
+  <LocationZip>332456</LocationZip>
+  <LocationZipDisplayType>
+    <![CDATA[aprèsVille]]>
+  </LocationZipDisplayType>
+  <OfficeImageAltText />
+  <OpeningHours />
+</contentitemdata.bdo.locationoffice>

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.dealcardcommon>
+  <CodeName>Food</CodeName>
+  <ContentItemDataCommonDataID>
+    <GUID>fb50d8e1-d8fd-4d83-a1bf-643ef3fee519</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>FoodAndDrink_en-GB-m6h3h2kj</CodeName>
+      <GUID>81195913-9be5-4dbd-8bbf-499c364c6934</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>886ca374-20c0-4f2b-8360-b6aef932df8b</ContentItemDataGUID>
+  <Language>en-GB</Language>
+  <Name>Food and Drink</Name>
+</contentitemdata.bdo.dealcardcommon>

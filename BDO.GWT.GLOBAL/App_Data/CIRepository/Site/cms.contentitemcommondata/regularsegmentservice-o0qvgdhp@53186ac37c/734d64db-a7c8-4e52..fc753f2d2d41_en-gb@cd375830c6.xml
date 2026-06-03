@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>RegularSegmentService-o0qvgdhp</CodeName>
+    <GUID>c6fcba56-c434-4223-ae0f-a6491d47d884</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-05-08 12:37:14Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>734d64db-a7c8-4e52-9489-fc753f2d2d41</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-05-08 12:37:14Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <HeroBackgroundImage>
+    <![CDATA[[{"Identifier":"4d8e152e-ddc5-4ee3-97fc-eb02d5bc56d0"}]]]>
+  </HeroBackgroundImage>
+  <HeroBackgroundImage_Mobile>
+    <![CDATA[[{"Identifier":"4d8e152e-ddc5-4ee3-97fc-eb02d5bc56d0"}]]]>
+  </HeroBackgroundImage_Mobile>
+  <HeroBackgroundImage_MobileAltText>alt</HeroBackgroundImage_MobileAltText>
+  <HeroBackgroundImageAltText>Regular segment service</HeroBackgroundImageAltText>
+  <HeroCallToActionButtonType>none</HeroCallToActionButtonType>
+  <HeroDescription>Regular segment service</HeroDescription>
+  <HeroLayout>hero</HeroLayout>
+  <HeroTitle>Regular segment service</HeroTitle>
+  <IncludeInSitemap>True</IncludeInSitemap>
+  <MetadataBusinessIssuesTG />
+  <MetadataCanonical>Regular segment service</MetadataCanonical>
+  <MetadataDescription>
+    <![CDATA[<p>Regular segment service</p>]]>
+  </MetadataDescription>
+  <MetadataNofollow>False</MetadataNofollow>
+  <MetadataNoindex>False</MetadataNoindex>
+  <MetadataOGDescription>Regular segment service</MetadataOGDescription>
+  <MetadataOGTitle>Regular segment service</MetadataOGTitle>
+  <MetadataOGTwitterImageSizeCheckbox>False</MetadataOGTwitterImageSizeCheckbox>
+  <MetadataTitle>Regular segment service</MetadataTitle>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6e10753f-0d29-4f6c-a16e-63f0d38e4f02</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>2712b2e9-53d5-4f30-b5e3-d9f456846b55</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>734d64db-a7c8-4e52-9489-fc753f2d2d41</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>TeaserImage-5ars0prc</CodeName>
+        <GUID>4d8e152e-ddc5-4ee3-97fc-eb02d5bc56d0</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>6fc08044-a87a-465e-b463-77a25b10ecba</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>0cdb5610-285c-488c-8b56-099b937811c1</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>734d64db-a7c8-4e52-9489-fc753f2d2d41</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>TeaserImage-5ars0prc</CodeName>
+        <GUID>4d8e152e-ddc5-4ee3-97fc-eb02d5bc56d0</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

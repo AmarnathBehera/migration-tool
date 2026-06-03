@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.careertypesfolder>
+  <ContentItemDataCommonDataID>
+    <GUID>71082846-37aa-42ed-9b4e-4852f8fea157</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>ContentTypes-6ziosji8</CodeName>
+      <GUID>aed05959-9618-4b83-bdc0-e5883898932a</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>50ab6cbc-49a7-4d0d-ba27-274cd64aab99</ContentItemDataGUID>
+  <Title>Career Types</Title>
+</contentitemdata.bdo.careertypesfolder>

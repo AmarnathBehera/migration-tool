@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.faqfolder>
+  <ContentItemDataCommonDataID>
+    <GUID>f49ea6cd-5173-4e21-92b7-bdbe0c1d4983</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Test-1eycug0v</CodeName>
+      <GUID>7dc27ccd-9411-4499-bb41-0cc1091fc969</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>64765591-891f-4b29-8998-12d7c44e8f0c</ContentItemDataGUID>
+  <Separator />
+  <Title>title</Title>
+</contentitemdata.bdo.faqfolder>

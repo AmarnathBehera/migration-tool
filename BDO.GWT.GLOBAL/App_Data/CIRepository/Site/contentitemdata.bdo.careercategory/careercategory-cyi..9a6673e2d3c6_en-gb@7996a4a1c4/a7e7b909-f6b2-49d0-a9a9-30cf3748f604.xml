@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.careercategory>
+  <ContentItemDataCommonDataID>
+    <GUID>3238de43-15ec-4718-ae36-9a6673e2d3c6</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>CareerCategory-cyi4iixr</CodeName>
+      <GUID>d9506378-7982-46dd-b381-b1deb1bb8f9a</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>a7e7b909-f6b2-49d0-a9a9-30cf3748f604</ContentItemDataGUID>
+</contentitemdata.bdo.careercategory>
