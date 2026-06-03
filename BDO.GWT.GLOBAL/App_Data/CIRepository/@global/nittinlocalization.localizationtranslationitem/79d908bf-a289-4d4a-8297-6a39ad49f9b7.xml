@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<nittinlocalization.localizationtranslationitem>
+  <LocalizationTranslationItemContentLanguageId>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </LocalizationTranslationItemContentLanguageId>
+  <LocalizationTranslationItemGuid>79d908bf-a289-4d4a-8297-6a39ad49f9b7</LocalizationTranslationItemGuid>
+  <LocalizationTranslationItemLocalizationKeyItemId>
+    <CodeName>BDO.LiveSite.Updated</CodeName>
+    <GUID>f8926aa9-8b20-444f-b528-e33457104a53</GUID>
+    <ObjectType>nittinlocalization.localizationkeyitem</ObjectType>
+  </LocalizationTranslationItemLocalizationKeyItemId>
+  <LocalizationTranslationItemText>Updated On</LocalizationTranslationItemText>
+</nittinlocalization.localizationtranslationitem>

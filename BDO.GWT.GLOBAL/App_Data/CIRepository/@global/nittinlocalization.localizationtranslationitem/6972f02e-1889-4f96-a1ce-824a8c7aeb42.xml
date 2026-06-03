@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<nittinlocalization.localizationtranslationitem>
+  <LocalizationTranslationItemContentLanguageId>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </LocalizationTranslationItemContentLanguageId>
+  <LocalizationTranslationItemGuid>6972f02e-1889-4f96-a1ce-824a8c7aeb42</LocalizationTranslationItemGuid>
+  <LocalizationTranslationItemLocalizationKeyItemId>
+    <CodeName>BDO.LiveSite.Download</CodeName>
+    <GUID>ce48e703-719c-4c23-88b6-5bea6a4d1d8e</GUID>
+    <ObjectType>nittinlocalization.localizationkeyitem</ObjectType>
+  </LocalizationTranslationItemLocalizationKeyItemId>
+  <LocalizationTranslationItemText>Download</LocalizationTranslationItemText>
+</nittinlocalization.localizationtranslationitem>

@@ -290,7 +290,7 @@ namespace BDO
 		/// <summary>
 		/// ContentType.
 		/// </summary>
-		public IEnumerable<TagReference> ContentType { get; set; }
+		public IEnumerable<Contenttypes> ContentType { get; set; }
 
 
 		/// <summary>
@@ -314,7 +314,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataServiceAreas.
 		/// </summary>
-		public IEnumerable<IWebPageFieldsSource> MetadataServiceAreas { get; set; }
+		public IEnumerable<ServiceArea> MetadataServiceAreas { get; set; }
 
 
 		/// <summary>

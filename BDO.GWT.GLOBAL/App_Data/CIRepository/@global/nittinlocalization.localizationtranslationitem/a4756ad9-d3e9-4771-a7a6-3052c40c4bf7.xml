@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<nittinlocalization.localizationtranslationitem>
+  <LocalizationTranslationItemContentLanguageId>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </LocalizationTranslationItemContentLanguageId>
+  <LocalizationTranslationItemGuid>a4756ad9-d3e9-4771-a7a6-3052c40c4bf7</LocalizationTranslationItemGuid>
+  <LocalizationTranslationItemLocalizationKeyItemId>
+    <CodeName>BDO.LiveSite.CookieBanner.Accept</CodeName>
+    <GUID>29113ef8-681b-4001-973a-8ecfd0c56c1c</GUID>
+    <ObjectType>nittinlocalization.localizationkeyitem</ObjectType>
+  </LocalizationTranslationItemLocalizationKeyItemId>
+  <LocalizationTranslationItemText>Accept</LocalizationTranslationItemText>
+</nittinlocalization.localizationtranslationitem>

@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Internal Contributors Folder</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="36d305f3-ec1e-4260-897c-3eaffd368abd" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="5e99b520-cc6b-4e61-a20b-4c08a36e08d2" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="5e458675-b61e-4450-bef4-531cb9227f6b" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>cfd788ec-5c57-4de4-b0f7-7f27497fda19</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-folder-inverted</ClassIconClass>
+  <ClassName>BDO.InternalPeopleFolder</ClassName>
+  <ClassShortName>BDOInternalPeopleFolder</ClassShortName>
+  <ClassTableName>BDO_InternalPeopleFolder</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

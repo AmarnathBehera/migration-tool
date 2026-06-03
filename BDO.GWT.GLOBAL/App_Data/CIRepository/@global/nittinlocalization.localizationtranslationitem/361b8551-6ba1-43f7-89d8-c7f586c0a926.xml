@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<nittinlocalization.localizationtranslationitem>
+  <LocalizationTranslationItemContentLanguageId>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </LocalizationTranslationItemContentLanguageId>
+  <LocalizationTranslationItemGuid>361b8551-6ba1-43f7-89d8-c7f586c0a926</LocalizationTranslationItemGuid>
+  <LocalizationTranslationItemLocalizationKeyItemId>
+    <CodeName>BDO.LiveSite.Careers.EmploymentType</CodeName>
+    <GUID>d9370faa-9898-4068-a932-25cbd1891348</GUID>
+    <ObjectType>nittinlocalization.localizationkeyitem</ObjectType>
+  </LocalizationTranslationItemLocalizationKeyItemId>
+  <LocalizationTranslationItemText>Tipo de empleo</LocalizationTranslationItemText>
+</nittinlocalization.localizationtranslationitem>

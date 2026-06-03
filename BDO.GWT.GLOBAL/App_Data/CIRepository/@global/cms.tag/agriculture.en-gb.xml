@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.tag>
+  <TagDescription />
+  <TagGUID>e21a9722-d7aa-4d77-8613-34f8ad25b190</TagGUID>
+  <TagMetadata>
+    <![CDATA[{"Translations":{"8517e6d4-6f93-4003-9e15-e30e302d68e9":{"Title":null,"Description":null},"ee380e62-f7ff-416a-88c1-646fe247d5f3":{"Title":null,"Description":null}}}]]>
+  </TagMetadata>
+  <TagName>Agriculture.En-GB</TagName>
+  <TagOrder>1</TagOrder>
+  <TagTaxonomyID>
+    <CodeName>globalIndustry</CodeName>
+    <GUID>f803b21f-ee55-4715-b348-882acd851bf8</GUID>
+    <ObjectType>cms.taxonomy</ObjectType>
+  </TagTaxonomyID>
+  <TagTitle>Agriculture</TagTitle>
+</cms.tag>

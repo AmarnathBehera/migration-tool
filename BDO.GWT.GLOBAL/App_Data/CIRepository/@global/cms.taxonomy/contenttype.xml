@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.taxonomy>
+  <TaxonomyDescription>
+    <![CDATA[content type has key value pair for content types to be selected]]>
+  </TaxonomyDescription>
+  <TaxonomyGUID>5abd302d-a273-49d8-b757-92b8803dfa7d</TaxonomyGUID>
+  <TaxonomyName>ContentType</TaxonomyName>
+  <TaxonomyTitle>ContentType</TaxonomyTitle>
+</cms.taxonomy>

@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Career Category</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="dd04ebac-2c6f-4593-9bb4-2cf42902398a" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="771cc672-fb8a-4762-a02a-17c8ed7ace51" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="2b1615c5-a651-428b-b0fc-d8f9177d78a7" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
+        <properties />
+      </schema>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>a44dde57-e1ba-4a8b-ba54-2c0705c12903</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-briefcase</ClassIconClass>
+  <ClassName>BDO.CareerCategory</ClassName>
+  <ClassShortName>BDOCareerCategory</ClassShortName>
+  <ClassTableName>BDO_CareerCategory</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>

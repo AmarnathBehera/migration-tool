@@ -86,7 +86,7 @@ public class PeopleCardsService : IPeopleCardsService
                {
                    LinkedItemsMaxLevel = 2,
                    LanguageName = language,
-                   //UseLanguageFallbacks = false 
+                   UseLanguageFallbacks = false
                },
             query =>
             {
@@ -98,13 +98,16 @@ public class PeopleCardsService : IPeopleCardsService
                         filter(w);
                     }
                 });
-                if (order == "desc") {
+                if (order == "desc")
+                {
                     query.OrderBy(new OrderByColumn(nameof(Person.PersonLastName), OrderDirection.Descending));
                 }
-                else if (order == "asc") {
+                else if (order == "asc")
+                {
                     query.OrderBy(new OrderByColumn(nameof(Person.PersonLastName), OrderDirection.Ascending));
                 }
-                else {
+                else
+                {
                     query.OrderBy(nameof(Person.SystemFields.WebPageItemID));
                 }
             }, RetrievalCacheSettings.CacheDisabled,
@@ -119,7 +122,7 @@ public class PeopleCardsService : IPeopleCardsService
             Data = cardDtos,
             TotalCount = peopleArray.Length
         };
-    } 
+    }
     private async Task<List<Action<WhereParameters>>> GetFilterParameterWhereExpressionsAsync(
      IDictionary<string, string> filterParameterValueByName)
     {
@@ -135,7 +138,6 @@ public class PeopleCardsService : IPeopleCardsService
             var filter = filterData.FilterParameterType switch
             {
                 FilterParameterType.Page => await GetPageFilterAsync(filterName, filterValue),
-                FilterParameterType.Taxonomy => await GetTaxonomyFilterAsync(filterName, filterValue),
                 _ => null,
             };
 
@@ -162,22 +164,8 @@ public class PeopleCardsService : IPeopleCardsService
         {
             FilterParameterName.OfficeLocation => w => w.WhereContains(nameof(Person.MetadataOfficeLocation), guid),
             FilterParameterName.City => w => w.WhereContains(nameof(Person.MetadataCity), guid),
-            _ => null,
-        };
-    }
-
-    private async Task<Action<WhereParameters>?> GetTaxonomyFilterAsync(string filterName, string filterValue)
-    {
-        var tag = await _taxonomyTagRetriever.GetTaxonomyTagByNameAsync(filterValue);
-        if (tag == null)
-            return null;
-
-        var identifiers = new List<Guid> { tag.TagGUID };
-
-        return filterName switch
-        {
-            FilterParameterName.Credential => w => w.WhereContainsTags(nameof(Person.PersonCredentials), identifiers),
-            FilterParameterName.ProfileGroup => w => w.WhereContainsTags(nameof(Person.MetadataProfileGroups), identifiers),
+            FilterParameterName.Credential => w => w.WhereContains(nameof(Person.PersonCredentials), guid),
+            FilterParameterName.ProfileGroup => w => w.WhereContains(nameof(Person.MetadataProfileGroups), guid),
             _ => null,
         };
     }

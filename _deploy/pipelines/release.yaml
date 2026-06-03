@@ -75,6 +75,8 @@ variables:
     value: "GWT.XbyK.MVC.Deploy"
   - name: reactAppPackageId
     value: "GWT.XbyK.React.Deploy"
+  - name: ciAppPackageId
+    value: "GWT.XbyK.CI.Deploy"
   # - name: synAppPackageId
   #   value: "GWT.XbyK.Sync.Deploy"
   # - name: apiAppPackageId
@@ -229,7 +231,8 @@ stages:
               rootFolderOrFile: "$(publishOutput)"
               includeRootFolder: false
               archiveType: zip
-              archiveFile: "$(octopusPackageOutput)/$(cmsAppPackageId).$(Build.BuildNumber).z\
+              archiveFile:
+                "$(octopusPackageOutput)/$(cmsAppPackageId).$(Build.BuildNumber).z\
                 ip"
               replaceExistingArchive: true
 
@@ -306,7 +309,8 @@ stages:
               rootFolderOrFile: "$(publishOutput)"
               includeRootFolder: false
               archiveType: zip
-              archiveFile: "$(octopusPackageOutput)/$(mvcAppPackageId).$(Build.BuildNumber).z\
+              archiveFile:
+                "$(octopusPackageOutput)/$(mvcAppPackageId).$(Build.BuildNumber).z\
                 ip"
               replaceExistingArchive: true
 
@@ -315,6 +319,65 @@ stages:
             inputs:
               targetPath: "$(octopusPackageOutput)"
               artifact: drop-mvc
+
+      - job: BuildCIPackage
+        displayName: "Build and package XbyK CI Deploy"
+        pool:
+          vmImage: "ubuntu-latest"
+        variables:
+          selfSourcesDirectory: "$(Build.SourcesDirectory)"
+        steps:
+          - checkout: self
+
+          - task: UseDotNet@2
+            displayName: "Use .NET $(dotnetVersion)"
+            inputs:
+              packageType: "sdk"
+              version: "$(dotnetVersion)"
+              installationPath: $(Agent.ToolsDirectory)/dotnet
+
+          - task: NuGetAuthenticate@1
+            displayName: "Authenticate NuGet"
+
+          - script: dotnet restore $(selfSourcesDirectory)/$(cmsProjectFilePath)
+            displayName: "Restore NuGet packages"
+
+          - script: >
+              dotnet publish $(selfSourcesDirectory)/$(cmsProjectFilePath)
+              --configuration $(buildConfiguration) --no-restore --output
+              $(publishOutput)
+            displayName: "Publish CMS project for CI runner"
+
+          - task: CopyFiles@2
+            displayName: "Copy CIRepository to CI package output"
+            inputs:
+              SourceFolder: "$(selfSourcesDirectory)/BDO.GWT.GLOBAL/App_Data/CIRepository"
+              Contents: "**"
+              TargetFolder: "$(publishOutput)/App_Data/CIRepository"
+              OverWrite: true
+
+          - task: CopyFiles@2
+            displayName: "Copy CI restore script to CI package output"
+            inputs:
+              SourceFolder: "$(selfSourcesDirectory)/_deploy/scripts"
+              Contents: "Invoke-KenticoCIRestore.ps1"
+              TargetFolder: "$(publishOutput)"
+              OverWrite: true
+
+          - task: ArchiveFiles@2
+            displayName: "Create CI Deploy package"
+            inputs:
+              rootFolderOrFile: "$(publishOutput)"
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: "$(octopusPackageOutput)/$(ciAppPackageId).$(Build.BuildNumber).zip"
+              replaceExistingArchive: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish CI package artifact"
+            inputs:
+              targetPath: "$(octopusPackageOutput)"
+              artifact: drop-ci
 
       - job: BuildReactApp
         displayName: "Build and package XbyK React SSR App"
@@ -363,7 +426,8 @@ stages:
               rootFolderOrFile: "$(Build.SourcesDirectory)/GWT.XbyK.ReactServer/build"
               includeRootFolder: false
               archiveType: "zip"
-              archiveFile: "$(Build.ArtifactStagingDirectory)/packages/$(reactAppPackageId).$\
+              archiveFile:
+                "$(Build.ArtifactStagingDirectory)/packages/$(reactAppPackageId).$\
                 (Build.BuildNumber).zip"
               replaceExistingArchive: true
               verbose: true
@@ -376,7 +440,7 @@ stages:
 
   - stage: Publish
     displayName: Publish to Octopus
-    dependsOn: [ Versioning, Build ]
+    dependsOn: [Versioning, Build]
     variables:
       releaseNumber: $[
         stageDependencies.Versioning.SetVersion.outputs['setVersion.releaseNumber']
@@ -404,6 +468,9 @@ stages:
           - download: current
             displayName: "Download React App package artifact"
             artifact: drop-react
+          - download: current
+            displayName: "Download CI Deploy package artifact"
+            artifact: drop-ci
 
           - task: OctopusPush@7
             displayName: Push Packages to Octopus
@@ -414,6 +481,7 @@ stages:
                 $(Pipeline.Workspace)/drop-cms/*.zip
                 $(Pipeline.Workspace)/drop-mvc/*.zip
                 $(Pipeline.Workspace)/drop-react/*.zip
+                $(Pipeline.Workspace)/drop-ci/*.zip
               Replace: "true"
 
           - task: OctopusBuildInformation@7
@@ -425,6 +493,7 @@ stages:
                 $(cmsAppPackageId)
                 $(mvcAppPackageId)
                 $(reactAppPackageId)
+                $(ciAppPackageId)
               PackageVersion: "$(Build.BuildNumber)"
               Replace: OverwriteExisting
 
@@ -440,8 +509,9 @@ stages:
               ReleaseNumber: "$(Build.BuildNumber)"
               Channel: "Pre-Release"
               DefaultPackageVersion: "$(Build.BuildNumber)"
-              GitRef: main
-              ReleaseNotes: "**Triggered by:** $(triggerDetails)<br>**Last GWT.XbyK.Web
+              GitRef: "$(Build.SourceBranch)"
+              ReleaseNotes:
+                "**Triggered by:** $(triggerDetails)<br>**Last GWT.XbyK.Web
                 Commit:** $(Build.SourceVersionMessage)<br>**Build Reason:**
                 $(Build.Reason)<br>**Link:** $(Build.Repository.Uri)"
 
@@ -455,7 +525,8 @@ stages:
               ReleaseNumber: "$(Build.BuildNumber)"
               Channel: "Stable"
               DefaultPackageVersion: "$(Build.BuildNumber)"
-              GitRef: main
-              ReleaseNotes: "**Triggered by:** $(triggerDetails)<br>**Last GWT.XbyK.Web Commit
+              GitRef: "$(Build.SourceBranch)"
+              ReleaseNotes:
+                "**Triggered by:** $(triggerDetails)<br>**Last GWT.XbyK.Web Commit
                 Msg:** $(Build.SourceVersionMessage)<br>**Build Reason:**
                 $(Build.Reason)<br>**Link:** $(Build.Repository.Uri)"

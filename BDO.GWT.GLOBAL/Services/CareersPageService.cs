@@ -272,7 +272,7 @@ public class CareersPageService : ICareersPageService
             }
         }
 
-        var insightCardsGridDto = new CardsGridDto
+        var CareersCardsGridDto = new CardsGridDto
         {
             Title = page.ItemListTitle,
             Description = page.ItemListDescription,
@@ -285,7 +285,7 @@ public class CareersPageService : ICareersPageService
             AdvancedSearchLink = page.ItemListAdvancedSearchLinkUrl?.FirstOrDefault()?.ToString()
         };
 
-        return insightCardsGridDto;
+        return CareersCardsGridDto;
     }
 
     private async Task<string> GetLanguageSafeUrlAsync(

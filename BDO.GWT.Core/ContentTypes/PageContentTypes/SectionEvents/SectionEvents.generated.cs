@@ -62,7 +62,7 @@ namespace BDO
 		/// <summary>
 		/// EventsWebinarsListFeaturedPages.
 		/// </summary>
-		public IEnumerable<Event> EventsWebinarsListFeaturedPages { get; set; }
+		public IEnumerable<IWebPageFieldsSource> EventsWebinarsListFeaturedPages { get; set; }
 
 
 		/// <summary>
@@ -80,7 +80,7 @@ namespace BDO
 		/// <summary>
 		/// EventsWebinarsListAdvancedSearchLinkUrl.
 		/// </summary>
-		public string EventsWebinarsListAdvancedSearchLinkUrl { get; set; }
+		public IEnumerable<WebPageRelatedItem> EventsWebinarsListAdvancedSearchLinkUrl { get; set; }
 
 
 		/// <summary>

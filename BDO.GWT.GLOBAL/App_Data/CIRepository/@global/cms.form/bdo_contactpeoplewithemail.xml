@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.form>
+  <FormBuilderLayout>
+<![CDATA[
+{
+  "editableAreas": [
+    {
+      "identifier": "DefaultFormBuilderArea",
+      "sections": [
+        {
+          "identifier": "00000000-0000-0000-0000-000000000000",
+          "type": "Kentico.DefaultSection",
+          "zones": [
+            {
+              "identifier": "8cb4c955-ab58-4131-82b7-dd43f038a337",
+              "formComponents": [
+                {
+                  "identifier": "de5eac55-96e0-4fb1-8c9c-19bbc4959118"
+                },
+                {
+                  "identifier": "3adc26e3-2448-407d-a0c4-73378580918e"
+                },
+                {
+                  "identifier": "c29a289b-1c46-4513-8d60-983ec3ca705b"
+                },
+                {
+                  "identifier": "d191135f-7a65-4fa4-8a55-345c60f0c545"
+                }
+              ]
+            }
+          ],
+          "properties": null
+        },
+        {
+          "identifier": "dfaf1361-04fa-4877-8209-0d3e8fc880d4",
+          "type": "Kentico.DefaultSection",
+          "zones": [
+            {
+              "identifier": "8cbb3aa8-8211-4dfb-8f8c-f1c14053c114",
+              "formComponents": [
+                {
+                  "identifier": "18f129a8-6cca-442a-8573-e437fe71e2dd"
+                }
+              ]
+            }
+          ],
+          "properties": null
+        }
+      ]
+    }
+  ]
+}
+]]>
+  </FormBuilderLayout>
+  <FormClassID>
+    <CodeName>BizForm.bdo_contactpeoplewithemail</CodeName>
+    <GUID>2a258b9a-e852-485c-8dd8-d1efec7dfe20</GUID>
+    <ObjectType>cms.formclass</ObjectType>
+  </FormClassID>
+  <FormDisplayName>bdo_contactpeoplewithemail</FormDisplayName>
+  <FormGUID>216d5669-fee7-4cb0-8f1a-d6dc348d8be3</FormGUID>
+  <FormItems>60</FormItems>
+  <FormLogActivity>True</FormLogActivity>
+  <FormName>bdo_contactpeoplewithemail</FormName>
+</cms.form>

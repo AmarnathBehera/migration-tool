@@ -13,5 +13,12 @@
         <ObjectType>cms.contenttype</ObjectType>
       </AllowedChildContentTypeChildID>
     </Binding>
+    <Binding id="cms.contenttype_BDO.TrendingTopics">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.TrendingTopics</CodeName>
+        <GUID>679d9478-6cee-46a5-98d7-0777bfcfceba</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
   </Bindings>
 </cms.allowedchildcontenttype>

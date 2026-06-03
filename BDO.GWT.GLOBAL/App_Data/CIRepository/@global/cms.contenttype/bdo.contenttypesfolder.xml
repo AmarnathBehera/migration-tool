@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Content types Folder</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="c9750926-ab77-4a15-9a8e-104def2686e9" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="ae941179-b530-4288-b12a-4b59992dff44" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="de046cd8-3b4e-4037-9078-b6095dc05bf7" isunique="true" system="true" />
+      <field column="Title" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="46704fec-310a-486b-ac50-118ea1b4c749" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>8b1ae0d6-31df-4491-959e-a6b8d86bb7a9</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-folder-inverted</ClassIconClass>
+  <ClassName>BDO.ContentTypesFolder</ClassName>
+  <ClassShortName>BDOContentTypesFolder</ClassShortName>
+  <ClassTableName>BDO_ContentTypesFolder</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

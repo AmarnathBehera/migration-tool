@@ -1,24 +1,41 @@
 ﻿using BDO.GWT.Xperience;
+using BDO.GWT.Xperience.Admin.Pages.ProjectSettings;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.GlobalSettings;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
+using GWTXbyKWeb.Pages.ProjectSettings.GlobalSettings;
 using Kentico.Xperience.Admin.Base;
 
 [assembly: UIPage(
     parentType: typeof(ProjectSettingsApplication),
     slug: "global-settings",
-    uiPageType: typeof(GlobalSettingsListingPage),
+    uiPageType: typeof(GlobalSettings),
     name: "Global settings",
-    templateName: TemplateNames.LISTING,
-      order: 0)]
+    templateName: TemplateNames.SECTION_LAYOUT,
+    order: 0)]
 
 [assembly: UIPage(
-    parentType: typeof(ProjectSettingsApplication),
-    slug: "Cookiebot",
+    parentType: typeof(GlobalSettings),
+    slug: "keys",
+    uiPageType: typeof(GlobalSettingsListingPage),
+    name: "Include Custom Scripts",
+    templateName: TemplateNames.LISTING,
+    order: 0)]
+
+[assembly: UIPage(
+    parentType: typeof(GlobalSettings),
+    slug: "cookiebot",
     uiPageType: typeof(CookiebootEditPage),
     name: "Cookiebot",
     templateName: TemplateNames.EDIT,
     order: 1)]
 
+[assembly: UIPage(
+    parentType: typeof(GlobalSettings),
+    slug: "events-webinar",
+    uiPageType: typeof(GlobalEventsWebinarEditPage),
+    name: "Events & Webinar",
+    templateName: TemplateNames.EDIT,
+    order: 2)]
 
 [assembly: UIPage(
     parentType: typeof(GlobalSettingsListingPage),
@@ -50,7 +67,7 @@ using Kentico.Xperience.Admin.Base;
     uiPageType: typeof(WebChannelSettingsListingPage),
     name: "Channel settings",
     templateName: TemplateNames.LISTING,
-    order: 0)]
+    order: 1)]
 
 [assembly: UIPage(
     parentType: typeof(WebChannelSettingsListingPage),
@@ -62,18 +79,27 @@ using Kentico.Xperience.Admin.Base;
 
 [assembly: UIPage(
     parentType: typeof(WebChannelSettingsEditSection),
-    slug: "Email",
+    slug: "email",
     uiPageType: typeof(EmailEditPage),
     name: "Email settings",
     templateName: TemplateNames.EDIT,
-    order: 6)]
+    order: 3)]
+
 [assembly: UIPage(
     parentType: typeof(WebChannelSettingsEditSection),
-    slug: "General",
+    slug: "events-webinar",
+    uiPageType: typeof(EventsWebinarEditPage),
+    name: "Events & Webinar",
+    templateName: TemplateNames.EDIT,
+    order: 4)]
+
+[assembly: UIPage(
+    parentType: typeof(WebChannelSettingsEditSection),
+    slug: "general",
     uiPageType: typeof(GeneralSettingsEditPage),
     name: "General Settings",
     templateName: TemplateNames.EDIT,
-    order: 6)]
+    order: 5)]
 
 [assembly: UIPage(
     parentType: typeof(WebChannelSettingsEditSection),
@@ -81,7 +107,7 @@ using Kentico.Xperience.Admin.Base;
     uiPageType: typeof(SeoSettingsEditPage),
     name: "SEO settings",
     templateName: TemplateNames.EDIT,
-    order: 5)]
+    order: 6)]
 
 [assembly: UIPage(
     parentType: typeof(WebChannelSettingsEditSection),
@@ -114,10 +140,9 @@ using Kentico.Xperience.Admin.Base;
     name: "Create snippet",
     templateName: TemplateNames.EDIT,
     order: 20)]
-
 [assembly: UIPage(
     parentType: typeof(WebChannelSettingsEditSection),
-    slug: "print-or-share",          
+    slug: "print-or-share",
     uiPageType: typeof(PrintorShareEditPage),
     name: "Print Or Share settings",
     templateName: TemplateNames.EDIT,

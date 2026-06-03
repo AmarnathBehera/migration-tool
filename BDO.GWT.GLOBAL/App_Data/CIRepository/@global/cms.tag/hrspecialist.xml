@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.tag>
+  <TagGUID>6d5f0f9c-a676-4344-a353-6c494facaa63</TagGUID>
+  <TagMetadata>
+    <![CDATA[{"Translations":{}}]]>
+  </TagMetadata>
+  <TagName>HRSpecialist</TagName>
+  <TagOrder>2</TagOrder>
+  <TagTaxonomyID>
+    <CodeName>CareerJobTitle</CodeName>
+    <GUID>12cbf508-d966-489a-a817-b30f6eaa0bb0</GUID>
+    <ObjectType>cms.taxonomy</ObjectType>
+  </TagTaxonomyID>
+  <TagTitle>HR Specialist</TagTitle>
+</cms.tag>

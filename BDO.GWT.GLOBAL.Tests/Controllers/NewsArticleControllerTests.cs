@@ -41,10 +41,10 @@ public class NewsArticleControllerTests
     }
 
     [Test]
-    public async Task Index_WhenCurrentPageExists_ReturnsViewWithContentPageDto()
+    public async Task Index_WhenCurrentPageExists_ReturnsViewWithSectionNewsPageDto()
     {
         var newsArticle = new NewsArticle();
-        var expectedDto = new ContentPageDto();
+        var expectedDto = new SectionNewsPageDto();
 
         _contentServiceMock
             .Setup(x => x.RetrieveCurrentPageAsync<NewsArticle>(
@@ -52,7 +52,7 @@ public class NewsArticleControllerTests
             .ReturnsAsync(newsArticle);
 
         _newsArticleServiceMock
-            .Setup(x => x.GetContentPageDtoAsync(newsArticle, It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetSectionNewsPageDtoAsync(newsArticle, It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedDto);
 
         var result = await _controller.Index(CancellationToken.None);
@@ -61,7 +61,7 @@ public class NewsArticleControllerTests
         var viewResult = (ViewResult)result;
         Assert.Multiple(() =>
         {
-            Assert.That(viewResult.ViewName, Is.EqualTo("~/Views/ContentPage/Index.cshtml"));
+            Assert.That(viewResult.ViewName, Is.EqualTo("~/Views/NewsArticle/Index.cshtml"));
             Assert.That(viewResult.Model, Is.EqualTo(expectedDto));
         });
     }
@@ -78,8 +78,8 @@ public class NewsArticleControllerTests
             .ReturnsAsync(newsArticle);
 
         _newsArticleServiceMock
-            .Setup(x => x.GetContentPageDtoAsync(newsArticle, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new ContentPageDto());
+            .Setup(x => x.GetSectionNewsPageDtoAsync(newsArticle, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SectionNewsPageDto());
 
         await _controller.Index(CancellationToken.None);
 

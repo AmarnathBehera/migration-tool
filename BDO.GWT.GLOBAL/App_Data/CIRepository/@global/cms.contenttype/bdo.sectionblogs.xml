@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Section Blogs</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="1aeb30e1-1461-4c16-8090-cd769c398cf6" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="d15f0f5f-8b29-40e8-b460-2ebb1dd395e4" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="080494fc-c6f0-436c-aeca-346c2bac3c91" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
+        <properties />
+      </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
+      <field column="ShowCopyUrlButtonInBlogPage" columnprecision="0" columntype="boolean" enabled="true" guid="19c33a68-3fd6-4d72-8ced-97be8191f746" visible="true">
+        <properties>
+          <explanationtext>
+            <![CDATA[Should the copy URL button be shown in descendant Blog Pages?]]>
+          </explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show copy URL button in Blog Page</fieldcaption>
+          <fielddescription>
+            <![CDATA[Should the copy URL button be shown in descendant Blog Pages?]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>b1d1ea96-03a2-4a44-82f7-92973086a93b</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-l-grid-2-2</ClassIconClass>
+  <ClassName>BDO.SectionBlogs</ClassName>
+  <ClassShortName>BDOSectionBlogs</ClassShortName>
+  <ClassTableName>BDO_SectionBlogs</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>
