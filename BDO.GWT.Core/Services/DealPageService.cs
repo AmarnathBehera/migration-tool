@@ -76,10 +76,10 @@ public class DealPageService : IDealPageService
         {
             Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
             Title = dealPage.MetadataShowTitle ? dealPage.MetadataTitle : null,
-            DealTypeNames = await GetDeals("", cancellationToken),
-            IndustryNames = await GetDeals("/BDO_Deal_Cards/Global_Deals/Global_Industry", cancellationToken),
-            SubIndustryNames = await GetDeals("", cancellationToken),
-            Range = await GetDeals("/BDO_Deal_Cards/Global_Deals/Global_Industry", cancellationToken),
+            DealTypeNames = GetDeals(dealPage.DealType, cancellationToken),
+            IndustryNames = GetDeals(dealPage.Industry, cancellationToken),
+            SubIndustryNames = GetDeals(dealPage.SubIndustry, cancellationToken),
+            Range = GetDeals(dealPage.Size, cancellationToken),
             ClientName = dealPage.ClientName,
             Content = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(dealPage.DealContent),
             Sidebar = dealPage.ShowSidebar ? await _sidebarService.GetDealSidebarDtoAsync(dealPage, cancellationToken) : null,
@@ -88,29 +88,17 @@ public class DealPageService : IDealPageService
         return dto;
     }
 
-    private async Task<List<DealCardDto>> GetDeals(string nodePath, CancellationToken cancellationToken)
+    private static List<DealCardDto> GetDeals(IEnumerable<DealCardCommon>? deals, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(nodePath))
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (deals == null)
         {
             return new List<DealCardDto>();
         }
 
-        var pages = await _contentRetriever.GetPagesAsync<DealCardCommon>(
-            new RetrievePagesParameters
-            {
-                LinkedItemsMaxLevel = 2,
-                PathMatch = PathMatch.Children(nodePath),
-            },
-            query => query.OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
-            RetrievalCacheSettings.CacheDisabled,
-            cancellationToken);
-
-        if (pages == null)
-        {
-            return new List<DealCardDto>();
-        }
-
-        return pages
+        return deals
+            .Where(p => p != null)
             .Select(p => new DealCardDto
             {
                 Name = p.Name,
