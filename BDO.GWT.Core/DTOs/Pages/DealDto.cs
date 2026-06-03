@@ -8,11 +8,13 @@ public class DealDto
 
     public string? Title { get; set; }
 
-    public List<string> DealTypeNames { get; set; } = [];
+    public List<DealCardDto> DealTypeNames { get; set; } = [];
 
-    public List<string> IndustryNames { get; set; } = [];
+    public List<DealCardDto> IndustryNames { get; set; } = [];
 
-    public List<string> SubIndustryNames { get; set; } = [];
+    public List<DealCardDto> SubIndustryNames { get; set; } = [];
+
+    public List<DealCardDto> Range { get; set; } = [];
 
     public string? ClientName { get; set; }
 

@@ -1,12 +1,14 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.services;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.DTOs.Pages;
 using BDO.GWT.Web.Core.Services;
 using CMS.ContentEngine;
+using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 
@@ -24,7 +26,8 @@ public class DealPageService : IDealPageService
     private readonly IContentService _contentRetriever;
     private readonly IWebsiteChannelContext _websiteChannelContext;
 
-    public DealPageService(ICultureContext cultureContext, IHeroService heroService, ISidebarService sidebarService, IContentService contentRetriever, IWebsiteChannelContext websiteChannelContext)
+    public DealPageService(IHeroService heroService, ISidebarService sidebarService, IContentService contentRetriever, 
+        IWebsiteChannelContext websiteChannelContext)
     {
         _heroService = heroService;
         _sidebarService = sidebarService;
@@ -73,9 +76,10 @@ public class DealPageService : IDealPageService
         {
             Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
             Title = dealPage.MetadataShowTitle ? dealPage.MetadataTitle : null,
-            DealTypeNames = await GetDealTypeNames(dealPage.DealType, cancellationToken),
-            IndustryNames = await GetIndustryNames(dealPage.Industry, cancellationToken),
-            SubIndustryNames = await GetSubIndustryNames(dealPage.SubIndustry, cancellationToken),
+            DealTypeNames = await GetDeals("", cancellationToken),
+            IndustryNames = await GetDeals("/BDO_Deal_Cards/Global_Deals/Global_Industry", cancellationToken),
+            SubIndustryNames = await GetDeals("", cancellationToken),
+            Range = await GetDeals("/BDO_Deal_Cards/Global_Deals/Global_Industry", cancellationToken),
             ClientName = dealPage.ClientName,
             Content = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(dealPage.DealContent),
             Sidebar = dealPage.ShowSidebar ? await _sidebarService.GetDealSidebarDtoAsync(dealPage, cancellationToken) : null,
@@ -84,25 +88,35 @@ public class DealPageService : IDealPageService
         return dto;
     }
 
-    private Task<List<string>> GetDealTypeNames(IEnumerable<TagReference> dealTypes, CancellationToken cancellationToken)
-        => GetTagNames(dealTypes, cancellationToken);
-
-    private Task<List<string>> GetIndustryNames(IEnumerable<TagReference> industries, CancellationToken cancellationToken)
-        => GetTagNames(industries, cancellationToken);
-
-    private Task<List<string>> GetSubIndustryNames(IEnumerable<TagReference> subIndustries, CancellationToken cancellationToken)
-        => GetTagNames(subIndustries, cancellationToken);
-
-    private static Task<List<string>> GetTagNames(IEnumerable<TagReference> tags, CancellationToken cancellationToken)
+    private async Task<List<DealCardDto>> GetDeals(string nodePath, CancellationToken cancellationToken)
     {
-        cancellationToken.ThrowIfCancellationRequested();
+        if (string.IsNullOrWhiteSpace(nodePath))
+        {
+            return new List<DealCardDto>();
+        }
 
-        var names = tags
-            .Select(tag => tag.ToString())
-            .Where(name => !string.IsNullOrWhiteSpace(name))
-            .Distinct()
+        var pages = await _contentRetriever.GetPagesAsync<DealCardCommon>(
+            new RetrievePagesParameters
+            {
+                LinkedItemsMaxLevel = 2,
+                PathMatch = PathMatch.Children(nodePath),
+            },
+            query => query.OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken);
+
+        if (pages == null)
+        {
+            return new List<DealCardDto>();
+        }
+
+        return pages
+            .Select(p => new DealCardDto
+            {
+                Name = p.Name,
+                CodeName = p.CodeName,
+                Language = p.Language,
+            })
             .ToList();
-
-        return Task.FromResult(names);
     }
 }
