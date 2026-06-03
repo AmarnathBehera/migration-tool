@@ -1,0 +1,215 @@
+# XbyK Web Publish and Release Pipeline
+# Builds, packages, and pushes GWTXbyKWeb to Octopus Deploy, then creates a release.
+
+name: XbyK Web Publish and Release
+
+# Trigger on main and Release/* branches
+trigger:
+  branches:
+    include:
+      - main
+      - development
+      - 'Release/*'
+
+variables:
+  buildConfiguration: 'Release'
+  dotnetVersion: '10.x'
+  publishOutput: '$(Build.ArtifactStagingDirectory)/publish'
+  octopusSpaceName: 'GWT'
+  octopusProjectName: 'XbyK Web'
+  octopusPackageOutput: '$(Build.ArtifactStagingDirectory)/packages'
+
+  # XbyK App Deploy packages
+  cmsAppProjectFile: '$(Build.SourcesDirectory)/BDO.GWT.GLOBAL/GWTXbyKWeb.csproj'
+  cmsAppPackageId: 'GWT.XbyK.CMS.Deploy'
+  mvcAppPackageId: 'GWT.XbyK.Mvc.Deploy'
+  # reactAppPackageId: 'GWT.XbyK.React.Deploy'
+  # synAppPackageId: 'GWT.XbyK.Sync.Deploy'
+  # apiAppPackageId: 'GWT.XbyK.API.Deploy'
+
+stages:
+  - stage: Build
+    displayName: Build
+    jobs:
+      - job: SetVersion
+        displayName: Set Release Version
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - checkout: self
+            fetchDepth: 0
+
+          - task: gitversion-setup@4
+            displayName: Install GitVersion
+            inputs:
+              versionSpec: "6.4.x"
+
+          - task: gitversion-execute@4
+            name: SetVersion
+            displayName: Run GitVersion
+
+          - script: |
+              echo "Derived FullSemVer: $(GitVersion_FullSemVer)"
+              newBuildNumber=$(echo "$(GitVersion_FullSemVer)" | sed 's/+/-/g')
+              echo "##vso[build.updatebuildnumber]$newBuildNumber"
+            displayName: Update build number
+
+          - bash: |
+              echo "##vso[task.setvariable variable=PreReleaseNumber;isOutput=true]$(GitVersion_PreReleaseNumber)"
+              echo "##vso[task.setvariable variable=FullSemVer;isOutput=true]$(GitVersion_FullSemVer)"
+              echo "##vso[task.setvariable variable=MajorMinorPatch;isOutput=true]$(GitVersion_MajorMinorPatch)"
+            name: SetGitVersionVars
+            displayName: Export GitVersion variables
+
+      - job: Build-cmsApp
+        condition: true
+        displayName: 'Build XbyK CMS App and package'
+        dependsOn: SetVersion
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Use .NET $(dotnetVersion)'
+            inputs:
+              packageType: 'sdk'
+              version: '$(dotnetVersion)'
+              installationPath: $(Agent.ToolsDirectory)/dotnet
+
+          - script: dotnet restore $(cmsAppProjectFile)
+            displayName: 'Restore NuGet packages'
+
+          - script: >
+              dotnet build $(cmsAppProjectFile)
+              --configuration $(buildConfiguration)
+              --no-restore
+            displayName: 'Build $(cmsAppProjectFile)'
+
+          - script: >
+              dotnet publish $(cmsAppProjectFile)
+              --configuration $(buildConfiguration)
+              --no-build
+              --output $(publishOutput)
+            displayName: 'Publish $(cmsAppProjectFile)'
+
+          - task: ArchiveFiles@2
+            displayName: 'Create deployment package'
+            inputs:
+              rootFolderOrFile: '$(publishOutput)'
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: '$(octopusPackageOutput)/$(cmsAppPackageId).$(Build.BuildNumber).zip'
+              replaceExistingArchive: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish package artifact'
+            inputs:
+              targetPath: '$(octopusPackageOutput)'
+              artifact: drop
+
+      - job: Build-mvcApp
+        condition: false
+        displayName: 'Build XbyK MVC App and package'
+        dependsOn: SetVersion
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Use .NET $(dotnetVersion)'
+            inputs:
+              packageType: 'sdk'
+              version: '$(dotnetVersion)'
+              installationPath: $(Agent.ToolsDirectory)/dotnet
+
+          - script: dotnet restore $(mvcAppProjectFile)
+            displayName: 'Restore NuGet packages'
+
+          - script: >
+              dotnet build $(mvcAppProjectFile)
+              --configuration $(buildConfiguration)
+              --no-restore
+            displayName: 'Build $(mvcAppProjectFile)'
+
+          - script: >
+              dotnet publish $(mvcAppProjectFile)
+              --configuration $(buildConfiguration)
+              --no-build
+              --output $(publishOutput)
+            displayName: 'Publish $(mvcAppProjectFile)'
+
+          - task: ArchiveFiles@2
+            displayName: 'Create deployment package'
+            inputs:
+              rootFolderOrFile: '$(publishOutput)'
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: '$(octopusPackageOutput)/$(mvcAppPackageId).$(Build.BuildNumber).zip'
+              replaceExistingArchive: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish package artifact'
+            inputs:
+              targetPath: '$(octopusPackageOutput)'
+              artifact: drop
+
+  - stage: Publish
+    displayName: Publish to Octopus
+    dependsOn: Build
+    variables:
+      GitVersion_PreReleaseNumber: $[ stageDependencies.Build.SetVersion.outputs['SetGitVersionVars.PreReleaseNumber'] ]
+      GitVersion_FullSemVer: $[ stageDependencies.Build.SetVersion.outputs['SetGitVersionVars.FullSemVer'] ]
+      GitVersion_MajorMinorPatch: $[ stageDependencies.Build.SetVersion.outputs['SetGitVersionVars.MajorMinorPatch'] ]
+    jobs:
+      - job: Publish
+        displayName: Publish to Octopus
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - download: current
+            artifact: drop
+
+          - task: OctopusPush@7
+            displayName: Push Packages to Octopus
+            inputs:
+              OctoConnectedServiceName: "Octopus Cloud"
+              Space: "$(octopusSpaceName)"
+              Packages: "$(Pipeline.Workspace)/drop/*.zip"
+              Replace: "true"
+
+          - task: OctopusBuildInformation@7
+            displayName: Push Package Build Information to Octopus
+            inputs:
+              OctoConnectedServiceName: "Octopus Cloud"
+              Space: "$(octopusSpaceName)"
+              PackageIds: |
+                $(cmsAppPackageId)
+              #  $(mvcAppPackageId)
+              PackageVersion: "$(Build.BuildNumber)"
+              Replace: OverwriteExisting
+
+          # Create release on 'Pre-Release' channel for main branch, and 'Stable' channel for Release/* branches
+          - task: OctopusCreateRelease@7
+            displayName: Create Octopus Release on Pre-Release Channel
+            condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/Release/')))
+            continueOnError: true
+            inputs:
+              OctoConnectedServiceName: "Octopus Cloud"
+              Space: "$(octopusSpaceName)"
+              Project: "$(octopusProjectName)"
+              ReleaseNumber: "$(Build.BuildNumber)"
+              Channel: "Pre-Release"
+              DefaultPackageVersion: "$(Build.BuildNumber)"
+              GitRef: "$(Build.SourceBranch)"
+              ReleaseNotes: "**Branch:** $(Build.SourceBranchName)<br>**Commit:** $(Build.SourceVersionMessage)<br>**Build Reason:** $(Build.Reason)<br>**Link:** $(Build.Repository.Uri)"
+
+          - task: OctopusCreateRelease@7
+            displayName: Create Octopus Release on Stable Channel
+            condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/Release/'))
+            inputs:
+              OctoConnectedServiceName: "Octopus Cloud"
+              Space: "$(octopusSpaceName)"
+              Project: "$(octopusProjectName)"
+              ReleaseNumber: "$(Build.BuildNumber)"
+              Channel: "Stable"
+              DefaultPackageVersion: "$(Build.BuildNumber)"
+              GitRef: "$(Build.SourceBranch)"
+              ReleaseNotes: "**Branch:** $(Build.SourceBranchName)<br>**Commit:** $(Build.SourceVersionMessage)<br>**Build Reason:** $(Build.Reason)<br>**Link:** $(Build.Repository.Uri)"
