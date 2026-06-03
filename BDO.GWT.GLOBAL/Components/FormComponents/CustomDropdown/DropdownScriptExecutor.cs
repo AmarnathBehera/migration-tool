@@ -7,52 +7,53 @@ using System.Threading.Tasks;
 namespace BDO.GWT.GLOBAL.Components.FormComponents.CustomDropdown
 {
     public class DropdownScriptExecutor
-{
-    public Task<IEnumerable<CustomDropdownOption>> ExecuteAsync(string sql)
     {
-        if (string.IsNullOrWhiteSpace(sql))
-            return Task.FromResult<IEnumerable<CustomDropdownOption>>([]);
-
-        var ds = ConnectionHelper.ExecuteQuery(sql, null, QueryTypeEnum.SQLQuery);
-
-        var results = new List<CustomDropdownOption>();
-
-        if (ds?.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+        public Task<IEnumerable<CustomDropdownOption>> ExecuteAsync(string sql)
         {
-            var table = ds.Tables[0];
-            var columns = table.Columns;
-            bool hasValueCol = columns.Contains("Value");
-            bool hasTextCol = columns.Contains("Text");
+            if (string.IsNullOrWhiteSpace(sql))
+                return Task.FromResult<IEnumerable<CustomDropdownOption>>([]);
 
-            foreach (DataRow row in table.Rows)
+            var ds = ConnectionHelper.ExecuteQuery(sql, null, QueryTypeEnum.SQLQuery);
+
+            var results = new List<CustomDropdownOption>();
+
+            if (ds?.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
-                string value;
-                string text;
+                var table = ds.Tables[0];
+                var columns = table.Columns;
+                bool hasValueCol = columns.Contains("Value");
+                bool hasTextCol = columns.Contains("Text");
 
-                if (hasValueCol && hasTextCol)
+                foreach (DataRow row in table.Rows)
                 {
-                    value = row["Value"]?.ToString() ?? "";
-                    text = row["Text"]?.ToString() ?? "";
-                }
-                else if (columns.Count >= 2)
-                {
-                    value = row[0]?.ToString() ?? "";
-                    text = row[1]?.ToString() ?? "";
-                }
-                else
-                {
-                    value = row[0]?.ToString() ?? "";
-                    text = value;
-                }
+                    string value;
+                    string text;
 
-                results.Add(new CustomDropdownOption
-                {
-                    Value = value,
-                    Text = text
-                });
+                    if (hasValueCol && hasTextCol)
+                    {
+                        value = row["Value"]?.ToString() ?? "";
+                        text = row["Text"]?.ToString() ?? "";
+                    }
+                    else if (columns.Count >= 2)
+                    {
+                        value = row[0]?.ToString() ?? "";
+                        text = row[1]?.ToString() ?? "";
+                    }
+                    else
+                    {
+                        value = row[0]?.ToString() ?? "";
+                        text = value;
+                    }
+
+                    results.Add(new CustomDropdownOption
+                    {
+                        Value = value,
+                        Text = text
+                    });
+                }
             }
-        }
 
-        return Task.FromResult<IEnumerable<CustomDropdownOption>>(results);
+            return Task.FromResult<IEnumerable<CustomDropdownOption>>(results);
+        }
     }
 }
