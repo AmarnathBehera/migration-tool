@@ -3,6 +3,7 @@ using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Web.Widgets.TabAccordionWidget;
+using CMS.ContentEngine;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
@@ -29,14 +30,54 @@ public class TabAccordionWidget : ViewComponent
     public async Task<IViewComponentResult> InvokeAsync(ComponentViewModel<TabAccordionWidgetProperties> model)
     {
         var cancellationToken = HttpContext.RequestAborted;
+        var guids = new List<System.Guid>();
 
-        List<System.Guid> guids = model.Properties.PageType switch
+
+        if (model?.Properties?.PageType == "Industry" && model.Properties.IndustryPages.Any())
         {
-            "Service" => model.Properties.ServicePages.Select(p => p.WebPageGuid).ToList(),
-            "Industry" => model.Properties.IndustryPages.Select(p => p.WebPageGuid).ToList(),
-            "Microsite" => model.Properties.MicrositePages.Select(p => p.WebPageGuid).ToList(),
-            _ => new List<System.Guid>()
-        };
+            var accordionPages = new List<TabAccordionDto>();
+
+             guids = model.Properties.IndustryPages
+            .Where(x => x.Identifier != Guid.Empty)
+            .Select(x => x.Identifier)
+            .ToList();
+
+            //if (guids == null || !guids.Any())
+            //    return new List<TabAccordionDto>();
+
+            var contentTypes = new[]
+            {
+                SectionIndustries.CONTENT_TYPE_NAME,
+                IndustryCategory.CONTENT_TYPE_NAME,
+                IndustryService.CONTENT_TYPE_NAME,
+                Industry.CONTENT_TYPE_NAME,
+                SectionServices.CONTENT_TYPE_NAME,
+                ServiceArea.CONTENT_TYPE_NAME,
+                Sub_Service.CONTENT_TYPE_NAME,
+                BusinessLine.CONTENT_TYPE_NAME,
+                Service.CONTENT_TYPE_NAME
+            };
+
+            var contentItems = await _contentRetriever
+                .RetrieveContentOfContentTypesByGuids<IContentItemFieldsSource>(
+                    contentTypes,
+                    guids,
+                    cancellationToken
+                );
+
+        }
+        else if (model?.Properties?.PageType == "Service" && model.Properties.ServicePages.Any())
+        {
+            guids = model.Properties.ServicePages
+                .Where(x => x.Identifier != Guid.Empty)
+                .Select(x => x.Identifier)
+                .ToList();
+
+            
+        }
+
+
+
 
         var data = new TabAccordionData
         {
@@ -48,7 +89,7 @@ public class TabAccordionWidget : ViewComponent
             WidgetID = model.Properties.WidgetID,
         };
 
-        var dto = await GetTabAccordionAsync(data, cancellationToken);
+       var dto = await GetTabAccordionAsync(data, cancellationToken);
 
         return View("~/Components/Widget/TabAccordionWidget/_TabAccordionWidget.cshtml", dto);
     }
@@ -70,14 +111,39 @@ public class TabAccordionWidget : ViewComponent
 
     private async Task<TabAccordionItemDto[]> GetTabAccordionItemDtosAsync(IEnumerable<Guid> pageGuids, CancellationToken cancellationToken)
     {
-        var pages = await _contentRetriever.RetrieveAllPagesByGuids<IWebPageFieldsSource>(
-            
-            pageGuids,cancellationToken);
+        var contentTypes = new[]
+            {
+                SectionIndustries.CONTENT_TYPE_NAME,
+                IndustryCategory.CONTENT_TYPE_NAME,
+                IndustryService.CONTENT_TYPE_NAME,
+                Industry.CONTENT_TYPE_NAME,
+                SectionServices.CONTENT_TYPE_NAME,
+                ServiceArea.CONTENT_TYPE_NAME,
+                Sub_Service.CONTENT_TYPE_NAME,
+                BusinessLine.CONTENT_TYPE_NAME,
+                Service.CONTENT_TYPE_NAME
+            };
 
-        return pages.Select(p => new TabAccordionItemDto
+        var contentItems = await _contentRetriever
+            .RetrieveContentOfContentTypesByGuids<IContentItemFieldsSource>(
+                contentTypes,
+                pageGuids,
+                cancellationToken
+            );
+
+
+        return contentItems.Select(p => new TabAccordionItemDto
         {
-            Title = p.SystemFields.ContentItemName,
-            Content = p.SystemFields.WebPageItemTreePath
+            Title = p.GetType()
+                                .GetProperty("MetadataTitle")
+                                ?.GetValue(p)
+                                ?.ToString()
+                            ?? p.SystemFields.ContentItemName,
+            Content = p.GetType()
+                                .GetProperty("MetadataDescription")
+                                ?.GetValue(p)
+                                ?.ToString()
+                            ?? p.SystemFields.ContentItemName
         }).ToArray();
     }
 }

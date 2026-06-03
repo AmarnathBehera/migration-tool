@@ -22,17 +22,17 @@ public class TabAccordionWidgetProperties : BaseWidgetProperties
     [DropDownComponent(Label = "Page type", ExplanationText = "Type of pages which will be shown as tabs or accordion items.", Order = 2, Options = "Industry\r\nService\r\nMicrosite")]
     public string PageType { get; set; } = "Industry";
 
-    [WebPageSelectorComponent(TreePath = "/services", MaximumPages = 0,Order =3)]
+    [ContentItemSelectorComponent(contentTypeName:Service.CONTENT_TYPE_NAME, Order =3, Label = "Tab / accordion items", ExplanationText = "For tab layout recommendation is to have maximum 4 items as it works best from responsiveness perspective.")]
     [VisibleIfEqualTo(nameof(PageType),"Service")]
-    public IEnumerable<WebPageRelatedItem> ServicePages { get; set; } = new List<WebPageRelatedItem>();
+    public IEnumerable<ContentItemReference> ServicePages { get; set; } = new List<ContentItemReference>();
 
-    [WebPageSelectorComponent(TreePath = "/industry", MaximumPages = 0,Order =3)]
+    [ContentItemSelectorComponent(contentTypeName: Industry.CONTENT_TYPE_NAME, Order =3, Label = "Tab / accordion items", ExplanationText = "For tab layout recommendation is to have maximum 4 items as it works best from responsiveness perspective.")]
     [VisibleIfEqualTo(nameof(PageType), "Industry")]
-    public IEnumerable<WebPageRelatedItem> IndustryPages { get; set; } = new List<WebPageRelatedItem>();
+    public IEnumerable<ContentItemReference> IndustryPages { get; set; } = new List<ContentItemReference>();
 
-    [WebPageSelectorComponent(TreePath = "/microsites", MaximumPages = 0, Order = 3)]
-    [VisibleIfEqualTo(nameof(PageType), "Microsite")]
-    public IEnumerable<WebPageRelatedItem> MicrositePages { get; set; } = new List<WebPageRelatedItem>();
+    //[ContentItemSelectorComponent(contentTypeName: "Microsites", Order = 3, Label = "Tab / accordion items", ExplanationText = "For tab layout recommendation is to have maximum 4 items as it works best from responsiveness perspective.")]
+    //[VisibleIfEqualTo(nameof(PageType), "Microsite")]
+    public IEnumerable<ContentItemReference> MicrositePages { get; set; } = new List<ContentItemReference>();
 
 
     [DropDownComponent(Label = "Top margin", Order = 4, Options = "0px;None\r\n20px\r\n40px\r\n60px\r\n80px")]
