@@ -19,8 +19,9 @@ namespace GWTXbyKWeb.Controllers
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
             var pageDto = await _businessLinePageService.GetBusinessLinePageDtoAsync(cancellationToken);
+            var schemaMarkupDto = await _businessLinePageService.GetServicesPrimarySchemaMarkupDto(pageDto, cancellationToken);
 
-            return View("~/Views/BusinessLine/Index.cshtml", pageDto);
+            return View("~/Views/BusinessLine/Index.cshtml", (pageDto, schemaMarkupDto));
         }
     }
 }

@@ -257,6 +257,9 @@ afterCountry;After country
       <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
         <properties />
       </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
     </form>
   </ClassFormDefinition>
   <ClassGUID>28595e58-3d13-4414-8f96-8a31285037fe</ClassGUID>

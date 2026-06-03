@@ -15,7 +15,7 @@ public class PersonPageServiceTests
     private Mock<IHttpClientFactory> _httpClientFactoryMock = null!;
     private Mock<IContentService> _contentServiceMock = null!;
     private Mock<ICultureContext> _cultureContextMock = null!;
-    private Mock<ITaxonomyTagRetriever> _taxonomyTagRetrieverMock = null!;
+    private Mock<ISettingService> _settingServiceMock = null!;
     private PersonPageService _service = null!;
 
     [SetUp]
@@ -24,7 +24,7 @@ public class PersonPageServiceTests
         _httpClientFactoryMock = new Mock<IHttpClientFactory>();
         _contentServiceMock = new Mock<IContentService>();
         _cultureContextMock = new Mock<ICultureContext>();
-        _taxonomyTagRetrieverMock = new Mock<ITaxonomyTagRetriever>();
+        _settingServiceMock = new Mock<ISettingService>();
 
         _cultureContextMock.Setup(c => c.CurrentLanguageTag).Returns("en");
 
@@ -32,7 +32,8 @@ public class PersonPageServiceTests
             _httpClientFactoryMock.Object,
             _contentServiceMock.Object,
             _cultureContextMock.Object,
-            _taxonomyTagRetrieverMock.Object);
+            _settingServiceMock.Object
+          );
     }
 
     [Test]
@@ -53,16 +54,13 @@ public class PersonPageServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<SectionPeoplePage>());
 
-        _taxonomyTagRetrieverMock
-            .Setup(t => t.GetTaxonomyTagByGUIDs(It.IsAny<IEnumerable<TagReference>>(), "en"))
-            .ReturnsAsync(Enumerable.Empty<Tag>());
-
         _contentServiceMock
-            .Setup(s => s.RetrievePagesAsync<LocationOffice>(
+            .Setup(s => s.GetPagesAsync<LocationOffice>(
                 It.IsAny<RetrievePagesParameters>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<LocationOffice?>());
+            .ReturnsAsync(Enumerable.Empty<LocationOffice>());
 
         var result = await _service.GetPersonPageDtoAsync(person, CancellationToken.None);
 
@@ -92,16 +90,13 @@ public class PersonPageServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<SectionPeoplePage> { sectionPage });
 
-        _taxonomyTagRetrieverMock
-            .Setup(t => t.GetTaxonomyTagByGUIDs(It.IsAny<IEnumerable<TagReference>>(), "en"))
-            .ReturnsAsync(Enumerable.Empty<Tag>());
-
         _contentServiceMock
-            .Setup(s => s.RetrievePagesAsync<LocationOffice>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<LocationOffice?>());
+                .Setup(x => x.GetPagesAsync<LocationOffice>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync((IEnumerable<LocationOffice>)null!);
 
         var result = await _service.GetPersonPageDtoAsync(person, CancellationToken.None);
 

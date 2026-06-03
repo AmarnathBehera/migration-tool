@@ -9,7 +9,7 @@
       <UseNameHashtable>False</UseNameHashtable>
     </Data>
   </ClassCodeGenerationSettings>
-  <ClassDisplayName>Global Include Custom Scripts </ClassDisplayName>
+  <ClassDisplayName>Global settings key</ClassDisplayName>
   <ClassFormDefinition>
     <form>
       <field column="GlobalsettingskeyID" columntype="integer" enabled="true" guid="a8a1abc8-0b73-46fe-84dc-3a7a8a17404f" isPK="true" />

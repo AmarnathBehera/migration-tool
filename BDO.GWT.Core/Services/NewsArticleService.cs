@@ -9,8 +9,9 @@ using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 
 namespace BDO.GWT.Core.Services;
-public interface INewsArticleService{   
-    Task<ContentPageDto> GetContentPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken);
+public interface INewsArticleService
+{
+    Task<SectionNewsPageDto> GetSectionNewsPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken);
     Task<ContentSidebarDto> GetContentPageSidebarDto(NewsArticle contentPage, CancellationToken cancellationToken);
 }
 public class NewsArticleService : INewsArticleService
@@ -18,25 +19,19 @@ public class NewsArticleService : INewsArticleService
     private readonly ISidebarService _sidebarService;
     private readonly IContentService _contentService;
     private readonly IExternalPeopleHelper _externalPeopleHelper;
-    private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
-    private readonly ICultureContext _cultureContext;
-
     public NewsArticleService(
         ISidebarService sidebarService,
         IContentService contentService,
-        IExternalPeopleHelper externalPeopleHelper,
-        ITaxonomyTagRetriever taxonomyTagRetriever,
-        ICultureContext cultureContext)
+        IExternalPeopleHelper externalPeopleHelper)
     {
         _sidebarService = sidebarService;
         _contentService = contentService;
         _externalPeopleHelper = externalPeopleHelper;
-        _taxonomyTagRetriever = taxonomyTagRetriever;
-        _cultureContext = cultureContext;
+    
     }
-    public async Task<ContentPageDto> GetContentPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken)
+    public async Task<SectionNewsPageDto> GetSectionNewsPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken)
     {
-        var dto = new ContentPageDto
+        var dto = new SectionNewsPageDto
         {
             Title = contentPage.ShowTitle ? contentPage.MetadataTitle : null,
             Description = contentPage.ShowDescription
@@ -57,17 +52,14 @@ public class NewsArticleService : INewsArticleService
     {
         var sidebarDto = await _sidebarService.GetSidebarDtoAsync(contentPage, cancellationToken);
 
-        var tags = await _taxonomyTagRetriever.GetTaxonomyTagByGUIDs(contentPage.ContentType, _cultureContext.CurrentLanguageTag);
-        var type = tags?.FirstOrDefault()?.Title;
-
         sidebarDto.ShowCopyLinkButton = await GetShowCopyLinkOptionFromSectionPageAsync(contentPage, sidebarDto.ShowCopyLinkButton, cancellationToken);
-        sidebarDto.TypeName = type;
+        sidebarDto.TypeName = contentPage.ContentType?.FirstOrDefault()?.Name;
         sidebarDto.PublishDate = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen ?? contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen;
         sidebarDto.UpdatedDate = contentPage.UpdatedOn == DateTime.MinValue ? null : contentPage.UpdatedOn;
         sidebarDto.RelevantContactPeopleTitle = ResourceStringKey.LiveSite.Insights.Authors;
         sidebarDto.RelevantContactPeople = await GetContentPageAuthorDtos(contentPage, cancellationToken);
         sidebarDto.RelatedExternalPeople = await _externalPeopleHelper.GetSidebarExternalPeopleDtosAsync(
-            contentPage.RelatedExternalPeople.Select(p => p.SystemFields.ContentItemGUID).ToList(), 
+            contentPage.RelatedExternalPeople.Select(p => p.SystemFields.ContentItemGUID).ToList(),
             cancellationToken);
 
         return sidebarDto;
@@ -77,8 +69,8 @@ public class NewsArticleService : INewsArticleService
         var relevantPersonGuids = contentPage.RelevantContactPerson.Select(p => p.SystemFields.ContentItemGUID).ToList();
 
         var people = (await _contentService.GetPagesAsync<Person>(
-           new RetrievePagesParameters { LinkedItemsMaxLevel =2},
-           query => query   
+           new RetrievePagesParameters { LinkedItemsMaxLevel = 2 },
+           query => query
                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
                .Where(w => w.WhereIn("ContentItemGUID", relevantPersonGuids)),
            RetrievalCacheSettings.CacheDisabled,
@@ -116,19 +108,11 @@ public class NewsArticleService : INewsArticleService
                 Image = PageHelper.GetImageDto(internalPerson.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset.Url, internalPerson.ImageFileAltText),
                 FullName = GetInternalPersonDisplayName(internalPerson),
                 JobTitle = internalPerson.JobTitle,
-                Url = internalPerson.GetUrl().RelativePath,
+                Url = _contentService.EnsureAbsoluteUrl(internalPerson.Url)
             };
         }
-        var dtos = new List<SidebarPersonDto>();
-        foreach (var guid in relevantPersonGuids)
-        {
-            if (dtsByGuid.TryGetValue(guid, out var dto))
-            {
-                dtos.Add(dto);
-            }
-        }
-
-        return dtos.ToArray();
+        return relevantPersonGuids.Select(guid => dtsByGuid.TryGetValue(guid, out var dto) ? dto : null)
+                                  .OfType<SidebarPersonDto>().ToArray();
     }
 
     private static string GetPersonDisplayName(Person person)

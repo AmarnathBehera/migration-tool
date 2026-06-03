@@ -24,7 +24,7 @@
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
-      <field column="DescriptionBody" columnprecision="0" columntype="longtext" enabled="true" guid="edd04f8d-30b1-4574-9209-bb2c9f8f80cd" visible="true">
+      <field column="DescriptionBody" columnprecision="0" columntype="richtexthtml" enabled="true" guid="edd04f8d-30b1-4574-9209-bb2c9f8f80cd" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Body content</fieldcaption>
@@ -104,6 +104,9 @@ embedCode;Embed Code
         <properties />
       </schema>
       <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
         <properties />
       </schema>
     </form>

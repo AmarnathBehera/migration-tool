@@ -124,6 +124,47 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     ContentTypeNames = new[] { "BDO.LocationCity" },
     IconClass = "xp-market")]
 
+
+[assembly: RegisterWebPageRoute(SectionCareers.CONTENT_TYPE_NAME, typeof(CareerController))]
+[assembly: RegisterPageTemplate(
+    identifier: SectionCareers.CONTENT_TYPE_NAME,
+    name: "Section Career Page Content Type Template",
+    customViewName: "~/Views/Career/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SectionCareers" },
+    IconClass = "xp-l-grid-2-2")]
+
+[assembly: RegisterWebPageRoute(Careers.CONTENT_TYPE_NAME, typeof(CareersController))]
+[assembly: RegisterPageTemplate(
+    identifier: Careers.CONTENT_TYPE_NAME,
+    name: "Careers Page Content Type Template",
+    customViewName: "~/Views/Careers/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.Careers" },
+    IconClass = "xp-l-grid-2-2")]
+
+[assembly: RegisterWebPageRoute(Career.CONTENT_TYPE_NAME, typeof(CareerDetailController))]
+[assembly: RegisterPageTemplate(
+    identifier: Career.CONTENT_TYPE_NAME,
+    name: "Career Page Content Type Template",
+    customViewName: "~/Views/CareerDetail/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.Career" },
+    IconClass = "xp-l-grid-2-2")]
+
+[assembly: RegisterWebPageRoute(CareerCategory.CONTENT_TYPE_NAME, typeof(CareerCategoryController))]
+[assembly: RegisterPageTemplate(
+    identifier: CareerCategory.CONTENT_TYPE_NAME,
+    name: "Career Page Content Type Template",
+    customViewName: "~/Views/CareerDetail/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.CareerCategory" },
+    IconClass = "xp-l-grid-2-2")]
+
+[assembly: RegisterWebPageRoute(CareerContent.CONTENT_TYPE_NAME, typeof(CareerContentController))]
+[assembly: RegisterPageTemplate(
+    identifier: CareerContent.CONTENT_TYPE_NAME,
+    name: "Career Content Page Content Type Template",
+    customViewName: "~/Views/CareerContent/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.CareerContent" },
+    IconClass = "xp-l-grid-2-2")]
+
 [assembly: RegisterWebPageRoute(SectionNews.CONTENT_TYPE_NAME, typeof(NewsSectionController))]
 
 [assembly: RegisterPageTemplate(
@@ -147,6 +188,81 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 [assembly: RegisterPageTemplate(
     identifier: NewsArticle.CONTENT_TYPE_NAME,
     name: "News Article Content Type Template",
-    customViewName: "~/Views/ContentPage/Index.cshtml",
+    customViewName: "~/Views/NewsArticle/Index.cshtml",
     ContentTypeNames = new[] { "BDO.NewsArticle" },
     IconClass = "xp-market")]
+
+
+[assembly: RegisterWebPageRoute(SpecialtiesPage.CONTENT_TYPE_NAME, typeof(SpecialtiesPageController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: SpecialtiesPage.CONTENT_TYPE_NAME,
+    name: "Specialties Page  Content Type Template",
+    customViewName: "~/Views/SpecialtiesPage/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SpecialtiesPage" },
+    IconClass = "xp-rectangle-a")]
+
+[assembly: RegisterWebPageRoute(SpecialtiesArea.CONTENT_TYPE_NAME, typeof(SpecialtiesAreaController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: SpecialtiesArea.CONTENT_TYPE_NAME,
+    name: "Specialties Area  Content Type Template",
+    customViewName: "~/Views/SpecialtiesArea/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SpecialtiesArea" },
+    IconClass = "xp-doc")]
+
+
+[assembly: RegisterWebPageRoute(SpecialtiesCategory.CONTENT_TYPE_NAME, typeof(SpecialtiesCategoryController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: SpecialtiesCategory.CONTENT_TYPE_NAME,
+    name: "Specialties Category  Content Type Template",
+    customViewName: "~/Views/SpecialtiesCategory/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SpecialtiesCategory" },
+    IconClass = "xp-doc")]
+
+[assembly: RegisterWebPageRoute(SectionSpecialties.CONTENT_TYPE_NAME, typeof(SectionSpecialtiesController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: SectionSpecialties.CONTENT_TYPE_NAME,
+    name: "Section Specialties Content Type Template",
+    customViewName: "~/Views/SectionSpecialties/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SectionSpecialties" },
+    IconClass = "xp-doc")]
+  
+
+[assembly: RegisterPageTemplate(
+    identifier: SectionEvents.CONTENT_TYPE_NAME,
+    name: "Section Events Content Type Template",
+    customViewName: "~/Views/SectionEvent/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SectionEvents" },
+    IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(SectionEvents.CONTENT_TYPE_NAME, typeof(SectionEventsController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: EventRegistrationForm.CONTENT_TYPE_NAME,
+    name: "Events Registration form Content Type Template",
+    customViewName: "~/Views/FormPage/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.EventRegistrationForm" },
+    IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(EventRegistrationForm.CONTENT_TYPE_NAME, typeof(EventRegistrationFormController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: Event.CONTENT_TYPE_NAME,
+    name: "Events  Content Type Template",
+    customViewName: "~/Views/EventWebinar/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.Event" },
+    IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(Event.CONTENT_TYPE_NAME, typeof(EventController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: Webinar.CONTENT_TYPE_NAME,
+    name: "Webinar  Content Type Template",
+    customViewName: "~/Views/EventWebinar/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.Webinar" },
+    IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(Webinar.CONTENT_TYPE_NAME, typeof(WebinarController))]

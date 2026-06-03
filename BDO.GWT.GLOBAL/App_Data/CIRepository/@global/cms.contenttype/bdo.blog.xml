@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Blog</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="077d3aeb-88c8-4a7c-a9f9-90bb79b4995e" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="b9fb40df-2a5c-4730-9c10-dd1cfbd87d11" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="8692b1fb-cefc-4bb0-8c8a-0b797705da1f" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
+      <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
+        <properties />
+      </schema>
+      <schema guid="f652f54b-8be8-4f2c-9e40-7dd3ab5dd149" name="f652f54b-8be8-4f2c-9e40-7dd3ab5dd149">
+        <properties />
+      </schema>
+      <field column="BlogPostListFilters" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="a1fe3dc3-4c9c-4448-9300-47f5766e8546" visible="true">
+        <properties>
+          <defaultvalue>
+            <![CDATA[person;businessIssue;businessLine;IndustryCategory;keywords]]>
+          </defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Filters</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>
+            <![CDATA[XperienceCommunity.Multichoiceformcontrol.MultiChoice]]>
+          </controlname>
+          <Options>
+<![CDATA[
+person;Author (Person)
+businessIssue;Topic (Business Issue)
+businessLine;Service (Business Line)
+serviceArea;Service Area
+industryCategory;Industry (Industry Category)
+keywords;Keywords
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+      </field>
+      <field allowempty="true" column="BlogPostListFeaturedItems" columnprecision="0" columntype="webpages" enabled="true" guid="1b72cf8d-d1e8-4963-9b77-e294b93e73ca" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Featured blogs posts</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.WebPageSelector</controlname>
+          <MaximumPages>1</MaximumPages>
+          <Sortable>False</Sortable>
+          <TreePath>/Blogs</TreePath>
+        </settings>
+      </field>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>b6a2aff8-7c0d-446a-be33-221a26bcac37</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.Blog</ClassName>
+  <ClassShortName>BDOBlog</ClassShortName>
+  <ClassTableName>BDO_Blog</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>

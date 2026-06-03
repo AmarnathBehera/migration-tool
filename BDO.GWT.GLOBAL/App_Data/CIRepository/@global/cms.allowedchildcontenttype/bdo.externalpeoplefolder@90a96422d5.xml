@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.ExternalPeopleFolder</CodeName>
+    <GUID>69ffeeaa-0106-48e5-a4af-be449452f7f0</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.ExternalPerson">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.ExternalPerson</CodeName>
+        <GUID>d62bd1c1-a3bf-4a66-a3f6-431f4f534317</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

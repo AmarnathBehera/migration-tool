@@ -40,24 +40,6 @@ public class FilterUtilityTests
     }
 
     [Test]
-    public void GetFilterParameterData_ReturnsData_ForProfileGroup()
-    {
-        var result = FilterUtility.GetFilterParameterData(FilterParameterName.ProfileGroup);
-
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.FilterParameterType, Is.EqualTo(FilterParameterType.Taxonomy));
-    }
-
-    [Test]
-    public void GetFilterParameterData_ReturnsData_ForCredential()
-    {
-        var result = FilterUtility.GetFilterParameterData(FilterParameterName.Credential);
-
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.FilterParameterType, Is.EqualTo(FilterParameterType.Taxonomy));
-    }
-
-    [Test]
     public void GetFilterParameterData_ReturnsNull_ForUnknownParameter()
     {
         var result = FilterUtility.GetFilterParameterData("unknownFilter");

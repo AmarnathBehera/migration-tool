@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName> BDO Metadata</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="f612922e-04f1-4e57-a2a4-4d5774bc661b" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="cd55c5ab-a7a4-4b0a-b382-c0c902da88bd" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="c923f29b-712f-4f16-bfc0-467d09c79ca9" isunique="true" system="true" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>2c656492-e8d0-4305-a99a-d49e17573637</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-crosshair-o</ClassIconClass>
+  <ClassName>BDO.BDOMetadata</ClassName>
+  <ClassShortName>BDOBDOMetadata</ClassShortName>
+  <ClassTableName>BDO_BDOMetadata</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>

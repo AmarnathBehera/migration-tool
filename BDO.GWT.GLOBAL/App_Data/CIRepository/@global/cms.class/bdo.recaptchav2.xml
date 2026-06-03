@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>reCAPTCHA v2</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ReCAPTCHAv2ID" columntype="integer" enabled="true" guid="55f1d807-0857-4374-a663-b2883c87dc9e" isPK="true" />
+      <field column="Sitekey" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="3177bdf0-30ae-467b-aa42-832239d62202" />
+      <field column="Secretkey" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="a1e84a49-e893-4ee2-a9f5-41039def78b7" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>868e6b67-d433-43b8-b5af-d4d592ce8357</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.reCAPTCHAv2</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_reCAPTCHAv2</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

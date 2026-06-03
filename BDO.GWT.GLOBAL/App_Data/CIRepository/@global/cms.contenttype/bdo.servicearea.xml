@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Service Area</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="619d782f-b900-4f29-8b1d-354bbc871276" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="4085f3ac-534e-4040-92de-7a0daa514dac" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="8d53c3a0-6c4b-457e-8195-c839db947df0" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
+        <properties />
+      </schema>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+      <field allowempty="true" column="TileIcon" columnprecision="0" columntype="contentitemreference" enabled="true" guid="09cbee15-267c-4aa6-8d25-248bce600a1f" visible="true">
+        <properties>
+          <explanationtext>
+            <![CDATA[SVG icon that will be used when showing page tile in Tiled link section. The whole icon should be black (r: 0, g: 0, b: 0).]]>
+          </explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Tile Icon</fieldcaption>
+          <fielddescription>
+            <![CDATA[SVG icon that will be used when showing page tile in Tiled link section. The whole icon should be black (r: 0, g: 0, b: 0).]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["82c5aa19-dd00-4e41-aeda-e2c1166a933e"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field column="ContentTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="09b84223-a1e7-4b3f-be3c-43518e4a7fc2" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field column="ContentBody" columnprecision="0" columntype="richtexthtml" enabled="true" guid="b4cdaa06-af9c-408b-94aa-6a410998eeff" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Content</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <ConfigurationName>Kentico.Administration.WebsitesStructuredContent</ConfigurationName>
+          <controlname>Kentico.Administration.RichTextEditor</controlname>
+        </settings>
+      </field>
+      <field column="ShowSideNavigation" columnprecision="0" columntype="boolean" enabled="true" guid="0d4d1df8-8e61-4fbd-945a-173a4a3ee016" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show side navigation</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="SideNavigationTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="4d200e6e-57f4-4785-b8e1-29ae63e2ad08" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowSideNavigation</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>62753fae-0b4b-4b11-9497-a975271396e4</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-doc</ClassIconClass>
+  <ClassName>BDO.ServiceArea</ClassName>
+  <ClassShortName>BDOServiceArea</ClassShortName>
+  <ClassTableName>BDO_ServiceArea</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>

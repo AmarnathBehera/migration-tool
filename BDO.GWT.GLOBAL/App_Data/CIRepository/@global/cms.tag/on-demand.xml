@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.tag>
+  <TagGUID>5e8fa124-1e79-49f5-855d-14c6227765f3</TagGUID>
+  <TagMetadata>
+    <![CDATA[{"Translations":{"8517e6d4-6f93-4003-9e15-e30e302d68e9":{"Title":null,"Description":null},"ee380e62-f7ff-416a-88c1-646fe247d5f3":{"Title":null,"Description":null}}}]]>
+  </TagMetadata>
+  <TagName>On-Demand</TagName>
+  <TagOrder>3</TagOrder>
+  <TagTaxonomyID>
+    <CodeName>EventType</CodeName>
+    <GUID>50570ff7-a48b-40ee-b41e-6e59ca9c1979</GUID>
+    <ObjectType>cms.taxonomy</ObjectType>
+  </TagTaxonomyID>
+  <TagTitle>On-Demand</TagTitle>
+</cms.tag>

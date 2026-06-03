@@ -27,7 +27,7 @@ namespace BDO
         /// Type information.
         /// </summary>
 #warning "You will need to configure the type info."
-        public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(IInfoProvider<GeneralSettingInfo>), OBJECT_TYPE, "BDO.GeneralSetting", "GeneralID", null, null, "CodeName", null, null, null, null)
+        public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(IInfoProvider<GeneralSettingInfo>), OBJECT_TYPE, "BDO.GeneralSetting", "GeneralID", null, null, "CodeName", "CodeName", null, null, null)
         {
             TouchCacheDependencies = true,
             DependsOn = new List<ObjectDependency>()
@@ -55,7 +55,7 @@ namespace BDO
         public virtual string NonASCIItoASCIIcharacterdictionary
         {
             get => ValidationHelper.GetString(GetValue(nameof(NonASCIItoASCIIcharacterdictionary)), String.Empty);
-            set => SetValue(nameof(NonASCIItoASCIIcharacterdictionary), value);
+            set => SetValue(nameof(NonASCIItoASCIIcharacterdictionary), value, String.Empty);
         }
 
 

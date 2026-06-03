@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Release information</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ReleaseinformationID" columntype="integer" enabled="true" guid="816d98c0-abc5-4da6-92ab-35b5a0ad4dc8" isPK="true" />
+      <field column="maintenancemode" columnprecision="0" columntype="boolean" enabled="true" guid="3da46b9c-0e19-4700-98ad-bdfc77ad6627" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>7299ebc6-8b5e-4498-8514-e217c27f0a4e</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.Releaseinformation</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_Releaseinformation</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

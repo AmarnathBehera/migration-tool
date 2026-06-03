@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.Blog</CodeName>
+    <GUID>b6a2aff8-7c0d-446a-be33-221a26bcac37</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.BlogContributors">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.BlogContributors</CodeName>
+        <GUID>10cf0436-9df3-42cf-9f9e-668addcc802b</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.BlogPostGroup">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.BlogPostGroup</CodeName>
+        <GUID>a07289a5-97f3-4d01-95f1-d5409908098b</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.Contact">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.Contact</CodeName>
+        <GUID>74635906-cb04-4ffd-9936-9dcde92c7f58</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

@@ -1,7 +1,5 @@
 ﻿using BDO.GWT.Common.Exceptions;
 using BDO.GWT.Core.DTOs;
-using BDO.GWT.Core.ValueObjects;
-using System.Text;
 
 namespace BDO.GWT.Core.Helpers;
 
@@ -39,20 +37,5 @@ public static class PageHelper
         };
 
         return dto;
-    }
-
-    public static List<string> GetParentPagesNodeAliasPaths(string nodeAliasPath)
-    {
-        var parentPaths = new List<string>();
-        var currentPath = new StringBuilder();
-
-        foreach (var part in nodeAliasPath.Split('/').Skip(1))
-        {
-            currentPath.Append('/');
-            currentPath.Append(part);
-            parentPaths.Add(currentPath.ToString());
-        }
-
-        return parentPaths;
     }
 }

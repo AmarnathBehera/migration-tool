@@ -30,8 +30,8 @@ public class PeopleCardsServiceTests
     {
         _cardsServiceMock = new Mock<ICardsService>();
         _contentServiceMock = new Mock<IContentService>();
-        _taxonomyTagRetrieverMock = new Mock<ITaxonomyTagRetriever>();
         _cultureContextMock = new Mock<ICultureContext>();
+        _taxonomyTagRetrieverMock = new Mock<ITaxonomyTagRetriever>();
         _settingServiceMock = new Mock<ISettingService>();
         _urlHelperFactoryMock = new Mock<IUrlHelperFactory>();
         _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
@@ -44,8 +44,6 @@ public class PeopleCardsServiceTests
         _service = new PeopleCardsService(
             _cardsServiceMock.Object,
             _contentServiceMock.Object,
-            _taxonomyTagRetrieverMock.Object,
-            _cultureContextMock.Object,
             _settingServiceMock.Object,
             _urlHelperFactoryMock.Object,
             _httpContextAccessorMock.Object);
@@ -89,14 +87,15 @@ public class PeopleCardsServiceTests
             .Returns(1);
 
         _contentServiceMock
-            .Setup(s => s.RetrievePagesAsync<Person>(
+            .Setup(s => s.GetPagesAsync<Person>(
                 It.IsAny<RetrievePagesParameters>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<Person?>());
+            .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
-            page, query, null, _ => false, CancellationToken.None);
+            page, "en", query, null, _ => false, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -114,14 +113,15 @@ public class PeopleCardsServiceTests
         _contentServiceMock.Setup(s => s.GetCurrentChannelID()).Returns(1);
 
         _contentServiceMock
-            .Setup(s => s.RetrievePagesAsync<Person>(
+            .Setup(s => s.GetPagesAsync<Person>(
                 It.IsAny<RetrievePagesParameters>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<Person?>());
+            .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
-            page, query, null, _ => false, CancellationToken.None);
+            page, "en", query, null, _ => false, CancellationToken.None);
 
         Assert.That(result.Data, Is.Empty);
     }
@@ -135,14 +135,15 @@ public class PeopleCardsServiceTests
         _contentServiceMock.Setup(s => s.GetCurrentChannelID()).Returns(1);
 
         _contentServiceMock
-            .Setup(s => s.RetrievePagesAsync<Person>(
+            .Setup(s => s.GetPagesAsync<Person>(
                 It.IsAny<RetrievePagesParameters>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<Person?>());
+            .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
-            page, query, null, _ => false, CancellationToken.None);
+            page, "en", query, null, _ => false, CancellationToken.None);
 
         Assert.That(result.Data, Is.Empty);
     }
@@ -173,14 +174,15 @@ public class PeopleCardsServiceTests
             .ReturnsAsync(mockPage.Object);
 
         _contentServiceMock
-            .Setup(s => s.RetrievePagesAsync<Person>(
+            .Setup(s => s.GetPagesAsync<Person>(
                 It.IsAny<RetrievePagesParameters>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<Person?>());
+            .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
-            page, query, null, _ => false, CancellationToken.None);
+            page, "en", query, null, _ => false, CancellationToken.None);
 
         Assert.That(result.TotalCount, Is.EqualTo(0));
     }
@@ -201,14 +203,15 @@ public class PeopleCardsServiceTests
         _contentServiceMock.Setup(s => s.GetCurrentChannelID()).Returns(1);
 
         _contentServiceMock
-            .Setup(s => s.RetrievePagesAsync<Person>(
+            .Setup(s => s.GetPagesAsync<Person>(
                 It.IsAny<RetrievePagesParameters>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<Person?>());
+            .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
-            page, query, null, _ => false, CancellationToken.None);
+            page, "en", query, null, _ => false, CancellationToken.None);
 
         Assert.That(result.TotalCount, Is.EqualTo(0));
     }
@@ -233,14 +236,15 @@ public class PeopleCardsServiceTests
             .ReturnsAsync((IWebPageFieldsSource?)null);
 
         _contentServiceMock
-            .Setup(s => s.RetrievePagesAsync<Person>(
+            .Setup(s => s.GetPagesAsync<Person>(
                 It.IsAny<RetrievePagesParameters>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<Person?>());
+            .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
-            page, query, null, _ => false, CancellationToken.None);
+            page, "en", query, null, _ => false, CancellationToken.None);
 
         // Filter was skipped, query still executes
         Assert.That(result.TotalCount, Is.EqualTo(0));
@@ -266,14 +270,15 @@ public class PeopleCardsServiceTests
             .ReturnsAsync((TagInfo?)null);
 
         _contentServiceMock
-            .Setup(s => s.RetrievePagesAsync<Person>(
+            .Setup(s => s.GetPagesAsync<Person>(
                 It.IsAny<RetrievePagesParameters>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<Person?>());
+            .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
-            page, query, null, _ => false, CancellationToken.None);
+            page, "en", query, null, _ => false, CancellationToken.None);
 
         Assert.That(result.TotalCount, Is.EqualTo(0));
     }

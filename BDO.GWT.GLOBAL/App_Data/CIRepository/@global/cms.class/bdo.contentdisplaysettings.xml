@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>ContentDisplaySettings</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentDisplaySettingsID" columntype="integer" enabled="true" guid="55ced3fe-19f9-48ae-8c5c-9b283edd141a" isPK="true" />
+      <field column="Underlinelinks" columnprecision="0" columntype="boolean" enabled="true" guid="15d7decd-9d46-45c0-860f-5c5a6d8391c2" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>c515b87a-b277-4691-b7ef-288727112ef6</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.ContentDisplaySettings</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_ContentDisplaySettings</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

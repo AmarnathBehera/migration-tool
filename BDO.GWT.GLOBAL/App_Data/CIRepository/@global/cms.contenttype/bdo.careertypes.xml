@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Career Types</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="a98b8c35-3ce8-4ea9-ac70-28ba114bedc5" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="c0346341-0e25-42af-b298-6c61efe1dd0b" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="7f49da45-4b12-49b8-9532-d53dacda15d3" isunique="true" system="true" />
+      <field column="Name" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="d50987e1-aa20-4934-8977-36899f2fae5a" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Name</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field column="CodeName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="a8cb6dfe-bd09-4ce5-aa79-6c65cd26720b" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Code name</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>4aba2ed0-1be1-448f-840e-ecc9f3de7a87</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-l-list-title</ClassIconClass>
+  <ClassName>BDO.CareerTypes</ClassName>
+  <ClassShortName>BDOCareerTypes</ClassShortName>
+  <ClassTableName>BDO_CareerTypes</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

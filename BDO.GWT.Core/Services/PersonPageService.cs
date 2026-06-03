@@ -28,7 +28,7 @@ public class PersonPageService : IPersonPageService
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IContentService _contentService;
     private readonly ICultureContext _cultureContext;
-    private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
+    private readonly ISettingService _settingsService;
 
     private HttpClient? _httpClient;
 
@@ -36,20 +36,25 @@ public class PersonPageService : IPersonPageService
         IHttpClientFactory httpClientFactory,
         IContentService contentService,
         ICultureContext cultureContext,
-        ITaxonomyTagRetriever taxonomyTagRetriever
+        ISettingService settingService
         )
     {
         _httpClientFactory = httpClientFactory;
         _contentService = contentService;
         _cultureContext = cultureContext;
-        _taxonomyTagRetriever = taxonomyTagRetriever;
+        _settingsService = settingService;
     }
 
     public async Task<PersonDto> GetPersonPageDtoAsync(Person page, CancellationToken cancellationToken = default)
     {
         var personDto = await MapBasicFieldsAsync(page, cancellationToken);
 
-        personDto.Credentials = await GetCredentialNamesAsync(page);
+        personDto.Credentials = page.PersonCredentials?
+            .Select(x => x.Name)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Select(name => name!)
+            ?? Enumerable.Empty<string>();
+
         personDto.OfficeLocations = await GetLocationLinkItemsAsync(page, cancellationToken);
 
         return personDto;
@@ -58,8 +63,10 @@ public class PersonPageService : IPersonPageService
     public async Task<VCardData?> GeneratePersonVCardAsync(Guid personGuid, string? source = null, CancellationToken cancellationToken = default)
     {
         var person = (await _contentService.GetPagesAsync<Person>(
-           new RetrievePagesParameters {
-               LinkedItemsMaxLevel = 1 },
+           new RetrievePagesParameters
+           {
+               LinkedItemsMaxLevel = 1
+           },
            query => query
                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
                .Where(w => w.WhereEquals("ContentItemGUID", personGuid)),
@@ -77,10 +84,11 @@ public class PersonPageService : IPersonPageService
         var (photoMediaType, photoData) = await RetrieveImageBinaryAsync(photoUrl, cancellationToken);
         var (logoMediaType, logoData) = await RetrieveImageBinaryAsync(_contentService.GetCurrentSiteLogoImageUrlAsync(), cancellationToken);
 
-        var offices = await _contentService.RetrievePagesAsync<LocationOffice>(
+        var offices = await _contentService.GetPagesAsync<LocationOffice>(
         new RetrievePagesParameters
         {
-            LanguageName = _cultureContext.CurrentLanguageTag
+            LanguageName = _cultureContext.CurrentLanguageTag,
+            UseLanguageFallbacks = false
         },
         query =>
         {
@@ -97,14 +105,16 @@ public class PersonPageService : IPersonPageService
                 nameof(LocationOffice.SystemFields.WebPageItemParentID)
             );
         },
+        RetrievalCacheSettings.CacheDisabled,
         cancellationToken
         );
         var parentNodeIDsOfOffices = offices?.Where(y => y is not null).Select(y => y!.SystemFields.WebPageItemParentID).Where(id => id > 0).ToArray();
 
-        var cities = await _contentService.RetrievePagesAsync<LocationCity>(
+        var cities = await _contentService.GetPagesAsync<LocationCity>(
         new RetrievePagesParameters
         {
-            LanguageName = _cultureContext.CurrentLanguageTag
+            LanguageName = _cultureContext.CurrentLanguageTag,
+            UseLanguageFallbacks = false
         },
         query =>
         {
@@ -119,6 +129,7 @@ public class PersonPageService : IPersonPageService
                 nameof(LocationCity.SystemFields.WebPageItemID)
             );
         },
+        RetrievalCacheSettings.CacheDisabled,
         cancellationToken
     );
         var locations = offices?.Join(
@@ -135,10 +146,14 @@ public class PersonPageService : IPersonPageService
         Country = office?.LocationCountry,
     }));
 
+
+        var settings = await _settingsService.GetUsePersonPageTitleInfo();
+        var showEmailInVCard = settings?.FirstOrDefault()?.DisplayEmailinvCard;
+
         var vCard = new VCardData
         {
             FullName = GetPersonDisplayNameAsync(person),
-            EMail = person.PersonEmail ?? string.Empty,
+            EMail = showEmailInVCard == true ? person.PersonEmail : string.Empty,
             Title = person.PersonJobTitle,
             TelephoneNumbers = new List<(string? Type, string? Number)>
             {
@@ -206,7 +221,11 @@ public class PersonPageService : IPersonPageService
     private async Task<PersonDto> MapBasicFieldsAsync(Person person, CancellationToken cancellationToken)
     {
         var sectionPeople = (await _contentService.GetPagesAsync<SectionPeoplePage>(
-           new RetrievePagesParameters { },
+           new RetrievePagesParameters
+           {
+               LanguageName = _cultureContext.CurrentLanguageTag,
+               UseLanguageFallbacks = false,
+           },
            query => query
                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
                .Where(w => w.WhereEquals("WebPageItemID", person.SystemFields.WebPageItemParentID)),
@@ -238,17 +257,13 @@ public class PersonPageService : IPersonPageService
     {
         return string.IsNullOrEmpty(person.PersonSurnamePrefixes) ? $"{person.PersonFirstName} {person.PersonLastName}" : $"{person.PersonFirstName} {person.PersonSurnamePrefixes} {person.PersonLastName}";
     }
-    private async Task<IEnumerable<string>> GetCredentialNamesAsync(Person person)
-    {
-        return (await _taxonomyTagRetriever.GetTaxonomyTagByGUIDs(person.PersonCredentials, _cultureContext.CurrentLanguageTag)).Select(x => x.Name);
-    }
-
     private async Task<IEnumerable<LinkItemDto>> GetLocationLinkItemsAsync(Person person, CancellationToken cancellationToken = default)
     {
-        var locationOffices = await _contentService.RetrievePagesAsync<LocationOffice>(
+        var locationOffices = await _contentService.GetPagesAsync<LocationOffice>(
              new RetrievePagesParameters
              {
-                 LanguageName = _cultureContext.CurrentLanguageTag
+                 LanguageName = _cultureContext.CurrentLanguageTag,
+                 UseLanguageFallbacks = false
              },
             query =>
             {
@@ -261,7 +276,7 @@ public class PersonPageService : IPersonPageService
                     nameof(LocationOffice.MetadataTitle),
                     nameof(LocationOffice.SystemFields.WebPageItemParentID)
                 );
-            },
+            }, RetrievalCacheSettings.CacheDisabled,
             cancellationToken
         );
         var locationOfficesNodeParentIds = locationOffices?
@@ -270,10 +285,11 @@ public class PersonPageService : IPersonPageService
             .Select(x => x!.SystemFields.WebPageItemParentID)
             .ToArray();
 
-        var locationCities = await _contentService.RetrievePagesAsync<LocationCity>(
+        var locationCities = await _contentService.GetPagesAsync<LocationCity>(
              new RetrievePagesParameters
              {
-                 LanguageName = _cultureContext.CurrentLanguageTag
+                 LanguageName = _cultureContext.CurrentLanguageTag,
+                 UseLanguageFallbacks = false
              },
             query =>
             {
@@ -282,7 +298,7 @@ public class PersonPageService : IPersonPageService
                     w.WhereEquals("ContentItemChannelID", _contentService.GetCurrentChannelID());
                     w.WhereIn(nameof(LocationCity.SystemFields.WebPageItemID), locationOfficesNodeParentIds);
                 });
-            },
+            }, RetrievalCacheSettings.CacheDisabled,
             cancellationToken
         );
         var locationCityPageByNodeId = (locationCities ?? Enumerable.Empty<LocationCity?>())

@@ -93,7 +93,7 @@ public class HomePageService : IHomePageService
 
     public async Task<string?> GetHomePageUrl(CancellationToken cancellationToken)
     {
-        var homePages = await _contentRetriever.RetrievePagesAsync<HomePage>(
+        var homePages = await _contentRetriever.GetPagesAsync<HomePage>(
            new RetrievePagesParameters
            {
                LanguageName = _cultureContext.CurrentLanguageTag,
@@ -103,7 +103,7 @@ public class HomePageService : IHomePageService
                {
                    w.WhereEquals("ContentItemChannelID", _contentRetriever.GetCurrentChannelID());
                });
-           },
+           }, RetrievalCacheSettings.CacheDisabled,
                cancellationToken
         );
 

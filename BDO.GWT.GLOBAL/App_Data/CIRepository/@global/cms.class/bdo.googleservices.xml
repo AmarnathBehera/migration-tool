@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>GoogleServices</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="GoogleServicesID" columntype="integer" enabled="true" guid="4dcf909d-6094-44ed-a423-f8684e274361" isPK="true" />
+      <field column="GoogleAnalyticsTrackingID" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7bc0d828-0714-4fb4-9c56-bb185f6bbdd7" />
+      <field column="GoogleTagManagerID" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="0f38e099-f2e6-4bb5-8111-ab9e1a9e4c0b" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>7ced09ed-40df-4382-ae55-89062f24b11b</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.GoogleServices</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_GoogleServices</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

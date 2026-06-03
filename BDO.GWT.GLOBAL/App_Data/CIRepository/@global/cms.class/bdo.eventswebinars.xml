@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>
+    <![CDATA[Events&Webinars]]>
+  </ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="EventsWebinarsID" columntype="integer" enabled="true" guid="3b682d2f-a794-4768-8233-a1cce238fb20" isPK="true" />
+      <field column="Minutestotriggercalendarreminder" columnprecision="0" columntype="integer" enabled="true" guid="14c05300-771d-447c-86a0-cc7607c4cd01" />
+      <field column="Displaylocationtitleinasidebar" columnprecision="0" columntype="boolean" enabled="true" guid="aa4ea25e-9234-4da7-80c1-e3a24f75f9fd" />
+      <field column="EventnWebinarWebChannelSettingID" columnprecision="0" columntype="integer" enabled="true" guid="686bab6e-a405-4107-bc65-870ebc382c87" refobjtype="bdo.webchannelsettings" reftype="Required" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>7a1e5ce1-1165-4813-94ac-059346e5c920</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.EventsWebinars</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_EventsWebinars</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.tag>
+  <TagGUID>08ff8465-83af-4322-9b8b-6b79805cb1e6</TagGUID>
+  <TagMetadata>
+    <![CDATA[{"Translations":{}}]]>
+  </TagMetadata>
+  <TagName>PHD</TagName>
+  <TagOrder>1</TagOrder>
+  <TagTaxonomyID>
+    <CodeName>Credentials</CodeName>
+    <GUID>f7a56e13-25de-4c5b-bdd5-16ff1dba6d41</GUID>
+    <ObjectType>cms.taxonomy</ObjectType>
+  </TagTaxonomyID>
+  <TagTitle>PHD</TagTitle>
+</cms.tag>

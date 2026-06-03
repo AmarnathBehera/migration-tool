@@ -4,7 +4,7 @@ using Kentico.Xperience.Admin.Base.FormAnnotations;
 using Kentico.Xperience.Admin.Base.Forms;
 using System.Collections.Generic;
 
-namespace BDO.GWT.GLOBAL.Components.Widget.ImageWithTextWidget;
+namespace BDO.GWT.Web.Widgets.ImageWithTextWidget;
 
 public class ImageWithTextWidgetProperties : IWidgetProperties
 {

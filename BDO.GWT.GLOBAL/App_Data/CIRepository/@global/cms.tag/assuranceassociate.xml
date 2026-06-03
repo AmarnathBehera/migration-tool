@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.tag>
+  <TagGUID>56d936c2-60ae-4007-ba4f-b57aa753a0a3</TagGUID>
+  <TagMetadata>
+    <![CDATA[{"Translations":{}}]]>
+  </TagMetadata>
+  <TagName>AssuranceAssociate</TagName>
+  <TagOrder>4</TagOrder>
+  <TagTaxonomyID>
+    <CodeName>CareerJobTitle</CodeName>
+    <GUID>12cbf508-d966-489a-a817-b30f6eaa0bb0</GUID>
+    <ObjectType>cms.taxonomy</ObjectType>
+  </TagTaxonomyID>
+  <TagTitle>Assurance Associate</TagTitle>
+</cms.tag>

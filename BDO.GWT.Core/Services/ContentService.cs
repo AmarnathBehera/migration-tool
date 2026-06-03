@@ -217,7 +217,7 @@
      int WebsiteChannelID,
      CancellationToken cancellationToken = default)
 
-        { 
+        {
             var results = new List<object>();
 
             foreach (var type in types)
@@ -278,11 +278,11 @@
             var childPages = await _contentRetriever.RetrievePages<TPage>(
                 new RetrievePagesParameters { LinkedItemsMaxLevel = 3 },
             query =>
-                {
-                    // Filter by parent GUID
-                    query.Where(w => w.WhereEquals("WebPageItemParentID", parentGuid))
-                         .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder));
-                },
+            {
+                // Filter by parent GUID
+                query.Where(w => w.WhereEquals("WebPageItemParentID", parentGuid))
+                     .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder));
+            },
                 cacheSettings: RetrievalCacheSettings.CacheDisabled, // Use the predefined disabled cache
                 cancellationToken: cancellationToken
             );
@@ -305,8 +305,6 @@
                 cancellationToken
             );
         }
-
-
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
         {
             return _contentRetriever.RetrievePages<T?>(cancellationToken);
@@ -315,17 +313,6 @@
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(RetrievePagesParameters parameters, CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
         {
             return _contentRetriever.RetrievePages<T?>(parameters, cancellationToken);
-        }
-        public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(
-          RetrievePagesParameters parameters,
-          Action<RetrievePagesQueryParameters> queryAction,
-          CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
-        {
-            return _contentRetriever.RetrievePages<T?>(
-                parameters,
-                queryAction,
-                RetrievalCacheSettings.CacheDisabled,
-                cancellationToken);
         }
         public string GetFallbackMetadataDescription(string? metaDescription, string? metaOGDescription)
         {
@@ -347,6 +334,10 @@
         {
             return _websiteChannelContext.WebsiteChannelName;
         }
+        public string GetCurrentLanguage()
+        {
+            return _cultureContext.CurrentLanguageTag;
+        }
         public int GetCurrentChannelID()
         {
             return _websiteChannelContext.WebsiteChannelID;
@@ -358,33 +349,77 @@
         }
 
         public async Task<IWebPageFieldsSource?> GetPageByTypeAndNameAsync(
-     Type type,
-     string pageName,
-     CancellationToken cancellationToken = default)
+            Type type,
+            string pageName,
+            CancellationToken cancellationToken = default)
         {
             var contentTypeName = GetContentTypeName(type);
+
+            // Only include the "Name" column condition when the CLR model exposes
+            // that property (e.g. EventType, Businessissues). Including it for
+            // content types that don't have the column causes a SQL error.
+            var hasNameProperty = type.GetProperty("Name") is not null;
+
             var builder = new ContentItemQueryBuilder()
                 .ForContentType(contentTypeName, q => q
-                    .ForWebsite(_websiteChannelContext.WebsiteChannelName) 
+                    .ForWebsite(_websiteChannelContext.WebsiteChannelName)
                 )
                 .Parameters(q => q
-                 .Where(w => w.WhereEquals("MetadataTitle", pageName)
-                .Or()
-                .WhereEquals("MetadataOGTitle", pageName)
-                .Or()
-                .WhereEquals("ContentItemName", pageName))
-                .TopN(1)
+                    .Where(w =>
+                    {
+                        var clause = w
+                            .WhereEquals("MetadataTitle", pageName)
+                            .Or()
+                            .WhereEquals("MetadataOGTitle", pageName)
+                            .Or()
+                            .WhereEquals("ContentItemName", pageName);
+
+                        if (hasNameProperty)
+                        {
+                            clause.Or().WhereEquals("Name", pageName);
+                        }
+                    })
+                    .TopN(1)
                 );
 
             var result = await _executor.GetMappedWebPageResult<IWebPageFieldsSource>(
-                builder,
-                new ContentQueryExecutionOptions
-                {
-                    ForPreview = _websiteChannelContext.IsPreview
-                },
-                cancellationToken);
+                    builder,
+                    new ContentQueryExecutionOptions
+                    {
+                        ForPreview = _websiteChannelContext.IsPreview
+                    },
+                    cancellationToken);
 
             return result.FirstOrDefault();
+        }
+
+        public async Task<IEnumerable<IContentItemFieldsSource>> RetrieveButtonUrlAsync(
+            IEnumerable<Guid> guids,
+            string[] contentTypes)
+        {
+            return await _contentRetriever
+                .RetrieveContentOfContentTypesByGuids<IContentItemFieldsSource>(
+                    contentTypes,
+                    guids.ToList(),
+                    new RetrieveContentOfContentTypesParameters
+                    {
+                        LinkedItemsMaxLevel = 3
+                    });
+        }
+
+        public string? EnsureAbsoluteUrl(string? url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+                return url;
+
+            if (!url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+                !url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) &&
+                !url.StartsWith('/'))
+            {
+                return "https://" + url;
+            }
+
+            return url;
         }
     }
 }

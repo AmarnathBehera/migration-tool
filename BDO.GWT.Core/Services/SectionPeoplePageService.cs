@@ -5,12 +5,11 @@ using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.DTOs.Pages;
-using BDO.GWT.Core.Retrievers;
+using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.Services;
 using CMS.Websites;
-using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 
 namespace BDO.GWT.Core.Services;
@@ -19,7 +18,7 @@ public interface ISectionPeoplePageService
 {
     Task<SectionPeopleDto> GetSectionPeoplePageDtoAsync(SectionPeoplePage page, CancellationToken cancellationToken);
 
-    Task<PaginationDto<PersonCardDto>> GetSectionPeoplePersonPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken);
+    Task<PaginationDto<PersonCardDto>> GetSectionPeoplePersonPaginationDtoAsync(Guid pageGuid, string language, CardsQuery cardsQuery, CancellationToken cancellationToken);
 }
 
 public class SectionPeoplePageService : ISectionPeoplePageService
@@ -36,18 +35,18 @@ public class SectionPeoplePageService : ISectionPeoplePageService
     private readonly IHeroService _heroService;
     private readonly IContentService _contentRetriever;
     private readonly IPeopleCardsService _peopleCardsService;
-    private readonly ICultureContext _cultureContext;
+    private readonly IFilteringHelper _filteringHelper;
 
     public SectionPeoplePageService(
         IContentService pageRetriever,
         IHeroService heroService,
         IPeopleCardsService peopleCardsService,
-        ICultureContext cultureContext)
+        IFilteringHelper filteringHelper)
     {
         _contentRetriever = pageRetriever;
         _heroService = heroService;
         _peopleCardsService = peopleCardsService;
-        _cultureContext = cultureContext;
+        _filteringHelper = filteringHelper;
     }
 
     public async Task<SectionPeopleDto> GetSectionPeoplePageDtoAsync(SectionPeoplePage page, CancellationToken cancellationToken)
@@ -79,7 +78,7 @@ public class SectionPeoplePageService : ISectionPeoplePageService
         {
             Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
             Filters = page.PeopleListFilteringEnabled ? await _peopleCardsService.CreateFiltersAsync(filters, null, cancellationToken) : null,
-            FilteringTooltipEnabled = true,
+            FilteringTooltipEnabled = await _filteringHelper.IsFilteringTooltipEnabledAsync(page.PeopleListFilteringEnabled, cancellationToken),
             SortBy = page.PeopleListOrderingEnabled ? CreateOrderingDto(page.PeopleListDefaultOrder) : null,
             PageSize = 20,
             ApiEndpoint = $"People/{page.SystemFields.ContentItemGUID}/Get",
@@ -88,12 +87,12 @@ public class SectionPeoplePageService : ISectionPeoplePageService
         return dto;
     }
 
-    public async Task<PaginationDto<PersonCardDto>> GetSectionPeoplePersonPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken)
+    public async Task<PaginationDto<PersonCardDto>> GetSectionPeoplePersonPaginationDtoAsync(Guid pageGuid, string language, CardsQuery cardsQuery, CancellationToken cancellationToken)
     {
         var sectionPeople = (await _contentRetriever.GetPagesAsync<SectionPeoplePage>(
             new RetrievePagesParameters
             {
-                LanguageName = _cultureContext.CurrentLanguageTag, 
+                LanguageName = language,
                 UseLanguageFallbacks = false
             },
            query => query
@@ -108,7 +107,7 @@ public class SectionPeoplePageService : ISectionPeoplePageService
             throw new MissingSectionPageException($"'{nameof(SectionPeoplePage)} page with GUID '{pageGuid}' not found.");
         }
 
-        var paginationDto = await _peopleCardsService.GetFilteredItemsAsync(sectionPeople,cardsQuery, null, _ => false, cancellationToken);
+        var paginationDto = await _peopleCardsService.GetFilteredItemsAsync(sectionPeople,language,cardsQuery, null, _ => false, cancellationToken);
 
         return paginationDto;
     }

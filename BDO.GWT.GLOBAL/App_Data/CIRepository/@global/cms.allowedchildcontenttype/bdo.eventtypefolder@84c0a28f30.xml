@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.EventTypeFolder</CodeName>
+    <GUID>45b3b362-a939-45d8-9d8b-4a1e5cc31261</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.EventType">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.EventType</CodeName>
+        <GUID>ed59f954-8d98-4783-8dfa-bdd81de58862</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>
