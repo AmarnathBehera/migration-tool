@@ -15,8 +15,6 @@ public class CardsServiceTests
 
     private Mock<IContentService> _contentServiceMock = null!;
     private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
-    private Mock<ITaxonomyTagRetriever> _taxonomyTagRetrieverMock = null!;
-    private Mock<ICultureContext> _cultureContextMock = null!;
     private CardsService _service = null!;
 
     [SetUp]
