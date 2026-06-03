@@ -1,8 +1,9 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
+using BDO.GWT.Web.Core.DTOs;
 
-namespace BDO.GWT.Web.Core.DTOs.Pages;
+namespace BDO.GWT.Core.DTOs;
 
 public class FormPageDto
 {

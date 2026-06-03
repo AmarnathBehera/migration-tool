@@ -36,9 +36,9 @@ namespace BDO
 
 
 		/// <summary>
-		/// Seperator.
+		/// Separator.
 		/// </summary>
-		public string Seperator { get; set; }
+		public string Separator { get; set; }
 
 
 		/// <summary>

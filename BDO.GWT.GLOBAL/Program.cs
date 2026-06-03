@@ -8,6 +8,7 @@ using BDO.GWT.Domain.Services;
 using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
+using BDO.GWT.Xperience.Core.Services;
 using BDO.GWT.Xperience.LiveSite.Services;
 using Kentico.Activities.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;

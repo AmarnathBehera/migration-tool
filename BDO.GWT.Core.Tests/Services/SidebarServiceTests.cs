@@ -1,5 +1,6 @@
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Services;
+using BDO.GWT.Web.Core.LiveSite.DTOs;
 using Moq;
 
 namespace BDO.GWT.Core.Tests.Services;

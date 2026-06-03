@@ -17,8 +17,9 @@ public class GlobalSettingsListingPage : ListingPage
             .AddColumn(nameof(GlobalsettingskeyInfo.GlobalSettingsKeyValue), "Value")
             .AddColumn(nameof(GlobalsettingskeyInfo.GlobalSettingsKeyNote), "Note")
             .AddColumn(nameof(GlobalsettingskeyInfo.GlobalSettingsKeyName), "Code name");
-
+        PageConfiguration.HeaderActions.AddLink<GlobalSettingsCreatePage>("New setting");
         PageConfiguration.AddEditRowAction<GlobalSettingsEditSection>();
+
         PageConfiguration.TableActions.AddDeleteAction(nameof(Delete));
         await base.ConfigurePage();
     }

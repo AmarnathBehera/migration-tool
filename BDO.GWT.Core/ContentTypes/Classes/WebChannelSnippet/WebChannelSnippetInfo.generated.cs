@@ -27,7 +27,7 @@ namespace BDO
         /// Type information.
         /// </summary>
 #warning "You will need to configure the type info."
-        public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(IInfoProvider<WebChannelSnippetInfo>), OBJECT_TYPE, "BDO.WebChannelSnippet", "WebChannelSnippetID", null, null, "WebchannelCodeName", "WebChannelSnippetDisplayName", null, null, null)
+        public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(IInfoProvider<WebChannelSnippetInfo>), OBJECT_TYPE, "BDO.WebChannelSnippet", "WebChannelSnippetID", null, null, "WebChannelCodeName", "WebChannelSnippetDisplayName", null, null, null)
         {
             TouchCacheDependencies = true,
             DependsOn = new List<ObjectDependency>()
@@ -104,13 +104,13 @@ namespace BDO
 
 
         /// <summary>
-        /// Webchannel code name.
+        /// Web channel code name.
         /// </summary>
         [DatabaseField]
-        public virtual string WebchannelCodeName
+        public virtual string WebChannelCodeName
         {
-            get => ValidationHelper.GetString(GetValue(nameof(WebchannelCodeName)), String.Empty);
-            set => SetValue(nameof(WebchannelCodeName), value);
+            get => ValidationHelper.GetString(GetValue(nameof(WebChannelCodeName)), String.Empty);
+            set => SetValue(nameof(WebChannelCodeName), value);
         }
 
 

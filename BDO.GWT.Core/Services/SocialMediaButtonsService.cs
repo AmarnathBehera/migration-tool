@@ -1,5 +1,7 @@
 ﻿using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.Entities;
+using BDO.GWT.Web.Core.LiveSite.DTOs;
 using CMS.Websites;
 using System.Web;
 
@@ -8,7 +10,7 @@ namespace BDO.GWT.Core.Services;
 public interface ISocialMediaButtonsService
 {
     Task<SocialMediaButtonsDto> GetSocialMediaButtonsDto(IWebPageFieldsSource page, string pageTitle, CancellationToken cancellationToken);
-}
+  }
 
 public class SocialMediaButtonsService : ISocialMediaButtonsService
 {
@@ -19,10 +21,11 @@ public class SocialMediaButtonsService : ISocialMediaButtonsService
         _settingsService = settingsService;
     }
 
+
     public async Task<SocialMediaButtonsDto> GetSocialMediaButtonsDto(
-        IWebPageFieldsSource page,
-        string pageTitle,
-        CancellationToken cancellationToken)
+      IWebPageFieldsSource page,
+      string pageTitle,
+      CancellationToken cancellationToken)
     {
         var encodedPageTitle = HttpUtility.UrlEncode(pageTitle);
         var pageUrl = page.GetUrl().AbsoluteUrl;
@@ -52,6 +55,9 @@ public class SocialMediaButtonsService : ISocialMediaButtonsService
             ShowCopyLinkButton = settingInfo?.DisableCopyLinkButton is not true,
         };
     }
+
+
+   
 
     private static string ConstructEmailButtonUrl(string encodedPageTitle, string encodedPageUrl)
         => $"mailto:?subject={SanitizeEmailSubject(encodedPageTitle)}&body={encodedPageUrl}";

@@ -1,16 +1,19 @@
-﻿using CMS.DataEngine;
-using CMS.Websites;
-using CMS.Websites.Routing;
+﻿using CMS.Websites.Routing;
 
-namespace BDO.GWT.GLOBAL.Services;
+namespace BDO.GWT.Xperience.Core.Services;
+
+public interface ISiteContext
+{
+    int CurrentSiteID { get; }
+
+    string CurrentSiteName { get; }
+}
 
 public class SiteContext : ISiteContext
 {
     private readonly IWebsiteChannelContext _websiteChannelContext;
 
-    public SiteContext(
-        IWebsiteChannelContext websiteChannelContext,
-        IInfoProvider<WebsiteChannelInfo> websiteChannelProvider)
+    public SiteContext(IWebsiteChannelContext websiteChannelContext)
     {
         _websiteChannelContext = websiteChannelContext;
     }

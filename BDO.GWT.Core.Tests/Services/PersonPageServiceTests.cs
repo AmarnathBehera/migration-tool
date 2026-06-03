@@ -56,10 +56,6 @@ public class PersonPageServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<SectionPeoplePage>());
 
-        _taxonomyTagRetrieverMock
-            .Setup(t => t.GetTaxonomyTagByGUIDs(It.IsAny<IEnumerable<TagReference>>(), "en"))
-            .ReturnsAsync(Enumerable.Empty<Tag>());
-
         _contentServiceMock
             .Setup(s => s.GetPagesAsync<LocationOffice>(
                 It.IsAny<RetrievePagesParameters>(),
@@ -95,10 +91,6 @@ public class PersonPageServiceTests
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<SectionPeoplePage> { sectionPage });
-
-        _taxonomyTagRetrieverMock
-            .Setup(t => t.GetTaxonomyTagByGUIDs(It.IsAny<IEnumerable<TagReference>>(), "en"))
-            .ReturnsAsync(Enumerable.Empty<Tag>());
 
         _contentServiceMock
                 .Setup(x => x.GetPagesAsync<LocationOffice>(

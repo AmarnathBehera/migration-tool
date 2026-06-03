@@ -16,8 +16,6 @@
     {
         public static IServiceCollection AddContentServices(this IServiceCollection services)
         {
-            // XbyK infrastructure services are typically already registered by Kentico
-            // You just wire your abstraction here.
             services.AddScoped<IContentService, ContentService>();
             services.AddScoped<IWebPageUrlResolver, WebPageUrlResolver>();
             services.AddScoped<IPageUtility, PageUtility>();
@@ -26,7 +24,6 @@
             services.AddScoped<IWebsiteCulturesService, WebsiteCulturesService>();
             services.AddHttpContextAccessor();
             services.AddScoped<ICultureContext, CultureContext>();
-            //services.AddScoped<IPageMetadataService, PageMetadataService>();
 
             return services;
         }

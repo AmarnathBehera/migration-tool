@@ -31,7 +31,12 @@ namespace BDO.GWT.Core.Constants
         CareerContent.CONTENT_TYPE_NAME,
         SectionNews.CONTENT_TYPE_NAME,
         NewsArticle.CONTENT_TYPE_NAME,
-        NewsGroup.CONTENT_TYPE_NAME
+        NewsGroup.CONTENT_TYPE_NAME,
+        Event.CONTENT_TYPE_NAME,
+        EventRegistrationForm.CONTENT_TYPE_NAME,
+        Webinar.CONTENT_TYPE_NAME,
+        SectionEvents.CONTENT_TYPE_NAME
+
     };
     }
 }

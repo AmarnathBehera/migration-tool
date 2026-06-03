@@ -52,7 +52,12 @@ public class PersonPageService : IPersonPageService
     {
         var personDto = await MapBasicFieldsAsync(page, cancellationToken);
 
-        personDto.Credentials = await GetCredentialNamesAsync(page);
+        personDto.Credentials = page.PersonCredentials?
+            .Select(x => x.Name)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Select(name => name!)
+            ?? Enumerable.Empty<string>();
+
         personDto.OfficeLocations = await GetLocationLinkItemsAsync(page, cancellationToken);
 
         return personDto;
@@ -61,8 +66,10 @@ public class PersonPageService : IPersonPageService
     public async Task<VCardData?> GeneratePersonVCardAsync(Guid personGuid, string? source = null, CancellationToken cancellationToken = default)
     {
         var person = (await _contentService.GetPagesAsync<Person>(
-           new RetrievePagesParameters {
-               LinkedItemsMaxLevel = 1 },
+           new RetrievePagesParameters
+           {
+               LinkedItemsMaxLevel = 1
+           },
            query => query
                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
                .Where(w => w.WhereEquals("ContentItemGUID", personGuid)),
@@ -217,9 +224,10 @@ public class PersonPageService : IPersonPageService
     private async Task<PersonDto> MapBasicFieldsAsync(Person person, CancellationToken cancellationToken)
     {
         var sectionPeople = (await _contentService.GetPagesAsync<SectionPeoplePage>(
-           new RetrievePagesParameters {
+           new RetrievePagesParameters
+           {
                LanguageName = _cultureContext.CurrentLanguageTag,
-               UseLanguageFallbacks=false,
+               UseLanguageFallbacks = false,
            },
            query => query
                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
@@ -252,11 +260,6 @@ public class PersonPageService : IPersonPageService
     {
         return string.IsNullOrEmpty(person.PersonSurnamePrefixes) ? $"{person.PersonFirstName} {person.PersonLastName}" : $"{person.PersonFirstName} {person.PersonSurnamePrefixes} {person.PersonLastName}";
     }
-    private async Task<IEnumerable<string>> GetCredentialNamesAsync(Person person)
-    {
-        return (await _taxonomyTagRetriever.GetTaxonomyTagByGUIDs(person.PersonCredentials, _cultureContext.CurrentLanguageTag)).Select(x => x.Name);
-    }
-
     private async Task<IEnumerable<LinkItemDto>> GetLocationLinkItemsAsync(Person person, CancellationToken cancellationToken = default)
     {
         var locationOffices = await _contentService.GetPagesAsync<LocationOffice>(
