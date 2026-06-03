@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.tag>
+  <TagGUID>6a0047a7-737b-462d-9d9b-4cfc7310f177</TagGUID>
+  <TagMetadata>
+    <![CDATA[{"Translations":{}}]]>
+  </TagMetadata>
+  <TagName>Internship</TagName>
+  <TagOrder>2</TagOrder>
+  <TagTaxonomyID>
+    <CodeName>CareerEmploymentTypes</CodeName>
+    <GUID>c7be582e-f63b-4139-8fa5-7cedd485480c</GUID>
+    <ObjectType>cms.taxonomy</ObjectType>
+  </TagTaxonomyID>
+  <TagTitle>Internship</TagTitle>
+</cms.tag>

@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Reusable</ClassContentTypeType>
+  <ClassDisplayName>Icon</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="2a8f20c5-7ba4-4bb3-bd3c-031c16898d5e" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="03f6e890-64c5-41b1-a87c-d6467fb1312e" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="d354c6d9-9a3a-4008-b753-78b07503cf4b" isunique="true" system="true" />
+      <field allowempty="true" column="IconAttachmentAsset" columnprecision="0" columntype="contentitemasset" enabled="true" guid="4338f3f4-1735-424f-acba-022cb69b3807" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Icon Asset</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedExtensions>svg</AllowedExtensions>
+          <controlname>Kentico.Administration.ContentItemAssetUploader</controlname>
+          <IsFormatConversionEnabled>False</IsFormatConversionEnabled>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>82c5aa19-dd00-4e41-aeda-e2c1166a933e</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-picture</ClassIconClass>
+  <ClassName>BDO.Icon</ClassName>
+  <ClassShortName>BDOIcon</ClassShortName>
+  <ClassTableName>BDO_Icon</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.BDOMetadata</CodeName>
+    <GUID>2c656492-e8d0-4305-a99a-d49e17573637</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.BusinessIssuesFolder">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.BusinessIssuesFolder</CodeName>
+        <GUID>ec9f8d4b-f38b-4552-a3c3-958bff31a01e</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.CareerEmploymentTypesFolder">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.CareerEmploymentTypesFolder</CodeName>
+        <GUID>cdcd126c-00c9-4129-a75e-130749e5e77c</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.CareerJobTitleFolder">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.CareerJobTitleFolder</CodeName>
+        <GUID>99202aba-f07c-4a74-a7ac-600fee85f52a</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.CareerLevelsFolder">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.CareerLevelsFolder</CodeName>
+        <GUID>5e49d095-ce7c-41f4-b5a3-9fffec0bc84a</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.CareerTypesFolder">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.CareerTypesFolder</CodeName>
+        <GUID>e733aba2-ab99-4fdb-abd4-5d13db4405be</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.ContentTypesFolder">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.ContentTypesFolder</CodeName>
+        <GUID>8b1ae0d6-31df-4491-959e-a6b8d86bb7a9</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.CredentialsFolder">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.CredentialsFolder</CodeName>
+        <GUID>d4942f96-7340-4ac8-bcc2-7b203992e182</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.EventTypeFolder">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.EventTypeFolder</CodeName>
+        <GUID>45b3b362-a939-45d8-9d8b-4a1e5cc31261</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.Metadatafolder">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.Metadatafolder</CodeName>
+        <GUID>1bdc9ae4-a4a6-4715-9f06-66bcd88ca24e</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.ProfileGroupsFolder">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.ProfileGroupsFolder</CodeName>
+        <GUID>eee2e7ae-862a-4543-b9bd-a212bcc637f4</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.ProfileRelationshipsFolder">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.ProfileRelationshipsFolder</CodeName>
+        <GUID>b60e32ff-3b4d-45ea-8787-dccbc39be0ac</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.RSSCategoriesFolder">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.RSSCategoriesFolder</CodeName>
+        <GUID>d4f9677f-117b-45e7-b1e2-e082dcb6d1b0</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.TestimonialClientTypesFolder">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.TestimonialClientTypesFolder</CodeName>
+        <GUID>ba814530-b04f-42eb-8ebe-2d836c4c25ef</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.TestimonialIndustriesFolder">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.TestimonialIndustriesFolder</CodeName>
+        <GUID>d588a4a8-963c-4047-b186-43373ffd67a2</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.TestimonialServiceLineFolder">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.TestimonialServiceLineFolder</CodeName>
+        <GUID>957e27d4-f00f-4a52-8010-bca6707f32ba</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

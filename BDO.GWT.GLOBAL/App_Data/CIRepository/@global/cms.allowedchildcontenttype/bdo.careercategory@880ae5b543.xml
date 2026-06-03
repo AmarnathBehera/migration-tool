@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.CareerCategory</CodeName>
+    <GUID>a44dde57-e1ba-4a8b-ba54-2c0705c12903</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.CareerContent">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.CareerContent</CodeName>
+        <GUID>b0993231-71af-4db0-b2c7-83fdf89e9071</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

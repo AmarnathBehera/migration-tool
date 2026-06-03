@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.FaqTopic</CodeName>
+    <GUID>ab7fc021-6f12-4384-b658-1d1535029228</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.FaqPage">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.FaqPage</CodeName>
+        <GUID>0997154f-0044-4380-a197-7c05464921c6</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

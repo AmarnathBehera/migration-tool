@@ -1,0 +1,451 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Webinar</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="75aca9ed-3179-4db9-ab23-b3aca151735c" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="5083190f-0196-4389-93df-d408ef9bd479" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="9201ef5b-a515-4129-abfb-93f13596f5d4" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <field allowempty="true" column="ShowWebinarTitle" columnprecision="0" columntype="boolean" enabled="true" guid="afaf34fc-d0ed-4f23-a217-964fb4bf3a56" visible="true">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show Title</fieldcaption>
+          <fielddescription>
+            <![CDATA[Changing this option may affect SEO if the page already has a Main Heading (H1) tag title.]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="EventPostDescription" columnprecision="0" columnsize="800" columntype="text" enabled="true" guid="770913fd-7ce1-4801-b175-33fd532f3f5a" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Post event description</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextArea</controlname>
+          <CopyButtonVisible>False</CopyButtonVisible>
+          <MaxRowsNumber>5</MaxRowsNumber>
+          <MinRowsNumber>3</MinRowsNumber>
+        </settings>
+      </field>
+      <field allowempty="true" column="CustomBodyText" columnprecision="0" columntype="longtext" enabled="true" guid="982b9555-1931-4b43-9327-434cf4661730" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Calendar custom body text</fieldcaption>
+          <fielddescription>
+            <![CDATA[Field for Calendar Body Text. This text describes what the event is for.]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.RichTextEditor</controlname>
+        </settings>
+      </field>
+      <field column="EventDateFrom" columnprecision="0" columntype="datetime" enabled="true" guid="48530f0a-c67d-4de7-8b8b-9e34ba87444a" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Date from</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.DateTimeInput</controlname>
+        </settings>
+      </field>
+      <field column="EventDateTo" columnprecision="0" columntype="datetime" enabled="true" guid="37186ae1-8675-4a13-b45c-87c62ae22bf7" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Date to</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.DateTimeInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="EventTimeOverride" columnprecision="0" columnsize="100" columntype="text" enabled="true" guid="61684e16-3b26-41b4-bd0f-50afddf939ab" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Time text override</fieldcaption>
+          <fielddescription>
+            <![CDATA[Text to display as time, instead of using times from Date From and Date To fields]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="EventDateOverride" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="2d51179d-1125-4e3b-8cd2-cd01ac179f9b" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Date text Override</fieldcaption>
+          <fielddescription>
+            <![CDATA[Text to display as date, instead of using Date From date and Date To date]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="EventIsPrivate" columnprecision="0" columntype="boolean" enabled="true" guid="2b8f3faf-0a57-4061-a599-e91c6f59fe78" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Is This Event Private</fieldcaption>
+          <fielddescription>
+            <![CDATA[Marking an event as private does not automatically exclude it from sitemap. If you want to hide this event from sitemap, please make sure to uncheck the "Include page in the sitemap" option under SEO section.]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="EventAllDay" columnprecision="0" columntype="boolean" enabled="true" guid="3b2f6955-8043-4d5f-af5c-542cb8177d5b" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>All-day event</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="AllowRegistration" columnprecision="0" columntype="boolean" enabled="true" guid="5957758d-46cb-42c8-bf44-d08d17c88845" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>You can register for this event</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="EventType" columnprecision="0" columntype="contentitemreference" enabled="true" guid="0345c8c1-ae2a-4d82-ba34-46ddb94e1c17" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Event Type</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["ed59f954-8d98-4783-8dfa-bdd81de58862"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="DisablePrintAndShare" columnprecision="0" columntype="boolean" enabled="true" guid="8f385491-c44a-4d24-94bf-77ae1ac61c3d" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Disable Print And Share</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="DisableAddToCalendar" columnprecision="0" columntype="boolean" enabled="true" guid="683369b3-01a1-4c93-b5df-c0e92e206c54" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>
+            <![CDATA[Disable 'Add to calendar']]>
+          </fieldcaption>
+          <fielddescription>
+            <![CDATA[Check this to disable the 'Add to calendar' option in the page]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="ShowPastEvent" columnprecision="0" columntype="boolean" enabled="true" guid="eef05fd3-f4a2-456a-a4bb-7f54c14ee007" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show past event</fieldcaption>
+          <fielddescription>
+            <![CDATA[Past event visibility is controlled at the section level but can be overridden per event.]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="RegistrationType" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="9cfee0b5-68e3-4538-858b-4a6dc063f2af" visible="true">
+        <properties>
+          <defaultvalue>kentico</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Registration type</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.DropDownSelector</controlname>
+          <Options>
+<![CDATA[
+kentico;Kentico
+external;External
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+      </field>
+      <field allowempty="true" column="RegistrationFormLink" columnprecision="0" columnsize="2000" columntype="text" enabled="true" guid="28b8c487-b750-45f5-aeb3-d3a9351b1a42" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Registration form link</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Link</controlname>
+          <OpenInNewTab>True</OpenInNewTab>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>RegistrationType</PropertyName>
+              <Value>external</Value>
+              <CaseSensitive>true</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="CpeEvent" columnprecision="0" columntype="boolean" enabled="true" guid="bc60bfaf-b862-4631-ac5c-281a909900dc" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Continuing professional education event</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="ProgramLevel" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6ae78c1e-5fac-46af-9fc5-fe32769e1cbf" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Program level</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.DropDownSelector</controlname>
+          <Options>
+<![CDATA[
+Basic
+Overwiev
+Update
+Intermediate
+Advanced
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>CpeEvent</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="CpeCount" columnprecision="0" columnsize="50" columntype="text" enabled="true" guid="71c98532-0c7d-46e3-893b-325b7b274257" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>CPE Count</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>CpeEvent</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="CpeCreditNotes" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="4083ebed-1a8b-495d-81c8-79ca351f9d8a" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>CPE Credit Notes</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>CpeEvent</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="CpeDescription" columnprecision="0" columntype="longtext" enabled="true" guid="f1464f88-5b79-4633-be69-51ff588ada29" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>CPE Description</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.RichTextEditor</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="EventAttachment" columnprecision="0" columntype="contentitemreference" enabled="true" guid="b35db7bb-f23b-4391-89a8-568cba82448f" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Attachment </fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field column="EventVideo" columnprecision="0" columntype="longtext" enabled="true" guid="4b8f5579-0018-4f91-853c-b9bd781ce9aa" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Video</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <schema guid="6bf9af2e-ee19-461b-a071-2b6541b36653" name="6bf9af2e-ee19-461b-a071-2b6541b36653">
+        <properties />
+      </schema>
+      <field allowempty="true" column="MetadataBusinessIssues" columnprecision="0" columntype="contentitemreference" enabled="true" guid="b634b9a0-ad2d-4f09-999a-2516581c3fa7" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Business issue</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["252cdc0e-f6a0-424f-bd6b-2584655e66c7"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataBusinessLines" columnprecision="0" columntype="contentitemreference" enabled="true" guid="a8ee00e6-ef8b-4e1b-a3f7-31682a4cc9a1" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Business lines</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["b70d2494-90c7-42c5-a7d6-44da7013729b"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataOfficeLocation" columnprecision="0" columntype="contentitemreference" enabled="true" guid="9a8b1e42-70e7-425f-bc2b-b12f9c71f41d" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Office location</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["28595e58-3d13-4414-8f96-8a31285037fe"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataSpecialtiesCategories" columnprecision="0" columntype="contentitemreference" enabled="true" guid="35f60512-549d-42b1-b6ec-8b68f4c558bd" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Specialty categories</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["ddc2c96a-2502-4adf-8b89-5ec17af92366"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataSpecialtiesAreas" columnprecision="0" columntype="contentitemreference" enabled="true" guid="9b0e33b9-b6da-447c-a01d-fb8e0ff724fb" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Specialties areas</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["81fa7e92-5ecc-4b38-a9d9-0246c97567d7"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataSpecialtiesPages" columnprecision="0" columntype="contentitemreference" enabled="true" guid="60c4a89b-1730-44ca-aaac-d95f9c0573d8" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Specialty pages</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["1972aba8-80f8-4d07-bfa2-7f088d2f4219"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <schema guid="8412bdf1-4ba5-4fc9-8d9b-7cf930b5c243" name="8412bdf1-4ba5-4fc9-8d9b-7cf930b5c243">
+        <properties />
+      </schema>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>a0c5bc6c-9409-4fe9-8430-697d961328a6</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-calendar-number</ClassIconClass>
+  <ClassName>BDO.Webinar</ClassName>
+  <ClassShortName>BDOWebinar</ClassShortName>
+  <ClassTableName>BDO_Webinar</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>

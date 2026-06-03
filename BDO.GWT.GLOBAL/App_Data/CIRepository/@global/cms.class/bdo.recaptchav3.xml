@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>reCAPTCHA v3</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ReCAPTCHAv3ID" columntype="integer" enabled="true" guid="51b4acd8-25f2-455c-8b46-a9893d2c35a3" isPK="true" />
+      <field column="Sitekey" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="b2febb08-6768-45e7-90c0-43473d3a43fa" />
+      <field column="Secretkey" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="423aea2a-2fdd-450a-9392-31ee15861c45" />
+      <field column="Scorethreshold" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6d46c902-2f56-4bad-8bd6-9e986d80f522" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>266fdf2a-77e6-4cf4-9c9a-8e156a213c25</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.reCAPTCHAv3</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_reCAPTCHAv3</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

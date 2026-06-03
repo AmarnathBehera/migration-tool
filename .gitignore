@@ -271,8 +271,6 @@ paket-files/
 
 ### Kentico ###
 
-
-BDO.GWT.GLOBAL/App_Data/CIRepository/**/*
 BDO.GWT.GLOBAL/ConnectionStrings.config
 
 # Include some Kentico folders excluded by rules above
@@ -295,3 +293,9 @@ BDO.GWT.GLOBAL/App_Data/CMSModules/SmartSearch/**
 !BDO.GWT.GLOBAL/App_Data/CMSModules/SmartSearch/*/
 !BDO.GWT.GLOBAL/App_Data/CMSModules/SmartSearch/_StopWords/**
 !BDO.GWT.GLOBAL/App_Data/CMSModules/SmartSearch/_Synonyms/**
+
+# Kentico CI Repository - only track the .lock folder, @global folder, and repository.config
+BDO.GWT.GLOBAL/App_Data/CIRepository/*
+!BDO.GWT.GLOBAL/App_Data/CIRepository/.lock/
+!BDO.GWT.GLOBAL/App_Data/CIRepository/@global/
+!BDO.GWT.GLOBAL/App_Data/CIRepository/repository.config

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.Service</CodeName>
+    <GUID>28ba1415-0ac5-40c2-bb50-ec5ee5532674</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.Sub_Service">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.Sub_Service</CodeName>
+        <GUID>3c5bfaa6-f77c-46a6-947b-87ab1bb8404b</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

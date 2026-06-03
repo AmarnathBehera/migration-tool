@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.SectionBlogs</CodeName>
+    <GUID>b1d1ea96-03a2-4a44-82f7-92973086a93b</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.Blog">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.Blog</CodeName>
+        <GUID>b6a2aff8-7c0d-446a-be33-221a26bcac37</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

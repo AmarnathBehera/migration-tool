@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.EventWebinarFolder</CodeName>
+    <GUID>3799ac04-7843-476b-8669-e0ad99e83f53</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.Event">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.Event</CodeName>
+        <GUID>eb56be66-90a1-4d84-ac39-56bba64e5a69</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.EventRegistrationForm">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.EventRegistrationForm</CodeName>
+        <GUID>2b7d3728-523e-429b-9a52-0336adbc8fd5</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.EventWebinarFolder">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.EventWebinarFolder</CodeName>
+        <GUID>3799ac04-7843-476b-8669-e0ad99e83f53</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.Webinar">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.Webinar</CodeName>
+        <GUID>a0c5bc6c-9409-4fe9-8430-697d961328a6</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

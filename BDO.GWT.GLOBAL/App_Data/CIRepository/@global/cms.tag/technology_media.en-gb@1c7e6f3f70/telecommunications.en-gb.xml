@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.tag>
+  <TagGUID>a6977f16-d531-4867-9a66-cffffd98c38f</TagGUID>
+  <TagMetadata>
+    <![CDATA[{"Translations":{"8517e6d4-6f93-4003-9e15-e30e302d68e9":{"Title":null,"Description":null},"ee380e62-f7ff-416a-88c1-646fe247d5f3":{"Title":null,"Description":null}}}]]>
+  </TagMetadata>
+  <TagName>Telecommunications.En-GB</TagName>
+  <TagOrder>1</TagOrder>
+  <TagParentID>
+    <CodeName>Technology_Media.En-GB</CodeName>
+    <GUID>d650525c-d9a4-458d-bb78-a051955c67d2</GUID>
+    <ObjectType>cms.tag</ObjectType>
+  </TagParentID>
+  <TagTaxonomyID>
+    <CodeName>globalIndustry</CodeName>
+    <GUID>f803b21f-ee55-4715-b348-882acd851bf8</GUID>
+    <ObjectType>cms.taxonomy</ObjectType>
+  </TagTaxonomyID>
+  <TagTitle>Telecommunications</TagTitle>
+</cms.tag>

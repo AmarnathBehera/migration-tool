@@ -119,6 +119,64 @@
           <controlname>Kentico.Administration.Checkbox</controlname>
         </settings>
       </field>
+      <field allowempty="true" column="PersonCredentials" columnprecision="0" columntype="contentitemreference" enabled="true" guid="cadbe8d0-d15b-4a26-aee5-6373727fa9b0" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Credentials</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["16d85757-dc53-4cb7-8fbb-68a96431e1d7"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataCity" columnprecision="0" columntype="contentitemreference" enabled="true" guid="53f84c7f-474b-404b-984b-b93bc54825f6" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>City</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["efaa910b-971a-4c92-9535-fde264dc8ecf"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataOfficeLocation" columnprecision="0" columntype="contentitemreference" enabled="true" guid="7bf737dd-cca5-4e0f-a32b-894a0106fcd3" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Office location</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["28595e58-3d13-4414-8f96-8a31285037fe"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataProfileGroups" columnprecision="0" columntype="contentitemreference" enabled="true" guid="e8937549-6db6-404f-89e4-6de647cde065" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Profile Groups</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["aa488ff8-e898-4ea1-84ca-61354fd05187"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
       <field allowempty="true" column="Facebook" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="8630a140-0d85-473d-8515-7a1b0497233d" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
@@ -156,6 +214,9 @@
         <properties />
       </schema>
       <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
         <properties />
       </schema>
     </form>
