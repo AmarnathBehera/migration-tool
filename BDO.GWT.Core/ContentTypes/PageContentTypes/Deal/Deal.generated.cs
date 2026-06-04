@@ -51,19 +51,19 @@ namespace BDO
 		/// <summary>
 		/// Industry.
 		/// </summary>
-		public IEnumerable<TagReference> Industry { get; set; }
+		public IEnumerable<DealCardCommon> Industry { get; set; }
 
 
 		/// <summary>
 		/// SubIndustry.
 		/// </summary>
-		public IEnumerable<TagReference> SubIndustry { get; set; }
+		public IEnumerable<DealCardCommon> SubIndustry { get; set; }
 
 
 		/// <summary>
 		/// DealType.
 		/// </summary>
-		public IEnumerable<TagReference> DealType { get; set; }
+		public IEnumerable<DealCardCommon> DealType { get; set; }
 
 
 		/// <summary>
@@ -75,7 +75,7 @@ namespace BDO
 		/// <summary>
 		/// Size.
 		/// </summary>
-		public IEnumerable<TagReference> Size { get; set; }
+		public IEnumerable<DealCardCommon> Size { get; set; }
 
 
 		/// <summary>
