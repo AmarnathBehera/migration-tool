@@ -128,6 +128,9 @@ if (builder.Environment.IsDevelopment())
 // Add Application Insights telemetry
 builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
+// Loads the administration redirect domain (AdminRedirectOptions) from a configuration file section
+builder.Services.Configure<AdminRedirectOptions>(builder.Configuration.GetSection("AdminRedirectOptions"));
+
 var app = builder.Build();
 
 app.InitKentico();
@@ -138,8 +141,10 @@ app.UseCookiePolicy();
 
 app.UseAuthentication();
 
-// Configures the URL rewriting options
-var rewriteOptions = new RewriteOptions()
+if (!builder.Environment.IsDevelopment())
+{
+    // Configures the URL rewriting options
+    var rewriteOptions = new RewriteOptions()
     .Add(context =>
     {
         var httpContext = context.HttpContext;
@@ -162,8 +167,9 @@ var rewriteOptions = new RewriteOptions()
         }
     });
 
-// Adds the URL rewriting middleware to the request pipeline using the configured RewriteOptions
-app.UseRewriter(rewriteOptions);
+    // Adds the URL rewriting middleware to the request pipeline using the configured RewriteOptions
+    app.UseRewriter(rewriteOptions);
+}
 
 app.UseKentico();
 
