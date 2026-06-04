@@ -20,6 +20,11 @@ namespace BDO.GWT.Core.Tests.Services
 {
     public class DealPageServiceTests
     {
+        private static readonly string[] ExpectedDealTypeNames = ["M&A"];
+        private static readonly string[] ExpectedIndustryNames = ["Finance", "Tech"];
+        private static readonly string[] ExpectedSubIndustryNames = ["Banking"];
+        private static readonly string[] ExpectedRangeNames = ["Large"];
+
         private Mock<IHeroService> _heroServiceMock = null!;
         private Mock<ISidebarService> _sidebarServiceMock = null!;
         private Mock<IContentService> _contentServiceMock = null!;
@@ -100,15 +105,12 @@ namespace BDO.GWT.Core.Tests.Services
 
             var result = await _service.GetDealPageDtoAsync(CancellationToken.None);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.Title, Is.EqualTo("Meta Title"));
-                Assert.That(result.ClientName, Is.EqualTo("Acme Inc."));
-                Assert.That(result.Content, Is.Not.Null);
-                Assert.That(result.Hero, Is.Not.Null);
-                Assert.That(result.Hero.Title, Is.EqualTo("Hero"));
-                Assert.That(result.Sidebar, Is.Null);
-            });
+            Assert.That(result.Title, Is.EqualTo("Meta Title"));
+            Assert.That(result.ClientName, Is.EqualTo("Acme Inc."));
+            Assert.That(result.Content, Is.Not.Null);
+            Assert.That(result.Hero, Is.Not.Null);
+            Assert.That(result.Hero.Title, Is.EqualTo("Hero"));
+            Assert.That(result.Sidebar, Is.Null);
         }
 
         [Test]
@@ -139,13 +141,10 @@ namespace BDO.GWT.Core.Tests.Services
 
             var result = await _service.GetDealPageDtoAsync(CancellationToken.None);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.DealTypeNames, Is.EqualTo(new[] { "M&A" }));
-                Assert.That(result.IndustryNames, Is.EqualTo(new[] { "Finance", "Tech" }));
-                Assert.That(result.SubIndustryNames, Is.EqualTo(new[] { "Banking" }));
-                Assert.That(result.Range, Is.EqualTo(new[] { "Large" }));
-            });
+            Assert.That(result.DealTypeNames, Is.EqualTo(ExpectedDealTypeNames));
+            Assert.That(result.IndustryNames, Is.EqualTo(ExpectedIndustryNames));
+            Assert.That(result.SubIndustryNames, Is.EqualTo(ExpectedSubIndustryNames));
+            Assert.That(result.Range, Is.EqualTo(ExpectedRangeNames));
         }
 
         [Test]
