@@ -4,7 +4,6 @@ using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Services;
-using BDO.GWT.Domain.Core.Entities;
 using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Xperience.Core.Services;
 using CMS.ContentEngine;

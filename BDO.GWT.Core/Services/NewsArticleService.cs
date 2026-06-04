@@ -50,7 +50,7 @@ public class NewsArticleService : INewsArticleService
 
     public async Task<ContentSidebarDto> GetContentPageSidebarDto(NewsArticle contentPage, CancellationToken cancellationToken)
     {
-        var sidebarDto = await _sidebarService.GetSidebarDtoAsync(contentPage, cancellationToken);
+        var sidebarDto = await _sidebarService.GetNewsSidebarDtoAsync(contentPage, cancellationToken);
 
         sidebarDto.ShowCopyLinkButton = await GetShowCopyLinkOptionFromSectionPageAsync(contentPage, sidebarDto.ShowCopyLinkButton, cancellationToken);
         sidebarDto.TypeName = contentPage.ContentType?.FirstOrDefault()?.Name;

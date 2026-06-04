@@ -32,13 +32,11 @@
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
-          <controlname>Kentico.Administration.TextArea</controlname>
-          <CopyButtonVisible>False</CopyButtonVisible>
-          <MaxRowsNumber>5</MaxRowsNumber>
-          <MinRowsNumber>3</MinRowsNumber>
+          <ConfigurationName>Kentico.Administration.StructuredContent</ConfigurationName>
+          <controlname>Kentico.Administration.RichTextEditor</controlname>
         </settings>
       </field>
-      <field allowempty="true" column="Industry" columnprecision="0" columntype="taxonomy" enabled="true" guid="948a7b8d-df0f-4494-b9c1-58c782ff753e" visible="true">
+      <field allowempty="true" column="Industry" columnprecision="0" columntype="contentitemreference" enabled="true" guid="948a7b8d-df0f-4494-b9c1-58c782ff753e" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Industry</fieldcaption>
@@ -46,15 +44,14 @@
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
-          <controlname>Kentico.Administration.TagSelector</controlname>
-          <MaxSelectedTagsCount>10</MaxSelectedTagsCount>
-          <MinSelectedTagsCount>1</MinSelectedTagsCount>
-          <TaxonomyGroup>
-            <![CDATA[["f803b21f-ee55-4715-b348-882acd851bf8"]]]>
-          </TaxonomyGroup>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["09fd4259-c646-41e1-8363-6ed3c47ed8b2"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
-      <field allowempty="true" column="SubIndustry" columnprecision="0" columntype="taxonomy" enabled="true" guid="584b9dca-a1d6-46f5-a070-78f4563db586" visible="true">
+      <field allowempty="true" column="SubIndustry" columnprecision="0" columntype="contentitemreference" enabled="true" guid="584b9dca-a1d6-46f5-a070-78f4563db586" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Sub Industry</fieldcaption>
@@ -62,16 +59,15 @@
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
-          <controlname>Kentico.Administration.TagSelector</controlname>
-          <MaxSelectedTagsCount>10</MaxSelectedTagsCount>
-          <MinSelectedTagsCount>1</MinSelectedTagsCount>
-          <TaxonomyGroup>
-            <![CDATA[["f803b21f-ee55-4715-b348-882acd851bf8"]]]>
-          </TaxonomyGroup>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["09fd4259-c646-41e1-8363-6ed3c47ed8b2"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
         </settings>
         <visibilityconditiondata>
           <VisibilityConditionConfiguration>
-            <Identifier>Kentico.Administration.MinLengthTaxonomy</Identifier>
+            <Identifier>Kentico.Administration.MinLengthContentItems</Identifier>
             <Properties>
               <PropertyName>Industry</PropertyName>
               <Length>1</Length>
@@ -79,7 +75,7 @@
           </VisibilityConditionConfiguration>
         </visibilityconditiondata>
       </field>
-      <field allowempty="true" column="DealType" columnprecision="0" columntype="taxonomy" enabled="true" guid="48680518-2f40-47d0-9ae7-fb6cbc8a635d" visible="true">
+      <field allowempty="true" column="DealType" columnprecision="0" columntype="contentitemreference" enabled="true" guid="48680518-2f40-47d0-9ae7-fb6cbc8a635d" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Deal type</fieldcaption>
@@ -87,11 +83,11 @@
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
-          <controlname>Kentico.Administration.TagSelector</controlname>
-          <MaxSelectedTagsCount>10</MaxSelectedTagsCount>
-          <TaxonomyGroup>
-            <![CDATA[["341f46fa-7d0d-4500-920b-36698d19dc97"]]]>
-          </TaxonomyGroup>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["09fd4259-c646-41e1-8363-6ed3c47ed8b2"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
       <field column="DateField" columnprecision="0" columntype="date" enabled="true" guid="4a35f79b-5035-44de-b957-dc642704b01a" visible="true">
@@ -104,7 +100,7 @@
           <controlname>Kentico.Administration.DateInput</controlname>
         </settings>
       </field>
-      <field allowempty="true" column="Size" columnprecision="0" columntype="taxonomy" enabled="true" guid="06db6bec-f0c6-4e23-91e1-114cea43e1d6" visible="true">
+      <field allowempty="true" column="Size" columnprecision="0" columntype="contentitemreference" enabled="true" guid="06db6bec-f0c6-4e23-91e1-114cea43e1d6" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Deal size</fieldcaption>
@@ -112,12 +108,11 @@
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
-          <controlname>Kentico.Administration.TagSelector</controlname>
-          <MaxSelectedTagsCount>1</MaxSelectedTagsCount>
-          <MinSelectedTagsCount>1</MinSelectedTagsCount>
-          <TaxonomyGroup>
-            <![CDATA[["1db6a51b-ddb8-4894-a28f-bb568a0e850e"]]]>
-          </TaxonomyGroup>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["09fd4259-c646-41e1-8363-6ed3c47ed8b2"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
       <field allowempty="true" column="MetadataOfficeLocation" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="97452d9a-b043-4d95-b691-4cdb210316b3" visible="true">
