@@ -56,9 +56,11 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 .ReturnsAsync(expectedDto);
 
             var result = await _controller.Index(CancellationToken.None) as ViewResult;
-
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result!.Model, Is.SameAs(expectedDto));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result!.Model, Is.SameAs(expectedDto));
+            });
         }
 
         [Test]

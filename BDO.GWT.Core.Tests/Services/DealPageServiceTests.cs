@@ -93,8 +93,11 @@ namespace BDO.GWT.Core.Tests.Services
 
             var result = await _service.GetDealPageDtoAsync(CancellationToken.None);
 
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Title, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Title, Is.Null);
+            });
         }
 
         [Test]
@@ -104,13 +107,15 @@ namespace BDO.GWT.Core.Tests.Services
             SetupDealPages(new[] { deal });
 
             var result = await _service.GetDealPageDtoAsync(CancellationToken.None);
-
-            Assert.That(result.Title, Is.EqualTo("Meta Title"));
-            Assert.That(result.ClientName, Is.EqualTo("Acme Inc."));
-            Assert.That(result.Content, Is.Not.Null);
-            Assert.That(result.Hero, Is.Not.Null);
-            Assert.That(result.Hero.Title, Is.EqualTo("Hero"));
-            Assert.That(result.Sidebar, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Title, Is.EqualTo("Meta Title"));
+                Assert.That(result.ClientName, Is.EqualTo("Acme Inc."));
+                Assert.That(result.Content, Is.Not.Null);
+                Assert.That(result.Hero, Is.Not.Null);
+                Assert.That(result.Hero.Title, Is.EqualTo("Hero"));
+                Assert.That(result.Sidebar, Is.Null);
+            });
         }
 
         [Test]
@@ -141,10 +146,13 @@ namespace BDO.GWT.Core.Tests.Services
 
             var result = await _service.GetDealPageDtoAsync(CancellationToken.None);
 
-            Assert.That(result.DealTypeNames, Is.EqualTo(ExpectedDealTypeNames));
-            Assert.That(result.IndustryNames, Is.EqualTo(ExpectedIndustryNames));
-            Assert.That(result.SubIndustryNames, Is.EqualTo(ExpectedSubIndustryNames));
-            Assert.That(result.Range, Is.EqualTo(ExpectedRangeNames));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.DealTypeNames, Is.EqualTo(ExpectedDealTypeNames));
+                Assert.That(result.IndustryNames, Is.EqualTo(ExpectedIndustryNames));
+                Assert.That(result.SubIndustryNames, Is.EqualTo(ExpectedSubIndustryNames));
+                Assert.That(result.Range, Is.EqualTo(ExpectedRangeNames));
+            });
         }
 
         [Test]
