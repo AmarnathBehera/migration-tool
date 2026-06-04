@@ -1,4 +1,5 @@
 ﻿using BDO.GWT.Core.DTOs;
+using BDO.GWT.Web.Core.DTOs.Pages;
 
 namespace BDO.GWT.Core.Services;
 public interface ISidebarService

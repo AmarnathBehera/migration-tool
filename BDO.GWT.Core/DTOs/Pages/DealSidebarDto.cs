@@ -1,5 +1,7 @@
 ﻿using BDO.GWT.Core.DTOs;
 
+namespace BDO.GWT.Web.Core.DTOs.Pages;
+
 public class DealSidebarDto : ISidebarDto
 {
     public DateTime Date { get; set; }
