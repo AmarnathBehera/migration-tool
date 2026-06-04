@@ -1,14 +1,10 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
-using BDO.GWT.Core.DTOs;
-using BDO.GWT.Core.services;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.DTOs.Pages;
 using BDO.GWT.Web.Core.Services;
-using CMS.ContentEngine;
-using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 
@@ -88,23 +84,18 @@ public class DealPageService : IDealPageService
         return dto;
     }
 
-    private static List<DealCardDto> GetDeals(IEnumerable<DealCardCommon>? deals, CancellationToken cancellationToken)
+    private static List<string> GetDeals(IEnumerable<DealCardCommon>? deals, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
         if (deals == null)
         {
-            return new List<DealCardDto>();
+            return new List<string>();
         }
 
         return deals
             .Where(p => p != null)
-            .Select(p => new DealCardDto
-            {
-                Name = p.Name,
-                CodeName = p.CodeName,
-                Language = p.Language,
-            })
+            .Select(p => p.Name)
             .ToList();
     }
 }
