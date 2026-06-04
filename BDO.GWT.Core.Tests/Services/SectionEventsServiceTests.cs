@@ -7,7 +7,6 @@ using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.Services;
-using BDO.GWT.Domain.Core.Entities;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
 using CMS.ContentEngine;
