@@ -32,10 +32,8 @@
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
-          <controlname>Kentico.Administration.TextArea</controlname>
-          <CopyButtonVisible>False</CopyButtonVisible>
-          <MaxRowsNumber>5</MaxRowsNumber>
-          <MinRowsNumber>3</MinRowsNumber>
+          <ConfigurationName>Kentico.Administration.StructuredContent</ConfigurationName>
+          <controlname>Kentico.Administration.RichTextEditor</controlname>
         </settings>
       </field>
       <field allowempty="true" column="Industry" columnprecision="0" columntype="contentitemreference" enabled="true" guid="948a7b8d-df0f-4494-b9c1-58c782ff753e" visible="true">
