@@ -5,7 +5,6 @@ using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Services.Footer;
 using BDO.GWT.Core.Services.Header;
 using BDO.GWT.Core.Services.Widget;
-using BDO.GWT.Domain.Core.Entities;
 using BDO.GWT.GLOBAL.Components.FormComponents.CustomDropdown;
 using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Core.LiveSite.Services;
