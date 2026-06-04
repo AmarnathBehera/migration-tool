@@ -87,8 +87,9 @@ public static class ReactComponentType
     public const string CareerSidebarGUID = "1203d3fb-df5e-4ac9-ae98-e9fc39b18cbc";
     public const string LocalNavigationItemGUID = "c4403ffb-12e9-4f20-86de-3379bc0514f0";
     public const string EventsWebinarsDetailsGUID = "9d7a5c92-c4b0-4fe8-8177-e87cbb79abf3";
-    public const string KeyTakeAwaysGUID = "05a3230a-1a8c-43b2-be13-127d2338d596";
     public const string FlexibleContentWidgetGUID = "906561a1-8778-4812-843a-018e44488577";
+    public const string KeyTakeAwaysGUID = "c4403ffb-12e9-4f20-86de-3379bc0514f0";
+    public const string DealDetailsGUID = "9ba2033f-9c72-4922-88c2-22f911be95c2";
 }
 
 
