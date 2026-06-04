@@ -128,6 +128,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// RelevantContactPersonDeal.
+		/// </summary>
+		public IEnumerable<IWebPageFieldsSource> RelevantContactPersonDeal { get; set; }
+
+
+		/// <summary>
 		/// ShowCallToAction.
 		/// </summary>
 		public bool ShowCallToAction { get; set; }
