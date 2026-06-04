@@ -192,6 +192,24 @@ namespace BDO
 
 
 		/// <summary>
+		/// MetadataBusinessLines.
+		/// </summary>
+		public IEnumerable<BusinessLine> MetadataBusinessLines { get; set; }
+
+
+		/// <summary>
+		/// MetadataSpecialtiesAreas.
+		/// </summary>
+		public IEnumerable<SpecialtiesArea> MetadataSpecialtiesAreas { get; set; }
+
+
+		/// <summary>
+		/// MetadataSpecialtiesPages.
+		/// </summary>
+		public IEnumerable<SpecialtiesPage> MetadataSpecialtiesPages { get; set; }
+
+
+		/// <summary>
 		/// MetadataOGTitle.
 		/// </summary>
 		public string MetadataOGTitle { get; set; }
