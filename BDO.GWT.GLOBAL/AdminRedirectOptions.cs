@@ -1,4 +1,4 @@
-﻿namespace GWTXbyKWeb
+﻿namespace BDO.GWT.Core
 {
     public class AdminRedirectOptions
     {
