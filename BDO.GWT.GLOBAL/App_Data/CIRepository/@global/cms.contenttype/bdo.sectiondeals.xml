@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Section Deals</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="ee22c2d0-6e40-417a-b5b4-fb45ce810bb0" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="f8dfe738-2cd7-411e-b471-5bea0d11be4e" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="711a871d-87a4-425a-abef-c8d4f9f32493" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <field allowempty="true" column="SectionDealsFilteringEnabled" columnprecision="0" columntype="boolean" enabled="true" guid="21aa3c00-d644-4c59-89c7-ec5c4bb82754" visible="true">
+        <properties>
+          <defaultvalue>True</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Enable filtering</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field column="SectionDealsFilters" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="d2e13307-dccf-439e-b1db-85b1b58a8a56" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Filters</fieldcaption>
+          <fielddescription>
+            <![CDATA[Filters that visitor will be able to filter deals by.]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>False</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>
+            <![CDATA[XperienceCommunity.Multichoiceformcontrol.MultiChoice]]>
+          </controlname>
+          <Options>
+<![CDATA[
+industry;Industry
+subIndustry;Sub-Industry
+dealType;Deal Type
+year;Year
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+      </field>
+      <field column="ShowCopyUrlButtonInDealPage" columnprecision="0" columntype="boolean" enabled="true" guid="2e2a44f2-4647-4645-82df-1a7dd189b1e8" visible="true">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show copy URL button in Deal Page</fieldcaption>
+          <fielddescription>
+            <![CDATA[Should the copy URL button be shown in descendant Deal Pages?]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>e82cdc6e-697b-4151-95a0-c156b65d69fb</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-windows</ClassIconClass>
+  <ClassName>BDO.SectionDeals</ClassName>
+  <ClassShortName>BDOSectionDeals</ClassShortName>
+  <ClassTableName>BDO_SectionDeals</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>
