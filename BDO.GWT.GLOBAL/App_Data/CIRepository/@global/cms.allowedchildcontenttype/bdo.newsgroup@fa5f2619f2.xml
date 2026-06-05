@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.NewsGroup</CodeName>
+    <GUID>137818af-e84f-48da-bc76-09dc9a6357c7</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.NewsArticle">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.NewsArticle</CodeName>
+        <GUID>4a8412a4-b16a-4e13-85f3-1bd503c0043e</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

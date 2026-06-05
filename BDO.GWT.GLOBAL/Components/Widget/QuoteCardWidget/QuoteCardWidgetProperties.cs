@@ -58,8 +58,8 @@ public class QuoteCardWidgetProperties : IWidgetProperties
     [DropDownComponent(Label = "Primary Button link target", Order = 11, Options = "_self;Same tab\r\n_blank;New tab")]
 
     public string PrimaryButtonLinkTarget { get; set; } = "_self";
-
-    [RadioGroupComponent(Label = "Quote text", Order = 12, Options = "small;Small\r\nmedium;Medium\r\nlarge;Large")]
+                                                                      
+    [RadioGroupComponent(Label = "Quote text", Order = 12, Options = "small;Small\r\nstandard;Standard\r\nlarge;Large")]
     public string Size { get; set; } = "standard";
 
     [DropDownComponent(Label = "Top margin", Order = 13, Options = "0px;None\n20px\n40px\n60px\n80px")]

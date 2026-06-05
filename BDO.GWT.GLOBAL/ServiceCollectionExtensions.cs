@@ -1,5 +1,4 @@
 ﻿using BDO.GWT.Common.Options;
-using BDO.GWT.Core.Entities;
 using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Services;
@@ -12,7 +11,7 @@ using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
-using CMS.Core;
+using BDO.GWT.Xperience.Core.Services;
 using GWTXbyKWeb.Components.Services.SEOOptions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -36,7 +35,6 @@ public static class ServiceCollectionExtensions
           .ValidateDataAnnotations();
 
         serviceCollection.AddHttpClient();
-
         serviceCollection.AddScoped<GlobalSettingsService>();
         serviceCollection.AddScoped<IContactPageService, ContactPageService>();
         serviceCollection.AddScoped<IHeroService, HeroService>();
@@ -74,7 +72,11 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IExternalPeopleHelper, ExternalPeopleHelper>();
         serviceCollection.AddScoped<IFilteringHelper, FilteringHelper>();
         serviceCollection.AddScoped<ISettingService, SettingService>();
-
+        serviceCollection.AddScoped<ITimeZoneService, TimeZoneService>();
+        serviceCollection.AddScoped<ISectionEventsService, SectionEventsService>();
+        serviceCollection.AddScoped<IEventWebinarCardsService, EventWebinarCardsService>(); // ADD THIS
+        serviceCollection.AddScoped<IEventRegistrationFormPageService, EventRegistrationFormPageService>();
+        serviceCollection.AddScoped<IEventWebinarPageService, EventWebinarPageService>();
         serviceCollection.AddScoped<IBreadcrumbsService, BreadcrumbsService>();
         serviceCollection.AddScoped<IFormBuilderService, FormBuilderService>();
         serviceCollection.AddScoped<ISectionIndustriesService, SectionIndustriesService>();
@@ -90,11 +92,15 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ICareerPageService, CareerPageService>();
         serviceCollection.AddScoped<ICareersPageService, CareersPageService>();
         serviceCollection.AddScoped<ICareerDetailPageService, CareerDetailPageService>();
-        serviceCollection.AddScoped<ICareerCategoryPageService , CareerCategoryPageService>();
+        serviceCollection.AddScoped<ICareerCategoryPageService, CareerCategoryPageService>();
         serviceCollection.AddScoped<ICareerContentPageService, CareerContentPageService>();
-
         serviceCollection.AddScoped<IChannelAccessService, ChannelAccessService>();
         serviceCollection.AddScoped<ISocialMediaButtonsService, SocialMediaButtonsService>();
+        serviceCollection.AddScoped<ISpecialtiesPageService, SpecialtiesPageService>();
+        serviceCollection.AddScoped<ISpecialtiesAreaPageService, SpecialtiesAreaPageService>();
+        serviceCollection.AddScoped<ISpecialtiesCategoryPageService, SpecialtiesCategoryPageService>();
+        serviceCollection.AddScoped<ISectionSpecialtiesService, SectionSpecialtiesService>();
+        serviceCollection.AddScoped<IDealPageService, DealPageService>();
         serviceCollection.AddScoped<ITabAccordionService, TabAccordionService>();
     }
 

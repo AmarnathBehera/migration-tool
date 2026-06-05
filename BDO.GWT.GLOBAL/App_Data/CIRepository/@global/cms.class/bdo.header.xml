@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Header</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="HeaderID" columntype="integer" enabled="true" guid="b5395064-e8a0-44fe-a985-8ece01b8ac90" isPK="true" />
+      <field column="SiteLogoURL" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="3bb3eddc-494c-483e-86e8-ec857ce24891" />
+      <field column="SiteDisplayNamesbyCulture" columnprecision="0" columntype="longtext" enabled="true" guid="0be0efef-4013-48ed-a449-2ef17496a0c4" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>fa6b0066-abba-42c7-aee6-946d2a4c594c</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.Header</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_Header</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

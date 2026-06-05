@@ -78,6 +78,7 @@
     <link rel="stylesheet" href="/dist/master.css" asp-append-version="true" />
     <link rel="stylesheet" href="/Public/Sections/section-column.css" asp-append-version="true" />
     <page-builder-styles />
+    @await RenderSectionAsync("SchemaMarkup", required: false)
 </head>
 
 <body data-lang="@CultureContext.CurrentLanguageTag.ToLowerInvariant()">
@@ -90,16 +91,16 @@
 
     @RenderBody()
 
-   
-   
+
+
     <script src="/dist/vendor.bundle.js" asp-append-version="true" data-cookieconsent="ignore"></script>
     <script src="/dist/master.bundle.js" asp-append-version="true" data-cookieconsent="ignore"></script>
 
-    
-@await (Component.InvokeAsync<ScriptsBottomBody>())
-@(await Component.InvokeAsync<Footer>())
-@await Html.Kentico().PageBuilderScriptsAsync()
-@await (Component.InvokeAsync<ScriptsBottomBody>())
+
+    @await (Component.InvokeAsync<ScriptsBottomBody>())
+    @(await Component.InvokeAsync<Footer>())
+    @await Html.Kentico().PageBuilderScriptsAsync()
+    @await (Component.InvokeAsync<ScriptsBottomBody>())
 
     @(ReactService.RenderCombinedScript())
 </body>

@@ -144,6 +144,7 @@ public interface ICareerDetailPageService
         return sidebarDto;
     }
 
+    // need to add from common sidebar service
     public async Task<ContentSidebarDto> GetSidebarDtoAsync(Career page, CancellationToken cancellationToken)
     {
         var settings = await _settingsService.GetPrintorShareInfo();

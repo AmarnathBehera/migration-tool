@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.tag>
+  <TagGUID>edb00c74-38ec-4f67-92eb-474623ca7c52</TagGUID>
+  <TagMetadata>
+    <![CDATA[{"Translations":{}}]]>
+  </TagMetadata>
+  <TagName>Expert</TagName>
+  <TagOrder>1</TagOrder>
+  <TagTaxonomyID>
+    <CodeName>CareerLevels</CodeName>
+    <GUID>b00e5ac1-3ef7-49cd-bf37-50602aae3c56</GUID>
+    <ObjectType>cms.taxonomy</ObjectType>
+  </TagTaxonomyID>
+  <TagTitle>Expert</TagTitle>
+</cms.tag>

@@ -49,9 +49,6 @@ public class CardsService : ICardsService
             var options = filterParameterData.FilterParameterType switch
             {
                 FilterParameterType.Page => await BuildOptionsForPageFilterAsync(filterParameterData, cancellationToken),
-                // FilterParameterType.Entity => await BuildOptionsForEntityFilterAsync(filterParameterData, cancellationToken),
-                // FilterParameterType.Field => await BuildOptionsForFieldFilterAsync(filterParameterData, filterParameterName, nodeAliasPath, cancellationToken),
-                FilterParameterType.Taxonomy => await BuildOptionsForTaxonomyFilterAsync(filterParameterData, cancellationToken),
                 _ => throw new NotSupportedException($"Filter parameter type {filterParameterData.FilterParameterType} is not supported."),
             };
 
@@ -68,56 +65,25 @@ public class CardsService : ICardsService
 
         var items = await _contentService.GetItemsByTypesAsync(
             new[] { entityType },
-            _websiteChannelContext.WebsiteChannelID, 
+            _websiteChannelContext.WebsiteChannelID,
             cancellationToken);
 
         var options = items
-      .Select(x =>
-      {
-          var type = x.GetType();
-
-          var metadataTitle =
-              type.GetProperty("MetadataTitle")?.GetValue(x) as string;
-
-          var metadataOgTitle =
-              type.GetProperty("MetadataOGTitle")?.GetValue(x) as string;
-
-          var systemFields =
-              type.GetProperty("SystemFields")?.GetValue(x);
-
-          var contentItemName =
-              systemFields?.GetType()
-                  .GetProperty("ContentItemName")
-                  ?.GetValue(systemFields) as string;
-
-          var name = metadataTitle ?? metadataOgTitle ?? contentItemName;
-
-          return new OptionDto
-          {
-              Value = name,
-              Label = name
-          };
-      })
-      .Where(x => !string.IsNullOrWhiteSpace(x.Value))
-      .OrderBy(x => x.Label)
-      .ToArray();
-
-        return options;
-
-    }
-    private async Task<OptionDto[]> BuildOptionsForTaxonomyFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
-    {
-        var tags = await _taxonomyTagRetriever.GetTaxonomyTagsAsync(
-            filterParameterData.AdminDisplayName, 
-            _cultureContext.CurrentLanguageTag, 
-            null, 
-            cancellationToken);
-
-        var options = tags
-            .Select(tag => new OptionDto
+            .Select(x =>
             {
-                Value = tag.Name ,
-                Label = tag.Name
+                var type = x.GetType();
+                var displayName =
+                    GetStringProperty(x, type, "MetadataTitle")
+                    ?? GetStringProperty(x, type, "PageTitle")
+                    ?? GetStringProperty(x, type, "Name")
+                    ?? GetStringProperty(x, type, "MetadataOGTitle")
+                    ?? GetContentItemName(x, type);
+
+                return new OptionDto
+                {
+                    Value = displayName,
+                    Label = displayName
+                };
             })
             .Where(x => !string.IsNullOrWhiteSpace(x.Value))
             .OrderBy(x => x.Label)
@@ -125,4 +91,24 @@ public class CardsService : ICardsService
 
         return options;
     }
+
+    private static string? GetStringProperty(object instance, Type type, string propertyName)
+    {
+        var value = type.GetProperty(propertyName)?.GetValue(instance) as string;
+        return string.IsNullOrWhiteSpace(value) ? null : value;
+    }
+
+    private static string? GetContentItemName(object instance, Type type)
+    {
+        var systemFields = type.GetProperty("SystemFields")?.GetValue(instance);
+        if (systemFields is null)
+        {
+            return null;
+        }
+
+        return systemFields.GetType()
+            .GetProperty("ContentItemName")
+            ?.GetValue(systemFields) as string;
+    }
+
 }

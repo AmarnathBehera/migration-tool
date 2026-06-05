@@ -2,11 +2,13 @@
 using BDO.GWT.Common;
 using BDO.GWT.Common.Options;
 using BDO.GWT.Core;
+using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Domain.Services;
 using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
+using BDO.GWT.Xperience.Core.Services;
 using BDO.GWT.Xperience.LiveSite.Services;
 using Kentico.Activities.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
@@ -18,9 +20,11 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.WebEncoders;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -38,32 +42,7 @@ builder.Services.AddKentico(features =>
     {
         DefaultSectionIdentifier = ComponentIdentifiers.Sections.Container,
         RegisterDefaultSection = true,
-        ContentTypeNames = new[]
-        {
-          HomePage.CONTENT_TYPE_NAME,
-          SectionAbout.CONTENT_TYPE_NAME,
-          AboutPage.CONTENT_TYPE_NAME,
-          Contact.CONTENT_TYPE_NAME,
-          Person.CONTENT_TYPE_NAME,
-          Locations.CONTENT_TYPE_NAME,
-          LocationCity.CONTENT_TYPE_NAME,
-          SectionIndustries.CONTENT_TYPE_NAME,
-          IndustryCategory.CONTENT_TYPE_NAME,
-          Industry.CONTENT_TYPE_NAME,
-          IndustryService.CONTENT_TYPE_NAME,
-          SectionServices.CONTENT_TYPE_NAME,
-          BusinessLine.CONTENT_TYPE_NAME,
-          Service.CONTENT_TYPE_NAME,
-          ServiceArea.CONTENT_TYPE_NAME,
-          Sub_Service.CONTENT_TYPE_NAME,
-          SectionCareers.CONTENT_TYPE_NAME,
-          Career.CONTENT_TYPE_NAME,
-          Careers.CONTENT_TYPE_NAME,
-          CareerCategory.CONTENT_TYPE_NAME,
-          CareerContent.CONTENT_TYPE_NAME
-
-
-       }
+        ContentTypeNames = PageBuilderContentTypes.ContentTypes
     }); features.UseActivityTracking();
     features.UseWebPageRouting();
     features.UseEmailStatisticsLogging();
@@ -148,6 +127,9 @@ if (builder.Environment.IsDevelopment())
 // Add Application Insights telemetry
 builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
+// Loads the administration redirect domain (AdminRedirectOptions) from a configuration file section
+builder.Services.Configure<AdminRedirectOptions>(builder.Configuration.GetSection("AdminRedirectOptions"));
+
 var app = builder.Build();
 
 app.InitKentico();
@@ -157,6 +139,36 @@ app.UseStaticFiles();
 app.UseCookiePolicy();
 
 app.UseAuthentication();
+
+if (!builder.Environment.IsDevelopment())
+{
+    // Configures the URL rewriting options
+    var rewriteOptions = new RewriteOptions()
+    .Add(context =>
+    {
+        var httpContext = context.HttpContext;
+        var request = httpContext.Request;
+
+        // Checks if the URL path starts with '/admin'
+        if (request.Path.StartsWithSegments("/admin", StringComparison.OrdinalIgnoreCase))
+        {
+            // Gets the redirect domain for the administration
+            string adminDomain = httpContext.RequestServices
+                .GetRequiredService<IOptions<AdminRedirectOptions>>().Value.RedirectDomain;
+
+            // Checks if the current host is not already the administration domain
+            if (!adminDomain.Equals(request.Host.ToString(), StringComparison.OrdinalIgnoreCase))
+            {
+                // Redirects the request to the new domain
+                httpContext.Response.Redirect($"//{adminDomain}{request.Path}{request.QueryString}", permanent: false);
+                context.Result = RuleResult.EndResponse;
+            }
+        }
+    });
+
+    // Adds the URL rewriting middleware to the request pipeline using the configured RewriteOptions
+    app.UseRewriter(rewriteOptions);
+}
 
 app.UseKentico();
 

@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.form>
+  <FormBuilderLayout>
+<![CDATA[
+{
+  "editableAreas": [
+    {
+      "identifier": "DefaultFormBuilderArea",
+      "sections": [
+        {
+          "identifier": "00000000-0000-0000-0000-000000000000",
+          "type": "Kentico.DefaultSection",
+          "zones": [
+            {
+              "identifier": "81e8c30d-f6ae-4b86-a966-5dd76e5311e2",
+              "formComponents": [
+                {
+                  "identifier": "ead51f3a-159a-4573-8a3f-34dd6568ed0e"
+                },
+                {
+                  "identifier": "96c0942c-5616-425d-b96a-8c697bda2a8f"
+                },
+                {
+                  "identifier": "283fe45b-6141-449e-b64a-6a0ea9aa61c5"
+                }
+              ]
+            }
+          ],
+          "properties": null
+        }
+      ]
+    }
+  ]
+}
+]]>
+  </FormBuilderLayout>
+  <FormClassID>
+    <CodeName>BizForm.Tform1</CodeName>
+    <GUID>11f862c9-ae8a-47b6-b9c9-d1bb05d4abcb</GUID>
+    <ObjectType>cms.formclass</ObjectType>
+  </FormClassID>
+  <FormDisplayName>Tform1</FormDisplayName>
+  <FormGUID>735dfab9-be8c-4f6b-b488-3395a1c9ae75</FormGUID>
+  <FormItems>0</FormItems>
+  <FormLogActivity>True</FormLogActivity>
+  <FormName>Tform1</FormName>
+</cms.form>

@@ -55,18 +55,7 @@ namespace BDO
         public virtual string SeoSettingsRobots
         {
             get => ValidationHelper.GetString(GetValue(nameof(SeoSettingsRobots)), String.Empty);
-            set => SetValue(nameof(SeoSettingsRobots), value);
-        }
-
-
-        /// <summary>
-        /// Seo settings security.
-        /// </summary>
-        [DatabaseField]
-        public virtual string SeoSettingsSecurity
-        {
-            get => ValidationHelper.GetString(GetValue(nameof(SeoSettingsSecurity)), String.Empty);
-            set => SetValue(nameof(SeoSettingsSecurity), value);
+            set => SetValue(nameof(SeoSettingsRobots), value, String.Empty);
         }
 
 
@@ -89,6 +78,17 @@ namespace BDO
         {
             get => ValidationHelper.GetGuid(GetValue(nameof(SeoSettingsGUID)), Guid.Empty);
             set => SetValue(nameof(SeoSettingsGUID), value);
+        }
+
+
+        /// <summary>
+        /// Seo settings security.
+        /// </summary>
+        [DatabaseField]
+        public virtual string SeoSettingsSecurity
+        {
+            get => ValidationHelper.GetString(GetValue(nameof(SeoSettingsSecurity)), String.Empty);
+            set => SetValue(nameof(SeoSettingsSecurity), value, String.Empty);
         }
 
 

@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.tag>
+  <TagGUID>30895033-8c36-49c1-8051-0117dd59ea2f</TagGUID>
+  <TagMetadata>
+    <![CDATA[{"Translations":{}}]]>
+  </TagMetadata>
+  <TagName>Mid-Senior</TagName>
+  <TagOrder>6</TagOrder>
+  <TagTaxonomyID>
+    <CodeName>CareerLevels</CodeName>
+    <GUID>b00e5ac1-3ef7-49cd-bf37-50602aae3c56</GUID>
+    <ObjectType>cms.taxonomy</ObjectType>
+  </TagTaxonomyID>
+  <TagTitle>Mid-Senior</TagTitle>
+</cms.tag>

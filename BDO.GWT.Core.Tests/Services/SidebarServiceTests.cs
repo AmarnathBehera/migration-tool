@@ -1,5 +1,6 @@
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Services;
+using BDO.GWT.Web.Core.LiveSite.DTOs;
 using Moq;
 
 namespace BDO.GWT.Core.Tests.Services;
@@ -18,7 +19,7 @@ public class SidebarServiceTests
     }
 
     [Test]
-    public async Task GetSidebarDtoAsync_WhenNoSettings_ReturnsDefaultSidebar()
+    public async Task GetNewsSidebarDtoAsync_WhenNoSettings_ReturnsDefaultSidebar()
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
@@ -26,13 +27,13 @@ public class SidebarServiceTests
 
         var page = new NewsArticle();
 
-        var result = await _service.GetSidebarDtoAsync(page, CancellationToken.None);
+        var result = await _service.GetNewsSidebarDtoAsync(page, CancellationToken.None);
 
         Assert.That(result, Is.Not.Null);
     }
 
     [Test]
-    public async Task GetSidebarDtoAsync_WhenEmptySettings_ReturnsDefaultSidebar()
+    public async Task GetNewsSidebarDtoAsync_WhenEmptySettings_ReturnsDefaultSidebar()
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
@@ -40,13 +41,13 @@ public class SidebarServiceTests
 
         var page = new NewsArticle();
 
-        var result = await _service.GetSidebarDtoAsync(page, CancellationToken.None);
+        var result = await _service.GetNewsSidebarDtoAsync(page, CancellationToken.None);
 
         Assert.That(result, Is.Not.Null);
     }
 
     [Test]
-    public async Task GetSidebarDtoAsync_WhenNoSettings_ShowPrintButtonReflectsPageValue()
+    public async Task GetNewsSidebarDtoAsync_WhenNoSettings_ShowPrintButtonReflectsPageValue()
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
@@ -54,13 +55,13 @@ public class SidebarServiceTests
 
         var page = new NewsArticle { ShowPrintButton = true };
 
-        var result = await _service.GetSidebarDtoAsync(page, CancellationToken.None);
+        var result = await _service.GetNewsSidebarDtoAsync(page, CancellationToken.None);
 
         Assert.That(result.ShowPrintButton, Is.True);
     }
 
     [Test]
-    public async Task GetSidebarDtoAsync_WhenNoSettings_DownloadButtonAttachmentIsNull()
+    public async Task GetNewsSidebarDtoAsync_WhenNoSettings_DownloadButtonAttachmentIsNull()
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
@@ -68,13 +69,13 @@ public class SidebarServiceTests
 
         var page = new NewsArticle();
 
-        var result = await _service.GetSidebarDtoAsync(page, CancellationToken.None);
+        var result = await _service.GetNewsSidebarDtoAsync(page, CancellationToken.None);
 
         Assert.That(result.DownloadButtonAttachment, Is.Null);
     }
 
     [Test]
-    public async Task GetSidebarDtoAsync_WhenShowSocialMediaButtonsFalse_SocialMediaButtonsIsNull()
+    public async Task GetNewsSidebarDtoAsync_WhenShowSocialMediaButtonsFalse_SocialMediaButtonsIsNull()
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
@@ -82,13 +83,13 @@ public class SidebarServiceTests
 
         var page = new NewsArticle { ShowSocialMediaButtons = false };
 
-        var result = await _service.GetSidebarDtoAsync(page, CancellationToken.None);
+        var result = await _service.GetNewsSidebarDtoAsync(page, CancellationToken.None);
 
         Assert.That(result.SocialMediaButtons, Is.Null);
     }
 
     [Test]
-    public async Task GetSidebarDtoAsync_WhenShowSocialMediaButtonsTrue_CallsSocialMediaButtonsService()
+    public async Task GetNewsSidebarDtoAsync_WhenShowSocialMediaButtonsTrue_CallsSocialMediaButtonsService()
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
@@ -101,7 +102,7 @@ public class SidebarServiceTests
 
         var page = new NewsArticle { ShowSocialMediaButtons = true };
 
-        var result = await _service.GetSidebarDtoAsync(page, CancellationToken.None);
+        var result = await _service.GetNewsSidebarDtoAsync(page, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -111,7 +112,7 @@ public class SidebarServiceTests
     }
 
     [Test]
-    public async Task GetSidebarDtoAsync_WhenShowSocialMediaButtonsTrue_VerifiesServiceCall()
+    public async Task GetNewsSidebarDtoAsync_WhenShowSocialMediaButtonsTrue_VerifiesServiceCall()
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
@@ -123,14 +124,14 @@ public class SidebarServiceTests
 
         var page = new NewsArticle { ShowSocialMediaButtons = true };
 
-        await _service.GetSidebarDtoAsync(page, CancellationToken.None);
+        await _service.GetNewsSidebarDtoAsync(page, CancellationToken.None);
 
         _socialMediaButtonsServiceMock.Verify(
             x => x.GetSocialMediaButtonsDto(page, It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Test]
-    public async Task GetSidebarDtoAsync_WhenShowSocialMediaButtonsFalse_DoesNotCallSocialMediaButtonsService()
+    public async Task GetNewsSidebarDtoAsync_WhenShowSocialMediaButtonsFalse_DoesNotCallSocialMediaButtonsService()
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
@@ -138,7 +139,7 @@ public class SidebarServiceTests
 
         var page = new NewsArticle { ShowSocialMediaButtons = false };
 
-        await _service.GetSidebarDtoAsync(page, CancellationToken.None);
+        await _service.GetNewsSidebarDtoAsync(page, CancellationToken.None);
 
         _socialMediaButtonsServiceMock.Verify(
             x => x.GetSocialMediaButtonsDto(It.IsAny<NewsArticle>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);

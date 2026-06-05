@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>External search engines</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ExternalsearchenginesID" columntype="integer" enabled="true" guid="553183af-1780-4b1b-9391-1700dfa2f5aa" isPK="true" />
+      <field column="noindex" columnprecision="0" columntype="boolean" enabled="true" guid="c332cfe0-c419-4a20-ac8b-eb8641daf724" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>d5314aab-a399-4d50-bc0e-659aa643e1d3</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.Externalsearchengines</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_Externalsearchengines</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>
