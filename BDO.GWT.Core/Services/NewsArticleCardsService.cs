@@ -33,7 +33,6 @@ public class NewsArticleCardsService : INewsArticleCardsService
     private readonly ICardsService _cardsService;
     private readonly ICultureContext _cultureContext;
     private readonly IContentService _contentService;
-    private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
     private readonly IUrlHelperFactory _urlHelperFactory;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -41,14 +40,12 @@ public class NewsArticleCardsService : INewsArticleCardsService
         ICardsService cardsService,
         ICultureContext cultureContext,
         IContentService contentService,
-        ITaxonomyTagRetriever taxonomyTagRetriever,
         IUrlHelperFactory urlHelperFactory,
         IHttpContextAccessor httpContextAccessor)
     {
         _cardsService = cardsService;
         _cultureContext = cultureContext;
         _contentService = contentService;
-        _taxonomyTagRetriever = taxonomyTagRetriever;
         _urlHelperFactory = urlHelperFactory;
         _httpContextAccessor = httpContextAccessor;
     }
@@ -91,7 +88,6 @@ public class NewsArticleCardsService : INewsArticleCardsService
 
         var orderedNewsArticles = newsArticles
             .Where(x => x is not null)
-            .Cast<NewsArticle>()
             .OrderByDescending(isFeatured)
             .ToArray();
 

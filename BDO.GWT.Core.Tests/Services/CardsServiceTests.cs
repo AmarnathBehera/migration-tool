@@ -15,8 +15,6 @@ public class CardsServiceTests
 
     private Mock<IContentService> _contentServiceMock = null!;
     private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
-    private Mock<ITaxonomyTagRetriever> _taxonomyTagRetrieverMock = null!;
-    private Mock<ICultureContext> _cultureContextMock = null!;
     private CardsService _service = null!;
 
     [SetUp]
@@ -24,17 +22,13 @@ public class CardsServiceTests
     {
         _contentServiceMock = new Mock<IContentService>();
         _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
-        _taxonomyTagRetrieverMock = new Mock<ITaxonomyTagRetriever>();
-        _cultureContextMock = new Mock<ICultureContext>();
-
-        _cultureContextMock.Setup(c => c.CurrentLanguageTag).Returns("en");
+       
         _websiteChannelContextMock.Setup(c => c.WebsiteChannelID).Returns(1);
 
         _service = new CardsService(
             _contentServiceMock.Object,
-            _websiteChannelContextMock.Object,
-            _taxonomyTagRetrieverMock.Object,
-            _cultureContextMock.Object);
+            _websiteChannelContextMock.Object
+            );
     }
 
     [Test]

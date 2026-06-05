@@ -6,12 +6,10 @@ using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.Helpers;
-using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.Services;
 using CMS.Websites;
-using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 
 namespace BDO.GWT.Core.Services;
@@ -37,20 +35,17 @@ public class SectionPeoplePageService : ISectionPeoplePageService
     private readonly IHeroService _heroService;
     private readonly IContentService _contentRetriever;
     private readonly IPeopleCardsService _peopleCardsService;
-    private readonly ICultureContext _cultureContext;
     private readonly IFilteringHelper _filteringHelper;
 
     public SectionPeoplePageService(
         IContentService pageRetriever,
         IHeroService heroService,
         IPeopleCardsService peopleCardsService,
-        ICultureContext cultureContext,
         IFilteringHelper filteringHelper)
     {
         _contentRetriever = pageRetriever;
         _heroService = heroService;
         _peopleCardsService = peopleCardsService;
-        _cultureContext = cultureContext;
         _filteringHelper = filteringHelper;
     }
 
