@@ -137,9 +137,11 @@ namespace BDO.GWT.Core.Tests.Services.Widget
             };
 
             var result = await _service.GetFlexibleContentAsync(data, CancellationToken.None);
-
-            Assert.That(result.Items, Is.InstanceOf<FlexibleContentItemDto[]>());
-            Assert.That(((FlexibleContentItemDto[])result.Items), Has.Length.EqualTo(0));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Items, Is.InstanceOf<FlexibleContentItemDto[]>());
+                Assert.That(((FlexibleContentItemDto[])result.Items), Has.Length.EqualTo(0));
+            });
         }
 
         [Test]

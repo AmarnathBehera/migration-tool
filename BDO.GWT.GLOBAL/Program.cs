@@ -140,7 +140,7 @@ app.UseCookiePolicy();
 
 app.UseAuthentication();
 
-if (!builder.Environment.IsDevelopment())
+if (builder.Configuration.GetSection("AdminRedirectOptions")?.GetSection("RedirectDomain")?.Value.Trim() != string.Empty)
 {
     // Configures the URL rewriting options
     var rewriteOptions = new RewriteOptions()

@@ -36,8 +36,6 @@ public class PeopleCardsService : IPeopleCardsService
 {
     private readonly ICardsService _cardsService;
     private readonly IContentService _contentService;
-    private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
-    private readonly ICultureContext _cultureContext;
     private readonly ISettingService _settingService;
     private readonly IUrlHelperFactory _urlHelperFactory;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -45,8 +43,6 @@ public class PeopleCardsService : IPeopleCardsService
     public PeopleCardsService(
         ICardsService cardsService,
         IContentService contentService,
-        ITaxonomyTagRetriever taxonomyTagRetriever,
-        ICultureContext cultureContext,
         ISettingService settingService,
         IUrlHelperFactory urlHelperFactory,
         IHttpContextAccessor httpContextAccessor
@@ -54,8 +50,6 @@ public class PeopleCardsService : IPeopleCardsService
     {
         _cardsService = cardsService;
         _contentService = contentService;
-        _taxonomyTagRetriever = taxonomyTagRetriever;
-        _cultureContext = cultureContext;
         _settingService = settingService;
         _urlHelperFactory = urlHelperFactory;
         _httpContextAccessor = httpContextAccessor;
