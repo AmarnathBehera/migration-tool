@@ -29,7 +29,7 @@ public class XperiencePageContext : IPageContext
         IWebPageDataContextRetriever webPageDataContextRetriever,
         IPageBuilderDataContextRetriever pageBuilderDataContextRetriever,
         IWebsiteChannelContext websiteChannelContext,
-        IContentQueryExecutor queryExecutor,
+        IContentQueryExecutor queryExecutor
         )
     {
         _httpContextAccessor = httpContextAccessor;
