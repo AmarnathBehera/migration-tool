@@ -30,7 +30,7 @@ public class TabAccordionWidgetProperties : BaseWidgetProperties
     [VisibleIfEqualTo(nameof(PageType), "Industry")]
     public IEnumerable<ContentItemReference> IndustryPages { get; set; } = new List<ContentItemReference>();
 
-    [ContentItemSelectorComponent(contentTypeName: SectionMicrosites.CONTENT_TYPE_NAME, Order = 3, Label = "Tab / accordion items", ExplanationText = "For tab layout recommendation is to have maximum 4 items as it works best from responsiveness perspective.")]
+    [ContentItemSelectorComponent(contentTypeNames: [SectionMicrosites.CONTENT_TYPE_NAME,MicrositeMasterPage.CONTENT_TYPE_NAME,MicrositePage.CONTENT_TYPE_NAME], Order = 3, Label = "Tab / accordion items", ExplanationText = "For tab layout recommendation is to have maximum 4 items as it works best from responsiveness perspective.")]
     [VisibleIfEqualTo(nameof(PageType), "Microsite")]
     public IEnumerable<ContentItemReference> MicrositePages { get; set; } = new List<ContentItemReference>();
 

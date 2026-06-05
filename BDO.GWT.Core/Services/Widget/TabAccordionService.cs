@@ -61,7 +61,10 @@ public class TabAccordionService : ITabAccordionService
             ServiceArea.CONTENT_TYPE_NAME,
             Sub_Service.CONTENT_TYPE_NAME,
             BusinessLine.CONTENT_TYPE_NAME,
-            Service.CONTENT_TYPE_NAME
+            Service.CONTENT_TYPE_NAME,
+            MicrositePage.CONTENT_TYPE_NAME,
+            MicrositeMasterPage.CONTENT_TYPE_NAME,
+            SectionMicrosites.CONTENT_TYPE_NAME,
         };
 
         var contentItems =
