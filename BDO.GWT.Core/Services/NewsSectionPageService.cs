@@ -14,7 +14,7 @@ namespace BDO.GWT.Core.Services;
 public interface INewsSectionPageService
 {
     Task<NewsSectionDto> GetNewsSectionDtoAsync(SectionNews currentPage, CancellationToken cancellationToken);
-    Task<PaginationDto<NewsPageCardDto>> GetNewsArticlePaginationResultAsync(string language, CardsQuery cardsQuery, CancellationToken cancellationToken);
+    Task<PaginationDto<NewsPageCardDto>> GetNewsArticlePaginationResultAsync(Guid pageGuid, string language, CardsQuery cardsQuery, CancellationToken cancellationToken);
 }
 
 public class NewsSectionPageService : INewsSectionPageService
@@ -65,9 +65,9 @@ public class NewsSectionPageService : INewsSectionPageService
 
         return dto;
     }
-    public async Task<PaginationDto<NewsPageCardDto>> GetNewsArticlePaginationResultAsync(string language, CardsQuery cardsQuery, CancellationToken cancellationToken)
+    public async Task<PaginationDto<NewsPageCardDto>> GetNewsArticlePaginationResultAsync(Guid pageGuid, string language, CardsQuery cardsQuery, CancellationToken cancellationToken)
     {
-        var featuredNewsArticlePageIds = await GetFeaturedNewsArticlePageIdsAsync(cancellationToken);
+        var featuredNewsArticlePageIds = await GetFeaturedNewsArticlePageIdsAsync(pageGuid, cancellationToken);
 
         var paginationDto = await _newsArticleCardsService.GetFilteredItemsAsync(
             language,
@@ -80,7 +80,7 @@ public class NewsSectionPageService : INewsSectionPageService
         return paginationDto;
     }
 
-    private async Task<ISet<int>> GetFeaturedNewsArticlePageIdsAsync(CancellationToken cancellationToken)
+    private async Task<ISet<int>> GetFeaturedNewsArticlePageIdsAsync(Guid pageGuid, CancellationToken cancellationToken)
     {
         var newsSection = (await _contentService.GetPagesAsync<SectionNews>(
             new RetrievePagesParameters
@@ -90,7 +90,8 @@ public class NewsSectionPageService : INewsSectionPageService
                 UseLanguageFallbacks = false
             },
            query => query
-               .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
+               .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
+               .Where(w => w.WhereEquals("ContentItemGUID", pageGuid)),
            RetrievalCacheSettings.CacheDisabled,
            cancellationToken
        )).FirstOrDefault();

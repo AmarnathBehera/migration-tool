@@ -30,7 +30,7 @@ public class NewsSectionPageController : ControllerBase
 
         query.Filters = RequestQueryUtility.ExtractFilterQueryParameters(Request.Query);
 
-        var result = await _newsSectionPageService.GetNewsArticlePaginationResultAsync(language, query, cancellationToken);
+        var result = await _newsSectionPageService.GetNewsArticlePaginationResultAsync(pageGuid, language, query, cancellationToken);
 
         return Ok(result);
     }
