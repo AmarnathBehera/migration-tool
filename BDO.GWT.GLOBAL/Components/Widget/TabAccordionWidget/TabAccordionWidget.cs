@@ -36,6 +36,12 @@ public class TabAccordionWidget : ViewComponent
                 .Where(x => x.Identifier != Guid.Empty)
                 .Select(x => x.Identifier);
         }
+        else if (model.Properties.PageType == "Microsite")
+        {
+            guids = model.Properties.MicrositePages
+                .Where(x => x.Identifier != Guid.Empty)
+                .Select(x => x.Identifier);
+        }
 
         var data = new TabAccordionData
         {
