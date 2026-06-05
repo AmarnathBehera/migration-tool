@@ -27,7 +27,7 @@ namespace BDO.GWT.Core.Services
             Func<BlogPost, bool> isFeatured,
             CancellationToken cancellationToken);
     }
-    public class BlogPageCardService : IBlogPageCardsService
+    public class BlogPageCardsService : IBlogPageCardsService
     {
         private readonly ICardsService _cardsService;
         private readonly ICultureContext _cultureContext;
@@ -36,7 +36,7 @@ namespace BDO.GWT.Core.Services
         private readonly IUrlHelperFactory _urlHelperFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public BlogPageCardService(
+        public BlogPageCardsService(
             ICardsService cardsService,
             ICultureContext cultureContext,
             IContentService contentService,
