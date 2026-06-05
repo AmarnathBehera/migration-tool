@@ -66,11 +66,11 @@ public class NewsSectionPageServiceTests
         };
 
         _newsSectionPageServiceMock
-            .Setup(x => x.GetNewsArticlePaginationResultAsync(It.IsAny<string>(), It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetNewsArticlePaginationResultAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedDto);
 
         var result = await _newsSectionPageServiceMock.Object.GetNewsArticlePaginationResultAsync(
-            "en", new CardsQuery(), CancellationToken.None);
+            Guid.NewGuid(), "en", new CardsQuery(), CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -89,11 +89,11 @@ public class NewsSectionPageServiceTests
         };
 
         _newsSectionPageServiceMock
-            .Setup(x => x.GetNewsArticlePaginationResultAsync(It.IsAny<string>(), It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetNewsArticlePaginationResultAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(emptyDto);
 
         var result = await _newsSectionPageServiceMock.Object.GetNewsArticlePaginationResultAsync(
-            "en", new CardsQuery(), CancellationToken.None);
+            Guid.NewGuid(), "en", new CardsQuery(), CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -125,14 +125,14 @@ public class NewsSectionPageServiceTests
     public async Task GetNewsArticlePaginationResultAsync_InvokedOnce()
     {
         _newsSectionPageServiceMock
-            .Setup(x => x.GetNewsArticlePaginationResultAsync(It.IsAny<string>(), It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetNewsArticlePaginationResultAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PaginationDto<NewsPageCardDto> { Data = [], TotalCount = 0 });
 
         var cardsQuery = new CardsQuery();
         await _newsSectionPageServiceMock.Object.GetNewsArticlePaginationResultAsync(
-            "en", cardsQuery, CancellationToken.None);
+            Guid.NewGuid(), "en", cardsQuery, CancellationToken.None);
 
         _newsSectionPageServiceMock.Verify(
-            x => x.GetNewsArticlePaginationResultAsync(It.IsAny<string>(), cardsQuery, It.IsAny<CancellationToken>()), Times.Once);
+            x => x.GetNewsArticlePaginationResultAsync(It.IsAny<Guid>(), It.IsAny<string>(), cardsQuery, It.IsAny<CancellationToken>()), Times.Once);
     }
 }
