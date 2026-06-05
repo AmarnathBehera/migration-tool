@@ -44,8 +44,6 @@ public class PeopleCardsServiceTests
         _service = new PeopleCardsService(
             _cardsServiceMock.Object,
             _contentServiceMock.Object,
-            _taxonomyTagRetrieverMock.Object,
-            _cultureContextMock.Object,
             _settingServiceMock.Object,
             _urlHelperFactoryMock.Object,
             _httpContextAccessorMock.Object);

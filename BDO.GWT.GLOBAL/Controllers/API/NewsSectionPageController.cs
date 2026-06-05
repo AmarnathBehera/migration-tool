@@ -5,6 +5,7 @@ using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.LiveSite.Filters;
 using BDO.GWT.Core.Services;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,8 +23,8 @@ public class NewsSectionPageController : ControllerBase
     }
 
 
-    [HttpGet("[action]")]
-    public async Task<ActionResult<PaginationDto<NewsPageCardDto>>> Get([FromQuery] CardsQuery query, CancellationToken cancellationToken)
+    [HttpGet("{pageGuid:guid}/[action]")]
+    public async Task<ActionResult<PaginationDto<NewsPageCardDto>>> Get([FromRoute] Guid pageGuid, [FromQuery] CardsQuery query, CancellationToken cancellationToken)
     {
         var language = RouteData.Values[CultureInjectorAttribute.RouteParameter]?.ToString();
 

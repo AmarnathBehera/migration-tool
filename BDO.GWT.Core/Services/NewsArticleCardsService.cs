@@ -26,6 +26,7 @@ public interface INewsArticleCardsService
         Action<ContentItemQueryBuilder>? decorateQuery,
         Func<NewsArticle, bool> isFeatured,
         CancellationToken cancellationToken);
+    Task<List<NewsPageCardDto>> GetContentPageCardListAsync(ICollection<NewsArticle> contentPages, string languageTag, Func<NewsArticle, bool> isPageFeatured, CancellationToken cancellationToken);
 }
 
 public class NewsArticleCardsService : INewsArticleCardsService

@@ -124,7 +124,7 @@ public class NewsSectionPageService : INewsSectionPageService
             Description = currentPage.ItemListDescription,
             Filters = currentPage.ItemListFilteringEnabled ? await _newsArticleCardsService.CreateFiltersAsync(filters, null, cancellationToken) : null,
             FilteringTooltipEnabled = await _filteringHelper.IsFilteringTooltipEnabledAsync(currentPage.ItemListFilteringEnabled, cancellationToken),
-            ApiEndpointName = "NewsSectionPage",
+            ApiEndpointName = $"NewsSectionPage/{currentPage.SystemFields.ContentItemGUID}/",
             PageSize = 20,
             AdvancedSearchPrelinkText = currentPage.ItemListAdvancedSearchDescription,
             AdvancedSearchLinkText = currentPage.ItemListAdvancedSearchLinkText,

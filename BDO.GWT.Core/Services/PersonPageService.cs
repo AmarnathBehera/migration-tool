@@ -1,14 +1,9 @@
-﻿using BDO.GWT.Core.Constants;
-using BDO.GWT.Core.Data;
+﻿using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.DTOs.SchemaMarkups;
-using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Utilities;
-using CMS.Core;
-using CMS.DataEngine;
 using CMS.Websites;
-using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 
 namespace BDO.GWT.Core.Services;
@@ -28,8 +23,8 @@ public class PersonPageService : IPersonPageService
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IContentService _contentService;
     private readonly ICultureContext _cultureContext;
-    private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
     private readonly ISettingService _settingsService;
+    private readonly IAuthoredContentService _authoredContentService;
 
     private HttpClient? _httpClient;
 
@@ -37,15 +32,15 @@ public class PersonPageService : IPersonPageService
         IHttpClientFactory httpClientFactory,
         IContentService contentService,
         ICultureContext cultureContext,
-        ITaxonomyTagRetriever taxonomyTagRetriever,
-        ISettingService settingService
+        ISettingService settingService,
+        IAuthoredContentService authoredContentService
         )
     {
         _httpClientFactory = httpClientFactory;
         _contentService = contentService;
         _cultureContext = cultureContext;
-        _taxonomyTagRetriever = taxonomyTagRetriever;
         _settingsService = settingService;
+        _authoredContentService = authoredContentService;
     }
 
     public async Task<PersonDto> GetPersonPageDtoAsync(Person page, CancellationToken cancellationToken = default)
@@ -59,6 +54,7 @@ public class PersonPageService : IPersonPageService
             ?? Enumerable.Empty<string>();
 
         personDto.OfficeLocations = await GetLocationLinkItemsAsync(page, cancellationToken);
+        personDto.AuthoredContent = await _authoredContentService.GetAuthoredContentDtoAsync(page, cancellationToken);
 
         return personDto;
     }
