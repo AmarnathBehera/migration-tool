@@ -67,25 +67,10 @@ public class NewsSectionPageService : INewsSectionPageService
     }
     public async Task<PaginationDto<NewsPageCardDto>> GetNewsArticlePaginationResultAsync(Guid pageGuid, string language, CardsQuery cardsQuery, CancellationToken cancellationToken)
     {
-        var featuredNewsArticlePageIds = await GetFeaturedNewsArticlePageIdsAsync(pageGuid, cancellationToken);
-
-        var paginationDto = await _newsArticleCardsService.GetFilteredItemsAsync(
-            language,
-            cardsQuery,
-            null,
-            newsArticle => featuredNewsArticlePageIds.Contains(newsArticle.SystemFields.WebPageItemID),
-            cancellationToken
-            );
-
-        return paginationDto;
-    }
-
-    private async Task<ISet<int>> GetFeaturedNewsArticlePageIdsAsync(Guid pageGuid, CancellationToken cancellationToken)
-    {
         var newsSection = (await _contentService.GetPagesAsync<SectionNews>(
             new RetrievePagesParameters
             {
-                LinkedItemsMaxLevel=2,
+                LinkedItemsMaxLevel = 2,
                 LanguageName = _cultureContext.CurrentLanguageTag,
                 UseLanguageFallbacks = false
             },
@@ -100,6 +85,22 @@ public class NewsSectionPageService : INewsSectionPageService
         {
             throw new MissingSectionPageException($"'No pages have been found of type '{nameof(SectionNews)}'.");
         }
+        var featuredNewsArticlePageIds = await GetFeaturedNewsArticlePageIdsAsync(newsSection, cancellationToken);
+
+        var paginationDto = await _newsArticleCardsService.GetFilteredItemsAsync(
+            newsSection,
+            language,
+            cardsQuery,
+            null,
+            newsArticle => featuredNewsArticlePageIds.Contains(newsArticle.SystemFields.WebPageItemID),
+            cancellationToken
+            );
+
+        return paginationDto;
+    }
+
+    private async Task<ISet<int>> GetFeaturedNewsArticlePageIdsAsync(SectionNews newsSection, CancellationToken cancellationToken)
+    {
         var featuredNewsArticlePageIds = newsSection.ItemListFeaturedItems.Select(x => x.SystemFields.WebPageItemID).ToHashSet();
 
         return featuredNewsArticlePageIds;
@@ -125,7 +126,7 @@ public class NewsSectionPageService : INewsSectionPageService
             Description = currentPage.ItemListDescription,
             Filters = currentPage.ItemListFilteringEnabled ? await _newsArticleCardsService.CreateFiltersAsync(filters, null, cancellationToken) : null,
             FilteringTooltipEnabled = await _filteringHelper.IsFilteringTooltipEnabledAsync(currentPage.ItemListFilteringEnabled, cancellationToken),
-            ApiEndpointName = $"NewsSectionPage/{currentPage.SystemFields.ContentItemGUID}/",
+            ApiEndpointName = $"NewsSectionPage/{currentPage.SystemFields.ContentItemGUID}",
             PageSize = 20,
             AdvancedSearchPrelinkText = currentPage.ItemListAdvancedSearchDescription,
             AdvancedSearchLinkText = currentPage.ItemListAdvancedSearchLinkText,

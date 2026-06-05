@@ -68,6 +68,7 @@ public class NewsArticleCardsServiceTests
 
         _newsArticleCardsServiceMock
             .Setup(x => x.GetFilteredItemsAsync(
+                It.IsAny<SectionNews>(),
                 It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
                 It.IsAny<Action<ContentItemQueryBuilder>?>(),
@@ -76,7 +77,7 @@ public class NewsArticleCardsServiceTests
             .ReturnsAsync(expectedDto);
 
         var result = await _newsArticleCardsServiceMock.Object.GetFilteredItemsAsync(
-            "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+            new SectionNews(), "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -97,6 +98,7 @@ public class NewsArticleCardsServiceTests
 
         _newsArticleCardsServiceMock
             .Setup(x => x.GetFilteredItemsAsync(
+                It.IsAny<SectionNews>(),
                 It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
                 It.IsAny<Action<ContentItemQueryBuilder>?>(),
@@ -105,7 +107,7 @@ public class NewsArticleCardsServiceTests
             .ReturnsAsync(emptyDto);
 
         var result = await _newsArticleCardsServiceMock.Object.GetFilteredItemsAsync(
-            "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+            new SectionNews(), "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -133,6 +135,7 @@ public class NewsArticleCardsServiceTests
     {
         _newsArticleCardsServiceMock
             .Setup(x => x.GetFilteredItemsAsync(
+                It.IsAny<SectionNews>(),
                 It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
                 It.IsAny<Action<ContentItemQueryBuilder>?>(),
@@ -142,10 +145,11 @@ public class NewsArticleCardsServiceTests
 
         var cardsQuery = new CardsQuery();
         await _newsArticleCardsServiceMock.Object.GetFilteredItemsAsync(
-            "en-US", cardsQuery, null, _ => false, CancellationToken.None);
+            new SectionNews(), "en-US", cardsQuery, null, _ => false, CancellationToken.None);
 
         _newsArticleCardsServiceMock.Verify(
             x => x.GetFilteredItemsAsync(
+                It.IsAny<SectionNews>(),
                 "en-US",
                 cardsQuery,
                 It.IsAny<Action<ContentItemQueryBuilder>?>(),

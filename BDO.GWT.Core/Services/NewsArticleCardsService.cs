@@ -6,6 +6,8 @@ using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Utilities;
 using CMS.ContentEngine;
+using CMS.ContentEngine.Internal;
+using CMS.DataEngine;
 using CMS.Websites;
 using HotChocolate.Data.Filters;
 using Kentico.Content.Web.Mvc;
@@ -21,7 +23,8 @@ public interface INewsArticleCardsService
 {
     Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(HashSet<string> filters, string? nodeAliasPath, CancellationToken cancellationToken);
     Task<PaginationDto<NewsPageCardDto>> GetFilteredItemsAsync
-        (string language,
+        (SectionNews newsSection,
+        string language,
         CardsQuery cardsQuery,
         Action<ContentItemQueryBuilder>? decorateQuery,
         Func<NewsArticle, bool> isFeatured,
@@ -34,7 +37,6 @@ public class NewsArticleCardsService : INewsArticleCardsService
     private readonly ICardsService _cardsService;
     private readonly ICultureContext _cultureContext;
     private readonly IContentService _contentService;
-    private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
     private readonly IUrlHelperFactory _urlHelperFactory;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -42,14 +44,12 @@ public class NewsArticleCardsService : INewsArticleCardsService
         ICardsService cardsService,
         ICultureContext cultureContext,
         IContentService contentService,
-        ITaxonomyTagRetriever taxonomyTagRetriever,
         IUrlHelperFactory urlHelperFactory,
         IHttpContextAccessor httpContextAccessor)
     {
         _cardsService = cardsService;
         _cultureContext = cultureContext;
         _contentService = contentService;
-        _taxonomyTagRetriever = taxonomyTagRetriever;
         _urlHelperFactory = urlHelperFactory;
         _httpContextAccessor = httpContextAccessor;
     }
@@ -58,61 +58,78 @@ public class NewsArticleCardsService : INewsArticleCardsService
     {
         return await _cardsService.CreateFiltersAsync(filters, nodeAliasPath, cancellationToken);
     }
-
-    public async Task<PaginationDto<NewsPageCardDto>> GetFilteredItemsAsync
-        (string language,
-        CardsQuery cardsQuery,
-        Action<ContentItemQueryBuilder>? decorateQuery,
-        Func<NewsArticle, bool> isFeatured,
-        CancellationToken cancellationToken)
+    public async Task<PaginationDto<NewsPageCardDto>> GetFilteredItemsAsync(
+    SectionNews newsSection,
+    string language,
+    CardsQuery cardsQuery,
+    Action<ContentItemQueryBuilder>? decorateQuery,
+    Func<NewsArticle, bool> isFeatured,
+    CancellationToken cancellationToken)
     {
         var filterWhereExpressions = await GetFilterParameterWhereExpressionsAsync(cardsQuery.Filters);
 
-        var newsArticles = await _contentService.GetPagesAsync<NewsArticle>(
-              new RetrievePagesParameters
-              {
-                  LinkedItemsMaxLevel = 4,
-                  LanguageName = language,
-                  UseLanguageFallbacks = false
-              },
-           query =>
-           {
-               query.Where(w =>
-               {
-                   w.WhereEquals("ContentItemChannelID", _contentService.GetCurrentChannelID());
-                   foreach (var filter in filterWhereExpressions)
-                   {
-                       filter(w);
-                   }
-               });
-           },
-                RetrievalCacheSettings.CacheDisabled,
-           cancellationToken
-       ) ?? [];
+        var newsGroupIDs = (await _contentService.GetPagesAsync<NewsGroup>(
+            new RetrievePagesParameters
+            {
+                LanguageName = language,
+                UseLanguageFallbacks = false
+            },
+            query => query
+                .Where(w => w.WhereEquals("WebPageItemParentID", newsSection.SystemFields.WebPageItemID)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken
+        ))?.Select(x => x.SystemFields.WebPageItemID).ToArray() ?? [];
 
-        var orderedNewsArticles = newsArticles
-            .Where(x => x is not null)
-            .Cast<NewsArticle>()
-            .OrderByDescending(isFeatured)
-            .ToArray();
+        if (newsGroupIDs.Length == 0)
+            return new PaginationDto<NewsPageCardDto> { Data = [], TotalCount = 0 };
+
+        var newsArticles = (await _contentService.GetPagesAsync<NewsArticle>(
+            new RetrievePagesParameters
+            {
+                LinkedItemsMaxLevel = 4,
+                LanguageName = language,
+                UseLanguageFallbacks = false
+            },
+            query =>
+            {
+                query.Where(w =>
+                {
+                    w.WhereEquals("ContentItemChannelID", _contentService.GetCurrentChannelID());
+                    w.WhereIn("WebPageItemParentID", newsGroupIDs);
+
+                    foreach (var filter in filterWhereExpressions)
+                    {
+                        filter(w);
+                    }
+                });
+            },
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken
+        ) ?? [])
+        .Where(x => x is not null)
+        .Cast<NewsArticle>()
+        .OrderByDescending(isFeatured)
+        .ToArray();
 
         var currentPage = cardsQuery.CurrentPage ?? 1;
         var pageSize = cardsQuery.PageSize ?? 10;
 
-        var paginatedPages = orderedNewsArticles
+        var paginatedPages = newsArticles
             .Skip((currentPage - 1) * pageSize)
             .Take(pageSize)
             .ToArray();
 
-        var itemDtos = await GetContentPageCardListAsync(paginatedPages, _cultureContext.CurrentLanguageTag, isFeatured, cancellationToken);
+        var itemDtos = await GetContentPageCardListAsync(
+            paginatedPages,
+            _cultureContext.CurrentLanguageTag,
+            isFeatured,
+            cancellationToken);
 
-        var paginationDto = new PaginationDto<NewsPageCardDto>
+        return new PaginationDto<NewsPageCardDto>
         {
             Data = itemDtos.ToArray(),
-            TotalCount = paginatedPages.Length,
+            TotalCount = newsArticles.Length 
         };
-
-        return paginationDto;
     }
     private async Task<List<Action<WhereParameters>>> GetFilterParameterWhereExpressionsAsync(IDictionary<string, string> filterParameterValueByName)
     {
