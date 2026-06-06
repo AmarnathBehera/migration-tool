@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace GWTXbyKWeb.Controllers
+namespace BDO.GWT.Web.Controllers
 {
     public class BlogsController : Controller
     {

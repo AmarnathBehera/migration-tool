@@ -14,7 +14,7 @@ namespace BDO.GWT.Core.DTOs
     {
         public string Title { get; set; } = null!;
 
-        public HeroData Hero { get; set; } = null!;
+        public HeroDto Hero { get; set; } = null!;
 
         public bool EnableFilters { get; set; } = false;
 

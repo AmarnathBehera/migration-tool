@@ -189,7 +189,7 @@ namespace BDO.GWT.Core.Services
             foreach (var contentPage in contentPages)
             {
                 //var tags = await _taxonomyTagRetriever.GetTaxonomyTagByGUIDs(contentPage.ContentType, _cultureContext.CurrentLanguageTag);
-                IEnumerable<Contenttypes> type = contentPage.ContentType;
+                //IEnumerable<Contenttypes> type = contentPage.ContentType;
                 var typeConst = "Blog";
                 bool isComingSoon = false;
                 var card = new BlogPageCardDto
