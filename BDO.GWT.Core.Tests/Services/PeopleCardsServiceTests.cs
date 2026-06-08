@@ -30,8 +30,8 @@ public class PeopleCardsServiceTests
     {
         _cardsServiceMock = new Mock<ICardsService>();
         _contentServiceMock = new Mock<IContentService>();
-        _taxonomyTagRetrieverMock = new Mock<ITaxonomyTagRetriever>();
         _cultureContextMock = new Mock<ICultureContext>();
+        _taxonomyTagRetrieverMock = new Mock<ITaxonomyTagRetriever>();
         _settingServiceMock = new Mock<ISettingService>();
         _urlHelperFactoryMock = new Mock<IUrlHelperFactory>();
         _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
