@@ -36,9 +36,14 @@ namespace GWTXbyKWeb.Components.ViewComponents
               .Get()
               .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), currentWebsiteID)
               .FirstOrDefault();
-           
-            var sitescriptHead =_siteProvider.Get()
-                                    .WhereEquals( nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID),
+
+            if (currentChannelId == null)
+            {
+                return View("~/Views/Shared/Components/Scripts/Default.cshtml");
+            }
+
+            var sitescriptHead = _siteProvider.Get()
+                                    .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID),
                                      currentChannelId.WebChannelSettingsID)
                                      .TopN(1)
                                      .GetEnumerableTypedResult()
@@ -47,7 +52,6 @@ namespace GWTXbyKWeb.Components.ViewComponents
 
             if (sitescriptHead != null)
             {
-                // Non-column fields are stored in the CustomData / ObjectData bag
                 inheritFromGlobal = sitescriptHead.ScriptHeadInheritfromglobalsettings;
             }
             if (inheritFromGlobal)
@@ -55,7 +59,7 @@ namespace GWTXbyKWeb.Components.ViewComponents
 
                  value = _provider.Get()
                                     .TopN(1)
-                                   .GetEnumerableTypedResult().FirstOrDefault().ScriptHeadKeyValue;
+                                   .GetEnumerableTypedResult().FirstOrDefault()?.ScriptHeadKeyValue;
             }
             else
             {

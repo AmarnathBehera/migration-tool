@@ -36,6 +36,10 @@ namespace GWTXbyKWeb.Components.ViewComponents
               .Get()
               .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), currentWebsiteID)
               .FirstOrDefault();
+            if (currentChannelId == null)
+            {
+                return View("~/Views/Shared/Components/Scripts/Default.cshtml");
+            }
 
             var sitescript = _siteProvider.Get()
                                     .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID),
@@ -55,7 +59,7 @@ namespace GWTXbyKWeb.Components.ViewComponents
 
                 value = _provider.Get()
                                    .TopN(1)
-                                  .GetEnumerableTypedResult().FirstOrDefault().ScriptinbottomofBodyKeyValue;
+                                  .GetEnumerableTypedResult().FirstOrDefault()?.ScriptinbottomofBodyKeyValue;
             }
             else
             {

@@ -20,7 +20,7 @@ public class GlobalSettingsEditPage : InfoEditPage<GlobalsettingskeyInfo>
                 .GetEnumerableTypedResult()
                 .FirstOrDefault()
                 ?.GlobalsettingskeyID ?? 0;
-        set { }
+        set { _ = value; }
     }
 
     public GlobalSettingsEditPage(

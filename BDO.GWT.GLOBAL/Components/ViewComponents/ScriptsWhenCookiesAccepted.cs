@@ -1,10 +1,8 @@
 ﻿using BDO;
 using BDO.GWT.Common;
-using BDO.GWT.Xperience;
 using CMS.DataEngine;
 using CMS.Websites.Routing;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,6 +34,10 @@ namespace GWTXbyKWeb.Components.ViewComponents
               .Get()
               .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), currentWebsiteID)
               .FirstOrDefault();
+            if (currentChannelId == null)
+            {
+                return View("~/Views/Shared/Components/Scripts/Default.cshtml");
+            }
 
             var sitescript = _siteProvider.Get()
                                     .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID),
@@ -55,7 +57,7 @@ namespace GWTXbyKWeb.Components.ViewComponents
 
                 value = _provider.Get()
                                    .TopN(1)
-                                  .GetEnumerableTypedResult().FirstOrDefault().ScriptexecutedwhencookiesareacceptedKeyValue;
+                                  .GetEnumerableTypedResult().FirstOrDefault()?.ScriptexecutedwhencookiesareacceptedKeyValue;
             }
             else
             {

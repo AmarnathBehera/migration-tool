@@ -24,7 +24,7 @@ public class WebChannelSnippetEditPage : InfoEditPage<WebChannelSnippetInfo>
                  .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID), WebChannelSettingsId)
                  .FirstOrDefault()?
                  .WebChannelSnippetID ?? 0;
-        set { }
+        set { _ = value; }
     }
 
     public WebChannelSnippetEditPage(
