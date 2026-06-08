@@ -27,7 +27,7 @@ namespace BDO.GWT.Core.Services
         private readonly IContentService _contentService;
         private readonly ICultureContext _cultureContext;
         private readonly IContentRetriever _contentRetriever;
-        private readonly string apiEndPointname = "BlogPosts";
+       
         public BlogsPageService(IFilteringHelper filteringHelper, IHeroService heroService, IBlogPageCardsService blogPageCardsService, IContentService contentService, ICultureContext cultureContext, IContentRetriever contentRetriever)
         {
             _filteringHelper = filteringHelper;

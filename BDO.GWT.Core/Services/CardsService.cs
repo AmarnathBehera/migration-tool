@@ -1,9 +1,12 @@
 ﻿using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.Helper;
 using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Utilities;
+using CMS.Websites;
 using CMS.Websites.Routing;
+using Kentico.Content.Web.Mvc;
 
 namespace BDO.GWT.Core.Services;
 
@@ -50,7 +53,7 @@ public class CardsService : ICardsService
             {
                 FilterParameterType.Page => await BuildOptionsForPageFilterAsync(filterParameterData, cancellationToken),
                 // FilterParameterType.Entity => await BuildOptionsForEntityFilterAsync(filterParameterData, cancellationToken),
-                // FilterParameterType.Field => await BuildOptionsForFieldFilterAsync(filterParameterData, filterParameterName, nodeAliasPath, cancellationToken),
+                 FilterParameterType.Field => await BuildOptionsForFieldFilterAsync(filterParameterData, cancellationToken),
                 FilterParameterType.Taxonomy => await BuildOptionsForTaxonomyFilterAsync(filterParameterData, cancellationToken),
                 _ => throw new NotSupportedException($"Filter parameter type {filterParameterData.FilterParameterType} is not supported."),
             };
@@ -90,7 +93,18 @@ public class CardsService : ICardsService
                   .GetProperty("ContentItemName")
                   ?.GetValue(systemFields) as string;
 
-          var name = metadataTitle ?? metadataOgTitle ?? contentItemName;
+          var nameBI = type.GetProperty("Name")?.GetValue(x) as string;
+
+          string name = string.Empty;
+
+          
+
+          name = metadataTitle ?? metadataOgTitle ?? contentItemName;
+
+          if (type.Name.ToString() == "Businessissues")
+          {
+              name = nameBI;
+          }
 
           return new OptionDto
           {
@@ -122,6 +136,37 @@ public class CardsService : ICardsService
             .Where(x => !string.IsNullOrWhiteSpace(x.Value))
             .OrderBy(x => x.Label)
             .ToArray();
+
+        return options;
+    }
+
+    private async Task<OptionDto[]> BuildOptionsForFieldFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
+    {
+        var entityType = filterParameterData.EntityType;
+        var options = Array.Empty<OptionDto>();
+
+        var items = await _contentService.GetItemsByTypesAsync(
+            new[] { entityType },
+            _websiteChannelContext.WebsiteChannelID,
+            cancellationToken);
+
+        if(items is null || !items.Any())
+        {
+            return options;
+        }
+       
+        switch (filterParameterData.EntityType)
+        {
+            case { } type when type == typeof(BlogPost):
+                options = items
+                    .Select(x => x.GetType().GetProperty(nameof(BlogPost.MetadataKeywordsBlog))?.GetValue(x) as string)
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .SelectMany(x => KeywordsHelper.ParseKeywords(x!))
+                    .Distinct()
+                    .Select(x => FilterDtoUtility.CreateOptionDto(x, x))
+                    .ToArray();
+                break;
+        }
 
         return options;
     }
