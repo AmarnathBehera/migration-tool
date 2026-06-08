@@ -85,7 +85,7 @@ public class NewsSectionPageService : INewsSectionPageService
         {
             throw new MissingSectionPageException($"'No pages have been found of type '{nameof(SectionNews)}'.");
         }
-        var featuredNewsArticlePageIds = await GetFeaturedNewsArticlePageIdsAsync(newsSection, cancellationToken);
+        var featuredNewsArticlePageIds = await GetFeaturedNewsArticlePageIdsAsync(newsSection);
 
         var paginationDto = await _newsArticleCardsService.GetFilteredItemsAsync(
             newsSection,
@@ -99,7 +99,7 @@ public class NewsSectionPageService : INewsSectionPageService
         return paginationDto;
     }
 
-    private async Task<ISet<int>> GetFeaturedNewsArticlePageIdsAsync(SectionNews newsSection, CancellationToken cancellationToken)
+    private static async Task<ISet<int>> GetFeaturedNewsArticlePageIdsAsync(SectionNews newsSection)
     {
         var featuredNewsArticlePageIds = newsSection.ItemListFeaturedItems.Select(x => x.SystemFields.WebPageItemID).ToHashSet();
 

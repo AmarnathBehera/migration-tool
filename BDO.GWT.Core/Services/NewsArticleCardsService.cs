@@ -3,13 +3,9 @@ using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
-using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Utilities;
 using CMS.ContentEngine;
-using CMS.ContentEngine.Internal;
-using CMS.DataEngine;
 using CMS.Websites;
-using HotChocolate.Data.Filters;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +25,6 @@ public interface INewsArticleCardsService
         Action<ContentItemQueryBuilder>? decorateQuery,
         Func<NewsArticle, bool> isFeatured,
         CancellationToken cancellationToken);
-    Task<List<NewsPageCardDto>> GetContentPageCardListAsync(ICollection<NewsArticle> contentPages, string languageTag, Func<NewsArticle, bool> isPageFeatured, CancellationToken cancellationToken);
 }
 
 public class NewsArticleCardsService : INewsArticleCardsService

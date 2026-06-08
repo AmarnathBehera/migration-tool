@@ -79,9 +79,7 @@ public class AuthoredContentService : IAuthoredContentService
         if (displayedTypes.Contains(nameof(BlogPost)))
             tasks.Add(GetPersonAuthoredBlogPostCardsAsync(person, cancellationToken));
 
-        // Uncomment when ready:
-        // if (displayedTypes.Contains(nameof(Insight)))
-        //     tasks.Add(GetPersonAuthoredInsightCardsAsync(person, cancellationToken));
+        // Add INSIGHT here.
 
         var results = await Task.WhenAll(tasks);
 
@@ -90,7 +88,7 @@ public class AuthoredContentService : IAuthoredContentService
             .OrderByDescending(card => card.Date)
             .ToArray();
     }
-    private Task<AuthoredContentCardDto[]> GetPersonAuthoredMicrositeMasterPageCardsAsync(Person person)
+    private static Task<AuthoredContentCardDto[]> GetPersonAuthoredMicrositeMasterPageCardsAsync(Person person)
     {
         var pages = person.MicrositeMasterPagesPerson?.ToArray()
             ?? Array.Empty<MicrositeMasterPage>();
@@ -110,7 +108,7 @@ public class AuthoredContentService : IAuthoredContentService
         return Task.FromResult(cards);
     }
 
-    private Task<AuthoredContentCardDto[]> GetPersonAuthoredMicrositePageCardsAsync(Person person)
+    private static Task<AuthoredContentCardDto[]> GetPersonAuthoredMicrositePageCardsAsync(Person person)
     {
         var pages = person.MicrositePagesPerson?.ToArray()
             ?? Array.Empty<MicrositePage>();
@@ -237,12 +235,12 @@ public class AuthoredContentService : IAuthoredContentService
             IsFeatured = false,
             Type = null,
             Date = date,
-            Title = title,
+            Title = title ?? string.Empty,
             Description = HtmlHelper.ExtractTextFromHtml(description),
             ReadMoreLink = new LinkItemDto
             {
                 Title = ResourceStringKey.LiveSite.ReadMore,
-                URL = url,
+                URL = url ?? string.Empty,
             },
         };
 }
