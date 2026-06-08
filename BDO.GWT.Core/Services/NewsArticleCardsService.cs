@@ -3,11 +3,9 @@ using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
-using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Utilities;
 using CMS.ContentEngine;
 using CMS.Websites;
-using HotChocolate.Data.Filters;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +19,8 @@ public interface INewsArticleCardsService
 {
     Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(HashSet<string> filters, string? nodeAliasPath, CancellationToken cancellationToken);
     Task<PaginationDto<NewsPageCardDto>> GetFilteredItemsAsync
-        (string language,
+        (SectionNews newsSection,
+        string language,
         CardsQuery cardsQuery,
         Action<ContentItemQueryBuilder>? decorateQuery,
         Func<NewsArticle, bool> isFeatured,
@@ -54,42 +53,59 @@ public class NewsArticleCardsService : INewsArticleCardsService
     {
         return await _cardsService.CreateFiltersAsync(filters, nodeAliasPath, cancellationToken);
     }
-
-    public async Task<PaginationDto<NewsPageCardDto>> GetFilteredItemsAsync
-        (string language,
-        CardsQuery cardsQuery,
-        Action<ContentItemQueryBuilder>? decorateQuery,
-        Func<NewsArticle, bool> isFeatured,
-        CancellationToken cancellationToken)
+    public async Task<PaginationDto<NewsPageCardDto>> GetFilteredItemsAsync(
+    SectionNews newsSection,
+    string language,
+    CardsQuery cardsQuery,
+    Action<ContentItemQueryBuilder>? decorateQuery,
+    Func<NewsArticle, bool> isFeatured,
+    CancellationToken cancellationToken)
     {
         var filterWhereExpressions = await GetFilterParameterWhereExpressionsAsync(cardsQuery.Filters);
 
-        var newsArticles = await _contentService.GetPagesAsync<NewsArticle>(
-              new RetrievePagesParameters
-              {
-                  LinkedItemsMaxLevel = 4,
-                  LanguageName = language,
-                  UseLanguageFallbacks = false
-              },
-           query =>
+        var newsGroupIDs = (await _contentService.GetPagesAsync<NewsGroup>(
+           new RetrievePagesParameters
            {
-               query.Where(w =>
-               {
-                   w.WhereEquals("ContentItemChannelID", _contentService.GetCurrentChannelID());
-                   foreach (var filter in filterWhereExpressions)
-                   {
-                       filter(w);
-                   }
-               });
+               LanguageName = language,
+               UseLanguageFallbacks = false
            },
-                RetrievalCacheSettings.CacheDisabled,
+           query => query
+               .Where(w => w.WhereEquals("WebPageItemParentID", newsSection.SystemFields.WebPageItemID)),
+           RetrievalCacheSettings.CacheDisabled,
            cancellationToken
-       ) ?? [];
+       ))?.Select(x => x.SystemFields.WebPageItemID).ToArray() ?? [];
+
+        if (newsGroupIDs.Length == 0)
+            return new PaginationDto<NewsPageCardDto> { Data = [], TotalCount = 0 };
+
+        var newsArticles = await _contentService.GetPagesAsync<NewsArticle>(
+            new RetrievePagesParameters
+            {
+                LinkedItemsMaxLevel = 4,
+                LanguageName = language,
+                UseLanguageFallbacks = false
+            },
+            query =>
+            {
+                query.Where(w =>
+                {
+                    w.WhereEquals("ContentItemChannelID", _contentService.GetCurrentChannelID());
+                    w.WhereIn("WebPageItemParentID", newsGroupIDs);
+
+                    foreach (var filter in filterWhereExpressions)
+                    {
+                        filter(w);
+                    }
+                });
+            },
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken
+        ) ?? [];      
 
         var orderedNewsArticles = newsArticles
             .Where(x => x is not null)
             .OrderByDescending(isFeatured)
-            .ToArray();
+            .ToArray();       
 
         var currentPage = cardsQuery.CurrentPage ?? 1;
         var pageSize = cardsQuery.PageSize ?? 10;

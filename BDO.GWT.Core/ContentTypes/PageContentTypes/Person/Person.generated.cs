@@ -120,24 +120,6 @@ namespace BDO
 
 
 		/// <summary>
-		/// Facebook.
-		/// </summary>
-		public string Facebook { get; set; }
-
-
-		/// <summary>
-		/// Twitter.
-		/// </summary>
-		public string Twitter { get; set; }
-
-
-		/// <summary>
-		/// LinkedIn.
-		/// </summary>
-		public string LinkedIn { get; set; }
-
-
-		/// <summary>
 		/// MetadataBusinessLines.
 		/// </summary>
 		public IEnumerable<BusinessLine> MetadataBusinessLines { get; set; }
@@ -162,12 +144,6 @@ namespace BDO
 
 
 		/// <summary>
-		/// MetadataIndustryCategoriesPerson.
-		/// </summary>
-		public IEnumerable<IndustryCategory> MetadataIndustryCategoriesPerson { get; set; }
-
-
-		/// <summary>
 		/// MetadataIndustriesPerson.
 		/// </summary>
 		public IEnumerable<Industry> MetadataIndustriesPerson { get; set; }
@@ -180,9 +156,57 @@ namespace BDO
 
 
 		/// <summary>
+		/// MetadataIndustryCategoriesPerson.
+		/// </summary>
+		public IEnumerable<IndustryCategory> MetadataIndustryCategoriesPerson { get; set; }
+
+
+		/// <summary>
 		/// MetadataSpecialtiesCategories.
 		/// </summary>
 		public IEnumerable<SpecialtiesCategory> MetadataSpecialtiesCategories { get; set; }
+
+
+		/// <summary>
+		/// MetadataSpecialtiesPages.
+		/// </summary>
+		public IEnumerable<SpecialtiesPage> MetadataSpecialtiesPages { get; set; }
+
+
+		/// <summary>
+		/// MetadataSpecialtiesAreas.
+		/// </summary>
+		public IEnumerable<SpecialtiesArea> MetadataSpecialtiesAreas { get; set; }
+
+
+		/// <summary>
+		/// MicrositeMasterPagesPerson.
+		/// </summary>
+		public IEnumerable<MicrositeMasterPage> MicrositeMasterPagesPerson { get; set; }
+
+
+		/// <summary>
+		/// MicrositePagesPerson.
+		/// </summary>
+		public IEnumerable<MicrositePage> MicrositePagesPerson { get; set; }
+
+
+		/// <summary>
+		/// LinkedIn.
+		/// </summary>
+		public string LinkedIn { get; set; }
+
+
+		/// <summary>
+		/// Facebook.
+		/// </summary>
+		public string Facebook { get; set; }
+
+
+		/// <summary>
+		/// Twitter.
+		/// </summary>
+		public string Twitter { get; set; }
 
 
 		/// <summary>

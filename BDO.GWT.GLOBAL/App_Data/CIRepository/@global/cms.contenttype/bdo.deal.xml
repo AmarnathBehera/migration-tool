@@ -232,6 +232,20 @@ INNER JOIN dbo.CMS_ContentItemCommonData AS cicd
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
+      <field allowempty="true" column="RelevantContactPersonDeal" columnprecision="0" columntype="contentitemreference" enabled="true" guid="726d3412-b273-4b57-95ca-f9ad9ad50e72" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Relevant contact people</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["f3c1aa73-5245-4566-ae9c-ac80c54a6ce2","f868347c-a9e1-459c-aa63-06b98c5fb82e"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
       <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
         <properties />
       </schema>
