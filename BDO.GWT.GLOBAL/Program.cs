@@ -20,9 +20,11 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.WebEncoders;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -125,6 +127,9 @@ if (builder.Environment.IsDevelopment())
 // Add Application Insights telemetry
 builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
+// Loads the administration redirect domain (AdminRedirectOptions) from a configuration file section
+builder.Services.Configure<AdminRedirectOptions>(builder.Configuration.GetSection("AdminRedirectOptions"));
+
 var app = builder.Build();
 
 app.InitKentico();
@@ -134,6 +139,36 @@ app.UseStaticFiles();
 app.UseCookiePolicy();
 
 app.UseAuthentication();
+
+if (builder.Configuration.GetSection("AdminRedirectOptions")?.GetSection("RedirectDomain")?.Value.Trim() != string.Empty)
+{
+    // Configures the URL rewriting options
+    var rewriteOptions = new RewriteOptions()
+    .Add(context =>
+    {
+        var httpContext = context.HttpContext;
+        var request = httpContext.Request;
+
+        // Checks if the URL path starts with '/admin'
+        if (request.Path.StartsWithSegments("/admin", StringComparison.OrdinalIgnoreCase))
+        {
+            // Gets the redirect domain for the administration
+            string adminDomain = httpContext.RequestServices
+                .GetRequiredService<IOptions<AdminRedirectOptions>>().Value.RedirectDomain;
+
+            // Checks if the current host is not already the administration domain
+            if (!adminDomain.Equals(request.Host.ToString(), StringComparison.OrdinalIgnoreCase))
+            {
+                // Redirects the request to the new domain
+                httpContext.Response.Redirect($"//{adminDomain}{request.Path}{request.QueryString}", permanent: false);
+                context.Result = RuleResult.EndResponse;
+            }
+        }
+    });
+
+    // Adds the URL rewriting middleware to the request pipeline using the configured RewriteOptions
+    app.UseRewriter(rewriteOptions);
+}
 
 app.UseKentico();
 

@@ -34,7 +34,7 @@ public class SectionPeoplePageServiceTests
             _contentServiceMock.Object,
             _heroServiceMock.Object,
             _peopleCardsServiceMock.Object,
-            _cultureContextMock.Object, _filteringHelperMock.Object);
+          _filteringHelperMock.Object);
     }
 
     [Test]

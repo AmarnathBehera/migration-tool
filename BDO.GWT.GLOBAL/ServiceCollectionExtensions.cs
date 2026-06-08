@@ -5,6 +5,7 @@ using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Services.Footer;
 using BDO.GWT.Core.Services.Header;
 using BDO.GWT.Core.Services.Widget;
+using BDO.GWT.GLOBAL.Components.FormComponents.CustomDropdown;
 using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Web.Core.Services;
@@ -66,6 +67,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<INewsGroupPageService, NewsGroupPageService>();
         serviceCollection.AddScoped<INewsArticleService, NewsArticleService>();
         serviceCollection.AddScoped<INewsArticleCardsService, NewsArticleCardsService>();
+        serviceCollection.AddScoped<IAuthoredContentService, AuthoredContentService>();
         serviceCollection.AddScoped<ISidebarService, SidebarService>();
         serviceCollection.AddScoped<ISocialMediaButtonsService, SocialMediaButtonsService>();
         serviceCollection.AddScoped<IExternalPeopleHelper, ExternalPeopleHelper>();
