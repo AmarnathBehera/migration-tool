@@ -68,6 +68,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<INewsGroupPageService, NewsGroupPageService>();
         serviceCollection.AddScoped<INewsArticleService, NewsArticleService>();
         serviceCollection.AddScoped<INewsArticleCardsService, NewsArticleCardsService>();
+        serviceCollection.AddScoped<IAuthoredContentService, AuthoredContentService>();
         serviceCollection.AddScoped<ISidebarService, SidebarService>();
         serviceCollection.AddScoped<ISocialMediaButtonsService, SocialMediaButtonsService>();
         serviceCollection.AddScoped<IExternalPeopleHelper, ExternalPeopleHelper>();
