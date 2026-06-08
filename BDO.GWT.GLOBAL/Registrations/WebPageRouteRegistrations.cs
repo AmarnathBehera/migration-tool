@@ -275,3 +275,13 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     IconClass = "xp-market")]
 
 [assembly: RegisterWebPageRoute(Webinar.CONTENT_TYPE_NAME, typeof(WebinarController))]
+
+
+[assembly: RegisterPageTemplate(
+    identifier: SectionRss.CONTENT_TYPE_NAME,
+    name: "Section Rss Content Type Template",
+    customViewName: "~/Views/SectionRss/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SectionRss" },
+    IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(SectionRss.CONTENT_TYPE_NAME, typeof(SectionRssController))]
