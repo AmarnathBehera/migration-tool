@@ -27,18 +27,16 @@ public interface ICareerDetailPageService
         private readonly IHeroService _heroService;
 
     private readonly IContentRetriever _contentRetriever;
-    private readonly ITaxonomyRetriever _taxonomyRetriever;
     private readonly ICultureContext _cultureContext;
     private readonly ISocialMediaButtonsService _socialMediaButtonsService;
     private readonly ISettingService _settingsService;
     private readonly IContentService _contentService;
 
-    public CareerDetailPageService(IHeroService heroService, IContentRetriever contentRetriever, ITaxonomyRetriever taxonomyRetriever, ICultureContext cultureContext, ISocialMediaButtonsService socialMediaButtonsService, ISettingService settingsService, IContentService contentService)
+    public CareerDetailPageService(IHeroService heroService, IContentRetriever contentRetriever, ICultureContext cultureContext, ISocialMediaButtonsService socialMediaButtonsService, ISettingService settingsService, IContentService contentService)
     {
         _heroService = heroService;
 
         _contentRetriever = contentRetriever;
-        _taxonomyRetriever = taxonomyRetriever;
         _cultureContext = cultureContext;
         _socialMediaButtonsService = socialMediaButtonsService;
         _settingsService = settingsService;
@@ -57,21 +55,29 @@ public interface ICareerDetailPageService
             return new CareerPageDto();
         }
 
+        var bgImageUrl = page.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+        var mobileImageUrl = page.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+        var ctaUrlPath = page.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath;
+
+        var heroData = new HeroData
+        {
+            Layout = page.HeroLayout,
+            Title = page.HeroTitle,
+            Description = page.HeroDescription,
+            BackgroundImage = bgImageUrl != null ? Link.Parse(bgImageUrl) : null,
+            BackgroundImageAltText = page.HeroBackgroundImageAltText,
+            MobileBackgroundImage = mobileImageUrl != null ? Link.Parse(mobileImageUrl) : null,
+            MobileBackgroundImageAltText = page.HeroBackgroundImage_MobileAltText,
+            CallToActionButtonType = page.HeroCallToActionButtonType,
+            CallToActionButtonText = page.HeroCallToActionButtonText,
+            CallToActionButtonUrl = ctaUrlPath != null ? Link.Parse(ctaUrlPath) : null,
+        };
+
+
+
         var dto = new CareerPageDto
         {
-            Hero = await _heroService.GetHeroDtoAsync(new HeroData
-            {
-                Layout = page.HeroLayout,
-                Title = page.HeroTitle,
-                Description = page.HeroDescription,
-                BackgroundImage = page.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string bgUrl ? Link.Parse(bgUrl) : null,
-                BackgroundImageAltText = page.HeroBackgroundImageAltText,
-                MobileBackgroundImage = page.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string mobileUrl ? Link.Parse(mobileUrl) : null,
-                MobileBackgroundImageAltText = page.HeroBackgroundImage_MobileAltText,
-                CallToActionButtonType = page.HeroCallToActionButtonType,
-                CallToActionButtonText = page.HeroCallToActionButtonText,
-                CallToActionButtonUrl = page.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath is string ctaPath ? Link.Parse(ctaPath) : null,
-            }, cancellationToken),
+            Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
             Content = await GetContentPageDtoAsync(page, cancellationToken),
             Form = page.CareerApplyForm,
             Sidebar = page.ShowSidebar ? await GetCareerSidebarDtoAsync(page, cancellationToken) : null,
@@ -87,17 +93,7 @@ public interface ICareerDetailPageService
         var languageTag = _cultureContext.CurrentLanguageTag;
 
 
-        var employmentTypeIds = careerPage.CareerEmploymentType?.Select(i => i.Identifier).ToList();
-        var careerLevelIds = careerPage.CareerLevel?.Select(i => i.Identifier).ToList();
-        var jobTitleIds = careerPage.CareerJobTitle?.Select(i => i.Identifier).ToList();
 
-        var employmentTags = await _taxonomyRetriever.RetrieveTags(employmentTypeIds, languageTag, cancellationToken);
-        var careerLevelTags = await _taxonomyRetriever.RetrieveTags(careerLevelIds, languageTag, cancellationToken);
-        var jobTitleTags = await _taxonomyRetriever.RetrieveTags(jobTitleIds, languageTag, cancellationToken);
-
-        var employmentTypeNames = employmentTags.Select(t => t.Name).ToList();
-        var careerLevelNames = careerLevelTags.Select(t => t.Name).ToList();
-        var jobTitleNames = jobTitleTags.Select(t => t.Name).ToList();
 
         var locationOfficeNames = careerPage.MetadataOfficeLocation.Select(i=> i.MetadataTitle).ToArray();
 
@@ -107,10 +103,10 @@ public interface ICareerDetailPageService
         var dto = new CareerContentDto
             {
                 Title = careerPage.MetadataTitle,
-                JobTitle = jobTitleNames.FirstOrDefault(),
+                JobTitle = careerPage.CareerJobTitle.FirstOrDefault().Name,
                 Reference = careerPage.CareerReference,
-            EmploymentType = employmentTypeNames.FirstOrDefault(),
-                Level = careerLevelNames.FirstOrDefault(),
+                EmploymentType = careerPage.CareerEmploymentType.FirstOrDefault().Name,
+                Level = careerPage.CareerLevel.FirstOrDefault().Name,
                 Locations = locationOfficeNames,
                 Content = careerPage.MetadataDescription,
             ContactPerson = contactPersonName?.MetadataTitle,
