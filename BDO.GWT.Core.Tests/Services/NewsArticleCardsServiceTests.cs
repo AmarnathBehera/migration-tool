@@ -308,14 +308,12 @@ public class NewsArticleCardsServiceTests
         {
             Assert.That(capturedFilters, Is.Not.Null);
             Assert.That(capturedFilters, Has.Count.EqualTo(3));
-            Assert.That(capturedFilters!.Contains("businessIssue"), Is.True);
-            Assert.That(capturedFilters.Contains("service"), Is.True);
-            Assert.That(capturedFilters.Contains("industryCategory"), Is.True);
+            Assert.That(capturedFilters!, Does.Contain("businessIssue"));
+            Assert.That(capturedFilters, Does.Contain("service"));
+            Assert.That(capturedFilters, Does.Contain("industryCategory"));
         });
     }
 }
-
-// --- Real implementation tests ---
 
 public class NewsArticleCardsServiceImplementationTests
 {
