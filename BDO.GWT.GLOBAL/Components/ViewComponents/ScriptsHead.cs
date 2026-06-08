@@ -1,61 +1,70 @@
-﻿using CMS.DataEngine;
+﻿using BDO;
+using BDO.GWT.Common;
+using BDO.GWT.Xperience;
+using CMS.DataEngine;
+using CMS.Websites.Routing;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CMS.Websites.Routing;
-using BDO.GWT.Common;
 
-namespace BDO.GWT.Xperience;
-
-public class ScriptsHead : ViewComponent
+namespace GWTXbyKWeb.Components.ViewComponents
 {
-    private readonly IInfoProvider<GlobalsettingskeyInfo> _provider;
-    private readonly IInfoProvider<WebChannelSnippetInfo> _siteProvider;
-    private readonly IWebsiteContext _websiteContext;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
-    private readonly IInfoProvider<WebChannelSettingsInfo> _webChannelSettingsInfoProvider;
-    private const string ScriptHeadKey = "BDO_ScriptHead";
-
-    public ScriptsHead(IInfoProvider<GlobalsettingskeyInfo> provider , IInfoProvider<WebChannelSnippetInfo> siteProvider, IWebsiteContext websiteContext, IWebsiteChannelContext websiteChannelContext, IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider)
+    public class ScriptsHead : ViewComponent
     {
-        _provider = provider;
-        _siteProvider = siteProvider;
-        _websiteContext= websiteContext;
-        _websiteChannelContext = websiteChannelContext;
-        _webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
+        private readonly IInfoProvider<GlobalsettingskeyInfo> _provider;
+        private readonly IInfoProvider<WebChannelSnippetInfo> _siteProvider;
+        private readonly IWebsiteContext _websiteContext;
+        private readonly IWebsiteChannelContext _websiteChannelContext;
+        private readonly IInfoProvider<WebChannelSettingsInfo> _webChannelSettingsInfoProvider;
+        public ScriptsHead(IInfoProvider<GlobalsettingskeyInfo> provider, IInfoProvider<WebChannelSnippetInfo> siteProvider, IWebsiteContext websiteContext, IWebsiteChannelContext websiteChannelContext, IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider)
+        {
+            _provider = provider;
+            _siteProvider = siteProvider;
+            _websiteContext = websiteContext;
+            _websiteChannelContext = websiteChannelContext;
+            _webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
 
-    }
+        }
 
-    public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken)
-    {
-        int currentWebsiteID = _websiteChannelContext.WebsiteChannelID;
-        var currentChannelId = _webChannelSettingsInfoProvider
-          .Get()
-          .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), currentWebsiteID)
-          .FirstOrDefault();
+        public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken)
+        {
+            int currentWebsiteID = _websiteChannelContext.WebsiteChannelID;
+            var value = string.Empty;
+            var currentChannelId = _webChannelSettingsInfoProvider
+              .Get()
+              .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), currentWebsiteID)
+              .FirstOrDefault();
 
-        var sitescriptHeadValue = _siteProvider.Get()
-                         .WhereEquals(
-                             nameof(WebChannelSnippetInfo.WebChannelSnippetCodeName),
-                             ScriptHeadKey)
-                         .WhereEquals(
-                             nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID),
-                             currentChannelId.WebChannelSettingsID)
-                         .TopN(1)
-                         .GetEnumerableTypedResult().FirstOrDefault()?.WebChannelSnippetCode;
+            
+            var sitescript = _siteProvider.Get()
+                                    .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID),
+                                     currentChannelId.WebChannelSettingsID)
+                                     .TopN(1)
+                                     .GetEnumerableTypedResult()
+                                     .FirstOrDefault();
+            bool inheritFromGlobal = false;
 
-        var GlobalscriptHeadValue = _provider.Get()
-                         .WhereEquals(
-                             nameof(GlobalsettingskeyInfo.GlobalSettingsKeyName),
-                             ScriptHeadKey)
-                         .TopN(1)
-                         .GetEnumerableTypedResult().FirstOrDefault()?.GlobalSettingsKeyValue;
+            if (sitescript != null)
+            {
+                // Non-column fields are stored in the CustomData / ObjectData bag
+                inheritFromGlobal = sitescript.ScriptHeadInheritfromglobalsettings;
+            }
+            if (inheritFromGlobal)
+            {
 
-        var finalValue = !string.IsNullOrWhiteSpace(sitescriptHeadValue)
-           ? sitescriptHeadValue
-           : GlobalscriptHeadValue;
-       
-        return View("~/Views/Shared/Components/Scripts/Default.cshtml", finalValue);
+                value = _provider.Get()
+                                   .TopN(1)
+                                  .GetEnumerableTypedResult().FirstOrDefault().ScriptHeadKeyValue;
+            }
+            else
+            {
+                value = sitescript?.ScriptHeadKeyValue;
+
+            }
+
+            return View("~/Views/Shared/Components/Scripts/Default.cshtml", value);
+        }
     }
 }

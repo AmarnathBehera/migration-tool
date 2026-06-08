@@ -4,21 +4,21 @@ using BDO.GWT.Xperience;
 using CMS.DataEngine;
 using CMS.Websites.Routing;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace GWTXbyKWeb.Components.ViewComponents
 {
-    public class MarketoMunchkincode : ViewComponent
+    public class MarketoMunchkinCode : ViewComponent
     {
         private readonly IInfoProvider<GlobalsettingskeyInfo> _provider;
         private readonly IInfoProvider<WebChannelSnippetInfo> _siteProvider;
         private readonly IWebsiteContext _websiteContext;
         private readonly IWebsiteChannelContext _websiteChannelContext;
         private readonly IInfoProvider<WebChannelSettingsInfo> _webChannelSettingsInfoProvider;
-        private const string MarketoMunchkincodeKey = "BDO_MarketoMunchkincode";
-        public MarketoMunchkincode(IInfoProvider<GlobalsettingskeyInfo> provider, IInfoProvider<WebChannelSnippetInfo> siteProvider, IWebsiteContext websiteContext, IWebsiteChannelContext websiteChannelContext, IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider)
+        public MarketoMunchkinCode(IInfoProvider<GlobalsettingskeyInfo> provider, IInfoProvider<WebChannelSnippetInfo> siteProvider, IWebsiteContext websiteContext, IWebsiteChannelContext websiteChannelContext, IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider)
         {
             _provider = provider;
             _siteProvider = siteProvider;
@@ -31,33 +31,38 @@ namespace GWTXbyKWeb.Components.ViewComponents
         public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken)
         {
             int currentWebsiteID = _websiteChannelContext.WebsiteChannelID;
+            var value = string.Empty;
             var currentChannelId = _webChannelSettingsInfoProvider
               .Get()
               .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), currentWebsiteID)
               .FirstOrDefault();
 
-            var siteMarketoMunchkincodeValue = _siteProvider.Get()
-                             .WhereEquals(
-                                 nameof(WebChannelSnippetInfo.WebChannelSnippetCodeName),
-                                 MarketoMunchkincodeKey)
-                             .WhereEquals(
-                                 nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID),
-                                 currentChannelId.WebChannelSettingsID)
-                             .TopN(1)
-                             .GetEnumerableTypedResult().FirstOrDefault()?.WebChannelSnippetCode;
+            var sitescript = _siteProvider.Get()
+                                    .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID),
+                                     currentChannelId.WebChannelSettingsID)
+                                     .TopN(1)
+                                     .GetEnumerableTypedResult()
+                                     .FirstOrDefault();
+            bool inheritFromGlobal = false;
 
-            var GlobalMarketoMunchkincodeValue = _provider.Get()
-                             .WhereEquals(
-                                 nameof(GlobalsettingskeyInfo.GlobalSettingsKeyName),
-                                 MarketoMunchkincodeKey)
-                             .TopN(1)
-                             .GetEnumerableTypedResult().FirstOrDefault()?.GlobalSettingsKeyValue;
+            if (sitescript != null)
+            {
+                inheritFromGlobal = sitescript.MarketoMunchkinCodeInheritfromglobal;
+            }
+            if (inheritFromGlobal)
+            {
 
-            var finalValue = !string.IsNullOrWhiteSpace(siteMarketoMunchkincodeValue)
-               ? siteMarketoMunchkincodeValue
-               : GlobalMarketoMunchkincodeValue;
+                value = _provider.Get()
+                                   .TopN(1)
+                                  .GetEnumerableTypedResult().FirstOrDefault().MarketoMunchkinCodeKeyValue;
+            }
+            else
+            {
+                value = sitescript?.MarketoMunchkinCodeKeyValue;
 
-            return View("~/Views/Shared/Components/Scripts/Default.cshtml", finalValue);
+            }
+
+            return View("~/Views/Shared/Components/Scripts/Default.cshtml", value);
         }
     }
 }

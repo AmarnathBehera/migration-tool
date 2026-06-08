@@ -4,6 +4,7 @@ using BDO.GWT.Xperience;
 using CMS.DataEngine;
 using CMS.Websites.Routing;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +18,6 @@ namespace GWTXbyKWeb.Components.ViewComponents
         private readonly IWebsiteContext _websiteContext;
         private readonly IWebsiteChannelContext _websiteChannelContext;
         private readonly IInfoProvider<WebChannelSettingsInfo> _webChannelSettingsInfoProvider;
-        private const string ScriptexecutedwhencookiesareacceptedKey = "BDO_Scriptexecutedwhencookiesareaccepted";
         public ScriptsWhenCookiesAccepted(IInfoProvider<GlobalsettingskeyInfo> provider, IInfoProvider<WebChannelSnippetInfo> siteProvider, IWebsiteContext websiteContext, IWebsiteChannelContext websiteChannelContext, IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider)
         {
             _provider = provider;
@@ -31,33 +31,39 @@ namespace GWTXbyKWeb.Components.ViewComponents
         public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken)
         {
             int currentWebsiteID = _websiteChannelContext.WebsiteChannelID;
+            var value = string.Empty;
             var currentChannelId = _webChannelSettingsInfoProvider
               .Get()
               .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), currentWebsiteID)
               .FirstOrDefault();
 
-            var ScriptsWhenCookiesAcceptedValue = _siteProvider.Get()
-                             .WhereEquals(
-                                 nameof(WebChannelSnippetInfo.WebChannelSnippetCodeName),
-                                 ScriptexecutedwhencookiesareacceptedKey)
-                             .WhereEquals(
-                                 nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID),
-                                 currentChannelId.WebChannelSettingsID)
-                             .TopN(1)
-                             .GetEnumerableTypedResult().FirstOrDefault()?.WebChannelSnippetCode;
+            var sitescript = _siteProvider.Get()
+                                    .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID),
+                                     currentChannelId.WebChannelSettingsID)
+                                     .TopN(1)
+                                     .GetEnumerableTypedResult()
+                                     .FirstOrDefault();
+            bool inheritFromGlobal = false;
 
-            var GlobalScriptsWhenCookiesAcceptedValue = _provider.Get()
-                             .WhereEquals(
-                                 nameof(GlobalsettingskeyInfo.GlobalSettingsKeyName),
-                                 ScriptexecutedwhencookiesareacceptedKey)
-                             .TopN(1)
-                             .GetEnumerableTypedResult().FirstOrDefault()?.GlobalSettingsKeyValue;
+            if (sitescript != null)
+            {
+                // Non-column fields are stored in the CustomData / ObjectData bag
+                inheritFromGlobal = sitescript.ScriptexecutedwhencookiesareacceptedInheritfromglobal;
+            }
+            if (inheritFromGlobal)
+            {
 
-            var finalValue = !string.IsNullOrWhiteSpace(ScriptsWhenCookiesAcceptedValue)
-               ? ScriptsWhenCookiesAcceptedValue
-               : GlobalScriptsWhenCookiesAcceptedValue;
+                value = _provider.Get()
+                                   .TopN(1)
+                                  .GetEnumerableTypedResult().FirstOrDefault().ScriptexecutedwhencookiesareacceptedKeyValue;
+            }
+            else
+            {
+                value = sitescript?.ScriptexecutedwhencookiesareacceptedKeyValue;
 
-            return View("~/Views/Shared/Components/Scripts/Default.cshtml", finalValue);
+            }
+
+            return View("~/Views/Shared/Components/Scripts/Default.cshtml", value);
         }
     }
 }

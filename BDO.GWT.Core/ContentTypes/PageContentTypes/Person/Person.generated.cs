@@ -120,6 +120,84 @@ namespace BDO
 
 
 		/// <summary>
+		/// MetadataBusinessLines.
+		/// </summary>
+		public IEnumerable<BusinessLine> MetadataBusinessLines { get; set; }
+
+
+		/// <summary>
+		/// MetadataServiceAreasPerson.
+		/// </summary>
+		public IEnumerable<ServiceArea> MetadataServiceAreasPerson { get; set; }
+
+
+		/// <summary>
+		/// MetadataServicesPerson.
+		/// </summary>
+		public IEnumerable<Service> MetadataServicesPerson { get; set; }
+
+
+		/// <summary>
+		/// MetadataSubServices.
+		/// </summary>
+		public IEnumerable<Sub_Service> MetadataSubServices { get; set; }
+
+
+		/// <summary>
+		/// MetadataIndustriesPerson.
+		/// </summary>
+		public IEnumerable<Industry> MetadataIndustriesPerson { get; set; }
+
+
+		/// <summary>
+		/// MetadataIndustryServices.
+		/// </summary>
+		public IEnumerable<IndustryService> MetadataIndustryServices { get; set; }
+
+
+		/// <summary>
+		/// MetadataIndustryCategoriesPerson.
+		/// </summary>
+		public IEnumerable<IndustryCategory> MetadataIndustryCategoriesPerson { get; set; }
+
+
+		/// <summary>
+		/// MetadataSpecialtiesCategories.
+		/// </summary>
+		public IEnumerable<SpecialtiesCategory> MetadataSpecialtiesCategories { get; set; }
+
+
+		/// <summary>
+		/// MetadataSpecialtiesPages.
+		/// </summary>
+		public IEnumerable<SpecialtiesPage> MetadataSpecialtiesPages { get; set; }
+
+
+		/// <summary>
+		/// MetadataSpecialtiesAreas.
+		/// </summary>
+		public IEnumerable<SpecialtiesArea> MetadataSpecialtiesAreas { get; set; }
+
+
+		/// <summary>
+		/// MicrositeMasterPagesPerson.
+		/// </summary>
+		public IEnumerable<MicrositeMasterPage> MicrositeMasterPagesPerson { get; set; }
+
+
+		/// <summary>
+		/// MicrositePagesPerson.
+		/// </summary>
+		public IEnumerable<MicrositePage> MicrositePagesPerson { get; set; }
+
+
+		/// <summary>
+		/// LinkedIn.
+		/// </summary>
+		public string LinkedIn { get; set; }
+
+
+		/// <summary>
 		/// Facebook.
 		/// </summary>
 		public string Facebook { get; set; }
@@ -129,12 +207,6 @@ namespace BDO
 		/// Twitter.
 		/// </summary>
 		public string Twitter { get; set; }
-
-
-		/// <summary>
-		/// LinkedIn.
-		/// </summary>
-		public string LinkedIn { get; set; }
 
 
 		/// <summary>
