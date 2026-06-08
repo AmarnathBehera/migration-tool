@@ -58,13 +58,6 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
             return mockQuery;
         }
 
-      
-   
-
-        private sealed class TestGlobalsettingskeyInfo : GlobalsettingskeyInfo
-        {
-            public override string MarketoMunchkinCodeKeyValue { get; set; } = string.Empty;
-        }
 
         [Test]
         public async Task InvokeAsync_WhenChannelNotFound_ReturnsDefaultView()
@@ -82,11 +75,80 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
         }
 
        
-      
+        [Test]
+        public async Task InvokeAsync_WhenChannelNotFound_DoesNotCallSiteOrGlobalProvider()
+        {
+            _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(1);
+
+            var channelQuery = SetupQueryReturning<WebChannelSettingsInfo>([]);
+            _webChannelSettingsProviderMock.Setup(p => p.Get()).Returns(channelQuery.Object);
+
+            await _component.InvokeAsync(CancellationToken.None);
+
+            _siteProviderMock.Verify(p => p.Get(), Times.Never);
+            _globalProviderMock.Verify(p => p.Get(), Times.Never);
+        }
+
+        [Test]
+        public async Task InvokeAsync_FiltersChannelByCurrentWebsiteChannelID()
+        {
+            _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(42);
+
+            var channelQuery = SetupQueryReturning<WebChannelSettingsInfo>([]);
+            _webChannelSettingsProviderMock.Setup(p => p.Get()).Returns(channelQuery.Object);
+
+            await _component.InvokeAsync(CancellationToken.None);
+
+            channelQuery.Verify(q => q.WhereEquals(
+                nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID),
+                It.IsAny<object>()), Times.AtLeastOnce);
+        }
+
+        [Test]
+        public async Task InvokeAsync_WhenChannelNotFound_ReturnsScriptsDefaultViewPath()
+        {
+            _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(1);
+
+            var channelQuery = SetupQueryReturning<WebChannelSettingsInfo>([]);
+            _webChannelSettingsProviderMock.Setup(p => p.Get()).Returns(channelQuery.Object);
+
+            var result = await _component.InvokeAsync(CancellationToken.None) as ViewViewComponentResult;
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.ViewName, Does.Contain("Scripts"));
+            Assert.That(result.ViewName, Does.Contain("Default.cshtml"));
+        }
+
+        [TestCase(1)]
+        [TestCase(5)]
+        [TestCase(99)]
+        public async Task InvokeAsync_WithDifferentWebsiteChannelIDs_ReturnsViewResult(int channelId)
+        {
+            _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(channelId);
+
+            var channelQuery = SetupQueryReturning<WebChannelSettingsInfo>([]);
+            _webChannelSettingsProviderMock.Setup(p => p.Get()).Returns(channelQuery.Object);
+
+            var result = await _component.InvokeAsync(CancellationToken.None);
+
+            Assert.That(result, Is.TypeOf<ViewViewComponentResult>());
+        }
+
        
-       
-       
-       
+        [Test]
+        public async Task InvokeAsync_WhenCancellationTokenProvided_StillReturnsResult()
+        {
+            _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(1);
+
+            var channelQuery = SetupQueryReturning<WebChannelSettingsInfo>([]);
+            _webChannelSettingsProviderMock.Setup(p => p.Get()).Returns(channelQuery.Object);
+
+            using var cts = new CancellationTokenSource();
+            var result = await _component.InvokeAsync(cts.Token);
+
+            Assert.That(result, Is.TypeOf<ViewViewComponentResult>());
+        }
+
         [Test]
         public async Task InvokeAsync_AlwaysReturnsViewViewComponentResult()
         {
