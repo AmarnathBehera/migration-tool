@@ -16,7 +16,7 @@ namespace BDO.GWT.Core.Services
     public interface IBlogsPageService
     {
         Task<BlogPageDto?> GetBlogsPageDtoAsync(Blog currentPage, CancellationToken cancellationToken);
-        Task<PaginationDto<BlogPageCardDto?>> GetBlogsPaginationResultAsync(Guid pageGuid,string language, CardsQuery cardsQuery, CancellationToken cancellationToken);
+        Task<PaginationDto<BlogPageCardDto?>> GetBlogsPaginationResultAsync(int pageId,string language, CardsQuery cardsQuery, CancellationToken cancellationToken);
     }
     public class BlogsPageService : IBlogsPageService
     {
@@ -45,6 +45,8 @@ namespace BDO.GWT.Core.Services
                 return null;
             }
 
+           
+
             bool enableFilters = currentPage.ItemListFilteringEnabled;
 
             var bgImageUrl = currentPage.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
@@ -64,11 +66,14 @@ namespace BDO.GWT.Core.Services
                 CallToActionButtonUrl = ctaUrlPath != null ? Link.Parse(ctaUrlPath) : null,
             };
 
+            // Construct the API endpoint URL using the page's GUID which is passed as url parameter to the BlogPostsAPIController to filter blog posts related to the current page
+            var fullApiEndpoint = $"BlogPosts/{currentPage.SystemFields.WebPageItemID}";
+
             BlogPageDto blogPageDtoObj = new BlogPageDto
             {
                 Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
                 EnableFilters = enableFilters,
-               CardsGrid = await GetBlogCardsGridDtoAsync(currentPage, apiEndPointname,cancellationToken)
+               CardsGrid = await GetBlogCardsGridDtoAsync(currentPage, fullApiEndpoint, cancellationToken)
 
             };
 
@@ -113,33 +118,61 @@ namespace BDO.GWT.Core.Services
             return blogCardsGridDto;
         }
 
-        public async Task<PaginationDto<BlogPageCardDto?>> GetBlogsPaginationResultAsync(Guid pageGuid, string language, CardsQuery cardsQuery, CancellationToken cancellationToken)
+        public async Task<PaginationDto<BlogPageCardDto?>> GetBlogsPaginationResultAsync(int pageId, string language, CardsQuery cardsQuery, CancellationToken cancellationToken)
         {
-            var featuredBlogsPageIds = await GetFeaturedBlogPostPageIdsAsync(pageGuid, cancellationToken);
+            var currrentBlogPage = (await _contentService.GetPagesAsync<Blog>(
+             new RetrievePagesParameters
+             {
+                 LanguageName = language,
+                 UseLanguageFallbacks = false
+             },
+            query => query
+                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
+                .Where(w => w.WhereEquals("WebPageItemID", pageId)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken
+        )).FirstOrDefault();
+
+            if (currrentBlogPage == null)
+            {
+                throw new MissingSectionPageException($"'{nameof(Blog)} page with GUID '{pageId}' not found.");
+            }
+
+            var featuredBlogsPageIds = await GetFeaturedBlogPostPageIdsAsync(currrentBlogPage.SystemFields.ContentItemGUID, cancellationToken);
 
             var paginationDto = await _blogPageCardsService.GetFilteredItemsAsync(
                 language,
                 cardsQuery,
-                null,
-                blogPost => featuredBlogsPageIds.Contains(blogPost.SystemFields.WebPageItemID),
+                 null,
+                blogPost => featuredBlogsPageIds.Contains(blogPost.SystemFields.ContentItemGUID),
+                currrentBlogPage.SystemFields.WebPageItemID,
                 cancellationToken
                 );
 
-            return paginationDto;
+            if (paginationDto == null)
+            {
+               return new PaginationDto<BlogPageCardDto?>();
+            }
+            
+            return new PaginationDto<BlogPageCardDto?>
+            {
+                Data = paginationDto.Data,
+                TotalCount = paginationDto.TotalCount
+            };
         }
 
-        private async Task<ISet<int>> GetFeaturedBlogPostPageIdsAsync(Guid contentItemGuid, CancellationToken cancellationToken)
+        private async Task<ISet<Guid>> GetFeaturedBlogPostPageIdsAsync(Guid contentItemGuid, CancellationToken cancellationToken)
         {
             var currentPage = (await _contentService.GetItemAsync<Blog>(contentItemGuid, cancellationToken));
 
             if (currentPage == null)
             {
-                return new HashSet<int>();
+                return new HashSet<Guid>();
             }
 
             var featuredBlogPostPageIds = currentPage.BlogPostListFeaturedItems.Select(x => x.WebPageGuid).ToHashSet();
-               
-            return (ISet<int>)featuredBlogPostPageIds;
+
+            return featuredBlogPostPageIds;
         }
 
     }

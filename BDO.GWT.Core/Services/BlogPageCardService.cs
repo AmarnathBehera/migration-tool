@@ -25,6 +25,7 @@ namespace BDO.GWT.Core.Services
             CardsQuery cardsQuery,
             Action<ContentItemQueryBuilder>? decorateQuery,
             Func<BlogPost, bool> isFeatured,
+            int parentPageId,
             CancellationToken cancellationToken);
     }
     public class BlogPageCardsService : IBlogPageCardsService
@@ -62,36 +63,53 @@ namespace BDO.GWT.Core.Services
             CardsQuery cardsQuery,
             Action<ContentItemQueryBuilder>? decorateQuery,
             Func<BlogPost, bool> isFeatured,
+            int parentPageId,
             CancellationToken cancellationToken)
         {
             var filterWhereExpressions = await GetFilterParameterWhereExpressionsAsync(cardsQuery.Filters);
 
-            var blogPosts = await _contentService.GetPagesAsync<BlogPost>(
-                  new RetrievePagesParameters
-                  {
-                      LinkedItemsMaxLevel = 4,
-                      LanguageName = language,
-                      UseLanguageFallbacks = false
-                  },
-               query =>
-               {
-                   query.Where(w =>
-                   {
-                       w.WhereEquals("ContentItemChannelID", _contentService.GetCurrentChannelID());
-                       foreach (var filter in filterWhereExpressions)
-                       {
-                           filter(w);
-                       }
-                   });
-               },
-                    RetrievalCacheSettings.CacheDisabled,
-               cancellationToken
-           ) ?? [];
+            var blogPostsGroups = await _contentService.GetChildPagesByParentGuidAsync<BlogPostGroup>(parentPageId, cancellationToken);
 
-            var orderedBlogPosts = blogPosts
+            foreach (var blogPostGroup in blogPostsGroups)
+            {
+                var blogPostList = await _contentService.GetChildPagesByParentGuidAsync<BlogPost>(blogPostGroup.SystemFields.WebPageItemID, cancellationToken);
+            }
+
+            List<BlogPost> blogPostsList = new List<BlogPost>();
+
+            foreach (var blogPostGrp in blogPostsGroups)
+            {
+                var blogPosts = await _contentService.GetChildPagesByParentGuidWithQueryBuilderAsync<BlogPost>(
+                                   query =>
+                                    {
+                                         // Apply parent ID filter if provided
+                                          if (parentPageId > 0)
+                                          {
+                                              query.Parameters(p => p.Where(w => w.WhereEquals(nameof(BlogPost.SystemFields.WebPageItemParentID), blogPostGrp.SystemFields.WebPageItemID)));
+                                          }
+
+                                          // Apply filter expressions
+                                          foreach (var filterExpression in filterWhereExpressions)
+                                          {
+                                              query.Parameters(p => p.Where(filterExpression));
+                                          }
+
+                                          // Apply any additional query decorations
+                                          decorateQuery?.Invoke(query);
+                                    },
+                                    cancellationToken);
+                 
+
+                blogPostsList.AddRange(blogPosts);
+            }
+          
+
+            var orderedBlogPosts = blogPostsList
                 .Where(x => x is not null)
                 .Cast<BlogPost>()
                 .OrderByDescending(isFeatured)
+                .ThenByDescending(x => x.SystemFields.ContentItemCommonDataLastPublishedWhen
+                                    ?? x.SystemFields.ContentItemCommonDataFirstPublishedWhen)
                 .ToArray();
 
             var currentPage = cardsQuery.CurrentPage ?? 1;
@@ -107,7 +125,7 @@ namespace BDO.GWT.Core.Services
             var paginationDto = new PaginationDto<BlogPageCardDto>
             {
                 Data = itemDtos.ToArray(),
-                TotalCount = paginatedPages.Length,
+                TotalCount = orderedBlogPosts.Length,
             };
 
             return paginationDto;
@@ -189,13 +207,19 @@ namespace BDO.GWT.Core.Services
             foreach (var contentPage in contentPages)
             {
                 //var tags = await _taxonomyTagRetriever.GetTaxonomyTagByGUIDs(contentPage.ContentType, _cultureContext.CurrentLanguageTag);
-                //IEnumerable<Contenttypes> type = contentPage.ContentType;
-                var typeConst = "Blog";
+                var type = contentPage.ContentType.FirstOrDefault();
+                string typeConst = string.Empty;
+               
+                if(type != null)
+                {
+                    typeConst = type.Name;
+                }
+                    
                 bool isComingSoon = false;
                 var card = new BlogPageCardDto
                 {
                     IsFeatured = isPageFeatured(contentPage),
-                    ImageURL = urlHelper.Content(contentPage.ImageFile.FirstOrDefault()?.ContentAttachmentAsset.Url),
+                    ImageURL = urlHelper.Content(contentPage.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset?.Url ?? string.Empty),
                     isComingSoon = isComingSoon,
                     ImageAltText = contentPage.ImageFileAltText,
                     Type = typeConst,
@@ -207,9 +231,14 @@ namespace BDO.GWT.Core.Services
                     {
                         Title = ResourceStringKey.LiveSite.ReadMore,
                         URL = contentPage.GetUrl().AbsoluteUrl
-                    },
+                    }
                 };
-                cards.Add(card);
+
+                if(card != null)
+                {
+                    cards.Add(card);
+                }
+                
             }
             return cards;
         }

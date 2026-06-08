@@ -22,15 +22,16 @@ namespace BDO.GWT.Web.Controllers
             _blogPageService = blogPageService;
         }
 
-        [HttpGet("[action]")]
-        public async Task<ActionResult<PaginationDto<NewsPageCardDto>>> Get([FromRoute] Guid pageGuid,[FromQuery] CardsQuery query, CancellationToken cancellationToken)
+        [HttpGet("{pageId:int}/[action]")]
+        public async Task<ActionResult<PaginationDto<BlogPageCardDto>>> Get([FromRoute] int pageId, [FromQuery] CardsQuery query, CancellationToken cancellationToken)
         {
-            var language = RouteData.Values[CultureInjectorAttribute.RouteParameter]?.ToString();
+           var language = RouteData.Values[CultureInjectorAttribute.RouteParameter]?.ToString();
 
             query.Filters = RequestQueryUtility.ExtractFilterQueryParameters(Request.Query);
+            // Call the service method to get the paginated blog posts based on the content Item GUID, language, and query parameters
+            var result = await _blogPageService.GetBlogsPaginationResultAsync(pageId, language, query, cancellationToken);
 
-            var result = await _blogPageService.GetBlogsPaginationResultAsync(pageGuid,language, query, cancellationToken);
-
+            
             return Ok(result);
         }
     }

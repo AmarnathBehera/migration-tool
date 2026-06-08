@@ -73,7 +73,14 @@
        CancellationToken cancellationToken = default)
        where TPage : IWebPageFieldsSource;
 
-        Task<IEnumerable<TPage>> GetPagesAsync<TPage>(
+        Task<IEnumerable<TPage>> GetChildPagesByParentGuidWithQueryBuilderAsync<TPage>(
+          Action<ContentItemQueryBuilder> configure,
+          CancellationToken cancellationToken = default)
+          where TPage : class, IWebPageFieldsSource;
+
+
+
+       Task<IEnumerable<TPage>> GetPagesAsync<TPage>(
       RetrievePagesParameters parameters,
       Action<RetrievePagesQueryParameters> queryAction,
       RetrievalCacheSettings cacheSettings,

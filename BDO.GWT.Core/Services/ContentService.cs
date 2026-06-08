@@ -276,7 +276,7 @@
                 throw new ArgumentException("Parent GUID must be provided", nameof(parentGuid));
 
             var childPages = await _contentRetriever.RetrievePages<TPage>(
-                new RetrievePagesParameters { LinkedItemsMaxLevel = 3 },
+                new RetrievePagesParameters { LinkedItemsMaxLevel = 5 },
             query =>
                 {
                     // Filter by parent GUID
@@ -288,6 +288,43 @@
             );
 
             return childPages;
+        }
+
+        /// <summary>
+        /// Retrieves web pages of type <typeparamref name="TPage"/> using a caller-supplied
+        /// <see cref="ContentItemQueryBuilder"/> configuration. This overload gives the caller
+        /// full control over the query (Where, OrderBy, TopN, Parameters, etc.) instead of
+        /// just filtering by a single parent ID.
+        /// Linked items are resolved up to 5 levels deep.
+        /// </summary>
+        public async Task<IEnumerable<TPage>> GetChildPagesByParentGuidWithQueryBuilderAsync<TPage>(
+            Action<ContentItemQueryBuilder> configure,
+            CancellationToken cancellationToken = default)
+            where TPage : class, IWebPageFieldsSource
+        {
+            if (configure is null)
+                throw new ArgumentNullException(nameof(configure));
+
+            var builder = new ContentItemQueryBuilder()
+                .ForContentType(GetContentTypeName<TPage>(), subquery =>
+                {
+                    subquery
+                        .ForWebsite(_websiteChannelContext.WebsiteChannelName)
+                        .WithLinkedItems(5); // equivalent to RetrievePagesParameters { LinkedItemsMaxLevel = 5 }
+                });
+
+            // Allow the caller to decorate the builder (apply parent filter, filter expressions,
+            // ordering, paging, linked-items levels via Parameters, etc.).
+            configure.Invoke(builder);
+
+            var queryOptions = BuildQueryExecutionOptions();
+
+            var results = await _executor.GetMappedWebPageResult<TPage>(
+                builder,
+                queryOptions,
+                cancellationToken);
+
+            return results;
         }
 
         public Task<IEnumerable<TPage>> GetPagesAsync<TPage>(
@@ -407,6 +444,8 @@
         {
             throw new NotImplementedException();
         }
+
+        
     }
 }
 
