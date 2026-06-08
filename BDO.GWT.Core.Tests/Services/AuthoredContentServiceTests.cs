@@ -1,4 +1,6 @@
 using BDO.GWT.Core.Services;
+using CMS.ContentEngine;
+using CMS.Core;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 using Moq;
@@ -169,5 +171,158 @@ public class AuthoredContentServiceTests
             It.IsAny<Action<RetrievePagesQueryParameters>>(),
             It.IsAny<RetrievalCacheSettings>(),
             It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Test]
+    public async Task GetAuthoredContentDtoAsync_ReturnsDtoWithCorrectBackgroundImageUrl_WhenImagePresent()
+    {
+        var person = new Person { SystemFields = new WebPageFields() };
+        var expectedUrl = "https://cdn.example.com/bg.jpg";
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[]
+            {
+            new SectionPeoplePage
+            {
+                ShowAuthoredInsights = true,
+                DisplayedAuthoredContentPageTypes = string.Empty,
+                AuthoredInsightsBackgroundImageUrl = new[]
+                {
+                    new ContentAttachment
+                    {
+                        ContentAttachmentAsset = new ContentItemAsset { Url = expectedUrl }
+                    }
+                }
+            } });
+
+        var result = await _service.GetAuthoredContentDtoAsync(person, CancellationToken.None);
+
+        Assert.That(result!.BackgroundImageURL, Is.EqualTo(expectedUrl));
+    }
+
+    [Test]
+    public async Task GetAuthoredContentDtoAsync_ReturnsNullBackgroundImageUrl_WhenNoImageConfigured()
+    {
+        var person = new Person { SystemFields = new WebPageFields() };
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[]
+            {
+            new SectionPeoplePage
+            {
+                ShowAuthoredInsights = true,
+                DisplayedAuthoredContentPageTypes = string.Empty,
+                AuthoredInsightsBackgroundImageUrl = null
+            }
+            });
+
+        var result = await _service.GetAuthoredContentDtoAsync(person, CancellationToken.None);
+
+        Assert.That(result!.BackgroundImageURL, Is.Null);
+    }
+
+    [Test]
+    public async Task GetAuthoredContentDtoAsync_DoesNotRequestQueryableTypes_WhenOnlyNonQueryableTypesConfigured()
+    {
+        var person = new Person
+        {
+            SystemFields = new WebPageFields(),
+            MicrositeMasterPagesPerson = Array.Empty<MicrositeMasterPage>(),
+            MicrositePagesPerson = Array.Empty<MicrositePage>()
+        };
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[]
+            {
+            new SectionPeoplePage
+            {
+                ShowAuthoredInsights = true,
+                DisplayedAuthoredContentPageTypes =
+                    $"{nameof(MicrositeMasterPage)}|{nameof(MicrositePage)}"
+            }
+            });
+
+        var result = await _service.GetAuthoredContentDtoAsync(person, CancellationToken.None);
+
+        Assert.That(result!.Items, Is.Empty);
+
+        _contentServiceMock.Verify(s => s.GetPagesAsync<NewsArticle>(
+            It.IsAny<RetrievePagesParameters>(),
+            It.IsAny<Action<RetrievePagesQueryParameters>>(),
+            It.IsAny<RetrievalCacheSettings>(),
+            It.IsAny<CancellationToken>()), Times.Never);
+
+        _contentServiceMock.Verify(s => s.GetPagesAsync<BlogPost>(
+            It.IsAny<RetrievePagesParameters>(),
+            It.IsAny<Action<RetrievePagesQueryParameters>>(),
+            It.IsAny<RetrievalCacheSettings>(),
+            It.IsAny<CancellationToken>()), Times.Never);
+
+        _contentServiceMock.Verify(s => s.GetPagesAsync<Deal>(
+            It.IsAny<RetrievePagesParameters>(),
+            It.IsAny<Action<RetrievePagesQueryParameters>>(),
+            It.IsAny<RetrievalCacheSettings>(),
+            It.IsAny<CancellationToken>()), Times.Never);
+    }
+    [Test]
+    public async Task GetAuthoredContentDtoAsync_PassesPersonGuidToQuery_WhenFetchingBlogPosts()
+    {
+        var personGuid = Guid.NewGuid();
+        var person = new Person
+        {
+            SystemFields = new WebPageFields { ContentItemGUID = personGuid }
+        };
+
+        RetrievePagesParameters? capturedParameters = null;
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[]
+            {
+            new SectionPeoplePage
+            {
+                ShowAuthoredInsights = true,
+                DisplayedAuthoredContentPageTypes = nameof(BlogPost)
+            }
+            });
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<BlogPost>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<RetrievePagesParameters, Action<RetrievePagesQueryParameters>, RetrievalCacheSettings, CancellationToken>(
+                (parameters, _, _, _) => capturedParameters = parameters)
+            .ReturnsAsync(Array.Empty<BlogPost>());
+
+        await _service.GetAuthoredContentDtoAsync(person, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedParameters, Is.Not.Null);
+            Assert.That(capturedParameters!.LinkedItemsMaxLevel, Is.EqualTo(2));
+            Assert.That(capturedParameters.LanguageName, Is.EqualTo("en-US"));
+            Assert.That(capturedParameters.UseLanguageFallbacks, Is.False);
+        });
     }
 }
