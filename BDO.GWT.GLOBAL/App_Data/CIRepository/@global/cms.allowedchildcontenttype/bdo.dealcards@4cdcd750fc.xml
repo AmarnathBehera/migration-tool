@@ -13,5 +13,12 @@
         <ObjectType>cms.contenttype</ObjectType>
       </AllowedChildContentTypeChildID>
     </Binding>
+    <Binding id="cms.contenttype_BDO.DealCards">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.DealCards</CodeName>
+        <GUID>7b19e49b-0002-4a8a-a4ce-ddc69ce5c526</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
   </Bindings>
 </cms.allowedchildcontenttype>
