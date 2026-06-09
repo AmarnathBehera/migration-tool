@@ -24,17 +24,15 @@ public class CareerDetailPageService : ICareerDetailPageService
     private readonly IHeroService _heroService;
 
     private readonly IContentRetriever _contentRetriever;
-    private readonly ICultureContext _cultureContext;
     private readonly ISocialMediaButtonsService _socialMediaButtonsService;
     private readonly ISettingService _settingsService;
     private readonly IContentService _contentService;
 
-    public CareerDetailPageService(IHeroService heroService, IContentRetriever contentRetriever, ICultureContext cultureContext, ISocialMediaButtonsService socialMediaButtonsService, ISettingService settingsService, IContentService contentService)
+    public CareerDetailPageService(IHeroService heroService, IContentRetriever contentRetriever, ISocialMediaButtonsService socialMediaButtonsService, ISettingService settingsService, IContentService contentService)
     {
         _heroService = heroService;
 
         _contentRetriever = contentRetriever;
-        _cultureContext = cultureContext;
         _socialMediaButtonsService = socialMediaButtonsService;
         _settingsService = settingsService;
         _contentService = contentService;
@@ -85,7 +83,7 @@ public class CareerDetailPageService : ICareerDetailPageService
     }
 
 
-    private async Task<CareerContentDto> GetContentPageDtoAsync(Career careerPage)
+    private static Task<CareerContentDto> GetContentPageDtoAsync(Career careerPage)
     {
         var locationOfficeNames = careerPage.MetadataOfficeLocation.Select(i => i.MetadataTitle).ToArray();
         var contactPersonName = careerPage.CareerContactPeopleID.FirstOrDefault();
@@ -102,7 +100,7 @@ public class CareerDetailPageService : ICareerDetailPageService
             ContactPerson = contactPersonName?.MetadataTitle,
         };
 
-        return dto;
+        return Task.FromResult(dto);
     }
 
     private async Task<ContentSidebarDto> GetCareerSidebarDtoAsync(Career careerPage, CancellationToken cancellationToken)
