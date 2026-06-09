@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.DataEngine;
 using Kentico.Xperience.Admin.Base;
@@ -45,13 +45,13 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
             var webChannelSettingsProvider = new Mock<IInfoProvider<WebChannelSettingsInfo>>().Object;
             var channelAccessService = new Mock<IChannelAccessService>().Object;
 
-             Assert.Throws<TargetInvocationException>(() =>
-                Activator.CreateInstance(typeof(GeneralSettingsEditPage),
-                    formComponentMapper,
-                    formDataBinder,
-                    (IInfoProvider<GeneralSettingInfo>?)null,
-                    webChannelSettingsProvider,
-                    channelAccessService));
+            Assert.Throws<TargetInvocationException>(() =>
+               Activator.CreateInstance(typeof(GeneralSettingsEditPage),
+                   formComponentMapper,
+                   formDataBinder,
+                   (IInfoProvider<GeneralSettingInfo>?)null,
+                   webChannelSettingsProvider,
+                   channelAccessService));
         }
 
         [Test]
