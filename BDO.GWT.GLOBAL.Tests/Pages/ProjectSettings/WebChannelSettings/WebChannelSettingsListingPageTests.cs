@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using BDO;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.ContentEngine;
@@ -114,6 +116,89 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
 
             var paramTypes = ctor!.GetParameters().Select(p => p.ParameterType).ToArray();
             Assert.That(paramTypes, Does.Contain(typeof(IInfoProvider<SEOSettingsInfo>)));
+        }
+
+        [Test]
+        public void ObjectType_IsOverriddenInListingPage()
+        {
+            var prop = typeof(WebChannelSettingsListingPage).GetProperty(
+                "ObjectType",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+
+            Assert.That(prop, Is.Not.Null);
+            Assert.That(prop!.DeclaringType, Is.EqualTo(typeof(WebChannelSettingsListingPage)));
+        }
+
+        [Test]
+        public void EnsureChannelSetting_HasCorrectParameterTypes()
+        {
+            var method = typeof(WebChannelSettingsListingPage).GetMethod(
+                "EnsureChannelSetting",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+
+            Assert.That(method, Is.Not.Null);
+            var parameters = method!.GetParameters();
+            Assert.Multiple(() =>
+            {
+                Assert.That(parameters.Length, Is.EqualTo(2));
+                Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(List<WebChannelSettingsInfo>)));
+                Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(ChannelInfo)));
+            });
+        }
+
+        [Test]
+        public void EnsureChannelSettingDisplayName_HasCorrectParameterTypes()
+        {
+            var method = typeof(WebChannelSettingsListingPage).GetMethod(
+                "EnsureChannelSettingDisplayName",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+
+            Assert.That(method, Is.Not.Null);
+            var parameters = method!.GetParameters();
+            Assert.Multiple(() =>
+            {
+                Assert.That(parameters.Length, Is.EqualTo(2));
+                Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(ChannelInfo)));
+                Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(WebChannelSettingsInfo)));
+            });
+        }
+
+        [Test]
+        public void EnsureSeoSettings_HasCorrectParameterTypes()
+        {
+            var method = typeof(WebChannelSettingsListingPage).GetMethod(
+                "EnsureSeoSettings",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+
+            Assert.That(method, Is.Not.Null);
+            var parameters = method!.GetParameters();
+            Assert.Multiple(() =>
+            {
+                Assert.That(parameters.Length, Is.EqualTo(2));
+                Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(WebChannelSettingsInfo)));
+                Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(IEnumerable<SEOSettingsInfo>)));
+            });
+        }
+
+        [Test]
+        public void ConfigurePage_IsAsyncAndReturnsTask()
+        {
+            var method = typeof(WebChannelSettingsListingPage).GetMethod(
+                "ConfigurePage",
+                BindingFlags.Instance | BindingFlags.Public);
+
+            Assert.That(method, Is.Not.Null);
+            Assert.That(method!.ReturnType, Is.EqualTo(typeof(Task)));
+        }
+
+        [Test]
+        public void Page_IsPublicNonAbstractClass()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(typeof(WebChannelSettingsListingPage).IsPublic, Is.True);
+                Assert.That(typeof(WebChannelSettingsListingPage).IsAbstract, Is.False);
+            });
         }
     }
 }

@@ -13,7 +13,6 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
     {
         private Mock<IInfoProvider<GlobalsettingskeyInfo>> _globalProviderMock = null!;
         private Mock<IInfoProvider<WebChannelSnippetInfo>> _siteProviderMock = null!;
-        private Mock<IWebsiteContext> _websiteContextMock = null!;
         private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
         private Mock<IInfoProvider<WebChannelSettingsInfo>> _webChannelSettingsProviderMock = null!;
         private ScriptsTopBody _component = null!;
@@ -25,14 +24,12 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
         {
             _globalProviderMock = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
             _siteProviderMock = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
-            _websiteContextMock = new Mock<IWebsiteContext>();
             _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
             _webChannelSettingsProviderMock = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
 
             _component = new ScriptsTopBody(
                 _globalProviderMock.Object,
                 _siteProviderMock.Object,
-                _websiteContextMock.Object,
                 _websiteChannelContextMock.Object,
                 _webChannelSettingsProviderMock.Object);
         }

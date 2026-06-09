@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Threading.Tasks;
 using BDO;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.DataEngine;
@@ -99,6 +100,94 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
                 BindingFlags.Instance | BindingFlags.Public);
 
             Assert.That(method?.DeclaringType, Is.EqualTo(typeof(WebChannelSnippetEditPage)));
+        }
+
+        [Test]
+        public void WebChannelSettingsId_PageParameterAttribute_UsesIntPageModelBinder()
+        {
+            var prop = typeof(WebChannelSnippetEditPage).GetProperty(nameof(WebChannelSnippetEditPage.WebChannelSettingsId));
+            Assert.That(prop, Is.Not.Null);
+
+            // Use CustomAttributeData so we don't depend on a named property on PageParameterAttribute.
+            var attrData = prop!.GetCustomAttributesData()
+                .FirstOrDefault(a => a.AttributeType.Name == "PageParameterAttribute");
+            Assert.That(attrData, Is.Not.Null);
+            Assert.That(attrData!.ConstructorArguments, Has.Count.GreaterThan(0));
+            Assert.That(
+                (Type)attrData.ConstructorArguments[0].Value!,
+                Is.EqualTo(typeof(Kentico.Xperience.Admin.Base.IntPageModelBinder)));
+        }
+
+        [Test]
+        public void ObjectId_HasPageParameterAttribute()
+        {
+            var prop = typeof(WebChannelSnippetEditPage).GetProperty(
+                nameof(WebChannelSnippetEditPage.ObjectId),
+                BindingFlags.Instance | BindingFlags.Public);
+
+            Assert.That(prop, Is.Not.Null);
+            var attr = prop!.GetCustomAttribute<Kentico.Xperience.Admin.Base.PageParameterAttribute>();
+            Assert.That(attr, Is.Not.Null);
+        }
+
+        [Test]
+        public void ConfigurePage_IsAsyncAndReturnsTask()
+        {
+            var method = typeof(WebChannelSnippetEditPage).GetMethod(
+                "ConfigurePage",
+                BindingFlags.Instance | BindingFlags.Public);
+
+            Assert.That(method, Is.Not.Null);
+            Assert.That(method!.ReturnType, Is.EqualTo(typeof(Task)));
+        }
+
+        [Test]
+        public void GetSubmitSuccessResponse_IsProtectedOverride()
+        {
+            var method = typeof(WebChannelSnippetEditPage).GetMethod(
+                "GetSubmitSuccessResponse",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+
+            Assert.That(method, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(method!.IsFamily, Is.True);   // protected
+                Assert.That(method.IsVirtual, Is.True);   // override
+            });
+        }
+
+        [Test]
+        public void WebChannelSettingsDisplayName_IsPrivateProperty()
+        {
+            var prop = typeof(WebChannelSnippetEditPage).GetProperty(
+                "WebChannelSettingsDisplayName",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+
+            Assert.That(prop, Is.Not.Null);
+            var getter = prop!.GetGetMethod(nonPublic: true);
+            Assert.Multiple(() =>
+            {
+                Assert.That(getter, Is.Not.Null);
+                Assert.That(getter!.IsPrivate, Is.True);
+            });
+        }
+
+        [Test]
+        public void Page_IsPublicNonAbstractClass()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(typeof(WebChannelSnippetEditPage).IsPublic, Is.True);
+                Assert.That(typeof(WebChannelSnippetEditPage).IsAbstract, Is.False);
+            });
+        }
+
+        [Test]
+        public void Constructor_HasFiveParameters()
+        {
+            var ctor = typeof(WebChannelSnippetEditPage).GetConstructors().FirstOrDefault();
+            Assert.That(ctor, Is.Not.Null);
+            Assert.That(ctor!.GetParameters().Length, Is.EqualTo(5));
         }
     }
 }

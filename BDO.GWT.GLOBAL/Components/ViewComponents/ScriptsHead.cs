@@ -10,10 +10,9 @@ namespace GWTXbyKWeb.Components.ViewComponents
         public ScriptsHead(
             IInfoProvider<GlobalsettingskeyInfo> provider,
             IInfoProvider<WebChannelSnippetInfo> siteProvider,
-            IWebsiteContext websiteContext,
             IWebsiteChannelContext websiteChannelContext,
             IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider)
-            : base(provider, siteProvider, websiteContext, websiteChannelContext, webChannelSettingsInfoProvider) { }
+            : base(provider, siteProvider, websiteChannelContext, webChannelSettingsInfoProvider) { }
 
         protected override bool GetInheritFromGlobal(WebChannelSnippetInfo siteScript)
             => siteScript.ScriptHeadInheritfromglobalsettings;

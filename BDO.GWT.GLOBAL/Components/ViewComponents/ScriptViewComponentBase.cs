@@ -14,20 +14,17 @@ namespace GWTXbyKWeb.Components.ViewComponents
     {
         private readonly IInfoProvider<GlobalsettingskeyInfo> _provider;
         private readonly IInfoProvider<WebChannelSnippetInfo> _siteProvider;
-        private readonly IWebsiteContext _websiteContext;
         private readonly IWebsiteChannelContext _websiteChannelContext;
         private readonly IInfoProvider<WebChannelSettingsInfo> _webChannelSettingsInfoProvider;
 
         protected ScriptViewComponentBase(
             IInfoProvider<GlobalsettingskeyInfo> provider,
             IInfoProvider<WebChannelSnippetInfo> siteProvider,
-            IWebsiteContext websiteContext,
             IWebsiteChannelContext websiteChannelContext,
             IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider)
         {
             _provider = provider;
             _siteProvider = siteProvider;
-            _websiteContext = websiteContext;
             _websiteChannelContext = websiteChannelContext;
             _webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
         }
