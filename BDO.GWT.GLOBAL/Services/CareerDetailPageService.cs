@@ -103,11 +103,11 @@ public interface ICareerDetailPageService
         var dto = new CareerContentDto
             {
                 Title = careerPage.MetadataTitle,
-                JobTitle = careerPage.CareerJobTitle.FirstOrDefault().Name,
-                Reference = careerPage.CareerReference,
-                EmploymentType = careerPage.CareerEmploymentType.FirstOrDefault().Name,
-                Level = careerPage.CareerLevel.FirstOrDefault().Name,
-                Locations = locationOfficeNames,
+            JobTitle = careerPage.CareerJobTitle.FirstOrDefault()?.Name ?? string.Empty,
+            Reference = careerPage.CareerReference,
+            EmploymentType = careerPage.CareerEmploymentType.FirstOrDefault()?.Name ?? string.Empty,
+            Level = careerPage.CareerLevel.FirstOrDefault()?.Name ?? string.Empty,
+            Locations = locationOfficeNames,
                 Content = careerPage.MetadataDescription,
             ContactPerson = contactPersonName?.MetadataTitle,
         };
