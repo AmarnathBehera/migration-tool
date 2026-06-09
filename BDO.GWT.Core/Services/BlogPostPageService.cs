@@ -45,7 +45,7 @@ public class BlogPostPageService : IBlogPostPageService
         }
 
         List<Guid> relevantPersonGuids = new List<Guid>();
-        var pageUrl = blogpostPage.GetUrl().AbsoluteUrl;
+        var pageUrl = blogpostPage.SystemFields.WebPageUrlPath;
 
         
 

@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.GLOBAL.Tests.Services;
+namespace BDO.GWT.Core.Tests.Services;
 
 public class SectionBlogServiceTests
 {
@@ -264,20 +264,21 @@ public class SectionBlogServiceTests
 
     private static SectionBlogs CreateMockSectionBlogsPage()
     {
-        var page = new Mock<SectionBlogs>();
-        page.Setup(x => x.HeroTitle).Returns("Hero Title");
-        page.Setup(x => x.HeroDescription).Returns("Hero Description");
-        page.Setup(x => x.HeroLayout).Returns("FullWidth");
-        page.Setup(x => x.HeroBackgroundImageAltText).Returns("Background Alt");
-        page.Setup(x => x.HeroBackgroundImage_MobileAltText).Returns("Mobile Alt");
-        page.Setup(x => x.HeroCallToActionButtonType).Returns("Primary");
-        page.Setup(x => x.HeroCallToActionButtonText).Returns("Learn More");
-        page.Setup(x => x.HeroBackgroundImage).Returns(new List<ContentAttachment>());
-        page.Setup(x => x.HeroBackgroundImage_Mobile).Returns(new List<ContentAttachment>());
-        page.Setup(x => x.HeroCallToActionButtonUrl).Returns(new List<IWebPageFieldsSource>());
-        page.Setup(x => x.MetadataTitle).Returns("Test Page Title");
-        page.Setup(x => x.MetadataDescription).Returns("Test Page Description");
-        page.Setup(x => x.SystemFields).Returns(new WebPageFields { WebPageItemID = 123 });
-        return page.Object;
+        return new SectionBlogs
+        {
+            HeroTitle = "Hero Title",
+            HeroDescription = "Hero Description",
+            HeroLayout = "FullWidth",
+            HeroBackgroundImageAltText = "Background Alt",
+            HeroBackgroundImage_MobileAltText = "Mobile Alt",
+            HeroCallToActionButtonType = "Primary",
+            HeroCallToActionButtonText = "Learn More",
+            HeroBackgroundImage = new List<ContentAttachment>(),
+            HeroBackgroundImage_Mobile = new List<ContentAttachment>(),
+            HeroCallToActionButtonUrl = new List<IWebPageFieldsSource>(),
+            MetadataTitle = "Test Page Title",
+            MetadataDescription = "Test Page Description",
+            SystemFields = new WebPageFields { WebPageItemID = 123 }
+        };
     }
 }

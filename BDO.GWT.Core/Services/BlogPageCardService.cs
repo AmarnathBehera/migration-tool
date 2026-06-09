@@ -185,20 +185,7 @@ namespace BDO.GWT.Core.Services
             };
         }
 
-        private async Task<Action<WhereParameters>?> GetTaxonomyFilterAsync(string filterName, string filterValue)
-        {
-            var tag = await _taxonomyTagRetriever.GetTaxonomyTagByNameAsync(filterValue);
-            if (tag == null)
-                return null;
-
-            var identifiers = new List<Guid> { tag.TagGUID };
-
-            return filterName switch
-            {
-                FilterParameterName.ContentType => w => w.WhereContainsTags(nameof(NewsArticle.ContentType), identifiers),
-                _ => null,
-            };
-        }
+     
         public async Task<List<BlogPageCardDto>> GetContentPageCardListAsync(ICollection<BlogPost> contentPages,
             string languageTag, Func<BlogPost, bool> isPageFeatured, CancellationToken cancellationToken)
         {
@@ -233,8 +220,7 @@ namespace BDO.GWT.Core.Services
                     ReadMoreLink = new LinkItemDto
                     {
                         Title = ResourceStringKey.LiveSite.ReadMore,
-                        URL = contentPage.GetUrl().AbsoluteUrl
-                    }
+                        URL = contentPage.SystemFields.WebPageUrlPath                    }
                 };
 
                 if(card != null)
