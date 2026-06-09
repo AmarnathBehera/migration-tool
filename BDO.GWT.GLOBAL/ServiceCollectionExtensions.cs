@@ -36,7 +36,6 @@ public static class ServiceCollectionExtensions
           .ValidateDataAnnotations();
 
         serviceCollection.AddHttpClient();
-        serviceCollection.AddScoped<GlobalSettingsService>();
         serviceCollection.AddScoped<IContactPageService, ContactPageService>();
         serviceCollection.AddScoped<IHeroService, HeroService>();
         serviceCollection.AddScoped<XperiencePageContext>();
@@ -103,6 +102,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ISpecialtiesCategoryPageService, SpecialtiesCategoryPageService>();
         serviceCollection.AddScoped<ISectionSpecialtiesService, SectionSpecialtiesService>();
         serviceCollection.AddScoped<IDealPageService, DealPageService>();
+        serviceCollection.AddScoped<ITabAccordionService, TabAccordionService>();
     }
 
 }

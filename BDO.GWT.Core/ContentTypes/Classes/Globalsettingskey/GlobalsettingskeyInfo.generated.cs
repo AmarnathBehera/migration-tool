@@ -43,46 +43,68 @@ namespace BDO
 
 
         /// <summary>
-        /// Global settings key value.
+        /// Script head key value.
         /// </summary>
         [DatabaseField]
-        public virtual string GlobalSettingsKeyValue
+        public virtual string ScriptHeadKeyValue
         {
-            get => ValidationHelper.GetString(GetValue(nameof(GlobalSettingsKeyValue)), String.Empty);
-            set => SetValue(nameof(GlobalSettingsKeyValue), value);
+            get => ValidationHelper.GetString(GetValue(nameof(ScriptHeadKeyValue)), String.Empty);
+            set => SetValue(nameof(ScriptHeadKeyValue), value, String.Empty);
         }
 
 
         /// <summary>
-        /// Global settings key name.
+        /// Marketo munchkin code key value.
         /// </summary>
         [DatabaseField]
-        public virtual string GlobalSettingsKeyName
+        public virtual string MarketoMunchkinCodeKeyValue
         {
-            get => ValidationHelper.GetString(GetValue(nameof(GlobalSettingsKeyName)), String.Empty);
-            set => SetValue(nameof(GlobalSettingsKeyName), value);
+            get => ValidationHelper.GetString(GetValue(nameof(MarketoMunchkinCodeKeyValue)), String.Empty);
+            set => SetValue(nameof(MarketoMunchkinCodeKeyValue), value, String.Empty);
         }
 
 
         /// <summary>
-        /// Global settings key display name.
+        /// Scriptexecutedwhencookiesareaccepted key value.
         /// </summary>
         [DatabaseField]
-        public virtual string GlobalSettingsKeyDisplayName
+        public virtual string ScriptexecutedwhencookiesareacceptedKeyValue
         {
-            get => ValidationHelper.GetString(GetValue(nameof(GlobalSettingsKeyDisplayName)), String.Empty);
-            set => SetValue(nameof(GlobalSettingsKeyDisplayName), value);
+            get => ValidationHelper.GetString(GetValue(nameof(ScriptexecutedwhencookiesareacceptedKeyValue)), String.Empty);
+            set => SetValue(nameof(ScriptexecutedwhencookiesareacceptedKeyValue), value, String.Empty);
         }
 
 
         /// <summary>
-        /// Global settings key note.
+        /// Scriptinbottomof body key value.
         /// </summary>
         [DatabaseField]
-        public virtual string GlobalSettingsKeyNote
+        public virtual string ScriptinbottomofBodyKeyValue
         {
-            get => ValidationHelper.GetString(GetValue(nameof(GlobalSettingsKeyNote)), String.Empty);
-            set => SetValue(nameof(GlobalSettingsKeyNote), value);
+            get => ValidationHelper.GetString(GetValue(nameof(ScriptinbottomofBodyKeyValue)), String.Empty);
+            set => SetValue(nameof(ScriptinbottomofBodyKeyValue), value, String.Empty);
+        }
+
+
+        /// <summary>
+        /// Scriptin topof body key value.
+        /// </summary>
+        [DatabaseField]
+        public virtual string ScriptinTopofBodyKeyValue
+        {
+            get => ValidationHelper.GetString(GetValue(nameof(ScriptinTopofBodyKeyValue)), String.Empty);
+            set => SetValue(nameof(ScriptinTopofBodyKeyValue), value, String.Empty);
+        }
+
+
+        /// <summary>
+        /// Scripts topof page head key value.
+        /// </summary>
+        [DatabaseField]
+        public virtual string ScriptsTopofPageHeadKeyValue
+        {
+            get => ValidationHelper.GetString(GetValue(nameof(ScriptsTopofPageHeadKeyValue)), String.Empty);
+            set => SetValue(nameof(ScriptsTopofPageHeadKeyValue), value, String.Empty);
         }
 
 
