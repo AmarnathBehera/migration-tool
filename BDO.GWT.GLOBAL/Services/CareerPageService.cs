@@ -2,8 +2,6 @@
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.ValueObjects;
-using BDO.GWT.Web.Core.DTOs;
-using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using System.Linq;
 using System.Threading;
@@ -40,23 +38,28 @@ public class CareerPageService  : ICareerPageService
         {
             return new CareerDto();
         }
-        
+        var bgImageUrl = page.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+        var mobileImageUrl = page.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+        var ctaUrlPath = page.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath;
+
+        var heroData = new HeroData
+        {
+            Layout = page.HeroLayout,
+            Title = page.HeroTitle,
+            Description = page.HeroDescription,
+            BackgroundImage = bgImageUrl != null ? Link.Parse(bgImageUrl) : null,
+            BackgroundImageAltText = page.HeroBackgroundImageAltText,
+            MobileBackgroundImage = mobileImageUrl != null ? Link.Parse(mobileImageUrl) : null,
+            MobileBackgroundImageAltText = page.HeroBackgroundImage_MobileAltText,
+            CallToActionButtonType = page.HeroCallToActionButtonType,
+            CallToActionButtonText = page.HeroCallToActionButtonText,
+            CallToActionButtonUrl = ctaUrlPath != null ? Link.Parse(ctaUrlPath) : null,
+        };
+
 
         var dto = new CareerDto()
         {
-            Hero = await _heroService.GetHeroDtoAsync(new HeroData
-            {
-                Layout = careerpage.HeroLayout,
-                Title = careerpage.HeroTitle,
-                Description = careerpage.HeroDescription,
-                BackgroundImage = careerpage.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string bgUrl ? Link.Parse(bgUrl) : null,
-                BackgroundImageAltText = careerpage.HeroBackgroundImageAltText,
-                MobileBackgroundImage = careerpage.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string mobileUrl ? Link.Parse(mobileUrl) : null,
-                MobileBackgroundImageAltText = careerpage.HeroBackgroundImage_MobileAltText,
-                CallToActionButtonType = careerpage.HeroCallToActionButtonType,
-                CallToActionButtonText = careerpage.HeroCallToActionButtonText,
-                CallToActionButtonUrl = careerpage.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath is string ctaPath ? Link.Parse(ctaPath) : null,
-            }, cancellationToken),
+            Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
         };
 
         return dto;
