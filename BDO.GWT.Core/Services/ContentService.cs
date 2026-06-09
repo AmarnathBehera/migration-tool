@@ -387,18 +387,34 @@
      CancellationToken cancellationToken = default)
         {
             var contentTypeName = GetContentTypeName(type);
+
+            // Only include the "Name" column condition when the CLR model exposes
+            // that property (e.g. EventType, Businessissues). Including it for
+            // content types that don't have the column causes a SQL error.
+            var hasNameProperty = type.GetProperty("Name") is not null;
+
             var builder = new ContentItemQueryBuilder()
                 .ForContentType(contentTypeName, q => q
-                    .ForWebsite(_websiteChannelContext.WebsiteChannelName) 
+                    .ForWebsite(_websiteChannelContext.WebsiteChannelName)
                 )
                 .Parameters(q => q
-                 .Where(w => w.WhereEquals("MetadataTitle", pageName)
-                .Or()
-                .WhereEquals("MetadataOGTitle", pageName)
-                .Or()
-                .WhereEquals("ContentItemName", pageName))
-                .TopN(1)
+                    .Where(w =>
+                    {
+                        var clause = w
+                            .WhereEquals("MetadataTitle", pageName)
+                            .Or()
+                            .WhereEquals("MetadataOGTitle", pageName)
+                            .Or()
+                            .WhereEquals("ContentItemName", pageName);
+
+                        if (hasNameProperty)
+                        {
+                            clause.Or().WhereEquals("Name", pageName);
+                        }
+                    })
+                    .TopN(1)
                 );
+
 
             var result = await _executor.GetMappedWebPageResult<IWebPageFieldsSource>(
                 builder,

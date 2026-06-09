@@ -75,49 +75,45 @@ public class CardsService : ICardsService
             cancellationToken);
 
         var options = items
-      .Select(x =>
-      {
-          var type = x.GetType();
+           .Select(x =>
+           {
+               var type = x.GetType();
+               var displayName =
+                   GetStringProperty(x, type, "MetadataTitle")
+                   ?? GetStringProperty(x, type, "PageTitle")
+                   ?? GetStringProperty(x, type, "Name")
+                   ?? GetStringProperty(x, type, "MetadataOGTitle")
+                   ?? GetContentItemName(x, type);
 
-          var metadataTitle =
-              type.GetProperty("MetadataTitle")?.GetValue(x) as string;
-
-          var metadataOgTitle =
-              type.GetProperty("MetadataOGTitle")?.GetValue(x) as string;
-
-          var systemFields =
-              type.GetProperty("SystemFields")?.GetValue(x);
-
-          var contentItemName =
-              systemFields?.GetType()
-                  .GetProperty("ContentItemName")
-                  ?.GetValue(systemFields) as string;
-
-          var nameBI = type.GetProperty("Name")?.GetValue(x) as string;
-
-          string name = string.Empty;
-
-          
-
-          name = metadataTitle ?? metadataOgTitle ?? contentItemName;
-
-          if (type.Name.ToString() == "Businessissues")
-          {
-              name = nameBI;
-          }
-
-          return new OptionDto
-          {
-              Value = name,
-              Label = name
-          };
-      })
-      .Where(x => !string.IsNullOrWhiteSpace(x.Value))
-      .OrderBy(x => x.Label)
-      .ToArray();
+               return new OptionDto
+               {
+                   Value = displayName,
+                   Label = displayName
+               };
+           })
+           .Where(x => !string.IsNullOrWhiteSpace(x.Value))
+           .OrderBy(x => x.Label)
+           .ToArray();
 
         return options;
 
+    }
+    private static string? GetContentItemName(object instance, Type type)
+    {
+        var systemFields = type.GetProperty("SystemFields")?.GetValue(instance);
+        if (systemFields is null)
+        {
+            return null;
+        }
+
+        return systemFields.GetType()
+            .GetProperty("ContentItemName")
+            ?.GetValue(systemFields) as string;
+    }
+    private static string? GetStringProperty(object instance, Type type, string propertyName)
+    {
+        var value = type.GetProperty(propertyName)?.GetValue(instance) as string;
+        return string.IsNullOrWhiteSpace(value) ? null : value;
     }
     private async Task<OptionDto[]> BuildOptionsForTaxonomyFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
     {

@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
+using System.Linq.Expressions;
 
 namespace BDO.GWT.Core.Services
 {
@@ -146,7 +147,7 @@ namespace BDO.GWT.Core.Services
                 var filter = filterParameterData.FilterParameterType switch
                 {
                     FilterParameterType.Page => await GetPageFilterAsync(filterParameterName, filterParameterValue),
-                    FilterParameterType.Taxonomy => await GetTaxonomyFilterAsync(filterParameterName, filterParameterValue),
+                    FilterParameterType.Field => await GetFieldFilterExpressionBlogAsync(filterParameterName, filterParameterValue),
                     _ => null,
                 };
 
@@ -161,6 +162,7 @@ namespace BDO.GWT.Core.Services
 
         private async Task<Action<WhereParameters>?> GetPageFilterAsync(string filterName, string filterValue)
         {
+                    
             var page = await _contentService.GetPageByTypeAndNameAsync(
                 FilterUtility.GetFilterParameterData(filterName)!.EntityType, filterValue);
 
@@ -172,6 +174,7 @@ namespace BDO.GWT.Core.Services
             return filterName switch
             {
                 FilterParameterName.BusinessLine => x => x.WhereContains(nameof(BlogPost.MetadataBusinessLine), guid),
+                FilterParameterName.BusinessIssue => x => x.WhereContains(nameof(BlogPost.MetadataBusinessIssues), guid),
                 FilterParameterName.ServiceArea => x => x.WhereContains(nameof(BlogPost.MetadataServiceAreas), guid),
                 FilterParameterName.Service => x => x.WhereContains(nameof(BlogPost.MetadataServices), guid),
                 FilterParameterName.IndustryCategory => x => x.WhereContains(nameof(BlogPost.MetadataIndustryCategories), guid),
@@ -243,6 +246,14 @@ namespace BDO.GWT.Core.Services
             return cards;
         }
 
+        protected async Task<Action<WhereParameters>?> GetFieldFilterExpressionBlogAsync(string filterParameterName, string filterParameterValue)
+        {
+            if (filterParameterName == FilterParameterName.Keywords)
+            {
+                return (x => x.WhereContains(nameof(BlogPost.MetadataKeywordsBlog), filterParameterValue));
+            }
 
+            return null;
+        }
     }
 }
