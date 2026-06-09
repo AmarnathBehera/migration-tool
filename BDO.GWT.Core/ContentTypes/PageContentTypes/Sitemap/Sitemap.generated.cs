@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="Sitemap"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class Sitemap : IWebPageFieldsSource, IMetadata, IPageMetadata
+	public partial class Sitemap : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero, IPageMetadata
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -33,6 +33,54 @@ namespace BDO
 		/// </summary>
 		[SystemField]
 		public WebPageFields SystemFields { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGTitle.
+		/// </summary>
+		public string MetadataOGTitle { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGDescription.
+		/// </summary>
+		public string MetadataOGDescription { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> MetadataOGImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGTwitterImageSizeCheckbox.
+		/// </summary>
+		public bool MetadataOGTwitterImageSizeCheckbox { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGTwitterImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> MetadataOGTwitterImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataNofollow.
+		/// </summary>
+		public bool MetadataNofollow { get; set; }
+
+
+		/// <summary>
+		/// MetadataNoindex.
+		/// </summary>
+		public bool MetadataNoindex { get; set; }
+
+
+		/// <summary>
+		/// IncludeInSitemap.
+		/// </summary>
+		public bool IncludeInSitemap { get; set; }
 
 
 		/// <summary>
@@ -63,6 +111,66 @@ namespace BDO
 		/// MetadataCanonical.
 		/// </summary>
 		public string MetadataCanonical { get; set; }
+
+
+		/// <summary>
+		/// HeroLayout.
+		/// </summary>
+		public string HeroLayout { get; set; }
+
+
+		/// <summary>
+		/// HeroTitle.
+		/// </summary>
+		public string HeroTitle { get; set; }
+
+
+		/// <summary>
+		/// HeroDescription.
+		/// </summary>
+		public string HeroDescription { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> HeroBackgroundImage { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImageAltText.
+		/// </summary>
+		public string HeroBackgroundImageAltText { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImage_Mobile.
+		/// </summary>
+		public IEnumerable<ContentAttachment> HeroBackgroundImage_Mobile { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImage_MobileAltText.
+		/// </summary>
+		public string HeroBackgroundImage_MobileAltText { get; set; }
+
+
+		/// <summary>
+		/// HeroCallToActionButtonType.
+		/// </summary>
+		public string HeroCallToActionButtonType { get; set; }
+
+
+		/// <summary>
+		/// HeroCallToActionButtonText.
+		/// </summary>
+		public string HeroCallToActionButtonText { get; set; }
+
+
+		/// <summary>
+		/// HeroCallToActionButtonUrl.
+		/// </summary>
+		public IEnumerable<IWebPageFieldsSource> HeroCallToActionButtonUrl { get; set; }
 
 
 		/// <summary>

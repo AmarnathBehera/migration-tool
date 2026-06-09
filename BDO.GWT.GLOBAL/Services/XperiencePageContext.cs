@@ -22,22 +22,22 @@ public class XperiencePageContext : IPageContext
     private readonly IPageBuilderDataContextRetriever _pageBuilderDataContextRetriever;
     private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly IContentQueryExecutor _queryExecutor;
-    private readonly IContentRetriever _contentRetriever;
+
 
     public XperiencePageContext(
         IHttpContextAccessor httpContextAccessor,
         IWebPageDataContextRetriever webPageDataContextRetriever,
         IPageBuilderDataContextRetriever pageBuilderDataContextRetriever,
         IWebsiteChannelContext websiteChannelContext,
-        IContentQueryExecutor queryExecutor,
-        IContentRetriever contentRetriever)
+        IContentQueryExecutor queryExecutor
+        )
     {
         _httpContextAccessor = httpContextAccessor;
         _webPageDataContextRetriever = webPageDataContextRetriever;
         _pageBuilderDataContextRetriever = pageBuilderDataContextRetriever;
         _websiteChannelContext = websiteChannelContext;
         _queryExecutor = queryExecutor;
-        _contentRetriever = contentRetriever;
+       
     }
 
     public bool IsInPreviewMode => _websiteChannelContext.IsPreview;

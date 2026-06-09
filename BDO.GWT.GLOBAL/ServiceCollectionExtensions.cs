@@ -36,7 +36,6 @@ public static class ServiceCollectionExtensions
           .ValidateDataAnnotations();
 
         serviceCollection.AddHttpClient();
-        serviceCollection.AddScoped<GlobalSettingsService>();
         serviceCollection.AddScoped<IContactPageService, ContactPageService>();
         serviceCollection.AddScoped<IHeroService, HeroService>();
         serviceCollection.AddScoped<XperiencePageContext>();
@@ -68,6 +67,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<INewsGroupPageService, NewsGroupPageService>();
         serviceCollection.AddScoped<INewsArticleService, NewsArticleService>();
         serviceCollection.AddScoped<INewsArticleCardsService, NewsArticleCardsService>();
+        serviceCollection.AddScoped<IAuthoredContentService, AuthoredContentService>();
         serviceCollection.AddScoped<ISidebarService, SidebarService>();
         serviceCollection.AddScoped<ISocialMediaButtonsService, SocialMediaButtonsService>();
         serviceCollection.AddScoped<IExternalPeopleHelper, ExternalPeopleHelper>();
@@ -102,6 +102,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ISpecialtiesCategoryPageService, SpecialtiesCategoryPageService>();
         serviceCollection.AddScoped<ISectionSpecialtiesService, SectionSpecialtiesService>();
         serviceCollection.AddScoped<IDealPageService, DealPageService>();
+        serviceCollection.AddScoped<ITabAccordionService, TabAccordionService>();
     }
 
 }

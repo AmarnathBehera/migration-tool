@@ -35,28 +35,21 @@ public class WebChannelSettingsListingPage : ListingPage
             .AddColumn(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelDisplayName), "Channel");
         PageConfiguration.AddEditRowAction<WebChannelSettingsEditSection>();
 
-        // ✅ Get accessible IDs for current user
         var accessibleIds = await channelAccessService.GetAccessibleWebChannelSettingsIdsAsync();
 
-        // null = global admin, skip filtering entirely
         if (accessibleIds != null)
         {
             var idList = accessibleIds.ToList();
-
-            // ✅ Correct API: new QueryModifier(Func<ObjectQuery, LoadDataSettings, ObjectQuery>)
-            // then .Add() on the IList<QueryModifier>
             PageConfiguration.QueryModifiers.Add(new QueryModifier((query, _) =>
             {
                 if (idList.Count!=0)
                 {
-                    // Show only channels this user has access to
                     return query.WhereIn(
                         nameof(WebChannelSettingsInfo.WebChannelSettingsID),
                         idList);
                 }
                 else
                 {
-                    // User has no channel access — return empty result
                     return query.WhereEquals(
                         nameof(WebChannelSettingsInfo.WebChannelSettingsID), 0);
                 }
@@ -66,7 +59,6 @@ public class WebChannelSettingsListingPage : ListingPage
         await base.ConfigurePage();
     }
 
-    // ── All existing methods below — unchanged ────────────────────────────────
 
     private void EnsureSettingsListData()
     {
