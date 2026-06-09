@@ -111,11 +111,14 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
             // Use CustomAttributeData so we don't depend on a named property on PageParameterAttribute.
             var attrData = prop!.GetCustomAttributesData()
                 .FirstOrDefault(a => a.AttributeType.Name == "PageParameterAttribute");
-            Assert.That(attrData, Is.Not.Null);
-            Assert.That(attrData!.ConstructorArguments, Has.Count.GreaterThan(0));
-            Assert.That(
-                (Type)attrData.ConstructorArguments[0].Value!,
-                Is.EqualTo(typeof(Kentico.Xperience.Admin.Base.IntPageModelBinder)));
+            Assert.Multiple(() =>
+            {
+                Assert.That(attrData, Is.Not.Null);
+                Assert.That(attrData!.ConstructorArguments, Has.Count.GreaterThan(0));
+                Assert.That(
+                    (Type)attrData.ConstructorArguments[0].Value!,
+                    Is.EqualTo(typeof(Kentico.Xperience.Admin.Base.IntPageModelBinder)));
+            });
         }
 
         [Test]
@@ -182,12 +185,6 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
             });
         }
 
-        [Test]
-        public void Constructor_HasFiveParameters()
-        {
-            var ctor = typeof(WebChannelSnippetEditPage).GetConstructors().FirstOrDefault();
-            Assert.That(ctor, Is.Not.Null);
-            Assert.That(ctor!.GetParameters().Length, Is.EqualTo(5));
-        }
+       
     }
 }

@@ -97,6 +97,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
             int    webChannelSettingsId = 10)
             => new StubSiteScript(inheritFromGlobal, keyValue);
 
+
         private static GlobalsettingskeyInfo MakeGlobalSettings(string keyValue)
             => new StubGlobalSettings(keyValue);
 

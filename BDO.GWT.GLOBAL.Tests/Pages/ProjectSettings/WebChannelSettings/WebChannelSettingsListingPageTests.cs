@@ -140,7 +140,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
             var parameters = method!.GetParameters();
             Assert.Multiple(() =>
             {
-                Assert.That(parameters.Length, Is.EqualTo(2));
+                Assert.That(parameters, Has.Length.EqualTo(2));
                 Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(List<WebChannelSettingsInfo>)));
                 Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(ChannelInfo)));
             });
@@ -157,7 +157,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
             var parameters = method!.GetParameters();
             Assert.Multiple(() =>
             {
-                Assert.That(parameters.Length, Is.EqualTo(2));
+                Assert.That(parameters, Has.Length.EqualTo(2));
                 Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(ChannelInfo)));
                 Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(WebChannelSettingsInfo)));
             });

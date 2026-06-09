@@ -62,7 +62,7 @@ namespace GWTXbyKWeb.Components.ViewComponents
                 return View("~/Views/Shared/Components/Scripts/Default.cshtml");
             }
 
-            string? value;
+            string value;
             if (GetInheritFromGlobal(sitescript))
             {
                 var globalSettings = _provider.Get()
