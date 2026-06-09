@@ -14,7 +14,7 @@ namespace BDO.GWT.Core.Services;
 public interface INewsArticleService
 {
     Task<SectionNewsPageDto> GetSectionNewsPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken);
-    Task<ContentSidebarDto> GetContentPageSidebarDto(NewsArticle contentPage, CancellationToken cancellationToken);
+    //Task<ContentSidebarDto> GetContentPageSidebarDto(NewsArticle contentPage, CancellationToken cancellationToken);
 }
 public class NewsArticleService : INewsArticleService
 {
@@ -84,96 +84,6 @@ public class NewsArticleService : INewsArticleService
         };
         return dto;
     }
-
-    //public async Task<ContentSidebarDto> GetContentPageSidebarDto<T>(T contentPage, CancellationToken cancellationToken) where T : NewsArticle
-    //{
-    //    var sidebarDto = await _sidebarService.GetSidebarDtoAsync(contentPage, cancellationToken);
-               
-    //    return sidebarDto;
-    //}
-
-   
-    
-
-    //public async Task<SidebarPersonDto[]> GetContentPageAuthorDtos(NewsArticle contentPage, CancellationToken cancellationToken)
-    //{
-    //    var relevantPersonGuids = contentPage.RelevantContactPerson.Select(p => p.SystemFields.ContentItemGUID).ToList();
-
-    //    var people = (await _contentService.GetPagesAsync<Person>(
-    //       new RetrievePagesParameters { LinkedItemsMaxLevel =2},
-    //       query => query   
-    //           .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
-    //           .Where(w => w.WhereIn("ContentItemGUID", relevantPersonGuids)),
-    //       RetrievalCacheSettings.CacheDisabled,
-    //       cancellationToken
-    //   ))
-    //   .DistinctBy(x => x.SystemFields.ContentItemGUID).ToArray();
-
-    //    var internalPeople = (await _contentService.GetPagesAsync<InternalPerson>(
-    //       new RetrievePagesParameters { LinkedItemsMaxLevel = 2 },
-    //       query => query
-    //           .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
-    //           .Where(w => w.WhereIn("ContentItemGUID", relevantPersonGuids)),
-    //       RetrievalCacheSettings.CacheDisabled,
-    //       cancellationToken
-    //   ))
-    //   .DistinctBy(x => x.SystemFields.ContentItemGUID).ToArray();
-
-    //    var dtsByGuid = new Dictionary<Guid, SidebarPersonDto>();
-
-    //    foreach (var person in people)
-    //    {
-    //        dtsByGuid[person.SystemFields.ContentItemGUID] = new SidebarPersonDto
-    //        {
-    //            Image = PageHelper.GetImageDto(person.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url, person.MetadataTeaserImageAltText),
-    //            FullName = GetPersonDisplayName(person),
-    //            JobTitle = person.PersonJobTitle,
-    //            Url = person.GetUrl().RelativePath,
-    //        };
-    //    }
-
-    //    foreach (var internalPerson in internalPeople)
-    //    {
-    //        dtsByGuid[internalPerson.SystemFields.ContentItemGUID] = new SidebarPersonDto
-    //        {
-    //            Image = PageHelper.GetImageDto(internalPerson.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset.Url, internalPerson.ImageFileAltText),
-    //            FullName = GetInternalPersonDisplayName(internalPerson),
-    //            JobTitle = internalPerson.JobTitle,
-    //            Url = _contentService.EnsureAbsoluteUrl(internalPerson.Url)
-    //        };
-    //    }
-    //    return relevantPersonGuids.Select(guid => dtsByGuid.TryGetValue(guid, out var dto) ? dto : null)
-    //                              .OfType<SidebarPersonDto>().ToArray();
-    //}
-
-
-
-    private static string GetPersonDisplayName(Person person)
-    {
-        var name = person.PersonFirstName ?? string.Empty;
-
-        if (!string.IsNullOrWhiteSpace(person.PersonSurnamePrefixes))
-            name += " " + person.PersonSurnamePrefixes;
-
-        if (!string.IsNullOrWhiteSpace(person.PersonLastName))
-            name += " " + person.PersonLastName;
-
-        return name;
-    }
-
-    private static string GetInternalPersonDisplayName(InternalPerson person)
-    {
-        var name = person.FirstName ?? string.Empty;
-
-        if (!string.IsNullOrWhiteSpace(person.SurnamePrefixes))
-            name += " " + person.SurnamePrefixes;
-
-        if (!string.IsNullOrWhiteSpace(person.LastName))
-            name += " " + person.LastName;
-
-        return name;
-    }
-
    
 
     private async Task<bool> GetShowCopyLinkOptionFromSectionPageAsync( bool showCopyLinkButton, CancellationToken cancellationToken)
@@ -187,16 +97,3 @@ public class NewsArticleService : INewsArticleService
     }
 }
 
-//public interface ISidebarFields
-//{
-//    bool ShowSidebar { get; }
-//}
-
-//public interface ICallToActionFields
-//{
-//    string? CallToActionDescription { get; }
-//    string? CallToActionButtonText { get; }
-//    string? CallToActionButtonUrl { get; }
-
-//    string? CallToActionPosition { get; }
-//}

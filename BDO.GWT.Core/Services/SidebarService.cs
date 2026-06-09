@@ -1,6 +1,7 @@
 ﻿using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Helpers;
+using BDO.GWT.Web.Core.DTOs.Pages;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 
@@ -8,13 +9,13 @@ namespace BDO.GWT.Core.Services;
 public interface ISidebarService
 {
     //Task<ContentSidebarDto> GetSidebarDtoAsync(NewsArticle page, CancellationToken cancellationToken);
-    Task<ContentSidebarDto> GetSidebarDtoAsync<T>(T page, string pageUrl, CancellationToken cancellationToken) where T : ISidebar, IPageMetadata;
+    Task<ContentSidebarDto> GetSidebarDtoAsync<T>(T page, string pageUrl, CancellationToken cancellationToken) where T : ISidebar, IPageMetadata, IWebPageFieldsSource;
 
     Task<SidebarPersonDto[]> GetContentPageAuthorDtosGen(List<Guid> relevantPersonGuids, CancellationToken cancellationToken);
 
     Task<ContentSidebarDto> GetContentPageSidebarDetails(ContentSidebarDto sidebarDto,
        CancellationToken cancellationToken, List<Guid>? relevantPersonGuidList = null, DateTime? publishedDate = null, DateTime? updatedDate = null);
-
+    Task<DealSidebarDto> GetDealSidebarDtoAsync(Deal page, CancellationToken cancellationToken);
 }
 public class SidebarService : ISidebarService
 {
@@ -51,7 +52,7 @@ public class SidebarService : ISidebarService
     //    return sidebarDto;
     //}
 
-    public async Task<ContentSidebarDto> GetSidebarDtoAsync<T>(T page,string pageUrl, CancellationToken cancellationToken) where T : ISidebar, IPageMetadata
+    public async Task<ContentSidebarDto> GetSidebarDtoAsync<T>(T page,string pageUrl, CancellationToken cancellationToken) where T : ISidebar, IPageMetadata, IWebPageFieldsSource
     {
         var settings = await _settingService.GetPrintorShareInfo();
         var settingInfo = settings?.FirstOrDefault();

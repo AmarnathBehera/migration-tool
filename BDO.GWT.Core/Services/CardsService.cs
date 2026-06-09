@@ -48,7 +48,7 @@ public class CardsService : ICardsService
                 FilterParameterType.Page => await BuildOptionsForPageFilterAsync(filterParameterData, cancellationToken),
                 // FilterParameterType.Entity => await BuildOptionsForEntityFilterAsync(filterParameterData, cancellationToken),
                  FilterParameterType.Field => await BuildOptionsForFieldFilterAsync(filterParameterData, cancellationToken),
-                FilterParameterType.Taxonomy => await BuildOptionsForTaxonomyFilterAsync(filterParameterData, cancellationToken),
+                //FilterParameterType.Taxonomy => await BuildOptionsForTaxonomyFilterAsync(filterParameterData, cancellationToken),
                 _ => throw new NotSupportedException($"Filter parameter type {filterParameterData.FilterParameterType} is not supported."),
             };
 
@@ -119,23 +119,19 @@ public class CardsService : ICardsService
             .GetProperty("ContentItemName")
             ?.GetValue(systemFields) as string;
     }
-    private static string? GetStringProperty(object instance, Type type, string propertyName)
-    {
-        var value = type.GetProperty(propertyName)?.GetValue(instance) as string;
-        return string.IsNullOrWhiteSpace(value) ? null : value;
-    }
-    private async Task<OptionDto[]> BuildOptionsForTaxonomyFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
-    {
-        var systemFields = type.GetProperty("SystemFields")?.GetValue(instance);
-        if (systemFields is null)
-        {
-            return null;
-        }
+   
+    //private async Task<OptionDto[]> BuildOptionsForTaxonomyFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
+    //{
+    //    var systemFields = type.GetProperty("SystemFields")?.GetValue(instance);
+    //    if (systemFields is null)
+    //    {
+    //        return null;
+    //    }
 
-        return systemFields.GetType()
-            .GetProperty("ContentItemName")
-            ?.GetValue(systemFields) as string;
-    }
+    //    return systemFields.GetType()
+    //        .GetProperty("ContentItemName")
+    //        ?.GetValue(systemFields) as string;
+    //}
 
     private async Task<OptionDto[]> BuildOptionsForFieldFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
     {
