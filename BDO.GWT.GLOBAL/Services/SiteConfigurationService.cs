@@ -1,6 +1,5 @@
 ﻿using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Entities;
-using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience.Core.Services;
 using CMS.ContentEngine;
@@ -27,7 +26,7 @@ public interface ISiteConfigurationService
 /// </summary>
 public sealed record SiteConfigurationProviders(
     IInfoProvider<LocalizationKeyInfo> LocalizationKey,
-    IInfoProvider<LocalizationTranslationItemInfo> LocalizationTranslation,
+    IInfoProvider<XperienceCommunity.Localization.LocalizationTranslationItemInfo> LocalizationTranslation,
     IInfoProvider<ContentLanguageInfo> ContentLanguage,
     IInfoProvider<WebChannelSettingsInfo> WebChannelSettings,
     IInfoProvider<GeneralSettingInfo> GeneralSetting,

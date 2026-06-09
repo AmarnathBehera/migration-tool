@@ -18,8 +18,7 @@ namespace BDO.GWT.GLOBAL.Tests.Services
         private Mock<IWebPageDataContextRetriever> _webPageDataContextRetrieverMock;
         private Mock<IPageBuilderDataContextRetriever> _pageBuilderDataContextRetrieverMock;
         private Mock<IWebsiteChannelContext> _websiteChannelContextMock;
-        private Mock<IContentQueryExecutor> _queryExecutorMock;
-        private Mock<IContentRetriever> _contentRetrieverMock;
+        private Mock<IContentQueryExecutor> _queryExecutorMock;       
         private XperiencePageContext _service;
 
         [SetUp]
@@ -30,15 +29,15 @@ namespace BDO.GWT.GLOBAL.Tests.Services
             _pageBuilderDataContextRetrieverMock = new Mock<IPageBuilderDataContextRetriever>();
             _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
             _queryExecutorMock = new Mock<IContentQueryExecutor>();
-            _contentRetrieverMock = new Mock<IContentRetriever>();
+            
 
             _service = new XperiencePageContext(
                 _httpContextAccessorMock.Object,
                 _webPageDataContextRetrieverMock.Object,
                 _pageBuilderDataContextRetrieverMock.Object,
                 _websiteChannelContextMock.Object,
-                _queryExecutorMock.Object,
-                _contentRetrieverMock.Object
+                _queryExecutorMock.Object
+                
             );
         }
 
