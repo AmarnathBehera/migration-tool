@@ -70,9 +70,12 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 
             var result = await _component.InvokeAsync(CancellationToken.None) as ViewViewComponentResult;
 
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result!.ViewName, Does.Contain("Default.cshtml"));
-            Assert.That(result.ViewData?.Model, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result!.ViewName, Does.Contain("Default.cshtml"));
+                Assert.That(result.ViewData?.Model, Is.Null);
+            });
         }
 
         [Test]
