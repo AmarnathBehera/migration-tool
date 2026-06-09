@@ -210,15 +210,18 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.GlobalSettings
         [Test]
         public void Page_UIEvaluatePermissionAttribute_HasAdministratorValue()
         {
-            var attrData = typeof(GlobalSettingsEditPage)
-                .GetCustomAttributesData()
-                .FirstOrDefault(a => a.AttributeType.Name == "UIEvaluatePermissionAttribute");
+               var attrData = typeof(GlobalSettingsEditPage)
+    .GetCustomAttributesData()
+    .FirstOrDefault(a => a.AttributeType.Name == "UIEvaluatePermissionAttribute");
 
-            Assert.That(attrData, Is.Not.Null);
-            Assert.That(attrData!.ConstructorArguments, Has.Count.GreaterThan(0));
-            Assert.That(
-                (string)attrData.ConstructorArguments[0].Value!,
-                Is.EqualTo("Administrator"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(attrData, Is.Not.Null);
+                Assert.That(attrData!.ConstructorArguments, Has.Count.GreaterThan(0));
+                Assert.That(
+                    (string)attrData.ConstructorArguments[0].Value!,
+                    Is.EqualTo("Administrator"));
+            });
         }
 
         [Test]
