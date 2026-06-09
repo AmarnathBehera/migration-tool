@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Reflection;
 using BDO;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.GlobalSettings;
@@ -204,6 +205,92 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.GlobalSettings
         public void Page_IsNotAbstract()
         {
             Assert.That(typeof(GlobalSettingsEditPage).IsAbstract, Is.False);
+        }
+
+        [Test]
+        public void Page_UIEvaluatePermissionAttribute_HasAdministratorValue()
+        {
+            var attrData = typeof(GlobalSettingsEditPage)
+                .GetCustomAttributesData()
+                .FirstOrDefault(a => a.AttributeType.Name == "UIEvaluatePermissionAttribute");
+
+            Assert.That(attrData, Is.Not.Null);
+            Assert.That(attrData!.ConstructorArguments, Has.Count.GreaterThan(0));
+            Assert.That(
+                (string)attrData.ConstructorArguments[0].Value!,
+                Is.EqualTo("Administrator"));
+        }
+
+        [Test]
+        public void GetSubmitSuccessResponse_IsProtectedOverride()
+        {
+            var method = typeof(GlobalSettingsEditPage).GetMethod(
+                "GetSubmitSuccessResponse",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+
+            Assert.That(method, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(method!.IsFamily, Is.True);
+                Assert.That(method.IsVirtual, Is.True);
+            });
+        }
+
+        [Test]
+        public void GetSubmitSuccessResponse_HasExpectedParameters()
+        {
+            var method = typeof(GlobalSettingsEditPage).GetMethod(
+                "GetSubmitSuccessResponse",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+
+            Assert.That(method, Is.Not.Null);
+            var parameters = method!.GetParameters();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(parameters, Has.Length.EqualTo(2));
+                Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(GlobalsettingskeyInfo)));
+                Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(ICollection<IFormItem>)));
+            });
+        }
+
+        [Test]
+        public void Page_HasSinglePublicConstructor()
+        {
+            var constructors = typeof(GlobalSettingsEditPage)
+                .GetConstructors(BindingFlags.Instance | BindingFlags.Public);
+
+            Assert.That(constructors, Has.Length.EqualTo(1));
+        }
+
+        [Test]
+        public void Page_IsInExpectedNamespace()
+        {
+            Assert.That(
+                typeof(GlobalSettingsEditPage).Namespace,
+                Is.EqualTo("BDO.GWT.Xperience.Admin.Pages.ProjectSettings.GlobalSettings"));
+        }
+
+        [Test]
+        public void ConfigurePage_IsAsyncMethod()
+        {
+            var method = typeof(GlobalSettingsEditPage).GetMethod(
+                nameof(GlobalSettingsEditPage.ConfigurePage),
+                BindingFlags.Instance | BindingFlags.Public);
+
+            Assert.That(method, Is.Not.Null);
+            var asyncAttr = method!.GetCustomAttribute<System.Runtime.CompilerServices.AsyncStateMachineAttribute>();
+            Assert.That(asyncAttr, Is.Not.Null);
+        }
+
+        [Test]
+        public void ObjectId_GetterIsPublic()
+        {
+            var property = typeof(GlobalSettingsEditPage)
+                .GetProperty(nameof(GlobalSettingsEditPage.ObjectId));
+
+            Assert.That(property, Is.Not.Null);
+            Assert.That(property!.GetGetMethod()?.IsPublic, Is.True);
         }
     }
 }

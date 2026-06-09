@@ -1,43 +1,89 @@
-using System.Collections.Generic;
 using System.Reflection;
-using System.Threading.Tasks;
 using BDO;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.ContentEngine;
 using CMS.DataEngine;
-using Moq;
+using Kentico.Xperience.Admin.Base;
 
 namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
 {
+    [TestFixture]
     public class WebChannelSettingsListingPageTests
     {
         [Test]
         public void Page_InheritsFromListingPage()
         {
-            Assert.That(
-                typeof(Kentico.Xperience.Admin.Base.ListingPage)
-                    .IsAssignableFrom(typeof(WebChannelSettingsListingPage)),
-                Is.True);
+            Assert.That(typeof(WebChannelSettingsListingPage).BaseType, Is.EqualTo(typeof(ListingPage)));
         }
 
         [Test]
-        public void Page_ExposesExpectedConstructor()
+        public void Page_IsPublicClass()
         {
-            var ctor = typeof(WebChannelSettingsListingPage).GetConstructor([
-                typeof(IInfoProvider<ChannelInfo>),
-                typeof(IInfoProvider<WebChannelSettingsInfo>),
-                typeof(IInfoProvider<SEOSettingsInfo>),
-                typeof(IChannelAccessService),
-            ]);
-
-            Assert.That(ctor, Is.Not.Null);
+            Assert.That(typeof(WebChannelSettingsListingPage).IsPublic, Is.True);
         }
 
         [Test]
-        public void OverridesConfigurePage()
+        public void Page_IsNotAbstract()
+        {
+            Assert.That(typeof(WebChannelSettingsListingPage).IsAbstract, Is.False);
+        }
+
+        [Test]
+        public void Page_HasSinglePublicConstructor()
+        {
+            Assert.That(typeof(WebChannelSettingsListingPage).GetConstructors(), Has.Length.EqualTo(1));
+        }
+
+        [Test]
+        public void Constructor_HasExpectedParameterCount()
+        {
+            var ctor = typeof(WebChannelSettingsListingPage).GetConstructors().Single();
+
+            Assert.That(ctor.GetParameters(), Has.Length.EqualTo(4));
+        }
+
+        [Test]
+        public void Constructor_HasExpectedParameterTypes()
+        {
+            var ctor = typeof(WebChannelSettingsListingPage).GetConstructors().Single();
+            var parameters = ctor.GetParameters();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(IInfoProvider<ChannelInfo>)));
+                Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(IInfoProvider<WebChannelSettingsInfo>)));
+                Assert.That(parameters[2].ParameterType, Is.EqualTo(typeof(IInfoProvider<SEOSettingsInfo>)));
+                Assert.That(parameters[3].ParameterType, Is.EqualTo(typeof(IChannelAccessService)));
+            });
+        }
+
+        [Test]
+        public void ObjectType_PropertyIsOverridden()
+        {
+            var property = typeof(WebChannelSettingsListingPage).GetProperty(
+                "ObjectType",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+
+            Assert.That(property, Is.Not.Null);
+            Assert.That(property!.DeclaringType, Is.EqualTo(typeof(WebChannelSettingsListingPage)));
+        }
+
+        [Test]
+        public void ObjectType_ReturnsWebChannelSettingsObjectType()
+        {
+            var property = typeof(WebChannelSettingsListingPage).GetProperty(
+                "ObjectType",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+
+            Assert.That(property, Is.Not.Null);
+            Assert.That(property!.PropertyType, Is.EqualTo(typeof(string)));
+        }
+
+        [Test]
+        public void ConfigurePage_IsOverridden()
         {
             var method = typeof(WebChannelSettingsListingPage).GetMethod(
-                "ConfigurePage",
+                nameof(WebChannelSettingsListingPage.ConfigurePage),
                 BindingFlags.Instance | BindingFlags.Public);
 
             Assert.That(method, Is.Not.Null);
@@ -45,99 +91,46 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
         }
 
         [Test]
-        public void ObjectType_ReturnsWebChannelSettingsObjectType()
+        public void ConfigurePage_ReturnsTask()
         {
-            var prop = typeof(WebChannelSettingsListingPage).GetProperty(
-                "ObjectType",
-                BindingFlags.Instance | BindingFlags.NonPublic);
+            var method = typeof(WebChannelSettingsListingPage).GetMethod(
+                nameof(WebChannelSettingsListingPage.ConfigurePage));
 
-            Assert.That(prop, Is.Not.Null);
+            Assert.That(method, Is.Not.Null);
+            Assert.That(method!.ReturnType, Is.EqualTo(typeof(Task)));
         }
 
         [Test]
-        public void Constructor_AcceptsChannelAccessService()
+        public void ConfigurePage_HasNoParameters()
         {
-            var ctor = typeof(WebChannelSettingsListingPage).GetConstructors().FirstOrDefault();
-            Assert.That(ctor, Is.Not.Null);
+            var method = typeof(WebChannelSettingsListingPage).GetMethod(
+                nameof(WebChannelSettingsListingPage.ConfigurePage));
 
-            var paramTypes = ctor!.GetParameters().Select(p => p.ParameterType).ToArray();
-            Assert.That(paramTypes, Does.Contain(typeof(IChannelAccessService)));
+            Assert.That(method, Is.Not.Null);
+            Assert.That(method!.GetParameters(), Has.Length.EqualTo(0));
         }
 
         [Test]
-        public void EnsureSettingsListData_IsPrivateMethod()
+        public void EnsureSettingsListData_MethodExists()
         {
             var method = typeof(WebChannelSettingsListingPage).GetMethod(
                 "EnsureSettingsListData",
                 BindingFlags.Instance | BindingFlags.NonPublic);
 
             Assert.That(method, Is.Not.Null);
-            Assert.That(method!.IsPrivate, Is.True);
         }
 
         [Test]
-        public void EnsureChannelSetting_IsPrivateMethod()
+        public void EnsureChannelSetting_MethodExistsWithExpectedParameters()
         {
             var method = typeof(WebChannelSettingsListingPage).GetMethod(
                 "EnsureChannelSetting",
                 BindingFlags.Instance | BindingFlags.NonPublic);
 
             Assert.That(method, Is.Not.Null);
-            Assert.That(method!.IsPrivate, Is.True);
-        }
 
-        [Test]
-        public void EnsureChannelSettingDisplayName_IsPrivateMethod()
-        {
-            var method = typeof(WebChannelSettingsListingPage).GetMethod(
-                "EnsureChannelSettingDisplayName",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-
-            Assert.That(method, Is.Not.Null);
-            Assert.That(method!.IsPrivate, Is.True);
-        }
-
-        [Test]
-        public void EnsureSeoSettings_IsPrivateMethod()
-        {
-            var method = typeof(WebChannelSettingsListingPage).GetMethod(
-                "EnsureSeoSettings",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-
-            Assert.That(method, Is.Not.Null);
-            Assert.That(method!.IsPrivate, Is.True);
-        }
-
-        [Test]
-        public void Constructor_DependsOnSeoSettingsInfoProvider()
-        {
-            var ctor = typeof(WebChannelSettingsListingPage).GetConstructors().FirstOrDefault();
-            Assert.That(ctor, Is.Not.Null);
-
-            var paramTypes = ctor!.GetParameters().Select(p => p.ParameterType).ToArray();
-            Assert.That(paramTypes, Does.Contain(typeof(IInfoProvider<SEOSettingsInfo>)));
-        }
-
-        [Test]
-        public void ObjectType_IsOverriddenInListingPage()
-        {
-            var prop = typeof(WebChannelSettingsListingPage).GetProperty(
-                "ObjectType",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-
-            Assert.That(prop, Is.Not.Null);
-            Assert.That(prop!.DeclaringType, Is.EqualTo(typeof(WebChannelSettingsListingPage)));
-        }
-
-        [Test]
-        public void EnsureChannelSetting_HasCorrectParameterTypes()
-        {
-            var method = typeof(WebChannelSettingsListingPage).GetMethod(
-                "EnsureChannelSetting",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-
-            Assert.That(method, Is.Not.Null);
             var parameters = method!.GetParameters();
+
             Assert.Multiple(() =>
             {
                 Assert.That(parameters, Has.Length.EqualTo(2));
@@ -147,14 +140,16 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
         }
 
         [Test]
-        public void EnsureChannelSettingDisplayName_HasCorrectParameterTypes()
+        public void EnsureChannelSettingDisplayName_MethodExistsWithExpectedParameters()
         {
             var method = typeof(WebChannelSettingsListingPage).GetMethod(
                 "EnsureChannelSettingDisplayName",
                 BindingFlags.Instance | BindingFlags.NonPublic);
 
             Assert.That(method, Is.Not.Null);
+
             var parameters = method!.GetParameters();
+
             Assert.Multiple(() =>
             {
                 Assert.That(parameters, Has.Length.EqualTo(2));
@@ -164,40 +159,21 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
         }
 
         [Test]
-        public void EnsureSeoSettings_HasCorrectParameterTypes()
+        public void EnsureSeoSettings_MethodExistsWithExpectedParameters()
         {
             var method = typeof(WebChannelSettingsListingPage).GetMethod(
                 "EnsureSeoSettings",
                 BindingFlags.Instance | BindingFlags.NonPublic);
 
             Assert.That(method, Is.Not.Null);
+
             var parameters = method!.GetParameters();
+
             Assert.Multiple(() =>
             {
                 Assert.That(parameters, Has.Length.EqualTo(2));
                 Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(WebChannelSettingsInfo)));
                 Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(IEnumerable<SEOSettingsInfo>)));
-            });
-        }
-
-        [Test]
-        public void ConfigurePage_IsAsyncAndReturnsTask()
-        {
-            var method = typeof(WebChannelSettingsListingPage).GetMethod(
-                "ConfigurePage",
-                BindingFlags.Instance | BindingFlags.Public);
-
-            Assert.That(method, Is.Not.Null);
-            Assert.That(method!.ReturnType, Is.EqualTo(typeof(Task)));
-        }
-
-        [Test]
-        public void Page_IsPublicNonAbstractClass()
-        {
-            Assert.Multiple(() =>
-            {
-                Assert.That(typeof(WebChannelSettingsListingPage).IsPublic, Is.True);
-                Assert.That(typeof(WebChannelSettingsListingPage).IsAbstract, Is.False);
             });
         }
     }

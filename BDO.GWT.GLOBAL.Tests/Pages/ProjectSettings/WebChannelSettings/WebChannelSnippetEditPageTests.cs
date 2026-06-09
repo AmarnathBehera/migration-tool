@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using BDO;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.DataEngine;
+using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
 using Moq;
 
@@ -185,6 +187,108 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
             });
         }
 
-       
+        [Test]
+        public void Page_IsInExpectedNamespace()
+        {
+            Assert.That(
+                typeof(WebChannelSnippetEditPage).Namespace,
+                Is.EqualTo("BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings"));
+        }
+
+        [Test]
+        public void Page_HasSinglePublicConstructor()
+        {
+            var constructors = typeof(WebChannelSnippetEditPage)
+                .GetConstructors(BindingFlags.Instance | BindingFlags.Public);
+
+            Assert.That(constructors, Has.Length.EqualTo(1));
+        }
+
+        [Test]
+        public void Constructor_HasExpectedParameterCount()
+        {
+            var ctor = typeof(WebChannelSnippetEditPage)
+                .GetConstructors()
+                .Single();
+
+            Assert.That(ctor.GetParameters(), Has.Length.EqualTo(5));
+        }
+
+        [Test]
+        public void Constructor_HasExpectedParameterTypes()
+        {
+            var ctor = typeof(WebChannelSnippetEditPage)
+                .GetConstructors()
+                .Single();
+
+            var parameters = ctor.GetParameters();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(IFormComponentMapper)));
+                Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(IFormDataBinder)));
+                Assert.That(parameters[2].ParameterType, Is.EqualTo(typeof(IInfoProvider<WebChannelSnippetInfo>)));
+                Assert.That(parameters[3].ParameterType, Is.EqualTo(typeof(IInfoProvider<WebChannelSettingsInfo>)));
+                Assert.That(parameters[4].ParameterType, Is.EqualTo(typeof(IChannelAccessService)));
+            });
+        }
+
+        [Test]
+        public void WebChannelSettingsId_PropertyHasGetterAndSetter()
+        {
+            var prop = typeof(WebChannelSnippetEditPage).GetProperty(nameof(WebChannelSnippetEditPage.WebChannelSettingsId));
+
+            Assert.That(prop, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(prop!.CanRead, Is.True);
+                Assert.That(prop.CanWrite, Is.True);
+            });
+        }
+
+        [Test]
+        public void WebChannelSettingsId_IsPublicProperty()
+        {
+            var prop = typeof(WebChannelSnippetEditPage).GetProperty(nameof(WebChannelSnippetEditPage.WebChannelSettingsId));
+
+            Assert.That(prop, Is.Not.Null);
+            Assert.That(prop!.GetGetMethod()?.IsPublic, Is.True);
+        }
+
+        [Test]
+        public void GetSubmitSuccessResponse_HasExpectedParameters()
+        {
+            var method = typeof(WebChannelSnippetEditPage).GetMethod(
+                "GetSubmitSuccessResponse",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+
+            Assert.That(method, Is.Not.Null);
+            var parameters = method!.GetParameters();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(parameters, Has.Length.EqualTo(2));
+                Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(WebChannelSnippetInfo)));
+                Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(ICollection<IFormItem>)));
+            });
+        }
+
+        [Test]
+        public void GetSubmitSuccessResponse_ReturnsTaskOfICommandResponse()
+        {
+            var method = typeof(WebChannelSnippetEditPage).GetMethod(
+                "GetSubmitSuccessResponse",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+
+            Assert.That(method, Is.Not.Null);
+            var returnType = method!.ReturnType;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(returnType.IsGenericType, Is.True);
+                Assert.That(returnType.GetGenericTypeDefinition(), Is.EqualTo(typeof(Task<>)));
+                Assert.That(returnType.GetGenericArguments()[0], Is.EqualTo(typeof(ICommandResponse)));
+            });
+        }
     }
 }
