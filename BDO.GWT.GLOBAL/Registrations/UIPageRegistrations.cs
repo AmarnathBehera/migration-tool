@@ -16,9 +16,9 @@ using Kentico.Xperience.Admin.Base;
 [assembly: UIPage(
     parentType: typeof(GlobalSettings),
     slug: "keys",
-    uiPageType: typeof(GlobalSettingsListingPage),
+    uiPageType: typeof(GlobalSettingsEditPage),
     name: "Include Custom Scripts",
-    templateName: TemplateNames.LISTING,
+    templateName: TemplateNames.EDIT,
     order: 0)]
 
 [assembly: UIPage(
@@ -37,29 +37,8 @@ using Kentico.Xperience.Admin.Base;
     templateName: TemplateNames.EDIT,
     order: 2)]
 
-[assembly: UIPage(
-    parentType: typeof(GlobalSettingsListingPage),
-    slug: PageParameterConstants.PARAMETERIZED_SLUG,
-    uiPageType: typeof(GlobalSettingsEditSection),
-    name: "Edit",
-    templateName: TemplateNames.SECTION_LAYOUT,
-    order: 10)]
 
-[assembly: UIPage(
-    parentType: typeof(GlobalSettingsEditSection),
-    slug: "edit",
-    uiPageType: typeof(GlobalSettingsEditPage),
-    name: "Edit global settings key",
-    templateName: TemplateNames.EDIT,
-    order: 0)]
 
-[assembly: UIPage(
-    parentType: typeof(GlobalSettingsListingPage),
-    slug: "create",
-    uiPageType: typeof(GlobalSettingsCreatePage),
-    name: "Create global settings key",
-    templateName: TemplateNames.EDIT,
-    order: 20)]
 
 [assembly: UIPage(
     parentType: typeof(ProjectSettingsApplication),
@@ -112,34 +91,21 @@ using Kentico.Xperience.Admin.Base;
 [assembly: UIPage(
     parentType: typeof(WebChannelSettingsEditSection),
     slug: "snippets",
-    uiPageType: typeof(WebChannelSnippetListingPage),
+    uiPageType: typeof(WebChannelSnippetEditSection),
     name: "Channel snippets",
     templateName: TemplateNames.LISTING,
     order: 10)]
 
 [assembly: UIPage(
-    parentType: typeof(WebChannelSnippetListingPage),
-    slug: PageParameterConstants.PARAMETERIZED_SLUG,
-    uiPageType: typeof(WebChannelSnippetEditSection),
-    name: "Edit snippets",
-    templateName: TemplateNames.SECTION_LAYOUT,
-    order: 0)]
-
-[assembly: UIPage(
-    parentType: typeof(WebChannelSnippetEditSection),
-    slug: "edit",
+    parentType: typeof(WebChannelSettingsEditSection),
+    slug: "Key",
     uiPageType: typeof(WebChannelSnippetEditPage),
-    name: "Edit snippet",
+    name: "Include Custom Scripts",
     templateName: TemplateNames.EDIT,
     order: 0)]
 
-[assembly: UIPage(
-    parentType: typeof(WebChannelSnippetListingPage),
-    slug: "create",
-    uiPageType: typeof(WebChannelSnippetCreatePage),
-    name: "Create snippet",
-    templateName: TemplateNames.EDIT,
-    order: 20)]
+
+
 [assembly: UIPage(
     parentType: typeof(WebChannelSettingsEditSection),
     slug: "print-or-share",
@@ -163,3 +129,4 @@ using Kentico.Xperience.Admin.Base;
     name: "Our People settings",
     templateName: TemplateNames.EDIT,
     order: 9)]
+
