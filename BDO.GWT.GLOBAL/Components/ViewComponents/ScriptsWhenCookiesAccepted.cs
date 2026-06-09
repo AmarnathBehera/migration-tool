@@ -2,70 +2,26 @@
 using BDO.GWT.Common;
 using CMS.DataEngine;
 using CMS.Websites.Routing;
-using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GWTXbyKWeb.Components.ViewComponents
 {
-    public class ScriptsWhenCookiesAccepted : ViewComponent
+    public class ScriptsWhenCookiesAccepted : ScriptViewComponentBase
     {
-        private readonly IInfoProvider<GlobalsettingskeyInfo> _provider;
-        private readonly IInfoProvider<WebChannelSnippetInfo> _siteProvider;
-        private readonly IWebsiteContext _websiteContext;
-        private readonly IWebsiteChannelContext _websiteChannelContext;
-        private readonly IInfoProvider<WebChannelSettingsInfo> _webChannelSettingsInfoProvider;
-        public ScriptsWhenCookiesAccepted(IInfoProvider<GlobalsettingskeyInfo> provider, IInfoProvider<WebChannelSnippetInfo> siteProvider, IWebsiteContext websiteContext, IWebsiteChannelContext websiteChannelContext, IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider)
-        {
-            _provider = provider;
-            _siteProvider = siteProvider;
-            _websiteContext = websiteContext;
-            _websiteChannelContext = websiteChannelContext;
-            _webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
+        public ScriptsWhenCookiesAccepted(
+            IInfoProvider<GlobalsettingskeyInfo> provider,
+            IInfoProvider<WebChannelSnippetInfo> siteProvider,
+            IWebsiteContext websiteContext,
+            IWebsiteChannelContext websiteChannelContext,
+            IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider)
+            : base(provider, siteProvider, websiteContext, websiteChannelContext, webChannelSettingsInfoProvider) { }
 
-        }
+        protected override bool GetInheritFromGlobal(WebChannelSnippetInfo siteScript)
+            => siteScript.ScriptexecutedwhencookiesareacceptedInheritfromglobal;
 
-        public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken)
-        {
-            int currentWebsiteID = _websiteChannelContext.WebsiteChannelID;
-            var value = string.Empty;
-            var currentChannelId = _webChannelSettingsInfoProvider
-              .Get()
-              .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), currentWebsiteID)
-              .FirstOrDefault();
-            if (currentChannelId == null)
-            {
-                return View("~/Views/Shared/Components/Scripts/Default.cshtml");
-            }
+        protected override string? GetSiteValue(WebChannelSnippetInfo siteScript)
+            => siteScript.ScriptexecutedwhencookiesareacceptedKeyValue;
 
-            var sitescript = _siteProvider.Get()
-                                    .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID),
-                                     currentChannelId.WebChannelSettingsID)
-                                     .TopN(1)
-                                     .GetEnumerableTypedResult()
-                                     .FirstOrDefault();
-            bool inheritFromGlobal = false;
-
-            if (sitescript != null)
-            {
-                // Non-column fields are stored in the CustomData / ObjectData bag
-                inheritFromGlobal = sitescript.ScriptexecutedwhencookiesareacceptedInheritfromglobal;
-            }
-            if (inheritFromGlobal)
-            {
-
-                value = _provider.Get()
-                                   .TopN(1)
-                                  .GetEnumerableTypedResult().FirstOrDefault()?.ScriptexecutedwhencookiesareacceptedKeyValue;
-            }
-            else
-            {
-                value = sitescript?.ScriptexecutedwhencookiesareacceptedKeyValue;
-
-            }
-
-            return View("~/Views/Shared/Components/Scripts/Default.cshtml", value);
-        }
+        protected override string? GetGlobalValue(GlobalsettingskeyInfo globalSettings)
+            => globalSettings.ScriptexecutedwhencookiesareacceptedKeyValue;
     }
 }
