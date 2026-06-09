@@ -15,7 +15,7 @@ namespace BDO
     /// <summary>
     /// Data container class for <see cref="WebChannelSnippetInfo"/>.
     /// </summary>
-    public partial class WebChannelSnippetInfo : AbstractInfo<WebChannelSnippetInfo, IInfoProvider<WebChannelSnippetInfo>>, IInfoWithId, IInfoWithName
+    public partial class WebChannelSnippetInfo : AbstractInfo<WebChannelSnippetInfo, IInfoProvider<WebChannelSnippetInfo>>, IInfoWithId, IInfoWithGuid
     {
         /// <summary>
         /// Object type.
@@ -27,7 +27,7 @@ namespace BDO
         /// Type information.
         /// </summary>
 #warning "You will need to configure the type info."
-        public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(IInfoProvider<WebChannelSnippetInfo>), OBJECT_TYPE, "BDO.WebChannelSnippet", "WebChannelSnippetID", null, null, "WebChannelCodeName", "WebChannelSnippetDisplayName", null, null, null)
+        public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(IInfoProvider<WebChannelSnippetInfo>), OBJECT_TYPE, "BDO.WebChannelSnippet", "WebChannelSnippetID", null, "WebSettingsGUID", null, null, null, null, null)
         {
             TouchCacheDependencies = true,
             DependsOn = new List<ObjectDependency>()
@@ -49,28 +49,6 @@ namespace BDO
 
 
         /// <summary>
-        /// Web channel snippet type.
-        /// </summary>
-        [DatabaseField]
-        public virtual string WebChannelSnippetType
-        {
-            get => ValidationHelper.GetString(GetValue(nameof(WebChannelSnippetType)), String.Empty);
-            set => SetValue(nameof(WebChannelSnippetType), value, String.Empty);
-        }
-
-
-        /// <summary>
-        /// Web channel snippet code.
-        /// </summary>
-        [DatabaseField]
-        public virtual string WebChannelSnippetCode
-        {
-            get => ValidationHelper.GetString(GetValue(nameof(WebChannelSnippetCode)), String.Empty);
-            set => SetValue(nameof(WebChannelSnippetCode), value, String.Empty);
-        }
-
-
-        /// <summary>
         /// Web channel snippet web channel settings ID.
         /// </summary>
         [DatabaseField]
@@ -82,35 +60,145 @@ namespace BDO
 
 
         /// <summary>
-        /// Web channel snippet display name.
+        /// Script head key value.
         /// </summary>
         [DatabaseField]
-        public virtual string WebChannelSnippetDisplayName
+        public virtual string ScriptHeadKeyValue
         {
-            get => ValidationHelper.GetString(GetValue(nameof(WebChannelSnippetDisplayName)), String.Empty);
-            set => SetValue(nameof(WebChannelSnippetDisplayName), value);
+            get => ValidationHelper.GetString(GetValue(nameof(ScriptHeadKeyValue)), String.Empty);
+            set => SetValue(nameof(ScriptHeadKeyValue), value, String.Empty);
         }
 
 
         /// <summary>
-        /// Web channel snippet code name.
+        /// Marketo munchkin code key value.
         /// </summary>
         [DatabaseField]
-        public virtual string WebChannelSnippetCodeName
+        public virtual string MarketoMunchkinCodeKeyValue
         {
-            get => ValidationHelper.GetString(GetValue(nameof(WebChannelSnippetCodeName)), String.Empty);
-            set => SetValue(nameof(WebChannelSnippetCodeName), value);
+            get => ValidationHelper.GetString(GetValue(nameof(MarketoMunchkinCodeKeyValue)), String.Empty);
+            set => SetValue(nameof(MarketoMunchkinCodeKeyValue), value, String.Empty);
         }
 
 
         /// <summary>
-        /// Web channel code name.
+        /// Scriptexecutedwhencookiesareaccepted key value.
         /// </summary>
         [DatabaseField]
-        public virtual string WebChannelCodeName
+        public virtual string ScriptexecutedwhencookiesareacceptedKeyValue
         {
-            get => ValidationHelper.GetString(GetValue(nameof(WebChannelCodeName)), String.Empty);
-            set => SetValue(nameof(WebChannelCodeName), value);
+            get => ValidationHelper.GetString(GetValue(nameof(ScriptexecutedwhencookiesareacceptedKeyValue)), String.Empty);
+            set => SetValue(nameof(ScriptexecutedwhencookiesareacceptedKeyValue), value, String.Empty);
+        }
+
+
+        /// <summary>
+        /// Scriptinbottomof body key value.
+        /// </summary>
+        [DatabaseField]
+        public virtual string ScriptinbottomofBodyKeyValue
+        {
+            get => ValidationHelper.GetString(GetValue(nameof(ScriptinbottomofBodyKeyValue)), String.Empty);
+            set => SetValue(nameof(ScriptinbottomofBodyKeyValue), value, String.Empty);
+        }
+
+
+        /// <summary>
+        /// Scriptin topof body key value.
+        /// </summary>
+        [DatabaseField]
+        public virtual string ScriptinTopofBodyKeyValue
+        {
+            get => ValidationHelper.GetString(GetValue(nameof(ScriptinTopofBodyKeyValue)), String.Empty);
+            set => SetValue(nameof(ScriptinTopofBodyKeyValue), value, String.Empty);
+        }
+
+
+        /// <summary>
+        /// Scripts topof page head key value.
+        /// </summary>
+        [DatabaseField]
+        public virtual string ScriptsTopofPageHeadKeyValue
+        {
+            get => ValidationHelper.GetString(GetValue(nameof(ScriptsTopofPageHeadKeyValue)), String.Empty);
+            set => SetValue(nameof(ScriptsTopofPageHeadKeyValue), value, String.Empty);
+        }
+
+
+        /// <summary>
+        /// Web settings GUID.
+        /// </summary>
+        [DatabaseField]
+        public virtual Guid WebSettingsGUID
+        {
+            get => ValidationHelper.GetGuid(GetValue(nameof(WebSettingsGUID)), Guid.Empty);
+            set => SetValue(nameof(WebSettingsGUID), value);
+        }
+
+
+        /// <summary>
+        /// Script head inheritfromglobalsettings.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool ScriptHeadInheritfromglobalsettings
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(ScriptHeadInheritfromglobalsettings)), false);
+            set => SetValue(nameof(ScriptHeadInheritfromglobalsettings), value);
+        }
+
+
+        /// <summary>
+        /// Scripts topof page inheritfromglobalsetting.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool ScriptsTopofPageInheritfromglobalsetting
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(ScriptsTopofPageInheritfromglobalsetting)), false);
+            set => SetValue(nameof(ScriptsTopofPageInheritfromglobalsetting), value);
+        }
+
+
+        /// <summary>
+        /// Scriptinbottomof body inherit from global.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool ScriptinbottomofBodyInheritFromGlobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(ScriptinbottomofBodyInheritFromGlobal)), false);
+            set => SetValue(nameof(ScriptinbottomofBodyInheritFromGlobal), value);
+        }
+
+
+        /// <summary>
+        /// Scriptin topof body inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool ScriptinTopofBodyInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(ScriptinTopofBodyInheritfromglobal)), false);
+            set => SetValue(nameof(ScriptinTopofBodyInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Scriptexecutedwhencookiesareaccepted inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool ScriptexecutedwhencookiesareacceptedInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(ScriptexecutedwhencookiesareacceptedInheritfromglobal)), false);
+            set => SetValue(nameof(ScriptexecutedwhencookiesareacceptedInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Marketo munchkin code inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool MarketoMunchkinCodeInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(MarketoMunchkinCodeInheritfromglobal)), false);
+            set => SetValue(nameof(MarketoMunchkinCodeInheritfromglobal), value);
         }
 
 
