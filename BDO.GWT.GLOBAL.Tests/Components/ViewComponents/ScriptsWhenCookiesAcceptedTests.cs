@@ -1,4 +1,4 @@
-using BDO.GWT.Common;
+﻿using BDO.GWT.Common;
 using CMS.DataEngine;
 using CMS.Websites.Routing;
 using GWTXbyKWeb.Components.ViewComponents;
@@ -74,12 +74,9 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 
             var result = await _component.InvokeAsync(CancellationToken.None) as ViewViewComponentResult;
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.Not.Null);
-                Assert.That(result!.ViewName, Does.Contain("Default.cshtml"));
-                Assert.That(result.ViewData?.Model, Is.Null);
-            });
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.ViewName, Does.Contain("Default.cshtml"));
+            Assert.That(result.ViewData?.Model, Is.Null);
         }
         [Test]
         public async Task InvokeAsync_AlwaysReturnsViewViewComponentResult()
@@ -134,12 +131,9 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 
             var result = await _component.InvokeAsync(CancellationToken.None) as ViewViewComponentResult;
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.Not.Null);
-                Assert.That(result!.ViewName, Does.Contain("Scripts"));
-                Assert.That(result.ViewName, Does.Contain("Default.cshtml"));
-            });
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.ViewName, Does.Contain("Scripts"));
+            Assert.That(result.ViewName, Does.Contain("Default.cshtml"));
         }
 
         [TestCase(1)]
