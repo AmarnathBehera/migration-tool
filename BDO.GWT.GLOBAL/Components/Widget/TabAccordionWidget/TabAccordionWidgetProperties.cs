@@ -1,13 +1,9 @@
-﻿
+﻿#nullable enable
+
 using CMS.ContentEngine;
-using CMS.Websites;
 using Kentico.Forms.Web.Mvc;
 using Kentico.Xperience.Admin.Base.FormAnnotations;
-using Kentico.Xperience.Admin.Websites.FormAnnotations;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BDO.GWT.Web.Widgets.TabAccordionWidget;
 
@@ -40,7 +36,4 @@ public class TabAccordionWidgetProperties : BaseWidgetProperties
 
     [DropDownComponent(Label = "Bottom margin", Order = 5, Options = "0px;None\r\n20px\r\n40px\r\n60px\r\n80px")]
     public string BottomMargin { get; set; } = null!;
-
-
-
 }
