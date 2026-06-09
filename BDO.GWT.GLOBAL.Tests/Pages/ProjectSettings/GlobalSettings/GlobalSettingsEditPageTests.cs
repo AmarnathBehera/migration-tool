@@ -46,7 +46,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.GlobalSettings
                 .GetConstructors()
                 .Single();
 
-            Assert.That(ctor.GetParameters(), Has.Length.EqualTo(3));
+            Assert.That(ctor.GetParameters().Length, Is.EqualTo(3));
         }
 
         [Test]

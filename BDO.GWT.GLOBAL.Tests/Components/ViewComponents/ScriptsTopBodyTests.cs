@@ -88,16 +88,16 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
         }
 
         // ── Factory helpers ──────────────────────────────────────────────────────────
-        private static WebChannelSettingsInfo MakeChannelSettings(int settingsId, int channelId)
+        private static StubChannelSettings MakeChannelSettings(int settingsId, int channelId)
             => new StubChannelSettings(settingsId, channelId);
 
-        private static WebChannelSnippetInfo MakeSiteScript(
+        private static StubSiteScript MakeSiteScript(
             bool   inheritFromGlobal,
             string keyValue,
             int    webChannelSettingsId = 10)
             => new StubSiteScript(inheritFromGlobal, keyValue);
 
-        private static GlobalsettingskeyInfo MakeGlobalSettings(string keyValue)
+        private static StubGlobalSettings MakeGlobalSettings(string keyValue)
             => new StubGlobalSettings(keyValue);
 
         // ════════════════════════════════════════════════════════════════════════════
@@ -165,7 +165,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 
             _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(channelId);
             _webChannelSettingsProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeChannelSettings(settingsId, channelId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSettingsInfo>([MakeChannelSettings(settingsId, channelId)]).Object);
 
             _siteProviderMock.Setup(p => p.Get())
                 .Returns(SetupQueryReturning<WebChannelSnippetInfo>([]).Object);
@@ -188,7 +188,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 
             _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(channelId);
             _webChannelSettingsProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeChannelSettings(settingsId, channelId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSettingsInfo>([MakeChannelSettings(settingsId, channelId)]).Object);
 
             _siteProviderMock.Setup(p => p.Get())
                 .Returns(SetupQueryReturning<WebChannelSnippetInfo>([]).Object);
@@ -212,10 +212,10 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 
             _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(channelId);
             _webChannelSettingsProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeChannelSettings(settingsId, channelId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSettingsInfo>([MakeChannelSettings(settingsId, channelId)]).Object);
 
             _siteProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeSiteScript(false, siteKeyValue, settingsId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSnippetInfo>([MakeSiteScript(false, siteKeyValue, settingsId)]).Object);
 
             var result = await _component.InvokeAsync(CancellationToken.None) as ViewViewComponentResult;
 
@@ -235,10 +235,10 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 
             _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(channelId);
             _webChannelSettingsProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeChannelSettings(settingsId, channelId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSettingsInfo>([MakeChannelSettings(settingsId, channelId)]).Object);
 
             _siteProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeSiteScript(false, "any-value", settingsId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSnippetInfo>([MakeSiteScript(false, "any-value", settingsId)]).Object);
 
             await _component.InvokeAsync(CancellationToken.None);
 
@@ -253,10 +253,10 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 
             _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(channelId);
             _webChannelSettingsProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeChannelSettings(settingsId, channelId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSettingsInfo>([MakeChannelSettings(settingsId, channelId)]).Object);
 
             _siteProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeSiteScript(false, "script-value", settingsId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSnippetInfo>([MakeSiteScript(false, "script-value", settingsId)]).Object);
 
             var result = await _component.InvokeAsync(CancellationToken.None) as ViewViewComponentResult;
 
@@ -277,13 +277,13 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 
             _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(channelId);
             _webChannelSettingsProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeChannelSettings(settingsId, channelId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSettingsInfo>([MakeChannelSettings(settingsId, channelId)]).Object);
 
             _siteProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeSiteScript(true, "ignored-site-value", settingsId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSnippetInfo>([MakeSiteScript(true, "ignored-site-value", settingsId)]).Object);
 
             _globalProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeGlobalSettings(globalKeyValue)]).Object);
+                .Returns(SetupQueryReturning<GlobalsettingskeyInfo>([MakeGlobalSettings(globalKeyValue)]).Object);
 
             var result = await _component.InvokeAsync(CancellationToken.None) as ViewViewComponentResult;
 
@@ -303,13 +303,13 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 
             _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(channelId);
             _webChannelSettingsProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeChannelSettings(settingsId, channelId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSettingsInfo>([MakeChannelSettings(settingsId, channelId)]).Object);
 
             _siteProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeSiteScript(true, "any", settingsId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSnippetInfo>([MakeSiteScript(true, "any", settingsId)]).Object);
 
             _globalProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeGlobalSettings("global-key")]).Object);
+                .Returns(SetupQueryReturning<GlobalsettingskeyInfo>([MakeGlobalSettings("global-key")]).Object);
 
             await _component.InvokeAsync(CancellationToken.None);
 
@@ -326,13 +326,13 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 
             _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(channelId);
             _webChannelSettingsProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeChannelSettings(settingsId, channelId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSettingsInfo>([MakeChannelSettings(settingsId, channelId)]).Object);
 
             _siteProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeSiteScript(true, siteKeyValue, settingsId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSnippetInfo>([MakeSiteScript(true, siteKeyValue, settingsId)]).Object);
 
             _globalProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeGlobalSettings(globalValue)]).Object);
+                .Returns(SetupQueryReturning<GlobalsettingskeyInfo> ([MakeGlobalSettings(globalValue)]).Object);
 
             var result = await _component.InvokeAsync(CancellationToken.None) as ViewViewComponentResult;
 
@@ -352,10 +352,10 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 
             _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(channelId);
             _webChannelSettingsProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeChannelSettings(settingsId, channelId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSettingsInfo>([MakeChannelSettings(settingsId, channelId)]).Object);
 
             _siteProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeSiteScript(true, "any", settingsId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSnippetInfo>([MakeSiteScript(true, "any", settingsId)]).Object);
 
             // Global returns nothing → FirstOrDefault() is null → value = null
             _globalProviderMock.Setup(p => p.Get())
@@ -397,7 +397,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 
             _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(channelId);
             _webChannelSettingsProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeChannelSettings(settingsId, channelId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSettingsInfo>([MakeChannelSettings(settingsId, channelId)]).Object);
 
             var siteQuery = SetupQueryReturning<WebChannelSnippetInfo>([]);
             _siteProviderMock.Setup(p => p.Get()).Returns(siteQuery.Object);
@@ -417,7 +417,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 
             _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(channelId);
             _webChannelSettingsProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeChannelSettings(settingsId, channelId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSettingsInfo>([MakeChannelSettings(settingsId, channelId)]).Object);
 
             var siteQuery = SetupQueryReturning<WebChannelSnippetInfo>([]);
             _siteProviderMock.Setup(p => p.Get()).Returns(siteQuery.Object);
@@ -435,12 +435,12 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 
             _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(channelId);
             _webChannelSettingsProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeChannelSettings(settingsId, channelId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSettingsInfo>([MakeChannelSettings(settingsId, channelId)]).Object);
 
             _siteProviderMock.Setup(p => p.Get())
-                .Returns(SetupQueryReturning([MakeSiteScript(true, "any", settingsId)]).Object);
+                .Returns(SetupQueryReturning<WebChannelSnippetInfo>([MakeSiteScript(true, "any", settingsId)]).Object);
 
-            var globalQuery = SetupQueryReturning([MakeGlobalSettings("global-key")]);
+            var globalQuery = SetupQueryReturning<GlobalsettingskeyInfo>([MakeGlobalSettings("global-key")]);
             _globalProviderMock.Setup(p => p.Get()).Returns(globalQuery.Object);
 
             await _component.InvokeAsync(CancellationToken.None);
