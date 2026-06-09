@@ -17,10 +17,10 @@ namespace GWTXbyKWeb.Components.ViewComponents
         protected override bool GetInheritFromGlobal(WebChannelSnippetInfo siteScript)
             => siteScript.ScriptinTopofBodyInheritfromglobal;
 
-        protected override string? GetSiteValue(WebChannelSnippetInfo siteScript)
+        protected override string GetSiteValue(WebChannelSnippetInfo siteScript)
             => siteScript.ScriptinTopofBodyKeyValue;
 
-        protected override string? GetGlobalValue(GlobalsettingskeyInfo globalSettings)
+        protected override string GetGlobalValue(GlobalsettingskeyInfo globalSettings)
             => globalSettings.ScriptinTopofBodyKeyValue;
     }
 }

@@ -31,10 +31,10 @@ namespace GWTXbyKWeb.Components.ViewComponents
 
         protected abstract bool GetInheritFromGlobal(WebChannelSnippetInfo siteScript);
 
-        protected abstract string? GetSiteValue(WebChannelSnippetInfo siteScript);
+        protected abstract string GetSiteValue(WebChannelSnippetInfo siteScript);
 
         /// <summary>Returns the script value stored on the global settings record.</summary>
-        protected abstract string? GetGlobalValue(GlobalsettingskeyInfo globalSettings);
+        protected abstract string GetGlobalValue(GlobalsettingskeyInfo globalSettings);
 
         public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken)
         {
