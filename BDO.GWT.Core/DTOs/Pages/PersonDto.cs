@@ -45,4 +45,5 @@ public class PersonDto
     public bool EnableForm { get; set; }
 
     public bool ParentEnableForm { get; set; }
+    public AuthoredContentDto? AuthoredContent { get; set; }
 }
