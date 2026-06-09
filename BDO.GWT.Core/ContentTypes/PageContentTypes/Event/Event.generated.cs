@@ -98,7 +98,7 @@ namespace BDO
 		/// <summary>
 		/// EventType.
 		/// </summary>
-		public IEnumerable<TagReference> EventType { get; set; }
+		public IEnumerable<EventType> EventType { get; set; }
 
 
 		/// <summary>
@@ -171,6 +171,42 @@ namespace BDO
 		/// EventVideo.
 		/// </summary>
 		public string EventVideo { get; set; }
+
+
+		/// <summary>
+		/// MetadataBusinessIssues.
+		/// </summary>
+		public IEnumerable<Businessissues> MetadataBusinessIssues { get; set; }
+
+
+		/// <summary>
+		/// MetadataOfficeLocation.
+		/// </summary>
+		public IEnumerable<LocationOffice> MetadataOfficeLocation { get; set; }
+
+
+		/// <summary>
+		/// MetadataSpecialtiesCategories.
+		/// </summary>
+		public IEnumerable<SpecialtiesCategory> MetadataSpecialtiesCategories { get; set; }
+
+
+		/// <summary>
+		/// MetadataBusinessLines.
+		/// </summary>
+		public IEnumerable<BusinessLine> MetadataBusinessLines { get; set; }
+
+
+		/// <summary>
+		/// MetadataSpecialtiesAreas.
+		/// </summary>
+		public IEnumerable<SpecialtiesArea> MetadataSpecialtiesAreas { get; set; }
+
+
+		/// <summary>
+		/// MetadataSpecialtiesPages.
+		/// </summary>
+		public IEnumerable<SpecialtiesPage> MetadataSpecialtiesPages { get; set; }
 
 
 		/// <summary>
@@ -254,7 +290,7 @@ namespace BDO
 		/// <summary>
 		/// ContentType.
 		/// </summary>
-		public IEnumerable<TagReference> ContentType { get; set; }
+		public IEnumerable<Contenttypes> ContentType { get; set; }
 
 
 		/// <summary>

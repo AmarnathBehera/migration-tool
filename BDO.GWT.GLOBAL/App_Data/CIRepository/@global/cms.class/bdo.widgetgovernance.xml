@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Widget Governance</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="WidgetGovernanceID" columntype="integer" enabled="true" guid="a388b3bc-89ab-4603-8181-4877cf95ef42" isPK="true" />
+      <field column="ShowAdvancedWidgets" columnprecision="0" columntype="boolean" enabled="true" guid="9cce85bb-bd8c-4d4f-be43-84ac6a7d9f46" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>2f5ff79c-4e73-4fb9-90cb-1f6a824921f1</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.WidgetGovernance</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_WidgetGovernance</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

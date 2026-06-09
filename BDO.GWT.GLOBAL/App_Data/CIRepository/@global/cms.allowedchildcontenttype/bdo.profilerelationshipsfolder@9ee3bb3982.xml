@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.ProfileRelationshipsFolder</CodeName>
+    <GUID>b60e32ff-3b4d-45ea-8787-dccbc39be0ac</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.ProfileRelationships">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.ProfileRelationships</CodeName>
+        <GUID>7b6d5a3c-9d9b-4fe9-b2bf-8b0c54c130f6</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

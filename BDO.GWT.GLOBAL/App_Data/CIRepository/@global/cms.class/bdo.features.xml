@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Features</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="FeaturesID" columntype="integer" enabled="true" guid="276fb911-6ab1-4942-a079-8572965c9040" isPK="true" />
+      <field column="BDOGlobal" columnprecision="0" columntype="boolean" enabled="true" guid="aebdb0d4-f10f-4c14-b76c-f29e9b005b1c" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>f8484077-ec40-4c93-94f3-65f3c6c6698b</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.Features</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_Features</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

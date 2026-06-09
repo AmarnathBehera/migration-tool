@@ -85,6 +85,41 @@ namespace BDO.GWT.Core
             };
         }
 
+
+        public async Task<SideBoxDto> GetSideboxDtoAsync<TSibling>(
+            string sideboxTitle,
+            int parentWebPageItemId,
+            int siblingParentWebPageItemId,
+            Func<TSibling, string> siblingTitleSelector,
+            CancellationToken cancellationToken = default)
+            where TSibling : class, IWebPageFieldsSource
+        {
+
+
+            var siblingPages = await _contentService.GetChildPagesByParentGuidAsync<TSibling>(
+                siblingParentWebPageItemId,
+                cancellationToken);
+
+            var orderedSiblings = siblingPages
+                .OrderBy(p => p.SystemFields.WebPageItemOrder)
+                .ToList();
+
+            if (orderedSiblings.Count == 1)
+            {
+                orderedSiblings = new List<TSibling>();
+            }
+
+            return new SideBoxDto
+            {
+                Title = sideboxTitle,
+                Links = orderedSiblings.Select(p => new LinkItemDto
+                {
+                    Title = siblingTitleSelector(p),
+                    URL = _urlResolver.GetRelativePath(p),
+                }),
+            };
+        }
+
         /// <summary>
         /// Builds an array of multi-link cards for a grid section.
         ///

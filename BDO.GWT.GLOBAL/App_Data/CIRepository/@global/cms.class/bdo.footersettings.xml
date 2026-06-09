@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Footer settings</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="FootersettingsID" columntype="integer" enabled="true" guid="1134fa55-2379-4306-9965-488f43095985" isPK="true" />
+      <field column="DisplaySubscriptionssection" columnprecision="0" columntype="boolean" enabled="true" guid="84c35113-a72c-41dc-b702-b4b013a7334a" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>73205df1-4f5e-4093-a00b-820f5fcea886</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.Footersettings</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_Footersettings</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

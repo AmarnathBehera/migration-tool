@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Metadata</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="MetadataID" columntype="integer" enabled="true" guid="e92efaf1-4a32-4250-b01c-c5968863494e" isPK="true" />
+      <field column="Enablemetadataprocessing" columnprecision="0" columntype="boolean" enabled="true" guid="a9627763-ab29-4e28-be9b-9419548cadec" />
+      <field column="Metadatadescriptionlength" columnprecision="0" columntype="integer" enabled="true" guid="92b3af97-f0f2-44e6-af3c-88ae17bb739e" />
+      <field column="Trimdescriptiontoonesentence" columnprecision="0" columntype="boolean" enabled="true" guid="c3bdf7ea-2351-4c53-a282-9c0f60b9a3c2" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>8c1b6b07-5fb3-41fc-b873-f997a696b9f9</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.Metadata</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_Metadata</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

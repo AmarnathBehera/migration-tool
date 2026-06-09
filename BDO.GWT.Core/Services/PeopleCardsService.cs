@@ -3,7 +3,6 @@ using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
-using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Utilities;
 using CMS.ContentEngine;
 using CMS.Websites;
@@ -36,8 +35,6 @@ public class PeopleCardsService : IPeopleCardsService
 {
     private readonly ICardsService _cardsService;
     private readonly IContentService _contentService;
-    private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
-    private readonly ICultureContext _cultureContext;
     private readonly ISettingService _settingService;
     private readonly IUrlHelperFactory _urlHelperFactory;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -45,8 +42,6 @@ public class PeopleCardsService : IPeopleCardsService
     public PeopleCardsService(
         ICardsService cardsService,
         IContentService contentService,
-        ITaxonomyTagRetriever taxonomyTagRetriever,
-        ICultureContext cultureContext,
         ISettingService settingService,
         IUrlHelperFactory urlHelperFactory,
         IHttpContextAccessor httpContextAccessor
@@ -54,8 +49,6 @@ public class PeopleCardsService : IPeopleCardsService
     {
         _cardsService = cardsService;
         _contentService = contentService;
-        _taxonomyTagRetriever = taxonomyTagRetriever;
-        _cultureContext = cultureContext;
         _settingService = settingService;
         _urlHelperFactory = urlHelperFactory;
         _httpContextAccessor = httpContextAccessor;
@@ -86,7 +79,7 @@ public class PeopleCardsService : IPeopleCardsService
                {
                    LinkedItemsMaxLevel = 2,
                    LanguageName = language,
-                   //UseLanguageFallbacks = false 
+                   UseLanguageFallbacks = false
                },
             query =>
             {
@@ -98,13 +91,16 @@ public class PeopleCardsService : IPeopleCardsService
                         filter(w);
                     }
                 });
-                if (order == "desc") {
+                if (order == "desc")
+                {
                     query.OrderBy(new OrderByColumn(nameof(Person.PersonLastName), OrderDirection.Descending));
                 }
-                else if (order == "asc") {
+                else if (order == "asc")
+                {
                     query.OrderBy(new OrderByColumn(nameof(Person.PersonLastName), OrderDirection.Ascending));
                 }
-                else {
+                else
+                {
                     query.OrderBy(nameof(Person.SystemFields.WebPageItemID));
                 }
             }, RetrievalCacheSettings.CacheDisabled,
@@ -119,7 +115,7 @@ public class PeopleCardsService : IPeopleCardsService
             Data = cardDtos,
             TotalCount = peopleArray.Length
         };
-    } 
+    }
     private async Task<List<Action<WhereParameters>>> GetFilterParameterWhereExpressionsAsync(
      IDictionary<string, string> filterParameterValueByName)
     {
@@ -135,7 +131,6 @@ public class PeopleCardsService : IPeopleCardsService
             var filter = filterData.FilterParameterType switch
             {
                 FilterParameterType.Page => await GetPageFilterAsync(filterName, filterValue),
-                FilterParameterType.Taxonomy => await GetTaxonomyFilterAsync(filterName, filterValue),
                 _ => null,
             };
 
@@ -162,22 +157,8 @@ public class PeopleCardsService : IPeopleCardsService
         {
             FilterParameterName.OfficeLocation => w => w.WhereContains(nameof(Person.MetadataOfficeLocation), guid),
             FilterParameterName.City => w => w.WhereContains(nameof(Person.MetadataCity), guid),
-            _ => null,
-        };
-    }
-
-    private async Task<Action<WhereParameters>?> GetTaxonomyFilterAsync(string filterName, string filterValue)
-    {
-        var tag = await _taxonomyTagRetriever.GetTaxonomyTagByNameAsync(filterValue);
-        if (tag == null)
-            return null;
-
-        var identifiers = new List<Guid> { tag.TagGUID };
-
-        return filterName switch
-        {
-            FilterParameterName.Credential => w => w.WhereContainsTags(nameof(Person.PersonCredentials), identifiers),
-            FilterParameterName.ProfileGroup => w => w.WhereContainsTags(nameof(Person.MetadataProfileGroups), identifiers),
+            FilterParameterName.Credential => w => w.WhereContains(nameof(Person.PersonCredentials), guid),
+            FilterParameterName.ProfileGroup => w => w.WhereContains(nameof(Person.MetadataProfileGroups), guid),
             _ => null,
         };
     }

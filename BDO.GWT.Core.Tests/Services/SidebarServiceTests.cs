@@ -1,5 +1,6 @@
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Services;
+using BDO.GWT.Web.Core.LiveSite.DTOs;
 using CMS.ContentEngine;
 using Kentico.Content.Web.Mvc;
 using Moq;
@@ -22,7 +23,7 @@ public class SidebarServiceTests
     }
 
     [Test]
-    public async Task GetSidebarDtoAsync_WhenNoSettings_ReturnsDefaultSidebar()
+    public async Task GetNewsSidebarDtoAsync_WhenNoSettings_ReturnsDefaultSidebar()
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
@@ -36,7 +37,7 @@ public class SidebarServiceTests
     }
 
     [Test]
-    public async Task GetSidebarDtoAsync_WhenEmptySettings_ReturnsDefaultSidebar()
+    public async Task GetNewsSidebarDtoAsync_WhenEmptySettings_ReturnsDefaultSidebar()
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
@@ -50,7 +51,7 @@ public class SidebarServiceTests
     }
 
     [Test]
-    public async Task GetSidebarDtoAsync_WhenNoSettings_ShowPrintButtonReflectsPageValue()
+    public async Task GetNewsSidebarDtoAsync_WhenNoSettings_ShowPrintButtonReflectsPageValue()
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
@@ -64,7 +65,7 @@ public class SidebarServiceTests
     }
 
     [Test]
-    public async Task GetSidebarDtoAsync_WhenNoSettings_DownloadButtonAttachmentIsNull()
+    public async Task GetNewsSidebarDtoAsync_WhenNoSettings_DownloadButtonAttachmentIsNull()
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
@@ -78,7 +79,7 @@ public class SidebarServiceTests
     }
 
     [Test]
-    public async Task GetSidebarDtoAsync_WhenShowSocialMediaButtonsFalse_SocialMediaButtonsIsNull()
+    public async Task GetNewsSidebarDtoAsync_WhenShowSocialMediaButtonsFalse_SocialMediaButtonsIsNull()
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
@@ -92,7 +93,7 @@ public class SidebarServiceTests
     }
 
     [Test]
-    public async Task GetSidebarDtoAsync_WhenShowSocialMediaButtonsTrue_CallsSocialMediaButtonsService()
+    public async Task GetNewsSidebarDtoAsync_WhenShowSocialMediaButtonsTrue_CallsSocialMediaButtonsService()
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
@@ -115,7 +116,7 @@ public class SidebarServiceTests
     }
 
     [Test]
-    public async Task GetSidebarDtoAsync_WhenShowSocialMediaButtonsTrue_VerifiesServiceCall()
+    public async Task GetNewsSidebarDtoAsync_WhenShowSocialMediaButtonsTrue_VerifiesServiceCall()
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
@@ -134,7 +135,7 @@ public class SidebarServiceTests
     }
 
     [Test]
-    public async Task GetSidebarDtoAsync_WhenShowSocialMediaButtonsFalse_DoesNotCallSocialMediaButtonsService()
+    public async Task GetNewsSidebarDtoAsync_WhenShowSocialMediaButtonsFalse_DoesNotCallSocialMediaButtonsService()
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())

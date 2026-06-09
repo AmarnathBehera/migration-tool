@@ -60,10 +60,40 @@ public class SidebarService : ISidebarService
         {
             ShowPrintButton = (settingInfo?.DisablePrint is not true) && page.ShowPrintButton,
             DownloadButtonAttachment = settingInfo?.DisableDownload is true
-                              ? null
-                              : page.DownloadButtonAttachment?.FirstOrDefault()?.ContentAttachmentAsset.Url,
-            SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDtoNB(pageUrl, page.PageTitle, cancellationToken) : null,
+                                      ? null
+                                      : page.DownloadButtonAttachment?.FirstOrDefault()?.ContentAttachmentAsset.Url,
+            SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page, page.PageTitle, cancellationToken) : null,
             ShowCopyLinkButton = settingInfo?.DisableCopyLinkButton is not true,
+        };
+
+        if (sidebarDto.SocialMediaButtons is not null)
+        {
+            sidebarDto.SocialMediaButtons.ShowCopyLinkButton = null;
+        }
+
+        return sidebarDto;
+    }
+
+    public async Task<DealSidebarDto> GetDealSidebarDtoAsync(Deal page, CancellationToken cancellationToken)
+    {
+        var settings = await _settingService.GetPrintorShareInfo();
+        var settingInfo = settings?.FirstOrDefault();
+
+        var sidebarDto = new DealSidebarDto
+        {
+            ShowPrintButton = (settingInfo?.DisablePrint is not true) && page.ShowPrintButton,
+            DownloadButtonAttachment = settingInfo?.DisableDownload is true
+                                      ? null
+                                      : page.DownloadButtonAttachment?.FirstOrDefault()?.ContentAttachmentAsset.Url,
+            SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page, page.PageTitle, cancellationToken) : null,
+            ShowCopyLinkButton = settingInfo?.DisableCopyLinkButton is not true,
+            Date = page.DateField,
+            CallToAction = page.ShowCallToAction ? new CallToActionDto
+            {
+                Description = page.CallToActionDescription,
+                ButtonTitle = page.CallToActionButtonText,
+                ButtonUrl = page.CallToActionButtonUrl,
+            } : null,
         };
 
         if (sidebarDto.SocialMediaButtons is not null)

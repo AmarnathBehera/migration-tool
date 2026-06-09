@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Central Repository</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="CentralRepositoryID" columntype="integer" enabled="true" guid="63a7f1d6-b75b-4da2-82d0-df6a9e588508" isPK="true" />
+      <field column="CentralrepositoryInstructions" columnprecision="0" columntype="richtexthtml" enabled="true" guid="a68ddcdb-f67d-4d9c-8adc-64fee4f2a782" />
+      <field column="Compliancemessage" columnprecision="0" columntype="richtexthtml" enabled="true" guid="0c1c5ae8-35a5-415c-8e17-c08cbb73fe04" />
+      <field column="ExcludesitefromCentralRepository" columnprecision="0" columntype="boolean" enabled="true" guid="27fcdc5e-0ee7-4682-8c37-d91eba62ea81" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>73ddad7a-96ac-4b89-b633-ae4cfc136802</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.CentralRepository</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_CentralRepository</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

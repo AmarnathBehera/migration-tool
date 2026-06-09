@@ -6,12 +6,11 @@ using BDO.GWT.GLOBAL.Components.FormComponents.CustomDropdown;
 [assembly: RegisterFormComponent(
     CustomDropdownComponent.IDENTIFIER,
     typeof(CustomDropdownComponent),
-    "SQL Dropdown"
+    "Query dropdown"
 )]
 
 namespace BDO.GWT.GLOBAL.Components.FormComponents.CustomDropdown;
 
-// ✅ [ComponentAttribute] links the attribute class to this component
 [ComponentAttribute(typeof(CustomDropdownComponentAttribute))]
 public class CustomDropdownComponent
     : FormComponent<CustomDropdownProperties, CustomDropdownClientProperties, string>
@@ -25,8 +24,7 @@ public class CustomDropdownComponent
         _scriptExecutor = scriptExecutor;
     }
 
-    // Must match the key in entries.ts
-    public override string ClientComponentName => "@bdo/custom-dropdown/BDOSQLDropdown";
+    public override string ClientComponentName => "@bdo/custom-components/BDOSQLDropdown";
     protected override async Task ConfigureClientProperties(
         CustomDropdownClientProperties clientProperties)
     {
@@ -41,7 +39,6 @@ public class CustomDropdownComponent
             clientProperties.Options = [];
         }
 
-        // Explicitly pass the label from the base class
         clientProperties.FieldLabel = clientProperties.Label;
     }
 }

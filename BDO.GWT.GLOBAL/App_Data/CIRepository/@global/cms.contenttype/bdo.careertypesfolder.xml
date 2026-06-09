@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Career Types Folder</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="e40dbf9f-8bf2-4dc7-9882-a3e32b9051f0" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="aa0660f7-f9a2-4a9a-bcde-8aa776419dcc" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="6961d9a5-5302-4639-9915-448aa5f6de47" isunique="true" system="true" />
+      <field column="Title" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="db3a0225-fb0e-4d60-a485-f9abe9c1a632" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>e733aba2-ab99-4fdb-abd4-5d13db4405be</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-folder-inverted</ClassIconClass>
+  <ClassName>BDO.CareerTypesFolder</ClassName>
+  <ClassShortName>BDOCareerTypesFolder</ClassShortName>
+  <ClassTableName>BDO_CareerTypesFolder</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

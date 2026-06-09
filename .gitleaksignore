@@ -10,3 +10,6 @@ e976c09ac3b67e8d9aeb1734effd16b32121c8d5:BDO.GWT.GLOBAL/appsettings.json:azure-a
 
 # Added storage account shared key into appsettings.json; key has been removed and rotated.
 e976c09ac3b67e8d9aeb1734effd16b32121c8d5:BDO.GWT.GLOBAL/appsettings.json:generic-api-key:15
+
+# React.cs; false positive
+fd99209e05b6807d5130feb09dad26daf33e5c5f:BDO.GWT.Core/Constants/ReactComponentType.cs:generic-api-key:90

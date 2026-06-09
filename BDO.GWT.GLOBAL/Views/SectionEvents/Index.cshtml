@@ -1,0 +1,47 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Core.DTOs.Pages.SectionEventsDto
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+
+    var widgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.Button,
+        ComponentIdentifiers.Widgets.Form,
+        ComponentIdentifiers.Widgets.RichText,
+       // ComponentIdentifiers.Widgets.HTML,
+        ComponentIdentifiers.Widgets.ExternalNavigation,
+        ComponentIdentifiers.Widgets.AccordionWidget,
+    };
+}
+
+@(await ReactService.RenderComponentAsync(
+    pageId,
+    ReactComponentType.Hero,
+    ReactComponentType.HeroGUID,
+    new { data = Model.Hero },
+    Context.RequestAborted))
+
+@(await ReactService.RenderComponentAsync(
+    pageId,
+    ReactComponentType.EventWebinarCardsGrid,
+    ReactComponentType.EventWebinarCardsGridGUID,
+    Model.CardsGrid,
+    Context.RequestAborted))
+
+@await Html.Kentico().EditableAreaAsync(
+    "mainContent",
+    new EditableAreaOptions
+    {
+        AllowedWidgets = widgetsList
+    })

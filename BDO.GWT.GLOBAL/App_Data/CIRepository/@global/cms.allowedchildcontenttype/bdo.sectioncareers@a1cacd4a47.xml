@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.SectionCareers</CodeName>
+    <GUID>7de84a06-569a-4dac-b701-55df640a4a49</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.CareerCategory">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.CareerCategory</CodeName>
+        <GUID>a44dde57-e1ba-4a8b-ba54-2c0705c12903</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.Careers">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.Careers</CodeName>
+        <GUID>e95256dc-44da-4237-a5d0-2f39834f7755</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

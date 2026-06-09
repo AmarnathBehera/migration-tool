@@ -217,7 +217,7 @@
      int WebsiteChannelID,
      CancellationToken cancellationToken = default)
 
-        { 
+        {
             var results = new List<object>();
 
             foreach (var type in types)
@@ -278,11 +278,11 @@
             var childPages = await _contentRetriever.RetrievePages<TPage>(
                 new RetrievePagesParameters { LinkedItemsMaxLevel = 5 },
             query =>
-                {
-                    // Filter by parent GUID
-                    query.Where(w => w.WhereEquals("WebPageItemParentID", parentGuid))
-                         .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder));
-                },
+            {
+                // Filter by parent GUID
+                query.Where(w => w.WhereEquals("WebPageItemParentID", parentGuid))
+                     .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder));
+            },
                 cacheSettings: RetrievalCacheSettings.CacheDisabled, // Use the predefined disabled cache
                 cancellationToken: cancellationToken
             );
@@ -371,6 +371,10 @@
         {
             return _websiteChannelContext.WebsiteChannelName;
         }
+        public string GetCurrentLanguage()
+        {
+            return _cultureContext.CurrentLanguageTag;
+        }
         public int GetCurrentChannelID()
         {
             return _websiteChannelContext.WebsiteChannelID;
@@ -382,9 +386,9 @@
         }
 
         public async Task<IWebPageFieldsSource?> GetPageByTypeAndNameAsync(
-     Type type,
-     string pageName,
-     CancellationToken cancellationToken = default)
+            Type type,
+            string pageName,
+            CancellationToken cancellationToken = default)
         {
             var contentTypeName = GetContentTypeName(type);
 
@@ -417,12 +421,12 @@
 
 
             var result = await _executor.GetMappedWebPageResult<IWebPageFieldsSource>(
-                builder,
-                new ContentQueryExecutionOptions
-                {
-                    ForPreview = _websiteChannelContext.IsPreview
-                },
-                cancellationToken);
+                    builder,
+                    new ContentQueryExecutionOptions
+                    {
+                        ForPreview = _websiteChannelContext.IsPreview
+                    },
+                    cancellationToken);
 
             return result.FirstOrDefault();
         }

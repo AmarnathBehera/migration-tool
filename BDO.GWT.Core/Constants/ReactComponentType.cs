@@ -29,11 +29,12 @@ public static class ReactComponentType
     public const string AccordionWidget = "AccordionWidget";
     public const string LocalLocationsList = "LocalLocationsList";
     public const string FlexibleBanner = "FlexibleBanner";
-    public const string FlexibleContentWidget = "TrendingTopicsCarouselWidget";
     public const string LocationsCity = "LocationsCity";
     public const string FaqWidget = "FaqWidget";
     public const string CardsGrid = "CardsGrid";
     public const string RssFeeds = "RssFeeds";
+    public const string EventsWebinarsDetails = "EventsWebinarsDetails";
+    public const string FlexibleContentWidget = "TrendingTopicsCarouselWidget";
 
     public const string ContactPageDescriptionText = "ContactPageDescriptionText";
     public const string MultiLinksCardsGrid = "MultiLinksCardsGrid";
@@ -41,7 +42,7 @@ public static class ReactComponentType
     public const string ServiceContent = "ServiceContent";
     public const string SideBoxNavigation = "SideBoxNavigation";
     public const string LocalNavigationItem = "LocalNavigationItem";
-    
+
     public const string CareerDetails = "CareerDetails";
     public const string KeyTakeAways = "KeyTakeAwaysWidget";
     public const string BlogPostContent = "BlogPostContent";
@@ -69,12 +70,13 @@ public static class ReactComponentType
     public const string PeopleBioGUID = "11195e95-b81e-4db3-b4bf-7c2926a2485c";
     public const string LocalLocationsListGUID = "11095e95-C43e-4db3-b4bf-7c2926a2485c";
     public const string FlexibleBannerGUID = "12085e95-b81e-4db3-b4bf-7c2926a2485E";
-    public const string FlexibleContentWidgetGUID = "9d7a5c92-c4b0-4fe8-8177-e87cbb79abf3";
     public const string LocationsCityGUID = "13085e95-b81e-4db3-b4bf-7c2926a2485c";
     public const string FaqWidgetGUID = "c4403ffb-12e9-4f20-86de-3379bc0514f0";
     public const string CardsGridGUID = "14085e98-b81e-4db3-b4bf-7c2926a2485c";
     public const string RssFeedsGUID = "15085e95-b81e-4db3-b4bf-7c2926a2485c";
     public const string InsightDetailsGUID = "16085e95-b81e-4db3-b4bf-7c2926a2485c";
+    public const string EventWebinarCardsGridGUID = "eeb2b6b7-f2df-411b-b55f-c7aac9b22093";
+
     public const string ContactPageDescriptionTextGUID = "cd1bc3e5-c6b6-4212-9fab-a86bdc570462";
     public const string ErrorPageContentGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
     public const string MultiLinksCardsGridGUID = "a1c3e5b7-d9f2-4a6c-8e0b-1f3a5c7e9d2b";
@@ -83,10 +85,14 @@ public static class ReactComponentType
     public const string SideBoxNavigationGUID = "6c835a07-d2f7-4041-8c19-0513d2b31b88";
     public const string CareersCardsGridGUID = "3fdef59e-4ab3-4047-abb8-c7b52408adc2";
     public const string CareerDetailsGUID = "cd1bc3e5-c6b6-4212-9fab-a86bdc570462";
-    public const string CareerSidebarGUID = "7d6afe7a-e672-43d4-b9e8-aad67c339c56";
+    public const string CareerSidebarGUID = "1203d3fb-df5e-4ac9-ae98-e9fc39b18cbc";
     public const string LocalNavigationItemGUID = "c4403ffb-12e9-4f20-86de-3379bc0514f0";
+    public const string EventsWebinarsDetailsGUID = "9d7a5c92-c4b0-4fe8-8177-e87cbb79abf3";
+    public const string FlexibleContentWidgetGUID = "906561a1-8778-4812-843a-018e44488577";
     public const string KeyTakeAwaysGUID = "c4403ffb-12e9-4f20-86de-3379bc0514f0";
     public const string BlogPostContentGUID = "1203d3fb-df5e-4ac9-ae98-e9fc39b18cbc";
+    public const string ContentTabAccordionGUID = "eeb2b6b7-f2df-411b-b55f-c7aac9b22093";
+    public const string DealDetailsGUID = "9ba2033f-9c72-4922-88c2-22f911be95c2";
 }
 
 
@@ -100,12 +106,12 @@ public static class ReactComponentType
 
 
 
-//9d7a5c92-c4b0-4fe8-8177-e87cbb79abf3
+//
 
-//906561a1-8778-4812-843a-018e44488577
+//
 
-//05a3230a-1a8c-43b2-be13-127d2338d596
+//
 
-//1203d3fb-df5e-4ac9-ae98-e9fc39b18cbc
+//
 
-//eeb2b6b7-f2df-411b-b55f-c7aac9b22093
+//

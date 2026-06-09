@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Section Events</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="3474f4dd-adbd-46c2-add2-aa846bb67afe" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="f9186b74-29b8-42d0-bef9-3878053049c9" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="5beb6af3-bc6c-4b5e-8021-192f3a064255" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
+        <properties />
+      </schema>
+      <field allowempty="true" column="EventsWebinarsListTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="383f5a26-e8e8-4304-a206-7bc214103ff0" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>
+            <![CDATA[Events & webinars list title]]>
+          </fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="EventsWebinarsListDescription" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="841a3ded-cf5e-48f0-9c19-b96dfe41c7fc" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>
+            <![CDATA[Events & webinars list description]]>
+          </fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="EventsWebinarsListFilteringEnabled" columnprecision="0" columntype="boolean" enabled="true" guid="fc7e871e-6024-4526-82f3-5d82103ea212" visible="true">
+        <properties>
+          <defaultvalue>True</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Enable filtering</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="EventsWebinarsListFilters" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="0ca261d3-d467-4976-ad32-86b77766ffe6" visible="true">
+        <properties>
+          <defaultvalue>
+            <![CDATA[eventType|businessIssue|businessLine|industryCategory]]>
+          </defaultvalue>
+          <explanationtext>
+            <![CDATA[Filters that visitor will be able to filter events and webinars by.]]>
+          </explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Filters</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>
+            <![CDATA[XperienceCommunity.Multichoiceformcontrol.MultiChoice]]>
+          </controlname>
+          <Options>
+<![CDATA[
+eventType;Type
+businessIssue;Topic (Business Issue)
+businessLine;Service (Business Line)
+serviceArea;Service Area
+industryCategory;Industry (Industry Category)
+specialtyCategory;Specialty (Specialty Category)
+micrositeMasterPage;Microsite (Microsite Master Page)
+officeLocation;Office (Office Location)
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This is the Required field.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>EventsWebinarsListFilteringEnabled</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="EventsWebinarsListFeaturedPages" columnprecision="0" columntype="contentitemreference" enabled="true" guid="cf9bf021-6f9b-41d1-85fd-614bc573b733" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>
+            <![CDATA[Featured events & webinars]]>
+          </fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["eb56be66-90a1-4d84-ac39-56bba64e5a69","a0c5bc6c-9409-4fe9-8430-697d961328a6"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="EventsWebinarsListAdvancedSearchDescription" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="36cb17a2-0133-4163-8e09-f91de90a773b" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Advanced search description</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="EventsWebinarsListAdvancedSearchLinkText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="84d7f1e2-93c9-42c0-860e-5b2d5fca0ab1" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Advanced search link text</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="EventsWebinarsListAdvancedSearchLinkUrl" columnprecision="0" columntype="webpages" enabled="true" guid="18570a0d-017e-4748-aa53-530295810d8a" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Advanced search link URL</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.WebPageSelector</controlname>
+          <MaximumPages>1</MaximumPages>
+          <Sortable>False</Sortable>
+        </settings>
+      </field>
+      <field allowempty="true" column="ShowPastEvents" columnprecision="0" columntype="boolean" enabled="true" guid="2fa38b10-77f6-483c-8424-326cac2251b2" visible="true">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+          <explanationtext>
+            <![CDATA[Past event visibility is controlled at the section level but can be overridden per event.]]>
+          </explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show past events</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>afb8a1ec-5001-46e6-8e98-4b9e28995e48</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-l-grid-2-2</ClassIconClass>
+  <ClassName>BDO.SectionEvents</ClassName>
+  <ClassShortName>BDOSectionEvents</ClassShortName>
+  <ClassTableName>BDO_SectionEvents</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>

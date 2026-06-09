@@ -1,5 +1,7 @@
 ﻿using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.Entities;
+using BDO.GWT.Web.Core.LiveSite.DTOs;
 using CMS.Websites;
 using System.Web;
 
@@ -20,10 +22,11 @@ public class SocialMediaButtonsService : ISocialMediaButtonsService
         _settingsService = settingsService;
     }
 
+
     public async Task<SocialMediaButtonsDto> GetSocialMediaButtonsDto(
-        IWebPageFieldsSource page,
-        string pageTitle,
-        CancellationToken cancellationToken)
+      IWebPageFieldsSource page,
+      string pageTitle,
+      CancellationToken cancellationToken)
     {
         var encodedPageTitle = HttpUtility.UrlEncode(pageTitle);
         var pageUrl = page.GetUrl().AbsoluteUrl;

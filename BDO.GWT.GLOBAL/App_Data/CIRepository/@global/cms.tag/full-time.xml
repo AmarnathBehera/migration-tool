@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.tag>
+  <TagGUID>5d4adcda-e8d9-4841-b6a3-f2e06fbc3eac</TagGUID>
+  <TagMetadata>
+    <![CDATA[{"Translations":{}}]]>
+  </TagMetadata>
+  <TagName>Full-time</TagName>
+  <TagOrder>1</TagOrder>
+  <TagTaxonomyID>
+    <CodeName>CareerEmploymentTypes</CodeName>
+    <GUID>c7be582e-f63b-4139-8fa5-7cedd485480c</GUID>
+    <ObjectType>cms.taxonomy</ObjectType>
+  </TagTaxonomyID>
+  <TagTitle>Full-time</TagTitle>
+</cms.tag>

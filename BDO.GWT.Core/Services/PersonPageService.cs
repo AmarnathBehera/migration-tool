@@ -1,14 +1,9 @@
-﻿using BDO.GWT.Core.Constants;
-using BDO.GWT.Core.Data;
+﻿using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.DTOs.SchemaMarkups;
-using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Utilities;
-using CMS.Core;
-using CMS.DataEngine;
 using CMS.Websites;
-using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 
 namespace BDO.GWT.Core.Services;
@@ -28,8 +23,8 @@ public class PersonPageService : IPersonPageService
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IContentService _contentService;
     private readonly ICultureContext _cultureContext;
-    private readonly ITaxonomyTagRetriever _taxonomyTagRetriever;
     private readonly ISettingService _settingsService;
+    private readonly IAuthoredContentService _authoredContentService;
 
     private HttpClient? _httpClient;
 
@@ -37,23 +32,29 @@ public class PersonPageService : IPersonPageService
         IHttpClientFactory httpClientFactory,
         IContentService contentService,
         ICultureContext cultureContext,
-        ITaxonomyTagRetriever taxonomyTagRetriever,
-        ISettingService settingService
+        ISettingService settingService,
+        IAuthoredContentService authoredContentService
         )
     {
         _httpClientFactory = httpClientFactory;
         _contentService = contentService;
         _cultureContext = cultureContext;
-        _taxonomyTagRetriever = taxonomyTagRetriever;
         _settingsService = settingService;
+        _authoredContentService = authoredContentService;
     }
 
     public async Task<PersonDto> GetPersonPageDtoAsync(Person page, CancellationToken cancellationToken = default)
     {
         var personDto = await MapBasicFieldsAsync(page, cancellationToken);
 
-        personDto.Credentials = await GetCredentialNamesAsync(page);
+        personDto.Credentials = page.PersonCredentials?
+            .Select(x => x.Name)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Select(name => name!)
+            ?? Enumerable.Empty<string>();
+
         personDto.OfficeLocations = await GetLocationLinkItemsAsync(page, cancellationToken);
+        personDto.AuthoredContent = await _authoredContentService.GetAuthoredContentDtoAsync(page, cancellationToken);
 
         return personDto;
     }
@@ -61,8 +62,10 @@ public class PersonPageService : IPersonPageService
     public async Task<VCardData?> GeneratePersonVCardAsync(Guid personGuid, string? source = null, CancellationToken cancellationToken = default)
     {
         var person = (await _contentService.GetPagesAsync<Person>(
-           new RetrievePagesParameters {
-               LinkedItemsMaxLevel = 1 },
+           new RetrievePagesParameters
+           {
+               LinkedItemsMaxLevel = 1
+           },
            query => query
                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
                .Where(w => w.WhereEquals("ContentItemGUID", personGuid)),
@@ -217,9 +220,10 @@ public class PersonPageService : IPersonPageService
     private async Task<PersonDto> MapBasicFieldsAsync(Person person, CancellationToken cancellationToken)
     {
         var sectionPeople = (await _contentService.GetPagesAsync<SectionPeoplePage>(
-           new RetrievePagesParameters {
+           new RetrievePagesParameters
+           {
                LanguageName = _cultureContext.CurrentLanguageTag,
-               UseLanguageFallbacks=false,
+               UseLanguageFallbacks = false,
            },
            query => query
                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
@@ -252,11 +256,6 @@ public class PersonPageService : IPersonPageService
     {
         return string.IsNullOrEmpty(person.PersonSurnamePrefixes) ? $"{person.PersonFirstName} {person.PersonLastName}" : $"{person.PersonFirstName} {person.PersonSurnamePrefixes} {person.PersonLastName}";
     }
-    private async Task<IEnumerable<string>> GetCredentialNamesAsync(Person person)
-    {
-        return (await _taxonomyTagRetriever.GetTaxonomyTagByGUIDs(person.PersonCredentials, _cultureContext.CurrentLanguageTag)).Select(x => x.Name);
-    }
-
     private async Task<IEnumerable<LinkItemDto>> GetLocationLinkItemsAsync(Person person, CancellationToken cancellationToken = default)
     {
         var locationOffices = await _contentService.GetPagesAsync<LocationOffice>(

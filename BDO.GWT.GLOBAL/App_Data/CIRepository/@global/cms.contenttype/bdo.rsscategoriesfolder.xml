@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>RSS Categories Folder</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="dab0a4e1-b7db-41a0-9f9f-94aee4952eff" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="26a530b8-9eba-49f6-ac5e-25ef1e4f9346" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="5f7c5c32-08a9-4ae6-9364-12ddb80bb70a" isunique="true" system="true" />
+      <field column="Title" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="ba9c8e67-52fe-48ff-b9e4-17f9f03adada" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>d4f9677f-117b-45e7-b1e2-e082dcb6d1b0</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-folder-inverted</ClassIconClass>
+  <ClassName>BDO.RSSCategoriesFolder</ClassName>
+  <ClassShortName>BDORSSCategoriesFolder</ClassShortName>
+  <ClassTableName>BDO_RSSCategoriesFolder</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

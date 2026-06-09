@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.TestimonialClientTypesFolder</CodeName>
+    <GUID>ba814530-b04f-42eb-8ebe-2d836c4c25ef</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.TestimonialClientTypes">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.TestimonialClientTypes</CodeName>
+        <GUID>9c1d29ee-087b-4836-aa29-978ca88155be</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

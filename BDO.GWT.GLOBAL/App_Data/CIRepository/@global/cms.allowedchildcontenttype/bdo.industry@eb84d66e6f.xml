@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.Industry</CodeName>
+    <GUID>1ddec4b5-dabe-4e5d-a38a-1cf710c59244</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.IndustryService">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.IndustryService</CodeName>
+        <GUID>b3459cfa-8a48-48e5-af1f-eca5d79dd087</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

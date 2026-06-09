@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>BDO Deal Cards</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="c61b93f9-b30b-4c91-a072-d686ada4aef4" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="08356c6a-457d-4e6b-ba61-863999fa9d84" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="e3b693cd-7c36-4e79-88aa-ed51e6db0d64" isunique="true" system="true" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>7b19e49b-0002-4a8a-a4ce-ddc69ce5c526</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-heartshake</ClassIconClass>
+  <ClassName>BDO.DealCards</ClassName>
+  <ClassShortName>BDODealCards</ClassShortName>
+  <ClassTableName>BDO_DealCards</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

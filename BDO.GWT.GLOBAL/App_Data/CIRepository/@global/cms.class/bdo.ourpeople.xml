@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>OurPeople</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="OurPeopleID" columntype="integer" enabled="true" guid="68a71425-6f14-40d4-b4ad-660a65312648" isPK="true" />
+      <field column="DisplayEmailinvCard" columnprecision="0" columntype="boolean" enabled="true" guid="e9f3e188-16b5-4699-923e-891776c1cac9" />
+      <field column="UsePageTitleToDisplayPersonName" columnprecision="0" columntype="boolean" enabled="true" guid="22abbcd3-569f-4b24-a01e-31614c64ddc1" />
+      <field column="PeopleSettingsWebChannelSettingID" columnprecision="0" columntype="integer" enabled="true" guid="e710e58f-4a53-4263-a9bc-ef07c4587c2e" refobjtype="bdo.webchannelsettings" reftype="Required">
+        <properties>
+          <defaultvalue>0</defaultvalue>
+        </properties>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>71bd463d-8ac7-4d4c-8d4b-a6a5b5ed4368</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.OurPeople</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_OurPeople</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>
