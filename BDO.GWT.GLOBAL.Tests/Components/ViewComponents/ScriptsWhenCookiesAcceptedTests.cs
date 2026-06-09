@@ -89,7 +89,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 
         // ── Factory helpers ──────────────────────────────────────────────────────────
         private static StubChannelSettings MakeChannelSettings(int settingsId, int channelId)
-            => new StubChannelSettings(settingsId, channelId);
+      => new StubChannelSettings(settingsId, channelId);
 
         private static StubSiteScript MakeSiteScript(
             bool inheritFromGlobal,
@@ -99,7 +99,6 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 
         private static StubGlobalSettings MakeGlobalSettings(string keyValue)
             => new StubGlobalSettings(keyValue);
-
 
         // ════════════════════════════════════════════════════════════════════════════
         // BRANCH 1 — Channel settings not found → early return, null model
