@@ -58,33 +58,32 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
             return mockQuery;
         }
 
-     
         private sealed class StubChannelSettings : WebChannelSettingsInfo
         {
             private readonly int _id;
             private readonly int _channelId;
 
-            public override int WebChannelSettingsID        => _id;
+            public override int WebChannelSettingsID => _id;
             public override int WebChannelSettingsChannelID => _channelId;
 
             internal StubChannelSettings(int id = 10, int channelId = 1)
             {
-                _id        = id;
+                _id = id;
                 _channelId = channelId;
             }
         }
 
         private sealed class StubSiteScript : WebChannelSnippetInfo
         {
-            private readonly bool   _inherit;
+            private readonly bool _inherit;
             private readonly string _keyValue;
 
-            public override bool   MarketoMunchkinCodeInheritfromglobal => _inherit;
-            public override string MarketoMunchkinCodeKeyValue          => _keyValue;
+            public override bool MarketoMunchkinCodeInheritfromglobal => _inherit;
+            public override string MarketoMunchkinCodeKeyValue => _keyValue;
 
             internal StubSiteScript(bool inherit, string keyValue = "")
             {
-                _inherit  = inherit;
+                _inherit = inherit;
                 _keyValue = keyValue;
             }
         }
@@ -103,9 +102,9 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
             => new StubChannelSettings(settingsId, channelId);
 
         private static WebChannelSnippetInfo MakeSiteScript(
-            bool   inheritFromGlobal,
-            string keyValue          = "",
-            int    webChannelSettingsId = 10)
+            bool inheritFromGlobal,
+            string keyValue = "",
+            int webChannelSettingsId = 10)
             => new StubSiteScript(inheritFromGlobal, keyValue);
 
         private static GlobalsettingskeyInfo MakeGlobalSettings(string keyValue)
@@ -178,7 +177,6 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
             _webChannelSettingsProviderMock.Setup(p => p.Get())
                 .Returns(SetupQueryReturning([MakeChannelSettings(settingsId, channelId)]).Object);
 
-            // Site-script query returns nothing
             _siteProviderMock.Setup(p => p.Get())
                 .Returns(SetupQueryReturning<WebChannelSnippetInfo>([]).Object);
 

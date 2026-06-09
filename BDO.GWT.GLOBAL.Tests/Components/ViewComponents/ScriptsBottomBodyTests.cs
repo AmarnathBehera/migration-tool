@@ -67,17 +67,17 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
         {
             private readonly int _id;
             private readonly int _channelId;
-            public override int WebChannelSettingsID        => _id;
+            public override int WebChannelSettingsID => _id;
             public override int WebChannelSettingsChannelID => _channelId;
             internal StubChannelSettings(int id, int channelId) { _id = id; _channelId = channelId; }
         }
 
         private sealed class StubSiteScript : WebChannelSnippetInfo
         {
-            private readonly bool   _inherit;
+            private readonly bool _inherit;
             private readonly string _keyValue;
-            public override bool   ScriptinbottomofBodyInheritFromGlobal => _inherit;
-            public override string ScriptinbottomofBodyKeyValue          => _keyValue;
+            public override bool ScriptinbottomofBodyInheritFromGlobal => _inherit;
+            public override string ScriptinbottomofBodyKeyValue => _keyValue;
             internal StubSiteScript(bool inherit, string keyValue = "") { _inherit = inherit; _keyValue = keyValue; }
         }
 
@@ -93,9 +93,9 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
             => new StubChannelSettings(settingsId, channelId);
 
         private static WebChannelSnippetInfo MakeSiteScript(
-            bool   inheritFromGlobal,
+            bool inheritFromGlobal,
             string keyValue,
-            int    webChannelSettingsId = 10)
+            int webChannelSettingsId = 10)
             => new StubSiteScript(inheritFromGlobal, keyValue);
 
         private static GlobalsettingskeyInfo MakeGlobalSettings(string keyValue)
