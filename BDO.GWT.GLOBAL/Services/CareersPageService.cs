@@ -131,8 +131,6 @@ public class CareersPageService : ICareersPageService
             };
         }
 
-        var languageTag = _cultureContext.CurrentLanguageTag;
-
         IEnumerable<Career> filtered = careerPages;
 
         if (query?.Filters != null && query.Filters.Any())
