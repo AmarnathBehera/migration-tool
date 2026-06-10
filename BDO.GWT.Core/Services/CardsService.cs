@@ -46,8 +46,10 @@ public class CardsService : ICardsService
             var options = filterParameterData.FilterParameterType switch
             {
                 FilterParameterType.Page => await BuildOptionsForPageFilterAsync(filterParameterData, cancellationToken),
+                FilterParameterType.Tagpage => await BuildOptionsForTagPageFilterAsync(filterParameterData, cancellationToken),
+
                 // FilterParameterType.Entity => await BuildOptionsForEntityFilterAsync(filterParameterData, cancellationToken),
-                 FilterParameterType.Field => await BuildOptionsForFieldFilterAsync(filterParameterData, cancellationToken),
+                FilterParameterType.Field => await BuildOptionsForFieldFilterAsync(filterParameterData, cancellationToken),
                 //FilterParameterType.Taxonomy => await BuildOptionsForTaxonomyFilterAsync(filterParameterData, cancellationToken),
                 _ => throw new NotSupportedException($"Filter parameter type {filterParameterData.FilterParameterType} is not supported."),
             };
@@ -100,6 +102,40 @@ public class CardsService : ICardsService
       .ToArray();
 
         return options;
+    }
+
+    private async Task<OptionDto[]> BuildOptionsForTagPageFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
+    {
+       var entityType = filterParameterData.EntityType;
+
+        var items = await _contentService.GetItemsByTypesAsync(
+            new[] { entityType },
+            _websiteChannelContext.WebsiteChannelID,
+            cancellationToken);
+
+        var options = items
+                    .Select(x =>
+                         {
+                             var type = x.GetType();
+
+                             var tagNameValue = type.GetProperty("Name")?.GetValue(x);
+      
+                             string name = tagNameValue is string s ? s : string.Empty;
+                             
+
+                             return new OptionDto
+                             {
+                                 Value = name,
+                                 Label = name
+
+
+                             };       
+                           })
+                          .Where(x => !string.IsNullOrWhiteSpace(x.Value))
+                          .OrderBy(x => x.Label)
+                          .ToArray();
+
+                            return options;
     }
 
     private static string? GetStringProperty(object instance, Type type, string propertyName)

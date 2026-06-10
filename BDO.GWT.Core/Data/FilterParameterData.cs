@@ -7,7 +7,7 @@ public enum FilterParameterType
     Page,
     Entity,
     Field,
-    Taxonomy
+    Tagpage
 }
 
 public record FilterParameterData(string AdminDisplayName, string LiveSiteDisplayName, Type EntityType, FilterParameterType FilterParameterType);

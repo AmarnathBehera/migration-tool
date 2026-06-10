@@ -147,6 +147,7 @@ namespace BDO.GWT.Core.Services
                 var filter = filterParameterData.FilterParameterType switch
                 {
                     FilterParameterType.Page => await GetPageFilterAsync(filterParameterName, filterParameterValue),
+                    FilterParameterType.Tagpage => await GetTagPageFilterAsync(filterParameterName, filterParameterValue),
                     FilterParameterType.Field => await GetFieldFilterExpressionBlogAsync(filterParameterName, filterParameterValue),
                     _ => null,
                 };
@@ -185,7 +186,26 @@ namespace BDO.GWT.Core.Services
             };
         }
 
-     
+        private async Task<Action<WhereParameters>?> GetTagPageFilterAsync(string filterName, string filterValue)
+        {
+
+            var page = await _contentService.GetPageByTypeAndNameAsync(
+                FilterUtility.GetFilterParameterData(filterName)!.EntityType, filterValue);
+
+            if (page is null)
+                return null;
+
+            var guid = page.SystemFields.ContentItemGUID.ToString();
+
+            return filterName switch
+            {
+               
+                FilterParameterName.BusinessIssue => x => x.WhereContains(nameof(BlogPost.MetadataBusinessIssues), guid),
+               
+                _ => null,
+            };
+        }
+
         public async Task<List<BlogPageCardDto>> GetContentPageCardListAsync(ICollection<BlogPost> contentPages,
             string languageTag, Func<BlogPost, bool> isPageFeatured, CancellationToken cancellationToken)
         {
