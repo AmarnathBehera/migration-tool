@@ -9,6 +9,7 @@ using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Utilities;
 using CMS.ContentEngine;
 using CMS.Websites;
+using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +31,7 @@ namespace BDO.GWT.Core.Tests.Services
         private Mock<ICardsService> _cardsServiceMock = null!;
         private Mock<ICultureContext> _cultureContextMock = null!;
         private Mock<IContentService> _contentServiceMock = null!;
-        private Mock<ITaxonomyTagRetriever> _taxonomyTagRetrieverMock = null!;
+        private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
         private Mock<IUrlHelperFactory> _urlHelperFactoryMock = null!;
         private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
         private Mock<IUrlHelper> _urlHelperMock = null!;
@@ -42,14 +43,18 @@ namespace BDO.GWT.Core.Tests.Services
             _cardsServiceMock = new Mock<ICardsService>();
             _cultureContextMock = new Mock<ICultureContext>();
             _contentServiceMock = new Mock<IContentService>();
-            _taxonomyTagRetrieverMock = new Mock<ITaxonomyTagRetriever>();
             _urlHelperFactoryMock = new Mock<IUrlHelperFactory>();
             _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+            _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
             _urlHelperMock = new Mock<IUrlHelper>();
 
             _cultureContextMock
                 .Setup(x => x.CurrentLanguageTag)
                 .Returns("en-US");
+
+            _websiteChannelContextMock
+                .Setup(x => x.WebsiteChannelID)
+                .Returns(1);
 
             // Setup HttpContext and UrlHelper
             var httpContext = new DefaultHttpContext();
@@ -71,7 +76,7 @@ namespace BDO.GWT.Core.Tests.Services
                 _contentServiceMock.Object,
                 _urlHelperFactoryMock.Object,
                 _httpContextAccessorMock.Object,
-                _taxonomyTagRetrieverMock.Object);
+                _websiteChannelContextMock.Object);
         }
 
         // ==========================================================================
@@ -84,51 +89,62 @@ namespace BDO.GWT.Core.Tests.Services
         public async Task CreateFiltersAsync_DelegatesToCardsService()
         {
             var filters = new HashSet<string> { "keywords", "businessLine" };
-            var expectedFilters = new[]
-            {
-                new FilterItemDto<OptionDto> { Name = "keywords" }
-            };
 
-            _cardsServiceMock
-                .Setup(x => x.CreateFiltersAsync(filters, null, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(expectedFilters);
+            // "keywords" → FilterParameterType.Field → BuildOptionsForFieldFilterAsync → GetItemsByTypesAsync
+            // "businessLine" → FilterParameterType.Page → BuildOptionsForPageFilterAsync → GetItemsByTypesAsync
+            _contentServiceMock
+                .Setup(x => x.GetItemsByTypesAsync(
+                    It.IsAny<Type[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<object>());
 
-            var result = await _service.CreateFiltersAsync(filters, null, CancellationToken.None);
+            var result = await _service.CreateBlogPageFiltersAsync(filters, 1, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
                 Assert.That(result, Is.Not.Null);
-                Assert.That(result, Has.Length.EqualTo(1));
-                Assert.That(result[0].Name, Is.EqualTo("keywords"));
+                Assert.That(result, Has.Length.EqualTo(2));
             });
         }
 
         [Test]
-        public async Task CreateFiltersAsync_PassesNodeAliasPathToCardsService()
+        public async Task CreateFiltersAsync_PassesPageIdToContentService()
         {
-            var filters = new HashSet<string> { "keywords" };
-            string? capturedPath = null;
+            var filters = new HashSet<string> { "person" };
+            int? capturedPageId = null;
 
-            _cardsServiceMock
-                .Setup(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
-                .Callback<HashSet<string>, string?, CancellationToken>((_, path, _) => capturedPath = path)
-                .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<BlogContributors>(
+                    It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .Callback<int, CancellationToken>((pageId, _) => capturedPageId = pageId)
+                .ReturnsAsync(Enumerable.Empty<BlogContributors>());
 
-            await _service.CreateFiltersAsync(filters, "/blogs/tech", CancellationToken.None);
+            await _service.CreateBlogPageFiltersAsync(filters, 42, CancellationToken.None);
 
-            Assert.That(capturedPath, Is.EqualTo("/blogs/tech"));
+            Assert.That(capturedPageId, Is.EqualTo(42));
         }
 
         [Test]
         public async Task CreateFiltersAsync_EmptyFilterSet_ReturnsEmptyArray()
         {
-            _cardsServiceMock
-                .Setup(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
-
-            var result = await _service.CreateFiltersAsync(new HashSet<string>(), null, CancellationToken.None);
+            var result = await _service.CreateBlogPageFiltersAsync(new HashSet<string>(), 1, CancellationToken.None);
 
             Assert.That(result, Is.Empty);
+        }
+
+        [Test]
+        public async Task CreateFiltersAsync_ReturnsFiltersForKnownFilterNames()
+        {
+            var filters = new HashSet<string> { "keywords", "businessLine" };
+
+            _contentServiceMock
+                .Setup(x => x.GetItemsByTypesAsync(
+                    It.IsAny<Type[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<object>());
+
+            var result = await _service.CreateBlogPageFiltersAsync(filters, 1, CancellationToken.None);
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Has.Length.EqualTo(2));
         }
 
         #endregion
@@ -166,50 +182,50 @@ namespace BDO.GWT.Core.Tests.Services
             });
         }
 
-                [Test]
-                public async Task GetFilteredItemsAsync_WithBlogPosts_ReturnsPaginatedResults()
-                {
-                    var blogPostGroup = CreateBlogPostGroup(webPageItemId: 10);
-                    var blogPosts = new[]
-                    {
-                        CreateBlogPost("Post 1", new DateTime(2024, 6, 1)),
-                        CreateBlogPost("Post 2", new DateTime(2024, 5, 1)),
-                        CreateBlogPost("Post 3", new DateTime(2024, 4, 1))
-                    };
+        [Test]
+        public async Task GetFilteredItemsAsync_WithBlogPosts_ReturnsPaginatedResults()
+        {
+            var blogPostGroup = CreateBlogPostGroup(webPageItemId: 10);
+            var blogPosts = new[]
+            {
+                CreateBlogPost("Post 1", new DateTime(2024, 6, 1)),
+                CreateBlogPost("Post 2", new DateTime(2024, 5, 1)),
+                CreateBlogPost("Post 3", new DateTime(2024, 4, 1))
+            };
 
-                    _contentServiceMock
-                        .Setup(x => x.GetChildPagesByParentGuidAsync<BlogPostGroup>(
-                            It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                        .ReturnsAsync(new[] { blogPostGroup });
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<BlogPostGroup>(
+                    It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[] { blogPostGroup });
 
-                    _contentServiceMock
-                        .Setup(x => x.GetChildPagesByParentGuidAsync<BlogPost>(
-                            It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                        .ReturnsAsync(blogPosts);
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<BlogPost>(
+                    It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(blogPosts);
 
-                    _contentServiceMock
-                        .Setup(x => x.GetChildPagesByParentGuidWithQueryBuilderAsync<BlogPost>(
-                            It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
-                        .ReturnsAsync(blogPosts);
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidWithQueryBuilderAsync<BlogPost>(
+                    It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(blogPosts);
 
-                    var cardsQuery = new CardsQuery
-                    {
-                        CurrentPage = 1,
-                        PageSize = 10,
-                        Filters = new Dictionary<string, string>()
-                    };
+            var cardsQuery = new CardsQuery
+            {
+                CurrentPage = 1,
+                PageSize = 10,
+                Filters = new Dictionary<string, string>()
+            };
 
-                    var result = await _service.GetFilteredItemsAsync(
-                        "en-US", cardsQuery, null,
-                        _ => false, 100, CancellationToken.None);
+            var result = await _service.GetFilteredItemsAsync(
+                "en-US", cardsQuery, null,
+                _ => false, 100, CancellationToken.None);
 
-                    Assert.Multiple(() =>
-                    {
-                        Assert.That(result, Is.Not.Null);
-                        Assert.That(result.TotalCount, Is.EqualTo(3));
-                        Assert.That(result.Data, Has.Length.EqualTo(3));
-                    });
-                }
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.TotalCount, Is.EqualTo(3));
+                Assert.That(result.Data, Has.Length.EqualTo(3));
+            });
+        }
 
         [Test]
         public async Task GetFilteredItemsAsync_PaginatesCorrectly_Page1()
@@ -705,10 +721,7 @@ namespace BDO.GWT.Core.Tests.Services
             Assert.That(result[0].ImageURL, Is.Null.Or.Empty);
         }
 
-       
-       
-
-              #endregion
+        #endregion
 
         // ==========================================================================
         // Helpers

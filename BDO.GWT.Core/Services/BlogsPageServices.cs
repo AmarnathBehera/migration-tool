@@ -106,7 +106,7 @@ namespace BDO.GWT.Core.Services
             {
                 Title = currentPage.ItemListTitle,
                 Description = currentPage.ItemListDescription,
-                Filters = enableFilters ? await _blogPageCardsService.CreateFiltersAsync(filtersSet, null, cancellationToken) : null,
+                Filters = enableFilters ? await _blogPageCardsService.CreateBlogPageFiltersAsync(filtersSet, currentPage.SystemFields.WebPageItemID, cancellationToken) : null,
                 FilteringTooltipEnabled = await _filteringHelper.IsFilteringTooltipEnabledAsync(currentPage.ItemListFilteringEnabled, cancellationToken),
                 ApiEndpointName = apiEndPointName,
                 PageSize = 20,

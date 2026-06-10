@@ -138,7 +138,7 @@ public class BlogsPageServiceTests
 
         Assert.That(result!.CardsGrid!.Filters, Is.Null);
         _blogPageCardsServiceMock.Verify(
-            s => s.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()),
+            s => s.CreateBlogPageFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<int>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
@@ -155,8 +155,8 @@ public class BlogsPageServiceTests
             .Setup(f => f.IsFilteringTooltipEnabledAsync(true, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
         _blogPageCardsServiceMock
-            .Setup(s => s.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
-            .Callback<HashSet<string>, string?, CancellationToken>((f, _, _) => captured = f)
+            .Setup(s => s.CreateBlogPageFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .Callback<HashSet<string>, int, CancellationToken>((f, _, _) => captured = f)
             .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
 
         await _sut.GetBlogsPageDtoAsync(blog, CancellationToken.None);
@@ -184,8 +184,8 @@ public class BlogsPageServiceTests
             .Setup(f => f.IsFilteringTooltipEnabledAsync(true, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
         _blogPageCardsServiceMock
-            .Setup(s => s.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
-            .Callback<HashSet<string>, string?, CancellationToken>((f, _, _) => captured = f)
+            .Setup(s => s.CreateBlogPageFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .Callback<HashSet<string>, int, CancellationToken>((f, _, _) => captured = f)
             .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
 
         await _sut.GetBlogsPageDtoAsync(blog, CancellationToken.None);
@@ -239,7 +239,7 @@ public class BlogsPageServiceTests
             .Setup(f => f.IsFilteringTooltipEnabledAsync(true, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
         _blogPageCardsServiceMock
-            .Setup(s => s.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+            .Setup(s => s.CreateBlogPageFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
 
         var result = await _sut.GetBlogsPageDtoAsync(blog, CancellationToken.None);
