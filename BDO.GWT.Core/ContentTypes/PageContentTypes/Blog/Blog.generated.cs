@@ -198,12 +198,6 @@ namespace BDO
 
 
 		/// <summary>
-		/// ItemListFilteringEnabled.
-		/// </summary>
-		public bool ItemListFilteringEnabled { get; set; }
-
-
-		/// <summary>
 		/// ItemListAdvancedSearchDescription.
 		/// </summary>
 		public string ItemListAdvancedSearchDescription { get; set; }
@@ -219,6 +213,12 @@ namespace BDO
 		/// ItemListAdvancedSearchLinkUrl.
 		/// </summary>
 		public IEnumerable<WebPageRelatedItem> ItemListAdvancedSearchLinkUrl { get; set; }
+
+
+		/// <summary>
+		/// ItemListFilteringEnabled.
+		/// </summary>
+		public bool ItemListFilteringEnabled { get; set; }
 
 
 		/// <summary>
