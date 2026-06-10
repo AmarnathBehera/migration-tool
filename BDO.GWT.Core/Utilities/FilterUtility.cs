@@ -9,9 +9,9 @@ public static class FilterUtility
     {
         [FilterParameterName.BusinessIssue] = new("Topic (Business Issue)", ResourceStringKey.LiveSite.Filters.BusinessIssue, typeof(Businessissue), FilterParameterType.Page),
         [FilterParameterName.BusinessLine] = new("Service (Business Line)", ResourceStringKey.LiveSite.Filters.BusinessLine, typeof(BusinessLine), FilterParameterType.Page),
-        [FilterParameterName.CareerEmploymentType] = new(Taxonomies.CareerEmploymentType, ResourceStringKey.LiveSite.Filters.CareerEmploymentType, typeof(CareerEmploymentType), FilterParameterType.Taxonomy),
-        [FilterParameterName.CareerJobTitle] = new(Taxonomies.CareerJobTitle, ResourceStringKey.LiveSite.Filters.CareerJobTitle, typeof(CareerJobTitle), FilterParameterType.Taxonomy),
-        [FilterParameterName.CareerLevel] = new(Taxonomies.CareerLevel, ResourceStringKey.LiveSite.Filters.CareerLevel, typeof(CareerLevel), FilterParameterType.Taxonomy),
+        [FilterParameterName.CareerEmploymentType] = new("Career Employment Type", ResourceStringKey.LiveSite.Filters.CareerEmploymentType, typeof(CareerEmploymentTypes), FilterParameterType.Page),
+        [FilterParameterName.CareerJobTitle] = new("Career Job Title", ResourceStringKey.LiveSite.Filters.CareerJobTitle, typeof(CareerJobTitle), FilterParameterType.Page),
+        [FilterParameterName.CareerLevel] = new("Career Level", ResourceStringKey.LiveSite.Filters.CareerLevel, typeof(CareerLevels), FilterParameterType.Page),
         [FilterParameterName.ContentType] = new("ContentType", ResourceStringKey.LiveSite.Filters.ContentType, typeof(Contenttypes), FilterParameterType.Page),
         //[FilterParameterName.Country] = new("industryCategoryCountry", ResourceStringKey.LiveSite.Filters.Country, typeof(IDealPage), FilterParameterType.Field),
         [FilterParameterName.Credential] = new("Credential", ResourceStringKey.LiveSite.Filters.Credential, typeof(Credentials), FilterParameterType.Page),
