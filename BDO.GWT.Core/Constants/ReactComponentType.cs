@@ -91,6 +91,7 @@ public static class ReactComponentType
     public const string KeyTakeAwaysGUID = "c4403ffb-12e9-4f20-86de-3379bc0514f0";
     public const string ContentTabAccordionGUID = "eeb2b6b7-f2df-411b-b55f-c7aac9b22093";
     public const string DealDetailsGUID = "9ba2033f-9c72-4922-88c2-22f911be95c2";
+    public const string DealsCardsGridGUID = "9dccc1e0-c246-46a6-a2a1-7dd18cfac628";
 }
 
 
