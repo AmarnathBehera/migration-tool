@@ -19,10 +19,19 @@
     @if (Model != null && pageId != 0)
     {
         @(await ReactService.RenderComponentAsync(
-        pageId,
-        ReactComponentType.DealsCardsGrid,
-        ReactComponentType.DealsCardsGridGUID,
-        Model,
-        Context.RequestAborted))
+            pageId,
+            ReactComponentType.Hero,
+            ReactComponentType.HeroGUID,
+            new
+            {
+               data = Model.Hero,
+            }, Context.RequestAborted))
+
+        @(await ReactService.RenderComponentAsync(
+            pageId,
+            ReactComponentType.DealsCardsGrid,
+            ReactComponentType.DealsCardsGridGUID,
+            Model,
+            Context.RequestAborted))
     }
 </div>
