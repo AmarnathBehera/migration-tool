@@ -394,7 +394,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             _sidebarServiceMock
                 .Setup(x => x.GetSidebarDtoAsync(It.IsAny<BlogPost>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((ContentSidebarDto?)null);
+                .ReturnsAsync((ContentSidebarDto)null!);
 
             var result = await _service.GetBlogPostDtoAsync(page, CancellationToken.None);
 
