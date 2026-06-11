@@ -10,6 +10,7 @@ using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
+using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Xperience;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.Core;
@@ -43,6 +44,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<XperiencePageContext>();
         serviceCollection.AddScoped<IWebsiteContext, WebsiteContext>();
         serviceCollection.AddScoped<IHeaderService, HeaderService>();
+        serviceCollection.AddScoped<IMicrositeHeaderService, MicrositeHeaderService>();
         serviceCollection.AddScoped<IFooterService, FooterService>();
         serviceCollection.AddScoped<ICookieBannerService, CookieBannerService>();
         serviceCollection.ConfigureOptions<SEOOptionsSetup>();
@@ -100,6 +102,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ISpecialtiesAreaPageService, SpecialtiesAreaPageService>();
         serviceCollection.AddScoped<ISpecialtiesCategoryPageService, SpecialtiesCategoryPageService>();
         serviceCollection.AddScoped<ISectionSpecialtiesService, SectionSpecialtiesService>();
+        serviceCollection.AddScoped<IMicrositeMasterPageService, MicrositeMasterPageService>();
+        serviceCollection.AddScoped<IMicrositePageService, MicrositePageService>();
     }
 
 }

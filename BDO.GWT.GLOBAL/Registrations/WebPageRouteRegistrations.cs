@@ -46,6 +46,8 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 [assembly: RegisterWebPageRoute(IndustryCategory.CONTENT_TYPE_NAME, typeof(IndustryCategoryController))]
 [assembly: RegisterWebPageRoute(Industry.CONTENT_TYPE_NAME, typeof(IndustryController))]
 [assembly: RegisterWebPageRoute(IndustryService.CONTENT_TYPE_NAME, typeof(IndustryServiceController))]
+[assembly: RegisterWebPageRoute(MicrositeMasterPage.CONTENT_TYPE_NAME, typeof(MicrositeMasterPageController))]
+[assembly: RegisterWebPageRoute(MicrositePage.CONTENT_TYPE_NAME, typeof(MicrositePageController))]
 
 
 [assembly: RegisterWebPageRoute(SectionServices.CONTENT_TYPE_NAME, typeof(SectionServicesController))]

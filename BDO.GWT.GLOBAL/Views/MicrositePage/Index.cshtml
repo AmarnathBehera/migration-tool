@@ -1,0 +1,40 @@
+@inject IPageBuilderService PageBuilderService
+@using BDO
+@using BDO.GWT.Core.Services
+@model BDO.GWT.Core.DTOs.Pages.MicrositePageDto;
+
+@section HeadHtml {
+    @(Model.HeadHtml is not null ? Html.Raw(Model.HeadHtml) : null)
+}
+
+@section CustomJS {
+    @foreach (var js in Model.CustomJsLinks)
+    {
+        <script type="text/javascript" src="@Html.Raw(js)"></script>
+    }
+}
+
+@section CustomCSS {
+    @foreach (var css in Model.CustomCssLinks)
+    {
+        <link href="@Html.Raw(css)" type='text/css' rel='stylesheet'>
+    }
+}
+
+@section BodyTopHtml {
+    @(Model.BodyTopHtml is not null ? Html.Raw(Model.BodyTopHtml) : null)
+}
+
+@section BodyBottomHtml {
+    @(Model.BodyBottomHtml is not null ? Html.Raw(Model.BodyBottomHtml) : null)
+}
+
+@{
+    Layout = "_MicrositeLayout";
+}
+
+@section Styles {
+    @PageBuilderService.GetPageBuilderStyles(Html)
+}
+
+@PageBuilderService.GetPageBuilderScripts(Html)

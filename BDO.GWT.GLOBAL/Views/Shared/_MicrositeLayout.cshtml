@@ -1,0 +1,99 @@
+﻿@using BDO.GWT.Core.Extensions
+@using BDO.GWT.Core.Services
+@using BDO.GWT.Core.ViewComponents
+@using BDO.GWT.Global.Components.ViewComponents
+@using BDO.GWT.Web.Core.LiveSite.Components.ViewComponents
+@using BDO.GWT.Xperience
+@using GWTXbyKWeb.Components.ViewComponents
+@using Kentico.Activities.Web.Mvc
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Kentico.PageBuilder.Web.Mvc
+@inject IPageContext PageContext
+@inject ICultureContext CultureContext
+@inject IReactService ReactService
+<!DOCTYPE html>
+<html lang="@CultureContext.CurrentLanguageTag" dir="@(CultureContext.IsCurrentCultureRtl ? "rtl" : "ltr")" class="scroll-smooth">
+<head id="head">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    @{
+        var metaDataSeoDto = await PageContext.GetCurrentPageMetadataAsync();
+    }
+
+    <title>@(metaDataSeoDto.PageMetaData.PageTitle + " - BDO")</title>
+    <meta name="description" content="@metaDataSeoDto.PageMetaData.PageDescription" />
+    <meta name="keywords" content="@metaDataSeoDto.PageMetaData.PageKeywords" />
+    <partial name="_Favicon.cshtml" />
+    @Context.RenderLdJsonSchemas()
+    @await RenderSectionAsync("SchemaMarkup", required: false)
+    @if (metaDataSeoDto.OGMetaData.MetadataOGTitle != null)
+    {
+        <meta property="og:title" content="@metaDataSeoDto.OGMetaData.MetadataOGTitle">
+    }
+    @if (metaDataSeoDto.OGMetaData.MetadataOGDescription != null)
+    {
+        <meta property="og:description" content="@metaDataSeoDto.OGMetaData.MetadataOGDescription">
+    }
+    @if (metaDataSeoDto.OGMetaData.MetadataOGImage != null)
+    {
+        <meta property="og:image" content="@metaDataSeoDto.OGMetaData.MetadataOGImage">
+    }
+    @if (metaDataSeoDto.MetaData.MetaCanonical != null)
+    {
+        <link rel="canonical" href="@metaDataSeoDto.MetaData.MetaCanonical" />
+    }
+    else
+    {
+        <link rel="canonical" href="@metaDataSeoDto.OGMetaData.Url" />
+    }
+    @if (metaDataSeoDto.SEOItemsDto.MetadataNoindex && metaDataSeoDto.SEOItemsDto.MetadataNofollow)
+    {
+        <meta name="robots" content="noindex,nofollow">
+    }
+    else if (metaDataSeoDto.SEOItemsDto.MetadataNoindex)
+    {
+        <meta name="robots" content="noindex">
+    }
+    else if (metaDataSeoDto.SEOItemsDto.MetadataNofollow)
+    {
+        <meta name="robots" content="nofollow">
+    }
+    <meta property="og:type" content="website">
+    @Html.Kentico().PageBuilderStyles()
+    @* @(await Component.InvokeAsync<ScriptsHead>())
+    @(await Component.InvokeAsync<StartScriptsHead>())
+    @await (Component.InvokeAsync<Cookiebot>())
+    @await (Component.InvokeAsync<Cookiebanner>())
+    @(await Component.InvokeAsync<ScriptsWhenCookiesAccepted>()) *@
+    @* @(await Component.InvokeAsync<MarketoMunchkincode>()) *@
+    @Html.Kentico().ActivityLoggingScriptV2()
+    @await RenderSectionAsync("HeadHtml", required: false)
+    @await RenderSectionAsync("CustomCSS", required: false)
+    <partial name="_DefaultStylesheets.cshtml" />
+    @await RenderSectionAsync("Styles", required: false)
+    <link rel="stylesheet" href="/dist/master.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/Public/Sections/section-column.css" asp-append-version="true" />
+    <page-builder-styles />
+</head>
+<body data-lang="@CultureContext.CurrentLanguageTag.ToLowerInvariant()">
+    @await RenderSectionAsync("BodyTopHtml", required: false)
+    @* @await (Component.InvokeAsync<ScriptsTopBody>()) *@
+    @(await Component.InvokeAsync<MicrositeHeader>())
+    @* @(await Component.InvokeAsync<ScriptsHead>()) *@
+    @await (Component.InvokeAsync<Breadcrumbs>())
+
+    @RenderBody()
+
+    <script src="/dist/vendor.bundle.js" asp-append-version="true" data-cookieconsent="ignore"></script>
+    <script src="/dist/master.bundle.js" asp-append-version="true" data-cookieconsent="ignore"></script>
+
+    @* @await (Component.InvokeAsync<ScriptsBottomBody>()) *@
+    @(await Component.InvokeAsync<Footer>())
+    @await Html.Kentico().PageBuilderScriptsAsync()
+    @* @await (Component.InvokeAsync<ScriptsBottomBody>()) *@
+
+    @(ReactService.RenderCombinedScript())
+    @await RenderSectionAsync("CustomJS", required: false)
+    @await RenderSectionAsync("BodyBottomHtml", required: false)
+</body>
+</html>

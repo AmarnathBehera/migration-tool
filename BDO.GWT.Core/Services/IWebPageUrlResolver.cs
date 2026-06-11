@@ -1,4 +1,6 @@
 using CMS.Websites;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BDO.GWT.Core
 {
@@ -6,5 +8,6 @@ namespace BDO.GWT.Core
     {
         string GetRelativePath(IWebPageFieldsSource page);
         string GetAbsoluteUrl(IWebPageFieldsSource page);
+        Task<string> ResolvePageUrlAsync(int webPageItemId, string language, CancellationToken cancellationToken);
     }
 }
