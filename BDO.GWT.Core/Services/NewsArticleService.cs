@@ -13,8 +13,8 @@ using Kentico.Content.Web.Mvc;
 namespace BDO.GWT.Core.Services;
 public interface INewsArticleService
 {
-    Task<SectionNewsPageDto> GetSectionNewsPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken);
-    //Task<ContentSidebarDto> GetContentPageSidebarDto(NewsArticle contentPage, CancellationToken cancellationToken);
+    Task<SectionNewsPageDto?> GetSectionNewsPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken);
+    
 }
 public class NewsArticleService : INewsArticleService
 {

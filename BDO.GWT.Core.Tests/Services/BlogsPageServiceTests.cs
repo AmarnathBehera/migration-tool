@@ -29,7 +29,6 @@ public class BlogsPageServiceTests
     private Mock<IHeroService> _heroServiceMock;
     private Mock<IBlogPageCardsService> _blogPageCardsServiceMock;
     private Mock<IContentService> _contentServiceMock;
-    private Mock<ICultureContext> _cultureContextMock;
     private Mock<IContentRetriever> _contentRetrieverMock;
     private BlogsPageService _sut;
 
@@ -40,7 +39,6 @@ public class BlogsPageServiceTests
         _heroServiceMock = new Mock<IHeroService>();
         _blogPageCardsServiceMock = new Mock<IBlogPageCardsService>();
         _contentServiceMock = new Mock<IContentService>();
-        _cultureContextMock = new Mock<ICultureContext>();
         _contentRetrieverMock = new Mock<IContentRetriever>();
 
         _sut = new BlogsPageService(
@@ -48,7 +46,6 @@ public class BlogsPageServiceTests
             _heroServiceMock.Object,
             _blogPageCardsServiceMock.Object,
             _contentServiceMock.Object,
-            _cultureContextMock.Object,
             _contentRetrieverMock.Object);
     }
 
@@ -156,7 +153,7 @@ public class BlogsPageServiceTests
             .ReturnsAsync(true);
         _blogPageCardsServiceMock
             .Setup(s => s.CreateBlogPageFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .Callback<HashSet<string>, int, CancellationToken>((f, _, _) => captured = f)
+            .Callback<HashSet<string>,int, CancellationToken>((f, _,_) => captured = f)
             .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
 
         await _sut.GetBlogsPageDtoAsync(blog, CancellationToken.None);
@@ -239,7 +236,7 @@ public class BlogsPageServiceTests
             .Setup(f => f.IsFilteringTooltipEnabledAsync(true, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
         _blogPageCardsServiceMock
-            .Setup(s => s.CreateBlogPageFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .Setup(s => s.CreateBlogPageFiltersAsync(It.IsAny<HashSet<string>>(),1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
 
         var result = await _sut.GetBlogsPageDtoAsync(blog, CancellationToken.None);

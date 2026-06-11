@@ -34,6 +34,7 @@ namespace BDO.GWT.Core.Tests.Services
         private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
         private Mock<IUrlHelperFactory> _urlHelperFactoryMock = null!;
         private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
+        private Mock<IWebPageUrlResolver> _urlResolverMock = null!;
         private Mock<IUrlHelper> _urlHelperMock = null!;
         private BlogPageCardsService _service = null!;
 
@@ -47,6 +48,7 @@ namespace BDO.GWT.Core.Tests.Services
             _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
             _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
             _urlHelperMock = new Mock<IUrlHelper>();
+            _urlResolverMock = new Mock<IWebPageUrlResolver>();
 
             _cultureContextMock
                 .Setup(x => x.CurrentLanguageTag)
@@ -76,7 +78,8 @@ namespace BDO.GWT.Core.Tests.Services
                 _contentServiceMock.Object,
                 _urlHelperFactoryMock.Object,
                 _httpContextAccessorMock.Object,
-                _websiteChannelContextMock.Object);
+                _websiteChannelContextMock.Object,
+                _urlResolverMock.Object);
         }
 
         // ==========================================================================
@@ -105,23 +108,7 @@ namespace BDO.GWT.Core.Tests.Services
                 Assert.That(result, Has.Length.EqualTo(2));
             });
         }
-
-        [Test]
-        public async Task CreateFiltersAsync_PassesPageIdToContentService()
-        {
-            var filters = new HashSet<string> { "person" };
-            int? capturedPageId = null;
-
-            _contentServiceMock
-                .Setup(x => x.GetChildPagesByParentGuidAsync<BlogContributors>(
-                    It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                .Callback<int, CancellationToken>((pageId, _) => capturedPageId = pageId)
-                .ReturnsAsync(Enumerable.Empty<BlogContributors>());
-
-            await _service.CreateBlogPageFiltersAsync(filters, 42, CancellationToken.None);
-
-            Assert.That(capturedPageId, Is.EqualTo(42));
-        }
+              
 
         [Test]
         public async Task CreateFiltersAsync_EmptyFilterSet_ReturnsEmptyArray()
@@ -141,7 +128,7 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<Type[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<object>());
 
-            var result = await _service.CreateBlogPageFiltersAsync(filters, 1, CancellationToken.None);
+            var result = await _service.CreateBlogPageFiltersAsync(filters, 1,CancellationToken.None);
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Has.Length.EqualTo(2));

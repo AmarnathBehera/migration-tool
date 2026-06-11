@@ -22,7 +22,6 @@ namespace BDO.GWT.Core.Tests.Services
 {
     public class BlogPostPageServiceTests
     {
-        private Mock<IContentService> _contentServiceMock = null!;
         private Mock<ISidebarService> _sidebarServiceMock = null!;
         private Mock<IExternalPeopleHelper> _externalPeopleHelperMock = null!;
         private BlogPostPageService _service = null!;
@@ -30,8 +29,7 @@ namespace BDO.GWT.Core.Tests.Services
         [SetUp]
         public void Setup()
         {
-            _contentServiceMock = new Mock<IContentService>();
-            _sidebarServiceMock = new Mock<ISidebarService>();
+             _sidebarServiceMock = new Mock<ISidebarService>();
             _externalPeopleHelperMock = new Mock<IExternalPeopleHelper>();
 
             _sidebarServiceMock
@@ -53,7 +51,6 @@ namespace BDO.GWT.Core.Tests.Services
                 .ReturnsAsync(Array.Empty<SidebarExternalPersonDto>());
 
             _service = new BlogPostPageService(
-                _contentServiceMock.Object,
                 _sidebarServiceMock.Object,
                 _externalPeopleHelperMock.Object);
         }

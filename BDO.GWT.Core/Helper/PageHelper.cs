@@ -61,23 +61,5 @@ public static class PageHelper
 
     }
 
-    //public static async Task<ContentSidebarDto> GetContentPageSidebarDto<T>(T contentPage, CancellationToken cancellationToken) where T : ISidebar, IPageMetadata
-    //{
-    //    var sidebarDto = await _sidebarService.GetSidebarDtoAsync(contentPage, cancellationToken);
-
-    //    var tags = await _taxonomyTagRetriever.GetTaxonomyTagByGUIDs(contentPage.ContentType, _cultureContext.CurrentLanguageTag);
-    //    var type = tags?.FirstOrDefault()?.Title;
-
-    //    sidebarDto.ShowCopyLinkButton = await GetShowCopyLinkOptionFromSectionNewsPageAsync(sidebarDto.ShowCopyLinkButton, cancellationToken);
-    //    sidebarDto.TypeName = type;
-    //    sidebarDto.PublishDate = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen ?? contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen;
-    //    sidebarDto.UpdatedDate = contentPage.UpdatedOn == DateTime.MinValue ? null : contentPage.UpdatedOn;
-    //    sidebarDto.RelevantContactPeopleTitle = ResourceStringKey.LiveSite.Insights.Authors;
-    //    sidebarDto.RelevantContactPeople = await GetContentPageAuthorDtos(contentPage, cancellationToken);
-    //    sidebarDto.RelatedExternalPeople = await _externalPeopleHelper.GetSidebarExternalPeopleDtosAsync(
-    //        contentPage.RelatedExternalPeople.Select(p => p.SystemFields.ContentItemGUID).ToList(),
-    //        cancellationToken);
-
-    //    return sidebarDto;
-    //}
+   
 }

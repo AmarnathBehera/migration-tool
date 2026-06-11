@@ -342,6 +342,11 @@
                 cancellationToken
             );
         }
+
+        public void GetPagesAsync<T>(RetrievePagesParameters retrievePagesParameters, Func<ContentItemQueryBuilder, ContentItemQueryBuilder> func, RetrievalCacheSettings retrievalCacheSettings, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
         {
             return _contentRetriever.RetrievePages<T?>(cancellationToken);
@@ -460,10 +465,7 @@
             return url;
         }
 
-        public void GetPagesAsync<T>(RetrievePagesParameters retrievePagesParameters, Func<ContentItemQueryBuilder, ContentItemQueryBuilder> func, RetrievalCacheSettings retrievalCacheSettings, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+      
 
         
     }

@@ -8,7 +8,6 @@ using Kentico.Content.Web.Mvc;
 namespace BDO.GWT.Core.Services;
 public interface ISidebarService
 {
-    //Task<ContentSidebarDto> GetSidebarDtoAsync(NewsArticle page, CancellationToken cancellationToken);
     Task<ContentSidebarDto> GetSidebarDtoAsync<T>(T page, string pageUrl, CancellationToken cancellationToken) where T : ISidebar, IPageMetadata, IWebPageFieldsSource;
 
     Task<SidebarPersonDto[]> GetContentPageAuthorDtosGen(List<Guid> relevantPersonGuids, CancellationToken cancellationToken);
@@ -29,30 +28,7 @@ public class SidebarService : ISidebarService
         _contentService = contentService;
     }
 
-    //public async Task<ContentSidebarDto> GetSidebarDtoAsync(NewsArticle page, CancellationToken cancellationToken)
-    //{
-    //    var settings = await _settingService.GetPrintorShareInfo();
-    //    var settingInfo = settings?.FirstOrDefault();
-
-    //    var sidebarDto = new ContentSidebarDto
-    //    {
-    //        ShowPrintButton = (settingInfo?.DisablePrint is not true) && page.ShowPrintButton,
-    //        DownloadButtonAttachment = settingInfo?.DisableDownload is true
-    //                                  ? null
-    //                                  : page.DownloadButtonAttachment?.FirstOrDefault()?.ContentAttachmentAsset.Url,
-    //        SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page,page.PageTitle, cancellationToken) : null,
-    //        ShowCopyLinkButton = settingInfo?.DisableCopyLinkButton is not true,
-    //    };
-
-    //    if (sidebarDto.SocialMediaButtons is not null)
-    //    {
-    //        sidebarDto.SocialMediaButtons.ShowCopyLinkButton = null;
-    //    }
-
-    //    return sidebarDto;
-    //}
-
-    public async Task<ContentSidebarDto> GetSidebarDtoAsync<T>(T page,string pageUrl, CancellationToken cancellationToken) where T : ISidebar, IPageMetadata, IWebPageFieldsSource
+       public async Task<ContentSidebarDto> GetSidebarDtoAsync<T>(T page,string pageUrl, CancellationToken cancellationToken) where T : ISidebar, IPageMetadata, IWebPageFieldsSource
     {
         var settings = await _settingService.GetPrintorShareInfo();
         var settingInfo = settings?.FirstOrDefault();
@@ -110,25 +86,15 @@ public class SidebarService : ISidebarService
        CancellationToken cancellationToken, List<Guid>? relevantPersonGuidList = null, DateTime? publishedDate = null, DateTime? updatedDate = null)
     {
 
-
-        //var tags = await _taxonomyTagRetriever.GetTaxonomyTagByGUIDs(contentPage.ContentType, _cultureContext.CurrentLanguageTag);
-        //var type = tags?.FirstOrDefault()?.Title;
-
-
-        //sidebarDto.TypeName = type;
         sidebarDto.PublishDate = publishedDate;
         sidebarDto.UpdatedDate = updatedDate;
         sidebarDto.RelevantContactPeopleTitle = ResourceStringKey.LiveSite.Insights.Authors;
 
-        //var relevantPersonGuids = contentPage.RelevantContactPerson.Select(p => p.SystemFields.ContentItemGUID).ToList();
-
+      
         if (relevantPersonGuidList != null && relevantPersonGuidList.Count > 0)
         {
             sidebarDto.RelevantContactPeople = await GetContentPageAuthorDtosGen(relevantPersonGuidList, cancellationToken);
         }
-
-        //sidebarDto.RelevantContactPeople = await _sidebarService.GetContentPageAuthorDtosGen(relevantPersonGuids, cancellationToken);
-
 
         return sidebarDto;
     }
@@ -136,8 +102,7 @@ public class SidebarService : ISidebarService
 
     public async Task<SidebarPersonDto[]> GetContentPageAuthorDtosGen(List<Guid> relevantPersonGuids, CancellationToken cancellationToken)
     {
-        //var relevantPersonGuids = contentPage.RelevantContactPerson.Select(p => p.SystemFields.ContentItemGUID).ToList();
-
+        
         var people = (await _contentService.GetPagesAsync<Person>(
            new RetrievePagesParameters { LinkedItemsMaxLevel = 2 },
            query => query

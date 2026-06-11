@@ -23,7 +23,6 @@ namespace BDO.GWT.Core.Services
     public interface IBlogPageCardsService
     {
         Task<FilterItemDto<OptionDto>[]> CreateBlogPageFiltersAsync(HashSet<string> filters,int pageId, CancellationToken cancellationToken);
-       // void CreateBlogPageFiltersAsync(HashSet<string> hashSet, string? v, CancellationToken cancellationToken);
         Task<PaginationDto<BlogPageCardDto>> GetFilteredItemsAsync
             (string language,
             CardsQuery cardsQuery,
@@ -40,6 +39,7 @@ namespace BDO.GWT.Core.Services
         private readonly IUrlHelperFactory _urlHelperFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebsiteChannelContext _websiteChannelContext;
+        private readonly IWebPageUrlResolver _urlResolver;
         private int currentBlogsPageId;
         public BlogPageCardsService(
             ICardsService cardsService,
@@ -47,7 +47,8 @@ namespace BDO.GWT.Core.Services
             IContentService contentService,
             IUrlHelperFactory urlHelperFactory,
             IHttpContextAccessor httpContextAccessor,
-            IWebsiteChannelContext websiteChannelContext
+            IWebsiteChannelContext websiteChannelContext,
+            IWebPageUrlResolver urlResolver
             )
         {
            
@@ -56,17 +57,18 @@ namespace BDO.GWT.Core.Services
             _urlHelperFactory = urlHelperFactory;
             _httpContextAccessor = httpContextAccessor;
             _websiteChannelContext = websiteChannelContext;
+            _urlResolver = urlResolver;
         }
 
        
 
-        public async Task<FilterItemDto<OptionDto>[]> CreateBlogPageFiltersAsync(HashSet<string> filters, int pageId, CancellationToken cancellationToken)
+        public async Task<FilterItemDto<OptionDto>[]> CreateBlogPageFiltersAsync(HashSet<string> filters,int pageId,  CancellationToken cancellationToken)
         {
             currentBlogsPageId = pageId;
-            return await CreateBlogFiltersAsync(filters, pageId, cancellationToken);
+            return await CreateBlogFiltersAsync(filters, cancellationToken);
         }
 
-        private async Task<FilterItemDto<OptionDto>[]> CreateBlogFiltersAsync(HashSet<string> filterParameterNames, int pageId, CancellationToken cancellationToken)
+        private async Task<FilterItemDto<OptionDto>[]> CreateBlogFiltersAsync(HashSet<string> filterParameterNames,  CancellationToken cancellationToken)
         {
             var filterItems = new List<FilterItemDto<OptionDto>>();
 
@@ -101,7 +103,7 @@ namespace BDO.GWT.Core.Services
         {
             var entityType = filterParameterData.EntityType;
 
-            if(entityType.Name.ToString() == "Person")
+            if(entityType.Name == "Person")
             {
                 var blogContributorPages = await _contentService.GetChildPagesByParentGuidAsync<BlogContributors>(currentBlogsPageId, cancellationToken);
                 List<Person> contributorPersons = new List<Person>();
@@ -111,7 +113,7 @@ namespace BDO.GWT.Core.Services
                     contributorPersons.AddRange(blogContributorPersonPages);
                 }
 
-                if(contributorPersons.Any())
+                if(contributorPersons.Count > 0)
                 {
                     return contributorPersons
                         .Select(x =>
@@ -254,12 +256,7 @@ namespace BDO.GWT.Core.Services
             var filterWhereExpressions = await GetFilterParameterWhereExpressionsAsync(cardsQuery.Filters);
 
             var blogPostsGroups = await _contentService.GetChildPagesByParentGuidAsync<BlogPostGroup>(parentPageId, cancellationToken);
-
-            foreach (var blogPostGroup in blogPostsGroups)
-            {
-                var blogPostList = await _contentService.GetChildPagesByParentGuidAsync<BlogPost>(blogPostGroup.SystemFields.WebPageItemID, cancellationToken);
-            }
-
+                        
             List<BlogPost> blogPostsList = new List<BlogPost>();
 
             foreach (var blogPostGrp in blogPostsGroups)
@@ -291,7 +288,6 @@ namespace BDO.GWT.Core.Services
 
             var orderedBlogPosts = blogPostsList
                 .Where(x => x is not null)
-                .Cast<BlogPost>()
                 .OrderByDescending(isFeatured)
                 .ThenByDescending(x => x.SystemFields.ContentItemCommonDataLastPublishedWhen
                                     ?? x.SystemFields.ContentItemCommonDataFirstPublishedWhen)
@@ -400,8 +396,7 @@ namespace BDO.GWT.Core.Services
             var cards = new List<BlogPageCardDto>();
             foreach (var contentPage in contentPages)
             {
-                //var tags = await _taxonomyTagRetriever.GetTaxonomyTagByGUIDs(contentPage.ContentType, _cultureContext.CurrentLanguageTag);
-                var type = contentPage.ContentType.FirstOrDefault();
+                 var type = contentPage.ContentType.FirstOrDefault();
                 string typeConst = string.Empty;
                
                 if(type != null)
@@ -424,7 +419,8 @@ namespace BDO.GWT.Core.Services
                     ReadMoreLink = new LinkItemDto
                     {
                         Title = ResourceStringKey.LiveSite.ReadMore,
-                        URL = contentPage.SystemFields.WebPageUrlPath                    }
+                        URL = _urlResolver.GetAbsoluteUrl(contentPage)
+                    }
                 };
 
                 if(card != null)

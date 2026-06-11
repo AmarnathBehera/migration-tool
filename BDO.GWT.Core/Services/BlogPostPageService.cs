@@ -21,18 +21,16 @@ namespace BDO.GWT.Web.Core.Services;
 
 public interface IBlogPostPageService
 {
-    Task<BlogPostDto> GetBlogPostDtoAsync(BlogPost contentPage,CancellationToken cancellationToken);
+    Task<BlogPostDto> GetBlogPostDtoAsync(BlogPost blogpostPage,CancellationToken cancellationToken);
 }
 
 public class BlogPostPageService : IBlogPostPageService
 {
-    private readonly IContentService _contentService;
     private readonly ISidebarService _sidebarService;
     private readonly IExternalPeopleHelper _externalPeopleHelper;
 
-    public BlogPostPageService(IContentService contentService, ISidebarService sidebarService, IExternalPeopleHelper externalPeopleHelper)
-    {
-        _contentService = contentService;
+    public BlogPostPageService(ISidebarService sidebarService, IExternalPeopleHelper externalPeopleHelper)
+    {     
         _sidebarService = sidebarService;
         _externalPeopleHelper = externalPeopleHelper;   
     }
@@ -83,11 +81,11 @@ public class BlogPostPageService : IBlogPostPageService
         }
 
         //check if ShowTitle and ShowDescription are true before setting the values in DTO
-        if (BlogPostDtoObj.ShowTitle == true)
+        if (BlogPostDtoObj.ShowTitle)
         {
             BlogPostDtoObj.Title = blogpostPage.MetadataTitle ?? string.Empty;
         }
-        if(BlogPostDtoObj.ShowDescription == true)
+        if(BlogPostDtoObj.ShowDescription)
         {
             BlogPostDtoObj.Description = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(blogpostPage.MetadataDescription) ?? string.Empty;
         }
@@ -102,8 +100,6 @@ public class BlogPostPageService : IBlogPostPageService
 
             sideBarObj = await _sidebarService.GetContentPageSidebarDetails(sideBarObj, cancellationToken,
                                                                           relevantPersonGuids, publishedDate, updatedDate);
-
-            //sideBarObj.ShowCopyLinkButton = await GetShowCopyLinkOptionFromSectionPageAsync(sideBarDto.ShowCopyLinkButton, cancellationToken);
 
             if (blogpostPage.RelatedExternalPeople != null)
             {

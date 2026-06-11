@@ -25,16 +25,14 @@ namespace BDO.GWT.Core.Services
         private readonly IHeroService _heroService;
         private readonly IBlogPageCardsService _blogPageCardsService;
         private readonly IContentService _contentService;
-        private readonly ICultureContext _cultureContext;
         private readonly IContentRetriever _contentRetriever;
        
-        public BlogsPageService(IFilteringHelper filteringHelper, IHeroService heroService, IBlogPageCardsService blogPageCardsService, IContentService contentService, ICultureContext cultureContext, IContentRetriever contentRetriever)
+        public BlogsPageService(IFilteringHelper filteringHelper, IHeroService heroService, IBlogPageCardsService blogPageCardsService, IContentService contentService, IContentRetriever contentRetriever)
         {
             _filteringHelper = filteringHelper;
             _heroService = heroService;
             _blogPageCardsService = blogPageCardsService;
             _contentService = contentService;
-            _cultureContext = cultureContext;
             _contentRetriever = contentRetriever;
         }
 
@@ -135,7 +133,7 @@ namespace BDO.GWT.Core.Services
 
             if (currrentBlogPage == null)
             {
-                throw new MissingSectionPageException($"'{nameof(Blog)} page with GUID '{pageId}' not found.");
+                throw new MissingSectionPageException($"'{nameof(Blog)} page with ID '{pageId}' not found.");
             }
 
             var featuredBlogsPageIds = await GetFeaturedBlogPostPageIdsAsync(currrentBlogPage.SystemFields.ContentItemGUID, cancellationToken);

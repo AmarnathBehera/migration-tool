@@ -78,14 +78,14 @@
           CancellationToken cancellationToken = default)
           where TPage : class, IWebPageFieldsSource;
 
+        void GetPagesAsync<T>(RetrievePagesParameters retrievePagesParameters, Func<ContentItemQueryBuilder, ContentItemQueryBuilder> func, RetrievalCacheSettings retrievalCacheSettings, CancellationToken cancellationToken);
 
-
-       Task<IEnumerable<TPage>> GetPagesAsync<TPage>(
+        Task<IEnumerable<TPage>> GetPagesAsync<TPage>(
       RetrievePagesParameters parameters,
       Action<RetrievePagesQueryParameters> queryAction,
       RetrievalCacheSettings cacheSettings,
       CancellationToken cancellationToken = default
-  ) where TPage : class, IWebPageFieldsSource;
+           ) where TPage : class, IWebPageFieldsSource;
 
 
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
@@ -109,6 +109,6 @@
             string[] contentTypes);
 
        public string? EnsureAbsoluteUrl(string? url);
-        void GetPagesAsync<T>(RetrievePagesParameters retrievePagesParameters, Func<ContentItemQueryBuilder, ContentItemQueryBuilder> func, RetrievalCacheSettings retrievalCacheSettings, CancellationToken cancellationToken);
+        
     }
 }

@@ -10,7 +10,7 @@ namespace BDO.GWT.Core.Services;
 public interface ISocialMediaButtonsService
 {
     Task<SocialMediaButtonsDto> GetSocialMediaButtonsDto(IWebPageFieldsSource page, string pageTitle, CancellationToken cancellationToken);
-    Task<SocialMediaButtonsDto> GetSocialMediaButtonsDtoNB(string pageUrl, string pageTitle, CancellationToken cancellationToken);
+    Task<SocialMediaButtonsDto> GetSocialMediaButtonsDtoNB(string pageAbsUrl, string pageTitle, CancellationToken cancellationToken);
 }
 
 public class SocialMediaButtonsService : ISocialMediaButtonsService

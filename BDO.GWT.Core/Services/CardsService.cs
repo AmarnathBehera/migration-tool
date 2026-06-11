@@ -156,20 +156,7 @@ public class CardsService : ICardsService
             ?.GetValue(systemFields) as string;
     }
    
-    //private async Task<OptionDto[]> BuildOptionsForTaxonomyFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
-    //{
-    //    var systemFields = type.GetProperty("SystemFields")?.GetValue(instance);
-    //    if (systemFields is null)
-    //    {
-    //        return null;
-    //    }
-
-    //    return systemFields.GetType()
-    //        .GetProperty("ContentItemName")
-    //        ?.GetValue(systemFields) as string;
-    //}
-
-    private async Task<OptionDto[]> BuildOptionsForFieldFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
+   private async Task<OptionDto[]> BuildOptionsForFieldFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
     {
         var entityType = filterParameterData.EntityType;
         var options = Array.Empty<OptionDto>();
