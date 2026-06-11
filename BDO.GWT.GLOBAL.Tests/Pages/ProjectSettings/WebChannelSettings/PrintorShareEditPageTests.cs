@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.DataEngine;
 using Kentico.Xperience.Admin.Base;

@@ -65,7 +65,6 @@ public class GlobalEventsWebinarEditPage : ModelEditPage<GlobalEventsWebinarDto>
         return base.ConfigurePage();
     }
 
-    // ✅ SAVE DATA
     protected override async Task<ICommandResponse> ProcessFormData(
         GlobalEventsWebinarDto model,
         ICollection<IFormItem> formItems)
