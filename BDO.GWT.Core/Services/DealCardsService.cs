@@ -18,7 +18,7 @@ namespace BDO.GWT.Core.Services
 {
     public interface IDealCardsService
     {
-        Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(
+        Task<List<FilterItemDto<OptionDto>>> CreateFiltersAsync(
             HashSet<string> filters,
             string? nodeAliasPath,
             CancellationToken cancellationToken);
@@ -55,12 +55,13 @@ namespace BDO.GWT.Core.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(
+        public async Task<List<FilterItemDto<OptionDto>>> CreateFiltersAsync(
             HashSet<string> filters,
             string? nodeAliasPath,
             CancellationToken cancellationToken)
         {
-            return await _cardsService.CreateFiltersAsync(filters, nodeAliasPath, cancellationToken);
+            var result = await _cardsService.CreateFiltersAsync(filters, nodeAliasPath, cancellationToken);
+            return result.ToList();
         }
 
         public async Task<PaginationDto<DealCardDto>> GetFilteredItemsAsync(
@@ -92,29 +93,18 @@ namespace BDO.GWT.Core.Services
                             filter(w);
                         }
                     });
-                    if (order == "desc")
-                    {
-                        query.OrderBy(new OrderByColumn(nameof(De.PersonLastName), OrderDirection.Descending));
-                    }
-                    else if (order == "asc")
-                    {
-                        query.OrderBy(new OrderByColumn(nameof(Person.PersonLastName), OrderDirection.Ascending));
-                    }
-                    else
-                    {
-                        query.OrderBy(nameof(Person.SystemFields.WebPageItemID));
-                    }
+                    query.OrderBy(nameof(Deal.SystemFields.WebPageItemID));
                 }, RetrievalCacheSettings.CacheDisabled,
                 cancellationToken
             );
-            var dealsArray = deals?.OfType<Deal>().ToArray() ?? Array.Empty<Deal>();
+            var dealsList = deals?.OfType<Deal>().ToList() ?? new List<Deal>();
 
-            var cardDtos = await CreatePeopleCardDtosAsync(dealsArray);
+            var cardDtos = await CreatePeopleCardDtosAsync(dealsList);
 
             return new PaginationDto<DealCardDto>
             {
-                Data = cardDtos,
-                TotalCount = dealsArray.Length
+                Data = cardDtos.ToArray(),
+                TotalCount = dealsList.Count
             };
         }
         private async Task<List<Action<WhereParameters>>> GetFilterParameterWhereExpressionsAsync(
@@ -146,6 +136,23 @@ namespace BDO.GWT.Core.Services
 
         private async Task<Action<WhereParameters>?> GetPageFilterAsync(string filterName, string filterValue)
         {
+            // Year is a scalar filter (e.g. "2024"), not a content-item lookup.
+            // Resolve it before the page query so the page-null short-circuit doesn't swallow it.
+            if (filterName == FilterParameterName.Year)
+            {
+                if (!int.TryParse(filterValue, out var year))
+                {
+                    return null;
+                }
+
+                var startOfYear = new DateTime(year, 1, 1);
+                var startOfNextYear = new DateTime(year + 1, 1, 1);
+
+                return w => w
+                    .WhereGreaterOrEquals(nameof(Deal.DateField), startOfYear)
+                    .WhereLess(nameof(Deal.DateField), startOfNextYear);
+            }
+
             var page = await _contentService.GetPageByTypeAndNameAsync(
                 FilterUtility.GetFilterParameterData(filterName)!.EntityType, filterValue);
 
@@ -156,14 +163,13 @@ namespace BDO.GWT.Core.Services
 
             return filterName switch
             {
-                FilterParameterName.OfficeLocation => w => w.WhereContains(nameof(Person.MetadataOfficeLocation), guid),
-                FilterParameterName.City => w => w.WhereContains(nameof(Person.MetadataCity), guid),
-                FilterParameterName.Credential => w => w.WhereContains(nameof(Person.PersonCredentials), guid),
-                FilterParameterName.ProfileGroup => w => w.WhereContains(nameof(Person.MetadataProfileGroups), guid),
+                FilterParameterName.Industry => w => w.WhereContains(nameof(Deal.Industry), guid),
+                FilterParameterName.SubIndustry => w => w.WhereContains(nameof(Deal.SubIndustry), guid),
+                FilterParameterName.DealType => w => w.WhereContains(nameof(Deal.DealType), guid),
                 _ => null,
             };
         }
-        private async Task<DealCardDto[]> CreatePeopleCardDtosAsync(Deal[] deals)
+        private async Task<List<DealCardDto>> CreatePeopleCardDtosAsync(List<Deal> deals)
         {
             var httpContext = _httpContextAccessor.HttpContext!;
             var actionContext = new ActionContext(httpContext, httpContext.GetRouteData() ?? new RouteData(), new ActionDescriptor());
@@ -183,20 +189,7 @@ namespace BDO.GWT.Core.Services
                 });
             }
 
-            return dtos.ToArray();
-        }
-        public async Task<string> GetFallbackMetadataDescription(Deal deal)
-        {
-            var settings = await _settingService.GetUsePersonPageTitleInfo();
-
-            var usePersonPageTitle = settings?.FirstOrDefault()?.UsePageTitleToDisplayPersonName ?? false;
-
-            if (usePersonPageTitle)
-            {
-                return deal.MetadataTitle;
-            }
-
-            return deal.MetadataShowTitle ? $"{deal.MetadataTitle} {deal.MetadataDescription}" : $"{deal.MetadataDescription}";
+            return dtos;
         }
 
     }
