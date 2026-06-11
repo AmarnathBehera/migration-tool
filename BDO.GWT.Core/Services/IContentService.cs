@@ -73,12 +73,19 @@
        CancellationToken cancellationToken = default)
        where TPage : IWebPageFieldsSource;
 
+        Task<IEnumerable<TPage>> GetChildPagesByParentGuidWithQueryBuilderAsync<TPage>(
+          Action<ContentItemQueryBuilder> configure,
+          CancellationToken cancellationToken = default)
+          where TPage : class, IWebPageFieldsSource;
+
+        void GetPagesAsync<T>(RetrievePagesParameters retrievePagesParameters, Func<ContentItemQueryBuilder, ContentItemQueryBuilder> func, RetrievalCacheSettings retrievalCacheSettings, CancellationToken cancellationToken);
+
         Task<IEnumerable<TPage>> GetPagesAsync<TPage>(
       RetrievePagesParameters parameters,
       Action<RetrievePagesQueryParameters> queryAction,
       RetrievalCacheSettings cacheSettings,
       CancellationToken cancellationToken = default
-  ) where TPage : class, IWebPageFieldsSource;
+           ) where TPage : class, IWebPageFieldsSource;
 
 
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
@@ -101,6 +108,7 @@
             IEnumerable<Guid> guids,
             string[] contentTypes);
 
-        public string? EnsureAbsoluteUrl(string? url);
+       public string? EnsureAbsoluteUrl(string? url);
+        
     }
 }
