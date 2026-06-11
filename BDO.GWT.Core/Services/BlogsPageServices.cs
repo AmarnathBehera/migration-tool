@@ -83,7 +83,7 @@ namespace BDO.GWT.Core.Services
             HashSet<string>? filtersSet = new HashSet<string>();
             bool enableFilters = currentPage.ItemListFilteringEnabled;
 
-            if(enableFilters == true)
+            if(enableFilters)
             {
                 if(!string.IsNullOrWhiteSpace(currentPage.BlogPostListFilters))
                 {
