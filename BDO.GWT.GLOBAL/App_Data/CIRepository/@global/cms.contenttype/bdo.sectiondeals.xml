@@ -4,13 +4,13 @@
   <ClassDisplayName>Section Deals</ClassDisplayName>
   <ClassFormDefinition>
     <form>
-      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="ee22c2d0-6e40-417a-b5b4-fb45ce810bb0" isPK="true" />
-      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="f8dfe738-2cd7-411e-b471-5bea0d11be4e" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
-      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="711a871d-87a4-425a-abef-c8d4f9f32493" isunique="true" system="true" />
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="db9dd155-a97b-4c49-b9f4-dce2f8ea1ea5" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="258220e9-327d-4d19-a912-d4921e470dc5" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="2f95926b-6e91-4139-b297-875462615cde" isunique="true" system="true" />
       <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
         <properties />
       </schema>
-      <field allowempty="true" column="SectionDealsFilteringEnabled" columnprecision="0" columntype="boolean" enabled="true" guid="21aa3c00-d644-4c59-89c7-ec5c4bb82754" visible="true">
+      <field allowempty="true" column="SectionDealsFilteringEnabled" columnprecision="0" columntype="boolean" enabled="true" guid="f9cdc63d-b755-43e3-bd63-30f16542fecd" visible="true">
         <properties>
           <defaultvalue>True</defaultvalue>
           <explanationtextashtml>False</explanationtextashtml>
@@ -21,7 +21,7 @@
           <controlname>Kentico.Administration.Checkbox</controlname>
         </settings>
       </field>
-      <field column="SectionDealsFilters" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="d2e13307-dccf-439e-b1db-85b1b58a8a56" visible="true">
+      <field column="SectionDealsFilters" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="727dafb6-9fd7-4323-b159-321f9dcb5a8d" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Filters</fieldcaption>
@@ -29,7 +29,7 @@
             <![CDATA[Filters that visitor will be able to filter deals by.]]>
           </fielddescription>
           <fielddescriptionashtml>False</fielddescriptionashtml>
-          <includeintranslation>False</includeintranslation>
+          <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
           <controlname>
@@ -46,9 +46,8 @@ year;Year
           <OptionsValueSeparator>;</OptionsValueSeparator>
         </settings>
       </field>
-      <field column="ShowCopyUrlButtonInDealPage" columnprecision="0" columntype="boolean" enabled="true" guid="2e2a44f2-4647-4645-82df-1a7dd189b1e8" visible="true">
+      <field column="ShowCopyUrlButtonInDealPage" columnprecision="0" columntype="boolean" enabled="true" guid="fca1cd0e-a516-4f1a-aea4-c12b62f4a85f" visible="true">
         <properties>
-          <defaultvalue>False</defaultvalue>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Show copy URL button in Deal Page</fieldcaption>
           <fielddescription>
@@ -68,12 +67,12 @@ year;Year
       </schema>
     </form>
   </ClassFormDefinition>
-  <ClassGUID>e82cdc6e-697b-4151-95a0-c156b65d69fb</ClassGUID>
+  <ClassGUID>c9ad5d32-9b92-477d-abd0-6b732dc1e86f</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
   <ClassIconClass>xp-windows</ClassIconClass>
   <ClassName>BDO.SectionDeals</ClassName>
   <ClassShortName>BDOSectionDeals</ClassShortName>
   <ClassTableName>BDO_SectionDeals</ClassTableName>
   <ClassType>Content</ClassType>
-  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
 </cms.contenttype>

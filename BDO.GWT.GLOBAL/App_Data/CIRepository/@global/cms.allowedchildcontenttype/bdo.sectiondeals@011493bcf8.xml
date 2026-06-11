@@ -2,7 +2,7 @@
 <cms.allowedchildcontenttype>
   <Parent>
     <CodeName>BDO.SectionDeals</CodeName>
-    <GUID>e82cdc6e-697b-4151-95a0-c156b65d69fb</GUID>
+    <GUID>c9ad5d32-9b92-477d-abd0-6b732dc1e86f</GUID>
     <ObjectType>cms.contenttype</ObjectType>
   </Parent>
   <Bindings>
