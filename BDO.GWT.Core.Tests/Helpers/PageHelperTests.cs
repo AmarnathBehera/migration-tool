@@ -50,7 +50,7 @@ public class PageHelperTests
     [Test]
     public void GetCallToActionDto_WhenButtonTextIsNull_ReturnsNull()
     {
-        var result = PageHelper.GetCallToActionDto("Description", null, "https://example.com", "top");
+        var result = PageHelper.GetCallToActionDto("Description", null, "https://example.com");
 
         Assert.That(result, Is.Null);
     }
@@ -58,7 +58,7 @@ public class PageHelperTests
     [Test]
     public void GetCallToActionDto_WhenButtonLinkIsNull_ReturnsNull()
     {
-        var result = PageHelper.GetCallToActionDto("Description", "Click here", null, "top");
+        var result = PageHelper.GetCallToActionDto("Description", "Click here", null);
 
         Assert.That(result, Is.Null);
     }
@@ -66,7 +66,7 @@ public class PageHelperTests
     [Test]
     public void GetCallToActionDto_WhenButtonTextAndLinkAreNull_ReturnsNull()
     {
-        var result = PageHelper.GetCallToActionDto("Description", null, null, "top");
+        var result = PageHelper.GetCallToActionDto("Description", null, null);
 
         Assert.That(result, Is.Null);
     }
@@ -75,7 +75,7 @@ public class PageHelperTests
     public void GetCallToActionDto_WhenAllValuesProvided_ReturnsCallToActionDto()
     {
         var result = PageHelper.GetCallToActionDto(
-            "Description", "Click here", "https://example.com", "top");
+            "Description", "Click here", "https://example.com");
 
         Assert.Multiple(() =>
         {
@@ -83,7 +83,7 @@ public class PageHelperTests
             Assert.That(result!.Description, Is.EqualTo("Description"));
             Assert.That(result.ButtonTitle, Is.EqualTo("Click here"));
             Assert.That(result.ButtonUrl, Is.EqualTo("https://example.com"));
-            Assert.That(result.Position, Is.EqualTo("top"));
+            //Assert.That(result.Position, Is.EqualTo("top"));
         });
     }
 
@@ -91,7 +91,7 @@ public class PageHelperTests
     public void GetCallToActionDto_WhenDescriptionIsNull_ReturnsDtoWithNullDescription()
     {
         var result = PageHelper.GetCallToActionDto(
-            null, "Click here", "https://example.com", "top");
+            null, "Click here", "https://example.com");
 
         Assert.Multiple(() =>
         {
@@ -106,12 +106,12 @@ public class PageHelperTests
     public void GetCallToActionDto_WhenPositionIsNull_ReturnsDtoWithNullPosition()
     {
         var result = PageHelper.GetCallToActionDto(
-            "Description", "Click here", "https://example.com", null);
+            "Description", "Click here", "https://example.com");
 
         Assert.Multiple(() =>
         {
             Assert.That(result, Is.Not.Null);
-            Assert.That(result!.Position, Is.Null);
+            //Assert.That(result!.Position, Is.Null);
         });
     }
 }
