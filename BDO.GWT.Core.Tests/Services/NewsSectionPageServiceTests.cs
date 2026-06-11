@@ -554,10 +554,10 @@ public class NewsSectionPageServiceTests
 
         _newsArticleCardsServiceMock
             .Setup(s => s.GetFilteredItemsAsync(
-                It.IsAny<SectionNews>(),
+                It.IsAny<List<SectionNews>>(),
                 It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
-                It.IsAny<Action<ContentItemQueryBuilder>?>(),
+                It.IsAny<List<Action<WhereParameters>>>(),
                 It.IsAny<Func<NewsArticle, bool>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedResult);
@@ -573,7 +573,7 @@ public class NewsSectionPageServiceTests
 
         _newsArticleCardsServiceMock.Verify(
             s => s.GetFilteredItemsAsync(
-                newsSection,
+                It.Is<List<SectionNews>>(list => list.Count == 1 && list[0] == newsSection),
                 "en-US",
                 cardsQuery,
                 null,

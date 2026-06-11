@@ -79,16 +79,18 @@ public class NewsSectionPageService : INewsSectionPageService
                .Where(w => w.WhereEquals("ContentItemGUID", pageGuid)),
            RetrievalCacheSettings.CacheDisabled,
            cancellationToken
-       )).FirstOrDefault();
+       )).ToList(); 
 
-        if (newsSection == null)
+        var newsSectionPage = newsSection?.FirstOrDefault();
+        if (newsSectionPage == null)
         {
             throw new MissingSectionPageException($"'No pages have been found of type '{nameof(SectionNews)}'.");
         }
-        var featuredNewsArticlePageIds = await GetFeaturedNewsArticlePageIdsAsync(newsSection);
+
+        var featuredNewsArticlePageIds = await GetFeaturedNewsArticlePageIdsAsync(newsSectionPage);
 
         var paginationDto = await _newsArticleCardsService.GetFilteredItemsAsync(
-            newsSection,
+            newsSection ?? new List<SectionNews>(),
             language,
             cardsQuery,
             null,

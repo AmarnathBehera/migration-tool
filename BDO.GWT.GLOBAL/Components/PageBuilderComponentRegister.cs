@@ -1,6 +1,7 @@
 ﻿using BDO;
 using BDO.GWT.GLOBAL.Components.Widget.LocalNavigationWidget;
 using BDO.GWT.GLOBAL.Components.Widget.KeyTakeawaysWidget;
+using BDO.GWT.GLOBAL.Widgets.NewsCarouselWidget;
 using BDO.GWT.Web.Widgets.AccordionWidget;
 using BDO.GWT.Web.Widgets.FaqWidget;
 using BDO.GWT.Web.Widgets.FlexibleBannerWidget;
@@ -29,10 +30,10 @@ using Kentico.PageBuilder.Web.Mvc;
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.Button, typeof(ButtonWidget), "Button", typeof(ButtonWidgetProperties), AllowCache = true, IconClass = "icon-xml-tag")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.LocalNavigation, typeof(LocalNavigationWidget), "Local Navigation Item", typeof(LocalNavigationWidgetProperties), AllowCache = true, IconClass = "icon-chain")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.KeyTakeaways, typeof(KeyTakeawaysWidget), "Key Takeaways", typeof(KeyTakeawaysWidgetProperties), AllowCache = true, IconClass = "icon-list-bullets")]
-
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.FaqWidget, typeof(FaqWidget), "FAQ Widget", typeof(FaqWidgetProperties), AllowCache = true, IconClass = "icon-bubbles")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.FlexibleBanner, typeof(FlexibleBannerWidget), "Flexible Banner", typeof(FlexibleBannerWidgetProperties), AllowCache = true, IconClass = "icon-ribbon")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.FlexibleContent, typeof(FlexibleContentWidget), "Flexible Content", typeof(FlexibleContentWidgetProperties), AllowCache = true, IconClass = "icon-newspaper")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.NewsCarousel, typeof(NewsCarouselWidget), "News Carousel", typeof(NewsCarouselWidgetProperties), AllowCache = true, IconClass = "icon-bubbles")]
 
 // Sections
 [assembly: RegisterSection(identifier: ComponentIdentifiers.Sections.Container,name: "Container",propertiesType: typeof(BaseSectionProperties),customViewName: "~/Components/Section/SectionView/_ContainerSection.cshtml")]
