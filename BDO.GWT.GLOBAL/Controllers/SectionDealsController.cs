@@ -10,14 +10,14 @@ public class SectionDealsController : PageController
 {
     private readonly ISectionDealsPageService _sectionDealsPageService;
 
-    public SectionDealsController(IPageContext<SectionDeals> sectionDealsPageContext, ISectionDealsPageService sectionDealsPageService)
+    public SectionDealsController(ISectionDealsPageService sectionDealsPageService)
     {
         _sectionDealsPageService = sectionDealsPageService;
     }
 
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        var pageDto = await _sectionDealsPageService.GetSectionDealsDtoAsync(_sectionDealsPageContext.CurrentPage, cancellationToken);
+        var pageDto = await _sectionDealsPageService.GetSectionDealsDtoAsync(cancellationToken);
 
         return View(pageDto);
     }

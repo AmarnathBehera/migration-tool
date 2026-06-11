@@ -21,9 +21,9 @@ namespace BDO.GWT.Web.Core.LiveSite.Services;
 
 public interface ISectionDealsPageService
 {
-    Task<SectionDealsDto> GetSectionDealsDtoAsync(SectionDeals page, CancellationToken cancellationToken);
+    Task<SectionDealsDto> GetSectionDealsDtoAsync(CancellationToken cancellationToken);
 
-    Task<PaginationDto<DealCardDto>> GetSectionDealsDealPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken);
+    Task<PaginationDto<DealCardDto>> GetSectionDealsDealPaginationDtoAsync(Guid pageGuid, string language, CardsQuery cardsQuery, CancellationToken cancellationToken);
 }
 
 public class SectionDealsPageService : ISectionDealsPageService
@@ -32,22 +32,46 @@ public class SectionDealsPageService : ISectionDealsPageService
     private readonly IContentService _contentRetriever;
     private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly ICardsService _cardsService;
+    private readonly IDealCardsService _dealCardsService;
 
-    public SectionDealsPageService(ICultureContext cultureContext, IContentService contentRetriever, IWebsiteChannelContext websiteChannelContext, ICardsService cardsService)
+    public SectionDealsPageService(ICultureContext cultureContext, IContentService contentRetriever, IWebsiteChannelContext websiteChannelContext, ICardsService cardsService, IDealCardsService dealCardsService)
     {
         _cultureContext = cultureContext;
         _contentRetriever = contentRetriever;
         _websiteChannelContext = websiteChannelContext;
         _cardsService = cardsService;
+        _dealCardsService = dealCardsService;
     }
 
-    public async Task<SectionDealsDto> GetSectionDealsDtoAsync(SectionDeals page, CancellationToken cancellationToken)
+    public async Task<SectionDealsDto> GetSectionDealsDtoAsync(CancellationToken cancellationToken)
     {
-        var sectionDealsUpdatedFilters = new HashSet<string>();
+        var results = await _contentRetriever.GetPagesAsync<SectionDeals>(
+           new RetrievePagesParameters
+           {
+               LinkedItemsMaxLevel = 5
+           },
+           query =>
+           {
+               query.Where(w =>
+                   w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
+           },
+           RetrievalCacheSettings.CacheDisabled,
+           cancellationToken);
 
-        if (_cultureContext.CurrentLanguageTag.Language == Language.English)
+        var page = results?.FirstOrDefault();
+
+        var sectionDealsUpdatedFilters = new HashSet<string>();
+        var sectionDealsFilters = string.IsNullOrWhiteSpace(page.SectionDealsFilters)
+            ? new HashSet<string>()
+               : page.SectionDealsFilters
+                .Split(';', StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim())
+                .ToHashSet();
+
+        if (LanguageTag.TryParse(_cultureContext.CurrentLanguageTag, out var currentLanguageTag)
+            && currentLanguageTag.Language == LanguageTag.GB.Language)
         {
-            foreach (var filter in page.SectionDealsFilters)
+            foreach (var filter in sectionDealsFilters)
             {
                 switch (filter)
                 {
@@ -68,7 +92,7 @@ public class SectionDealsPageService : ISectionDealsPageService
         }
         else
         {
-            sectionDealsUpdatedFilters = page.SectionDealsFilters;
+            sectionDealsUpdatedFilters = sectionDealsFilters;
         }
 
         var dto = new SectionDealsDto
@@ -102,7 +126,7 @@ public class SectionDealsPageService : ISectionDealsPageService
             throw new MissingSectionPageException($"'{nameof(SectionDeals)} page with GUID '{pageGuid}' not found.");
         }
 
-        var paginationDto = await _dealsCardService.GetFilteredItemsAsync(sectionDeal, language, cardsQuery, null, _ => false, cancellationToken);
+        var paginationDto = await _dealCardsService.GetFilteredItemsAsync(sectionDeal, language, cardsQuery, null, _ => false, cancellationToken);
 
         return paginationDto;
     }
