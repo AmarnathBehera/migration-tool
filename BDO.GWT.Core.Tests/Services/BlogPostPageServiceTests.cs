@@ -171,11 +171,8 @@ namespace BDO.GWT.Core.Tests.Services
 
             var result = await _service.GetBlogPostDtoAsync(page, CancellationToken.None);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.ShowTitle, Is.True);
-                Assert.That(result.Title, Is.EqualTo("My Blog Post Title"));
-            });
+            Assert.That(result.ShowTitle, Is.True);
+            Assert.That(result.Title, Is.EqualTo("My Blog Post Title"));
         }
 
         [Test]
