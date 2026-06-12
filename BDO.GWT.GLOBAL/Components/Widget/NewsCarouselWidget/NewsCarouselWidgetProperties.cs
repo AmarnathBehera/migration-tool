@@ -10,6 +10,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using static BDO.GWT.Core.Constants.ResourceStringKey.LiveSite;
 
 namespace BDO.GWT.GLOBAL.Widgets.NewsCarouselWidget;
 
@@ -31,6 +32,31 @@ public class NewsCarouselWidgetProperties : IWidgetProperties
         Order = 3)]
     [VisibleIfTrue(nameof(FilteringEnabled))]
     public List<string> Filters { get; set; } = NewsCarouselFilters.AllowedFilters.Where(x => x.IsDefault).Select(x => x.ParameterName).ToList();
+
+    // Change from List<string> to string? with semicolon separation
+
+    private List<string>? _filters;
+    [GeneralSelectorComponent(
+        dataProviderType: typeof(FiltersDataProvider),
+        Label = "Filters",
+        ExplanationText = "Filters that visitor will be able to filter news by.",
+        Order = 3)]
+    [VisibleIfTrue(nameof(FilteringEnabled))]
+    public List<string> Filtersf
+    {
+        get
+        {
+            if (_filters == null)
+            {
+                _filters = NewsCarouselFilters.AllowedFilters
+                    .Where(x => x.IsDefault)
+                    .Select(x => x.ParameterName)
+                    .ToList();
+            }
+            return _filters;
+        }
+        set => _filters = value; // [] stays as [], null gets defaults on next get
+    }
 
     [ContentItemSelectorComponent(
         contentTypeNames: [NewsArticle.CONTENT_TYPE_NAME],

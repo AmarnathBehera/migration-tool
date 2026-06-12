@@ -12,9 +12,13 @@ namespace BDO.GWT.Core.LiveSite.Services;
 
 public interface INewsCarouselService
 {
-    Task<NewsCarouselDto> GetNewsCarouselAsync<T>(T currentPage,NewsCarouselData data, CancellationToken cancellationToken)where T : IWebPageFieldsSource;
+    Task<NewsCarouselDto> GetNewsCarouselAsync<T>(T currentPage, NewsCarouselData data, CancellationToken cancellationToken)
+        where T : IWebPageFieldsSource;
 
-    Task<ICollection<NewsPageCardDto>> GetFilteredItemsAsync<T>(T currentPage, HashSet<Guid> featuredNodeGuids, CancellationToken cancellationToken) where T : IWebPageFieldsSource;
+    Task<ICollection<NewsPageCardDto>> GetFilteredItemsAsync<T>(T currentPage, HashSet<Guid> featuredGuids, CardsQuery query, CancellationToken cancellationToken)
+        where T : IWebPageFieldsSource;
+
+    Task<ICollection<NewsPageCardDto>> GetAPIFilteredItemsAsync(CardsQuery query, CancellationToken cancellationToken);
 }
 
 public class NewsCarouselService : INewsCarouselService
@@ -30,7 +34,8 @@ public class NewsCarouselService : INewsCarouselService
         _contentService = contentService;
     }
 
-    public async Task<NewsCarouselDto> GetNewsCarouselAsync<T>(T currentPage, NewsCarouselData data, CancellationToken cancellationToken) where T : IWebPageFieldsSource
+    public async Task<NewsCarouselDto> GetNewsCarouselAsync<T>(T currentPage, NewsCarouselData data, CancellationToken cancellationToken)
+        where T : IWebPageFieldsSource
     {
         var dto = new NewsCarouselDto
         {
@@ -38,7 +43,7 @@ public class NewsCarouselService : INewsCarouselService
             Description = data.Description,
             Filters = data.FilteringEnabled ? await _newsArticleCardsService.CreateFiltersAsync(data.Filters, null, cancellationToken) : null,
             FilteringTooltipEnabled = await _filteringHelper.IsFilteringTooltipEnabledAsync(data.FilteringEnabled, cancellationToken),
-            Items = await GetFilteredItemsAsync<T>(currentPage, data.NodeGuidsOfFeaturedNews.ToHashSet(), cancellationToken),
+            Items = await GetFilteredItemsAsync(currentPage, data.NodeGuidsOfFeaturedNews.ToHashSet(), new CardsQuery(), cancellationToken),
             BackgroundImageURL = data.BackgroundImageURL,
             BackgroundImageAltText = data.BackgroundImageAltText,
             SeeAllLink = data is { SeeAllLinkText: not null, SeeAllLinkUrl: not null }
@@ -52,18 +57,43 @@ public class NewsCarouselService : INewsCarouselService
             TopMargin = data.TopMargin,
             BottomMargin = data.BottomMargin,
             WidgetID = data.WidgetID,
+            CurrentPageGuid = currentPage.SystemFields.ContentItemGUID,
+            PageType = currentPage.GetType().Name,
         };
 
         return dto;
     }
 
-    public async Task<ICollection<NewsPageCardDto>> GetFilteredItemsAsync<T>(T currentPage, HashSet<Guid> featuredNodeGuids, CancellationToken cancellationToken) where T : IWebPageFieldsSource
+    public async Task<ICollection<NewsPageCardDto>> GetFilteredItemsAsync<T>(T currentPage, HashSet<Guid> featuredGuids, CardsQuery query, CancellationToken cancellationToken)
+        where T : IWebPageFieldsSource
+    {
+        return await BuildAndExecuteQueryAsync(
+            currentPage.SystemFields.ContentItemGUID.ToString(),
+            currentPage.GetType().Name,
+            featuredGuids,
+            query,
+            cancellationToken);
+    }
+
+    public async Task<ICollection<NewsPageCardDto>> GetAPIFilteredItemsAsync( CardsQuery query, CancellationToken cancellationToken)
+    {
+        return await BuildAndExecuteQueryAsync(
+            query?.CurrentPageGuid?.ToString(),
+            query?.PageType,
+            new HashSet<Guid>(),
+            query,
+            cancellationToken);
+    }
+    private async Task<ICollection<NewsPageCardDto>> BuildAndExecuteQueryAsync(
+        string guid,
+        string pageTypeName,
+        HashSet<Guid> featuredGuids,
+        CardsQuery query,
+        CancellationToken cancellationToken)
     {
         var whereExpressions = new List<Action<WhereParameters>>();
-        var guid = currentPage.SystemFields.ContentItemGUID.ToString();
 
-        var name = currentPage.GetType().Name;
-        Action<WhereParameters>? filter = name switch
+        Action<WhereParameters>? filter = pageTypeName switch
         {
             FilterParameterName.BusinessLine => x => x.WhereContains(nameof(NewsArticle.MetadataBusinessLine), guid),
             FilterParameterName.ServiceArea => x => x.WhereContains(nameof(NewsArticle.MetadataServiceAreas), guid),
@@ -74,14 +104,12 @@ public class NewsCarouselService : INewsCarouselService
             FilterParameterName.MicrositePage => x => x.WhereContains(nameof(NewsArticle.MicrositePages), guid),
             _ => null,
         };
-        if (filter is not null)
-        {
-            whereExpressions.Add(filter);
-        }
 
-        CardsQuery cardsQuery = new CardsQuery();
-        cardsQuery.CurrentPage ??= 1;
-        cardsQuery.PageSize ??= filter is null ? 10 : 20;
+        if (filter is not null)
+            whereExpressions.Add(filter);
+
+        query.CurrentPage ??= 1;
+        query.PageSize ??= filter is null ? 10 : 20;
 
         var sectionNews = (await _contentService.RetrievePagesAsync<SectionNews>(cancellationToken))?
             .OfType<SectionNews>()
@@ -90,9 +118,9 @@ public class NewsCarouselService : INewsCarouselService
         var paginationDto = await _newsArticleCardsService.GetFilteredItemsAsync(
             sectionNews ?? new List<SectionNews>(),
             _contentService.GetCurrentLanguage(),
-            cardsQuery,
+            query,
             whereExpressions,
-            newsArticle => featuredNodeGuids.Contains(newsArticle.SystemFields.WebPageItemGUID),
+            newsArticle => featuredGuids.Contains(newsArticle.SystemFields.WebPageItemGUID),
             cancellationToken);
 
         return paginationDto.Data;

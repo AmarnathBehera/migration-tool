@@ -17,15 +17,15 @@ using CMS.Websites;
 namespace BDO
 {
 	/// <summary>
-	/// Represents a page of type <see cref="Businessissues"/>.
+	/// Represents a page of type <see cref="Businessissue"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class Businessissues : IWebPageFieldsSource
+	public partial class Businessissue : IWebPageFieldsSource
 	{
 		/// <summary>
 		/// Code name of the content type.
 		/// </summary>
-		public const string CONTENT_TYPE_NAME = "BDO.Businessissues";
+		public const string CONTENT_TYPE_NAME = "BDO.Businessissue";
 
 
 		/// <summary>

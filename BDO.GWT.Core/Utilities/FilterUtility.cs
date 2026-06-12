@@ -7,7 +7,7 @@ public static class FilterUtility
 {
     private static readonly Dictionary<string, FilterParameterData> FilterParameterDataByName = new Dictionary<string, FilterParameterData>
     {
-        [FilterParameterName.BusinessIssue] = new("Business Issue", ResourceStringKey.LiveSite.Filters.BusinessIssue, typeof(Businessissues), FilterParameterType.Page),
+        [FilterParameterName.BusinessIssue] = new("Business Issue", ResourceStringKey.LiveSite.Filters.BusinessIssue, typeof(Businessissue), FilterParameterType.Page),
         [FilterParameterName.BusinessLine] = new("Service (Business Line)", ResourceStringKey.LiveSite.Filters.BusinessLine, typeof(BusinessLine), FilterParameterType.Page),
         [FilterParameterName.CareerEmploymentType] = new("Career Employment Type", ResourceStringKey.LiveSite.Filters.CareerEmploymentType, typeof(CareerEmploymentTypes), FilterParameterType.Page),
         [FilterParameterName.CareerJobTitle] = new("Career Job Title", ResourceStringKey.LiveSite.Filters.CareerJobTitle, typeof(CareerJobTitle), FilterParameterType.Page),
@@ -25,8 +25,8 @@ public static class FilterUtility
         [FilterParameterName.IndustryCategory] = new("Industry (Industry Category)", ResourceStringKey.LiveSite.Filters.IndustryCategory, typeof(IndustryCategory), FilterParameterType.Page),
         [FilterParameterName.IndustryPage] = new("Industry", ResourceStringKey.LiveSite.Filters.Industry, typeof(Industry), FilterParameterType.Page),
         //[FilterParameterName.Keywords] = new("Keyword", ResourceStringKey.LiveSite.Filters.Keyword, typeof(IKeywordsPage), FilterParameterType.Field),
-        //[FilterParameterName.MicrositeMasterPage] = new("Microsite (Microsite Master Page)", ResourceStringKey.LiveSite.Filters.MicrositeMasterPage, typeof(MicrositeMasterPage), FilterParameterType.Page),
-        //[FilterParameterName.MicrositePage] = new("Microsite Page", ResourceStringKey.LiveSite.Filters.MicrositePage, typeof(MicrositePage), FilterParameterType.Page),
+        [FilterParameterName.MicrositeMasterPage] = new("Microsite (Microsite Master Page)", ResourceStringKey.LiveSite.Filters.MicrositeMasterPage, typeof(MicrositeMasterPage), FilterParameterType.Page),
+        [FilterParameterName.MicrositePage] = new("Microsite Page", ResourceStringKey.LiveSite.Filters.MicrositePage, typeof(MicrositePage), FilterParameterType.Page),
         [FilterParameterName.OfficeLocation] = new("Office Location", ResourceStringKey.LiveSite.Filters.LocationOffice, typeof(LocationOffice), FilterParameterType.Page),
         [FilterParameterName.City] = new("City (City)", ResourceStringKey.LiveSite.Filters.City, typeof(LocationCity), FilterParameterType.Page),
         [FilterParameterName.Person] = new("Author (Person)", ResourceStringKey.LiveSite.Filters.Author, typeof(Person), FilterParameterType.Page),
@@ -37,7 +37,7 @@ public static class FilterUtility
         [FilterParameterName.SpecialtyArea] = new("Specialty Area", ResourceStringKey.LiveSite.Filters.SpecialtyArea, typeof(SpecialtiesArea), FilterParameterType.Page),
         [FilterParameterName.Specialty] = new("Specialty", ResourceStringKey.LiveSite.Filters.Specialty, typeof(SpecialtiesPage), FilterParameterType.Page),
         //[FilterParameterName.SubIndustry] = new("Sub-Industry", ResourceStringKey.LiveSite.Filters.SubIndustry, typeof(SubIndustry), FilterParameterType.Entity),
-        //[FilterParameterName.SubService] = new("Sub-Service", ResourceStringKey.LiveSite.Filters.SubService, typeof(SubService), FilterParameterType.Page),
+        [FilterParameterName.SubService] = new("Sub-Service", ResourceStringKey.LiveSite.Filters.SubService, typeof(Sub_Service), FilterParameterType.Page),
         //[FilterParameterName.Year] = new("Year", ResourceStringKey.LiveSite.Filters.Year, typeof(IDealPage), FilterParameterType.Field),
     };
     public static FilterParameterData? GetFilterParameterData(string filterParameterName)

@@ -402,21 +402,6 @@
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
-      <field allowempty="true" column="MetadataRssImage" columnprecision="0" columntype="contentitemreference" enabled="true" guid="21b470dc-cce7-4bef-a3aa-7c5140fbc3dc" visible="true">
-        <properties>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>RSS Image</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-          <kxp_schema_identifier>6bf9af2e-ee19-461b-a071-2b6541b36653</kxp_schema_identifier>
-        </properties>
-        <settings>
-          <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["205639d0-5385-472a-bd1a-ba685cf3915d","4e214df1-edd5-4441-a0b7-53849526b1d3","bb17604c-c134-4faa-a401-2727cad93707"]]]>
-          </AllowedContentItemTypeIdentifiers>
-          <controlname>Kentico.Administration.ContentItemSelector</controlname>
-          <SelectionType>contentTypes</SelectionType>
-        </settings>
-      </field>
       <field allowempty="true" column="MetadataBusinessLine" columnprecision="0" columntype="contentitemreference" enabled="true" guid="147446c5-3568-450a-a57c-72f6e905010e" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
@@ -532,6 +517,21 @@
         <settings>
           <AllowedContentItemTypeIdentifiers>
             <![CDATA[["2fbc3346-16df-4d75-a048-f3a714cd5592"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataRssImage" columnprecision="0" columntype="contentitemreference" enabled="true" guid="21b470dc-cce7-4bef-a3aa-7c5140fbc3dc" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>RSS Image</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>6bf9af2e-ee19-461b-a071-2b6541b36653</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["205639d0-5385-472a-bd1a-ba685cf3915d","4e214df1-edd5-4441-a0b7-53849526b1d3","bb17604c-c134-4faa-a401-2727cad93707"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
@@ -996,18 +996,6 @@ MicrositePage;Microsite Page
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
-      <field allowempty="true" column="ItemListFilteringEnabled" columnprecision="0" columntype="boolean" enabled="true" guid="86735151-38d3-4941-bb06-2accb5de1622" visible="true">
-        <properties>
-          <defaultvalue>True</defaultvalue>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Enable filtering</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-          <kxp_schema_identifier>f652f54b-8be8-4f2c-9e40-7dd3ab5dd149</kxp_schema_identifier>
-        </properties>
-        <settings>
-          <controlname>Kentico.Administration.Checkbox</controlname>
-        </settings>
-      </field>
       <field allowempty="true" column="ItemListAdvancedSearchDescription" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7b79d957-f01c-4472-85a7-c0ed4c57fa98" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
@@ -1043,6 +1031,18 @@ MicrositePage;Microsite Page
           <controlname>Kentico.Administration.WebPageSelector</controlname>
           <MaximumPages>1</MaximumPages>
           <Sortable>False</Sortable>
+        </settings>
+      </field>
+      <field allowempty="true" column="ItemListFilteringEnabled" columnprecision="0" columntype="boolean" enabled="true" guid="86735151-38d3-4941-bb06-2accb5de1622" visible="true">
+        <properties>
+          <defaultvalue>True</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Enable filtering</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>f652f54b-8be8-4f2c-9e40-7dd3ab5dd149</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
         </settings>
       </field>
       <schema guid="d572f6e8-b362-4863-bff1-91e107064efe" name="Grid">
@@ -1484,21 +1484,6 @@ after;After
           <TaxonomyGroup>
             <![CDATA[["d03bce74-595d-4de8-9b30-49958b33c252"]]]>
           </TaxonomyGroup>
-        </settings>
-      </field>
-      <field allowempty="true" column="MetadataBusinessLineTG" columnprecision="0" columntype="contentitemreference" enabled="true" guid="c89a85b0-8337-4ed3-a5b3-b7449fb281ba" visible="true">
-        <properties>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Business lines</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-          <kxp_schema_identifier>65cd695f-3c95-40ec-a777-07e3c1796ca0</kxp_schema_identifier>
-        </properties>
-        <settings>
-          <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["b70d2494-90c7-42c5-a7d6-44da7013729b"]]]>
-          </AllowedContentItemTypeIdentifiers>
-          <controlname>Kentico.Administration.ContentItemSelector</controlname>
-          <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
       <field allowempty="true" column="MetadataServicesTG" columnprecision="0" columntype="contentitemreference" enabled="true" guid="c1f84244-df92-4494-a6bf-fe2f674f62f2" visible="true">

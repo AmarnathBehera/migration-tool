@@ -23,6 +23,6 @@ public interface IEventOrWebinar : IWebPageFieldsSource
     IEnumerable<IndustryCategory> MetadataIndustryCategories { get; }
     IEnumerable<LocationOffice> MetadataOfficeLocation { get; }
     IEnumerable<EventType> EventType { get; }
-    IEnumerable<Businessissues> MetadataBusinessIssues { get; }
+    IEnumerable<Businessissue> MetadataBusinessIssues { get; }
     bool ShowPastEvent { get; }
 }

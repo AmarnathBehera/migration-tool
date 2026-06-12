@@ -26,7 +26,7 @@ public class WebinarWrapper : IEventOrWebinar
     public IEnumerable<IndustryCategory> MetadataIndustryCategories => _webinar.MetadataIndustryCategories;
     public IEnumerable<LocationOffice> MetadataOfficeLocation => _webinar.MetadataOfficeLocation;
     public IEnumerable<EventType> EventType => _webinar.EventType;
-    public IEnumerable<Businessissues> MetadataBusinessIssues => _webinar.MetadataBusinessIssues;
+    public IEnumerable<Businessissue> MetadataBusinessIssues => _webinar.MetadataBusinessIssues;
     public bool ShowPastEvent => _webinar.ShowPastEvent;
     public WebPageFields SystemFields => _webinar.SystemFields;
 }

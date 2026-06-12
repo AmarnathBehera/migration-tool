@@ -36,6 +36,18 @@ namespace BDO
 
 
 		/// <summary>
+		/// MetadataKeywordsBlog.
+		/// </summary>
+		public string MetadataKeywordsBlog { get; set; }
+
+
+		/// <summary>
+		/// MetadataBusinessIssues.
+		/// </summary>
+		public IEnumerable<Businessissue> MetadataBusinessIssues { get; set; }
+
+
+		/// <summary>
 		/// ShowCallToAction.
 		/// </summary>
 		public bool ShowCallToAction { get; set; }
@@ -168,27 +180,21 @@ namespace BDO
 
 
 		/// <summary>
-		/// MetadataRssImage.
-		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataRssImage { get; set; }
-
-
-		/// <summary>
 		/// MetadataBusinessLine.
 		/// </summary>
 		public IEnumerable<BusinessLine> MetadataBusinessLine { get; set; }
 
 
 		/// <summary>
-		/// MetadataServices.
-		/// </summary>
-		public IEnumerable<Service> MetadataServices { get; set; }
-
-
-		/// <summary>
 		/// MetadataServiceAreas.
 		/// </summary>
 		public IEnumerable<ServiceArea> MetadataServiceAreas { get; set; }
+
+
+		/// <summary>
+		/// MetadataServices.
+		/// </summary>
+		public IEnumerable<Service> MetadataServices { get; set; }
 
 
 		/// <summary>
@@ -219,6 +225,12 @@ namespace BDO
 		/// MetadataRssCategory.
 		/// </summary>
 		public IEnumerable<MicrositePlaceholder> MetadataRssCategory { get; set; }
+
+
+		/// <summary>
+		/// MetadataRssImage.
+		/// </summary>
+		public IEnumerable<IContentItemFieldsSource> MetadataRssImage { get; set; }
 
 
 		/// <summary>
