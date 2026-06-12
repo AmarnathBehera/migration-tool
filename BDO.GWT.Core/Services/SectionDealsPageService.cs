@@ -1,11 +1,14 @@
 ﻿using BDO.GWT.Common.Exceptions;
 using BDO.GWT.Core;
 using BDO.GWT.Core.Constants;
+using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.DTOs.Pages;
+using BDO.GWT.Core.Helper;
 using BDO.GWT.Core.Services;
+using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
 using CMS.Websites;
 using CMS.Websites.Routing;
@@ -25,15 +28,14 @@ public class SectionDealsPageService : ISectionDealsPageService
     private readonly ICultureContext _cultureContext;
     private readonly IContentService _contentRetriever;
     private readonly IWebsiteChannelContext _websiteChannelContext;
-    private readonly ICardsService _cardsService;
     private readonly IDealCardsService _dealCardsService;
+    private int currentDealPageId;
 
-    public SectionDealsPageService(ICultureContext cultureContext, IContentService contentRetriever, IWebsiteChannelContext websiteChannelContext, ICardsService cardsService, IDealCardsService dealCardsService)
+    public SectionDealsPageService(ICultureContext cultureContext, IContentService contentRetriever, IWebsiteChannelContext websiteChannelContext, IDealCardsService dealCardsService)
     {
         _cultureContext = cultureContext;
         _contentRetriever = contentRetriever;
         _websiteChannelContext = websiteChannelContext;
-        _cardsService = cardsService;
         _dealCardsService = dealCardsService;
     }
 
@@ -91,7 +93,7 @@ public class SectionDealsPageService : ISectionDealsPageService
 
         var dto = new SectionDealsDto
         {
-            Filters = page.SectionDealsFilteringEnabled ? await _cardsService.CreateFiltersAsync(sectionDealsUpdatedFilters, null, cancellationToken) : new List<FilterItemDto<OptionDto>>(),
+            Filters = page.SectionDealsFilteringEnabled ? await CreateDealsFiltersAsync(sectionDealsUpdatedFilters, page.SystemFields.ContentItemID , null, cancellationToken) : new List<FilterItemDto<OptionDto>>(),
             PageSize = 12,
             ApiEndpoint = $"Deals/{page.SystemFields.ContentItemGUID}" +
             $"/Get",
@@ -124,4 +126,150 @@ public class SectionDealsPageService : ISectionDealsPageService
 
         return paginationDto;
     }
+
+    private async Task<FilterItemDto<OptionDto>[]> CreateDealsFiltersAsync(HashSet<string> filterParameterNames, int pageId, string? nodeAliasPath, CancellationToken cancellationToken)
+    {
+        currentDealPageId = pageId;
+        var filterItems = new List<FilterItemDto<OptionDto>>();
+
+        foreach (var filterParameterName in filterParameterNames)
+        {
+            var filterParameterData = FilterUtility.GetFilterParameterData(filterParameterName);
+
+            if (filterParameterData is null)
+            {
+                continue;
+            }
+
+            var options = filterParameterData.FilterParameterType switch
+            {
+                FilterParameterType.Page => await BuildOptionsForPageFilterAsync(filterParameterData, cancellationToken),
+                FilterParameterType.Tagpage => await BuildOptionsForTagPageFilterAsync(filterParameterData, cancellationToken),
+
+                // FilterParameterType.Entity => await BuildOptionsForEntityFilterAsync(filterParameterData, cancellationToken),
+                FilterParameterType.Field => await BuildOptionsForFieldFilterAsync(filterParameterData, cancellationToken),
+                //FilterParameterType.Taxonomy => await BuildOptionsForTaxonomyFilterAsync(filterParameterData, cancellationToken),
+                _ => throw new NotSupportedException($"Filter parameter type {filterParameterData.FilterParameterType} is not supported."),
+            };
+
+            var filterItem = FilterDtoUtility.CreateFilterItemDto(FilterItemType.Select, filterParameterName, filterParameterData.LiveSiteDisplayName, null, options);
+
+            filterItems.Add(filterItem);
+        }
+
+        return filterItems.ToArray();
+    }
+
+    private async Task<OptionDto[]> BuildOptionsForPageFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
+    {
+        var entityType = filterParameterData.EntityType;
+        if (entityType.Name == "SectionDeals")
+        {
+          var items = await _contentRetriever.GetChildPagesByParentGuidAsync<Deal>(currentDealPageId, cancellationToken);
+
+          var options = items
+          .Select(x =>
+          {
+              var type = x.GetType();
+
+              var metadataTitle =
+                  type.GetProperty("MetadataTitle")?.GetValue(x) as string;
+
+              var metadataOgTitle =
+                  type.GetProperty("MetadataOGTitle")?.GetValue(x) as string;
+
+              var systemFields =
+                  type.GetProperty("SystemFields")?.GetValue(x);
+
+              var contentItemName =
+                  systemFields?.GetType()
+                      .GetProperty("ContentItemName")
+                      ?.GetValue(systemFields) as string;
+
+              var name = metadataTitle ?? metadataOgTitle ?? contentItemName;
+
+              return new OptionDto
+              {
+                  Value = name,
+                  Label = name
+              };
+          })
+          .Where(x => !string.IsNullOrWhiteSpace(x.Value))
+          .OrderBy(x => x.Label)
+          .ToArray();
+
+
+            return options;
+        }
+        else
+        {
+            return Array.Empty<OptionDto>();
+        }
+    }
+
+    private async Task<OptionDto[]> BuildOptionsForTagPageFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
+    {
+        var entityType = filterParameterData.EntityType;
+
+        var items = await _contentRetriever.GetItemsByTypesAsync(
+            new[] { entityType },
+            _websiteChannelContext.WebsiteChannelID,
+            cancellationToken);
+
+        var options = items
+                    .Select(x =>
+                    {
+                        var type = x.GetType();
+
+                        var tagNameValue = type.GetProperty("Name")?.GetValue(x);
+
+                        string name = tagNameValue is string s ? s : string.Empty;
+
+
+                        return new OptionDto
+                        {
+                            Value = name,
+                            Label = name
+
+
+                        };
+                    })
+                          .Where(x => !string.IsNullOrWhiteSpace(x.Value))
+                          .OrderBy(x => x.Label)
+                          .ToArray();
+
+        return options;
+    }
+
+    private async Task<OptionDto[]> BuildOptionsForFieldFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
+    {
+        var entityType = filterParameterData.EntityType;
+        var options = Array.Empty<OptionDto>();
+
+        var items = await _contentRetriever.GetItemsByTypesAsync(
+            new[] { entityType },
+            _websiteChannelContext.WebsiteChannelID,
+            cancellationToken);
+
+        if (items is null || !items.Any())
+        {
+            return options;
+        }
+
+        switch (filterParameterData.EntityType)
+        {
+            case { } type when type == typeof(BlogPost):
+                options = items
+                    .Select(x => x.GetType().GetProperty(nameof(BlogPost.MetadataKeywordsBlog))?.GetValue(x) as string)
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .SelectMany(x => KeywordsHelper.ParseKeywords(x!))
+                    .Distinct()
+                    .Select(x => FilterDtoUtility.CreateOptionDto(x, x))
+                    .ToArray();
+                break;
+        }
+
+        return options;
+    }
+
 }
