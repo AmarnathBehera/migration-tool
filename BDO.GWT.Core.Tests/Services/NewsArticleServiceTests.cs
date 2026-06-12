@@ -78,32 +78,20 @@ public class NewsArticleServiceTests
     }
 
     [Test]
-    public async Task GetContentPageSidebarDto_ReturnsExpectedSidebar()
+    public async Task GetSectionNewsPageDtoAsync_WhenPageIsNull_ReturnsNull()
     {
-        var expectedSidebar = new ContentSidebarDto
-        {
-            TypeName = "Article",
-            RelevantContactPeopleTitle = "Authors",
-            ShowCopyLinkButton = true
-        };
-
         _newsArticleServiceMock
-            .Setup(x => x.GetContentPageSidebarDto(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(expectedSidebar);
+            .Setup(x => x.GetSectionNewsPageDtoAsync(null!, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((SectionNewsPageDto?)null);
 
-        var result = await _newsArticleServiceMock.Object.GetContentPageSidebarDto(
-            new NewsArticle(), CancellationToken.None);
+        var result = await _newsArticleServiceMock.Object.GetSectionNewsPageDtoAsync(
+            null!, CancellationToken.None);
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.TypeName, Is.EqualTo("Article"));
-            Assert.That(result.RelevantContactPeopleTitle, Is.EqualTo("Authors"));
-            Assert.That(result.ShowCopyLinkButton, Is.True);
-        });
+        Assert.That(result, Is.Null);
     }
 
     [Test]
-    public async Task GetNewsPageDtoAsync_InvokedOnce()
+    public async Task GetSectionNewsPageDtoAsync_InvokedOnce()
     {
         _newsArticleServiceMock
             .Setup(x => x.GetSectionNewsPageDtoAsync(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
@@ -117,16 +105,23 @@ public class NewsArticleServiceTests
     }
 
     [Test]
-    public async Task GetContentPageSidebarDto_InvokedOnce()
+    public async Task GetSectionNewsPageDtoAsync_WhenSidebarShown_ShowCopyLinkButtonIsSet()
     {
+        var expectedDto = new SectionNewsPageDto
+        {
+            Sidebar = new ContentSidebarDto
+            {
+                ShowCopyLinkButton = true
+            }
+        };
+
         _newsArticleServiceMock
-            .Setup(x => x.GetContentPageSidebarDto(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new ContentSidebarDto { RelevantContactPeopleTitle = "Authors" });
+            .Setup(x => x.GetSectionNewsPageDtoAsync(It.IsAny<NewsArticle>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expectedDto);
 
-        var page = new NewsArticle();
-        await _newsArticleServiceMock.Object.GetContentPageSidebarDto(page, CancellationToken.None);
+        var result = await _newsArticleServiceMock.Object.GetSectionNewsPageDtoAsync(
+            new NewsArticle(), CancellationToken.None);
 
-        _newsArticleServiceMock.Verify(
-            x => x.GetContentPageSidebarDto(page, It.IsAny<CancellationToken>()), Times.Once);
+        Assert.That(result.Sidebar!.ShowCopyLinkButton, Is.True);
     }
 }

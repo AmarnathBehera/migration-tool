@@ -141,6 +141,7 @@ public class NewsArticleCardsService : INewsArticleCardsService
             var filter = filterParameterData.FilterParameterType switch
             {
                 FilterParameterType.Page => await GetPageFilterAsync(filterParameterName, filterParameterValue),
+                FilterParameterType.Tagpage => await GetTagPageFilterAsync(filterParameterName, filterParameterValue),
                 _ => null,
             };
 
@@ -172,7 +173,27 @@ public class NewsArticleCardsService : INewsArticleCardsService
             FilterParameterName.IndustryPage => x => x.WhereContains(nameof(NewsArticle.MetadataIndustries), guid),
             FilterParameterName.MicrositeMasterPage => x => x.WhereContains(nameof(NewsArticle.MicrositeMasterPages), guid),
             FilterParameterName.MicrositePage => x => x.WhereContains(nameof(NewsArticle.MicrositePages), guid),
+            
+            _ => null,
+        };
+    }
+
+    private async Task<Action<WhereParameters>?> GetTagPageFilterAsync(string filterName, string filterValue)
+    {
+
+        var page = await _contentService.GetPageByTypeAndNameAsync(
+            FilterUtility.GetFilterParameterData(filterName)!.EntityType, filterValue);
+
+        if (page is null)
+            return null;
+
+        var guid = page.SystemFields.ContentItemGUID.ToString();
+
+        return filterName switch
+        {
+
             FilterParameterName.ContentType => w => w.WhereContains(nameof(NewsArticle.ContentType), guid),
+
             _ => null,
         };
     }

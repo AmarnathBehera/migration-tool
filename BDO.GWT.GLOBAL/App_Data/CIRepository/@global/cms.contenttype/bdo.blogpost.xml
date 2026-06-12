@@ -34,9 +34,34 @@
       <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
         <properties />
       </schema>
-      <schema guid="65cd695f-3c95-40ec-a777-07e3c1796ca0" name="65cd695f-3c95-40ec-a777-07e3c1796ca0">
+      <schema guid="6bf9af2e-ee19-461b-a071-2b6541b36653" name="6bf9af2e-ee19-461b-a071-2b6541b36653">
         <properties />
       </schema>
+      <field column="MetadataKeywordsBlog" columnprecision="0" columntype="longtext" enabled="true" guid="fca5b4eb-d973-4608-a3aa-9108e4af9e82" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Keywords</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataBusinessIssues" columnprecision="0" columntype="contentitemreference" enabled="true" guid="e02fe3e1-085e-4ea2-a37b-5e00e146f704" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Business Issue</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["252cdc0e-f6a0-424f-bd6b-2584655e66c7"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
     </form>
   </ClassFormDefinition>
   <ClassGUID>75615b26-2702-4a3a-bf7d-34c13b87bb63</ClassGUID>
