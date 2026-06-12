@@ -93,7 +93,7 @@ public class SectionDealsPageService : ISectionDealsPageService
 
         var dto = new SectionDealsDto
         {
-            Filters = page.SectionDealsFilteringEnabled ? await CreateDealsFiltersAsync(sectionDealsUpdatedFilters, page.SystemFields.ContentItemID , null, cancellationToken) : new List<FilterItemDto<OptionDto>>(),
+            Filters = page.SectionDealsFilteringEnabled ? await CreateDealsFiltersAsync(sectionDealsUpdatedFilters, page.SystemFields.WebPageItemID , null, cancellationToken) : new List<FilterItemDto<OptionDto>>(),
             PageSize = 12,
             ApiEndpoint = $"Deals/{page.SystemFields.ContentItemGUID}" +
             $"/Get",
@@ -163,10 +163,13 @@ public class SectionDealsPageService : ISectionDealsPageService
     private async Task<OptionDto[]> BuildOptionsForPageFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
     {
         var entityType = filterParameterData.EntityType;
-        if (entityType.Name == "SectionDeals")
+        if (entityType.Name == "DealCardCommon")
         {
-          var items = await _contentRetriever.GetChildPagesByParentGuidAsync<Deal>(currentDealPageId, cancellationToken);
-
+          var items = await _contentRetriever.GetPagesAsync<DealCardCommon>(new RetrievePagesParameters { LinkedItemsMaxLevel = 5 },
+            query => query
+                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken);
           var options = items
           .Select(x =>
           {
