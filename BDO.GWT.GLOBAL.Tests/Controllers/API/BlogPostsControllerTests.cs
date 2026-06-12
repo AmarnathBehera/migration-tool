@@ -138,6 +138,7 @@ public class BlogPostsControllerTests
 
         // No culture route value set
 
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
         _ = _blogsPageServiceMock
             .Setup(x => x.GetBlogsPaginationResultAsync(
                 It.IsAny<int>(),
@@ -145,11 +146,13 @@ public class BlogPostsControllerTests
                 It.IsAny<CardsQuery>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PaginationDto<BlogPageCardDto?> { Data = Array.Empty<BlogPageCardDto?>(), TotalCount = 0 });
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 
         // Act
         await _controller.Get(pageId, query, CancellationToken.None);
 
         // Assert
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
         _blogsPageServiceMock.Verify(
             x => x.GetBlogsPaginationResultAsync(
                 It.IsAny<int>(),
@@ -157,6 +160,7 @@ public class BlogPostsControllerTests
                 It.IsAny<CardsQuery>(),
                 It.IsAny<CancellationToken>()),
             Times.Once);
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
     }
 
     [Test]
