@@ -15,18 +15,10 @@
     Layout = "_Layout";
 }
 
+@* @await Html.PartialAsync("~/Views/ContentPage/_Hero.cshtml") *@
 <div>
     @if (Model != null && pageId != 0)
     {
-        @(await ReactService.RenderComponentAsync(
-            pageId,
-            ReactComponentType.Hero,
-            ReactComponentType.HeroGUID,
-            new
-            {
-               data = Model.Hero,
-            }, Context.RequestAborted))
-
         @(await ReactService.RenderComponentAsync(
             pageId,
             ReactComponentType.DealsCardsGrid,
