@@ -5,9 +5,6 @@ using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
-using BDO.GWT.Web.Core.DTOs;
-
-using CMS.ContentEngine;
 using CMS.Websites;
 
 using Kentico.Content.Web.Mvc;
@@ -19,33 +16,31 @@ using System.Threading.Tasks;
 namespace BDO.GWT.Web.Core.Services;
 
 public interface ICareerDetailPageService
-    {
-        Task<CareerPageDto> GetCareerPageDtoAsync( CancellationToken cancellationToken);
-    }
-    public class CareerDetailPageService : ICareerDetailPageService
-    {
-        private readonly IHeroService _heroService;
+{
+    Task<CareerPageDto> GetCareerPageDtoAsync(CancellationToken cancellationToken);
+}
+public class CareerDetailPageService : ICareerDetailPageService
+{
+    private readonly IHeroService _heroService;
 
     private readonly IContentRetriever _contentRetriever;
-    private readonly ICultureContext _cultureContext;
     private readonly ISocialMediaButtonsService _socialMediaButtonsService;
     private readonly ISettingService _settingsService;
     private readonly IContentService _contentService;
 
-    public CareerDetailPageService(IHeroService heroService, IContentRetriever contentRetriever, ICultureContext cultureContext, ISocialMediaButtonsService socialMediaButtonsService, ISettingService settingsService, IContentService contentService)
+    public CareerDetailPageService(IHeroService heroService, IContentRetriever contentRetriever, ISocialMediaButtonsService socialMediaButtonsService, ISettingService settingsService, IContentService contentService)
     {
         _heroService = heroService;
 
         _contentRetriever = contentRetriever;
-        _cultureContext = cultureContext;
         _socialMediaButtonsService = socialMediaButtonsService;
         _settingsService = settingsService;
-        _contentService = contentService;   
+        _contentService = contentService;
     }
 
 
-        public async Task<CareerPageDto> GetCareerPageDtoAsync(CancellationToken cancellationToken)
-        {
+    public async Task<CareerPageDto> GetCareerPageDtoAsync(CancellationToken cancellationToken)
+    {
         var page = await _contentRetriever.RetrieveCurrentPage<Career>(
                 new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
 
@@ -78,50 +73,43 @@ public interface ICareerDetailPageService
         var dto = new CareerPageDto
         {
             Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
-            Content = await GetContentPageDtoAsync(page, cancellationToken),
+            Content = await GetContentPageDtoAsync(page),
             Form = page.CareerApplyForm,
             Sidebar = page.ShowSidebar ? await GetCareerSidebarDtoAsync(page, cancellationToken) : null,
         };
- 
-
-            return dto;
-        }
-    
-
-    private async Task<CareerContentDto> GetContentPageDtoAsync(Career careerPage, CancellationToken cancellationToken)
-        {
-        var languageTag = _cultureContext.CurrentLanguageTag;
 
 
+        return dto;
+    }
 
 
-        var locationOfficeNames = careerPage.MetadataOfficeLocation.Select(i=> i.MetadataTitle).ToArray();
-
-
+    private static Task<CareerContentDto> GetContentPageDtoAsync(Career careerPage)
+    {
+        var locationOfficeNames = careerPage.MetadataOfficeLocation.Select(i => i.MetadataTitle).ToArray();
         var contactPersonName = careerPage.CareerContactPeopleID.FirstOrDefault();
 
         var dto = new CareerContentDto
-            {
-                Title = careerPage.MetadataTitle,
+        {
+            Title = careerPage.MetadataTitle,
             JobTitle = careerPage.CareerJobTitle.FirstOrDefault()?.Name ?? string.Empty,
             Reference = careerPage.CareerReference,
             EmploymentType = careerPage.CareerEmploymentType.FirstOrDefault()?.Name ?? string.Empty,
             Level = careerPage.CareerLevel.FirstOrDefault()?.Name ?? string.Empty,
             Locations = locationOfficeNames,
-                Content = careerPage.MetadataDescription,
+            Content = careerPage.MetadataDescription,
             ContactPerson = contactPersonName?.MetadataTitle,
         };
 
-            return dto;
-        }
+        return Task.FromResult(dto);
+    }
 
     private async Task<ContentSidebarDto> GetCareerSidebarDtoAsync(Career careerPage, CancellationToken cancellationToken)
     {
         var sidebarDto = await GetSidebarDtoAsync(careerPage, cancellationToken);
 
-        sidebarDto.ShowCopyLinkButton = await GetShowCopyLinkOptionFromSectionPageAsync(careerPage,sidebarDto.ShowCopyLinkButton,cancellationToken); 
+        sidebarDto.ShowCopyLinkButton = await GetShowCopyLinkOptionFromSectionPageAsync(careerPage, sidebarDto.ShowCopyLinkButton, cancellationToken);
 
-        sidebarDto.PublishDate = careerPage.DocumentPublishFrom; 
+        sidebarDto.PublishDate = careerPage.DocumentPublishFrom;
 
         sidebarDto.RelevantContactPeopleTitle = ResourceStringKey.LiveSite.Careers.RelevantContactPeople;
 
@@ -161,13 +149,13 @@ public interface ICareerDetailPageService
                 .FirstOrDefault()?
                 .ContentAttachmentAsset
                 .Url,
-            SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page,page.PageTitle, cancellationToken) : null,
+            SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page, page.PageTitle, cancellationToken) : null,
             ShowCopyLinkButton = settingInfo?.DisableCopyLinkButton == true
         };
 
         if (sidebarDto.SocialMediaButtons is not null)
         {
-            sidebarDto.SocialMediaButtons.ShowCopyLinkButton = null; 
+            sidebarDto.SocialMediaButtons.ShowCopyLinkButton = null;
         }
 
         return sidebarDto;
@@ -175,7 +163,7 @@ public interface ICareerDetailPageService
 
     private async Task<bool> GetShowCopyLinkOptionFromSectionPageAsync(Career careerPage, bool showCopyLinkButton, CancellationToken cancellationToken)
     {
-        var careers = await _contentService.GetPagesAsync<Careers>(new RetrievePagesParameters { },query => query.Where(w => w.WhereEquals("WebPageItemID",careerPage.SystemFields.WebPageItemParentID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
+        var careers = await _contentService.GetPagesAsync<Careers>(new RetrievePagesParameters { }, query => query.Where(w => w.WhereEquals("WebPageItemID", careerPage.SystemFields.WebPageItemParentID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
 
         if (careers is null)
         {
@@ -191,7 +179,7 @@ public interface ICareerDetailPageService
         {
             throw new MissingSectionPageException($"'No pages have been found of type '{nameof(SectionCareers)}'.");
         }
-        
+
 
         return sectionCareer.ShowCopyUrlButtonInJobOpportunity && showCopyLinkButton;
     }
