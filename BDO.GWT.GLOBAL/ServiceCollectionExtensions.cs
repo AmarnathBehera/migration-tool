@@ -36,7 +36,6 @@ public static class ServiceCollectionExtensions
           .ValidateDataAnnotations();
 
         serviceCollection.AddHttpClient();
-        serviceCollection.AddScoped<GlobalSettingsService>();
         serviceCollection.AddScoped<IContactPageService, ContactPageService>();
         serviceCollection.AddScoped<IHeroService, HeroService>();
         serviceCollection.AddScoped<XperiencePageContext>();
@@ -68,6 +67,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<INewsGroupPageService, NewsGroupPageService>();
         serviceCollection.AddScoped<INewsArticleService, NewsArticleService>();
         serviceCollection.AddScoped<INewsArticleCardsService, NewsArticleCardsService>();
+        serviceCollection.AddScoped<IAuthoredContentService, AuthoredContentService>();
         serviceCollection.AddScoped<ISidebarService, SidebarService>();
         serviceCollection.AddScoped<ISocialMediaButtonsService, SocialMediaButtonsService>();
         serviceCollection.AddScoped<IExternalPeopleHelper, ExternalPeopleHelper>();
@@ -96,6 +96,11 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ICareerCategoryPageService, CareerCategoryPageService>();
         serviceCollection.AddScoped<ICareerContentPageService, CareerContentPageService>();
         serviceCollection.AddScoped<IChannelAccessService, ChannelAccessService>();
+        serviceCollection.AddScoped<ISectionBlogService, SectionBlogService>();
+        serviceCollection.AddScoped<IBlogPostPageService, BlogPostPageService>();
+        serviceCollection.AddScoped<IBlogsPageService, BlogsPageService>();
+        serviceCollection.AddScoped<IBlogPageCardsService, BlogPageCardsService>();
+        
         serviceCollection.AddScoped<ISocialMediaButtonsService, SocialMediaButtonsService>();
         serviceCollection.AddScoped<ISpecialtiesPageService, SpecialtiesPageService>();
         serviceCollection.AddScoped<ISpecialtiesAreaPageService, SpecialtiesAreaPageService>();
@@ -104,6 +109,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IDealPageService, DealPageService>();
         serviceCollection.AddScoped<IRssSectionPageService,RssSectionPageService>();
 
+        serviceCollection.AddScoped<ITabAccordionService, TabAccordionService>();
     }
 
 }

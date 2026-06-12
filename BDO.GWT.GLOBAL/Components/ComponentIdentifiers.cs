@@ -38,6 +38,8 @@
 
             public const string KeyTakeaways = WidgetPrefix + "KeyTakeaways";
 
+            public const string TabAccordion = WidgetPrefix + "TabAccordion";
+
         }
 
         //sections

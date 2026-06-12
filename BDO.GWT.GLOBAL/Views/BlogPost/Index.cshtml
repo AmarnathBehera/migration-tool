@@ -1,0 +1,30 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Core.DTOs.BlogPostDto
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+
+    
+}
+
+<div>
+    @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.InsightDetails,
+        ReactComponentType.InsightDetailsGUID,
+        new { data = Model },
+        Context.RequestAborted))
+</div>
+
+
+

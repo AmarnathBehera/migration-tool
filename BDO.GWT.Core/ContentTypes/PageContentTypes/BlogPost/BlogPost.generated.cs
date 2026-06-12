@@ -36,6 +36,18 @@ namespace BDO
 
 
 		/// <summary>
+		/// MetadataKeywordsBlog.
+		/// </summary>
+		public string MetadataKeywordsBlog { get; set; }
+
+
+		/// <summary>
+		/// MetadataBusinessIssues.
+		/// </summary>
+		public IEnumerable<Businessissues> MetadataBusinessIssues { get; set; }
+
+
+		/// <summary>
 		/// ShowCallToAction.
 		/// </summary>
 		public bool ShowCallToAction { get; set; }

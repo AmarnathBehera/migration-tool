@@ -7,12 +7,12 @@ public static class FilterUtility
 {
     private static readonly Dictionary<string, FilterParameterData> FilterParameterDataByName = new Dictionary<string, FilterParameterData>
     {
-        [FilterParameterName.BusinessIssue] = new("Business Issue", ResourceStringKey.LiveSite.Filters.BusinessIssue, typeof(Businessissues), FilterParameterType.Page),
+        [FilterParameterName.BusinessIssue] = new("Topic (Business Issue)", ResourceStringKey.LiveSite.Filters.BusinessIssue, typeof(Businessissue), FilterParameterType.Tagpage),
         [FilterParameterName.BusinessLine] = new("Service (Business Line)", ResourceStringKey.LiveSite.Filters.BusinessLine, typeof(BusinessLine), FilterParameterType.Page),
-        [FilterParameterName.CareerEmploymentType] = new(Taxonomies.CareerEmploymentType, ResourceStringKey.LiveSite.Filters.CareerEmploymentType, typeof(CareerEmploymentType), FilterParameterType.Taxonomy),
-        [FilterParameterName.CareerJobTitle] = new(Taxonomies.CareerJobTitle, ResourceStringKey.LiveSite.Filters.CareerJobTitle, typeof(CareerJobTitle), FilterParameterType.Taxonomy),
-        [FilterParameterName.CareerLevel] = new(Taxonomies.CareerLevel, ResourceStringKey.LiveSite.Filters.CareerLevel, typeof(CareerLevel), FilterParameterType.Taxonomy),
-        [FilterParameterName.ContentType] = new("ContentType", ResourceStringKey.LiveSite.Filters.ContentType, typeof(Contenttypes), FilterParameterType.Page),
+        [FilterParameterName.CareerEmploymentType] = new("Career Employment Type", ResourceStringKey.LiveSite.Filters.CareerEmploymentType, typeof(CareerEmploymentTypes), FilterParameterType.Page),
+        [FilterParameterName.CareerJobTitle] = new("Career Job Title", ResourceStringKey.LiveSite.Filters.CareerJobTitle, typeof(CareerJobTitle), FilterParameterType.Page),
+        [FilterParameterName.CareerLevel] = new("Career Level", ResourceStringKey.LiveSite.Filters.CareerLevel, typeof(CareerLevels), FilterParameterType.Page),
+        [FilterParameterName.ContentType] = new("ContentType", ResourceStringKey.LiveSite.Filters.ContentType, typeof(Contenttypes), FilterParameterType.Tagpage),
         //[FilterParameterName.Country] = new("industryCategoryCountry", ResourceStringKey.LiveSite.Filters.Country, typeof(IDealPage), FilterParameterType.Field),
         [FilterParameterName.Credential] = new("Credential", ResourceStringKey.LiveSite.Filters.Credential, typeof(Credentials), FilterParameterType.Page),
         //[FilterParameterName.DealType] = new("Deal Type", ResourceStringKey.LiveSite.Filters.DealType, typeof(DealType), FilterParameterType.Entity),
@@ -24,7 +24,7 @@ public static class FilterUtility
         [FilterParameterName.IndustryService] = new("Industry Service", ResourceStringKey.LiveSite.Filters.IndustryService, typeof(IndustryService), FilterParameterType.Page),
         [FilterParameterName.IndustryCategory] = new("Industry (Industry Category)", ResourceStringKey.LiveSite.Filters.IndustryCategory, typeof(IndustryCategory), FilterParameterType.Page),
         [FilterParameterName.IndustryPage] = new("Industry", ResourceStringKey.LiveSite.Filters.Industry, typeof(Industry), FilterParameterType.Page),
-        //[FilterParameterName.Keywords] = new("Keyword", ResourceStringKey.LiveSite.Filters.Keyword, typeof(IKeywordsPage), FilterParameterType.Field),
+        [FilterParameterName.Keywords] = new("MetadataKeywordsBlog", ResourceStringKey.LiveSite.Filters.Keyword, typeof(BlogPost), FilterParameterType.Field),
         //[FilterParameterName.MicrositeMasterPage] = new("Microsite (Microsite Master Page)", ResourceStringKey.LiveSite.Filters.MicrositeMasterPage, typeof(MicrositeMasterPage), FilterParameterType.Page),
         //[FilterParameterName.MicrositePage] = new("Microsite Page", ResourceStringKey.LiveSite.Filters.MicrositePage, typeof(MicrositePage), FilterParameterType.Page),
         [FilterParameterName.OfficeLocation] = new("Office Location", ResourceStringKey.LiveSite.Filters.LocationOffice, typeof(LocationOffice), FilterParameterType.Page),
