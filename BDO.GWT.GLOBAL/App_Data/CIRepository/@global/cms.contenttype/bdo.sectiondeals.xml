@@ -65,6 +65,9 @@ year;Year
       <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
         <properties />
       </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
     </form>
   </ClassFormDefinition>
   <ClassGUID>c9ad5d32-9b92-477d-abd0-6b732dc1e86f</ClassGUID>
