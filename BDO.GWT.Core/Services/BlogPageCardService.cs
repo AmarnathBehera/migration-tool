@@ -255,38 +255,44 @@ namespace BDO.GWT.Core.Services
         {
             var filterWhereExpressions = await GetFilterParameterWhereExpressionsAsync(cardsQuery.Filters);
 
+            //Get blog groups under the parent page Blogs, to then get the blog posts under each group.
+            //This is needed to apply the parent page filter for blog posts if provided in the query parameters.
+            //as each blog post is under a blog group and not directly under the Blogs parent page.
             var blogPostsGroups = await _contentService.GetChildPagesByParentGuidAsync<BlogPostGroup>(parentPageId, cancellationToken);
-                        
+
             List<BlogPost> blogPostsList = new List<BlogPost>();
 
             foreach (var blogPostGrp in blogPostsGroups)
             {
                 var blogPosts = await _contentService.GetChildPagesByParentGuidWithQueryBuilderAsync<BlogPost>(
                                    query =>
-                                    {
-                                         // Apply parent ID filter if provided
-                                          if (parentPageId > 0)
-                                          {
-                                              query.Parameters(p => p.Where(w => w.WhereEquals(nameof(BlogPost.SystemFields.WebPageItemParentID), blogPostGrp.SystemFields.WebPageItemID)));
-                                          }
+                                   {
+                                       // Filter by specific language
+                                       query.InLanguage(language);
 
-                                          // Apply filter expressions
-                                          foreach (var filterExpression in filterWhereExpressions)
-                                          {
-                                              query.Parameters(p => p.Where(filterExpression));
-                                          }
+                                       // Apply parent ID filter if provided
+                                       if (parentPageId > 0)
+                                       {
+                                           query.Parameters(p => p.Where(w => w.WhereEquals(nameof(BlogPost.SystemFields.WebPageItemParentID), blogPostGrp.SystemFields.WebPageItemID)));
+                                       }
 
-                                          // Apply any additional query decorations
-                                          decorateQuery?.Invoke(query);
-                                    },
+                                       // Apply filter expressions
+                                       foreach (var filterExpression in filterWhereExpressions)
+                                       {
+                                           query.Parameters(p => p.Where(filterExpression));
+                                       }
+
+                                       // Apply any additional query decorations
+                                       decorateQuery?.Invoke(query);
+                                   },
                                     cancellationToken);
-                 
+
 
                 blogPostsList.AddRange(blogPosts);
             }
-          
 
-            var orderedBlogPosts = blogPostsList
+
+                var orderedBlogPosts = blogPostsList
                 .Where(x => x is not null)
                 .OrderByDescending(isFeatured)
                 .ThenByDescending(x => x.SystemFields.ContentItemCommonDataLastPublishedWhen
