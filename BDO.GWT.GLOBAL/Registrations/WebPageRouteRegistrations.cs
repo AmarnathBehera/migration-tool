@@ -1,4 +1,5 @@
 ﻿using BDO;
+using BDO.GWT.Controllers;
 using BDO.GWT.Web.Controllers;
 using BDO.GWT.Web.Core.LiveSite.Controllers;
 using GWTXbyKWeb.Controllers;
@@ -312,3 +313,4 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     IconClass = "xp-market")]
 
 [assembly: RegisterWebPageRoute(SectionRss.CONTENT_TYPE_NAME, typeof(SectionRssController))]
+[assembly: RegisterWebPageRoute(Rss.CONTENT_TYPE_NAME, typeof(RssController))]

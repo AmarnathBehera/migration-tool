@@ -108,7 +108,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ISectionSpecialtiesService, SectionSpecialtiesService>();
         serviceCollection.AddScoped<IDealPageService, DealPageService>();
         serviceCollection.AddScoped<IRssSectionPageService,RssSectionPageService>();
-
+        serviceCollection.AddScoped<IRssPageService,RssPageService>();
         serviceCollection.AddScoped<ITabAccordionService, TabAccordionService>();
     }
 
