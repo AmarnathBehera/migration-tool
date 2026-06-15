@@ -1,6 +1,6 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
-using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.ValueObjects;
 using Kentico.Content.Web.Mvc;
 using System.Linq;

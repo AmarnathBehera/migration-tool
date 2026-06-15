@@ -1,15 +1,10 @@
-﻿
-using BDO.GWT.Core.DTOs;
+﻿using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.Services;
 using BDO.GWT.GLOBAL.Tests.Utilities;
 using BDO.GWT.Web.Controllers;
-using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using NUnit.Framework;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BDO.GWT.GLOBAL.Tests.Controllers;
 

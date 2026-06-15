@@ -4,6 +4,8 @@ using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.Cards;
+using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.DTOs;
