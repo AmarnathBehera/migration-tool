@@ -188,7 +188,10 @@ public class CareersPageService : ICareersPageService
                 Reference = c.CareerReference,
                 EmploymentType = c.CareerEmploymentType?.FirstOrDefault()?.Name,
                 Level = c.CareerLevel?.FirstOrDefault()?.Name,
-                Locations = c.MetadataOfficeLocation?.Select(loc => loc.MetadataTitle).ToArray(),
+                Locations = c.MetadataOfficeLocation?
+        .Select(loc => loc.MetadataTitle ?? string.Empty)
+        .ToArray()
+        ?? Array.Empty<string>(),
                 PublishDate = c.DocumentPublishFrom,
                 ApplyURL = absolutepageurl,
                 JobTitleURL = careersPage.MetadataTitle is not null && c.CareerJobTitle is not null
@@ -214,7 +217,7 @@ public class CareersPageService : ICareersPageService
         var settingInfo = settings?.FirstOrDefault();
 
 
-        FilterItemDto<OptionDto>[] filters = null;
+        FilterItemDto<OptionDto>[]? filters = null;
 
         if (page.ItemListFilteringEnabled && !string.IsNullOrWhiteSpace(page.CareerListFilters))
         {

@@ -21,5 +21,5 @@ public class CareerCardDto
 
     public string? Level { get; set; }
 
-    public string[] Locations { get; set; } = Array.Empty<string>();
+    public string?[] Locations { get; set; } = Array.Empty<string>();
 }
