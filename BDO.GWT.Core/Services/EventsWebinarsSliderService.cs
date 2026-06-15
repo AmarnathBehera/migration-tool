@@ -93,7 +93,7 @@ public class EventsWebinarsSliderService : IEventsWebinarsSliderService
                 {
                     Title = data.SeeAllLinkText,
                     URL = data.SeeAllLinkUrl,
-                    Target = data.SeeAllLinkURLTarget
+                    Target = data.SeeAllLinkURLTarget ?? "_self"
                 }
                 : null,
             TopMargin = data.TopMargin ?? string.Empty,

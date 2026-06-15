@@ -12,29 +12,31 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
 {
     public class EventsWebinarsSliderControllerTests
     {
-        private Mock<IEventsWebinarsSliderService> _serviceMock;
-        private EventsWebinarsSliderController _controller;
+        private Mock<IEventsWebinarsSliderService> _serviceMock = null!;
+        private EventsWebinarsSliderController _controller = null!;
 
         [SetUp]
         public void SetUp()
         {
             _serviceMock = new Mock<IEventsWebinarsSliderService>();
 
-            _controller = new EventsWebinarsSliderController(_serviceMock.Object);
-            _controller.ControllerContext = new ControllerContext
+            _controller = new EventsWebinarsSliderController(_serviceMock.Object)
             {
-                HttpContext = new DefaultHttpContext()
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = new DefaultHttpContext()
+                }
             };
         }
-
-        // ── Items: basic behaviour ────────────────────────────────────────────
 
         [Test]
         public async Task Items_ReturnsOkResult()
         {
             // Arrange
             _serviceMock
-                .Setup(s => s.GetAPIFilteredItemsAsync(It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+                .Setup(s => s.GetAPIFilteredItemsAsync(
+                    It.IsAny<CardsQuery>(),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<EventsWebinarsCardDto>());
 
             // Act
@@ -55,7 +57,9 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             };
 
             _serviceMock
-                .Setup(s => s.GetAPIFilteredItemsAsync(It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+                .Setup(s => s.GetAPIFilteredItemsAsync(
+                    It.IsAny<CardsQuery>(),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expected);
 
             // Act
@@ -63,8 +67,11 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             var ok = result.Result as OkObjectResult;
 
             // Assert
-            Assert.That(ok, Is.Not.Null);
-            Assert.That(ok!.Value, Is.EqualTo(expected));
+            Assert.Multiple(() =>
+            {
+                Assert.That(ok, Is.Not.Null);
+                Assert.That(ok!.Value, Is.EqualTo(expected));
+            });
         }
 
         [Test]
@@ -74,7 +81,9 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             CardsQuery? capturedQuery = null;
 
             _serviceMock
-                .Setup(s => s.GetAPIFilteredItemsAsync(It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+                .Setup(s => s.GetAPIFilteredItemsAsync(
+                    It.IsAny<CardsQuery>(),
+                    It.IsAny<CancellationToken>()))
                 .Callback<CardsQuery, CancellationToken>((q, _) => capturedQuery = q)
                 .ReturnsAsync(new List<EventsWebinarsCardDto>());
 
@@ -82,9 +91,16 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             await _controller.Items(new CardsQuery(), CancellationToken.None);
 
             // Assert
-            Assert.That(capturedQuery, Is.Not.Null);
-            Assert.That(capturedQuery!.Filters, Contains.Key(FilterParameterName.ShowOngoingEvents));
-            Assert.That(capturedQuery.Filters[FilterParameterName.ShowOngoingEvents], Is.EqualTo(bool.TrueString));
+            Assert.Multiple(() =>
+            {
+                Assert.That(capturedQuery, Is.Not.Null);
+                Assert.That(
+                    capturedQuery!.Filters,
+                    Contains.Key(FilterParameterName.ShowOngoingEvents));
+                Assert.That(
+                    capturedQuery.Filters[FilterParameterName.ShowOngoingEvents],
+                    Is.EqualTo(bool.TrueString));
+            });
         }
 
         [Test]
@@ -92,7 +108,9 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
         {
             // Arrange
             _serviceMock
-                .Setup(s => s.GetAPIFilteredItemsAsync(It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+                .Setup(s => s.GetAPIFilteredItemsAsync(
+                    It.IsAny<CardsQuery>(),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<EventsWebinarsCardDto>());
 
             // Act
@@ -100,7 +118,9 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
 
             // Assert
             _serviceMock.Verify(
-                s => s.GetAPIFilteredItemsAsync(It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()),
+                s => s.GetAPIFilteredItemsAsync(
+                    It.IsAny<CardsQuery>(),
+                    It.IsAny<CancellationToken>()),
                 Times.Once);
         }
 
@@ -111,18 +131,28 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             CardsQuery? capturedQuery = null;
 
             _serviceMock
-                .Setup(s => s.GetAPIFilteredItemsAsync(It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+                .Setup(s => s.GetAPIFilteredItemsAsync(
+                    It.IsAny<CardsQuery>(),
+                    It.IsAny<CancellationToken>()))
                 .Callback<CardsQuery, CancellationToken>((q, _) => capturedQuery = q)
                 .ReturnsAsync(new List<EventsWebinarsCardDto>());
 
-            var inputQuery = new CardsQuery { CurrentPage = 2, PageSize = 5 };
+            var inputQuery = new CardsQuery
+            {
+                CurrentPage = 2,
+                PageSize = 5
+            };
 
             // Act
             await _controller.Items(inputQuery, CancellationToken.None);
 
             // Assert
-            Assert.That(capturedQuery!.CurrentPage, Is.EqualTo(2));
-            Assert.That(capturedQuery.PageSize, Is.EqualTo(5));
+            Assert.Multiple(() =>
+            {
+                Assert.That(capturedQuery, Is.Not.Null);
+                Assert.That(capturedQuery!.CurrentPage, Is.EqualTo(2));
+                Assert.That(capturedQuery.PageSize, Is.EqualTo(5));
+            });
         }
 
         [Test]
@@ -130,7 +160,9 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
         {
             // Arrange
             _serviceMock
-                .Setup(s => s.GetAPIFilteredItemsAsync(It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+                .Setup(s => s.GetAPIFilteredItemsAsync(
+                    It.IsAny<CardsQuery>(),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<EventsWebinarsCardDto>());
 
             // Act
@@ -139,8 +171,11 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             var items = ok!.Value as IEnumerable<EventsWebinarsCardDto>;
 
             // Assert
-            Assert.That(items, Is.Not.Null);
-            Assert.That(items, Is.Empty);
+            Assert.Multiple(() =>
+            {
+                Assert.That(items, Is.Not.Null);
+                Assert.That(items, Is.Empty);
+            });
         }
 
         [Test]
@@ -150,7 +185,9 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             CancellationToken capturedToken = default;
 
             _serviceMock
-                .Setup(s => s.GetAPIFilteredItemsAsync(It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+                .Setup(s => s.GetAPIFilteredItemsAsync(
+                    It.IsAny<CardsQuery>(),
+                    It.IsAny<CancellationToken>()))
                 .Callback<CardsQuery, CancellationToken>((_, ct) => capturedToken = ct)
                 .ReturnsAsync(new List<EventsWebinarsCardDto>());
 
