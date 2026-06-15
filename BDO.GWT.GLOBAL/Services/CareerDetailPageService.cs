@@ -78,7 +78,7 @@ public interface ICareerDetailPageService
         var dto = new CareerPageDto
         {
             Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
-            Content = await GetContentPageDtoAsync(page, cancellationToken),
+            Content = await GetContentPageDtoAsync(page),
             Form = page.CareerApplyForm,
             Sidebar = page.ShowSidebar ? await GetCareerSidebarDtoAsync(page, cancellationToken) : null,
         };
@@ -88,13 +88,9 @@ public interface ICareerDetailPageService
         }
     
 
-    private async Task<CareerContentDto> GetContentPageDtoAsync(Career careerPage, CancellationToken cancellationToken)
+    private async Task<CareerContentDto> GetContentPageDtoAsync(Career careerPage)
         {
-        var languageTag = _cultureContext.CurrentLanguageTag;
-
-
-
-
+       
         var locationOfficeNames = careerPage.MetadataOfficeLocation.Select(i=> i.MetadataTitle).ToArray();
 
 
