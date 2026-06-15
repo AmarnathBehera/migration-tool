@@ -16,9 +16,12 @@
       <schema guid="f652f54b-8be8-4f2c-9e40-7dd3ab5dd149" name="f652f54b-8be8-4f2c-9e40-7dd3ab5dd149">
         <properties />
       </schema>
-      <field column="ItemListFilters" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="f9b04177-9edd-45d1-8cdc-f766bd744768" visible="true">
+      <field allowempty="true" column="ItemListFilters" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="f9b04177-9edd-45d1-8cdc-f766bd744768" visible="true">
         <properties>
           <defaultvalue>contentType;businessLine;industryCategory</defaultvalue>
+          <explanationtext>
+            <![CDATA[Filters that visitor will be able to filter news articles by.]]>
+          </explanationtext>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Filters</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
@@ -39,6 +42,14 @@ micrositeMasterPage;Microsite (Microsite Master Page)
           </Options>
           <OptionsValueSeparator>;</OptionsValueSeparator>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ItemListFilteringEnabled</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <field allowempty="true" column="ItemListFeaturedItems" columnprecision="0" columntype="contentitemreference" enabled="true" guid="baaa6698-1e7c-4fe7-a5f4-bb950a677a77" visible="true">
         <properties>
