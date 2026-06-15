@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>RSS</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="50ca3d7d-6479-4a57-89aa-0592831b6dc0" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="91794421-9d88-4979-b44c-2482ae0d7087" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="3d7cc5c9-b8e8-4adc-ad10-104ed05b778a" isunique="true" system="true" />
+      <field column="RssFeedTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="bdace4f4-1323-4932-af68-651ee0c40541" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Feed title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field column="RssFeedDescription" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="c59f4fe4-45b3-4a8d-933a-16209370e1fb" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Feed description</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextArea</controlname>
+          <CopyButtonVisible>False</CopyButtonVisible>
+          <MaxRowsNumber>5</MaxRowsNumber>
+          <MinRowsNumber>3</MinRowsNumber>
+        </settings>
+      </field>
+      <field allowempty="true" column="RssCategory" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="10bad6f9-7818-40b6-a643-5bff28148910" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>RSS category</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="RssPath" columnprecision="0" columntype="contentitemreference" enabled="true" guid="5976b913-5641-440a-8370-5a37547d8714" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Path</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["43fcea42-e42d-4773-95dc-b415ea3e7547","b6a2aff8-7c0d-446a-be33-221a26bcac37","75615b26-2702-4a3a-bf7d-34c13b87bb63","a07289a5-97f3-4d01-95f1-d5409908098b","252cdc0e-f6a0-424f-bd6b-2584655e66c7","b70d2494-90c7-42c5-a7d6-44da7013729b","a44dde57-e1ba-4a8b-ba54-2c0705c12903","b0993231-71af-4db0-b2c7-83fdf89e9071","e95256dc-44da-4237-a5d0-2f39834f7755","1ab55e4f-344f-4d36-a64b-5812140fcfa3","74635906-cb04-4ffd-9936-9dcde92c7f58","6551b6dd-873d-4535-b72d-a1ab4c4103e3","09fd4259-c646-41e1-8363-6ed3c47ed8b2","7539c21d-cde0-4d71-ab9f-12de5ddec092","eb56be66-90a1-4d84-ac39-56bba64e5a69","ed59f954-8d98-4783-8dfa-bdd81de58862","ebf7ae4f-b53c-482a-aa33-46267b8699fd","1ddec4b5-dabe-4e5d-a38a-1cf710c59244","31f6383b-697e-4d8f-acec-be459fe4ad01","23d38e4a-908a-4b31-9ae2-2fbaeaed4940","b3459cfa-8a48-48e5-af1f-eca5d79dd087","ca36fdc4-756f-4f9e-afdf-bdf19fc50427","efaa910b-971a-4c92-9535-fde264dc8ecf","137818af-e84f-48da-bc76-09dc9a6357c7","afbd8222-11b6-424b-acec-3e96023413bf","81fa7e92-5ecc-4b38-a9d9-0246c97567d7","ddc2c96a-2502-4adf-8b89-5ec17af92366","1972aba8-80f8-4d07-bfa2-7f088d2f4219","3c5bfaa6-f77c-46a6-947b-87ab1bb8404b"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This input field is required.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+      <field column="RssTopN" columnprecision="0" columntype="integer" enabled="true" guid="7f5d6ddc-74a6-4e84-ad74-a74454dc1ca9" visible="true">
+        <properties>
+          <defaultvalue>10</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Top N</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.NumberInput</controlname>
+        </settings>
+      </field>
+      <field column="RssPublic" columnprecision="0" columntype="boolean" enabled="true" guid="470fc8f8-08c1-4a0c-b7d7-4073547d943e" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show feed publicly</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>22064a96-e307-425f-be14-88c1dd367c07</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-rss</ClassIconClass>
+  <ClassName>BDO.Rss</ClassName>
+  <ClassShortName>BDORss</ClassShortName>
+  <ClassTableName>BDO_Rss</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>

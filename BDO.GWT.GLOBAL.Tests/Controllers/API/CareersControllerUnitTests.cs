@@ -1,5 +1,6 @@
 ﻿using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.GLOBAL.Tests.Utilities;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;

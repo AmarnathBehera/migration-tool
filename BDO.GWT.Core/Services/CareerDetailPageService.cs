@@ -3,6 +3,7 @@ using BDO.GWT.Core;
 using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.DTOs;
@@ -121,16 +122,28 @@ public interface ICareerDetailPageService
 
         sidebarDto.RelevantContactPeopleTitle = ResourceStringKey.LiveSite.Careers.RelevantContactPeople;
 
-        sidebarDto.RelevantContactPeople = careerPage.MetadataRelevantContactPerson.Select(i => new SidebarPersonDto
+        sidebarDto.RelevantContactPeople =
+    careerPage.MetadataRelevantContactPerson?
+    .Select(i => new SidebarPersonDto
+    {
+        FullName = $"{i.PersonFirstName} {i.PersonLastName}".Trim(),
+
+        Image = new ImageDto
         {
-            FullName = i.PersonFirstName + i.PersonLastName,
-            Image = new ImageDto { Url = i.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url, AltText = i.MetadataTeaserImageAltText },
-            JobTitle = i.PersonJobTitle,
-            Url = i.GetUrl().RelativePath
+            Url = i.MetadataTeaserImage?
+                .FirstOrDefault()?
+                .ContentAttachmentAsset?
+                .Url,
 
+            AltText = i.MetadataTeaserImageAltText
+        },
 
+        JobTitle = i.PersonJobTitle,
 
-        }).ToArray();
+        Url = i.GetUrl()?.RelativePath
+    })
+    .ToArray()
+    ?? Array.Empty<SidebarPersonDto>();
 
 
         return sidebarDto;
@@ -171,7 +184,7 @@ public interface ICareerDetailPageService
 
     private async Task<bool> GetShowCopyLinkOptionFromSectionPageAsync(Career careerPage, bool showCopyLinkButton, CancellationToken cancellationToken)
     {
-        var careers = await _contentService.GetPagesAsync<Careers>(new RetrievePagesParameters { },query => query.Where(w => w.WhereEquals("WebPageItemID",careerPage.SystemFields.WebPageItemParentID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
+        var careers = await _contentService.GetPagesAsync<Careers>(new RetrievePagesParameters { },query => query.Where(w => w.WhereEquals("WebPageItemID",careerPage?.SystemFields.WebPageItemParentID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
 
         if (careers is null)
         {
@@ -179,7 +192,7 @@ public interface ICareerDetailPageService
         }
         var careerspage = careers.FirstOrDefault();
 
-        var sectionCareers = await _contentService.GetPagesAsync<SectionCareers>(new RetrievePagesParameters { }, query => query.Where(w => w.WhereEquals("WebPageItemID", careerspage.SystemFields.WebPageItemParentID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
+        var sectionCareers = await _contentService.GetPagesAsync<SectionCareers>(new RetrievePagesParameters { }, query => query.Where(w => w.WhereEquals("WebPageItemID", careerspage?.SystemFields.WebPageItemParentID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
 
         var sectionCareer = sectionCareers.FirstOrDefault();
 
