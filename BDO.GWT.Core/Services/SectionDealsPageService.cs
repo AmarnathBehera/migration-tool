@@ -162,10 +162,20 @@ public class SectionDealsPageService : ISectionDealsPageService
 
     private async Task<OptionDto[]> BuildOptionsForPageFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
     {
+        var rootPath = "BDO_Deal_Cards";
+        var level = 1;
+
+        if (filterParameterData.AdminDisplayName.ToLower() == "subindustry")
+        {
+            level = 5;
+        }
+
         var entityType = filterParameterData.EntityType;
         if (entityType.Name == "DealCardCommon")
         {
-          var items = await _contentRetriever.GetPagesAsync<DealCardCommon>(new RetrievePagesParameters { LinkedItemsMaxLevel = 5 },
+          var items = await _contentRetriever.GetPagesAsync<DealCardCommon>(new RetrievePagesParameters { LinkedItemsMaxLevel = level,
+              PathMatch = PathMatch.Section(rootPath)
+          },
             query => query
                 .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
             RetrievalCacheSettings.CacheDisabled,
