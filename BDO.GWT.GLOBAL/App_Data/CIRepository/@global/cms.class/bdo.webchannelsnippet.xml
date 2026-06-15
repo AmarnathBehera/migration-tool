@@ -2,8 +2,7 @@
 <cms.class>
   <ClassCodeGenerationSettings>
     <Data>
-      <CodeNameColumn>WebChannelCodeName</CodeNameColumn>
-      <DisplayNameColumn>WebChannelSnippetDisplayName</DisplayNameColumn>
+      <GUIDColumn>WebSettingsGUID</GUIDColumn>
       <ObjectType>BDO.WebChannelSnippet</ObjectType>
       <UseGuidHashtable>False</UseGuidHashtable>
       <UseIdHashtable>False</UseIdHashtable>
@@ -14,16 +13,28 @@
   <ClassFormDefinition>
     <form>
       <field column="WebChannelSnippetID" columntype="integer" enabled="true" guid="a969acad-c0b2-4b86-bbed-df2f712c4b66" isPK="true" />
-      <field allowempty="true" column="WebChannelSnippetType" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6609ea4e-416f-4832-8ef6-4758b7ee545b" />
-      <field allowempty="true" column="WebChannelSnippetCode" columnprecision="0" columnsize="2000" columntype="text" enabled="true" guid="4087e8c1-e529-432d-9a19-4b4180016425" />
       <field column="WebChannelSnippetWebChannelSettingsID" columnprecision="0" columntype="integer" enabled="true" guid="fcb17088-e34b-4669-966d-8c2a5e8286f0" refobjtype="bdo.webchannelsettings" reftype="Required">
         <properties>
           <defaultvalue>0</defaultvalue>
         </properties>
       </field>
-      <field column="WebChannelSnippetDisplayName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="46b81926-07df-42e1-9649-02b0d8dd9726" />
-      <field column="WebChannelSnippetCodeName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7660276b-bc84-4e67-bc28-f33bedcd0e06" />
-      <field column="WebChannelCodeName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="b3d72b7f-3b17-4ba2-9197-de64cbd59013" />
+      <field allowempty="true" column="ScriptHeadKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="f69bc0d8-8866-4d1a-a19f-d80f910b81a5" />
+      <field allowempty="true" column="MarketoMunchkinCodeKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="4ec107e7-b3e5-40b1-a4a3-6bf7413d9596" />
+      <field allowempty="true" column="ScriptexecutedwhencookiesareacceptedKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="8942f7cd-063c-4382-993d-68e9664f15aa" />
+      <field allowempty="true" column="ScriptinbottomofBodyKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="2d0e7e52-dce5-4e1b-8ae0-4d6d8c51ea96" />
+      <field allowempty="true" column="ScriptinTopofBodyKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="8a444e9a-6aa2-4650-be6f-6fab1de0ce00" />
+      <field allowempty="true" column="ScriptsTopofPageHeadKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="c591e432-aa42-46d0-b964-d6c18e077553" />
+      <field column="WebSettingsGUID" columnprecision="0" columntype="guid" enabled="true" guid="7d160e34-c736-43a4-ad71-3676433fb98d" />
+      <field allowempty="true" column="ScriptHeadInheritfromglobalsettings" columnprecision="0" columntype="boolean" enabled="true" guid="83b3f2cc-1cb0-40f6-bb79-20c2c0f76ec0" />
+      <field allowempty="true" column="ScriptsTopofPageInheritfromglobalsetting" columnprecision="0" columntype="boolean" enabled="true" guid="44664618-1f69-49b3-9bea-24ffcd3ba501">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+        </properties>
+      </field>
+      <field allowempty="true" column="ScriptinbottomofBodyInheritFromGlobal" columnprecision="0" columntype="boolean" enabled="true" guid="660e3157-af78-4f2f-8396-9993c3e64827" />
+      <field allowempty="true" column="ScriptinTopofBodyInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="2b5ffc8d-4ab8-4336-a975-31ea181ea868" />
+      <field allowempty="true" column="ScriptexecutedwhencookiesareacceptedInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="6dce8a8f-331e-438e-8efd-36ee0a09d7b6" />
+      <field allowempty="true" column="MarketoMunchkinCodeInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="c181f540-9a92-4597-b77e-3e865c4b8924" />
     </form>
   </ClassFormDefinition>
   <ClassGUID>b8d0d5cb-4b0a-48fa-a8a4-54dc06ee7bfa</ClassGUID>
