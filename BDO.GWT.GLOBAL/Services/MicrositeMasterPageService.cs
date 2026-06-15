@@ -38,12 +38,12 @@ public class MicrositeMasterPageService : IMicrositeMasterPageService
             BodyTopHtml = page.BodyTopHTML,
             BodyBottomHtml = page.BodyBottomHTML,
             CustomCssLinks = page.CustomCSS?
-                .Where(a => a.ContentAttachmentAsset?.Url is not null)
-                .Select(a => a.ContentAttachmentAsset.Url!)
+                .Where(a => a.CssAttachmentAsset1?.Url is not null)
+                .Select(a => a.CssAttachmentAsset1.Url!)
                 ?? Enumerable.Empty<string>(),
             CustomJsLinks = page.CustomJS?
-                .Where(a => a.ContentAttachmentAsset?.Url is not null)
-                .Select(a => a.ContentAttachmentAsset.Url!)
+                .Where(a => a.JavaScriptAttachmentAsset1?.Url is not null)
+                .Select(a => a.JavaScriptAttachmentAsset1.Url!)
                 ?? Enumerable.Empty<string>(),
         };
     }
