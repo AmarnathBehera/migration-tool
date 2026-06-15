@@ -1,5 +1,6 @@
 ﻿using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.EventsWebinarsSliderWidget;
 using CMS.Websites;
@@ -16,6 +17,12 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 {
     public class EventsWebinarsSliderWidgetTests
     {
+        private static readonly string[] ExpectedFilters =
+        [
+            "Service",
+            "Industry"
+        ];
+
         private Mock<IEventsWebinarsSliderService> _serviceMock = null!;
         private Mock<IPageContext> _pageContextMock = null!;
         private Mock<IContentRetriever> _contentRetrieverMock = null!;
@@ -81,10 +88,10 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 
             var viewResult = result as ViewViewComponentResult;
 
-            Assert.That(viewResult, Is.Not.Null);
-
             Assert.Multiple(() =>
             {
+                Assert.That(viewResult, Is.Not.Null);
+
                 Assert.That(
                     viewResult!.ViewName,
                     Is.EqualTo("~/Components/Widget/EventsWebinarsSliderWidget/_EventsWebinarsSliderWidget.cshtml"));
@@ -143,11 +150,11 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 
             var viewResult = result as ViewViewComponentResult;
 
-            Assert.That(viewResult, Is.Not.Null);
-            Assert.That(capturedData, Is.Not.Null);
-
             Assert.Multiple(() =>
             {
+                Assert.That(viewResult, Is.Not.Null);
+                Assert.That(capturedData, Is.Not.Null);
+
                 Assert.That(
                     viewResult!.ViewName,
                     Is.EqualTo("~/Components/Widget/EventsWebinarsSliderWidget/_EventsWebinarsSliderWidget.cshtml"));
@@ -157,7 +164,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
                 Assert.That(capturedData!.Title, Is.EqualTo("Test Title"));
                 Assert.That(capturedData.Description, Is.EqualTo("Test Description"));
                 Assert.That(capturedData.FilteringEnabled, Is.True);
-                Assert.That(capturedData.Filters, Is.EquivalentTo(new[] { "Service", "Industry" }));
+                Assert.That(capturedData.Filters, Is.EquivalentTo(ExpectedFilters));
                 Assert.That(capturedData.BackgroundImageAltText, Is.EqualTo("Alt text"));
                 Assert.That(capturedData.SeeAllLinkText, Is.EqualTo("See all"));
                 Assert.That(capturedData.SeeAllLinkUrl, Is.EqualTo("/events"));
@@ -196,8 +203,11 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 
             await _widget.InvokeAsync(model);
 
-            Assert.That(capturedData, Is.Not.Null);
-            Assert.That(capturedData!.BackgroundImageAltText, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(capturedData, Is.Not.Null);
+                Assert.That(capturedData!.BackgroundImageAltText, Is.Null);
+            });
         }
 
         [Test]
@@ -228,8 +238,11 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 
             await _widget.InvokeAsync(model);
 
-            Assert.That(capturedData, Is.Not.Null);
-            Assert.That(capturedData!.Filters, Is.Empty);
+            Assert.Multiple(() =>
+            {
+                Assert.That(capturedData, Is.Not.Null);
+                Assert.That(capturedData!.Filters, Is.Empty);
+            });
         }
 
         [Test]
@@ -255,8 +268,11 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 
             var result = await _widget.InvokeAsync(model);
 
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.TypeOf<ViewViewComponentResult>());
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result, Is.TypeOf<ViewViewComponentResult>());
+            });
         }
     }
 }
