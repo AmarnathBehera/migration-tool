@@ -60,12 +60,12 @@
     }
     <meta property="og:type" content="website">
     @Html.Kentico().PageBuilderStyles()
-    @* @(await Component.InvokeAsync<ScriptsHead>())
+    @(await Component.InvokeAsync<ScriptsHead>())
     @(await Component.InvokeAsync<StartScriptsHead>())
     @await (Component.InvokeAsync<Cookiebot>())
     @await (Component.InvokeAsync<Cookiebanner>())
-    @(await Component.InvokeAsync<ScriptsWhenCookiesAccepted>()) *@
-    @* @(await Component.InvokeAsync<MarketoMunchkincode>()) *@
+    @(await Component.InvokeAsync<ScriptsWhenCookiesAccepted>())
+    @(await Component.InvokeAsync<MarketoMunchkinCode>())
     @Html.Kentico().ActivityLoggingScriptV2()
     @await RenderSectionAsync("HeadHtml", required: false)
     @await RenderSectionAsync("CustomCSS", required: false)
@@ -77,9 +77,9 @@
 </head>
 <body data-lang="@CultureContext.CurrentLanguageTag.ToLowerInvariant()">
     @await RenderSectionAsync("BodyTopHtml", required: false)
-    @* @await (Component.InvokeAsync<ScriptsTopBody>()) *@
+    @await (Component.InvokeAsync<ScriptsTopBody>())
     @(await Component.InvokeAsync<MicrositeHeader>())
-    @* @(await Component.InvokeAsync<ScriptsHead>()) *@
+    @(await Component.InvokeAsync<ScriptsHead>())
     @await (Component.InvokeAsync<Breadcrumbs>())
 
     @RenderBody()
@@ -87,10 +87,9 @@
     <script src="/dist/vendor.bundle.js" asp-append-version="true" data-cookieconsent="ignore"></script>
     <script src="/dist/master.bundle.js" asp-append-version="true" data-cookieconsent="ignore"></script>
 
-    @* @await (Component.InvokeAsync<ScriptsBottomBody>()) *@
+    @await (Component.InvokeAsync<ScriptsBottomBody>())
     @(await Component.InvokeAsync<Footer>())
     @await Html.Kentico().PageBuilderScriptsAsync()
-    @* @await (Component.InvokeAsync<ScriptsBottomBody>()) *@
 
     @(ReactService.RenderCombinedScript())
     @await RenderSectionAsync("CustomJS", required: false)
