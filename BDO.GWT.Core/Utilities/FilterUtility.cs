@@ -7,7 +7,7 @@ public static class FilterUtility
 {
     private static readonly Dictionary<string, FilterParameterData> FilterParameterDataByName = new Dictionary<string, FilterParameterData>
     {
-        [FilterParameterName.BusinessIssue] = new("Topic (Business Issue)", ResourceStringKey.LiveSite.Filters.BusinessIssue, typeof(Businessissue), FilterParameterType.Tagpage),
+        [FilterParameterName.BusinessIssue] = new("Business Issue", ResourceStringKey.LiveSite.Filters.BusinessIssue, typeof(Businessissue), FilterParameterType.Page),
         [FilterParameterName.BusinessLine] = new("Service (Business Line)", ResourceStringKey.LiveSite.Filters.BusinessLine, typeof(BusinessLine), FilterParameterType.Page),
         [FilterParameterName.CareerEmploymentType] = new("Career Employment Type", ResourceStringKey.LiveSite.Filters.CareerEmploymentType, typeof(CareerEmploymentTypes), FilterParameterType.Page),
         [FilterParameterName.CareerJobTitle] = new("Career Job Title", ResourceStringKey.LiveSite.Filters.CareerJobTitle, typeof(CareerJobTitle), FilterParameterType.Page),

@@ -17,12 +17,12 @@ public interface IEventOrWebinar : IWebPageFieldsSource
     IEnumerable<IWebPageFieldsSource> MetadataSpecialtiesCategories { get; }
     IEnumerable<IWebPageFieldsSource> MetadataSpecialtiesAreas { get; }
     IEnumerable<IWebPageFieldsSource> MetadataSpecialtiesPages { get; }
-    IEnumerable<MicrositePlaceholder> MicrositeMasterPages { get; }
-    IEnumerable<MicrositePlaceholder> MicrositePages { get; }
+    IEnumerable<MicrositeMasterPage> MicrositeMasterPages { get; }
+    IEnumerable<MicrositePage> MicrositePages { get; }
     IEnumerable<Industry> MetadataIndustries { get; }
     IEnumerable<IndustryCategory> MetadataIndustryCategories { get; }
     IEnumerable<LocationOffice> MetadataOfficeLocation { get; }
     IEnumerable<EventType> EventType { get; }
-    IEnumerable<Businessissues> MetadataBusinessIssues { get; }
+    IEnumerable<Businessissue> MetadataBusinessIssues { get; }
     bool ShowPastEvent { get; }
 }

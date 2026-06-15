@@ -1,6 +1,7 @@
 ﻿using BDO;
-using BDO.GWT.GLOBAL.Components.Widget.LocalNavigationWidget;
 using BDO.GWT.GLOBAL.Components.Widget.KeyTakeawaysWidget;
+using BDO.GWT.GLOBAL.Components.Widget.LocalNavigationWidget;
+using BDO.GWT.Web.Components.Widget.TabAccordionWidget;
 using BDO.GWT.Web.Widgets.AccordionWidget;
 using BDO.GWT.Web.Widgets.FaqWidget;
 using BDO.GWT.Web.Widgets.FlexibleBannerWidget;
@@ -8,17 +9,17 @@ using BDO.GWT.Web.Widgets.FlexibleContentWidget;
 using BDO.GWT.Web.Widgets.ImageWithTextWidget;
 using BDO.GWT.Web.Widgets.QuoteCardWidget;
 using BDO.GWT.Web.Widgets.RichTextWidget;
+using BDO.GWT.Web.Widgets.TabAccordionWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents;
 using BDO.GWT.Xperience.Core.LiveSite.Components.FormSections.FormSectionProperties;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ButtonWidget;
+using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.EventsWebinarsSliderWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ExternalNavigationWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ViewGlobalLocations;
 using BDO.GWT.Xperience.LiveSite.Components.Section;
 using Kentico.Forms.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
-using BDO.GWT.Web.Components.Widget.TabAccordionWidget;
-using BDO.GWT.Web.Widgets.TabAccordionWidget;
 
 // Widgets
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.Imagewithtext,typeof(ImageWithTextWidget),"Image With Text",typeof(ImageWithTextWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
@@ -31,7 +32,7 @@ using BDO.GWT.Web.Widgets.TabAccordionWidget;
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.Button, typeof(ButtonWidget), "Button", typeof(ButtonWidgetProperties), AllowCache = true, IconClass = "icon-xml-tag")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.LocalNavigation, typeof(LocalNavigationWidget), "Local Navigation Item", typeof(LocalNavigationWidgetProperties), AllowCache = true, IconClass = "icon-chain")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.KeyTakeaways, typeof(KeyTakeawaysWidget), "Key Takeaways", typeof(KeyTakeawaysWidgetProperties), AllowCache = true, IconClass = "icon-list-bullets")]
-
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.EventsWebinarsSlider, typeof(EventsWebinarsSliderWidget), "Events Webinar Slider Widget", typeof(EventsWebinarsSliderWidgetProperties), AllowCache = true, IconClass = "icon-bubbles")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.FaqWidget, typeof(FaqWidget), "FAQ Widget", typeof(FaqWidgetProperties), AllowCache = true, IconClass = "icon-bubbles")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.FlexibleBanner, typeof(FlexibleBannerWidget), "Flexible Banner", typeof(FlexibleBannerWidgetProperties), AllowCache = true, IconClass = "icon-ribbon")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.FlexibleContent, typeof(FlexibleContentWidget), "Flexible Content", typeof(FlexibleContentWidgetProperties), AllowCache = true, IconClass = "icon-newspaper")]
