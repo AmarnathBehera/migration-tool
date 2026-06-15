@@ -1,124 +1,236 @@
-﻿
-//namespace BDO.GWT.Core.Services;
-//using System;
-//using System.Linq;
-//using System.Threading;
-//using System.Threading.Tasks;
+﻿using BDO.GWT.Core.Data.Rss;
+using BDO.GWT.Core.Services;
+using BDO.GWT.Core.Utilities;
+using CMS.ContentEngine;
+using CMS.DataEngine;
+using CMS.Websites;
+using CMS.Websites.Routing;
+using Kentico.Content.Web.Mvc;
+using Microsoft.Extensions.Logging;
 
+namespace BDO.GWT.Core.Services;
 
+public interface IRssPageService
+{
+    Task<string> GetRssFeedXmlAsync( CancellationToken cancellationToken);
+}
 
-//public interface IRssPageService
-//{
-//    Task<string> GetRssFeedXmlAsync(CancellationToken cancellationToken);
-//}
+public class RssPageService : IRssPageService
+{
+    private readonly IContentQueryExecutor _contentQueryExecutor;
+    private readonly IWebPageUrlRetriever _webPageUrlRetriever;
+    private readonly IWebsiteChannelContext _websiteChannelContext;
+    private readonly IContentService _contentService;
+    private readonly ICultureContext _cultureContext;
+    private readonly ILogger<RssPageService> _logger;
 
-//public class RssPageService : IRssPageService
-//{
-//    private readonly IFileService _fileService;
-//    private readonly IMultiTypePageRetriever _multiTypePageRetriever;
-//    private readonly IPageUrlService _pageUrlService;
-//    private readonly IRetriever<RssCategory> _rssCategoryRetriever;
-//    private readonly IRetriever<Site> _siteRetriever;
-//    private readonly ISiteContext _siteContext;
+    public RssPageService(
+        IContentQueryExecutor contentQueryExecutor,
+        IWebPageUrlRetriever webPageUrlRetriever,
+        IWebsiteChannelContext websiteChannelContext,
+        ICultureContext cultureContext,
+        ILogger<RssPageService> logger,
+        IContentService contentService)
+    {
+        _contentQueryExecutor = contentQueryExecutor;
+        _webPageUrlRetriever = webPageUrlRetriever;
+        _websiteChannelContext = websiteChannelContext;
+        _cultureContext = cultureContext;
+        _contentService = contentService;
+        _logger = logger;
+    }
 
-//    public RssPageService(IFileService fileService, IMultiTypePageRetriever multiTypePageRetriever, IPageUrlService pageUrlService, IRetriever<RssCategory> rssCategoryRetriever, IRetriever<Site> siteRetriever, ISiteContext siteContext)
-//    {
-//        _fileService = fileService;
-//        _multiTypePageRetriever = multiTypePageRetriever;
-//        _pageUrlService = pageUrlService;
-//        _rssCategoryRetriever = rssCategoryRetriever;
-//        _siteRetriever = siteRetriever;
-//        _siteContext = siteContext;
-//    }
+    public async Task<string> GetRssFeedXmlAsync( CancellationToken cancellationToken)
+    {
+        // Resolve the self-referencing URL for the RSS page itself
+        // (used as <atom:link rel="self"> in the feed)
+         var currentPage = await _contentService.RetrieveCurrentPageAsync<Rss>(
+                new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
+        if (currentPage == null)
+        {
+            _logger.LogWarning("[RSS] Current page is not of type Rss. Returning empty feed.");
+            return string.Empty;
+        }
 
-//    public async Task<string> GetRssFeedXmlAsync(Rss currentPage, CancellationToken cancellationToken)
-//    {
-//        var currentSite = await _siteRetriever.RetrieveEntityAsync(query => query.Where(x => x.ID == _siteContext.CurrentSiteID), cancellationToken) ?? throw new InvalidOperationException("Could not retrieve current site entity.");
+        var rssPageUrl = await GetPageAbsoluteUrlAsync(
+            currentPage.SystemFields.WebPageItemID,
+            cancellationToken);
 
-//        var pageAbsoluteUrl = await _pageUrlService.GetPageAbsoluteUrlAsync(currentSite.PresentationURL, currentPage.NodeID, currentPage.LanguageTag, cancellationToken);
+        var feed = await BuildRssFeedAsync(currentPage, cancellationToken);
 
-//        var feed = await BuildRssFeedAsync(currentSite, currentPage, cancellationToken);
+        return await RssUtility.GetRssFeedXml(feed, rssPageUrl);
+    }
 
-//        var rssUrl = pageAbsoluteUrl.ToHtmlCompatibleString();
+    private async Task<RssFeed> BuildRssFeedAsync(Rss page, CancellationToken cancellationToken)
+    {
+        var languageName = _cultureContext.CurrentLanguageTag;
 
-//        var rssFeedXml = await RssUtility.GetRssFeedXml(feed, rssUrl);
+        // -------------------------------------------------------------------------
+        // Step 1: Resolve the ancestor/section path from RssPath
+        // RssPath is a linked web page selector — first item's TreePath defines
+        // the subtree to query (e.g. "/en-gb/insights" → find all pages underneath)
+        // Equivalent of KX13's NodeAliasPath.StartsWith(ancestorPage.NodeAliasPath)
+        // -------------------------------------------------------------------------
+        var ancestorPage = page.RssPath?.FirstOrDefault();
+        var ancestorTreePath = ancestorPage?.SystemFields?.WebPageItemTreePath;
 
-//        return rssFeedXml;
-//    }
+        // -------------------------------------------------------------------------
+        // Step 2: Build feed channel metadata from the Rss page's fields
+        // -------------------------------------------------------------------------
+        var feed = new RssFeed
+        {
+            Channel = new RssChannel
+            {
+                Title = page.RssFeedTitle ?? string.Empty,
+                // Channel link = the RSS page's own URL (resolved above, passed in)
+                Link = await GetPageAbsoluteUrlAsync(page.SystemFields.WebPageItemID, cancellationToken),
+                Description = page.RssFeedDescription ?? string.Empty,
+                Language = languageName,
+                Category = page.RssCategory,
+            }
+        };
 
-//    private async Task<RssFeed> BuildRssFeedAsync(Site site, Rss page, CancellationToken cancellationToken)
-//    {
-//        var feed = new RssFeed
-//        {
-//            Channel = new RssChannel
-//            {
-//                Title = page.RssFeedTitle,
-//                Link = site.PresentationURL.ToHtmlCompatibleString(),
-//                Description = page.RssFeedDescription,
-//                Language = page.LanguageTag.ToString(),
-//                Category = page.RssCategory,
-//            },
-//        };
+        if (ancestorTreePath is null)
+        {
+            _logger.LogWarning(
+                "[RSS] RssPath is not set or could not be resolved on page '{PageName}'. Returning empty feed.",
+                page.SystemFields.WebPageItemName);
 
-//        var ancestorPage = await _multiTypePageRetriever.RetrievePageAsync(query => query.Where(x => x.NodeGUID == page.RssPath), cancellationToken);
+            return feed;
+        }
 
-//        var rssItemPages = ancestorPage is not null
-//            ? (await _multiTypePageRetriever.RetrievePagesAsync<IRssItem>(query => query
-//                .Where(x => x.NodeAliasPath.StartsWith(ancestorPage.NodeAliasPath))
-//                .OrderBy(x => x.Descending(nameof(IRssItem.PublishFrom)))
-//                .Take(page.RssTopN)
-//            , cancellationToken))
-//                .ToArray()
-//            : Array.Empty<IRssItem>();
+        // -------------------------------------------------------------------------
+        // Step 3: Query all content types under the ancestor path
+        // Uses ForContentTypes + OfReusableSchema("Metadata") — the XbyK equivalent
+        // of KX13's IMultiTypePageRetriever.RetrievePagesAsync<IRssItem>(
+        //     query => query.Where(x => x.NodeAliasPath.StartsWith(ancestorPage.NodeAliasPath)))
+        //
+        // OfReusableSchema("Metadata") = IMetadata reusable schema, shared by all
+        // page types — gives access to MetadataTitle, MetadataDescription, MetadataTeaserImage
+        // -------------------------------------------------------------------------
+        var query = new ContentItemQueryBuilder()
+    .ForContentTypes(parameters => parameters
+        .OfReusableSchema(IMetadata.REUSABLE_FIELD_SCHEMA_NAME)
+        .ForWebsite(_websiteChannelContext.WebsiteChannelName))
+    .Parameters(p => p
+        .Where(w => w.WhereStartsWith(
+            nameof(WebPageFields.WebPageItemTreePath), ancestorTreePath))
+        .OrderBy(new OrderByColumn(
+            nameof(ContentItemFields.ContentItemCommonDataLastPublishedWhen),
+            OrderDirection.Descending))
+        .TopN(page.RssTopN > 0 ? page.RssTopN : 10))
+    .InLanguage(languageName);
 
-//        var rssItemAbsoluteUrlByNodeId = await _pageUrlService.GetPageAbsoluteUrlByNodeIdAsync(site.PresentationURL, rssItemPages.Select(x => x.NodeID), page.LanguageTag, cancellationToken);
+        var options = new ContentQueryExecutionOptions
+        {
+            ForPreview = false,
+            IncludeSecuredItems = false,
+        };
 
-//        var rssCategoryIds = rssItemPages.SelectMany(rssItemPage => rssItemPage.MetadataRssCategory).Distinct();
+        // -------------------------------------------------------------------------
+        // Step 4: Execute query — results come back as IWebPageContentQueryDataContainer
+        // We read common IMetadata columns via GetValue<T> since ForContentTypes
+        // doesn't support strongly typed mapping to a single model
+        // -------------------------------------------------------------------------
+        IEnumerable<RssItemData> rssItems;
 
-//        var rssCategoryById = (await _rssCategoryRetriever.RetrieveEntitiesAsync(query => query
-//            .Where(x => rssCategoryIds.Contains(x.ID)
-//        ), cancellationToken))
-//            .ToDictionary(x => x.ID, x => x);
+        try
+        {
+            rssItems = await _contentQueryExecutor.GetWebPageResult(
+                query,
+                container => new RssItemData
+                {
+                    WebPageItemID = container.WebPageItemID,
+                    Title = container.GetValue<string>("MetadataTitle"),
+                    Description = container.GetValue<string>("MetadataDescription"),
+                    LastPublished = container.GetValue<DateTime?>("ContentItemCommonDataLastPublishedWhen"),
+                    ImageUrl = container.GetValue<string>("MetadataTeaserImageUrl"),
+                },
+                options,
+                cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex,
+                "[RSS] Failed to query RSS items under path '{Path}' in language '{Language}'.",
+                ancestorTreePath, languageName);
 
-//        foreach (var rssItemPage in rssItemPages)
-//        {
-//            var url = rssItemAbsoluteUrlByNodeId[rssItemPage.NodeID];
+            return feed;
+        }
 
-//            var categories = rssItemPage.MetadataRssCategory
-//                .Select(rssCategoryId => rssCategoryById.TryGetValue(rssCategoryId, out var rssCategory) ? rssCategory.Name : null)
-//                .OfType<string>()
-//                .ToList();
+        // -------------------------------------------------------------------------
+        // Step 5: Resolve URLs and build RssChannelItems
+        // Sequential URL resolution — same pattern as SitemapService
+        // -------------------------------------------------------------------------
+        foreach (var item in rssItems)
+        {
+            string? absoluteUrl = null;
 
-//            var item = new RssChannelItem
-//            {
-//                Title = rssItemPage.MetadataTitle,
-//                Description = HtmlHelper.ExtractTextFromHtml(rssItemPage.MetadataDescription)?.Trim(),
-//                PubDate = rssItemPage.PublishFrom,
-//                Link = url.ToUri(),
-//                Categories = categories,
-//                GUID = url.ToHtmlCompatibleString(),
-//            };
+            try
+            {
+                var url = await _webPageUrlRetriever.Retrieve(
+                    item.WebPageItemID,
+                    languageName,
+                    cancellationToken: cancellationToken);
 
-//            if (rssItemPage.MetadataRssImage is not null)
-//            {
-//                var file = await _fileService.GetFileAsync(rssItemPage.MetadataRssImage, cancellationToken);
+                absoluteUrl = url?.AbsoluteUrl;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex,
+                    "[RSS] Failed to retrieve URL for WebPageItemID: {WebPageItemID}",
+                    item.WebPageItemID);
+            }
 
-//                if (file is not null)
-//                {
-//                    var imageUrl = rssItemPage.MetadataRssImage is RelativeLink relativeLink ? site.PresentationURL + relativeLink : (AbsoluteLink)rssItemPage.MetadataRssImage;
+            if (string.IsNullOrEmpty(absoluteUrl))
+            {
+                continue;
+            }
 
-//                    item.Enclosure = new RssChannelItemEnclosure
-//                    {
-//                        Length = file.Size,
-//                        Type = file.MimeType,
-//                        Url = imageUrl.ToUri(),
-//                    };
-//                }
-//            }
+            var channelItem = new RssChannelItem
+            {
+                Title = item.Title,
+                Description = item.Description,
+                PubDate = item.LastPublished.HasValue
+                    ? new DateTimeOffset(item.LastPublished.Value, TimeSpan.Zero)
+                    : null,
+                Link = Uri.TryCreate(absoluteUrl, UriKind.Absolute, out var uri) ? uri : null,
+                GUID = absoluteUrl
+                // Categories omitted — MetadataRssCategory not consistently present
+                // Enclosure omitted — image URL format not confirmed for ContentAttachment
+            };
 
-//            feed.Channel.Items.Add(item);
-//        }
+            feed.Channel.Items.Add(channelItem);
+        }
 
-//        return feed;
-//    }
-//}
+        return feed;
+    }
+
+    // -------------------------------------------------------------------------
+    // Resolves an absolute URL for a given WebPageItemID in the current language
+    // -------------------------------------------------------------------------
+    private async Task<string> GetPageAbsoluteUrlAsync(
+        int webPageItemId,
+        CancellationToken cancellationToken)
+    {
+        var url = await _webPageUrlRetriever.Retrieve(
+            webPageItemId,
+            _cultureContext.CurrentLanguageTag,
+            cancellationToken: cancellationToken);
+
+        return url?.AbsoluteUrl ?? string.Empty;
+    }
+}
+
+// -------------------------------------------------------------------------
+// Internal projection for RSS item data
+// Holds only the fields needed to build an RssChannelItem
+// -------------------------------------------------------------------------
+internal sealed class RssItemData
+{
+    public int WebPageItemID { get; init; }
+    public string? Title { get; init; }
+    public string? Description { get; init; }
+    public DateTime? LastPublished { get; init; }
+    public string? ImageUrl { get; init; }
+}
