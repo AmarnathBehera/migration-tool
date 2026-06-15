@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.tag>
+  <TagGUID>5c80cdbf-e422-48f3-a974-dfac1a94c0ee</TagGUID>
+  <TagMetadata>
+    <![CDATA[{"Translations":{}}]]>
+  </TagMetadata>
+  <TagName>Associate</TagName>
+  <TagOrder>3</TagOrder>
+  <TagTaxonomyID>
+    <CodeName>CareerJobTitle</CodeName>
+    <GUID>12cbf508-d966-489a-a817-b30f6eaa0bb0</GUID>
+    <ObjectType>cms.taxonomy</ObjectType>
+  </TagTaxonomyID>
+  <TagTitle>Associate</TagTitle>
+</cms.tag>

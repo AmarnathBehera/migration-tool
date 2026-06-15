@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <CodeNameColumn>CodeName</CodeNameColumn>
+      <DisplayNameColumn>CodeName</DisplayNameColumn>
+      <ObjectType>BDO.GeneralSetting</ObjectType>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassDisplayName>General Setting</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="GeneralID" columntype="integer" enabled="true" guid="77317884-10ab-4d87-9a5f-a261651877a2" isPK="true" />
+      <field allowempty="true" column="NonASCIItoASCIIcharacterdictionary" columnprecision="0" columntype="longtext" enabled="true" guid="83669b8e-808a-438d-aed4-e348a760d9a2" />
+      <field column="Enableexternallinkwarning" columnprecision="0" columntype="boolean" enabled="true" guid="75d339ca-bccb-4943-8c2e-2f553b109312" />
+      <field column="GeneralSettingsWebChannelSettingID" columnprecision="0" columntype="integer" enabled="true" guid="c728e103-ceb7-4b47-81b7-76d96c9509ec" refobjtype="bdo.webchannelsettings" reftype="Required" />
+      <field column="CodeName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="9b2808fa-c155-4ea8-bebd-51eee90142a7" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>3f5d22d9-f732-4edc-9c62-d9acf9790091</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.GeneralSetting</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_General</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

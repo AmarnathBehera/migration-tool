@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.tag>
+  <TagGUID>c04909c1-eac4-495f-b753-40ec6b31d809</TagGUID>
+  <TagMetadata>
+    <![CDATA[{"Translations":{}}]]>
+  </TagMetadata>
+  <TagName>Mid</TagName>
+  <TagOrder>5</TagOrder>
+  <TagTaxonomyID>
+    <CodeName>CareerLevels</CodeName>
+    <GUID>b00e5ac1-3ef7-49cd-bf37-50602aae3c56</GUID>
+    <ObjectType>cms.taxonomy</ObjectType>
+  </TagTaxonomyID>
+  <TagTitle>Mid</TagTitle>
+</cms.tag>

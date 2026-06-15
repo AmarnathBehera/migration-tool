@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.tag>
+  <TagDescription />
+  <TagGUID>a8eb09f1-63d6-4484-8314-ab8d6b4526d9</TagGUID>
+  <TagName>20m-30m</TagName>
+  <TagOrder>1</TagOrder>
+  <TagTaxonomyID>
+    <CodeName>range</CodeName>
+    <GUID>1db6a51b-ddb8-4894-a28f-bb568a0e850e</GUID>
+    <ObjectType>cms.taxonomy</ObjectType>
+  </TagTaxonomyID>
+  <TagTitle>20m-30m</TagTitle>
+</cms.tag>

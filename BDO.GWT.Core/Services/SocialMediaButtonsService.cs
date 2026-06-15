@@ -1,5 +1,7 @@
 ﻿using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.Entities;
+using BDO.GWT.Web.Core.LiveSite.DTOs;
 using CMS.Websites;
 using System.Web;
 
@@ -8,6 +10,7 @@ namespace BDO.GWT.Core.Services;
 public interface ISocialMediaButtonsService
 {
     Task<SocialMediaButtonsDto> GetSocialMediaButtonsDto(IWebPageFieldsSource page, string pageTitle, CancellationToken cancellationToken);
+    Task<SocialMediaButtonsDto> GetSocialMediaButtonsDtoNB(string pageAbsUrl, string pageTitle, CancellationToken cancellationToken);
 }
 
 public class SocialMediaButtonsService : ISocialMediaButtonsService
@@ -19,13 +22,48 @@ public class SocialMediaButtonsService : ISocialMediaButtonsService
         _settingsService = settingsService;
     }
 
+
     public async Task<SocialMediaButtonsDto> GetSocialMediaButtonsDto(
-        IWebPageFieldsSource page,
-        string pageTitle,
-        CancellationToken cancellationToken)
+      IWebPageFieldsSource page,
+      string pageTitle,
+      CancellationToken cancellationToken)
     {
         var encodedPageTitle = HttpUtility.UrlEncode(pageTitle);
         var pageUrl = page.GetUrl().AbsoluteUrl;
+        var encodedPageUrl = HttpUtility.UrlEncode(pageUrl);
+
+        var settings = await _settingsService.GetPrintorShareInfo();
+        var settingInfo = settings?.FirstOrDefault();
+
+        return new SocialMediaButtonsDto
+        {
+            EmailButtonUrl = settingInfo?.DisableEmail is true
+                ? null
+                : ConstructEmailButtonUrl(encodedPageTitle, encodedPageUrl),
+
+            FacebookButtonUrl = settingInfo?.DisableFacebook is true
+                ? null
+                : ConstructFacebookButtonUrl(encodedPageTitle, encodedPageUrl),
+
+            TwitterButtonUrl = settingInfo?.DisableTwitter is true
+                ? null
+                : ConstructTwitterButtonUrl(encodedPageTitle, encodedPageUrl),
+
+            LinkedInUrl = settingInfo?.DisableLinkedIn is true
+                ? null
+                : ConstructLinkedInButtonUrl(encodedPageTitle, encodedPageUrl),
+
+            ShowCopyLinkButton = settingInfo?.DisableCopyLinkButton is not true,
+        };
+    }
+
+    public async Task<SocialMediaButtonsDto> GetSocialMediaButtonsDtoNB(
+       string pageAbsUrl,
+       string pageTitle,
+       CancellationToken cancellationToken)
+    {
+        var encodedPageTitle = HttpUtility.UrlEncode(pageTitle);
+        var pageUrl = pageAbsUrl;
         var encodedPageUrl = HttpUtility.UrlEncode(pageUrl);
 
         var settings = await _settingsService.GetPrintorShareInfo();

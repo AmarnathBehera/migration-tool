@@ -1,4 +1,6 @@
-﻿namespace BDO.GWT.Core.DTOs;
+﻿using BDO.GWT.Web.Core.LiveSite.DTOs;
+
+namespace BDO.GWT.Core.DTOs;
 
 public interface ISidebarDto
 {

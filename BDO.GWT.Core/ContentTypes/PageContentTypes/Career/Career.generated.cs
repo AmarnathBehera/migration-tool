@@ -74,19 +74,19 @@ namespace BDO
 		/// <summary>
 		/// CareerLevel.
 		/// </summary>
-		public IEnumerable<TagReference> CareerLevel { get; set; }
+		public IEnumerable<CareerLevels> CareerLevel { get; set; }
 
 
 		/// <summary>
 		/// CareerEmploymentType.
 		/// </summary>
-		public IEnumerable<TagReference> CareerEmploymentType { get; set; }
+		public IEnumerable<CareerEmploymentTypes> CareerEmploymentType { get; set; }
 
 
 		/// <summary>
 		/// CareerJobTitle.
 		/// </summary>
-		public IEnumerable<TagReference> CareerJobTitle { get; set; }
+		public IEnumerable<CareerJobTitle> CareerJobTitle { get; set; }
 
 
 		/// <summary>

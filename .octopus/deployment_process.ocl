@@ -55,6 +55,11 @@ step "deploy-cms-app-service" {
                     "slotSetting": false
                   },
                   {
+                    "name": "AdminRedirectOptions__RedirectDomain",
+                    "value": "#{appsettings.RedirectDomain}",
+                    "slotSetting": false
+                  },
+                  {
                     "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
                     "value": "#{appsettings.appInsightsCMSConnectionString}",
                     "slotSetting": false
@@ -126,6 +131,11 @@ step "deploy-mvc-app-service" {
                   {
                     "name": "CMSHashStringSalt",
                     "value": "#{appsettings.CMSHashStringSalt}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AdminRedirectOptions__RedirectDomain",
+                    "value": "#{appsettings.RedirectDomain}",
                     "slotSetting": false
                   },
                   {
@@ -218,6 +228,33 @@ step "deploy-react-app-service" {
             acquisition_location = "Server"
             feed = "octopus-server-built-in"
             package_id = "GWT.XbyK.React.Deploy"
+            properties = {
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
+step "restore-kentico-ci-database" {
+    name = "Restore Kentico CI Database"
+
+    action {
+        action_type = "Octopus.AzurePowerShell"
+        properties = {
+            Octopus.Action.Azure.AccountId = "#{octopus.azure.account}"
+            Octopus.Action.Package.DownloadOnTentacle = "False"
+            Octopus.Action.Package.FeedId = "octopus-server-built-in"
+            Octopus.Action.Package.PackageId = "GWT.XbyK.CI.Deploy"
+            Octopus.Action.Script.ScriptFileName = "Invoke-KenticoCIRestore.ps1"
+            Octopus.Action.Script.ScriptSource = "Package"
+            OctopusUseBundledTooling = "False"
+        }
+        worker_pool_variable = "deploy.octopus.workerPool"
+
+        packages {
+            acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = "GWT.XbyK.CI.Deploy"
             properties = {
                 SelectionMode = "immediate"
             }

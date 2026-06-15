@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Image resizing</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ImageresizingID" columntype="integer" enabled="true" guid="864d5490-36f3-4574-a811-4140fce232c7" isPK="true" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>e3647143-4ef9-47e4-8cbc-8f1d3ee463a3</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.Imageresizing</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_Imageresizing</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

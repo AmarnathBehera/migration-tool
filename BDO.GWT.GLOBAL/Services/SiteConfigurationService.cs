@@ -1,7 +1,7 @@
 ﻿using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Entities;
-using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Services;
+using BDO.GWT.Xperience.Core.Services;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Websites;
@@ -26,7 +26,7 @@ public interface ISiteConfigurationService
 /// </summary>
 public sealed record SiteConfigurationProviders(
     IInfoProvider<LocalizationKeyInfo> LocalizationKey,
-    IInfoProvider<LocalizationTranslationItemInfo> LocalizationTranslation,
+    IInfoProvider<XperienceCommunity.Localization.LocalizationTranslationItemInfo> LocalizationTranslation,
     IInfoProvider<ContentLanguageInfo> ContentLanguage,
     IInfoProvider<WebChannelSettingsInfo> WebChannelSettings,
     IInfoProvider<GeneralSettingInfo> GeneralSetting,
@@ -74,7 +74,7 @@ public class SiteConfigurationService : ISiteConfigurationService
     public async Task<SiteConfigurationDto> GetSiteConfigurationDtoAsync(CancellationToken cancellationToken)
     {
         var localizationResources = await GetLocalizationValuesAsync();
-        
+
         var translations = localizationResources.ToDictionary(
             resource => resource.CultureCode.ToLower(),
             resource => (IDictionary<string, string>)resource.LocalizationKey.ToDictionary(
@@ -99,7 +99,7 @@ public class SiteConfigurationService : ISiteConfigurationService
 
         result.Hash = calculatedHash;
 
-        return result;              
+        return result;
     }
 
     private SiteSettingsDto GetSiteSettings()

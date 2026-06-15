@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="BlogPost"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class BlogPost : IWebPageFieldsSource, ICallToAction, ISidebar, IOGMetadataFields, ISearchAndSEO, IMetadata, IAuthorInformation, IImage, IPageMetadata, IContentPage, ITaggingAndGrouping
+	public partial class BlogPost : IWebPageFieldsSource, ICallToAction, ISidebar, IOGMetadataFields, ISearchAndSEO, IMetadata, IWhereShouldThisPageAppear, IAuthorInformation, IImage, IPageMetadata, IContentPage
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -33,6 +33,18 @@ namespace BDO
 		/// </summary>
 		[SystemField]
 		public WebPageFields SystemFields { get; set; }
+
+
+		/// <summary>
+		/// MetadataKeywordsBlog.
+		/// </summary>
+		public string MetadataKeywordsBlog { get; set; }
+
+
+		/// <summary>
+		/// MetadataBusinessIssues.
+		/// </summary>
+		public IEnumerable<Businessissues> MetadataBusinessIssues { get; set; }
 
 
 		/// <summary>
@@ -162,6 +174,66 @@ namespace BDO
 
 
 		/// <summary>
+		/// ContentType.
+		/// </summary>
+		public IEnumerable<Contenttypes> ContentType { get; set; }
+
+
+		/// <summary>
+		/// MetadataRssImage.
+		/// </summary>
+		public IEnumerable<IContentItemFieldsSource> MetadataRssImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataBusinessLine.
+		/// </summary>
+		public IEnumerable<BusinessLine> MetadataBusinessLine { get; set; }
+
+
+		/// <summary>
+		/// MetadataServices.
+		/// </summary>
+		public IEnumerable<Service> MetadataServices { get; set; }
+
+
+		/// <summary>
+		/// MetadataServiceAreas.
+		/// </summary>
+		public IEnumerable<ServiceArea> MetadataServiceAreas { get; set; }
+
+
+		/// <summary>
+		/// MetadataIndustryCategories.
+		/// </summary>
+		public IEnumerable<IndustryCategory> MetadataIndustryCategories { get; set; }
+
+
+		/// <summary>
+		/// MetadataIndustries.
+		/// </summary>
+		public IEnumerable<Industry> MetadataIndustries { get; set; }
+
+
+		/// <summary>
+		/// MicrositePages.
+		/// </summary>
+		public IEnumerable<MicrositePlaceholder> MicrositePages { get; set; }
+
+
+		/// <summary>
+		/// MicrositeMasterPages.
+		/// </summary>
+		public IEnumerable<MicrositePlaceholder> MicrositeMasterPages { get; set; }
+
+
+		/// <summary>
+		/// MetadataRssCategory.
+		/// </summary>
+		public IEnumerable<MicrositePlaceholder> MetadataRssCategory { get; set; }
+
+
+		/// <summary>
 		/// RelevantContactPerson.
 		/// </summary>
 		public IEnumerable<IWebPageFieldsSource> RelevantContactPerson { get; set; }
@@ -225,59 +297,5 @@ namespace BDO
 		/// UpdatedOn.
 		/// </summary>
 		public DateTime UpdatedOn { get; set; }
-
-
-		/// <summary>
-		/// MetadataKeywords.
-		/// </summary>
-		public string MetadataKeywords { get; set; }
-
-
-		/// <summary>
-		/// MetadataBusinessIssuesTG.
-		/// </summary>
-		public IEnumerable<TagReference> MetadataBusinessIssuesTG { get; set; }
-
-
-		/// <summary>
-		/// MetadataBusinessLineTG.
-		/// </summary>
-		public IEnumerable<BusinessLine> MetadataBusinessLineTG { get; set; }
-
-
-		/// <summary>
-		/// MetadataServicesTG.
-		/// </summary>
-		public IEnumerable<Service> MetadataServicesTG { get; set; }
-
-
-		/// <summary>
-		/// MetadataServiceAreasTG.
-		/// </summary>
-		public IEnumerable<ServiceArea> MetadataServiceAreasTG { get; set; }
-
-
-		/// <summary>
-		/// MetadataIndustryCategoriesTG.
-		/// </summary>
-		public IEnumerable<IndustryCategory> MetadataIndustryCategoriesTG { get; set; }
-
-
-		/// <summary>
-		/// MetadataIndustriesTG.
-		/// </summary>
-		public IEnumerable<Industry> MetadataIndustriesTG { get; set; }
-
-
-		/// <summary>
-		/// MicrositePagesTG.
-		/// </summary>
-		public IEnumerable<MicrositePlaceholder> MicrositePagesTG { get; set; }
-
-
-		/// <summary>
-		/// MicrositeMasterPagesTG.
-		/// </summary>
-		public IEnumerable<MicrositePlaceholder> MicrositeMasterPagesTG { get; set; }
 	}
 }

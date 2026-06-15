@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.SectionPeoplePage</CodeName>
+    <GUID>a15c3744-bd53-4359-b3a8-9fd52bd0c611</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.Person">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.Person</CodeName>
+        <GUID>f3c1aa73-5245-4566-ae9c-ac80c54a6ce2</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

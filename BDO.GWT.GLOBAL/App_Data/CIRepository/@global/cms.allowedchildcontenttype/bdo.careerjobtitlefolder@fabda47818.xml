@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.CareerJobTitleFolder</CodeName>
+    <GUID>99202aba-f07c-4a74-a7ac-600fee85f52a</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.CareerJobTitle">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.CareerJobTitle</CodeName>
+        <GUID>892f3411-5870-480c-b671-d0f3da7bdf45</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

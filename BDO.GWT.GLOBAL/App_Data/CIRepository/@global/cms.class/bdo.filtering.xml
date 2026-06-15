@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Filtering</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="FilteringID" columntype="integer" enabled="true" guid="029b1394-3f1a-43fe-a733-d111b74e7786" isPK="true" />
+      <field column="Showtooltip" columnprecision="0" columntype="boolean" enabled="true" guid="d9ea7ce9-e501-469a-9589-7561a777130b" />
+      <field column="FilteringSettingsWebChannelSettingID" columnprecision="0" columntype="integer" enabled="true" guid="b1d0878b-4834-48b5-a970-c3d00b3046bf" refobjtype="bdo.webchannelsettings" reftype="Required">
+        <properties>
+          <defaultvalue>0</defaultvalue>
+        </properties>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>c489ce71-548c-407f-8ff9-d0c8c3b80ead</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.Filtering</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_Filtering</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

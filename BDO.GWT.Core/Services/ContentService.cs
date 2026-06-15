@@ -217,7 +217,7 @@
      int WebsiteChannelID,
      CancellationToken cancellationToken = default)
 
-        { 
+        {
             var results = new List<object>();
 
             foreach (var type in types)
@@ -276,18 +276,55 @@
                 throw new ArgumentException("Parent GUID must be provided", nameof(parentGuid));
 
             var childPages = await _contentRetriever.RetrievePages<TPage>(
-                new RetrievePagesParameters { LinkedItemsMaxLevel = 3 },
+                new RetrievePagesParameters { LinkedItemsMaxLevel = 5 },
             query =>
-                {
-                    // Filter by parent GUID
-                    query.Where(w => w.WhereEquals("WebPageItemParentID", parentGuid))
-                         .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder));
-                },
+            {
+                // Filter by parent GUID
+                query.Where(w => w.WhereEquals("WebPageItemParentID", parentGuid))
+                     .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder));
+            },
                 cacheSettings: RetrievalCacheSettings.CacheDisabled, // Use the predefined disabled cache
                 cancellationToken: cancellationToken
             );
 
             return childPages;
+        }
+
+        /// <summary>
+        /// Retrieves web pages of type <typeparamref name="TPage"/> using a caller-supplied
+        /// <see cref="ContentItemQueryBuilder"/> configuration. This overload gives the caller
+        /// full control over the query (Where, OrderBy, TopN, Parameters, etc.) instead of
+        /// just filtering by a single parent ID.
+        /// Linked items are resolved up to 5 levels deep.
+        /// </summary>
+        public async Task<IEnumerable<TPage>> GetChildPagesByParentGuidWithQueryBuilderAsync<TPage>(
+            Action<ContentItemQueryBuilder> configure,
+            CancellationToken cancellationToken = default)
+            where TPage : class, IWebPageFieldsSource
+        {
+            if (configure is null)
+                throw new ArgumentNullException(nameof(configure));
+
+            var builder = new ContentItemQueryBuilder()
+                .ForContentType(GetContentTypeName<TPage>(), subquery =>
+                {
+                    subquery
+                        .ForWebsite(_websiteChannelContext.WebsiteChannelName)
+                        .WithLinkedItems(5); // equivalent to RetrievePagesParameters { LinkedItemsMaxLevel = 5 }
+                });
+
+            // Allow the caller to decorate the builder (apply parent filter, filter expressions,
+            // ordering, paging, linked-items levels via Parameters, etc.).
+            configure.Invoke(builder);
+
+            var queryOptions = BuildQueryExecutionOptions();
+
+            var results = await _executor.GetMappedWebPageResult<TPage>(
+                builder,
+                queryOptions,
+                cancellationToken);
+
+            return results;
         }
 
         public Task<IEnumerable<TPage>> GetPagesAsync<TPage>(
@@ -304,6 +341,11 @@
                 cacheSettings,
                 cancellationToken
             );
+        }
+
+        public void GetPagesAsync<T>(RetrievePagesParameters retrievePagesParameters, Func<ContentItemQueryBuilder, ContentItemQueryBuilder> func, RetrievalCacheSettings retrievalCacheSettings, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource
         {
@@ -334,6 +376,10 @@
         {
             return _websiteChannelContext.WebsiteChannelName;
         }
+        public string GetCurrentLanguage()
+        {
+            return _cultureContext.CurrentLanguageTag;
+        }
         public int GetCurrentChannelID()
         {
             return _websiteChannelContext.WebsiteChannelID;
@@ -345,31 +391,47 @@
         }
 
         public async Task<IWebPageFieldsSource?> GetPageByTypeAndNameAsync(
-     Type type,
-     string pageName,
-     CancellationToken cancellationToken = default)
+            Type type,
+            string pageName,
+            CancellationToken cancellationToken = default)
         {
             var contentTypeName = GetContentTypeName(type);
+
+            // Only include the "Name" column condition when the CLR model exposes
+            // that property (e.g. EventType, Businessissues). Including it for
+            // content types that don't have the column causes a SQL error.
+            var hasNameProperty = type.GetProperty("Name") is not null;
+
             var builder = new ContentItemQueryBuilder()
                 .ForContentType(contentTypeName, q => q
-                    .ForWebsite(_websiteChannelContext.WebsiteChannelName) 
+                    .ForWebsite(_websiteChannelContext.WebsiteChannelName)
                 )
                 .Parameters(q => q
-                 .Where(w => w.WhereEquals("MetadataTitle", pageName)
-                .Or()
-                .WhereEquals("MetadataOGTitle", pageName)
-                .Or()
-                .WhereEquals("ContentItemName", pageName))
-                .TopN(1)
+                    .Where(w =>
+                    {
+                        var clause = w
+                            .WhereEquals("MetadataTitle", pageName)
+                            .Or()
+                            .WhereEquals("MetadataOGTitle", pageName)
+                            .Or()
+                            .WhereEquals("ContentItemName", pageName);
+
+                        if (hasNameProperty)
+                        {
+                            clause.Or().WhereEquals("Name", pageName);
+                        }
+                    })
+                    .TopN(1)
                 );
 
+
             var result = await _executor.GetMappedWebPageResult<IWebPageFieldsSource>(
-                builder,
-                new ContentQueryExecutionOptions
-                {
-                    ForPreview = _websiteChannelContext.IsPreview
-                },
-                cancellationToken);
+                    builder,
+                    new ContentQueryExecutionOptions
+                    {
+                        ForPreview = _websiteChannelContext.IsPreview
+                    },
+                    cancellationToken);
 
             return result.FirstOrDefault();
         }
@@ -402,6 +464,10 @@
 
             return url;
         }
+
+      
+
+        
     }
 }
 

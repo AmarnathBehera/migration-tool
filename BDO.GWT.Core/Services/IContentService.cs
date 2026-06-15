@@ -73,22 +73,29 @@
        CancellationToken cancellationToken = default)
        where TPage : IWebPageFieldsSource;
 
+        Task<IEnumerable<TPage>> GetChildPagesByParentGuidWithQueryBuilderAsync<TPage>(
+          Action<ContentItemQueryBuilder> configure,
+          CancellationToken cancellationToken = default)
+          where TPage : class, IWebPageFieldsSource;
+
+        void GetPagesAsync<T>(RetrievePagesParameters retrievePagesParameters, Func<ContentItemQueryBuilder, ContentItemQueryBuilder> func, RetrievalCacheSettings retrievalCacheSettings, CancellationToken cancellationToken);
+
         Task<IEnumerable<TPage>> GetPagesAsync<TPage>(
       RetrievePagesParameters parameters,
       Action<RetrievePagesQueryParameters> queryAction,
       RetrievalCacheSettings cacheSettings,
       CancellationToken cancellationToken = default
-  ) where TPage : class, IWebPageFieldsSource;
+           ) where TPage : class, IWebPageFieldsSource;
 
 
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(RetrievePagesParameters parameters, CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
-        
+
         public string GetFallbackMetadataDescription(string? metaDescription, string? metaOGDescription);
         public string GetCurrentSiteLogoImageUrlAsync();
 
         public string GetCurrentSiteLegalNameAsync();
-
+        public string GetCurrentLanguage();
         public int GetCurrentChannelID();
         Task<T?> RetrieveCurrentPageAsync<T>(RetrieveCurrentPageParameters parameters, CancellationToken cancellationToken = default) where T : class;
 
@@ -102,5 +109,6 @@
             string[] contentTypes);
 
        public string? EnsureAbsoluteUrl(string? url);
+        
     }
 }

@@ -22,22 +22,22 @@ public class XperiencePageContext : IPageContext
     private readonly IPageBuilderDataContextRetriever _pageBuilderDataContextRetriever;
     private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly IContentQueryExecutor _queryExecutor;
-    private readonly IContentRetriever _contentRetriever;
+
 
     public XperiencePageContext(
         IHttpContextAccessor httpContextAccessor,
         IWebPageDataContextRetriever webPageDataContextRetriever,
         IPageBuilderDataContextRetriever pageBuilderDataContextRetriever,
         IWebsiteChannelContext websiteChannelContext,
-        IContentQueryExecutor queryExecutor,
-        IContentRetriever contentRetriever)
+        IContentQueryExecutor queryExecutor
+        )
     {
         _httpContextAccessor = httpContextAccessor;
         _webPageDataContextRetriever = webPageDataContextRetriever;
         _pageBuilderDataContextRetriever = pageBuilderDataContextRetriever;
         _websiteChannelContext = websiteChannelContext;
         _queryExecutor = queryExecutor;
-        _contentRetriever = contentRetriever;
+       
     }
 
     public bool IsInPreviewMode => _websiteChannelContext.IsPreview;
@@ -81,17 +81,31 @@ public class XperiencePageContext : IPageContext
         if (!canRetrieve || ctx.WebPage == null)
             return null;
 
-        var webPageItemId = ctx.WebPage.WebPageItemID;
 
-        var pages = await _contentRetriever.RetrieveAllPages<IWebPageFieldsSource>(
-            new RetrieveAllPagesParameters { LinkedItemsMaxLevel = 5 },
-            query => query.Where(w =>
-                w.WhereEquals("WebPageItemID", webPageItemId)
-                 .WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID)),
-            cacheSettings: RetrievalCacheSettings.CacheDisabled,
-            configureModel: (container, p) => Task.FromResult(p),
-            cancellationToken: cancellationToken
-        );
+        var webPageItemId = ctx.WebPage.WebPageItemID;
+        // Get the content type name from context - avoids querying ALL types
+        var contentTypeName = ctx.WebPage.ContentTypeName;
+
+        //use the content type name to query only pages of tha particular content type.
+        var builder = new ContentItemQueryBuilder()
+       .ForContentType(
+           contentTypeName,
+           subQuery => subQuery
+               .ForWebsite(ctx.WebPage.WebsiteChannelName)
+               .Where(w => w
+                   .WhereEquals(nameof(IWebPageContentQueryDataContainer.WebPageItemID), webPageItemId)
+               )
+               .WithLinkedItems(5)
+       )
+       .InLanguage(ctx.WebPage.LanguageName);
+
+        var options = new ContentQueryExecutionOptions
+        {
+            ForPreview = _websiteChannelContext.IsPreview
+        };
+
+        var pages = await _queryExecutor.GetMappedWebPageResult<IWebPageFieldsSource>(
+            builder, options, cancellationToken);
 
         var page = pages?.Select(MapToMetaDataSEOItemsDto).FirstOrDefault();
 
@@ -103,6 +117,7 @@ public class XperiencePageContext : IPageContext
             ResolveOGMetaDataUrls(page, request);
 
         return page;
+
     }
 
     private static MetaDataSEOItemsDto MapToMetaDataSEOItemsDto(IWebPageFieldsSource p)

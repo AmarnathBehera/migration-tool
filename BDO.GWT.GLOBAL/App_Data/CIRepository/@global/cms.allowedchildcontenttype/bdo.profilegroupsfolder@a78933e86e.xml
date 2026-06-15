@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.ProfileGroupsFolder</CodeName>
+    <GUID>eee2e7ae-862a-4543-b9bd-a212bcc637f4</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.ProfileGroups">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.ProfileGroups</CodeName>
+        <GUID>aa488ff8-e898-4ea1-84ca-61354fd05187</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>
