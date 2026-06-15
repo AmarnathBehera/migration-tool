@@ -35,16 +35,13 @@ namespace BDO.GWT.GLOBAL.Tests.Services
         {
             _filteringHelperMock = new Mock<IFilteringHelper>();
             _eventWebinarCardsServiceMock = new Mock<IEventWebinarCardsService>();
-            _contentServiceMock = new Mock<IContentService>();
-            _cultureContextMock = new Mock<ICultureContext>();
+         
             _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
             _contentQueryExecutorMock = new Mock<IContentQueryExecutor>();
 
             _service = new EventsWebinarsSliderService(
                 _eventWebinarCardsServiceMock.Object,
                 _filteringHelperMock.Object,
-                _contentServiceMock.Object,
-                _cultureContextMock.Object,
                 _websiteChannelContextMock.Object,
                 _contentQueryExecutorMock.Object);
         }
