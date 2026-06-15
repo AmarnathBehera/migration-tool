@@ -3,7 +3,7 @@ namespace BDO.GWT.Core.Data;
 
 public class HeroData
 {
-    public string Layout { get; set; } = null!;
+    public string? Layout { get; set; } = null!;
 
     public string? Title { get; set; }
 

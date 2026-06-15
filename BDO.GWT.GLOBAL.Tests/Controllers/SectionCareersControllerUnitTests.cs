@@ -1,6 +1,6 @@
 ﻿namespace BDO.GWT.GLOBAL.Tests.Controllers;
 
-using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.Pages;
 using global::BDO.GWT.GLOBAL.Tests.Utilities;
 using global::BDO.GWT.Web.Controllers;
 using global::BDO.GWT.Web.Core.Services;
