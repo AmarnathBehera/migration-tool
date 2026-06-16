@@ -4,17 +4,39 @@
   <ClassDisplayName>Deal Card - Range</ClassDisplayName>
   <ClassFormDefinition>
     <form>
-      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="711b8364-bd0e-4ed0-99f9-b8b083bf95ad" isPK="true" />
-      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="4fd4baed-2892-4e68-8a57-bf7573db9200" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
-      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="ecce3360-def4-464e-b7e0-bd5ff76086ad" isunique="true" system="true" />
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="9aa6d38b-343c-43c5-bc2b-86ae5995a496" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="d6c95894-c4a2-4111-b5f4-fa2e105ddc5f" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="31a5c87c-7a94-45ba-8356-3e2f082cd48c" isunique="true" system="true" />
+      <field column="Name" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7e30bc88-bae7-4cc9-9a04-2498034820a2" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Name</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field column="CodeName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="b108f09b-eef9-4772-9971-f89c054238c0" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Code Name</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
     </form>
   </ClassFormDefinition>
-  <ClassGUID>7e697a93-eea8-465f-bd16-145062f870eb</ClassGUID>
+  <ClassGUID>b06a34f3-9904-41b9-8a1a-a9747892bb6e</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
-  <ClassIconClass>xp-list-numbers</ClassIconClass>
+  <ClassIconClass>xp-list-bullets</ClassIconClass>
   <ClassName>BDO.DealCardRange</ClassName>
   <ClassShortName>BDODealCardRange</ClassShortName>
   <ClassTableName>BDO_DealCardRange</ClassTableName>
   <ClassType>Content</ClassType>
-  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
 </cms.contenttype>

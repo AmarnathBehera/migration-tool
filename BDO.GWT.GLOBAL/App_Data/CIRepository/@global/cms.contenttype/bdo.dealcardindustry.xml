@@ -7,6 +7,39 @@
       <field column="ContentItemDataID" columntype="integer" enabled="true" guid="c4845871-ab9b-4cfe-b8dd-f147d87ec029" isPK="true" />
       <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="62f1680b-d4f1-49c2-b09a-c01a0bcc45f5" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
       <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="7513eb68-2ce7-4286-b6dc-ccfd305fab91" isunique="true" system="true" />
+      <field column="Name" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="315ddc51-775d-448e-ac94-59d1bbb4cf58" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Name</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field column="CodeName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="db4a1102-f125-42b7-9138-701a48f7424c" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Code Name</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field column="Language" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="f1b5873c-bae0-4560-a6f0-b9e13e31619d" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Language</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
     </form>
   </ClassFormDefinition>
   <ClassGUID>bdd17a11-079d-4afa-9490-c8c2f90f8353</ClassGUID>

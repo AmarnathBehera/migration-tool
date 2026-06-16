@@ -23,7 +23,14 @@
     <Binding id="cms.contenttype_BDO.DealCardRange">
       <AllowedChildContentTypeChildID>
         <CodeName>BDO.DealCardRange</CodeName>
-        <GUID>7e697a93-eea8-465f-bd16-145062f870eb</GUID>
+        <GUID>b06a34f3-9904-41b9-8a1a-a9747892bb6e</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.DealCards">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.DealCards</CodeName>
+        <GUID>7b19e49b-0002-4a8a-a4ce-ddc69ce5c526</GUID>
         <ObjectType>cms.contenttype</ObjectType>
       </AllowedChildContentTypeChildID>
     </Binding>

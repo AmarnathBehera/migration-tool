@@ -45,7 +45,7 @@
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["09fd4259-c646-41e1-8363-6ed3c47ed8b2"]]]>
+            <![CDATA[["bdd17a11-079d-4afa-9490-c8c2f90f8353"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
@@ -60,7 +60,7 @@
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["09fd4259-c646-41e1-8363-6ed3c47ed8b2"]]]>
+            <![CDATA[["cdab0d33-430e-407a-ad3e-f0a5ac05d5e0"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
@@ -84,7 +84,7 @@
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["09fd4259-c646-41e1-8363-6ed3c47ed8b2"]]]>
+            <![CDATA[["cfe5a014-3dc5-4df5-8727-b21e91016436"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
@@ -109,7 +109,7 @@
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["09fd4259-c646-41e1-8363-6ed3c47ed8b2"]]]>
+            <![CDATA[["b06a34f3-9904-41b9-8a1a-a9747892bb6e"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
