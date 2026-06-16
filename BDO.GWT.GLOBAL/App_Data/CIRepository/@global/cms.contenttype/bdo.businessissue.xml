@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <cms.contenttype>
   <ClassContentTypeType>Website</ClassContentTypeType>
-  <ClassDisplayName>Business issues</ClassDisplayName>
+  <ClassDisplayName>Business issue</ClassDisplayName>
   <ClassFormDefinition>
     <form>
       <field column="ContentItemDataID" columntype="integer" enabled="true" guid="d2e9a47a-49cb-4c07-877c-68b14e04b488" isPK="true" />
@@ -34,7 +34,7 @@
   <ClassGUID>252cdc0e-f6a0-424f-bd6b-2584655e66c7</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
   <ClassIconClass>xp-l-list-title</ClassIconClass>
-  <ClassName>BDO.Businessissues</ClassName>
+  <ClassName>BDO.Businessissue</ClassName>
   <ClassShortName>BDOBusinessissues</ClassShortName>
   <ClassTableName>BDO_Businessissues</ClassTableName>
   <ClassType>Content</ClassType>

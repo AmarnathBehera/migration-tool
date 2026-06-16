@@ -1,10 +1,13 @@
 ﻿using BDO.GWT.Common.Exceptions;
+using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.Services;
 
 namespace BDO.GWT.Core.Helpers;
 
 public static class PageHelper
 {
+   
     public static ImageDto? GetImageDto(String? imageLink, string? imageAltText)
     {
         if (imageLink == null)
@@ -21,7 +24,7 @@ public static class PageHelper
         return dto;
     }
 
-    public static CallToActionDto? GetCallToActionDto(string? callToActionDescription, string? callToActionButtonText, String? callToActionButtonLink, string? callToActionPosition)
+    public static CallToActionDto? GetCallToActionDto(string? callToActionDescription, string? callToActionButtonText, String? callToActionButtonLink)
     {
         if (callToActionButtonText == null || callToActionButtonLink == null)
         {
@@ -33,9 +36,30 @@ public static class PageHelper
             Description = callToActionDescription,
             ButtonTitle = callToActionButtonText,
             ButtonUrl = callToActionButtonLink,
-            Position = callToActionPosition,
+          
         };
 
         return dto;
     }
+
+    public static CallToActionDto? GetCallToActionDto<T>(T contentPage) where T : ICallToAction, ISidebar
+    {
+        if (contentPage.CallToActionButtonText == null || contentPage.CallToActionButtonUrl == null)
+        {
+            return null;
+        }
+
+        var dto = new CallToActionDto
+        {
+            Description = contentPage.CallToActionDescription,
+            ButtonTitle = contentPage.CallToActionButtonText,
+            ButtonUrl = contentPage.CallToActionButtonUrl
+
+        };
+
+        return dto;
+
+    }
+
+   
 }
