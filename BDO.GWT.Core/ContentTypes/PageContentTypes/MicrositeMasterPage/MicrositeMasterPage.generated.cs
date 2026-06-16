@@ -56,13 +56,13 @@ namespace BDO
 		/// <summary>
 		/// CustomJS.
 		/// </summary>
-		public IEnumerable<ContentAttachment> CustomJS { get; set; }
+		public IEnumerable<JavaScriptAttachmentAsset> CustomJS { get; set; }
 
 
 		/// <summary>
 		/// CustomCSS.
 		/// </summary>
-		public IEnumerable<ContentAttachment> CustomCSS { get; set; }
+		public IEnumerable<CssAttachmentAsset> CustomCSS { get; set; }
 
 
 		/// <summary>

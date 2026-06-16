@@ -39,12 +39,6 @@ namespace BDO
 
 
 		/// <summary>
-		/// MetadataBusinessLineTG.
-		/// </summary>
-		public IEnumerable<BusinessLine> MetadataBusinessLineTG { get; set; }
-
-
-		/// <summary>
 		/// MetadataServicesTG.
 		/// </summary>
 		public IEnumerable<Service> MetadataServicesTG { get; set; }
