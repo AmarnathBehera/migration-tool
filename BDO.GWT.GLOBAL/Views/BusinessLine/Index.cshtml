@@ -20,7 +20,6 @@
 
     var widgetsList = new[]
     {
-        ComponentIdentifiers.Widgets.ExternalNavigation,
         ComponentIdentifiers.Widgets.Imagewithtext,
         ComponentIdentifiers.Widgets.QuoteCard,
         ComponentIdentifiers.Widgets.TiledLink,
@@ -33,6 +32,7 @@
 @{
     var isSideBoxVisible = Model.BusinessLinePageDto.Sidebox != null && Model.BusinessLinePageDto.ShowSideNavigation;
 }
+@await Html.PartialAsync("_LocalNavigation")
 
 <div>
     @(await ReactService.RenderComponentAsync(
