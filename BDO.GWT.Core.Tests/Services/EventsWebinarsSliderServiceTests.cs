@@ -19,8 +19,6 @@ namespace BDO.GWT.GLOBAL.Tests.Services
     {
         private Mock<IFilteringHelper> _filteringHelperMock = null!;
         private Mock<IEventWebinarCardsService> _eventWebinarCardsServiceMock = null!;
-        private Mock<IContentService> _contentServiceMock = null!;
-        private Mock<ICultureContext> _cultureContextMock = null!;
         private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
         private Mock<IContentQueryExecutor> _contentQueryExecutorMock = null!;
         private EventsWebinarsSliderService _service = null!;
@@ -177,10 +175,13 @@ namespace BDO.GWT.GLOBAL.Tests.Services
                 cancellationToken);
 
             // Assert
-            Assert.That(result.Filters, Is.Null);
-            Assert.That(result.FilteringTooltipEnabled, Is.False);
-
-            _eventWebinarCardsServiceMock.Verify(
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Filters, Is.Null);
+                Assert.That(result.FilteringTooltipEnabled, Is.False);
+            });
+                _eventWebinarCardsServiceMock.Verify(
                 x => x.CreateFiltersAsync(
                     It.IsAny<HashSet<string>>(),
                     It.IsAny<string?>(),
