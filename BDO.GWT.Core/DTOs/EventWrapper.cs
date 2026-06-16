@@ -20,13 +20,13 @@ public class EventWrapper : IEventOrWebinar
     public IEnumerable<IWebPageFieldsSource> MetadataSpecialtiesCategories => _event.MetadataSpecialtiesCategories;
     public IEnumerable<IWebPageFieldsSource> MetadataSpecialtiesAreas => _event.MetadataSpecialtiesCategories;
     public IEnumerable<IWebPageFieldsSource> MetadataSpecialtiesPages => _event.MetadataSpecialtiesCategories;
-    public IEnumerable<MicrositePlaceholder> MicrositeMasterPages => _event.MicrositeMasterPages;
-    public IEnumerable<MicrositePlaceholder> MicrositePages => _event.MicrositePages;
+    public IEnumerable<MicrositeMasterPage> MicrositeMasterPages => _event.MicrositeMasterPages;
+    public IEnumerable<MicrositePage> MicrositePages => _event.MicrositePages;
     public IEnumerable<Industry> MetadataIndustries => _event.MetadataIndustries;
     public IEnumerable<IndustryCategory> MetadataIndustryCategories => _event.MetadataIndustryCategories;
     public IEnumerable<LocationOffice> MetadataOfficeLocation => _event.MetadataOfficeLocation;
     public IEnumerable<EventType> EventType => _event.EventType;
-    public IEnumerable<Businessissues> MetadataBusinessIssues => _event.MetadataBusinessIssues;
+    public IEnumerable<Businessissue> MetadataBusinessIssues => _event.MetadataBusinessIssues;
     public bool ShowPastEvent => _event.ShowPastEvent;
     public WebPageFields SystemFields => _event.SystemFields;
 }

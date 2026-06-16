@@ -20,8 +20,8 @@
         ComponentIdentifiers.Widgets.Form,
         ComponentIdentifiers.Widgets.RichText,
        // ComponentIdentifiers.Widgets.HTML,
-        ComponentIdentifiers.Widgets.ExternalNavigation,
         ComponentIdentifiers.Widgets.AccordionWidget,
+
     };
 }
 
@@ -31,6 +31,7 @@
     ReactComponentType.HeroGUID,
     new { data = Model.Hero },
     Context.RequestAborted))
+@await Html.PartialAsync("_LocalNavigation")
 
 @(await ReactService.RenderComponentAsync(
     pageId,

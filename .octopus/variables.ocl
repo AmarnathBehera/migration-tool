@@ -69,3 +69,11 @@ variable "appsettings.CMSAzureSharedKey" {
 variable "appsettings.CMSHashStringSalt" {
     value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-cms-hashStringSalt)" {}
 }
+
+variable "appsettings.RedirectDomain" {
+    value "admin-xbyk.#{environment.abbreviation}.bdo.global" {}
+    value "admin-xbyk.bdo.global" {
+        description = ""
+        environment = ["production"]
+    }
+}

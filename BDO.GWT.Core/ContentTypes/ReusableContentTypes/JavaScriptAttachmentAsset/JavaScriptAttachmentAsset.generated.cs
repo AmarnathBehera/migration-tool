@@ -12,38 +12,33 @@
 using System;
 using System.Collections.Generic;
 using CMS.ContentEngine;
-using CMS.Websites;
+using CMS.DataEngine;
 
 namespace BDO
 {
 	/// <summary>
-	/// Represents a page of type <see cref="Businessissues"/>.
+	/// Represents a content item of type <see cref="JavaScriptAttachmentAsset"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class Businessissues : IWebPageFieldsSource
+	public partial class JavaScriptAttachmentAsset : IContentItemFieldsSource
 	{
 		/// <summary>
 		/// Code name of the content type.
 		/// </summary>
-		public const string CONTENT_TYPE_NAME = "BDO.Businessissues";
+		public const string CONTENT_TYPE_NAME = "BDO.JavaScriptAttachmentAsset";
 
 
 		/// <summary>
-		/// Represents system properties for a web page item.
+		/// Represents system properties for a content item.
 		/// </summary>
 		[SystemField]
-		public WebPageFields SystemFields { get; set; }
+		public ContentItemFields SystemFields { get; set; }
 
 
 		/// <summary>
-		/// Name.
+		/// JavaScriptAttachmentAsset.
 		/// </summary>
-		public string Name { get; set; }
-
-
-		/// <summary>
-		/// CodeName.
-		/// </summary>
-		public string CodeName { get; set; }
+		[DatabaseField("JavaScriptAttachmentAsset")]
+		public ContentItemAsset JavaScriptAttachmentAsset1 { get; set; }
 	}
 }

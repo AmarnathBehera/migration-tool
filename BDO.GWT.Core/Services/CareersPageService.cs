@@ -4,6 +4,8 @@ using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.Cards;
+using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.DTOs;
@@ -53,7 +55,7 @@ public class CareersPageService : ICareersPageService
     public async Task<CareersPageDto> GetCareersPageDtoAsync(CancellationToken cancellationToken)
     {
         var page = await _contentRetriever.RetrieveCurrentPageAsync<Careers>(
-            new RetrieveCurrentPageParameters { }, cancellationToken);
+            new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
 
         if (page == null)
         {
@@ -131,8 +133,6 @@ public class CareersPageService : ICareersPageService
             };
         }
 
-        var languageTag = _cultureContext.CurrentLanguageTag;
-
         IEnumerable<Career> filtered = careerPages;
 
         if (query?.Filters != null && query.Filters.Any())
@@ -181,14 +181,17 @@ public class CareersPageService : ICareersPageService
 
             return new CareerCardDto
             {
-                ImageURL =  c.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+                ImageURL =  (c.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url)?.TrimStart('~'),
                 ImageAltText = c.MetadataTeaserImageAltText,
                 Title = c.MetadataTitle,
                 JobTitle = c.CareerJobTitle?.FirstOrDefault()?.Name,
                 Reference = c.CareerReference,
                 EmploymentType = c.CareerEmploymentType?.FirstOrDefault()?.Name,
                 Level = c.CareerLevel?.FirstOrDefault()?.Name,
-                Locations = c.MetadataOfficeLocation?.Select(loc => loc.MetadataTitle).ToArray(),
+                Locations = c.MetadataOfficeLocation?
+        .Select(loc => loc.MetadataTitle ?? string.Empty)
+        .ToArray()
+        ?? Array.Empty<string>(),
                 PublishDate = c.DocumentPublishFrom,
                 ApplyURL = absolutepageurl,
                 JobTitleURL = careersPage.MetadataTitle is not null && c.CareerJobTitle is not null
@@ -214,7 +217,7 @@ public class CareersPageService : ICareersPageService
         var settingInfo = settings?.FirstOrDefault();
 
 
-        FilterItemDto<OptionDto>[] filters = null;
+        FilterItemDto<OptionDto>[]? filters = null;
 
         if (page.ItemListFilteringEnabled && !string.IsNullOrWhiteSpace(page.CareerListFilters))
         {

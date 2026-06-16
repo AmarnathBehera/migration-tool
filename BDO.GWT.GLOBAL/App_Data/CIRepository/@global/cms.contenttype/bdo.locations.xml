@@ -13,6 +13,17 @@
       <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
         <properties />
       </schema>
+      <field column="DescriptionText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="78263149-20ed-4e79-a127-0bae1cf4772f" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Description text</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
       <field allowempty="true" column="DescriptionTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="e7546971-f8ac-4a7c-948a-01ee40457fa8" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
@@ -35,6 +46,17 @@
           <controlname>Kentico.Administration.RichTextEditor</controlname>
         </settings>
       </field>
+      <field column="LocalLocations" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="2a662a50-6062-4187-8b38-25408042e18e" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Local locations</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
       <field allowempty="true" column="LocationsTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="e6bc2d4f-c2d7-4d27-9d65-b5904a8ce8ab" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
@@ -44,6 +66,17 @@
         </properties>
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field column="GlobalLocationsBanner" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="2743cf82-3d56-44eb-b02d-820372d7132c" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Global locations banner</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
         </settings>
       </field>
       <field allowempty="true" column="BannerContent" columnprecision="0" columntype="richtexthtml" enabled="true" guid="4d27ec6e-5dba-4303-a592-0612055b3a53" visible="true">
