@@ -10,7 +10,6 @@ using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
-using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Xperience;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using BDO.GWT.Xperience.Core.Services;

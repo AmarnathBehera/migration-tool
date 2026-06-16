@@ -52,7 +52,7 @@ public class MicrositePageService : IMicrositePageService
         };
     }
 
-    private static string? CombineHtmlFields(string? htmlField1, string? htmlField2)
+    private static string CombineHtmlFields(string htmlField1, string htmlField2)
     {
         if (string.IsNullOrEmpty(htmlField1) && string.IsNullOrEmpty(htmlField2))
         {

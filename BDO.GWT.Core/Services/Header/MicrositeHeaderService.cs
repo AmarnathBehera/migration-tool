@@ -24,6 +24,8 @@ public class MicrositeHeaderService : IMicrositeHeaderService
     private readonly IPageContext _pageContext;
     private readonly IHeaderService _headerService;
 
+    private const string BdoLogoImageUrl = "https://cdn.bdo.global/images/bdo_logo/1.0.0/bdo_logo_color.png";
+
     public MicrositeHeaderService(
         IContentService contentService,
         IHomePageService homePageService,
@@ -59,7 +61,7 @@ public class MicrositeHeaderService : IMicrositeHeaderService
             return await _headerService.GetAsync(contentService, cancellationToken);
         }
 
-        var cultures = await GetCultureDtosAsync(cancellationToken);
+        var cultures = await GetCultureDtosAsync();
 
         var siteName = masterPage is not null && !string.IsNullOrEmpty(masterPage.LogoText)
             ? masterPage.LogoText
@@ -76,7 +78,7 @@ public class MicrositeHeaderService : IMicrositeHeaderService
             Contact = null,
             SiteName = siteName,
             LogoURL = logoPageLink,
-            LogoImageURL = "https://cdn.bdo.global/images/bdo_logo/1.0.0/bdo_logo_color.png",
+            LogoImageURL = BdoLogoImageUrl,
             SearchPageURL = string.Empty,
             MegaMenuItems = megaMenu,
         };
@@ -125,7 +127,7 @@ public class MicrositeHeaderService : IMicrositeHeaderService
         var level1Pages = (await _contentService.GetChildPagesByParentGuidAsync<MicrositePage>(
             masterPageId, cancellationToken)).ToList();
 
-        if (!level1Pages.Any())
+        if (level1Pages.Count == 0)
             return Enumerable.Empty<FirstLevelMenuItemDto>();
 
         var menuItems = new List<FirstLevelMenuItemDto>();
@@ -188,7 +190,7 @@ public class MicrositeHeaderService : IMicrositeHeaderService
 
     // ── Cultures 
 
-    private async Task<IEnumerable<CultureDto>> GetCultureDtosAsync(CancellationToken cancellationToken)
+    private async Task<IEnumerable<CultureDto>> GetCultureDtosAsync()
     {
         var httpContext = _httpContextAccessor.HttpContext;
         if (httpContext is null)
@@ -218,22 +220,19 @@ public class MicrositeHeaderService : IMicrositeHeaderService
                 cancellationToken);
 
         var masterPages = (await _contentService.RetrievePagesAsync<MicrositeMasterPage>(cancellationToken))?
-            .Where(p => p != null)
-            .ToDictionary(p => p.SystemFields.WebPageItemID) ?? new Dictionary<int, MicrositeMasterPage?>();
+            .OfType<MicrositeMasterPage>()
+            .ToDictionary(p => p.SystemFields.WebPageItemID) ?? new Dictionary<int, MicrositeMasterPage>();
 
         var page = await _pageContext.GetCurrentPageBasePropertiesAsync(cancellationToken);
         var parentId = page.WebPageItemParentID;
 
         while (parentId > 0)
         {
-            if (masterPages.TryGetValue(parentId, out var masterPage) && masterPage != null)
+            if (masterPages.TryGetValue(parentId, out var masterPage))
                 return masterPage;
 
             var ancestor = await _pageContext.GetAnyPageByWebPageItemId(parentId, cancellationToken);
-            if (ancestor == null)
-                break;
-
-            parentId = ancestor.SystemFields.WebPageItemParentID;
+            parentId = ancestor?.SystemFields.WebPageItemParentID ?? 0;
         }
 
         return null;

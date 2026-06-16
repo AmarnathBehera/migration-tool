@@ -10,6 +10,11 @@ namespace BDO.GWT.GLOBAL.Tests.Services;
 
 public class MicrositeMasterPageServiceTests
 {
+    private static readonly string[] ExpectedValidCss = ["/styles/valid.css"];
+    private static readonly string[] ExpectedValidJs = ["/scripts/valid.js"];
+    private static readonly string[] ExpectedCustomCss = ["/styles/custom.css"];
+    private static readonly string[] ExpectedCustomJs = ["/scripts/custom.js"];
+
     private Mock<IContentService> _contentServiceMock = null!;
     private MicrositeMasterPageService _service = null!;
 
@@ -92,7 +97,7 @@ public class MicrositeMasterPageServiceTests
 
         var result = await _service.GetMicrositeMasterPageDtoAsync(CancellationToken.None);
 
-        Assert.That(result.CustomCssLinks, Is.EquivalentTo(new[] { "/styles/custom.css" }));
+        Assert.That(result.CustomCssLinks, Is.EquivalentTo(ExpectedCustomCss));
     }
 
     [Test]
@@ -117,7 +122,7 @@ public class MicrositeMasterPageServiceTests
 
         var result = await _service.GetMicrositeMasterPageDtoAsync(CancellationToken.None);
 
-        Assert.That(result.CustomJsLinks, Is.EquivalentTo(new[] { "/scripts/custom.js" }));
+        Assert.That(result.CustomJsLinks, Is.EquivalentTo(ExpectedCustomJs));
     }
 
     [Test]
@@ -146,7 +151,7 @@ public class MicrositeMasterPageServiceTests
 
         var result = await _service.GetMicrositeMasterPageDtoAsync(CancellationToken.None);
 
-        Assert.That(result.CustomCssLinks, Is.EquivalentTo(new[] { "/styles/valid.css" }));
+        Assert.That(result.CustomCssLinks, Is.EquivalentTo(ExpectedValidCss));
     }
 
     [Test]
@@ -175,7 +180,7 @@ public class MicrositeMasterPageServiceTests
 
         var result = await _service.GetMicrositeMasterPageDtoAsync(CancellationToken.None);
 
-        Assert.That(result.CustomJsLinks, Is.EquivalentTo(new[] { "/scripts/valid.js" }));
+        Assert.That(result.CustomJsLinks, Is.EquivalentTo(ExpectedValidJs));
     }
 
     [Test]
