@@ -33,5 +33,17 @@ namespace BDO
 		/// </summary>
 		[SystemField]
 		public WebPageFields SystemFields { get; set; }
+
+
+		/// <summary>
+		/// Name.
+		/// </summary>
+		public string Name { get; set; }
+
+
+		/// <summary>
+		/// CodeName.
+		/// </summary>
+		public string CodeName { get; set; }
 	}
 }
