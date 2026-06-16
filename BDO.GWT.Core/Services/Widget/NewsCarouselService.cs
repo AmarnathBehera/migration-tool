@@ -80,11 +80,11 @@ public class NewsCarouselService : INewsCarouselService
             cancellationToken);
     }
 
-    public async Task<ICollection<NewsPageCardDto>> GetAPIFilteredItemsAsync( CardsQuery query, CancellationToken cancellationToken)
+    public async Task<ICollection<NewsPageCardDto>> GetAPIFilteredItemsAsync(CardsQuery query, CancellationToken cancellationToken)
     {
         return await BuildAndExecuteQueryAsync(
-            query?.CurrentPageGuid?.ToString(),
-            query?.PageType,
+            query.CurrentPageGuid.ToString() ?? string.Empty,
+            query.PageType ?? string.Empty,
             new HashSet<ContentItemReference>(),
             query,
             cancellationToken);
@@ -109,9 +109,18 @@ public class NewsCarouselService : INewsCarouselService
             FilterParameterName.MicrositePage => x => x.WhereContains(nameof(NewsArticle.MicrositePages), guid),
             _ => null,
         };
-        bool isOneOfTheseSeven = pageTypeName is FilterParameterName.BusinessLine or FilterParameterName.ServiceArea
-               or FilterParameterName.Service or FilterParameterName.IndustryCategory or FilterParameterName.Industry
-               or FilterParameterName.MicrositeMasterPage or FilterParameterName.MicrositePage;
+        var allowedPageTypes = new HashSet<string>
+        {
+            FilterParameterName.BusinessLine,
+            FilterParameterName.ServiceArea,
+            FilterParameterName.Service,
+            FilterParameterName.IndustryCategory,
+            FilterParameterName.Industry,
+            FilterParameterName.MicrositeMasterPage,
+            FilterParameterName.MicrositePage
+        };
+
+        bool isOneOfTheseSeven = allowedPageTypes.Contains(pageTypeName);
 
         if (filter is null && isOneOfTheseSeven)
             return null!;
@@ -125,9 +134,6 @@ public class NewsCarouselService : INewsCarouselService
         var sectionNews = (await _contentService.RetrievePagesAsync<SectionNews>(cancellationToken))?
             .OfType<SectionNews>()
             .ToList();
-
-        var result = await RetrieveFeaturedPageIdsAsync(featuredGuids, cancellationToken);
-        var featuredPageIds = result.FeaturedPageIds;
 
         var paginationDto = await _newsArticleCardsService.GetFilteredItemsAsync(
             sectionNews ?? new List<SectionNews>(),
@@ -143,7 +149,7 @@ public class NewsCarouselService : INewsCarouselService
   HashSet<ContentItemReference> featuredGuids,
   CancellationToken cancellationToken)
     {
-        if (!featuredGuids.Any())
+        if (featuredGuids.Count == 0)
             return (new HashSet<int>(), false);
 
         var guids = featuredGuids.Select(r => r.Identifier).ToHashSet();
