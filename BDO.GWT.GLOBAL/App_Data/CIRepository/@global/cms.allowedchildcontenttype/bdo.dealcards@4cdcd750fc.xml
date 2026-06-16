@@ -6,17 +6,24 @@
     <ObjectType>cms.contenttype</ObjectType>
   </Parent>
   <Bindings>
-    <Binding id="cms.contenttype_BDO.DealCardCommon">
+    <Binding id="cms.contenttype_BDO.DealCardDealType">
       <AllowedChildContentTypeChildID>
-        <CodeName>BDO.DealCardCommon</CodeName>
-        <GUID>09fd4259-c646-41e1-8363-6ed3c47ed8b2</GUID>
+        <CodeName>BDO.DealCardDealType</CodeName>
+        <GUID>cfe5a014-3dc5-4df5-8727-b21e91016436</GUID>
         <ObjectType>cms.contenttype</ObjectType>
       </AllowedChildContentTypeChildID>
     </Binding>
-    <Binding id="cms.contenttype_BDO.DealCards">
+    <Binding id="cms.contenttype_BDO.DealCardIndustry">
       <AllowedChildContentTypeChildID>
-        <CodeName>BDO.DealCards</CodeName>
-        <GUID>7b19e49b-0002-4a8a-a4ce-ddc69ce5c526</GUID>
+        <CodeName>BDO.DealCardIndustry</CodeName>
+        <GUID>bdd17a11-079d-4afa-9490-c8c2f90f8353</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.DealCardRange">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.DealCardRange</CodeName>
+        <GUID>7e697a93-eea8-465f-bd16-145062f870eb</GUID>
         <ObjectType>cms.contenttype</ObjectType>
       </AllowedChildContentTypeChildID>
     </Binding>

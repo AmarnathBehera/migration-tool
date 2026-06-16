@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Deal Card - Industry</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="c4845871-ab9b-4cfe-b8dd-f147d87ec029" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="62f1680b-d4f1-49c2-b09a-c01a0bcc45f5" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="7513eb68-2ce7-4286-b6dc-ccfd305fab91" isunique="true" system="true" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>bdd17a11-079d-4afa-9490-c8c2f90f8353</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-factory</ClassIconClass>
+  <ClassName>BDO.DealCardIndustry</ClassName>
+  <ClassShortName>BDODealCardIndustry</ClassShortName>
+  <ClassTableName>BDO_DealCardIndustry_1</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>
