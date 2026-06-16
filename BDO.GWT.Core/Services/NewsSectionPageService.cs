@@ -81,8 +81,11 @@ public class NewsSectionPageService : INewsSectionPageService
            cancellationToken
        )).ToList(); 
 
-        var newsSectionPage = newsSection?.FirstOrDefault();
-
+        var newsSectionPage = newsSection.FirstOrDefault();
+        if (newsSectionPage == null)
+        {
+            throw new MissingSectionPageException($"'No pages have been found of type '{nameof(SectionNews)}'.");
+        }
         var featuredNewsArticlePageIds = await GetFeaturedNewsArticlePageIdsAsync(newsSectionPage);
 
         var paginationDto = await _newsArticleCardsService.GetFilteredItemsAsync(

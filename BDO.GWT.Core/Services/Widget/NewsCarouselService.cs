@@ -27,16 +27,12 @@ public class NewsCarouselService : INewsCarouselService
     private readonly IFilteringHelper _filteringHelper;
     private readonly INewsArticleCardsService _newsArticleCardsService;
     private readonly IContentService _contentService;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
-    private readonly IContentQueryExecutor _contentQueryExecutor;
 
-    public NewsCarouselService(IFilteringHelper filteringHelper, INewsArticleCardsService newsArticleCardsService, IContentService contentService, IWebsiteChannelContext websiteChannelContext, IContentQueryExecutor contentQueryExecutor)
+    public NewsCarouselService(IFilteringHelper filteringHelper, INewsArticleCardsService newsArticleCardsService, IContentService contentService)
     {
         _filteringHelper = filteringHelper;
         _newsArticleCardsService = newsArticleCardsService;
         _contentService = contentService;
-        _websiteChannelContext = websiteChannelContext;
-        _contentQueryExecutor = contentQueryExecutor;
     }
 
     public async Task<NewsCarouselDto> GetNewsCarouselAsync<T>(T currentPage, NewsCarouselData data, CancellationToken cancellationToken)

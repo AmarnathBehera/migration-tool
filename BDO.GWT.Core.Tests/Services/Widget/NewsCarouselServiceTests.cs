@@ -35,9 +35,6 @@ public class NewsCarouselServiceTests
             .Setup(x => x.GetCurrentLanguage())
             .Returns("en-US");
 
-        // BuildAndExecuteQueryAsync always retrieves SectionNews first; an empty
-        // list is enough since featuredGuids is empty for the API path too,
-        // which keeps RetrieveFeaturedPageIdsAsync from calling the query executor.
         _contentServiceMock
             .Setup(x => x.RetrievePagesAsync<SectionNews>(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<SectionNews?>());
@@ -45,9 +42,7 @@ public class NewsCarouselServiceTests
         _service = new NewsCarouselService(
             _filteringHelperMock.Object,
             _newsArticleCardsServiceMock.Object,
-            _contentServiceMock.Object,
-            _websiteChannelContextMock.Object,
-            _contentQueryExecutorMock.Object);
+            _contentServiceMock.Object);
     }
 
     private (List<Action<WhereParameters>>? Filters, CardsQuery? Query) SetupFilteredItemsCapture()
