@@ -42,6 +42,7 @@ public static class ReactComponentType
     public const string ServiceContent = "ServiceContent";
     public const string SideBoxNavigation = "SideBoxNavigation";
     public const string LocalNavigationItem = "LocalNavigationItem";
+    public const string EventsAndWebinarsCarousel = "EventsAndWebinarsCarousel";
 
     public const string CareerDetails = "CareerDetails";
     public const string KeyTakeAways = "KeyTakeAwaysWidget";
@@ -52,6 +53,7 @@ public static class ReactComponentType
 
     //Below are the guid constants for the above components.
     public const string QuoteCardWidgetGUID = "5c570fe5-fc60-4efd-b7eb-7da977e486ab";
+    public const string EventsAndWebinarsCarouselGUID = "e1c7a5d9-4b2f-4e8c-b6d3-9a1f7c5e2b68";
     public const string ButtonWidgetGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
     public const string ImageWithTextWidgetGUID = "186b5e99-3a30-4c5e-bdff-9c5d40ac08a4";
     public const string ExternalNavigationWidgetGUID = "77688626-8511-4f2f-a7f4-eee7c65148c0";
@@ -75,7 +77,7 @@ public static class ReactComponentType
     public const string CardsGridGUID = "14085e98-b81e-4db3-b4bf-7c2926a2485c";
     public const string RssFeedsGUID = "15085e95-b81e-4db3-b4bf-7c2926a2485c";
     public const string InsightDetailsGUID = "16085e95-b81e-4db3-b4bf-7c2926a2485c";
-    public const string EventWebinarCardsGridGUID = "eeb2b6b7-f2df-411b-b55f-c7aac9b22093";
+    public const string EventWebinarCardsGridGUID = "eeb2b6b7-f2df-411b-b55f-c7aac9b22096";
 
     public const string ContactPageDescriptionTextGUID = "cd1bc3e5-c6b6-4212-9fab-a86bdc570462";
     public const string ErrorPageContentGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";

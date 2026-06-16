@@ -147,6 +147,7 @@
             <![CDATA[["ed59f954-8d98-4783-8dfa-bdd81de58862"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>

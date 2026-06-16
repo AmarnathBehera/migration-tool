@@ -200,13 +200,13 @@ namespace BDO
 		/// <summary>
 		/// MicrositePages.
 		/// </summary>
-		public IEnumerable<MicrositePlaceholder> MicrositePages { get; set; }
+		public IEnumerable<MicrositePage> MicrositePages { get; set; }
 
 
 		/// <summary>
 		/// MicrositeMasterPages.
 		/// </summary>
-		public IEnumerable<MicrositePlaceholder> MicrositeMasterPages { get; set; }
+		public IEnumerable<MicrositeMasterPage> MicrositeMasterPages { get; set; }
 
 
 		/// <summary>

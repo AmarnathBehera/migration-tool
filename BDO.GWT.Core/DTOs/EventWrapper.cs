@@ -20,8 +20,8 @@ public class EventWrapper : IEventOrWebinar
     public IEnumerable<IWebPageFieldsSource> MetadataSpecialtiesCategories => _event.MetadataSpecialtiesCategories;
     public IEnumerable<IWebPageFieldsSource> MetadataSpecialtiesAreas => _event.MetadataSpecialtiesCategories;
     public IEnumerable<IWebPageFieldsSource> MetadataSpecialtiesPages => _event.MetadataSpecialtiesCategories;
-    public IEnumerable<MicrositePlaceholder> MicrositeMasterPages => _event.MicrositeMasterPages;
-    public IEnumerable<MicrositePlaceholder> MicrositePages => _event.MicrositePages;
+    public IEnumerable<MicrositeMasterPage> MicrositeMasterPages => _event.MicrositeMasterPages;
+    public IEnumerable<MicrositePage> MicrositePages => _event.MicrositePages;
     public IEnumerable<Industry> MetadataIndustries => _event.MetadataIndustries;
     public IEnumerable<IndustryCategory> MetadataIndustryCategories => _event.MetadataIndustryCategories;
     public IEnumerable<LocationOffice> MetadataOfficeLocation => _event.MetadataOfficeLocation;

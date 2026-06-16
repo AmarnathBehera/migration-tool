@@ -15,5 +15,5 @@ public class CardsQuery : IPaginationQuery
     public int? PageSize { get; set; }
 
     public string? Order { get; set; }
-    public bool? ComingSoon { get; set; }
+
 }

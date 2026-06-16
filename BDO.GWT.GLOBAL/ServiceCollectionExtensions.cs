@@ -1,4 +1,5 @@
 ﻿using BDO.GWT.Common.Options;
+using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.LiveSite.Services;
 using BDO.GWT.Core.Retrievers;
@@ -14,7 +15,9 @@ using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using BDO.GWT.Xperience.Core.Services;
+using CMS.Core;
 using GWTXbyKWeb.Components.Services.SEOOptions;
+using Kentico.Content.Web.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -24,13 +27,9 @@ public static class ServiceCollectionExtensions
 {
     public static void AddXperience(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddOptions<CachingOptions>()
-           .BindConfiguration("Caching")
-           .ValidateDataAnnotations();
+        serviceCollection.AddOptions<CachingOptions>().BindConfiguration("Caching").ValidateDataAnnotations();
 
-        serviceCollection.AddOptions<ReactCachingOptions>()
-            .BindConfiguration("Caching:React")
-            .ValidateDataAnnotations();
+        serviceCollection.AddOptions<ReactCachingOptions>() .BindConfiguration("Caching:React").ValidateDataAnnotations();
 
         serviceCollection.AddOptions<ReactOptions>()
           .BindConfiguration("React")
@@ -113,6 +112,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<INewsCarouselService, NewsCarouselService>();
 
         serviceCollection.AddScoped<ITabAccordionService, TabAccordionService>();
+        serviceCollection.AddScoped<IEventsWebinarsSliderService,EventsWebinarsSliderService>();
     }
 
 }
