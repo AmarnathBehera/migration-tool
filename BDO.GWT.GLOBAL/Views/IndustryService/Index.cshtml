@@ -16,7 +16,6 @@
 
     var widgetsList = new[]
     {
-        ComponentIdentifiers.Widgets.ExternalNavigation,
         ComponentIdentifiers.Widgets.Imagewithtext,
         ComponentIdentifiers.Widgets.QuoteCard,
         ComponentIdentifiers.Widgets.TiledLink,
@@ -45,6 +44,8 @@
         Model,
         Context.RequestAborted))
 </div>
+@await Html.PartialAsync("_LocalNavigation")
+
 <div>
     @await Html.Kentico().EditableAreaAsync(
         "mainContent",
