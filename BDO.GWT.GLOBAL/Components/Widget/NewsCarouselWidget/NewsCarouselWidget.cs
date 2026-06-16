@@ -30,12 +30,12 @@ public class NewsCarouselWidget : ViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync(ComponentViewModel<NewsCarouselWidgetProperties> model)
     {
-        if (model is null)
+        var page = model.Page?.WebPageItemGUID;
+
+        if (page is null)
         {
             return View("~/Components/Widget/NewsCarouselWidget/_NewsCarouselWidget.cshtml", new NewsCarouselDto { FilteringTooltipEnabled = false });
         }
-
-        var page = model?.Page?.WebPageItemGUID;
         var currentPage = (await _contentService.GetItemsByGUIDAsync(new List<Guid> { page.Value })).FirstOrDefault();
 
         var backgroundimageurl = model.Properties?.BackgroundImages?.Any() == true

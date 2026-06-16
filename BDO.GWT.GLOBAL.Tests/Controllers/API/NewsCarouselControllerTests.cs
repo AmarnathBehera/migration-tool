@@ -282,9 +282,12 @@ public class NewsCarouselControllerTests
         await _controller.Items(query, CancellationToken.None);
 
         // Assert
-        Assert.That(capturedQuery, Is.Not.Null);
-        Assert.That(capturedQuery!.Filters, Is.Not.Null);
-        Assert.That(capturedQuery.Filters, Is.Empty);
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedQuery, Is.Not.Null);
+            Assert.That(capturedQuery!.Filters, Is.Not.Null);
+            Assert.That(capturedQuery.Filters, Is.Empty);
+        });
     }
 
     [Test]

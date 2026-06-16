@@ -16,10 +16,10 @@ namespace BDO.GWT.GLOBAL.Widgets.NewsCarouselWidget;
 public class NewsCarouselWidgetProperties : IWidgetProperties
 {
     [TextInputComponent(Label = "Title", ExplanationText = "Title that will be shown over news carousel widget.", Order = 0)]
-    public string? Title { get; set; }
+    public string Title { get; set; }
 
     [TextInputComponent(Label = "Description", ExplanationText = "Description that will be shown over news carousel widget but under title.", Order = 1)]
-    public string? Description { get; set; }
+    public string Description { get; set; }
 
     [CheckBoxComponent(Label = "Enable filtering", Order = 2)]
     public bool FilteringEnabled { get; set; } = true;
@@ -52,10 +52,10 @@ public class NewsCarouselWidgetProperties : IWidgetProperties
     public string BackgroundImageAltText { get; set; } = "";
 
     [TextInputComponent(Label = "See all link text", Order = 7)]
-    public string? SeeAllLinkText { get; set; }
+    public string SeeAllLinkText { get; set; }
 
     [TextInputComponent(Label = "See all link URL", Order = 8)]
-    public string? SeeAllLinkURL { get; set; }
+    public string SeeAllLinkURL { get; set; }
 
     [DropDownComponent(Label = "See all link URL target", Order = 9, Options = "_self;Same tab\r\n_blank;New tab")]
     public string SeeAllLinkURLTarget { get; set; } = "_self";

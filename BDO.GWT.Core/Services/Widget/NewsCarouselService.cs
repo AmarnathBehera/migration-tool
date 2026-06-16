@@ -145,25 +145,4 @@ public class NewsCarouselService : INewsCarouselService
 
         return paginationDto.Data;
     }
-    private async Task<(HashSet<int> FeaturedPageIds, bool ShowPastEvents)> RetrieveFeaturedPageIdsAsync(
-  HashSet<ContentItemReference> featuredGuids,
-  CancellationToken cancellationToken)
-    {
-        if (featuredGuids.Count == 0)
-            return (new HashSet<int>(), false);
-
-        var guids = featuredGuids.Select(r => r.Identifier).ToHashSet();
-
-        var builder = new ContentItemQueryBuilder()
-            .ForContentType(Event.CONTENT_TYPE_NAME, q => q
-                .ForWebsite(_websiteChannelContext.WebsiteChannelName)
-                .Where(w => w.WhereIn(nameof(WebPageFields.ContentItemGUID), guids)));
-
-        var results = await _contentQueryExecutor.GetWebPageResult(
-     builder,
-     container => container.WebPageItemID,
-     cancellationToken: cancellationToken);
-
-        return (results.ToHashSet(), false);
-    }
 }
