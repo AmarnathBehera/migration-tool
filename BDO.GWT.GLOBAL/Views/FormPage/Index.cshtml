@@ -19,7 +19,6 @@
     var widgetsList = new[]
     {
         ComponentIdentifiers.Widgets.Button,
-        // ComponentIdentifiers.Widgets.FlexibleBanner,
          ComponentIdentifiers.Widgets.Form,
         ComponentIdentifiers.Widgets.RichText,
         ComponentIdentifiers.Widgets.Imagewithtext,
@@ -37,6 +36,7 @@
     {
         data = Model.Hero,
     }, Context.RequestAborted))
+@await Html.PartialAsync("_LocalNavigation")
 
 <div class="section-container section-container--items section-container--two-thirds gap--xl py-20">
     <div class="contact-form-container">
