@@ -57,9 +57,8 @@ public class RssSectionPageService : IRssSectionPageService
                 LinkedItemsMaxLevel = 0,
             },
             q => q.Where(where => where
-                // Equivalent to q.Where(x => x.RssPublic)
+
                 .WhereTrue(nameof(Rss.RssPublic))
-                // Equivalent to q.Path(NodeAliasPath, PathTypeEnum.Children) — direct children only
                 .WhereLike(nameof(IWebPageContentQueryDataContainer.WebPageItemTreePath), $"{currentTreePath}/%")
                 .WhereNotLike(nameof(IWebPageContentQueryDataContainer.WebPageItemTreePath), $"{currentTreePath}/%/%")),
              RetrievalCacheSettings.CacheDisabled,
@@ -78,7 +77,9 @@ public class RssSectionPageService : IRssSectionPageService
                 if (!string.IsNullOrEmpty(url?.RelativePath))
                     relativeUrlByWebPageItemId[rssFeed.SystemFields.WebPageItemID] = url.RelativePath;
             }
-            catch (Exception ex) { }
+            catch (Exception) {
+                // Log the exception as needed. For now, we can ignore it to ensure that one failure doesn't break the entire feed.
+            }
         }
         var dto = new RssSectionDto
         {
