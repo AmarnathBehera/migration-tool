@@ -30,7 +30,7 @@ public class CareerPageService  : ICareerPageService
 
     public async Task<CareerDto> GetCareerDtoAsync(CancellationToken cancellationToken)
     {
-        var page = await _contentRetriever.RetrieveCurrentPageAsync<SectionCareers>(new RetrieveCurrentPageParameters { },cancellationToken);
+        var page = await _contentRetriever.RetrieveCurrentPageAsync<SectionCareers>(new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
 
         var careerpage = page;
 
