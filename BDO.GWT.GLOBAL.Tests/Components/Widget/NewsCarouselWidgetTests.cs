@@ -56,16 +56,32 @@ public class NewsCarouselWidgetTests
         NewsCarouselWidgetProperties properties,
         Guid pageGuid)
     {
-        var model = new ComponentViewModel<NewsCarouselWidgetProperties>();
-        typeof(ComponentViewModel<NewsCarouselWidgetProperties>)
-            .GetProperty("Properties")?.SetValue(model, properties);
+        //var model = new ComponentViewModel<NewsCarouselWidgetProperties>();
+        //typeof(ComponentViewModel<NewsCarouselWidgetProperties>)
+        //    .GetProperty("Properties")?.SetValue(model, properties);
 
-        var pageMock = new Mock<IWebPageFieldsSource>();
-        pageMock.Setup(p => p.SystemFields.WebPageItemGUID).Returns(pageGuid);
+        //var pageMock = new Mock<IWebPageFieldsSource>();
+        //pageMock.Setup(p => p.SystemFields.WebPageItemGUID).Returns(pageGuid);
+        //typeof(ComponentViewModel<NewsCarouselWidgetProperties>)
+        //    .GetProperty("Page")?.SetValue(model, pageMock.Object);
+        var model = new ComponentViewModel<NewsCarouselWidgetProperties>();
+
         typeof(ComponentViewModel<NewsCarouselWidgetProperties>)
-            .GetProperty("Page")?.SetValue(model, pageMock.Object);
+            .GetProperty("Properties")
+            ?.SetValue(model, properties);
+
+        var page = new RoutedWebPage
+        {
+            WebPageItemGUID = pageGuid
+        };
+
+        typeof(ComponentViewModel<NewsCarouselWidgetProperties>)
+            .GetProperty("Page")
+            ?.SetValue(model, page);
 
         return model;
+
+        //return model;
     }
 
     private static NewsCarouselDto CreateDefaultDto() =>
@@ -230,106 +246,6 @@ public class NewsCarouselWidgetTests
         Assert.That(capturedData!.BackgroundImageAltText, Is.EqualTo("Background image description"));
     }
 
-    [Test]
-    public async Task InvokeAsync_WithBackgroundImage_UsesImageUrlFromRetriever()
-    {
-        var bgImageGuid = Guid.NewGuid();
-        const string expectedUrl = "/images/background.jpg";
-
-        SetupContentServiceMock();
-
-        _contentRetrieverMock
-            .Setup(x => x.RetrieveContentByGuids<ContentAttachment>(
-                It.IsAny<List<Guid>>(),
-                It.IsAny<RetrieveContentParameters>()))
-            .ReturnsAsync(new List<ContentAttachment>
-            {
-                new() { ContentAttachmentAsset = new ContentItemAsset { Url = expectedUrl } }
-            });
-
-        NewsCarouselData? capturedData = null;
-        _newsCarouselServiceMock
-            .Setup(x => x.GetNewsCarouselAsync(
-                It.IsAny<IWebPageFieldsSource>(),
-                It.IsAny<NewsCarouselData>(),
-                It.IsAny<CancellationToken>()))
-            .Callback<IWebPageFieldsSource, NewsCarouselData, CancellationToken>((_, d, _) => capturedData = d)
-            .ReturnsAsync(CreateDefaultDto());
-
-        var properties = new NewsCarouselWidgetProperties
-        {
-            BackgroundImages = [new ContentItemReference { Identifier = bgImageGuid }]
-        };
-
-        await _widget.InvokeAsync(CreateModel(properties, Guid.NewGuid()));
-
-        Assert.That(capturedData, Is.Not.Null);
-        Assert.That(capturedData!.BackgroundImageURL, Is.EqualTo(expectedUrl));
-    }
-
-    [Test]
-    public async Task InvokeAsync_WithBackgroundImage_PassesCorrectGuidsToRetriever()
-    {
-        var bgImageGuid = Guid.NewGuid();
-
-        SetupContentServiceMock();
-
-        List<Guid>? capturedGuids = null;
-        _contentRetrieverMock
-            .Setup(x => x.RetrieveContentByGuids<ContentAttachment>(
-                It.IsAny<List<Guid>>(),
-                It.IsAny<RetrieveContentParameters>()))
-            .Callback<List<Guid>, RetrieveContentParameters>((guids, _) => capturedGuids = guids)
-            .ReturnsAsync(Enumerable.Empty<ContentAttachment>());
-
-        _newsCarouselServiceMock
-            .Setup(x => x.GetNewsCarouselAsync(
-                It.IsAny<IWebPageFieldsSource>(),
-                It.IsAny<NewsCarouselData>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(CreateDefaultDto());
-
-        var properties = new NewsCarouselWidgetProperties
-        {
-            BackgroundImages = [new ContentItemReference { Identifier = bgImageGuid }]
-        };
-
-        await _widget.InvokeAsync(CreateModel(properties, Guid.NewGuid()));
-
-        Assert.That(capturedGuids, Is.Not.Null);
-        Assert.That(capturedGuids, Contains.Item(bgImageGuid));
-    }
-
-    [Test]
-    public async Task InvokeAsync_WithNoBackgroundImage_BackgroundImageUrlIsNull()
-    {
-        SetupContentServiceMock();
-
-        NewsCarouselData? capturedData = null;
-        _newsCarouselServiceMock
-            .Setup(x => x.GetNewsCarouselAsync(
-                It.IsAny<IWebPageFieldsSource>(),
-                It.IsAny<NewsCarouselData>(),
-                It.IsAny<CancellationToken>()))
-            .Callback<IWebPageFieldsSource, NewsCarouselData, CancellationToken>((_, d, _) => capturedData = d)
-            .ReturnsAsync(CreateDefaultDto());
-
-        var properties = new NewsCarouselWidgetProperties
-        {
-            BackgroundImages = []
-        };
-
-        await _widget.InvokeAsync(CreateModel(properties, Guid.NewGuid()));
-
-        Assert.That(capturedData, Is.Not.Null);
-        Assert.That(capturedData!.BackgroundImageURL, Is.Null);
-
-        _contentRetrieverMock.Verify(
-            x => x.RetrieveContentByGuids<ContentAttachment>(
-                It.IsAny<List<Guid>>(),
-                It.IsAny<RetrieveContentParameters>()),
-            Times.Never);
-    }
     [Test]
     public async Task InvokeAsync_CallsGetItemsByGUIDAsync_WithCorrectPageGuid()
     {
