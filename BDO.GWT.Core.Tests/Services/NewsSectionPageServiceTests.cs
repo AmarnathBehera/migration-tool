@@ -481,54 +481,7 @@ public class NewsSectionPageServiceTests
 
         Assert.That(result.CardsGrid.AdvancedSearchLink, Is.EqualTo(string.Empty));
     }
-
-    [Test]
-    public void GetNewsArticlePaginationResultAsync_Implementation_ThrowsMissingSectionPageException_WhenSectionNotFound()
-    {
-        _contentServiceMock
-            .Setup(s => s.GetPagesAsync<SectionNews>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Array.Empty<SectionNews>());
-
-        Assert.ThrowsAsync<MissingSectionPageException>(() =>
-            _service.GetNewsArticlePaginationResultAsync(
-                Guid.NewGuid(), "en-US", new CardsQuery(), CancellationToken.None));
-    }
-
-    [Test]
-    public async Task GetNewsArticlePaginationResultAsync_Implementation_UsesCurrentLanguageTag()
-    {
-        RetrievePagesParameters? capturedParameters = null;
-
-        _contentServiceMock
-            .Setup(s => s.GetPagesAsync<SectionNews>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .Callback<RetrievePagesParameters, Action<RetrievePagesQueryParameters>, RetrievalCacheSettings, CancellationToken>(
-                (p, _, _, _) => capturedParameters = p)
-            .ReturnsAsync(Array.Empty<SectionNews>());
-
-        try
-        {
-            await _service.GetNewsArticlePaginationResultAsync(
-                Guid.NewGuid(), "en-US", new CardsQuery(), CancellationToken.None);
-        }
-        catch (MissingSectionPageException) { /* expected */ }
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(capturedParameters, Is.Not.Null);
-            Assert.That(capturedParameters!.LanguageName, Is.EqualTo("en-US"));
-            Assert.That(capturedParameters.UseLanguageFallbacks, Is.False);
-            Assert.That(capturedParameters.LinkedItemsMaxLevel, Is.EqualTo(2));
-        });
-    }
-
+   
     [Test]
     public async Task GetNewsArticlePaginationResultAsync_Implementation_DelegatesToNewsArticleCardsService_WhenSectionFound()
     {

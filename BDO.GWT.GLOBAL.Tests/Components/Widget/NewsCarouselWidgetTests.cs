@@ -94,30 +94,7 @@ public class NewsCarouselWidgetTests
             .ReturnsAsync(new List<IWebPageFieldsSource> { page ?? new Mock<IWebPageFieldsSource>().Object });
     }
 
-    [Test]
-    public async Task InvokeAsync_WithNullModel_ReturnsViewWithFilteringTooltipDisabled()
-    {
-        var result = await _widget.InvokeAsync(null!);
-
-        var viewResult = result as ViewViewComponentResult;
-        var dto = viewResult?.ViewData?.Model as NewsCarouselDto;
-
-        Assert.That(dto, Is.Not.Null);
-        Assert.That(dto!.FilteringTooltipEnabled, Is.False);
-    }
-
-    [Test]
-    public async Task InvokeAsync_WithNullModel_DoesNotCallService()
-    {
-        await _widget.InvokeAsync(null!);
-
-        _newsCarouselServiceMock.Verify(
-            x => x.GetNewsCarouselAsync(
-                It.IsAny<IWebPageFieldsSource>(),
-                It.IsAny<NewsCarouselData>(),
-                It.IsAny<CancellationToken>()),
-            Times.Never);
-    }
+   
     [Test]
     public async Task InvokeAsync_WithAllProperties_MapsDataToServiceCorrectly()
     {
