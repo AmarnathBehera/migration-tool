@@ -33,6 +33,8 @@
 
             public const string LocalNavigation = WidgetPrefix + "LocalNavigation";
 
+            public const string NewsCarousel = WidgetPrefix + "NewsCarousel";
+
             public const string FlexibleBanner = WidgetPrefix + "FlexibleBanner";
 
             public const string FlexibleContent = WidgetPrefix + "FlexibleContent";

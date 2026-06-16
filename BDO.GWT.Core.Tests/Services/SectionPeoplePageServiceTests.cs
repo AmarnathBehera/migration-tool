@@ -1,17 +1,14 @@
 using BDO.GWT.Common.Exceptions;
-using BDO.GWT.Core;
-using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.Services;
-using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
 using Kentico.Content.Web.Mvc;
 using Moq;
 
-namespace BDO.GWT.GLOBAL.Tests.Services;
+namespace BDO.GWT.Core.Tests.Services;
 
 public class SectionPeoplePageServiceTests
 {

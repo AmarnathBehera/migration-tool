@@ -6,6 +6,7 @@
 @model (BDO.GWT.Core.DTOs.Pages.LocationCityDto LocationCityDto, BDO.GWT.Core.DTOs.SchemaMarkups.FinancialServiceSchemaMarkupDto LocationCitySchemaMarkupDto)
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
 
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
@@ -51,15 +52,5 @@
         this.Model.LocationCityDto.MainContent,
         Context.RequestAborted))
     }
- @await Html.Kentico().EditableAreaAsync(
-    "mainContent",
-        new EditableAreaOptions
-        {
-            AllowedWidgets = widgetsList
-        })
-@await Html.Kentico().EditableAreaAsync(
-    "mainContent",
-        new EditableAreaOptions
-        {
-            AllowedWidgets = advancedWidgetsList
-        })
+
+@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)

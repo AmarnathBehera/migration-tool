@@ -1,5 +1,3 @@
-using BDO.GWT.Core;
-using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
@@ -9,9 +7,7 @@ using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Routing;
 using Moq;
 
 namespace BDO.GWT.Core.Tests.Services;
@@ -76,16 +72,16 @@ public class NewsArticleCardsServiceTests
 
         _newsArticleCardsServiceMock
             .Setup(x => x.GetFilteredItemsAsync(
-                It.IsAny<SectionNews>(),
+                It.IsAny<List<SectionNews>>(),
                 It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
-                It.IsAny<Action<ContentItemQueryBuilder>?>(),
+                It.IsAny<List<Action<WhereParameters>>>(),
                 It.IsAny<Func<NewsArticle, bool>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedDto);
 
         var result = await _newsArticleCardsServiceMock.Object.GetFilteredItemsAsync(
-            new SectionNews(), "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+            [new SectionNews()], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -106,16 +102,16 @@ public class NewsArticleCardsServiceTests
 
         _newsArticleCardsServiceMock
             .Setup(x => x.GetFilteredItemsAsync(
-                It.IsAny<SectionNews>(),
+                It.IsAny<List<SectionNews>>(),
                 It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
-                It.IsAny<Action<ContentItemQueryBuilder>?>(),
+                It.IsAny<List<Action<WhereParameters>>>(),
                 It.IsAny<Func<NewsArticle, bool>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(emptyDto);
 
         var result = await _newsArticleCardsServiceMock.Object.GetFilteredItemsAsync(
-            new SectionNews(), "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+            [new SectionNews()] , "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -143,24 +139,24 @@ public class NewsArticleCardsServiceTests
     {
         _newsArticleCardsServiceMock
             .Setup(x => x.GetFilteredItemsAsync(
-                It.IsAny<SectionNews>(),
+                It.IsAny<List<SectionNews>>(),
                 It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
-                It.IsAny<Action<ContentItemQueryBuilder>?>(),
+                It.IsAny<List<Action<WhereParameters>>>(),
                 It.IsAny<Func<NewsArticle, bool>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PaginationDto<NewsPageCardDto> { Data = [], TotalCount = 0 });
 
         var cardsQuery = new CardsQuery();
         await _newsArticleCardsServiceMock.Object.GetFilteredItemsAsync(
-            new SectionNews(), "en-US", cardsQuery, null, _ => false, CancellationToken.None);
+            [new SectionNews()], "en-US", cardsQuery, null, _ => false, CancellationToken.None);
 
         _newsArticleCardsServiceMock.Verify(
             x => x.GetFilteredItemsAsync(
-                It.IsAny<SectionNews>(),
+                It.IsAny<List<SectionNews>>(),
                 "en-US",
                 cardsQuery,
-                It.IsAny<Action<ContentItemQueryBuilder>?>(),
+                It.IsAny<List<Action<WhereParameters>>>(),
                 It.IsAny<Func<NewsArticle, bool>>(),
                 It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -172,18 +168,18 @@ public class NewsArticleCardsServiceTests
 
         _newsArticleCardsServiceMock
             .Setup(x => x.GetFilteredItemsAsync(
-                It.IsAny<SectionNews>(),
+                It.IsAny<List<SectionNews>>(),
                 It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
-                It.IsAny<Action<ContentItemQueryBuilder>?>(),
+                It.IsAny<List<Action<WhereParameters>>>(),
                 It.IsAny<Func<NewsArticle, bool>>(),
                 It.IsAny<CancellationToken>()))
-            .Callback<SectionNews, string, CardsQuery, Action<ContentItemQueryBuilder>?, Func<NewsArticle, bool>, CancellationToken>(
+            .Callback<List<SectionNews>, string, CardsQuery, List<Action<WhereParameters>>, Func<NewsArticle, bool>, CancellationToken>(
                 (_, lang, _, _, _, _) => capturedLanguage = lang)
             .ReturnsAsync(new PaginationDto<NewsPageCardDto> { Data = [], TotalCount = 0 });
 
         await _newsArticleCardsServiceMock.Object.GetFilteredItemsAsync(
-            new SectionNews(), "fr-FR", new CardsQuery(), null, _ => false, CancellationToken.None);
+            [new SectionNews()], "fr-FR", new CardsQuery(), null, _ => false, CancellationToken.None);
 
         Assert.That(capturedLanguage, Is.EqualTo("fr-FR"));
     }
@@ -195,19 +191,19 @@ public class NewsArticleCardsServiceTests
 
         _newsArticleCardsServiceMock
             .Setup(x => x.GetFilteredItemsAsync(
-                It.IsAny<SectionNews>(),
+                It.IsAny<List<SectionNews>>(),
                 It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
-                It.IsAny<Action<ContentItemQueryBuilder>?>(),
+                It.IsAny<List<Action<WhereParameters>>>(),
                 It.IsAny<Func<NewsArticle, bool>>(),
                 It.IsAny<CancellationToken>()))
-            .Callback<SectionNews, string, CardsQuery, Action<ContentItemQueryBuilder>?, Func<NewsArticle, bool>, CancellationToken>(
-                (section, _, _, _, _, _) => capturedSection = section)
+            .Callback<List<SectionNews>, string, CardsQuery, List<Action<WhereParameters>>, Func<NewsArticle, bool>, CancellationToken>(
+                (sections, _, _, _, _, _) => capturedSection = sections.FirstOrDefault())
             .ReturnsAsync(new PaginationDto<NewsPageCardDto> { Data = [], TotalCount = 0 });
 
         var newsSection = new SectionNews { PageTitle = "My Section" };
         await _newsArticleCardsServiceMock.Object.GetFilteredItemsAsync(
-            newsSection, "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+            [newsSection], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
 
         Assert.That(capturedSection, Is.SameAs(newsSection));
     }
@@ -242,16 +238,16 @@ public class NewsArticleCardsServiceTests
 
         _newsArticleCardsServiceMock
             .Setup(x => x.GetFilteredItemsAsync(
-                It.IsAny<SectionNews>(),
+                It.IsAny<List<SectionNews>>(),
                 It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
-                It.IsAny<Action<ContentItemQueryBuilder>?>(),
+                It.IsAny<List<Action<WhereParameters>>>(),
                 It.IsAny<Func<NewsArticle, bool>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedDto);
 
         var result = await _newsArticleCardsServiceMock.Object.GetFilteredItemsAsync(
-            new SectionNews(), "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+            [new SectionNews()], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -269,18 +265,18 @@ public class NewsArticleCardsServiceTests
 
         _newsArticleCardsServiceMock
             .Setup(x => x.GetFilteredItemsAsync(
-                It.IsAny<SectionNews>(),
+                It.IsAny<List<SectionNews>>(),
                 It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
-                It.IsAny<Action<ContentItemQueryBuilder>?>(),
+                It.IsAny<List<Action<WhereParameters>>>(),
                 It.IsAny<Func<NewsArticle, bool>>(),
                 It.IsAny<CancellationToken>()))
-            .Callback<SectionNews, string, CardsQuery, Action<ContentItemQueryBuilder>?, Func<NewsArticle, bool>, CancellationToken>(
+            .Callback<List<SectionNews>, string, CardsQuery, List<Action<WhereParameters>>, Func<NewsArticle, bool>, CancellationToken>(
                 (_, _, query, _, _, _) => capturedQuery = query)
             .ReturnsAsync(new PaginationDto<NewsPageCardDto> { Data = [], TotalCount = 0 });
 
         await _newsArticleCardsServiceMock.Object.GetFilteredItemsAsync(
-            new SectionNews(), "en-US", cardsQuery, null, _ => false, CancellationToken.None);
+            [new SectionNews()], "en-US", cardsQuery, null, _ => false, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -394,7 +390,7 @@ public class NewsArticleCardsServiceImplementationTests
             .ReturnsAsync(Enumerable.Empty<NewsGroup>());
 
         var result = await _service.GetFilteredItemsAsync(
-            newsSection, "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+            [newsSection], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -433,7 +429,7 @@ public class NewsArticleCardsServiceImplementationTests
             .ReturnsAsync(Enumerable.Empty<NewsArticle>());
 
         var result = await _service.GetFilteredItemsAsync(
-            newsSection, "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+            [newsSection], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
 
         _contentServiceMock.Verify(
             s => s.GetPagesAsync<NewsArticle>(
@@ -467,7 +463,7 @@ public class NewsArticleCardsServiceImplementationTests
             .ReturnsAsync(Enumerable.Empty<NewsGroup>());
 
         await _service.GetFilteredItemsAsync(
-            newsSection, "fr-FR", new CardsQuery(), null, _ => false, CancellationToken.None);
+            [newsSection], "fr-FR", new CardsQuery(), null, _ => false, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -507,7 +503,7 @@ public class NewsArticleCardsServiceImplementationTests
 
         var query = new CardsQuery { CurrentPage = null, PageSize = null };
         var result = await _service.GetFilteredItemsAsync(
-            newsSection, "en-US", query, null, _ => false, CancellationToken.None);
+            [new SectionNews()], "en-US", query, null, _ => false, CancellationToken.None);
 
         Assert.That(result.Data, Is.Empty);
     }
