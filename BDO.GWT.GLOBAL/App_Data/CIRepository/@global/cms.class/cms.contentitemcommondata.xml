@@ -417,21 +417,6 @@
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
-      <field allowempty="true" column="MetadataServices" columnprecision="0" columntype="contentitemreference" enabled="true" guid="b7913010-495f-4a0b-a680-6c44834c4489" visible="true">
-        <properties>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Services</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-          <kxp_schema_identifier>6bf9af2e-ee19-461b-a071-2b6541b36653</kxp_schema_identifier>
-        </properties>
-        <settings>
-          <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["28ba1415-0ac5-40c2-bb50-ec5ee5532674"]]]>
-          </AllowedContentItemTypeIdentifiers>
-          <controlname>Kentico.Administration.ContentItemSelector</controlname>
-          <SelectionType>contentTypes</SelectionType>
-        </settings>
-      </field>
       <field allowempty="true" column="MetadataServiceAreas" columnprecision="0" columntype="contentitemreference" enabled="true" guid="bb2a5c0a-6346-4f19-83b2-daf3791d52ed" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
@@ -442,6 +427,21 @@
         <settings>
           <AllowedContentItemTypeIdentifiers>
             <![CDATA[["62753fae-0b4b-4b11-9497-a975271396e4"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataServices" columnprecision="0" columntype="contentitemreference" enabled="true" guid="b7913010-495f-4a0b-a680-6c44834c4489" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Services</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>6bf9af2e-ee19-461b-a071-2b6541b36653</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["28ba1415-0ac5-40c2-bb50-ec5ee5532674"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
@@ -486,7 +486,7 @@
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["2fbc3346-16df-4d75-a048-f3a714cd5592"]]]>
+            <![CDATA[["24473f7c-9eb7-44cc-bf31-e1b9c4aa78fc"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
@@ -501,7 +501,7 @@
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["2fbc3346-16df-4d75-a048-f3a714cd5592"]]]>
+            <![CDATA[["14a4e025-0212-44f7-805b-f7604ca10d04"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>

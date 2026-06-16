@@ -174,7 +174,7 @@ public class NewsArticleCardsServiceTests
                 It.IsAny<List<Action<WhereParameters>>>(),
                 It.IsAny<Func<NewsArticle, bool>>(),
                 It.IsAny<CancellationToken>()))
-            .Callback<SectionNews, string, CardsQuery, Action<ContentItemQueryBuilder>?, Func<NewsArticle, bool>, CancellationToken>(
+            .Callback<List<SectionNews>, string, CardsQuery, List<Action<WhereParameters>>, Func<NewsArticle, bool>, CancellationToken>(
                 (_, lang, _, _, _, _) => capturedLanguage = lang)
             .ReturnsAsync(new PaginationDto<NewsPageCardDto> { Data = [], TotalCount = 0 });
 
@@ -197,8 +197,8 @@ public class NewsArticleCardsServiceTests
                 It.IsAny<List<Action<WhereParameters>>>(),
                 It.IsAny<Func<NewsArticle, bool>>(),
                 It.IsAny<CancellationToken>()))
-            .Callback<SectionNews, string, CardsQuery, Action<ContentItemQueryBuilder>?, Func<NewsArticle, bool>, CancellationToken>(
-                (section, _, _, _, _, _) => capturedSection = section)
+            .Callback<List<SectionNews>, string, CardsQuery, List<Action<WhereParameters>>, Func<NewsArticle, bool>, CancellationToken>(
+                (sections, _, _, _, _, _) => capturedSection = sections.FirstOrDefault())
             .ReturnsAsync(new PaginationDto<NewsPageCardDto> { Data = [], TotalCount = 0 });
 
         var newsSection = new SectionNews { PageTitle = "My Section" };
