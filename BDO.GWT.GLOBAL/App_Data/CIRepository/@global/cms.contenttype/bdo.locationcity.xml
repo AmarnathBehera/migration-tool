@@ -10,6 +10,20 @@
       <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
         <properties />
       </schema>
+      <field allowempty="true" column="RegionNameLocationCity" columnprecision="0" columntype="contentitemreference" enabled="true" guid="a73515b3-3828-4004-a11e-fa14cb177ab9" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Full State/Region Name</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["750963fc-1562-4da7-b7ea-6aadfc4366fb"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
       <field allowempty="true" column="ContentTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="007ca0eb-dce6-47fa-8123-85db4b296db2" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>

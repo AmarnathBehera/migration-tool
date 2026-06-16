@@ -24,8 +24,14 @@
           <defaultvalue>
             <![CDATA[person;businessIssue;businessLine;IndustryCategory;keywords]]>
           </defaultvalue>
+          <explanationtext>
+            <![CDATA[Filters that visitor will be able to filter blogs posts by.]]>
+          </explanationtext>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Filters</fieldcaption>
+          <fielddescription>
+            <![CDATA[Filters that visitor will be able to filter blogs posts by.]]>
+          </fielddescription>
           <fielddescriptionashtml>False</fielddescriptionashtml>
           <includeintranslation>True</includeintranslation>
         </properties>

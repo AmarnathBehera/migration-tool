@@ -1,4 +1,5 @@
-﻿using BDO.GWT.Core.Data;
+﻿using BDO.GWT.Common.Core.Helpers;
+using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.DTOs.SchemaMarkups;
@@ -66,7 +67,7 @@ public class LocationCityPageService : ILocationCityPageService
         return new FinancialServiceSchemaMarkupDto
         {
             Url = page.GetUrl().AbsoluteUrl,
-            //Name = page.RegionName,
+            Name = page.RegionNameLocationCity?.FirstOrDefault()?.RegionName1,
             Description = _contentService.GetFallbackMetadataDescription(page.MetadataDescription, page.MetadataOGDescription),
             Image = page.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url,//.ToHtmlCompatibleString(),
             Logo = logo,
@@ -84,7 +85,7 @@ public class LocationCityPageService : ILocationCityPageService
                 AddressLocality = page.MetadataTitle,
                 PostalCode = office?.LocationZip,
                 AddressCountry = office?.LocationCountry, 
-                //AddressRegion = page?.RegionName,
+                AddressRegion = page?.RegionNameLocationCity?.FirstOrDefault()?.RegionName1,
             },
         };
     }
@@ -107,7 +108,7 @@ public class LocationCityPageService : ILocationCityPageService
     {
         var officeCards = offices?.Select(x => new OfficeCardDto
         {
-            ImageURL = x.OfficeImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,//ToHtmlCompatibleString(),
+            ImageURL = x.OfficeImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
             ImageAltText = x.OfficeImageAltText,
             Name = x.MetadataTitle,
             AddressLine1 = x.LocationAddressLine1,
@@ -120,7 +121,7 @@ public class LocationCityPageService : ILocationCityPageService
             PhoneNumber = x.LocationPhone,
             Fax = x.LocationFax,
             OpeningHours = x.OpeningHours,
-           // GetDirectionsUrl = GoogleMapsHelper.GenerateGoogleMapsLink(x.LocationLatitude, x.LocationLongitude),
+            GetDirectionsUrl = GoogleMapsHelper.GenerateGoogleMapsLink(x.LocationLatitude, x.LocationLongitude),
             PoBoxNumber = x.LocationPOBoxNumber,
             PoCity = x.LocationPOCity,
             PoPostalCode = x.LocationPOZip,

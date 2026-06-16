@@ -36,6 +36,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// DescriptionText.
+		/// </summary>
+		public string DescriptionText { get; set; }
+
+
+		/// <summary>
 		/// DescriptionTitle.
 		/// </summary>
 		public string DescriptionTitle { get; set; }
@@ -48,9 +54,21 @@ namespace BDO
 
 
 		/// <summary>
+		/// LocalLocations.
+		/// </summary>
+		public string LocalLocations { get; set; }
+
+
+		/// <summary>
 		/// LocationsTitle.
 		/// </summary>
 		public string LocationsTitle { get; set; }
+
+
+		/// <summary>
+		/// GlobalLocationsBanner.
+		/// </summary>
+		public string GlobalLocationsBanner { get; set; }
 
 
 		/// <summary>
