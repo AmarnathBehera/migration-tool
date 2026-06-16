@@ -94,16 +94,16 @@ public class NewsSectionPageService : INewsSectionPageService
             language,
             cardsQuery,
             null,
-            newsArticle => featuredNewsArticlePageIds.Contains(newsArticle.SystemFields.WebPageItemID),
+            newsArticle => featuredNewsArticlePageIds.Contains(newsArticle.SystemFields.WebPageItemGUID),
             cancellationToken
             );
 
         return paginationDto;
     }
 
-    private static async Task<ISet<int>> GetFeaturedNewsArticlePageIdsAsync(SectionNews newsSection)
+    private static async Task<ISet<Guid>> GetFeaturedNewsArticlePageIdsAsync(SectionNews newsSection)
     {
-        var featuredNewsArticlePageIds = newsSection.ItemListFeaturedItems.Select(x => x.SystemFields.WebPageItemID).ToHashSet();
+        var featuredNewsArticlePageIds = newsSection.ItemListFeaturedItems.Select(x => x.SystemFields.WebPageItemGUID).ToHashSet();
 
         return featuredNewsArticlePageIds;
     }

@@ -6,6 +6,7 @@
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
 
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
@@ -24,6 +25,16 @@
         ComponentIdentifiers.Widgets.Globallocation,
         ComponentIdentifiers.Widgets.AccordionWidget,
         ComponentIdentifiers.Widgets.FaqWidget
+    };
+    var advancedWidgetsList = new[]
+    {
+        // ComponentIdentifiers.Widgets.Faq,
+        ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.Imagewithtext,
+        //ComponentIdentifiers.Widgets.InFocus,
+        //ComponentIdentifiers.Widgets.PurposeIcon,
+        ComponentIdentifiers.Widgets.TabAccordion,
+        //ComponentIdentifiers.Widgets.TrendingTopicsCarousel,
     };
 }
 <div>
@@ -45,11 +56,6 @@
         Model,
         Context.RequestAborted))
 </div>
-<div>
-    @await Html.Kentico().EditableAreaAsync(
-        "mainContent",
-        new EditableAreaOptions
-        {
-            AllowedWidgets = widgetsList
-        })
+<div>    
+   @await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
 </div>

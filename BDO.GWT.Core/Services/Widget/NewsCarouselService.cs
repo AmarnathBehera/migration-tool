@@ -7,6 +7,7 @@ using BDO.GWT.Core.LiveSite.Data;
 using BDO.GWT.Core.Services;
 using CMS.ContentEngine;
 using CMS.Websites;
+using CMS.Websites.Routing;
 
 namespace BDO.GWT.Core.LiveSite.Services;
 
@@ -15,7 +16,7 @@ public interface INewsCarouselService
     Task<NewsCarouselDto> GetNewsCarouselAsync<T>(T currentPage, NewsCarouselData data, CancellationToken cancellationToken)
         where T : IWebPageFieldsSource;
 
-    Task<ICollection<NewsPageCardDto>> GetFilteredItemsAsync<T>(T currentPage, HashSet<Guid> featuredGuids, CardsQuery query, CancellationToken cancellationToken)
+    Task<ICollection<NewsPageCardDto>> GetFilteredItemsAsync<T>(T currentPage, HashSet<ContentItemReference> featuredGuids, CardsQuery query, CancellationToken cancellationToken)
         where T : IWebPageFieldsSource;
 
     Task<ICollection<NewsPageCardDto>> GetAPIFilteredItemsAsync(CardsQuery query, CancellationToken cancellationToken);
@@ -26,12 +27,16 @@ public class NewsCarouselService : INewsCarouselService
     private readonly IFilteringHelper _filteringHelper;
     private readonly INewsArticleCardsService _newsArticleCardsService;
     private readonly IContentService _contentService;
+    private readonly IWebsiteChannelContext _websiteChannelContext;
+    private readonly IContentQueryExecutor _contentQueryExecutor;
 
-    public NewsCarouselService(IFilteringHelper filteringHelper, INewsArticleCardsService newsArticleCardsService, IContentService contentService)
+    public NewsCarouselService(IFilteringHelper filteringHelper, INewsArticleCardsService newsArticleCardsService, IContentService contentService, IWebsiteChannelContext websiteChannelContext, IContentQueryExecutor contentQueryExecutor)
     {
         _filteringHelper = filteringHelper;
         _newsArticleCardsService = newsArticleCardsService;
         _contentService = contentService;
+        _websiteChannelContext = websiteChannelContext;
+        _contentQueryExecutor = contentQueryExecutor;
     }
 
     public async Task<NewsCarouselDto> GetNewsCarouselAsync<T>(T currentPage, NewsCarouselData data, CancellationToken cancellationToken)
@@ -64,7 +69,7 @@ public class NewsCarouselService : INewsCarouselService
         return dto;
     }
 
-    public async Task<ICollection<NewsPageCardDto>> GetFilteredItemsAsync<T>(T currentPage, HashSet<Guid> featuredGuids, CardsQuery query, CancellationToken cancellationToken)
+    public async Task<ICollection<NewsPageCardDto>> GetFilteredItemsAsync<T>(T currentPage, HashSet<ContentItemReference> featuredGuids, CardsQuery query, CancellationToken cancellationToken)
         where T : IWebPageFieldsSource
     {
         return await BuildAndExecuteQueryAsync(
@@ -80,14 +85,14 @@ public class NewsCarouselService : INewsCarouselService
         return await BuildAndExecuteQueryAsync(
             query?.CurrentPageGuid?.ToString(),
             query?.PageType,
-            new HashSet<Guid>(),
+            new HashSet<ContentItemReference>(),
             query,
             cancellationToken);
     }
     private async Task<ICollection<NewsPageCardDto>> BuildAndExecuteQueryAsync(
         string guid,
         string pageTypeName,
-        HashSet<Guid> featuredGuids,
+        HashSet<ContentItemReference> featuredGuids,
         CardsQuery query,
         CancellationToken cancellationToken)
     {
@@ -99,11 +104,17 @@ public class NewsCarouselService : INewsCarouselService
             FilterParameterName.ServiceArea => x => x.WhereContains(nameof(NewsArticle.MetadataServiceAreas), guid),
             FilterParameterName.Service => x => x.WhereContains(nameof(NewsArticle.MetadataServices), guid),
             FilterParameterName.IndustryCategory => x => x.WhereContains(nameof(NewsArticle.MetadataIndustryCategories), guid),
-            FilterParameterName.IndustryPage => x => x.WhereContains(nameof(NewsArticle.MetadataIndustries), guid),
+            FilterParameterName.Industry => x => x.WhereContains(nameof(NewsArticle.MetadataIndustries), guid),
             FilterParameterName.MicrositeMasterPage => x => x.WhereContains(nameof(NewsArticle.MicrositeMasterPages), guid),
             FilterParameterName.MicrositePage => x => x.WhereContains(nameof(NewsArticle.MicrositePages), guid),
             _ => null,
         };
+        bool isOneOfTheseSeven = pageTypeName is FilterParameterName.BusinessLine or FilterParameterName.ServiceArea
+               or FilterParameterName.Service or FilterParameterName.IndustryCategory or FilterParameterName.Industry
+               or FilterParameterName.MicrositeMasterPage or FilterParameterName.MicrositePage;
+
+        if (filter is null && isOneOfTheseSeven)
+            return null!;
 
         if (filter is not null)
             whereExpressions.Add(filter);
@@ -115,14 +126,38 @@ public class NewsCarouselService : INewsCarouselService
             .OfType<SectionNews>()
             .ToList();
 
+        var result = await RetrieveFeaturedPageIdsAsync(featuredGuids, cancellationToken);
+        var featuredPageIds = result.FeaturedPageIds;
+
         var paginationDto = await _newsArticleCardsService.GetFilteredItemsAsync(
             sectionNews ?? new List<SectionNews>(),
             _contentService.GetCurrentLanguage(),
             query,
             whereExpressions,
-            newsArticle => featuredGuids.Contains(newsArticle.SystemFields.WebPageItemGUID),
+            item => featuredGuids.Any(r => r.Identifier == item.SystemFields.ContentItemGUID),
             cancellationToken);
 
         return paginationDto.Data;
+    }
+    private async Task<(HashSet<int> FeaturedPageIds, bool ShowPastEvents)> RetrieveFeaturedPageIdsAsync(
+  HashSet<ContentItemReference> featuredGuids,
+  CancellationToken cancellationToken)
+    {
+        if (!featuredGuids.Any())
+            return (new HashSet<int>(), false);
+
+        var guids = featuredGuids.Select(r => r.Identifier).ToHashSet();
+
+        var builder = new ContentItemQueryBuilder()
+            .ForContentType(Event.CONTENT_TYPE_NAME, q => q
+                .ForWebsite(_websiteChannelContext.WebsiteChannelName)
+                .Where(w => w.WhereIn(nameof(WebPageFields.ContentItemGUID), guids)));
+
+        var results = await _contentQueryExecutor.GetWebPageResult(
+     builder,
+     container => container.WebPageItemID,
+     cancellationToken: cancellationToken);
+
+        return (results.ToHashSet(), false);
     }
 }

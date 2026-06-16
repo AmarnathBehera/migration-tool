@@ -1,4 +1,6 @@
-﻿namespace BDO.GWT.Core.LiveSite.Data;
+﻿using CMS.ContentEngine;
+
+namespace BDO.GWT.Core.LiveSite.Data;
 
 public class NewsCarouselData : BaseWidgetData
 {
@@ -10,7 +12,7 @@ public class NewsCarouselData : BaseWidgetData
 
     public HashSet<string> Filters { get; set; } = [];
 
-    public IEnumerable<Guid> NodeGuidsOfFeaturedNews { get; set; } = Enumerable.Empty<Guid>();
+    public IEnumerable<ContentItemReference> NodeGuidsOfFeaturedNews { get; set; } = Enumerable.Empty<ContentItemReference>();
 
     public string? BackgroundImageURL { get; set; }
 

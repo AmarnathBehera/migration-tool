@@ -50,7 +50,7 @@ public class NewsCarouselWidget : ViewComponent
             Description = model.Properties.Description,
             FilteringEnabled = model.Properties.FilteringEnabled,
             Filters = model.Properties.Filters?.ToHashSet() ?? [],
-            NodeGuidsOfFeaturedNews = model.Properties.FeaturedNews?.Select(x => x.Identifier) ?? [],
+            NodeGuidsOfFeaturedNews = model.Properties.FeaturedNews ?? [],
             BackgroundImageURL = backgroundimageurl.FirstOrDefault()?.ContentAttachmentAsset?.Url,
             BackgroundImageAltText = string.IsNullOrEmpty(model.Properties.BackgroundImageAltText) ? null : model.Properties.BackgroundImageAltText,
             SeeAllLinkText = model.Properties.SeeAllLinkText,
