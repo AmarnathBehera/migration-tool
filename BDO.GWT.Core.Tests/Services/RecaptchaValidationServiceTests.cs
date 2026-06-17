@@ -149,9 +149,12 @@ public class RecaptchaValidationServiceTests
             threshold: 0.5m,
             recaptchaResponse: ValidRecaptchaResponse,
             cancellationToken: CancellationToken.None);
-
-        Assert.That(_service.GetRecaptchaPrivateKeyCalled, Is.True);
-        Assert.That(_service.LastIsV3Arg, Is.False);
+        Assert.Multiple(() =>
+        {
+            Assert.That(_service.GetRecaptchaPrivateKeyCalled, Is.True);
+            Assert.That(_service.LastIsV3Arg, Is.False);
+        });
+       
     }
 
     [Test]
@@ -164,9 +167,12 @@ public class RecaptchaValidationServiceTests
             threshold: 0.5m,
             recaptchaResponse: ValidRecaptchaResponse,
             cancellationToken: CancellationToken.None);
-
-        Assert.That(_service.GetRecaptchaPrivateKeyCalled, Is.True);
-        Assert.That(_service.LastIsV3Arg, Is.True);
+        Assert.Multiple(() =>
+        {
+            Assert.That(_service.GetRecaptchaPrivateKeyCalled, Is.True);
+            Assert.That(_service.LastIsV3Arg, Is.True);
+        });
+       
     }
 
     // ─── Integration: RecaptchaValidator behaviour with fake key ─────────────
