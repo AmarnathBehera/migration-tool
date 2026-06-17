@@ -16,7 +16,6 @@
 
     var widgetsList = new[]
     {
-        ComponentIdentifiers.Widgets.ExternalNavigation,
         ComponentIdentifiers.Widgets.Imagewithtext,
         ComponentIdentifiers.Widgets.QuoteCard,
         ComponentIdentifiers.Widgets.TiledLink,
@@ -44,6 +43,7 @@
         ReactComponentType.MultiLinksCardsGridGUID,
         Model.MultiLinksCardsGrid,
         Context.RequestAborted))
+@await Html.PartialAsync("_LocalNavigation")
 
     @await Html.Kentico().EditableAreaAsync(
         "mainContent",

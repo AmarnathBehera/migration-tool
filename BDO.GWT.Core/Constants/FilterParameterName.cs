@@ -15,7 +15,7 @@ public static class FilterParameterName
     public const string GlobalDealType = "globalDealType";
     public const string GlobalIndustry = "globalIndustry";
     public const string GlobalSubIndustry = "globalSubIndustry";
-    public const string Industry = "industry";
+    public const string Industry = "Industry";
     public const string IndustryCategory = "industryCategory";
     public const string IndustryPage = "industryPage";
     public const string IndustryService = "industryService";

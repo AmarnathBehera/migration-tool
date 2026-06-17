@@ -112,7 +112,7 @@ namespace BDO.GWT.GLOBAL.Tests.Modules
             Assert.Multiple(() =>
             {
                 Assert.That(returned, Is.SameAs(_service));
-                Assert.That(GetPrivateList(_service, "_widgets"), Has.Count.EqualTo(2));
+                Assert.That(GetPrivateList(_service, "_widgets"), Has.Count.EqualTo(4));
             });
         }
 

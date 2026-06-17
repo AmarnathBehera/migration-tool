@@ -55,7 +55,7 @@ public class CareersPageService : ICareersPageService
     public async Task<CareersPageDto> GetCareersPageDtoAsync(CancellationToken cancellationToken)
     {
         var page = await _contentRetriever.RetrieveCurrentPageAsync<Careers>(
-            new RetrieveCurrentPageParameters { }, cancellationToken);
+            new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
 
         if (page == null)
         {
@@ -181,7 +181,7 @@ public class CareersPageService : ICareersPageService
 
             return new CareerCardDto
             {
-                ImageURL =  c.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+                ImageURL =  (c.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url)?.TrimStart('~'),
                 ImageAltText = c.MetadataTeaserImageAltText,
                 Title = c.MetadataTitle,
                 JobTitle = c.CareerJobTitle?.FirstOrDefault()?.Name,
