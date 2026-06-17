@@ -26,8 +26,10 @@ public class PageBuilderService : IPageBuilderService
     {
         _widgets.AddRange(new[]
         {
+            ComponentIdentifiers.Widgets.Form,
             ComponentIdentifiers.Widgets.Imagewithtext,
-            ComponentIdentifiers.Widgets.ExternalNavigation
+            ComponentIdentifiers.Widgets.ExternalNavigation,
+            ComponentIdentifiers.Widgets.NewsCarousel
         });
         return this;
     }

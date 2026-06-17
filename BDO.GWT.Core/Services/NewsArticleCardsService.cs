@@ -19,10 +19,10 @@ public interface INewsArticleCardsService
 {
     Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(HashSet<string> filters, string? nodeAliasPath, CancellationToken cancellationToken);
     Task<PaginationDto<NewsPageCardDto>> GetFilteredItemsAsync
-        (SectionNews newsSection,
+        (List<SectionNews> newsSections,
         string language,
         CardsQuery cardsQuery,
-        Action<ContentItemQueryBuilder>? decorateQuery,
+        List<Action<WhereParameters>>? queryFilters,
         Func<NewsArticle, bool> isFeatured,
         CancellationToken cancellationToken);
 }
@@ -54,26 +54,35 @@ public class NewsArticleCardsService : INewsArticleCardsService
         return await _cardsService.CreateFiltersAsync(filters, nodeAliasPath, cancellationToken);
     }
     public async Task<PaginationDto<NewsPageCardDto>> GetFilteredItemsAsync(
-    SectionNews newsSection,
+    List<SectionNews> newsSections,
     string language,
     CardsQuery cardsQuery,
-    Action<ContentItemQueryBuilder>? decorateQuery,
+    List<Action<WhereParameters>>? queryFilters,
     Func<NewsArticle, bool> isFeatured,
     CancellationToken cancellationToken)
     {
         var filterWhereExpressions = await GetFilterParameterWhereExpressionsAsync(cardsQuery.Filters);
 
-        var newsGroupIDs = (await _contentService.GetPagesAsync<NewsGroup>(
-           new RetrievePagesParameters
-           {
-               LanguageName = language,
-               UseLanguageFallbacks = false
-           },
-           query => query
-               .Where(w => w.WhereEquals("WebPageItemParentID", newsSection.SystemFields.WebPageItemID)),
-           RetrievalCacheSettings.CacheDisabled,
-           cancellationToken
-       ))?.Select(x => x.SystemFields.WebPageItemID).ToArray() ?? [];
+        var newsGroupIDsList = new List<int>();
+
+        foreach (var newsSection in newsSections)
+        { 
+            var sectionNewsGroupIDs = (await _contentService.GetPagesAsync<NewsGroup>(
+               new RetrievePagesParameters
+               {
+                   LanguageName = language,
+                   UseLanguageFallbacks = false
+               },
+               query => query
+                   .Where(w => w.WhereEquals("WebPageItemParentID", newsSection.SystemFields.WebPageItemID)),
+               RetrievalCacheSettings.CacheDisabled,
+               cancellationToken
+           ))?.Select(x => x.SystemFields.WebPageItemID).ToArray() ?? [];
+           
+           newsGroupIDsList.AddRange(sectionNewsGroupIDs);
+        }
+
+        var newsGroupIDs = newsGroupIDsList.ToArray();
 
         if (newsGroupIDs.Length == 0)
             return new PaginationDto<NewsPageCardDto> { Data = [], TotalCount = 0 };
@@ -95,6 +104,13 @@ public class NewsArticleCardsService : INewsArticleCardsService
                     foreach (var filter in filterWhereExpressions)
                     {
                         filter(w);
+                    }
+                    if (queryFilters!=null)
+                    {
+                        foreach (var filter in queryFilters)
+                        {
+                            filter(w);
+                        }
                     }
                 });
             },
@@ -166,7 +182,7 @@ public class NewsArticleCardsService : INewsArticleCardsService
 
         return filterName switch
         {
-            // FilterParameterName.BusinessLine => x => x.WhereContains(nameof(NewsArticle.MetadataBusinessLine), guid),
+            FilterParameterName.BusinessLine => x => x.WhereContains(nameof(NewsArticle.MetadataBusinessLine), guid),
             FilterParameterName.ServiceArea => x => x.WhereContains(nameof(NewsArticle.MetadataServiceAreas), guid),
             FilterParameterName.Service => x => x.WhereContains(nameof(NewsArticle.MetadataServices), guid),
             FilterParameterName.IndustryCategory => x => x.WhereContains(nameof(NewsArticle.MetadataIndustryCategories), guid),

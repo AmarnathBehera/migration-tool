@@ -1,6 +1,7 @@
 ﻿using BDO.GWT.Common.Options;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Helpers;
+using BDO.GWT.Core.LiveSite.Services;
 using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Services.Footer;
@@ -74,7 +75,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ISettingService, SettingService>();
         serviceCollection.AddScoped<ITimeZoneService, TimeZoneService>();
         serviceCollection.AddScoped<ISectionEventsService, SectionEventsService>();
-        serviceCollection.AddScoped<IEventWebinarCardsService, EventWebinarCardsService>(); // ADD THIS
+        serviceCollection.AddScoped<IEventWebinarCardsService, EventWebinarCardsService>(); 
         serviceCollection.AddScoped<IEventRegistrationFormPageService, EventRegistrationFormPageService>();
         serviceCollection.AddScoped<IEventWebinarPageService, EventWebinarPageService>();
         serviceCollection.AddScoped<IBreadcrumbsService, BreadcrumbsService>();
@@ -108,6 +109,10 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IDealPageService, DealPageService>();
         serviceCollection.AddScoped<IRssSectionPageService,RssSectionPageService>();
         serviceCollection.AddScoped<IRssPageService,RssPageService>();
+
+        //Widget Service
+        serviceCollection.AddScoped<INewsCarouselService, NewsCarouselService>();
+
         serviceCollection.AddScoped<ITabAccordionService, TabAccordionService>();
         serviceCollection.AddScoped<IEventsWebinarsSliderService,EventsWebinarsSliderService>();
     }

@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Moq;
 
-namespace BDO.GWT.GLOBAL.Tests.Services;
+namespace BDO.GWT.Core.Tests.Services;
 
 public class PeopleCardsServiceTests
 {

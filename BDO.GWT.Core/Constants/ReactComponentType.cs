@@ -95,6 +95,7 @@ public static class ReactComponentType
     public const string BlogPostContentGUID = "1203d3fb-df5e-4ac9-ae98-e9fc39b18cbc";
     public const string ContentTabAccordionGUID = "eeb2b6b7-f2df-411b-b55f-c7aac9b22093";
     public const string DealDetailsGUID = "9ba2033f-9c72-4922-88c2-22f911be95c2";
+    public const string NewsCarouselGUID = "d1c3e5b7-d9f2-4a6c-8e0b-1f3a5c7e9d2b";
 }
 
 
