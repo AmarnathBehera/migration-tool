@@ -8,6 +8,10 @@ using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Microsoft.Extensions.Logging;
 
+
+
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("BDO.GWT.Core.Tests")]
+
 namespace BDO.GWT.Core.Services;
 
 public interface IRssPageService
