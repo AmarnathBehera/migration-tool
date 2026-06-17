@@ -95,7 +95,6 @@ public partial class EventWebinarPageService : IEventWebinarPageService
             page.EventLocationAddress1,
             page.EventLocationCity,
             page.EventLocationCountry,
-            page.EventType.ToString(),
             cancellationToken);
 
     public async Task<EventWebinarDto> GetWebinarPageDtoAsync(Webinar page, CancellationToken cancellationToken)
@@ -105,7 +104,6 @@ public partial class EventWebinarPageService : IEventWebinarPageService
             page.EventLocationAddress1,
             page.EventLocationCity,
             page.EventLocationCountry,
-            page.EventType.ToString(),
             cancellationToken);
 
     public async Task<EventSchemaMarkupDto> GetEventSchemaMarkupDto(Event page, CancellationToken cancellationToken)
@@ -363,7 +361,6 @@ public partial class EventWebinarPageService : IEventWebinarPageService
         string? eventLocationAddress1,
         string? eventLocationCity,
         string? eventLocationCountry,
-        string? eventTypeName,
         CancellationToken cancellationToken)
     {
         string? registrationButtonUrl = null;
@@ -425,7 +422,7 @@ public partial class EventWebinarPageService : IEventWebinarPageService
             Description = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(page.MetadataDescription),
             RegistrationCard = new EventWebinarDetailsRegistrationCardDto
             {
-                Type = eventTypeName,
+                Type = page.EventType.Count() == 1 ? (page.EventType.FirstOrDefault()?.Name) : null,
                 DateFrom = page.EventDateFrom,
                 DateTo = page.EventDateTo,
                 Country = eventLocationCountry,
@@ -495,7 +492,6 @@ public partial class EventWebinarPageService : IEventWebinarPageService
         string? eventLocationAddress1,
         string? eventLocationCity,
         string? eventLocationCountry,
-        string? eventTypeName,
         CancellationToken cancellationToken)
     {
         string? registrationButtonUrl = null;
@@ -553,11 +549,11 @@ public partial class EventWebinarPageService : IEventWebinarPageService
 
         return new EventWebinarDto
         {
-            Title =  page.MetadataTitle,
+            Title = page.MetadataTitle,
             Description = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(page.MetadataDescription),
             RegistrationCard = new EventWebinarDetailsRegistrationCardDto
             {
-                Type = eventTypeName,
+                Type = page.EventType.Count() == 1 ? (page.EventType.FirstOrDefault()?.Name) : null,
                 DateFrom = page.EventDateFrom,
                 DateTo = page.EventDateTo,
                 Country = eventLocationCountry,

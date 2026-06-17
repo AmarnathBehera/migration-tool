@@ -1,30 +1,26 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
-using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.ValueObjects;
-using BDO.GWT.Web.Core.DTOs;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BDO.GWT.Web.Core.Services;
 
-public interface ICareerCategoryPageService
+public interface ICareerContentPageService
 {
 
-    Task<CareerCategoryDto> GetCareerCategoryDtoAsync(CancellationToken cancellationToken);
+    Task<CareerDto> GetCareerContentDtoAsync(CancellationToken cancellationToken);
 
 }
 
 
-public class CareerCategoryPageService : ICareerCategoryPageService
+public class CareerContentPageService : ICareerContentPageService
 {
     private readonly IHeroService _heroService;
     private readonly IContentService _contentRetriever;
     private readonly IWebsiteChannelContext _websiteChannelContext;
-    public CareerCategoryPageService(IHeroService heroService, IContentService contentService, IWebsiteChannelContext websiteChannelContext)
+    public CareerContentPageService(IHeroService heroService, IContentService contentService, IWebsiteChannelContext websiteChannelContext)
     {
         _heroService = heroService;
         _contentRetriever = contentService;
@@ -32,9 +28,9 @@ public class CareerCategoryPageService : ICareerCategoryPageService
 
     }
 
-    public async Task<CareerCategoryDto> GetCareerCategoryDtoAsync(CancellationToken cancellationToken)
+    public async Task<CareerDto> GetCareerContentDtoAsync(CancellationToken cancellationToken)
     {
-        var pages = await _contentRetriever.GetPagesAsync<CareerCategory>(
+        var pages = await _contentRetriever.GetPagesAsync<CareerContent>(
             new RetrievePagesParameters
             {
                 LinkedItemsMaxLevel = 5
@@ -51,11 +47,11 @@ public class CareerCategoryPageService : ICareerCategoryPageService
 
         if (careercategorypage == null)
         {
-            return new CareerCategoryDto();
+            return new CareerDto();
         }
 
 
-        var dto = new CareerCategoryDto()
+        var dto = new CareerDto()
         {
             Hero = await _heroService.GetHeroDtoAsync(new HeroData
             {

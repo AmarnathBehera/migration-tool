@@ -17,11 +17,11 @@
     {
         //ComponentIdentifiers.Widgets.Accordion,
         ComponentIdentifiers.Widgets.Button,
-        // ComponentIdentifiers.Widgets.EventsWebinarsSlider,
+        ComponentIdentifiers.Widgets.EventsWebinarsSlider,
         // ComponentIdentifiers.Widgets.FlexibleBanner,
         ComponentIdentifiers.Widgets.Form,
-        // ComponentIdentifiers.Widgets.HTML,
-        // ComponentIdentifiers.Widgets.NewsCarousel,
+        //ComponentIdentifiers.Widgets.HTML,
+        ComponentIdentifiers.Widgets.NewsCarousel,
         // ComponentIdentifiers.Widgets.RelatedContentCarousel,
         ComponentIdentifiers.Widgets.RichText,
         //ComponentIdentifiers.Widgets.FeaturedEvent, 7.1.0 feature
@@ -41,6 +41,10 @@
         Model.Page,
         Context.RequestAborted))
 
-@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
-
+@await Html.Kentico().EditableAreaAsync(
+        "Html",
+        new EditableAreaOptions
+        {
+            AllowedWidgets = widgetsList
+        })
 @PageBuilderService.GetPageBuilderScripts(Html)
