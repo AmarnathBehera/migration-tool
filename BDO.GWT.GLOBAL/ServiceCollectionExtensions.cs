@@ -107,6 +107,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ISpecialtiesCategoryPageService, SpecialtiesCategoryPageService>();
         serviceCollection.AddScoped<ISectionSpecialtiesService, SectionSpecialtiesService>();
         serviceCollection.AddScoped<IDealPageService, DealPageService>();
+        serviceCollection.AddScoped<IRecaptchaValidationService, RecaptchaValidationService>();
 
         //Widget Service
         serviceCollection.AddScoped<INewsCarouselService, NewsCarouselService>();
