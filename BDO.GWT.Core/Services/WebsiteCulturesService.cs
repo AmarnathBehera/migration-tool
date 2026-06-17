@@ -1,5 +1,6 @@
 ﻿using BDO.GWT.Core.DTOs;
 using CMS.ContentEngine;
+using CMS.DataEngine;
 using CMS.Websites;
 using CMS.Websites.Routing;
 
@@ -15,6 +16,11 @@ namespace BDO.GWT.Core.Services
 
     public class WebsiteCulturesService : IWebsiteCulturesService
     {
+        private readonly IInfoProvider<ChannelInfo> _channelInfoProvider;
+        public WebsiteCulturesService(IInfoProvider<ChannelInfo> channelInfoProvider)
+        {
+            _channelInfoProvider = channelInfoProvider;
+        }
         public Task<IEnumerable<CultureDto?>> GetWebsiteCulturesAsync()
         {
             var provider = new ContentLanguageInfoProvider();
@@ -44,7 +50,11 @@ namespace BDO.GWT.Core.Services
         }
         public string GetDisplayName(IWebsiteChannelContext websiteChannel)
         {
-            return websiteChannel.WebsiteChannelName ?? string.Empty;
+            var channelInfo = _channelInfoProvider.Get()
+                .WhereEquals(nameof(ChannelInfo.ChannelName), websiteChannel.WebsiteChannelName)
+                .FirstOrDefault();
+
+            return channelInfo?.ChannelDisplayName ?? websiteChannel.WebsiteChannelName ?? string.Empty;
         }
     }
 }

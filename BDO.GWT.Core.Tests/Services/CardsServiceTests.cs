@@ -1,13 +1,9 @@
-using BDO.GWT.Core;
-using BDO.GWT.Core.DTOs;
-using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Services;
 using CMS.ContentEngine;
 using CMS.Websites.Routing;
-using Kentico.Content.Web.Mvc;
 using Moq;
 
-namespace BDO.GWT.GLOBAL.Tests.Services;
+namespace BDO.GWT.Core.Tests.Services;
 
 public class CardsServiceTests
 {

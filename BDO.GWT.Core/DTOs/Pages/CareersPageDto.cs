@@ -1,8 +1,6 @@
-﻿
+﻿using BDO.GWT.Web.Core.DTOs;
 
-using BDO.GWT.Web.Core.DTOs;
-
-namespace BDO.GWT.Core.DTOs;
+namespace BDO.GWT.Core.DTOs.Pages;
 
 
 public class CareersPageDto
