@@ -99,21 +99,22 @@
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
-      <field allowempty="true" column="CareerLevel" columnprecision="0" columntype="taxonomy" enabled="true" guid="028465c1-ab3c-4a65-a9fd-77c267bac357" visible="true">
+      <field allowempty="true" column="CareerLevel" columnprecision="0" columntype="contentitemreference" enabled="true" guid="028465c1-ab3c-4a65-a9fd-77c267bac357" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Level</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
         </properties>
         <settings>
-          <controlname>Kentico.Administration.TagSelector</controlname>
-          <MaxSelectedTagsCount>1</MaxSelectedTagsCount>
-          <TaxonomyGroup>
-            <![CDATA[["b00e5ac1-3ef7-49cd-bf37-50602aae3c56"]]]>
-          </TaxonomyGroup>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["6405a035-64c1-4d4e-9274-d19f41d56b0a"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
-      <field allowempty="true" column="CareerEmploymentType" columnprecision="0" columntype="taxonomy" enabled="true" guid="e02f521b-a538-472b-ad1c-23787ebccdcf" visible="true">
+      <field allowempty="true" column="CareerEmploymentType" columnprecision="0" columntype="contentitemreference" enabled="true" guid="e02f521b-a538-472b-ad1c-23787ebccdcf" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Employment type</fieldcaption>
@@ -121,25 +122,27 @@
           <fielddescriptionashtml>False</fielddescriptionashtml>
         </properties>
         <settings>
-          <controlname>Kentico.Administration.TagSelector</controlname>
-          <MaxSelectedTagsCount>1</MaxSelectedTagsCount>
-          <TaxonomyGroup>
-            <![CDATA[["c7be582e-f63b-4139-8fa5-7cedd485480c"]]]>
-          </TaxonomyGroup>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["1616dcd8-526f-453e-8959-aa2fbb6a194d"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
-      <field allowempty="true" column="CareerJobTitle" columnprecision="0" columntype="taxonomy" enabled="true" guid="dd1ff6c8-08f9-40bb-999f-18fd3e4bcc94" visible="true">
+      <field allowempty="true" column="CareerJobTitle" columnprecision="0" columntype="contentitemreference" enabled="true" guid="dd1ff6c8-08f9-40bb-999f-18fd3e4bcc94" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Job title</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
         </properties>
         <settings>
-          <controlname>Kentico.Administration.TagSelector</controlname>
-          <MaxSelectedTagsCount>1</MaxSelectedTagsCount>
-          <TaxonomyGroup>
-            <![CDATA[["12cbf508-d966-489a-a817-b30f6eaa0bb0"]]]>
-          </TaxonomyGroup>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["892f3411-5870-480c-b671-d0f3da7bdf45"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
       <field allowempty="true" column="MetadataOfficeLocation" columnprecision="0" columntype="contentitemreference" enabled="true" guid="06aea7df-106c-45b9-b164-c542467fcceb" visible="true">
