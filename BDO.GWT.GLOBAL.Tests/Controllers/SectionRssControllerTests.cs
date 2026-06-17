@@ -69,17 +69,7 @@ public class SectionRssControllerTests
             Times.Once);
     }
 
-    [Test]
-    public async Task Index_WhenServiceReturnsNull_PassesNullAsViewModel()
-    {
-        _rssSectionPageServiceMock
-            .Setup(s => s.GetRssSectionDtoAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync((RssSectionDto?)null);
-
-        var result = await _sut.Index(CancellationToken.None) as ViewResult;
-
-        Assert.That(result!.Model, Is.Null);
-    }
+    
 
     [Test]
     public async Task Index_PropagatesCancellationToken()

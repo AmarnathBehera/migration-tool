@@ -87,7 +87,7 @@ public class RssPageServiceTests
         container.Setup(c => c.GetValue<string>("MetadataDescription")).Returns(description);
         container.Setup(c => c.GetValue<DateTime?>("ContentItemCommonDataLastPublishedWhen"))
             .Returns(lastPublished ?? new DateTime(2024, 1, 1));
-        container.Setup(c => c.GetValue<string>("MetadataTeaserImageUrl")).Returns((string?)null);
+        container.Setup(c => c.GetValue<string>("MetadataTeaserImageUrl")).Returns((string.Empty));
         return container;
     }
 
