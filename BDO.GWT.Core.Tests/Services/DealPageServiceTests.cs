@@ -29,6 +29,7 @@ namespace BDO.GWT.Core.Tests.Services
         private Mock<ISidebarService> _sidebarServiceMock = null!;
         private Mock<IContentService> _contentServiceMock = null!;
         private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
+        private Mock<IWebPageDataContextRetriever> _webPageDataContextRetrieverMock = null!;
         private DealPageService _service = null!;
 
         [SetUp]
@@ -38,6 +39,7 @@ namespace BDO.GWT.Core.Tests.Services
             _sidebarServiceMock = new Mock<ISidebarService>();
             _contentServiceMock = new Mock<IContentService>();
             _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
+            _webPageDataContextRetrieverMock = new Mock<IWebPageDataContextRetriever>();
 
             _websiteChannelContextMock.SetupGet(x => x.WebsiteChannelID).Returns(1);
 
@@ -49,7 +51,8 @@ namespace BDO.GWT.Core.Tests.Services
                 _heroServiceMock.Object,
                 _sidebarServiceMock.Object,
                 _contentServiceMock.Object,
-                _websiteChannelContextMock.Object);
+                _websiteChannelContextMock.Object,
+                _webPageDataContextRetrieverMock.Object);
         }
 
         [Test]
@@ -133,14 +136,14 @@ namespace BDO.GWT.Core.Tests.Services
         public async Task GetDealPageDtoAsync_MapsLinkedItemNames_ToStringLists()
         {
             var deal = CreateDeal(showTitle: true, showSidebar: false);
-            deal.DealType = new[] { new DealCardCommon { Name = "M&A", CodeName = "ma", Language = "en" } };
+            deal.DealType = new[] { new DealCardDealType { Name = "M&A", CodeName = "ma", Language = "en" } };
             deal.Industry = new[]
             {
-                new DealCardCommon { Name = "Finance", CodeName = "fin", Language = "en" },
-                new DealCardCommon { Name = "Tech", CodeName = "tech", Language = "en" }
+                new DealCardIndustry { Name = "Finance", CodeName = "fin", Language = "en" },
+                new DealCardIndustry { Name = "Tech", CodeName = "tech", Language = "en" }
             };
-            deal.SubIndustry = new[] { new DealCardCommon { Name = "Banking", CodeName = "bank", Language = "en" } };
-            deal.Size = new[] { new DealCardCommon { Name = "Large", CodeName = "lg", Language = "en" } };
+            deal.SubIndustry = new[] { new DealCardSubIndustry { Name = "Banking", CodeName = "bank", Language = "en" } };
+            deal.Size = new[] { new DealCardRange0 { Name = "Large", CodeName = "lg", Language = "en" } };
 
             SetupDealPages(new[] { deal });
 

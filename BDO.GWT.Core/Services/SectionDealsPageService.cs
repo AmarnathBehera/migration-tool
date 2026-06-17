@@ -7,6 +7,7 @@ using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.Helper;
+using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
@@ -46,39 +47,50 @@ public class SectionDealsPageService : ISectionDealsPageService
            {
                LinkedItemsMaxLevel = 5
            },
-           query =>
-           {
-               query.Where(w =>
-                   w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
-           },
+           query => query
+               .Where(w => w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID))
+               .TopN(1),
            RetrievalCacheSettings.CacheDisabled,
            cancellationToken);
 
         var page = results?.FirstOrDefault();
+        if (page is null)
+        {
+            return new SectionDealsDto
+            {
+                Filters = new List<FilterItemDto<OptionDto>>(),
+                PageSize = 12,
+                ApiEndpoint = string.Empty
+            };
+        }
 
-        var sectionDealsUpdatedFilters = new HashSet<string>();
         var sectionDealsFilters = string.IsNullOrWhiteSpace(page.SectionDealsFilters)
             ? new HashSet<string>()
-               : page.SectionDealsFilters
+            : page.SectionDealsFilters
                 .Split(';', StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.Trim())
                 .ToHashSet();
 
+        HashSet<string> sectionDealsUpdatedFilters;
         if (LanguageTag.TryParse(_cultureContext.CurrentLanguageTag, out var currentLanguageTag)
             && currentLanguageTag.Language == LanguageTag.GB.Language)
         {
+            sectionDealsUpdatedFilters = new HashSet<string>(sectionDealsFilters.Count);
             foreach (var filter in sectionDealsFilters)
             {
                 switch (filter)
                 {
                     case FilterParameterName.DealType:
-                        sectionDealsUpdatedFilters.Add(FilterParameterName.GlobalDealType);
+                        sectionDealsUpdatedFilters.Add(FilterParameterName.DealType);
                         break;
                     case FilterParameterName.Industry:
-                        sectionDealsUpdatedFilters.Add(FilterParameterName.GlobalIndustry);
+                        sectionDealsUpdatedFilters.Add(FilterParameterName.Industry);
                         break;
                     case FilterParameterName.SubIndustry:
-                        sectionDealsUpdatedFilters.Add(FilterParameterName.GlobalSubIndustry);
+                        sectionDealsUpdatedFilters.Add(FilterParameterName.SubIndustry);
+                        break;
+                    case FilterParameterName.Year:
+                        sectionDealsUpdatedFilters.Add(FilterParameterName.Year);
                         break;
                     default:
                         sectionDealsUpdatedFilters.Add(filter);
@@ -93,10 +105,11 @@ public class SectionDealsPageService : ISectionDealsPageService
 
         var dto = new SectionDealsDto
         {
-            Filters = page.SectionDealsFilteringEnabled ? await CreateDealsFiltersAsync(sectionDealsUpdatedFilters, page.SystemFields.WebPageItemID , null, cancellationToken) : new List<FilterItemDto<OptionDto>>(),
+            Filters = page.SectionDealsFilteringEnabled
+                ? await CreateDealsFiltersAsync(sectionDealsUpdatedFilters, page.SystemFields.WebPageItemID, null, cancellationToken)
+                : new List<FilterItemDto<OptionDto>>(),
             PageSize = 12,
-            ApiEndpoint = $"Deals/{page.SystemFields.ContentItemGUID}" +
-            $"/Get",
+            ApiEndpoint = $"Deals/{page.SystemFields.ContentItemGUID}/Get"
         };
 
         return dto;
@@ -130,7 +143,7 @@ public class SectionDealsPageService : ISectionDealsPageService
     private async Task<FilterItemDto<OptionDto>[]> CreateDealsFiltersAsync(HashSet<string> filterParameterNames, int pageId, string? nodeAliasPath, CancellationToken cancellationToken)
     {
         currentDealPageId = pageId;
-        var filterItems = new List<FilterItemDto<OptionDto>>();
+        var filterItems = new List<FilterItemDto<OptionDto>>(filterParameterNames.Count);
 
         foreach (var filterParameterName in filterParameterNames)
         {
@@ -162,62 +175,40 @@ public class SectionDealsPageService : ISectionDealsPageService
 
     private async Task<OptionDto[]> BuildOptionsForPageFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
     {
-        var rootPath = "BDO_Deal_Cards";
-        var level = 1;
-
-        if (filterParameterData.AdminDisplayName.ToLower() == "subindustry")
-        {
-            level = 5;
-        }
+        const string rootPath = "/";
+        const int linkedItemsMaxLevel = 5;
 
         var entityType = filterParameterData.EntityType;
-        if (entityType.Name == "DealCardCommon")
+
+        if (entityType == typeof(DealCardDealType))
         {
-          var items = await _contentRetriever.GetPagesAsync<DealCardCommon>(new RetrievePagesParameters { LinkedItemsMaxLevel = level,
-              PathMatch = PathMatch.Section(rootPath)
-          },
-            query => query
-                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
-            RetrievalCacheSettings.CacheDisabled,
-            cancellationToken);
-          var options = items
-          .Select(x =>
-          {
-              var type = x.GetType();
-
-              var metadataTitle =
-                  type.GetProperty("MetadataTitle")?.GetValue(x) as string;
-
-              var metadataOgTitle =
-                  type.GetProperty("MetadataOGTitle")?.GetValue(x) as string;
-
-              var systemFields =
-                  type.GetProperty("SystemFields")?.GetValue(x);
-
-              var contentItemName =
-                  systemFields?.GetType()
-                      .GetProperty("ContentItemName")
-                      ?.GetValue(systemFields) as string;
-
-              var name = metadataTitle ?? metadataOgTitle ?? contentItemName;
-
-              return new OptionDto
-              {
-                  Value = name,
-                  Label = name
-              };
-          })
-          .Where(x => !string.IsNullOrWhiteSpace(x.Value))
-          .OrderBy(x => x.Label)
-          .ToArray();
-
-
-            return options;
+            return await GetSystemFieldNameOptionsAsync<DealCardDealType>(rootPath, linkedItemsMaxLevel, cancellationToken);
         }
-        else
+
+        if (entityType == typeof(DealCardRange))
         {
-            return Array.Empty<OptionDto>();
+            return await GetSystemFieldNameOptionsAsync<DealCardRange>(rootPath, linkedItemsMaxLevel, cancellationToken);
         }
+
+        if (entityType == typeof(DealCardIndustry))
+        {
+            return await GetSystemFieldNameOptionsAsync<DealCardIndustry>(rootPath, linkedItemsMaxLevel, cancellationToken);
+        }
+
+        if (entityType == typeof(DealCardSubIndustry))
+        {
+            return await GetSystemFieldNameOptionsAsync<DealCardSubIndustry>(rootPath, linkedItemsMaxLevel, cancellationToken);
+        }
+
+        // Generic fallback: any other content type wired through FilterParameterType.Page
+        // (e.g. DealCardCommon, BusinessLine, Person, etc.). Uses cached PropertyInfo to avoid
+        // repeated reflection lookups per item.
+        var fallbackItems = await _contentRetriever.GetItemsByTypesAsync(
+        new[] { entityType },
+        _websiteChannelContext.WebsiteChannelID,
+        cancellationToken);
+
+        return ProjectPageItemsToOptions(entityType, fallbackItems);
     }
 
     private async Task<OptionDto[]> BuildOptionsForTagPageFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
@@ -229,60 +220,144 @@ public class SectionDealsPageService : ISectionDealsPageService
             _websiteChannelContext.WebsiteChannelID,
             cancellationToken);
 
-        var options = items
-                    .Select(x =>
-                    {
-                        var type = x.GetType();
+        if (items is null || items.Count == 0)
+        {
+            return Array.Empty<OptionDto>();
+        }
 
-                        var tagNameValue = type.GetProperty("Name")?.GetValue(x);
+        var nameAccessor = ItemPropertyMapper.GetAccessors(entityType).GetName;
+        var buffer = new List<OptionDto>(items.Count);
+        for (int i = 0; i < items.Count; i++)
+        {
+            var item = items[i];
+            var name = nameAccessor?.Invoke(item);
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                continue;
+            }
 
-                        string name = tagNameValue is string s ? s : string.Empty;
+            buffer.Add(new OptionDto
+            {
+                Value = name,
+                Label = name
+            });
+        }
 
-
-                        return new OptionDto
-                        {
-                            Value = name,
-                            Label = name
-
-
-                        };
-                    })
-                          .Where(x => !string.IsNullOrWhiteSpace(x.Value))
-                          .OrderBy(x => x.Label)
-                          .ToArray();
-
-        return options;
+        buffer.Sort(static (a, b) => string.CompareOrdinal(a.Label, b.Label));
+        return buffer.ToArray();
     }
 
     private async Task<OptionDto[]> BuildOptionsForFieldFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
     {
         var entityType = filterParameterData.EntityType;
-        var options = Array.Empty<OptionDto>();
 
         var items = await _contentRetriever.GetItemsByTypesAsync(
             new[] { entityType },
             _websiteChannelContext.WebsiteChannelID,
             cancellationToken);
 
-        if (items is null || !items.Any())
+        if (items is null || items.Count == 0)
         {
-            return options;
+            return Array.Empty<OptionDto>();
         }
 
-        switch (filterParameterData.EntityType)
+        if (entityType == typeof(BlogPost))
         {
-            case { } type when type == typeof(BlogPost):
-                options = items
-                    .Select(x => x.GetType().GetProperty(nameof(BlogPost.MetadataKeywordsBlog))?.GetValue(x) as string)
-                    .Where(x => !string.IsNullOrWhiteSpace(x))
-                    .SelectMany(x => KeywordsHelper.ParseKeywords(x!))
-                    .Distinct()
-                    .Select(x => FilterDtoUtility.CreateOptionDto(x, x))
-                    .ToArray();
-                break;
+            return items
+                .OfType<BlogPost>()
+                .Select(x => x.MetadataKeywordsBlog)
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .SelectMany(x => KeywordsHelper.ParseKeywords(x!))
+                .Distinct()
+                .Select(x => FilterDtoUtility.CreateOptionDto(x, x))
+                .ToArray();
         }
 
-        return options;
+        return Array.Empty<OptionDto>();
     }
 
+    private async Task<OptionDto[]> GetSystemFieldNameOptionsAsync<TPage>(
+        string rootPath,
+        int linkedItemsMaxLevel,
+        CancellationToken cancellationToken)
+        where TPage : class, IWebPageFieldsSource
+    {
+        var items = await _contentRetriever.GetPagesAsync<TPage>(
+            new RetrievePagesParameters
+            {
+                LinkedItemsMaxLevel = linkedItemsMaxLevel,
+                PathMatch = PathMatch.Section(rootPath)
+            },
+            query => query.OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken);
+
+        return ProjectByContentItemName(items);
+    }
+
+    private static OptionDto[] ProjectByContentItemName<TPage>(IEnumerable<TPage> items)
+        where TPage : IWebPageFieldsSource
+    {
+        var accessors = ItemPropertyMapper.GetAccessors<TPage>();
+        var buffer = new List<OptionDto>();
+        foreach (var item in items)
+        {
+            if (item is null)
+            {
+                continue;
+            }
+
+            var label = accessors.GetName?.Invoke(item)
+                       ?? accessors.GetContentItemName?.Invoke(item);
+
+            var value = accessors.GetCodeName?.Invoke(item)
+                       ?? accessors.GetContentItemName?.Invoke(item);
+            if (string.IsNullOrWhiteSpace(label))
+            {
+                continue;
+            }
+
+            buffer.Add(new OptionDto
+            {
+                Value = value,
+                Label = label
+            });
+        }
+
+        buffer.Sort(static (a, b) => string.CompareOrdinal(a.Label, b.Label));
+        return buffer.ToArray();
+    }
+
+    private static OptionDto[] ProjectPageItemsToOptions(Type entityType, IReadOnlyList<object> items)
+    {
+        if (items.Count == 0)
+        {
+            return Array.Empty<OptionDto>();
+        }
+
+        var accessors = ItemPropertyMapper.GetAccessors(entityType);
+        var buffer = new List<OptionDto>(items.Count);
+
+        for (int i = 0; i < items.Count; i++)
+        {
+            var item = items[i];
+            var codeName = accessors.GetCodeName?.Invoke(item);
+            if (string.IsNullOrWhiteSpace(codeName))
+            {
+                continue;
+            }
+
+            var label = accessors.GetName?.Invoke(item)
+                       ?? accessors.GetContentItemName?.Invoke(item);
+
+            buffer.Add(new OptionDto
+            {
+                Value = codeName,
+                Label = label
+            });
+        }
+
+        buffer.Sort(static (a, b) => string.CompareOrdinal(a.Label, b.Label));
+        return buffer.ToArray();
+    }
 }
