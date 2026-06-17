@@ -29,12 +29,35 @@
     @(Model.BodyBottomHtml is not null ? Html.Raw(Model.BodyBottomHtml) : null)
 }
 
+
 @{
     Layout = "_MicrositeLayout";
+
+    var widgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.ExternalNavigation,
+        ComponentIdentifiers.Widgets.Imagewithtext,
+        ComponentIdentifiers.Widgets.QuoteCard,
+        ComponentIdentifiers.Widgets.TiledLink,
+        ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.Globallocation,
+        ComponentIdentifiers.Widgets.AccordionWidget,
+        ComponentIdentifiers.Widgets.FaqWidget,
+        ComponentIdentifiers.Widgets.FlexibleBanner,
+        ComponentIdentifiers.Widgets.FlexibleContent,
+
+    };
 }
 
 @section Styles {
     @PageBuilderService.GetPageBuilderStyles(Html)
 }
-
+<div>
+    @await Html.Kentico().EditableAreaAsync(
+        "mainContent",
+        new EditableAreaOptions
+        {
+            AllowedWidgets = widgetsList
+        })
+</div>
 @PageBuilderService.GetPageBuilderScripts(Html)

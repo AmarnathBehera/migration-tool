@@ -52,8 +52,14 @@
     @PageBuilderService.GetPageBuilderStyles(Html)
 }
 
-@* @await Html.PartialAsync("_Hero") *@
 
-@* @await Html.PartialAsync("_LocalNavigation") *@
+<div>
+    @await Html.Kentico().EditableAreaAsync(
+        "mainContent",
+        new EditableAreaOptions
+        {
+            AllowedWidgets = widgetsList
+        })
+</div>
 
 @PageBuilderService.GetPageBuilderScripts(Html)

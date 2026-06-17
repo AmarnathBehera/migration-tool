@@ -24,7 +24,6 @@ public class MicrositeHeaderService : IMicrositeHeaderService
     private readonly IPageContext _pageContext;
     private readonly IHeaderService _headerService;
 
-    private const string BdoLogoImageUrl = "https://cdn.bdo.global/images/bdo_logo/1.0.0/bdo_logo_color.png";
 
     public MicrositeHeaderService(
         IContentService contentService,
@@ -78,7 +77,7 @@ public class MicrositeHeaderService : IMicrositeHeaderService
             Contact = null,
             SiteName = siteName,
             LogoURL = logoPageLink,
-            LogoImageURL = BdoLogoImageUrl,
+            LogoImageURL = _contentService.GetCurrentSiteLogoImageUrlAsync(),
             SearchPageURL = string.Empty,
             MegaMenuItems = megaMenu,
         };
@@ -228,7 +227,7 @@ public class MicrositeHeaderService : IMicrositeHeaderService
 
         while (parentId > 0)
         {
-            if (masterPages.TryGetValue(parentId, out var masterPage))
+            if (masterPages.TryGetValue(parentId, out var masterPage) && masterPage != null)
                 return masterPage;
 
             var ancestor = await _pageContext.GetAnyPageByWebPageItemId(parentId, cancellationToken);
