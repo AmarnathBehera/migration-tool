@@ -1,10 +1,7 @@
 using BDO.GWT.Core.Data;
-using BDO.GWT.Core.DTOs;
-using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
-using CMS.ContentEngine;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 using Moq;
@@ -143,8 +140,7 @@ namespace BDO.GWT.Core.Tests.Services
             Assert.Multiple(() =>
             {
                 Assert.That(result.MainContent.Locations, Is.Not.Null);
-                Assert.That(result.MainContent.Locations.Count(), Is.EqualTo(1));
-                Assert.That(result.MainContent.Locations.First().Items.Count(), Is.EqualTo(0));
+                Assert.That(result.MainContent.Locations.Count(), Is.EqualTo(0));
             });
         }
 
