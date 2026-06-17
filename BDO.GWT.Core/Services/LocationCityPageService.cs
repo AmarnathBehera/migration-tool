@@ -85,7 +85,7 @@ public class LocationCityPageService : ILocationCityPageService
                 AddressLocality = page.MetadataTitle,
                 PostalCode = office?.LocationZip,
                 AddressCountry = office?.LocationCountry, 
-                AddressRegion = page?.RegionNameLocationCity?.FirstOrDefault()?.RegionName1,
+                AddressRegion = page.RegionNameLocationCity?.FirstOrDefault()?.RegionName1,
             },
         };
     }
