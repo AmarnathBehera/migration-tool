@@ -8,7 +8,6 @@ using BDO.GWT.Core.Services.Header;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
-using Microsoft.AspNetCore.Http;
 using Moq;
 
 namespace BDO.GWT.Core.Tests.Services.Header
@@ -16,11 +15,8 @@ namespace BDO.GWT.Core.Tests.Services.Header
     public class MicrositeHeaderServiceTests
     {
         private Mock<IContentService> _contentServiceMock = null!;
-        private Mock<IHomePageService> _homePageServiceMock = null!;
         private Mock<IWebsiteCulturesService> _websiteCulturesServiceMock = null!;
         private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
-        private Mock<ILocalizedUrlsBuilder> _localizedUrlsBuilderMock = null!;
-        private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
         private Mock<IWebPageDataContextRetriever> _dataContextRetrieverMock = null!;
         private Mock<IWebPageUrlResolver> _urlResolverMock = null!;
         private Mock<IPageContext> _pageContextMock = null!;
@@ -31,11 +27,8 @@ namespace BDO.GWT.Core.Tests.Services.Header
         public void Setup()
         {
             _contentServiceMock = new Mock<IContentService>();
-            _homePageServiceMock = new Mock<IHomePageService>();
             _websiteCulturesServiceMock = new Mock<IWebsiteCulturesService>();
             _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
-            _localizedUrlsBuilderMock = new Mock<ILocalizedUrlsBuilder>();
-            _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
             _dataContextRetrieverMock = new Mock<IWebPageDataContextRetriever>();
             _urlResolverMock = new Mock<IWebPageUrlResolver>();
             _pageContextMock = new Mock<IPageContext>();
@@ -43,11 +36,8 @@ namespace BDO.GWT.Core.Tests.Services.Header
 
             _service = new MicrositeHeaderService(
                 _contentServiceMock.Object,
-                _homePageServiceMock.Object,
                 _websiteCulturesServiceMock.Object,
                 _websiteChannelContextMock.Object,
-                _localizedUrlsBuilderMock.Object,
-                _httpContextAccessorMock.Object,
                 _dataContextRetrieverMock.Object,
                 _urlResolverMock.Object,
                 _pageContextMock.Object,
@@ -65,8 +55,8 @@ namespace BDO.GWT.Core.Tests.Services.Header
                 .Setup(r => r.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
                 .Returns(false);
 
-            _homePageServiceMock
-                .Setup(x => x.GetHomePageUrl(It.IsAny<CancellationToken>()))
+            _urlResolverMock
+                .Setup(x => x.GetHomePageUrlAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync("/home");
 
             _websiteCulturesServiceMock
@@ -77,13 +67,9 @@ namespace BDO.GWT.Core.Tests.Services.Header
                 .Setup(x => x.GetCurrentSiteLogoImageUrlAsync())
                 .Returns("https://cdn/logo.png");
 
-            _httpContextAccessorMock
-                .SetupGet(x => x.HttpContext)
-                .Returns(new DefaultHttpContext());
-
-            _localizedUrlsBuilderMock
-                .Setup(x => x.BuildAsync(It.IsAny<HttpContext>()))
-                .ReturnsAsync(new List<LocalizedUrl>());
+            _headerServiceMock
+                .Setup(x => x.GetCultureDtosAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Enumerable.Empty<CultureDto>());
 
             // Act
             var result = await _service.GetAsync(_contentServiceMock.Object, CancellationToken.None);
@@ -104,14 +90,14 @@ namespace BDO.GWT.Core.Tests.Services.Header
         }
 
         [Test]
-        public async Task GetAsync_WhenHttpContextIsNull_ReturnsEmptyCultures()
+        public async Task GetAsync_WhenHeaderServiceReturnsNoCultures_ReturnsEmptyCultures()
         {
             _dataContextRetrieverMock
                 .Setup(r => r.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
                 .Returns(false);
 
-            _homePageServiceMock
-                .Setup(x => x.GetHomePageUrl(It.IsAny<CancellationToken>()))
+            _urlResolverMock
+                .Setup(x => x.GetHomePageUrlAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync("/home");
 
             _websiteCulturesServiceMock
@@ -122,27 +108,26 @@ namespace BDO.GWT.Core.Tests.Services.Header
                 .Setup(x => x.GetCurrentSiteLogoImageUrlAsync())
                 .Returns("https://cdn/logo.png");
 
-            _httpContextAccessorMock
-                .SetupGet(x => x.HttpContext)
-                .Returns((HttpContext?)null);
+            _headerServiceMock
+                .Setup(x => x.GetCultureDtosAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Enumerable.Empty<CultureDto>());
 
             var result = await _service.GetAsync(_contentServiceMock.Object, CancellationToken.None);
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result!.Cultures, Is.Not.Null.And.Empty);
-            _localizedUrlsBuilderMock.Verify(b => b.BuildAsync(It.IsAny<HttpContext>()), Times.Never);
         }
 
         [Test]
-        public async Task GetAsync_WhenHomePageUrlIsNull_FallsBackToEmptyLogoUrl()
+        public async Task GetAsync_WhenHomePageUrlIsEmpty_FallsBackToEmptyLogoUrl()
         {
             _dataContextRetrieverMock
                 .Setup(r => r.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
                 .Returns(false);
 
-            _homePageServiceMock
-                .Setup(x => x.GetHomePageUrl(It.IsAny<CancellationToken>()))
-                .ReturnsAsync((string?)null);
+            _urlResolverMock
+                .Setup(x => x.GetHomePageUrlAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(string.Empty);
 
             _websiteCulturesServiceMock
                 .Setup(x => x.GetDisplayName(It.IsAny<IWebsiteChannelContext>()))
@@ -152,13 +137,9 @@ namespace BDO.GWT.Core.Tests.Services.Header
                 .Setup(x => x.GetCurrentSiteLogoImageUrlAsync())
                 .Returns(string.Empty);
 
-            _httpContextAccessorMock
-                .SetupGet(x => x.HttpContext)
-                .Returns(new DefaultHttpContext());
-
-            _localizedUrlsBuilderMock
-                .Setup(x => x.BuildAsync(It.IsAny<HttpContext>()))
-                .ReturnsAsync(new List<LocalizedUrl>());
+            _headerServiceMock
+                .Setup(x => x.GetCultureDtosAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Enumerable.Empty<CultureDto>());
 
             var result = await _service.GetAsync(_contentServiceMock.Object, CancellationToken.None);
 
@@ -167,14 +148,14 @@ namespace BDO.GWT.Core.Tests.Services.Header
         }
 
         [Test]
-        public async Task GetAsync_MapsCulturesFromLocalizedUrls()
+        public async Task GetAsync_MapsCulturesFromHeaderService()
         {
             _dataContextRetrieverMock
                 .Setup(r => r.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
                 .Returns(false);
 
-            _homePageServiceMock
-                .Setup(x => x.GetHomePageUrl(It.IsAny<CancellationToken>()))
+            _urlResolverMock
+                .Setup(x => x.GetHomePageUrlAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync("/home");
 
             _websiteCulturesServiceMock
@@ -185,34 +166,12 @@ namespace BDO.GWT.Core.Tests.Services.Header
                 .Setup(x => x.GetCurrentSiteLogoImageUrlAsync())
                 .Returns("https://cdn/logo.png");
 
-            _httpContextAccessorMock
-                .SetupGet(x => x.HttpContext)
-                .Returns(new DefaultHttpContext());
-
-            _localizedUrlsBuilderMock
-                .Setup(x => x.BuildAsync(It.IsAny<HttpContext>()))
-                .ReturnsAsync(new List<LocalizedUrl>
+            _headerServiceMock
+                .Setup(x => x.GetCultureDtosAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<CultureDto>
                 {
-                    new()
-                    {
-                        LanguageName = "en",
-                        CultureFormat = "en-US",
-                        DisplayName = "English",
-                        ShortCode = "EN",
-                        RelativeUrl = "/en",
-                        AbsoluteUrl = "https://localhost/en",
-                        IsDefault = true,
-                        IsActive = true,
-                    },
-                    new()
-                    {
-                        LanguageName = "lt",
-                        CultureFormat = "lt-LT",
-                        DisplayName = "Lithuanian",
-                        ShortCode = "LT",
-                        RelativeUrl = "/lt",
-                        AbsoluteUrl = "https://localhost/lt",
-                    },
+                    new() { Name = "English", ShortName = "EN", Url = "/en" },
+                    new() { Name = "Lithuanian", ShortName = "LT", Url = "/lt" },
                 });
 
             var result = await _service.GetAsync(_contentServiceMock.Object, CancellationToken.None);
@@ -231,14 +190,14 @@ namespace BDO.GWT.Core.Tests.Services.Header
         }
 
         [Test]
-        public void GetAsync_PropagatesException_FromLocalizedUrlsBuilder()
+        public void GetAsync_PropagatesException_FromHeaderService()
         {
             _dataContextRetrieverMock
                 .Setup(r => r.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
                 .Returns(false);
 
-            _homePageServiceMock
-                .Setup(x => x.GetHomePageUrl(It.IsAny<CancellationToken>()))
+            _urlResolverMock
+                .Setup(x => x.GetHomePageUrlAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync("/home");
 
             _websiteCulturesServiceMock
@@ -249,12 +208,8 @@ namespace BDO.GWT.Core.Tests.Services.Header
                 .Setup(x => x.GetCurrentSiteLogoImageUrlAsync())
                 .Returns(string.Empty);
 
-            _httpContextAccessorMock
-                .SetupGet(x => x.HttpContext)
-                .Returns(new DefaultHttpContext());
-
-            _localizedUrlsBuilderMock
-                .Setup(x => x.BuildAsync(It.IsAny<HttpContext>()))
+            _headerServiceMock
+                .Setup(x => x.GetCultureDtosAsync(It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new InvalidOperationException("boom"));
 
             Assert.ThrowsAsync<InvalidOperationException>(async () =>
@@ -318,8 +273,8 @@ namespace BDO.GWT.Core.Tests.Services.Header
         [Test]
         public async Task GetLogoPageLinkAsync_WhenMasterPageIsNull_ReturnsHomePageUrl()
         {
-            _homePageServiceMock
-                .Setup(x => x.GetHomePageUrl(It.IsAny<CancellationToken>()))
+            _urlResolverMock
+                .Setup(x => x.GetHomePageUrlAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync("/home");
 
             var result = await InvokePrivateAsync<string>(
@@ -332,8 +287,8 @@ namespace BDO.GWT.Core.Tests.Services.Header
         [Test]
         public async Task GetLogoPageLinkAsync_WhenMasterPageHasNonMicrositeLogoLinkTarget_ReturnsHomePageUrl()
         {
-            _homePageServiceMock
-                .Setup(x => x.GetHomePageUrl(It.IsAny<CancellationToken>()))
+            _urlResolverMock
+                .Setup(x => x.GetHomePageUrlAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync("/home");
 
             var masterPage = new MicrositeMasterPage
@@ -355,8 +310,8 @@ namespace BDO.GWT.Core.Tests.Services.Header
         [Test]
         public async Task GetLogoPageLinkAsync_WhenMicrositeLogoTarget_ButNoDataContext_ReturnsHomePageUrl()
         {
-            _homePageServiceMock
-                .Setup(x => x.GetHomePageUrl(It.IsAny<CancellationToken>()))
+            _urlResolverMock
+                .Setup(x => x.GetHomePageUrlAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync("/home");
 
             _dataContextRetrieverMock
@@ -377,89 +332,6 @@ namespace BDO.GWT.Core.Tests.Services.Header
             _urlResolverMock.Verify(
                 u => u.ResolvePageUrlAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
                 Times.Never);
-        }
-
-        // ── GetHomePageUrlAsync (private) ────────────────────────────────────
-
-        [Test]
-        public async Task GetHomePageUrlAsync_WhenHomePageUrlIsNull_ReturnsEmpty()
-        {
-            _homePageServiceMock
-                .Setup(x => x.GetHomePageUrl(It.IsAny<CancellationToken>()))
-                .ReturnsAsync((string?)null);
-
-            var result = await InvokePrivateAsync<string>(
-                "GetHomePageUrlAsync",
-                new object[] { CancellationToken.None });
-
-            Assert.That(result, Is.EqualTo(string.Empty));
-        }
-
-        [Test]
-        public async Task GetHomePageUrlAsync_WhenHomePageUrlIsSet_ReturnsValue()
-        {
-            _homePageServiceMock
-                .Setup(x => x.GetHomePageUrl(It.IsAny<CancellationToken>()))
-                .ReturnsAsync("/home/page");
-
-            var result = await InvokePrivateAsync<string>(
-                "GetHomePageUrlAsync",
-                new object[] { CancellationToken.None });
-
-            Assert.That(result, Is.EqualTo("/home/page"));
-        }
-
-        // ── GetCultureDtosAsync (private) ────────────────────────────────────
-
-        [Test]
-        public async Task GetCultureDtosAsync_WhenHttpContextIsNull_ReturnsEmpty()
-        {
-            _httpContextAccessorMock
-                .SetupGet(x => x.HttpContext)
-                .Returns((HttpContext?)null);
-
-            var result = await InvokePrivateAsync<IEnumerable<CultureDto>>(
-                "GetCultureDtosAsync",
-                Array.Empty<object>());
-
-            Assert.That(result, Is.Not.Null.And.Empty);
-            _localizedUrlsBuilderMock.Verify(b => b.BuildAsync(It.IsAny<HttpContext>()), Times.Never);
-        }
-
-        [Test]
-        public async Task GetCultureDtosAsync_MapsLocalizedUrlsToCultureDtos()
-        {
-            _httpContextAccessorMock
-                .SetupGet(x => x.HttpContext)
-                .Returns(new DefaultHttpContext());
-
-            _localizedUrlsBuilderMock
-                .Setup(x => x.BuildAsync(It.IsAny<HttpContext>()))
-                .ReturnsAsync(new List<LocalizedUrl>
-                {
-                    new()
-                    {
-                        LanguageName = "en",
-                        CultureFormat = "en-US",
-                        DisplayName = "English",
-                        ShortCode = "EN",
-                        RelativeUrl = "/en",
-                        AbsoluteUrl = "https://localhost/en",
-                    },
-                });
-
-            var result = await InvokePrivateAsync<IEnumerable<CultureDto>>(
-                "GetCultureDtosAsync",
-                Array.Empty<object>());
-
-            var list = result.ToList();
-            Assert.That(list, Has.Count.EqualTo(1));
-            Assert.Multiple(() =>
-            {
-                Assert.That(list[0].Name, Is.EqualTo("English"));
-                Assert.That(list[0].ShortName, Is.EqualTo("EN"));
-                Assert.That(list[0].Url, Is.EqualTo("/en"));
-            });
         }
 
         // ── ResolveMicrositePageTitle (private static) ───────────────────────

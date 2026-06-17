@@ -9,5 +9,6 @@ namespace BDO.GWT.Core
         string GetRelativePath(IWebPageFieldsSource page);
         string GetAbsoluteUrl(IWebPageFieldsSource page);
         Task<string> ResolvePageUrlAsync(int webPageItemId, string language, CancellationToken cancellationToken);
+        Task<string> GetHomePageUrlAsync(CancellationToken cancellationToken);
     }
 }

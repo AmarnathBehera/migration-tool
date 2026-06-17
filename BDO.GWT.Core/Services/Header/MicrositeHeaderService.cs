@@ -2,7 +2,6 @@
 using BDO.GWT.Core.DTOs.Header;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
-using Microsoft.AspNetCore.Http;
 
 namespace BDO.GWT.Core.Services.Header;
 
@@ -14,11 +13,8 @@ public interface IMicrositeHeaderService
 public class MicrositeHeaderService : IMicrositeHeaderService
 {
     private readonly IContentService _contentService;
-    private readonly IHomePageService _homePageService;
     private readonly IWebsiteCulturesService _websiteCulturesService;
     private readonly IWebsiteChannelContext _websiteChannel;
-    private readonly ILocalizedUrlsBuilder _localizedUrlsBuilder;
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IWebPageDataContextRetriever _dataContextRetriever;
     private readonly IWebPageUrlResolver _urlResolver;
     private readonly IPageContext _pageContext;
@@ -27,22 +23,16 @@ public class MicrositeHeaderService : IMicrositeHeaderService
 
     public MicrositeHeaderService(
         IContentService contentService,
-        IHomePageService homePageService,
         IWebsiteCulturesService websiteCulturesService,
         IWebsiteChannelContext websiteChannel,
-        ILocalizedUrlsBuilder localizedUrlsBuilder,
-        IHttpContextAccessor httpContextAccessor,
         IWebPageDataContextRetriever dataContextRetriever,
         IWebPageUrlResolver urlResolver,
         IPageContext pageContext,
         IHeaderService headerService)
     {
         _contentService = contentService;
-        _homePageService = homePageService;
         _websiteCulturesService = websiteCulturesService;
         _websiteChannel = websiteChannel;
-        _localizedUrlsBuilder = localizedUrlsBuilder;
-        _httpContextAccessor = httpContextAccessor;
         _dataContextRetriever = dataContextRetriever;
         _urlResolver = urlResolver;
         _pageContext = pageContext;
@@ -60,7 +50,7 @@ public class MicrositeHeaderService : IMicrositeHeaderService
             return await _headerService.GetAsync(contentService, cancellationToken);
         }
 
-        var cultures = await GetCultureDtosAsync();
+        var cultures = await _headerService.GetCultureDtosAsync(cancellationToken);
 
         var siteName = masterPage is not null && !string.IsNullOrEmpty(masterPage.LogoText)
             ? masterPage.LogoText
@@ -88,24 +78,20 @@ public class MicrositeHeaderService : IMicrositeHeaderService
         CancellationToken cancellationToken)
     {
         if (masterPage is null || masterPage.LogoLinkTarget != "microsite")
-            return await GetHomePageUrlAsync(cancellationToken);
+            return await _urlResolver.GetHomePageUrlAsync(cancellationToken);
 
         if (!_dataContextRetriever.TryRetrieve(out var ctx))
-            return await GetHomePageUrlAsync(cancellationToken);
+            return await _urlResolver.GetHomePageUrlAsync(cancellationToken);
 
         var url = await _urlResolver.ResolvePageUrlAsync(
             masterPage.SystemFields.WebPageItemID,
             ctx.WebPage.LanguageName,
             cancellationToken);
 
-        return url != "#" ? url : await GetHomePageUrlAsync(cancellationToken);
+        return url != "#" ? url : await _urlResolver.GetHomePageUrlAsync(cancellationToken);
     }
 
-    private async Task<string> GetHomePageUrlAsync(CancellationToken cancellationToken)
-    {
-        var homePage = await _homePageService.GetHomePageUrl(cancellationToken);
-        return homePage ?? string.Empty;
-    }
+  
 
     // ── Mega menu ─────────────────────────────────────────────────────────────
  
@@ -187,23 +173,7 @@ public class MicrositeHeaderService : IMicrositeHeaderService
         return page.SystemFields.WebPageItemName;
     }
 
-    // ── Cultures 
-
-    private async Task<IEnumerable<CultureDto>> GetCultureDtosAsync()
-    {
-        var httpContext = _httpContextAccessor.HttpContext;
-        if (httpContext is null)
-            return Enumerable.Empty<CultureDto>();
-
-        var localizedUrls = await _localizedUrlsBuilder.BuildAsync(httpContext);
-
-        return localizedUrls.Select(u => new CultureDto
-        {
-            Name = u.DisplayName,
-            ShortName = u.ShortCode,
-            Url = u.RelativeUrl,
-        }).ToList();
-    }
+ 
 
     // ── Master page 
     // Walks up the ancestor tree from the current page until it finds a MicrositeMasterPage.

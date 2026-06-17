@@ -8,13 +8,15 @@ namespace BDO.GWT.Core.Tests.Services;
 public class WebPageUrlResolverTests
 {
     private Mock<IWebPageUrlRetriever> _pageUrlRetrieverMock = null!;
+    private Mock<IHomePageService> _homePageServiceMock = null!;
     private WebPageUrlResolver _resolver = null!;
 
     [SetUp]
     public void Setup()
     {
         _pageUrlRetrieverMock = new Mock<IWebPageUrlRetriever>();
-        _resolver = new WebPageUrlResolver(_pageUrlRetrieverMock.Object);
+        _homePageServiceMock = new Mock<IHomePageService>();
+        _resolver = new WebPageUrlResolver(_pageUrlRetrieverMock.Object, _homePageServiceMock.Object);
     }
 
     // -----------------------------------------------------------------
@@ -161,5 +163,49 @@ public class WebPageUrlResolverTests
     public void GetAbsoluteUrl_WhenPageIsNull_ThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() => _resolver.GetAbsoluteUrl(null!));
+    }
+
+    // -----------------------------------------------------------------
+    // GetHomePageUrlAsync
+    // -----------------------------------------------------------------
+
+    [Test]
+    public async Task GetHomePageUrlAsync_WhenServiceReturnsValue_ReturnsValue()
+    {
+        _homePageServiceMock
+            .Setup(s => s.GetHomePageUrl(It.IsAny<CancellationToken>()))
+            .ReturnsAsync("/home");
+
+        var result = await _resolver.GetHomePageUrlAsync(CancellationToken.None);
+
+        Assert.That(result, Is.EqualTo("/home"));
+    }
+
+    [Test]
+    public async Task GetHomePageUrlAsync_WhenServiceReturnsNull_ReturnsEmptyString()
+    {
+        _homePageServiceMock
+            .Setup(s => s.GetHomePageUrl(It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        var result = await _resolver.GetHomePageUrlAsync(CancellationToken.None);
+
+        Assert.That(result, Is.EqualTo(string.Empty));
+    }
+
+    [Test]
+    public async Task GetHomePageUrlAsync_PassesCancellationToken_ToHomePageService()
+    {
+        using var cts = new CancellationTokenSource();
+        var token = cts.Token;
+
+        _homePageServiceMock
+            .Setup(s => s.GetHomePageUrl(token))
+            .ReturnsAsync("/home")
+            .Verifiable();
+
+        await _resolver.GetHomePageUrlAsync(token);
+
+        _homePageServiceMock.Verify(s => s.GetHomePageUrl(token), Times.Once);
     }
 }

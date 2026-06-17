@@ -8,10 +8,12 @@ namespace BDO.GWT.Core
     public class WebPageUrlResolver : IWebPageUrlResolver
     {
         private readonly IWebPageUrlRetriever _pageUrlRetriever;
+        private readonly IHomePageService _homePageService;
 
-        public WebPageUrlResolver(IWebPageUrlRetriever pageUrlRetriever)
+        public WebPageUrlResolver(IWebPageUrlRetriever pageUrlRetriever, IHomePageService homePageService)
         {
             _pageUrlRetriever = pageUrlRetriever;
+            _homePageService = homePageService;
         }
 
         public string GetRelativePath(IWebPageFieldsSource page) =>
@@ -24,6 +26,13 @@ namespace BDO.GWT.Core
         {
             var urlResult = await _pageUrlRetriever.Retrieve(webPageItemId, language, cancellationToken: cancellationToken);
             return urlResult?.RelativePath?.Replace("~", "") ?? "#";
+        }
+
+
+        public async Task<string> GetHomePageUrlAsync(CancellationToken cancellationToken)
+        {
+            var homePage = await _homePageService.GetHomePageUrl(cancellationToken);
+            return homePage ?? string.Empty;
         }
     }
 }
