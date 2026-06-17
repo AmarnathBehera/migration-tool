@@ -1,0 +1,6 @@
+﻿@inject IReactHelper ReactHelper
+@using BDO.GWT.Web.Core.LiveSite.Constants
+@using BDO.GWT.Web.Core.LiveSite.Helpers
+@model BDO.GWT.Web.Core.LiveSite.DTOs.SocialMediaButtonsDto
+
+@ReactHelper.RenderComponent(Html, ReactComponent.SocialMedia, Model)
