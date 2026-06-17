@@ -20,16 +20,13 @@ namespace BDO.GWT.Core.Services
         private const string RecaptchaVersionV2 = "RecaptchaV2";
         private const string RecaptchaVersionV3 = "RecaptchaV3";
 
-        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IWebsiteChannelContext _websiteChannelContext;
         private readonly IInfoProvider<WebsiteCaptchaSettingsInfo> _captchaSettingsProvider;
 
         public RecaptchaValidationService(
-            IHttpClientFactory httpClientFactory,
             IWebsiteChannelContext websiteChannelContext,
             IInfoProvider<WebsiteCaptchaSettingsInfo> captchaSettingsProvider)
         {
-            _httpClientFactory = httpClientFactory;
             _websiteChannelContext = websiteChannelContext;
             _captchaSettingsProvider = captchaSettingsProvider;
         }

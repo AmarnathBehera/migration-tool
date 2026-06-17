@@ -8,7 +8,6 @@ namespace BDO.GWT.Core.Tests.Services;
 
 public class RecaptchaValidationServiceTests
 {
-    private Mock<IHttpClientFactory> _httpClientFactoryMock = null!;
     private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
     private Mock<IInfoProvider<WebsiteCaptchaSettingsInfo>> _captchaSettingsProviderMock = null!;
     private TestableRecaptchaValidationService _service = null!;
@@ -20,7 +19,6 @@ public class RecaptchaValidationServiceTests
     [SetUp]
     public void Setup()
     {
-        _httpClientFactoryMock = new Mock<IHttpClientFactory>();
         _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
         _captchaSettingsProviderMock = new Mock<IInfoProvider<WebsiteCaptchaSettingsInfo>>();
 
@@ -228,7 +226,6 @@ public class RecaptchaValidationServiceTests
     private void BuildService(string? privateKey)
     {
         _service = new TestableRecaptchaValidationService(
-            _httpClientFactoryMock.Object,
             _websiteChannelContextMock.Object,
             _captchaSettingsProviderMock.Object,
             privateKey);
@@ -244,11 +241,10 @@ public class RecaptchaValidationServiceTests
         public bool LastIsV3Arg { get; private set; }
 
         public TestableRecaptchaValidationService(
-            IHttpClientFactory httpClientFactory,
             IWebsiteChannelContext websiteChannelContext,
             IInfoProvider<WebsiteCaptchaSettingsInfo> captchaSettingsProvider,
             string? fakePrivateKey)
-            : base(httpClientFactory, websiteChannelContext, captchaSettingsProvider)
+            : base( websiteChannelContext, captchaSettingsProvider)
         {
             _fakePrivateKey = fakePrivateKey;
         }
