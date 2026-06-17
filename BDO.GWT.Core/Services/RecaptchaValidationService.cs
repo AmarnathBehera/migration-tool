@@ -1,5 +1,6 @@
 ﻿using CMS.Core;
 using CMS.DataEngine;
+using CMS.FormEngine;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using System.Text.Json;
@@ -19,7 +20,6 @@ namespace BDO.GWT.Core.Services
     public class RecaptchaValidationService : IRecaptchaValidationService
     {
         private const string HttpClientName = "Recaptcha";
-        private const string VerifyUrl = "https://www.google.com/recaptcha/api/siteverify";
 
         // These must match whatever values Kentico stores in WebsiteCaptchaSettingsReCaptchaVersion
         private const string RecaptchaVersionV2 = "RecaptchaV2";
@@ -39,32 +39,20 @@ namespace BDO.GWT.Core.Services
             _captchaSettingsProvider = captchaSettingsProvider;
         }
 
-        public async Task<bool> ValidateAsync(
-            bool isV3,
-            decimal threshold,
-            string recaptchaResponse,
-            CancellationToken cancellationToken)
+        public async Task<bool> ValidateAsync( bool isV3, decimal threshold, string recaptchaResponse, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(recaptchaResponse))
             {
                 return false;
             }
-
-            var privateKey = GetRecaptchaPrivateKey(isV3);
-
-            if (string.IsNullOrWhiteSpace(privateKey))
+            var response = await new RecaptchaValidator
             {
-                return false;
-            }
+                PrivateKey = GetRecaptchaPrivateKey(isV3),
+                Response = recaptchaResponse,
+            }.Validate();
 
-            var result = await CallGoogleVerifyApiAsync(privateKey, recaptchaResponse, cancellationToken);
+            return !isV3 || response.Score >= (double)threshold;
 
-            if (result is null || !result.Success)
-            {
-                return false;
-            }
-
-            return !isV3 || result.Score >= (double)threshold;
         }
 
         private string? GetRecaptchaPrivateKey(bool isV3)
@@ -76,7 +64,7 @@ namespace BDO.GWT.Core.Services
             var captchaSettings = _captchaSettingsProvider
                 .Get()
                 .WhereEquals(
-                    nameof(_websiteChannelContext.WebsiteChannelID),
+                    nameof(WebsiteCaptchaSettingsInfo.WebsiteCaptchaSettingsWebsiteChannelID),
                     channelId)
                 .WhereEquals(
                     nameof(WebsiteCaptchaSettingsInfo.WebsiteCaptchaSettingsReCaptchaVersion),
@@ -92,44 +80,6 @@ namespace BDO.GWT.Core.Services
             return captchaSettings.WebsiteCaptchaSettingsReCaptchaSecretKey;
         }
 
-        private async Task<RecaptchaVerifyResponse?> CallGoogleVerifyApiAsync(
-            string secret,
-            string token,
-            CancellationToken cancellationToken)
-        {
-            var client = _httpClientFactory.CreateClient(HttpClientName);
-
-            var formContent = new FormUrlEncodedContent(
-            [
-                new KeyValuePair<string, string>("secret", secret),
-                new KeyValuePair<string, string>("response", token)
-            ]);
-
-            using var httpResponse = await client.PostAsync(VerifyUrl, formContent, cancellationToken);
-
-            if (!httpResponse.IsSuccessStatusCode)
-            {
-                return null;
-            }
-
-            var json = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
-
-            return JsonSerializer.Deserialize<RecaptchaVerifyResponse>(json);
-        }
-
-        private sealed class RecaptchaVerifyResponse
-        {
-            [JsonPropertyName("success")]
-            public bool Success { get; set; }
-
-            [JsonPropertyName("score")]
-            public double Score { get; set; }
-
-            [JsonPropertyName("action")]
-            public string? Action { get; set; }
-
-            [JsonPropertyName("error-codes")]
-            public List<string>? ErrorCodes { get; set; }
-        }
+      
     }
 }
