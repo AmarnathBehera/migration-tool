@@ -310,8 +310,6 @@ public class SectionDealsPageService : ISectionDealsPageService
             var label = accessors.GetName?.Invoke(item)
                        ?? accessors.GetContentItemName?.Invoke(item);
 
-            var value = accessors.GetCodeName?.Invoke(item)
-                       ?? accessors.GetContentItemName?.Invoke(item);
             if (string.IsNullOrWhiteSpace(label))
             {
                 continue;
@@ -319,7 +317,7 @@ public class SectionDealsPageService : ISectionDealsPageService
 
             buffer.Add(new OptionDto
             {
-                Value = value,
+                Value = label,
                 Label = label
             });
         }
