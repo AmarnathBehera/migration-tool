@@ -143,7 +143,7 @@ namespace BDO.GWT.Core.Tests.Services
                 new DealCardIndustry { Name = "Tech", CodeName = "tech", Language = "en" }
             };
             deal.SubIndustry = new[] { new DealCardSubIndustry { Name = "Banking", CodeName = "bank", Language = "en" } };
-            deal.Size = new[] { new DealCardRange0 { Name = "Large", CodeName = "lg", Language = "en" } };
+            deal.Size = new[] { new DealCardRange { Name = "Large", CodeName = "lg" } };
 
             SetupDealPages(new[] { deal });
 

@@ -418,7 +418,7 @@
 
                         if (hasNameProperty)
                         {
-                            clause.Or().WhereEquals("Name", pageName);
+                            clause.Or().WhereEquals("CodeName", pageName);
                         }
                     })
                     .TopN(1)

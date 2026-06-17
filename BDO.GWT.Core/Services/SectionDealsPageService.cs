@@ -21,7 +21,7 @@ public interface ISectionDealsPageService
 {
     Task<SectionDealsDto> GetSectionDealsDtoAsync(CancellationToken cancellationToken);
 
-    Task<PaginationDto<DealCardDto>> GetSectionDealsDealPaginationDtoAsync(Guid pageGuid, string language, CardsQuery cardsQuery, CancellationToken cancellationToken);
+    Task<PaginationDto<DealCardDto>> GetSectionDealsDealPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken);
 }
 
 public class SectionDealsPageService : ISectionDealsPageService
@@ -115,12 +115,12 @@ public class SectionDealsPageService : ISectionDealsPageService
         return dto;
     }
 
-    public async Task<PaginationDto<DealCardDto>> GetSectionDealsDealPaginationDtoAsync(Guid pageGuid, string language, CardsQuery cardsQuery, CancellationToken cancellationToken)
+    public async Task<PaginationDto<DealCardDto>> GetSectionDealsDealPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken)
     {
         var sectionDeal = (await _contentRetriever.GetPagesAsync<SectionDeals>(
             new RetrievePagesParameters
             {
-                LanguageName = language,
+                LanguageName = _cultureContext.CurrentLanguageTag,
                 UseLanguageFallbacks = false
             },
            query => query
@@ -135,7 +135,7 @@ public class SectionDealsPageService : ISectionDealsPageService
             throw new MissingSectionPageException($"'{nameof(SectionDeals)} page with GUID '{pageGuid}' not found.");
         }
 
-        var paginationDto = await _dealCardsService.GetFilteredItemsAsync(sectionDeal, language, cardsQuery, null, _ => false, cancellationToken);
+        var paginationDto = await _dealCardsService.GetFilteredItemsAsync(sectionDeal, _cultureContext.CurrentLanguageTag, cardsQuery, null, _ => false, cancellationToken);
 
         return paginationDto;
     }
