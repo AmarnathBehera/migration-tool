@@ -11,6 +11,7 @@ using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
+using BDO.GWT.Domain.Core.Entities;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
@@ -89,9 +90,6 @@ public class SectionDealsPageService : ISectionDealsPageService
                     case FilterParameterName.SubIndustry:
                         sectionDealsUpdatedFilters.Add(FilterParameterName.SubIndustry);
                         break;
-                    case FilterParameterName.Year:
-                        sectionDealsUpdatedFilters.Add(FilterParameterName.Year);
-                        break;
                     default:
                         sectionDealsUpdatedFilters.Add(filter);
                         break;
@@ -158,9 +156,8 @@ public class SectionDealsPageService : ISectionDealsPageService
             {
                 FilterParameterType.Page => await BuildOptionsForPageFilterAsync(filterParameterData, cancellationToken),
                 FilterParameterType.Tagpage => await BuildOptionsForTagPageFilterAsync(filterParameterData, cancellationToken),
-
                 // FilterParameterType.Entity => await BuildOptionsForEntityFilterAsync(filterParameterData, cancellationToken),
-                FilterParameterType.Field => await BuildOptionsForFieldFilterAsync(filterParameterData, cancellationToken),
+                FilterParameterType.Field => await BuildOptionsForFieldFilterAsync(filterParameterData, filterParameterName, cancellationToken),
                 //FilterParameterType.Taxonomy => await BuildOptionsForTaxonomyFilterAsync(filterParameterData, cancellationToken),
                 _ => throw new NotSupportedException($"Filter parameter type {filterParameterData.FilterParameterType} is not supported."),
             };
@@ -247,8 +244,10 @@ public class SectionDealsPageService : ISectionDealsPageService
         return buffer.ToArray();
     }
 
-    private async Task<OptionDto[]> BuildOptionsForFieldFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
+    private async Task<OptionDto[]> BuildOptionsForFieldFilterAsync(FilterParameterData filterParameterData, string filterParameterName, CancellationToken cancellationToken)
     {
+        var options = Array.Empty<OptionDto>();
+
         var entityType = filterParameterData.EntityType;
 
         var items = await _contentRetriever.GetItemsByTypesAsync(
@@ -256,20 +255,14 @@ public class SectionDealsPageService : ISectionDealsPageService
             _websiteChannelContext.WebsiteChannelID,
             cancellationToken);
 
-        if (items is null || items.Count == 0)
-        {
-            return Array.Empty<OptionDto>();
-        }
-
-        if (entityType == typeof(BlogPost))
+        if (entityType == typeof(Deal))
         {
             return items
-                .OfType<BlogPost>()
-                .Select(x => x.MetadataKeywordsBlog)
-                .Where(x => !string.IsNullOrWhiteSpace(x))
-                .SelectMany(x => KeywordsHelper.ParseKeywords(x!))
+                .OfType<Deal>()
+                .Select(x => x.DateField.Year)
                 .Distinct()
-                .Select(x => FilterDtoUtility.CreateOptionDto(x, x))
+                .OrderByDescending(x => x)
+                .Select(x => FilterDtoUtility.CreateOptionDto(x.ToString(), x.ToString()))
                 .ToArray();
         }
 

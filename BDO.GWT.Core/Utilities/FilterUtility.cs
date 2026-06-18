@@ -1,5 +1,6 @@
 ﻿using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data;
+using BDO.GWT.Domain.Core.Entities;
 
 namespace BDO.GWT.Core.Utilities;
 
@@ -38,7 +39,7 @@ public static class FilterUtility
         [FilterParameterName.Specialty] = new("Specialty", ResourceStringKey.LiveSite.Filters.Specialty, typeof(SpecialtiesPage), FilterParameterType.Page),
         [FilterParameterName.SubIndustry] = new("Sub-Industry", ResourceStringKey.LiveSite.Filters.SubIndustry, typeof(DealCardSubIndustry), FilterParameterType.Page),
         //[FilterParameterName.SubService] = new("Sub-Service", ResourceStringKey.LiveSite.Filters.SubService, typeof(SubService), FilterParameterType.Page),
-        [FilterParameterName.Year] = new("Year", ResourceStringKey.LiveSite.Filters.Year, typeof(DealCardCommon), FilterParameterType.Page),
+        [FilterParameterName.Year] = new("Year", ResourceStringKey.LiveSite.Filters.Year, typeof(Deal), FilterParameterType.Field),
     };
     public static FilterParameterData? GetFilterParameterData(string filterParameterName)
     {

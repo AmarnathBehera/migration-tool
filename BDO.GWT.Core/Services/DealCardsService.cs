@@ -8,11 +8,13 @@ using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
+using Kentico.Forms.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
+using System.Linq.Expressions;
 
 namespace BDO.GWT.Core.Services
 {
@@ -111,6 +113,7 @@ namespace BDO.GWT.Core.Services
          IDictionary<string, string> filterParameterValueByName)
         {
             var filters = new List<Action<WhereParameters>>();
+            var whereExpressions = new List<Expression<Func<Deal, bool>>>();
 
             foreach (var (filterName, filterValue) in filterParameterValueByName)
             {
@@ -122,13 +125,30 @@ namespace BDO.GWT.Core.Services
                 var filter = filterData.FilterParameterType switch
                 {
                     FilterParameterType.Page => await GetPageFilterAsync(filterName, filterValue),
+                    FilterParameterType.Field => await GetPageFilterAsync(filterName, filterValue),
                     _ => null,
+
                 };
 
                 if (filter is not null)
                 {
                     filters.Add(filter);
                 }
+
+                //if (filterData.FilterParameterType == FilterParameterType.Field)
+                //{
+                //        case FilterParameterName.Year:
+                //        {
+                //            if (int.TryParse(filterValue, out var integer))
+                //            {
+                //                FilterParameterType. }=> await GetPageFilterAsync(filterName, filterValue)},
+                //                    _ => null},
+                //                }
+
+                //            break;
+                //        }
+                //    }
+                //}
             }
 
             return filters;
