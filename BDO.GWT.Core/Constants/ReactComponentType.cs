@@ -96,6 +96,7 @@ public static class ReactComponentType
     public const string ContentTabAccordionGUID = "eeb2b6b7-f2df-411b-b55f-c7aac9b22093";
     public const string DealDetailsGUID = "9ba2033f-9c72-4922-88c2-22f911be95c2";
     public const string NewsCarouselGUID = "d1c3e5b7-d9f2-4a6c-8e0b-1f3a5c7e9d2b";
+    public const string SocialMediaGUID = "c58bfb27-7feb-4fdb-94f2-8bca61df250d";
 }
 
 
@@ -105,16 +106,53 @@ public static class ReactComponentType
 
 
 
-
-
-
-
 //
-
-//
-
-//
-
-//
-
-//
+//79c73db6-0a00-43b7-9081-bff002b19ca9
+//5b72020a-38b5-43b1-9e26-71fd36ee9e29
+//4e110f8b-531c-4d3b-bafb-7c03af83ea0b
+//4772187b-22a3-4888-a7e9-54b3bd9cbd02
+//abfdfcbf-6696-4de8-a409-d9d3ff31a17c
+//8405ba6d-77df-48ee-b4e5-99dc66789f8a
+//0a1631de-8e53-4b24-8cb1-9ea41e674bde
+//5310b388-bbd3-4ad2-8b37-fa597521e8ca
+//6e1a2c9d-911f-4276-a282-ff243d024af5
+//b90453f8-3c9d-41c7-a681-3b9ee6037c11
+//e2b375dd-5751-449f-a463-8390ba8f7190
+//17d0d31c-bcd9-4fc0-b8bf-30a2d35fe870
+//c4509f79-147e-47dc-986c-a1310c592757
+//482a97da-8e57-4e10-85d2-80231743f605
+//316a4c46-acf4-47fc-8128-b8296f52e923
+//3a63d9d4-b8ed-46da-a687-ac6f8bb2df42
+//62d796f9-2644-410a-a440-9f14ed8cca39
+//f872f44d-1002-4345-9424-1a041a75e700
+//1b8bd96c-4938-4e86-9899-9c2a28f8881d
+//7815a68e-9a0f-4781-8c12-978b422a1d0e
+//4f9226a2-7aa5-48ca-b3ef-a4aa46086cfc
+//0453e38f-3e92-4a4d-a424-7ebe6bd641e2
+//1dbabfab-0e62-4aac-ab68-e1e33145d099
+//7366771f-6ba1-4618-b30d-18ac48ac1486
+//c4a32174-ae22-4eb8-97b4-89c135bce341
+//6e33a9c7-455a-4acb-ad13-ea3c98df7d00
+//6e062569-8c2e-4e82-a698-e72344fd5eaf
+//84627edc-d342-4f20-b40c-3ae936dcc868
+//42601ad9-f373-4139-a828-1b758a94396c
+//f29f9bed-bfd7-449e-aabe-a9801f77ae58
+//2c730482-2d87-49f4-80f9-7bbf286e8349
+//7d173e8d-bd63-4e33-800d-e35eb73ea965
+//82e332d7-f6ae-4540-bac2-5ddc00201065
+//c8e05f50-2ef4-4bde-986a-589c9c54e846
+//a953595c-ad44-48be-a2b5-ad39a4d25f3e
+//7ff4043a-4902-4872-97e2-f6e9ee010b04
+//ae6de6fc-4a7c-496c-9bfe-00dea1149277
+//01736c38-6464-4aca-b941-f0f7dbcf2ff1
+//fa5a4094-1e45-4c31-b1f6-63ef0979f60d
+//1fb8da5e-70e6-4add-951b-783fd8ced675
+//60e7f03e-c1a3-460e-802e-fb823849a271
+//cf06ee3c-dd38-4eb7-b4e4-6a4083746e5a
+//0eb99768-5713-4d83-96d1-29763df38ddd
+//e85a7656-343b-4880-8a6d-38a85c6afe04
+//a8cb6377-8e20-4ae4-a443-d59ca384473b
+//7a1c15df-7243-4a11-b104-c4bc7ad3fd26
+//d645a3b3-c92e-4623-8b39-9e3de52592ba
+//93682f0f-6526-4ecd-bdba-b34a98f8f97d
+//0d810559-fd95-4dd1-a352-384d26987302

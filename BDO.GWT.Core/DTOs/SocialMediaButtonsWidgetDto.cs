@@ -8,7 +8,6 @@ public class SocialMediaButtonsWidgetDto
 
     public string? WidgetID { get; set; }
 
-
     public string? EmailButtonUrl { get; set; } = null!;
 
     public string? FacebookButtonUrl { get; set; } = null!;

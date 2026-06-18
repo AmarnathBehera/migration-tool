@@ -10,6 +10,7 @@ using BDO.GWT.Web.Widgets.FlexibleContentWidget;
 using BDO.GWT.Web.Widgets.ImageWithTextWidget;
 using BDO.GWT.Web.Widgets.QuoteCardWidget;
 using BDO.GWT.Web.Widgets.RichTextWidget;
+using BDO.GWT.Web.Widgets.SocialMediaButtonsWidget;
 using BDO.GWT.Web.Widgets.TabAccordionWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents;
 using BDO.GWT.Xperience.Core.LiveSite.Components.FormSections.FormSectionProperties;
@@ -39,6 +40,7 @@ using Kentico.PageBuilder.Web.Mvc;
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.FlexibleContent, typeof(FlexibleContentWidget), "Flexible Content", typeof(FlexibleContentWidgetProperties), AllowCache = true, IconClass = "icon-newspaper")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.TabAccordion, typeof(TabAccordionWidget), "Tab Accordion", typeof(TabAccordionWidgetProperties), AllowCache = true, IconClass = "icon-tab")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.NewsCarousel,typeof(NewsCarouselWidget),"News carousel",typeof(NewsCarouselWidgetProperties),AllowCache = true,IconClass = "icon-carousel")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.SocialMediaButtons,typeof(SocialMediaButtonsWidget),"Social media buttons",typeof(SocialMediaButtonsWidgetProperties),AllowCache = true,IconClass = "icon-paper-plane")]
 
 // Sections
 [assembly: RegisterSection(identifier: ComponentIdentifiers.Sections.Container,name: "Container",propertiesType: typeof(BaseSectionProperties),customViewName: "~/Components/Section/SectionView/_ContainerSection.cshtml")]
