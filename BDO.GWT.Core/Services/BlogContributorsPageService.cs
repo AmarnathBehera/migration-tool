@@ -1,103 +1,126 @@
-﻿using BDO.GWT.Core.Constants;
+﻿using BDO.GWT.Common.Exceptions;
+using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
-using BDO.GWT.Core.DTOs.Pages;
-using BDO.GWT.Core.Helper;
-using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.Services;
-using CMS.ContentEngine;
 using CMS.Websites;
-using CMS.Websites.Routing;
-using HotChocolate.Data.Filters;
 using Kentico.Content.Web.Mvc;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Routing;
-using System.CodeDom;
-using System.Linq.Expressions;
-namespace BDO.GWT.Core.Services
+using Kentico.Content.Web.Mvc.Routing;
+
+namespace BDO.GWT.Core.Services;
+
+public interface IBlogContributorsPageService
 {
-    public interface IBlogContributorsPageService
-    {
-        Task<BlogContributorDto> GetBlogContributorsPageDtoAsync(BlogContributors page, CancellationToken cancellationToken);
+    Task<BlogContributorsDto> GetSectionPeoplePageDtoAsync(BlogContributors page, CancellationToken cancellationToken);
 
-        Task<PaginationDto<PersonCardDto>> GeBlogContributorsPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken);
+    Task<PaginationDto<PersonCardDto>> GeBlogContributorsPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken);
+}
+
+public class BlogContributorsPageService : IBlogContributorsPageService
+{
+    #region Filtering constants
+
+    private const string OrderFilterName = "Order";
+    private const string LastNameAtoZOptionValue = "asc";
+    private const string LastNameZtoAOptionValue = "desc";
+    private const string NodeOrderOptionValue = "nodeorder";
+
+    #endregion
+
+    private readonly IPeopleCardsService _peopleCardsService;
+    private readonly IContentService _contentService;
+    private readonly IHeroService _heroService;
+    private readonly ICultureContext _cultureContext;
+    private readonly IPreferredLanguageRetriever _preferredLanguageRetriever;
+
+
+    public BlogContributorsPageService(
+        IPeopleCardsService peopleCardsService,
+        IContentService contentService,
+        IHeroService heroService,
+        ICultureContext cultureContext,
+        IPreferredLanguageRetriever preferredLanguageRetriever)
+    {
+        _peopleCardsService = peopleCardsService;
+        _contentService = contentService;
+        _heroService = heroService;
+        _cultureContext = cultureContext;
+        _preferredLanguageRetriever = preferredLanguageRetriever;
     }
-    public class BlogContributorsPageService : IBlogContributorsPageService
+
+    public async Task<BlogContributorsDto> GetSectionPeoplePageDtoAsync(BlogContributors page, CancellationToken cancellationToken)
     {
-        #region Filtering constants
-
-        private const string OrderFilterName = "Order";
-        private const string LastNameAtoZOptionValue = "asc";
-        private const string LastNameZtoAOptionValue = "desc";
-        private const string NodeOrderOptionValue = "nodeorder";
-
-        #endregion
-        private readonly ICardsService _cardsService;
-        private readonly IContentService _contentService;
-        private readonly IHeroService _heroService;
-
-        public BlogContributorsPageService(ICardsService cardsService, IContentService contentService, IHeroService heroService)
+        var options = new[]
         {
-            _cardsService = cardsService;
-            _contentService = contentService;
-            _heroService = heroService;
-        }
+            FilterDtoUtility.CreateOptionDto(ResourceStringKey.LiveSite.People.SortLastNameAtoZ, LastNameAtoZOptionValue),
+            FilterDtoUtility.CreateOptionDto(ResourceStringKey.LiveSite.People.SortLastNameZtoA, LastNameZtoAOptionValue),
+            FilterDtoUtility.CreateOptionDto(ResourceStringKey.LiveSite.People.SortNodeOrder, NodeOrderOptionValue),
+        };
 
-        public Task<PaginationDto<PersonCardDto>> GeBlogContributorsPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken)
+     
+
+        var heroData = new HeroData
         {
-            throw new NotImplementedException();
-        }
+            Layout = page.HeroLayout,
+            Title = page.HeroTitle,
+            Description = page.HeroDescription,
+            BackgroundImage = page.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string bgUrl
+                    ? Link.Parse(bgUrl) : null,
+            BackgroundImageAltText = page.HeroBackgroundImageAltText,
+            MobileBackgroundImage = page.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string mobileUrl
+                    ? Link.Parse(mobileUrl) : null,
+            MobileBackgroundImageAltText = page.HeroBackgroundImage_MobileAltText,
+            CallToActionButtonType = page.HeroCallToActionButtonType,
+            CallToActionButtonText = page.HeroCallToActionButtonText,
+            CallToActionButtonUrl = page.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath is string ctaPath
+                    ? Link.Parse(ctaPath) : null,
+        };
 
-        public async Task<BlogContributorDto> GetBlogContributorsPageDtoAsync(BlogContributors currentPage, CancellationToken cancellationToken)
+        var dto = new BlogContributorsDto
         {
-            var options = new[]
-              {
-                FilterDtoUtility.CreateOptionDto(ResourceStringKey.LiveSite.People.SortLastNameAtoZ, LastNameAtoZOptionValue),
-                FilterDtoUtility.CreateOptionDto(ResourceStringKey.LiveSite.People.SortLastNameZtoA, LastNameZtoAOptionValue),
-                FilterDtoUtility.CreateOptionDto(ResourceStringKey.LiveSite.People.SortNodeOrder, NodeOrderOptionValue),
-              };
+            Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
+            SortBy = FilterDtoUtility.CreateFilterItemDto("select",
+                OrderFilterName,
+                OrderFilterName,
+                page.PeopleListDefaultOrder,
+                options),
+            PageSize = 20,
+            ApiEndpoint = $"BlogContributors/{page.SystemFields.ContentItemGUID}/Get",
+        };
 
-            var bgImageUrl = currentPage.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
-            var mobileImageUrl = currentPage.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
-            var ctaUrlPath = currentPage.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath;
+        return dto;
+    }
 
-            var heroData = new HeroData
+    public async Task<PaginationDto<PersonCardDto>> GeBlogContributorsPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken)
+    {
+        var blogContributorsPage = (await _contentService.GetPagesAsync<BlogContributors>(
+            new RetrievePagesParameters
             {
-                Layout = currentPage.HeroLayout,
-                Title = currentPage.HeroTitle,
-                Description = currentPage.HeroDescription,
-                BackgroundImage = bgImageUrl != null ? Link.Parse(bgImageUrl) : null,
-                BackgroundImageAltText = currentPage.HeroBackgroundImageAltText,
-                MobileBackgroundImage = mobileImageUrl != null ? Link.Parse(mobileImageUrl) : null,
-                MobileBackgroundImageAltText = currentPage.HeroBackgroundImage_MobileAltText,
-                CallToActionButtonType = currentPage.HeroCallToActionButtonType,
-                CallToActionButtonText = currentPage.HeroCallToActionButtonText,
-                CallToActionButtonUrl = ctaUrlPath != null ? Link.Parse(ctaUrlPath) : null,
-            };
+                LanguageName = _cultureContext.CurrentLanguageTag,
+                UseLanguageFallbacks = false
+            },
+            query => query
+                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
+                .Where(w => w.WhereEquals("ContentItemGUID", pageGuid)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken
+        )).FirstOrDefault();
 
-            // Construct the API endpoint URL using the page's GUID which is passed as url parameter to the BlogPostsAPIController to filter blog posts related to the current page
-            var fullApiEndpoint = $"BlogContributors/{currentPage.SystemFields.WebPageItemID}/Get";
-            
-            var dto = new BlogContributorDto
-            {
-                Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
-                SortBy = FilterDtoUtility.CreateFilterItemDto("select",
-                    OrderFilterName,
-                    OrderFilterName,
-                    currentPage.PeopleListDefaultOrder,
-                    options),
-                PageSize = 20,
-                ApiEndpoint = fullApiEndpoint,
-            };
-
-            return dto;
+        if (blogContributorsPage is null)
+        {
+            throw new MissingSectionPageException($"'{nameof(BlogContributors)} page with GUID '{pageGuid}' not found.");
         }
+
+        var paginationDto = await _peopleCardsService.GetFilteredItemsAsync(
+            blogContributorsPage.SystemFields.WebPageItemID,
+            _preferredLanguageRetriever.Get(),
+            cardsQuery,
+            cancellationToken);
+
+        return paginationDto;
     }
 }
