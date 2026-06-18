@@ -5,10 +5,8 @@ using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.Utilities;
 using CMS.ContentEngine;
-using CMS.DataEngine;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
-using Kentico.Forms.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -134,21 +132,6 @@ namespace BDO.GWT.Core.Services
                 {
                     filters.Add(filter);
                 }
-
-                //if (filterData.FilterParameterType == FilterParameterType.Field)
-                //{
-                //        case FilterParameterName.Year:
-                //        {
-                //            if (int.TryParse(filterValue, out var integer))
-                //            {
-                //                FilterParameterType. }=> await GetPageFilterAsync(filterName, filterValue)},
-                //                    _ => null},
-                //                }
-
-                //            break;
-                //        }
-                //    }
-                //}
             }
 
             return filters;
@@ -171,6 +154,12 @@ namespace BDO.GWT.Core.Services
                 return w => w
                     .WhereGreaterOrEquals(nameof(Deal.DateField), startOfYear)
                     .WhereLess(nameof(Deal.DateField), startOfNextYear);
+            }
+
+            if (filterName == FilterParameterName.Country)
+            {
+                return w => w
+                    .WhereEquals(nameof(Deal.DealCountry), filterValue);
             }
 
             var page = await _contentService.GetPageByTypeAndNameAsync(

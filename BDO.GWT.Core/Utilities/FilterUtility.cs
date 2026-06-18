@@ -14,7 +14,7 @@ public static class FilterUtility
         [FilterParameterName.CareerJobTitle] = new("Career Job Title", ResourceStringKey.LiveSite.Filters.CareerJobTitle, typeof(CareerJobTitle), FilterParameterType.Tagpage),
         [FilterParameterName.CareerLevel] = new("Career Level", ResourceStringKey.LiveSite.Filters.CareerLevel, typeof(CareerLevels), FilterParameterType.Tagpage),
         [FilterParameterName.ContentType] = new("ContentType", ResourceStringKey.LiveSite.Filters.ContentType, typeof(Contenttypes), FilterParameterType.Tagpage),
-        //[FilterParameterName.Country] = new("industryCategoryCountry", ResourceStringKey.LiveSite.Filters.Country, typeof(IDealPage), FilterParameterType.Field),
+        [FilterParameterName.Country] = new("Country", ResourceStringKey.LiveSite.Filters.Country, typeof(Deal), FilterParameterType.Field),
         [FilterParameterName.Credential] = new("Credential", ResourceStringKey.LiveSite.Filters.Credential, typeof(Credentials), FilterParameterType.Page),
         [FilterParameterName.DealType] = new("Deal Type", ResourceStringKey.LiveSite.Filters.DealType, typeof(DealCardDealType), FilterParameterType.Page),
         [FilterParameterName.EventType] = new("Event Type", ResourceStringKey.LiveSite.Filters.EventType, typeof(EventType), FilterParameterType.Page),
