@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using CMS.ContentEngine;
 using CMS.Websites;
-using CMS.MediaLibrary;
 
 namespace BDO
 {
@@ -105,8 +104,7 @@ namespace BDO
 		/// <summary>
 		/// DealMetadataRssImage.
 		/// </summary>
-		[Obsolete("Media libraries and their APIs are obsolete and will be discontinued in the future. Please migrate all media library files to Content hub and use their corresponding content item APIs.")]
-		public IEnumerable<AssetRelatedItem> DealMetadataRssImage { get; set; }
+		public IEnumerable<ContentAttachment> DealMetadataRssImage { get; set; }
 
 
 		/// <summary>
