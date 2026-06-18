@@ -10,6 +10,7 @@ using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
+using CMS.AutomationEngine.Internal;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
@@ -63,12 +64,25 @@ public class SectionDealsPageService : ISectionDealsPageService
             };
         }
 
-        var sectionDealsFilters = string.IsNullOrWhiteSpace(page.SectionDealsFilters)
+        var sectionDealsFilters = new HashSet<string>();
+        if (page.IsGlobal)
+        {
+            sectionDealsFilters = string.IsNullOrWhiteSpace(page.GlobalSectionDealsFilters)
+            ? new HashSet<string>()
+            : page.GlobalSectionDealsFilters
+                .Split(';', StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim())
+                .ToHashSet();
+        }
+        else
+        {
+            sectionDealsFilters = string.IsNullOrWhiteSpace(page.SectionDealsFilters)
             ? new HashSet<string>()
             : page.SectionDealsFilters
                 .Split(';', StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.Trim())
                 .ToHashSet();
+        }
 
         HashSet<string> sectionDealsUpdatedFilters;
         if (LanguageTag.TryParse(_cultureContext.CurrentLanguageTag, out var currentLanguageTag)
@@ -253,11 +267,22 @@ public class SectionDealsPageService : ISectionDealsPageService
             _websiteChannelContext.WebsiteChannelID,
             cancellationToken);
 
-        if (entityType == typeof(Deal))
+        if (entityType == typeof(Deal) && filterParameterName.ToLowerInvariant().Trim() == "year")
         {
             return items
                 .OfType<Deal>()
                 .Select(x => x.DateField.Year)
+                .Distinct()
+                .OrderByDescending(x => x)
+                .Select(x => FilterDtoUtility.CreateOptionDto(x.ToString(), x.ToString()))
+                .ToArray();
+        }
+
+        if (entityType == typeof(Deal) && filterParameterName.ToLowerInvariant().Trim() == "country")
+        {
+            return items
+                .OfType<Deal>()
+                .Select(x => x.DealCountry.Trim())
                 .Distinct()
                 .OrderByDescending(x => x)
                 .Select(x => FilterDtoUtility.CreateOptionDto(x.ToString(), x.ToString()))
