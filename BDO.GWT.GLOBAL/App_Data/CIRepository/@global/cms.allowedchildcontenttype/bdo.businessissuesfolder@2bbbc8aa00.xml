@@ -6,9 +6,9 @@
     <ObjectType>cms.contenttype</ObjectType>
   </Parent>
   <Bindings>
-    <Binding id="cms.contenttype_BDO.Businessissues">
+    <Binding id="cms.contenttype_BDO.Businessissue">
       <AllowedChildContentTypeChildID>
-        <CodeName>BDO.Businessissues</CodeName>
+        <CodeName>BDO.Businessissue</CodeName>
         <GUID>252cdc0e-f6a0-424f-bd6b-2584655e66c7</GUID>
         <ObjectType>cms.contenttype</ObjectType>
       </AllowedChildContentTypeChildID>
