@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.SectionMicrosites</CodeName>
+    <GUID>15ff1eef-9fad-4269-85bb-af954f09c301</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.MicrositeMasterPage">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.MicrositeMasterPage</CodeName>
+        <GUID>14a4e025-0212-44f7-805b-f7604ca10d04</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

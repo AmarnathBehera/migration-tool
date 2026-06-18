@@ -10,6 +10,8 @@ namespace BDO.GWT.Core.Services.Header;
 public interface IHeaderService
 {
     Task<HeaderDto?> GetAsync(IContentService contentservice, CancellationToken cancellationToken);
+    Task<IEnumerable<CultureDto>> GetCultureDtosAsync(CancellationToken cancellationToken);
+
 }
 
 public class HeaderService : IHeaderService
@@ -80,7 +82,7 @@ public class HeaderService : IHeaderService
         return homePage ?? string.Empty;
     }
 
-    private async Task<IEnumerable<CultureDto>> GetCultureDtosAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<CultureDto>> GetCultureDtosAsync(CancellationToken cancellationToken)
     {
         var httpContext = _httpContextAccessor.HttpContext;
         if (httpContext is null)

@@ -13,10 +13,17 @@
   <ClassFormDefinition>
     <form>
       <field column="GlobalsettingskeyID" columntype="integer" enabled="true" guid="a8a1abc8-0b73-46fe-84dc-3a7a8a17404f" isPK="true" />
-      <field column="GlobalSettingsKeyValue" columnprecision="0" columnsize="2000" columntype="text" enabled="true" guid="fc8561f8-1c58-4cf9-b9fe-27479ee1d2c3" />
-      <field column="GlobalSettingsKeyName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="9b47db0b-6890-48c2-a279-451a792a9b6e" />
-      <field column="GlobalSettingsKeyDisplayName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="817e0328-10c8-4d34-a1a3-ed8e35b0b524" />
-      <field column="GlobalSettingsKeyNote" columnprecision="0" columnsize="2000" columntype="text" enabled="true" guid="76dd759e-9cc7-43f5-92ee-deed5b884001" />
+      <field allowempty="true" column="ScriptHeadKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="0dea4985-f46e-470e-9b91-3ceb64004882" />
+      <field allowempty="true" column="MarketoMunchkinCodeKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="84ad8ba5-ec04-465a-9f28-b78d926f2170" />
+      <field allowempty="true" column="ScriptexecutedwhencookiesareacceptedKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="b2977f1b-0558-4408-addb-bb326dd97124" />
+      <field allowempty="true" column="ScriptinbottomofBodyKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="7478522a-3449-497f-9dec-f427bffd06a5" />
+      <field allowempty="true" column="ScriptinTopofBodyKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="388b8e6a-9e0a-444b-b16c-c5ee896c055e" />
+      <field allowempty="true" column="ScriptsTopofPageHeadKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="27cb7f3b-9404-4096-9086-a0bc141937bc" />
+      <field allowempty="true" column="SitekeyreCAPTCHAv2" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="37fe23d1-1c67-4a31-8968-b0178c17eea0" />
+      <field allowempty="true" column="SecretkeyreCAPTCHAv2" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="fd52f274-34a2-4756-bad6-7c01fd687370" />
+      <field allowempty="true" column="SitekeyreCAPTCHAv3" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="1d1627ef-e1ab-4ef3-bedf-4b9948f468f7" />
+      <field allowempty="true" column="SecretkeyreCAPTCHAv3" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="f6217532-d8b9-494c-b798-ae2cfe7158cf" />
+      <field allowempty="true" column="ScorethresholdreCAPTCHAv3" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6cb3232e-f47c-4eed-a625-741d3a2cfdd8" />
     </form>
   </ClassFormDefinition>
   <ClassGUID>f393a535-3751-4fe5-bd51-90482f775b9a</ClassGUID>

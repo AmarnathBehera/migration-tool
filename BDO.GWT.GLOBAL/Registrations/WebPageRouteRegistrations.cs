@@ -1,4 +1,5 @@
 ﻿using BDO;
+using BDO.GWT.Controllers;
 using BDO.GWT.Web.Controllers;
 using BDO.GWT.Web.Core.LiveSite.Controllers;
 using GWTXbyKWeb.Controllers;
@@ -64,6 +65,8 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 [assembly: RegisterWebPageRoute(IndustryCategory.CONTENT_TYPE_NAME, typeof(IndustryCategoryController))]
 [assembly: RegisterWebPageRoute(Industry.CONTENT_TYPE_NAME, typeof(IndustryController))]
 [assembly: RegisterWebPageRoute(IndustryService.CONTENT_TYPE_NAME, typeof(IndustryServiceController))]
+[assembly: RegisterWebPageRoute(MicrositeMasterPage.CONTENT_TYPE_NAME, typeof(MicrositeMasterPageController))]
+[assembly: RegisterWebPageRoute(MicrositePage.CONTENT_TYPE_NAME, typeof(MicrositePageController))]
 
 
 [assembly: RegisterWebPageRoute(SectionServices.CONTENT_TYPE_NAME, typeof(SectionServicesController))]
@@ -311,3 +314,14 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     IconClass = "xp-market")]
 
 [assembly: RegisterWebPageRoute(Webinar.CONTENT_TYPE_NAME, typeof(WebinarController))]
+
+
+[assembly: RegisterPageTemplate(
+    identifier: SectionRss.CONTENT_TYPE_NAME,
+    name: "Section Rss Content Type Template",
+    customViewName: "~/Views/SectionRss/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SectionRss" },
+    IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(SectionRss.CONTENT_TYPE_NAME, typeof(SectionRssController))]
+[assembly: RegisterWebPageRoute(Rss.CONTENT_TYPE_NAME, typeof(RssController))]
