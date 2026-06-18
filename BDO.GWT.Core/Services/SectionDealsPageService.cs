@@ -267,7 +267,7 @@ public class SectionDealsPageService : ISectionDealsPageService
             _websiteChannelContext.WebsiteChannelID,
             cancellationToken);
 
-        if (entityType == typeof(Deal) && filterParameterName.ToLowerInvariant().Trim() == "year")
+        if (entityType == typeof(Deal) && filterParameterName == FilterParameterName.Year)
         {
             return items
                 .OfType<Deal>()
@@ -278,7 +278,7 @@ public class SectionDealsPageService : ISectionDealsPageService
                 .ToArray();
         }
 
-        if (entityType == typeof(Deal) && filterParameterName.ToLowerInvariant().Trim() == "country")
+        if (entityType == typeof(Deal) && filterParameterName == FilterParameterName.Country)
         {
             return items
                 .OfType<Deal>()
