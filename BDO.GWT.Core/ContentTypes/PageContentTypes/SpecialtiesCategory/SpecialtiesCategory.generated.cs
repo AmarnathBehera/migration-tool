@@ -36,6 +36,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// BusinessLineBackgroundImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> BusinessLineBackgroundImage { get; set; }
+
+
+		/// <summary>
 		/// ContentTitle.
 		/// </summary>
 		public string ContentTitle { get; set; }
