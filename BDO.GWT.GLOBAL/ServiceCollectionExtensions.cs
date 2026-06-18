@@ -41,6 +41,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<XperiencePageContext>();
         serviceCollection.AddScoped<IWebsiteContext, WebsiteContext>();
         serviceCollection.AddScoped<IHeaderService, HeaderService>();
+        serviceCollection.AddScoped<IMicrositeHeaderService, MicrositeHeaderService>();
         serviceCollection.AddScoped<IFooterService, FooterService>();
         serviceCollection.AddScoped<ICookieBannerService, CookieBannerService>();
         serviceCollection.ConfigureOptions<SEOOptionsSetup>();
@@ -106,8 +107,12 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ISpecialtiesAreaPageService, SpecialtiesAreaPageService>();
         serviceCollection.AddScoped<ISpecialtiesCategoryPageService, SpecialtiesCategoryPageService>();
         serviceCollection.AddScoped<ISectionSpecialtiesService, SectionSpecialtiesService>();
+        serviceCollection.AddScoped<IMicrositeMasterPageService, MicrositeMasterPageService>();
+        serviceCollection.AddScoped<IMicrositePageService, MicrositePageService>();
         serviceCollection.AddScoped<IDealPageService, DealPageService>();
-
+        serviceCollection.AddScoped<IRecaptchaValidationService, RecaptchaValidationService>();
+        serviceCollection.AddScoped<IRssSectionPageService, RssSectionPageService>();
+        serviceCollection.AddScoped<IRssPageService, RssPageService>();
         //Widget Service
         serviceCollection.AddScoped<INewsCarouselService, NewsCarouselService>();
 

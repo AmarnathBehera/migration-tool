@@ -200,10 +200,10 @@ public class XperiencePageContext : IPageContext
             return new BaseWebPage();
         }
         var query = new ContentItemQueryBuilder()
-
               .ForContentType(ctx.WebPage.ContentTypeName, q => q
                 .ForWebsite(ctx.WebPage.WebsiteChannelName)
-              .TopN(1))
+                .Where(w => w.WhereEquals(nameof(IWebPageContentQueryDataContainer.WebPageItemID), ctx.WebPage.WebPageItemID))
+                .TopN(1))
               .InLanguage(ctx.WebPage.LanguageName);
 
         var result = await _queryExecutor.GetWebPageResult(
