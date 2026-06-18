@@ -316,3 +316,5 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 
 [assembly: RegisterWebPageRoute(SectionRss.CONTENT_TYPE_NAME, typeof(SectionRssController))]
 [assembly: RegisterWebPageRoute(Rss.CONTENT_TYPE_NAME, typeof(RssController))]
+
+[assembly: RegisterWebPageRoute(Sitemap.CONTENT_TYPE_NAME, typeof(SitemapPageController))]
