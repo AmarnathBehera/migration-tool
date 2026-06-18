@@ -163,6 +163,156 @@ namespace BDO.GWT.Core.Tests.Services
 
             Assert.That(result.Banner.PrimaryButton, Is.Null);
         }
+
+        [Test]
+        public async Task GetLocationsDtoAsync_MapsHeroCtaFields()
+        {
+            var page = CreateLocationsPage();
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<LocationCity>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync([]);
+
+            _contentServiceMock
+                .Setup(x => x.GetItemsByGUIDAsync(It.IsAny<List<Guid>>()))
+                .ReturnsAsync([]);
+
+            var result = await _service.GetLocationsDtoAsync(
+                page,
+                CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Hero.CtaButtonType,
+                    Is.EqualTo("primary"));
+
+                Assert.That(result.Hero.CtaButtonText,
+                    Is.EqualTo("Click Here"));
+            });
+        }
+        [Test]
+        public async Task GetLocationsDtoAsync_MapsDescriptionFields()
+        {
+            var page = CreateLocationsPage();
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<LocationCity>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync([]);
+
+            _contentServiceMock
+                .Setup(x => x.GetItemsByGUIDAsync(It.IsAny<List<Guid>>()))
+                .ReturnsAsync([]);
+
+            var result = await _service.GetLocationsDtoAsync(
+                page,
+                CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.MainContent.Description,
+                    Is.EqualTo("<p>Body content</p>"));
+
+                Assert.That(result.Banner.Description,
+                    Is.EqualTo("<p>Banner content</p>"));
+            });
+        }
+        [Test]
+        public async Task GetLocationsDtoAsync_WhenBannerButtonUrlEmpty_DoesNotCallGetItemsByGuid()
+        {
+            var page = CreateLocationsPage();
+
+            page.BannerButtonURL = [];
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<LocationCity>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync([]);
+
+            await _service.GetLocationsDtoAsync(
+                page,
+                CancellationToken.None);
+
+            _contentServiceMock.Verify(
+                x => x.GetItemsByGUIDAsync(
+                    It.IsAny<List<Guid>>()),
+                Times.Never);
+        }
+        [Test]
+        public async Task GetLocationsDtoAsync_WhenBannerButtonUrlExists_CallsGetItemsByGuid()
+        {
+            var page = CreateLocationsPage();
+
+            page.BannerButtonURL =
+            [
+                new WebPageRelatedItem
+        {
+            WebPageGuid = Guid.NewGuid()
+        }
+            ];
+
+            _contentServiceMock
+                .Setup(x => x.GetItemsByGUIDAsync(
+                    It.IsAny<List<Guid>>()))
+                .ReturnsAsync([]);
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<LocationCity>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync([]);
+
+            await _service.GetLocationsDtoAsync(
+                page,
+                CancellationToken.None);
+
+            _contentServiceMock.Verify(
+                x => x.GetItemsByGUIDAsync(
+                    It.IsAny<List<Guid>>()),
+                Times.Once);
+        }
+        [Test]
+        public async Task GetLocationsDtoAsync_CallsGetPagesAsyncOnce()
+        {
+            var page = CreateLocationsPage();
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<LocationCity>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync([]);
+
+            _contentServiceMock
+                .Setup(x => x.GetItemsByGUIDAsync(
+                    It.IsAny<List<Guid>>()))
+                .ReturnsAsync([]);
+
+            await _service.GetLocationsDtoAsync(
+                page,
+                CancellationToken.None);
+
+            _contentServiceMock.Verify(
+                x => x.GetPagesAsync<LocationCity>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
         private static Locations CreateLocationsPage()
         {
             return new Locations

@@ -1,10 +1,7 @@
 using BDO.GWT.Core.Data;
-using BDO.GWT.Core.DTOs;
-using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
-using CMS.ContentEngine;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 using Moq;
@@ -163,7 +160,101 @@ namespace BDO.GWT.Core.Tests.Services
                 Assert.That(card.City, Is.EqualTo("City Meta Title"));
             });
         }
+        [Test]
+        public async Task GetLocationCityDtoAsync_MapsHeroCtaFields()
+        {
+            var page = CreateLocationCityPage();
 
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<LocationOffice>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync([]);
+
+            var result = await _service.GetLocationCityDtoAsync(
+                page,
+                CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Hero.CtaButtonType,
+                    Is.EqualTo("primary"));
+
+                Assert.That(result.Hero.CtaButtonText,
+                    Is.EqualTo("Click Here"));
+            });
+        }
+        [Test]
+        public async Task GetLocationCityDtoAsync_MapsPoBoxFields()
+        {
+            var page = CreateLocationCityPage();
+
+            var office = CreateLocationOffice(
+                "Office",
+                "Street",
+                null);
+
+            office.LocationPOBoxNumber = "PO123";
+            office.LocationPOCity = "Bhopal";
+            office.LocationPOZip = "462001";
+            office.LocationPOCountry = "India";
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<LocationOffice>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync([office]);
+
+            var result = await _service.GetLocationCityDtoAsync(
+                page,
+                CancellationToken.None);
+
+            var card = result.MainContent.OfficeCards.First();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(card.PoBoxNumber,
+                    Is.EqualTo("PO123"));
+
+                Assert.That(card.PoCity,
+                    Is.EqualTo("Bhopal"));
+
+                Assert.That(card.PoPostalCode,
+                    Is.EqualTo("462001"));
+
+                Assert.That(card.PoCountry,
+                    Is.EqualTo("India"));
+            });
+        }
+        [Test]
+        public async Task GetLocationCityDtoAsync_CallsGetPagesAsyncOnce()
+        {
+            var page = CreateLocationCityPage();
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<LocationOffice>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync([]);
+
+            await _service.GetLocationCityDtoAsync(
+                page,
+                CancellationToken.None);
+
+            _contentServiceMock.Verify(x =>
+                x.GetPagesAsync<LocationOffice>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
         private static LocationCity CreateLocationCityPage()
         {
             return new LocationCity
@@ -218,4 +309,5 @@ namespace BDO.GWT.Core.Tests.Services
             };
         }
     }
+
 }
