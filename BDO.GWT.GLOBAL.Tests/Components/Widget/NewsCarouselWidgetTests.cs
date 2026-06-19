@@ -56,14 +56,6 @@ public class NewsCarouselWidgetTests
         NewsCarouselWidgetProperties properties,
         Guid pageGuid)
     {
-        //var model = new ComponentViewModel<NewsCarouselWidgetProperties>();
-        //typeof(ComponentViewModel<NewsCarouselWidgetProperties>)
-        //    .GetProperty("Properties")?.SetValue(model, properties);
-
-        //var pageMock = new Mock<IWebPageFieldsSource>();
-        //pageMock.Setup(p => p.SystemFields.WebPageItemGUID).Returns(pageGuid);
-        //typeof(ComponentViewModel<NewsCarouselWidgetProperties>)
-        //    .GetProperty("Page")?.SetValue(model, pageMock.Object);
         var model = new ComponentViewModel<NewsCarouselWidgetProperties>();
 
         typeof(ComponentViewModel<NewsCarouselWidgetProperties>)
@@ -80,8 +72,6 @@ public class NewsCarouselWidgetTests
             ?.SetValue(model, page);
 
         return model;
-
-        //return model;
     }
 
     private static NewsCarouselDto CreateDefaultDto() =>

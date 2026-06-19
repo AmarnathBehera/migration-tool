@@ -11,10 +11,10 @@ namespace BDO.GWT.GLOBAL.Widgets;
 public class KeyContactsWidgetProperties : IWidgetProperties
 {
     [TextInputComponent(Label = "Title", Order = 0)]
-    public string? Title { get; set; }
+    public string Title { get; set; }
 
     [TextInputComponent(Label = "Description", Order = 1)]
-    public string? Description { get; set; }
+    public string Description { get; set; }
 
     [ContentItemSelectorComponent(
         Person.CONTENT_TYPE_NAME,
@@ -36,7 +36,7 @@ public class KeyContactsWidgetProperties : IWidgetProperties
     [DropDownComponent(Label = "Order contacts by", Order = 5,
         Options = $"{PeopleOrderCriteria.FirstName};First name\r\n{PeopleOrderCriteria.LastName};Last name\r\n{PeopleOrderCriteria.JobTitle};Job title")]
     [VisibleIfTrue(nameof(IsOrderOverriden))]
-    public string? OrderCriteria { get; set; }
+    public string OrderCriteria { get; set; }
 
     [CheckBoxComponent(Label = "Use descending alphabetical order", Order = 6)]
     [VisibleIfTrue(nameof(IsOrderOverriden))]
@@ -46,10 +46,10 @@ public class KeyContactsWidgetProperties : IWidgetProperties
     public bool ShowOffice { get; set; } = false;
 
     [TextInputComponent(Label = "See all link text", Order = 8)]
-    public string? SeeAllLinkText { get; set; }
+    public string SeeAllLinkText { get; set; }
 
     [TextInputComponent(Label = "See all link URL", Order = 9)]
-    public string? SeeAllLinkURL { get; set; }
+    public string SeeAllLinkURL { get; set; }
 
     [DropDownComponent(Label = "See all link URL target", Order = 10, Options = "_self;Same tab\r\n_blank;New tab")]
     public string SeeAllLinkURLTarget { get; set; } = "_self";

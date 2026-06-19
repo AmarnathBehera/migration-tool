@@ -136,7 +136,7 @@ public class KeyContactsService : IKeyContactsService
                 {
                     Title = data.SeeAllLinkText,
                     URL = data.SeeAllLinkUrl,
-                    Target = data.SeeAllLinkURLTarget,
+                    Target = data.SeeAllLinkURLTarget ?? "_self",
                 }
                 : null,
             TopMargin = data.TopMargin,
@@ -173,7 +173,7 @@ public class KeyContactsService : IKeyContactsService
 
         return (isDescendingOrder ? cards.OrderByDescending(orderBy) : cards.OrderBy(orderBy)).ToArray();
     }
-    public async Task<IEnumerable<string>> RetrieveLocationOfficeNamesAsync(Person person, CancellationToken cancellationToken)
+    public static async Task<IEnumerable<string>> RetrieveLocationOfficeNamesAsync(Person person, CancellationToken cancellationToken)
     {
         var offices = person.MetadataOfficeLocation;
 
