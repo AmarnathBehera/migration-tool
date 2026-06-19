@@ -115,6 +115,11 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IKeyContactsService, KeyContactsService>();
         serviceCollection.AddScoped<ITabAccordionService, TabAccordionService>();
         serviceCollection.AddScoped<IEventsWebinarsSliderService,EventsWebinarsSliderService>();
+        serviceCollection.AddScoped<ISitemapPageService, SitemapPageService>();
+        serviceCollection.AddScoped<ISitemapService, SitemapService>();
+        serviceCollection.AddScoped<ISitemapXmlRenderer, SitemapXmlRenderer>();
+        serviceCollection.AddScoped<ILanguageProvider, LanguageProvider>();
+        serviceCollection.AddScoped<IPageNodeProvider, PageNodeProvider>();
     }
 
 }
