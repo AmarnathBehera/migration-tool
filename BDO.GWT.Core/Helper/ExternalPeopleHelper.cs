@@ -9,6 +9,8 @@ public interface IExternalPeopleHelper
 {
     Task<SidebarExternalPersonDto[]> GetSidebarExternalPeopleDtosAsync(List<Guid> externalPeopleNodeGuids, CancellationToken cancellationToken);
     Task<List<string>> GetExternalPeopleDisplayNames(List<Guid> externalPeopleNodeGuids, CancellationToken cancellationToken);
+    Task<string> GetDisplayNameAsync(ExternalPerson externalPerson);
+    Task<string> GetDisplayNameAsyncInternalPeople(InternalPerson internalPerson);
 }
 
 public class ExternalPeopleHelper : IExternalPeopleHelper
@@ -81,5 +83,18 @@ public class ExternalPeopleHelper : IExternalPeopleHelper
         }
 
         return string.IsNullOrEmpty(externalPerson.SurnamePrefixes) ? $"{externalPerson.FirstName} {externalPerson.LastName}" : $"{externalPerson.FirstName} {externalPerson.SurnamePrefixes} {externalPerson.LastName}";
+    }
+    public async Task<string> GetDisplayNameAsyncInternalPeople(InternalPerson internalPerson)
+    {
+        var setting = await _settingsService.GetUsePersonPageTitleInfo();
+
+        var usePersonPageTitle = setting?.FirstOrDefault()?.UsePageTitleToDisplayPersonName ?? false;
+
+        if (usePersonPageTitle)
+        {
+            return internalPerson.MetadataTitle;        
+        }
+
+        return string.IsNullOrEmpty(internalPerson.SurnamePrefixes) ? $"{internalPerson.FirstName} {internalPerson.LastName}" : $"{internalPerson.FirstName} {internalPerson.SurnamePrefixes} {internalPerson.LastName}";
     }
 }

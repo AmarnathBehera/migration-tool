@@ -15,6 +15,7 @@ public interface IPersonPageService
     Task<VCardData?> GeneratePersonVCardAsync(Guid personGuid, string? source = null, CancellationToken cancellationToken = default);
 
     Task<PersonSchemaMarkupDto> GetPersonSchemaMarkupDto(Person person, CancellationToken cancellationToken);
+    string GetPersonDisplayNameAsync(Person person);
 
 }
 
@@ -253,7 +254,7 @@ public class PersonPageService : IPersonPageService
             ParentEnableForm = sectionPeople?.EnableForm ?? false
         };
     }
-    public static string GetPersonDisplayNameAsync(Person person)
+    public string GetPersonDisplayNameAsync(Person person)
     {
         return string.IsNullOrEmpty(person.PersonSurnamePrefixes) ? $"{person.PersonFirstName} {person.PersonLastName}" : $"{person.PersonFirstName} {person.PersonSurnamePrefixes} {person.PersonLastName}";
     }

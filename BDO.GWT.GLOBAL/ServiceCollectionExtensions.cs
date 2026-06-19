@@ -1,5 +1,4 @@
 ﻿using BDO.GWT.Common.Options;
-using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.LiveSite.Services;
 using BDO.GWT.Core.Retrievers;
@@ -12,12 +11,9 @@ using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
-using BDO.GWT.Xperience;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using BDO.GWT.Xperience.Core.Services;
-using CMS.Core;
 using GWTXbyKWeb.Components.Services.SEOOptions;
-using Kentico.Content.Web.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -100,8 +96,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ISectionBlogService, SectionBlogService>();
         serviceCollection.AddScoped<IBlogPostPageService, BlogPostPageService>();
         serviceCollection.AddScoped<IBlogsPageService, BlogsPageService>();
-        serviceCollection.AddScoped<IBlogPageCardsService, BlogPageCardsService>();
-        
+        serviceCollection.AddScoped<IBlogPageCardsService, BlogPageCardsService>();        
         serviceCollection.AddScoped<ISocialMediaButtonsService, SocialMediaButtonsService>();
         serviceCollection.AddScoped<ISpecialtiesPageService, SpecialtiesPageService>();
         serviceCollection.AddScoped<ISpecialtiesAreaPageService, SpecialtiesAreaPageService>();
@@ -113,9 +108,11 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IRecaptchaValidationService, RecaptchaValidationService>();
         serviceCollection.AddScoped<IRssSectionPageService, RssSectionPageService>();
         serviceCollection.AddScoped<IRssPageService, RssPageService>();
+        serviceCollection.AddScoped<ILocationOfficeHelper, LocationOfficeHelper>();
+
         //Widget Service
         serviceCollection.AddScoped<INewsCarouselService, NewsCarouselService>();
-
+        serviceCollection.AddScoped<IKeyContactsService, KeyContactsService>();
         serviceCollection.AddScoped<ITabAccordionService, TabAccordionService>();
         serviceCollection.AddScoped<IEventsWebinarsSliderService,EventsWebinarsSliderService>();
     }

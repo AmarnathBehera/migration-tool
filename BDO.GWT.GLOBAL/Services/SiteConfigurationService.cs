@@ -92,7 +92,7 @@ public class SiteConfigurationService : ISiteConfigurationService
         };
 
         var calculatedHash = await _cachingService.LoadAsync(
-            async _ => await BDO.GWT.Core.Helpers.ObjectHelper.CalculateObjectHashAsync(result),
+            async _ => await GWT.Core.Helper.ObjectHelper.CalculateObjectHashAsync(result),
             cacheKey: GetSiteConfigurationHashCacheKey(_siteContext.CurrentSiteID),
             cacheDependencies,
             cancellationToken);

@@ -3,7 +3,7 @@ using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.LiveSite.Data;
 using BDO.GWT.Core.LiveSite.Services;
-using BDO.GWT.GLOBAL.Widgets.NewsCarouselWidget;
+using BDO.GWT.GLOBAL.Widgets;
 using CMS.ContentEngine;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;

@@ -154,7 +154,7 @@ public class PersonPageServiceTests
             PersonSurnamePrefixes = ""
         };
 
-        var result = PersonPageService.GetPersonDisplayNameAsync(person);
+        var result = _service.GetPersonDisplayNameAsync(person);
 
         Assert.That(result, Is.EqualTo("John Doe"));
     }
@@ -169,7 +169,7 @@ public class PersonPageServiceTests
             PersonSurnamePrefixes = "van den"
         };
 
-        var result = PersonPageService.GetPersonDisplayNameAsync(person);
+        var result = _service.GetPersonDisplayNameAsync(person);
 
         Assert.That(result, Is.EqualTo("Jan van den Berg"));
     }
@@ -184,7 +184,7 @@ public class PersonPageServiceTests
             PersonSurnamePrefixes = null!
         };
 
-        var result = PersonPageService.GetPersonDisplayNameAsync(person);
+        var result = _service.GetPersonDisplayNameAsync(person);
 
         Assert.That(result, Is.EqualTo("Alice Johnson"));
     }
