@@ -1,5 +1,6 @@
 ﻿using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data;
+using BDO.GWT.Domain.Core.Entities;
 
 namespace BDO.GWT.Core.Utilities;
 
@@ -13,14 +14,14 @@ public static class FilterUtility
         [FilterParameterName.CareerJobTitle] = new("Career Job Title", ResourceStringKey.LiveSite.Filters.CareerJobTitle, typeof(CareerJobTitle), FilterParameterType.Tagpage),
         [FilterParameterName.CareerLevel] = new("Career Level", ResourceStringKey.LiveSite.Filters.CareerLevel, typeof(CareerLevels), FilterParameterType.Tagpage),
         [FilterParameterName.ContentType] = new("ContentType", ResourceStringKey.LiveSite.Filters.ContentType, typeof(Contenttypes), FilterParameterType.Tagpage),
-        //[FilterParameterName.Country] = new("industryCategoryCountry", ResourceStringKey.LiveSite.Filters.Country, typeof(IDealPage), FilterParameterType.Field),
+        [FilterParameterName.Country] = new("Country", ResourceStringKey.LiveSite.Filters.Country, typeof(Deal), FilterParameterType.Field),
         [FilterParameterName.Credential] = new("Credential", ResourceStringKey.LiveSite.Filters.Credential, typeof(Credentials), FilterParameterType.Page),
-        //[FilterParameterName.DealType] = new("Deal Type", ResourceStringKey.LiveSite.Filters.DealType, typeof(DealType), FilterParameterType.Entity),
+        [FilterParameterName.DealType] = new("Deal Type", ResourceStringKey.LiveSite.Filters.DealType, typeof(DealCardDealType), FilterParameterType.Page),
         [FilterParameterName.EventType] = new("Event Type", ResourceStringKey.LiveSite.Filters.EventType, typeof(EventType), FilterParameterType.Page),
-        //[FilterParameterName.GlobalDealType] = new("Deal Type", ResourceStringKey.LiveSite.Filters.DealType, typeof(GlobalDealType), FilterParameterType.Entity),
-        //[FilterParameterName.GlobalIndustry] = new("Industry", ResourceStringKey.LiveSite.Filters.Industry, typeof(GlobalIndustry), FilterParameterType.Entity),
-        //[FilterParameterName.GlobalSubIndustry] = new("Sub-Industry", ResourceStringKey.LiveSite.Filters.SubIndustry, typeof(GlobalSubIndustry), FilterParameterType.Entity),
-        //[FilterParameterName.Industry] = new("Industry", ResourceStringKey.LiveSite.Filters.Industry, typeof(IndustryEntity), FilterParameterType.Entity),
+        //[FilterParameterName.GlobalDealType] = new("Deal Type", ResourceStringKey.LiveSite.Filters.DealType, typeof(DealCardDealType), FilterParameterType.Page),
+        //[FilterParameterName.GlobalIndustry] = new("Industry", ResourceStringKey.LiveSite.Filters.Industry, typeof(DealCardIndustry), FilterParameterType.Page),
+        //[FilterParameterName.GlobalSubIndustry] = new("Sub-Industry", ResourceStringKey.LiveSite.Filters.SubIndustry, typeof(DealCardIndustry), FilterParameterType.Page),
+        [FilterParameterName.Industry] = new("Industry", ResourceStringKey.LiveSite.Filters.Industry, typeof(DealCardIndustry), FilterParameterType.Page),
         [FilterParameterName.IndustryService] = new("Industry Service", ResourceStringKey.LiveSite.Filters.IndustryService, typeof(IndustryService), FilterParameterType.Page),
         [FilterParameterName.IndustryCategory] = new("Industry (Industry Category)", ResourceStringKey.LiveSite.Filters.IndustryCategory, typeof(IndustryCategory), FilterParameterType.Page),
         [FilterParameterName.IndustryPage] = new("Industry", ResourceStringKey.LiveSite.Filters.Industry, typeof(Industry), FilterParameterType.Page),
@@ -36,9 +37,9 @@ public static class FilterUtility
         [FilterParameterName.SpecialtyCategory] = new("Specialty (Specialty Category)", ResourceStringKey.LiveSite.Filters.SpecialtiesCategory, typeof(SpecialtiesCategory), FilterParameterType.Page),
         [FilterParameterName.SpecialtyArea] = new("Specialty Area", ResourceStringKey.LiveSite.Filters.SpecialtyArea, typeof(SpecialtiesArea), FilterParameterType.Page),
         [FilterParameterName.Specialty] = new("Specialty", ResourceStringKey.LiveSite.Filters.Specialty, typeof(SpecialtiesPage), FilterParameterType.Page),
-        //[FilterParameterName.SubIndustry] = new("Sub-Industry", ResourceStringKey.LiveSite.Filters.SubIndustry, typeof(SubIndustry), FilterParameterType.Entity),
+        [FilterParameterName.SubIndustry] = new("Sub-Industry", ResourceStringKey.LiveSite.Filters.SubIndustry, typeof(DealCardSubIndustry), FilterParameterType.Page),
         //[FilterParameterName.SubService] = new("Sub-Service", ResourceStringKey.LiveSite.Filters.SubService, typeof(SubService), FilterParameterType.Page),
-        //[FilterParameterName.Year] = new("Year", ResourceStringKey.LiveSite.Filters.Year, typeof(IDealPage), FilterParameterType.Field),
+        [FilterParameterName.Year] = new("Year", ResourceStringKey.LiveSite.Filters.Year, typeof(Deal), FilterParameterType.Field),
     };
     public static FilterParameterData? GetFilterParameterData(string filterParameterName)
     {

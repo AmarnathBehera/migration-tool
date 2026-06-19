@@ -21,7 +21,17 @@
           <controlname>Kentico.Administration.Checkbox</controlname>
         </settings>
       </field>
-      <field column="SectionDealsFilters" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="727dafb6-9fd7-4323-b159-321f9dcb5a8d" visible="true">
+      <field column="IsGlobal" columnprecision="0" columntype="boolean" enabled="true" guid="ed3ff190-3e9d-465c-8254-42e40a725d51" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Is Global Site</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="SectionDealsFilters" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="727dafb6-9fd7-4323-b159-321f9dcb5a8d" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Filters</fieldcaption>
@@ -45,6 +55,45 @@ year;Year
           </Options>
           <OptionsValueSeparator>;</OptionsValueSeparator>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsFalseVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>IsGlobal</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="GlobalSectionDealsFilters" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="3e7b96e6-b915-4074-8e17-f77f74c3ed47" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Section Deals Filters</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>
+            <![CDATA[XperienceCommunity.Multichoiceformcontrol.MultiChoice]]>
+          </controlname>
+          <Options>
+<![CDATA[
+industry;Industry
+subIndustry;Sub-Industry
+dealType;Deal Type
+year;Year
+country;Country
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>IsGlobal</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <field column="ShowCopyUrlButtonInDealPage" columnprecision="0" columntype="boolean" enabled="true" guid="fca1cd0e-a516-4f1a-aea4-c12b62f4a85f" visible="true">
         <properties>

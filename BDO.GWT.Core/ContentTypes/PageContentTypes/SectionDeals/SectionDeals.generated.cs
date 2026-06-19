@@ -42,9 +42,21 @@ namespace BDO
 
 
 		/// <summary>
+		/// IsGlobal.
+		/// </summary>
+		public bool IsGlobal { get; set; }
+
+
+		/// <summary>
 		/// SectionDealsFilters.
 		/// </summary>
 		public string SectionDealsFilters { get; set; }
+
+
+		/// <summary>
+		/// GlobalSectionDealsFilters.
+		/// </summary>
+		public string GlobalSectionDealsFilters { get; set; }
 
 
 		/// <summary>

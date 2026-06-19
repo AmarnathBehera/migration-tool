@@ -113,6 +113,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IRecaptchaValidationService, RecaptchaValidationService>();
         serviceCollection.AddScoped<IRssSectionPageService, RssSectionPageService>();
         serviceCollection.AddScoped<IRssPageService, RssPageService>();
+        serviceCollection.AddScoped<ISectionDealsPageService, SectionDealsPageService>();
+
         //Widget Service
         serviceCollection.AddScoped<INewsCarouselService, NewsCarouselService>();
 

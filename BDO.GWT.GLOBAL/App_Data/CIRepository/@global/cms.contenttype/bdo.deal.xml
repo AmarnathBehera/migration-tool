@@ -7,9 +7,6 @@
       <field column="ContentItemDataID" columntype="integer" enabled="true" guid="7d3584a8-3e45-40e8-9f95-ac788ea17a0e" isPK="true" />
       <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="38a8c61f-7dfb-40f5-8a3a-2efc156f6076" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
       <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="07fb2f90-4f9c-4a5c-b8c2-fec8892d528a" isunique="true" system="true" />
-      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
-        <properties />
-      </schema>
       <field allowempty="true" column="MetadataShowTitle" columnprecision="0" columntype="boolean" enabled="true" guid="ebabff49-7326-4712-a586-508d5d09ce30" visible="true">
         <properties>
           <defaultvalue>False</defaultvalue>
@@ -24,6 +21,9 @@
           <controlname>Kentico.Administration.Checkbox</controlname>
         </settings>
       </field>
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
       <field allowempty="true" column="DealContent" columnprecision="0" columntype="longtext" enabled="true" guid="0d54bdd8-baf9-4149-bc18-7334587e4ff7" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
@@ -45,7 +45,7 @@
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["09fd4259-c646-41e1-8363-6ed3c47ed8b2"]]]>
+            <![CDATA[["bdd17a11-079d-4afa-9490-c8c2f90f8353"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
@@ -60,7 +60,7 @@
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["09fd4259-c646-41e1-8363-6ed3c47ed8b2"]]]>
+            <![CDATA[["cdab0d33-430e-407a-ad3e-f0a5ac05d5e0"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
@@ -84,7 +84,7 @@
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["09fd4259-c646-41e1-8363-6ed3c47ed8b2"]]]>
+            <![CDATA[["cfe5a014-3dc5-4df5-8727-b21e91016436"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
@@ -109,7 +109,7 @@
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["09fd4259-c646-41e1-8363-6ed3c47ed8b2"]]]>
+            <![CDATA[["b06a34f3-9904-41b9-8a1a-a9747892bb6e"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
@@ -175,16 +175,18 @@ INNER JOIN dbo.CMS_ContentItemCommonData AS cicd
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
-      <field allowempty="true" column="DealMetadataRssImage" columnprecision="0" columntype="assets" enabled="true" guid="04e565b2-d7c0-4e2c-8d96-26d0e67c7bd9" visible="true">
+      <field allowempty="true" column="DealMetadataRssImage" columnprecision="0" columntype="contentitemreference" enabled="true" guid="04e565b2-d7c0-4e2c-8d96-26d0e67c7bd9" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Rss Image</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
         </properties>
         <settings>
-          <AllowedExtensions>_INHERITED_</AllowedExtensions>
-          <controlname>Kentico.Administration.AssetSelector</controlname>
-          <MaximumAssets>1</MaximumAssets>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
       <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
