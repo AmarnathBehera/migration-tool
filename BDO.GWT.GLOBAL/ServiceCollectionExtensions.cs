@@ -110,8 +110,6 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IRssPageService, RssPageService>();
         serviceCollection.AddScoped<ISectionDealsPageService, SectionDealsPageService>();
 
-        serviceCollection.AddScoped<ILocationOfficeHelper, LocationOfficeHelper>();
-
         //Widget Service
         serviceCollection.AddScoped<INewsCarouselService, NewsCarouselService>();
         serviceCollection.AddScoped<IKeyContactsService, KeyContactsService>();
