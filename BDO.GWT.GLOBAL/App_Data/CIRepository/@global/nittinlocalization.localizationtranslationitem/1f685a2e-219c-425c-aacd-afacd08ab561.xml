@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<nittinlocalization.localizationtranslationitem>
+  <LocalizationTranslationItemContentLanguageId>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </LocalizationTranslationItemContentLanguageId>
+  <LocalizationTranslationItemGuid>1f685a2e-219c-425c-aacd-afacd08ab561</LocalizationTranslationItemGuid>
+  <LocalizationTranslationItemLocalizationKeyItemId>
+    <CodeName>BDO.LiveSite.DealsCards.FilterLabel</CodeName>
+    <GUID>a4c71e0e-f810-467c-a261-45e6393e8a51</GUID>
+    <ObjectType>nittinlocalization.localizationkeyitem</ObjectType>
+  </LocalizationTranslationItemLocalizationKeyItemId>
+</nittinlocalization.localizationtranslationitem>

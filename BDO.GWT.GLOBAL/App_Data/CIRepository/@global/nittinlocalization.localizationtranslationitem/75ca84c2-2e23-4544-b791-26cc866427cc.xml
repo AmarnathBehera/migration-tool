@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<nittinlocalization.localizationtranslationitem>
+  <LocalizationTranslationItemContentLanguageId>
+    <CodeName>fr-fr</CodeName>
+    <GUID>8517e6d4-6f93-4003-9e15-e30e302d68e9</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </LocalizationTranslationItemContentLanguageId>
+  <LocalizationTranslationItemGuid>75ca84c2-2e23-4544-b791-26cc866427cc</LocalizationTranslationItemGuid>
+  <LocalizationTranslationItemLocalizationKeyItemId>
+    <CodeName>BDO.LiveSite.Filters.Country</CodeName>
+    <GUID>aeb76e72-3041-4c1b-84d1-466001b60cfd</GUID>
+    <ObjectType>nittinlocalization.localizationkeyitem</ObjectType>
+  </LocalizationTranslationItemLocalizationKeyItemId>
+</nittinlocalization.localizationtranslationitem>

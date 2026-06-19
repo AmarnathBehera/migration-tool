@@ -52,6 +52,15 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     ContentTypeNames = new[] { "BDO.Deal" },
     IconClass = "xp-market")]
 
+[assembly: RegisterWebPageRoute(SectionDeals.CONTENT_TYPE_NAME, typeof(SectionDealsController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: SectionDeals.CONTENT_TYPE_NAME,
+    name: "Section Deals Page Content Type Template",
+    customViewName: "~/Views/SectionDeals/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SectionDeals" },
+    IconClass = "xp-market")]
+
 [assembly: RegisterWebPageRoute(SectionIndustries.CONTENT_TYPE_NAME, typeof(SectionIndustriesController))]
 [assembly: RegisterWebPageRoute(IndustryCategory.CONTENT_TYPE_NAME, typeof(IndustryCategoryController))]
 [assembly: RegisterWebPageRoute(Industry.CONTENT_TYPE_NAME, typeof(IndustryController))]
