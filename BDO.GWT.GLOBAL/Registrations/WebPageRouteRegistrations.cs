@@ -136,6 +136,7 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     ContentTypeNames = new[] { "BDO.LocationCity" },
     IconClass = "xp-market")]
 
+[assembly: RegisterWebPageRoute(BlogContributors.CONTENT_TYPE_NAME, typeof(BlogContributorsPageController))]
 [assembly: RegisterWebPageRoute(SectionBlogs.CONTENT_TYPE_NAME, typeof(SectionBlogsController))]
 
 [assembly: RegisterPageTemplate(

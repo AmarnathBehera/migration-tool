@@ -96,6 +96,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ICareerDetailPageService, CareerDetailPageService>();
         serviceCollection.AddScoped<ICareerCategoryPageService, CareerCategoryPageService>();
         serviceCollection.AddScoped<ICareerContentPageService, CareerContentPageService>();
+        serviceCollection.AddScoped<IBlogContributorsPageService, BlogContributorsPageService>();
+
         serviceCollection.AddScoped<IChannelAccessService, ChannelAccessService>();
         serviceCollection.AddScoped<ISectionBlogService, SectionBlogService>();
         serviceCollection.AddScoped<IBlogPostPageService, BlogPostPageService>();
