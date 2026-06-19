@@ -36,22 +36,16 @@ namespace BDO.GWT.Core.Services
     {
         private readonly ICardsService _cardsService;
         private readonly IContentService _contentService;
-        private readonly ISettingService _settingService;
-        private readonly IUrlHelperFactory _urlHelperFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public DealCardsService(
             ICardsService cardsService,
             IContentService contentService,
-            ISettingService settingService,
-            IUrlHelperFactory urlHelperFactory,
             IHttpContextAccessor httpContextAccessor
             )
         {
             _cardsService = cardsService;
             _contentService = contentService;
-            _settingService = settingService;
-            _urlHelperFactory = urlHelperFactory;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -73,8 +67,6 @@ namespace BDO.GWT.Core.Services
         CancellationToken cancellationToken)
         {
             var filterWhereExpressions = await GetFilterParameterWhereExpressionsAsync(cardsQuery.Filters);
-
-            var order = cardsQuery.Order?.ToLower() ?? "asc";
 
             var deals = await _contentService.GetPagesAsync<Deal>(
                    new RetrievePagesParameters
@@ -111,7 +103,6 @@ namespace BDO.GWT.Core.Services
          IDictionary<string, string> filterParameterValueByName)
         {
             var filters = new List<Action<WhereParameters>>();
-            var whereExpressions = new List<Expression<Func<Deal, bool>>>();
 
             foreach (var (filterName, filterValue) in filterParameterValueByName)
             {
@@ -182,7 +173,6 @@ namespace BDO.GWT.Core.Services
         {
             var httpContext = _httpContextAccessor.HttpContext!;
             var actionContext = new ActionContext(httpContext, httpContext.GetRouteData() ?? new RouteData(), new ActionDescriptor());
-            var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
 
             var dtos = new List<DealCardDto>();
             foreach (var deal in deals)

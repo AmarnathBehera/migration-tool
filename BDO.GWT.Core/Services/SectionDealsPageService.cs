@@ -10,7 +10,6 @@ using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
-using CMS.AutomationEngine.Internal;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
@@ -30,7 +29,6 @@ public class SectionDealsPageService : ISectionDealsPageService
     private readonly IContentService _contentRetriever;
     private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly IDealCardsService _dealCardsService;
-    private int currentDealPageId;
 
     public SectionDealsPageService(ICultureContext cultureContext, IContentService contentRetriever, IWebsiteChannelContext websiteChannelContext, IDealCardsService dealCardsService)
     {
@@ -116,7 +114,7 @@ public class SectionDealsPageService : ISectionDealsPageService
         var dto = new SectionDealsDto
         {
             Filters = page.SectionDealsFilteringEnabled
-                ? await CreateDealsFiltersAsync(sectionDealsUpdatedFilters, page.SystemFields.WebPageItemID, null, cancellationToken)
+                ? await CreateDealsFiltersAsync(sectionDealsUpdatedFilters, page.SystemFields.WebPageItemID, cancellationToken)
                 : new List<FilterItemDto<OptionDto>>(),
             PageSize = 12,
             ApiEndpoint = $"Deals/{page.SystemFields.ContentItemGUID}/Get"
@@ -150,9 +148,8 @@ public class SectionDealsPageService : ISectionDealsPageService
         return paginationDto;
     }
 
-    private async Task<FilterItemDto<OptionDto>[]> CreateDealsFiltersAsync(HashSet<string> filterParameterNames, int pageId, string? nodeAliasPath, CancellationToken cancellationToken)
+    private async Task<FilterItemDto<OptionDto>[]> CreateDealsFiltersAsync(HashSet<string> filterParameterNames, int pageId, CancellationToken cancellationToken)
     {
-        currentDealPageId = pageId;
         var filterItems = new List<FilterItemDto<OptionDto>>(filterParameterNames.Count);
 
         foreach (var filterParameterName in filterParameterNames)
@@ -258,8 +255,6 @@ public class SectionDealsPageService : ISectionDealsPageService
 
     private async Task<OptionDto[]> BuildOptionsForFieldFilterAsync(FilterParameterData filterParameterData, string filterParameterName, CancellationToken cancellationToken)
     {
-        var options = Array.Empty<OptionDto>();
-
         var entityType = filterParameterData.EntityType;
 
         var items = await _contentRetriever.GetItemsByTypesAsync(
@@ -285,7 +280,7 @@ public class SectionDealsPageService : ISectionDealsPageService
                 .Select(x => x.DealCountry.Trim())
                 .Distinct()
                 .OrderByDescending(x => x)
-                .Select(x => FilterDtoUtility.CreateOptionDto(x.ToString(), x.ToString()))
+                .Select(x => FilterDtoUtility.CreateOptionDto(x, x))
                 .ToArray();
         }
 
