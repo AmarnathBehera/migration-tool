@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentfolder>
+  <ContentFolderCreatedByUserID>
+    <CodeName>kirankumar@bdo.in</CodeName>
+    <GUID>ab306e36-b9b9-4ed7-8374-5d31fb2794d0</GUID>
+    <ObjectType>cms.user</ObjectType>
+  </ContentFolderCreatedByUserID>
+  <ContentFolderCreatedWhen>2026-05-04 08:15:56Z</ContentFolderCreatedWhen>
+  <ContentFolderDisplayName>Demo Site Images1</ContentFolderDisplayName>
+  <ContentFolderGUID>6a000cef-2e92-444b-8ca0-1d061fa57bcb</ContentFolderGUID>
+  <ContentFolderModifiedByUserID>
+    <CodeName>kirankumar@bdo.in</CodeName>
+    <GUID>ab306e36-b9b9-4ed7-8374-5d31fb2794d0</GUID>
+    <ObjectType>cms.user</ObjectType>
+  </ContentFolderModifiedByUserID>
+  <ContentFolderName>Demo_Site_Images1-6qha9e6x</ContentFolderName>
+  <ContentFolderParentFolderID>
+    <CodeName>Root-Demo</CodeName>
+    <GUID>fd64accc-b307-4f28-ab8a-db19fb13b149</GUID>
+    <ObjectType>cms.contentfolder</ObjectType>
+  </ContentFolderParentFolderID>
+  <ContentFolderTreePath>/Demo_Site_Images1</ContentFolderTreePath>
+  <ContentFolderWorkspaceID>
+    <CodeName>Demo</CodeName>
+    <GUID>f989d1d9-8f97-448b-9d4a-88157ff84d25</GUID>
+    <ObjectType>cms.workspace</ObjectType>
+  </ContentFolderWorkspaceID>
+</cms.contentfolder>

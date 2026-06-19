@@ -97,6 +97,7 @@ public static class ReactComponentType
     public const string DealDetailsGUID = "9ba2033f-9c72-4922-88c2-22f911be95c2";
     public const string NewsCarouselGUID = "d1c3e5b7-d9f2-4a6c-8e0b-1f3a5c7e9d2b";
     public const string PeopleGridGUID = "e9c3e5b7-d9f2-4a6c-8e0b-1f3a5c7e9d2b";
+    public const string DealsCardsGridGUID = "9dccc1e0-c246-46a6-a2a1-7dd18cfac628";
 }
 
 
