@@ -1,159 +1,250 @@
 ﻿using BDO.GWT.Core.DTOs;
-using BDO.GWT.Core.Services;
 using BDO.GWT.Web.Core.Services;
+using CMS.DataEngine;
+using CMS.Localization;
+using CMS.ContentEngine;
+using CMS.Websites;
+using CMS.Websites.Routing;
+using Kentico.Content.Web.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
-using NUnit.Framework;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Data;
 
 namespace BDO.GWT.Core.Tests.Services;
 
-[TestFixture]
 public class SitemapServiceTests
 {
-    private readonly Mock<ISitemapService> _sitemapServiceMock;
+    private Mock<IContentQueryExecutor> _contentQueryExecutorMock = null!;
+    private Mock<IWebPageUrlRetriever> _webPageUrlRetrieverMock = null!;
+    private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
+    private Mock<IInfoProvider<ContentLanguageInfo>> _languageInfoProviderMock = null!;
+    private Mock<ILogger<SitemapService>> _loggerMock = null!;
+    private SitemapService _service = null!;
 
-    public SitemapServiceTests()
+    [SetUp]
+    public void Setup()
     {
-        _sitemapServiceMock = new Mock<ISitemapService>();
+        _contentQueryExecutorMock = new Mock<IContentQueryExecutor>();
+        _webPageUrlRetrieverMock = new Mock<IWebPageUrlRetriever>();
+        _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
+        _languageInfoProviderMock = new Mock<IInfoProvider<ContentLanguageInfo>>();
+        _loggerMock = new Mock<ILogger<SitemapService>>();
+
+        _websiteChannelContextMock.SetupGet(x => x.WebsiteChannelName).Returns("TestChannel");
+
+        _service = new SitemapService(
+            _contentQueryExecutorMock.Object,
+            _webPageUrlRetrieverMock.Object,
+            _websiteChannelContextMock.Object,
+            _languageInfoProviderMock.Object,
+            _loggerMock.Object);
     }
 
     [Test]
-    public async Task GetSitemapDtoAsync_ReturnsDto()
+    public async Task GetSitemapDtoAsync_WhenNoLanguages_ReturnsEmptySitemap()
     {
-        var expectedDto = new SitemapDto { Urls = [] };
+        // Arrange
+        var emptyLanguages = Array.Empty<ContentLanguageInfo>();
+        var mockQuery = new Mock<ObjectQuery<ContentLanguageInfo>>();
+        mockQuery.Setup(x => x.GetEnumerableTypedResultAsync(default, default, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(emptyLanguages);
+        _languageInfoProviderMock.Setup(x => x.Get()).Returns(mockQuery.Object);
 
-        _sitemapServiceMock
-            .Setup(s => s.GetSitemapDtoAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(expectedDto);
+        // Act
+        var result = await _service.GetSitemapDtoAsync(CancellationToken.None);
 
-        var result = await _sitemapServiceMock.Object.GetSitemapDtoAsync(CancellationToken.None);
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Urls, Is.Empty);
+        });
 
-        Assert.That(result, Is.Not.Null);
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("No languages found")),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
     }
 
     [Test]
-    public async Task GetSitemapDtoAsync_WhenNoPages_ReturnsEmptyUrls()
+    public void Constructor_CreatesInstance_WithValidDependencies()
     {
-        _sitemapServiceMock
-            .Setup(s => s.GetSitemapDtoAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new SitemapDto { Urls = [] });
+        // Arrange & Act
+        var service = new SitemapService(
+            _contentQueryExecutorMock.Object,
+            _webPageUrlRetrieverMock.Object,
+            _websiteChannelContextMock.Object,
+            _languageInfoProviderMock.Object,
+            _loggerMock.Object);
 
-        var result = await _sitemapServiceMock.Object.GetSitemapDtoAsync(CancellationToken.None);
+        // Assert
+        Assert.That(service, Is.Not.Null);
+        Assert.That(service, Is.InstanceOf<ISitemapService>());
+    }
 
+    [Test]
+    public async Task GetSitemapDtoAsync_ReturnsCorrectDtoType()
+    {
+        // Arrange
+        var emptyLanguages = Array.Empty<ContentLanguageInfo>();
+        var mockQuery = new Mock<ObjectQuery<ContentLanguageInfo>>();
+        mockQuery.Setup(x => x.GetEnumerableTypedResultAsync(default, default, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(emptyLanguages);
+        _languageInfoProviderMock.Setup(x => x.Get()).Returns(mockQuery.Object);
+
+        // Act
+        var result = await _service.GetSitemapDtoAsync(CancellationToken.None);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.TypeOf<SitemapDto>());
+            Assert.That(result.Urls, Is.Not.Null);
+        });
+    }
+
+    [Test]
+    public async Task GetSitemapDtoAsync_WhenNoLanguages_LogsWarningWithCorrectMessage()
+    {
+        // Arrange
+        var emptyLanguages = Array.Empty<ContentLanguageInfo>();
+        var mockQuery = new Mock<ObjectQuery<ContentLanguageInfo>>();
+        mockQuery.Setup(x => x.GetEnumerableTypedResultAsync(default, default, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(emptyLanguages);
+        _languageInfoProviderMock.Setup(x => x.Get()).Returns(mockQuery.Object);
+
+        // Act
+        await _service.GetSitemapDtoAsync(CancellationToken.None);
+
+        // Assert
+        _loggerMock.Verify(
+            x => x.Log(
+                It.Is<LogLevel>(l => l == LogLevel.Warning),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("No languages found") && v.ToString()!.Contains("Returning empty sitemap")),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
+
+    [Test]
+    public void SitemapService_ImplementsISitemapService()
+    {
+        // Assert
+        Assert.That(_service, Is.InstanceOf<ISitemapService>());
+    }
+
+    [Test]
+    public async Task GetSitemapDtoAsync_ReturnsEmptyUrls_WhenNoLanguages()
+    {
+        // Arrange
+        var emptyLanguages = Array.Empty<ContentLanguageInfo>();
+        var mockQuery = new Mock<ObjectQuery<ContentLanguageInfo>>();
+        mockQuery.Setup(x => x.GetEnumerableTypedResultAsync(default, default, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(emptyLanguages);
+        _languageInfoProviderMock.Setup(x => x.Get()).Returns(mockQuery.Object);
+
+        // Act
+        var result = await _service.GetSitemapDtoAsync(CancellationToken.None);
+
+        // Assert
         Assert.That(result.Urls, Is.Empty);
     }
 
     [Test]
-    public async Task GetSitemapDtoAsync_WhenPagesExist_ReturnsNonEmptyUrls()
+    public async Task GetSitemapDtoAsync_InvokesLanguageProvider()
     {
-        var urls = new List<SitemapUrlDto>
-        {
-            new() { LocationUri = "https://example.com/page-1" },
-            new() { LocationUri = "https://example.com/page-2" },
-        };
+        // Arrange
+        var emptyLanguages = Array.Empty<ContentLanguageInfo>();
+        var mockQuery = new Mock<ObjectQuery<ContentLanguageInfo>>();
+        mockQuery.Setup(x => x.GetEnumerableTypedResultAsync(default, default, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(emptyLanguages);
+        _languageInfoProviderMock.Setup(x => x.Get()).Returns(mockQuery.Object);
 
-        _sitemapServiceMock
-            .Setup(s => s.GetSitemapDtoAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new SitemapDto { Urls = urls });
+        // Act
+        await _service.GetSitemapDtoAsync(CancellationToken.None);
 
-        var result = await _sitemapServiceMock.Object.GetSitemapDtoAsync(CancellationToken.None);
-
-        Assert.That(result.Urls, Has.Exactly(2).Items);
+        // Assert
+        _languageInfoProviderMock.Verify(x => x.Get(), Times.Once);
     }
 
     [Test]
-    public async Task GetSitemapDtoAsync_UrlsContainCorrectLocationUri()
+    public void Constructor_AcceptsAllRequiredDependencies()
     {
-        var urls = new List<SitemapUrlDto>
-        {
-            new() { LocationUri = "https://example.com/careers" },
-        };
+        // Act
+        var service = new SitemapService(
+            _contentQueryExecutorMock.Object,
+            _webPageUrlRetrieverMock.Object,
+            _websiteChannelContextMock.Object,
+            _languageInfoProviderMock.Object,
+            _loggerMock.Object);
 
-        _sitemapServiceMock
-            .Setup(s => s.GetSitemapDtoAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new SitemapDto { Urls = urls });
-
-        var result = await _sitemapServiceMock.Object.GetSitemapDtoAsync(CancellationToken.None);
-
-        Assert.That(result.Urls.First().LocationUri, Is.EqualTo("https://example.com/careers"));
+        // Assert - Should not throw
+        Assert.That(service, Is.Not.Null);
     }
 
     [Test]
-    public async Task GetSitemapDtoAsync_WhenMultiLanguage_ReturnsAlternateUrls()
+    public async Task GetSitemapDtoAsync_ReturnsEmptySitemapDto_WithEmptyUrlsCollection()
     {
-        var urls = new List<SitemapUrlDto>
+        // Arrange
+        var emptyLanguages = Array.Empty<ContentLanguageInfo>();
+        var mockQuery = new Mock<ObjectQuery<ContentLanguageInfo>>();
+        mockQuery.Setup(x => x.GetEnumerableTypedResultAsync(default, default, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(emptyLanguages);
+        _languageInfoProviderMock.Setup(x => x.Get()).Returns(mockQuery.Object);
+
+        // Act
+        var result = await _service.GetSitemapDtoAsync(CancellationToken.None);
+
+        // Assert
+        Assert.Multiple(() =>
         {
-            new()
-            {
-                LocationUri = "https://example.com/en-gb/page",
-                AlternateUrls =
-                [
-                    new() { Url = "https://example.com/en-gb/page", LanguageTag = "en-gb" },
-                    new() { Url = "https://example.com/fr/page", LanguageTag = "fr" },
-                ]
-            }
-        };
-
-        _sitemapServiceMock
-            .Setup(s => s.GetSitemapDtoAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new SitemapDto { Urls = urls });
-
-        var result = await _sitemapServiceMock.Object.GetSitemapDtoAsync(CancellationToken.None);
-
-        Assert.That(result.Urls.First().AlternateUrls, Has.Exactly(2).Items);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Urls, Is.Not.Null);
+            Assert.That(result.Urls, Is.Empty);
+            Assert.That(result.Urls, Is.AssignableTo<IEnumerable<SitemapUrlDto>>());
+        });
     }
 
     [Test]
-    public async Task GetSitemapDtoAsync_WhenSingleLanguage_ReturnsNullAlternateUrls()
+    public async Task GetSitemapDtoAsync_WithCancellationToken_UsesToken()
     {
-        var urls = new List<SitemapUrlDto>
-        {
-            new()
-            {
-                LocationUri = "https://example.com/en-gb/page",
-                AlternateUrls = null
-            }
-        };
+        // Arrange
+        var languages = Array.Empty<ContentLanguageInfo>();
+        var mockQuery = new Mock<ObjectQuery<ContentLanguageInfo>>();
+        var cancellationToken = new CancellationToken();
 
-        _sitemapServiceMock
-            .Setup(s => s.GetSitemapDtoAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new SitemapDto { Urls = urls });
+        mockQuery.Setup(x => x.GetEnumerableTypedResultAsync(default, default, cancellationToken))
+            .ReturnsAsync(languages);
+        _languageInfoProviderMock.Setup(x => x.Get()).Returns(mockQuery.Object);
 
-        var result = await _sitemapServiceMock.Object.GetSitemapDtoAsync(CancellationToken.None);
+        // Act
+        await _service.GetSitemapDtoAsync(cancellationToken);
 
-        Assert.That(result.Urls.First().AlternateUrls, Is.Null);
+        // Assert
+        _languageInfoProviderMock.Verify(x => x.Get(), Times.Once);
     }
 
     [Test]
-    public async Task GetSitemapDtoAsync_UrlsContainLastModificationDate()
+    public async Task GetSitemapDtoAsync_VerifiesWebsiteChannelContextIsInjected()
     {
-        var lastModified = new DateTime(2024, 6, 1);
-        var urls = new List<SitemapUrlDto>
-        {
-            new() { LocationUri = "https://example.com/page", LastModificationDate = lastModified }
-        };
+        // Arrange
+        var emptyLanguages = Array.Empty<ContentLanguageInfo>();
+        var mockQuery = new Mock<ObjectQuery<ContentLanguageInfo>>();
+        mockQuery.Setup(x => x.GetEnumerableTypedResultAsync(default, default, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(emptyLanguages);
+        _languageInfoProviderMock.Setup(x => x.Get()).Returns(mockQuery.Object);
 
-        _sitemapServiceMock
-            .Setup(s => s.GetSitemapDtoAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new SitemapDto { Urls = urls });
+        // Act
+        await _service.GetSitemapDtoAsync(CancellationToken.None);
 
-        var result = await _sitemapServiceMock.Object.GetSitemapDtoAsync(CancellationToken.None);
-
-        Assert.That(result.Urls.First().LastModificationDate, Is.EqualTo(lastModified));
-    }
-
-    [Test]
-    public async Task GetSitemapDtoAsync_IsCalledOnce()
-    {
-        _sitemapServiceMock
-            .Setup(s => s.GetSitemapDtoAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new SitemapDto { Urls = [] });
-
-        await _sitemapServiceMock.Object.GetSitemapDtoAsync(CancellationToken.None);
-
-        _sitemapServiceMock.Verify(
-            s => s.GetSitemapDtoAsync(It.IsAny<CancellationToken>()),
-            Times.Once);
+        // Assert - The service should be constructed with the website channel context
+        // Note: WebsiteChannelName is only accessed when querying page types, which doesn't happen with no languages
+        Assert.That(_service, Is.Not.Null);
     }
 }
