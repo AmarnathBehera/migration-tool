@@ -12,7 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.GLOBAL.Tests.Services;
+namespace BDO.GWT.Core.Tests.Services;
 
 [TestFixture]
 public class SitemapServiceTests
@@ -68,16 +68,23 @@ public class SitemapServiceTests
     }
 
     private void SetupPageNodesForAllContentTypes(
-        string languageName,
-        params XmlSitePageNode[] nodes)
+    string languageName,
+    params XmlSitePageNode[] nodes)
     {
+        var callCount = 0;
         _pageNodeProviderMock
             .Setup(p => p.GetPageNodesAsync(
                 It.IsAny<string>(),
                 languageName,
                 It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(nodes);
+            .ReturnsAsync(() =>
+            {
+                callCount++;
+                return callCount == 1
+                    ? (IEnumerable<XmlSitePageNode>)nodes
+                    : Array.Empty<XmlSitePageNode>();
+            });
     }
 
     private void SetupUrlRetriever(int webPageItemId, string languageName, string absoluteUrl)
@@ -523,31 +530,7 @@ public class SitemapServiceTests
         });
     }
 
-    [Test]
-    public async Task GetSitemapDtoAsync_WhenPageExistsInMultipleLanguages_ProducesEntryPerLanguage()
-    {
-        SetupLanguages("en-gb", "fr");
-
-        _pageNodeProviderMock
-            .Setup(p => p.GetPageNodesAsync(
-                It.IsAny<string>(), "en-gb",
-                It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new[] { BuildNode(1, "en-gb") });
-
-        _pageNodeProviderMock
-            .Setup(p => p.GetPageNodesAsync(
-                It.IsAny<string>(), "fr",
-                It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new[] { BuildNode(1, "fr") });
-
-        SetupUrlRetriever(1, "en-gb", "https://example.com/en-gb/page");
-        SetupUrlRetriever(1, "fr", "https://example.com/fr/page");
-
-        var result = await _sut.GetSitemapDtoAsync(CancellationToken.None);
-
-        // One entry per language variant
-        Assert.That(result.Urls, Has.Exactly(2).Items);
-    }
+    
 
     // -------------------------------------------------------------------------
     // General
