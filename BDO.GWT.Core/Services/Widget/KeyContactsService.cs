@@ -15,20 +15,17 @@ public interface IKeyContactsService
 
 public class KeyContactsService : IKeyContactsService
 {
-    private readonly ILocationOfficeHelper _locationOfficeHelper;
     private readonly IContentService _contentService;
     private readonly ICultureContext _cultureContext;
     private readonly IPersonPageService _personpageService;
     private readonly IExternalPeopleHelper _externalPeopleHelper;
 
     public KeyContactsService(
-        ILocationOfficeHelper locationOfficeHelper,
         IContentService contentService,
         ICultureContext cultureContext,
         IPersonPageService personpageService,
         IExternalPeopleHelper externalPeopleHelper)
     {
-        _locationOfficeHelper = locationOfficeHelper;
         _contentService = contentService;
         _cultureContext = cultureContext;
         _personpageService = personpageService;
@@ -39,7 +36,7 @@ public class KeyContactsService : IKeyContactsService
     {
         var peopleParameters = new RetrievePagesParameters
         {
-            LinkedItemsMaxLevel = 1,
+            LinkedItemsMaxLevel = 2,
             LanguageName = _cultureContext.CurrentLanguageTag,
             UseLanguageFallbacks = false
         };
@@ -83,20 +80,8 @@ public class KeyContactsService : IKeyContactsService
             TeaserImageUrl = person.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url,
             TeaserImageAltText = person.MetadataTeaserImageAltText,
             JobTitle = person.PersonJobTitle,
-            OfficeNames = data.ShowOffice ? await _locationOfficeHelper.RetrieveLocationOfficeNamesAsync(person, cancellationToken) : null,
+            OfficeNames = data.ShowOffice ?await RetrieveLocationOfficeNamesAsync(person, cancellationToken) : null,
             PersonUrl = person.GetUrl().RelativePath,
-        }));
-
-        var externalCards = await Task.WhenAll(externalContributors.Select(async contributorPage => new KeyContactCardDto
-        {
-            DisplayName = await _externalPeopleHelper.GetDisplayNameAsync(contributorPage),
-            FirstName = contributorPage.FirstName,
-            LastName = contributorPage.LastName,
-            ContentItemGuid = contributorPage.SystemFields.ContentItemGUID,
-            TeaserImageUrl = contributorPage.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset.Url,
-            TeaserImageAltText = contributorPage.ImageFileAltText,
-            JobTitle = contributorPage.JobTitle,
-            PersonUrl = contributorPage.Url
         }));
 
         var internalCards = await Task.WhenAll(internalContributors.Select(async contributorPage => new KeyContactCardDto
@@ -111,9 +96,20 @@ public class KeyContactsService : IKeyContactsService
             PersonUrl = contributorPage.Url
         }));
 
-        var cards = peopleCards.Concat(externalCards).Concat(internalCards).ToList();
+        var externalCards = await Task.WhenAll(externalContributors.Select(async contributorPage => new KeyContactCardDto
+        {
+            DisplayName = await _externalPeopleHelper.GetDisplayNameAsync(contributorPage),
+            FirstName = contributorPage.FirstName,
+            LastName = contributorPage.LastName,
+            ContentItemGuid = contributorPage.SystemFields.ContentItemGUID,
+            TeaserImageUrl = contributorPage.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset.Url,
+            TeaserImageAltText = contributorPage.ImageFileAltText,
+            JobTitle = contributorPage.JobTitle,
+            PersonUrl = contributorPage.Url
+        }));
+        var cards = peopleCards.Concat(internalCards).ToList();
 
-        IEnumerable<PersonCardDto> orderedCards;
+        IEnumerable<KeyContactCardDto> orderedCards;
 
         if (data.IsOrderOverriden)
         {
@@ -133,7 +129,8 @@ public class KeyContactsService : IKeyContactsService
         {
             Title = data.Title,
             Description = data.Description,
-            Items = orderedCards.ToArray(),
+            Items = orderedCards.Select(MapToPersonCard).ToArray(),
+            ExternalItems = externalCards.Select(MapToPersonCard).ToArray(),
             SeeAllLink = data is { SeeAllLinkText: not null, SeeAllLinkUrl: not null }
                 ? new LinkItemDto
                 {
@@ -149,8 +146,17 @@ public class KeyContactsService : IKeyContactsService
 
         return dto;
     }
+    private static PersonCardDto MapToPersonCard(KeyContactCardDto card) => new()
+    {
+        DisplayName = card.DisplayName,
+        TeaserImageUrl = card.TeaserImageUrl,
+        TeaserImageAltText = card.TeaserImageAltText,
+        JobTitle = card.JobTitle,
+        PersonUrl = card.PersonUrl,
+        OfficeNames = card.OfficeNames,
+    };
 
-    private static IEnumerable<PersonCardDto> OrderPersonCardByCriteria(IEnumerable<KeyContactCardDto> cards, string? orderCriteria, bool isDescendingOrder)
+    private static IEnumerable<KeyContactCardDto> OrderPersonCardByCriteria(IEnumerable<KeyContactCardDto> cards, string? orderCriteria, bool isDescendingOrder)
     {
         if (orderCriteria is null)
         {
@@ -166,5 +172,11 @@ public class KeyContactsService : IKeyContactsService
         };
 
         return (isDescendingOrder ? cards.OrderByDescending(orderBy) : cards.OrderBy(orderBy)).ToArray();
+    }
+    public async Task<IEnumerable<string>> RetrieveLocationOfficeNamesAsync(Person person, CancellationToken cancellationToken)
+    {
+        var offices = person.MetadataOfficeLocation;
+
+        return offices.Select(o => o.MetadataTitle);
     }
 }

@@ -12,12 +12,5 @@
 
 @if (Model != null && pageId != 0)
 {
-    @* @(await ReactService.RenderComponentAsync(
-                pageId,
-                ReactComponentType.PeopleGrid,
-                ReactComponentType.PeopleGridGUID,
-                new { PeopleGrid = Model },
-                Context.RequestAborted)) *@
-
     @(await ReactService.RenderComponentAsync(pageId, ReactComponentType.PeopleGrid, ReactComponentType.PeopleGridGUID, new { Data = Model }, Context.RequestAborted))
 }
