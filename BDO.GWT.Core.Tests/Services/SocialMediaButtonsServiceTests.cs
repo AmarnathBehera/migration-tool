@@ -31,7 +31,7 @@ public class SocialMediaButtonsServiceTests
             _urlResolverMock.Object);
     }
 
-    private static PrintorShareInfo Create(
+    private static TestPrintorShareInfo Create(
         bool email = false,
         bool fb = false,
         bool tw = false,
@@ -208,8 +208,11 @@ public class SocialMediaButtonsServiceTests
 
         // The service URL-encodes the resolved URL before embedding it in share links.
         var encoded = System.Web.HttpUtility.UrlEncode("https://resolved.com/page");
-        Assert.That(result.EmailButtonUrl, Does.Contain(encoded));
-        Assert.That(result.LinkedInUrl, Does.Contain(encoded));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.EmailButtonUrl, Does.Contain(encoded));
+            Assert.That(result.LinkedInUrl, Does.Contain(encoded));
+        });
     }
 
     // -------------------------------
@@ -234,9 +237,12 @@ public class SocialMediaButtonsServiceTests
             "Test Title & Special #Chars",
             CancellationToken.None);
 
-        Assert.That(result.EmailButtonUrl, Does.Contain("%"));
-        Assert.That(result.TwitterButtonUrl, Does.Contain("%"));
-        Assert.That(result.EmailButtonUrl, Does.Not.Contain("Test Title & Special"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.EmailButtonUrl, Does.Contain("%"));
+            Assert.That(result.TwitterButtonUrl, Does.Contain("%"));
+            Assert.That(result.EmailButtonUrl, Does.Not.Contain("Test Title & Special"));
+        });
     }
 
     // -------------------------------
