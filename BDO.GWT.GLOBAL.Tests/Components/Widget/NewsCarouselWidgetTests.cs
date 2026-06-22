@@ -84,7 +84,7 @@ public class NewsCarouselWidgetTests
             .ReturnsAsync(new List<IWebPageFieldsSource> { page ?? new Mock<IWebPageFieldsSource>().Object });
     }
 
-   
+
     [Test]
     public async Task InvokeAsync_WithAllProperties_MapsDataToServiceCorrectly()
     {
@@ -289,5 +289,98 @@ public class NewsCarouselWidgetTests
 
         Assert.That(dto, Is.Not.Null);
         Assert.That(dto, Is.SameAs(expectedDto));
+    }
+    [Test]
+    public async Task InvokeAsync_WhenPageIsNull_ReturnsDefaultDto()
+    {
+        var model = new ComponentViewModel<NewsCarouselWidgetProperties>();
+
+        typeof(ComponentViewModel<NewsCarouselWidgetProperties>)
+            .GetProperty("Properties")
+            ?.SetValue(model, new NewsCarouselWidgetProperties());
+
+        var result = await _widget.InvokeAsync(model);
+
+        var viewResult = result as ViewViewComponentResult;
+
+        var dto = viewResult?.ViewData?.Model as NewsCarouselDto;
+
+        Assert.That(dto, Is.Not.Null);
+
+        Assert.That(dto!.FilteringTooltipEnabled, Is.False);
+
+        _contentServiceMock.Verify(
+            x => x.GetItemsByGUIDAsync(It.IsAny<List<Guid>>()),
+            Times.Never);
+
+        _newsCarouselServiceMock.Verify(
+            x => x.GetNewsCarouselAsync(
+                It.IsAny<IWebPageFieldsSource>(),
+                It.IsAny<NewsCarouselData>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task InvokeAsync_WhenFeaturedNewsIsNull_UsesEmptyCollection()
+    {
+        SetupContentServiceMock();
+
+        NewsCarouselData? capturedData = null;
+
+        _newsCarouselServiceMock
+            .Setup(x => x.GetNewsCarouselAsync(
+                It.IsAny<IWebPageFieldsSource>(),
+                It.IsAny<NewsCarouselData>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<IWebPageFieldsSource, NewsCarouselData, CancellationToken>(
+                (_, d, _) => capturedData = d)
+            .ReturnsAsync(CreateDefaultDto());
+
+        var properties = new NewsCarouselWidgetProperties
+        {
+            FeaturedNews = null!
+        };
+
+        await _widget.InvokeAsync(
+            CreateModel(properties, Guid.NewGuid()));
+
+        Assert.That(
+            capturedData!.NodeGuidsOfFeaturedNews,
+            Is.Empty);
+    }
+    [Test]
+    public async Task InvokeAsync_MapsFeaturedNewsCorrectly()
+    {
+        SetupContentServiceMock();
+
+        NewsCarouselData? capturedData = null;
+
+        _newsCarouselServiceMock
+            .Setup(x => x.GetNewsCarouselAsync(
+                It.IsAny<IWebPageFieldsSource>(),
+                It.IsAny<NewsCarouselData>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<IWebPageFieldsSource, NewsCarouselData, CancellationToken>(
+                (_, d, _) => capturedData = d)
+            .ReturnsAsync(CreateDefaultDto());
+
+        var featured = new List<ContentItemReference>{
+            new ContentItemReference
+           {
+                 Identifier = Guid.NewGuid()
+           }};
+
+        var properties = new NewsCarouselWidgetProperties
+        {
+            FeaturedNews = featured
+        };
+
+        await _widget.InvokeAsync(
+            CreateModel(properties, Guid.NewGuid()));
+
+        Assert.That(
+            capturedData!.NodeGuidsOfFeaturedNews,
+            Is.EqualTo(featured));
     }
 }
