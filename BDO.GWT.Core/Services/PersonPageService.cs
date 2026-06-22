@@ -112,6 +112,7 @@ public class PersonPageService : IPersonPageService
         var cities = await _contentService.GetPagesAsync<LocationCity>(
         new RetrievePagesParameters
         {
+            LinkedItemsMaxLevel=3,
             LanguageName = _cultureContext.CurrentLanguageTag,
             UseLanguageFallbacks = false
         },
@@ -124,7 +125,7 @@ public class PersonPageService : IPersonPageService
             });
             query.Columns(
                 nameof(LocationCity.MetadataTitle),
-                //nameof(LocationCity.RegionName),
+                nameof(LocationCity.RegionNameLocationCity),
                 nameof(LocationCity.SystemFields.WebPageItemID)
             );
         },
@@ -140,7 +141,7 @@ public class PersonPageService : IPersonPageService
         Address = office?.LocationAddressLine1,
         SecondAddress = office?.LocationAddressLine2,
         City = city?.MetadataTitle,
-        //State = city?.RegionName,
+        State = city?.RegionNameLocationCity?.FirstOrDefault()?.RegionName1,
         Zip = office?.LocationZip,
         Country = office?.LocationCountry,
     }));

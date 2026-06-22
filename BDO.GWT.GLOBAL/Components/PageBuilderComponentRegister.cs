@@ -73,14 +73,6 @@ using Kentico.PageBuilder.Web.Mvc;
     IconClass = "icon-cb-check-preview",
     ViewName = "~/Components/FormComponents/ConsentAgreement/ConsentAgreement.cshtml"
 )]
-[assembly: RegisterFormComponent(
-    SecurityCode.IDENTIFIER,
-    typeof(SecurityCode),
-    "Security Code",
-    IsAvailableInFormBuilderEditor = true,
-    ViewName = "~/Components/FormComponents/SecurityCode/_SecurityCode.cshtml",
-    Description = "{$" + ComponentIdentifiers.FormComponents.SecurityCode + ".Description$}",
-    IconClass = "icon-cb-check-preview")]
 
 [assembly: RegisterFormComponent(
     MonthYear.IDENTIFIER,

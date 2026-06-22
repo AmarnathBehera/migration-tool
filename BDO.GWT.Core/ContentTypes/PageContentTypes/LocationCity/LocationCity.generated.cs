@@ -36,6 +36,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// RegionNameLocationCity.
+		/// </summary>
+		public IEnumerable<RegionName> RegionNameLocationCity { get; set; }
+
+
+		/// <summary>
 		/// ContentTitle.
 		/// </summary>
 		public string ContentTitle { get; set; }

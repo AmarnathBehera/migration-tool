@@ -19,6 +19,11 @@
       <field allowempty="true" column="ScriptinbottomofBodyKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="7478522a-3449-497f-9dec-f427bffd06a5" />
       <field allowempty="true" column="ScriptinTopofBodyKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="388b8e6a-9e0a-444b-b16c-c5ee896c055e" />
       <field allowempty="true" column="ScriptsTopofPageHeadKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="27cb7f3b-9404-4096-9086-a0bc141937bc" />
+      <field allowempty="true" column="SitekeyreCAPTCHAv2" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="37fe23d1-1c67-4a31-8968-b0178c17eea0" />
+      <field allowempty="true" column="SecretkeyreCAPTCHAv2" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="fd52f274-34a2-4756-bad6-7c01fd687370" />
+      <field allowempty="true" column="SitekeyreCAPTCHAv3" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="1d1627ef-e1ab-4ef3-bedf-4b9948f468f7" />
+      <field allowempty="true" column="SecretkeyreCAPTCHAv3" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="f6217532-d8b9-494c-b798-ae2cfe7158cf" />
+      <field allowempty="true" column="ScorethresholdreCAPTCHAv3" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6cb3232e-f47c-4eed-a625-741d3a2cfdd8" />
     </form>
   </ClassFormDefinition>
   <ClassGUID>f393a535-3751-4fe5-bd51-90482f775b9a</ClassGUID>

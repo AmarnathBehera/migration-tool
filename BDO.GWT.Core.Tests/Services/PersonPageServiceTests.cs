@@ -614,4 +614,205 @@ public class PersonPageServiceTests
             a => a.GetAuthoredContentDtoAsync(person, It.IsAny<CancellationToken>()),
             Times.Once);
     }
+    [Test]
+    public async Task GetPersonPageDtoAsync_WhenCredentialsNull_ReturnsEmptyCollection()
+    {
+        var person = new Person
+        {
+            PersonFirstName = "John",
+            PersonLastName = "Doe",
+            PersonCredentials = null
+        };
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<LocationOffice>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        var result = await _service.GetPersonPageDtoAsync(
+            person,
+            CancellationToken.None);
+
+        Assert.That(result.Credentials, Is.Empty);
+    }
+    [Test]
+    public async Task GetPersonPageDtoAsync_WhenNoAuthoredContent_ReturnsNull()
+    {
+        var person = new Person
+        {
+            PersonFirstName = "John",
+            PersonLastName = "Doe"
+        };
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<LocationOffice>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        _authoredContentServiceMock
+            .Setup(x => x.GetAuthoredContentDtoAsync(
+                person,
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((AuthoredContentDto?)null);
+
+        var result = await _service.GetPersonPageDtoAsync(
+            person,
+            CancellationToken.None);
+
+        Assert.That(result.AuthoredContent, Is.Null);
+    }
+    [Test]
+    public async Task GetPersonPageDtoAsync_WhenNoOfficeLocations_ReturnsEmptyCollection()
+    {
+        var person = new Person
+        {
+            PersonFirstName = "John",
+            PersonLastName = "Doe",
+            MetadataOfficeLocation = []
+        };
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<LocationOffice>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<LocationCity>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        var result = await _service.GetPersonPageDtoAsync(
+            person,
+            CancellationToken.None);
+
+        Assert.That(result.OfficeLocations, Is.Empty);
+    }
+    [Test]
+    public async Task GetPersonPageDtoAsync_CallsLocationCityLookup()
+    {
+        var person = new Person
+        {
+            PersonFirstName = "John",
+            PersonLastName = "Doe",
+            MetadataOfficeLocation = []
+        };
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<LocationOffice>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<LocationCity>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        await _service.GetPersonPageDtoAsync(
+            person,
+            CancellationToken.None);
+
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<LocationCity>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+    [Test]
+    public async Task GetPersonPageDtoAsync_CallsLocationOfficeLookup()
+    {
+        var person = new Person
+        {
+            PersonFirstName = "John",
+            PersonLastName = "Doe",
+            MetadataOfficeLocation = []
+        };
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<LocationOffice>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<LocationCity>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        await _service.GetPersonPageDtoAsync(
+            person,
+            CancellationToken.None);
+
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<LocationOffice>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
 }

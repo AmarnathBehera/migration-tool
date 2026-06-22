@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.DealCardIndustry</CodeName>
+    <GUID>bdd17a11-079d-4afa-9490-c8c2f90f8353</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.DealCardSubIndustry">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.DealCardSubIndustry</CodeName>
+        <GUID>cdab0d33-430e-407a-ad3e-f0a5ac05d5e0</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

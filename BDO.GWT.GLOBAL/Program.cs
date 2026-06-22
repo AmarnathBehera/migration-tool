@@ -76,6 +76,7 @@ builder.Services.Configure<WebEncoderOptions>(options =>
 
 builder.Services.AddAuthentication();
 builder.Services.AddContentServices();
+builder.Services.AddScoped<IDealCardsService, DealCardsService>();
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddScoped<IPageBuilderService, PageBuilderService>();
 builder.Services.AddScoped<IContentService, ContentService>();
