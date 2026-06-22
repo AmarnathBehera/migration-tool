@@ -21,11 +21,13 @@ public interface IPersonPageService
 
 public class PersonPageService : IPersonPageService
 {
+
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IContentService _contentService;
     private readonly ICultureContext _cultureContext;
     private readonly ISettingService _settingsService;
     private readonly IAuthoredContentService _authoredContentService;
+    private readonly IWebPageUrlResolver _webPageUrlResolver;
 
     private HttpClient? _httpClient;
 
@@ -34,7 +36,8 @@ public class PersonPageService : IPersonPageService
         IContentService contentService,
         ICultureContext cultureContext,
         ISettingService settingService,
-        IAuthoredContentService authoredContentService
+        IAuthoredContentService authoredContentService,
+        IWebPageUrlResolver webPageUrlResolver
         )
     {
         _httpClientFactory = httpClientFactory;
@@ -42,6 +45,7 @@ public class PersonPageService : IPersonPageService
         _cultureContext = cultureContext;
         _settingsService = settingService;
         _authoredContentService = authoredContentService;
+        _webPageUrlResolver = webPageUrlResolver;
     }
 
     public async Task<PersonDto> GetPersonPageDtoAsync(Person page, CancellationToken cancellationToken = default)
@@ -163,7 +167,7 @@ public class PersonPageService : IPersonPageService
                 ("PREF", person.PersonDirectDialNumber),
             },
             Locations = locations,
-            URL = person.GetUrl().AbsoluteUrl,
+            URL = _webPageUrlResolver.GetAbsoluteUrl(person),
             RevisionDate = DateTime.UtcNow,
             Source = source,
             Organization = "BDO",
@@ -205,7 +209,7 @@ public class PersonPageService : IPersonPageService
 
         return new PersonSchemaMarkupDto()
         {
-            Url = person.GetUrl().AbsoluteUrl,
+            Url = _webPageUrlResolver.GetAbsoluteUrl(person),
             Name = person.MetadataTitle,
             JobTitle = person.PersonJobTitle,
             Description = _contentService.GetFallbackMetadataDescription(person.MetadataDescription, person.MetadataOGDescription),
@@ -320,7 +324,7 @@ public class PersonPageService : IPersonPageService
                 result.Add(new LinkItemDto
                 {
                     Title = locationOffice.MetadataTitle ?? string.Empty,
-                    URL = city.GetUrl().AbsoluteUrl,
+                    URL = _webPageUrlResolver.GetAbsoluteUrl(city),
                 });
             }
         }

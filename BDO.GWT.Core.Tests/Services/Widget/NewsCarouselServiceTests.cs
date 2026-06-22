@@ -93,8 +93,12 @@ public class NewsCarouselServiceTests
 
         await _service.GetAPIFilteredItemsAsync(new CardsQuery(), CancellationToken.None);
 
-        Assert.That(captured!.PageSize, Is.EqualTo(10));
-        Assert.That(captured.CurrentPage, Is.EqualTo(1));
+        Assert.That(captured, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(captured!.PageSize, Is.EqualTo(10));
+            Assert.That(captured!.CurrentPage, Is.EqualTo(1));
+        });
     }
 
     [Test]
@@ -123,8 +127,12 @@ public class NewsCarouselServiceTests
             PageSize = 20
         }, CancellationToken.None);
 
-        Assert.That(captured!.PageSize, Is.EqualTo(20));
-        Assert.That(captured.CurrentPage, Is.EqualTo(5));
+        Assert.That(captured, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(captured!.PageSize, Is.EqualTo(20));
+            Assert.That(captured!.CurrentPage, Is.EqualTo(5));
+        });
     }
 
     [Test]
@@ -197,6 +205,6 @@ public class NewsCarouselServiceTests
 
         var result = await _service.GetAPIFilteredItemsAsync(new CardsQuery(), CancellationToken.None);
 
-        Assert.That(result.Count, Is.GreaterThanOrEqualTo(0));
+        Assert.That(result, Has.Count.GreaterThanOrEqualTo(0));
     }
 }
