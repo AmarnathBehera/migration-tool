@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using CMS.ContentEngine;
 using CMS.Websites;
-using CMS.MediaLibrary;
 
 namespace BDO
 {
@@ -51,19 +50,19 @@ namespace BDO
 		/// <summary>
 		/// Industry.
 		/// </summary>
-		public IEnumerable<DealCardCommon> Industry { get; set; }
+		public IEnumerable<DealCardIndustry> Industry { get; set; }
 
 
 		/// <summary>
 		/// SubIndustry.
 		/// </summary>
-		public IEnumerable<DealCardCommon> SubIndustry { get; set; }
+		public IEnumerable<DealCardSubIndustry> SubIndustry { get; set; }
 
 
 		/// <summary>
 		/// DealType.
 		/// </summary>
-		public IEnumerable<DealCardCommon> DealType { get; set; }
+		public IEnumerable<DealCardDealType> DealType { get; set; }
 
 
 		/// <summary>
@@ -75,7 +74,7 @@ namespace BDO
 		/// <summary>
 		/// Size.
 		/// </summary>
-		public IEnumerable<DealCardCommon> Size { get; set; }
+		public IEnumerable<DealCardRange> Size { get; set; }
 
 
 		/// <summary>
@@ -105,8 +104,7 @@ namespace BDO
 		/// <summary>
 		/// DealMetadataRssImage.
 		/// </summary>
-		[Obsolete("Media libraries and their APIs are obsolete and will be discontinued in the future. Please migrate all media library files to Content hub and use their corresponding content item APIs.")]
-		public IEnumerable<AssetRelatedItem> DealMetadataRssImage { get; set; }
+		public IEnumerable<ContentAttachment> DealMetadataRssImage { get; set; }
 
 
 		/// <summary>
