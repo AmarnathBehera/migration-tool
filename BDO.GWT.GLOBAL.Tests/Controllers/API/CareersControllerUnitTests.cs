@@ -69,6 +69,7 @@ public class CareersControllerUnitTests
 
         _mockService
             .Setup(x => x.GetCareerPaginationResultAsync(
+                It.IsAny<string>(),
                 It.IsAny<Guid>(),
                 It.IsAny<CardsQuery>(),
                 It.IsAny<CancellationToken>()))
@@ -90,6 +91,7 @@ public class CareersControllerUnitTests
             Is.EqualTo(paginationDto));
 
         _mockService.Verify(x => x.GetCareerPaginationResultAsync(
+                It.IsAny<string>(),
                 It.Is<Guid>(g => g == pageGuid),
                 It.Is<CardsQuery>(q => q == query),
                 It.IsAny<CancellationToken>()),
@@ -112,6 +114,7 @@ public class CareersControllerUnitTests
 
         _mockService
             .Setup(x => x.GetCareerPaginationResultAsync(
+                It.IsAny<string>(),
                 It.IsAny<Guid>(),
                 It.IsAny<CardsQuery>(),
                 It.IsAny<CancellationToken>()))
@@ -133,6 +136,7 @@ public class CareersControllerUnitTests
             Is.EqualTo(emptyDto));
 
         _mockService.Verify(x => x.GetCareerPaginationResultAsync(
+                It.IsAny<string>(),
                 It.Is<Guid>(g => g == pageGuid),
                 It.Is<CardsQuery>(q => q == query),
                 It.IsAny<CancellationToken>()),
