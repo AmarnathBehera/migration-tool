@@ -26,9 +26,11 @@ public class CareersController: ControllerBase
     [HttpGet("{pageGuid:guid}/[action]")]
     public async Task<ActionResult<PaginationDto<ContentPageCardDto>>> Get([FromRoute] Guid pageGuid, [FromQuery] CardsQuery query, CancellationToken cancellationToken)
     {
+        var language = RouteData.Values[CultureInjectorAttribute.RouteParameter]?.ToString();
+
         query.Filters = RequestQueryUtility.ExtractFilterQueryParameters(Request.Query);
 
-        var result = await _careersPageService.GetCareerPaginationResultAsync(pageGuid, query, cancellationToken);
+        var result = await _careersPageService.GetCareerPaginationResultAsync(language, pageGuid, query, cancellationToken);
 
         return Ok(result);
     }
