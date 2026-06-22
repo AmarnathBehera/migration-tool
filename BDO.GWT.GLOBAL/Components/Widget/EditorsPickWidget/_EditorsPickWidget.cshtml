@@ -1,7 +1,7 @@
-﻿@inject IReactHelper ReactHelper
+﻿@* @inject IReactHelper ReactHelper
 @using BDO.GWT.Web.Core.LiveSite.Helpers
 @model BDO.GWT.Web.Core.DTOs.EditorsPickDto
 
 @ReactHelper.RenderComponent(Html, "InsightCarousel", new {
     InsightCarousel = Model,
-})
+}) *@

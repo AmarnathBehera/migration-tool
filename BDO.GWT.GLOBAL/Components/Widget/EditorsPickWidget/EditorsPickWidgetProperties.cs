@@ -35,9 +35,9 @@ public class EditorsPickWidgetProperties : BaseWidgetProperties
     [CheckBoxComponent(Label = "Enable filtering", Order = 2)]
     public bool FilteringEnabled { get; set; } = true;
 
-    [MultipleChoiceComponent(Label = "Filters", ExplanationText = "Filters that visitor will be able to filter editor's pick content by. Some filter values will not work for some page types.", Order = 3)]
-    //[EditingComponentConfiguration(typeof(FiltersConfiguration))]
-    [VisibleIfTrue(nameof(FilteringEnabled))]
+    //[MultipleChoiceComponent(Label = "Filters", ExplanationText = "Filters that visitor will be able to filter editor's pick content by. Some filter values will not work for some page types.", Order = 3)]
+    ////[EditingComponentConfiguration(typeof(FiltersConfiguration))]
+    //[VisibleIfTrue(nameof(FilteringEnabled))]
     public string? Filters { get; set; } = string.Join(';', EditorsPickFilters.Where(x => x.IsDefault).Select(x => x.ParameterName));
 
     //NOTE: Modify configuration of the OrderedPageSelector component to allow only specific page types (https://roadmap.kentico.com/c/75-page-selector-allowed-page-types)
@@ -70,25 +70,25 @@ public class EditorsPickWidgetProperties : BaseWidgetProperties
     public string BottomMargin { get; set; } = null!;
 
 #pragma warning disable CA1812 // Avoid uninstantiated internal classes - this class is instantiated by Kentico
-    private class FiltersConfiguration : FormComponentConfigurator<MultipleChoiceComponent>
-#pragma warning restore CA1812 // Avoid uninstantiated internal classes - this class is instantiated by Kentico
-    {
-        public override void Configure(MultipleChoiceComponent formComponent, IFormFieldValueProvider formFieldValueProvider)
-        {
-            var sourceValues = EditorsPickFilters.Select(x =>
-            {
-                var filterParameterData = FilterUtility.GetFilterParameterData(x.ParameterName) ?? throw new NotSupportedException($"Filter parameter '{x.ParameterName}' is not supported.");
+//    private class FiltersConfiguration : FormComponentConfigurator<MultipleChoiceComponent>
+//#pragma warning restore CA1812 // Avoid uninstantiated internal classes - this class is instantiated by Kentico
+//    {
+//        public override void Configure(MultipleChoiceComponent formComponent, IFormFieldValueProvider formFieldValueProvider)
+//        {
+//            var sourceValues = EditorsPickFilters.Select(x =>
+//            {
+//                var filterParameterData = FilterUtility.GetFilterParameterData(x.ParameterName) ?? throw new NotSupportedException($"Filter parameter '{x.ParameterName}' is not supported.");
 
-                var sourceValue = $"{x.ParameterName};{filterParameterData.AdminDisplayName}";
+//                var sourceValue = $"{x.ParameterName};{filterParameterData.AdminDisplayName}";
 
-                return sourceValue;
-            });
+//                return sourceValue;
+//            });
 
-            formComponent.Properties.DataSource = string.Join(Environment.NewLine, sourceValues);
-            if (formFieldValueProvider.TryGet<bool>(nameof(FilteringEnabled), out var filteringEnabled) && filteringEnabled)
-            {
-                formComponent.Properties.Required = true;
-            }
-        }
-    }
+//            formComponent.Properties.DataSource = string.Join(Environment.NewLine, sourceValues);
+//            if (formFieldValueProvider.TryGet<bool>(nameof(FilteringEnabled), out var filteringEnabled) && filteringEnabled)
+//            {
+//                formComponent.Properties.Required = true;
+//            }
+//        }
+    //}
 }

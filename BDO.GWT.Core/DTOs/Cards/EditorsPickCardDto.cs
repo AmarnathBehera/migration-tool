@@ -2,7 +2,7 @@
 
 namespace BDO.GWT.Core.DTOs.Cards;
 
-public class EditorsPickCardDto : CarouselCardDto
+public class EditorsPickCardDto 
 {
     public string? DateTextOverride { get; set; }
 

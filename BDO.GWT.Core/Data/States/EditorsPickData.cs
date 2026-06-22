@@ -1,4 +1,6 @@
 ﻿
+using CMS.ContentEngine;
+
 namespace BDO.GWT.Core.Data;
 
 public class EditorsPickData : BaseWidgetData
@@ -13,9 +15,9 @@ public class EditorsPickData : BaseWidgetData
 
     public HashSet<string> SelectedPageTypes { get; set; } = new();
 
-    public IEnumerable<Guid> EditorsPickNodeGuids { get; set; } = Enumerable.Empty<Guid>();
+    public IEnumerable<ContentItemReference> EditorsPickNodeGuids { get; set; } = Enumerable.Empty<ContentItemReference>();
 
-    public IEnumerable<Guid> FeaturedPageNodeGuids { get; set; } = Enumerable.Empty<Guid>();
+    public IEnumerable<ContentItemReference> FeaturedPageNodeGuids { get; set; } = Enumerable.Empty<ContentItemReference>();
 
     public Guid? BackgroundImageMediaFileGuid { get; set; }
 
