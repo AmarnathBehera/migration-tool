@@ -8,6 +8,15 @@ namespace BDO.GWT.Core.Tests.Services;
 
 public class PersonPageServiceTests
 {
+    private static readonly string[] ExpectedFacebookOnlyProfiles = ["https://facebook.com/john"];
+
+    private static readonly string[] ExpectedAllSocialProfiles =
+    [
+        "https://facebook.com/john",
+        "https://twitter.com/john",
+        "https://linkedin.com/in/john"
+    ];
+
     private Mock<IHttpClientFactory> _httpClientFactoryMock = null!;
     private Mock<IContentService> _contentServiceMock = null!;
     private Mock<ICultureContext> _cultureContextMock = null!;
@@ -868,7 +877,7 @@ public class PersonPageServiceTests
 
         var result = await _service.GetPersonSchemaMarkupDto(person, CancellationToken.None);
 
-        Assert.That(result.SameAs, Is.EqualTo(new[] { "https://facebook.com/john" }));
+        Assert.That(result.SameAs, Is.EqualTo(ExpectedFacebookOnlyProfiles));
     }
 
     [Test]
@@ -887,12 +896,7 @@ public class PersonPageServiceTests
 
         var result = await _service.GetPersonSchemaMarkupDto(person, CancellationToken.None);
 
-        Assert.That(result.SameAs, Is.EqualTo(new[]
-        {
-            "https://facebook.com/john",
-            "https://twitter.com/john",
-            "https://linkedin.com/in/john"
-        }));
+        Assert.That(result.SameAs, Is.EqualTo(ExpectedAllSocialProfiles));
     }
 
     [Test]
