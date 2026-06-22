@@ -120,8 +120,11 @@ public class NewsArticleServiceTests
 
         var result = await _service.GetSectionNewsPageDtoAsync(page, CancellationToken.None);
 
-        Assert.That(result!.Description, Does.Not.Contain("~/"));
-        Assert.That(result.Description, Does.Contain("/page"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.Description, Does.Not.Contain("~/"));
+            Assert.That(result!.Description, Does.Contain("/page"));
+        });
     }
 
     [Test]
@@ -143,8 +146,11 @@ public class NewsArticleServiceTests
 
         var result = await _service.GetSectionNewsPageDtoAsync(page, CancellationToken.None);
 
-        Assert.That(result!.Content, Does.Not.Contain("~/"));
-        Assert.That(result.Content, Does.Contain("/media/x.png"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.Content, Does.Not.Contain("~/"));
+            Assert.That(result!.Content, Does.Contain("/media/x.png"));
+        });
     }
 
     [Test]

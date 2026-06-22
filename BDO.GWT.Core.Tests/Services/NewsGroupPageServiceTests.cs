@@ -9,7 +9,7 @@ public class NewsGroupPageServiceTests
 {
     private Mock<IContentService> _contentServiceMock = null!;
     private Mock<IWebPageUrlResolver> _urlResolverMock = null!;
-    private INewsGroupPageService _service = null!;
+    private NewsGroupPageService _service = null!;
 
     [SetUp]
     public void Setup()
