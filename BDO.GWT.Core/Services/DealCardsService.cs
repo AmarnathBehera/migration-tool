@@ -172,7 +172,6 @@ namespace BDO.GWT.Core.Services
         private async Task<List<DealCardDto>> CreatePeopleCardDtosAsync(List<Deal> deals)
         {
             var httpContext = _httpContextAccessor.HttpContext!;
-            var actionContext = new ActionContext(httpContext, httpContext.GetRouteData() ?? new RouteData(), new ActionDescriptor());
 
             var dtos = new List<DealCardDto>();
             foreach (var deal in deals)
