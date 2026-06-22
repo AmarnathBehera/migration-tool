@@ -18,7 +18,6 @@ public class PeopleCardsServiceTests
 {
     private Mock<ICardsService> _cardsServiceMock = null!;
     private Mock<IContentService> _contentServiceMock = null!;
-    private Mock<ITaxonomyTagRetriever> _taxonomyTagRetrieverMock = null!;
     private Mock<ICultureContext> _cultureContextMock = null!;
     private Mock<ISettingService> _settingServiceMock = null!;
     private Mock<IUrlHelperFactory> _urlHelperFactoryMock = null!;
@@ -49,53 +48,21 @@ public class PeopleCardsServiceTests
             _httpContextAccessorMock.Object);
     }
 
-    [Test]
-    public async Task CreateFiltersAsync_DelegatesToCardsService()
-    {
-        var filters = new HashSet<string> { "officeLocation" };
-        var expectedFilters = new[]
-        {
-            new FilterItemDto<OptionDto>
-            {
-                Name = "officeLocation",
-                Title = "Location",
-                Type = "select",
-                Options = [new OptionDto { Value = "NYC", Label = "NYC" }]
-            }
-        };
-
-        _cardsServiceMock
-            .Setup(s => s.CreateFiltersAsync(filters, null, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(expectedFilters);
-
-        var result = await _service.CreateFiltersAsync(filters, null, CancellationToken.None);
-
-        Assert.That(result, Is.SameAs(expectedFilters));
-        _cardsServiceMock.Verify(
-            s => s.CreateFiltersAsync(filters, null, It.IsAny<CancellationToken>()),
-            Times.Once);
-    }
+    #region GetFilteredItemsAsync (parentWebPageItemId overload)
 
     [Test]
-    public async Task GetFilteredItemsAsync_ReturnsEmptyPagination_WhenNoPeople()
+    public async Task GetFilteredItemsAsync_ByParentId_ReturnsEmptyPagination_WhenNoPeople()
     {
-        var page = new SectionPeoplePage();
         var query = new CardsQuery { Order = "asc" };
 
         _contentServiceMock
-            .Setup(s => s.GetCurrentChannelID())
-            .Returns(1);
-
-        _contentServiceMock
-            .Setup(s => s.GetPagesAsync<Person>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
+            .Setup(s => s.GetChildPagesByParentGuidWithQueryBuilderAsync<Person>(
+                It.IsAny<Action<ContentItemQueryBuilder>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
-            page, "en", query, null, _ => false, CancellationToken.None);
+            1, "en", query, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -105,53 +72,59 @@ public class PeopleCardsServiceTests
     }
 
     [Test]
-    public async Task GetFilteredItemsAsync_WithNoOrder_DefaultsToWebPageItemOrder()
+    public async Task GetFilteredItemsAsync_ByParentId_WithDescOrder_ReturnsResults()
     {
-        var page = new SectionPeoplePage();
-        var query = new CardsQuery { Order = null };
-
-        _contentServiceMock.Setup(s => s.GetCurrentChannelID()).Returns(1);
-
-        _contentServiceMock
-            .Setup(s => s.GetPagesAsync<Person>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<Person>());
-
-        var result = await _service.GetFilteredItemsAsync(
-            page, "en", query, null, _ => false, CancellationToken.None);
-
-        Assert.That(result.Data, Is.Empty);
-    }
-
-    [Test]
-    public async Task GetFilteredItemsAsync_WithDescOrder_Works()
-    {
-        var page = new SectionPeoplePage();
         var query = new CardsQuery { Order = "DESC" };
 
-        _contentServiceMock.Setup(s => s.GetCurrentChannelID()).Returns(1);
-
         _contentServiceMock
-            .Setup(s => s.GetPagesAsync<Person>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
+            .Setup(s => s.GetChildPagesByParentGuidWithQueryBuilderAsync<Person>(
+                It.IsAny<Action<ContentItemQueryBuilder>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
-            page, "en", query, null, _ => false, CancellationToken.None);
+            1, "en", query, CancellationToken.None);
 
         Assert.That(result.Data, Is.Empty);
     }
 
     [Test]
-    public async Task GetFilteredItemsAsync_WithFilters_AppliesFilterExpressions()
+    public async Task GetFilteredItemsAsync_ByParentId_WithNodeOrder_UsesWebPageItemIdOrdering()
     {
-        var page = new SectionPeoplePage();
+        var query = new CardsQuery { Order = "nodeorder" };
+
+        _contentServiceMock
+            .Setup(s => s.GetChildPagesByParentGuidWithQueryBuilderAsync<Person>(
+                It.IsAny<Action<ContentItemQueryBuilder>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Enumerable.Empty<Person>());
+
+        var result = await _service.GetFilteredItemsAsync(
+            42, "en", query, CancellationToken.None);
+
+        Assert.That(result.Data, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_ByParentId_WithNullOrder_DefaultsToAsc()
+    {
+        var query = new CardsQuery { Order = null };
+
+        _contentServiceMock
+            .Setup(s => s.GetChildPagesByParentGuidWithQueryBuilderAsync<Person>(
+                It.IsAny<Action<ContentItemQueryBuilder>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Enumerable.Empty<Person>());
+
+        var result = await _service.GetFilteredItemsAsync(
+            1, "en", query, CancellationToken.None);
+
+        Assert.That(result.TotalCount, Is.EqualTo(0));
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_ByParentId_WithFilters_AppliesFilterExpressions()
+    {
         var query = new CardsQuery
         {
             Order = "asc",
@@ -167,30 +140,25 @@ public class PeopleCardsServiceTests
             ContentItemGUID = Guid.NewGuid()
         });
 
-        _contentServiceMock.Setup(s => s.GetCurrentChannelID()).Returns(1);
-
         _contentServiceMock
             .Setup(s => s.GetPageByTypeAndNameAsync(It.IsAny<Type>(), "New York"))
             .ReturnsAsync(mockPage.Object);
 
         _contentServiceMock
-            .Setup(s => s.GetPagesAsync<Person>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
+            .Setup(s => s.GetChildPagesByParentGuidWithQueryBuilderAsync<Person>(
+                It.IsAny<Action<ContentItemQueryBuilder>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
-            page, "en", query, null, _ => false, CancellationToken.None);
+            1, "en", query, CancellationToken.None);
 
         Assert.That(result.TotalCount, Is.EqualTo(0));
     }
 
     [Test]
-    public async Task GetFilteredItemsAsync_UnknownFilter_IsIgnored()
+    public async Task GetFilteredItemsAsync_ByParentId_UnknownFilter_IsIgnored()
     {
-        var page = new SectionPeoplePage();
         var query = new CardsQuery
         {
             Order = "asc",
@@ -200,26 +168,21 @@ public class PeopleCardsServiceTests
             }
         };
 
-        _contentServiceMock.Setup(s => s.GetCurrentChannelID()).Returns(1);
-
         _contentServiceMock
-            .Setup(s => s.GetPagesAsync<Person>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
+            .Setup(s => s.GetChildPagesByParentGuidWithQueryBuilderAsync<Person>(
+                It.IsAny<Action<ContentItemQueryBuilder>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
-            page, "en", query, null, _ => false, CancellationToken.None);
+            1, "en", query, CancellationToken.None);
 
         Assert.That(result.TotalCount, Is.EqualTo(0));
     }
 
     [Test]
-    public async Task GetFilteredItemsAsync_PageFilterReturnsNull_IsSkipped()
+    public async Task GetFilteredItemsAsync_ByParentId_PageFilterReturnsNull_IsSkipped()
     {
-        var page = new SectionPeoplePage();
         var query = new CardsQuery
         {
             Order = "asc",
@@ -229,57 +192,63 @@ public class PeopleCardsServiceTests
             }
         };
 
-        _contentServiceMock.Setup(s => s.GetCurrentChannelID()).Returns(1);
-
         _contentServiceMock
             .Setup(s => s.GetPageByTypeAndNameAsync(It.IsAny<Type>(), "NonExistent"))
             .ReturnsAsync((IWebPageFieldsSource?)null);
 
         _contentServiceMock
-            .Setup(s => s.GetPagesAsync<Person>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
+            .Setup(s => s.GetChildPagesByParentGuidWithQueryBuilderAsync<Person>(
+                It.IsAny<Action<ContentItemQueryBuilder>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(Enumerable.Empty<Person>());
 
         var result = await _service.GetFilteredItemsAsync(
-            page, "en", query, null, _ => false, CancellationToken.None);
+            1, "en", query, CancellationToken.None);
 
-        // Filter was skipped, query still executes
         Assert.That(result.TotalCount, Is.EqualTo(0));
+    }
+
+   
+
+    [Test]
+    public async Task GetFallbackMetadataDescription_WhenSettingsNull_ReturnsFirstAndLastName()
+    {
+        var person = new Person
+        {
+            MetadataTitle = "Title",
+            PersonFirstName = "Jane",
+            PersonLastName = "Doe",
+            PersonSurnamePrefixes = ""
+        };
+
+        _settingServiceMock
+            .Setup(s => s.GetUsePersonPageTitleInfo())
+            .ReturnsAsync((IEnumerable<OurPeopleInfo>?)null);
+
+        var result = await _service.GetFallbackMetadataDescription(person);
+
+        Assert.That(result, Is.EqualTo("Jane Doe"));
     }
 
     [Test]
-    public async Task GetFilteredItemsAsync_TaxonomyTagNotFound_FilterSkipped()
+    public async Task GetFallbackMetadataDescription_WhenSettingsEmpty_ReturnsFirstAndLastName()
     {
-        var page = new SectionPeoplePage();
-        var query = new CardsQuery
+        var person = new Person
         {
-            Order = "asc",
-            Filters = new Dictionary<string, string>
-            {
-                { "credential", "NonExistentTag" }
-            }
+            MetadataTitle = "Title",
+            PersonFirstName = "Jane",
+            PersonLastName = "Doe",
+            PersonSurnamePrefixes = ""
         };
 
-        _contentServiceMock.Setup(s => s.GetCurrentChannelID()).Returns(1);
+        _settingServiceMock
+            .Setup(s => s.GetUsePersonPageTitleInfo())
+            .ReturnsAsync(Enumerable.Empty<OurPeopleInfo>());
 
-        _taxonomyTagRetrieverMock
-            .Setup(t => t.GetTaxonomyTagByNameAsync("NonExistentTag"))
-            .ReturnsAsync((TagInfo?)null);
+        var result = await _service.GetFallbackMetadataDescription(person);
 
-        _contentServiceMock
-            .Setup(s => s.GetPagesAsync<Person>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<Person>());
-
-        var result = await _service.GetFilteredItemsAsync(
-            page, "en", query, null, _ => false, CancellationToken.None);
-
-        Assert.That(result.TotalCount, Is.EqualTo(0));
+        Assert.That(result, Is.EqualTo("Jane Doe"));
     }
+
+    #endregion
 }
