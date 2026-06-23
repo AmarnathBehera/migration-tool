@@ -29,6 +29,12 @@ public interface IPeopleCardsService
         Action<ContentItemQueryBuilder>? decorateQuery,
         Func<Person, bool> isFeatured,
         CancellationToken cancellationToken);
+
+    Task<PaginationDto<PersonCardDto>> GetFilteredItemsAsync(
+        int parentWebPageItemId,
+        string language,
+        CardsQuery cardsQuery,
+        CancellationToken cancellationToken);
 }
 
 public class PeopleCardsService : IPeopleCardsService
@@ -63,6 +69,57 @@ public class PeopleCardsService : IPeopleCardsService
     }
 
     public async Task<PaginationDto<PersonCardDto>> GetFilteredItemsAsync(
+        int parentWebPageItemId,
+        string language,
+        CardsQuery cardsQuery,
+        CancellationToken cancellationToken)
+    {
+        var filterWhereExpressions = await GetFilterParameterWhereExpressionsAsync(cardsQuery.Filters);
+
+        var order = cardsQuery.Order?.ToLower() ?? "asc";
+
+        var people = await _contentService.GetChildPagesByParentGuidWithQueryBuilderAsync<Person>(
+            query =>
+            {
+                query.InLanguage(language);
+                query.Parameters(p =>
+                {
+                    p.Where(w =>
+                    {
+                        w.WhereEquals("WebPageItemParentID", parentWebPageItemId);
+                        foreach (var filter in filterWhereExpressions)
+                        {
+                            filter(w);
+                        }
+                    });
+                    if (order == "desc")
+                    {
+                        p.OrderBy(new OrderByColumn(nameof(Person.PersonLastName), OrderDirection.Descending));
+                    }
+                    else if (order == "asc")
+                    {
+                        p.OrderBy(new OrderByColumn(nameof(Person.PersonLastName), OrderDirection.Ascending));
+                    }
+                    else
+                    {
+                        p.OrderBy(nameof(Person.SystemFields.WebPageItemID));
+                    }
+                });
+            },
+            cancellationToken
+        );
+        var peopleArray = people?.OfType<Person>().ToArray() ?? Array.Empty<Person>();
+
+        var cardDtos = await CreatePeopleCardDtosAsync(peopleArray);
+
+        return new PaginationDto<PersonCardDto>
+        {
+            Data = cardDtos,
+            TotalCount = peopleArray.Length
+        };
+    }
+
+    public async Task<PaginationDto<PersonCardDto>> GetFilteredItemsAsync(
  SectionPeoplePage page,
  string language,
  CardsQuery cardsQuery,
@@ -74,36 +131,35 @@ public class PeopleCardsService : IPeopleCardsService
 
         var order = cardsQuery.Order?.ToLower() ?? "asc";
 
-        var people = await _contentService.GetPagesAsync<Person>(
-               new RetrievePagesParameters
-               {
-                   LinkedItemsMaxLevel = 2,
-                   LanguageName = language,
-                   UseLanguageFallbacks = false
-               },
+        var people = await _contentService.GetChildPagesByParentGuidWithQueryBuilderAsync<Person>(
             query =>
             {
-                query.Where(w =>
+                query.InLanguage(language, useLanguageFallbacks: false);
+                query.Parameters(p =>
                 {
-                    w.WhereEquals("WebPageItemParentID", page.SystemFields.WebPageItemID);
-                    foreach (var filter in filterWhereExpressions)
+                    p.Where(w =>
                     {
-                        filter(w);
+                        w.WhereEquals("WebPageItemParentID", page.SystemFields.WebPageItemID);
+                        foreach (var filter in filterWhereExpressions)
+                        {
+                            filter(w);
+                        }
+                    });
+                    if (order == "desc")
+                    {
+                        p.OrderBy(new OrderByColumn(nameof(Person.PersonLastName), OrderDirection.Descending));
+                    }
+                    else if (order == "asc")
+                    {
+                        p.OrderBy(new OrderByColumn(nameof(Person.PersonLastName), OrderDirection.Ascending));
+                    }
+                    else
+                    {
+                        p.OrderBy(nameof(Person.SystemFields.WebPageItemID));
                     }
                 });
-                if (order == "desc")
-                {
-                    query.OrderBy(new OrderByColumn(nameof(Person.PersonLastName), OrderDirection.Descending));
-                }
-                else if (order == "asc")
-                {
-                    query.OrderBy(new OrderByColumn(nameof(Person.PersonLastName), OrderDirection.Ascending));
-                }
-                else
-                {
-                    query.OrderBy(nameof(Person.SystemFields.WebPageItemID));
-                }
-            }, RetrievalCacheSettings.CacheDisabled,
+                decorateQuery?.Invoke(query);
+            },
             cancellationToken
         );
         var peopleArray = people?.OfType<Person>().ToArray() ?? Array.Empty<Person>();
