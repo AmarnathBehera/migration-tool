@@ -1,3 +1,4 @@
+using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
@@ -14,310 +15,13 @@ namespace BDO.GWT.Core.Tests.Services;
 
 public class NewsArticleCardsServiceTests
 {
-    private readonly Mock<INewsArticleCardsService> _newsArticleCardsServiceMock;
-
-    public NewsArticleCardsServiceTests()
-    {
-        _newsArticleCardsServiceMock = new Mock<INewsArticleCardsService>();
-    }
-
-    [Test]
-    public async Task CreateFiltersAsync_ReturnsFilterItems()
-    {
-        var expectedFilters = new FilterItemDto<OptionDto>[]
-        {
-            new() { Title = "Filter 1" },
-            new() { Title = "Filter 2" }
-        };
-
-        _newsArticleCardsServiceMock
-            .Setup(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(expectedFilters);
-
-        var result = await _newsArticleCardsServiceMock.Object.CreateFiltersAsync(
-            new HashSet<string> { "filter1" }, null, CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result, Has.Length.EqualTo(2));
-            Assert.That(result[0].Title, Is.EqualTo("Filter 1"));
-        });
-    }
-
-    [Test]
-    public async Task CreateFiltersAsync_WhenNoFilters_ReturnsEmptyArray()
-    {
-        _newsArticleCardsServiceMock
-            .Setup(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
-
-        var result = await _newsArticleCardsServiceMock.Object.CreateFiltersAsync(
-            new HashSet<string>(), null, CancellationToken.None);
-
-        Assert.That(result, Is.Empty);
-    }
-
-    [Test]
-    public async Task GetFilteredItemsAsync_ReturnsPaginationDto()
-    {
-        var expectedDto = new PaginationDto<NewsPageCardDto>
-        {
-            Data = new[]
-            {
-                new NewsPageCardDto { Title = "Article 1" },
-                new NewsPageCardDto { Title = "Article 2" }
-            },
-            TotalCount = 2
-        };
-
-        _newsArticleCardsServiceMock
-            .Setup(x => x.GetFilteredItemsAsync(
-                It.IsAny<List<SectionNews>>(),
-                It.IsAny<string>(),
-                It.IsAny<CardsQuery>(),
-                It.IsAny<List<Action<WhereParameters>>>(),
-                It.IsAny<Func<NewsArticle, bool>>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(expectedDto);
-
-        var result = await _newsArticleCardsServiceMock.Object.GetFilteredItemsAsync(
-            [new SectionNews()], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Data, Has.Length.EqualTo(2));
-            Assert.That(result.TotalCount, Is.EqualTo(2));
-            Assert.That(result.Data[0].Title, Is.EqualTo("Article 1"));
-        });
-    }
-
-    [Test]
-    public async Task GetFilteredItemsAsync_WhenNoItems_ReturnsEmptyPagination()
-    {
-        var emptyDto = new PaginationDto<NewsPageCardDto>
-        {
-            Data = Array.Empty<NewsPageCardDto>(),
-            TotalCount = 0
-        };
-
-        _newsArticleCardsServiceMock
-            .Setup(x => x.GetFilteredItemsAsync(
-                It.IsAny<List<SectionNews>>(),
-                It.IsAny<string>(),
-                It.IsAny<CardsQuery>(),
-                It.IsAny<List<Action<WhereParameters>>>(),
-                It.IsAny<Func<NewsArticle, bool>>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(emptyDto);
-
-        var result = await _newsArticleCardsServiceMock.Object.GetFilteredItemsAsync(
-            [new SectionNews()] , "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Data, Is.Empty);
-            Assert.That(result.TotalCount, Is.EqualTo(0));
-        });
-    }
-
-    [Test]
-    public async Task CreateFiltersAsync_InvokedOnce()
-    {
-        _newsArticleCardsServiceMock
-            .Setup(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
-
-        var filters = new HashSet<string>();
-        await _newsArticleCardsServiceMock.Object.CreateFiltersAsync(filters, null, CancellationToken.None);
-
-        _newsArticleCardsServiceMock.Verify(
-            x => x.CreateFiltersAsync(filters, null, It.IsAny<CancellationToken>()), Times.Once);
-    }
-
-    [Test]
-    public async Task GetFilteredItemsAsync_InvokedOnce()
-    {
-        _newsArticleCardsServiceMock
-            .Setup(x => x.GetFilteredItemsAsync(
-                It.IsAny<List<SectionNews>>(),
-                It.IsAny<string>(),
-                It.IsAny<CardsQuery>(),
-                It.IsAny<List<Action<WhereParameters>>>(),
-                It.IsAny<Func<NewsArticle, bool>>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PaginationDto<NewsPageCardDto> { Data = [], TotalCount = 0 });
-
-        var cardsQuery = new CardsQuery();
-        await _newsArticleCardsServiceMock.Object.GetFilteredItemsAsync(
-            [new SectionNews()], "en-US", cardsQuery, null, _ => false, CancellationToken.None);
-
-        _newsArticleCardsServiceMock.Verify(
-            x => x.GetFilteredItemsAsync(
-                It.IsAny<List<SectionNews>>(),
-                "en-US",
-                cardsQuery,
-                It.IsAny<List<Action<WhereParameters>>>(),
-                It.IsAny<Func<NewsArticle, bool>>(),
-                It.IsAny<CancellationToken>()), Times.Once);
-    }
-
-    [Test]
-    public async Task GetFilteredItemsAsync_PassesLanguageThrough()
-    {
-        string? capturedLanguage = null;
-
-        _newsArticleCardsServiceMock
-            .Setup(x => x.GetFilteredItemsAsync(
-                It.IsAny<List<SectionNews>>(),
-                It.IsAny<string>(),
-                It.IsAny<CardsQuery>(),
-                It.IsAny<List<Action<WhereParameters>>>(),
-                It.IsAny<Func<NewsArticle, bool>>(),
-                It.IsAny<CancellationToken>()))
-            .Callback<List<SectionNews>, string, CardsQuery, List<Action<WhereParameters>>, Func<NewsArticle, bool>, CancellationToken>(
-                (_, lang, _, _, _, _) => capturedLanguage = lang)
-            .ReturnsAsync(new PaginationDto<NewsPageCardDto> { Data = [], TotalCount = 0 });
-
-        await _newsArticleCardsServiceMock.Object.GetFilteredItemsAsync(
-            [new SectionNews()], "fr-FR", new CardsQuery(), null, _ => false, CancellationToken.None);
-
-        Assert.That(capturedLanguage, Is.EqualTo("fr-FR"));
-    }
-
-    [Test]
-    public async Task GetFilteredItemsAsync_PassesSectionNewsThrough()
-    {
-        SectionNews? capturedSection = null;
-
-        _newsArticleCardsServiceMock
-            .Setup(x => x.GetFilteredItemsAsync(
-                It.IsAny<List<SectionNews>>(),
-                It.IsAny<string>(),
-                It.IsAny<CardsQuery>(),
-                It.IsAny<List<Action<WhereParameters>>>(),
-                It.IsAny<Func<NewsArticle, bool>>(),
-                It.IsAny<CancellationToken>()))
-            .Callback<List<SectionNews>, string, CardsQuery, List<Action<WhereParameters>>, Func<NewsArticle, bool>, CancellationToken>(
-                (sections, _, _, _, _, _) => capturedSection = sections.FirstOrDefault())
-            .ReturnsAsync(new PaginationDto<NewsPageCardDto> { Data = [], TotalCount = 0 });
-
-        var newsSection = new SectionNews { PageTitle = "My Section" };
-        await _newsArticleCardsServiceMock.Object.GetFilteredItemsAsync(
-            [newsSection], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
-
-        Assert.That(capturedSection, Is.SameAs(newsSection));
-    }
-
-    [Test]
-    public async Task CreateFiltersAsync_PassesNodeAliasPathThrough()
-    {
-        string? capturedPath = null;
-
-        _newsArticleCardsServiceMock
-            .Setup(x => x.CreateFiltersAsync(
-                It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
-            .Callback<HashSet<string>, string?, CancellationToken>((_, path, _) => capturedPath = path)
-            .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
-
-        await _newsArticleCardsServiceMock.Object.CreateFiltersAsync(
-            new HashSet<string> { "filter1" }, "/news/section", CancellationToken.None);
-
-        Assert.That(capturedPath, Is.EqualTo("/news/section"));
-    }
-
-    [Test]
-    public async Task GetFilteredItemsAsync_WithFeaturedItems_ReturnsFeaturedFirst()
-    {
-        var featuredCard = new NewsPageCardDto { Title = "Featured", IsFeatured = true };
-        var regularCard = new NewsPageCardDto { Title = "Regular", IsFeatured = false };
-        var expectedDto = new PaginationDto<NewsPageCardDto>
-        {
-            Data = [featuredCard, regularCard],
-            TotalCount = 2
-        };
-
-        _newsArticleCardsServiceMock
-            .Setup(x => x.GetFilteredItemsAsync(
-                It.IsAny<List<SectionNews>>(),
-                It.IsAny<string>(),
-                It.IsAny<CardsQuery>(),
-                It.IsAny<List<Action<WhereParameters>>>(),
-                It.IsAny<Func<NewsArticle, bool>>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(expectedDto);
-
-        var result = await _newsArticleCardsServiceMock.Object.GetFilteredItemsAsync(
-            [new SectionNews()], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Data[0].IsFeatured, Is.True);
-            Assert.That(result.Data[1].IsFeatured, Is.False);
-        });
-    }
-
-    [Test]
-    public async Task GetFilteredItemsAsync_WithPagination_RespectsPageSizeAndCurrentPage()
-    {
-        var cardsQuery = new CardsQuery { CurrentPage = 2, PageSize = 5 };
-
-        CardsQuery? capturedQuery = null;
-
-        _newsArticleCardsServiceMock
-            .Setup(x => x.GetFilteredItemsAsync(
-                It.IsAny<List<SectionNews>>(),
-                It.IsAny<string>(),
-                It.IsAny<CardsQuery>(),
-                It.IsAny<List<Action<WhereParameters>>>(),
-                It.IsAny<Func<NewsArticle, bool>>(),
-                It.IsAny<CancellationToken>()))
-            .Callback<List<SectionNews>, string, CardsQuery, List<Action<WhereParameters>>, Func<NewsArticle, bool>, CancellationToken>(
-                (_, _, query, _, _, _) => capturedQuery = query)
-            .ReturnsAsync(new PaginationDto<NewsPageCardDto> { Data = [], TotalCount = 0 });
-
-        await _newsArticleCardsServiceMock.Object.GetFilteredItemsAsync(
-            [new SectionNews()], "en-US", cardsQuery, null, _ => false, CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(capturedQuery, Is.Not.Null);
-            Assert.That(capturedQuery!.CurrentPage, Is.EqualTo(2));
-            Assert.That(capturedQuery.PageSize, Is.EqualTo(5));
-        });
-    }
-
-    [Test]
-    public async Task CreateFiltersAsync_WithMultipleFilters_PassesAllFilterNames()
-    {
-        HashSet<string>? capturedFilters = null;
-
-        _newsArticleCardsServiceMock
-            .Setup(x => x.CreateFiltersAsync(
-                It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
-            .Callback<HashSet<string>, string?, CancellationToken>((filters, _, _) => capturedFilters = filters)
-            .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
-
-        var filterNames = new HashSet<string> { "businessIssue", "service", "industryCategory" };
-        await _newsArticleCardsServiceMock.Object.CreateFiltersAsync(filterNames, null, CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(capturedFilters, Is.Not.Null);
-            Assert.That(capturedFilters, Has.Count.EqualTo(3));
-            Assert.That(capturedFilters!, Does.Contain("businessIssue"));
-            Assert.That(capturedFilters, Does.Contain("service"));
-            Assert.That(capturedFilters, Does.Contain("industryCategory"));
-        });
-    }
-}
-
-public class NewsArticleCardsServiceImplementationTests
-{
     private Mock<ICardsService> _cardsServiceMock = null!;
     private Mock<ICultureContext> _cultureContextMock = null!;
     private Mock<IContentService> _contentServiceMock = null!;
     private Mock<IUrlHelperFactory> _urlHelperFactoryMock = null!;
     private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
+    private Mock<IWebPageUrlResolver> _webPageUrlResolverMock = null!;
+    private Mock<IUrlHelper> _urlHelperMock = null!;
     private NewsArticleCardsService _service = null!;
 
     [SetUp]
@@ -328,27 +32,32 @@ public class NewsArticleCardsServiceImplementationTests
         _contentServiceMock = new Mock<IContentService>();
         _urlHelperFactoryMock = new Mock<IUrlHelperFactory>();
         _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+        _webPageUrlResolverMock = new Mock<IWebPageUrlResolver>();
 
         var httpContext = new DefaultHttpContext();
         _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var urlHelperMock = new Mock<IUrlHelper>();
-        urlHelperMock.Setup(u => u.Content(It.IsAny<string?>())).Returns((string? path) => path);
+        _urlHelperMock = new Mock<IUrlHelper>();
+        _urlHelperMock.Setup(u => u.Content(It.IsAny<string?>())).Returns((string? path) => path);
         _urlHelperFactoryMock
             .Setup(f => f.GetUrlHelper(It.IsAny<ActionContext>()))
-            .Returns(urlHelperMock.Object);
+            .Returns(_urlHelperMock.Object);
 
         _cultureContextMock.Setup(c => c.CurrentLanguageTag).Returns("en-US");
         _contentServiceMock.Setup(c => c.GetCurrentChannelID()).Returns(1);
+
+        _webPageUrlResolverMock
+            .Setup(r => r.GetAbsoluteUrl(It.IsAny<IWebPageFieldsSource>()))
+            .Returns("https://example.com/article");
 
         _service = new NewsArticleCardsService(
             _cardsServiceMock.Object,
             _cultureContextMock.Object,
             _contentServiceMock.Object,
             _urlHelperFactoryMock.Object,
-            _httpContextAccessorMock.Object);
+            _httpContextAccessorMock.Object,
+            _webPageUrlResolverMock.Object);
     }
-
     [Test]
     public async Task CreateFiltersAsync_DelegatesToCardsService()
     {
@@ -365,8 +74,11 @@ public class NewsArticleCardsServiceImplementationTests
         var filters = new HashSet<string> { "serviceArea" };
         var result = await _service.CreateFiltersAsync(filters, "/news", CancellationToken.None);
 
-        Assert.That(result, Has.Length.EqualTo(1));
-        Assert.That(result[0].Title, Is.EqualTo("Service Area"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Length.EqualTo(1));
+            Assert.That(result[0].Title, Is.EqualTo("Service Area"));
+        });
 
         _cardsServiceMock.Verify(
             x => x.CreateFiltersAsync(filters, "/news", It.IsAny<CancellationToken>()),
@@ -374,20 +86,56 @@ public class NewsArticleCardsServiceImplementationTests
     }
 
     [Test]
+    public async Task CreateFiltersAsync_WhenNoFilters_ReturnsEmptyArray()
+    {
+        _cardsServiceMock
+            .Setup(x => x.CreateFiltersAsync(
+                It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
+
+        var result = await _service.CreateFiltersAsync(new HashSet<string>(), null, CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public async Task CreateFiltersAsync_PassesNullNodeAliasPath_ToCardsService()
+    {
+        _cardsServiceMock
+            .Setup(x => x.CreateFiltersAsync(
+                It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
+
+        await _service.CreateFiltersAsync(new HashSet<string>(), null, CancellationToken.None);
+
+        _cardsServiceMock.Verify(
+            x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), null, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task CreateFiltersAsync_PassesCancellationToken_ToCardsService()
+    {
+        using var cts = new CancellationTokenSource();
+        var token = cts.Token;
+
+        _cardsServiceMock
+            .Setup(x => x.CreateFiltersAsync(
+                It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
+
+        await _service.CreateFiltersAsync(new HashSet<string>(), null, token);
+
+        _cardsServiceMock.Verify(
+            x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), token),
+            Times.Once);
+    }
+    [Test]
     public async Task GetFilteredItemsAsync_ReturnsEmptyPagination_WhenNoNewsGroupsFound()
     {
-        var newsSection = new SectionNews
-        {
-            SystemFields = new WebPageFields { WebPageItemID = 100 }
-        };
+        var newsSection = CreateSectionNews(100);
 
-        _contentServiceMock
-            .Setup(s => s.GetPagesAsync<NewsGroup>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<NewsGroup>());
+        SetupNewsGroupReturns(Enumerable.Empty<NewsGroup>());
 
         var result = await _service.GetFilteredItemsAsync(
             [newsSection], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
@@ -400,17 +148,9 @@ public class NewsArticleCardsServiceImplementationTests
     }
 
     [Test]
-    public async Task GetFilteredItemsAsync_QueriesNewsArticles_WhenNewsGroupsExist()
+    public async Task GetFilteredItemsAsync_ReturnsEmptyPagination_WhenNewsGroupsReturnsNull()
     {
-        var newsSection = new SectionNews
-        {
-            SystemFields = new WebPageFields { WebPageItemID = 100 }
-        };
-
-        var newsGroup = new NewsGroup
-        {
-            SystemFields = new WebPageFields { WebPageItemID = 200 }
-        };
+        var newsSection = CreateSectionNews(100);
 
         _contentServiceMock
             .Setup(s => s.GetPagesAsync<NewsGroup>(
@@ -418,37 +158,84 @@ public class NewsArticleCardsServiceImplementationTests
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new[] { newsGroup });
-
-        _contentServiceMock
-            .Setup(s => s.GetPagesAsync<NewsArticle>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<NewsArticle>());
+            .ReturnsAsync((IEnumerable<NewsGroup>)null!);
 
         var result = await _service.GetFilteredItemsAsync(
             [newsSection], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
 
+        Assert.That(result.Data, Is.Empty);
         _contentServiceMock.Verify(
             s => s.GetPagesAsync<NewsArticle>(
-                It.Is<RetrievePagesParameters>(p => p.LinkedItemsMaxLevel == 4 && p.LanguageName == "en-US"),
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_AggregatesNewsGroups_FromMultipleSections()
+    {
+        var section1 = CreateSectionNews(100);
+        var section2 = CreateSectionNews(101);
+
+        _contentServiceMock
+            .SetupSequence(s => s.GetPagesAsync<NewsGroup>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { CreateNewsGroup(200) })
+            .ReturnsAsync(new[] { CreateNewsGroup(201) });
+
+        SetupNewsArticleReturns(Enumerable.Empty<NewsArticle>());
+
+        await _service.GetFilteredItemsAsync(
+            [section1, section2], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+
+        _contentServiceMock.Verify(
+            s => s.GetPagesAsync<NewsGroup>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Exactly(2));
+
+        _contentServiceMock.Verify(
+            s => s.GetPagesAsync<NewsArticle>(
+                It.IsAny<RetrievePagesParameters>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()),
             Times.Once);
+    }
+    [Test]
+    public async Task GetFilteredItemsAsync_QueriesNewsArticles_WithExpectedParameters()
+    {
+        var newsSection = CreateSectionNews(100);
 
-        Assert.That(result.Data, Is.Empty);
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(Enumerable.Empty<NewsArticle>());
+
+        await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+
+        _contentServiceMock.Verify(
+            s => s.GetPagesAsync<NewsArticle>(
+                It.Is<RetrievePagesParameters>(p =>
+                    p.LinkedItemsMaxLevel == 4 &&
+                    p.LanguageName == "en-US" &&
+                    p.UseLanguageFallbacks == false),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [Test]
-    public async Task GetFilteredItemsAsync_UsesLanguageFallbacksFalse()
+    public async Task GetFilteredItemsAsync_UsesLanguageFallbacksFalse_OnNewsGroupQuery()
     {
-        var newsSection = new SectionNews
-        {
-            SystemFields = new WebPageFields { WebPageItemID = 100 }
-        };
+        var newsSection = CreateSectionNews(100);
 
         RetrievePagesParameters? capturedParams = null;
 
@@ -474,37 +261,474 @@ public class NewsArticleCardsServiceImplementationTests
     }
 
     [Test]
-    public async Task GetFilteredItemsAsync_DefaultsPaginationToPage1_WhenCurrentPageIsNull()
+    public async Task GetFilteredItemsAsync_PassesCancellationToken_ToContentService()
     {
-        var newsSection = new SectionNews
+        using var cts = new CancellationTokenSource();
+        var token = cts.Token;
+        var newsSection = CreateSectionNews(100);
+
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(Enumerable.Empty<NewsArticle>());
+
+        await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", new CardsQuery(), null, _ => false, token);
+
+        _contentServiceMock.Verify(
+            s => s.GetPagesAsync<NewsGroup>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                token),
+            Times.Once);
+
+        _contentServiceMock.Verify(
+            s => s.GetPagesAsync<NewsArticle>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                token),
+            Times.Once);
+    }
+    [Test]
+    public async Task GetFilteredItemsAsync_DefaultsToPage1AndPageSize10_WhenQueryHasNoPaging()
+    {
+        var newsSection = CreateSectionNews(100);
+        var articles = Enumerable.Range(1, 25).Select(i => CreateNewsArticle(i)).ToArray();
+
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(articles);
+
+        var result = await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+
+        Assert.Multiple(() =>
         {
-            SystemFields = new WebPageFields { WebPageItemID = 100 }
-        };
-        var newsGroup = new NewsGroup
+            Assert.That(result.Data, Has.Length.EqualTo(10));
+            Assert.That(result.TotalCount, Is.EqualTo(10));
+        });
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_RespectsCustomPageSize()
+    {
+        var newsSection = CreateSectionNews(100);
+        var articles = Enumerable.Range(1, 10).Select(i => CreateNewsArticle(i)).ToArray();
+
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(articles);
+
+        var query = new CardsQuery { CurrentPage = 1, PageSize = 3 };
+        var result = await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", query, null, _ => false, CancellationToken.None);
+
+        Assert.That(result.Data, Has.Length.EqualTo(3));
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_RespectsCurrentPage()
+    {
+        var newsSection = CreateSectionNews(100);
+        var articles = Enumerable.Range(1, 10)
+            .Select(i => CreateNewsArticle(i, title: $"Article {i}"))
+            .ToArray();
+
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(articles);
+
+        var query = new CardsQuery { CurrentPage = 2, PageSize = 3 };
+        var result = await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", query, null, _ => false, CancellationToken.None);
+
+        Assert.Multiple(() =>
         {
-            SystemFields = new WebPageFields { WebPageItemID = 200 }
+            Assert.That(result.Data, Has.Length.EqualTo(3));
+            Assert.That(result.Data[0].Title, Is.EqualTo("Article 4"));
+        });
+    }
+    [Test]
+    public async Task GetFilteredItemsAsync_OrdersFeaturedItemsFirst()
+    {
+        var newsSection = CreateSectionNews(100);
+        var featured = CreateNewsArticle(1, title: "Featured");
+        var regular = CreateNewsArticle(2, title: "Regular");
+
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(new[] { regular, featured });
+
+        var result = await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", new CardsQuery(),
+            null,
+            article => article.MetadataTitle == "Featured",
+            CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Data[0].Title, Is.EqualTo("Featured"));
+            Assert.That(result.Data[0].IsFeatured, Is.True);
+            Assert.That(result.Data[1].Title, Is.EqualTo("Regular"));
+            Assert.That(result.Data[1].IsFeatured, Is.False);
+        });
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_FiltersOutNullArticles()
+    {
+        var newsSection = CreateSectionNews(100);
+        var validArticle = CreateNewsArticle(1, title: "Valid");
+
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(new[] { validArticle, null! });
+
+        var result = await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Data, Has.Length.EqualTo(1));
+            Assert.That(result.Data[0].Title, Is.EqualTo("Valid"));
+        });
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_MapsNewsArticleFields_ToCardDto()
+    {
+        var newsSection = CreateSectionNews(100);
+        var publishDate = new DateTime(2024, 6, 1);
+        var article = CreateNewsArticle(1,
+            title: "Mapped",
+            description: "<p>Hello</p>",
+            imageUrl: "/media/img.jpg",
+            imageAlt: "alt-text",
+            publishDate: publishDate);
+
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(new[] { article });
+
+        _webPageUrlResolverMock
+            .Setup(r => r.GetAbsoluteUrl(article))
+            .Returns("https://example.com/news/mapped");
+
+        var result = await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+
+        var card = result.Data[0];
+        Assert.Multiple(() =>
+        {
+            Assert.That(card.Title, Is.EqualTo("Mapped"));
+            Assert.That(card.Description, Is.EqualTo("Hello"));
+            Assert.That(card.ImageURL, Is.EqualTo("/media/img.jpg"));
+            Assert.That(card.ImageAltText, Is.EqualTo("alt-text"));
+            Assert.That(card.Date, Is.EqualTo(publishDate));
+            Assert.That(card.UpdatedOnDate, Is.Null);
+            Assert.That(card.isComingSoon, Is.False);
+            Assert.That(card.ReadMoreLink, Is.Not.Null);
+            Assert.That(card.ReadMoreLink.URL, Is.EqualTo("https://example.com/news/mapped"));
+            Assert.That(card.ReadMoreLink.Title, Is.EqualTo(ResourceStringKey.LiveSite.ReadMore));
+        });
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_UsesFirstPublishedDate_WhenLastPublishedIsNull()
+    {
+        var newsSection = CreateSectionNews(100);
+        var firstPublished = new DateTime(2024, 1, 1);
+        var article = CreateNewsArticle(1, publishDate: null, firstPublishDate: firstPublished);
+
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(new[] { article });
+
+        var result = await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+
+        Assert.That(result.Data[0].Date, Is.EqualTo(firstPublished));
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_SetsUpdatedOnDate_WhenNotMinValue()
+    {
+        var newsSection = CreateSectionNews(100);
+        var updated = new DateTime(2024, 7, 1);
+        var article = CreateNewsArticle(1, updatedOn: updated);
+
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(new[] { article });
+
+        var result = await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+
+        Assert.That(result.Data[0].UpdatedOnDate, Is.EqualTo(updated));
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_MapsContentTypeName_WhenPresent()
+    {
+        var newsSection = CreateSectionNews(100);
+        var article = CreateNewsArticle(1);
+        article.ContentType = new[]
+        {
+            new Contenttypes { Name = "Press Release" }
         };
 
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(new[] { article });
+
+        var result = await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+
+        Assert.That(result.Data[0].Type, Is.EqualTo("Press Release"));
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_ContentTypeIsNull_WhenNoContentTypes()
+    {
+        var newsSection = CreateSectionNews(100);
+        var article = CreateNewsArticle(1);
+        article.ContentType = Array.Empty<Contenttypes>();
+
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(new[] { article });
+
+        var result = await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+
+        Assert.That(result.Data[0].Type, Is.Null);
+    }
+    [Test]
+    public async Task GetFilteredItemsAsync_AppliesQueryFilters_WhenProvided()
+    {
+        var newsSection = CreateSectionNews(100);
+
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(Enumerable.Empty<NewsArticle>());
+
+        var queryFilters = new List<Action<WhereParameters>>
+        {
+            _ => { /* no-op */ }
+        };
+
+        var result = await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", new CardsQuery(), queryFilters, _ => false, CancellationToken.None);
+
+        Assert.That(result.Data, Is.Empty);
+
+        _contentServiceMock.Verify(
+            s => s.GetPagesAsync<NewsArticle>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_HandlesNullQueryFilters()
+    {
+        var newsSection = CreateSectionNews(100);
+
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(Enumerable.Empty<NewsArticle>());
+
+        var result = await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+
+        Assert.That(result.Data, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_AppliesUnknownFilterParameter_IgnoresIt()
+    {
+        var newsSection = CreateSectionNews(100);
+
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(Enumerable.Empty<NewsArticle>());
+
+        var cardsQuery = new CardsQuery
+        {
+            Filters = new Dictionary<string, string>
+            {
+                ["unknownFilter"] = "value"
+            }
+        };
+
+        var result = await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", cardsQuery, null, _ => false, CancellationToken.None);
+
+        Assert.That(result.Data, Is.Empty);
+
+        _contentServiceMock.Verify(
+            s => s.GetPageByTypeAndNameAsync(
+                It.IsAny<Type>(),
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_AppliesPageFilter_WhenFilterParameterMatchesPageType()
+    {
+        var newsSection = CreateSectionNews(100);
+        var matchedPage = new NewsArticle
+        {
+            SystemFields = new WebPageFields { ContentItemGUID = Guid.NewGuid() }
+        };
+
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(Enumerable.Empty<NewsArticle>());
+
+        _contentServiceMock
+            .Setup(s => s.GetPageByTypeAndNameAsync(
+                It.IsAny<Type>(),
+                "service-value",
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(matchedPage);
+
+        var cardsQuery = new CardsQuery
+        {
+            Filters = new Dictionary<string, string>
+            {
+                [FilterParameterName.Service] = "service-value"
+            }
+        };
+
+        await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", cardsQuery, null, _ => false, CancellationToken.None);
+
+        _contentServiceMock.Verify(
+            s => s.GetPageByTypeAndNameAsync(
+                It.IsAny<Type>(),
+                "service-value",
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_SkipsPageFilter_WhenPageNotFound()
+    {
+        var newsSection = CreateSectionNews(100);
+
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(Enumerable.Empty<NewsArticle>());
+
+        _contentServiceMock
+            .Setup(s => s.GetPageByTypeAndNameAsync(
+                It.IsAny<Type>(),
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IWebPageFieldsSource?)null);
+
+        var cardsQuery = new CardsQuery
+        {
+            Filters = new Dictionary<string, string>
+            {
+                [FilterParameterName.BusinessLine] = "missing-value"
+            }
+        };
+
+        var result = await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", cardsQuery, null, _ => false, CancellationToken.None);
+
+        Assert.That(result.Data, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_AppliesTagPageFilter_WhenFilterParameterIsContentType()
+    {
+        var newsSection = CreateSectionNews(100);
+        var matchedPage = new Contenttypes
+        {
+            SystemFields = new WebPageFields { ContentItemGUID = Guid.NewGuid() }
+        };
+
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(Enumerable.Empty<NewsArticle>());
+
+        _contentServiceMock
+            .Setup(s => s.GetPageByTypeAndNameAsync(
+                It.IsAny<Type>(),
+                "press-release",
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(matchedPage);
+
+        var cardsQuery = new CardsQuery
+        {
+            Filters = new Dictionary<string, string>
+            {
+                [FilterParameterName.ContentType] = "press-release"
+            }
+        };
+
+        await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", cardsQuery, null, _ => false, CancellationToken.None);
+
+        _contentServiceMock.Verify(
+            s => s.GetPageByTypeAndNameAsync(
+                It.IsAny<Type>(),
+                "press-release",
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+    private void SetupNewsGroupReturns(IEnumerable<NewsGroup> data)
+    {
         _contentServiceMock
             .Setup(s => s.GetPagesAsync<NewsGroup>(
                 It.IsAny<RetrievePagesParameters>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new[] { newsGroup });
+            .ReturnsAsync(data);
+    }
 
+    private void SetupNewsArticleReturns(IEnumerable<NewsArticle> data)
+    {
         _contentServiceMock
             .Setup(s => s.GetPagesAsync<NewsArticle>(
                 It.IsAny<RetrievePagesParameters>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<NewsArticle>());
+            .ReturnsAsync(data);
+    }
 
-        var query = new CardsQuery { CurrentPage = null, PageSize = null };
-        var result = await _service.GetFilteredItemsAsync(
-            [new SectionNews()], "en-US", query, null, _ => false, CancellationToken.None);
+    private static SectionNews CreateSectionNews(int webPageItemId) =>
+        new()
+        {
+            SystemFields = new WebPageFields { WebPageItemID = webPageItemId }
+        };
 
-        Assert.That(result.Data, Is.Empty);
+    private static NewsGroup CreateNewsGroup(int webPageItemId) =>
+        new()
+        {
+            SystemFields = new WebPageFields { WebPageItemID = webPageItemId }
+        };
+
+    private static NewsArticle CreateNewsArticle(
+        int id,
+        string title = "Article",
+        string description = "",
+        string? imageUrl = null,
+        string imageAlt = "",
+        DateTime? publishDate = null,
+        DateTime? firstPublishDate = null,
+        DateTime? updatedOn = null)
+    {
+        return new NewsArticle
+        {
+            SystemFields = new WebPageFields
+            {
+                WebPageItemID = id,
+                ContentItemID = id,
+                ContentItemGUID = Guid.NewGuid(),
+                ContentItemCommonDataLastPublishedWhen = publishDate,
+                ContentItemCommonDataFirstPublishedWhen = firstPublishDate ?? new DateTime(2024, 1, 1)
+            },
+            MetadataTitle = title,
+            MetadataDescription = description,
+            ImageFile = imageUrl != null
+                ? new[] { new ContentAttachment { ContentAttachmentAsset = new ContentItemAsset { Url = imageUrl } } }
+                : Array.Empty<ContentAttachment>(),
+            ImageFileAltText = imageAlt,
+            ContentType = Array.Empty<Contenttypes>(),
+            UpdatedOn = updatedOn ?? DateTime.MinValue
+        };
     }
 }

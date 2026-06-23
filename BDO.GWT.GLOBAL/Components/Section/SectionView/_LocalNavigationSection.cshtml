@@ -8,7 +8,7 @@
 
 <nav id="local-nav" class="local-navigation" aria-label="secondary navigation">
     <ul style="@(Context.Kentico().PageBuilder().EditMode ? "display:block; padding-top:50px;" : "")">
-        @await PageBuilder.AddWidgets(new[] { ComponentIdentifiers.Widgets.ExternalNavigation }).AddIdentifier("local-nav").BuildWidgetZoneAsync(Html, new List<string> { ComponentIdentifiers.Widgets.ExternalNavigation }, default)
+        @await PageBuilder.AddWidgets(new[] { ComponentIdentifiers.Widgets.ExternalNavigation, ComponentIdentifiers.Widgets.LocalNavigation }).AddIdentifier("local-nav").BuildWidgetZoneAsync(Html, new List<string> { ComponentIdentifiers.Widgets.ExternalNavigation, ComponentIdentifiers.Widgets.LocalNavigation }, default)
     </ul>
 </nav>
 

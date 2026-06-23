@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.GLOBAL.Widgets.NewsCarouselWidget;
+namespace BDO.GWT.GLOBAL.Widgets;
 
 public class NewsCarouselWidget : ViewComponent
 {
