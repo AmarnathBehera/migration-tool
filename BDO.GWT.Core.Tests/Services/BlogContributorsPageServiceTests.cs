@@ -205,6 +205,8 @@ public class BlogContributorsPageServiceTests
     public async Task GeBlogContributorsPaginationDtoAsync_ReturnsDto_WhenPageExists()
     {
         var pageGuid = Guid.NewGuid();
+
+        var cts = new CancellationTokenSource();
         var expectedPagination = new PaginationDto<PersonCardDto>
         {
             Data = [new PersonCardDto { DisplayName = "John Doe" }],
@@ -214,8 +216,7 @@ public class BlogContributorsPageServiceTests
         SetupContentServiceReturnsPage(pageGuid);
         SetupPeopleCardsServiceReturns(expectedPagination);
 
-        var result = await _service.GeBlogContributorsPaginationDtoAsync(
-            pageGuid, new CardsQuery(), CancellationToken.None);
+        var result = await _service.GetBlogContributorsPaginationDtoAsync(pageGuid, "en", new CardsQuery(), cts.Token);
 
         Assert.Multiple(() =>
         {
@@ -229,7 +230,6 @@ public class BlogContributorsPageServiceTests
     public void GeBlogContributorsPaginationDtoAsync_ThrowsMissingSectionPageException_WhenPageNotFound()
     {
         var pageGuid = Guid.NewGuid();
-        _cultureContextMock.Setup(c => c.CurrentLanguageTag).Returns("en");
 
         _contentServiceMock
             .Setup(s => s.GetPagesAsync<BlogContributors>(
@@ -240,8 +240,8 @@ public class BlogContributorsPageServiceTests
             .ReturnsAsync(Enumerable.Empty<BlogContributors>());
 
         Assert.ThrowsAsync<MissingSectionPageException>(async () =>
-            await _service.GeBlogContributorsPaginationDtoAsync(
-                pageGuid, new CardsQuery(), CancellationToken.None));
+            await _service.GetBlogContributorsPaginationDtoAsync(
+                pageGuid, "en", new CardsQuery(), CancellationToken.None));
     }
 
     [Test]
@@ -253,8 +253,8 @@ public class BlogContributorsPageServiceTests
         SetupContentServiceReturnsPage(pageGuid, webPageItemId);
         SetupPeopleCardsServiceReturns(new PaginationDto<PersonCardDto> { Data = [], TotalCount = 0 });
 
-        await _service.GeBlogContributorsPaginationDtoAsync(
-            pageGuid, new CardsQuery(), CancellationToken.None);
+        await _service.GetBlogContributorsPaginationDtoAsync(
+            pageGuid, "en", new CardsQuery(), CancellationToken.None);
 
         _peopleCardsServiceMock.Verify(
             s => s.GetFilteredItemsAsync(
@@ -275,8 +275,8 @@ public class BlogContributorsPageServiceTests
         SetupContentServiceReturnsPage(pageGuid);
         SetupPeopleCardsServiceReturns(new PaginationDto<PersonCardDto> { Data = [], TotalCount = 0 });
 
-        await _service.GeBlogContributorsPaginationDtoAsync(
-            pageGuid, new CardsQuery(), CancellationToken.None);
+        await _service.GetBlogContributorsPaginationDtoAsync(
+            pageGuid, "en", new CardsQuery(), CancellationToken.None);
 
         _peopleCardsServiceMock.Verify(
             s => s.GetFilteredItemsAsync(
@@ -296,8 +296,8 @@ public class BlogContributorsPageServiceTests
         SetupContentServiceReturnsPage(pageGuid);
         SetupPeopleCardsServiceReturns(new PaginationDto<PersonCardDto> { Data = [], TotalCount = 0 });
 
-        await _service.GeBlogContributorsPaginationDtoAsync(
-            pageGuid, cardsQuery, CancellationToken.None);
+        await _service.GetBlogContributorsPaginationDtoAsync(
+            pageGuid, "en", cardsQuery, CancellationToken.None);
 
         _peopleCardsServiceMock.Verify(
             s => s.GetFilteredItemsAsync(
@@ -309,21 +309,20 @@ public class BlogContributorsPageServiceTests
     }
 
     [Test]
-    public async Task GeBlogContributorsPaginationDtoAsync_UsesCultureContext_ForLanguageTag()
+    public async Task GeBlogContributorsPaginationDtoAsync_UsesLanguageParameter_ForPageRetrieval()
     {
         var pageGuid = Guid.NewGuid();
-        const string expectedCulture = "de-DE";
+        const string expectedLanguage = "de-DE";
 
-        _cultureContextMock.Setup(c => c.CurrentLanguageTag).Returns(expectedCulture);
         SetupContentServiceReturnsPage(pageGuid);
         SetupPeopleCardsServiceReturns(new PaginationDto<PersonCardDto> { Data = [], TotalCount = 0 });
 
-        await _service.GeBlogContributorsPaginationDtoAsync(
-            pageGuid, new CardsQuery(), CancellationToken.None);
+        await _service.GetBlogContributorsPaginationDtoAsync(
+            pageGuid, expectedLanguage, new CardsQuery(), CancellationToken.None);
 
         _contentServiceMock.Verify(
             s => s.GetPagesAsync<BlogContributors>(
-                It.Is<RetrievePagesParameters>(p => p.LanguageName == expectedCulture),
+                It.Is<RetrievePagesParameters>(p => p.LanguageName == expectedLanguage),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()),
@@ -334,13 +333,12 @@ public class BlogContributorsPageServiceTests
     public async Task GeBlogContributorsPaginationDtoAsync_DisablesLanguageFallbacks()
     {
         var pageGuid = Guid.NewGuid();
-        _cultureContextMock.Setup(c => c.CurrentLanguageTag).Returns("en");
 
         SetupContentServiceReturnsPage(pageGuid);
         SetupPeopleCardsServiceReturns(new PaginationDto<PersonCardDto> { Data = [], TotalCount = 0 });
 
-        await _service.GeBlogContributorsPaginationDtoAsync(
-            pageGuid, new CardsQuery(), CancellationToken.None);
+        await _service.GetBlogContributorsPaginationDtoAsync(
+            pageGuid, "en", new CardsQuery(), CancellationToken.None);
 
         _contentServiceMock.Verify(
             s => s.GetPagesAsync<BlogContributors>(

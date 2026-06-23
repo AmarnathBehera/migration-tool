@@ -17,7 +17,7 @@ public interface IBlogContributorsPageService
 {
     Task<BlogContributorsDto> GetSectionPeoplePageDtoAsync(BlogContributors page, CancellationToken cancellationToken);
 
-    Task<PaginationDto<PersonCardDto>> GeBlogContributorsPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken);
+    Task<PaginationDto<PersonCardDto>> GetBlogContributorsPaginationDtoAsync(Guid pageGuid, string language, CardsQuery cardsQuery, CancellationToken cancellationToken = default);
 }
 
 public class BlogContributorsPageService : IBlogContributorsPageService
@@ -95,12 +95,12 @@ public class BlogContributorsPageService : IBlogContributorsPageService
         return dto;
     }
 
-    public async Task<PaginationDto<PersonCardDto>> GeBlogContributorsPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken)
+    public async Task<PaginationDto<PersonCardDto>> GetBlogContributorsPaginationDtoAsync(Guid pageGuid, string language, CardsQuery cardsQuery, CancellationToken cancellationToken = default)
     {
         var blogContributorsPage = (await _contentService.GetPagesAsync<BlogContributors>(
             new RetrievePagesParameters
             {
-                LanguageName = _cultureContext.CurrentLanguageTag,
+                LanguageName = language,
                 UseLanguageFallbacks = false
             },
             query => query
@@ -117,7 +117,7 @@ public class BlogContributorsPageService : IBlogContributorsPageService
 
         var paginationDto = await _peopleCardsService.GetFilteredItemsAsync(
             blogContributorsPage.SystemFields.WebPageItemID,
-            _preferredLanguageRetriever.Get(),
+            language,
             cardsQuery,
             cancellationToken);
 
