@@ -1,14 +1,8 @@
 ﻿using BDO.GWT.Common.Exceptions;
-using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.Helpers;
-using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Utilities;
-using CMS.Websites;
-using HotChocolate.Resolvers;
-using Kentico.Content.Web.Mvc;
-
 
 namespace BDO.GWT.Core.Services;
 public interface INewsArticleService
@@ -21,15 +15,18 @@ public class NewsArticleService : INewsArticleService
     private readonly ISidebarService _sidebarService;
     private readonly IContentService _contentService;
     private readonly IExternalPeopleHelper _externalPeopleHelper;
+    private readonly IWebPageUrlResolver _webPageUrlResolver;
     public NewsArticleService(
         ISidebarService sidebarService,
         IContentService contentService,
-        IExternalPeopleHelper externalPeopleHelper)
+        IExternalPeopleHelper externalPeopleHelper,
+        IWebPageUrlResolver webPageUrlResolver)
     {
         _sidebarService = sidebarService;
         _contentService = contentService;
         _externalPeopleHelper = externalPeopleHelper;
-    
+        _webPageUrlResolver = webPageUrlResolver;
+
     }
     public async Task<SectionNewsPageDto?> GetSectionNewsPageDtoAsync(NewsArticle contentPage, CancellationToken cancellationToken)
     {
@@ -37,7 +34,7 @@ public class NewsArticleService : INewsArticleService
             return null;
 
         List<Guid> relevantPersonGuids = new List<Guid>();
-        var pageUrl = contentPage.GetUrl().AbsoluteUrl;
+        var pageUrl = _webPageUrlResolver.GetAbsoluteUrl(contentPage);
         ContentSidebarDto? sideBarDto = contentPage.ShowSidebar
                 ? await _sidebarService.GetSidebarDtoAsync(contentPage, pageUrl, cancellationToken)
                 : null;

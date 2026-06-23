@@ -10,9 +10,12 @@ public interface INewsGroupPageService
 public class NewsGroupPageService : INewsGroupPageService
 {
     private readonly IContentService _contentService;
-    public NewsGroupPageService(IContentService contentService)
+    private readonly IWebPageUrlResolver _webPageUrlResolver;
+
+    public NewsGroupPageService(IContentService contentService, IWebPageUrlResolver webPageUrlResolver)
     {
         _contentService = contentService;
+        _webPageUrlResolver = webPageUrlResolver;
     }
     public async Task<NewsGroupDto> GetNewsGroupDtoAsync(NewsGroup currentPage, CancellationToken cancellationToken)
     {
@@ -41,7 +44,7 @@ public class NewsGroupPageService : INewsGroupPageService
         var result = orderedNewsArticles.Select(newsArticle => new NewsGroupItemDto
         {
             Title = newsArticle.MetadataTitle,
-            URL = newsArticle.GetUrl().RelativePath,
+            URL = _webPageUrlResolver.GetRelativePath(newsArticle),
             PublishFrom = newsArticle.SystemFields.ContentItemCommonDataLastPublishedWhen,
         }).ToArray();
 
