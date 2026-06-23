@@ -1,85 +1,221 @@
-using BDO.GWT.Core;
-using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.Services;
+using CMS.Websites;
+using Kentico.Content.Web.Mvc;
 using Moq;
 
 namespace BDO.GWT.Core.Tests.Services;
 
 public class NewsGroupPageServiceTests
 {
-    private readonly Mock<INewsGroupPageService> _newsGroupPageServiceMock;
+    private Mock<IContentService> _contentServiceMock = null!;
+    private Mock<IWebPageUrlResolver> _urlResolverMock = null!;
+    private NewsGroupPageService _service = null!;
 
-    public NewsGroupPageServiceTests()
+    [SetUp]
+    public void Setup()
     {
-        _newsGroupPageServiceMock = new Mock<INewsGroupPageService>();
+        _contentServiceMock = new Mock<IContentService>();
+        _urlResolverMock = new Mock<IWebPageUrlResolver>();
+
+        _service = new NewsGroupPageService(
+            _contentServiceMock.Object,
+            _urlResolverMock.Object);
     }
 
-    [Test]
-    public async Task GetNewsGroupDtoAsync_ReturnsExpectedDto()
-    {
-        var expectedDto = new NewsGroupDto
+    private static NewsGroup CreatePage(int id) =>
+        new()
         {
-            Title = "Group Title",
+            NewsGroupTitle = "Group Title",
             Description = "Group Description",
-            Links = new[]
+            SystemFields = new WebPageFields
             {
-                new NewsGroupItemDto { Title = "Article 1", URL = "/article-1" },
-                new NewsGroupItemDto { Title = "Article 2", URL = "/article-2" }
+                WebPageItemID = id
             }
         };
 
-        _newsGroupPageServiceMock
-            .Setup(x => x.GetNewsGroupDtoAsync(It.IsAny<NewsGroup>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(expectedDto);
+    private static NewsArticle CreateArticle(string title, DateTime? date) =>
+        new()
+        {
+            MetadataTitle = title,
+            SystemFields = new WebPageFields
+            {
+                ContentItemCommonDataLastPublishedWhen = date
+            }
+        };
 
-        var result = await _newsGroupPageServiceMock.Object.GetNewsGroupDtoAsync(
-            new NewsGroup(), CancellationToken.None);
+    private void SetupContentService(IEnumerable<NewsArticle> data)
+    {
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<NewsArticle>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(data);
+    }
+
+    [Test]
+    public async Task GetNewsGroupDtoAsync_ReturnsMappedDto()
+    {
+        var page = CreatePage(1);
+
+        SetupContentService(new List<NewsArticle>
+        {
+            CreateArticle("A", DateTime.UtcNow.AddDays(-1)),
+            CreateArticle("B", DateTime.UtcNow)
+        });
+
+        _urlResolverMock
+            .Setup(x => x.GetRelativePath(It.IsAny<NewsArticle>()))
+            .Returns<NewsArticle>(x => "/url/" + x.MetadataTitle);
+
+        var result = await _service.GetNewsGroupDtoAsync(page, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
             Assert.That(result.Title, Is.EqualTo("Group Title"));
             Assert.That(result.Description, Is.EqualTo("Group Description"));
             Assert.That(result.Links, Has.Length.EqualTo(2));
-            Assert.That(result.Links[0].Title, Is.EqualTo("Article 1"));
         });
     }
 
     [Test]
-    public async Task GetNewsGroupDtoAsync_WhenNoLinks_ReturnsEmptyLinksArray()
+    public async Task GetNewsGroupDtoAsync_ReturnsEmpty_WhenNoArticles()
     {
-        var emptyDto = new NewsGroupDto
-        {
-            Title = "Group Title",
-            Description = null,
-            Links = Array.Empty<NewsGroupItemDto>()
-        };
+        var page = CreatePage(1);
 
-        _newsGroupPageServiceMock
-            .Setup(x => x.GetNewsGroupDtoAsync(It.IsAny<NewsGroup>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(emptyDto);
+        SetupContentService(new List<NewsArticle>());
 
-        var result = await _newsGroupPageServiceMock.Object.GetNewsGroupDtoAsync(
-            new NewsGroup(), CancellationToken.None);
+        var result = await _service.GetNewsGroupDtoAsync(page, CancellationToken.None);
+
+        Assert.That(result.Links, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetNewsGroupDtoAsync_OrdersByLatestDate_FirstItemIsNewest()
+    {
+        var page = CreatePage(1);
+
+        var older = CreateArticle("Old", DateTime.UtcNow.AddDays(-5));
+        var newer = CreateArticle("New", DateTime.UtcNow);
+
+        SetupContentService(new[] { older, newer });
+
+        _urlResolverMock
+            .Setup(x => x.GetRelativePath(It.IsAny<NewsArticle>()))
+            .Returns<NewsArticle>(x => x.MetadataTitle);
+
+        var result = await _service.GetNewsGroupDtoAsync(page, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
-            Assert.That(result.Title, Is.EqualTo("Group Title"));
-            Assert.That(result.Description, Is.Null);
-            Assert.That(result.Links, Is.Empty);
+            Assert.That(result.Links.First().Title, Is.EqualTo("New"));
+            Assert.That(result.Links.Last().Title, Is.EqualTo("Old"));
         });
     }
 
     [Test]
-    public async Task GetNewsGroupDtoAsync_InvokedOnce()
+    public async Task GetNewsGroupDtoAsync_UsesUrlResolver_ForEachItem()
     {
-        _newsGroupPageServiceMock
-            .Setup(x => x.GetNewsGroupDtoAsync(It.IsAny<NewsGroup>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new NewsGroupDto { Title = "Test", Links = [] });
+        var page = CreatePage(1);
 
-        var page = new NewsGroup();
-        await _newsGroupPageServiceMock.Object.GetNewsGroupDtoAsync(page, CancellationToken.None);
+        SetupContentService(new[]
+        {
+            CreateArticle("Test", DateTime.UtcNow)
+        });
 
-        _newsGroupPageServiceMock.Verify(
-            x => x.GetNewsGroupDtoAsync(page, It.IsAny<CancellationToken>()), Times.Once);
+        _urlResolverMock
+            .Setup(x => x.GetRelativePath(It.IsAny<NewsArticle>()))
+            .Returns("/resolved-url");
+
+        var result = await _service.GetNewsGroupDtoAsync(page, CancellationToken.None);
+
+        _urlResolverMock.Verify(x => x.GetRelativePath(It.IsAny<NewsArticle>()), Times.Once);
+        Assert.That(result.Links[0].URL, Is.EqualTo("/resolved-url"));
+    }
+
+    [Test]
+    public async Task GetNewsGroupDtoAsync_MapsPublishDateCorrectly()
+    {
+        var page = CreatePage(1);
+
+        var date = DateTime.UtcNow;
+
+        SetupContentService(new[]
+        {
+            CreateArticle("Mapped", date)
+        });
+
+        _urlResolverMock
+            .Setup(x => x.GetRelativePath(It.IsAny<NewsArticle>()))
+            .Returns("/x");
+
+        var result = await _service.GetNewsGroupDtoAsync(page, CancellationToken.None);
+
+        Assert.That(result.Links[0].PublishFrom, Is.EqualTo(date));
+    }
+
+    [Test]
+    public async Task GetNewsGroupDtoAsync_HandlesNullPublishDate()
+    {
+        var page = CreatePage(1);
+
+        SetupContentService(new[]
+        {
+            CreateArticle("NullDate", null)
+        });
+
+        _urlResolverMock
+            .Setup(x => x.GetRelativePath(It.IsAny<NewsArticle>()))
+            .Returns("/x");
+
+        var result = await _service.GetNewsGroupDtoAsync(page, CancellationToken.None);
+
+        Assert.That(result.Links[0].PublishFrom, Is.Null);
+    }
+
+    [Test]
+    public async Task GetNewsGroupDtoAsync_MapsAllFieldsCorrectly()
+    {
+        var page = CreatePage(1);
+
+        var article = CreateArticle("FinalCheck", DateTime.UtcNow);
+
+        SetupContentService(new[] { article });
+
+        _urlResolverMock
+            .Setup(x => x.GetRelativePath(It.IsAny<NewsArticle>()))
+            .Returns("/final");
+
+        var result = await _service.GetNewsGroupDtoAsync(page, CancellationToken.None);
+
+        var link = result.Links.First();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(link.Title, Is.EqualTo("FinalCheck"));
+            Assert.That(link.URL, Is.EqualTo("/final"));
+            Assert.That(link.PublishFrom, Is.Not.Null);
+        });
+    }
+
+    [Test]
+    public async Task GetNewsGroupDtoAsync_PassesCancellationToken_ToContentService()
+    {
+        var page = CreatePage(1);
+        using var cts = new CancellationTokenSource();
+        var expectedToken = cts.Token;
+
+        SetupContentService(new List<NewsArticle>());
+
+        await _service.GetNewsGroupDtoAsync(page, expectedToken);
+
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<NewsArticle>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                expectedToken),
+            Times.Once);
     }
 }

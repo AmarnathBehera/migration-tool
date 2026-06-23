@@ -11,11 +11,12 @@
 }
 
 @if (Model != null && pageId != 0)
-{
+{<li>
     @(await ReactService.RenderComponentAsync(
     pageId,
     ReactComponentType.LocalNavigationItem,
     ReactComponentType.LocalNavigationItemGUID,
     Model,
     Context.RequestAborted))
+    </li>
 }

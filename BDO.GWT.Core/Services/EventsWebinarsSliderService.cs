@@ -98,7 +98,9 @@ public class EventsWebinarsSliderService : IEventsWebinarsSliderService
                 : null,
             TopMargin = data.TopMargin ?? string.Empty,
             BottomMargin = data.BottomMargin ?? string.Empty,
-            WidgetID = data.WidgetID
+            WidgetID = data.WidgetID,
+            CurrentPageGuid = currentPage.SystemFields.ContentItemGUID,
+            PageType = currentPage.GetType().Name
         };
     }
 
