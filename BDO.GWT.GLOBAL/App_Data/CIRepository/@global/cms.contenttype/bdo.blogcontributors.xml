@@ -13,6 +13,9 @@
       <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
         <properties />
       </schema>
+      <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
+        <properties />
+      </schema>
       <field column="PeopleListDefaultOrder" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="b1d4e369-59d5-4ee5-82ea-6770a0dab01b" visible="true">
         <properties>
           <defaultvalue>asc</defaultvalue>

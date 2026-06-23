@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="BlogContributors"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class BlogContributors : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IPageMetadata
+	public partial class BlogContributors : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero, IPageMetadata
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -141,6 +141,66 @@ namespace BDO
 		/// MetadataCanonical.
 		/// </summary>
 		public string MetadataCanonical { get; set; }
+
+
+		/// <summary>
+		/// HeroLayout.
+		/// </summary>
+		public string HeroLayout { get; set; }
+
+
+		/// <summary>
+		/// HeroTitle.
+		/// </summary>
+		public string HeroTitle { get; set; }
+
+
+		/// <summary>
+		/// HeroDescription.
+		/// </summary>
+		public string HeroDescription { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> HeroBackgroundImage { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImageAltText.
+		/// </summary>
+		public string HeroBackgroundImageAltText { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImage_Mobile.
+		/// </summary>
+		public IEnumerable<ContentAttachment> HeroBackgroundImage_Mobile { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImage_MobileAltText.
+		/// </summary>
+		public string HeroBackgroundImage_MobileAltText { get; set; }
+
+
+		/// <summary>
+		/// HeroCallToActionButtonType.
+		/// </summary>
+		public string HeroCallToActionButtonType { get; set; }
+
+
+		/// <summary>
+		/// HeroCallToActionButtonText.
+		/// </summary>
+		public string HeroCallToActionButtonText { get; set; }
+
+
+		/// <summary>
+		/// HeroCallToActionButtonUrl.
+		/// </summary>
+		public IEnumerable<IWebPageFieldsSource> HeroCallToActionButtonUrl { get; set; }
 
 
 		/// <summary>
