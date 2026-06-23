@@ -24,7 +24,7 @@ namespace BDO.GWT.Web.Core.Services;
 public interface ICareersPageService
 {
     Task<CareersPageDto> GetCareersPageDtoAsync(CancellationToken cancellationToken);
-    Task<PaginationDto<CareerCardDto>> GetCareerPaginationResultAsync(Guid pageGuid, CardsQuery query, CancellationToken cancellationToken);
+    Task<PaginationDto<CareerCardDto>> GetCareerPaginationResultAsync(string language, Guid pageGuid, CardsQuery query, CancellationToken cancellationToken);
 }
 
 public class CareersPageService : ICareersPageService
@@ -90,6 +90,7 @@ public class CareersPageService : ICareersPageService
     }
 
     public async Task<PaginationDto<CareerCardDto>> GetCareerPaginationResultAsync(
+        string language,
         Guid pageGuid,
         CardsQuery query,
         CancellationToken cancellationToken)
@@ -113,7 +114,7 @@ public class CareersPageService : ICareersPageService
             new RetrievePagesParameters
             {
                 LinkedItemsMaxLevel = 1,
-                LanguageName = _cultureContext.CurrentLanguageTag,
+                LanguageName = language,
                 UseLanguageFallbacks = false
             },
             q => q.Where(w =>

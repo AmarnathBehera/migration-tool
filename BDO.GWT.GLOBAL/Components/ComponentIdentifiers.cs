@@ -27,6 +27,7 @@
             public const string AccordionWidget = WidgetPrefix + "AccordionWidget";
 
             public const string FaqWidget = WidgetPrefix + "FaqWidget";
+
             public const string EventsWebinarsSlider = WidgetPrefix + "EventWebinarSliderWidget";
 
             public const string Form = "Kentico.FormWidget";
@@ -34,6 +35,8 @@
             public const string LocalNavigation = WidgetPrefix + "LocalNavigation";
 
             public const string NewsCarousel = WidgetPrefix + "NewsCarousel";
+
+            public const string KeyContacts = WidgetPrefix + "KeyContacts";
 
             public const string FlexibleBanner = WidgetPrefix + "FlexibleBanner";
 

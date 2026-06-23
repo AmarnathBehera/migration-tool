@@ -11,7 +11,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.GLOBAL.Widgets.NewsCarouselWidget;
+namespace BDO.GWT.GLOBAL.Widgets;
 
 public class NewsCarouselWidgetProperties : IWidgetProperties
 {

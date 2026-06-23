@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Reusable</ClassContentTypeType>
+  <ClassDisplayName>CssAttachmentAsset</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="924784e5-86bc-466f-9c43-0533fc6bb770" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="5f37f8fc-dda5-4353-8c6d-934bd267a2d8" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="2f317863-2c59-4cee-86df-24eb6e098c4c" isunique="true" system="true" />
+      <field allowempty="true" column="CssAttachmentAsset" columnprecision="0" columntype="contentitemasset" enabled="true" guid="66950e26-18ab-4ab8-8ec7-f416a3444865" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>CSS Asset</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedExtensions>css</AllowedExtensions>
+          <controlname>Kentico.Administration.ContentItemAssetUploader</controlname>
+          <IsFormatConversionEnabled>False</IsFormatConversionEnabled>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>69b39d35-8ce6-4739-9253-2914f52b0f79</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-file</ClassIconClass>
+  <ClassName>BDO.CssAttachmentAsset</ClassName>
+  <ClassShortName>BDOCSS</ClassShortName>
+  <ClassTableName>BDO_CSS</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

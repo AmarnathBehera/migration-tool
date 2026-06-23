@@ -1,5 +1,6 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
+using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
@@ -15,87 +16,111 @@ public interface IDealPageService
     Task<DealDto> GetDealPageDtoAsync(CancellationToken cancellationToken);
 }
 
-public class DealPageService : IDealPageService
+public class DealPageService(
+    IHeroService heroService,
+    ISidebarService sidebarService,
+    IContentService contentRetriever,
+    IWebsiteChannelContext websiteChannelContext,
+    IWebPageDataContextRetriever webPageDataContextRetriever) : IDealPageService
 {
-    private readonly IHeroService _heroService;
-    private readonly ISidebarService _sidebarService;
-    private readonly IContentService _contentRetriever;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
-
-    public DealPageService(IHeroService heroService, ISidebarService sidebarService, IContentService contentRetriever, 
-        IWebsiteChannelContext websiteChannelContext)
+    private static readonly RetrievePagesParameters _retrieveParameters = new()
     {
-        _heroService = heroService;
-        _sidebarService = sidebarService;
-        _contentRetriever = contentRetriever;
-        _websiteChannelContext = websiteChannelContext;
-    }
+        LinkedItemsMaxLevel = 5
+    };
 
     public async Task<DealDto> GetDealPageDtoAsync(CancellationToken cancellationToken)
     {
-        var results = await _contentRetriever.GetPagesAsync<Deal>(
-           new RetrievePagesParameters
-           {
-               LinkedItemsMaxLevel = 5
-           },
-           query =>
-           {
-               query.Where(w =>
-                   w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
-           },
-           RetrievalCacheSettings.CacheDisabled,
-           cancellationToken);
+        _ = websiteChannelContext;
 
-        var dealPage = results?.FirstOrDefault();
-
-        if (dealPage == null)
+        if (!webPageDataContextRetriever.TryRetrieve(out var webPageContext) || webPageContext.WebPage is null)
         {
             return new DealDto();
         }
 
-        // Map hero data
+        var currentPageGuid = webPageContext.WebPage.WebPageItemGUID;
+
+        var results = await contentRetriever.GetPagesAsync<Deal>(
+            _retrieveParameters,
+            query => query.Where(w => w.WhereEquals("WebPageItemGUID", currentPageGuid)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken);
+
+        var dealPage = results.FirstOrDefault();
+        if (dealPage is null)
+        {
+            return new DealDto();
+        }
+
+        var heroBackgroundImage = dealPage.HeroBackgroundImage?.FirstOrDefault();
+        var heroMobileBackgroundImage = dealPage.HeroBackgroundImage_Mobile?.FirstOrDefault();
+        var heroCallToActionUrl = dealPage.HeroCallToActionButtonUrl?.FirstOrDefault();
+
         var heroData = new HeroData
         {
             Layout = dealPage.HeroLayout,
             Title = dealPage.HeroTitle,
             Description = dealPage.HeroDescription,
-            BackgroundImage = dealPage.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string bgUrl ? Link.Parse(bgUrl) : null,
+            BackgroundImage = ParseLink(heroBackgroundImage?.ContentAttachmentAsset?.Url),
             BackgroundImageAltText = dealPage.HeroBackgroundImageAltText,
-            MobileBackgroundImage = dealPage.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string mobileUrl ? Link.Parse(mobileUrl) : null,
+            MobileBackgroundImage = ParseLink(heroMobileBackgroundImage?.ContentAttachmentAsset?.Url),
             MobileBackgroundImageAltText = dealPage.HeroBackgroundImage_MobileAltText,
             CallToActionButtonType = dealPage.HeroCallToActionButtonType,
             CallToActionButtonText = dealPage.HeroCallToActionButtonText,
-            CallToActionButtonUrl = dealPage.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath is string ctaPath ? Link.Parse(ctaPath) : null,
+            CallToActionButtonUrl = ParseLink(heroCallToActionUrl?.SystemFields?.WebPageUrlPath),
         };
 
-        var dto = new DealDto
+        var sidebarTask = dealPage.ShowSidebar
+            ? sidebarService.GetDealSidebarDtoAsync(dealPage, cancellationToken)
+            : null;
+
+        var hero = await heroService.GetHeroDtoAsync(heroData, cancellationToken);
+        var sidebar = sidebarTask is null ? null : await sidebarTask;
+
+        return new DealDto
         {
-            Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
+            Hero = hero,
             Title = dealPage.MetadataShowTitle ? dealPage.MetadataTitle : null,
-            DealTypeNames = GetDeals(dealPage.DealType, cancellationToken),
-            IndustryNames = GetDeals(dealPage.Industry, cancellationToken),
-            SubIndustryNames = GetDeals(dealPage.SubIndustry, cancellationToken),
-            Range = GetDeals(dealPage.Size, cancellationToken),
+            DealTypeNames = MapNames(dealPage.DealType, cancellationToken),
+            IndustryNames = MapNames(dealPage.Industry, cancellationToken),
+            SubIndustryNames = MapNames(dealPage.SubIndustry, cancellationToken),
+            Range = MapNames(dealPage.Size, cancellationToken),
             ClientName = dealPage.ClientName,
             Content = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(dealPage.DealContent),
-            Sidebar = dealPage.ShowSidebar ? await _sidebarService.GetDealSidebarDtoAsync(dealPage, cancellationToken) : null,
+            Sidebar = sidebar,
         };
-
-        return dto;
     }
 
-    private static List<string> GetDeals(IEnumerable<DealCardCommon>? deals, CancellationToken cancellationToken)
+    private static Link? ParseLink(string? url) =>
+        string.IsNullOrWhiteSpace(url) ? null : Link.Parse(url);
+
+    private static List<string> MapNames<T>(IEnumerable<T>? items, CancellationToken cancellationToken)
+        where T : class
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        if (deals == null)
+        if (items is null)
         {
-            return new List<string>();
+            return [];
         }
 
-        return deals
-            .Where(p => p != null)
-            .Select(p => p.Name)
-            .ToList();
+        var result = items is ICollection<T> collection
+            ? new List<string>(collection.Count)
+            : [];
+
+        foreach (var item in items)
+        {
+            if (item is null)
+            {
+                continue;
+            }
+
+            var name = ItemPropertyMapper.GetName(item);
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                result.Add(name);
+            }
+        }
+
+        return result;
     }
 }

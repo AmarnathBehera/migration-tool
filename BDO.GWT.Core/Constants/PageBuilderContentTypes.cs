@@ -35,8 +35,19 @@ namespace BDO.GWT.Core.Constants
         Event.CONTENT_TYPE_NAME,
         EventRegistrationForm.CONTENT_TYPE_NAME,
         Webinar.CONTENT_TYPE_NAME,
-        SectionEvents.CONTENT_TYPE_NAME
+        SectionEvents.CONTENT_TYPE_NAME,
+        SectionSpecialties.CONTENT_TYPE_NAME,
+        SpecialtiesArea.CONTENT_TYPE_NAME,
+        SpecialtiesCategory.CONTENT_TYPE_NAME,
+        SpecialtiesPage.CONTENT_TYPE_NAME,
+        SectionEvents.CONTENT_TYPE_NAME,
 
+        NewsGroup.CONTENT_TYPE_NAME,
+        MicrositeMasterPage.CONTENT_TYPE_NAME,
+        MicrositePage.CONTENT_TYPE_NAME,
+        SectionEvents.CONTENT_TYPE_NAME,
+        Deal.CONTENT_TYPE_NAME,
+        SectionDeals.CONTENT_TYPE_NAME
     };
     }
 }

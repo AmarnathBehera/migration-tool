@@ -52,10 +52,21 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     ContentTypeNames = new[] { "BDO.Deal" },
     IconClass = "xp-market")]
 
+[assembly: RegisterWebPageRoute(SectionDeals.CONTENT_TYPE_NAME, typeof(SectionDealsController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: SectionDeals.CONTENT_TYPE_NAME,
+    name: "Section Deals Page Content Type Template",
+    customViewName: "~/Views/SectionDeals/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SectionDeals" },
+    IconClass = "xp-market")]
+
 [assembly: RegisterWebPageRoute(SectionIndustries.CONTENT_TYPE_NAME, typeof(SectionIndustriesController))]
 [assembly: RegisterWebPageRoute(IndustryCategory.CONTENT_TYPE_NAME, typeof(IndustryCategoryController))]
 [assembly: RegisterWebPageRoute(Industry.CONTENT_TYPE_NAME, typeof(IndustryController))]
 [assembly: RegisterWebPageRoute(IndustryService.CONTENT_TYPE_NAME, typeof(IndustryServiceController))]
+[assembly: RegisterWebPageRoute(MicrositeMasterPage.CONTENT_TYPE_NAME, typeof(MicrositeMasterPageController))]
+[assembly: RegisterWebPageRoute(MicrositePage.CONTENT_TYPE_NAME, typeof(MicrositePageController))]
 
 
 [assembly: RegisterWebPageRoute(SectionServices.CONTENT_TYPE_NAME, typeof(SectionServicesController))]
@@ -134,6 +145,7 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     ContentTypeNames = new[] { "BDO.LocationCity" },
     IconClass = "xp-market")]
 
+[assembly: RegisterWebPageRoute(BlogContributors.CONTENT_TYPE_NAME, typeof(BlogContributorsPageController))]
 [assembly: RegisterWebPageRoute(SectionBlogs.CONTENT_TYPE_NAME, typeof(SectionBlogsController))]
 
 [assembly: RegisterPageTemplate(
@@ -314,3 +326,5 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 
 [assembly: RegisterWebPageRoute(SectionRss.CONTENT_TYPE_NAME, typeof(SectionRssController))]
 [assembly: RegisterWebPageRoute(Rss.CONTENT_TYPE_NAME, typeof(RssController))]
+
+[assembly: RegisterWebPageRoute(Sitemap.CONTENT_TYPE_NAME, typeof(SitemapPageController))]

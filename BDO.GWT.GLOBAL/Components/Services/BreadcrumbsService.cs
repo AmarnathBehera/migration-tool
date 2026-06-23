@@ -69,10 +69,14 @@ namespace BDO.GWT.Core.Services
             var current = await _pageContext.GetAnyPageByWebPageItemId(parentPageID, cancellationToken);
             while (parentPageID > 0 && current != null)
             {
-                ancestors.Insert(0, (
-                    current.SystemFields.WebPageItemName,
-                    current.SystemFields.WebPageItemID
-                ));
+                // Skip SectionMicrosites — breadcrumb starts from MicrositeMasterPage
+                if (current is not SectionMicrosites)
+                {
+                    ancestors.Insert(0, (
+                        current.SystemFields.WebPageItemName,
+                        current.SystemFields.WebPageItemID
+                    ));
+                }
 
                 parentPageID = current.SystemFields.WebPageItemParentID;
                 if (parentPageID > 0)
@@ -80,11 +84,15 @@ namespace BDO.GWT.Core.Services
                     current = await _pageContext.GetAnyPageByWebPageItemId(parentPageID, cancellationToken);
                 }
             }
-            // Home is always the first breadcrumb link
-            var links = new List<LinkItemDto>
-    {
-        new LinkItemDto { Title = homeTitle, URL = homeUrl, Target = "_self" }
-    };
+            var isMicrositeContentType = currentPage.ContentTypeName == MicrositeMasterPage.CONTENT_TYPE_NAME
+                || currentPage.ContentTypeName == MicrositePage.CONTENT_TYPE_NAME
+                || currentPage.ContentTypeName == SectionMicrosites.CONTENT_TYPE_NAME;
+
+            var links = new List<LinkItemDto>();
+            if (!isMicrositeContentType)
+            {
+                links.Add(new LinkItemDto { Title = homeTitle, URL = homeUrl, Target = "_self" });
+            }
 
             foreach (var (_, webPageItemId) in ancestors)
             {

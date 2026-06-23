@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Reusable</ClassContentTypeType>
+  <ClassDisplayName>RegionName</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="6860dcf1-a056-47ed-b4cf-a78751eee35d" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="ad60297b-5c1d-4be6-9324-314781f53556" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="3d70e9be-8e7a-4cad-9b6e-d4bdc5fcca61" isunique="true" system="true" />
+      <field column="RegionName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="09bdd3c7-050f-40ce-85f4-da1630d8c0df" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Name</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>750963fc-1562-4da7-b7ea-6aadfc4366fb</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-bullseye</ClassIconClass>
+  <ClassName>BDO.RegionName</ClassName>
+  <ClassShortName>BDORegionName</ClassShortName>
+  <ClassTableName>BDO_RegionName</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

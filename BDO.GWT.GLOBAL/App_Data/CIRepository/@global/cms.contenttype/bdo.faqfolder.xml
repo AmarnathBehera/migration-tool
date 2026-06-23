@@ -10,12 +10,37 @@
       <field allowempty="true" column="Separator" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="4e812ace-51c8-4b46-a8f9-a21c42a2305d" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Separator</fieldcaption>
+          <fieldcaption>Dropdown</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
-          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+          <controlname>BDO.SQLDropdown</controlname>
+          <Script>
+<![CDATA[
+DECLARE @ChannelId INT = 1;
+DECLARE @Culture NVARCHAR(20) = 'en-US';
+
+SELECT
+    CAST(w.WebPageItemID AS NVARCHAR(20)) AS Value,
+    COALESCE(
+        NULLIF(lm.ContentItemLanguageMetadataDisplayName, ''),
+        w.WebPageItemName
+    ) AS Text
+FROM BDO_HomePage h
+INNER JOIN CMS_ContentItemCommonData cd
+    ON cd.ContentItemCommonDataID = h.ContentItemDataCommonDataID
+INNER JOIN CMS_WebPageItem w
+    ON w.WebPageItemContentItemID = cd.ContentItemCommonDataContentItemID
+INNER JOIN CMS_ContentItemLanguageMetadata lm
+    ON lm.ContentItemLanguageMetadataContentItemID = cd.ContentItemCommonDataContentItemID
+INNER JOIN CMS_ContentLanguage cl
+    ON cl.ContentLanguageID = lm.ContentItemLanguageMetadataContentLanguageID
+WHERE w.WebPageItemWebsiteChannelID = @ChannelId
+  AND cl.ContentLanguageName = @Culture
+ORDER BY Text;
+]]>
+          </Script>
         </settings>
       </field>
       <field column="Title" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="534d375d-4949-4e84-9663-23169ac0ba0e" visible="true">

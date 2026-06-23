@@ -79,20 +79,21 @@ public class LocationsPageService : ILocationsPageService
            cancellationToken
        )).ToList();
 
-        var locationsList = new List<LocalLocationsDto>
-        {new LocalLocationsDto
-        {
-            Title = page.LocationsTitle,
-            Items = pages
-                .Select(v => new LinkItemDto()
-                {
-                    Title = v.MetadataTitle,
-                    URL = v.GetUrl().AbsoluteUrl
-                })
-                .OrderBy(x => x.Title)
-                .ToList()
-        }
-        };
+        var locationsList = pages
+            .GroupBy(v => v.RegionNameLocationCity?.FirstOrDefault()?.RegionName1 ?? "")
+            .Select(group => new LocalLocationsDto
+            {
+                Title = group.Key,
+                Items = group
+                    .Select(v => new LinkItemDto()
+                    {
+                        Title = v.MetadataTitle,
+                        URL = v.GetUrl().AbsoluteUrl
+                    })
+                    .OrderBy(x => x.Title)
+                    .ToList()
+            })
+            .ToList();
 
         return locationsList;
     }

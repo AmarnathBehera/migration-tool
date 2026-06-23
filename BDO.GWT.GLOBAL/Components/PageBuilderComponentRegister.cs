@@ -1,7 +1,7 @@
 ﻿using BDO;
+using BDO.GWT.GLOBAL.Widgets;
 using BDO.GWT.GLOBAL.Components.Widget.KeyTakeawaysWidget;
 using BDO.GWT.GLOBAL.Components.Widget.LocalNavigationWidget;
-using BDO.GWT.GLOBAL.Widgets.NewsCarouselWidget;
 using BDO.GWT.Web.Components.Widget.TabAccordionWidget;
 using BDO.GWT.Web.Widgets.AccordionWidget;
 using BDO.GWT.Web.Widgets.FaqWidget;
@@ -40,6 +40,7 @@ using Kentico.PageBuilder.Web.Mvc;
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.FlexibleContent, typeof(FlexibleContentWidget), "Flexible Content", typeof(FlexibleContentWidgetProperties), AllowCache = true, IconClass = "icon-newspaper")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.TabAccordion, typeof(TabAccordionWidget), "Tab Accordion", typeof(TabAccordionWidgetProperties), AllowCache = true, IconClass = "icon-tab")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.NewsCarousel,typeof(NewsCarouselWidget),"News carousel",typeof(NewsCarouselWidgetProperties),AllowCache = true,IconClass = "icon-carousel")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.KeyContacts, typeof(KeyContactsWidget), "Key Contacts", typeof(KeyContactsWidgetProperties), AllowCache = true, IconClass = "icon-app-contact-groups")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.SocialMediaButtons,typeof(SocialMediaButtonsWidget),"Social media buttons",typeof(SocialMediaButtonsWidgetProperties),AllowCache = true,IconClass = "icon-paper-plane")]
 
 // Sections
@@ -75,14 +76,6 @@ using Kentico.PageBuilder.Web.Mvc;
     IconClass = "icon-cb-check-preview",
     ViewName = "~/Components/FormComponents/ConsentAgreement/ConsentAgreement.cshtml"
 )]
-[assembly: RegisterFormComponent(
-    SecurityCode.IDENTIFIER,
-    typeof(SecurityCode),
-    "Security Code",
-    IsAvailableInFormBuilderEditor = true,
-    ViewName = "~/Components/FormComponents/SecurityCode/_SecurityCode.cshtml",
-    Description = "{$" + ComponentIdentifiers.FormComponents.SecurityCode + ".Description$}",
-    IconClass = "icon-cb-check-preview")]
 
 [assembly: RegisterFormComponent(
     MonthYear.IDENTIFIER,

@@ -15,16 +15,19 @@ public interface IPersonPageService
     Task<VCardData?> GeneratePersonVCardAsync(Guid personGuid, string? source = null, CancellationToken cancellationToken = default);
 
     Task<PersonSchemaMarkupDto> GetPersonSchemaMarkupDto(Person person, CancellationToken cancellationToken);
+    string GetPersonDisplayNameAsync(Person person);
 
 }
 
 public class PersonPageService : IPersonPageService
 {
+
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IContentService _contentService;
     private readonly ICultureContext _cultureContext;
     private readonly ISettingService _settingsService;
     private readonly IAuthoredContentService _authoredContentService;
+    private readonly IWebPageUrlResolver _webPageUrlResolver;
 
     private HttpClient? _httpClient;
 
@@ -33,7 +36,8 @@ public class PersonPageService : IPersonPageService
         IContentService contentService,
         ICultureContext cultureContext,
         ISettingService settingService,
-        IAuthoredContentService authoredContentService
+        IAuthoredContentService authoredContentService,
+        IWebPageUrlResolver webPageUrlResolver
         )
     {
         _httpClientFactory = httpClientFactory;
@@ -41,6 +45,7 @@ public class PersonPageService : IPersonPageService
         _cultureContext = cultureContext;
         _settingsService = settingService;
         _authoredContentService = authoredContentService;
+        _webPageUrlResolver = webPageUrlResolver;
     }
 
     public async Task<PersonDto> GetPersonPageDtoAsync(Person page, CancellationToken cancellationToken = default)
@@ -112,6 +117,7 @@ public class PersonPageService : IPersonPageService
         var cities = await _contentService.GetPagesAsync<LocationCity>(
         new RetrievePagesParameters
         {
+            LinkedItemsMaxLevel=3,
             LanguageName = _cultureContext.CurrentLanguageTag,
             UseLanguageFallbacks = false
         },
@@ -124,7 +130,7 @@ public class PersonPageService : IPersonPageService
             });
             query.Columns(
                 nameof(LocationCity.MetadataTitle),
-                //nameof(LocationCity.RegionName),
+                nameof(LocationCity.RegionNameLocationCity),
                 nameof(LocationCity.SystemFields.WebPageItemID)
             );
         },
@@ -140,7 +146,7 @@ public class PersonPageService : IPersonPageService
         Address = office?.LocationAddressLine1,
         SecondAddress = office?.LocationAddressLine2,
         City = city?.MetadataTitle,
-        //State = city?.RegionName,
+        State = city?.RegionNameLocationCity?.FirstOrDefault()?.RegionName1,
         Zip = office?.LocationZip,
         Country = office?.LocationCountry,
     }));
@@ -161,7 +167,7 @@ public class PersonPageService : IPersonPageService
                 ("PREF", person.PersonDirectDialNumber),
             },
             Locations = locations,
-            URL = person.GetUrl().AbsoluteUrl,
+            URL = _webPageUrlResolver.GetAbsoluteUrl(person),
             RevisionDate = DateTime.UtcNow,
             Source = source,
             Organization = "BDO",
@@ -203,7 +209,7 @@ public class PersonPageService : IPersonPageService
 
         return new PersonSchemaMarkupDto()
         {
-            Url = person.GetUrl().AbsoluteUrl,
+            Url = _webPageUrlResolver.GetAbsoluteUrl(person),
             Name = person.MetadataTitle,
             JobTitle = person.PersonJobTitle,
             Description = _contentService.GetFallbackMetadataDescription(person.MetadataDescription, person.MetadataOGDescription),
@@ -252,7 +258,7 @@ public class PersonPageService : IPersonPageService
             ParentEnableForm = sectionPeople?.EnableForm ?? false
         };
     }
-    public static string GetPersonDisplayNameAsync(Person person)
+    public string GetPersonDisplayNameAsync(Person person)
     {
         return string.IsNullOrEmpty(person.PersonSurnamePrefixes) ? $"{person.PersonFirstName} {person.PersonLastName}" : $"{person.PersonFirstName} {person.PersonSurnamePrefixes} {person.PersonLastName}";
     }
@@ -318,7 +324,7 @@ public class PersonPageService : IPersonPageService
                 result.Add(new LinkItemDto
                 {
                     Title = locationOffice.MetadataTitle ?? string.Empty,
-                    URL = city.GetUrl().AbsoluteUrl,
+                    URL = _webPageUrlResolver.GetAbsoluteUrl(city),
                 });
             }
         }

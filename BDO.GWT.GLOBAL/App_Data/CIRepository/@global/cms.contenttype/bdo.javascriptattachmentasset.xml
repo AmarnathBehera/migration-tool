@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Reusable</ClassContentTypeType>
+  <ClassDisplayName>JavaScriptAttachmentAsset</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="c945fc12-cdb0-4f6b-b486-1c957551c3b3" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="e3a931b1-dd6a-413f-91a1-3125c51425bf" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="1610261f-cf0c-45f4-b1a7-7cafd9ce1d15" isunique="true" system="true" />
+      <field allowempty="true" column="JavaScriptAttachmentAsset" columnprecision="0" columntype="contentitemasset" enabled="true" guid="20f515b9-6b58-44c3-b28c-b606bef63616" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>JavaScript File</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedExtensions>js</AllowedExtensions>
+          <controlname>Kentico.Administration.ContentItemAssetUploader</controlname>
+          <IsFormatConversionEnabled>False</IsFormatConversionEnabled>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>085896f9-88d7-471a-92e3-13b83b7fb22f</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-file</ClassIconClass>
+  <ClassName>BDO.JavaScriptAttachmentAsset</ClassName>
+  <ClassShortName>BDOJsAttachmentAsset</ClassShortName>
+  <ClassTableName>BDO_JsAttachmentAsset</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

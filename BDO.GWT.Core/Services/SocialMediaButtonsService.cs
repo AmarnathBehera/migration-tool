@@ -1,7 +1,4 @@
-﻿using BDO.GWT.Core.Constants;
-using BDO.GWT.Core.DTOs;
-using BDO.GWT.Core.Entities;
-using BDO.GWT.Web.Core.LiveSite.DTOs;
+﻿using BDO.GWT.Core.DTOs;
 using CMS.Websites;
 using System.Web;
 
@@ -16,10 +13,12 @@ public interface ISocialMediaButtonsService
 public class SocialMediaButtonsService : ISocialMediaButtonsService
 {
     private readonly ISettingService _settingsService;
+    private readonly IWebPageUrlResolver _webPageUrlResolver;
 
-    public SocialMediaButtonsService(ISettingService settingsService)
+    public SocialMediaButtonsService(ISettingService settingsService, IWebPageUrlResolver webPageUrlResolver)
     {
         _settingsService = settingsService;
+        _webPageUrlResolver = webPageUrlResolver;
     }
 
 
@@ -29,7 +28,7 @@ public class SocialMediaButtonsService : ISocialMediaButtonsService
       CancellationToken cancellationToken)
     {
         var encodedPageTitle = HttpUtility.UrlEncode(pageTitle);
-        var pageUrl = page.GetUrl().AbsoluteUrl;
+        var pageUrl = _webPageUrlResolver.GetAbsoluteUrl(page);
         var encodedPageUrl = HttpUtility.UrlEncode(pageUrl);
 
         var settings = await _settingsService.GetPrintorShareInfo();

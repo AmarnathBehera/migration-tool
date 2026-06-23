@@ -26,5 +26,7 @@ public class EventsWebinarsSliderDto : ICardsCarouselDto<EventsWebinarsCardDto>,
 
     public string? WidgetID { get; set; }
 
-    public Guid StateGUID { get; set; }
+    public Guid? CurrentPageGuid { get; set; }
+
+    public string? PageType { get; set; }
 }

@@ -152,11 +152,11 @@ public class HomePageService : IHomePageService
             {
                 Title = homeHeroSlide.Title,
                 Description = homeHeroSlide.Description,
-                ImageURL = homeHeroSlide.Image_Mobile?.FirstOrDefault()?.ContentAttachmentAsset.Url,
+                ImageURL = homeHeroSlide.Image_Mobile?.FirstOrDefault()?.ContentAttachmentAsset.Url?.TrimStart('~'),
                 ImageAltText = homeHeroSlide.ImageAltText,
-                MobileImageURL = homeHeroSlide.Image_Mobile?.FirstOrDefault()?.ContentAttachmentAsset.Url,
+                MobileImageURL = homeHeroSlide.Image_Mobile?.FirstOrDefault()?.ContentAttachmentAsset.Url?.TrimStart('~'),
                 MobileImageAltText = homeHeroSlide.Image_MobileAltText,
-                ThumbnailImageURL = homeHeroSlide.Image_Thumbnail?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+                ThumbnailImageURL = homeHeroSlide.Image_Thumbnail?.FirstOrDefault()?.ContentAttachmentAsset?.Url?.TrimStart('~'),
                 ThumbnailImageAltText = homeHeroSlide.Image_ThumbnailAltText,
                 Button = homeHeroSlide.CTAButtonText != null && homeHeroSlide.CTAButtonUrl != null ? new LinkItemDto
                 {
