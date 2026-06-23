@@ -47,8 +47,7 @@ public class SocialMediaButtonsWidget : ViewComponent
         
         string pageTitle = string.Empty;
 
-        if (currentPage != null)
-        {
+
             var url = await _webPageUrlRetriever.Retrieve(
                 currentPage,
                 _cultureContext.CurrentLanguageTag,
@@ -59,7 +58,7 @@ public class SocialMediaButtonsWidget : ViewComponent
             pageTitle = currentPage.GetType()
                 .GetProperty("MetadataTitle")
                 ?.GetValue(currentPage) as string ?? string.Empty;
-        }
+        
 
         var dto = await _socialMediaButtonsService.GetSocialMediaButtonsDtoNB(pageAbsoluteUrl,pageTitle, HttpContext.RequestAborted);
 
