@@ -34,8 +34,7 @@ public class BlogContributorsPageService : IBlogContributorsPageService
     private readonly IPeopleCardsService _peopleCardsService;
     private readonly IContentService _contentService;
     private readonly IHeroService _heroService;
-    private readonly ICultureContext _cultureContext;
-    private readonly IPreferredLanguageRetriever _preferredLanguageRetriever;
+ 
 
 
     public BlogContributorsPageService(
@@ -48,8 +47,7 @@ public class BlogContributorsPageService : IBlogContributorsPageService
         _peopleCardsService = peopleCardsService;
         _contentService = contentService;
         _heroService = heroService;
-        _cultureContext = cultureContext;
-        _preferredLanguageRetriever = preferredLanguageRetriever;
+       
     }
 
     public async Task<BlogContributorsDto> GetSectionPeoplePageDtoAsync(BlogContributors page, CancellationToken cancellationToken)
