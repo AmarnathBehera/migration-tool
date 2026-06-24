@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <cms.contenttype>
   <ClassContentTypeType>Website</ClassContentTypeType>
-  <ClassDisplayName>LegalPage</ClassDisplayName>
+  <ClassDisplayName>Legal Page</ClassDisplayName>
   <ClassFormDefinition>
     <form>
       <field column="ContentItemDataID" columntype="integer" enabled="true" guid="df349827-eba4-460e-ad5f-1d32e4ac3dc1" isPK="true" />
@@ -13,10 +13,17 @@
       <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
         <properties />
       </schema>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
     </form>
   </ClassFormDefinition>
   <ClassGUID>ca36fdc4-756f-4f9e-afdf-bdf19fc50427</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-briefcase</ClassIconClass>
   <ClassName>BDO.LegalPage</ClassName>
   <ClassShortName>BDOLegalPage</ClassShortName>
   <ClassTableName>BDO_LegalPage</ClassTableName>
