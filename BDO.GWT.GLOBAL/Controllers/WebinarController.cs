@@ -29,7 +29,9 @@ public class WebinarController : Controller
 
         var WebinarPage = await _contentRetriever.RetrieveCurrentPageAsync<Webinar>(
             new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
-        
+        if (WebinarPage is null)
+            return NotFound();
+
 
         var pageDto = await _eventWebinarPageService.GetWebinarPageDtoAsync(WebinarPage, cancellationToken);
         var eventSchemaMarkupDto = await _eventWebinarPageService.GetWebinarSchemaMarkupDto(WebinarPage, cancellationToken);
