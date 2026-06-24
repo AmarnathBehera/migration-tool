@@ -41,7 +41,7 @@ namespace BDO.GWT.Core.Constants
         SpecialtiesCategory.CONTENT_TYPE_NAME,
         SpecialtiesPage.CONTENT_TYPE_NAME,
         SectionEvents.CONTENT_TYPE_NAME,
-
+        LegalPage.CONTENT_TYPE_NAME,
         NewsGroup.CONTENT_TYPE_NAME,
         MicrositeMasterPage.CONTENT_TYPE_NAME,
         MicrositePage.CONTENT_TYPE_NAME,
