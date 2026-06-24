@@ -33,30 +33,34 @@ public class ExternalPeopleHelper : IExternalPeopleHelper
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken
         );
-        var dtoMap = new Dictionary<Guid, SidebarExternalPersonDto>();
-        await Task.WhenAll(externalPeople.Select(async externalPerson =>
+
+        var dtos = await Task.WhenAll(externalPeople.Select(async externalPerson =>
         {
             var imageFile = externalPerson.ImageFile.FirstOrDefault();
-            var dto = new SidebarExternalPersonDto
+            return new
             {
-                Image = imageFile != null ? new ImageDto
+                Key = externalPerson.SystemFields.ContentItemGUID,
+                Dto = new SidebarExternalPersonDto
                 {
-                    Url = imageFile.ContentAttachmentAsset.Url,
-                    AltText = externalPerson.ImageFileAltText
-                } : null,
-                FullName = await GetDisplayNameAsync(externalPerson),
-                JobTitle = externalPerson.JobTitle,
-                Url = _contentService.EnsureAbsoluteUrl(externalPerson.Url)
+                    Image = imageFile != null ? new ImageDto
+                    {
+                        Url = imageFile.ContentAttachmentAsset.Url,
+                        AltText = externalPerson.ImageFileAltText
+                    } : null,
+                    FullName = await GetDisplayNameAsync(externalPerson),
+                    JobTitle = externalPerson.JobTitle,
+                    Url = _contentService.EnsureAbsoluteUrl(externalPerson.Url)
+                }
             };
-            dtoMap[externalPerson.SystemFields.ContentItemGUID] = dto;
         }));
+
+        var dtoMap = dtos.ToDictionary(x => x.Key, x => x.Dto);
 
         return externalPeopleNodeGuids
             .Where(guid => dtoMap.ContainsKey(guid))
             .Select(guid => dtoMap[guid])
             .ToArray();
     }
-
     public async Task<List<string>> GetExternalPeopleDisplayNames(List<Guid> externalPeopleNodeGuids, CancellationToken cancellationToken)
     {
         var externalPeople = (await _contentService.GetPagesAsync<ExternalPerson>(
