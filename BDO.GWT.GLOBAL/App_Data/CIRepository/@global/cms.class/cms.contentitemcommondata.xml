@@ -67,6 +67,28 @@
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
+      <field allowempty="true" column="CallToActionPosition" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6326143a-ad1e-4b2f-a1ac-a57a523062c0" visible="true">
+        <properties>
+          <defaultvalue>left</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Call to action position</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>34bc2c94-d4b6-4c53-a6f4-9b9520a24493</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.RadioGroup</controlname>
+          <Inline>False</Inline>
+          <Options>
+<![CDATA[
+left;Left
+right;Right
+center;Center
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+      </field>
       <schema guid="b760a373-943b-4321-ac39-d5067101ff82" name="Sidebar">
         <properties>
           <fieldcaption>Sidebar</fieldcaption>
@@ -129,14 +151,6 @@
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
         </settings>
-        <validationrulesdata>
-          <ValidationRuleConfiguration>
-            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
-            <RuleValues>
-              <ErrorMessage>This field is required</ErrorMessage>
-            </RuleValues>
-          </ValidationRuleConfiguration>
-        </validationrulesdata>
       </field>
       <field allowempty="true" column="ShowSocialMediaButtons" columnprecision="0" columntype="boolean" enabled="true" guid="7fcd0e9c-ddea-4f41-9038-88126fceccca" visible="true">
         <properties>
@@ -822,7 +836,7 @@ tertiary;Tertiary
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["43fcea42-e42d-4773-95dc-b415ea3e7547","31f6383b-697e-4d8f-acec-be459fe4ad01","74635906-cb04-4ffd-9936-9dcde92c7f58","392e5450-56f2-49da-96a0-fc49215599d8"]]]>
+            <![CDATA[["43fcea42-e42d-4773-95dc-b415ea3e7547","31f6383b-697e-4d8f-acec-be459fe4ad01","74635906-cb04-4ffd-9936-9dcde92c7f58","392e5450-56f2-49da-96a0-fc49215599d8","f3c1aa73-5245-4566-ae9c-ac80c54a6ce2"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>

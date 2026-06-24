@@ -47,6 +47,8 @@ public static class ReactComponentType
     public const string CareerDetails = "CareerDetails";
     public const string KeyTakeAways = "KeyTakeAwaysWidget";
     public const string BlogPostContent = "BlogPostContent";
+    public const string LegalBodyContent = "LegalBodyContent";
+    public const string LegalSideBoxNavigation = "LegalSideBoxNavigation";
 
 
 
@@ -99,6 +101,8 @@ public static class ReactComponentType
     public const string PeopleGridGUID = "e9c3e5b7-d9f2-4a6c-8e0b-1f3a5c7e9d2b";
     public const string SitemapGUID = "9ba2033f-9c72-4922-88c2-22f911be95c2";
     public const string DealsCardsGridGUID = "9dccc1e0-c246-46a6-a2a1-7dd18cfac628";
+    public const string LegalBodyContentGUID = "c58bfb27-7feb-4fdb-94f2-8bca61df250d";
+    public const string LegalSideBoxNavigationGUID = "79c73db6-0a00-43b7-9081-bff002b19ca9";
     public const string SocialMediaGUID = "c58bfb27-7feb-4fdb-94f2-8bca61df250d";
 }
 
@@ -108,9 +112,6 @@ public static class ReactComponentType
 //also delete below guid comments once the guid is used and component is registered in ReactComponentType
 
 
-
-//
-//79c73db6-0a00-43b7-9081-bff002b19ca9
 //5b72020a-38b5-43b1-9e26-71fd36ee9e29
 //4e110f8b-531c-4d3b-bafb-7c03af83ea0b
 //4772187b-22a3-4888-a7e9-54b3bd9cbd02

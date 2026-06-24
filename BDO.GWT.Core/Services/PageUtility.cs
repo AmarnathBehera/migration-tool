@@ -202,12 +202,12 @@ namespace BDO.GWT.Core
                             URL = u.Url
                         })
                         .ToArray();
-
+                    var imageUrl = cardImageUrlSelector(category)?.TrimStart('~');
                     return new MultiLinkCardDto
                     {
                         Title = cardTitleSelector(category),
                         Description = cardDescriptionSelector(category),
-                        ImageURL = cardImageUrlSelector(category),
+                        ImageURL = imageUrl,
                         ImageAltText = cardImageAltTextSelector(category),
                         Url = _urlResolver.GetRelativePath(category),
                         ReadMoreLinks = readMoreLinks,
@@ -333,12 +333,12 @@ namespace BDO.GWT.Core
                             URL = u.Url
                         })
                         .ToArray();
-
+                    var imageUrl = cardImageUrlSelector(category)?.TrimStart('~');
                     return new MultiLinkCardDto
                     {
                         Title = cardTitleSelector(category),
                         Description = cardDescriptionSelector(category),
-                        ImageURL = cardImageUrlSelector(category),
+                        ImageURL = imageUrl,
                         ImageAltText = cardImageAltTextSelector(category),
                         Url = _urlResolver.GetRelativePath(category),
                         ReadMoreLinks = readMoreLinks,

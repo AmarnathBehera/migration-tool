@@ -15,30 +15,21 @@ public class WebinarController : Controller
 {
     private readonly IEventWebinarPageService _eventWebinarPageService;
     private readonly IContentService _contentRetriever;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
 
-    public WebinarController(IEventWebinarPageService eventWebinarPageService, IWebsiteChannelContext websiteChannelContext, IContentService contentRetriever)
+    public WebinarController(IEventWebinarPageService eventWebinarPageService, IContentService contentRetriever)
     {
         _eventWebinarPageService = eventWebinarPageService;
-        _websiteChannelContext = websiteChannelContext;
         _contentRetriever = contentRetriever;
     }
 
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        var results = await _contentRetriever.GetPagesAsync<Webinar>(
-          new RetrievePagesParameters
-          {
-              LinkedItemsMaxLevel = 5
-          },
-          query =>
-          {
-              query.Where(w =>
-                  w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
-          },
-          RetrievalCacheSettings.CacheDisabled,
-          cancellationToken);
-        var WebinarPage = results?.FirstOrDefault();
+
+        var WebinarPage = await _contentRetriever.RetrieveCurrentPageAsync<Webinar>(
+            new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
+        if (WebinarPage is null)
+            return NotFound();
+
 
         var pageDto = await _eventWebinarPageService.GetWebinarPageDtoAsync(WebinarPage, cancellationToken);
         var eventSchemaMarkupDto = await _eventWebinarPageService.GetWebinarSchemaMarkupDto(WebinarPage, cancellationToken);
