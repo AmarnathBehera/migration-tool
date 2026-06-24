@@ -418,7 +418,7 @@ public partial class EventWebinarPageService : IEventWebinarPageService
 
         return new EventWebinarDto
         {
-            Title =  page.MetadataTitle,
+            Title = page.ShowWebinarTitle ? page.MetadataTitle : null,
             Description = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(page.MetadataDescription),
             RegistrationCard = new EventWebinarDetailsRegistrationCardDto
             {
@@ -549,7 +549,7 @@ public partial class EventWebinarPageService : IEventWebinarPageService
 
         return new EventWebinarDto
         {
-            Title = page.MetadataTitle,
+            Title = page.ShowEventTitle ? page.MetadataTitle : null,
             Description = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(page.MetadataDescription),
             RegistrationCard = new EventWebinarDetailsRegistrationCardDto
             {
