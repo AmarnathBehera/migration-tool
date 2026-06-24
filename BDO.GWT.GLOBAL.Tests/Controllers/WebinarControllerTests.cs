@@ -27,7 +27,6 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
 
             _controller = new WebinarController(
                 _eventServiceMock.Object,
-                _channelMock.Object,
                 _contentServiceMock.Object);
         }
 
