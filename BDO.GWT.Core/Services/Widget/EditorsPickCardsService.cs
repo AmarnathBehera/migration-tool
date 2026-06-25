@@ -1,270 +1,314 @@
-﻿//using BDO.GWT.Core.DTOs.Cards;
+﻿using BDO.GWT.Core;
+using BDO.GWT.Core.Constants;
+using BDO.GWT.Core.Data.Queries;
+using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.Cards;
+using BDO.GWT.Core.Helpers;
+using BDO.GWT.Core.Utilities;
+using CMS.ContentEngine;
+using CMS.Websites;
+using CMS.Websites.Routing;
+using System.Reflection;
 
-//using BDO.GWT.Web.Core.Helpers;
+namespace BDO.GWT.Core.Services;
 
+public interface IEditorsPickCardService
+{
+    Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(
+        HashSet<string> filters,
+        string? treePath,
+        CancellationToken cancellationToken);
 
-//namespace BDO.GWT.Web.Core.Services;
+    Task<PaginationDto<EditorsPickCardDto>> GetFilteredItemsAsync(
+        CardsQuery cardsQuery,
+        HashSet<Guid> selectedPageGuids,
+        Func<IWebPageFieldsSource, bool> isFeatured,
+        CancellationToken cancellationToken);
+}
 
-//public interface IEditorsPickCardsService
-//{
-//    Task<EditorsPickCardDto[]> GetEditorsPickCardDtoAsync(ICollection<IEditorsPickPage> editorsPickPages, Func<IEditorsPickPage, bool> isFeatured, CancellationToken cancellationToken);
-//}
+public class EditorsPickCardService : IEditorsPickCardService
+{
+    private readonly ICardsService _cardsService;
+    private readonly IContentService _contentService;
+    private readonly IWebPageUrlRetriever _webPageUrlRetriever;
 
-//public class EditorsPickCardsService : IEditorsPickCardsService, IPageCardsService<IEditorsPickPage, EditorsPickCardDto>
-//{
-//    private static readonly Type[] AllowedPageTypes =
-//    [
-//        typeof(BlogPost),
-//        typeof(Event),
-//        //typeof(Insight),
-//        typeof(MicrositePage),
-//        typeof(NewsArticle),
-//        typeof(Webinar),
-//    ];
+    public EditorsPickCardService(
+        ICardsService cardsService,
+        IContentService contentService,
+        IWebPageUrlRetriever webPageUrlRetriever)
+    {
+        _cardsService = cardsService;
+        _contentService = contentService;
+        _webPageUrlRetriever = webPageUrlRetriever;
+    }
 
-//    private readonly ICardsService _cardsService;
-//    private readonly IChildPageHelper _childPageHelper;
-//    private readonly ICultureContext _cultureContext;
-//    private readonly IMultiTypePageRetriever _multiTypePageRetriever;
-//    private readonly IPageUrlService _pageUrlService;
-//    private readonly IRetriever<ContentType> _contentTypeRetriever;
+    public async Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(
+        HashSet<string> filters,
+        string? treePath,
+        CancellationToken cancellationToken)
+    {
+        return await _cardsService.CreateFiltersAsync(filters, treePath, cancellationToken);
+    }
 
-//    public EditorsPickCardsService(ICardsService cardsService, IChildPageHelper childPageHelper, ICultureContext cultureContext, IMultiTypePageRetriever multiTypePageRetriever, IPageUrlService pageUrlService, IRetriever<ContentType> contentTypeRetriever)
-//    {
-//        _cardsService = cardsService;
-//        _childPageHelper = childPageHelper;
-//        _cultureContext = cultureContext;
-//        _multiTypePageRetriever = multiTypePageRetriever;
-//        _pageUrlService = pageUrlService;
-//        _contentTypeRetriever = contentTypeRetriever;
-//    }
+    public async Task<PaginationDto<EditorsPickCardDto>> GetFilteredItemsAsync(
+        CardsQuery cardsQuery,
+        HashSet<Guid> selectedPageGuids,
+        Func<IWebPageFieldsSource, bool> isFeatured,
+        CancellationToken cancellationToken)
+    {
+        cardsQuery ??= new CardsQuery();
+        cardsQuery.CurrentPage ??= 1;
+        cardsQuery.PageSize ??= 10;
 
-//    public void AddFilterQueryDecorator<TPageFilter>(Action<IMultiTypePageQuery<Page>> decorateFilterQuery)
-//        where TPageFilter : Page
-//    {
-//        _cardsService.AddFilterQueryDecorator<TPageFilter>(decorateFilterQuery);
-//    }
+        if (selectedPageGuids.Count == 0)
+        {
+            return new PaginationDto<EditorsPickCardDto>
+            {
+                Data = Array.Empty<EditorsPickCardDto>(),
+                TotalCount = 0
+            };
+        }
 
-//    public async Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(HashSet<string> filters, string? nodeAliasPath, CancellationToken cancellationToken)
-//    {
-//        return await _cardsService.CreateFiltersAsync(filters, nodeAliasPath, cancellationToken);
-//    }
+        var pages = await _contentService.GetItemsByGUIDAsync(selectedPageGuids.ToList());
 
-//    public async Task<PaginationDto<EditorsPickCardDto>> GetFilteredItemsAsync(CardsQuery cardsQuery, Action<IPageQuery<IEditorsPickPage>>? decorateQuery, Func<IEditorsPickPage, bool> isFeatured, CancellationToken cancellationToken)
-//    {
-//        var contentPages = await _multiTypePageRetriever.RetrievePagesAsync<IEditorsPickPage>(query =>
-//        {
-//            query.Types(AllowedPageTypes);
-//            ApplyCommonFilter(query);
-//            decorateQuery?.Invoke(query.PageQuery);
-//            query.Select(x => new
-//            {
-//                x.ID,
-//                x.ContentType,
-//                x.CreationDate,
-//                x.Image,
-//                x.ImageAltText,
-//                x.MetadataDescription,
-//                x.MetadataTitle,
-//                x.NodeGUID,
-//                x.NodeID,// Required for URL
-//                x.PublishFrom,
-//            });
-//        }, cancellationToken);
+        var filtered = ApplyFilters(pages, cardsQuery.Filters)
+            .OrderByDescending(isFeatured)
+            .ThenByDescending(GetPublishDateUtc)
+            .ToArray();
 
-//        var orderedContentPages = OrderingUtility.OrderFeaturablePages(contentPages, isFeatured).ToArray();
+        var paged = filtered
+            .Skip((cardsQuery.CurrentPage.Value - 1) * cardsQuery.PageSize.Value)
+            .Take(cardsQuery.PageSize.Value)
+            .ToArray();
 
-//        orderedContentPages = await ApplyCurrentPageFilterAsync(orderedContentPages, cardsQuery.Filters);
+        var itemDtos = await MapCardsAsync(paged, isFeatured, cancellationToken);
 
-//        cardsQuery.CurrentPage ??= 1;
-//        cardsQuery.PageSize ??= 20;
+        return new PaginationDto<EditorsPickCardDto>
+        {
+            Data = itemDtos,
+            TotalCount = filtered.Length
+        };
+    }
 
-//        var paginatedEditorsPickPages = PaginationHelper.PaginatePages(orderedContentPages, cardsQuery)
-//            .ToArray();
+    private static IEnumerable<IWebPageFieldsSource> ApplyFilters(
+        IEnumerable<IWebPageFieldsSource> pages,
+        IDictionary<string, string> filters)
+    {
+        if (filters.Count == 0)
+        {
+            return pages;
+        }
 
-//        var dtos = await GetEditorsPickCardDtoAsync(paginatedEditorsPickPages, isFeatured, cancellationToken);
+        IEnumerable<IWebPageFieldsSource> filtered = pages;
 
-//        var paginationDto = new PaginationDto<EditorsPickCardDto>
-//        {
-//            Data = dtos,
-//            TotalCount = orderedContentPages.Length,
-//        };
+        foreach (var (filterName, filterValue) in filters)
+        {
+            if (string.IsNullOrWhiteSpace(filterValue))
+            {
+                continue;
+            }
 
-//        return paginationDto;
-//    }
+            filtered = filterName switch
+            {
+                FilterParameterName.ContentType => filtered.Where(page =>
+                    string.Equals(GetPageTypeName(page), filterValue, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(GetSingleOrLinkedName(page, "ContentType"), filterValue, StringComparison.OrdinalIgnoreCase)),
 
-//    private async Task<IEditorsPickPage[]> ApplyCurrentPageFilterAsync(IEditorsPickPage[] orderedContentPages, IDictionary<string, string> filters)
-//    {
-//        var filterWhereExpressions = await GetFilterParameterWhereExpressionsAsync(filters);
+                FilterParameterName.BusinessLine => filtered.Where(page =>
+                    HasLinkedValue(page, filterValue, "MetadataBusinessLines", "MetadataBusinessLine")),
 
-//        bool combinedPredicate(IEditorsPickPage x) => x.ShowInWidget && (filterWhereExpressions == null || filterWhereExpressions.All(whereExpr => whereExpr(x)));
+                FilterParameterName.ServiceArea => filtered.Where(page =>
+                    HasLinkedValue(page, filterValue, "MetadataServiceAreas")),
 
-//        return orderedContentPages.Where(combinedPredicate).ToArray();
-//    }
+                FilterParameterName.IndustryCategory => filtered.Where(page =>
+                    HasLinkedValue(page, filterValue, "MetadataIndustryCategories")),
 
-//    private static void ApplyCommonFilter(IMultiTypePageQuery<IEditorsPickPage> pageQuery)
-//    {
-//        pageQuery
-//            // TODO: Change to page.IsSearchExcluded != true when we implement IS NOT NULL check for DB fields that can be null
-//            .Where(x => x.IsSearchExcluded == false || x.IsSearchExcluded == null);
-//    }
+                _ => filtered
+            };
+        }
 
-//    private async Task<List<Func<IEditorsPickPage, bool>>> GetFilterParameterWhereExpressionsAsync(IDictionary<string, string> filterParameterValueByName)
-//    {
-//        var whereExpressions = new List<Func<IEditorsPickPage, bool>>();
+        return filtered;
+    }
 
-//        foreach (var (filterParameterName, filterParameterValue) in filterParameterValueByName)
-//        {
-//            var filterParameterData = FilterUtility.GetFilterParameterData(filterParameterName);
+    private async Task<EditorsPickCardDto[]> MapCardsAsync(
+        IEnumerable<IWebPageFieldsSource> pages,
+        Func<IWebPageFieldsSource, bool> isFeatured,
+        CancellationToken cancellationToken)
+    {
+        var language = _contentService.GetCurrentLanguage();
+        var cards = new List<EditorsPickCardDto>();
 
-//            if (filterParameterData is null)
-//            {
-//                continue;
-//            }
+        foreach (var page in pages)
+        {
+            var url = await TryGetUrlAsync(page, language, cancellationToken);
 
-//            if (filterParameterData.FilterParameterType == FilterParameterType.Page)
-//            {
-//                var page = await _multiTypePageRetriever.RetrievePageAsync(query => query
-//                    .Types(filterParameterData.EntityType)
-//                    .Where(x => x.Name == filterParameterValue)
-//                );
+            cards.Add(new EditorsPickCardDto
+            {
+                IsFeatured = isFeatured(page),
+                Type = GetSingleOrLinkedName(page, "ContentType"),
+                ContentType = GetPageTypeName(page),
+                Title = GetStringProperty(page, "MetadataTitle")
+                    ?? GetStringProperty(page, "MetadataOGTitle")
+                    ?? page.SystemFields.ContentItemName
+                    ?? string.Empty,
+                Description = NormalizeDescription(GetStringProperty(page, "MetadataDescription")),
+                ImageURL = GetImageUrl(page),
+                ImageAltText = GetStringProperty(page, "MetadataTeaserImageAltText")
+                    ?? GetStringProperty(page, "ImageFileAltText"),
+                Date = GetPublishDateUtc(page),
+                UpdatedOnDate = GetDateTimeProperty(page, "UpdatedOn"),
+                ReadMoreLink = url is null
+                    ? null
+                    : new LinkItemDto
+                    {
+                        Title = "Read more",
+                        URL = url
+                    }
+            });
+        }
 
-//                if (page is null)
-//                {
-//                    continue;
-//                }
+        return cards.ToArray();
+    }
 
-//                var whereExpression = filterParameterName switch
-//                {
-//                    FilterParameterName.BusinessLine => await BuildBusinessLineWhereExpression(page.NodeAliasPath),
-//                    FilterParameterName.ServiceArea => await BuildServiceAreaWhereExpression(page.NodeAliasPath),
-//                    FilterParameterName.IndustryCategory => await BuildIndustryCategoryWhereExpression(page.NodeAliasPath),
-//                    _ => null,
-//                };
+    private async Task<string?> TryGetUrlAsync(
+        IWebPageFieldsSource page,
+        string language,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var pageUrl = await _webPageUrlRetriever.Retrieve(page, language, cancellationToken);
+            return pageUrl.AbsoluteUrl;
+        }
+        catch
+        {
+            return null;
+        }
+    }
 
-//                if (whereExpression is not null)
-//                {
-//                    whereExpressions.Add(whereExpression);
-//                }
-//            }
-//            else if(filterParameterData.FilterParameterType == FilterParameterType.Entity)
-//            {
-//                switch (filterParameterName)
-//                {
-//                    case FilterParameterName.ContentType:
-//                    {
-//                        var entity = await _contentTypeRetriever.RetrieveEntityAsync(query => query.Where(x => x.CodeName == filterParameterValue));
+    private static bool HasLinkedValue(IWebPageFieldsSource page, string value, params string[] propertyNames)
+    {
+        foreach (var propertyName in propertyNames)
+        {
+            var names = GetLinkedNames(page, propertyName);
+            if (names.Any(x => string.Equals(x, value, StringComparison.OrdinalIgnoreCase)))
+            {
+                return true;
+            }
+        }
 
-//                        if (entity is not null)
-//                        {
-//                            whereExpressions.Add(x => x.ContentType.Contains(entity.ID));
-//                        }
+        return false;
+    }
 
-//                        break;
-//                    }
-//                }
-//            }
-//        }
+    private static IEnumerable<string> GetLinkedNames(object source, string propertyName)
+    {
+        var property = source.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+        if (property?.GetValue(source) is not System.Collections.IEnumerable items)
+        {
+            return Enumerable.Empty<string>();
+        }
 
-//        return whereExpressions;
-//    }
+        var values = new List<string>();
 
-//    public async Task<EditorsPickCardDto[]> GetEditorsPickCardDtoAsync(ICollection<IEditorsPickPage> editorsPickPages, Func<IEditorsPickPage, bool> isFeatured, CancellationToken cancellationToken)
-//    {
-//        var cards = new List<EditorsPickCardDto>();
+        foreach (var item in items)
+        {
+            if (item is null)
+            {
+                continue;
+            }
 
-//        var urlByPageNodeId = await _pageUrlService.GetPageRelativeUrlByNodeIdAsync(editorsPickPages.Select(x => x.NodeID), _cultureContext.CurrentLanguageTag, cancellationToken);
+            var name = item.GetType().GetProperty("Name")?.GetValue(item)?.ToString()
+                       ?? item.GetType().GetProperty("MetadataTitle")?.GetValue(item)?.ToString()
+                       ?? item.GetType().GetProperty("MetadataOGTitle")?.GetValue(item)?.ToString();
 
-//        foreach (var contentPage in editorsPickPages)
-//        {
-//            var pageType = contentPage.GetType();
-//            var card = new EditorsPickCardDto
-//            {
-//                IsFeatured = isFeatured(contentPage),
-//                ImageURL = contentPage.Image?.ToHtmlCompatibleString(),
-//                ImageAltText = contentPage.ImageAltText,
-//                Type = await GetTypeNameAsync(contentPage, cancellationToken),
-//                Title = contentPage.MetadataTitle,
-//                DateTextOverride = contentPage.RelatedContentDateOverride,
-//                Date = (pageType == typeof(Event) || pageType == typeof(Webinar))
-//                    ? contentPage.RelatedContentDate
-//                    : (contentPage.PublishFrom ?? contentPage.CreationDate),
-//                DateTo = (pageType == typeof(Event) || pageType == typeof(Webinar))
-//                    ? contentPage.RelatedContentDateTo
-//                    : null,
-//                Description = HtmlHelper.ExtractTextFromHtml(contentPage.MetadataDescription),
-//                ReadMoreLink = new LinkItemDto
-//                {
-//                    Title = ResourceStringKey.LiveSite.ReadMore,
-//                    URL = urlByPageNodeId[contentPage.NodeID].ToHtmlCompatibleString(),
-//                },
-//            };
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                values.Add(name);
+            }
+        }
 
-//            cards.Add(card);
-//        }
+        return values;
+    }
 
-//        return [.. cards];
-//    }
+    private static string? GetSingleOrLinkedName(object source, string propertyName)
+    {
+        var linked = GetLinkedNames(source, propertyName).FirstOrDefault();
+        if (!string.IsNullOrWhiteSpace(linked))
+        {
+            return linked;
+        }
 
-//    private async Task<string?> GetTypeNameAsync(IEditorsPickPage contentPage, CancellationToken cancellationToken)
-//    {
-//        var contentTypeId = contentPage.ContentType.FirstOrDefault();
+        return GetStringProperty(source, propertyName);
+    }
 
-//        if (contentTypeId == default)
-//        {
-//            return null;
-//        }
+    private static string? GetImageUrl(object source)
+    {
+        foreach (var propertyName in new[] { "MetadataTeaserImage", "ImageFile" })
+        {
+            var property = source.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+            if (property?.GetValue(source) is not System.Collections.IEnumerable items)
+            {
+                continue;
+            }
 
-//        var insightType = await _contentTypeRetriever.RetrieveEntityAsync(contentTypeId, cancellationToken);
+            foreach (var item in items)
+            {
+                var url = item?.GetType()
+                    .GetProperty("ContentAttachmentAsset")
+                    ?.GetValue(item)?
+                    .GetType()
+                    .GetProperty("Url")
+                    ?.GetValue(item.GetType().GetProperty("ContentAttachmentAsset")?.GetValue(item))?
+                    .ToString();
 
-//        return insightType?.Name;
-//    }
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    return url;
+                }
+            }
+        }
 
-//    private async Task<Func<IEditorsPickPage, bool>?> BuildBusinessLineWhereExpression(string nodeAliasPathPrefix)
-//    {
-//        var nodeIdsByPageType = await _childPageHelper.GetDescendantNodeIdsByPageType([
-//            typeof(BusinessLine),
-//            typeof(ServiceArea),
-//            typeof(Service),
-//        ], nodeAliasPathPrefix);
+        return null;
+    }
 
-//        var businessLineNodeIds = PageTypeUtility.GetPageTypeNodeIds<BusinessLine>(nodeIdsByPageType);
-//        var serviceAreaNodeIds = PageTypeUtility.GetPageTypeNodeIds<ServiceArea>(nodeIdsByPageType);
-//        var serviceNodeIds = PageTypeUtility.GetPageTypeNodeIds<Service>(nodeIdsByPageType);
+    private static string NormalizeDescription(string? description) =>
+        string.IsNullOrWhiteSpace(description)
+            ? string.Empty
+            : HtmlHelper.ExtractTextFromHtml(description);
 
-//        return x =>
-//            x.MetadataBusinessLines.Intersect(businessLineNodeIds).Any() ||
-//            x.MetadataServiceAreas.Intersect(serviceAreaNodeIds).Any() ||
-//            x.MetadataServices.Intersect(serviceNodeIds).Any();
-//    }
+    private static string GetPageTypeName(IWebPageFieldsSource page) => page.GetType().Name;
 
-//    private async Task<Func<IEditorsPickPage, bool>> BuildServiceAreaWhereExpression(string nodeAliasPathPrefix)
-//    {
-//        var nodeIdsByPageType = await _childPageHelper.GetDescendantNodeIdsByPageType([
-//            typeof(ServiceArea),
-//            typeof(Service),
-//        ], nodeAliasPathPrefix);
+    private static string? GetStringProperty(object source, string propertyName) =>
+        source.GetType()
+            .GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance)?
+            .GetValue(source)?
+            .ToString();
 
-//        var serviceAreaNodeIds = PageTypeUtility.GetPageTypeNodeIds<ServiceArea>(nodeIdsByPageType);
-//        var serviceNodeIds = PageTypeUtility.GetPageTypeNodeIds<Service>(nodeIdsByPageType);
+    private static DateTime? GetDateTimeProperty(object source, string propertyName)
+    {
+        var value = source.GetType()
+            .GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance)?
+            .GetValue(source);
 
-//        return x =>
-//            x.MetadataServiceAreas.Intersect(serviceAreaNodeIds).Any() ||
-//            x.MetadataServices.Intersect(serviceNodeIds).Any();
-//    }
+        return value is DateTime date
+            ? date == DateTime.MinValue ? null : date
+            : null;
+    }
 
-//    private async Task<Func<IEditorsPickPage, bool>?> BuildIndustryCategoryWhereExpression(string nodeAliasPathPrefix)
-//    {
-//        var nodeIdsByPageType = await _childPageHelper.GetDescendantNodeIdsByPageType([
-//            typeof(IndustryCategory),
-//            typeof(Industry),
-//        ], nodeAliasPathPrefix);
+    private static DateTime? GetPublishDateUtc(IWebPageFieldsSource page)
+    {
+        var directDate = GetDateTimeProperty(page, "DocumentPublishFrom");
+        if (directDate is not null)
+        {
+            return directDate;
+        }
 
-//        var industryCategoryNodeIds = PageTypeUtility.GetPageTypeNodeIds<IndustryCategory>(nodeIdsByPageType);
-//        var industryNodeIds = PageTypeUtility.GetPageTypeNodeIds<Industry>(nodeIdsByPageType);
+        var systemFields = page.SystemFields;
+        var type = systemFields.GetType();
 
-//        return x =>
-//            x.MetadataIndustryCategories.Intersect(industryCategoryNodeIds).Any() ||
-//            x.MetadataIndustries.Intersect(industryNodeIds).Any();
-//    }
-//}
+        var lastPublished = type.GetProperty("ContentItemCommonDataLastPublishedWhen")?.GetValue(systemFields) as DateTime?;
+        var firstPublished = type.GetProperty("ContentItemCommonDataFirstPublishedWhen")?.GetValue(systemFields) as DateTime?;
+
+        return lastPublished ?? firstPublished;
+    }
+}

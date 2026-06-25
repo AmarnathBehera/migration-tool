@@ -1,5 +1,6 @@
 ﻿
 using CMS.ContentEngine;
+using CMS.Websites;
 
 namespace BDO.GWT.Core.Data;
 
@@ -15,11 +16,11 @@ public class EditorsPickData : BaseWidgetData
 
     public HashSet<string> SelectedPageTypes { get; set; } = new();
 
-    public IEnumerable<ContentItemReference> EditorsPickNodeGuids { get; set; } = Enumerable.Empty<ContentItemReference>();
+    public IEnumerable<ContentItemReference> EditorsPickGuids { get; set; } = Enumerable.Empty<ContentItemReference>();
 
-    public IEnumerable<ContentItemReference> FeaturedPageNodeGuids { get; set; } = Enumerable.Empty<ContentItemReference>();
+    public IEnumerable<ContentItemReference> FeaturedPageGuids { get; set; } = Enumerable.Empty<ContentItemReference>();
 
-    public Guid? BackgroundImageMediaFileGuid { get; set; }
+    public string? BackgroundImageUrl { get; set; }
 
     public string? BackgroundImageAltText { get; set; }
 

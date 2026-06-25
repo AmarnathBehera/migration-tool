@@ -1,88 +1,115 @@
-﻿//using BDO.GWT.Core.Data;
-//using BDO.GWT.Core.DTOs;
-//using BDO.GWT.Core.DTOs.Cards;
-//using BDO.GWT.Web.Core.Services;
-//using CMS.Websites;
+﻿using BDO.GWT.Core.Data;
+using BDO.GWT.Core.Data.Queries;
+using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.Cards;
+using BDO.GWT.Core.Helpers;
+using CMS.ContentEngine;
+using CMS.Websites;
 
+namespace BDO.GWT.Core.Services;
 
-//namespace BDO.GWT.Web.Core.LiveSite.Services;
+public interface IEditorsPickService
+{
+    Task<EditorsPickDto> GetEditorsPickAsync<T>(
+        T currentPage,
+        EditorsPickData data,
+        CancellationToken cancellationToken)
+        where T : IWebPageFieldsSource;
 
-//public interface IEditorsPickService 
-//{
-//    Task<EditorsPickDto> GetEditorsPickDtoAsync(IWebPageFieldsSource currentPage, EditorsPickData data, CancellationToken cancellationToken);
+    Task<ICollection<EditorsPickCardDto>> GetFilteredItemsAsync(
+        HashSet<ContentItemReference> featuredGuids,
+        HashSet<ContentItemReference> selectedGuids,
+        CardsQuery query,
+        CancellationToken cancellationToken);
+}
 
-//    Task<ICollection<EditorsPickCardDto>> GetFilteredItemsAsync(StatefulCardsQuery itemsQuery, CancellationToken cancellationToken);
-//}
+public class EditorsPickService : IEditorsPickService
+{
+    private readonly IFilteringHelper _filteringHelper;
+    private readonly IEditorsPickCardService _editorsPickCardService;
 
-//public class EditorsPickService : CarouselServiceBase<EditorsPickCarouselState>, IEditorsPickService
-//{
-//    private readonly ICarouselStateHelper<EditorsPickCarouselState> _carouselStateHelper;
-//    private readonly IFilteringHelper _filteringHelper;
-//    private readonly IMediaFileService _mediaFileService;
-//    private readonly IPageCardsService<IEditorsPickPage, EditorsPickCardDto> _editorsPickCardsService;
+    public EditorsPickService(
+        IFilteringHelper filteringHelper,
+        IEditorsPickCardService editorsPickCardService)
+    {
+        _filteringHelper = filteringHelper;
+        _editorsPickCardService = editorsPickCardService;
+    }
 
-//    public EditorsPickService(ICarouselStateHelper<EditorsPickCarouselState> carouselStateHelper, IFilteringHelper filteringHelper, IMediaFileService mediaFileService, IPageCardsService<IEditorsPickPage, EditorsPickCardDto> editorsPickCardsService) : base(carouselStateHelper)
-//    {
-//        _carouselStateHelper = carouselStateHelper;
-//        _filteringHelper = filteringHelper;
-//        _mediaFileService = mediaFileService;
-//        _editorsPickCardsService = editorsPickCardsService;
-//    }
+    public async Task<EditorsPickDto> GetEditorsPickAsync<T>(
+        T currentPage,
+        EditorsPickData data,
+        CancellationToken cancellationToken)
+        where T : IWebPageFieldsSource
+    {
+        ArgumentNullException.ThrowIfNull(currentPage);
+        ArgumentNullException.ThrowIfNull(data);
 
-//    public async Task<EditorsPickDto> GetEditorsPickDtoAsync(IWebPageFieldsSource currentPage, EditorsPickData data, CancellationToken cancellationToken)
-//    {
-//        var backgroundImagePermanentLink = await _mediaFileService.GetMediaFilePermanentLinkAsync(data.BackgroundImageMediaFileGuid, cancellationToken);
+        var featuredGuids = (data.FeaturedPageGuids ?? Enumerable.Empty<ContentItemReference>()).ToHashSet();
+        var selectedGuids = (data.EditorsPickGuids ?? Enumerable.Empty<ContentItemReference>()).ToHashSet();
 
-//        var carouselState = new EditorsPickCarouselState
-//        {
-//            CurrentPageTypeName = currentPage.GetType().Name,
-//            CurrentPageNodeId = currentPage.NodeID,
-//            CurrentPageNodeAliasPath = currentPage.NodeAliasPath,
-//            FeaturedNodeGuids = data.FeaturedPageNodeGuids.ToHashSet(),
-//            PageNodeGuids = data.EditorsPickNodeGuids.ToHashSet(),
-//        };
+        var filters = data.FilteringEnabled
+            ? await _editorsPickCardService.CreateFiltersAsync(
+                data.Filters ?? new HashSet<string>(),
+                null,
+                cancellationToken)
+            : null;
 
-//        var stateGUID = _carouselStateHelper.SetCarouselState(carouselState);
+        var items = await GetFilteredItemsAsync(
+            featuredGuids,
+            selectedGuids,
+            new CardsQuery(),
+            cancellationToken);
 
-//        var dto = new EditorsPickDto
-//        {
-//            Title = data.Title,
-//            Description = data.Description,
-//            Filters = data.FilteringEnabled ? await _editorsPickCardsService.CreateFiltersAsync(data.Filters, null, cancellationToken) : null,
-//            FilteringTooltipEnabled = await _filteringHelper.IsFilteringTooltipEnabledAsync(data.FilteringEnabled, cancellationToken),
-//            Items = await GetFilteredItemsAsync(new StatefulCardsQuery { State = stateGUID }, cancellationToken),
-//            BackgroundImageURL = backgroundImagePermanentLink?.ToHtmlCompatibleString(),
-//            BackgroundImageAltText = data.BackgroundImageAltText,
-//            SeeAllLink = data is { SeeAllLinkText: not null, SeeAllLinkUrl: not null }
-//                ? new LinkItemDto
-//                {
-//                    Title = data.SeeAllLinkText,
-//                    URL = data.SeeAllLinkUrl,
-//                    Target= data.SeeAllLinkURLTarget,
-//                }
-//                : null,
-//            TopMargin = data.TopMargin,
-//            BottomMargin = data.BottomMargin,
-//            WidgetID = data.WidgetID,
-//            StateGUID = stateGUID,
-//        };
+        return new EditorsPickDto
+        {
+            Title = data.Title,
+            Description = data.Description,
+            Filters = filters,
+            FilteringTooltipEnabled = await _filteringHelper.IsFilteringTooltipEnabledAsync(
+                data.FilteringEnabled,
+                cancellationToken),
+            Items = items,
+            BackgroundImageURL = data.BackgroundImageUrl,
+            BackgroundImageAltText = data.BackgroundImageAltText,
+            SeeAllLink = data is { SeeAllLinkText: not null, SeeAllLinkUrl: not null }
+                ? new LinkItemDto
+                {
+                    Title = data.SeeAllLinkText,
+                    URL = data.SeeAllLinkUrl,
+                    Target = data.SeeAllLinkURLTarget ?? "_self"
+                }
+                : null,
+            TopMargin = data.TopMargin ?? string.Empty,
+            BottomMargin = data.BottomMargin ?? string.Empty,
+            WidgetID = data.WidgetID
+        };
+    }
 
-//        return dto;
-//    }
+    public async Task<ICollection<EditorsPickCardDto>> GetFilteredItemsAsync(
+        HashSet<ContentItemReference> featuredGuids,
+        HashSet<ContentItemReference> selectedGuids,
+        CardsQuery query,
+        CancellationToken cancellationToken)
+    {
+        query ??= new CardsQuery();
+        featuredGuids ??= new HashSet<ContentItemReference>();
+        selectedGuids ??= new HashSet<ContentItemReference>();
 
-//    public async Task<ICollection<EditorsPickCardDto>> GetFilteredItemsAsync(StatefulCardsQuery itemsQuery, CancellationToken cancellationToken)
-//    {
-//        var carouselState = _carouselStateHelper.GetCarouselState(itemsQuery.State);
+        var selectedPageGuids = selectedGuids
+            .Select(x => x.Identifier)
+            .ToHashSet();
 
-//        var featuredPageNodeGuidArray = carouselState.FeaturedNodeGuids.ToArray();
-//        var nodeGuids = featuredPageNodeGuidArray.Concat(carouselState.PageNodeGuids).Distinct();
+        var featuredPageGuids = featuredGuids
+            .Select(x => x.Identifier)
+            .ToHashSet();
 
-//        var paginationDto = await _editorsPickCardsService.GetFilteredItemsAsync(
-//            itemsQuery,
-//            query => query.Where(x => nodeGuids.Contains(x.NodeGUID)),
-//            page => carouselState.FeaturedNodeGuids.Contains(page.NodeGUID),
-//            cancellationToken);
+        var paginationDto = await _editorsPickCardService.GetFilteredItemsAsync(
+            query,
+            selectedPageGuids,
+            page => featuredPageGuids.Contains(page.SystemFields.ContentItemGUID),
+            cancellationToken);
 
-//        return paginationDto.Data;
-//    }
-//}
+        return paginationDto.Data;
+    }
+}
