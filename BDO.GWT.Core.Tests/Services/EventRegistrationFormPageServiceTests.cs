@@ -209,10 +209,11 @@ namespace BDO.GWT.Core.Tests.Services
             SetupContent(page);
 
             var result = await _service.GetEventRegistrationFormPageDtoAsync(null!, CancellationToken.None);
-
+            Assert.Multiple(() =>
+            { 
             Assert.That(result.BaseContent, Is.Not.Null);
             Assert.That(result.BaseWebPage, Is.Not.Null);
-
+            });
             Assert.Multiple(() =>
             {
                 Assert.That(result.BaseContent!.ContentItemID, Is.EqualTo(0));

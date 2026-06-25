@@ -23,7 +23,7 @@ public class OutlookEventController : Controller
     {
         var source = Url.Action(nameof(DownloadOutlookEvent), "OutlookEvent", pageGuid, Request.Scheme);
 
-        string? card;
+        string card;
 
         switch (type.ToLower())
         {
