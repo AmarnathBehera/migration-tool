@@ -24,7 +24,11 @@ public class BlogContributorsController : ControllerBase
     [HttpGet("{pageGuid:guid}/[action]")]
     public async Task<ActionResult<PaginationDto<PersonCardDto>>> Get([FromRoute] Guid pageGuid, [FromQuery] CardsQuery query, CancellationToken cancellationToken)
     {
-        var dto = await _blogContributorsPageService.GeBlogContributorsPaginationDtoAsync(pageGuid, query, cancellationToken);
+        //getting the current language and passing it to the service method to
+        //get the paginated blog contributors based on the content Item GUID, language, and query parameters
+        var language = RouteData.Values[CultureInjectorAttribute.RouteParameter]?.ToString();
+
+        var dto = await _blogContributorsPageService.GetBlogContributorsPaginationDtoAsync(pageGuid, language, query, cancellationToken);
 
         return Ok(dto);
     }

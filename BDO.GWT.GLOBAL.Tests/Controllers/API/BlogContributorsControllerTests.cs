@@ -47,8 +47,9 @@ public class BlogContributorsControllerTests
         };
 
         _blogContributorsPageServiceMock
-            .Setup(x => x.GeBlogContributorsPaginationDtoAsync(
+            .Setup(x => x.GetBlogContributorsPaginationDtoAsync(
                 pageGuid,
+                It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedResult);
@@ -73,8 +74,9 @@ public class BlogContributorsControllerTests
         var query = new CardsQuery();
 
         _blogContributorsPageServiceMock
-            .Setup(x => x.GeBlogContributorsPaginationDtoAsync(
+            .Setup(x => x.GetBlogContributorsPaginationDtoAsync(
                 pageGuid,
+                It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PaginationDto<PersonCardDto> { Data = [], TotalCount = 0 });
@@ -84,8 +86,9 @@ public class BlogContributorsControllerTests
 
         // Assert
         _blogContributorsPageServiceMock.Verify(
-            x => x.GeBlogContributorsPaginationDtoAsync(
+            x => x.GetBlogContributorsPaginationDtoAsync(
                 pageGuid,
+                It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
                 It.IsAny<CancellationToken>()),
             Times.Once);
@@ -100,11 +103,12 @@ public class BlogContributorsControllerTests
 
         CardsQuery? capturedQuery = null;
         _blogContributorsPageServiceMock
-            .Setup(x => x.GeBlogContributorsPaginationDtoAsync(
+            .Setup(x => x.GetBlogContributorsPaginationDtoAsync(
                 It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
                 It.IsAny<CancellationToken>()))
-            .Callback<Guid, CardsQuery, CancellationToken>((_, q, _) => capturedQuery = q)
+            .Callback<Guid, string, CardsQuery, CancellationToken>((_, _, q, _) => capturedQuery = q)
             .ReturnsAsync(new PaginationDto<PersonCardDto> { Data = [], TotalCount = 0 });
 
         // Act
@@ -129,8 +133,9 @@ public class BlogContributorsControllerTests
         var token = cts.Token;
 
         _blogContributorsPageServiceMock
-            .Setup(x => x.GeBlogContributorsPaginationDtoAsync(
+            .Setup(x => x.GetBlogContributorsPaginationDtoAsync(
                 It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
                 token))
             .ReturnsAsync(new PaginationDto<PersonCardDto> { Data = [], TotalCount = 0 });
@@ -140,8 +145,9 @@ public class BlogContributorsControllerTests
 
         // Assert
         _blogContributorsPageServiceMock.Verify(
-            x => x.GeBlogContributorsPaginationDtoAsync(
+            x => x.GetBlogContributorsPaginationDtoAsync(
                 It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
                 token),
             Times.Once);
@@ -160,8 +166,9 @@ public class BlogContributorsControllerTests
         };
 
         _blogContributorsPageServiceMock
-            .Setup(x => x.GeBlogContributorsPaginationDtoAsync(
+            .Setup(x => x.GetBlogContributorsPaginationDtoAsync(
                 It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedResult);
@@ -199,8 +206,9 @@ public class BlogContributorsControllerTests
         };
 
         _blogContributorsPageServiceMock
-            .Setup(x => x.GeBlogContributorsPaginationDtoAsync(
+            .Setup(x => x.GetBlogContributorsPaginationDtoAsync(
                 It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedResult);
@@ -229,8 +237,9 @@ public class BlogContributorsControllerTests
         var query = new CardsQuery();
 
         _blogContributorsPageServiceMock
-            .Setup(x => x.GeBlogContributorsPaginationDtoAsync(
+            .Setup(x => x.GetBlogContributorsPaginationDtoAsync(
                 It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
                 It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception("Service error"));
@@ -248,8 +257,9 @@ public class BlogContributorsControllerTests
         var query = new CardsQuery();
 
         _blogContributorsPageServiceMock
-            .Setup(x => x.GeBlogContributorsPaginationDtoAsync(
+            .Setup(x => x.GetBlogContributorsPaginationDtoAsync(
                 It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
                 It.IsAny<CancellationToken>()))
             .ThrowsAsync(new OperationCanceledException());
@@ -267,8 +277,9 @@ public class BlogContributorsControllerTests
         var query = new CardsQuery();
 
         _blogContributorsPageServiceMock
-            .Setup(x => x.GeBlogContributorsPaginationDtoAsync(
+            .Setup(x => x.GetBlogContributorsPaginationDtoAsync(
                 It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PaginationDto<PersonCardDto> { Data = [], TotalCount = 0 });
@@ -278,8 +289,9 @@ public class BlogContributorsControllerTests
 
         // Assert
         _blogContributorsPageServiceMock.Verify(
-            x => x.GeBlogContributorsPaginationDtoAsync(
+            x => x.GetBlogContributorsPaginationDtoAsync(
                 It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
                 It.IsAny<CancellationToken>()),
             Times.Once);
