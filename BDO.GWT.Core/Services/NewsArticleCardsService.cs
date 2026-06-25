@@ -34,19 +34,22 @@ public class NewsArticleCardsService : INewsArticleCardsService
     private readonly IContentService _contentService;
     private readonly IUrlHelperFactory _urlHelperFactory;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IWebPageUrlResolver _webPageUrlResolver;
 
     public NewsArticleCardsService(
         ICardsService cardsService,
         ICultureContext cultureContext,
         IContentService contentService,
         IUrlHelperFactory urlHelperFactory,
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor,
+        IWebPageUrlResolver webPageUrlResolver)
     {
         _cardsService = cardsService;
         _cultureContext = cultureContext;
         _contentService = contentService;
         _urlHelperFactory = urlHelperFactory;
         _httpContextAccessor = httpContextAccessor;
+        _webPageUrlResolver = webPageUrlResolver;
     }
 
     public async Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(HashSet<string> filters, string? nodeAliasPath, CancellationToken cancellationToken)
@@ -237,7 +240,7 @@ public class NewsArticleCardsService : INewsArticleCardsService
                 ReadMoreLink = new LinkItemDto
                 {
                     Title = ResourceStringKey.LiveSite.ReadMore,
-                    URL = contentPage.GetUrl().AbsoluteUrl
+                    URL = _webPageUrlResolver.GetAbsoluteUrl(contentPage)
                 },
             };
             cards.Add(card);

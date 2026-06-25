@@ -19,11 +19,8 @@
       <schema guid="f652f54b-8be8-4f2c-9e40-7dd3ab5dd149" name="f652f54b-8be8-4f2c-9e40-7dd3ab5dd149">
         <properties />
       </schema>
-      <field column="BlogPostListFilters" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="a1fe3dc3-4c9c-4448-9300-47f5766e8546" visible="true">
+      <field allowempty="true" column="BlogPostListFilters" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="a1fe3dc3-4c9c-4448-9300-47f5766e8546" visible="true">
         <properties>
-          <defaultvalue>
-            <![CDATA[person;businessIssue;businessLine;IndustryCategory;keywords]]>
-          </defaultvalue>
           <explanationtext>
             <![CDATA[Filters that visitor will be able to filter blogs posts by.]]>
           </explanationtext>
@@ -51,6 +48,22 @@ keywords;Keywords
           </Options>
           <OptionsValueSeparator>;</OptionsValueSeparator>
         </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>please select at least one filter</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ItemListFilteringEnabled</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <field allowempty="true" column="BlogPostListFeaturedItems" columnprecision="0" columntype="webpages" enabled="true" guid="1b72cf8d-d1e8-4963-9b77-e294b93e73ca" visible="true">
         <properties>

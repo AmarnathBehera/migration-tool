@@ -114,7 +114,7 @@ public class SectionDealsPageService : ISectionDealsPageService
         var dto = new SectionDealsDto
         {
             Filters = page.SectionDealsFilteringEnabled
-                ? await CreateDealsFiltersAsync(sectionDealsUpdatedFilters, page.SystemFields.WebPageItemID, cancellationToken)
+                ? await CreateDealsFiltersAsync(sectionDealsUpdatedFilters, cancellationToken)
                 : new List<FilterItemDto<OptionDto>>(),
             PageSize = 12,
             ApiEndpoint = $"Deals/{page.SystemFields.ContentItemGUID}/Get"
@@ -148,7 +148,7 @@ public class SectionDealsPageService : ISectionDealsPageService
         return paginationDto;
     }
 
-    private async Task<FilterItemDto<OptionDto>[]> CreateDealsFiltersAsync(HashSet<string> filterParameterNames, int pageId, CancellationToken cancellationToken)
+    private async Task<FilterItemDto<OptionDto>[]> CreateDealsFiltersAsync(HashSet<string> filterParameterNames, CancellationToken cancellationToken)
     {
         var filterItems = new List<FilterItemDto<OptionDto>>(filterParameterNames.Count);
 

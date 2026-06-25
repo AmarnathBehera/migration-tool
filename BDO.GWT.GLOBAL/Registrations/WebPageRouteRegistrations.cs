@@ -145,6 +145,7 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     ContentTypeNames = new[] { "BDO.LocationCity" },
     IconClass = "xp-market")]
 
+[assembly: RegisterWebPageRoute(BlogContributors.CONTENT_TYPE_NAME, typeof(BlogContributorsPageController))]
 [assembly: RegisterWebPageRoute(SectionBlogs.CONTENT_TYPE_NAME, typeof(SectionBlogsController))]
 
 [assembly: RegisterPageTemplate(
@@ -324,6 +325,6 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     IconClass = "xp-market")]
 
 [assembly: RegisterWebPageRoute(SectionRss.CONTENT_TYPE_NAME, typeof(SectionRssController))]
-[assembly: RegisterWebPageRoute(Rss.CONTENT_TYPE_NAME, typeof(RssController))]
-
 [assembly: RegisterWebPageRoute(Sitemap.CONTENT_TYPE_NAME, typeof(SitemapPageController))]
+[assembly: RegisterWebPageRoute(Rss.CONTENT_TYPE_NAME, typeof(RssController))]
+[assembly: RegisterWebPageRoute(LegalPage.CONTENT_TYPE_NAME, typeof(LegalPageController))]

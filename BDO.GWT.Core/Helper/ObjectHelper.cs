@@ -4,7 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.Core.Helpers;
+namespace BDO.GWT.Core.Helper;
 
 public static class ObjectHelper
 {
