@@ -615,7 +615,7 @@ namespace BDO.GWT.Core.Tests.Services
         public async Task GetContentPageCardListAsync_MapsImageAltText()
         {
             var post = CreateBlogPost("Post", new DateTime(2024, 6, 1));
-            post.ImageFileAltText = "My Image Alt";
+            post.ImageFileAltTextM = "My Image Alt";
 
             var result = await _service.GetContentPageCardListAsync(
                 new[] { post }, "en-US", _ => false, CancellationToken.None);
@@ -678,7 +678,7 @@ namespace BDO.GWT.Core.Tests.Services
         public async Task GetContentPageCardListAsync_MapsImageUrl_WhenImageExists()
         {
             var post = CreateBlogPost("Post", new DateTime(2024, 6, 1));
-            post.ImageFile = new[]
+            post.ImageFileM = new[]
             {
                 new ContentAttachment
                 {
@@ -700,7 +700,7 @@ namespace BDO.GWT.Core.Tests.Services
         public async Task GetContentPageCardListAsync_MapsEmptyImageUrl_WhenNoImage()
         {
             var post = CreateBlogPost("Post", new DateTime(2024, 6, 1));
-            post.ImageFile = Array.Empty<ContentAttachment>();
+            post.ImageFileM = Array.Empty<ContentAttachment>();
 
             var result = await _service.GetContentPageCardListAsync(
                 new[] { post }, "en-US", _ => false, CancellationToken.None);
@@ -759,8 +759,8 @@ namespace BDO.GWT.Core.Tests.Services
                 },
                 MetadataTitle = title,
                 MetadataDescription = $"Description for {title}",
-                ImageFile = Array.Empty<ContentAttachment>(),
-                ImageFileAltText = "alt",
+                ImageFileM = Array.Empty<ContentAttachment>(),
+                ImageFileAltTextM = "alt",
                 ContentType = Array.Empty<Contenttypes>(),
                 UpdatedOn = DateTime.MinValue,
                 MetadataKeywordsBlog = string.Empty,

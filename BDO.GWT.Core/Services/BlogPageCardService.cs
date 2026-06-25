@@ -414,9 +414,9 @@ namespace BDO.GWT.Core.Services
                 var card = new BlogPageCardDto
                 {
                     IsFeatured = isPageFeatured(contentPage),
-                    ImageURL = urlHelper.Content(contentPage.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset?.Url ?? string.Empty),
+                    ImageURL = urlHelper.Content(contentPage.ImageFileM?.FirstOrDefault()?.ContentAttachmentAsset?.Url ?? string.Empty),
                     isComingSoon = isComingSoon,
-                    ImageAltText = contentPage.ImageFileAltText,
+                    ImageAltText = contentPage.ImageFileAltTextM,
                     Type = typeConst,
                     Title = contentPage.MetadataTitle,
                     Date = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen ?? contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen,
