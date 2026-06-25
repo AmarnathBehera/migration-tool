@@ -4,8 +4,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Moq;
+using System;
 using System.Net.Mime;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BDO.GWT.GLOBAL.Tests.Controllers
 {
@@ -13,7 +16,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
     {
         private Mock<IEventWebinarPageService> _serviceMock = null!;
         private Mock<IUrlHelper> _urlHelperMock = null!;
-        private OutlookEventController controller = null!;
+        private OutlookEventController? _controller;
 
         private readonly Guid _pageGuid = Guid.Parse("11111111-1111-1111-1111-111111111111");
         private const string SourceUrl = "https://localhost/OutlookEvent/event/11111111-1111-1111-1111-111111111111";
@@ -28,7 +31,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 .Setup(x => x.Action(It.IsAny<UrlActionContext>()))
                 .Returns(SourceUrl);
 
-            controller = new OutlookEventController(_serviceMock.Object)
+            _controller = new OutlookEventController(_serviceMock.Object)
             {
                 ControllerContext = new ControllerContext
                 {
@@ -37,7 +40,13 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 Url = _urlHelperMock.Object
             };
 
-            controller.ControllerContext.HttpContext.Request.Scheme = "https";
+            _controller.ControllerContext.HttpContext.Request.Scheme = "https";
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _controller?.Dispose();
         }
 
         [Test]
@@ -54,7 +63,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 .ReturnsAsync(card);
 
             // Act
-            var result = await controller.DownloadOutlookEvent(
+            var result = await _controller!.DownloadOutlookEvent(
                 _pageGuid,
                 "event",
                 CancellationToken.None);
@@ -77,7 +86,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 .ReturnsAsync(card);
 
             // Act
-            var result = await controller.DownloadOutlookEvent(
+            var result = await _controller!.DownloadOutlookEvent(
                 _pageGuid,
                 "webinar",
                 CancellationToken.None);
@@ -100,7 +109,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 .ReturnsAsync(card);
 
             // Act
-            var result = await controller.DownloadOutlookEvent(
+            var result = await _controller!.DownloadOutlookEvent(
                 _pageGuid,
                 "event",
                 CancellationToken.None);
@@ -131,7 +140,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 .ReturnsAsync(card);
 
             // Act
-            var result = await controller.DownloadOutlookEvent(
+            var result = await _controller!.DownloadOutlookEvent(
                 _pageGuid,
                 "webinar",
                 CancellationToken.None);
@@ -160,7 +169,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 .ReturnsAsync("BEGIN:VCALENDAR\r\nEND:VCALENDAR");
 
             // Act
-            await controller.DownloadOutlookEvent(
+            await _controller!.DownloadOutlookEvent(
                 _pageGuid,
                 "event",
                 CancellationToken.None);
@@ -193,7 +202,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 .ReturnsAsync("BEGIN:VCALENDAR\r\nEND:VCALENDAR");
 
             // Act
-            await controller.DownloadOutlookEvent(
+            await _controller!.DownloadOutlookEvent(
                 _pageGuid,
                 "webinar",
                 CancellationToken.None);
@@ -226,7 +235,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 .ReturnsAsync("BEGIN:VCALENDAR\r\nEND:VCALENDAR");
 
             // Act
-            var result = await controller.DownloadOutlookEvent(
+            var result = await _controller!.DownloadOutlookEvent(
                 _pageGuid,
                 "EVENT",
                 CancellationToken.None);
@@ -254,7 +263,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 .ReturnsAsync("BEGIN:VCALENDAR\r\nEND:VCALENDAR");
 
             // Act
-            var result = await controller.DownloadOutlookEvent(
+            var result = await _controller!.DownloadOutlookEvent(
                 _pageGuid,
                 "WEBINAR",
                 CancellationToken.None);
@@ -279,10 +288,10 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                     It.IsAny<Guid>(),
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync((string?)null);
+                .ReturnsAsync((string)null!);
 
             // Act
-            var result = await controller.DownloadOutlookEvent(
+            var result = await _controller!.DownloadOutlookEvent(
                 _pageGuid,
                 "event",
                 CancellationToken.None);
@@ -300,10 +309,10 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                     It.IsAny<Guid>(),
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync((string?)null);
+                .ReturnsAsync((string)null!);
 
             // Act
-            var result = await controller.DownloadOutlookEvent(
+            var result = await _controller!.DownloadOutlookEvent(
                 _pageGuid,
                 "webinar",
                 CancellationToken.None);
@@ -317,7 +326,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
         {
             // Act
             var exception = Assert.ThrowsAsync<ArgumentException>(() =>
-                controller.DownloadOutlookEvent(
+                _controller!.DownloadOutlookEvent(
                     _pageGuid,
                     "invalid",
                     CancellationToken.None));
@@ -358,7 +367,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             using var cts = new CancellationTokenSource();
 
             // Act
-            await controller.DownloadOutlookEvent(
+            await _controller!.DownloadOutlookEvent(
                 _pageGuid,
                 "event",
                 cts.Token);
@@ -382,7 +391,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 .ReturnsAsync("BEGIN:VCALENDAR\r\nEND:VCALENDAR");
 
             // Act
-            await controller.DownloadOutlookEvent(
+            await _controller!.DownloadOutlookEvent(
                 _pageGuid,
                 "event",
                 CancellationToken.None);
@@ -406,7 +415,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 .ReturnsAsync("BEGIN:VCALENDAR\r\nEND:VCALENDAR");
 
             // Act
-            await controller.DownloadOutlookEvent(
+            await _controller!.DownloadOutlookEvent(
                 _pageGuid,
                 "event",
                 CancellationToken.None);
@@ -427,7 +436,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 .ReturnsAsync("BEGIN:VCALENDAR\r\nEND:VCALENDAR");
 
             // Act
-            await controller.DownloadOutlookEvent(
+            await _controller!.DownloadOutlookEvent(
                 _pageGuid,
                 "event",
                 CancellationToken.None);
