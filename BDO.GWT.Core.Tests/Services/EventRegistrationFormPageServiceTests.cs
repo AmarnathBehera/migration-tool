@@ -1,4 +1,4 @@
-using BDO;
+using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Web.Core.DTOs;
@@ -6,6 +6,7 @@ using BDO.GWT.Web.Core.Services;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
+using Kentico.Xperience.Headless.Internal;
 using Moq;
 
 namespace BDO.GWT.Core.Tests.Services
@@ -40,21 +41,47 @@ namespace BDO.GWT.Core.Tests.Services
                 _channelMock.Object);
         }
 
-        private void SetupContent(IEnumerable<EventRegistrationForm>? pages)
+        private void SetupContent(EventRegistrationForm? page)
         {
             _contentServiceMock
-                .Setup(x => x.GetPagesAsync<EventRegistrationForm>(
-                    It.IsAny<RetrievePagesParameters>(),
-                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                    It.IsAny<RetrievalCacheSettings>(),
+                .Setup(x => x.RetrieveCurrentPageAsync<EventRegistrationForm>(
+                    It.IsAny<RetrieveCurrentPageParameters>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(pages!);
+                .ReturnsAsync(page);
+        }
+
+        // Helper: mock a page with scalar fields via SetupGet
+        private Mock<EventRegistrationForm> CreatePageMock(
+            string? title = null,
+            string? description = null,
+            string? formType = null,
+            string? form = null,
+            string? embedCode = null)
+        {
+            var mock = new Mock<EventRegistrationForm>();
+            mock.SetupGet(p => p.PageTitle).Returns(title!);
+            mock.SetupGet(p => p.PageDescription).Returns(description!);
+            mock.SetupGet(p => p.FormType).Returns(formType!);
+            mock.SetupGet(p => p.Form).Returns(form!);
+            mock.SetupGet(p => p.EmbedCode).Returns(embedCode!);
+            mock.SetupGet(p => p.HeroLayout).Returns((string?)null!);
+            mock.SetupGet(p => p.HeroTitle).Returns((string?)null!);
+            mock.SetupGet(p => p.HeroDescription).Returns((string?)null!);
+            mock.SetupGet(p => p.HeroBackgroundImage).Returns((IEnumerable<ContentAttachment>?)null!);
+            mock.SetupGet(p => p.HeroBackgroundImageAltText).Returns((string?)null!);
+            mock.SetupGet(p => p.HeroBackgroundImage_Mobile).Returns((IEnumerable<ContentAttachment>?)null!);
+            mock.SetupGet(p => p.HeroBackgroundImage_MobileAltText).Returns((string?)null!);
+            mock.SetupGet(p => p.HeroCallToActionButtonType).Returns((string?)null!);
+            mock.SetupGet(p => p.HeroCallToActionButtonText).Returns((string?)null!);
+           // mock.SetupGet(p => p.HeroCallToActionButtonUrl).Returns((IEnumerable<WebPage>?)null!);
+            mock.SetupGet(p => p.SystemFields).Returns((WebPageFields?)null!);
+            return mock;
         }
 
         [Test]
-        public async Task GetEventRegistrationFormPageDtoAsync_ReturnsEmpty_WhenNoPage()
+        public async Task GetEventRegistrationFormPageDtoAsync_ReturnsEmptyDto_WhenPageIsNull()
         {
-            SetupContent(new List<EventRegistrationForm>());
+            SetupContent(null);
 
             var result = await _service.GetEventRegistrationFormPageDtoAsync(null!, CancellationToken.None);
 
@@ -68,37 +95,15 @@ namespace BDO.GWT.Core.Tests.Services
         }
 
         [Test]
-        public async Task GetEventRegistrationFormPageDtoAsync_ReturnsEmpty_WhenResultsAreNull()
-        {
-            _contentServiceMock
-                .Setup(x => x.GetPagesAsync<EventRegistrationForm>(
-                    It.IsAny<RetrievePagesParameters>(),
-                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                    It.IsAny<RetrievalCacheSettings>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync((IEnumerable<EventRegistrationForm>?)null!);
-
-            var result = await _service.GetEventRegistrationFormPageDtoAsync(null!, CancellationToken.None);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.Not.Null);
-                Assert.That(result.Hero, Is.Null);
-            });
-        }
-
-        [Test]
         public async Task GetEventRegistrationFormPageDtoAsync_MapsScalarFields()
         {
-            var page = new EventRegistrationForm
-            {
-                PageTitle = "Reg Title",
-                PageDescription = "Reg Desc",
-                FormType = "Custom",
-                Form = "form-id",
-                EmbedCode = "<embed/>",
-            };
-            SetupContent(new List<EventRegistrationForm> { page });
+            var pageMock = CreatePageMock(
+                title: "Reg Title",
+                description: "Reg Desc",
+                formType: "Custom",
+                form: "form-id",
+                embedCode: "<embed/>");
+            SetupContent(pageMock.Object);
 
             var result = await _service.GetEventRegistrationFormPageDtoAsync(null!, CancellationToken.None);
 
@@ -116,18 +121,29 @@ namespace BDO.GWT.Core.Tests.Services
         public async Task GetEventRegistrationFormPageDtoAsync_MapsBaseContent_FromSystemFields()
         {
             var guid = Guid.NewGuid();
-            var page = new EventRegistrationForm
-            {
-                SystemFields = new WebPageFields
-                {
-                    ContentItemID = 17,
-                    ContentItemGUID = guid,
-                    ContentItemName = "Reg",
-                    WebPageItemID = 7,
-                    WebPageUrlPath = "/reg"
-                }
-            };
-            SetupContent(new List<EventRegistrationForm> { page });
+
+            var sysMock = new Mock<WebPageFields>();
+            sysMock.SetupGet(s => s.ContentItemID).Returns(17);
+            sysMock.SetupGet(s => s.ContentItemGUID).Returns(guid);
+            sysMock.SetupGet(s => s.ContentItemName).Returns("Reg");
+            sysMock.SetupGet(s => s.ContentItemContentTypeID).Returns(0);
+            sysMock.SetupGet(s => s.ContentItemIsSecured).Returns(false);
+            sysMock.SetupGet(s => s.ContentItemCommonDataContentLanguageID).Returns(0);
+            sysMock.SetupGet(s => s.ContentItemCommonDataFirstPublishedWhen).Returns(default(DateTime));
+            sysMock.SetupGet(s => s.ContentItemCommonDataLastPublishedWhen).Returns(default(DateTime));
+            sysMock.SetupGet(s => s.WebPageItemGUID).Returns(Guid.Empty);
+            sysMock.SetupGet(s => s.WebPageItemID).Returns(7);
+            sysMock.SetupGet(s => s.WebPageItemName).Returns((string?)null!);
+            sysMock.SetupGet(s => s.WebPageItemWebsiteChannelId).Returns(0);
+            sysMock.SetupGet(s => s.WebPageUrlPath).Returns("/reg");
+            sysMock.SetupGet(s => s.WebPageItemOrder).Returns(0);
+            sysMock.SetupGet(s => s.WebPageItemTreePath).Returns((string?)null!);
+            sysMock.SetupGet(s => s.WebPageUrlPathContentLanguageID).Returns(0);
+            sysMock.SetupGet(s => s.WebPageItemParentID).Returns(0);
+
+            var pageMock = CreatePageMock();
+            pageMock.SetupGet(p => p.SystemFields).Returns(sysMock.Object);
+            SetupContent(pageMock.Object);
 
             var result = await _service.GetEventRegistrationFormPageDtoAsync(null!, CancellationToken.None);
 
@@ -144,17 +160,24 @@ namespace BDO.GWT.Core.Tests.Services
         [Test]
         public async Task GetEventRegistrationFormPageDtoAsync_PassesHeroData_ToHeroService()
         {
-            var page = new EventRegistrationForm
-            {
-                HeroLayout = "Default",
-                HeroTitle = "Hero",
-                HeroDescription = "Desc",
-                HeroCallToActionButtonType = "Primary",
-                HeroCallToActionButtonText = "Go",
-                HeroBackgroundImageAltText = "Alt",
-                HeroBackgroundImage_MobileAltText = "MAlt",
-            };
-            SetupContent(new List<EventRegistrationForm> { page });
+            var pageMock = new Mock<EventRegistrationForm>();
+            pageMock.SetupGet(p => p.HeroLayout).Returns("Default");
+            pageMock.SetupGet(p => p.HeroTitle).Returns("Hero");
+            pageMock.SetupGet(p => p.HeroDescription).Returns("Desc");
+            pageMock.SetupGet(p => p.HeroCallToActionButtonType).Returns("Primary");
+            pageMock.SetupGet(p => p.HeroCallToActionButtonText).Returns("Go");
+            pageMock.SetupGet(p => p.HeroBackgroundImageAltText).Returns("Alt");
+            pageMock.SetupGet(p => p.HeroBackgroundImage_MobileAltText).Returns("MAlt");
+            pageMock.SetupGet(p => p.HeroBackgroundImage).Returns((IEnumerable<ContentAttachment>?)null!);
+            pageMock.SetupGet(p => p.HeroBackgroundImage_Mobile).Returns((IEnumerable<ContentAttachment>?)null!);
+           // pageMock.SetupGet(p => p.HeroCallToActionButtonUrl).Returns((IEnumerable<WebPage>?)null!);
+            pageMock.SetupGet(p => p.PageTitle).Returns((string?)null!);
+            pageMock.SetupGet(p => p.PageDescription).Returns((string?)null!);
+            pageMock.SetupGet(p => p.FormType).Returns((string?)null!);
+            pageMock.SetupGet(p => p.Form).Returns((string?)null!);
+            pageMock.SetupGet(p => p.EmbedCode).Returns((string?)null!);
+            pageMock.SetupGet(p => p.SystemFields).Returns((WebPageFields?)null!);
+            SetupContent(pageMock.Object);
 
             HeroData? captured = null;
             _heroServiceMock
@@ -182,21 +205,13 @@ namespace BDO.GWT.Core.Tests.Services
         {
             using var cts = new CancellationTokenSource();
             var token = cts.Token;
-
-            _contentServiceMock
-                .Setup(x => x.GetPagesAsync<EventRegistrationForm>(
-                    It.IsAny<RetrievePagesParameters>(),
-                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                    It.IsAny<RetrievalCacheSettings>(),
-                    token))
-                .ReturnsAsync(new List<EventRegistrationForm>());
+            var pageMock = CreatePageMock();
+            SetupContent(pageMock.Object);
 
             await _service.GetEventRegistrationFormPageDtoAsync(null!, token);
 
-            _contentServiceMock.Verify(x => x.GetPagesAsync<EventRegistrationForm>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
+            _contentServiceMock.Verify(x => x.RetrieveCurrentPageAsync<EventRegistrationForm>(
+                It.IsAny<RetrieveCurrentPageParameters>(),
                 token), Times.Once);
         }
 
@@ -204,10 +219,8 @@ namespace BDO.GWT.Core.Tests.Services
         public void GetEventRegistrationFormPageDtoAsync_PropagatesException_FromContentService()
         {
             _contentServiceMock
-                .Setup(x => x.GetPagesAsync<EventRegistrationForm>(
-                    It.IsAny<RetrievePagesParameters>(),
-                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                    It.IsAny<RetrievalCacheSettings>(),
+                .Setup(x => x.RetrieveCurrentPageAsync<EventRegistrationForm>(
+                    It.IsAny<RetrieveCurrentPageParameters>(),
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new InvalidOperationException("DB fail"));
 
