@@ -47,7 +47,7 @@ public class BlogPostPageService : IBlogPostPageService
 
         
 
-        var imageFileUrl = blogpostPage.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+        var imageFileUrl = blogpostPage.ImageFileM?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
 
 
         BlogPostDto BlogPostDtoObj = new BlogPostDto
@@ -56,7 +56,7 @@ public class BlogPostPageService : IBlogPostPageService
             ImageDto = new ImageDto
             {
                  Url = imageFileUrl ?? string.Empty,
-                 AltText = blogpostPage.ImageFileAltText ?? string.Empty,
+                 AltText = blogpostPage.ImageFileAltTextM ?? string.Empty,
             },                                                                   
             ShowSidebar = blogpostPage.ShowSidebar,
             ShowTitle = blogpostPage.ShowTitle,

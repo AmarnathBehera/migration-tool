@@ -76,15 +76,15 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
         {
             private readonly bool _inherit;
             private readonly string _keyValue;
-            public override bool ScriptHeadInheritfromglobalsettings => _inherit;
-            public override string ScriptHeadKeyValue => _keyValue;
+            public override bool ScriptsTopofPageInheritfromglobalsetting => _inherit;
+            public override string ScriptsTopofPageHeadKeyValue => _keyValue;
             internal StubSiteScript(bool inherit, string keyValue = "") { _inherit = inherit; _keyValue = keyValue; }
         }
 
         private sealed class StubGlobalSettings : GlobalsettingskeyInfo
         {
             private readonly string _keyValue;
-            public override string ScriptHeadKeyValue => _keyValue;
+            public override string ScriptsTopofPageHeadKeyValue => _keyValue;
             internal StubGlobalSettings(string keyValue) => _keyValue = keyValue;
         }
 

@@ -84,7 +84,7 @@ public class SectionEventsService : ISectionEventsService
 
         };
 
-        var sys = page.SystemFields;
+           var sys = page.SystemFields;
 
         var dto = new SectionEventsDto
         {

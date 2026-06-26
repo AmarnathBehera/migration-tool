@@ -8,7 +8,7 @@ public static class FilterUtility
 {
     private static readonly Dictionary<string, FilterParameterData> FilterParameterDataByName = new Dictionary<string, FilterParameterData>
     {
-        [FilterParameterName.BusinessIssue] = new("Business Issue", ResourceStringKey.LiveSite.Filters.BusinessIssue, typeof(Businessissue), FilterParameterType.Page),
+        [FilterParameterName.BusinessIssue] = new("Business Issue", ResourceStringKey.LiveSite.Filters.BusinessIssue, typeof(Businessissue), FilterParameterType.Tagpage),
         [FilterParameterName.BusinessLine] = new("Service (Business Line)", ResourceStringKey.LiveSite.Filters.BusinessLine, typeof(BusinessLine), FilterParameterType.Page),
         [FilterParameterName.CareerEmploymentType] = new("Career Employment Type", ResourceStringKey.LiveSite.Filters.CareerEmploymentType, typeof(CareerEmploymentTypes), FilterParameterType.Tagpage),
         [FilterParameterName.CareerJobTitle] = new("Career Job Title", ResourceStringKey.LiveSite.Filters.CareerJobTitle, typeof(CareerJobTitle), FilterParameterType.Tagpage),
@@ -17,7 +17,7 @@ public static class FilterUtility
         [FilterParameterName.Country] = new("Country", ResourceStringKey.LiveSite.Filters.Country, typeof(Deal), FilterParameterType.Field),
         [FilterParameterName.Credential] = new("Credential", ResourceStringKey.LiveSite.Filters.Credential, typeof(Credentials), FilterParameterType.Page),
         [FilterParameterName.DealType] = new("Deal Type", ResourceStringKey.LiveSite.Filters.DealType, typeof(DealCardDealType), FilterParameterType.Page),
-        [FilterParameterName.EventType] = new("Event Type", ResourceStringKey.LiveSite.Filters.EventType, typeof(EventType), FilterParameterType.Page),
+        [FilterParameterName.EventType] = new("Event Type", ResourceStringKey.LiveSite.Filters.EventType, typeof(EventType), FilterParameterType.Tagpage),
         //[FilterParameterName.GlobalDealType] = new("Deal Type", ResourceStringKey.LiveSite.Filters.DealType, typeof(DealCardDealType), FilterParameterType.Page),
         //[FilterParameterName.GlobalIndustry] = new("Industry", ResourceStringKey.LiveSite.Filters.Industry, typeof(DealCardIndustry), FilterParameterType.Page),
         //[FilterParameterName.GlobalSubIndustry] = new("Sub-Industry", ResourceStringKey.LiveSite.Filters.SubIndustry, typeof(DealCardIndustry), FilterParameterType.Page),
