@@ -21,6 +21,7 @@
       </schema>
       <field column="FormType" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="82a5b4a3-792f-4c5e-a83d-97902c34b206" visible="true">
         <properties>
+          <defaultvalue>form</defaultvalue>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Type</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
