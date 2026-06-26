@@ -1,7 +1,21 @@
-﻿@* @inject IReactHelper ReactHelper
-@using BDO.GWT.Web.Core.LiveSite.Helpers
-@model BDO.GWT.Web.Core.DTOs.EditorsPickDto
+﻿@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Core.DTOs.EditorsPickDto
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
 
-@ReactHelper.RenderComponent(Html, "InsightCarousel", new {
-    InsightCarousel = Model,
-}) *@
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+
+@if (Model != null && pageId != 0)
+{
+    @(await ReactService.RenderComponentAsync(
+            pageId,
+            ReactComponentType.EditorsPick,
+            ReactComponentType.EditorsPickGUID,
+            new { InsightCarousel = Model },
+            Context.RequestAborted))
+}

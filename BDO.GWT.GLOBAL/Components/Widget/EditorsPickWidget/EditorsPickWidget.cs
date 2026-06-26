@@ -1,5 +1,6 @@
 ﻿using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.Services;
 using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.EditorsPickWidget;
 using CMS.Websites;
@@ -14,14 +15,17 @@ namespace BDO.GWT.Core.Components.Widgets.EditorsPickWidget;
 
 public class EditorsPickWidget : ViewComponent
 {
-    //private readonly IEditorsPickService _editorsPickService;
+    private readonly IEditorsPickService _editorsPickService;
     private readonly IContentRetriever _contentRetriever;
     private readonly IContentService _contentService;
 
 
-    public EditorsPickWidget( IContentRetriever contentRetriever, IContentService contentService)
+    public EditorsPickWidget(
+        IEditorsPickService editorsPickService,
+        IContentRetriever contentRetriever,
+        IContentService contentService)
     {
-        //_editorsPickService = editorsPickService;
+        _editorsPickService = editorsPickService;
         _contentRetriever = contentRetriever;
         _contentService = contentService;
     }
@@ -34,7 +38,11 @@ public class EditorsPickWidget : ViewComponent
 
         if (currentPage is null)
         {
-            return View("~/Components/Widget/EditorsPickWidget/_EditorsPickWidget.cshtml", new EditorsPickData());
+            return View("~/Components/Widget/EditorsPickWidget/_EditorsPickWidget.cshtml", new EditorsPickDto
+            {
+                FilteringTooltipEnabled = false,
+                Items = []
+            });
 
         }
         var backgroundimageurl = model.Properties.BackgroundImages?.Any() == true
@@ -61,11 +69,8 @@ public class EditorsPickWidget : ViewComponent
             WidgetID = model.Properties.WidgetID,
         };
 
-        //var dto = await _editorsPickService.GetEditorsPickDtoAsync(currentPage, data, HttpContext.RequestAborted);
-        
-         
+        var dto = await _editorsPickService.GetEditorsPickAsync(currentPage, data, HttpContext.RequestAborted);
 
-
-        return View("~/Components/Widget/EditorsPickWidget/_EditorsPickWidget.cshtml");
+        return View("~/Components/Widget/EditorsPickWidget/_EditorsPickWidget.cshtml", dto);
     }
 }
