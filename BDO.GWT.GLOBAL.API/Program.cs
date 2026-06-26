@@ -7,7 +7,6 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddKentico();
 
 builder.Services.AddAPIServices();
-builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
