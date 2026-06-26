@@ -123,6 +123,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ISitemapXmlRenderer, SitemapXmlRenderer>();
         serviceCollection.AddScoped<ILanguageProvider, LanguageProvider>();
         serviceCollection.AddScoped<IPageNodeProvider, PageNodeProvider>();
+        serviceCollection.AddScoped<IEditorsPickCardService, EditorsPickCardService>();
+        serviceCollection.AddScoped<IEditorsPickService, EditorsPickService>();
     }
 
 }
