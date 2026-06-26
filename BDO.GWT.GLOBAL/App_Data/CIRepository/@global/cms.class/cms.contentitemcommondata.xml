@@ -1595,6 +1595,53 @@ after;After
           <fieldcaption>Event Base</fieldcaption>
         </properties>
       </schema>
+      <schema guid="45af2efa-f3b7-44e5-87f2-3e7c9afb8843" name="ImageM">
+        <properties>
+          <description>this is image which is required</description>
+          <fieldcaption>ImageM</fieldcaption>
+        </properties>
+      </schema>
+      <field allowempty="true" column="ImageFileM" columnprecision="0" columntype="contentitemreference" enabled="true" guid="fba93a35-aacf-40a2-ace7-61ad60823a69" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Image</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>45af2efa-f3b7-44e5-87f2-3e7c9afb8843</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>Please select an Image</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+      <field allowempty="true" column="ImageFileAltTextM" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="86ff991c-9e10-40bb-b825-ed80b12f23e1" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Image alt text</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>45af2efa-f3b7-44e5-87f2-3e7c9afb8843</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues />
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
     </form>
   </ClassFormDefinition>
   <ClassGUID>a6581fb3-892a-45b4-981a-012ce4b50b43</ClassGUID>

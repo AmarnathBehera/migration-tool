@@ -723,10 +723,10 @@ public class NewsArticleCardsServiceTests
             },
             MetadataTitle = title,
             MetadataDescription = description,
-            ImageFile = imageUrl != null
+            ImageFileM = imageUrl != null
                 ? new[] { new ContentAttachment { ContentAttachmentAsset = new ContentItemAsset { Url = imageUrl } } }
                 : Array.Empty<ContentAttachment>(),
-            ImageFileAltText = imageAlt,
+            ImageFileAltTextM = imageAlt,
             ContentType = Array.Empty<Contenttypes>(),
             UpdatedOn = updatedOn ?? DateTime.MinValue
         };
