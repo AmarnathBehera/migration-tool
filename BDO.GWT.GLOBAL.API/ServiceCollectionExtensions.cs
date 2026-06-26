@@ -1,7 +1,4 @@
-﻿using BDO.GWT.GLOBAL.API.Services;
-
-
-namespace BDO.GWT.GLOBAL.API;
+﻿namespace BDO.GWT.GLOBAL.API;
 
 public static class ServiceCollectionExtensions
 {

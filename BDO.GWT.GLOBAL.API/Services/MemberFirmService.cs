@@ -64,13 +64,13 @@ public class MemberFirmService : IMemberFirmService
 
         if (_options.Value.IncludeMemberFirmsJson)
         {
-            var memberFirmsJsonFilePath = Path.Combine(Environment.CurrentDirectory, "memberfirms.json");
+            var memberFirmsJsonFilePath = System.IO.Path.Combine(Environment.CurrentDirectory, "memberfirms.json");
 
             if (File.Exists(memberFirmsJsonFilePath))
             {
                 await using var fileStream = File.OpenRead(memberFirmsJsonFilePath);
 
-                var nonProductionMemberFirmDataEntries = await JsonSerializer.DeserializeAsync<List<MemberFirmData>>(fileStream, cancellationToken: cancellationToken) ?? throw new SerializationException("Failed to deserialize 'memberfirms.json' configuration file.");
+                var nonProductionMemberFirmDataEntries = await JsonSerializer.DeserializeAsync<List<MemberFirmData>>(fileStream, cancellationToken: cancellationToken) ?? throw new System.Runtime.Serialization.SerializationException("Failed to deserialize 'memberfirms.json' configuration file.");
 
                 var nonProductionMemberFirms = _mapper.Map<IEnumerable<MemberFirm>>(nonProductionMemberFirmDataEntries);
 

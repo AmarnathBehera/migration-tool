@@ -1,6 +1,9 @@
-﻿using BDO.GWT.Domain.Core.Entities;
+﻿using BDO.GWT.Core;
+using BDO.GWT.Domain.Core.Constants;
+using BDO.GWT.Domain.Core.Entities;
 using BDO.GWT.Domain.Core.Retrievers;
-using BDO.GWT.Web.Core.API.Constants;
+using CMS.Membership;
+using CMS.Membership.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Linq;
@@ -15,11 +18,12 @@ public interface IAuthorizationHelper
 
 public class AuthorizationHelper : IAuthorizationHelper
 {
-    private readonly IRetriever<User> _userRetriever;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public AuthorizationHelper(IRetriever<User> userRetriever)
+
+    public AuthorizationHelper(IHttpContextAccessor httpContextAccessor)
     {
-        _userRetriever = userRetriever;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<User?> AuthorizeUserAsync(AuthorizationFilterContext context)
@@ -43,16 +47,18 @@ public class AuthorizationHelper : IAuthorizationHelper
         }
 
         var cancellationToken = context.HttpContext.RequestAborted;
+        var username = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+        var user = new User();
 
-        var users = await _userRetriever.RetrieveEntitiesAsync(query => query.Global().Where(x => x.UserName == userName), cancellationToken);
-
-        var user = users.SingleOrDefault();
-
-        if (user == null)
+        if (string.IsNullOrEmpty(username))
         {
             context.Result = new ForbidResult();
 
             return null;
+        }
+        else
+        {
+            user.PrivilegeLevel = Domain.Core.Enums.UserPrivilegeLevel.GlobalAdministrator;
         }
 
         return user;

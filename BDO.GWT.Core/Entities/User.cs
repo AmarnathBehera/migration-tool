@@ -1,5 +1,5 @@
 ﻿using BDO.GWT.Domain.Core.Enums;
-using BDO.GWT.Domain.Core.ValueObjects;
+using BDO.GWT.Core.ValueObjects;
 using System;
 
 namespace BDO.GWT.Domain.Core.Entities;

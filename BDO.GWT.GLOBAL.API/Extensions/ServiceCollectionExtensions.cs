@@ -54,7 +54,7 @@ public static class ServiceCollectionExtensions
         //serviceCollection.AddScoped<ISiteCrudService, SiteCrudService>();
         //serviceCollection.AddScoped<ISiteDomainAliasHelper, SiteDomainAliasHelper>();
         //serviceCollection.AddScoped<ISiteSettingCrudService, SiteSettingCrudService>();
-        serviceCollection.AddScoped<IUserApiPermissionsCrudService, UserApiPermissionsCrudService>();
+        //serviceCollection.AddScoped<IUserApiPermissionsCrudService, UserApiPermissionsCrudService>();
         //serviceCollection.AddScoped<IUserCrudService, UserCrudService>();
     }
 }
