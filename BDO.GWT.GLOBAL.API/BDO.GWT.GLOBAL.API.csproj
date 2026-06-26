@@ -9,10 +9,15 @@
   <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Admin" Version="31.2.3" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.2.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\BDO.GWT.Core\BDO.GWT.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>
