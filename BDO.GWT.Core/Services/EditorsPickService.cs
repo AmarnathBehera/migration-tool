@@ -96,6 +96,7 @@ public class EditorsPickService : IEditorsPickService
         featuredGuids ??= new HashSet<ContentItemReference>();
         selectedGuids ??= new HashSet<ContentItemReference>();
 
+
         var selectedPageGuids = selectedGuids
             .Select(x => x.Identifier)
             .ToHashSet();
@@ -104,6 +105,7 @@ public class EditorsPickService : IEditorsPickService
             .Select(x => x.Identifier)
             .ToHashSet();
 
+        selectedPageGuids.UnionWith(featuredPageGuids);
         var paginationDto = await _editorsPickCardService.GetFilteredItemsAsync(
             query,
             selectedPageGuids,

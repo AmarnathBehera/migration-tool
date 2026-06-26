@@ -8,6 +8,7 @@ using BDO.GWT.Core.Utilities;
 using CMS.ContentEngine;
 using CMS.Websites;
 using CMS.Websites.Routing;
+using Kentico.Content.Web.Mvc;
 using System.Reflection;
 
 namespace BDO.GWT.Core.Services;
@@ -31,15 +32,26 @@ public class EditorsPickCardService : IEditorsPickCardService
     private readonly ICardsService _cardsService;
     private readonly IContentService _contentService;
     private readonly IWebPageUrlRetriever _webPageUrlRetriever;
+    private readonly IContentRetriever _contentRetriever;
+    private static readonly string[] EditorPickContentTypes =
+[
+    BlogPost.CONTENT_TYPE_NAME,
+    Event.CONTENT_TYPE_NAME,
+    MicrositePage.CONTENT_TYPE_NAME,
+    NewsArticle.CONTENT_TYPE_NAME,
+    Webinar.CONTENT_TYPE_NAME,
+];
 
     public EditorsPickCardService(
         ICardsService cardsService,
         IContentService contentService,
-        IWebPageUrlRetriever webPageUrlRetriever)
+        IWebPageUrlRetriever webPageUrlRetriever,
+        IContentRetriever contentRetriever)
     {
         _cardsService = cardsService;
         _contentService = contentService;
         _webPageUrlRetriever = webPageUrlRetriever;
+        _contentRetriever = contentRetriever;
     }
 
     public async Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(
@@ -67,9 +79,14 @@ public class EditorsPickCardService : IEditorsPickCardService
                 Data = Array.Empty<EditorsPickCardDto>(),
                 TotalCount = 0
             };
-        }
+        };
 
-        var pages = await _contentService.GetItemsByGUIDAsync(selectedPageGuids.ToList());
+
+
+        var pages = await _contentRetriever.RetrieveContentOfContentTypesByGuids<IWebPageFieldsSource>(
+                EditorPickContentTypes,
+                selectedPageGuids.ToList(), new RetrieveContentOfContentTypesParameters() { LinkedItemsMaxLevel = 2},
+                cancellationToken);
 
         var filtered = ApplyFilters(pages, cardsQuery.Filters)
             .OrderByDescending(isFeatured)
@@ -145,7 +162,7 @@ public class EditorsPickCardService : IEditorsPickCardService
             cards.Add(new EditorsPickCardDto
             {
                 IsFeatured = isFeatured(page),
-                Type = GetSingleOrLinkedName(page, "ContentType"),
+                Type = GetSingleOrLinkedName(page, "ContentType") ?? GetPageTypeName(page),
                 ContentType = GetPageTypeName(page),
                 Title = GetStringProperty(page, "MetadataTitle")
                     ?? GetStringProperty(page, "MetadataOGTitle")
@@ -217,9 +234,12 @@ public class EditorsPickCardService : IEditorsPickCardService
                 continue;
             }
 
+            var systemFields = item.GetType().GetProperty("SystemFields")?.GetValue(item);
             var name = item.GetType().GetProperty("Name")?.GetValue(item)?.ToString()
+                       ?? item.GetType().GetProperty("CodeName")?.GetValue(item)?.ToString()
                        ?? item.GetType().GetProperty("MetadataTitle")?.GetValue(item)?.ToString()
-                       ?? item.GetType().GetProperty("MetadataOGTitle")?.GetValue(item)?.ToString();
+                       ?? item.GetType().GetProperty("MetadataOGTitle")?.GetValue(item)?.ToString()
+                       ?? systemFields?.GetType().GetProperty("ContentItemName")?.GetValue(systemFields)?.ToString();
 
             if (!string.IsNullOrWhiteSpace(name))
             {
@@ -238,7 +258,13 @@ public class EditorsPickCardService : IEditorsPickCardService
             return linked;
         }
 
-        return GetStringProperty(source, propertyName);
+        var property = source.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+        if (property?.PropertyType == typeof(string))
+        {
+            return property.GetValue(source) as string;
+        }
+
+        return null;
     }
 
     private static string? GetImageUrl(object source)
