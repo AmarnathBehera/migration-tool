@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="NewsArticle"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class NewsArticle : IWebPageFieldsSource, ICallToAction, ISidebar, IOGMetadataFields, ISearchAndSEO, IMetadata, IWhereShouldThisPageAppear, IAuthorInformation, IImage, IPageMetadata, IContentPage
+	public partial class NewsArticle : IWebPageFieldsSource, ICallToAction, ISidebar, IOGMetadataFields, ISearchAndSEO, IMetadata, IWhereShouldThisPageAppear, IAuthorInformation, IPageMetadata, IContentPage, IImageM
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -57,6 +57,12 @@ namespace BDO
 		/// CallToActionButtonUrl.
 		/// </summary>
 		public string CallToActionButtonUrl { get; set; }
+
+
+		/// <summary>
+		/// CallToActionPosition.
+		/// </summary>
+		public string CallToActionPosition { get; set; }
 
 
 		/// <summary>
@@ -234,18 +240,6 @@ namespace BDO
 
 
 		/// <summary>
-		/// ImageFile.
-		/// </summary>
-		public IEnumerable<ContentAttachment> ImageFile { get; set; }
-
-
-		/// <summary>
-		/// ImageFileAltText.
-		/// </summary>
-		public string ImageFileAltText { get; set; }
-
-
-		/// <summary>
 		/// PageTitle.
 		/// </summary>
 		public string PageTitle { get; set; }
@@ -285,5 +279,17 @@ namespace BDO
 		/// UpdatedOn.
 		/// </summary>
 		public DateTime UpdatedOn { get; set; }
+
+
+		/// <summary>
+		/// ImageFileM.
+		/// </summary>
+		public IEnumerable<ContentAttachment> ImageFileM { get; set; }
+
+
+		/// <summary>
+		/// ImageFileAltTextM.
+		/// </summary>
+		public string ImageFileAltTextM { get; set; }
 	}
 }

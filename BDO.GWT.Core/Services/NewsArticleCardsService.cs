@@ -229,9 +229,9 @@ public class NewsArticleCardsService : INewsArticleCardsService
             var card = new NewsPageCardDto
             {
                 IsFeatured = isPageFeatured(contentPage),
-                ImageURL = urlHelper.Content(contentPage.ImageFile.FirstOrDefault()?.ContentAttachmentAsset.Url),
+                ImageURL = urlHelper.Content(contentPage.ImageFileM.FirstOrDefault()?.ContentAttachmentAsset.Url),
                 isComingSoon = isComingSoon,
-                ImageAltText = contentPage.ImageFileAltText,
+                ImageAltText = contentPage.ImageFileAltTextM,
                 Type = contentPage.ContentType.FirstOrDefault()?.Name,
                 Title = contentPage.MetadataTitle,
                 Date = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen ?? contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen,
