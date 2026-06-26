@@ -74,7 +74,7 @@
           <explanationtext>
             <![CDATA[Only 3 selected items will be displayed<br/><b>Available page types:</b><br/>'Event', 'Industry Service', 'Industry', 'Insight', 'Microsite - Master Page', 'Microsite - Page', 'Service Area', 'Service', 'Sub-Service', 'Deal']]>
           </explanationtext>
-          <explanationtextashtml>False</explanationtextashtml>
+          <explanationtextashtml>True</explanationtextashtml>
           <fieldcaption>Featured items (3)</fieldcaption>
           <fielddescription>Only 3 selected items will be displayed</fielddescription>
           <fielddescriptionashtml>False</fielddescriptionashtml>
