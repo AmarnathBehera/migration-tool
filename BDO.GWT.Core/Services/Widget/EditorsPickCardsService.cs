@@ -162,7 +162,7 @@ public class EditorsPickCardService : IEditorsPickCardService
             cards.Add(new EditorsPickCardDto
             {
                 IsFeatured = isFeatured(page),
-                Type = GetSingleOrLinkedName(page, "ContentType") ?? GetPageTypeName(page),
+                Type = GetSingleOrLinkedName(page, "ContentType"),
                 ContentType = GetPageTypeName(page),
                 Title = GetStringProperty(page, "MetadataTitle")
                     ?? GetStringProperty(page, "MetadataOGTitle")
@@ -234,12 +234,10 @@ public class EditorsPickCardService : IEditorsPickCardService
                 continue;
             }
 
-            var systemFields = item.GetType().GetProperty("SystemFields")?.GetValue(item);
             var name = item.GetType().GetProperty("Name")?.GetValue(item)?.ToString()
                        ?? item.GetType().GetProperty("CodeName")?.GetValue(item)?.ToString()
                        ?? item.GetType().GetProperty("MetadataTitle")?.GetValue(item)?.ToString()
-                       ?? item.GetType().GetProperty("MetadataOGTitle")?.GetValue(item)?.ToString()
-                       ?? systemFields?.GetType().GetProperty("ContentItemName")?.GetValue(systemFields)?.ToString();
+                       ?? item.GetType().GetProperty("MetadataOGTitle")?.GetValue(item)?.ToString();
 
             if (!string.IsNullOrWhiteSpace(name))
             {
