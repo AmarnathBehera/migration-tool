@@ -79,7 +79,7 @@ public class EditorsPickCardService : IEditorsPickCardService
                 Data = Array.Empty<EditorsPickCardDto>(),
                 TotalCount = 0
             };
-        };
+        }
 
 
 
@@ -295,10 +295,15 @@ public class EditorsPickCardService : IEditorsPickCardService
         return null;
     }
 
-    private static string NormalizeDescription(string? description) =>
-        string.IsNullOrWhiteSpace(description)
-            ? string.Empty
-            : HtmlHelper.ExtractTextFromHtml(description);
+    private static string NormalizeDescription(string? description)
+    {
+        if (string.IsNullOrWhiteSpace(description))
+        {
+            return string.Empty;
+        }
+
+        return HtmlHelper.ExtractTextFromHtml(description) ?? string.Empty;
+    }
 
     private static string GetPageTypeName(IWebPageFieldsSource page) => page.GetType().Name;
 
@@ -314,9 +319,12 @@ public class EditorsPickCardService : IEditorsPickCardService
             .GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance)?
             .GetValue(source);
 
-        return value is DateTime date
-            ? date == DateTime.MinValue ? null : date
-            : null;
+        if (value is DateTime date)
+        {
+            return date == DateTime.MinValue ? null : date;
+        }
+
+        return null;
     }
 
     private static DateTime? GetPublishDateUtc(IWebPageFieldsSource page)

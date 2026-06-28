@@ -162,7 +162,7 @@ public class EditorsPickWidgetTests
 
         var result = await _widget.InvokeAsync(CreateModel(properties));
         var viewResult = result as ViewViewComponentResult;
-
+        var filters = new[] { "contentType", "businessLine" };
         Assert.Multiple(() =>
         {
             Assert.That(viewResult, Is.Not.Null);
@@ -172,7 +172,7 @@ public class EditorsPickWidgetTests
             Assert.That(capturedData!.Title, Is.EqualTo("Top Picks"));
             Assert.That(capturedData.Description, Is.EqualTo("Our best content"));
             Assert.That(capturedData.FilteringEnabled, Is.True);
-            Assert.That(capturedData.Filters, Is.EquivalentTo(new[] { "contentType", "businessLine" }));
+            Assert.That(capturedData.Filters, Is.EquivalentTo(filters));
             Assert.That(capturedData.BackgroundImageAltText, Is.EqualTo("Alt text"));
             Assert.That(capturedData.SeeAllLinkText, Is.EqualTo("See all"));
             Assert.That(capturedData.SeeAllLinkUrl, Is.EqualTo("/all-picks"));
