@@ -47,7 +47,14 @@ public class MicrositeHeaderService : IMicrositeHeaderService
         if (masterPage is not null &&
             string.Equals(masterPage.SettingsMenuType, "mfmenu", StringComparison.OrdinalIgnoreCase))
         {
-            return await _headerService.GetAsync(contentService, cancellationToken);
+            var headerDto = await _headerService.GetAsync(contentService, cancellationToken);
+
+            if (headerDto is not null && !string.IsNullOrEmpty(masterPage.LogoText))
+            {
+                headerDto.SiteName = masterPage.LogoText;
+            }
+
+            return headerDto;
         }
 
         var cultures = await _headerService.GetCultureDtosAsync(cancellationToken);

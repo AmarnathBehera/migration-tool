@@ -30,24 +30,11 @@ public class EventRegistrationFormPageService : IEventRegistrationFormPageServic
 
     public async Task<FormPageDto> GetEventRegistrationFormPageDtoAsync(EventRegistrationForm page, CancellationToken cancellationToken)
     {
-        var results = await _contentRetriever.GetPagesAsync<EventRegistrationForm>(
-          new RetrievePagesParameters
-          {
-              LinkedItemsMaxLevel = 5
-          },
-          query =>
-          {
-              query.Where(w =>
-                  w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
-          },
-          RetrievalCacheSettings.CacheDisabled,
-          cancellationToken);
-
-        var EventRPage = results?.FirstOrDefault();
-
-        if (EventRPage == null)
+        var EventRPage = await _contentRetriever.RetrieveCurrentPageAsync<EventRegistrationForm>(
+            new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
+        if (EventRPage is null)
         {
-            return new FormPageDto(); // or throw exception if required
+            return new FormPageDto();
         }
 
         var sys = EventRPage.SystemFields;
