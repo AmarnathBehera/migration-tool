@@ -42,7 +42,7 @@ public class EditorsPickCardService : IEditorsPickCardService
     Webinar.CONTENT_TYPE_NAME,
 ];
 
-    private Func<IEnumerable<string>, IEnumerable<Guid>, RetrieveContentOfContentTypesParameters, CancellationToken, Task<IEnumerable<IWebPageFieldsSource>>> _retrieveContentByGuidsAsync;
+    private readonly Func<IEnumerable<string>, IEnumerable<Guid>, RetrieveContentOfContentTypesParameters, CancellationToken, Task<IEnumerable<IWebPageFieldsSource>>> _retrieveContentByGuidsAsync;
 
     public EditorsPickCardService(
         ICardsService cardsService,

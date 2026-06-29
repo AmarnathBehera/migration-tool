@@ -161,7 +161,7 @@ public class EditorsPickCardServiceTests
         Assert.Multiple(() =>
         {
             Assert.That(result.TotalCount, Is.EqualTo(12));
-            Assert.That(result.Data.Length, Is.EqualTo(10)); // default page size
+            Assert.That(result.Data, Has.Length.EqualTo(10)); // default page size
         });
     }
 
@@ -199,7 +199,7 @@ public class EditorsPickCardServiceTests
         Assert.Multiple(() =>
         {
             Assert.That(result.TotalCount, Is.EqualTo(1));
-            Assert.That(result.Data.Length, Is.EqualTo(1));
+            Assert.That(result.Data, Has.Length.EqualTo(1));
             Assert.That(result.Data[0].Type, Is.EqualTo("NewsArticle"));
             Assert.That(result.Data[0].Title, Is.EqualTo("News item"));
         });
@@ -239,7 +239,7 @@ public class EditorsPickCardServiceTests
         Assert.Multiple(() =>
         {
             Assert.That(result.TotalCount, Is.EqualTo(1));
-            Assert.That(result.Data.Length, Is.EqualTo(1));
+            Assert.That(result.Data, Has.Length.EqualTo(1));
             Assert.That(result.Data[0].Title, Is.EqualTo("Tax article"));
         });
     }
@@ -268,12 +268,11 @@ public class EditorsPickCardServiceTests
             IsFeatured,
             CancellationToken.None);
 
-        Assert.That(result.Data.Select(x => x.Title).ToArray(), Is.EqualTo(new[]
-        {
-            "Featured old",
+        var titles = new HashSet<string> { "Featured old",
             "Regular new",
-            "Regular mid"
-        }));
+            "Regular mid"};
+
+        Assert.That(result.Data.Select(x => x.Title).ToArray(), Is.EqualTo(titles));
     }
 
     // ── Test helpers ──────────────────────────────────────────────────────────
