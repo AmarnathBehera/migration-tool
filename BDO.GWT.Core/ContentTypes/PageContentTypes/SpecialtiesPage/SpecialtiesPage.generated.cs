@@ -36,6 +36,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// SideNavigationSeperator.
+		/// </summary>
+		public string SideNavigationSeperator { get; set; }
+
+
+		/// <summary>
 		/// ShowSideNavigation.
 		/// </summary>
 		public bool ShowSideNavigation { get; set; }
