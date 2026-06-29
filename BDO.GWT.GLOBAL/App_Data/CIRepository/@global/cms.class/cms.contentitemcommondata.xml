@@ -350,6 +350,8 @@ center;Center
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -660,6 +662,8 @@ heroImage;Hero
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
         <validationrulesdata>
@@ -724,6 +728,8 @@ heroImage;Hero
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
         <validationrulesdata>
@@ -1598,7 +1604,7 @@ after;After
       <schema guid="45af2efa-f3b7-44e5-87f2-3e7c9afb8843" name="ImageM">
         <properties>
           <description>this is image which is required</description>
-          <fieldcaption>ImageM</fieldcaption>
+          <fieldcaption>Image</fieldcaption>
         </properties>
       </schema>
       <field allowempty="true" column="ImageFileM" columnprecision="0" columntype="contentitemreference" enabled="true" guid="fba93a35-aacf-40a2-ace7-61ad60823a69" visible="true">
