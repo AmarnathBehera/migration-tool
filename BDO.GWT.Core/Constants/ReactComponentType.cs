@@ -35,7 +35,7 @@ public static class ReactComponentType
     public const string RssFeeds = "RssFeeds";
     public const string EventsWebinarsDetails = "EventsWebinarsDetails";
     public const string FlexibleContentWidget = "TrendingTopicsCarouselWidget";
-
+    public const string EditorsPick = "InsightCarousel";
     public const string ContactPageDescriptionText = "ContactPageDescriptionText";
     public const string MultiLinksCardsGrid = "MultiLinksCardsGrid";
     public const string IndustryPrimary = "IndustryPrimary";
@@ -104,6 +104,7 @@ public static class ReactComponentType
     public const string LegalBodyContentGUID = "c58bfb27-7feb-4fdb-94f2-8bca61df250d";
     public const string LegalSideBoxNavigationGUID = "79c73db6-0a00-43b7-9081-bff002b19ca9";
     public const string SocialMediaGUID = "c58bfb27-7feb-4fdb-94f2-8bca61df250d";
+    public const string EditorsPickGUID = "5b72020a-38b5-43b1-9e26-71fd36ee9e29";
 }
 
 
@@ -112,7 +113,7 @@ public static class ReactComponentType
 //also delete below guid comments once the guid is used and component is registered in ReactComponentType
 
 
-//5b72020a-38b5-43b1-9e26-71fd36ee9e29
+//
 //4e110f8b-531c-4d3b-bafb-7c03af83ea0b
 //4772187b-22a3-4888-a7e9-54b3bd9cbd02
 //abfdfcbf-6696-4de8-a409-d9d3ff31a17c
