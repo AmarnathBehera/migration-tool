@@ -1,4 +1,5 @@
 ﻿using BDO.GWT.Core;
+using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Services;
@@ -28,26 +29,7 @@ public interface ISitemapPageService
 public class SitemapPageService : ISitemapPageService
 {
 
-    private static readonly IReadOnlyList<string> _pageTypeRegistry =
-    [
-        Career.CONTENT_TYPE_NAME,
-Careers.CONTENT_TYPE_NAME,
-SectionCareers.CONTENT_TYPE_NAME,
-Sitemap.CONTENT_TYPE_NAME,
-SectionIndustries.CONTENT_TYPE_NAME,
-Industry.CONTENT_TYPE_NAME,
-IndustryService.CONTENT_TYPE_NAME,
-IndustryCategory.CONTENT_TYPE_NAME,
-SpecialtiesArea.CONTENT_TYPE_NAME,
-SpecialtiesCategory.CONTENT_TYPE_NAME,
-SpecialtiesPage.CONTENT_TYPE_NAME,
-SectionSpecialties.CONTENT_TYPE_NAME,
-ServiceArea.CONTENT_TYPE_NAME,
-BusinessLine.CONTENT_TYPE_NAME,
-Sub_Service.CONTENT_TYPE_NAME,
-SectionServices.CONTENT_TYPE_NAME,
-Service.CONTENT_TYPE_NAME
-    ];
+    
 
     private readonly IHeroService _heroService;
     private readonly IContentQueryExecutor _contentQueryExecutor;
@@ -122,7 +104,7 @@ Service.CONTENT_TYPE_NAME
 
     private async Task<List<SitemapPageNode>> GetAllSitemapPagesAsync(CancellationToken cancellationToken)
     {
-        var tasks = _pageTypeRegistry.Select(contentTypeName =>
+        var tasks = SitemapContentTypes.SitemapPages.Select(contentTypeName =>
             QuerySitemapPagesAsync(contentTypeName, cancellationToken));
 
         var results = await Task.WhenAll(tasks);
