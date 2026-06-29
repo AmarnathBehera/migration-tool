@@ -40,7 +40,7 @@ using Kentico.PageBuilder.Web.Mvc;
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.FaqWidget, typeof(FaqWidget), "FAQ Widget", typeof(FaqWidgetProperties), AllowCache = true, IconClass = "icon-bubbles")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.FlexibleBanner, typeof(FlexibleBannerWidget), "Flexible Banner", typeof(FlexibleBannerWidgetProperties), AllowCache = true, IconClass = "icon-ribbon")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.FlexibleContent, typeof(FlexibleContentWidget), "Flexible Content", typeof(FlexibleContentWidgetProperties), AllowCache = true, IconClass = "icon-newspaper")]
-[assembly: RegisterWidget(ComponentIdentifiers.Widgets.TabAccordion, typeof(TabAccordionWidget), "Tab Accordion", typeof(TabAccordionWidgetProperties), AllowCache = true, IconClass = "icon-tab")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.TabAccordion, typeof(TabAccordionWidget), "Reusable Content Tab/Accordion", typeof(TabAccordionWidgetProperties), AllowCache = true, IconClass = "icon-tab")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.NewsCarousel,typeof(NewsCarouselWidget),"News carousel",typeof(NewsCarouselWidgetProperties),AllowCache = true,IconClass = "icon-carousel")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.KeyContacts, typeof(KeyContactsWidget), "Key Contacts", typeof(KeyContactsWidgetProperties), AllowCache = true, IconClass = "icon-app-contact-groups")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.SocialMediaButtons,typeof(SocialMediaButtonsWidget),"Social media buttons",typeof(SocialMediaButtonsWidgetProperties),AllowCache = true,IconClass = "icon-paper-plane")]

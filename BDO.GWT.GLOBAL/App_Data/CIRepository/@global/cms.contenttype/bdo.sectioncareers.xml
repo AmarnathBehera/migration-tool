@@ -13,6 +13,17 @@
       <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
         <properties />
       </schema>
+      <field allowempty="true" column="DescendantPages" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="70846c9b-6144-47ca-a7d2-c3565d068dda" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Descendant pages</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
       <field column="ShowCopyUrlButtonInJobOpportunity" columnprecision="0" columntype="boolean" enabled="true" guid="5f8c309a-933e-4179-8210-a720c787e3b0" visible="true">
         <properties>
           <explanationtext>

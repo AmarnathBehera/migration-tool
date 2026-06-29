@@ -13,6 +13,17 @@
       <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
         <properties />
       </schema>
+      <field allowempty="true" column="SideNavigationSeperator" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="8519ed00-3b1d-4605-8a1d-b42f6bbeee83" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Side navigation</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
       <field column="ShowSideNavigation" columnprecision="0" columntype="boolean" enabled="true" guid="21646fe1-83a1-41bb-aed5-5fffd8396d15" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
