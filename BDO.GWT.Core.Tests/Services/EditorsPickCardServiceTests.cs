@@ -17,6 +17,8 @@ public class EditorsPickCardServiceTests
     private Mock<IWebPageUrlRetriever> _urlRetrieverMock = null!;
     private Mock<IContentRetriever> _contentRetrieverMock = null!;
     private EditorsPickCardService _service = null!;
+    private IWebPageFieldsSource[] _retrievedPages = [];
+    private int _retrieveCallCount;
 
     [SetUp]
     public void SetUp()
@@ -35,6 +37,14 @@ public class EditorsPickCardServiceTests
             _contentServiceMock.Object,
             _urlRetrieverMock.Object,
             _contentRetrieverMock.Object);
+
+        typeof(EditorsPickCardService)
+            .GetField("_retrieveContentByGuidsAsync", BindingFlags.NonPublic | BindingFlags.Instance)!
+            .SetValue(_service, (Func<IEnumerable<string>, IEnumerable<Guid>, RetrieveContentOfContentTypesParameters, CancellationToken, Task<IEnumerable<IWebPageFieldsSource>>>)((_, _, _, _) =>
+            {
+                _retrieveCallCount++;
+                return Task.FromResult<IEnumerable<IWebPageFieldsSource>>(_retrievedPages);
+            }));
     }
 
     // ── Structure ────────────────────────────────────────────────────────────
@@ -127,5 +137,178 @@ public class EditorsPickCardServiceTests
             Times.Once);
     }
 
+    // ── GetFilteredItemsAsync ────────────────────────────────────────────────
 
+    [Test]
+    public async Task GetFilteredItemsAsync_WhenCardsQueryIsNull_UsesDefaultPaging()
+    {
+        var pages = Enumerable.Range(1, 12)
+            .Select(i => (IWebPageFieldsSource)CreatePage($"Title {i}", publishDateUtc: DateTime.UtcNow.AddDays(-i)))
+            .ToArray();
+
+        SetupContentRetriever(pages);
+
+        _urlRetrieverMock
+            .Setup(x => x.Retrieve(It.IsAny<IWebPageFieldsSource>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Ignore URL in this test"));
+
+        var result = await _service.GetFilteredItemsAsync(
+            new CardsQuery(),
+            new HashSet<Guid> { Guid.NewGuid() },
+            _ => false,
+            CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.TotalCount, Is.EqualTo(12));
+            Assert.That(result.Data.Length, Is.EqualTo(10)); // default page size
+        });
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_AppliesContentTypeFilter()
+    {
+        var pages = new IWebPageFieldsSource[]
+        {
+            CreatePage("News item", contentType: "NewsArticle"),
+            CreatePage("Webinar item", contentType: "Webinar")
+        };
+
+        SetupContentRetriever(pages);
+
+        _urlRetrieverMock
+            .Setup(x => x.Retrieve(It.IsAny<IWebPageFieldsSource>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Ignore URL in this test"));
+
+        var query = new CardsQuery
+        {
+            CurrentPage = 1,
+            PageSize = 10,
+            Filters = new Dictionary<string, string>
+            {
+                ["contentType"] = "NewsArticle"
+            }
+        };
+
+        var result = await _service.GetFilteredItemsAsync(
+            query,
+            new HashSet<Guid> { Guid.NewGuid() },
+            _ => false,
+            CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.TotalCount, Is.EqualTo(1));
+            Assert.That(result.Data.Length, Is.EqualTo(1));
+            Assert.That(result.Data[0].Type, Is.EqualTo("NewsArticle"));
+            Assert.That(result.Data[0].Title, Is.EqualTo("News item"));
+        });
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_AppliesBusinessLineFilter_FromLinkedItems()
+    {
+        var pages = new IWebPageFieldsSource[]
+        {
+            CreatePage("Tax article", businessLines: ["Tax"]),
+            CreatePage("Audit article", businessLines: ["Audit"])
+        };
+
+        SetupContentRetriever(pages);
+
+        _urlRetrieverMock
+            .Setup(x => x.Retrieve(It.IsAny<IWebPageFieldsSource>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Ignore URL in this test"));
+
+        var query = new CardsQuery
+        {
+            CurrentPage = 1,
+            PageSize = 10,
+            Filters = new Dictionary<string, string>
+            {
+                ["businessLine"] = "Tax"
+            }
+        };
+
+        var result = await _service.GetFilteredItemsAsync(
+            query,
+            new HashSet<Guid> { Guid.NewGuid() },
+            _ => false,
+            CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.TotalCount, Is.EqualTo(1));
+            Assert.That(result.Data.Length, Is.EqualTo(1));
+            Assert.That(result.Data[0].Title, Is.EqualTo("Tax article"));
+        });
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_OrdersFeaturedFirst_ThenByPublishDateDescending()
+    {
+        var featuredOld = CreatePage("Featured old", publishDateUtc: new DateTime(2022, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+        var regularNew = CreatePage("Regular new", publishDateUtc: new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+        var regularMid = CreatePage("Regular mid", publishDateUtc: new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+
+        var pages = new IWebPageFieldsSource[] { regularMid, featuredOld, regularNew };
+
+        SetupContentRetriever(pages);
+
+        _urlRetrieverMock
+            .Setup(x => x.Retrieve(It.IsAny<IWebPageFieldsSource>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Ignore URL in this test"));
+
+        bool IsFeatured(IWebPageFieldsSource page) =>
+            page is TestPage p && p.MetadataTitle == "Featured old";
+
+        var result = await _service.GetFilteredItemsAsync(
+            new CardsQuery { CurrentPage = 1, PageSize = 10 },
+            new HashSet<Guid> { Guid.NewGuid() },
+            IsFeatured,
+            CancellationToken.None);
+
+        Assert.That(result.Data.Select(x => x.Title).ToArray(), Is.EqualTo(new[]
+        {
+            "Featured old",
+            "Regular new",
+            "Regular mid"
+        }));
+    }
+
+    // ── Test helpers ──────────────────────────────────────────────────────────
+
+    private sealed class TestLinkedItem
+    {
+        public string? Name { get; set; }
+    }
+
+    private sealed class TestPage : IWebPageFieldsSource
+    {
+        public WebPageFields SystemFields { get; set; } = new();
+        public string? MetadataTitle { get; set; }
+        public DateTime? DocumentPublishFrom { get; set; }
+        public string? ContentType { get; set; }
+        public IEnumerable<TestLinkedItem>? MetadataBusinessLines { get; set; }
+    }
+
+    private static TestPage CreatePage(
+        string title,
+        string? contentType = null,
+        DateTime? publishDateUtc = null,
+        string[]? businessLines = null)
+    {
+        return new TestPage
+        {
+            MetadataTitle = title,
+            ContentType = contentType,
+            DocumentPublishFrom = publishDateUtc,
+            MetadataBusinessLines = businessLines?.Select(x => new TestLinkedItem { Name = x }).ToArray()
+        };
+    }
+
+    private void SetupContentRetriever(IWebPageFieldsSource[] pages)
+    {
+        _retrievedPages = pages;
+    }
 }

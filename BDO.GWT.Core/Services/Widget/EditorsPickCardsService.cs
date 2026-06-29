@@ -42,6 +42,8 @@ public class EditorsPickCardService : IEditorsPickCardService
     Webinar.CONTENT_TYPE_NAME,
 ];
 
+    private Func<IEnumerable<string>, IEnumerable<Guid>, RetrieveContentOfContentTypesParameters, CancellationToken, Task<IEnumerable<IWebPageFieldsSource>>> _retrieveContentByGuidsAsync;
+
     public EditorsPickCardService(
         ICardsService cardsService,
         IContentService contentService,
@@ -52,6 +54,9 @@ public class EditorsPickCardService : IEditorsPickCardService
         _contentService = contentService;
         _webPageUrlRetriever = webPageUrlRetriever;
         _contentRetriever = contentRetriever;
+        _retrieveContentByGuidsAsync = (contentTypes, guids, parameters, ct) =>
+            _contentRetriever.RetrieveContentOfContentTypesByGuids<IWebPageFieldsSource>(
+                contentTypes, guids.ToList(), parameters, ct);
     }
 
     public async Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(
@@ -83,9 +88,10 @@ public class EditorsPickCardService : IEditorsPickCardService
 
 
 
-        var pages = await _contentRetriever.RetrieveContentOfContentTypesByGuids<IWebPageFieldsSource>(
+        var pages = await _retrieveContentByGuidsAsync(
                 EditorPickContentTypes,
-                selectedPageGuids.ToList(), new RetrieveContentOfContentTypesParameters() { LinkedItemsMaxLevel = 2},
+                selectedPageGuids,
+                new RetrieveContentOfContentTypesParameters() { LinkedItemsMaxLevel = 2 },
                 cancellationToken);
 
         var filtered = ApplyFilters(pages, cardsQuery.Filters)
