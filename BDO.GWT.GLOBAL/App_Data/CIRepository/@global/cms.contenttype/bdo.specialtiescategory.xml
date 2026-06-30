@@ -61,7 +61,7 @@
           <controlname>Kentico.Administration.RichTextEditor</controlname>
         </settings>
       </field>
-      <field column="SideNavigationSeperator" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7256f009-0f49-4f3a-9775-a9f4f60d3cc4" visible="true">
+      <field allowempty="true" column="SideNavigationSeperator" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7256f009-0f49-4f3a-9775-a9f4f60d3cc4" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Side navigation</fieldcaption>
