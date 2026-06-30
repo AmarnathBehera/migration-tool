@@ -16,10 +16,9 @@ public class HasPermissionAttribute : TypeFilterAttribute
 
 public class HasPermissionFilter : IAsyncAuthorizationFilter
 {
-    private readonly string _apiMethodGroupName;
+    //private readonly string _apiMethodGroupName;
     private readonly ApiPermission _permission;
     private readonly IAuthorizationHelper _authorizationHelper;
-    private readonly IContentService _contentRetriever;
     //private readonly IRetriever<ApiMethodGroup> _apiMethodGroupRetriever;
     //private readonly IRetriever<UserApiPermission> _userApiPermissionRetriever;
 
@@ -27,7 +26,7 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
     public HasPermissionFilter(IAuthorizationHelper authorizationHelper, string apiMethodGroupName, ApiPermission permission) //IRetriever<ApiMethodGroup> apiMethodGroupRetriever, IRetriever<UserApiPermission> userApiPermissionRetriever
     {
         //_apiMethodGroupRetriever = apiMethodGroupRetriever;
-        _apiMethodGroupName = apiMethodGroupName;
+        //_apiMethodGroupName = apiMethodGroupName;
         _authorizationHelper = authorizationHelper;
         _permission = permission;
         //_userApiPermissionRetriever = userApiPermissionRetriever;

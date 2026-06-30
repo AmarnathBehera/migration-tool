@@ -1,4 +1,4 @@
-using BDO.GWT.GLOBAL.API;
+using BDO.GWT.GLOBAL.API.Extensions;
 using Kentico.Web.Mvc;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
@@ -7,8 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddKentico();
-
-builder.Services.AddAPIServices();
+builder.Services.AddApi();
 //builder.Services.AddOpenApi();
 
 builder.Services.AddSwaggerGen(c =>

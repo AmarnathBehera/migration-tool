@@ -1,10 +1,8 @@
-﻿using BDO.GWT.Domain.Core.Entities;
-using BDO.GWT.GLOBAL.API.ApiClients;
+﻿using BDO.GWT.GLOBAL.API.ApiClients;
 using BDO.GWT.GLOBAL.API.Helpers;
 using BDO.GWT.GLOBAL.API.Middleware;
 using BDO.GWT.GLOBAL.API.Options;
 using BDO.GWT.GLOBAL.API.Services;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BDO.GWT.GLOBAL.API.Extensions;
 
@@ -15,7 +13,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddHttpClient();
         serviceCollection.AddMemoryCache();
 
-        serviceCollection.AddScoped<MemberFirmMiddleware>();
+        //serviceCollection.AddScoped<MemberFirmMiddleware>();
 
         serviceCollection.AddOptions<MemberFirmServiceOptions>()
             .BindConfiguration("MemberFirmService")
@@ -43,9 +41,9 @@ public static class ServiceCollectionExtensions
         //serviceCollection.AddScoped<IInsightCrudService, InsightCrudService>();
         //serviceCollection.AddScoped<ILicenseKeysCrudService, LicenseKeysCrudService>();
         //serviceCollection.AddScoped<ILocationOfficeCrudService, LocationOfficeCrudService>();
-        serviceCollection.AddScoped<IMasterDataApiClient, MasterDataApiClient>();
+        //serviceCollection.AddScoped<IMasterDataApiClient, MasterDataApiClient>();
         //serviceCollection.AddScoped<IMediaFileCrudService, MediaFileCrudService>();
-        serviceCollection.AddScoped<IMemberFirmService, MemberFirmService>();
+        //serviceCollection.AddScoped<IMemberFirmService, MemberFirmService>();
         //serviceCollection.AddScoped<IPageAttachmentCrudService, PageAttachmentCrudService>();
         //serviceCollection.AddScoped<IPersonCrudService, PersonCrudService>();
         //serviceCollection.AddScoped<IScheduledTaskCrudService, ScheduledTaskCrudService>();
