@@ -5,21 +5,27 @@ using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Options;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BDO.GWT.GLOBAL.API.Services;
 
+/// <summary>
+/// Service interface for managing member firms, providing methods to retrieve member firm information.
+/// </summary>
 public interface IMemberFirmService
 {
+    /// <summary>
+    /// Retrieves a member firm by its ID, utilizing caching for improved performance.
+    /// </summary>
+    /// <param name="memberFirmId">The ID of the member firm to retrieve.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>The member firm if found; otherwise, null.</returns>
     Task<MemberFirm?> GetMemberFirmAsync(int memberFirmId, CancellationToken cancellationToken);
 }
 
+/// <summary>
+/// Implementation of the IMemberFirmService interface, responsible for managing member firms and providing methods to retrieve member firm information.
+/// </summary>
 public class MemberFirmService : IMemberFirmService
 {
     private const string CacheKey = "MemberFirmList";
@@ -29,6 +35,13 @@ public class MemberFirmService : IMemberFirmService
     private readonly IMemoryCache _memoryCache;
     private readonly IOptions<MemberFirmServiceOptions> _options;
 
+    /// <summary>
+    /// Initializes a new instance of the MemberFirmService class with the specified dependencies.
+    /// </summary>
+    /// <param name="mapper"></param>
+    /// <param name="masterDataApiClient"></param>
+    /// <param name="memoryCache"></param>
+    /// <param name="options"></param>
     public MemberFirmService(IMapper mapper, IMasterDataApiClient masterDataApiClient, IMemoryCache memoryCache, IOptions<MemberFirmServiceOptions> options)
     {
         _mapper = mapper;
@@ -37,6 +50,12 @@ public class MemberFirmService : IMemberFirmService
         _options = options;
     }
 
+    /// <summary>
+    /// Retrieves a member firm by its ID, utilizing caching for improved performance. If the member firm is not found in the cache, it will be fetched from the master data API and added to the cache.
+    /// </summary>
+    /// <param name="memberFirmId">The ID of the member firm to retrieve.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>The member firm if found; otherwise, null.</returns>
     public async Task<MemberFirm?> GetMemberFirmAsync(int memberFirmId, CancellationToken cancellationToken)
     {
         var memberFirmById = _memoryCache.Get<IDictionary<int, MemberFirm>>(CacheKey);
