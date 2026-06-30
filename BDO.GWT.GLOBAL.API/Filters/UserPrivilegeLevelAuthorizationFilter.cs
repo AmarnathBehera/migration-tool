@@ -1,10 +1,10 @@
 ﻿using BDO.GWT.Domain.Core.Enums;
-using BDO.GWT.Web.Core.API.Helpers;
+using BDO.GWT.GLOBAL.API.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.Web.Core.API.Filters;
+namespace BDO.GWT.GLOBAL.API.Filters;
 
 public class UserPrivilegeLevelAuthorizationFilter : IAsyncAuthorizationFilter
 {

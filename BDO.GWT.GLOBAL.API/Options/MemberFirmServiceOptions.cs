@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BDO.GWT.Web.Core.API.Options;
+namespace BDO.GWT.GLOBAL.API.Options;
 
 public class MemberFirmServiceOptions
 {

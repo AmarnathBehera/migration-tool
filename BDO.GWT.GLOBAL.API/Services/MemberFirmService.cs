@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using BDO.GWT.Domain.Core.Entities;
-using BDO.GWT.Web.Core.API.ApiClients;
-using BDO.GWT.Web.Core.API.Data;
-using BDO.GWT.Web.Core.API.Options;
+using BDO.GWT.GLOBAL.API.ApiClients;
+using BDO.GWT.GLOBAL.API.Data;
+using BDO.GWT.GLOBAL.API.Options;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System;
@@ -13,7 +13,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.Web.Core.API.Services;
+namespace BDO.GWT.GLOBAL.API.Services;
 
 public interface IMemberFirmService
 {

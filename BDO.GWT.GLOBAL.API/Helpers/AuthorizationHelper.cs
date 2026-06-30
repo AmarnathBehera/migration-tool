@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.Web.Core.API.Helpers;
+namespace BDO.GWT.GLOBAL.API.Helpers;
 
 public interface IAuthorizationHelper
 {

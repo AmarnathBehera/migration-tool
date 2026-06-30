@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BDO.GWT.Web.Core.API.Bases;
+namespace BDO.GWT.GLOBAL.API.Bases;
 
 [Authorize]
 [ApiController]

@@ -1,12 +1,12 @@
 ﻿using BDO.GWT.Domain.Core.Entities;
-using BDO.GWT.Web.Core.API.ApiClients;
-using BDO.GWT.Web.Core.API.Helpers;
-using BDO.GWT.Web.Core.API.Middleware;
-using BDO.GWT.Web.Core.API.Options;
-using BDO.GWT.Web.Core.API.Services;
+using BDO.GWT.GLOBAL.API.ApiClients;
+using BDO.GWT.GLOBAL.API.Helpers;
+using BDO.GWT.GLOBAL.API.Middleware;
+using BDO.GWT.GLOBAL.API.Options;
+using BDO.GWT.GLOBAL.API.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BDO.GWT.Web.Core.API.Extensions;
+namespace BDO.GWT.GLOBAL.API.Extensions;
 
 public static class ServiceCollectionExtensions
 {

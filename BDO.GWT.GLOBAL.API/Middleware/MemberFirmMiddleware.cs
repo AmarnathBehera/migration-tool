@@ -1,11 +1,11 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
-using BDO.GWT.Web.Core.API.Services;
+using BDO.GWT.GLOBAL.API.Services;
 using CMS.Websites.Routing;
 using System.Globalization;
 
-namespace BDO.GWT.Web.Core.API.Middleware;
+namespace BDO.GWT.GLOBAL.API.Middleware;
 
 public class MemberFirmMiddleware : IMiddleware
 {

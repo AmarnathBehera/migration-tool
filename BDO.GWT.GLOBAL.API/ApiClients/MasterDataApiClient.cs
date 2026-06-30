@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using BDO.GWT.Common.Extensions;
 using BDO.GWT.Domain.Core.Entities;
-using BDO.GWT.Web.Core.API.Data;
-using BDO.GWT.Web.Core.API.Options;
+using BDO.GWT.GLOBAL.API.Data;
+using BDO.GWT.GLOBAL.API.Options;
 using Microsoft.Extensions.Options;
 using System.Net;
 
-namespace BDO.GWT.Web.Core.API.ApiClients;
+namespace BDO.GWT.GLOBAL.API.ApiClients;
 
 public interface IMasterDataApiClient
 {

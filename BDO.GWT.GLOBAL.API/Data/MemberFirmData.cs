@@ -1,4 +1,4 @@
-﻿namespace BDO.GWT.Web.Core.API.Data;
+﻿namespace BDO.GWT.GLOBAL.API.Data;
 
 public class MemberFirmData
 {
