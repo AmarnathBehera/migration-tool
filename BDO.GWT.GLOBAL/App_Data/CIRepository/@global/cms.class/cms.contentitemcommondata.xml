@@ -149,6 +149,8 @@ center;Center
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -226,6 +228,8 @@ center;Center
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -254,6 +258,8 @@ center;Center
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -550,6 +556,8 @@ center;Center
             <![CDATA[["205639d0-5385-472a-bd1a-ba685cf3915d","4e214df1-edd5-4441-a0b7-53849526b1d3","bb17604c-c134-4faa-a401-2727cad93707"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -845,6 +853,8 @@ tertiary;Tertiary
             <![CDATA[["43fcea42-e42d-4773-95dc-b415ea3e7547","31f6383b-697e-4d8f-acec-be459fe4ad01","74635906-cb04-4ffd-9936-9dcde92c7f58","392e5450-56f2-49da-96a0-fc49215599d8","f3c1aa73-5245-4566-ae9c-ac80c54a6ce2"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
         <visibilityconditiondata>
@@ -940,6 +950,8 @@ tertiary;Tertiary
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
         <visibilityconditiondata>
@@ -1130,6 +1142,8 @@ MicrositePage;Microsite Page
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -1619,6 +1633,8 @@ after;After
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
         <validationrulesdata>
