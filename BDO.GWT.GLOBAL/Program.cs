@@ -16,6 +16,7 @@ using Kentico.Membership;
 using Kentico.OnlineMarketing.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
 using Kentico.Web.Mvc;
+using Kentico.Xperience.SendGrid;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
@@ -28,6 +29,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.WebEncoders;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using SendGrid;
 using System;
 using System.Linq;
 using System.Text.Encodings.Web;
@@ -131,6 +133,15 @@ builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 // Loads the administration redirect domain (AdminRedirectOptions) from a configuration file section
 builder.Services.Configure<AdminRedirectOptions>(builder.Configuration.GetSection("AdminRedirectOptions"));
 
+// Configures email sending via SendGrid for system emails
+builder.Services.AddXperienceSystemSendGrid();
+// Configures email sending via SendGrid for the fallback situation
+builder.Services.AddXperienceSendGrid();
+
+// Loads the SendGrid API keys from configuration file sections
+builder.Services.ConfigureSystemSendGridClientOptions(builder.Configuration.GetSection("SystemSendGridClientOptions"));
+builder.Services.Configure<SendGridClientOptions>(builder.Configuration.GetSection("FallbackSendGridClientOptions"));
+
 var app = builder.Build();
 
 app.InitKentico();
@@ -172,7 +183,6 @@ if (!builder.Environment.IsDevelopment())
         app.UseRewriter(rewriteOptions);
     }
 }
- 
 
 app.UseKentico();
 
