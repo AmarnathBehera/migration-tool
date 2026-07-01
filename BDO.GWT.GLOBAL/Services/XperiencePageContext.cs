@@ -272,12 +272,12 @@ public class XperiencePageContext : IPageContext
             {
                 if (item.TryGetValue("Title", out string title) && !string.IsNullOrEmpty(title))
                 {
-                    return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(title.ToLower());
+                    return title;
                 }
 
                 if (item.TryGetValue("MetadataTitle", out string metaTitle) && !string.IsNullOrEmpty(metaTitle))
                 {
-                    return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(metaTitle.ToLower());
+                    return metaTitle;
                 }
 
                 return item.WebPageItemName;
