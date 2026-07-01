@@ -50,13 +50,13 @@ public interface IMultiTypePageRetriever
 
 public class MultiTypePageRetriever : IMultiTypePageRetriever
 {
-    private readonly IContentQueryExecutor _contentQueryExecutor;
+    private readonly IContentQueryExecutorAdapter _contentQueryExecutor;
     private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly IProgressiveCache _progressiveCache;
     private readonly IPreferredLanguageRetriever _preferredLanguageRetriever;
 
     public MultiTypePageRetriever(
-        IContentQueryExecutor contentQueryExecutor,
+        IContentQueryExecutorAdapter contentQueryExecutor,
         IWebsiteChannelContext websiteChannelContext,
         IProgressiveCache progressiveCache,
         IPreferredLanguageRetriever preferredLanguageRetriever)
@@ -91,10 +91,10 @@ public class MultiTypePageRetriever : IMultiTypePageRetriever
         };
 
         return await _progressiveCache.LoadAsync(
-            async _ => (await _contentQueryExecutor.GetMappedWebPageResult<TContentItem>(
+            async _ => (await _contentQueryExecutor.GetMappedWebPageResultAsync<TContentItem>(
                 queryBuilder,
                 executionOptions,
-                cancellationToken: cancellationToken
+                cancellationToken
             )).ToArray(),
             cacheSettings
         );
@@ -136,11 +136,11 @@ public class MultiTypePageRetriever : IMultiTypePageRetriever
         return await _progressiveCache.LoadAsync(
             async _ =>
             {
-                var results = await _contentQueryExecutor.GetWebPageResult(
+                var results = await _contentQueryExecutor.GetWebPageResultAsync(
                     queryBuilder,
                     mapper,
                     executionOptions,
-                    cancellationToken: cancellationToken
+                    cancellationToken
                 );
 
                 return results.ToArray();
@@ -174,10 +174,10 @@ public class MultiTypePageRetriever : IMultiTypePageRetriever
         };
 
         return await _progressiveCache.LoadAsync(
-            async _ => (await _contentQueryExecutor.GetMappedWebPageResult<TContentItem>(
+            async _ => (await _contentQueryExecutor.GetMappedWebPageResultAsync<TContentItem>(
                 queryBuilder,
                 executionOptions,
-                cancellationToken: cancellationToken
+                cancellationToken
             )).FirstOrDefault(),
             cacheSettings
         );
@@ -220,11 +220,11 @@ public class MultiTypePageRetriever : IMultiTypePageRetriever
         return await _progressiveCache.LoadAsync(
             async _ =>
             {
-                var results = await _contentQueryExecutor.GetWebPageResult(
+                var results = await _contentQueryExecutor.GetWebPageResultAsync(
                     queryBuilder,
                     mapper,
                     executionOptions,
-                    cancellationToken: cancellationToken
+                    cancellationToken
                 );
 
                 return results.FirstOrDefault();
@@ -258,11 +258,11 @@ public class MultiTypePageRetriever : IMultiTypePageRetriever
         return await _progressiveCache.LoadAsync(
             async _ =>
             {
-                var results = await _contentQueryExecutor.GetWebPageResult(
+                var results = await _contentQueryExecutor.GetWebPageResultAsync(
                     queryBuilder,
                     container => container.WebPageItemID,
                     executionOptions,
-                    cancellationToken: cancellationToken
+                    cancellationToken
                 );
 
                 return results.Count();
@@ -305,11 +305,11 @@ public class MultiTypePageRetriever : IMultiTypePageRetriever
         return await _progressiveCache.LoadAsync(
             async _ =>
             {
-                var results = await _contentQueryExecutor.GetWebPageResult(
+                var results = await _contentQueryExecutor.GetWebPageResultAsync(
                     queryBuilder,
                     container => container.WebPageItemID,
                     executionOptions,
-                    cancellationToken: cancellationToken
+                    cancellationToken
                 );
 
                 return results.Count();
