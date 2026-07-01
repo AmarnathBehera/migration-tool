@@ -98,7 +98,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ISectionBlogService, SectionBlogService>();
         serviceCollection.AddScoped<IBlogPostPageService, BlogPostPageService>();
         serviceCollection.AddScoped<IBlogsPageService, BlogsPageService>();
-        serviceCollection.AddScoped<IBlogPageCardsService, BlogPageCardsService>();        
+        serviceCollection.AddScoped<IBlogPageCardsService, BlogPageCardsService>();
+        serviceCollection.AddScoped<ILegalPageService, LegalPageService>();
         serviceCollection.AddScoped<ISocialMediaButtonsService, SocialMediaButtonsService>();
         serviceCollection.AddScoped<ISpecialtiesPageService, SpecialtiesPageService>();
         serviceCollection.AddScoped<ISpecialtiesAreaPageService, SpecialtiesAreaPageService>();
@@ -122,6 +123,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ISitemapXmlRenderer, SitemapXmlRenderer>();
         serviceCollection.AddScoped<ILanguageProvider, LanguageProvider>();
         serviceCollection.AddScoped<IPageNodeProvider, PageNodeProvider>();
+        serviceCollection.AddScoped<IEditorsPickCardService, EditorsPickCardService>();
+        serviceCollection.AddScoped<IEditorsPickService, EditorsPickService>();
     }
 
 }

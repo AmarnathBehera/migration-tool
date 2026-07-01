@@ -16,5 +16,5 @@
   <ClassShortName>BDOEventWebinarFolder</ClassShortName>
   <ClassTableName>BDO_EventWebinarFolder</ClassTableName>
   <ClassType>Content</ClassType>
-  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
 </cms.contenttype>

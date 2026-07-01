@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="LegalPage"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class LegalPage : IWebPageFieldsSource, IMetadata, IPageMetadata
+	public partial class LegalPage : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IPageMetadata
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -33,6 +33,54 @@ namespace BDO
 		/// </summary>
 		[SystemField]
 		public WebPageFields SystemFields { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGTitle.
+		/// </summary>
+		public string MetadataOGTitle { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGDescription.
+		/// </summary>
+		public string MetadataOGDescription { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> MetadataOGImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGTwitterImageSizeCheckbox.
+		/// </summary>
+		public bool MetadataOGTwitterImageSizeCheckbox { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGTwitterImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> MetadataOGTwitterImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataNofollow.
+		/// </summary>
+		public bool MetadataNofollow { get; set; }
+
+
+		/// <summary>
+		/// MetadataNoindex.
+		/// </summary>
+		public bool MetadataNoindex { get; set; }
+
+
+		/// <summary>
+		/// IncludeInSitemap.
+		/// </summary>
+		public bool IncludeInSitemap { get; set; }
 
 
 		/// <summary>

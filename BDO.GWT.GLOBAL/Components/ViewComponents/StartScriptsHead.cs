@@ -15,12 +15,12 @@ namespace GWTXbyKWeb.Components.ViewComponents
             : base(provider, siteProvider, websiteChannelContext, webChannelSettingsInfoProvider) { }
 
         protected override bool GetInheritFromGlobal(WebChannelSnippetInfo siteScript)
-            => siteScript.ScriptHeadInheritfromglobalsettings;
+            => siteScript.ScriptsTopofPageInheritfromglobalsetting;
 
         protected override string GetSiteValue(WebChannelSnippetInfo siteScript)
-            => siteScript.ScriptHeadKeyValue;
+            => siteScript.ScriptsTopofPageHeadKeyValue;
 
         protected override string GetGlobalValue(GlobalsettingskeyInfo globalSettings)
-            => globalSettings.ScriptHeadKeyValue;
+            => globalSettings.ScriptsTopofPageHeadKeyValue;
     }
 }

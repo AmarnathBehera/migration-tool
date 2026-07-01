@@ -42,6 +42,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// ContentSeperator.
+		/// </summary>
+		public string ContentSeperator { get; set; }
+
+
+		/// <summary>
 		/// ContentTitle.
 		/// </summary>
 		public string ContentTitle { get; set; }
@@ -51,6 +57,12 @@ namespace BDO
 		/// ContentBody.
 		/// </summary>
 		public string ContentBody { get; set; }
+
+
+		/// <summary>
+		/// SideNavigationSeperator.
+		/// </summary>
+		public string SideNavigationSeperator { get; set; }
 
 
 		/// <summary>

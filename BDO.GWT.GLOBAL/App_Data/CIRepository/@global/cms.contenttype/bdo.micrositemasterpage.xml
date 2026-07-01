@@ -10,6 +10,17 @@
       <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
         <properties />
       </schema>
+      <field allowempty="true" column="Settings" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="f285c7a8-48b4-49f1-b7de-7b91bb19693d" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Settings</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
       <field column="SettingsMenuType" columnprecision="0" columnsize="20" columntype="text" enabled="true" guid="82e5dedb-5312-4de9-a842-9abf995f6347" visible="true">
         <properties>
           <defaultvalue>msmenu</defaultvalue>
@@ -60,6 +71,17 @@ microsite;Microsite homepage
         </properties>
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="Custom" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="5fe0634a-90a2-4b66-a78a-71850c7cf113" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Custom</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
         </settings>
       </field>
       <field allowempty="true" column="CustomJS" columnprecision="0" columntype="contentitemreference" enabled="true" guid="ab554cf8-e626-4e06-901e-887be51978ef" visible="true">
