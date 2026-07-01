@@ -6,7 +6,6 @@ using CMS.EmailLibrary;
 using CMS.EmailLibrary.Internal;
 using CMS.FormEngine;
 using CMS.OnlineForms;
-using CMS.Websites.Routing;
 using Kentico.Xperience.Admin.DigitalMarketing.Internal;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Net.Mime;
@@ -42,7 +41,6 @@ public class FormCrudService : IFormCrudService
     private readonly IInfoProvider<ContentItemInfo> _contentItemProvider;
     private readonly IEmailChannelLanguageRetriever _languageRetriever;
     private readonly IEmailChannelSenderEmailProvider _senderEmailProvider;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
 
     public FormCrudService(
         IInfoProvider<EmailConfigurationInfo> emailConfigurationProvider,
@@ -51,8 +49,7 @@ public class FormCrudService : IFormCrudService
         IContentItemDataInfoRetriever contentItemDataRetriever,
         IInfoProvider<ContentItemInfo> contentItemProvider,
         IEmailChannelLanguageRetriever languageRetriever,
-        IEmailChannelSenderEmailProvider senderEmailProvider,
-        IWebsiteChannelContext websiteChannelContext)
+        IEmailChannelSenderEmailProvider senderEmailProvider)
     {
         _emailConfigurationProvider = emailConfigurationProvider;
         _emailChannelProvider = emailChannelProvider;
@@ -61,7 +58,6 @@ public class FormCrudService : IFormCrudService
         _contentItemProvider = contentItemProvider;
         _languageRetriever = languageRetriever;
         _senderEmailProvider = senderEmailProvider;
-        _websiteChannelContext = websiteChannelContext;
     }
 
     public async Task<IEnumerable<FormOutput>> GetFormsAsync(CancellationToken cancellationToken)
@@ -108,12 +104,11 @@ public class FormCrudService : IFormCrudService
     public async Task<FileStreamData> GetFormEntryAttachmentAsync(string formCodeName, int formEntryID, string formFileFieldName, CancellationToken cancellationToken)
     {
         var form = await GetValidatedFormAsync(formCodeName, cancellationToken);
-        var formInfo = form.Form;
         var dataClassInfo = DataClassInfoProvider.GetDataClassInfo(form.FormClassID);
 
         var formFileFieldNames = BizFormInfoProvider.GetBizFormFileColumns(dataClassInfo.ClassFormDefinition).ToHashSet();
 
-        if (formFileFieldNames.Any() && !formFileFieldNames.Contains(formFileFieldName))
+        if (formFileFieldNames.Count > 0 && !formFileFieldNames.Contains(formFileFieldName))
         {
             throw new InvalidOperationException(
                 $"The form field '{formFileFieldName}' does not exist or its component is not a File uploader.");
@@ -150,7 +145,7 @@ public class FormCrudService : IFormCrudService
         var formEntryAttachment = new FileStreamData
         {
             Stream = stream,
-            ContentType = MediaTypeNames.Application.Octet,
+            ContentType = contentType,
             FileName = friendlyFileName,
         };
 
@@ -250,9 +245,9 @@ public class FormCrudService : IFormCrudService
 
         try
         {
-            var contentItem = await _contentItemProvider.GetAsync(emailConfig.EmailConfigurationContentItemID);
-            var contentLanguage = await _languageRetriever.GetEmailChannelLanguageInfoOrThrow(emailConfig.EmailConfigurationEmailChannelID);
-            var data = await _contentItemDataRetriever.GetContentItemData(contentItem, contentLanguage.ContentLanguageID, false);
+            var contentItem = await _contentItemProvider.GetAsync(emailConfig.EmailConfigurationContentItemID, cancellationToken);
+            var contentLanguage = await _languageRetriever.GetEmailChannelLanguageInfoOrThrow(emailConfig.EmailConfigurationEmailChannelID, cancellationToken);
+            var data = await _contentItemDataRetriever.GetContentItemData(contentItem, contentLanguage.ContentLanguageID, false, cancellationToken);
             var emailFields = new EmailContentTypeSpecificFieldValues(data);
 
             var emailChannel = (await _emailChannelProvider
@@ -270,7 +265,7 @@ public class FormCrudService : IFormCrudService
                 if (sender is not null)
                 {
                     senderDisplayName = sender.EmailChannelSenderDisplayName;
-                    senderEmail = await _senderEmailProvider.GetEmailAddress(emailChannel.EmailChannelID, sender.EmailChannelSenderName);
+                    senderEmail = await _senderEmailProvider.GetEmailAddress(emailChannel.EmailChannelID, sender.EmailChannelSenderName, cancellationToken);
                 }
             }
 

@@ -3,7 +3,6 @@ using CMS.ContentEngine.Internal;
 using CMS.DataEngine;
 using CMS.EmailLibrary;
 using CMS.EmailLibrary.Internal;
-using CMS.Websites.Routing;
 using Kentico.Xperience.Admin.DigitalMarketing.Internal;
 using Moq;
 
@@ -421,6 +420,5 @@ public class FormCrudServiceTests
         new Mock<IContentItemDataInfoRetriever>().Object,
         new Mock<IInfoProvider<ContentItemInfo>>().Object,
         new Mock<IEmailChannelLanguageRetriever>().Object,
-        new Mock<IEmailChannelSenderEmailProvider>().Object,
-        new Mock<IWebsiteChannelContext>().Object);
+        new Mock<IEmailChannelSenderEmailProvider>().Object);
 }
