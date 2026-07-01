@@ -6,14 +6,25 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace BDO.GWT.GLOBAL.API.Filters;
 
+/// <summary>
+/// Attribute for specifying required API permissions on controller actions.
+/// </summary>
 public class HasPermissionAttribute : TypeFilterAttribute
 {
+    /// <summary>
+    /// Initializes a new instance of the HasPermissionAttribute class with the specified API method group and permission.
+    /// </summary>
+    /// <param name="apiMethodGroupName">The name of the API method group.</param>
+    /// <param name="permission">The required permission level.</param>
     public HasPermissionAttribute(string apiMethodGroupName, ApiPermission permission) : base(typeof(HasPermissionFilter))
     {
         Arguments = new object[] { apiMethodGroupName, permission };
     }
 }
 
+/// <summary>
+/// Authorization filter for verifying API permissions on requests.
+/// </summary>
 public class HasPermissionFilter : IAsyncAuthorizationFilter
 {
     //private readonly string _apiMethodGroupName;
@@ -22,7 +33,12 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
     //private readonly IRetriever<ApiMethodGroup> _apiMethodGroupRetriever;
     //private readonly IRetriever<UserApiPermission> _userApiPermissionRetriever;
 
-
+    /// <summary>
+    /// Initializes a new instance of the HasPermissionFilter class.
+    /// </summary>
+    /// <param name="authorizationHelper">The authorization helper instance.</param>
+    /// <param name="apiMethodGroupName">The name of the API method group.</param>
+    /// <param name="permission">The required permission level.</param>
     public HasPermissionFilter(IAuthorizationHelper authorizationHelper, string apiMethodGroupName, ApiPermission permission) //IRetriever<ApiMethodGroup> apiMethodGroupRetriever, IRetriever<UserApiPermission> userApiPermissionRetriever
     {
         //_apiMethodGroupRetriever = apiMethodGroupRetriever;
@@ -32,6 +48,11 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
         //_userApiPermissionRetriever = userApiPermissionRetriever;
     }
 
+    /// <summary>
+    /// Executes the authorization logic to verify if the user has the required permission.
+    /// </summary>
+    /// <param name="context">The authorization filter context.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
         var user = await _authorizationHelper.AuthorizeUserAsync(context);

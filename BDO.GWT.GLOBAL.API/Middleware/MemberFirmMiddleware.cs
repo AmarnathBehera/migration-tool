@@ -7,17 +7,31 @@ using System.Globalization;
 
 namespace BDO.GWT.GLOBAL.API.Middleware;
 
+/// <summary>
+/// Middleware for handling member firm-related operations in the request pipeline.
+/// </summary>
 public class MemberFirmMiddleware : IMiddleware
 {
     private readonly IMemberFirmService _memberFirmService;
     private readonly IWebsiteChannelContext _websiteChannelContext;
 
+    /// <summary>
+    /// Initializes a new instance of the MemberFirmMiddleware class with the specified dependencies.
+    /// </summary>
+    /// <param name="memberFirmService">The member firm service instance.</param>
+    /// <param name="websiteChannelContext">The website channel context instance.</param>
     public MemberFirmMiddleware(IMemberFirmService memberFirmService, IWebsiteChannelContext websiteChannelContext)
     {
         _memberFirmService = memberFirmService;
         _websiteChannelContext = websiteChannelContext;
     }
 
+    /// <summary>
+    /// Processes HTTP requests related to member firm operations.
+    /// </summary>
+    /// <param name="context">The HTTP context for the current request.</param>
+    /// <param name="next">The next middleware in the request pipeline.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         if (context.User.Identity is not { IsAuthenticated: true })

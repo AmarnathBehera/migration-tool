@@ -5,6 +5,12 @@
 /// </summary>
 public enum ApiPermission
 {
+    /// <summary>
+    /// Read permission for viewing data.
+    /// </summary>
     Read,
+    /// <summary>
+    /// Manage permission for creating, updating, or deleting data.
+    /// </summary>
     Manage,
 }

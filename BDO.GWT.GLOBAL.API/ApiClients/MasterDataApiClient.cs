@@ -29,6 +29,9 @@ public interface IMasterDataApiClient
     Task<MemberFirm?> GetMemberFirmAsync(int memberFirmId, CancellationToken cancellationToken = default);
 }
 
+/// <summary>
+/// Implementation of the IMasterDataApiClient interface for retrieving member firm data from the Master Data API.
+/// </summary>
 public class MasterDataApiClient : IMasterDataApiClient
 {
     private readonly IHttpClientFactory _httpClientFactory;
@@ -37,6 +40,12 @@ public class MasterDataApiClient : IMasterDataApiClient
 
     private HttpClient? _httpClient;
 
+    /// <summary>
+    /// Initializes a new instance of the MasterDataApiClient class with the specified dependencies.
+    /// </summary>
+    /// <param name="httpClientFactory">The HTTP client factory for creating HTTP clients.</param>
+    /// <param name="mapper">The AutoMapper instance for mapping data objects.</param>
+    /// <param name="options">The Master Data API configuration options.</param>
     public MasterDataApiClient(IHttpClientFactory httpClientFactory, IMapper mapper, IOptions<MasterDataApiOptions> options)
     {
         _httpClientFactory = httpClientFactory;
@@ -44,6 +53,7 @@ public class MasterDataApiClient : IMasterDataApiClient
         _options = options;
     }
 
+    /// <inheritdoc />
     public async Task<IEnumerable<MemberFirm>> GetMemberFirmsAsync(CancellationToken cancellationToken = default)
     {
         var client = CreateHttpClient();
@@ -67,6 +77,7 @@ public class MasterDataApiClient : IMasterDataApiClient
         return memberFirms;
     }
 
+    /// <inheritdoc />
     public async Task<MemberFirm?> GetMemberFirmAsync(int memberFirmId, CancellationToken cancellationToken = default)
     {
         var client = CreateHttpClient();
@@ -90,6 +101,10 @@ public class MasterDataApiClient : IMasterDataApiClient
         return memberFirm;
     }
 
+    /// <summary>
+    /// Creates and configures an HTTP client for communicating with the Master Data API.
+    /// </summary>
+    /// <returns>A configured HTTP client instance.</returns>
     private HttpClient CreateHttpClient()
     {
         if (_httpClient != null)

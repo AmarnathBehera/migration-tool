@@ -16,19 +16,31 @@ namespace BDO.GWT.GLOBAL.API.Helpers;
 /// </summary>
 public interface IAuthorizationHelper
 {
+    /// <summary>
+    /// Authorizes a user based on the provided authorization filter context.
+    /// </summary>
+    /// <param name="context">The authorization filter context containing the HTTP context and user identity.</param>
+    /// <returns>A task that returns the authorized user if successful; otherwise, null.</returns>
     Task<User?> AuthorizeUserAsync(AuthorizationFilterContext context);
 }
 
+/// <summary>
+/// Implementation of the authorization helper interface.
+/// </summary>
 public class AuthorizationHelper : IAuthorizationHelper
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-
+    /// <summary>
+    /// Initializes a new instance of the AuthorizationHelper class with the specified HTTP context accessor.
+    /// </summary>
+    /// <param name="httpContextAccessor">The HTTP context accessor instance.</param>
     public AuthorizationHelper(IHttpContextAccessor httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor;
     }
 
+    /// <inheritdoc />
     public async Task<User?> AuthorizeUserAsync(AuthorizationFilterContext context)
     {
         var identity = context.HttpContext.User.Identity;
