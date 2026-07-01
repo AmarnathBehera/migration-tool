@@ -18,14 +18,12 @@ public class EventRegistrationFormPageService : IEventRegistrationFormPageServic
 {
     private readonly IHeroService _heroService;
     private readonly IContentService _contentRetriever;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
     public EventRegistrationFormPageService(IContentService pageRetriever,
-        IHeroService heroService,
-        IWebsiteChannelContext websiteChannelContext)
+        IHeroService heroService)
     {
         _contentRetriever = pageRetriever;
         _heroService = heroService;
-        _websiteChannelContext = websiteChannelContext;
+       
     }
 
     public async Task<FormPageDto> GetEventRegistrationFormPageDtoAsync(EventRegistrationForm page, CancellationToken cancellationToken)
