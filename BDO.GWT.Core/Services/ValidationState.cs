@@ -29,6 +29,11 @@ public class ValidationState : IValidationState
         _errors[key] = value;
     }
 
+    /// <summary>
+    /// Adds an error to the collection of unprocessable entity errors. This method is used to store errors that are related to the processing of a request, but do not necessarily indicate a failure in the request itself. These errors can be used to provide additional information to the client about why the request could not be processed successfully.
+    /// </summary>
+    /// <param name="key">The key associated with the error.</param>
+    /// <param name="value">The error message.</param>
     public void AddUnprocessableEntityError(string key, string value)
     {
         _unprocessableEntityErrors[key] = value;

@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 
 namespace BDO.GWT.GLOBAL.API.Helpers;
 
+/// <summary>
+/// Interface for the authorization helper that provides methods for authorizing users in the application.
+/// </summary>
 public interface IAuthorizationHelper
 {
     Task<User?> AuthorizeUserAsync(AuthorizationFilterContext context);

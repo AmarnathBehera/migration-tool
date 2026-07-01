@@ -11,15 +11,11 @@ public class MemberFirmMiddleware : IMiddleware
 {
     private readonly IMemberFirmService _memberFirmService;
     private readonly IWebsiteChannelContext _websiteChannelContext;
-    private readonly IContentService _contentRetriever;
-    private readonly ICultureService _cultureService;
 
-    public MemberFirmMiddleware(IMemberFirmService memberFirmService, IWebsiteChannelContext websiteChannelContext, IContentService contentRetriever, ICultureService cultureService)
+    public MemberFirmMiddleware(IMemberFirmService memberFirmService, IWebsiteChannelContext websiteChannelContext)
     {
         _memberFirmService = memberFirmService;
         _websiteChannelContext = websiteChannelContext;
-        _contentRetriever = contentRetriever;
-        _cultureService = cultureService;
     }
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)

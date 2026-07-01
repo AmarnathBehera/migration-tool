@@ -7,6 +7,9 @@ public interface IMultiObjectQueryProperties
 {
     ICollection<(string Name, JoinType JoinType)> IncludeProperties { get; set; }
 
+    /// <summary>
+    /// Gets or sets a collection of tuples representing the entity types and their corresponding column names to be selected in the query. Each tuple contains the entity type and an array of column names to be included in the query results.
+    /// </summary>
     ICollection<(Type EntityType, string[] ColumnNames)> SelectList { get; set; }
 
     ICollection<(Type EntityType, IWhereCondition WhereCondition)> WhereList { get; set; }

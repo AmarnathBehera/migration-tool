@@ -8,10 +8,24 @@ using System.Net;
 
 namespace BDO.GWT.GLOBAL.API.ApiClients;
 
+/// <summary>
+/// Defines the interface for the Master Data API client, which provides methods to retrieve member firm data from the Master Data API.
+/// </summary>
 public interface IMasterDataApiClient
 {
+    /// <summary>
+    /// Retrieves a list of member firms from the Master Data API. The method filters the results to include only firms of type 'TestFirm' or 'Firm'.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     Task<IEnumerable<MemberFirm>> GetMemberFirmsAsync(CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Retrieves a specific member firm by its ID from the Master Data API. If the member firm is not found, the method returns null.
+    /// </summary>
+    /// <param name="memberFirmId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     Task<MemberFirm?> GetMemberFirmAsync(int memberFirmId, CancellationToken cancellationToken = default);
 }
 
