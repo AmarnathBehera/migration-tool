@@ -15,7 +15,6 @@ namespace BDO.GWT.Core.Tests.Services
     {
         private Mock<IContentService> _contentServiceMock = null!;
         private Mock<IHeroService> _heroServiceMock = null!;
-        private Mock<IWebsiteChannelContext> _channelMock = null!;
         private EventRegistrationFormPageService _service = null!;
 
         [SetUp]
@@ -23,10 +22,6 @@ namespace BDO.GWT.Core.Tests.Services
         {
             _contentServiceMock = new Mock<IContentService>();
             _heroServiceMock = new Mock<IHeroService>();
-            _channelMock = new Mock<IWebsiteChannelContext>();
-
-            _channelMock.Setup(x => x.WebsiteChannelID).Returns(1);
-
             _heroServiceMock
                 .Setup(x => x.GetHeroDtoAsync(It.IsAny<HeroData>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((HeroData data, CancellationToken _) => new HeroDto
@@ -38,8 +33,8 @@ namespace BDO.GWT.Core.Tests.Services
 
             _service = new EventRegistrationFormPageService(
                 _contentServiceMock.Object,
-                _heroServiceMock.Object,
-                _channelMock.Object);
+                _heroServiceMock.Object
+               );
         }
 
         private void SetupContent(EventRegistrationForm? page)
