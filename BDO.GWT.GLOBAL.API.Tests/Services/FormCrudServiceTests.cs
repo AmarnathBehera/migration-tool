@@ -33,9 +33,12 @@ public class FormCrudServiceTests
     {
         var data = new FileStreamData();
 
-        Assert.That(data.Stream, Is.Null);
-        Assert.That(data.ContentType, Is.Null);
-        Assert.That(data.FileName, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(data.Stream, Is.Null);
+            Assert.That(data.ContentType, Is.Null);
+            Assert.That(data.FileName, Is.Null);
+        });
     }
 
     [Test]
@@ -49,9 +52,12 @@ public class FormCrudServiceTests
             FileName = "resume.pdf"
         };
 
-        Assert.That(data.Stream, Is.SameAs(stream));
-        Assert.That(data.ContentType, Is.EqualTo("application/pdf"));
-        Assert.That(data.FileName, Is.EqualTo("resume.pdf"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(data.Stream, Is.SameAs(stream));
+            Assert.That(data.ContentType, Is.EqualTo("application/pdf"));
+            Assert.That(data.FileName, Is.EqualTo("resume.pdf"));
+        });
     }
 
     [Test]
@@ -65,8 +71,11 @@ public class FormCrudServiceTests
             FileName = "photo.jpg"
         };
 
-        Assert.That(data.ContentType, Is.EqualTo("image/jpeg"));
-        Assert.That(data.FileName, Is.EqualTo("photo.jpg"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(data.ContentType, Is.EqualTo("image/jpeg"));
+            Assert.That(data.FileName, Is.EqualTo("photo.jpg"));
+        });
     }
 
     [Test]
@@ -87,10 +96,13 @@ public class FormCrudServiceTests
     {
         var output = new FormOutput();
 
-        Assert.That(output.General, Is.Null);
-        Assert.That(output.FormBuilder, Is.Null);
-        Assert.That(output.EmailNotification, Is.Null);
-        Assert.That(output.Autoresponder, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(output.General, Is.Null);
+            Assert.That(output.FormBuilder, Is.Null);
+            Assert.That(output.EmailNotification, Is.Null);
+            Assert.That(output.Autoresponder, Is.Null);
+        });
     }
 
     [Test]
@@ -114,9 +126,12 @@ public class FormCrudServiceTests
             Autoresponder = autoresponder
         };
 
-        Assert.That(output.General, Is.SameAs(general));
-        Assert.That(output.FormBuilder, Is.Not.Null);
-        Assert.That(output.Autoresponder, Is.SameAs(autoresponder));
+        Assert.Multiple(() =>
+        {
+            Assert.That(output.General, Is.SameAs(general));
+            Assert.That(output.FormBuilder, Is.Not.Null);
+            Assert.That(output.Autoresponder, Is.SameAs(autoresponder));
+        });
     }
 
     [Test]
@@ -124,13 +139,16 @@ public class FormCrudServiceTests
     {
         var general = new FormGeneralOutput();
 
-        Assert.That(general.FormDisplayName, Is.Null);
-        Assert.That(general.FormCodeName, Is.Null);
-        Assert.That(general.AfterTheFormIsSubmitted, Is.EqualTo(AfterTheFormIsSubmitted.ReloadForm));
-        Assert.That(general.DisplayText, Is.Null);
-        Assert.That(general.RedirectToUri, Is.Null);
-        Assert.That(general.SubmitButtonText, Is.Null);
-        Assert.That(general.SubmitButtonImage, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(general.FormDisplayName, Is.Null);
+            Assert.That(general.FormCodeName, Is.Null);
+            Assert.That(general.AfterTheFormIsSubmitted, Is.EqualTo(AfterTheFormIsSubmitted.ReloadForm));
+            Assert.That(general.DisplayText, Is.Null);
+            Assert.That(general.RedirectToUri, Is.Null);
+            Assert.That(general.SubmitButtonText, Is.Null);
+            Assert.That(general.SubmitButtonImage, Is.Null);
+        });
     }
 
     [Test]
@@ -147,13 +165,16 @@ public class FormCrudServiceTests
             SubmitButtonImage = "/img/send.png"
         };
 
-        Assert.That(general.FormDisplayName, Is.EqualTo("Contact Us"));
-        Assert.That(general.FormCodeName, Is.EqualTo("ContactUs"));
-        Assert.That(general.AfterTheFormIsSubmitted, Is.EqualTo(AfterTheFormIsSubmitted.DisplayText));
-        Assert.That(general.DisplayText, Is.EqualTo("Thank you!"));
-        Assert.That(general.RedirectToUri, Is.EqualTo("/thanks"));
-        Assert.That(general.SubmitButtonText, Is.EqualTo("Send"));
-        Assert.That(general.SubmitButtonImage, Is.EqualTo("/img/send.png"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(general.FormDisplayName, Is.EqualTo("Contact Us"));
+            Assert.That(general.FormCodeName, Is.EqualTo("ContactUs"));
+            Assert.That(general.AfterTheFormIsSubmitted, Is.EqualTo(AfterTheFormIsSubmitted.DisplayText));
+            Assert.That(general.DisplayText, Is.EqualTo("Thank you!"));
+            Assert.That(general.RedirectToUri, Is.EqualTo("/thanks"));
+            Assert.That(general.SubmitButtonText, Is.EqualTo("Send"));
+            Assert.That(general.SubmitButtonImage, Is.EqualTo("/img/send.png"));
+        });
     }
 
     [Test]
@@ -161,11 +182,14 @@ public class FormCrudServiceTests
     {
         var notification = new FormEmailNotificationOutput();
 
-        Assert.That(notification.SenderEmail, Is.Null);
-        Assert.That(notification.RecipientEmails, Is.Empty);
-        Assert.That(notification.Subject, Is.Null);
-        Assert.That(notification.AttachUploadedDocuments, Is.True);
-        Assert.That(notification.CustomLayout, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(notification.SenderEmail, Is.Null);
+            Assert.That(notification.RecipientEmails, Is.Empty);
+            Assert.That(notification.Subject, Is.Null);
+            Assert.That(notification.AttachUploadedDocuments, Is.True);
+            Assert.That(notification.CustomLayout, Is.Null);
+        });
     }
 
     [Test]
@@ -180,11 +204,14 @@ public class FormCrudServiceTests
             CustomLayout = "<html>Custom</html>"
         };
 
-        Assert.That(notification.SenderEmail, Is.EqualTo("admin@company.com"));
-        Assert.That(notification.RecipientEmails, Has.Length.EqualTo(2));
-        Assert.That(notification.Subject, Is.EqualTo("New submission"));
-        Assert.That(notification.AttachUploadedDocuments, Is.False);
-        Assert.That(notification.CustomLayout, Is.EqualTo("<html>Custom</html>"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(notification.SenderEmail, Is.EqualTo("admin@company.com"));
+            Assert.That(notification.RecipientEmails, Has.Length.EqualTo(2));
+            Assert.That(notification.Subject, Is.EqualTo("New submission"));
+            Assert.That(notification.AttachUploadedDocuments, Is.False);
+            Assert.That(notification.CustomLayout, Is.EqualTo("<html>Custom</html>"));
+        });
     }
 
     [Test]
@@ -192,11 +219,14 @@ public class FormCrudServiceTests
     {
         var autoresponder = new FormAutoresponderOutput();
 
-        Assert.That(autoresponder.EmailConfigurationGuid, Is.EqualTo(Guid.Empty));
-        Assert.That(autoresponder.EmailName, Is.Null);
-        Assert.That(autoresponder.Subject, Is.Null);
-        Assert.That(autoresponder.SenderEmail, Is.Null);
-        Assert.That(autoresponder.SenderDisplayName, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(autoresponder.EmailConfigurationGuid, Is.EqualTo(Guid.Empty));
+            Assert.That(autoresponder.EmailName, Is.Null);
+            Assert.That(autoresponder.Subject, Is.Null);
+            Assert.That(autoresponder.SenderEmail, Is.Null);
+            Assert.That(autoresponder.SenderDisplayName, Is.Null);
+        });
     }
 
     [Test]
@@ -212,19 +242,25 @@ public class FormCrudServiceTests
             SenderDisplayName = "Company Team"
         };
 
-        Assert.That(autoresponder.EmailConfigurationGuid, Is.EqualTo(guid));
-        Assert.That(autoresponder.EmailName, Is.EqualTo("Welcome Email"));
-        Assert.That(autoresponder.Subject, Is.EqualTo("Welcome!"));
-        Assert.That(autoresponder.SenderEmail, Is.EqualTo("hello@company.com"));
-        Assert.That(autoresponder.SenderDisplayName, Is.EqualTo("Company Team"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(autoresponder.EmailConfigurationGuid, Is.EqualTo(guid));
+            Assert.That(autoresponder.EmailName, Is.EqualTo("Welcome Email"));
+            Assert.That(autoresponder.Subject, Is.EqualTo("Welcome!"));
+            Assert.That(autoresponder.SenderEmail, Is.EqualTo("hello@company.com"));
+            Assert.That(autoresponder.SenderDisplayName, Is.EqualTo("Company Team"));
+        });
     }
 
     [Test]
     public void AfterTheFormIsSubmitted_HasExpectedValues()
     {
-        Assert.That((int)AfterTheFormIsSubmitted.DisplayText, Is.EqualTo(0));
-        Assert.That((int)AfterTheFormIsSubmitted.RedirectToUrl, Is.EqualTo(1));
-        Assert.That((int)AfterTheFormIsSubmitted.ReloadForm, Is.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That((int)AfterTheFormIsSubmitted.DisplayText, Is.EqualTo(0));
+            Assert.That((int)AfterTheFormIsSubmitted.RedirectToUrl, Is.EqualTo(1));
+            Assert.That((int)AfterTheFormIsSubmitted.ReloadForm, Is.EqualTo(2));
+        });
     }
 
     [Test]
@@ -232,12 +268,15 @@ public class FormCrudServiceTests
     {
         var interfaceType = typeof(IFormCrudService);
 
-        Assert.That(interfaceType.GetMethod("GetFormsAsync"), Is.Not.Null);
-        Assert.That(interfaceType.GetMethod("GetFormAsync"), Is.Not.Null);
-        Assert.That(interfaceType.GetMethod("GetFormEntriesAsync"), Is.Not.Null);
-        Assert.That(interfaceType.GetMethod("GetFormEntryAsync"), Is.Not.Null);
-        Assert.That(interfaceType.GetMethod("GetFormEntryAttachmentAsync"), Is.Not.Null);
-        Assert.That(interfaceType.GetMethod("DeleteFormEntryAsync"), Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(interfaceType.GetMethod("GetFormsAsync"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("GetFormAsync"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("GetFormEntriesAsync"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("GetFormEntryAsync"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("GetFormEntryAttachmentAsync"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("DeleteFormEntryAsync"), Is.Not.Null);
+        });
     }
 
     [Test]
@@ -256,9 +295,12 @@ public class FormCrudServiceTests
 
         Assert.That(method, Is.Not.Null);
         var parameters = method!.GetParameters();
-        Assert.That(parameters, Has.Length.EqualTo(2));
-        Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(string)));
-        Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(CancellationToken)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(parameters, Has.Length.EqualTo(2));
+            Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(string)));
+            Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(CancellationToken)));
+        });
     }
 
     [Test]
@@ -268,10 +310,13 @@ public class FormCrudServiceTests
 
         Assert.That(method, Is.Not.Null);
         var parameters = method!.GetParameters();
-        Assert.That(parameters, Has.Length.EqualTo(3));
-        Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(string)));
-        Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(int)));
-        Assert.That(parameters[2].ParameterType, Is.EqualTo(typeof(CancellationToken)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(parameters, Has.Length.EqualTo(3));
+            Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(string)));
+            Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(int)));
+            Assert.That(parameters[2].ParameterType, Is.EqualTo(typeof(CancellationToken)));
+        });
     }
 
     [Test]
@@ -350,9 +395,12 @@ public class FormCrudServiceTests
 
         var result = await mock.Object.GetFormEntryAttachmentAsync("form", 1, "doc", CancellationToken.None);
 
-        Assert.That(result.Stream, Is.SameAs(stream));
-        Assert.That(result.ContentType, Is.EqualTo("application/octet-stream"));
-        Assert.That(result.FileName, Is.EqualTo("file.bin"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Stream, Is.SameAs(stream));
+            Assert.That(result.ContentType, Is.EqualTo("application/octet-stream"));
+            Assert.That(result.FileName, Is.EqualTo("file.bin"));
+        });
     }
 
     [Test]

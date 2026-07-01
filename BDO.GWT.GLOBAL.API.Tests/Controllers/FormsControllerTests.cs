@@ -47,10 +47,13 @@ public class FormsControllerTests
 
         var result = await _controller.GetForms(CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        var objectResult = (ObjectResult)result.Result!;
-        Assert.That(objectResult.StatusCode, Is.EqualTo(500));
-        Assert.That(objectResult.Value?.ToString(), Does.Contain("Error retrieving forms"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            var objectResult = (ObjectResult)result.Result!;
+            Assert.That(objectResult.StatusCode, Is.EqualTo(500));
+            Assert.That(objectResult.Value?.ToString(), Does.Contain("Error retrieving forms"));
+        });
     }
 
     [Test]
@@ -116,10 +119,13 @@ public class FormsControllerTests
 
         var result = await _controller.GetFormEntryAttachment(1, "contact", 10, "resume", CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<FileStreamResult>());
-        var fileResult = (FileStreamResult)result.Result!;
-        Assert.That(fileResult.ContentType, Is.EqualTo("application/pdf"));
-        Assert.That(fileResult.FileDownloadName, Is.EqualTo("resume.pdf"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<FileStreamResult>());
+            var fileResult = (FileStreamResult)result.Result!;
+            Assert.That(fileResult.ContentType, Is.EqualTo("application/pdf"));
+            Assert.That(fileResult.FileDownloadName, Is.EqualTo("resume.pdf"));
+        });
     }
 
     [Test]
@@ -179,10 +185,13 @@ public class FormsControllerTests
 
         var result = await _controller.GetForm("contact", CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        var objectResult = (ObjectResult)result.Result!;
-        Assert.That(objectResult.StatusCode, Is.EqualTo(500));
-        Assert.That(objectResult.Value?.ToString(), Does.Contain("Error retrieving form"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            var objectResult = (ObjectResult)result.Result!;
+            Assert.That(objectResult.StatusCode, Is.EqualTo(500));
+            Assert.That(objectResult.Value?.ToString(), Does.Contain("Error retrieving form"));
+        });
     }
 
     [Test]
@@ -208,10 +217,13 @@ public class FormsControllerTests
 
         var result = await _controller.GetFormEntries("contact", CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        var objectResult = (ObjectResult)result.Result!;
-        Assert.That(objectResult.StatusCode, Is.EqualTo(500));
-        Assert.That(objectResult.Value?.ToString(), Does.Contain("Error retrieving form entries"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            var objectResult = (ObjectResult)result.Result!;
+            Assert.That(objectResult.StatusCode, Is.EqualTo(500));
+            Assert.That(objectResult.Value?.ToString(), Does.Contain("Error retrieving form entries"));
+        });
     }
 
     [Test]
@@ -239,10 +251,13 @@ public class FormsControllerTests
 
         var result = await _controller.GetFormEntry("contact", 5, CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        var objectResult = (ObjectResult)result.Result!;
-        Assert.That(objectResult.StatusCode, Is.EqualTo(500));
-        Assert.That(objectResult.Value?.ToString(), Does.Contain("Error retrieving form entry"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            var objectResult = (ObjectResult)result.Result!;
+            Assert.That(objectResult.StatusCode, Is.EqualTo(500));
+            Assert.That(objectResult.Value?.ToString(), Does.Contain("Error retrieving form entry"));
+        });
     }
 
     [Test]
@@ -254,10 +269,13 @@ public class FormsControllerTests
 
         var result = await _controller.DeleteFormEntry("contact", 15, CancellationToken.None);
 
-        Assert.That(result, Is.InstanceOf<ObjectResult>());
-        var objectResult = (ObjectResult)result;
-        Assert.That(objectResult.StatusCode, Is.EqualTo(500));
-        Assert.That(objectResult.Value?.ToString(), Does.Contain("Error deleting form entry"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.InstanceOf<ObjectResult>());
+            var objectResult = (ObjectResult)result;
+            Assert.That(objectResult.StatusCode, Is.EqualTo(500));
+            Assert.That(objectResult.Value?.ToString(), Does.Contain("Error deleting form entry"));
+        });
     }
 
     [Test]
@@ -269,10 +287,13 @@ public class FormsControllerTests
 
         var result = await _controller.GetForms(CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
-        var okResult = (OkObjectResult)result.Result!;
-        Assert.That(okResult.Value, Is.InstanceOf<IEnumerable<FormOutput>>());
-        Assert.That(((IEnumerable<FormOutput>)okResult.Value!).Count(), Is.EqualTo(0));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
+            var okResult = (OkObjectResult)result.Result!;
+            Assert.That(okResult.Value, Is.InstanceOf<IEnumerable<FormOutput>>());
+            Assert.That(((IEnumerable<FormOutput>)okResult.Value!).Count(), Is.EqualTo(0));
+        });
     }
 
     [Test]
@@ -419,11 +440,14 @@ public class FormsControllerTests
 
         var result = await _controller.GetFormEntryAttachment(1, "contact", 5, "photo", CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<FileStreamResult>());
-        var fileResult = (FileStreamResult)result.Result!;
-        Assert.That(fileResult.ContentType, Is.EqualTo("image/jpeg"));
-        Assert.That(fileResult.FileDownloadName, Is.EqualTo("profile-photo.jpg"));
-        Assert.That(fileResult.FileStream, Is.SameAs(stream));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<FileStreamResult>());
+            var fileResult = (FileStreamResult)result.Result!;
+            Assert.That(fileResult.ContentType, Is.EqualTo("image/jpeg"));
+            Assert.That(fileResult.FileDownloadName, Is.EqualTo("profile-photo.jpg"));
+            Assert.That(fileResult.FileStream, Is.SameAs(stream));
+        });
     }
 
     [Test]
@@ -446,9 +470,12 @@ public class FormsControllerTests
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
         var okResult = (OkObjectResult)result.Result!;
         var returned = (Dictionary<string, object?>)okResult.Value!;
-        Assert.That(returned["Phone"], Is.Null);
-        Assert.That(returned["Notes"], Is.Null);
-        Assert.That(returned["Name"], Is.EqualTo("Jane"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(returned["Phone"], Is.Null);
+            Assert.That(returned["Notes"], Is.Null);
+            Assert.That(returned["Name"], Is.EqualTo("Jane"));
+        });
     }
 
     [Test]
