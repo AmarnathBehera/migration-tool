@@ -15,12 +15,10 @@ public class WebinarController : Controller
 {
     private readonly IEventWebinarPageService _eventWebinarPageService;
     private readonly IContentService _contentRetriever;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
 
-    public WebinarController(IEventWebinarPageService eventWebinarPageService, IWebsiteChannelContext websiteChannelContext, IContentService contentRetriever)
+    public WebinarController(IEventWebinarPageService eventWebinarPageService, IContentService contentRetriever)
     {
         _eventWebinarPageService = eventWebinarPageService;
-        _websiteChannelContext = websiteChannelContext;
         _contentRetriever = contentRetriever;
     }
 

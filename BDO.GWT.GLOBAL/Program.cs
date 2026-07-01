@@ -33,6 +33,8 @@ using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using XperienceCommunity.MultiChoiceFormControl.Admin.Helpers.Components.MultiChoice;
+using SendGrid;
+using Kentico.Xperience.SendGrid;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -130,6 +132,15 @@ builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
 // Loads the administration redirect domain (AdminRedirectOptions) from a configuration file section
 builder.Services.Configure<AdminRedirectOptions>(builder.Configuration.GetSection("AdminRedirectOptions"));
+
+// Configures email sending via SendGrid for system emails
+builder.Services.AddXperienceSystemSendGrid();
+// Configures email sending via SendGrid for the 'AcmeEmailChannel' email channel
+builder.Services.AddXperienceChannelSendGrid("AcmeEmailChannel");
+
+// Loads the SendGrid API keys from configuration file sections
+builder.Services.ConfigureSystemSendGridClientOptions(builder.Configuration.GetSection("SystemSendGridClientOptions"));
+builder.Services.Configure<SendGridClientOptions>("AcmeEmailChannel", builder.Configuration.GetSection("AcmeSendGridClientOptions"));
 
 var app = builder.Build();
 
