@@ -27,17 +27,15 @@ public interface ICareerDetailPageService
     {
         private readonly IHeroService _heroService;
 
-    private readonly IContentRetriever _contentRetriever;
     private readonly ICultureContext _cultureContext;
     private readonly ISocialMediaButtonsService _socialMediaButtonsService;
     private readonly ISettingService _settingsService;
     private readonly IContentService _contentService;
 
-    public CareerDetailPageService(IHeroService heroService, IContentRetriever contentRetriever, ICultureContext cultureContext, ISocialMediaButtonsService socialMediaButtonsService, ISettingService settingsService, IContentService contentService)
+    public CareerDetailPageService(IHeroService heroService, ICultureContext cultureContext, ISocialMediaButtonsService socialMediaButtonsService, ISettingService settingsService, IContentService contentService)
     {
         _heroService = heroService;
 
-        _contentRetriever = contentRetriever;
         _cultureContext = cultureContext;
         _socialMediaButtonsService = socialMediaButtonsService;
         _settingsService = settingsService;
@@ -47,7 +45,7 @@ public interface ICareerDetailPageService
 
         public async Task<CareerPageDto> GetCareerPageDtoAsync(CancellationToken cancellationToken)
         {
-        var page = await _contentRetriever.RetrieveCurrentPage<Career>(
+        var page = await _contentService.RetrieveCurrentPageAsync<Career>(
                 new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
 
 
