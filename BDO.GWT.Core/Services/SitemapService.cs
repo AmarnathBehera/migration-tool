@@ -3,7 +3,7 @@ using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Microsoft.Extensions.Logging;
-
+using BDO.GWT.Core.Constants;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("BDO.GWT.GLOBAL.Tests")]
 
@@ -22,26 +22,7 @@ public class SitemapService : ISitemapService
     private readonly IPageNodeProvider _pageNodeProvider;
     private readonly ILogger<SitemapService> _logger;
 
-    private static readonly IReadOnlyList<string> PageContentTypeNames =
-    [
-        Career.CONTENT_TYPE_NAME,
-        Careers.CONTENT_TYPE_NAME,
-        SectionCareers.CONTENT_TYPE_NAME,
-        Sitemap.CONTENT_TYPE_NAME,
-        SectionIndustries.CONTENT_TYPE_NAME,
-        Industry.CONTENT_TYPE_NAME,
-        IndustryService.CONTENT_TYPE_NAME,
-        IndustryCategory.CONTENT_TYPE_NAME,
-        SpecialtiesArea.CONTENT_TYPE_NAME,
-        SpecialtiesCategory.CONTENT_TYPE_NAME,
-        SpecialtiesPage.CONTENT_TYPE_NAME,
-        SectionSpecialties.CONTENT_TYPE_NAME,
-        ServiceArea.CONTENT_TYPE_NAME,
-        BusinessLine.CONTENT_TYPE_NAME,
-        Sub_Service.CONTENT_TYPE_NAME,
-        SectionServices.CONTENT_TYPE_NAME,
-        Service.CONTENT_TYPE_NAME,
-    ];
+
 
     public SitemapService(
         IWebPageUrlRetriever webPageUrlRetriever,
@@ -127,7 +108,7 @@ public class SitemapService : ISitemapService
 
         foreach (var languageName in languageNames)
         {
-            var tasks = PageContentTypeNames.Select(contentTypeName =>
+            var tasks = SitemapContentTypes.SitemapPages.Select(contentTypeName =>
                 _pageNodeProvider.GetPageNodesAsync(
                     contentTypeName, languageName, channelName, cancellationToken));
 

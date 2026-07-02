@@ -16,6 +16,7 @@ using Kentico.Membership;
 using Kentico.OnlineMarketing.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
 using Kentico.Web.Mvc;
+using Kentico.Xperience.SendGrid;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
@@ -28,13 +29,12 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.WebEncoders;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using SendGrid;
 using System;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using XperienceCommunity.MultiChoiceFormControl.Admin.Helpers.Components.MultiChoice;
-using SendGrid;
-using Kentico.Xperience.SendGrid;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -135,12 +135,12 @@ builder.Services.Configure<AdminRedirectOptions>(builder.Configuration.GetSectio
 
 // Configures email sending via SendGrid for system emails
 builder.Services.AddXperienceSystemSendGrid();
-// Configures email sending via SendGrid for the 'AcmeEmailChannel' email channel
-builder.Services.AddXperienceChannelSendGrid("AcmeEmailChannel");
+// Configures email sending via SendGrid for the fallback situation
+builder.Services.AddXperienceSendGrid();
 
 // Loads the SendGrid API keys from configuration file sections
 builder.Services.ConfigureSystemSendGridClientOptions(builder.Configuration.GetSection("SystemSendGridClientOptions"));
-builder.Services.Configure<SendGridClientOptions>("AcmeEmailChannel", builder.Configuration.GetSection("AcmeSendGridClientOptions"));
+builder.Services.Configure<SendGridClientOptions>(builder.Configuration.GetSection("FallbackSendGridClientOptions"));
 
 var app = builder.Build();
 
@@ -183,7 +183,6 @@ if (!builder.Environment.IsDevelopment())
         app.UseRewriter(rewriteOptions);
     }
 }
- 
 
 app.UseKentico();
 

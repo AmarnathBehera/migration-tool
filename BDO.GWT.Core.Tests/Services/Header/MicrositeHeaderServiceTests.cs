@@ -14,6 +14,8 @@ namespace BDO.GWT.Core.Tests.Services.Header
 {
     public class MicrositeHeaderServiceTests
     {
+        private delegate bool TryRetrieveDelegate(out WebPageDataContext context);
+
         private Mock<IContentService> _contentServiceMock = null!;
         private Mock<IWebsiteCulturesService> _websiteCulturesServiceMock = null!;
         private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
@@ -216,6 +218,249 @@ namespace BDO.GWT.Core.Tests.Services.Header
                 await _service.GetAsync(_contentServiceMock.Object, CancellationToken.None));
         }
 
+        // ── mfmenu delegation branch ─────────────────────────────────────────
+
+        [Test]
+        public async Task GetAsync_WhenMasterPageMenuTypeIsMfMenu_DelegatesToHeaderService()
+        {
+            // Arrange — set up TryRetrieve to return a context whose ContentTypeName matches MicrositeMasterPage
+            var masterPage = new MicrositeMasterPage
+            {
+                SystemFields = new WebPageFields { WebPageItemID = 1 },
+                SettingsMenuType = "mfmenu",
+                LogoText = string.Empty,
+            };
+
+            var webPage = new RoutedWebPage { ContentTypeName = MicrositeMasterPage.CONTENT_TYPE_NAME };
+            var ctx = CreateWebPageDataContext(webPage);
+
+            _dataContextRetrieverMock
+                .Setup(r => r.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
+                .Returns(new TryRetrieveDelegate(delegate (out WebPageDataContext c)
+                {
+                    c = ctx;
+                    return true;
+                }));
+
+            _contentServiceMock
+                .Setup(x => x.RetrieveCurrentPageAsync<MicrositeMasterPage>(
+                    It.IsAny<RetrieveCurrentPageParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(masterPage);
+
+            var delegatedHeader = new HeaderDto
+            {
+                MenuItems = Enumerable.Empty<LinkItemDto>(),
+                Cultures = Enumerable.Empty<CultureDto>(),
+                SiteName = "Standard Site",
+                LogoURL = "/home",
+                LogoImageURL = string.Empty,
+                SearchPageURL = string.Empty,
+                MegaMenuItems = Enumerable.Empty<FirstLevelMenuItemDto>(),
+            };
+
+            _headerServiceMock
+                .Setup(x => x.GetAsync(_contentServiceMock.Object, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(delegatedHeader);
+
+            // Act
+            var result = await _service.GetAsync(_contentServiceMock.Object, CancellationToken.None);
+
+            // Assert
+            _headerServiceMock.Verify(
+                h => h.GetAsync(_contentServiceMock.Object, It.IsAny<CancellationToken>()),
+                Times.Once);
+            Assert.That(result, Is.SameAs(delegatedHeader));
+        }
+
+        [Test]
+        public async Task GetAsync_WhenMasterPageMenuTypeIsMfMenuCaseInsensitive_DelegatesToHeaderService()
+        {
+            // Arrange — "MFMENU" (upper-case) should still match
+            var masterPage = new MicrositeMasterPage
+            {
+                SystemFields = new WebPageFields { WebPageItemID = 1 },
+                SettingsMenuType = "MFMENU",
+                LogoText = string.Empty,
+            };
+
+            var webPage = new RoutedWebPage { ContentTypeName = MicrositeMasterPage.CONTENT_TYPE_NAME };
+            var ctx = CreateWebPageDataContext(webPage);
+
+            _dataContextRetrieverMock
+                .Setup(r => r.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
+                .Returns(new TryRetrieveDelegate(delegate (out WebPageDataContext c)
+                {
+                    c = ctx;
+                    return true;
+                }));
+
+            _contentServiceMock
+                .Setup(x => x.RetrieveCurrentPageAsync<MicrositeMasterPage>(
+                    It.IsAny<RetrieveCurrentPageParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(masterPage);
+
+            _headerServiceMock
+                .Setup(x => x.GetAsync(_contentServiceMock.Object, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new HeaderDto
+                {
+                    MenuItems = Enumerable.Empty<LinkItemDto>(),
+                    Cultures = Enumerable.Empty<CultureDto>(),
+                    SiteName = "Site",
+                    LogoURL = string.Empty,
+                    LogoImageURL = string.Empty,
+                    SearchPageURL = string.Empty,
+                    MegaMenuItems = Enumerable.Empty<FirstLevelMenuItemDto>(),
+                });
+
+            // Act
+            var result = await _service.GetAsync(_contentServiceMock.Object, CancellationToken.None);
+
+            // Assert
+            _headerServiceMock.Verify(
+                h => h.GetAsync(_contentServiceMock.Object, It.IsAny<CancellationToken>()),
+                Times.Once);
+            Assert.That(result, Is.Not.Null);
+        }
+
+        [Test]
+        public async Task GetAsync_WhenMfMenuAndLogoTextSet_OverridesSiteName()
+        {
+            // Arrange
+            var masterPage = new MicrositeMasterPage
+            {
+                SystemFields = new WebPageFields { WebPageItemID = 1 },
+                SettingsMenuType = "mfmenu",
+                LogoText = "My Microsite",
+            };
+
+            var webPage = new RoutedWebPage { ContentTypeName = MicrositeMasterPage.CONTENT_TYPE_NAME };
+            var ctx = CreateWebPageDataContext(webPage);
+
+            _dataContextRetrieverMock
+                .Setup(r => r.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
+                .Returns(new TryRetrieveDelegate(delegate (out WebPageDataContext c)
+                {
+                    c = ctx;
+                    return true;
+                }));
+
+            _contentServiceMock
+                .Setup(x => x.RetrieveCurrentPageAsync<MicrositeMasterPage>(
+                    It.IsAny<RetrieveCurrentPageParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(masterPage);
+
+            _headerServiceMock
+                .Setup(x => x.GetAsync(_contentServiceMock.Object, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new HeaderDto
+                {
+                    MenuItems = Enumerable.Empty<LinkItemDto>(),
+                    Cultures = Enumerable.Empty<CultureDto>(),
+                    SiteName = "Original Name",
+                    LogoURL = string.Empty,
+                    LogoImageURL = string.Empty,
+                    SearchPageURL = string.Empty,
+                    MegaMenuItems = Enumerable.Empty<FirstLevelMenuItemDto>(),
+                });
+
+            // Act
+            var result = await _service.GetAsync(_contentServiceMock.Object, CancellationToken.None);
+
+            // Assert — LogoText must override the delegated header's SiteName
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.SiteName, Is.EqualTo("My Microsite"));
+        }
+
+        [Test]
+        public async Task GetAsync_WhenMfMenuAndLogoTextEmpty_DoesNotOverrideSiteName()
+        {
+            // Arrange — LogoText is empty, so SiteName from the delegated header must be preserved
+            var masterPage = new MicrositeMasterPage
+            {
+                SystemFields = new WebPageFields { WebPageItemID = 1 },
+                SettingsMenuType = "mfmenu",
+                LogoText = string.Empty,
+            };
+
+            var webPage = new RoutedWebPage { ContentTypeName = MicrositeMasterPage.CONTENT_TYPE_NAME };
+            var ctx = CreateWebPageDataContext(webPage);
+
+            _dataContextRetrieverMock
+                .Setup(r => r.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
+                .Returns(new TryRetrieveDelegate(delegate (out WebPageDataContext c)
+                {
+                    c = ctx;
+                    return true;
+                }));
+
+            _contentServiceMock
+                .Setup(x => x.RetrieveCurrentPageAsync<MicrositeMasterPage>(
+                    It.IsAny<RetrieveCurrentPageParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(masterPage);
+
+            _headerServiceMock
+                .Setup(x => x.GetAsync(_contentServiceMock.Object, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new HeaderDto
+                {
+                    MenuItems = Enumerable.Empty<LinkItemDto>(),
+                    Cultures = Enumerable.Empty<CultureDto>(),
+                    SiteName = "Original Name",
+                    LogoURL = string.Empty,
+                    LogoImageURL = string.Empty,
+                    SearchPageURL = string.Empty,
+                    MegaMenuItems = Enumerable.Empty<FirstLevelMenuItemDto>(),
+                });
+
+            // Act
+            var result = await _service.GetAsync(_contentServiceMock.Object, CancellationToken.None);
+
+            // Assert — SiteName must remain unchanged
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.SiteName, Is.EqualTo("Original Name"));
+        }
+
+        [Test]
+        public async Task GetAsync_WhenMfMenuAndHeaderServiceReturnsNull_ReturnsNull()
+        {
+            // Arrange
+            var masterPage = new MicrositeMasterPage
+            {
+                SystemFields = new WebPageFields { WebPageItemID = 1 },
+                SettingsMenuType = "mfmenu",
+                LogoText = "Logo",
+            };
+
+            var webPage = new RoutedWebPage { ContentTypeName = MicrositeMasterPage.CONTENT_TYPE_NAME };
+            var ctx = CreateWebPageDataContext(webPage);
+
+            _dataContextRetrieverMock
+                .Setup(r => r.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
+                .Returns(new TryRetrieveDelegate(delegate (out WebPageDataContext c)
+                {
+                    c = ctx;
+                    return true;
+                }));
+
+            _contentServiceMock
+                .Setup(x => x.RetrieveCurrentPageAsync<MicrositeMasterPage>(
+                    It.IsAny<RetrieveCurrentPageParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(masterPage);
+
+            _headerServiceMock
+                .Setup(x => x.GetAsync(_contentServiceMock.Object, It.IsAny<CancellationToken>()))
+                .ReturnsAsync((HeaderDto?)null);
+
+            // Act
+            var result = await _service.GetAsync(_contentServiceMock.Object, CancellationToken.None);
+
+            // Assert — null from the delegated service propagates straight through
+            Assert.That(result, Is.Null);
+        }
+
         // ── GetMicrositeMasterPageAsync (private) ────────────────────────────
 
         [Test]
@@ -382,6 +627,17 @@ namespace BDO.GWT.Core.Tests.Services.Header
         }
 
         // ── helpers ──────────────────────────────────────────────────────────
+
+        private static WebPageDataContext CreateWebPageDataContext(RoutedWebPage webPage)
+        {
+            return (WebPageDataContext)typeof(WebPageDataContext)
+                .GetConstructor(
+                    BindingFlags.NonPublic | BindingFlags.Instance,
+                    null,
+                    new[] { typeof(RoutedWebPage) },
+                    null)!
+                .Invoke(new object[] { webPage });
+        }
 
         private async Task<T> InvokePrivateAsync<T>(string methodName, object?[] args)
         {

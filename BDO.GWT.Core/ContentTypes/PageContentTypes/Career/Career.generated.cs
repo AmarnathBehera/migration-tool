@@ -36,6 +36,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// CareerDetailsSeperator.
+		/// </summary>
+		public string CareerDetailsSeperator { get; set; }
+
+
+		/// <summary>
 		/// DocumentPublishFrom.
 		/// </summary>
 		public DateTime DocumentPublishFrom { get; set; }
@@ -45,12 +51,6 @@ namespace BDO
 		/// DocumentPublishTo.
 		/// </summary>
 		public DateTime DocumentPublishTo { get; set; }
-
-
-		/// <summary>
-		/// CareerApplyForm.
-		/// </summary>
-		public string CareerApplyForm { get; set; }
 
 
 		/// <summary>
@@ -66,9 +66,21 @@ namespace BDO
 
 
 		/// <summary>
+		/// MetadataOfficeLocation.
+		/// </summary>
+		public IEnumerable<LocationOffice> MetadataOfficeLocation { get; set; }
+
+
+		/// <summary>
 		/// CareerReference.
 		/// </summary>
 		public string CareerReference { get; set; }
+
+
+		/// <summary>
+		/// CareerJobTitle.
+		/// </summary>
+		public IEnumerable<CareerJobTitle> CareerJobTitle { get; set; }
 
 
 		/// <summary>
@@ -84,15 +96,15 @@ namespace BDO
 
 
 		/// <summary>
-		/// CareerJobTitle.
+		/// ApplyFormSeperator.
 		/// </summary>
-		public IEnumerable<CareerJobTitle> CareerJobTitle { get; set; }
+		public string ApplyFormSeperator { get; set; }
 
 
 		/// <summary>
-		/// MetadataOfficeLocation.
+		/// CareerApplyForm.
 		/// </summary>
-		public IEnumerable<LocationOffice> MetadataOfficeLocation { get; set; }
+		public string CareerApplyForm { get; set; }
 
 
 		/// <summary>
@@ -117,6 +129,12 @@ namespace BDO
 		/// CallToActionButtonUrl.
 		/// </summary>
 		public string CallToActionButtonUrl { get; set; }
+
+
+		/// <summary>
+		/// CallToActionPosition.
+		/// </summary>
+		public string CallToActionPosition { get; set; }
 
 
 		/// <summary>
