@@ -106,7 +106,6 @@ step "deploy-cms-app-service" {
     }
 }
 
-#MARK: MVC
 step "deploy-mvc-app-service" {
     name = "Deploy MVC App Service"
     properties = {
@@ -216,7 +215,6 @@ step "deploy-mvc-app-service" {
     }
 }
 
-#MARK: React
 step "deploy-react-app-service" {
     name = "Deploy React App Service"
     properties = {
