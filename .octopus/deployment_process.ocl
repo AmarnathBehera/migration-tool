@@ -55,6 +55,16 @@ step "deploy-cms-app-service" {
                     "slotSetting": false
                   },
                   {
+                    "name": "FallbackSendGridClientOptions__ApiKey",
+                    "value": "#{appsettings.FallbackSendGridClientApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "SystemSendGridClientOptions__ApiKey",
+                    "value": "#{appsettings.SystemSendGridClientApiKey}",
+                    "slotSetting": false
+                  },
+                  {
                     "name": "AdminRedirectOptions__RedirectDomain",
                     "value": "#{appsettings.RedirectDomain}",
                     "slotSetting": false
@@ -96,6 +106,7 @@ step "deploy-cms-app-service" {
     }
 }
 
+#MARK: MVC
 step "deploy-mvc-app-service" {
     name = "Deploy MVC App Service"
     properties = {
@@ -159,6 +170,16 @@ step "deploy-mvc-app-service" {
                     "slotSetting": false
                   },
                   {
+                    "name": "FallbackSendGridClientOptions__ApiKey",
+                    "value": "#{appsettings.FallbackSendGridClientApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "SystemSendGridClientOptions__ApiKey",
+                    "value": "#{appsettings.SystemSendGridClientApiKey}",
+                    "slotSetting": false
+                  },
+                  {
                     "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
                     "value": "#{appsettings.appInsightsMVCConnectionString}",
                     "slotSetting": false
@@ -195,6 +216,7 @@ step "deploy-mvc-app-service" {
     }
 }
 
+#MARK: React
 step "deploy-react-app-service" {
     name = "Deploy React App Service"
     properties = {
