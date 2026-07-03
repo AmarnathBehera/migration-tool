@@ -13,6 +13,8 @@ namespace BDO.GWT.GLOBAL.Tests.Services
 {
     public class BreadcrumbsServiceTests
     {
+        private static readonly string[] HomePlusCurrentPageTitles = ["Home", "Current page"];
+
         private Mock<IWebPageDataContextRetriever> _dataContextRetrieverMock = null!;
         private Mock<IWebPageUrlRetriever> _pageUrlRetrieverMock = null!;
         private Mock<IContentService> _contentServiceMock = null!;
@@ -139,7 +141,7 @@ namespace BDO.GWT.GLOBAL.Tests.Services
             var result = await _service.GetAsync(CancellationToken.None);
 
             Assert.That(result.Links, Is.Not.Null);
-            Assert.That(result.Links!.Select(link => link.Title), Is.EqualTo(new[] { "Home", "Current page" }));
+            Assert.That(result.Links!.Select(link => link.Title), Is.EqualTo(HomePlusCurrentPageTitles));
             _pageContextMock.Verify(
                 p => p.GetPageTitleByWebPageItemId(100, It.IsAny<CancellationToken>()),
                 Times.Never
@@ -180,7 +182,7 @@ namespace BDO.GWT.GLOBAL.Tests.Services
             var result = await _service.GetAsync(CancellationToken.None);
 
             Assert.That(result.Links, Is.Not.Null);
-            Assert.That(result.Links!.Select(link => link.Title), Is.EqualTo(new[] { "Home", "Current page" }));
+            Assert.That(result.Links!.Select(link => link.Title), Is.EqualTo(HomePlusCurrentPageTitles));
             _pageContextMock.Verify(
                 p => p.GetPageTitleByWebPageItemId(100, It.IsAny<CancellationToken>()),
                 Times.Never
