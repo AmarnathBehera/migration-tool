@@ -39,33 +39,60 @@
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Call to action description</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>34bc2c94-d4b6-4c53-a6f4-9b9520a24493</kxp_schema_identifier>
         </properties>
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowCallToAction</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <field allowempty="true" column="CallToActionButtonText" columnprecision="0" columnsize="50" columntype="text" enabled="true" guid="a86ab114-d05c-4712-bfbb-596b783b56a0" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Call to action button text</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>34bc2c94-d4b6-4c53-a6f4-9b9520a24493</kxp_schema_identifier>
         </properties>
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowCallToAction</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <field allowempty="true" column="CallToActionButtonUrl" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="4750e82f-065b-43eb-856a-3545e517cf53" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Call to action button URL</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>34bc2c94-d4b6-4c53-a6f4-9b9520a24493</kxp_schema_identifier>
         </properties>
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowCallToAction</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <field allowempty="true" column="CallToActionPosition" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6326143a-ad1e-4b2f-a1ac-a57a523062c0" visible="true">
         <properties>
@@ -88,6 +115,14 @@ center;Center
           </Options>
           <OptionsValueSeparator>;</OptionsValueSeparator>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowCallToAction</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <schema guid="b760a373-943b-4321-ac39-d5067101ff82" name="Sidebar">
         <properties>
@@ -1284,7 +1319,6 @@ MicrositePage;Microsite Page
       </field>
       <field allowempty="true" column="UpdatedOn" columnprecision="7" columntype="datetime" enabled="true" guid="a36d0271-c267-438f-85fc-0acb024ec786" visible="true">
         <properties>
-          <defaultvalue>5/14/2026 7:02:04 AM</defaultvalue>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Updated on</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
