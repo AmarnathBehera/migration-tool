@@ -1,0 +1,6 @@
+{
+    "sonarlint.connectedMode.project": {
+        "connectionId": "vsts-sonarcloud41751",
+        "projectKey": "bdo_GWT.XbyK.Web"
+    }
+}

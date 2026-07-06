@@ -1,11 +1,19 @@
-﻿using BDO.GWT.GLOBAL.API.Services;
+﻿using BDO.GWT.Domain.Core.Constants;
+using BDO.GWT.GLOBAL.API.Bases;
+using BDO.GWT.GLOBAL.API.Filters;
+using BDO.GWT.GLOBAL.API.Services;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
+using System.Net.Mime;
 
 namespace BDO.GWT.GLOBAL.API.Controllers;
 
+/// <summary>
+/// Provides methods to read and manage forms.
+/// </summary>
 [ApiController]
-[Route("Forms")]
-public class FormsController : ControllerBase
+[Route("memberFirms/{memberFirmID:int}/Forms")]
+public class FormsController : EntityControllerBase
 {
     private readonly IFormCrudService _formCrudService;
 
@@ -14,8 +22,16 @@ public class FormsController : ControllerBase
         _formCrudService = formCrudService;
     }
 
+    /// <summary>
+    /// Returns all forms.
+    /// </summary>
+    /// /// <param name="memberFirmID">ID of the member firm from which the forms should be retrieved.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns a list of forms.</returns>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<FormOutput>>> GetForms(CancellationToken cancellationToken)
+    [HasPermission(ApiMethodGroupName.Forms, ApiPermission.Read)]
+    [SwaggerResponse(StatusCodes.Status200OK, null, typeof(IEnumerable<FormOutput>), MediaTypeNames.Application.Json)]
+    public async Task<ActionResult<IEnumerable<FormOutput>>> GetForms(int memberFirmID, CancellationToken cancellationToken)
     {
         try
         {
@@ -28,8 +44,17 @@ public class FormsController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Returns a single form having the specified code name.
+    /// </summary>
+    /// <param name="memberFirmID">ID of the member firm from which the form should be retrieved.</param>
+    /// <param name="formCodeName">Code name of the form you want to retrieve.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns one form.</returns>
     [HttpGet("{formCodeName}")]
-    public async Task<ActionResult<FormOutput>> GetForm(string formCodeName, CancellationToken cancellationToken)
+    [HasPermission(ApiMethodGroupName.Forms, ApiPermission.Read)]
+    [SwaggerResponse(StatusCodes.Status200OK, null, typeof(FormOutput), MediaTypeNames.Application.Json)]
+    public async Task<ActionResult<FormOutput>> GetForm(int memberFirmID, string formCodeName, CancellationToken cancellationToken)
     {
         try
         {
@@ -46,8 +71,17 @@ public class FormsController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Returns all form entries.
+    /// </summary>
+    /// <param name="memberFirmID">ID of the member firm from which you want to retrieve form entries.</param>
+    /// <param name="formCodeName">Code name of the form.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns all form entries.</returns>
     [HttpGet("{formCodeName}/entries")]
-    public async Task<ActionResult<IEnumerable<Dictionary<string, object?>>>> GetFormEntries(string formCodeName, CancellationToken cancellationToken)
+    [HasPermission(ApiMethodGroupName.Forms, ApiPermission.Read)]
+    [SwaggerResponse(StatusCodes.Status200OK, null, typeof(IEnumerable<Dictionary<string, object?>>), MediaTypeNames.Application.Json)]
+    public async Task<ActionResult<IEnumerable<Dictionary<string, object?>>>> GetFormEntries(int memberFirmID, string formCodeName, CancellationToken cancellationToken)
     {
         try
         {
@@ -64,8 +98,18 @@ public class FormsController : ControllerBase
         }
     }
 
-    [HttpGet("{formCodeName}/entries/{formEntryID:int}")]
-    public async Task<ActionResult<Dictionary<string, object?>>> GetFormEntry(string formCodeName, int formEntryID, CancellationToken cancellationToken)
+    /// <summary>
+    /// Returns a single form entry.
+    /// </summary>
+    /// <param name="memberFirmID">ID of the member firm from which you want to retrieve form entry.</param>
+    /// <param name="formCodeName">Code name of the form.</param>
+    /// <param name="formEntryID">ID of the form entry.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns one form entry.</returns>
+    [HttpGet("{formCodeName}/entries/{formEntryID}")]
+    [HasPermission(ApiMethodGroupName.Forms, ApiPermission.Read)]
+    [SwaggerResponse(StatusCodes.Status200OK, null, typeof(Dictionary<string, object?>), MediaTypeNames.Application.Json)]
+    public async Task<ActionResult<Dictionary<string, object?>>> GetFormEntry(int memberFirmID, string formCodeName, int formEntryID, CancellationToken cancellationToken)
     {
         try
         {
@@ -82,7 +126,18 @@ public class FormsController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Returns a form entry attachment.
+    /// </summary>
+    /// <param name="memberFirmID">ID of the member firm from which you want to retrieve form entry attachment.</param>
+    /// <param name="formCodeName">Code name of the form.</param>
+    /// <param name="formEntryID">ID of the form entry.</param>
+    /// <param name="formFileFieldName">Name (code name) of the form field which uses 'File uploader' form component.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns file content.</returns>
     [HttpGet("{formCodeName}/entries/{formEntryID}/attachments/{formFileFieldName}")]
+    [HasPermission(ApiMethodGroupName.Forms, ApiPermission.Read)]
+    [SwaggerResponse(StatusCodes.Status200OK, null, typeof(byte[]), MediaTypeNames.Application.Octet)]
     public async Task<ActionResult<byte[]>> GetFormEntryAttachment(int memberFirmID, string formCodeName, int formEntryID, string formFileFieldName, CancellationToken cancellationToken)
     {
         var formEntryAttachment = await _formCrudService.GetFormEntryAttachmentAsync(formCodeName, formEntryID, formFileFieldName, cancellationToken);
@@ -90,8 +145,18 @@ public class FormsController : ControllerBase
         return File(formEntryAttachment.Stream, formEntryAttachment.ContentType, formEntryAttachment.FileName);
     }
 
-    [HttpDelete("{formCodeName}/entries/{formEntryID:int}")]
-    public async Task<IActionResult> DeleteFormEntry(string formCodeName, int formEntryID, CancellationToken cancellationToken)
+    /// <summary>
+    /// Deletes a single form entry.
+    /// </summary>
+    /// <param name="memberFirmID">ID of the member firm in which you want to delete form entry.</param>
+    /// <param name="formCodeName">Code name of the form.</param>
+    /// <param name="formEntryID">ID of the form entry.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Deletes one form entry.</returns>
+    [HttpDelete("{formCodeName}/entries/{formEntryID}")]
+    [HasPermission(ApiMethodGroupName.Forms, ApiPermission.Manage)]
+    [SwaggerResponse(StatusCodes.Status204NoContent, null, typeof(void), MediaTypeNames.Application.Json)]
+    public async Task<IActionResult> DeleteFormEntry(int memberFirmID, string formCodeName, int formEntryID, CancellationToken cancellationToken)
     {
         try
         {

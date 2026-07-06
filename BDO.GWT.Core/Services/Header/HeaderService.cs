@@ -102,10 +102,10 @@ public class HeaderService : IHeaderService
 
     private async Task<(IEnumerable<LinkItemDto> TopMenu, LinkItemDto? Contact)> BuildTopMenuAsync(CancellationToken cancellationToken)
     {
-        string rootPath = "/";
+        string navRootPath = "/Navigation";
 
         var pages = (await _contentRetriever.RetrievePages<Navigation>(
-            new RetrievePagesParameters { PathMatch = PathMatch.Children(rootPath, 1) },
+            new RetrievePagesParameters { PathMatch = PathMatch.Children(navRootPath,1) },
             query => query.OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken

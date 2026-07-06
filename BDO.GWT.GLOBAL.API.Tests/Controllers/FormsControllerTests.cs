@@ -9,6 +9,7 @@ public class FormsControllerTests
 {
     private Mock<IFormCrudService> _formCrudServiceMock = null!;
     private FormsController _controller = null!;
+    private readonly int memberFirmID = 960;
 
     [SetUp]
     public void Setup()
@@ -30,7 +31,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormsAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(forms);
 
-        var result = await _controller.GetForms(cancellationToken);
+        var result = await _controller.GetForms(memberFirmID, cancellationToken);
 
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
         var okResult = (OkObjectResult)result.Result!;
@@ -45,7 +46,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormsAsync(It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception("boom"));
 
-        var result = await _controller.GetForms(CancellationToken.None);
+        var result = await _controller.GetForms(memberFirmID, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -63,7 +64,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormAsync("missing", It.IsAny<CancellationToken>()))
             .ThrowsAsync(new KeyNotFoundException("not found"));
 
-        var result = await _controller.GetForm("missing", CancellationToken.None);
+        var result = await _controller.GetForm(memberFirmID, "missing", CancellationToken.None);
 
         Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
         var notFound = (NotFoundObjectResult)result.Result!;
@@ -82,7 +83,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormEntriesAsync("contact", It.IsAny<CancellationToken>()))
             .ReturnsAsync(entries);
 
-        var result = await _controller.GetFormEntries("contact", CancellationToken.None);
+        var result = await _controller.GetFormEntries(memberFirmID, "contact", CancellationToken.None);
 
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
         var okResult = (OkObjectResult)result.Result!;
@@ -96,7 +97,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormEntryAsync("contact", 999, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new KeyNotFoundException("missing entry"));
 
-        var result = await _controller.GetFormEntry("contact", 999, CancellationToken.None);
+        var result = await _controller.GetFormEntry(memberFirmID, "contact", 999, CancellationToken.None);
 
         Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
         var notFound = (NotFoundObjectResult)result.Result!;
@@ -135,7 +136,7 @@ public class FormsControllerTests
             .Setup(x => x.DeleteFormEntryAsync("contact", 15, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
-        var result = await _controller.DeleteFormEntry("contact", 15, CancellationToken.None);
+        var result = await _controller.DeleteFormEntry(memberFirmID, "contact", 15, CancellationToken.None);
 
         Assert.That(result, Is.InstanceOf<OkObjectResult>());
         var okResult = (OkObjectResult)result;
@@ -150,7 +151,7 @@ public class FormsControllerTests
             .Setup(x => x.DeleteFormEntryAsync("contact", 15, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new KeyNotFoundException("missing"));
 
-        var result = await _controller.DeleteFormEntry("contact", 15, CancellationToken.None);
+        var result = await _controller.DeleteFormEntry(memberFirmID, "contact", 15, CancellationToken.None);
 
         Assert.That(result, Is.InstanceOf<NotFoundObjectResult>());
         var notFound = (NotFoundObjectResult)result;
@@ -169,7 +170,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormAsync("contact", It.IsAny<CancellationToken>()))
             .ReturnsAsync(form);
 
-        var result = await _controller.GetForm("contact", CancellationToken.None);
+        var result = await _controller.GetForm(memberFirmID, "contact", CancellationToken.None);
 
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
         var okResult = (OkObjectResult)result.Result!;
@@ -183,7 +184,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormAsync("contact", It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception("unexpected"));
 
-        var result = await _controller.GetForm("contact", CancellationToken.None);
+        var result = await _controller.GetForm(memberFirmID, "contact", CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -201,7 +202,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormEntriesAsync("missing", It.IsAny<CancellationToken>()))
             .ThrowsAsync(new KeyNotFoundException("form not found"));
 
-        var result = await _controller.GetFormEntries("missing", CancellationToken.None);
+        var result = await _controller.GetFormEntries(memberFirmID, "missing", CancellationToken.None);
 
         Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
         var notFound = (NotFoundObjectResult)result.Result!;
@@ -215,7 +216,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormEntriesAsync("contact", It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception("db error"));
 
-        var result = await _controller.GetFormEntries("contact", CancellationToken.None);
+        var result = await _controller.GetFormEntries(memberFirmID, "contact", CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -235,7 +236,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormEntryAsync("contact", 5, It.IsAny<CancellationToken>()))
             .ReturnsAsync(entry);
 
-        var result = await _controller.GetFormEntry("contact", 5, CancellationToken.None);
+        var result = await _controller.GetFormEntry(memberFirmID, "contact", 5, CancellationToken.None);
 
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
         var okResult = (OkObjectResult)result.Result!;
@@ -249,7 +250,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormEntryAsync("contact", 5, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception("timeout"));
 
-        var result = await _controller.GetFormEntry("contact", 5, CancellationToken.None);
+        var result = await _controller.GetFormEntry(memberFirmID, "contact", 5, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -267,7 +268,7 @@ public class FormsControllerTests
             .Setup(x => x.DeleteFormEntryAsync("contact", 15, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception("delete failed"));
 
-        var result = await _controller.DeleteFormEntry("contact", 15, CancellationToken.None);
+        var result = await _controller.DeleteFormEntry(memberFirmID, "contact", 15, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -285,7 +286,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormsAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<FormOutput>());
 
-        var result = await _controller.GetForms(CancellationToken.None);
+        var result = await _controller.GetForms(memberFirmID, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -306,7 +307,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormsAsync(token))
             .ReturnsAsync(new List<FormOutput>());
 
-        await _controller.GetForms(token);
+        await _controller.GetForms(memberFirmID, token);
 
         _formCrudServiceMock.Verify(x => x.GetFormsAsync(token), Times.Once);
     }
@@ -321,7 +322,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormAsync("test", token))
             .ReturnsAsync(new FormOutput { General = new FormGeneralOutput { FormCodeName = "test", FormDisplayName = "Test" } });
 
-        await _controller.GetForm("test", token);
+        await _controller.GetForm(memberFirmID, "test", token);
 
         _formCrudServiceMock.Verify(x => x.GetFormAsync("test", token), Times.Once);
     }
@@ -336,7 +337,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormEntriesAsync("contact", token))
             .ReturnsAsync(new List<Dictionary<string, object?>>());
 
-        await _controller.GetFormEntries("contact", token);
+        await _controller.GetFormEntries(memberFirmID, "contact", token);
 
         _formCrudServiceMock.Verify(x => x.GetFormEntriesAsync("contact", token), Times.Once);
     }
@@ -351,7 +352,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormEntryAsync("contact", 1, token))
             .ReturnsAsync(new Dictionary<string, object?> { ["ID"] = 1 });
 
-        await _controller.GetFormEntry("contact", 1, token);
+        await _controller.GetFormEntry(memberFirmID, "contact", 1, token);
 
         _formCrudServiceMock.Verify(x => x.GetFormEntryAsync("contact", 1, token), Times.Once);
     }
@@ -366,7 +367,7 @@ public class FormsControllerTests
             .Setup(x => x.DeleteFormEntryAsync("contact", 1, token))
             .Returns(Task.CompletedTask);
 
-        await _controller.DeleteFormEntry("contact", 1, token);
+        await _controller.DeleteFormEntry(memberFirmID, "contact", 1, token);
 
         _formCrudServiceMock.Verify(x => x.DeleteFormEntryAsync("contact", 1, token), Times.Once);
     }
@@ -401,7 +402,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormsAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(forms);
 
-        var result = await _controller.GetForms(CancellationToken.None);
+        var result = await _controller.GetForms(memberFirmID, CancellationToken.None);
 
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
         var okResult = (OkObjectResult)result.Result!;
@@ -416,7 +417,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormEntriesAsync("contact", It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<Dictionary<string, object?>>());
 
-        var result = await _controller.GetFormEntries("contact", CancellationToken.None);
+        var result = await _controller.GetFormEntries(memberFirmID, "contact", CancellationToken.None);
 
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
         var okResult = (OkObjectResult)result.Result!;
@@ -465,7 +466,7 @@ public class FormsControllerTests
             .Setup(x => x.GetFormEntryAsync("contact", 1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(entry);
 
-        var result = await _controller.GetFormEntry("contact", 1, CancellationToken.None);
+        var result = await _controller.GetFormEntry(memberFirmID, "contact", 1, CancellationToken.None);
 
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
         var okResult = (OkObjectResult)result.Result!;
@@ -485,7 +486,7 @@ public class FormsControllerTests
             .Setup(x => x.DeleteFormEntryAsync("feedback", 42, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
-        var result = await _controller.DeleteFormEntry("feedback", 42, CancellationToken.None);
+        var result = await _controller.DeleteFormEntry(memberFirmID, "feedback", 42, CancellationToken.None);
 
         Assert.That(result, Is.InstanceOf<OkObjectResult>());
         var okResult = (OkObjectResult)result;

@@ -299,3 +299,6 @@ BDO.GWT.GLOBAL/App_Data/CIRepository/*
 !BDO.GWT.GLOBAL/App_Data/CIRepository/.lock/
 !BDO.GWT.GLOBAL/App_Data/CIRepository/@global/
 !BDO.GWT.GLOBAL/App_Data/CIRepository/repository.config
+
+# Ignore this github folder used for CoPilot instructions
+.github/*
