@@ -1284,7 +1284,6 @@ MicrositePage;Microsite Page
       </field>
       <field allowempty="true" column="UpdatedOn" columnprecision="7" columntype="datetime" enabled="true" guid="a36d0271-c267-438f-85fc-0acb024ec786" visible="true">
         <properties>
-          <defaultvalue>5/14/2026 7:02:04 AM</defaultvalue>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Updated on</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
