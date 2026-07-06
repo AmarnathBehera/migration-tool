@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="InFocusFolder"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class InFocusFolder : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IPageMetadata
+	public partial class InFocusFolder : IWebPageFieldsSource, IOGMetadataFields, IMetadata, IPageMetadata
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -63,24 +63,6 @@ namespace BDO
 		/// MetadataOGTwitterImage.
 		/// </summary>
 		public IEnumerable<ContentAttachment> MetadataOGTwitterImage { get; set; }
-
-
-		/// <summary>
-		/// MetadataNofollow.
-		/// </summary>
-		public bool MetadataNofollow { get; set; }
-
-
-		/// <summary>
-		/// MetadataNoindex.
-		/// </summary>
-		public bool MetadataNoindex { get; set; }
-
-
-		/// <summary>
-		/// IncludeInSitemap.
-		/// </summary>
-		public bool IncludeInSitemap { get; set; }
 
 
 		/// <summary>
