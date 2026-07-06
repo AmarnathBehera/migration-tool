@@ -68,9 +68,15 @@ namespace BDO.GWT.Core.Services
             // Walk up the content tree until we hit the root or HomePage
             var current = await _pageContext.GetAnyPageByWebPageItemId(parentPageID, cancellationToken);
             while (parentPageID > 0 && current != null)
-            {
+            {     //checking the valid url for each page to insert it in breadcrumb
+                    var pageUrl = await _pageUrlRetriever.Retrieve(
+                    current.SystemFields.WebPageItemID,
+                    ctx.WebPage.LanguageName,
+                    cancellationToken: cancellationToken);
+                var hasValidUrl = !string.IsNullOrWhiteSpace(pageUrl?.RelativePath);
+
                 // Skip SectionMicrosites — breadcrumb starts from MicrositeMasterPage
-                if (current is not SectionMicrosites)
+                if (current is not SectionMicrosites && hasValidUrl)
                 {
                     ancestors.Insert(0, (
                         current.SystemFields.WebPageItemName,
