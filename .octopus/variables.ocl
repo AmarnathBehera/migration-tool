@@ -77,3 +77,11 @@ variable "appsettings.RedirectDomain" {
         environment = ["production"]
     }
 }
+
+variable "appsettings.FallbackSendGridClientApiKey" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-sendgrid-apikey)" {}
+}
+
+variable "appsettings.SystemSendGridClientApiKey" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-sendgrid-apikey)" {}
+}
