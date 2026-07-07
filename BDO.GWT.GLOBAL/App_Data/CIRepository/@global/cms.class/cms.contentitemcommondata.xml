@@ -39,33 +39,60 @@
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Call to action description</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>34bc2c94-d4b6-4c53-a6f4-9b9520a24493</kxp_schema_identifier>
         </properties>
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowCallToAction</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <field allowempty="true" column="CallToActionButtonText" columnprecision="0" columnsize="50" columntype="text" enabled="true" guid="a86ab114-d05c-4712-bfbb-596b783b56a0" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Call to action button text</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>34bc2c94-d4b6-4c53-a6f4-9b9520a24493</kxp_schema_identifier>
         </properties>
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowCallToAction</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <field allowempty="true" column="CallToActionButtonUrl" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="4750e82f-065b-43eb-856a-3545e517cf53" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Call to action button URL</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>34bc2c94-d4b6-4c53-a6f4-9b9520a24493</kxp_schema_identifier>
         </properties>
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowCallToAction</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <field allowempty="true" column="CallToActionPosition" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6326143a-ad1e-4b2f-a1ac-a57a523062c0" visible="true">
         <properties>
@@ -88,6 +115,14 @@ center;Center
           </Options>
           <OptionsValueSeparator>;</OptionsValueSeparator>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowCallToAction</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <schema guid="b760a373-943b-4321-ac39-d5067101ff82" name="Sidebar">
         <properties>
@@ -149,6 +184,8 @@ center;Center
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -226,6 +263,8 @@ center;Center
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -254,6 +293,8 @@ center;Center
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -295,6 +336,17 @@ center;Center
           <defaultvalue>True</defaultvalue>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Include page in the sitemap</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>a1394d11-ac3a-40b9-8162-d117c5ff85fe</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="IsSearchExcluded" columnprecision="0" columntype="boolean" enabled="true" guid="4425b5ce-4662-46fe-8b04-bd97161c12ce" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Search Excluded</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
           <kxp_schema_identifier>a1394d11-ac3a-40b9-8162-d117c5ff85fe</kxp_schema_identifier>
         </properties>
@@ -350,6 +402,8 @@ center;Center
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -548,6 +602,8 @@ center;Center
             <![CDATA[["205639d0-5385-472a-bd1a-ba685cf3915d","4e214df1-edd5-4441-a0b7-53849526b1d3","bb17604c-c134-4faa-a401-2727cad93707"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -660,6 +716,8 @@ heroImage;Hero
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
         <validationrulesdata>
@@ -724,6 +782,8 @@ heroImage;Hero
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
         <validationrulesdata>
@@ -839,6 +899,8 @@ tertiary;Tertiary
             <![CDATA[["43fcea42-e42d-4773-95dc-b415ea3e7547","31f6383b-697e-4d8f-acec-be459fe4ad01","74635906-cb04-4ffd-9936-9dcde92c7f58","392e5450-56f2-49da-96a0-fc49215599d8","f3c1aa73-5245-4566-ae9c-ac80c54a6ce2"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
         <visibilityconditiondata>
@@ -934,6 +996,8 @@ tertiary;Tertiary
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
         <visibilityconditiondata>
@@ -1124,6 +1188,8 @@ MicrositePage;Microsite Page
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -1264,7 +1330,6 @@ MicrositePage;Microsite Page
       </field>
       <field allowempty="true" column="UpdatedOn" columnprecision="7" columntype="datetime" enabled="true" guid="a36d0271-c267-438f-85fc-0acb024ec786" visible="true">
         <properties>
-          <defaultvalue>5/14/2026 7:02:04 AM</defaultvalue>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Updated on</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
@@ -1598,7 +1663,7 @@ after;After
       <schema guid="45af2efa-f3b7-44e5-87f2-3e7c9afb8843" name="ImageM">
         <properties>
           <description>this is image which is required</description>
-          <fieldcaption>ImageM</fieldcaption>
+          <fieldcaption>Image</fieldcaption>
         </properties>
       </schema>
       <field allowempty="true" column="ImageFileM" columnprecision="0" columntype="contentitemreference" enabled="true" guid="fba93a35-aacf-40a2-ace7-61ad60823a69" visible="true">
@@ -1613,6 +1678,8 @@ after;After
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
         <validationrulesdata>

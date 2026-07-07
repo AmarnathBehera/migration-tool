@@ -1,4 +1,6 @@
-﻿using BDO.GWT.Common.Options;
+﻿using BDO;
+using BDO.GWT.Common.Options;
+using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.LiveSite.Services;
 using BDO.GWT.Core.Retrievers;
@@ -123,6 +125,12 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ISitemapXmlRenderer, SitemapXmlRenderer>();
         serviceCollection.AddScoped<ILanguageProvider, LanguageProvider>();
         serviceCollection.AddScoped<IPageNodeProvider, PageNodeProvider>();
+        serviceCollection.AddScoped<IInsightPageService, InsightPageService>();
+        serviceCollection.AddScoped<IInsightSectionCardListingPageService, InsightSectionCardListingPageService>();
+        serviceCollection.AddScoped<IInsightGroupCardListingPageService, InsightGroupCardListingPageService>();
+        serviceCollection.AddScoped<IInsightCategoryCardListingPageService, InsightCategoryCardListingPageService>();
+        serviceCollection.AddScoped<IInsightCardService, InsightCardService>();
+   
     }
 
 }

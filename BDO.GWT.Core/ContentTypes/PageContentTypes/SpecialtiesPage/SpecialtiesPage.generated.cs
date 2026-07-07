@@ -36,6 +36,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// SideNavigationSeperator.
+		/// </summary>
+		public string SideNavigationSeperator { get; set; }
+
+
+		/// <summary>
 		/// ShowSideNavigation.
 		/// </summary>
 		public bool ShowSideNavigation { get; set; }
@@ -93,6 +99,12 @@ namespace BDO
 		/// IncludeInSitemap.
 		/// </summary>
 		public bool IncludeInSitemap { get; set; }
+
+
+		/// <summary>
+		/// IsSearchExcluded.
+		/// </summary>
+		public bool IsSearchExcluded { get; set; }
 
 
 		/// <summary>

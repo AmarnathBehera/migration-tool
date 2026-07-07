@@ -36,6 +36,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// DescendantPages.
+		/// </summary>
+		public string DescendantPages { get; set; }
+
+
+		/// <summary>
 		/// ShowCopyUrlButtonInJobOpportunity.
 		/// </summary>
 		public bool ShowCopyUrlButtonInJobOpportunity { get; set; }
@@ -87,6 +93,12 @@ namespace BDO
 		/// IncludeInSitemap.
 		/// </summary>
 		public bool IncludeInSitemap { get; set; }
+
+
+		/// <summary>
+		/// IsSearchExcluded.
+		/// </summary>
+		public bool IsSearchExcluded { get; set; }
 
 
 		/// <summary>

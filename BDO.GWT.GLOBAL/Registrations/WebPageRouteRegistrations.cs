@@ -1,6 +1,8 @@
 ﻿using BDO;
 using BDO.GWT.Controllers;
+using BDO.GWT.Core.LiveSite.Controllers;
 using BDO.GWT.Web.Controllers;
+using BDO.GWT.Web.Core.Controllers;
 using BDO.GWT.Web.Core.LiveSite.Controllers;
 using GWTXbyKWeb.Controllers;
 using Kentico.Content.Web.Mvc.Routing;
@@ -316,12 +318,46 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 
 [assembly: RegisterWebPageRoute(Webinar.CONTENT_TYPE_NAME, typeof(WebinarController))]
 
+[assembly: RegisterPageTemplate(
+    identifier: Webinar.CONTENT_TYPE_NAME,
+    name: "Webinar  Content Type Template",
+    customViewName: "~/Views/EventWebinar/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.Webinar" },
+    IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(Insight.CONTENT_TYPE_NAME, typeof(InsightController))]
+
 
 [assembly: RegisterPageTemplate(
-    identifier: SectionRss.CONTENT_TYPE_NAME,
-    name: "Section Rss Content Type Template",
-    customViewName: "~/Views/SectionRss/Index.cshtml",
-    ContentTypeNames = new[] { "BDO.SectionRss" },
+    identifier: Insight.CONTENT_TYPE_NAME,
+    name: "Insight Content Type Template",
+    customViewName: "~/Views/InsightPage/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.Insight" },
+    IconClass = "xp-market")]
+
+
+[assembly: RegisterWebPageRoute(SectionInsightsPage.CONTENT_TYPE_NAME, typeof(InsightSectionController))]
+[assembly: RegisterPageTemplate(
+    identifier: SectionInsightsPage.CONTENT_TYPE_NAME,
+    name: "Insight Content Type Template",
+    customViewName: "~/Views/InsightListing/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.SectionInsightsPage" },
+    IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(InsightGroup.CONTENT_TYPE_NAME, typeof(InsightGroupController))]
+[assembly: RegisterPageTemplate(
+    identifier: InsightGroup.CONTENT_TYPE_NAME,
+    name: "Insight Content Type Template",
+    customViewName: "~/Views/InsightListing/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.InsightGroup" },
+    IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(InsightCategory.CONTENT_TYPE_NAME, typeof(InsightCategoryController))]
+[assembly: RegisterPageTemplate(
+    identifier: InsightCategory.CONTENT_TYPE_NAME,
+    name: "Insight Content Type Template",
+    customViewName: "~/Views/InsightListing/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.InsightCategory" },
     IconClass = "xp-market")]
 
 [assembly: RegisterWebPageRoute(SectionRss.CONTENT_TYPE_NAME, typeof(SectionRssController))]

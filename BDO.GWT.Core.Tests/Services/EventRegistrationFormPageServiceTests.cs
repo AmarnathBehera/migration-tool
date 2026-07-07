@@ -108,7 +108,7 @@ namespace BDO.GWT.Core.Tests.Services
         {
             SetupContent(null);
 
-            var result = await _service.GetEventRegistrationFormPageDtoAsync(null!, CancellationToken.None);
+            var result = await _service.GetEventRegistrationFormPageDtoAsync(null, CancellationToken.None);
 
             Assert.That(result, Is.Not.Null);
 
@@ -138,7 +138,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             SetupContent(page);
 
-            var result = await _service.GetEventRegistrationFormPageDtoAsync(null!, CancellationToken.None);
+            var result = await _service.GetEventRegistrationFormPageDtoAsync(null, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -158,7 +158,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             SetupContent(page);
 
-            var result = await _service.GetEventRegistrationFormPageDtoAsync(null!, CancellationToken.None);
+            var result = await _service.GetEventRegistrationFormPageDtoAsync(null, CancellationToken.None);
 
             Assert.That(result.BaseContent, Is.Not.Null);
 
@@ -183,7 +183,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             SetupContent(page);
 
-            var result = await _service.GetEventRegistrationFormPageDtoAsync(null!, CancellationToken.None);
+            var result = await _service.GetEventRegistrationFormPageDtoAsync(null, CancellationToken.None);
 
             Assert.That(result.BaseWebPage, Is.Not.Null);
 
@@ -208,12 +208,14 @@ namespace BDO.GWT.Core.Tests.Services
 
             SetupContent(page);
 
-            var result = await _service.GetEventRegistrationFormPageDtoAsync(null!, CancellationToken.None);
+            var result = await _service.GetEventRegistrationFormPageDtoAsync(null, CancellationToken.None);
+
             Assert.Multiple(() =>
-            { 
-            Assert.That(result.BaseContent, Is.Not.Null);
-            Assert.That(result.BaseWebPage, Is.Not.Null);
+            {
+                Assert.That(result.BaseContent, Is.Not.Null);
+                Assert.That(result.BaseWebPage, Is.Not.Null);
             });
+
             Assert.Multiple(() =>
             {
                 Assert.That(result.BaseContent!.ContentItemID, Is.EqualTo(0));
@@ -252,7 +254,7 @@ namespace BDO.GWT.Core.Tests.Services
                 .Callback<HeroData, CancellationToken>((data, _) => captured = data)
                 .ReturnsAsync(new HeroDto());
 
-            await _service.GetEventRegistrationFormPageDtoAsync(null!, CancellationToken.None);
+            await _service.GetEventRegistrationFormPageDtoAsync(null, CancellationToken.None);
 
             Assert.That(captured, Is.Not.Null);
 
@@ -290,7 +292,7 @@ namespace BDO.GWT.Core.Tests.Services
                     Description = "Mapped desc"
                 });
 
-            var result = await _service.GetEventRegistrationFormPageDtoAsync(null!, CancellationToken.None);
+            var result = await _service.GetEventRegistrationFormPageDtoAsync(null, CancellationToken.None);
 
             Assert.That(result.Hero, Is.Not.Null);
 
@@ -309,7 +311,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             SetupContent(page);
 
-            await _service.GetEventRegistrationFormPageDtoAsync(null!, CancellationToken.None);
+            await _service.GetEventRegistrationFormPageDtoAsync(null, CancellationToken.None);
 
             _contentServiceMock.Verify(x => x.RetrieveCurrentPageAsync<EventRegistrationForm>(
                 It.Is<RetrieveCurrentPageParameters>(p => p.LinkedItemsMaxLevel == 4),
@@ -326,7 +328,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             SetupContent(page);
 
-            await _service.GetEventRegistrationFormPageDtoAsync(null!, token);
+            await _service.GetEventRegistrationFormPageDtoAsync(null, token);
 
             _contentServiceMock.Verify(x => x.RetrieveCurrentPageAsync<EventRegistrationForm>(
                 It.IsAny<RetrieveCurrentPageParameters>(),
@@ -335,6 +337,20 @@ namespace BDO.GWT.Core.Tests.Services
             _heroServiceMock.Verify(x => x.GetHeroDtoAsync(
                 It.IsAny<HeroData>(),
                 token), Times.Once);
+        }
+
+        [Test]
+        public async Task GetEventRegistrationFormPageDtoAsync_UsesSuppliedPage_WhenPageIsProvided()
+        {
+            var suppliedPage = CreatePage(title: "Supplied Page");
+
+            var result = await _service.GetEventRegistrationFormPageDtoAsync(suppliedPage, CancellationToken.None);
+
+            Assert.That(result.Title, Is.EqualTo("Supplied Page"));
+
+            _contentServiceMock.Verify(x => x.RetrieveCurrentPageAsync<EventRegistrationForm>(
+                It.IsAny<RetrieveCurrentPageParameters>(),
+                It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Test]
@@ -347,7 +363,7 @@ namespace BDO.GWT.Core.Tests.Services
                 .ThrowsAsync(new InvalidOperationException("DB fail"));
 
             Assert.ThrowsAsync<InvalidOperationException>(() =>
-                _service.GetEventRegistrationFormPageDtoAsync(null!, CancellationToken.None));
+                _service.GetEventRegistrationFormPageDtoAsync(null, CancellationToken.None));
         }
 
         [Test]
@@ -362,7 +378,7 @@ namespace BDO.GWT.Core.Tests.Services
                 .ThrowsAsync(new InvalidOperationException("Hero fail"));
 
             Assert.ThrowsAsync<InvalidOperationException>(() =>
-                _service.GetEventRegistrationFormPageDtoAsync(null!, CancellationToken.None));
+                _service.GetEventRegistrationFormPageDtoAsync(null, CancellationToken.None));
         }
     }
 }

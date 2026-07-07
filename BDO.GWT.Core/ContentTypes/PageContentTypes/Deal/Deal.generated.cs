@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="Deal"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class Deal : IWebPageFieldsSource, ICallToAction, ISidebar, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero, IAuthoredContentSection, IPageMetadata
+	public partial class Deal : IWebPageFieldsSource, ICallToAction, ISidebar, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero, IPageMetadata
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -126,6 +126,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// DisplayedContacts.
+		/// </summary>
+		public string DisplayedContacts { get; set; }
+
+
+		/// <summary>
 		/// RelevantContactPersonDeal.
 		/// </summary>
 		public IEnumerable<IWebPageFieldsSource> RelevantContactPersonDeal { get; set; }
@@ -153,6 +159,12 @@ namespace BDO
 		/// CallToActionButtonUrl.
 		/// </summary>
 		public string CallToActionButtonUrl { get; set; }
+
+
+		/// <summary>
+		/// CallToActionPosition.
+		/// </summary>
+		public string CallToActionPosition { get; set; }
 
 
 		/// <summary>
@@ -225,6 +237,12 @@ namespace BDO
 		/// IncludeInSitemap.
 		/// </summary>
 		public bool IncludeInSitemap { get; set; }
+
+
+		/// <summary>
+		/// IsSearchExcluded.
+		/// </summary>
+		public bool IsSearchExcluded { get; set; }
 
 
 		/// <summary>
@@ -315,36 +333,6 @@ namespace BDO
 		/// HeroCallToActionButtonUrl.
 		/// </summary>
 		public IEnumerable<IWebPageFieldsSource> HeroCallToActionButtonUrl { get; set; }
-
-
-		/// <summary>
-		/// ShowAuthoredInsights.
-		/// </summary>
-		public bool ShowAuthoredInsights { get; set; }
-
-
-		/// <summary>
-		/// AuthoredInsightsTitle.
-		/// </summary>
-		public string AuthoredInsightsTitle { get; set; }
-
-
-		/// <summary>
-		/// AuthoredInsightsDescription.
-		/// </summary>
-		public string AuthoredInsightsDescription { get; set; }
-
-
-		/// <summary>
-		/// AuthoredInsightsBackgroundImageUrl.
-		/// </summary>
-		public IEnumerable<ContentAttachment> AuthoredInsightsBackgroundImageUrl { get; set; }
-
-
-		/// <summary>
-		/// DisplayedAuthoredContentPageTypes.
-		/// </summary>
-		public string DisplayedAuthoredContentPageTypes { get; set; }
 
 
 		/// <summary>

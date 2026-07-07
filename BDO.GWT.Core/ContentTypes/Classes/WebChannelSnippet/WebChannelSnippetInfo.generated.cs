@@ -203,6 +203,39 @@ namespace BDO
 
 
         /// <summary>
+        /// Secretkeyre CAPTCH av 3 inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool SecretkeyreCAPTCHAv3Inheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(SecretkeyreCAPTCHAv3Inheritfromglobal)), false);
+            set => SetValue(nameof(SecretkeyreCAPTCHAv3Inheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Secretkeyre CAPTCH av 2 inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool SecretkeyreCAPTCHAv2Inheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(SecretkeyreCAPTCHAv2Inheritfromglobal)), false);
+            set => SetValue(nameof(SecretkeyreCAPTCHAv2Inheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Sitekeyre CAPTCH av 3 inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool SitekeyreCAPTCHAv3Inheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(SitekeyreCAPTCHAv3Inheritfromglobal)), false);
+            set => SetValue(nameof(SitekeyreCAPTCHAv3Inheritfromglobal), value);
+        }
+
+
+        /// <summary>
         /// Deletes the object using appropriate provider.
         /// </summary>
         protected override void DeleteObject()

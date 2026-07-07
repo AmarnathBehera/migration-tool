@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.copyinsight>
+  <Attachments />
+  <ContentItemDataCommonDataID>
+    <GUID>320924f7-67f7-4510-8f0f-18b4dab13c48</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>Copy-kzq6dsrr</CodeName>
+      <GUID>06e96d4d-a11b-4198-8c36-4bbc658d6078</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>895bd22c-0b70-4fc5-9da0-edd079ee8d69</ContentItemDataGUID>
+  <Contentsharing />
+  <Description>
+    <![CDATA[<p>test</p>]]>
+  </Description>
+  <DownloadButtonText>sfs</DownloadButtonText>
+  <DownloadButtonTitle>sfds</DownloadButtonTitle>
+  <InsightContent>test</InsightContent>
+  <OriginalDocumentAttachmentType>Download</OriginalDocumentAttachmentType>
+  <OriginalDocumentOwnerEmail>tapasya.mahor@mgt.bdo.global</OriginalDocumentOwnerEmail>
+  <OriginalDocumentOwnerName>Tapasya.Mahor@gmail.com</OriginalDocumentOwnerName>
+  <OriginalDocumentOwnerOptOut>False</OriginalDocumentOwnerOptOut>
+  <OriginalInvolvedCountriesAll>True</OriginalInvolvedCountriesAll>
+  <OriginalSiteGuid>Site</OriginalSiteGuid>
+  <SharingHeadline>False</SharingHeadline>
+  <SharingInstructions>
+<![CDATA[
+You are about to copy [name of insight], originally created by [name of author / BDO MF]. Before continuing, you may find the following information about this insight useful:
+
+- This insight is intended for CFOs of SMEs in the retail sector with a turnover between 100-500 million euro
+- There is an infographic that accompanies this insight: you can request it here (link to email)
+- An executive summary can be found here [link]
+- We ran a two hour breakfast event that outlined the key findings of the report – details here [link]
+
+For any questions, please contact [link to insight creator’s email]
+
+Remember, in order to proceed, you must check the box to indicate that you agree to comply with the protocol and requirements outlined above
+]]>
+  </SharingInstructions>
+  <SharingOptOut>False</SharingOptOut>
+  <ShowInsightDescription>True</ShowInsightDescription>
+  <ShowInsightTitle>True</ShowInsightTitle>
+  <Title>tst</Title>
+</contentitemdata.bdo.copyinsight>

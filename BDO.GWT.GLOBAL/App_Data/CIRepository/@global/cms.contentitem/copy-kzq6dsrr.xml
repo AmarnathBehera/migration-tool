@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitem>
+  <ContentItemContentFolderID>
+    <CodeName>Insight-d02t6hzy</CodeName>
+    <GUID>ecb90aab-a443-4e0b-8c35-231c8fe0a322</GUID>
+    <ObjectType>cms.contentfolder</ObjectType>
+  </ContentItemContentFolderID>
+  <ContentItemContentTypeID>
+    <CodeName>BDO.CopyInsight</CodeName>
+    <GUID>4ce005da-7a7f-4d90-9465-fb743e9a943f</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </ContentItemContentTypeID>
+  <ContentItemGUID>06e96d4d-a11b-4198-8c36-4bbc658d6078</ContentItemGUID>
+  <ContentItemIsReusable>True</ContentItemIsReusable>
+  <ContentItemIsSecured>False</ContentItemIsSecured>
+  <ContentItemName>Copy-kzq6dsrr</ContentItemName>
+  <ContentItemWorkspaceID>
+    <CodeName>KenticoDefault</CodeName>
+    <GUID>43f674d6-540d-4f91-8c19-608b5bddb2f2</GUID>
+    <ObjectType>cms.workspace</ObjectType>
+  </ContentItemWorkspaceID>
+</cms.contentitem>

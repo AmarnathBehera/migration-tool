@@ -36,6 +36,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// Settings.
+		/// </summary>
+		public string Settings { get; set; }
+
+
+		/// <summary>
 		/// SettingsMenuType.
 		/// </summary>
 		public string SettingsMenuType { get; set; }
@@ -51,6 +57,12 @@ namespace BDO
 		/// LogoText.
 		/// </summary>
 		public string LogoText { get; set; }
+
+
+		/// <summary>
+		/// Custom.
+		/// </summary>
+		public string Custom { get; set; }
 
 
 		/// <summary>
@@ -129,6 +141,12 @@ namespace BDO
 		/// IncludeInSitemap.
 		/// </summary>
 		public bool IncludeInSitemap { get; set; }
+
+
+		/// <summary>
+		/// IsSearchExcluded.
+		/// </summary>
+		public bool IsSearchExcluded { get; set; }
 
 
 		/// <summary>
