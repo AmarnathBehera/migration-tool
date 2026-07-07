@@ -23,7 +23,7 @@ public class HeaderService : IHeaderService
     private readonly IWebsiteChannelContext _websiteChannel;
     private readonly ILocalizedUrlsBuilder _localizedUrlsBuilder;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly string _logoImageUrl = "https://cdn.bdo.global/images/bdo_logo/1.0.0/bdo_logo_color.png";
+
     public HeaderService(
         IContentService contentService,
         IContentRetriever contentRetriever,
@@ -41,7 +41,7 @@ public class HeaderService : IHeaderService
         _localizedUrlsBuilder = localizedUrlsBuilder;
         _httpContextAccessor = httpContextAccessor;
     }
-    public async Task<HeaderDto> GetAsync(IContentService contentservice, CancellationToken cancellationToken)
+    public async Task<HeaderDto?> GetAsync(IContentService contentservice, CancellationToken cancellationToken)
     {
         var topMenu = await BuildTopMenuAsync(cancellationToken);
 
@@ -51,7 +51,15 @@ public class HeaderService : IHeaderService
 
         var megaMenu = await BuildMegaMenuAsync(cancellationToken);
 
+        //var logoImageUrl = await _currentWebsiteHelper.GetCurrentWebsiteLogoImageUrlAsync(cancellationToken);
+
         var logoPageLink = await GetLogoPageLinkAsync(cancellationToken);
+
+        //var searchPage = await _searchPageRetriever.RetrievePageAsync(query =>
+        //{
+        //    query.IncludeUrlPath();
+
+        //}, cancellationToken);
 
         var headerDto = new HeaderDto
         {
@@ -60,7 +68,7 @@ public class HeaderService : IHeaderService
             Contact = topMenu.Contact,
             SiteName = websiteDisplayName,
             LogoURL = logoPageLink ?? string.Empty,
-            LogoImageURL = _logoImageUrl ?? string.Empty,//logoImageUrl ?? string.Empty,
+            LogoImageURL = "https://cdn.bdo.global/images/bdo_logo/1.0.0/bdo_logo_color.png",
             SearchPageURL = string.Empty,//searchPage != null ? searchPage.UrlPath.ToHtmlCompatibleString() : string.Empty,
             MegaMenuItems = megaMenu,
         };
@@ -136,7 +144,7 @@ public class HeaderService : IHeaderService
     }
     protected virtual async Task<IEnumerable<FirstLevelMenuItemDto>> BuildMegaMenuAsync(CancellationToken cancellationToken = default)
     {
-        var firstLevelItems = (await _contentService?.GetContentType<NavigationFirstLevelItem>(cancellationToken))?.ToList()
+        var firstLevelItems = (await _contentService.GetContentType<NavigationFirstLevelItem>(cancellationToken))?.ToList()
                               ?? new List<NavigationFirstLevelItem>();
 
         var megaMenu = new List<FirstLevelMenuItemDto>();

@@ -1,9 +1,8 @@
-using BDO;
 using BDO.GWT.Core;
-using BDO.GWT.Web.Core.LiveSite.Controllers;
-using BDO.GWT.Web.Core.Services;
-using BDO.GWT.Web.Core.LiveSite.DTOs.Pages;
 using BDO.GWT.Web.Core.DTOs.SchemaMarkups;
+using BDO.GWT.Web.Core.LiveSite.Controllers;
+using BDO.GWT.Web.Core.LiveSite.DTOs.Pages;
+using BDO.GWT.Web.Core.Services;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
@@ -28,31 +27,32 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
 
             _controller = new WebinarController(
                 _eventServiceMock.Object,
-                _channelMock.Object,
                 _contentServiceMock.Object);
         }
 
         [TearDown]
         public void TearDown() => _controller.Dispose();
 
-        private void SetupContent(IEnumerable<Webinar>? pages)
+        // Matches what the controller actually calls
+        private void SetupContent(Webinar? page)
         {
             _contentServiceMock
-                .Setup(x => x.GetPagesAsync<Webinar>(
-                    It.IsAny<RetrievePagesParameters>(),
-                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                    It.IsAny<RetrievalCacheSettings>(),
+                .Setup(x => x.RetrieveCurrentPageAsync<Webinar>(
+                    It.IsAny<RetrieveCurrentPageParameters>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(pages!);
+                .ReturnsAsync(page);
         }
 
         [Test]
         public async Task Index_ReturnsViewResult_WithCorrectViewName()
         {
-            SetupContent(new List<Webinar> { new Webinar() });
-            _eventServiceMock.Setup(s => s.GetWebinarPageDtoAsync(It.IsAny<Webinar>(), It.IsAny<CancellationToken>()))
+            var page = new Mock<Webinar>().Object;
+            SetupContent(page);
+            _eventServiceMock
+                .Setup(s => s.GetWebinarPageDtoAsync(page, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new EventWebinarDto());
-            _eventServiceMock.Setup(s => s.GetWebinarSchemaMarkupDto(It.IsAny<Webinar>(), It.IsAny<CancellationToken>()))
+            _eventServiceMock
+                .Setup(s => s.GetWebinarSchemaMarkupDto(page, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new EventSchemaMarkupDto());
 
             var result = await _controller.Index(CancellationToken.None);
@@ -67,14 +67,16 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
         [Test]
         public async Task Index_ModelIsTupleOfDtoAndSchema()
         {
-            var page = new Webinar();
+            var page = new Mock<Webinar>().Object;
             var pageDto = new EventWebinarDto();
             var schema = new EventSchemaMarkupDto();
 
-            SetupContent(new List<Webinar> { page });
-            _eventServiceMock.Setup(s => s.GetWebinarPageDtoAsync(page, It.IsAny<CancellationToken>()))
+            SetupContent(page);
+            _eventServiceMock
+                .Setup(s => s.GetWebinarPageDtoAsync(page, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(pageDto);
-            _eventServiceMock.Setup(s => s.GetWebinarSchemaMarkupDto(page, It.IsAny<CancellationToken>()))
+            _eventServiceMock
+                .Setup(s => s.GetWebinarSchemaMarkupDto(page, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(schema);
 
             var view = (ViewResult)await _controller.Index(CancellationToken.None);
@@ -88,36 +90,39 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
         }
 
         [Test]
-        public async Task Index_PassesFirstPage_ToService()
+        public async Task Index_PassesRetrievedPage_ToService()
         {
-            var first = new Webinar();
-            var second = new Webinar();
-            SetupContent(new List<Webinar> { first, second });
-
-            _eventServiceMock.Setup(s => s.GetWebinarPageDtoAsync(It.IsAny<Webinar>(), It.IsAny<CancellationToken>()))
+            var page = new Mock<Webinar>().Object;
+            SetupContent(page);
+            _eventServiceMock
+                .Setup(s => s.GetWebinarPageDtoAsync(page, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new EventWebinarDto());
-            _eventServiceMock.Setup(s => s.GetWebinarSchemaMarkupDto(It.IsAny<Webinar>(), It.IsAny<CancellationToken>()))
+            _eventServiceMock
+                .Setup(s => s.GetWebinarSchemaMarkupDto(page, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new EventSchemaMarkupDto());
 
             await _controller.Index(CancellationToken.None);
 
-            _eventServiceMock.Verify(s => s.GetWebinarPageDtoAsync(first, It.IsAny<CancellationToken>()), Times.Once);
-            _eventServiceMock.Verify(s => s.GetWebinarSchemaMarkupDto(first, It.IsAny<CancellationToken>()), Times.Once);
+            _eventServiceMock.Verify(
+                s => s.GetWebinarPageDtoAsync(page, It.IsAny<CancellationToken>()), Times.Once);
+            _eventServiceMock.Verify(
+                s => s.GetWebinarSchemaMarkupDto(page, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
-        public async Task Index_PassesNullPage_WhenNoResults()
+        public async Task Index_ReturnsNotFound_WhenPageIsNull()
         {
-            SetupContent(new List<Webinar>());
-            _eventServiceMock.Setup(s => s.GetWebinarPageDtoAsync(null!, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new EventWebinarDto());
-            _eventServiceMock.Setup(s => s.GetWebinarSchemaMarkupDto(null!, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new EventSchemaMarkupDto());
+            SetupContent(null);
 
             var result = await _controller.Index(CancellationToken.None);
 
-            Assert.That(result, Is.InstanceOf<ViewResult>());
-            _eventServiceMock.Verify(s => s.GetWebinarPageDtoAsync(null!, It.IsAny<CancellationToken>()), Times.Once);
+            Assert.That(result, Is.InstanceOf<NotFoundResult>());
+            _eventServiceMock.Verify(
+                s => s.GetWebinarPageDtoAsync(It.IsAny<Webinar>(), It.IsAny<CancellationToken>()),
+                Times.Never);
+            _eventServiceMock.Verify(
+                s => s.GetWebinarSchemaMarkupDto(It.IsAny<Webinar>(), It.IsAny<CancellationToken>()),
+                Times.Never);
         }
 
         [Test]
@@ -125,31 +130,48 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
         {
             using var cts = new CancellationTokenSource();
             var token = cts.Token;
+            var page = new Mock<Webinar>().Object;
 
-            SetupContent(new List<Webinar> { new Webinar() });
-            _eventServiceMock.Setup(s => s.GetWebinarPageDtoAsync(It.IsAny<Webinar>(), token))
+            SetupContent(page);
+            _eventServiceMock
+                .Setup(s => s.GetWebinarPageDtoAsync(page, token))
                 .ReturnsAsync(new EventWebinarDto());
-            _eventServiceMock.Setup(s => s.GetWebinarSchemaMarkupDto(It.IsAny<Webinar>(), token))
+            _eventServiceMock
+                .Setup(s => s.GetWebinarSchemaMarkupDto(page, token))
                 .ReturnsAsync(new EventSchemaMarkupDto());
 
             await _controller.Index(token);
 
-            _eventServiceMock.Verify(s => s.GetWebinarPageDtoAsync(It.IsAny<Webinar>(), token), Times.Once);
-            _eventServiceMock.Verify(s => s.GetWebinarSchemaMarkupDto(It.IsAny<Webinar>(), token), Times.Once);
+            _eventServiceMock.Verify(
+                s => s.GetWebinarPageDtoAsync(page, token), Times.Once);
+            _eventServiceMock.Verify(
+                s => s.GetWebinarSchemaMarkupDto(page, token), Times.Once);
         }
 
         [Test]
         public void Index_PropagatesException_FromContentService()
         {
             _contentServiceMock
-                .Setup(x => x.GetPagesAsync<Webinar>(
-                    It.IsAny<RetrievePagesParameters>(),
-                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                    It.IsAny<RetrievalCacheSettings>(),
+                .Setup(x => x.RetrieveCurrentPageAsync<Webinar>(
+                    It.IsAny<RetrieveCurrentPageParameters>(),
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new InvalidOperationException("boom"));
 
-            Assert.ThrowsAsync<InvalidOperationException>(() => _controller.Index(CancellationToken.None));
+            Assert.ThrowsAsync<InvalidOperationException>(
+                () => _controller.Index(CancellationToken.None));
+        }
+
+        [Test]
+        public void Index_PropagatesException_FromEventService()
+        {
+            var page = new Mock<Webinar>().Object;
+            SetupContent(page);
+            _eventServiceMock
+                .Setup(s => s.GetWebinarPageDtoAsync(It.IsAny<Webinar>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("service down"));
+
+            Assert.ThrowsAsync<InvalidOperationException>(
+                () => _controller.Index(CancellationToken.None));
         }
     }
 }

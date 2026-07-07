@@ -8,13 +8,30 @@ using System.Net;
 
 namespace BDO.GWT.GLOBAL.API.ApiClients;
 
+/// <summary>
+/// Defines the interface for the Master Data API client, which provides methods to retrieve member firm data from the Master Data API.
+/// </summary>
 public interface IMasterDataApiClient
 {
+    /// <summary>
+    /// Retrieves a list of member firms from the Master Data API. The method filters the results to include only firms of type 'TestFirm' or 'Firm'.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     Task<IEnumerable<MemberFirm>> GetMemberFirmsAsync(CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Retrieves a specific member firm by its ID from the Master Data API. If the member firm is not found, the method returns null.
+    /// </summary>
+    /// <param name="memberFirmId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     Task<MemberFirm?> GetMemberFirmAsync(int memberFirmId, CancellationToken cancellationToken = default);
 }
 
+/// <summary>
+/// Implementation of the IMasterDataApiClient interface for retrieving member firm data from the Master Data API.
+/// </summary>
 public class MasterDataApiClient : IMasterDataApiClient
 {
     private readonly IHttpClientFactory _httpClientFactory;
@@ -23,6 +40,12 @@ public class MasterDataApiClient : IMasterDataApiClient
 
     private HttpClient? _httpClient;
 
+    /// <summary>
+    /// Initializes a new instance of the MasterDataApiClient class with the specified dependencies.
+    /// </summary>
+    /// <param name="httpClientFactory">The HTTP client factory for creating HTTP clients.</param>
+    /// <param name="mapper">The AutoMapper instance for mapping data objects.</param>
+    /// <param name="options">The Master Data API configuration options.</param>
     public MasterDataApiClient(IHttpClientFactory httpClientFactory, IMapper mapper, IOptions<MasterDataApiOptions> options)
     {
         _httpClientFactory = httpClientFactory;
@@ -30,6 +53,7 @@ public class MasterDataApiClient : IMasterDataApiClient
         _options = options;
     }
 
+    /// <inheritdoc />
     public async Task<IEnumerable<MemberFirm>> GetMemberFirmsAsync(CancellationToken cancellationToken = default)
     {
         var client = CreateHttpClient();
@@ -53,6 +77,7 @@ public class MasterDataApiClient : IMasterDataApiClient
         return memberFirms;
     }
 
+    /// <inheritdoc />
     public async Task<MemberFirm?> GetMemberFirmAsync(int memberFirmId, CancellationToken cancellationToken = default)
     {
         var client = CreateHttpClient();
@@ -76,6 +101,10 @@ public class MasterDataApiClient : IMasterDataApiClient
         return memberFirm;
     }
 
+    /// <summary>
+    /// Creates and configures an HTTP client for communicating with the Master Data API.
+    /// </summary>
+    /// <returns>A configured HTTP client instance.</returns>
     private HttpClient CreateHttpClient()
     {
         if (_httpClient != null)

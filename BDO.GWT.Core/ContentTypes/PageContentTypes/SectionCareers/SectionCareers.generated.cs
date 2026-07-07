@@ -36,6 +36,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// DescendantPages.
+		/// </summary>
+		public string DescendantPages { get; set; }
+
+
+		/// <summary>
 		/// ShowCopyUrlButtonInJobOpportunity.
 		/// </summary>
 		public bool ShowCopyUrlButtonInJobOpportunity { get; set; }

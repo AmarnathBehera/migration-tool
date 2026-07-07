@@ -36,6 +36,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// Image.
+		/// </summary>
+		public string Image { get; set; }
+
+
+		/// <summary>
 		/// MicrositeImage.
 		/// </summary>
 		public IEnumerable<ContentAttachment> MicrositeImage { get; set; }
@@ -45,6 +51,12 @@ namespace BDO
 		/// MicrositeImageAltText.
 		/// </summary>
 		public string MicrositeImageAltText { get; set; }
+
+
+		/// <summary>
+		/// Where_should_this_Microsite_appear.
+		/// </summary>
+		public string Where_should_this_Microsite_appear { get; set; }
 
 
 		/// <summary>
@@ -105,6 +117,12 @@ namespace BDO
 		/// SpecialitiesPages.
 		/// </summary>
 		public IEnumerable<SpecialtiesPage> SpecialitiesPages { get; set; }
+
+
+		/// <summary>
+		/// Custom.
+		/// </summary>
+		public string Custom { get; set; }
 
 
 		/// <summary>

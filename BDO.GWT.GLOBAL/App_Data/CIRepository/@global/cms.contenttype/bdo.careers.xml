@@ -16,7 +16,7 @@
       <schema guid="f652f54b-8be8-4f2c-9e40-7dd3ab5dd149" name="f652f54b-8be8-4f2c-9e40-7dd3ab5dd149">
         <properties />
       </schema>
-      <field allowempty="true" column="CareerListFilters" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="b253ecbf-c3d7-4b28-97e0-d3b38ce80355" visible="true">
+      <field column="CareerListFilters" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="b253ecbf-c3d7-4b28-97e0-d3b38ce80355" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Filters</fieldcaption>
@@ -37,14 +37,6 @@ officeLocation;Office (Office Location)
           </Options>
           <OptionsValueSeparator>;</OptionsValueSeparator>
         </settings>
-        <visibilityconditiondata>
-          <VisibilityConditionConfiguration>
-            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
-            <Properties>
-              <PropertyName>ItemListFilteringEnabled</PropertyName>
-            </Properties>
-          </VisibilityConditionConfiguration>
-        </visibilityconditiondata>
       </field>
       <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
         <properties />

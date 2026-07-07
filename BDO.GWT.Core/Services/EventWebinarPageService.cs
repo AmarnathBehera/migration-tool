@@ -2,7 +2,6 @@
 using BDO.GWT.Core;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.SchemaMarkups;
-using BDO.GWT.Core.Entities;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Web.Core.DTOs;
@@ -65,22 +64,21 @@ public partial class EventWebinarPageService : IEventWebinarPageService
     public async Task<string?> GenerateOutlookEventCardContent(Guid pageGuid, string? source, CancellationToken cancellationToken)
     {
         var pages = await _contentRetriever.GetPagesAsync<Event>(
-            new RetrievePagesParameters { LinkedItemsMaxLevel = 5 },
-            query => query.Where(w =>
-                w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID)),
-            RetrievalCacheSettings.CacheDisabled,
-            cancellationToken);
-
+             new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
+             query => query.Where(w =>
+              w.WhereEquals("ContentItemGUID", pageGuid)), RetrievalCacheSettings.CacheDisabled, 
+             cancellationToken);
         var page = pages?.FirstOrDefault();
+
         return await GenerateEventICalendarAsync(page, page?.EventLocationCity, page?.EventLocationAddress1, cancellationToken);
     }
 
     public async Task<string?> GenerateOutlookWebinarCardContent(Guid pageGuid, string? source, CancellationToken cancellationToken)
     {
         var pages = await _contentRetriever.GetPagesAsync<Webinar>(
-            new RetrievePagesParameters { LinkedItemsMaxLevel = 5 },
+            new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
             query => query.Where(w =>
-                w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID)),
+                w.WhereEquals("ContentItemGUID", pageGuid)),
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken);
 
@@ -418,7 +416,7 @@ public partial class EventWebinarPageService : IEventWebinarPageService
 
         return new EventWebinarDto
         {
-            Title =  page.MetadataTitle,
+            Title = page.ShowWebinarTitle ? page.MetadataTitle : null,
             Description = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(page.MetadataDescription),
             RegistrationCard = new EventWebinarDetailsRegistrationCardDto
             {
@@ -549,7 +547,7 @@ public partial class EventWebinarPageService : IEventWebinarPageService
 
         return new EventWebinarDto
         {
-            Title = page.MetadataTitle,
+            Title = page.ShowEventTitle ? page.MetadataTitle : null,
             Description = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(page.MetadataDescription),
             RegistrationCard = new EventWebinarDetailsRegistrationCardDto
             {

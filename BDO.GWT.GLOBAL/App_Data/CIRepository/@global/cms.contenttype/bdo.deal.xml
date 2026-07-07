@@ -234,6 +234,25 @@ INNER JOIN dbo.CMS_ContentItemCommonData AS cicd
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
+      <field allowempty="true" column="DisplayedContacts" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="e9cf71ba-0d1e-4072-86f4-825b92dc854f" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>No. of contacts displayed in sidebar</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.DropDownSelector</controlname>
+          <Options>
+<![CDATA[
+1;1
+2;2
+3;3
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+      </field>
       <field allowempty="true" column="RelevantContactPersonDeal" columnprecision="0" columntype="contentitemreference" enabled="true" guid="726d3412-b273-4b57-95ca-f9ad9ad50e72" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
@@ -255,9 +274,6 @@ INNER JOIN dbo.CMS_ContentItemCommonData AS cicd
         <properties />
       </schema>
       <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
-        <properties />
-      </schema>
-      <schema guid="c7c96373-2939-43c4-ac0f-85b345f6c005" name="c7c96373-2939-43c4-ac0f-85b345f6c005">
         <properties />
       </schema>
     </form>

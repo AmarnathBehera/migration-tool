@@ -13,6 +13,12 @@ public class WhereConditionParser
         _entityParameterExpression = entityParameterExpression;
     }
 
+    /// <summary>
+    /// Parses the given expression and returns an <see cref="IWhereCondition"/> representing the parsed condition.
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <returns></returns>
+    /// <exception cref="NotSupportedException"></exception>
     public IWhereCondition ParseExpression(Expression expression)
     {
         return expression switch
@@ -41,7 +47,7 @@ public class WhereConditionParser
         };
     }
 
-    private IWhereCondition ParseAndAlsoBinaryExpression(BinaryExpression binaryExpression)
+    private AndWhereCondition ParseAndAlsoBinaryExpression(BinaryExpression binaryExpression)
     {
         var left = ParseExpression(binaryExpression.Left);
         var right = ParseExpression(binaryExpression.Right);

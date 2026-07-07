@@ -46,6 +46,12 @@
 
             public const string TabAccordion = WidgetPrefix + "TabAccordion";
 
+            public const string RelatedContacts = WidgetPrefix + "RelatedContacts";
+
+            public const string EditorsPick = WidgetPrefix + "EditorsPick";
+
+            public const string InFocus = WidgetPrefix + "InFocus";
+
         }
 
         //sections

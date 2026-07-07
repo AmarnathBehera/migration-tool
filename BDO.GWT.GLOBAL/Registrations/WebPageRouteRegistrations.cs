@@ -325,6 +325,6 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     IconClass = "xp-market")]
 
 [assembly: RegisterWebPageRoute(SectionRss.CONTENT_TYPE_NAME, typeof(SectionRssController))]
-[assembly: RegisterWebPageRoute(Rss.CONTENT_TYPE_NAME, typeof(RssController))]
-
 [assembly: RegisterWebPageRoute(Sitemap.CONTENT_TYPE_NAME, typeof(SitemapPageController))]
+[assembly: RegisterWebPageRoute(Rss.CONTENT_TYPE_NAME, typeof(RssController))]
+[assembly: RegisterWebPageRoute(LegalPage.CONTENT_TYPE_NAME, typeof(LegalPageController))]

@@ -146,6 +146,7 @@ public class EventWebinarCardsService : IEventWebinarCardsService
                 .ForContentType(contentTypeName, c =>
                 {
                     c.ForWebsite(channel)
+                    .WithLinkedItems(2)
                      .Where(w => w.WhereEquals(nameof(IEventOrWebinar.EventIsPrivate), false));
                      
                     foreach (var decorator in filterWhereExpressions)
@@ -243,6 +244,7 @@ public class EventWebinarCardsService : IEventWebinarCardsService
             .Where(eventOrWebinar => urlByGuid.ContainsKey(eventOrWebinar.SystemFields.WebPageItemGUID))
             .Select(eventOrWebinar =>
             {
+                
                 var firstEventType = eventOrWebinar.EventType?.FirstOrDefault();
                 var eventTypeName = firstEventType?.Name;
 

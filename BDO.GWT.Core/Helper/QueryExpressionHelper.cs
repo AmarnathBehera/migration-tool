@@ -4,8 +4,17 @@ using System.Linq.Expressions;
 
 namespace BDO.GWT.Domain.Core;
 
+/// <summary>
+/// Provides helper methods for working with query expressions, including extracting property names and values from expressions and mapping expression types to query operators.
+/// </summary>
 public static class QueryExpressionHelper
 {
+    /// <summary>
+    /// Gets the property name from an expression. This method supports BinaryExpression, MemberExpression, and UnaryExpression types. If the expression type is not supported, a NotSupportedException is thrown.
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <returns></returns>
+    /// <exception cref="NotSupportedException"></exception>
     public static string GetPropertyName(Expression expression)
     {
         var propertyName = expression switch
@@ -19,6 +28,12 @@ public static class QueryExpressionHelper
         return propertyName;
     }
 
+    /// <summary>
+    /// Gets the corresponding QueryOperator for a given BinaryExpression. This method maps the ExpressionType of the binary expression to a QueryOperator. If the ExpressionType is not supported, a NotImplementedException is thrown.
+    /// </summary>
+    /// <param name="binaryExpression"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
     public static QueryOperator GetQueryOperator(BinaryExpression binaryExpression)
     {
         var queryOperator = binaryExpression.NodeType switch

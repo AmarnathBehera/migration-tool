@@ -9,6 +9,9 @@ namespace BDO.GWT.Domain.Core.Retrievers;
 
 public interface IQuery<TEntity> : ICacheKeyPartsBuilder, ICacheKeyBuilder where TEntity : IEntity
 {
+    /// <summary>
+    /// Gets the properties used for querying data from a data source. This property provides access to the query parameters such as filtering, ordering, selection, and pagination. Implementing classes can use these properties to construct queries that retrieve specific subsets of data based on the defined criteria.
+    /// </summary>
     IQueryProperties Properties { get; }
 
     IQuery<TEntity> Global();
@@ -28,6 +31,9 @@ public interface IQuery<TEntity> : ICacheKeyPartsBuilder, ICacheKeyBuilder where
 
 public class Query<TEntity> : IQuery<TEntity> where TEntity : IEntity
 {
+    /// <summary>
+    /// Gets the properties used for querying data from a data source. This property provides access to the query parameters such as filtering, ordering, selection, and pagination. Implementing classes can use these properties to construct queries that retrieve specific subsets of data based on the defined criteria.
+    /// </summary>
     public IQueryProperties Properties { get; } = new QueryProperties();
 
     public IQuery<TEntity> Global()

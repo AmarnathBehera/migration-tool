@@ -109,14 +109,14 @@ namespace BDO.GWT.Core.Tests.Services
         public async Task GetBlogPostDtoAsync_MapsImageDto_WhenImageFileExists()
         {
             var page = CreateBlogPostPage();
-            page.ImageFile = new[]
+            page.ImageFileM = new[]
             {
                 new ContentAttachment
                 {
                     ContentAttachmentAsset = new ContentItemAsset { Url = "/media/blog-hero.jpg" }
                 }
             };
-            page.ImageFileAltText = "Blog hero image";
+            page.ImageFileAltTextM = "Blog hero image";
 
             var result = await _service.GetBlogPostDtoAsync(page, CancellationToken.None);
 
@@ -132,7 +132,7 @@ namespace BDO.GWT.Core.Tests.Services
         public async Task GetBlogPostDtoAsync_MapsEmptyImageUrl_WhenNoImageFile()
         {
             var page = CreateBlogPostPage();
-            page.ImageFile = Array.Empty<ContentAttachment>();
+            page.ImageFileM = Array.Empty<ContentAttachment>();
 
             var result = await _service.GetBlogPostDtoAsync(page, CancellationToken.None);
 
@@ -147,7 +147,7 @@ namespace BDO.GWT.Core.Tests.Services
         public async Task GetBlogPostDtoAsync_MapsEmptyAltText_WhenImageFileAltTextIsNull()
         {
             var page = CreateBlogPostPage();
-            page.ImageFileAltText = null;
+            page.ImageFileAltTextM = null;
 
             var result = await _service.GetBlogPostDtoAsync(page, CancellationToken.None);
 
@@ -760,8 +760,8 @@ namespace BDO.GWT.Core.Tests.Services
                 SystemFields = CreateWebPageFields(),
                 MetadataTitle = "Test Blog Post",
                 MetadataDescription = "Test description",
-                ImageFile = Array.Empty<ContentAttachment>(),
-                ImageFileAltText = "alt text",
+                ImageFileM = Array.Empty<ContentAttachment>(),
+                ImageFileAltTextM = "alt text",
                 ContentType = Array.Empty<Contenttypes>(),
                 UpdatedOn = DateTime.MinValue,
                 MetadataKeywordsBlog = string.Empty,

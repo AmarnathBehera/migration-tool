@@ -30,9 +30,9 @@ public class BlogPostPageService : IBlogPostPageService
     private readonly IExternalPeopleHelper _externalPeopleHelper;
 
     public BlogPostPageService(ISidebarService sidebarService, IExternalPeopleHelper externalPeopleHelper)
-    {     
+    {
         _sidebarService = sidebarService;
-        _externalPeopleHelper = externalPeopleHelper;   
+        _externalPeopleHelper = externalPeopleHelper;
     }
 
     public async Task<BlogPostDto> GetBlogPostDtoAsync(BlogPost blogpostPage, CancellationToken cancellationToken)
@@ -47,7 +47,7 @@ public class BlogPostPageService : IBlogPostPageService
 
         
 
-        var imageFileUrl = blogpostPage.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+        var imageFileUrl = blogpostPage.ImageFileM?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
 
 
         BlogPostDto BlogPostDtoObj = new BlogPostDto
@@ -55,9 +55,9 @@ public class BlogPostPageService : IBlogPostPageService
            
             ImageDto = new ImageDto
             {
-                 Url = imageFileUrl ?? string.Empty,
-                 AltText = blogpostPage.ImageFileAltText ?? string.Empty,
-            },                                                                   
+                Url = imageFileUrl ?? string.Empty,
+                AltText = blogpostPage.ImageFileAltTextM ?? string.Empty,
+            },
             ShowSidebar = blogpostPage.ShowSidebar,
             ShowTitle = blogpostPage.ShowTitle,
             ShowDescription = blogpostPage.ShowDescription,
@@ -68,12 +68,13 @@ public class BlogPostPageService : IBlogPostPageService
 
             //getting sidebar data if ShowSidebar is true
         ContentSidebarDto? sideBarObj = BlogPostDtoObj.ShowSidebar
-                    ? await _sidebarService.GetSidebarDtoAsync(blogpostPage, pageUrl, cancellationToken)
-                    : null;
+            ? await _sidebarService.GetSidebarDtoAsync(blogpostPage, pageUrl, cancellationToken)
+            : null;
 
-        CallToActionDto? callToActionDto = BlogPostDtoObj.ShowCallToAction 
-                    ? PageHelper.GetCallToActionDto(blogpostPage)
-                    : null;
+        if (BlogPostDtoObj.ShowCallToAction)
+        {
+            BlogPostDtoObj.CallToAction = PageHelper.GetCallToActionDto(blogpostPage);
+        }
 
         if (blogpostPage.RelevantContactPerson != null)
         {
@@ -94,7 +95,7 @@ public class BlogPostPageService : IBlogPostPageService
         if (sideBarObj != null)
         {
             var publishedDate = blogpostPage.SystemFields.ContentItemCommonDataLastPublishedWhen ??
-                blogpostPage.SystemFields.ContentItemCommonDataFirstPublishedWhen;
+                                blogpostPage.SystemFields.ContentItemCommonDataFirstPublishedWhen;
             var updatedDate = blogpostPage.UpdatedOn == DateTime.MinValue ? null : (DateTime?)blogpostPage.UpdatedOn;
 
 
@@ -105,7 +106,7 @@ public class BlogPostPageService : IBlogPostPageService
             {
                 sideBarObj.RelatedExternalPeople = await _externalPeopleHelper.GetSidebarExternalPeopleDtosAsync(
                              blogpostPage.RelatedExternalPeople.Select(p => p.SystemFields.ContentItemGUID).ToList(),
-                             cancellationToken);
+                        cancellationToken);
             }
         }
 

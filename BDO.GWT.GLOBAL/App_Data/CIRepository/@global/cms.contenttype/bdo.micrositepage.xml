@@ -10,6 +10,17 @@
       <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
         <properties />
       </schema>
+      <field allowempty="true" column="Image" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="a91cfbc2-4f00-4cd4-8b07-89fa51cc7f05" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Image</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
       <field allowempty="true" column="MicrositeImage" columnprecision="0" columntype="contentitemreference" enabled="true" guid="1e54f7d4-5635-43a1-95ee-f3fb26bfb1f3" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
@@ -21,6 +32,8 @@
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
         <validationrulesdata>
@@ -41,6 +54,17 @@
         </properties>
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="Where_should_this_Microsite_appear" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7fd5e6cd-72bf-44e6-a3da-3d4459b0f104" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Where should this Microsite appear?</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
         </settings>
       </field>
       <field allowempty="true" column="Homepage" columnprecision="0" columntype="contentitemreference" enabled="true" guid="400c5cf7-5271-4602-9b45-18a6f284dde9" visible="true">
@@ -191,6 +215,17 @@
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="Custom" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="9308cbf0-dac0-49f8-99e2-642aae105842" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Custom</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
         </settings>
       </field>
       <field allowempty="true" column="PageHeadHTML" columnprecision="0" columntype="longtext" enabled="true" guid="bd2d5016-5fca-4620-977d-ec25eaee955c" visible="true">

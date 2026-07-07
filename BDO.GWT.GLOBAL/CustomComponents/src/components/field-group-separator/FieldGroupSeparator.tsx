@@ -17,10 +17,6 @@ export const FieldGroupSeparator = (props: FieldGroupSeparatorProps = {}) => {
                     {explanationText}
                 </div>
             )}
-            <div
-                aria-hidden="true"
-                className="h-[1.2px] w-full bg-[#676767]"
-            />
         </div>
     );
 };

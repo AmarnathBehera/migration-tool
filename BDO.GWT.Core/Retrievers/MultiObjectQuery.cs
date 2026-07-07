@@ -11,8 +11,21 @@ public interface IMultiObjectQuery<TMainEntity> : ICacheKeyPartsBuilder, ICacheK
 {
     IMultiObjectQueryProperties Properties { get; }
 
+    /// <summary>
+    /// Includes the specified entity type in the query results, allowing for eager loading of related data. The expression parameter is a lambda expression that specifies the navigation property to include, and the joinType parameter determines the type of join to use (inner or left). This method enables the retrieval of related entities in a single query, reducing the number of database round trips and improving performance.
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <param name="expression"></param>
+    /// <param name="joinType"></param>
+    /// <returns></returns>
     IMultiObjectQuery<TMainEntity> Include<TEntity>(Expression<Func<TMainEntity, TEntity?>> expression, JoinType joinType = JoinType.Inner) where TEntity : DomainEntity;
 
+    /// <summary>
+    /// Selects specific properties from the specified entity type to be included in the query results. The expression parameter is a lambda expression that specifies the properties to select. This method allows for fine-grained control over which properties are retrieved from the database, potentially improving performance by reducing the amount of data transferred.
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <param name="expression"></param>
+    /// <returns></returns>
     IMultiObjectQuery<TMainEntity> Select<TEntity>(Expression<Func<TEntity, object?>> expression) where TEntity : DomainEntity;
 
     IMultiObjectQuery<TMainEntity> Where<TEntity>(Expression<Func<TEntity, bool>> expression) where TEntity : DomainEntity;

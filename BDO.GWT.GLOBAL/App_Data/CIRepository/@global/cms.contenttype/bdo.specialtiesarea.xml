@@ -16,6 +16,17 @@
       <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
         <properties />
       </schema>
+      <field allowempty="true" column="ContentSeperator" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="b97c6cf8-f5a5-4242-a107-b889e0a0148b" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Content</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
       <field column="ContentTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="58b00d3f-f95b-41f7-ae8f-9805632689f0" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
@@ -36,6 +47,17 @@
         </properties>
         <settings>
           <controlname>Kentico.Administration.RichTextEditor</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="SideNavigationSeperator" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="41682b3b-7594-4512-832c-764cc1dd84c6" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Side navigation</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
         </settings>
       </field>
       <field column="ShowSideNavigation" columnprecision="0" columntype="boolean" enabled="true" guid="1c75c247-b1d0-4672-8da6-32da08fff00b" visible="true">

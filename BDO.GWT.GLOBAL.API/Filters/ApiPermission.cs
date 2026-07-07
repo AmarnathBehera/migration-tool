@@ -1,7 +1,16 @@
 ﻿namespace BDO.GWT.GLOBAL.API.Filters;
 
+/// <summary>
+/// Defines the types of permissions that can be assigned to API endpoints for authorization purposes. The 'Read' permission allows users to view data, while the 'Manage' permission allows users to create, update, or delete data.
+/// </summary>
 public enum ApiPermission
 {
+    /// <summary>
+    /// Read permission for viewing data.
+    /// </summary>
     Read,
+    /// <summary>
+    /// Manage permission for creating, updating, or deleting data.
+    /// </summary>
     Manage,
 }
