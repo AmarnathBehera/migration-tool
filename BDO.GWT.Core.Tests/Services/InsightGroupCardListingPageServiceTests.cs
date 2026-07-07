@@ -8,6 +8,7 @@ using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Web.Core.Services;
+using BDO.GWT.Web.Core.DTOs;
 using CMS.ContentEngine;
 using CMS.Websites;
 using CMS.Websites.Routing;
@@ -288,6 +289,114 @@ public class InsightGroupCardListingPageServiceTests
         Assert.That(exception!.Message, Does.Contain("System fields"));
     }
 
+    [Test]
+    public async Task GetInsightPageDtoAsync_ReturnsMappedDto_WithFilteringEnabled()
+    {
+        var pageGuid = Guid.NewGuid();
+        var page = CreateInsightGroup(pageGuid, "/Insights/Group");
+        var expectedHero = new HeroDto { Layout = "layout", Title = "Hero" };
+        var expectedFilters = new[]
+        {
+            new FilterItemDto<OptionDto>
+            {
+                Name = "businessLine",
+                Options = Array.Empty<OptionDto>()
+            }
+        };
+
+        _contentRetrieverMock
+            .Setup(x => x.RetrieveCurrentPage<InsightGroup>(
+                It.IsAny<RetrieveCurrentPageParameters>(),
+                It.IsAny<Action<RetrieveCurrentPageQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, InsightGroup, Task<InsightGroup>>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(page);
+
+        _contentRetrieverMock
+            .Setup(x => x.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, SectionInsightsPage, Task<SectionInsightsPage>>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[]
+            {
+                new SectionInsightsPage
+                {
+                    InsightListFilters = "businessLine; serviceArea",
+                    ItemListFilteringEnabled = true,
+                    ItemListAdvancedSearchDescription = "Pre-link",
+                    ItemListAdvancedSearchLinkText = "Advanced search",
+                    ItemListAdvancedSearchLinkUrl = Array.Empty<WebPageRelatedItem>()
+                }
+            });
+
+        _heroServiceMock
+            .Setup(x => x.GetHeroDtoAsync(It.IsAny<BDO.GWT.Core.Data.HeroData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expectedHero);
+
+        _filteringHelperMock
+            .Setup(x => x.IsFilteringTooltipEnabledAsync(true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        _insightCardServiceMock
+            .Setup(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), null, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expectedFilters);
+
+        var result = await _service.GetInsightPageDtoAsync(page, CancellationToken.None);
+
+        Assert.That(result.Title, Is.EqualTo(page.MetadataTitle));
+        Assert.That(result.Hero, Is.SameAs(expectedHero));
+        Assert.That(result.CardsGrid.Filters, Is.SameAs(expectedFilters));
+        Assert.That(result.CardsGrid.FilteringTooltipEnabled, Is.True);
+        Assert.That(result.CardsGrid.ApiEndpointName, Is.EqualTo($"Insights/{pageGuid}"));
+        Assert.That(result.CardsGrid.AdvancedSearchPrelinkText, Is.EqualTo("Pre-link"));
+        Assert.That(result.CardsGrid.AdvancedSearchLinkText, Is.EqualTo("Advanced search"));
+    }
+
+    [Test]
+    public async Task GetInsightPageDtoAsync_SetsFiltersNull_WhenFilteringDisabled()
+    {
+        var pageGuid = Guid.NewGuid();
+        var page = CreateInsightGroup(pageGuid, "/Insights/Group");
+
+        _contentRetrieverMock
+            .Setup(x => x.RetrieveCurrentPage<InsightGroup>(
+                It.IsAny<RetrieveCurrentPageParameters>(),
+                It.IsAny<Action<RetrieveCurrentPageQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, InsightGroup, Task<InsightGroup>>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(page);
+
+        _contentRetrieverMock
+            .Setup(x => x.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, SectionInsightsPage, Task<SectionInsightsPage>>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[]
+            {
+                new SectionInsightsPage
+                {
+                    InsightListFilters = "businessLine",
+                    ItemListFilteringEnabled = false,
+                    ItemListAdvancedSearchLinkUrl = Array.Empty<WebPageRelatedItem>()
+                }
+            });
+
+        _filteringHelperMock
+            .Setup(x => x.IsFilteringTooltipEnabledAsync(false, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
+        var result = await _service.GetInsightPageDtoAsync(page, CancellationToken.None);
+
+        Assert.That(result.CardsGrid.Filters, Is.Null);
+        Assert.That(result.CardsGrid.FilteringTooltipEnabled, Is.False);
+    }
+
     private static CardsQuery CreateCardsQuery()
     {
         return new CardsQuery
@@ -302,7 +411,18 @@ public class InsightGroupCardListingPageServiceTests
         Guid pageGuid,
         string? treePath)
     {
-        var page = new InsightGroup();
+        var page = new InsightGroup
+        {
+            MetadataTitle = "Insight Group",
+            MetadataDescription = "Group description",
+            MetadataCanonical = "/insights/group",
+            MetadataTeaserImage = Array.Empty<ContentAttachment>(),
+            MetadataOGImage = Array.Empty<ContentAttachment>(),
+            MetadataOGTwitterImage = Array.Empty<ContentAttachment>(),
+            HeroBackgroundImage = Array.Empty<ContentAttachment>(),
+            HeroBackgroundImage_Mobile = Array.Empty<ContentAttachment>(),
+            HeroCallToActionButtonUrl = Array.Empty<IWebPageFieldsSource>()
+        };
 
         var systemFieldsProperty = typeof(InsightGroup).GetProperty(nameof(InsightGroup.SystemFields));
         if (systemFieldsProperty is null)
