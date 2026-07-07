@@ -50,6 +50,8 @@
 
             public const string EditorsPick = WidgetPrefix + "EditorsPick";
 
+            public const string InFocus = WidgetPrefix + "InFocus";
+
         }
 
         //sections

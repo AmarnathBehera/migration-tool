@@ -126,6 +126,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IEditorsPickCardService, EditorsPickCardService>();
         serviceCollection.AddScoped<IEditorsPickService, EditorsPickService>();
         serviceCollection.AddScoped<IRelatedContactsService, RelatedContactsService>();
+        serviceCollection.AddScoped<IInFocusService, InFocusService>();
     }
 
 }
