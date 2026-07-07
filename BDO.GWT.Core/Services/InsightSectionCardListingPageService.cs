@@ -48,6 +48,9 @@ public class InsightSectionCardListingPageService : IInsightSectionCardListingPa
     {
         var insightPage = await _contentRetriever.RetrieveCurrentPage<SectionInsightsPage>(
             new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 },
+            _ => { },
+            RetrievalCacheSettings.CacheDisabled,
+            (_, currentPage) => Task.FromResult(currentPage),
             cancellationToken);
 
         if (insightPage is null)
@@ -130,8 +133,11 @@ public class InsightSectionCardListingPageService : IInsightSectionCardListingPa
         CardsQuery cardsQuery,
         CancellationToken cancellationToken)
     {
-        var page = (await _contentRetriever.RetrieveAllPagesByGuids<IWebPageFieldsSource>(
-            new[] { pageGuid },
+        var page = (await _contentRetriever.RetrievePages<IWebPageFieldsSource, IWebPageFieldsSource>(
+            new RetrievePagesParameters(),
+            query => query.Where(where => where.WhereIn(nameof(WebPageFields.WebPageItemGUID), new[] { pageGuid })),
+            RetrievalCacheSettings.CacheDisabled,
+            (_, item) => Task.FromResult(item),
             cancellationToken))
             .FirstOrDefault();
 
@@ -162,7 +168,7 @@ public class InsightSectionCardListingPageService : IInsightSectionCardListingPa
             return currentPage;
         }
 
-        var insightSection = await _contentRetriever.RetrievePages<SectionInsightsPage>(
+        var insightSection = await _contentRetriever.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
                             new RetrievePagesParameters
                             {
                                 LinkedItemsMaxLevel = 5
@@ -173,6 +179,7 @@ public class InsightSectionCardListingPageService : IInsightSectionCardListingPa
                                     w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
                             },
                             RetrievalCacheSettings.CacheDisabled,
+                            (_, item) => Task.FromResult(item),
                             cancellationToken);
 
         var insightSectionPage = insightSection.FirstOrDefault();

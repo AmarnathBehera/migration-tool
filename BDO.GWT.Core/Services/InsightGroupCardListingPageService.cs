@@ -44,7 +44,12 @@ public class InsightGroupCardListingPageService : IInsightGroupCardListingPageSe
     }
     public async Task<InsightCardListingDto> GetInsightPageDtoAsync(InsightGroup page, CancellationToken cancellationToken)
     {
-        var insightPage = await _contentRetriever.RetrieveCurrentPage<InsightGroup>(new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
+        var insightPage = await _contentRetriever.RetrieveCurrentPage<InsightGroup>(
+            new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 },
+            _ => { },
+            RetrievalCacheSettings.CacheDisabled,
+            (_, currentPage) => Task.FromResult(currentPage),
+            cancellationToken);
         if (insightPage is null)
         {
             throw new InvalidOperationException("Current page of type InsightGroup could not be retrieved.");
@@ -131,8 +136,11 @@ public class InsightGroupCardListingPageService : IInsightGroupCardListingPageSe
      CardsQuery cardsQuery,
      CancellationToken cancellationToken)
     {
-        var page = (await _contentRetriever.RetrievePagesByGuids<InsightGroup>(
-            new[] { pageGuid },
+        var page = (await _contentRetriever.RetrievePages<InsightGroup, InsightGroup>(
+            new RetrievePagesParameters(),
+            query => query.Where(where => where.WhereIn(nameof(WebPageFields.WebPageItemGUID), new[] { pageGuid })),
+            RetrievalCacheSettings.CacheDisabled,
+            (_, item) => Task.FromResult(item),
             cancellationToken)).FirstOrDefault();
 
         if (page is null)
@@ -141,9 +149,12 @@ public class InsightGroupCardListingPageService : IInsightGroupCardListingPageSe
         }
 
         var treePath = page.SystemFields.WebPageItemTreePath;
-        Action<RetrievePagesQueryParameters>? decorateQuery = string.IsNullOrWhiteSpace(treePath)
-            ? null
-            : q => q.Where(w => w.WhereStartsWith(nameof(WebPageFields.WebPageItemTreePath), $"{treePath}/"));
+        if (string.IsNullOrWhiteSpace(treePath))
+        {
+            throw new InvalidOperationException("WebPageItemTreePath is missing for the selected InsightGroup page.");
+        }
+
+        Action<RetrievePagesQueryParameters>? decorateQuery = null;
 
         var featuredContentPageIds = new HashSet<int>();
 

@@ -58,7 +58,7 @@ public class InsightCardService : IInsightCardService
 
         var filters = await GetFilterPredicatesAsync(cardsQuery.Filters);
 
-        var contentPages = await _contentRetriever.RetrievePages<Insight>(
+        var contentPages = await _contentRetriever.RetrievePages<Insight, Insight>(
             new RetrievePagesParameters
             {
                 LinkedItemsMaxLevel = 4,
@@ -72,6 +72,7 @@ public class InsightCardService : IInsightCardService
                 decorateQuery?.Invoke(query);
             },
             RetrievalCacheSettings.CacheDisabled,
+            (_, page) => Task.FromResult(page),
             cancellationToken);
 
         var filteredContentPages = contentPages

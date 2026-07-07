@@ -40,7 +40,12 @@ public class InsightCategoryCardListingPageService : IInsightCategoryCardListing
 
     public async Task<InsightCardListingDto> GetInsightPageDtoAsync(InsightCategory page, CancellationToken cancellationToken)
     {
-        var insightPage = await _contentRetriever.RetrieveCurrentPage<InsightCategory>(new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
+        var insightPage = await _contentRetriever.RetrieveCurrentPage<InsightCategory>(
+            new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 },
+            _ => { },
+            RetrievalCacheSettings.CacheDisabled,
+            (_, currentPage) => Task.FromResult(currentPage),
+            cancellationToken);
         if (insightPage is null)
         {
             throw new InvalidOperationException("Current page of type InsightCategory could not be retrieved.");
@@ -127,8 +132,11 @@ public class InsightCategoryCardListingPageService : IInsightCategoryCardListing
      CardsQuery cardsQuery,
      CancellationToken cancellationToken)
     {
-        var page = (await _contentRetriever.RetrievePagesByGuids<InsightCategory>(
-            new[] { pageGuid },
+        var page = (await _contentRetriever.RetrievePages<InsightCategory, InsightCategory>(
+            new RetrievePagesParameters(),
+            query => query.Where(where => where.WhereIn(nameof(WebPageFields.WebPageItemGUID), new[] { pageGuid })),
+            RetrievalCacheSettings.CacheDisabled,
+            (_, item) => Task.FromResult(item),
             cancellationToken)).FirstOrDefault();
 
         if (page is null)
@@ -136,7 +144,7 @@ public class InsightCategoryCardListingPageService : IInsightCategoryCardListing
             throw new ContentItemNotFoundException($"InsightCategory page not found for guid '{pageGuid}'.");
         }
 
-        var treePath = page.SystemFields.WebPageItemTreePath;
+        var treePath = page.SystemFields?.WebPageItemTreePath ?? string.Empty;
         Action<RetrievePagesQueryParameters>? decorateQuery = string.IsNullOrWhiteSpace(treePath)
             ? null
             : q => q.Where(w => w.WhereStartsWith(nameof(WebPageFields.WebPageItemTreePath), $"{treePath}/"));
