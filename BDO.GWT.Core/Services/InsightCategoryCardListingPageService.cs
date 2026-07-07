@@ -38,7 +38,7 @@ public class InsightCategoryCardListingPageService : IInsightCategoryCardListing
         _insightCardService = insightCardService;
     }
 
-    public async Task<InsightCardListingDto> GetInsightPageDtoAsync(InsightCategory insightCategory, CancellationToken cancellationToken)
+    public async Task<InsightCardListingDto> GetInsightPageDtoAsync(InsightCategory page, CancellationToken cancellationToken)
     {
         var insightPage = await _contentRetriever.RetrieveCurrentPage<InsightCategory>(new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
         if (insightPage is null)

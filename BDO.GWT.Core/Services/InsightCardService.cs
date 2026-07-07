@@ -37,12 +37,7 @@ public class InsightCardService : IInsightCardService
         _httpContextAccessor= httpContextAccessor;
     }
 
-    public void AddFilterQueryDecorator<TPageFilter>(Action<ContentItemQueryBuilder> decorateFilterQuery)
-        where TPageFilter : class, IWebPageFieldsSource
-    {
-        // No-op for Insight card implementation.
-        // Filters are currently built from configured filter names and applied at query/materialization level.
-    }
+   
  
     public async Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(HashSet<string> filterParameterNames, string? nodeAliasPath, CancellationToken cancellationToken)
     {

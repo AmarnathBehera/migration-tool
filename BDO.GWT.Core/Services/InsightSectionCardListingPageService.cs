@@ -209,15 +209,15 @@ public class InsightSectionCardListingPageService : IInsightSectionCardListingPa
                    cancellationToken);
         var insightCardsGridDto = new CardsGridDto
         {
-            Title = insightSection.ItemListTitle,
-            Description = insightSection.ItemListDescription,
-            Filters = insightSection.ItemListFilteringEnabled ? await createFilters : null,
-            FilteringTooltipEnabled = await _filteringHelper.IsFilteringTooltipEnabledAsync(insightSection.ItemListFilteringEnabled, cancellationToken),
+            Title = insightSection?.ItemListTitle,
+            Description = insightSection?.ItemListDescription,
+            Filters = insightSection?.ItemListFilteringEnabled == true ? await createFilters : null,
+            FilteringTooltipEnabled = await _filteringHelper.IsFilteringTooltipEnabledAsync(insightSection?.ItemListFilteringEnabled ?? false, cancellationToken),
             PageSize = 20,
             ApiEndpointName = $"Insights/{page.SystemFields.WebPageItemGUID}",
-            AdvancedSearchPrelinkText = insightSection.ItemListAdvancedSearchDescription,
-            AdvancedSearchLinkText = insightSection.ItemListAdvancedSearchLinkText,
-            AdvancedSearchLink = insightSection.ItemListAdvancedSearchLinkUrl?.FirstOrDefault()?.ToString(),
+            AdvancedSearchPrelinkText = insightSection?.ItemListAdvancedSearchDescription,
+            AdvancedSearchLinkText = insightSection?.ItemListAdvancedSearchLinkText,
+            AdvancedSearchLink = insightSection?.ItemListAdvancedSearchLinkUrl?.FirstOrDefault()?.ToString(),
         };
 
         return insightCardsGridDto;

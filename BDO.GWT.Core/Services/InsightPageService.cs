@@ -1,5 +1,4 @@
-﻿using AngleSharp.Dom;
-using BDO.GWT.Common.Exceptions;
+﻿using BDO.GWT.Common.Exceptions;
 using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
@@ -8,7 +7,6 @@ using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
 using BDO.GWT.Core.DTOs.SchemaMarkups;
 using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.Utilities;
-using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.DTOs.Pages;
 using CMS.ContentEngine;
 using CMS.DataEngine;
@@ -247,13 +245,13 @@ namespace BDO.GWT.Core.Services
             sidebarDto.UpdatedDate = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen == DateTime.MinValue ? null : contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen;
             sidebarDto.RelevantContactPeopleTitle = ResourceStringKey.LiveSite.Insights.Authors;
             
-            sidebarDto.RelevantContactPeople = await GetContentPageAuthorDtos(contentPage,cancellationToken);
+            sidebarDto.RelevantContactPeople = await GetContentPageAuthorDtos(contentPage);
 
             sidebarDto.RelatedExternalPeople = await GetSidebarExternalPeopleDtosAsync(contentPage.RelatedExternalPeople, cancellationToken);
 
             return sidebarDto;
         }
-        private async Task<SidebarPersonDto[]> GetContentPageAuthorDtos(Insight contentPage,CancellationToken cancellationToken)
+        private async Task<SidebarPersonDto[]> GetContentPageAuthorDtos(Insight contentPage)
         {
            
             var people = contentPage.RelevantContactPerson?.OfType<Person>()
@@ -330,7 +328,6 @@ namespace BDO.GWT.Core.Services
         }
         private async Task<ArticleSchemaMarkupDto> GetInsightSchemaMarkupDtoAsync(Insight insights, CancellationToken cancellationToken)
         {
-            var site = _websiteChannelContext.WebsiteChannelID;
             var websiteChannel = await _websiteChannelInfoProvider.GetAsync(_websiteChannelContext.WebsiteChannelID, cancellationToken);
             var presentationUrl = websiteChannel?.WebsiteChannelDomain;
             var authorNames = new List<string>();
