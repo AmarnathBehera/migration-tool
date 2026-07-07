@@ -42,7 +42,7 @@ public class InsightGroupCardListingPageService : IInsightGroupCardListingPageSe
         _websiteChannelContext = websiteChannelContext;
         _insightCardService = insightCardService;
     }
-    public async Task<InsightCardListingDto> GetInsightPageDtoAsync(InsightGroup insightgroup, CancellationToken cancellationToken)
+    public async Task<InsightCardListingDto> GetInsightPageDtoAsync(InsightGroup page, CancellationToken cancellationToken)
     {
         var insightPage = await _contentRetriever.RetrieveCurrentPage<InsightGroup>(new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
         if (insightPage is null)
@@ -74,26 +74,26 @@ public class InsightGroupCardListingPageService : IInsightGroupCardListingPageSe
             }, cancellationToken),
             BaseContent = new BaseContent
             {
-                ContentItemID = sys?.ContentItemID ?? 0,
-                ContentItemGUID = sys?.ContentItemGUID ?? Guid.Empty,
-                ContentItemName = sys?.ContentItemName,
-                ContentItemContentTypeID = sys?.ContentItemContentTypeID ?? 0,
-                ContentItemIsSecured = sys?.ContentItemIsSecured ?? false,
-                ContentItemCommonDataContentLanguageID = sys?.ContentItemCommonDataContentLanguageID ?? 0,
-                ContentItemCommonDataFirstPublishedWhen = sys?.ContentItemCommonDataFirstPublishedWhen ?? default,
-                ContentItemCommonDataLastPublishedWhen = sys?.ContentItemCommonDataLastPublishedWhen ?? default
+                ContentItemID = sys.ContentItemID,
+                ContentItemGUID = sys.ContentItemGUID,
+                ContentItemName = sys.ContentItemName,
+                ContentItemContentTypeID = sys.ContentItemContentTypeID,
+                ContentItemIsSecured = sys.ContentItemIsSecured,
+                ContentItemCommonDataContentLanguageID = sys.ContentItemCommonDataContentLanguageID,
+                ContentItemCommonDataFirstPublishedWhen = sys.ContentItemCommonDataFirstPublishedWhen,
+                ContentItemCommonDataLastPublishedWhen = sys.ContentItemCommonDataLastPublishedWhen
             },
             BaseWebPage = new BaseWebPage
             {
-                WebPageItemGUID = sys?.WebPageItemGUID ?? Guid.Empty,
-                WebPageItemID = sys?.WebPageItemID ?? 0,
-                WebPageItemName = sys?.WebPageItemName,
-                WebPageItemWebsiteChannelID = sys?.WebPageItemWebsiteChannelId ?? 0,
-                WebPageUrlPath = sys?.WebPageUrlPath,
-                WebPageItemOrder = sys?.WebPageItemOrder ?? 0,
-                WebPageItemTreePath = sys?.WebPageItemTreePath,
-                WebPageUrlPathContentLanguageID = sys?.WebPageUrlPathContentLanguageID ?? 0,
-                WebPageItemParentID = sys?.WebPageItemParentID ?? 0
+                WebPageItemGUID = sys.WebPageItemGUID,
+                WebPageItemID = sys.WebPageItemID,
+                WebPageItemName = sys.WebPageItemName,
+                WebPageItemWebsiteChannelID = sys.WebPageItemWebsiteChannelId,
+                WebPageUrlPath = sys.WebPageUrlPath,
+                WebPageItemOrder = sys.WebPageItemOrder,
+                WebPageItemTreePath = sys.WebPageItemTreePath,
+                WebPageUrlPathContentLanguageID = sys.WebPageUrlPathContentLanguageID,
+                WebPageItemParentID = sys.WebPageItemParentID
             },
             MetaData = new MetaDataDto
             {

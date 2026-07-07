@@ -19,6 +19,8 @@ public interface IInsightCardService
 }
 public class InsightCardService : IInsightCardService
 {
+    private const char UrlPathSeparator = '/';
+
     private readonly IContentRetriever _contentRetriever;
     private readonly ICardsService _cardsService;
     private readonly IWebPageUrlResolver _webPageUrlResolver;
@@ -42,9 +44,9 @@ public class InsightCardService : IInsightCardService
         // Filters are currently built from configured filter names and applied at query/materialization level.
     }
  
-    public async Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(HashSet<string> filters, string? nodeAliasPath, CancellationToken cancellationToken)
+    public async Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(HashSet<string> filterParameterNames, string? nodeAliasPath, CancellationToken cancellationToken)
     {
-        return await _cardsService.CreateFiltersAsync(filters, nodeAliasPath, cancellationToken);
+        return await _cardsService.CreateFiltersAsync(filterParameterNames, nodeAliasPath, cancellationToken);
     }
 
     public async Task<PaginationDto<ContentPageCardDto>> GetFilteredItemsAsync(
@@ -115,7 +117,7 @@ public class InsightCardService : IInsightCardService
                  .WhereNull(nameof(Insight.IsSearchExcluded)));
     }
 
-    private Task<List<Func<Insight, bool>>> GetFilterPredicatesAsync(IDictionary<string, string> filterParameterValueByName)
+    private static Task<List<Func<Insight, bool>>> GetFilterPredicatesAsync(IDictionary<string, string> filterParameterValueByName)
     {
         var predicates = new List<Func<Insight, bool>>();
 
@@ -208,13 +210,25 @@ public class InsightCardService : IInsightCardService
         return url.Replace("~/", "/");
     }
 
-    var relativeUrl = url.StartsWith("~/")
-        ? url[1..] // converts ~/getContentAsset/... to /getContentAsset/...
-        : url.StartsWith("/")
-            ? url
-            : "/" + url;
+    var relativeUrl = GetRelativeUrl(url);
 
     return $"{request.Scheme}://{request.Host}{relativeUrl}";
+}
+
+    private static string GetRelativeUrl(string url)
+{
+    if (url.StartsWith("~/"))
+    {
+        // converts ~/getContentAsset/... to /getContentAsset/...
+        return url[1..];
+    }
+
+    if (url.StartsWith(UrlPathSeparator))
+    {
+        return url;
+    }
+
+    return UrlPathSeparator + url;
 }
     private Task<ContentPageCardDto> GetContentPageCardDtoAsync(Insight page, Func<Insight, bool> isFeatured)
     {

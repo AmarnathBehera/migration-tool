@@ -46,7 +46,7 @@ namespace BDO.GWT.Core.Services
             _channelInfoProvider = channelInfoProvider;
             
         }
-        public async Task<InsightPageDto> GetInsightPageDtoAsync(Insight? insight, CancellationToken cancellationToken)
+        public async Task<InsightPageDto> GetInsightPageDtoAsync(Insight? page, CancellationToken cancellationToken)
         {
             var insightPage = await _contentRetriever.RetrieveCurrentPage<Insight>(new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
             var contentPageDto = await GetContentPageDtoAsync(insightPage, cancellationToken);
@@ -282,11 +282,17 @@ namespace BDO.GWT.Core.Services
                 var setting = await _settingsService.GetUsePersonPageTitleInfo();
                 var usePersonPageTitle = setting?.FirstOrDefault()?.UsePageTitleToDisplayPersonName ?? false;
 
-                var fullName = usePersonPageTitle
-                    ? person.MetadataTitle
-                    : string.IsNullOrEmpty(person.PersonSurnamePrefixes)
+                string fullName;
+                if (usePersonPageTitle)
+                {
+                    fullName = person.MetadataTitle;
+                }
+                else
+                {
+                    fullName = string.IsNullOrEmpty(person.PersonSurnamePrefixes)
                         ? $"{person.PersonFirstName} {person.PersonLastName}"
                         : $"{person.PersonFirstName} {person.PersonSurnamePrefixes} {person.PersonLastName}";
+                }
 
                 return new SidebarPersonDto
                 {
@@ -452,7 +458,7 @@ namespace BDO.GWT.Core.Services
             var channels = await _channelInfoProvider
                 .Get()
                 .WhereEquals(nameof(ChannelInfo.ChannelName), channelName)
-                .GetEnumerableTypedResultAsync();
+                .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
 
             var currentChannel = channels.FirstOrDefault();
             if (currentChannel?.ChannelGUID == Guid.Empty || currentChannel is null)
