@@ -55,6 +55,16 @@ step "deploy-cms-app-service" {
                     "slotSetting": false
                   },
                   {
+                    "name": "FallbackSendGridClientOptions__ApiKey",
+                    "value": "#{appsettings.FallbackSendGridClientApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "SystemSendGridClientOptions__ApiKey",
+                    "value": "#{appsettings.SystemSendGridClientApiKey}",
+                    "slotSetting": false
+                  },
+                  {
                     "name": "AdminRedirectOptions__RedirectDomain",
                     "value": "#{appsettings.RedirectDomain}",
                     "slotSetting": false
@@ -156,6 +166,16 @@ step "deploy-mvc-app-service" {
                     {
                     "name": "AzureAd__ClientSecret",
                     "value": "#{appsettings.azureAdClientSecret}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "FallbackSendGridClientOptions__ApiKey",
+                    "value": "#{appsettings.FallbackSendGridClientApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "SystemSendGridClientOptions__ApiKey",
+                    "value": "#{appsettings.SystemSendGridClientApiKey}",
                     "slotSetting": false
                   },
                   {

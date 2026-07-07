@@ -10,8 +10,6 @@ namespace BDO.GWT.Core.Services
     {
         public Task<IEnumerable<CultureDto?>> GetWebsiteCulturesAsync();
         public string GetDisplayName(IWebsiteChannelContext websiteChannel);
-
-
     }
 
     public class WebsiteCulturesService : IWebsiteCulturesService
