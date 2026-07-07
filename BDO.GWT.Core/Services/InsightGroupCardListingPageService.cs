@@ -45,7 +45,16 @@ public class InsightGroupCardListingPageService : IInsightGroupCardListingPageSe
     public async Task<InsightCardListingDto> GetInsightPageDtoAsync(InsightGroup insightgroup, CancellationToken cancellationToken)
     {
         var insightPage = await _contentRetriever.RetrieveCurrentPage<InsightGroup>(new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
+        if (insightPage is null)
+        {
+            throw new InvalidOperationException("Current page of type InsightGroup could not be retrieved.");
+        }
+
         var sys = insightPage.SystemFields;
+        if (sys is null)
+        {
+            throw new InvalidOperationException("System fields for InsightGroup page are unavailable.");
+        }
 
         var dto = new InsightCardListingDto
         {
