@@ -10,6 +10,7 @@ using BDO.GWT.Web.Widgets.FlexibleBannerWidget;
 using BDO.GWT.Web.Widgets.FlexibleContentWidget;
 using BDO.GWT.Web.Widgets.ImageWithTextWidget;
 using BDO.GWT.Web.Widgets.QuoteCardWidget;
+using BDO.GWT.Web.Widgets.RelatedContactsWidget;
 using BDO.GWT.Web.Widgets.RichTextWidget;
 using BDO.GWT.Web.Widgets.SocialMediaButtonsWidget;
 using BDO.GWT.Web.Widgets.TabAccordionWidget;
@@ -45,6 +46,8 @@ using Kentico.PageBuilder.Web.Mvc;
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.KeyContacts, typeof(KeyContactsWidget), "Key Contacts", typeof(KeyContactsWidgetProperties), AllowCache = true, IconClass = "icon-app-contact-groups")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.SocialMediaButtons,typeof(SocialMediaButtonsWidget),"Social media buttons",typeof(SocialMediaButtonsWidgetProperties),AllowCache = true,IconClass = "icon-paper-plane")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.EditorsPick,typeof(EditorsPickWidget),"Editors pick widget",typeof(EditorsPickWidgetProperties),AllowCache = true,IconClass = "icon-carousel")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.RelatedContacts, typeof(RelatedContactsWidget), "Related Contacts", typeof(RelatedContactsWidgetProperties), AllowCache = true, IconClass = "icon-app-contact-groups")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.InFocus,typeof(InFocusWidget),"In Focus",typeof(InFocusWidgetProperties),AllowCache = true,IconClass = "icon-tab-vertical")]
 
 // Sections
 [assembly: RegisterSection(identifier: ComponentIdentifiers.Sections.Container,name: "Container",propertiesType: typeof(BaseSectionProperties),customViewName: "~/Components/Section/SectionView/_ContainerSection.cshtml")]

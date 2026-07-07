@@ -43,6 +43,7 @@ public static class ReactComponentType
     public const string SideBoxNavigation = "SideBoxNavigation";
     public const string LocalNavigationItem = "LocalNavigationItem";
     public const string EventsAndWebinarsCarousel = "EventsAndWebinarsCarousel";
+    public const string InFocus = "InFocus";
 
     public const string CareerDetails = "CareerDetails";
     public const string KeyTakeAways = "KeyTakeAwaysWidget";
@@ -105,6 +106,7 @@ public static class ReactComponentType
     public const string LegalSideBoxNavigationGUID = "79c73db6-0a00-43b7-9081-bff002b19ca9";
     public const string SocialMediaGUID = "c58bfb27-7feb-4fdb-94f2-8bca61df250d";
     public const string EditorsPickGUID = "5b72020a-38b5-43b1-9e26-71fd36ee9e29";
+    public const string InFocusGUID = "6m72020a-38b5-43b1-9e26-71fd36ee9e20";
 }
 
 
