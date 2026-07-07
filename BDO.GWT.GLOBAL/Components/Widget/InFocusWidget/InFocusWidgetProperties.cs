@@ -10,10 +10,10 @@ namespace BDO.GWT.GLOBAL.Widgets;
 public class InFocusWidgetProperties : IWidgetProperties
 {
     [TextInputComponent(Label = "Title", ExplanationText = "Title that will be shown over in focus widget.", Order = 0)]
-    public string? Title { get; set; }
+    public string Title { get; set; }
 
     [TextInputComponent(Label = "Subtitle", ExplanationText = "Subtitle that will be shown over in focus widget.", Order = 1)]
-    public string? Subtitle { get; set; }
+    public string Subtitle { get; set; }
 
     [ContentItemSelectorComponent(
         ContentAttachment.CONTENT_TYPE_NAME,
@@ -24,7 +24,7 @@ public class InFocusWidgetProperties : IWidgetProperties
     public IEnumerable<ContentItemReference> ImageURL { get; set; } = Enumerable.Empty<ContentItemReference>();
 
     [TextInputComponent(Label = "Image alt text", Order = 3)]
-    public string? ImageAltText { get; set; } = "";
+    public string ImageAltText { get; set; } = "";
 
     [ContentItemSelectorComponent(
         InFocusPage.CONTENT_TYPE_NAME,
