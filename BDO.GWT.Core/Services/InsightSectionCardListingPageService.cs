@@ -137,11 +137,7 @@ public class InsightSectionCardListingPageService : IInsightSectionCardListingPa
 
         if (page is null)
         {
-            throw new ContentItemNotFoundException($"SectionInsightsPage page not found for guid '{pageGuid}'.")
-            {
-                ErrorCode = "SectionInsightsPage.NotFound",
-                HttpStatusCode = System.Net.HttpStatusCode.NotFound
-            };
+            throw new ContentItemNotFoundException($"SectionInsightsPage page not found for guid '{pageGuid}'.");
         }
 
         var treePath = page.SystemFields.WebPageItemTreePath;
