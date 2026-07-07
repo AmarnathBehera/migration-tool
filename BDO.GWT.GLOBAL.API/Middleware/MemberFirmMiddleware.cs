@@ -83,7 +83,9 @@ public class MemberFirmMiddleware : IMiddleware
 
         if (memberFirm.Website == null)
         {
+#pragma warning disable S112
             throw new NullReferenceException($"Member firm with ID '{memberFirmID}' does not have 'Website' property set.");
+#pragma warning restore S112
         }
 
         if (string.IsNullOrEmpty(_websiteChannelContext.WebsiteChannelName))

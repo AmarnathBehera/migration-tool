@@ -61,7 +61,6 @@ public class AuthorizationHelper : IAuthorizationHelper
             return null;
         }
 
-        var cancellationToken = context.HttpContext.RequestAborted;
         var username = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
         var user = new User();
 
