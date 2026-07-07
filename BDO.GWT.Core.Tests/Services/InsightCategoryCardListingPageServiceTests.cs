@@ -340,6 +340,98 @@ public class InsightCategoryCardListingPageServiceTests
         _filteringHelperMock.Verify(x => x.IsFilteringTooltipEnabledAsync(false, It.IsAny<CancellationToken>()), Times.Once);
     }
 
+    [Test]
+    public async Task GetInsightPageDtoAsync_UsesDefaults_WhenSectionInsightsPageNotFound()
+    {
+        var pageGuid = Guid.NewGuid();
+        var currentPage = CreateInsightCategory(pageGuid, "/Insights/Category");
+
+        _contentRetrieverMock
+            .Setup(x => x.RetrieveCurrentPage<InsightCategory>(
+                It.IsAny<RetrieveCurrentPageParameters>(),
+                It.IsAny<Action<RetrieveCurrentPageQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, InsightCategory, Task<InsightCategory>>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(currentPage);
+
+        _contentRetrieverMock
+            .Setup(x => x.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, SectionInsightsPage, Task<SectionInsightsPage>>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<SectionInsightsPage>());
+
+        var result = await _service.GetInsightPageDtoAsync(currentPage, CancellationToken.None);
+
+        Assert.That(result.CardsGrid.Filters, Is.Null);
+        Assert.That(result.CardsGrid.AdvancedSearchPrelinkText, Is.Null);
+        Assert.That(result.CardsGrid.AdvancedSearchLinkText, Is.Null);
+        Assert.That(result.CardsGrid.AdvancedSearchLink, Is.Null);
+
+        _insightCardServiceMock.Verify(x => x.CreateFiltersAsync(
+            It.Is<HashSet<string>>(set => set.Count == 0),
+            null,
+            It.IsAny<CancellationToken>()), Times.Once);
+        _filteringHelperMock.Verify(x => x.IsFilteringTooltipEnabledAsync(false, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Test]
+    public async Task GetInsightPageDtoAsync_ParsesWhitespaceFiltersAsEmptySet()
+    {
+        var pageGuid = Guid.NewGuid();
+        var currentPage = CreateInsightCategory(pageGuid, "/Insights/Category");
+        var expectedFilters = new[]
+        {
+            new FilterItemDto<OptionDto>
+            {
+                Name = "empty",
+                Options = Array.Empty<OptionDto>()
+            }
+        };
+
+        _contentRetrieverMock
+            .Setup(x => x.RetrieveCurrentPage<InsightCategory>(
+                It.IsAny<RetrieveCurrentPageParameters>(),
+                It.IsAny<Action<RetrieveCurrentPageQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, InsightCategory, Task<InsightCategory>>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(currentPage);
+
+        _contentRetrieverMock
+            .Setup(x => x.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, SectionInsightsPage, Task<SectionInsightsPage>>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[]
+            {
+                new SectionInsightsPage
+                {
+                    InsightListFilters = "   ",
+                    ItemListFilteringEnabled = true,
+                    ItemListAdvancedSearchLinkUrl = Array.Empty<WebPageRelatedItem>()
+                }
+            });
+
+        _insightCardServiceMock
+            .Setup(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), null, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expectedFilters);
+
+        var result = await _service.GetInsightPageDtoAsync(currentPage, CancellationToken.None);
+
+        Assert.That(result.CardsGrid.Filters, Is.SameAs(expectedFilters));
+
+        _insightCardServiceMock.Verify(x => x.CreateFiltersAsync(
+            It.Is<HashSet<string>>(set => set.Count == 0),
+            null,
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
     private static InsightCategory CreateInsightCategory(Guid pageGuid, string treePath)
     {
         return new InsightCategory

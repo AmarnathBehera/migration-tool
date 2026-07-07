@@ -16,6 +16,13 @@ namespace BDO.GWT.Core.Tests.Services;
 
 public class InsightPageServiceTests
 {
+    private static readonly int[] ContactIds = [1, 2];
+    private static readonly int[] SingleContactId = [1];
+    private static readonly string[] ExpectedComposedContactNames = ["Ada Lovelace", "Grace van Hopper"];
+    private static readonly string[] ExpectedPersonMetadataTitle = ["Person Metadata Title"];
+    private static readonly string[] ExpectedExternalComposedName = ["Ada van Lovelace"];
+    private static readonly string[] ExpectedExternalMetadataTitle = ["External Metadata Title"];
+
     private Mock<IContentRetriever> _contentRetrieverMock = null!;
     private Mock<IInfoProvider<WebsiteChannelInfo>> _websiteChannelInfoProviderMock = null!;
     private Mock<IContentService> _contentServiceMock = null!;
@@ -143,14 +150,10 @@ public class InsightPageServiceTests
         SetupContentPages(internalPerson);
 
         var result = await _service.GetKeyContactsDisplayNames(
-            new[] { 1, 2 },
+            ContactIds,
             CancellationToken.None);
 
-        Assert.That(result, Is.EquivalentTo(new[]
-        {
-            "Ada Lovelace",
-            "Grace van Hopper"
-        }));
+        Assert.That(result, Is.EquivalentTo(ExpectedComposedContactNames));
     }
 
     [Test]
@@ -171,10 +174,10 @@ public class InsightPageServiceTests
         SetupContentPages(Array.Empty<InternalPerson>());
 
         var result = await _service.GetKeyContactsDisplayNames(
-            new[] { 1 },
+            SingleContactId,
             CancellationToken.None);
 
-        Assert.That(result, Is.EqualTo(new[] { "Person Metadata Title" }));
+        Assert.That(result, Is.EqualTo(ExpectedPersonMetadataTitle));
     }
 
     [Test]
@@ -195,7 +198,7 @@ public class InsightPageServiceTests
             new List<Guid> { externalPerson.SystemFields.ContentItemGUID },
             CancellationToken.None);
 
-        Assert.That(result, Is.EqualTo(new[] { "Ada van Lovelace" }));
+        Assert.That(result, Is.EqualTo(ExpectedExternalComposedName));
     }
 
     [Test]
@@ -218,7 +221,7 @@ public class InsightPageServiceTests
             new List<Guid> { externalPerson.SystemFields.ContentItemGUID },
             CancellationToken.None);
 
-        Assert.That(result, Is.EqualTo(new[] { "External Metadata Title" }));
+        Assert.That(result, Is.EqualTo(ExpectedExternalMetadataTitle));
     }
 
     [Test]
@@ -257,12 +260,15 @@ public class InsightPageServiceTests
             new[] { linkedExternalPerson },
             CancellationToken.None);
 
-        Assert.That(result.Length, Is.EqualTo(1));
-        Assert.That(result[0].FullName, Is.EqualTo("Ada van Lovelace"));
-        Assert.That(result[0].JobTitle, Is.EqualTo("Partner"));
-        Assert.That(result[0].Url, Is.EqualTo("https://example.com/retrieved-ada"));
-        Assert.That(result[0].Image?.Url, Is.EqualTo("/media/ada.png"));
-        Assert.That(result[0].Image?.AltText, Is.EqualTo("Ada image"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Length.EqualTo(1));
+            Assert.That(result[0].FullName, Is.EqualTo("Ada van Lovelace"));
+            Assert.That(result[0].JobTitle, Is.EqualTo("Partner"));
+            Assert.That(result[0].Url, Is.EqualTo("https://example.com/retrieved-ada"));
+            Assert.That(result[0].Image?.Url, Is.EqualTo("/media/ada.png"));
+            Assert.That(result[0].Image?.AltText, Is.EqualTo("Ada image"));
+        });
     }
 
     [Test]
@@ -284,10 +290,13 @@ public class InsightPageServiceTests
             insight,
             CancellationToken.None);
 
-        Assert.That(result.ShowPrintButton, Is.True);
-        Assert.That(result.DownloadButtonAttachment, Is.EqualTo("/media/download.pdf"));
-        Assert.That(result.SocialMediaButtons, Is.Null);
-        Assert.That(result.ShowCopyLinkButton, Is.False);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.ShowPrintButton, Is.True);
+            Assert.That(result.DownloadButtonAttachment, Is.EqualTo("/media/download.pdf"));
+            Assert.That(result.SocialMediaButtons, Is.Null);
+            Assert.That(result.ShowCopyLinkButton, Is.False);
+        });
     }
 
     [Test]
@@ -328,11 +337,14 @@ public class InsightPageServiceTests
             insight,
             CancellationToken.None);
 
-        Assert.That(result.Title, Is.EqualTo("Copy title"));
-        Assert.That(result.Description, Is.EqualTo("<p>Copy description</p>"));
-        Assert.That(result.Content, Does.Contain("href=\"/test\""));
-        Assert.That(result.Sidebar, Is.Null);
-        Assert.That(result.CallToAction, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Title, Is.EqualTo("Copy title"));
+            Assert.That(result.Description, Is.EqualTo("<p>Copy description</p>"));
+            Assert.That(result.Content, Does.Contain("href=\"/test\""));
+            Assert.That(result.Sidebar, Is.Null);
+            Assert.That(result.CallToAction, Is.Null);
+        });
     }
 
     [Test]
@@ -356,10 +368,13 @@ public class InsightPageServiceTests
             insight,
             CancellationToken.None);
 
-        Assert.That(result.Title, Is.Null);
-        Assert.That(result.Description, Is.Null);
-        Assert.That(result.Content, Is.EqualTo("<p>Visible content</p>"));
-        Assert.That(result.CallToAction, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Title, Is.Null);
+            Assert.That(result.Description, Is.Null);
+            Assert.That(result.Content, Is.EqualTo("<p>Visible content</p>"));
+            Assert.That(result.CallToAction, Is.Null);
+        });
     }
 
     [Test]
@@ -375,10 +390,13 @@ public class InsightPageServiceTests
             insight,
             CancellationToken.None);
 
-        Assert.That(result.Title, Is.Null);
-        Assert.That(result.Description, Is.Null);
-        Assert.That(result.Content, Is.Null);
-        Assert.That(result.CallToAction, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Title, Is.Null);
+            Assert.That(result.Description, Is.Null);
+            Assert.That(result.Content, Is.Null);
+            Assert.That(result.CallToAction, Is.Null);
+        });
     }
 
     [Test]
@@ -443,20 +461,17 @@ public class InsightPageServiceTests
             insight,
             CancellationToken.None);
 
-        Assert.That(result.TypeName, Is.EqualTo("Article"));
-        Assert.That(result.PublishDate, Is.EqualTo(insight.SystemFields.ContentItemCommonDataFirstPublishedWhen));
-        Assert.That(result.UpdatedDate, Is.EqualTo(insight.SystemFields.ContentItemCommonDataLastPublishedWhen));
-        Assert.That(result.RelevantContactPeopleTitle, Is.EqualTo(ResourceStringKey.LiveSite.Insights.Authors));
-
-        Assert.That(result.RelevantContactPeople.Length, Is.EqualTo(2));
-        Assert.That(result.RelevantContactPeople.Select(x => x.FullName), Is.EquivalentTo(new[]
+        Assert.Multiple(() =>
         {
-            "Ada Lovelace",
-            "Grace van Hopper"
-        }));
-
-        Assert.That(result.RelatedExternalPeople.Length, Is.EqualTo(1));
-        Assert.That(result.RelatedExternalPeople[0].FullName, Is.EqualTo("External Retrieved"));
+            Assert.That(result.TypeName, Is.EqualTo("Article"));
+            Assert.That(result.PublishDate, Is.EqualTo(insight.SystemFields.ContentItemCommonDataFirstPublishedWhen));
+            Assert.That(result.UpdatedDate, Is.EqualTo(insight.SystemFields.ContentItemCommonDataLastPublishedWhen));
+            Assert.That(result.RelevantContactPeopleTitle, Is.EqualTo(ResourceStringKey.LiveSite.Insights.Authors));
+            Assert.That(result.RelevantContactPeople, Has.Length.EqualTo(2));
+            Assert.That(result.RelevantContactPeople.Select(x => x.FullName), Is.EquivalentTo(ExpectedComposedContactNames));
+            Assert.That(result.RelatedExternalPeople, Has.Length.EqualTo(1));
+            Assert.That(result.RelatedExternalPeople[0].FullName, Is.EqualTo("External Retrieved"));
+        });
     }
 
     [Test]
@@ -476,7 +491,7 @@ public class InsightPageServiceTests
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync((IEnumerable<Insight>?)null);
+            .ReturnsAsync((IEnumerable<Insight>)null!);
 
         var exception = Assert.ThrowsAsync<MissingSectionPageException>(async () =>
             await _service.GetContentPageSidebarDto(
@@ -524,8 +539,10 @@ public class InsightPageServiceTests
 
     private void SetupUsePersonPageTitleSetting(bool usePageTitle)
     {
-        var setting = (TestOurPeopleInfo)FormatterServices.GetUninitializedObject(typeof(TestOurPeopleInfo));
-        setting.UsePageTitleToDisplayPersonName = usePageTitle;
+        var setting = new TestOurPeopleInfo
+        {
+            UsePageTitleToDisplayPersonName = usePageTitle
+        };
 
         _settingServiceMock
             .Setup(x => x.GetUsePersonPageTitleInfo())

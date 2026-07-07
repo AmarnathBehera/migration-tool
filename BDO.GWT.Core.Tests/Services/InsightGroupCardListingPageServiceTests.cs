@@ -255,7 +255,7 @@ public class InsightGroupCardListingPageServiceTests
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<Func<IContentQueryDataContainer, InsightGroup, Task<InsightGroup>>>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync((InsightGroup?)null);
+            .ReturnsAsync((InsightGroup)null!);
 
         var exception = Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await _service.GetInsightPageDtoAsync(

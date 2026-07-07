@@ -99,9 +99,12 @@ public class InsightCardServiceTests
             _ => false,
             CancellationToken.None);
 
-        Assert.That(_capturedRetrievePagesParameters, Is.Not.Null);
-        Assert.That(_capturedRetrievePagesParameters!.LinkedItemsMaxLevel, Is.EqualTo(4));
-        Assert.That(_capturedRetrievePagesParameters.PathMatch, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(_capturedRetrievePagesParameters, Is.Not.Null);
+            Assert.That(_capturedRetrievePagesParameters!.LinkedItemsMaxLevel, Is.EqualTo(4));
+            Assert.That(_capturedRetrievePagesParameters.PathMatch, Is.Not.Null);
+        });
 
         _contentRetrieverMock.Verify(
             x => x.RetrievePages<Insight, Insight>(
@@ -154,14 +157,15 @@ public class InsightCardServiceTests
             x => x.MetadataTitle == "Featured Insight",
             CancellationToken.None);
 
-        Assert.That(result.TotalCount, Is.EqualTo(3));
-        Assert.That(result.Data.Length, Is.EqualTo(2));
-
-        Assert.That(result.Data[0].Title, Is.EqualTo("Featured Insight"));
-        Assert.That(result.Data[0].IsFeatured, Is.True);
-
-        Assert.That(result.Data[1].Title, Is.EqualTo("Insight 2"));
-        Assert.That(result.Data[1].IsFeatured, Is.False);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.TotalCount, Is.EqualTo(3));
+            Assert.That(result.Data, Has.Length.EqualTo(2));
+            Assert.That(result.Data[0].Title, Is.EqualTo("Featured Insight"));
+            Assert.That(result.Data[0].IsFeatured, Is.True);
+            Assert.That(result.Data[1].Title, Is.EqualTo("Insight 2"));
+            Assert.That(result.Data[1].IsFeatured, Is.False);
+        });
     }
 
     [Test]
@@ -184,9 +188,12 @@ public class InsightCardServiceTests
             _ => false,
             CancellationToken.None);
 
-        Assert.That(result.TotalCount, Is.EqualTo(3));
-        Assert.That(result.Data.Length, Is.EqualTo(1));
-        Assert.That(result.Data[0].Title, Is.EqualTo("Insight 2"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.TotalCount, Is.EqualTo(3));
+            Assert.That(result.Data, Has.Length.EqualTo(1));
+            Assert.That(result.Data[0].Title, Is.EqualTo("Insight 2"));
+        });
     }
 
     [Test]
@@ -220,9 +227,12 @@ public class InsightCardServiceTests
             _ => false,
             CancellationToken.None);
 
-        Assert.That(result.TotalCount, Is.EqualTo(1));
-        Assert.That(result.Data.Length, Is.EqualTo(1));
-        Assert.That(result.Data[0].Title, Is.EqualTo("Audit Insight"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.TotalCount, Is.EqualTo(1));
+            Assert.That(result.Data, Has.Length.EqualTo(1));
+            Assert.That(result.Data[0].Title, Is.EqualTo("Audit Insight"));
+        });
     }
 
     [Test]
@@ -247,12 +257,15 @@ public class InsightCardServiceTests
 
         var card = result.Data.Single();
 
-        Assert.That(card.Title, Is.EqualTo("Mapped Insight"));
-        Assert.That(card.Description, Is.EqualTo("This is test description"));
-        Assert.That(card.isComingSoon, Is.True);
-        Assert.That(card.IsFeatured, Is.True);
-        Assert.That(card.ReadMoreLink.Title, Is.EqualTo(ResourceStringKey.LiveSite.ReadMore));
-        Assert.That(card.ReadMoreLink.URL, Is.EqualTo("/insights/Mapped Insight"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(card.Title, Is.EqualTo("Mapped Insight"));
+            Assert.That(card.Description, Is.EqualTo("This is test description"));
+            Assert.That(card.isComingSoon, Is.True);
+            Assert.That(card.IsFeatured, Is.True);
+            Assert.That(card.ReadMoreLink.Title, Is.EqualTo(ResourceStringKey.LiveSite.ReadMore));
+            Assert.That(card.ReadMoreLink.URL, Is.EqualTo("/insights/Mapped Insight"));
+        });
     }
 
     [Test]
@@ -286,8 +299,11 @@ public class InsightCardServiceTests
 
         var card = result.Data.Single();
 
-        Assert.That(card.ImageURL, Is.EqualTo("https://www.bdo.test/getContentAsset/test-image.jpg"));
-        Assert.That(card.ImageAltText, Is.EqualTo("Image alt text"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(card.ImageURL, Is.EqualTo("https://www.bdo.test/getContentAsset/test-image.jpg"));
+            Assert.That(card.ImageAltText, Is.EqualTo("Image alt text"));
+        });
     }
 
     private void SetupRetrievePages(
