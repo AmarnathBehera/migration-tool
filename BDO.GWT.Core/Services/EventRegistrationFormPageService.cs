@@ -10,9 +10,7 @@ namespace BDO.GWT.Web.Core.Services;
 
 public interface IEventRegistrationFormPageService
 {
-    Task<FormPageDto> GetEventRegistrationFormPageDtoAsync(
-        EventRegistrationForm? page,
-        CancellationToken cancellationToken);
+    Task<FormPageDto> GetEventRegistrationFormPageDtoAsync(CancellationToken cancellationToken);
 }
 
 public class EventRegistrationFormPageService : IEventRegistrationFormPageService
@@ -28,14 +26,12 @@ public class EventRegistrationFormPageService : IEventRegistrationFormPageServic
         _heroService = heroService;
     }
 
-    public async Task<FormPageDto> GetEventRegistrationFormPageDtoAsync(
-        EventRegistrationForm? page,
-        CancellationToken cancellationToken)
+    public async Task<FormPageDto> GetEventRegistrationFormPageDtoAsync(CancellationToken cancellationToken)
     {
-        var eventRegistrationPage = page ?? await _contentService.RetrieveCurrentPageAsync<EventRegistrationForm>(
+        var eventRegistrationPage = await _contentService.RetrieveCurrentPageAsync<EventRegistrationForm>(
             new RetrieveCurrentPageParameters
             {
-                LinkedItemsMaxLevel = 4
+                LinkedItemsMaxLevel = 5
             },
             cancellationToken);
 
@@ -46,11 +42,13 @@ public class EventRegistrationFormPageService : IEventRegistrationFormPageServic
 
         var sys = eventRegistrationPage.SystemFields;
 
+        var normalizedFormType = ResolveFormType(eventRegistrationPage.FormType, eventRegistrationPage.Form, eventRegistrationPage.EmbedCode);
+
         return new FormPageDto
         {
-            Title = eventRegistrationPage.PageTitle,
-            Description = eventRegistrationPage.PageDescription,
-            FormType = eventRegistrationPage.FormType,
+            Title = eventRegistrationPage.MetadataTitle,
+            Description = eventRegistrationPage.MetadataDescription,
+            FormType = normalizedFormType,
             Form = eventRegistrationPage.Form,
             EmbedCode = eventRegistrationPage.EmbedCode,
 
@@ -114,5 +112,39 @@ public class EventRegistrationFormPageService : IEventRegistrationFormPageServic
                         : null
             }, cancellationToken)
         };
+    }
+
+    private static string? ResolveFormType(string? formType, string? form, string? embedCode)
+    {
+        if (!string.IsNullOrWhiteSpace(formType))
+        {
+            var normalized = formType.Trim();
+
+            if (normalized.Equals("form", StringComparison.OrdinalIgnoreCase) ||
+                normalized.Equals("form list", StringComparison.OrdinalIgnoreCase))
+            {
+                return "form";
+            }
+
+            if (normalized.Equals("embedcode", StringComparison.OrdinalIgnoreCase) ||
+                normalized.Equals("embed code", StringComparison.OrdinalIgnoreCase))
+            {
+                return "embedCode";
+            }
+
+            return normalized;
+        }
+
+        if (!string.IsNullOrWhiteSpace(form))
+        {
+            return "form";
+        }
+
+        if (!string.IsNullOrWhiteSpace(embedCode))
+        {
+            return "embedCode";
+        }
+
+        return null;
     }
 }

@@ -31,7 +31,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
         public async Task Index_ReturnsViewResult_WithCorrectViewName()
         {
             _serviceMock
-                .Setup(s => s.GetEventRegistrationFormPageDtoAsync(null!, It.IsAny<CancellationToken>()))
+                .Setup(s => s.GetEventRegistrationFormPageDtoAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new FormPageDto());
 
             var result = await _controller.Index(CancellationToken.None);
@@ -46,7 +46,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
         {
             var dto = new FormPageDto { Title = "Register" };
             _serviceMock
-                .Setup(s => s.GetEventRegistrationFormPageDtoAsync(null!, It.IsAny<CancellationToken>()))
+                .Setup(s => s.GetEventRegistrationFormPageDtoAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dto);
 
             var view = (ViewResult)await _controller.Index(CancellationToken.None);
@@ -61,19 +61,19 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             var token = cts.Token;
 
             _serviceMock
-                .Setup(s => s.GetEventRegistrationFormPageDtoAsync(null!, token))
+                .Setup(s => s.GetEventRegistrationFormPageDtoAsync(token))
                 .ReturnsAsync(new FormPageDto());
 
             await _controller.Index(token);
 
-            _serviceMock.Verify(s => s.GetEventRegistrationFormPageDtoAsync(null!, token), Times.Once);
+            _serviceMock.Verify(s => s.GetEventRegistrationFormPageDtoAsync(token), Times.Once);
         }
 
         [Test]
         public void Index_PropagatesException_FromService()
         {
             _serviceMock
-                .Setup(s => s.GetEventRegistrationFormPageDtoAsync(null!, It.IsAny<CancellationToken>()))
+                .Setup(s => s.GetEventRegistrationFormPageDtoAsync(It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new InvalidOperationException("boom"));
 
             Assert.ThrowsAsync<InvalidOperationException>(() => _controller.Index(CancellationToken.None));

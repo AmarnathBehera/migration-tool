@@ -5,6 +5,7 @@ using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Pages;
+using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
 using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.Services;
@@ -61,15 +62,17 @@ public class SectionEventsService : ISectionEventsService
         .ToHashSet();
         var heroData = new HeroData
         {
-            Layout = page.HeroLayout,
-            Title = page.HeroTitle,
-            Description = page.HeroDescription,
-            BackgroundImage = bgImageUrl != null ? Link.Parse(bgImageUrl) : null,
-            BackgroundImageAltText = page.HeroBackgroundImageAltText,
-            MobileBackgroundImage = mobileImageUrl != null ? Link.Parse(mobileImageUrl) : null,
-            MobileBackgroundImageAltText = page.HeroBackgroundImage_MobileAltText,
-            CallToActionButtonType = page.HeroCallToActionButtonType,
-            CallToActionButtonText = page.HeroCallToActionButtonText,
+            Layout = page.HeroLayout ?? string.Empty,
+            Title = page.HeroTitle ?? string.Empty,
+            Description = page.HeroDescription ?? string.Empty,
+            BackgroundImage = page.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string bgUrl ? Link.Parse(bgUrl) : null,
+            BackgroundImageAltText = page.HeroBackgroundImageAltText ?? string.Empty,
+            MobileBackgroundImage = page.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string mobileUrl ? Link.Parse(mobileUrl) : null,
+            MobileBackgroundImageAltText = page.HeroBackgroundImage_MobileAltText ?? string.Empty,
+            CallToActionButtonType = page.HeroCallToActionButtonType ?? string.Empty,
+            CallToActionButtonText = page.HeroCallToActionButtonText ?? string.Empty,
+            CallToActionButtonUrl = page.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath is string ctaPath ? Link.Parse(ctaPath) : null,
+
         };
         var cardsGridDto = new CardsGridDto
         {
@@ -90,8 +93,6 @@ public class SectionEventsService : ISectionEventsService
         {
             Title = page.EventsWebinarsListTitle,
             Description = page.EventsWebinarsListDescription,
-          
-
             BaseContent = new BaseContent
             {
                 ContentItemID = sys?.ContentItemID ?? 0,
@@ -103,7 +104,6 @@ public class SectionEventsService : ISectionEventsService
                 ContentItemCommonDataFirstPublishedWhen = sys?.ContentItemCommonDataFirstPublishedWhen ?? default,
                 ContentItemCommonDataLastPublishedWhen = sys?.ContentItemCommonDataLastPublishedWhen ?? default
             },
-
             BaseWebPage = new BaseWebPage
             {
                 WebPageItemGUID = sys?.WebPageItemGUID ?? Guid.Empty,
@@ -115,6 +115,29 @@ public class SectionEventsService : ISectionEventsService
                 WebPageItemTreePath = sys?.WebPageItemTreePath,
                 WebPageUrlPathContentLanguageID = sys?.WebPageUrlPathContentLanguageID ?? 0,
                 WebPageItemParentID = sys?.WebPageItemParentID ?? 0
+            },
+            MetaData = new MetaDataDto
+            {
+                MetaTitle = page.MetadataTitle,
+                MetaDescription = page.MetadataDescription,
+                MetadataTeaserImage = page.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+                MetaTeaserImageAltText = page.MetadataTeaserImageAltText,
+                MetaCanonical = page.MetadataCanonical,
+            },
+            SearchAndSEO = new SearchAndSEODto
+            {
+                MetadataNofollow = page.MetadataNofollow,
+                MetadataNoindex = page.MetadataNoindex,
+                IncludeInSitemap = page.IncludeInSitemap,
+            },
+            OGMetaData = new OGMetaDataDto
+            {
+                MetadataOGTitle = page.MetadataOGTitle,
+                MetadataOGDescription = page.MetadataOGDescription,
+                MetadataOGImage = page.MetadataOGImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+                MetadataOGTwitterImage = page.MetadataOGTwitterImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+                MetadataOGTwitterImageSizeCheckbox = page.MetadataOGTwitterImageSizeCheckbox,
+                Url = page.MetadataCanonical,
             },
             Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
             CardsGrid = cardsGridDto,
