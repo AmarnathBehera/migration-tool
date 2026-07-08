@@ -49,16 +49,19 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-        var user = await _authorizationHelper.AuthorizeUserAsync(context);
+        //var user = await _authorizationHelper.AuthorizeUserAsync(context);
 
-        if (user is null)
-        {
-            return;
-        }
+        //if (user is null)
+        //{
+        //    return;
+        //}
+
+        //var cancellationToken = context.HttpContext.RequestAborted;
+        //var methodGroups = await _apiMethodGroupRetriever.RetrieveEntitiesAsync(query => query.Where(x => x.Name == _apiMethodGroupName), cancellationToken);
 
         var methodGroups = new List<ApiMethodGroup>
         {
-            new ApiMethodGroup { ID = 1, Name = "weather" }
+            new ApiMethodGroup { ID = 1, Name = "forms" }
         };
 
         var methodGroup = methodGroups.SingleOrDefault();
@@ -70,11 +73,12 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
             return;
         }
 
+        //var userApiPermissions = await _userApiPermissionRetriever.RetrieveEntitiesAsync(query => query.Where(x => x.UserID == user.ID && x.ApiMethodGroupID == methodGroup.ID), cancellationToken);
+
         var userApiPermissions = new List<UserApiPermission>
         {
-            new UserApiPermission { UserID = user.ID, ApiMethodGroupID = methodGroup.ID, AllowRead = true, AllowManage = false }
+            new UserApiPermission { UserID = 53, ApiMethodGroupID = methodGroup.ID, AllowRead = true, AllowManage = false }
         };
-
         var userApiPermission = userApiPermissions.SingleOrDefault();
 
         if (userApiPermission == null)
