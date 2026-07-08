@@ -203,11 +203,13 @@ public class InsightSectionCardListingPageServiceTests
             });
 
         await _service.GetContentPaginationResultAsync(pageGuid, new CardsQuery(), CancellationToken.None);
-
-        Assert.That(capturedDecorateQuery, Is.Not.Null);
-        Assert.That(capturedIsFeatured, Is.Not.Null);
-        Assert.That(capturedIsFeatured!(CreateInsight(101)), Is.True);
-        Assert.That(capturedIsFeatured!(CreateInsight(999)), Is.False);
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedDecorateQuery, Is.Not.Null);
+            Assert.That(capturedIsFeatured, Is.Not.Null);
+            Assert.That(capturedIsFeatured!(CreateInsight(101)), Is.True);
+            Assert.That(capturedIsFeatured!(CreateInsight(999)), Is.False);
+        });
     }
 
     [Test]
@@ -243,13 +245,15 @@ public class InsightSectionCardListingPageServiceTests
             .ReturnsAsync(expectedFilters);
 
         var result = await _service.GetContentSectionDtoAsync(page, CancellationToken.None);
-
-        Assert.That(result.Title, Is.EqualTo(page.MetadataTitle));
-        Assert.That(result.Hero, Is.SameAs(expectedHero));
-        Assert.That(result.CardsGrid.Filters, Is.SameAs(expectedFilters));
-        Assert.That(result.CardsGrid.FilteringTooltipEnabled, Is.True);
-        Assert.That(result.CardsGrid.ApiEndpointName, Is.EqualTo($"Insights/{pageGuid}"));
-    }
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Title, Is.EqualTo(page.MetadataTitle));
+            Assert.That(result.Hero, Is.SameAs(expectedHero));
+            Assert.That(result.CardsGrid.Filters, Is.SameAs(expectedFilters));
+            Assert.That(result.CardsGrid.FilteringTooltipEnabled, Is.True);
+            Assert.That(result.CardsGrid.ApiEndpointName, Is.EqualTo($"Insights/{pageGuid}"));
+        });
+        }
 
     private static Insight CreateInsight(int webPageItemId)
     {

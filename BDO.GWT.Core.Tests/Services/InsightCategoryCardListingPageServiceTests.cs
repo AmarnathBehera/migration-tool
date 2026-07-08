@@ -148,9 +148,11 @@ public class InsightCategoryCardListingPageServiceTests
             });
 
         await _service.GetContentPaginationResultAsync(pageGuid, new CardsQuery(), CancellationToken.None);
-
-        Assert.That(capturedParentPath, Is.EqualTo(treePath));
-        Assert.That(capturedDecorateQuery, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedParentPath, Is.EqualTo(treePath));
+            Assert.That(capturedDecorateQuery, Is.Not.Null);
+        });
     }
 
     [Test]
@@ -283,7 +285,8 @@ public class InsightCategoryCardListingPageServiceTests
             .ReturnsAsync(expectedFilters);
 
         var result = await _service.GetInsightPageDtoAsync(currentPage, CancellationToken.None);
-
+        Assert.Multiple(() =>
+        {
         Assert.That(result.Title, Is.EqualTo(currentPage.MetadataTitle));
         Assert.That(result.Hero, Is.SameAs(expectedHero));
         Assert.That(result.CardsGrid.Filters, Is.SameAs(expectedFilters));
@@ -291,7 +294,7 @@ public class InsightCategoryCardListingPageServiceTests
         Assert.That(result.CardsGrid.ApiEndpointName, Is.EqualTo($"Insights/{pageGuid}"));
         Assert.That(result.CardsGrid.AdvancedSearchPrelinkText, Is.EqualTo("Pre-link"));
         Assert.That(result.CardsGrid.AdvancedSearchLinkText, Is.EqualTo("Advanced search"));
-
+        });
         _insightCardServiceMock.Verify(x => x.CreateFiltersAsync(
             It.Is<HashSet<string>>(set =>
                 set.Contains("businessLine") &&
@@ -366,10 +369,13 @@ public class InsightCategoryCardListingPageServiceTests
 
         var result = await _service.GetInsightPageDtoAsync(currentPage, CancellationToken.None);
 
-        Assert.That(result.CardsGrid.Filters, Is.Null);
-        Assert.That(result.CardsGrid.AdvancedSearchPrelinkText, Is.Null);
-        Assert.That(result.CardsGrid.AdvancedSearchLinkText, Is.Null);
-        Assert.That(result.CardsGrid.AdvancedSearchLink, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.CardsGrid.Filters, Is.Null);
+            Assert.That(result.CardsGrid.AdvancedSearchPrelinkText, Is.Null);
+            Assert.That(result.CardsGrid.AdvancedSearchLinkText, Is.Null);
+            Assert.That(result.CardsGrid.AdvancedSearchLink, Is.Null);
+        });
 
         _insightCardServiceMock.Verify(x => x.CreateFiltersAsync(
             It.Is<HashSet<string>>(set => set.Count == 0),

@@ -345,14 +345,16 @@ public class InsightGroupCardListingPageServiceTests
             .ReturnsAsync(expectedFilters);
 
         var result = await _service.GetInsightPageDtoAsync(page, CancellationToken.None);
-
-        Assert.That(result.Title, Is.EqualTo(page.MetadataTitle));
-        Assert.That(result.Hero, Is.SameAs(expectedHero));
-        Assert.That(result.CardsGrid.Filters, Is.SameAs(expectedFilters));
-        Assert.That(result.CardsGrid.FilteringTooltipEnabled, Is.True);
-        Assert.That(result.CardsGrid.ApiEndpointName, Is.EqualTo($"Insights/{pageGuid}"));
-        Assert.That(result.CardsGrid.AdvancedSearchPrelinkText, Is.EqualTo("Pre-link"));
-        Assert.That(result.CardsGrid.AdvancedSearchLinkText, Is.EqualTo("Advanced search"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Title, Is.EqualTo(page.MetadataTitle));
+            Assert.That(result.Hero, Is.SameAs(expectedHero));
+            Assert.That(result.CardsGrid.Filters, Is.SameAs(expectedFilters));
+            Assert.That(result.CardsGrid.FilteringTooltipEnabled, Is.True);
+            Assert.That(result.CardsGrid.ApiEndpointName, Is.EqualTo($"Insights/{pageGuid}"));
+            Assert.That(result.CardsGrid.AdvancedSearchPrelinkText, Is.EqualTo("Pre-link"));
+            Assert.That(result.CardsGrid.AdvancedSearchLinkText, Is.EqualTo("Advanced search"));
+        });
     }
 
     [Test]
@@ -392,9 +394,11 @@ public class InsightGroupCardListingPageServiceTests
             .ReturnsAsync(false);
 
         var result = await _service.GetInsightPageDtoAsync(page, CancellationToken.None);
-
-        Assert.That(result.CardsGrid.Filters, Is.Null);
-        Assert.That(result.CardsGrid.FilteringTooltipEnabled, Is.False);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.CardsGrid.Filters, Is.Null);
+            Assert.That(result.CardsGrid.FilteringTooltipEnabled, Is.False);
+        });
     }
 
     private static CardsQuery CreateCardsQuery()
