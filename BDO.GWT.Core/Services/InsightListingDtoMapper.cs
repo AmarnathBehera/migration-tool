@@ -22,7 +22,7 @@ internal static class InsightListingDtoMapper
 
         return new InsightCardListingDto
         {
-            Title = page.MetadataTitle,
+            Title = page.MetadataTitle ?? string.Empty,
             Hero = await heroService.GetHeroDtoAsync(new HeroData
             {
                 Layout = page.HeroLayout ?? string.Empty,
@@ -82,7 +82,7 @@ internal static class InsightListingDtoMapper
                 MetadataOGTwitterImageSizeCheckbox = page.MetadataOGTwitterImageSizeCheckbox,
                 Url = page.MetadataCanonical,
             },
-            CardsGrid = await cardsGridFactory(page),
+            CardsGrid = (await cardsGridFactory(page))!,
         };
     }
 }
