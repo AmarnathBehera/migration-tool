@@ -64,9 +64,12 @@ public class InsightListingDtoMapperTests
             Assert.That(result.Title, Is.EqualTo("Metadata title"));
             Assert.That(result.Hero, Is.SameAs(expectedHero));
             Assert.That(result.CardsGrid, Is.SameAs(expectedGrid));
-            Assert.That(result.BaseContent.ContentItemID, Is.EqualTo(1));
-            Assert.That(result.BaseWebPage.WebPageItemID, Is.EqualTo(10));
-            Assert.That(result.MetaData.MetaCanonical, Is.EqualTo("/insights/test"));
+            Assert.That(result.BaseContent, Is.Not.Null);
+            Assert.That(result.BaseWebPage, Is.Not.Null);
+            Assert.That(result.MetaData, Is.Not.Null);
+            Assert.That(result.BaseContent!.ContentItemID, Is.EqualTo(1));
+            Assert.That(result.BaseWebPage!.WebPageItemID, Is.EqualTo(10));
+            Assert.That(result.MetaData!.MetaCanonical, Is.EqualTo("/insights/test"));
         });
     }
 

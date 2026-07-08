@@ -22,9 +22,9 @@ internal static class InsightCardsGridFactory
         SectionInsightsPage? insightSection,
         IInsightCardService insightCardService,
         IFilteringHelper filteringHelper,
-        CancellationToken cancellationToken,
         IWebPageUrlRetriever webPageUrlRetriever,
-        bool includeTitleAndDescription = false)
+        bool includeTitleAndDescription = false,
+        CancellationToken cancellationToken = default)
     {
         var filterNames = CreateFilterNames(insightSection?.InsightListFilters);
         var filteringEnabled = insightSection?.ItemListFilteringEnabled == true;

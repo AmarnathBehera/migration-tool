@@ -52,9 +52,9 @@ public class InsightCardsGridFactoryTests
             insightSection,
             insightCardServiceMock.Object,
             filteringHelperMock.Object,
-            CancellationToken.None,
             webPageUrlRetrieverMock.Object,
-            includeTitleAndDescription: true);
+            includeTitleAndDescription: true,
+            cancellationToken: CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -101,8 +101,8 @@ public class InsightCardsGridFactoryTests
             },
             insightCardServiceMock.Object,
             filteringHelperMock.Object,
-            CancellationToken.None,
-            webPageUrlRetrieverMock.Object);
+            webPageUrlRetrieverMock.Object,
+            cancellationToken: CancellationToken.None);
 
         Assert.Multiple(() =>
         {

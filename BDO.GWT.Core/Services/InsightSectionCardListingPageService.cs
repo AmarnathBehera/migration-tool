@@ -131,8 +131,8 @@ public class InsightSectionCardListingPageService : IInsightSectionCardListingPa
             insightSection,
             _insightCardService,
             _filteringHelper,
-            cancellationToken,
             _webPageUrlRetriever,
-            includeTitleAndDescription: true);
+            includeTitleAndDescription: true,
+            cancellationToken: cancellationToken);
     }
 }

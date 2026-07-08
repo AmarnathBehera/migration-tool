@@ -109,7 +109,7 @@ public class InsightGroupCardListingPageService : IInsightGroupCardListingPageSe
             insightSection,
             _insightCardService,
             _filteringHelper,
-            cancellationToken,
-            _webPageUrlRetriever);
+            _webPageUrlRetriever,
+            cancellationToken: cancellationToken);
     }
 }

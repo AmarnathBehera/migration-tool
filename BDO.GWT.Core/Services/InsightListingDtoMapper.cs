@@ -25,15 +25,15 @@ internal static class InsightListingDtoMapper
             Title = page.MetadataTitle,
             Hero = await heroService.GetHeroDtoAsync(new HeroData
             {
-                Layout = page.HeroLayout,
-                Title = page.HeroTitle,
-                Description = page.HeroDescription,
+                Layout = page.HeroLayout ?? string.Empty,
+                Title = page.HeroTitle ?? string.Empty,
+                Description = page.HeroDescription ?? string.Empty,
                 BackgroundImage = page.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string bgUrl ? Link.Parse(bgUrl) : null,
-                BackgroundImageAltText = page.HeroBackgroundImageAltText,
+                BackgroundImageAltText = page.HeroBackgroundImageAltText ?? string.Empty,
                 MobileBackgroundImage = page.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string mobileUrl ? Link.Parse(mobileUrl) : null,
-                MobileBackgroundImageAltText = page.HeroBackgroundImage_MobileAltText,
-                CallToActionButtonType = page.HeroCallToActionButtonType,
-                CallToActionButtonText = page.HeroCallToActionButtonText,
+                MobileBackgroundImageAltText = page.HeroBackgroundImage_MobileAltText ?? string.Empty,
+                CallToActionButtonType = page.HeroCallToActionButtonType ?? string.Empty,
+                CallToActionButtonText = page.HeroCallToActionButtonText ?? string.Empty,
                 CallToActionButtonUrl = page.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath is string ctaPath ? Link.Parse(ctaPath) : null,
             }, cancellationToken),
             BaseContent = new BaseContent
