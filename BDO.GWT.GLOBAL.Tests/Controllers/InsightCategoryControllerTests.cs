@@ -3,6 +3,8 @@ using BDO.GWT.Core.DTOs;
 using BDO.GWT.Web.Core.Controllers;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
+using CMS.ContentEngine;
+using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -11,13 +13,15 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers;
 public class InsightCategoryControllerTests
 {
     private Mock<IInsightCategoryCardListingPageService> _serviceMock = null!;
+    private Mock<IContentRetriever> _contentRetrieverMock = null!;
     private InsightCategoryController _controller = null!;
 
     [SetUp]
     public void Setup()
     {
         _serviceMock = new Mock<IInsightCategoryCardListingPageService>();
-        _controller = new InsightCategoryController(_serviceMock.Object);
+        _contentRetrieverMock = new Mock<IContentRetriever>();
+        _controller = new InsightCategoryController(_serviceMock.Object, _contentRetrieverMock.Object);
     }
 
     [TearDown]
@@ -37,11 +41,20 @@ public class InsightCategoryControllerTests
             CardsGrid = new CardsGridDto { FilteringTooltipEnabled = false }
         };
 
+        _contentRetrieverMock
+            .Setup(x => x.RetrieveCurrentPage<InsightCategory>(
+                It.IsAny<RetrieveCurrentPageParameters>(),
+                It.IsAny<Action<RetrieveCurrentPageQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, InsightCategory, Task<InsightCategory>>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(page);
+
         _serviceMock
             .Setup(x => x.GetInsightPageDtoAsync(page, It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedDto);
 
-        var result = await _controller.Index(page, CancellationToken.None);
+        var result = await _controller.Index(CancellationToken.None);
 
         var viewResult = result as ViewResult;
         Assert.Multiple(() =>
@@ -58,11 +71,20 @@ public class InsightCategoryControllerTests
         var page = new InsightCategory();
         var token = new CancellationTokenSource().Token;
 
+        _contentRetrieverMock
+            .Setup(x => x.RetrieveCurrentPage<InsightCategory>(
+                It.IsAny<RetrieveCurrentPageParameters>(),
+                It.IsAny<Action<RetrieveCurrentPageQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, InsightCategory, Task<InsightCategory>>>(),
+                token))
+            .ReturnsAsync(page);
+
         _serviceMock
             .Setup(x => x.GetInsightPageDtoAsync(page, token))
             .ReturnsAsync(new InsightCardListingDto { Title = "x", Hero = new HeroDto(), CardsGrid = new CardsGridDto { FilteringTooltipEnabled = false } });
 
-        await _controller.Index(page, token);
+        await _controller.Index(token);
 
         _serviceMock.Verify(x => x.GetInsightPageDtoAsync(page, token), Times.Once);
     }

@@ -124,21 +124,12 @@ public class InsightSectionCardListingPageServiceTests
     }
 
     [Test]
-    public void GetContentSectionDtoAsync_ThrowsContentItemNotFoundException_WhenCurrentPageIsNull()
+    public void GetContentSectionDtoAsync_ThrowsArgumentNullException_WhenPageHasUninitializedCollections()
     {
-        _contentRetrieverMock
-            .Setup(x => x.RetrieveCurrentPage<SectionInsightsPage>(
-                It.IsAny<RetrieveCurrentPageParameters>(),
-                It.IsAny<Action<RetrieveCurrentPageQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<Func<IContentQueryDataContainer, SectionInsightsPage, Task<SectionInsightsPage>>>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync((SectionInsightsPage)null!);
-
-        var exception = Assert.ThrowsAsync<ContentItemNotFoundException>(async () =>
+        var exception = Assert.ThrowsAsync<ArgumentNullException>(async () =>
             await _service.GetContentSectionDtoAsync(new SectionInsightsPage(), CancellationToken.None));
 
-        Assert.That(exception!.Message, Does.Contain(nameof(SectionInsightsPage)));
+        Assert.That(exception, Is.Not.Null);
     }
 
     [Test]

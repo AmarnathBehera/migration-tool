@@ -246,43 +246,11 @@ public class InsightGroupCardListingPageServiceTests
     }
 
     [Test]
-    public void GetInsightPageDtoAsync_ThrowsInvalidOperation_WhenCurrentPageIsNull()
+    public void GetInsightPageDtoAsync_ThrowsInvalidOperation_WhenSystemFieldsAreNull()
     {
-        _contentRetrieverMock
-            .Setup(x => x.RetrieveCurrentPage<InsightGroup>(
-                It.Is<RetrieveCurrentPageParameters>(p => p.LinkedItemsMaxLevel == 4),
-                It.IsAny<Action<RetrieveCurrentPageQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<Func<IContentQueryDataContainer, InsightGroup, Task<InsightGroup>>>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync((InsightGroup)null!);
-
         var exception = Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await _service.GetInsightPageDtoAsync(
                 new InsightGroup(),
-                CancellationToken.None));
-
-        Assert.That(exception, Is.Not.Null);
-        Assert.That(exception!.Message, Does.Contain("Current page of type InsightGroup could not be retrieved"));
-    }
-
-    [Test]
-    public void GetInsightPageDtoAsync_ThrowsInvalidOperation_WhenSystemFieldsAreNull()
-    {
-        var page = new InsightGroup();
-
-        _contentRetrieverMock
-            .Setup(x => x.RetrieveCurrentPage<InsightGroup>(
-                It.Is<RetrieveCurrentPageParameters>(p => p.LinkedItemsMaxLevel == 4),
-                It.IsAny<Action<RetrieveCurrentPageQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<Func<IContentQueryDataContainer, InsightGroup, Task<InsightGroup>>>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(page);
-
-        var exception = Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await _service.GetInsightPageDtoAsync(
-                page,
                 CancellationToken.None));
 
         Assert.That(exception, Is.Not.Null);

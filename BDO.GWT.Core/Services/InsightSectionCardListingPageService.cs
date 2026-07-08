@@ -44,20 +44,9 @@ public class InsightSectionCardListingPageService : IInsightSectionCardListingPa
         _insightCardService = insightCardService;
     }
 
-    public async Task<InsightCardListingDto> GetContentSectionDtoAsync(SectionInsightsPage page, CancellationToken cancellationToken)
+    public async Task<InsightCardListingDto> GetContentSectionDtoAsync(SectionInsightsPage insightPage, CancellationToken cancellationToken)
     {
-        var insightPage = await _contentRetriever.RetrieveCurrentPage<SectionInsightsPage>(
-            new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 },
-            _ => { },
-            RetrievalCacheSettings.CacheDisabled,
-            (_, currentPage) => Task.FromResult(currentPage),
-            cancellationToken);
-
-        if (insightPage is null)
-        {
-            throw new ContentItemNotFoundException($"Current page of type '{nameof(SectionInsightsPage)}' was not found.");
-        }
-
+       
         var sys = insightPage.SystemFields;
 
         var dto = new InsightCardListingDto
@@ -205,28 +194,13 @@ public class InsightSectionCardListingPageService : IInsightSectionCardListingPa
     private async Task<CardsGridDto> GetCardsGridDtoAsync(SectionInsightsPage page, CancellationToken cancellationToken)
     {
         var insightSection = await GetInsightSectionPage(page, cancellationToken);
-        var filterNames = string.IsNullOrWhiteSpace(insightSection?.InsightListFilters)
-        ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        : insightSection.InsightListFilters
-        .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-        .ToHashSet(StringComparer.OrdinalIgnoreCase);
-        var createFilters = _insightCardService.CreateFiltersAsync(
-                   filterNames,
-                   null,
-                   cancellationToken);
-        var insightCardsGridDto = new CardsGridDto
-        {
-            Title = insightSection?.ItemListTitle,
-            Description = insightSection?.ItemListDescription,
-            Filters = insightSection?.ItemListFilteringEnabled == true ? await createFilters : null,
-            FilteringTooltipEnabled = await _filteringHelper.IsFilteringTooltipEnabledAsync(insightSection?.ItemListFilteringEnabled ?? false, cancellationToken),
-            PageSize = 20,
-            ApiEndpointName = $"Insights/{page.SystemFields.WebPageItemGUID}",
-            AdvancedSearchPrelinkText = insightSection?.ItemListAdvancedSearchDescription,
-            AdvancedSearchLinkText = insightSection?.ItemListAdvancedSearchLinkText,
-            AdvancedSearchLink = insightSection?.ItemListAdvancedSearchLinkUrl?.FirstOrDefault()?.ToString(),
-        };
 
-        return insightCardsGridDto;
+        return await InsightCardsGridFactory.CreateAsync(
+            page.SystemFields.WebPageItemGUID,
+            insightSection,
+            _insightCardService,
+            _filteringHelper,
+            cancellationToken,
+            includeTitleAndDescription: true);
     }
 }

@@ -194,21 +194,12 @@ public class InsightCategoryCardListingPageServiceTests
     }
 
     [Test]
-    public void GetInsightPageDtoAsync_ThrowsInvalidOperationException_WhenCurrentPageIsNull()
+    public void GetInsightPageDtoAsync_ThrowsNullReferenceException_WhenPageIsNull()
     {
-        _contentRetrieverMock
-            .Setup(x => x.RetrieveCurrentPage<InsightCategory>(
-                It.IsAny<RetrieveCurrentPageParameters>(),
-                It.IsAny<Action<RetrieveCurrentPageQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<Func<IContentQueryDataContainer, InsightCategory, Task<InsightCategory>>>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync((InsightCategory)null!);
+        var exception = Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await _service.GetInsightPageDtoAsync(null!, CancellationToken.None));
 
-        var exception = Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await _service.GetInsightPageDtoAsync(new InsightCategory(), CancellationToken.None));
-
-        Assert.That(exception!.Message, Does.Contain("Current page of type InsightCategory could not be retrieved"));
+        Assert.That(exception, Is.Not.Null);
     }
 
     [Test]
@@ -218,17 +209,8 @@ public class InsightCategoryCardListingPageServiceTests
         // exercises the second guard clause once RetrieveCurrentPage succeeds.
         var pageWithoutSystemFields = new InsightCategory();
 
-        _contentRetrieverMock
-            .Setup(x => x.RetrieveCurrentPage<InsightCategory>(
-                It.IsAny<RetrieveCurrentPageParameters>(),
-                It.IsAny<Action<RetrieveCurrentPageQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<Func<IContentQueryDataContainer, InsightCategory, Task<InsightCategory>>>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(pageWithoutSystemFields);
-
         var exception = Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await _service.GetInsightPageDtoAsync(new InsightCategory(), CancellationToken.None));
+            await _service.GetInsightPageDtoAsync(pageWithoutSystemFields, CancellationToken.None));
 
         Assert.That(exception!.Message, Does.Contain("System fields for InsightCategory page are unavailable"));
     }
@@ -247,15 +229,6 @@ public class InsightCategoryCardListingPageServiceTests
                 Options = Array.Empty<OptionDto>()
             }
         };
-
-        _contentRetrieverMock
-            .Setup(x => x.RetrieveCurrentPage<InsightCategory>(
-                It.IsAny<RetrieveCurrentPageParameters>(),
-                It.IsAny<Action<RetrieveCurrentPageQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<Func<IContentQueryDataContainer, InsightCategory, Task<InsightCategory>>>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(currentPage);
 
         _contentRetrieverMock
             .Setup(x => x.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
@@ -311,15 +284,6 @@ public class InsightCategoryCardListingPageServiceTests
         var currentPage = CreateInsightCategory(pageGuid, "/Insights/Category");
 
         _contentRetrieverMock
-            .Setup(x => x.RetrieveCurrentPage<InsightCategory>(
-                It.IsAny<RetrieveCurrentPageParameters>(),
-                It.IsAny<Action<RetrieveCurrentPageQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<Func<IContentQueryDataContainer, InsightCategory, Task<InsightCategory>>>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(currentPage);
-
-        _contentRetrieverMock
             .Setup(x => x.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
                 It.IsAny<RetrievePagesParameters>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
@@ -348,15 +312,6 @@ public class InsightCategoryCardListingPageServiceTests
     {
         var pageGuid = Guid.NewGuid();
         var currentPage = CreateInsightCategory(pageGuid, "/Insights/Category");
-
-        _contentRetrieverMock
-            .Setup(x => x.RetrieveCurrentPage<InsightCategory>(
-                It.IsAny<RetrieveCurrentPageParameters>(),
-                It.IsAny<Action<RetrieveCurrentPageQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<Func<IContentQueryDataContainer, InsightCategory, Task<InsightCategory>>>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(currentPage);
 
         _contentRetrieverMock
             .Setup(x => x.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
@@ -397,15 +352,6 @@ public class InsightCategoryCardListingPageServiceTests
                 Options = Array.Empty<OptionDto>()
             }
         };
-
-        _contentRetrieverMock
-            .Setup(x => x.RetrieveCurrentPage<InsightCategory>(
-                It.IsAny<RetrieveCurrentPageParameters>(),
-                It.IsAny<Action<RetrieveCurrentPageQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<Func<IContentQueryDataContainer, InsightCategory, Task<InsightCategory>>>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(currentPage);
 
         _contentRetrieverMock
             .Setup(x => x.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
