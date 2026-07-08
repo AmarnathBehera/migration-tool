@@ -29,92 +29,31 @@ public class InsightSectionCardListingPageService : IInsightSectionCardListingPa
     private readonly IContentRetriever _contentRetriever;
     private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly IInsightCardService _insightCardService;
+    private readonly IWebPageUrlRetriever _webPageUrlRetriever;
 
     public InsightSectionCardListingPageService(
         IFilteringHelper filteringHelper,
         IHeroService heroService,
         IContentRetriever contentRetriever,
         IInsightCardService insightCardService,
-        IWebsiteChannelContext websiteChannelContext)
+        IWebsiteChannelContext websiteChannelContext,
+        IWebPageUrlRetriever webPageUrlRetriever)
     {
         _filteringHelper = filteringHelper;
         _heroService = heroService;
         _contentRetriever = contentRetriever;
         _websiteChannelContext = websiteChannelContext;
         _insightCardService = insightCardService;
+        _webPageUrlRetriever = webPageUrlRetriever;
     }
 
     public async Task<InsightCardListingDto> GetContentSectionDtoAsync(SectionInsightsPage insightPage, CancellationToken cancellationToken)
     {
-       
-        var sys = insightPage.SystemFields;
-
-        var dto = new InsightCardListingDto
-        {
-            Title = insightPage.MetadataTitle,
-            Hero = await _heroService.GetHeroDtoAsync(new HeroData
-            {
-                Layout = insightPage.HeroLayout,
-                Title = insightPage.HeroTitle,
-                Description = insightPage.HeroDescription,
-                BackgroundImage = insightPage.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string bgUrl ? Link.Parse(bgUrl) : null,
-                BackgroundImageAltText = insightPage.HeroBackgroundImageAltText,
-                MobileBackgroundImage = insightPage.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string mobileUrl ? Link.Parse(mobileUrl) : null,
-                MobileBackgroundImageAltText = insightPage.HeroBackgroundImage_MobileAltText,
-                CallToActionButtonType = insightPage.HeroCallToActionButtonType,
-                CallToActionButtonText = insightPage.HeroCallToActionButtonText,
-                CallToActionButtonUrl = insightPage.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath is string ctaPath ? Link.Parse(ctaPath) : null,
-            }, cancellationToken),
-            BaseContent = new BaseContent
-            {
-                ContentItemID = sys?.ContentItemID ?? 0,
-                ContentItemGUID = sys?.ContentItemGUID ?? Guid.Empty,
-                ContentItemName = sys?.ContentItemName,
-                ContentItemContentTypeID = sys?.ContentItemContentTypeID ?? 0,
-                ContentItemIsSecured = sys?.ContentItemIsSecured ?? false,
-                ContentItemCommonDataContentLanguageID = sys?.ContentItemCommonDataContentLanguageID ?? 0,
-                ContentItemCommonDataFirstPublishedWhen = sys?.ContentItemCommonDataFirstPublishedWhen ?? default,
-                ContentItemCommonDataLastPublishedWhen = sys?.ContentItemCommonDataLastPublishedWhen ?? default
-            },
-            BaseWebPage = new BaseWebPage
-            {
-                WebPageItemGUID = sys?.WebPageItemGUID ?? Guid.Empty,
-                WebPageItemID = sys?.WebPageItemID ?? 0,
-                WebPageItemName = sys?.WebPageItemName,
-                WebPageItemWebsiteChannelID = sys?.WebPageItemWebsiteChannelId ?? 0,
-                WebPageUrlPath = sys?.WebPageUrlPath,
-                WebPageItemOrder = sys?.WebPageItemOrder ?? 0,
-                WebPageItemTreePath = sys?.WebPageItemTreePath,
-                WebPageUrlPathContentLanguageID = sys?.WebPageUrlPathContentLanguageID ?? 0,
-                WebPageItemParentID = sys?.WebPageItemParentID ?? 0
-            },
-            MetaData = new MetaDataDto
-            {
-                MetaTitle = insightPage.MetadataTitle,
-                MetaDescription = insightPage.MetadataDescription,
-                MetadataTeaserImage = insightPage.MetadataTeaserImage.FirstOrDefault()?.ContentAttachmentAsset?.Url,
-                MetaTeaserImageAltText = insightPage.MetadataTeaserImageAltText,
-                MetaCanonical = insightPage.MetadataCanonical,
-            },
-            SearchAndSEO = new SearchAndSEODto
-            {
-                MetadataNofollow = insightPage.MetadataNofollow,
-                MetadataNoindex = insightPage.MetadataNoindex,
-                IncludeInSitemap = insightPage.IncludeInSitemap,
-            },
-            OGMetaData = new OGMetaDataDto
-            {
-                MetadataOGTitle = insightPage.MetadataOGTitle,
-                MetadataOGDescription = insightPage.MetadataOGDescription,
-                MetadataOGImage = insightPage.MetadataOGImage.FirstOrDefault()?.ContentAttachmentAsset?.Url,
-                MetadataOGTwitterImage = insightPage.MetadataOGTwitterImage.FirstOrDefault()?.ContentAttachmentAsset?.Url,
-                MetadataOGTwitterImageSizeCheckbox = insightPage.MetadataOGTwitterImageSizeCheckbox,
-                Url = insightPage.MetadataCanonical,
-            },
-            CardsGrid = await GetCardsGridDtoAsync(insightPage, cancellationToken),
-        };
-
-        return dto;
+        return await InsightListingDtoMapper.MapToInsightCardListingDtoAsync(
+            insightPage,
+            _heroService,
+            async page => await GetCardsGridDtoAsync(page, cancellationToken),
+            cancellationToken);
     }
 
     public async Task<PaginationDto<ContentPageCardDto>> GetContentPaginationResultAsync(
@@ -122,20 +61,15 @@ public class InsightSectionCardListingPageService : IInsightSectionCardListingPa
         CardsQuery cardsQuery,
         CancellationToken cancellationToken)
     {
-        var page = (await _contentRetriever.RetrievePages<IWebPageFieldsSource, IWebPageFieldsSource>(
-            new RetrievePagesParameters(),
-            query => query.Where(where => where.WhereIn(nameof(WebPageFields.WebPageItemGUID), new[] { pageGuid })),
-            RetrievalCacheSettings.CacheDisabled,
-            (_, item) => Task.FromResult(item),
-            cancellationToken))
-            .FirstOrDefault();
+        var treePath = await GetTreePathAsync<SectionInsightsPage>(pageGuid, cancellationToken)
+            ?? await GetTreePathAsync<InsightGroup>(pageGuid, cancellationToken)
+            ?? await GetTreePathAsync<InsightCategory>(pageGuid, cancellationToken);
 
-        if (page is null)
+        if (string.IsNullOrWhiteSpace(treePath))
         {
             throw new ContentItemNotFoundException($"SectionInsightsPage page not found for guid '{pageGuid}'.");
         }
 
-        var treePath = page.SystemFields.WebPageItemTreePath;
         Action<RetrievePagesQueryParameters>? decorateQuery = string.IsNullOrWhiteSpace(treePath)
             ? null
             : q => q.Where(w => w.WhereStartsWith(nameof(WebPageFields.WebPageItemTreePath), $"{treePath}/"));
@@ -150,6 +84,20 @@ public class InsightSectionCardListingPageService : IInsightSectionCardListingPa
             cancellationToken);
     }
 
+    private async Task<string?> GetTreePathAsync<TPage>(Guid pageGuid, CancellationToken cancellationToken)
+        where TPage : class, IWebPageFieldsSource
+    {
+        var page = (await _contentRetriever.RetrievePages<TPage, TPage>(
+            new RetrievePagesParameters(),
+            query => query.Where(where => where.WhereIn(nameof(WebPageFields.WebPageItemGUID), new[] { pageGuid })),
+            RetrievalCacheSettings.CacheDisabled,
+            (_, item) => Task.FromResult(item),
+            cancellationToken))
+            .FirstOrDefault();
+
+        return page?.SystemFields?.WebPageItemTreePath;
+    }
+
     private async Task<SectionInsightsPage> GetInsightSectionPage(SectionInsightsPage? currentPage, CancellationToken cancellationToken)
     {
         if (currentPage is not null)
@@ -157,27 +105,10 @@ public class InsightSectionCardListingPageService : IInsightSectionCardListingPa
             return currentPage;
         }
 
-        var insightSection = await _contentRetriever.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
-                            new RetrievePagesParameters
-                            {
-                                LinkedItemsMaxLevel = 5
-                            },
-                            query =>
-                            {
-                                query.Where(w =>
-                                    w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
-                            },
-                            RetrievalCacheSettings.CacheDisabled,
-                            (_, item) => Task.FromResult(item),
-                            cancellationToken);
-
-        var insightSectionPage = insightSection.FirstOrDefault();
-        if (insightSectionPage is null)
-        {
-            throw new MissingSectionPageException($"No pages have been found of type '{nameof(SectionInsightsPage)}'.");
-        }
-
-        return insightSectionPage;
+        return await SectionInsightsPageRetriever.GetRequiredSectionInsightsPageAsync(
+            _contentRetriever,
+            _websiteChannelContext,
+            cancellationToken);
     }
 
     private async Task<ISet<int>> GetFeaturedContentPageIdsAsync(CancellationToken cancellationToken)
@@ -201,6 +132,7 @@ public class InsightSectionCardListingPageService : IInsightSectionCardListingPa
             _insightCardService,
             _filteringHelper,
             cancellationToken,
+            _webPageUrlRetriever,
             includeTitleAndDescription: true);
     }
 }

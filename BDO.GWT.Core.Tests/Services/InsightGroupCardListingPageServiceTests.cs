@@ -24,6 +24,7 @@ public class InsightGroupCardListingPageServiceTests
     private Mock<IContentRetriever> _contentRetrieverMock = null!;
     private Mock<IFilteringHelper> _filteringHelperMock = null!;
     private Mock<IHeroService> _heroServiceMock = null!;
+    private Mock<IWebPageUrlRetriever> _webPageUrlRetrieverMock = null!;
 
     private InsightGroupCardListingPageService _service = null!;
 
@@ -35,13 +36,15 @@ public class InsightGroupCardListingPageServiceTests
         _contentRetrieverMock = new Mock<IContentRetriever>();
         _filteringHelperMock = new Mock<IFilteringHelper>();
         _heroServiceMock = new Mock<IHeroService>();
+        _webPageUrlRetrieverMock = new Mock<IWebPageUrlRetriever>();
 
         _service = new InsightGroupCardListingPageService(
             _insightCardServiceMock.Object,
             _websiteChannelContextMock.Object,
             _contentRetrieverMock.Object,
             _filteringHelperMock.Object,
-            _heroServiceMock.Object);
+            _heroServiceMock.Object,
+            _webPageUrlRetrieverMock.Object);
     }
 
     [Test]

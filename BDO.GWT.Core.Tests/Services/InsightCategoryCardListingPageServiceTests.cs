@@ -21,6 +21,7 @@ public class InsightCategoryCardListingPageServiceTests
     private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
     private Mock<IFilteringHelper> _filteringHelperMock = null!;
     private Mock<IHeroService> _heroServiceMock = null!;
+    private Mock<IWebPageUrlRetriever> _webPageUrlRetrieverMock = null!;
     private InsightCategoryCardListingPageService _service = null!;
 
     [SetUp]
@@ -31,6 +32,7 @@ public class InsightCategoryCardListingPageServiceTests
         _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
         _filteringHelperMock = new Mock<IFilteringHelper>();
         _heroServiceMock = new Mock<IHeroService>();
+        _webPageUrlRetrieverMock = new Mock<IWebPageUrlRetriever>();
 
         _websiteChannelContextMock
             .Setup(x => x.WebsiteChannelID)
@@ -69,7 +71,8 @@ public class InsightCategoryCardListingPageServiceTests
             _websiteChannelContextMock.Object,
             _contentRetrieverMock.Object,
             _filteringHelperMock.Object,
-            _heroServiceMock.Object);
+            _heroServiceMock.Object,
+            _webPageUrlRetrieverMock.Object);
     }
 
     [Test]

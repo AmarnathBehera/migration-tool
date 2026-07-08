@@ -22,6 +22,7 @@ public class InsightSectionCardListingPageServiceTests
     private Mock<IFilteringHelper> _filteringHelperMock = null!;
     private Mock<IHeroService> _heroServiceMock = null!;
     private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
+    private Mock<IWebPageUrlRetriever> _webPageUrlRetrieverMock = null!;
     private InsightSectionCardListingPageService _service = null!;
 
     [SetUp]
@@ -32,6 +33,7 @@ public class InsightSectionCardListingPageServiceTests
         _filteringHelperMock = new Mock<IFilteringHelper>();
         _heroServiceMock = new Mock<IHeroService>();
         _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
+        _webPageUrlRetrieverMock = new Mock<IWebPageUrlRetriever>();
 
         _websiteChannelContextMock
             .Setup(x => x.WebsiteChannelID)
@@ -67,7 +69,8 @@ public class InsightSectionCardListingPageServiceTests
             _heroServiceMock.Object,
             _contentRetrieverMock.Object,
             _insightCardServiceMock.Object,
-            _websiteChannelContextMock.Object);
+            _websiteChannelContextMock.Object,
+            _webPageUrlRetrieverMock.Object);
     }
 
     [Test]
@@ -76,13 +79,31 @@ public class InsightSectionCardListingPageServiceTests
         var pageGuid = Guid.NewGuid();
 
         _contentRetrieverMock
-            .Setup(x => x.RetrievePages<IWebPageFieldsSource, IWebPageFieldsSource>(
+            .Setup(x => x.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
                 It.IsAny<RetrievePagesParameters>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<Func<IContentQueryDataContainer, IWebPageFieldsSource, Task<IWebPageFieldsSource>>>(),
+                It.IsAny<Func<IContentQueryDataContainer, SectionInsightsPage, Task<SectionInsightsPage>>>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<IWebPageFieldsSource>());
+            .ReturnsAsync(Array.Empty<SectionInsightsPage>());
+
+        _contentRetrieverMock
+            .Setup(x => x.RetrievePages<InsightGroup, InsightGroup>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, InsightGroup, Task<InsightGroup>>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<InsightGroup>());
+
+        _contentRetrieverMock
+            .Setup(x => x.RetrievePages<InsightCategory, InsightCategory>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, InsightCategory, Task<InsightCategory>>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<InsightCategory>());
 
         var exception = Assert.ThrowsAsync<ContentItemNotFoundException>(async () =>
             await _service.GetContentPaginationResultAsync(pageGuid, new CardsQuery(), CancellationToken.None));
@@ -94,20 +115,17 @@ public class InsightSectionCardListingPageServiceTests
     public void GetContentPaginationResultAsync_ThrowsMissingSectionPageException_WhenNoSectionInsightsPageExists()
     {
         var pageGuid = Guid.NewGuid();
-        var pageMock = new Mock<IWebPageFieldsSource>();
-        pageMock.Setup(x => x.SystemFields).Returns(new WebPageFields
+        var groupPage = new InsightGroup
         {
-            WebPageItemTreePath = "/Insights/Category"
-        });
+            SystemFields = new WebPageFields { WebPageItemTreePath = "/Insights/Category" },
+            HeroBackgroundImage = Array.Empty<ContentAttachment>(),
+            HeroBackgroundImage_Mobile = Array.Empty<ContentAttachment>(),
+            HeroCallToActionButtonUrl = Array.Empty<IWebPageFieldsSource>(),
+            MetadataTeaserImage = Array.Empty<ContentAttachment>(),
+            MetadataOGImage = Array.Empty<ContentAttachment>(),
+            MetadataOGTwitterImage = Array.Empty<ContentAttachment>()
+        };
 
-        _contentRetrieverMock
-            .Setup(x => x.RetrievePages<IWebPageFieldsSource, IWebPageFieldsSource>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<Func<IContentQueryDataContainer, IWebPageFieldsSource, Task<IWebPageFieldsSource>>>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new[] { pageMock.Object });
         _contentRetrieverMock
             .Setup(x => x.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
                 It.IsAny<RetrievePagesParameters>(),
@@ -115,7 +133,16 @@ public class InsightSectionCardListingPageServiceTests
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<Func<IContentQueryDataContainer, SectionInsightsPage, Task<SectionInsightsPage>>>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<SectionInsightsPage>());
+            .ReturnsAsync(Array.Empty<SectionInsightsPage>());
+
+        _contentRetrieverMock
+            .Setup(x => x.RetrievePages<InsightGroup, InsightGroup>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, InsightGroup, Task<InsightGroup>>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { groupPage });
 
         var exception = Assert.ThrowsAsync<MissingSectionPageException>(async () =>
             await _service.GetContentPaginationResultAsync(pageGuid, new CardsQuery(), CancellationToken.None));
@@ -138,28 +165,25 @@ public class InsightSectionCardListingPageServiceTests
         var pageGuid = Guid.NewGuid();
         var treePath = "/Insights/Section";
 
-        var pageMock = new Mock<IWebPageFieldsSource>();
-        pageMock.Setup(x => x.SystemFields).Returns(new WebPageFields
+        var sectionPage = new SectionInsightsPage
         {
-            WebPageItemTreePath = treePath
-        });
+            SystemFields = new WebPageFields { WebPageItemTreePath = treePath },
+            HeroBackgroundImage = Array.Empty<ContentAttachment>(),
+            HeroBackgroundImage_Mobile = Array.Empty<ContentAttachment>(),
+            HeroCallToActionButtonUrl = Array.Empty<IWebPageFieldsSource>(),
+            MetadataTeaserImage = Array.Empty<ContentAttachment>(),
+            MetadataOGImage = Array.Empty<ContentAttachment>(),
+            MetadataOGTwitterImage = Array.Empty<ContentAttachment>()
+        };
 
         _contentRetrieverMock
-            .Setup(x => x.RetrievePages<IWebPageFieldsSource, IWebPageFieldsSource>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<Func<IContentQueryDataContainer, IWebPageFieldsSource, Task<IWebPageFieldsSource>>>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new[] { pageMock.Object });
-
-        _contentRetrieverMock
-            .Setup(x => x.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
+            .SetupSequence(x => x.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
                 It.IsAny<RetrievePagesParameters>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<Func<IContentQueryDataContainer, SectionInsightsPage, Task<SectionInsightsPage>>>(),
                 It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { sectionPage })
             .ReturnsAsync(new[]
             {
                 new SectionInsightsPage
