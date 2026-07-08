@@ -16,7 +16,7 @@ using Kentico.Content.Web.Mvc;
 namespace BDO.GWT.Web.Core.Services;
 public interface IInsightSectionCardListingPageService
 {
-    Task<InsightCardListingDto> GetContentSectionDtoAsync(SectionInsightsPage page, CancellationToken cancellationToken);
+    Task<InsightCardListingDto> GetContentSectionDtoAsync(SectionInsightsPage insightPage, CancellationToken cancellationToken);
 
     Task<PaginationDto<ContentPageCardDto>> GetContentPaginationResultAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken);
 }

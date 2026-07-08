@@ -16,7 +16,7 @@ namespace BDO.GWT.Web.Core.Services;
 
 public interface IInsightGroupCardListingPageService
 {
-    Task<InsightCardListingDto> GetInsightPageDtoAsync(InsightGroup page, CancellationToken cancellationToken);
+    Task<InsightCardListingDto> GetInsightPageDtoAsync(InsightGroup insightPage, CancellationToken cancellationToken);
 
     Task<PaginationDto<ContentPageCardDto>> GetContentPaginationResultAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken);
 }
