@@ -1,7 +1,7 @@
-﻿
-using BDO.GWT.Core;
+﻿using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
 using BDO.GWT.Core.ValueObjects;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
@@ -10,40 +10,49 @@ namespace BDO.GWT.Web.Core.Services;
 
 public interface IEventRegistrationFormPageService
 {
-
-    Task<FormPageDto> GetEventRegistrationFormPageDtoAsync(EventRegistrationForm page, CancellationToken cancellationToken);
+    Task<FormPageDto> GetEventRegistrationFormPageDtoAsync(
+        EventRegistrationForm? page,
+        CancellationToken cancellationToken);
 }
 
 public class EventRegistrationFormPageService : IEventRegistrationFormPageService
 {
     private readonly IHeroService _heroService;
-    private readonly IContentService _contentRetriever;
-    public EventRegistrationFormPageService(IContentService pageRetriever,
+    private readonly IContentService _contentService;
+
+    public EventRegistrationFormPageService(
+        IContentService contentService,
         IHeroService heroService)
     {
-        _contentRetriever = pageRetriever;
+        _contentService = contentService;
         _heroService = heroService;
-       
     }
 
-    public async Task<FormPageDto> GetEventRegistrationFormPageDtoAsync(EventRegistrationForm page, CancellationToken cancellationToken)
+    public async Task<FormPageDto> GetEventRegistrationFormPageDtoAsync(
+        EventRegistrationForm? page,
+        CancellationToken cancellationToken)
     {
-        var EventRPage = await _contentRetriever.RetrieveCurrentPageAsync<EventRegistrationForm>(
-            new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
-        if (EventRPage is null)
+        var eventRegistrationPage = page ?? await _contentService.RetrieveCurrentPageAsync<EventRegistrationForm>(
+            new RetrieveCurrentPageParameters
+            {
+                LinkedItemsMaxLevel = 4
+            },
+            cancellationToken);
+
+        if (eventRegistrationPage is null)
         {
             return new FormPageDto();
         }
 
-        var sys = EventRPage.SystemFields;
+        var sys = eventRegistrationPage.SystemFields;
 
         return new FormPageDto
         {
-            Title = EventRPage.PageTitle,
-            Description = EventRPage.PageDescription,
-            FormType = EventRPage.FormType,
-            Form = EventRPage.Form,
-            EmbedCode = EventRPage.EmbedCode,
+            Title = eventRegistrationPage.PageTitle,
+            Description = eventRegistrationPage.PageDescription,
+            FormType = eventRegistrationPage.FormType,
+            Form = eventRegistrationPage.Form,
+            EmbedCode = eventRegistrationPage.EmbedCode,
 
             BaseContent = new BaseContent
             {
@@ -72,17 +81,38 @@ public class EventRegistrationFormPageService : IEventRegistrationFormPageServic
 
             Hero = await _heroService.GetHeroDtoAsync(new HeroData
             {
-                Layout = EventRPage.HeroLayout,
-                Title = EventRPage.HeroTitle,
-                Description = EventRPage.HeroDescription,
-                BackgroundImage = EventRPage.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string bgUrl ? Link.Parse(bgUrl) : null,
-                BackgroundImageAltText = EventRPage.HeroBackgroundImageAltText,
-                MobileBackgroundImage = EventRPage.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string mobileUrl ? Link.Parse(mobileUrl) : null,
-                MobileBackgroundImageAltText = EventRPage.HeroBackgroundImage_MobileAltText,
-                CallToActionButtonType = EventRPage.HeroCallToActionButtonType,
-                CallToActionButtonText = EventRPage.HeroCallToActionButtonText,
-                CallToActionButtonUrl = EventRPage.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath is string ctaPath ? Link.Parse(ctaPath) : null,
-            }, cancellationToken),
+                Layout = eventRegistrationPage.HeroLayout,
+                Title = eventRegistrationPage.HeroTitle,
+                Description = eventRegistrationPage.HeroDescription,
+
+                BackgroundImage = eventRegistrationPage.HeroBackgroundImage?
+                    .FirstOrDefault()?
+                    .ContentAttachmentAsset?
+                    .Url is string bgUrl
+                        ? Link.Parse(bgUrl)
+                        : null,
+
+                BackgroundImageAltText = eventRegistrationPage.HeroBackgroundImageAltText,
+
+                MobileBackgroundImage = eventRegistrationPage.HeroBackgroundImage_Mobile?
+                    .FirstOrDefault()?
+                    .ContentAttachmentAsset?
+                    .Url is string mobileUrl
+                        ? Link.Parse(mobileUrl)
+                        : null,
+
+                MobileBackgroundImageAltText = eventRegistrationPage.HeroBackgroundImage_MobileAltText,
+
+                CallToActionButtonType = eventRegistrationPage.HeroCallToActionButtonType,
+                CallToActionButtonText = eventRegistrationPage.HeroCallToActionButtonText,
+
+                CallToActionButtonUrl = eventRegistrationPage.HeroCallToActionButtonUrl?
+                    .FirstOrDefault()?
+                    .SystemFields?
+                    .WebPageUrlPath is string ctaPath
+                        ? Link.Parse(ctaPath)
+                        : null
+            }, cancellationToken)
         };
     }
 }

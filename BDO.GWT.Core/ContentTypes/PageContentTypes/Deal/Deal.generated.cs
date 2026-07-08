@@ -240,6 +240,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// IsSearchExcluded.
+		/// </summary>
+		public bool IsSearchExcluded { get; set; }
+
+
+		/// <summary>
 		/// MetadataTitle.
 		/// </summary>
 		public string MetadataTitle { get; set; }

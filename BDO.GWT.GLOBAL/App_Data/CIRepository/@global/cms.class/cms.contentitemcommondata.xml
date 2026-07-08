@@ -343,6 +343,17 @@ center;Center
           <controlname>Kentico.Administration.Checkbox</controlname>
         </settings>
       </field>
+      <field allowempty="true" column="IsSearchExcluded" columnprecision="0" columntype="boolean" enabled="true" guid="4425b5ce-4662-46fe-8b04-bd97161c12ce" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Search Excluded</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>a1394d11-ac3a-40b9-8162-d117c5ff85fe</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
       <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="Metadata">
         <properties>
           <fieldcaption>Metadata</fieldcaption>
