@@ -88,7 +88,7 @@ public class KeyContactsServiceTests
     }
 
     [Test]
-    public async Task GetKeyContactsAsync_WithEmptyGuids_ReturnsEmptyItemsAndExternalItems()
+    public async Task GetKeyContactsAsync_WithEmptyGuids_ReturnsEmptyItems()
     {
         var data = CreateDefaultData();
 
@@ -99,8 +99,6 @@ public class KeyContactsServiceTests
         {
             Assert.That(result.Items, Is.Not.Null);
             Assert.That(result.Items, Is.Empty);
-            Assert.That(result.ExternalItems, Is.Not.Null);
-            Assert.That(result.ExternalItems, Is.Empty);
         });
     }
 

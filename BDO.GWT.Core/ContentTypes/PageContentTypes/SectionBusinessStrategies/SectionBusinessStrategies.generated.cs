@@ -36,6 +36,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// Menu.
+		/// </summary>
+		public string Menu { get; set; }
+
+
+		/// <summary>
 		/// MenuBackgroundImage.
 		/// </summary>
 		public IEnumerable<ContentAttachment> MenuBackgroundImage { get; set; }

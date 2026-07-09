@@ -131,6 +131,12 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IEditorsPickService, EditorsPickService>();
         serviceCollection.AddScoped<IRelatedContactsService, RelatedContactsService>();
         serviceCollection.AddScoped<IInFocusService, InFocusService>();
+        serviceCollection.AddScoped<IInsightPageService, InsightPageService>();
+        serviceCollection.AddScoped<IInsightSectionCardListingPageService, InsightSectionCardListingPageService>();
+        serviceCollection.AddScoped<IInsightGroupCardListingPageService, InsightGroupCardListingPageService>();
+        serviceCollection.AddScoped<IInsightCategoryCardListingPageService, InsightCategoryCardListingPageService>();
+        serviceCollection.AddScoped<IInsightCardService, InsightCardService>();
+
     }
 
 }

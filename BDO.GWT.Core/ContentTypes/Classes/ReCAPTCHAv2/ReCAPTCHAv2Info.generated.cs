@@ -43,28 +43,6 @@ namespace BDO
 
 
         /// <summary>
-        /// Sitekey.
-        /// </summary>
-        [DatabaseField]
-        public virtual string Sitekey
-        {
-            get => ValidationHelper.GetString(GetValue(nameof(Sitekey)), String.Empty);
-            set => SetValue(nameof(Sitekey), value);
-        }
-
-
-        /// <summary>
-        /// Secretkey.
-        /// </summary>
-        [DatabaseField]
-        public virtual string Secretkey
-        {
-            get => ValidationHelper.GetString(GetValue(nameof(Secretkey)), String.Empty);
-            set => SetValue(nameof(Secretkey), value);
-        }
-
-
-        /// <summary>
         /// Deletes the object using appropriate provider.
         /// </summary>
         protected override void DeleteObject()

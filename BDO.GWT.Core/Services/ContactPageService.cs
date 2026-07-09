@@ -15,51 +15,40 @@ public interface IContactPageService
 
 public class ContactPageService : IContactPageService
 {
+    private readonly IContentService _contentService;
     private readonly IHeroService _heroService;
-    private readonly IContentService _contentRetriever;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
 
     public ContactPageService(
-        IContentService pageRetriever,
-        IHeroService heroService,
-        IWebsiteChannelContext websiteChannelContext)
+        IContentService contentService,
+        IHeroService heroService)
     {
-        _contentRetriever = pageRetriever;
+        _contentService = contentService;
         _heroService = heroService;
-        _websiteChannelContext = websiteChannelContext;
     }
 
     public async Task<FormPageDto> GetContactPageDtoAsync(Contact? page, CancellationToken cancellationToken)
     {
-        var results = await _contentRetriever.GetPagesAsync<Contact>(
-            new RetrievePagesParameters
+        var contactPage = page ?? await _contentService.RetrieveCurrentPageAsync<Contact>(
+            new RetrieveCurrentPageParameters
             {
-                LinkedItemsMaxLevel = 5
+                LinkedItemsMaxLevel = 4
             },
-            query =>
-            {
-                query.Where(w =>
-                    w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
-            },
-            RetrievalCacheSettings.CacheDisabled,
             cancellationToken);
 
-        var ContactPage = results?.FirstOrDefault();
-
-        if (ContactPage == null)
+        if (contactPage == null)
         {
-            return new FormPageDto(); // or throw exception if required
+            return new FormPageDto();
         }
 
-        var sys = ContactPage.SystemFields;
+        var sys = contactPage.SystemFields;
 
         return new FormPageDto
         {
-            Title = ContactPage.DescriptionTitle,
-            Description = ContactPage.DescriptionBody,
-            FormType = ContactPage.FormType,
-            Form = ContactPage.Form,
-            EmbedCode = ContactPage.EmbedCode,
+            Title = contactPage.DescriptionTitle,
+            Description = contactPage.DescriptionBody,
+            FormType = contactPage.FormType,
+            Form = contactPage.Form,
+            EmbedCode = contactPage.EmbedCode,
 
             BaseContent = new BaseContent
             {
@@ -88,17 +77,38 @@ public class ContactPageService : IContactPageService
 
             Hero = await _heroService.GetHeroDtoAsync(new HeroData
             {
-                Layout = ContactPage.HeroLayout,
-                Title = ContactPage.HeroTitle,
-                Description = ContactPage.HeroDescription,
-                BackgroundImage = ContactPage.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string bgUrl ? Link.Parse(bgUrl) : null,
-                BackgroundImageAltText = ContactPage.HeroBackgroundImageAltText,
-                MobileBackgroundImage = ContactPage.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string mobileUrl ? Link.Parse(mobileUrl) : null,
-                MobileBackgroundImageAltText = ContactPage.HeroBackgroundImage_MobileAltText,
-                CallToActionButtonType = ContactPage.HeroCallToActionButtonType,
-                CallToActionButtonText = ContactPage.HeroCallToActionButtonText,
-                CallToActionButtonUrl = ContactPage.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath is string ctaPath ? Link.Parse(ctaPath) : null,
-            }, cancellationToken),
+                Layout = contactPage.HeroLayout,
+                Title = contactPage.HeroTitle,
+                Description = contactPage.HeroDescription,
+
+                BackgroundImage = contactPage.HeroBackgroundImage?
+                    .FirstOrDefault()?
+                    .ContentAttachmentAsset?
+                    .Url is string bgUrl
+                        ? Link.Parse(bgUrl)
+                        : null,
+
+                BackgroundImageAltText = contactPage.HeroBackgroundImageAltText,
+
+                MobileBackgroundImage = contactPage.HeroBackgroundImage_Mobile?
+                    .FirstOrDefault()?
+                    .ContentAttachmentAsset?
+                    .Url is string mobileUrl
+                        ? Link.Parse(mobileUrl)
+                        : null,
+
+                MobileBackgroundImageAltText = contactPage.HeroBackgroundImage_MobileAltText,
+
+                CallToActionButtonType = contactPage.HeroCallToActionButtonType,
+                CallToActionButtonText = contactPage.HeroCallToActionButtonText,
+
+                CallToActionButtonUrl = contactPage.HeroCallToActionButtonUrl?
+                    .FirstOrDefault()?
+                    .SystemFields?
+                    .WebPageUrlPath is string ctaPath
+                        ? Link.Parse(ctaPath)
+                        : null
+            }, cancellationToken)
         };
     }
 }

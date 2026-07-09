@@ -57,7 +57,7 @@ public class WhereConditionParser
         return queryCondition;
     }
 
-    private static IWhereCondition ParseMemberExpression(Expression memberExpression)
+    private static RelationalWhereCondition ParseMemberExpression(Expression memberExpression)
     {
         var propertyName = QueryExpressionHelper.GetPropertyName(memberExpression);
 
@@ -66,32 +66,31 @@ public class WhereConditionParser
         return queryCondition;
     }
 
+#pragma warning disable S3776
     private IWhereCondition ParseMethodCallExpression(MethodCallExpression methodCallExpression)
+#pragma warning restore S3776
     {
         if (methodCallExpression.Method.DeclaringType == null)
         {
             throw new InvalidOperationException($"If you see this error, change {nameof(WhereConditionParser)}.{nameof(ParseMethodCallExpression)} implementation!");
         }
 
-        if (methodCallExpression.Method.DeclaringType == typeof(Enumerable))
+        if (methodCallExpression.Method.DeclaringType == typeof(Enumerable) && methodCallExpression.Method.Name == nameof(Enumerable.Any))
         {
-            if (methodCallExpression.Method.Name == nameof(Enumerable.Any))
+            var intersectExpression = (MethodCallExpression)methodCallExpression.Arguments.First();
+
+            var propertyName = QueryExpressionHelper.GetPropertyName(intersectExpression.Arguments[0]);
+            var values = QueryExpressionHelper.GetPropertyValue(intersectExpression.Arguments[1]);
+
+            return values switch
             {
-                var intersectExpression = (MethodCallExpression)methodCallExpression.Arguments.First();
-
-                var propertyName = QueryExpressionHelper.GetPropertyName(intersectExpression.Arguments[0]);
-                var values = QueryExpressionHelper.GetPropertyValue(intersectExpression.Arguments[1]);
-
-                return values switch
-                {
-                    IEnumerable<string> stringValues => new ContainsAnyWhereCondition<string>(propertyName, typeof(string), stringValues.ToArray()),
-                    IEnumerable<int> intValues => new ContainsAnyWhereCondition<int>(propertyName, typeof(int), intValues.ToArray()),
-                    IEnumerable<long> longValues => new ContainsAnyWhereCondition<long>(propertyName, typeof(long), longValues.ToArray()),
-                    IEnumerable<Guid> guidValues => new ContainsAnyWhereCondition<Guid>(propertyName, typeof(Guid), guidValues.ToArray()),
-                    IEnumerable<LanguageTag> languageTagValues => new ContainsAnyWhereCondition<LanguageTag>(propertyName, typeof(LanguageTag), languageTagValues.ToArray()),
-                    _ => throw new NotSupportedException($"Method call expression with collection type '{values?.GetType().Name}' is not supported."),
-                };
-            }
+                IEnumerable<string> stringValues => new ContainsAnyWhereCondition<string>(propertyName, typeof(string), stringValues.ToArray()),
+                IEnumerable<int> intValues => new ContainsAnyWhereCondition<int>(propertyName, typeof(int), intValues.ToArray()),
+                IEnumerable<long> longValues => new ContainsAnyWhereCondition<long>(propertyName, typeof(long), longValues.ToArray()),
+                IEnumerable<Guid> guidValues => new ContainsAnyWhereCondition<Guid>(propertyName, typeof(Guid), guidValues.ToArray()),
+                IEnumerable<LanguageTag> languageTagValues => new ContainsAnyWhereCondition<LanguageTag>(propertyName, typeof(LanguageTag), languageTagValues.ToArray()),
+                _ => throw new NotSupportedException($"Method call expression with collection type '{values?.GetType().Name}' is not supported."),
+            };
         }
 
         if (methodCallExpression.Method.Name == "Contains")
@@ -169,7 +168,7 @@ public class WhereConditionParser
         };
     }
 
-    private IWhereCondition ParseOrElseBinaryExpression(BinaryExpression binaryExpression)
+    private OrWhereCondition ParseOrElseBinaryExpression(BinaryExpression binaryExpression)
     {
         var left = ParseExpression(binaryExpression.Left);
         var right = ParseExpression(binaryExpression.Right);
@@ -207,7 +206,7 @@ public class WhereConditionParser
         return queryCondition;
     }
 
-    private static IWhereCondition ParseUnaryExpression(UnaryExpression unaryExpression)
+    private static NotWhereCondition ParseUnaryExpression(UnaryExpression unaryExpression)
     {
         if (unaryExpression.NodeType == ExpressionType.Not)
         {
