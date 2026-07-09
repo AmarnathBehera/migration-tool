@@ -433,7 +433,7 @@ public class SectionBusinessStrategiesServiceTests
                 MetadataTitle = $"Strategy {i + 1}",
                 MetadataDescription = $"Description {i + 1}",
                 MenuShowInSection = true,
-                MenuTileIcon = CreateMockAttachmentList($"https://example.com/icon-{i + 1}.png"),
+                MenuTileIcon = CreateMockIconList($"https://example.com/icon-{i + 1}.png"),
                 MenuReadMoreText = "Read More",
                 SystemFields = CreateMockWebPageFields(i + 2, $"Strategy {i + 1}", 1),
             });
@@ -492,7 +492,7 @@ public class SectionBusinessStrategiesServiceTests
             MetadataTitle = title,
             MetadataDescription = description,
             MenuShowInSection = true,
-            MenuTileIcon = CreateMockAttachmentList(imageUrl),
+            MenuTileIcon = CreateMockIconList(imageUrl),
             MenuReadMoreText = readMoreText,
             SystemFields = CreateMockWebPageFields(2, title, 1),
         };
@@ -516,6 +516,11 @@ public class SectionBusinessStrategiesServiceTests
         _urlResolverMock
             .Setup(x => x.GetRelativePath(It.IsAny<BusinessStrategy>()))
             .Returns<BusinessStrategy>(s => $"/strategies/{s.SystemFields.WebPageItemName.ToLower().Replace(" ", "-")}");
+    }
+
+    private static List<Icon> CreateMockIconList(string url)
+    {
+        return new List<Icon>();
     }
 
     #endregion

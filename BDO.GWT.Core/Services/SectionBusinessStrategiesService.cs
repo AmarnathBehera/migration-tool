@@ -96,7 +96,7 @@ public class SectionBusinessStrategiesService : ISectionBusinessStrategiesServic
 
         var businessStrategiesDetailsDtos = businessStrategiesDetailsPages.Select(businessStrategiesDetailsPage => new BusinessStrategiesMenuDto
         {
-            ImageURL = businessStrategiesDetailsPage.MenuTileIcon?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+            ImageURL = businessStrategiesDetailsPage.MenuTileIcon?.FirstOrDefault()?.IconAttachmentAsset.Url,
             Title = businessStrategiesDetailsPage.MetadataTitle,
             Description = HtmlHelper.ExtractTextFromHtml(businessStrategiesDetailsPage.MetadataDescription),
             ReadMoreLink = new LinkItemDto
