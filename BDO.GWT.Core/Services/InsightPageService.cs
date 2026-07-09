@@ -13,6 +13,7 @@ using CMS.DataEngine;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
+using static BDO.GWT.Core.Constants.ResourceStringKey.LiveSite;
 
 namespace BDO.GWT.Core.Services
 {
@@ -49,7 +50,7 @@ namespace BDO.GWT.Core.Services
             var insightPage = await _contentRetriever.RetrieveCurrentPage<Insight>(new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
             var contentPageDto = await GetContentPageDtoAsync(insightPage, cancellationToken);
             var sys = insightPage.SystemFields;
-
+           
             var dto = new InsightPageDto(contentPageDto)
             {
                 SchemaMarkup = await GetInsightSchemaMarkupDtoAsync(insightPage, cancellationToken),
@@ -65,7 +66,8 @@ namespace BDO.GWT.Core.Services
                     ContentItemCommonDataFirstPublishedWhen = sys?.ContentItemCommonDataFirstPublishedWhen ?? default,
                     ContentItemCommonDataLastPublishedWhen = sys?.ContentItemCommonDataLastPublishedWhen ?? default
                 },
-
+                CallToAction = contentPageDto.CallToActionWithPosition.CallToActionDto,
+                CallToActionWithPosition= contentPageDto.CallToActionWithPosition,
                 BaseWebPage = new BaseWebPage
                 {
                     WebPageItemGUID = sys?.WebPageItemGUID ?? Guid.Empty,
@@ -118,7 +120,7 @@ namespace BDO.GWT.Core.Services
                 var showCopyLinkButton = await GetShowCopyLinkOptionFromSectionPageAsync(insightPage, dto.Sidebar.ShowCopyLinkButton, cancellationToken);
                 dto.Sidebar.ShowCopyLinkButton = showCopyLinkButton;
             }
-
+           
             return dto;
         }
 

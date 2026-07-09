@@ -65,6 +65,8 @@ namespace BDO.GWT.Core.Constants
         InsightGroup.CONTENT_TYPE_NAME,
         Insight.CONTENT_TYPE_NAME,
         SectionInsightsPage.CONTENT_TYPE_NAME,
+        BusinessStrategy.CONTENT_TYPE_NAME,
+        SectionBusinessStrategies.CONTENT_TYPE_NAME,
         Sitemap.CONTENT_TYPE_NAME
     };
     }

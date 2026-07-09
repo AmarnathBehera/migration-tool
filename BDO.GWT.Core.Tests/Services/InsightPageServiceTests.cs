@@ -669,7 +669,9 @@ public class InsightPageServiceTests
         string content,
         bool showTitle,
         bool showDescription,
-        bool showCallToAction)
+        bool showCallToAction,
+        string? callToActionButtonUrl = null,
+        string? callToActionPosition = null)
     {
         var copyInsightProperty = typeof(Insight).GetProperty(nameof(Insight.CopyInsight));
         if (copyInsightProperty is null)
@@ -688,6 +690,8 @@ public class InsightPageServiceTests
         SetPropertyValue(copyInsight, "ShowCallToAction", showCallToAction);
         SetPropertyValue(copyInsight, "CallToActionDescription", "CTA description");
         SetPropertyValue(copyInsight, "CallToActionButtonText", "CTA button");
+        SetPropertyValue(copyInsight, "CallToActionButtonUrl", callToActionButtonUrl);
+        SetPropertyValue(copyInsight, "CallToActionPosition", callToActionPosition);
         SetPropertyValue(copyInsight, "SharingSourceFirm", "BDO Firm");
 
         SetCollection(copyInsight, "ImageFile", Array.Empty<object>());
