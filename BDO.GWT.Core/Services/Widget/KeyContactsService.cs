@@ -108,7 +108,7 @@ public class KeyContactsService : IKeyContactsService
             PersonUrl = contributorPage.Url
         }));
         var cards = peopleCards.Concat(internalCards).ToList();
-
+        cards = cards.Concat(externalCards).ToList();
         IEnumerable<KeyContactCardDto> orderedCards;
 
         if (data.IsOrderOverriden)
@@ -130,7 +130,6 @@ public class KeyContactsService : IKeyContactsService
             Title = data.Title,
             Description = data.Description,
             Items = orderedCards.Select(MapToPersonCard).ToArray(),
-            ExternalItems = externalCards.Select(MapToPersonCard).ToArray(),
             SeeAllLink = data is { SeeAllLinkText: not null, SeeAllLinkUrl: not null }
                 ? new LinkItemDto
                 {
