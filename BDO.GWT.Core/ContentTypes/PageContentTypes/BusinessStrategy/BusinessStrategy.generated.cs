@@ -36,15 +36,15 @@ namespace BDO
 
 
 		/// <summary>
-		/// MenuShowInSection.
+		/// Menu.
 		/// </summary>
-		public bool MenuShowInSection { get; set; }
+		public string Menu { get; set; }
 
 
 		/// <summary>
-		/// MenuTileIcon.
+		/// MenuShowInSection.
 		/// </summary>
-		public IEnumerable<ContentAttachment> MenuTileIcon { get; set; }
+		public bool MenuShowInSection { get; set; }
 
 
 		/// <summary>
@@ -56,7 +56,7 @@ namespace BDO
 		/// <summary>
 		/// MenuTileIcon.
 		/// </summary>
-		public IEnumerable<ContentAttachment> MenuTileIcon { get; set; }
+		public IEnumerable<Icon> MenuTileIcon { get; set; }
 
 
 		/// <summary>
