@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <CallToActionButtonText>CTA button txt</CallToActionButtonText>
+  <CallToActionButtonUrl>www.google.com</CallToActionButtonUrl>
+  <CallToActionDescription>description of CTA</CallToActionDescription>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>CommentLesEntreprises-enqy1rgm</CodeName>
+    <GUID>f5080ab7-e3c5-4a17-b8a3-99a6724b5ab9</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-07-07 05:43:56Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>ae271352-f1f3-46f5-a784-13b3a7e95702</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-07-07 10:07:30Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ImageFile>
+    <![CDATA[[{"Identifier":"5cb6e0bf-c7bc-4908-b359-bc05b629d012"}]]]>
+  </ImageFile>
+  <ImageFileAltText>ccc</ImageFileAltText>
+  <ShowCallToAction>True</ShowCallToAction>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>279701fd-47c3-4ddf-9fbc-ea555ed99a63</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>ef0670a4-ec53-4743-829d-8b7da708c4b6</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>ae271352-f1f3-46f5-a784-13b3a7e95702</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Test-cmpjaec6</CodeName>
+        <GUID>5cb6e0bf-c7bc-4908-b359-bc05b629d012</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

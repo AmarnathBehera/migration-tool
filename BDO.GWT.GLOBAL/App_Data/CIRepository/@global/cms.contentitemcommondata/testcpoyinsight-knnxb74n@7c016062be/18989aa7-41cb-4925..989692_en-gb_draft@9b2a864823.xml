@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <CallToActionButtonText>Call to action button text</CallToActionButtonText>
+  <CallToActionButtonUrl>Call to action button URL</CallToActionButtonUrl>
+  <CallToActionDescription>Call to action description</CallToActionDescription>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>TestCpoyInsight-knnxb74n</CodeName>
+    <GUID>8044930f-2329-46b0-8401-06460c15c2a7</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataGUID>18989aa7-41cb-4925-9774-9ec434989692</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataVersionStatus>0</ContentItemCommonDataVersionStatus>
+  <ImageFile>
+    <![CDATA[[{"Identifier":"8fbeb935-29cb-4f9f-9f7f-b8f2a71d7d61"}]]]>
+  </ImageFile>
+  <ImageFileAltText>image</ImageFileAltText>
+  <ShowCallToAction>True</ShowCallToAction>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>279701fd-47c3-4ddf-9fbc-ea555ed99a63</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>d8bd30c9-2a3f-43a3-b794-67663381a523</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>18989aa7-41cb-4925-9774-9ec434989692</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Aaaaaaaaaa-tlzri0os</CodeName>
+        <GUID>8fbeb935-29cb-4f9f-9f7f-b8f2a71d7d61</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

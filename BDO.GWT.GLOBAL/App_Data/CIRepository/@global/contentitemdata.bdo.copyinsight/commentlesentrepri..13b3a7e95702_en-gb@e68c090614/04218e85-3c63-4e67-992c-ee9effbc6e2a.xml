@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentitemdata.bdo.copyinsight>
+  <Attachments />
+  <ContentItemDataCommonDataID>
+    <GUID>ae271352-f1f3-46f5-a784-13b3a7e95702</GUID>
+    <ObjectType>cms.contentitemcommondata</ObjectType>
+    <Parent>
+      <CodeName>CommentLesEntreprises-enqy1rgm</CodeName>
+      <GUID>f5080ab7-e3c5-4a17-b8a3-99a6724b5ab9</GUID>
+      <ObjectType>cms.contentitem</ObjectType>
+    </Parent>
+  </ContentItemDataCommonDataID>
+  <ContentItemDataGUID>04218e85-3c63-4e67-992c-ee9effbc6e2a</ContentItemDataGUID>
+  <Contentsharing />
+  <Description>
+    <![CDATA[<p>Pour la 9ème année consécutive, le baromètre de la gestion des accidents du travail et des maladies professionnelles (AT/MP) a été mené par BDO France.</p>]]>
+  </Description>
+  <DownloadButtonText>Downlod</DownloadButtonText>
+  <DownloadButtonTitle>Downlod</DownloadButtonTitle>
+  <InsightContent>
+    <![CDATA[<p>tst</p>]]>
+  </InsightContent>
+  <OriginalDocumentAttachmentType>Download</OriginalDocumentAttachmentType>
+  <OriginalDocumentOwnerEmail>tapasya.mahor@mgt.bdo.global</OriginalDocumentOwnerEmail>
+  <OriginalDocumentOwnerName>tapasya.mahor@mgt.bdo.global</OriginalDocumentOwnerName>
+  <OriginalDocumentOwnerOptOut>False</OriginalDocumentOwnerOptOut>
+  <OriginalInvolvedCountriesAll>False</OriginalInvolvedCountriesAll>
+  <OriginalSiteGuid>Site</OriginalSiteGuid>
+  <SharingHeadline>False</SharingHeadline>
+  <SharingInstructions>
+<![CDATA[
+You are about to copy [name of insight], originally created by [name of author / BDO MF]. Before continuing, you may find the following information about this insight useful:
+
+- This insight is intended for CFOs of SMEs in the retail sector with a turnover between 100-500 million euro
+- There is an infographic that accompanies this insight: you can request it here (link to email)
+- An executive summary can be found here [link]
+- We ran a two hour breakfast event that outlined the key findings of the report – details here [link]
+
+For any questions, please contact [link to insight creator’s email]
+
+Remember, in order to proceed, you must check the box to indicate that you agree to comply with the protocol and requirements outlined above
+]]>
+  </SharingInstructions>
+  <SharingOptOut>False</SharingOptOut>
+  <ShowInsightDescription>True</ShowInsightDescription>
+  <ShowInsightTitle>True</ShowInsightTitle>
+  <Title>Comment les entreprises...</Title>
+</contentitemdata.bdo.copyinsight>

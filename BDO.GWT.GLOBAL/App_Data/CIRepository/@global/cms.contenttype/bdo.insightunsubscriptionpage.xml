@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Headless</ClassContentTypeType>
+  <ClassDisplayName>Insight unsubscription page</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="f58181aa-64ff-4385-8eee-aabda77e982b" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="9758c94c-ffa3-4c9a-a11a-d6c59abde838" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="e6400b79-71e4-4de6-82d1-ebad502071d8" isunique="true" system="true" />
+      <field column="Custom" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6d3c13f4-90ea-4063-99b9-d3d2785e4fe8" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Custom</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>3796c70d-d283-4efa-b932-6d31f024baa7</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-circle</ClassIconClass>
+  <ClassName>BDO.InsightUnsubscriptionPage</ClassName>
+  <ClassShortName>BDOInsightUnsubscriptionPage</ClassShortName>
+  <ClassTableName>BDO_InsightUnsubscriptionPage</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

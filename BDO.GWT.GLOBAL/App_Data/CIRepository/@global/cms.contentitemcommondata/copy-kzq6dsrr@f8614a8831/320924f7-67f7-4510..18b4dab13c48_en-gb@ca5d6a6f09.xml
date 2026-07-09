@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitemcommondata>
+  <CallToActionButtonText>Call to action button text</CallToActionButtonText>
+  <CallToActionButtonUrl>Call to action button URL</CallToActionButtonUrl>
+  <CallToActionDescription>Call to action description</CallToActionDescription>
+  <ContentItemCommonDataContentItemID>
+    <CodeName>Copy-kzq6dsrr</CodeName>
+    <GUID>06e96d4d-a11b-4198-8c36-4bbc658d6078</GUID>
+    <ObjectType>cms.contentitem</ObjectType>
+  </ContentItemCommonDataContentItemID>
+  <ContentItemCommonDataContentLanguageID>
+    <CodeName>en-gb</CodeName>
+    <GUID>e4a8fb12-ebc2-45d0-930f-c9fba2780c85</GUID>
+    <ObjectType>cms.contentlanguage</ObjectType>
+  </ContentItemCommonDataContentLanguageID>
+  <ContentItemCommonDataFirstPublishedWhen>2026-07-02 05:49:17Z</ContentItemCommonDataFirstPublishedWhen>
+  <ContentItemCommonDataGUID>320924f7-67f7-4510-8f0f-18b4dab13c48</ContentItemCommonDataGUID>
+  <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
+  <ContentItemCommonDataLastPublishedWhen>2026-07-02 05:49:17Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
+  <ImageFile>
+    <![CDATA[[{"Identifier":"5766b5af-03e5-47d3-8ceb-3ae03808d60c"}]]]>
+  </ImageFile>
+  <ImageFileAltText>ccc</ImageFileAltText>
+  <ShowCallToAction>True</ShowCallToAction>
+  <ContentItemReferences>
+    <cms.contentitemreference>
+      <ContentItemReferenceGroupGUID>279701fd-47c3-4ddf-9fbc-ea555ed99a63</ContentItemReferenceGroupGUID>
+      <ContentItemReferenceGUID>10319204-4dca-469c-8c48-16b1d259f4b4</ContentItemReferenceGUID>
+      <ContentItemReferenceSourceCommonDataID>
+        <GUID>320924f7-67f7-4510-8f0f-18b4dab13c48</GUID>
+        <ObjectType>cms.contentitemcommondata</ObjectType>
+      </ContentItemReferenceSourceCommonDataID>
+      <ContentItemReferenceTargetItemID>
+        <CodeName>Aboutpage-18tpzr8j</CodeName>
+        <GUID>5766b5af-03e5-47d3-8ceb-3ae03808d60c</GUID>
+        <ObjectType>cms.contentitem</ObjectType>
+      </ContentItemReferenceTargetItemID>
+    </cms.contentitemreference>
+  </ContentItemReferences>
+</cms.contentitemcommondata>

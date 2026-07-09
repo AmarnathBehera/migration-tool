@@ -68,26 +68,19 @@
     @(await Component.InvokeAsync<MarketoMunchkinCode>())
     @Html.Kentico().ActivityLoggingScriptV2()
     @RenderSection("styles", required: false)
-
-
     @Html.Kentico().ActivityLoggingScriptV2()
     <partial name="_DefaultStylesheets.cshtml" />
     @await RenderSectionAsync("Styles", required: false)
     <link rel="stylesheet" href="/dist/master.css" asp-append-version="true" />
     <link rel="stylesheet" href="/Public/Sections/section-column.css" asp-append-version="true" />
     <page-builder-styles />
-</head>
-
-<body data-lang="@CultureContext.CurrentLanguageTag.ToLowerInvariant()">
+    </head>
+    <body data-lang="@CultureContext.CurrentLanguageTag.ToLowerInvariant()">
     @await (Component.InvokeAsync<ScriptsTopBody>())
     @RenderSection("styles", required: false)
     @await (Component.InvokeAsync<Header>())
     @await (Component.InvokeAsync<Breadcrumbs>())
-
     @RenderBody()
-
-
-
     <script src="/dist/vendor.bundle.js" asp-append-version="true" data-cookieconsent="ignore"></script>
     <script src="/dist/master.bundle.js" asp-append-version="true" data-cookieconsent="ignore"></script>
     @await (Component.InvokeAsync<ScriptsBottomBody>())
@@ -95,6 +88,6 @@
     @await (Component.InvokeAsync<Cookiebanner>())
     @await Html.Kentico().PageBuilderScriptsAsync()
     @(ReactService.RenderCombinedScript())
-</body>
-</html>
+    </body>
+    </html>
 

@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.SectionInsightsPage</CodeName>
+    <GUID>ddbf4830-0766-4cff-a420-f0ca936fd21f</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.Insight">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.Insight</CodeName>
+        <GUID>afb8b736-7f16-4a85-ab17-081c7833188c</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.InsightCategory">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.InsightCategory</CodeName>
+        <GUID>909414d2-8cda-47d0-bfe0-4e2f522eb606</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.InsightGroup">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.InsightGroup</CodeName>
+        <GUID>a982d8ba-3d1a-4597-9282-854fc3b84030</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

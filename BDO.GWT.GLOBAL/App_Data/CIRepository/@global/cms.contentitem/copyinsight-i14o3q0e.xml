@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentitem>
+  <ContentItemContentFolderID>
+    <CodeName>Root-CopyInsight</CodeName>
+    <GUID>a51212d4-8269-44a8-a489-2d4c15180bba</GUID>
+    <ObjectType>cms.contentfolder</ObjectType>
+  </ContentItemContentFolderID>
+  <ContentItemContentTypeID>
+    <CodeName>BDO.CopyInsight</CodeName>
+    <GUID>4ce005da-7a7f-4d90-9465-fb743e9a943f</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </ContentItemContentTypeID>
+  <ContentItemGUID>be3f76f4-1473-4766-abac-662cb13fa653</ContentItemGUID>
+  <ContentItemIsReusable>True</ContentItemIsReusable>
+  <ContentItemIsSecured>False</ContentItemIsSecured>
+  <ContentItemName>CopyInsight-i14o3q0e</ContentItemName>
+  <ContentItemWorkspaceID>
+    <CodeName>CopyInsight</CodeName>
+    <GUID>9c7d697b-7901-4293-8791-5d69112a554b</GUID>
+    <ObjectType>cms.workspace</ObjectType>
+  </ContentItemWorkspaceID>
+</cms.contentitem>

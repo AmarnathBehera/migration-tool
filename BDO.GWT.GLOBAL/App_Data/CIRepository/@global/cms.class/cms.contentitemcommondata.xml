@@ -94,36 +94,6 @@
           </VisibilityConditionConfiguration>
         </visibilityconditiondata>
       </field>
-      <field allowempty="true" column="CallToActionPosition" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6326143a-ad1e-4b2f-a1ac-a57a523062c0" visible="true">
-        <properties>
-          <defaultvalue>left</defaultvalue>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Call to action position</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-          <includeintranslation>True</includeintranslation>
-          <kxp_schema_identifier>34bc2c94-d4b6-4c53-a6f4-9b9520a24493</kxp_schema_identifier>
-        </properties>
-        <settings>
-          <controlname>Kentico.Administration.RadioGroup</controlname>
-          <Inline>False</Inline>
-          <Options>
-<![CDATA[
-left;Left
-right;Right
-center;Center
-]]>
-          </Options>
-          <OptionsValueSeparator>;</OptionsValueSeparator>
-        </settings>
-        <visibilityconditiondata>
-          <VisibilityConditionConfiguration>
-            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
-            <Properties>
-              <PropertyName>ShowCallToAction</PropertyName>
-            </Properties>
-          </VisibilityConditionConfiguration>
-        </visibilityconditiondata>
-      </field>
       <schema guid="b760a373-943b-4321-ac39-d5067101ff82" name="Sidebar">
         <properties>
           <fieldcaption>Sidebar</fieldcaption>
@@ -336,6 +306,17 @@ center;Center
           <defaultvalue>True</defaultvalue>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Include page in the sitemap</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>a1394d11-ac3a-40b9-8162-d117c5ff85fe</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="IsSearchExcluded" columnprecision="0" columntype="boolean" enabled="true" guid="4425b5ce-4662-46fe-8b04-bd97161c12ce" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Search Excluded</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
           <kxp_schema_identifier>a1394d11-ac3a-40b9-8162-d117c5ff85fe</kxp_schema_identifier>
         </properties>
@@ -1147,12 +1128,10 @@ MicrositePage;Microsite Page
       </field>
       <field allowempty="true" column="ShowMultiLinks" columnprecision="0" columntype="boolean" enabled="true" guid="18612cac-8098-46c8-a436-f379d0c83d62" visible="true">
         <properties>
-          <explanationtext>
-            <![CDATA[Shows industry category links in cards when checked]]>
-          </explanationtext>
+          <explanationtext>Shows category links in cards when checked</explanationtext>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Show Multi Links</fieldcaption>
-          <fielddescription>Display industry category links in cards</fielddescription>
+          <fielddescription>Display category links in cards</fielddescription>
           <fielddescriptionashtml>False</fielddescriptionashtml>
           <kxp_schema_identifier>d572f6e8-b362-4863-bff1-91e107064efe</kxp_schema_identifier>
         </properties>

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.smartfolder>
+  <SmartFolderCreatedByUserID>
+    <CodeName>administrator</CodeName>
+    <GUID>6415b8ce-8072-4bcd-8e48-9d7178b826b7</GUID>
+    <ObjectType>cms.user</ObjectType>
+  </SmartFolderCreatedByUserID>
+  <SmartFolderCreatedWhen>2026-07-07 05:17:00Z</SmartFolderCreatedWhen>
+  <SmartFolderDisplayName>Copy Insight</SmartFolderDisplayName>
+  <SmartFolderFilter>
+    <![CDATA[{"workflowStatuses":["Published"],"contentItemIsSecured":"True","selectedLastModifiedTimeFrame":"absolute","lastModifiedAbsolute":null,"lastModifiedRelative":null,"classGUID":["4ce005da-7a7f-4d90-9465-fb743e9a943f"],"tags":null,"lastPublishedAbsolute":null,"lastPublishedRelative":null,"selectedLastPublishedTimeFrame":"absolute"}]]>
+  </SmartFolderFilter>
+  <SmartFolderGUID>5314d51a-cb5a-4584-bd39-1d5d88b0fbde</SmartFolderGUID>
+  <SmartFolderIsContentDeliveryEnabled>False</SmartFolderIsContentDeliveryEnabled>
+  <SmartFolderModifiedByUserID>
+    <CodeName>administrator</CodeName>
+    <GUID>6415b8ce-8072-4bcd-8e48-9d7178b826b7</GUID>
+    <ObjectType>cms.user</ObjectType>
+  </SmartFolderModifiedByUserID>
+  <SmartFolderName>Copy_Insight-0ojugu97</SmartFolderName>
+  <SmartFolderWorkspaceID>
+    <CodeName>KenticoDefault</CodeName>
+    <GUID>43f674d6-540d-4f91-8c19-608b5bddb2f2</GUID>
+    <ObjectType>cms.workspace</ObjectType>
+  </SmartFolderWorkspaceID>
+</cms.smartfolder>
