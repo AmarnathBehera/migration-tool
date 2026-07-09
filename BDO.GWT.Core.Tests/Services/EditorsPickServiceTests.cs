@@ -4,6 +4,7 @@ using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.Services;
+using BDO.GWT.Web.Services;
 using CMS.ContentEngine;
 using CMS.Websites;
 using Moq;
@@ -14,6 +15,7 @@ public class EditorsPickServiceTests
 {
     private Mock<IFilteringHelper> _filteringHelperMock = null!;
     private Mock<IEditorsPickCardService> _editorsPickCardServiceMock = null!;
+    private Mock<IReactCachingService> _reactCachingServiceMock = null!;
     private EditorsPickService _service = null!;
 
     private sealed class TestPage : IWebPageFieldsSource
@@ -26,10 +28,12 @@ public class EditorsPickServiceTests
     {
         _filteringHelperMock = new Mock<IFilteringHelper>();
         _editorsPickCardServiceMock = new Mock<IEditorsPickCardService>();
+        _reactCachingServiceMock = new Mock<IReactCachingService>();
 
         _service = new EditorsPickService(
             _filteringHelperMock.Object,
-            _editorsPickCardServiceMock.Object);
+            _editorsPickCardServiceMock.Object,
+            _reactCachingServiceMock.Object);
     }
 
     private static EditorsPickData CreateData(
