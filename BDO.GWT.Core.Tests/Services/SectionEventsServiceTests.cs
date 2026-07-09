@@ -338,5 +338,91 @@ namespace BDO.GWT.Core.Tests.Services
                 Assert.That(query.Filters[FilterParameterName.ShowAllPastEvents], Is.EqualTo(bool.TrueString));
             });
         }
+
+        [Test]
+        public async Task GetFilteredItemsAsync_WhenFiltersIsNull_InitializesAndSetsShowAllPastEvents()
+        {
+            var sectionPage = new SectionEvents
+            {
+                ShowPastEvents = false,
+                EventsWebinarsListFeaturedPages = new List<IWebPageFieldsSource>(),
+            };
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<SectionEvents>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<SectionEvents> { sectionPage });
+
+            _eventWebinarCardsServiceMock
+                .Setup(x => x.GetFilteredItemsAsync(
+                    It.IsAny<CardsQuery>(),
+                    It.IsAny<Action<ContentItemQueryBuilder>?>(),
+                    It.IsAny<Func<IEventOrWebinar, bool>>(),
+                    false,
+                    false,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new PaginationDto<EventsWebinarsCardDto>
+                {
+                    Data = Array.Empty<EventsWebinarsCardDto>(),
+                    TotalCount = 0,
+                });
+
+            var query = new CardsQuery { Filters = null! };
+
+            await _service.GetFilteredItemsAsync(query, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(query.Filters, Is.Not.Null);
+                Assert.That(query.Filters[FilterParameterName.ShowAllPastEvents], Is.EqualTo(bool.FalseString));
+            });
+        }
+
+        [Test]
+        public async Task GetFilteredItemsAsync_WhenShowAllPastEventsAlreadyExists_ReplacesValue()
+        {
+            var sectionPage = new SectionEvents
+            {
+                ShowPastEvents = true,
+                EventsWebinarsListFeaturedPages = new List<IWebPageFieldsSource>(),
+            };
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<SectionEvents>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<SectionEvents> { sectionPage });
+
+            _eventWebinarCardsServiceMock
+                .Setup(x => x.GetFilteredItemsAsync(
+                    It.IsAny<CardsQuery>(),
+                    It.IsAny<Action<ContentItemQueryBuilder>?>(),
+                    It.IsAny<Func<IEventOrWebinar, bool>>(),
+                    true,
+                    false,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new PaginationDto<EventsWebinarsCardDto>
+                {
+                    Data = Array.Empty<EventsWebinarsCardDto>(),
+                    TotalCount = 0,
+                });
+
+            var query = new CardsQuery
+            {
+                Filters = new Dictionary<string, string>
+                {
+                    [FilterParameterName.ShowAllPastEvents] = bool.FalseString,
+                },
+            };
+
+            await _service.GetFilteredItemsAsync(query, CancellationToken.None);
+
+            Assert.That(query.Filters[FilterParameterName.ShowAllPastEvents], Is.EqualTo(bool.TrueString));
+        }
     }
 }

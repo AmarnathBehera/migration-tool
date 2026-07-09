@@ -65,6 +65,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// CallToActionPosition.
+		/// </summary>
+		public string CallToActionPosition { get; set; }
+
+
+		/// <summary>
 		/// Attachments.
 		/// </summary>
 		public string Attachments { get; set; }
@@ -194,12 +200,6 @@ namespace BDO
 		/// CallToActionButtonUrl.
 		/// </summary>
 		public string CallToActionButtonUrl { get; set; }
-
-
-		/// <summary>
-		/// CallToActionPosition.
-		/// </summary>
-		public string CallToActionPosition { get; set; }
 
 
 		/// <summary>

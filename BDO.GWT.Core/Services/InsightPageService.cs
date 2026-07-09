@@ -174,19 +174,41 @@ namespace BDO.GWT.Core.Services
                 Description = copyInsight?.ShowInsightDescription == true ? HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(copyInsight.Description) : null,
                 Content = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(copyInsight?.InsightContent),
                 Sidebar = contentPage.ShowSidebar ? await GetContentPageSidebarDto(contentPage, cancellationToken) : null,
-                CallToAction = copyInsight?.ShowCallToAction == true ? GetCallToActionDto(contentPage) : null,
+                CallToActionWithPosition = copyInsight?.ShowCallToAction == true ? GetCallToActionDto(contentPage) : null,
             };
 
             return dto;
         }
-        private static CallToActionDto? GetCallToActionDto(Insight contentPage)
+        public static CallToActionWithPositionDto? GetCallToActionDto(string? callToActionDescription, string? callToActionButtonText, string? callToActionButtonLink, string? CallToActionPosition)
+        {
+            if (callToActionButtonText == null || callToActionButtonLink == null)
+            {
+                return null;
+            }
+
+            var dto = new CallToActionWithPositionDto
+            {
+                CallToActionDto = new CallToActionDto
+                {
+                    Description = callToActionDescription,
+                    ButtonTitle = callToActionButtonText,
+                    ButtonUrl = callToActionButtonLink,
+                },
+                Position = CallToActionPosition ?? "left"
+            };
+
+            return dto;
+
+        }
+        private static CallToActionWithPositionDto? GetCallToActionDto(Insight contentPage)
         {
             var copyInsight = contentPage.CopyInsight?.FirstOrDefault();
 
-            return PageHelper.GetCallToActionDto(
+            return GetCallToActionDto(
                 copyInsight?.CallToActionDescription,
                 copyInsight?.CallToActionButtonText,
-                copyInsight?.CallToActionButtonUrl);
+                copyInsight?.CallToActionButtonUrl,
+                copyInsight?.CallToActionPosition);
         }
         public async Task<ContentSidebarDto> GetSidebarDtoAsync(Insight page, CancellationToken cancellationToken)
         {

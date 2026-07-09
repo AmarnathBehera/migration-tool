@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <contentitemdata.bdo.copyinsight>
   <Attachments />
+  <CallToActionPosition>Left</CallToActionPosition>
   <ContentItemDataCommonDataID>
     <GUID>320924f7-67f7-4510-8f0f-18b4dab13c48</GUID>
     <ObjectType>cms.contentitemcommondata</ObjectType>
