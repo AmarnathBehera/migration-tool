@@ -61,7 +61,9 @@ namespace BDO.GWT.Core.Constants
         BlogContributors.CONTENT_TYPE_NAME,
         SectionBlogs.CONTENT_TYPE_NAME,
         SectionRss.CONTENT_TYPE_NAME,
-        Sitemap.CONTENT_TYPE_NAME
+        Sitemap.CONTENT_TYPE_NAME,
+        BusinessStrategy.CONTENT_TYPE_NAME,
+        SectionBusinessStrategies.CONTENT_TYPE_NAME,
     };
     }
 }
