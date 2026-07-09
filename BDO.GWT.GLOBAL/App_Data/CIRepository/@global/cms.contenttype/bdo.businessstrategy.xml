@@ -13,6 +13,17 @@
       <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
         <properties />
       </schema>
+      <field allowempty="true" column="Menu" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="61f93304-77ca-4e7d-ab50-752a4e4d6680" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Menu</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
       <field allowempty="true" column="MenuShowInSection" columnprecision="0" columntype="boolean" enabled="true" guid="8633bbb5-749d-49b4-8b2c-9d8a3d19cde7" visible="true">
         <properties>
           <defaultvalue>True</defaultvalue>
@@ -24,9 +35,17 @@
           <controlname>Kentico.Administration.Checkbox</controlname>
         </settings>
       </field>
-      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
-        <properties />
-      </schema>
+      <field allowempty="true" column="MenuReadMoreText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="02c76224-fa5e-41b6-bc17-e16e2fcb73a4" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Read more text</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
       <field allowempty="true" column="MenuTileIcon" columnprecision="0" columntype="contentitemreference" enabled="true" guid="fe23f18f-3685-473d-ae5b-b84d9971b18b" visible="true">
         <properties>
           <explanationtext>
@@ -44,23 +63,15 @@
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
       <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
         <properties />
       </schema>
       <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
         <properties />
       </schema>
-      <field allowempty="true" column="MenuReadMoreText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="02c76224-fa5e-41b6-bc17-e16e2fcb73a4" visible="true">
-        <properties>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Read more text</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-          <includeintranslation>True</includeintranslation>
-        </properties>
-        <settings>
-          <controlname>Kentico.Administration.TextInput</controlname>
-        </settings>
-      </field>
     </form>
   </ClassFormDefinition>
   <ClassGUID>f350df32-e183-46df-9156-68116ac72958</ClassGUID>

@@ -13,6 +13,17 @@
       <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
         <properties />
       </schema>
+      <field allowempty="true" column="Menu" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="3c3dada2-79dc-4669-ab45-78a23d996a24" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Menu</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
       <field allowempty="true" column="MenuBackgroundImage" columnprecision="0" columntype="contentitemreference" enabled="true" guid="e68e967b-f07c-47ef-9f3c-c73df153021b" visible="true">
         <properties>
           <explanationtext>Recommended size: 1440x800</explanationtext>
