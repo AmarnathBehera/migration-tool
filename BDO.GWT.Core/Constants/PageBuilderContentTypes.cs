@@ -47,7 +47,9 @@ namespace BDO.GWT.Core.Constants
         MicrositePage.CONTENT_TYPE_NAME,
         SectionEvents.CONTENT_TYPE_NAME,
         Deal.CONTENT_TYPE_NAME,
-        SectionDeals.CONTENT_TYPE_NAME
+        SectionDeals.CONTENT_TYPE_NAME,
+        SectionBusinessStrategies.CONTENT_TYPE_NAME,
+        BusinessStrategy.CONTENT_TYPE_NAME
     };
     }
 }

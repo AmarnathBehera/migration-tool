@@ -44,6 +44,7 @@ public static class ReactComponentType
     public const string LocalNavigationItem = "LocalNavigationItem";
     public const string EventsAndWebinarsCarousel = "EventsAndWebinarsCarousel";
     public const string InFocus = "InFocus";
+    public const string BusinessStrategiesGrid = "BusinessStrategiesGrid";
 
     public const string CareerDetails = "CareerDetails";
     public const string KeyTakeAways = "KeyTakeAwaysWidget";
@@ -107,6 +108,7 @@ public static class ReactComponentType
     public const string SocialMediaGUID = "c58bfb27-7feb-4fdb-94f2-8bca61df250d";
     public const string EditorsPickGUID = "5b72020a-38b5-43b1-9e26-71fd36ee9e29";
     public const string InFocusGUID = "6m72020a-38b5-43b1-9e26-71fd36ee9e20";
+    public const string BusinessStrategiesGridGUID = "8p72020a-38b5-43b1-9e26-71fd36ee9e20";
 }
 
 

@@ -328,3 +328,6 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 [assembly: RegisterWebPageRoute(Sitemap.CONTENT_TYPE_NAME, typeof(SitemapPageController))]
 [assembly: RegisterWebPageRoute(Rss.CONTENT_TYPE_NAME, typeof(RssController))]
 [assembly: RegisterWebPageRoute(LegalPage.CONTENT_TYPE_NAME, typeof(LegalPageController))]
+
+[assembly: RegisterWebPageRoute(BusinessStrategy.CONTENT_TYPE_NAME, typeof(BusinessStrategyController), ActionName = nameof(BusinessStrategyController.Index))]
+[assembly: RegisterWebPageRoute(SectionBusinessStrategies.CONTENT_TYPE_NAME, typeof(SectionBusinessStrategiesController), ActionName = nameof(SectionBusinessStrategiesController.Index))]
