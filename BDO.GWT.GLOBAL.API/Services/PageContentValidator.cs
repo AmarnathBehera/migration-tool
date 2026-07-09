@@ -1,23 +1,12 @@
-﻿using BDO.GWT.Common.Core.Extensions;
-using BDO.GWT.Common.Core.Services;
-using BDO.GWT.Domain.Core.ValueObjects;
+﻿using BDO.GWT.GLOBAL.API.Constants;
 using BDO.GWT.GLOBAL.API.Data;
-using BDO.GWT.Web.Core.API.Data;
-using BDO.GWT.Web.Core.API.Services;
-using BDO.GWT.Xperience.Constants;
-using BDO.GWT.Xperience.Core.API.Extensions;
-using BDO.GWT.Xperience.Core.API.Helpers;
-using BDO.GWT.Xperience.Core.Constants;
-using BDO.GWT.Xperience.Core.Utilities;
+using BDO.GWT.GLOBAL.API.Extensions;
 using CMS.DataEngine;
 using CMS.FormEngine;
 using CMS.Helpers;
 using CMS.MacroEngine;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 
 namespace BDO.GWT.GLOBAL.API.Services;
 
@@ -29,13 +18,11 @@ public interface IPageContentValidator
 
 public class PageContentValidator : IPageContentValidator
 {
-    private readonly IApiTypeMapper _apiTypeMapper;
     private readonly IMacroResolver _macroResolver;
     private readonly IValidationState _validationState;
 
-    public PageContentValidator(IApiTypeMapper apiTypeMapper, IMacroResolver macroResolver, IValidationState validationState)
+    public PageContentValidator(IMacroResolver macroResolver, IValidationState validationState)
     {
-        _apiTypeMapper = apiTypeMapper;
         _macroResolver = macroResolver;
         _validationState = validationState;
     }
@@ -43,7 +30,7 @@ public class PageContentValidator : IPageContentValidator
     public void ValidateAndNormalizePageContent<TPageContent>(TPageContent content)
         where TPageContent : IPageContent
     {
-        var className = _apiTypeMapper.GetClassNameFromPageContentType<TPageContent>();
+        var className = GetClassNameFromPageContentType<TPageContent>();
 
         var dataClassInfo = DataClassInfoProvider.GetDataClassInfo(className);
 
@@ -100,7 +87,7 @@ public class PageContentValidator : IPageContentValidator
         {
             FieldDataType.Boolean => ValidateBooleanFieldDataType(field, controlName, value),
             FieldDataType.Date => ValidateDateFieldDataType(field, controlName, value),
-            FieldDataType.File => ValidateFileFieldDataType(field, controlName, value),
+            //FieldDataType.File => ValidateFileFieldDataType(field, controlName, value),
             FieldDataType.Guid => ValidateGuidFieldDataType(field, controlName, value),
             FieldDataType.Integer => ValidateIntegerFieldDataType(field, controlName, value),
             FieldDataType.LongText => ValidateLongTextFieldDataType(field, controlName, value),
@@ -111,94 +98,207 @@ public class PageContentValidator : IPageContentValidator
 
     #region Field data type validation methods
 
-    private bool? ValidateBooleanFieldDataType(FormFieldInfo field, string controlName, object? value)
+    private bool? ValidateBooleanFieldDataType(FormFieldInfo field, string componentIdentifier, object? value)
     {
-        return controlName switch
+        return componentIdentifier switch
         {
-            FormFieldControlName.CHECKBOX => ValidateAndNormalizeBool(field, (bool?)value, DoNothing),
-            _ => throw new NotImplementedException($"Validation for '{field.DataType}'.'{controlName}' is not implemented."),
+            "Kentico.CheckBox" =>
+                ValidateAndNormalizeBool(
+                    field,
+                    value as bool?,
+                    DoNothing),
+
+            _ => throw new NotImplementedException(
+                $"Validation for '{field.DataType}'.'{componentIdentifier}' is not implemented.")
         };
     }
 
-    private DateTime? ValidateDateFieldDataType(FormFieldInfo field, string controlName, object? value)
+    private DateTime? ValidateDateFieldDataType(FormFieldInfo field, string componentIdentifier, object? value)
     {
-        return controlName switch
+        return componentIdentifier switch
         {
-            FormFieldControlName.CALENDAR => ValidateAndNormalizeDateTime(field, (DateTime?)value, DoNothing),
-            _ => throw new NotImplementedException($"Validation for '{field.DataType}'.'{controlName}' is not implemented."),
+            "Kentico.DateTimeInput" =>
+                ValidateAndNormalizeDateTime(
+                    field,
+                    value as DateTime?,
+                    DoNothing),
+
+            _ => throw new NotImplementedException(
+                $"Validation for '{field.DataType}'.'{componentIdentifier}' is not implemented.")
         };
     }
 
-    private Guid? ValidateFileFieldDataType(FormFieldInfo field, string controlName, object? value)
+    private Guid? ValidateFileFieldDataType(FormFieldInfo field, string componentIdentifier, object? value)
     {
-        return controlName switch
+        return componentIdentifier switch
         {
-            FormFieldOtherControlName.DIRECT_UPLOAD => ValidateAndNormalizeGuid(field, (Guid?)value, DoNothing),
-            _ => throw new NotImplementedException($"Validation for '{field.DataType}'.'{controlName}' is not implemented."),
+            "Kentico.FileUploader" =>
+                ValidateAndNormalizeGuid(
+                    field,
+                    value as Guid?,
+                    DoNothing),
+
+            _ => throw new NotImplementedException(
+                $"Validation for '{field.DataType}'.'{componentIdentifier}' is not implemented.")
         };
     }
 
     private Guid? ValidateGuidFieldDataType(FormFieldInfo field, string controlName, object? value)
     {
-        return controlName switch
+        if (string.IsNullOrWhiteSpace(controlName))
         {
-            FormFieldControlName.LABEL => ValidateAndNormalizeGuid(field, (Guid?)value, DoNothing),
-            _ => throw new NotImplementedException($"Validation for '{field.DataType}'.'{controlName}' is not implemented."),
-        };
+            throw new ArgumentException(nameof(controlName));
+        }
+
+        return ValidateAndNormalizeGuid(
+            field,
+            value is Guid guid ? guid : value as Guid?,
+            DoNothing);
     }
 
     private object? ValidateIntegerFieldDataType(FormFieldInfo field, string controlName, object? value)
     {
         return controlName switch
         {
-            FormFieldControlName.DROPDOWNLIST => ValidateAndNormalizeInt(field, (int?)value, ValidateFieldOption),
-            FormFieldControlName.RADIOBUTTONS => ValidateAndNormalizeInt(field, (int?)value, ValidateFieldOption),
-            FormFieldOtherControlName.UNI_SELECTOR => ValidateAndNormalizeInt(field, (int?)value, DoNothing),
-            _ => throw new NotImplementedException($"Validation for '{field.DataType}'.'{controlName}' is not implemented."),
+            "Kentico.DropDown" or
+            "Kentico.RadioButtons" =>
+                ValidateAndNormalizeInt(field, value as int?, ValidateFieldOption),
+
+            "Kentico.ObjectSelector" or
+            "Kentico.GeneralSelector" =>
+                ValidateAndNormalizeInt(field, value as int?, DoNothing),
+
+            _ =>
+                throw new NotImplementedException(
+                    $"Validation for '{field.DataType}'.'{controlName}' is not implemented.")
         };
     }
 
     private object? ValidateLongTextFieldDataType(FormFieldInfo field, string controlName, object? value)
     {
-        return controlName switch
+        switch (controlName)
         {
-            FormFieldControlName.DROPDOWNLIST => ValidateAndNormalizeString(field, (string?)value, ValidateFieldOption),
-            FormFieldControlName.HTMLAREA => ValidateAndNormalizeString(field, (string?)value, DoNothing),
-            FormFieldCustomControlName.INSIGHTPEOPLESORT => ValidateAndNormalizeMultipleValues(field, (List<Guid>?)value, DoNothing),
-            FormFieldCustomControlName.MULTISELECTOR => ValidateAndNormalizeMultipleValues(field, (List<int>?)value, DoNothing),
-            FormFieldControlName.TEXTAREA => ValidateAndNormalizeString(field, (string?)value, DoNothing),
-            FormFieldControlName.TEXTBOX => ValidateAndNormalizeString(field, (string?)value, DoNothing),
-            FormFieldOtherControlName.UNI_SELECTOR => ValidateAndNormalizeMultipleValues(field, (List<int>?)value, DoNothing),
-            _ => throw new NotImplementedException($"Validation for '{field.DataType}'.'{controlName}' is not implemented."),
-        };
+            case "Kentico.DropDown":
+                return ValidateAndNormalizeString(
+                    field,
+                    value as string,
+                    ValidateFieldOption);
+
+            case "Kentico.TextInput":
+            case "Kentico.TextArea":
+            case "Kentico.RichText":
+                return ValidateAndNormalizeString(
+                    field,
+                    value as string,
+                    DoNothing);
+
+            case "InsightPeopleSort":
+                return ValidateAndNormalizeMultipleValues(
+                    field,
+                    value as List<Guid>,
+                    DoNothing);
+
+            case "Kentico.ObjectSelector":
+            case "Kentico.GeneralSelector":
+            case "MultiSelector":
+                return ValidateAndNormalizeMultipleValues(
+                    field,
+                    value as List<int>,
+                    DoNothing);
+
+            default:
+                throw new NotImplementedException(
+                    $"Validation for '{field.DataType}'.'{controlName}' is not implemented.");
+        }
     }
 
-    private object? ValidateTextFieldDataType(FormFieldInfo field, string controlName, object? value)
+    private object? ValidateTextFieldDataType(
+    FormFieldInfo field,
+    string controlName,
+    object? value)
     {
-        return controlName switch
+        switch (controlName)
         {
-            FormFieldControlName.DROPDOWNLIST => ValidateAndNormalizeString(field, (string?)value, ValidateFieldOption),
-            FormFieldOtherControlName.EMAILINPUT => ValidateAndNormalizeString(field, (string?)value, ValidateEmailInput),
-            FormFieldCustomControlName.INSIGHTPEOPLESORT => ValidateAndNormalizeMultipleValues(field, (List<Guid>?)value, DoNothing),
-            FormFieldControlName.LABEL => null,
-            FormFieldControlName.MEDIASELECTION => ValidateAndNormalizeString(field, (string?)value, ValidateAndNormalizeUri),
-            FormFieldControlName.MULTIPLECHOICE => ValidateAndNormalizeMultipleValues(field, (HashSet<string>?)value, ValidateFieldOptions),
-            FormFieldCustomControlName.MULTIRENDITIONMEDIASELECTOR => ValidateAndNormalizeString(field, (string?)value, ValidateAndNormalizeUri),
-            FormFieldCustomControlName.MULTISELECTOR => FormFieldUtility.TryGetOptionTypeFromSqlQuery(field) switch
-            {
-                { } type when type == typeof(Guid) => ValidateAndNormalizeMultipleValues(field, (List<Guid>?)value, DoNothing),
-                { } type when type == typeof(int) => ValidateAndNormalizeMultipleValues(field, (List<int>?)value, DoNothing),
-                _ => ValidateAndNormalizeMultipleValues(field, (List<int>?)value, DoNothing),
-            },
-            FormFieldOtherControlName.NUMERICUPDOWN => ValidateAndNormalizeString(field, (string?)value, DoNothing),
-            FormFieldOtherControlName.OBJECTSELECTOR => ValidateAndNormalizeString(field, (string?)value, DoNothing),
-            FormFieldControlName.RADIOBUTTONS => ValidateAndNormalizeString(field, (string?)value, ValidateFieldOption),
-            FormFieldControlName.TEXTAREA => ValidateAndNormalizeString(field, (string?)value, DoNothing),
-            FormFieldControlName.TEXTBOX => ValidateAndNormalizeString(field, (string?)value, DoNothing),
-            FormFieldOtherControlName.UNI_SELECTOR => ValidateAndNormalizeMultipleValues(field, (List<int>?)value, DoNothing),
-            FormFieldOtherControlName.URLSELECTOR => ValidateAndNormalizeString(field, (string?)value, ValidateAndNormalizeUri),
-            _ => throw new NotImplementedException($"Validation for '{field.DataType}'.'{controlName}' is not implemented."),
-        };
+            // Single-select option components
+            case "Kentico.DropDown":
+            case "Kentico.RadioButtons":
+                return ValidateAndNormalizeString(
+                    field,
+                    value as string,
+                    ValidateFieldOption);
+
+            // Text-based components
+            case "Kentico.TextInput":
+            case "Kentico.TextArea":
+            case "Kentico.EmailInput":
+            case "Kentico.NumericInput":
+            case "Kentico.ObjectSelector":
+                return ValidateAndNormalizeString(
+                    field,
+                    value as string,
+                    controlName == "Kentico.EmailInput"
+                        ? ValidateEmailInput
+                        : DoNothing);
+
+            // URL / media-based components
+            case "Kentico.MediaFilesSelector":
+            case "Kentico.UrlSelector":
+            case "MultiRenditionMediaSelector":
+                return ValidateAndNormalizeString(
+                    field,
+                    value as string,
+                    ValidateAndNormalizeUri);
+
+            // Multiple choice
+            case "Kentico.MultipleChoice":
+                return ValidateAndNormalizeMultipleValues(
+                    field,
+                    value as HashSet<string>,
+                    ValidateFieldOptions);
+
+            // Custom Guid-based selector
+            case "InsightPeopleSort":
+                return ValidateAndNormalizeMultipleValues(
+                    field,
+                    value as List<Guid>,
+                    DoNothing);
+
+            // Multi-selector
+            case "MultiSelector":
+                return field.DataType switch
+                {
+                    FieldDataType.Guid =>
+                        ValidateAndNormalizeMultipleValues(
+                            field,
+                            value as List<Guid>,
+                            DoNothing),
+
+                    FieldDataType.Integer =>
+                        ValidateAndNormalizeMultipleValues(
+                            field,
+                            value as List<int>,
+                            DoNothing),
+
+                    _ =>
+                        throw new NotSupportedException(
+                            $"Unsupported selector type '{field.DataType}'.")
+                };
+
+            // General selector
+            case "Kentico.GeneralSelector":
+                return ValidateAndNormalizeMultipleValues(
+                    field,
+                    value as List<int>,
+                    DoNothing);
+
+            // Label/read-only field
+            case "Kentico.Label":
+                return null;
+
+            default:
+                throw new NotImplementedException(
+                    $"Validation for '{field.DataType}'.'{controlName}' is not implemented.");
+        }
     }
 
     #endregion
@@ -284,7 +384,7 @@ public class PageContentValidator : IPageContentValidator
     {
         try
         {
-            var link = Link.Parse(value);
+            var link = Uri.TryCreate(value?.ToString(), UriKind.RelativeOrAbsolute, out var uri);
 
             value = link.ToString();
 
@@ -377,4 +477,12 @@ public class PageContentValidator : IPageContentValidator
     {
         return string.Join(", ", stringValues.Select(x => $"'{x}'"));
     }
+
+    private string GetClassNameFromPageContentType<TPageContent>()
+    {
+        // Need to implement properly, for now just return the Deal content type name
+        return Deal.CONTENT_TYPE_NAME;
+    }
+
+
 }

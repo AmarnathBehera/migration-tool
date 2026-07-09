@@ -1,11 +1,12 @@
+using BDO.GWT.Common.Core.Exceptions;
 using BDO.GWT.Core;
+using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
-using BDO.GWT.Domain.Core.Entities;
 using BDO.GWT.GLOBAL.API.Data;
-using BDO.GWT.Web.Core.DTOs.Pages;
+using CMS.Websites;
+using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.RegularExpressions;
 
 namespace BDO.GWT.GLOBAL.API.Services;
 
@@ -22,6 +23,11 @@ public interface IDealCrudService
 public class DealCrudService : IDealCrudService
 {
     private readonly IContentService _contentRetriever;
+    private readonly IValidationState _validationState;
+    private readonly IWebsiteChannelContext _websiteChannelContext;
+    private readonly ICultureService _cultureService;
+    private readonly IPageContentValidator _pageContentValidator;
+
     private static readonly RetrievePagesParameters _retrieveParameters = new()
     {
         LinkedItemsMaxLevel = 5
@@ -31,9 +37,13 @@ public class DealCrudService : IDealCrudService
         LinkedItemsMaxLevel = 1
     };
 
-    public DealCrudService(IContentService contentRetriever)
+    public DealCrudService(IContentService contentRetriever, IValidationState validationState, IWebsiteChannelContext websiteChannelContext, IContentService contentService, ICultureService cultureService, IPageContentValidator pageContentValidator)
     {
         _contentRetriever = contentRetriever;
+        _validationState = validationState;
+        _websiteChannelContext = websiteChannelContext;
+        _cultureService = cultureService;
+        _pageContentValidator = pageContentValidator;
     }
 
     public async Task<ActionResult<IEnumerable<PageOutput<DealPageContent>>>> GetDealPagesAsync(string? culture, bool? onlyPublished, CancellationToken cancellationToken)
@@ -70,7 +80,7 @@ public class DealCrudService : IDealCrudService
 
         if (deal is null)
         {
-            return new PageOutput<DealPageContent>();
+            throw new NotFoundException();
         }
 
         return MapDealToPageOutput(deal);
@@ -83,7 +93,28 @@ public class DealCrudService : IDealCrudService
             return new BadRequestResult();
         }
 
-        var deal = MapDealPageContentToDeal(request, nodeParentID, culture);
+        var currentCulture = await ValidateAndNormalizeSiteCultureAsync(culture ?? "en-gb", cancellationToken) ?? LanguageTag.GB;
+
+        var parentPage = await _contentRetriever.GetPagesAsync<IWebPageFieldsSource>(_retrieveCurrentPage, query => query
+            .Where(w => w.WhereEquals("NodeID", nodeParentID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
+
+        if (parentPage == null)
+        {
+            _validationState.AddUnprocessableEntityError(nameof(nodeParentID), ErrorMessage.ParentWithNodeIdNotFound(nodeParentID));
+            throw new UnprocessableEntityException();
+        }
+
+        //if (!_contentService.IsChildPageTypeAllowed<IPage>(parentPage))
+        //{
+        //    _validationState.AddUnprocessableEntityError(nameof(nodeParentID), ErrorMessage.ParentPageTypeDoesNotAllowChildPageType(parentPage.GetType(), typeof(IPage)));
+        //    throw new UnprocessableEntityException();
+        //}
+
+        _pageContentValidator.ValidateAndNormalizePageContent(request);
+
+        //_validationState.ThrowIfThereAreErrors();
+
+        var deal = await MapDealPageContentToDeal(request, nodeParentID, currentCulture.Language, cancellationToken);
 
         // For now, return the mapped output
         // TODO: Implement actual page creation in Kentico CMS
@@ -110,7 +141,7 @@ public class DealCrudService : IDealCrudService
         }
 
         // Create new culture version
-        var deal = MapDealPageContentToDeal(request, 0, culture, existingDeal.SystemFields?.WebPageItemParentID ?? 0);
+        var deal = await MapDealPageContentToDeal(request, 0, culture, cancellationToken);
 
         // TODO: Implement actual page creation in Kentico CMS for new culture version
         return MapDealToPageOutput(deal);
@@ -136,7 +167,7 @@ public class DealCrudService : IDealCrudService
         }
 
         // Update the existing deal with new content
-        var updatedDeal = MapDealPageContentToDeal(request, 0, "", existingDeal.SystemFields?.WebPageItemParentID ?? 0);
+        var updatedDeal = await MapDealPageContentToDeal(request, 0, "", cancellationToken);
 
         // TODO: Implement actual page update in Kentico CMS
         return MapDealToPageOutput(updatedDeal);
@@ -150,7 +181,7 @@ public class DealCrudService : IDealCrudService
         await Task.CompletedTask;
     }
 
-    private static Deal MapDealPageContentToDeal(DealPageContent content, int nodeParentID, string? culture, int parentId = 0)
+    private async Task<Deal> MapDealPageContentToDeal(DealPageContent content, int nodeParentID, string culture, CancellationToken cancellationToken)
     {
         return new Deal
         {
@@ -267,4 +298,34 @@ public class DealCrudService : IDealCrudService
         };
     }
 
+    private async Task<LanguageTag?> ValidateAndNormalizeSiteCultureAsync(string languageTagString, CancellationToken cancellationToken)
+    {
+        var languageTag = ValidateAndNormalizeCultureAsync(languageTagString);
+
+        if (languageTag == null)
+        {
+            return null;
+        }
+
+        var siteCultures = (await _cultureService.GetCurrentSiteCulturesAsync(cancellationToken)).ToHashSet();
+
+        if (!siteCultures.Contains(languageTag))
+        {
+            _validationState.AddError("culture", ErrorMessage.DocumentCultureNotAllowedOnSite(languageTag, _websiteChannelContext.WebsiteChannelName, siteCultures));
+        }
+
+        return languageTag;
+    }
+
+    private LanguageTag? ValidateAndNormalizeCultureAsync(string languageTagString)
+    {
+        if (LanguageTag.TryParse(languageTagString, out var languageTag))
+        {
+            return languageTag;
+        }
+
+        _validationState.AddError("culture", ErrorMessage.IncorrectLanguageTagFormat(languageTagString));
+
+        return null;
+    }
 }

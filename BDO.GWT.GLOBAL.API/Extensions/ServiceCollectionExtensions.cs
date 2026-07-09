@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
+using BDO.GWT.Core;
+using BDO.GWT.Core.Services;
 using BDO.GWT.GLOBAL.API.ApiClients;
 using BDO.GWT.GLOBAL.API.Helpers;
 using BDO.GWT.GLOBAL.API.Middleware;
 using BDO.GWT.GLOBAL.API.Options;
 using BDO.GWT.GLOBAL.API.Services;
+using CMS.MacroEngine;
+using CMS.Websites.Routing;
 
 namespace BDO.GWT.GLOBAL.API.Extensions;
 
@@ -35,5 +39,13 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IMasterDataApiClient, MasterDataApiClient>();
         serviceCollection.AddScoped<IFormCrudService, FormCrudService>();
         serviceCollection.AddScoped<IAuthorizationHelper, AuthorizationHelper>();
+        serviceCollection.AddScoped<IContentService, ContentService>();
+        serviceCollection.AddScoped<IValidationState, ValidationState>();
+        serviceCollection.AddScoped<ICultureService, CultureService>();
+        serviceCollection.AddScoped<ICultureContext, CultureContext>();
+        serviceCollection.AddScoped<IWebsiteCulturesService, WebsiteCulturesService>();
+        serviceCollection.AddScoped<IPageContentValidator, PageContentValidator>();
+        serviceCollection.AddScoped<IMacroResolver, MacroResolver>();
+        serviceCollection.AddScoped<IDealCrudService, DealCrudService>();
     }
 }

@@ -3,6 +3,7 @@ using BDO.GWT.GLOBAL.API.Bases;
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Filters;
 using BDO.GWT.GLOBAL.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
@@ -13,6 +14,8 @@ namespace BDO.GWT.GLOBAL.API.Controllers
     /// <summary>
     /// Provides methods to read and manage deals.
     /// </summary>
+    [AllowAnonymous]
+    [ApiController]
     [Route("memberFirms/{memberFirmID:int}/Deals")]
     public class DealsController : EntityControllerBase
     {
