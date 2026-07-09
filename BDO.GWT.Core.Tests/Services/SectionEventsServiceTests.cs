@@ -272,6 +272,30 @@ namespace BDO.GWT.Core.Tests.Services
         }
 
         [Test]
+        public async Task GetEventsSectionDtoAsync_FilteringEnabled_WithWhitespaceFilters_PassesTrimmedTokens()
+        {
+            var page = new SectionEvents
+            {
+                EventsWebinarsListFilteringEnabled = true,
+                EventsWebinarsListFilters = "   ;  ;   ",
+            };
+
+            HashSet<string>? captured = null;
+            _eventWebinarCardsServiceMock
+                .Setup(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+                .Callback<HashSet<string>, string?, CancellationToken>((f, _, _) => captured = f)
+                .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
+
+            await _service.GetEventsSectionDtoAsync(page, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(captured, Is.Not.Null);
+                Assert.That(captured, Is.EquivalentTo(new[] { string.Empty }));
+            });
+        }
+
+        [Test]
         public async Task GetEventsSectionDtoAsync_AdvancedSearchLink_DefaultsToEmpty_WhenNoSelectedPage()
         {
             var page = new SectionEvents();
@@ -423,6 +447,59 @@ namespace BDO.GWT.Core.Tests.Services
             await _service.GetFilteredItemsAsync(query, CancellationToken.None);
 
             Assert.That(query.Filters[FilterParameterName.ShowAllPastEvents], Is.EqualTo(bool.TrueString));
+        }
+
+        [Test]
+        public async Task GetFilteredItemsAsync_PassesFeaturedPredicate_BasedOnFeaturedPageIds()
+        {
+            var featuredSource = new Mock<IWebPageFieldsSource>();
+            featuredSource.SetupGet(x => x.SystemFields).Returns(new WebPageFields { WebPageItemID = 101 });
+
+            var sectionPage = new SectionEvents
+            {
+                ShowPastEvents = true,
+                EventsWebinarsListFeaturedPages = new List<IWebPageFieldsSource> { featuredSource.Object },
+            };
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<SectionEvents>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[] { sectionPage });
+
+            Func<IEventOrWebinar, bool>? capturedPredicate = null;
+            _eventWebinarCardsServiceMock
+                .Setup(x => x.GetFilteredItemsAsync(
+                    It.IsAny<CardsQuery>(),
+                    It.IsAny<Action<ContentItemQueryBuilder>?>(),
+                    It.IsAny<Func<IEventOrWebinar, bool>>(),
+                    true,
+                    false,
+                    It.IsAny<CancellationToken>()))
+                .Callback<CardsQuery, Action<ContentItemQueryBuilder>?, Func<IEventOrWebinar, bool>, bool, bool, CancellationToken>((_, _, p, _, _, _) => capturedPredicate = p)
+                .ReturnsAsync(new PaginationDto<EventsWebinarsCardDto>
+                {
+                    Data = Array.Empty<EventsWebinarsCardDto>(),
+                    TotalCount = 0,
+                });
+
+            var query = new CardsQuery { Filters = new Dictionary<string, string>() };
+            await _service.GetFilteredItemsAsync(query, CancellationToken.None);
+
+            var featured = new Mock<IEventOrWebinar>();
+            featured.SetupGet(x => x.SystemFields).Returns(new WebPageFields { WebPageItemID = 101 });
+
+            var regular = new Mock<IEventOrWebinar>();
+            regular.SetupGet(x => x.SystemFields).Returns(new WebPageFields { WebPageItemID = 999 });
+
+            Assert.That(capturedPredicate, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(capturedPredicate!(featured.Object), Is.True);
+                Assert.That(capturedPredicate(regular.Object), Is.False);
+            });
         }
     }
 }

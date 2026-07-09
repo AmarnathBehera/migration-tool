@@ -554,6 +554,13 @@ public class InsightPageServiceTests
         public override bool UsePageTitleToDisplayPersonName { get; set; }
     }
 
+    private sealed class TestPrintorShareInfo : PrintorShareInfo
+    {
+        public override bool DisableDownload { get; set; }
+        public override bool DisablePrint { get; set; }
+        public override bool DisableCopyLinkButton { get; set; }
+    }
+
     private void SetupCopyLinkSection(
         Insight insight,
         bool showCopyUrlButtonInInsightPage)
@@ -971,5 +978,69 @@ public class InsightPageServiceTests
         {
             backingField.SetValue(target, value);
         }
+    }
+
+    [Test]
+    public async Task GetSidebarDtoAsync_HidesPrintDownloadAndCopy_WhenSettingsDisableFlagsAreTrue()
+    {
+        var insight = CreateInsight(
+            title: "Insight page",
+            showSidebar: true);
+
+        insight.ShowPrintButton = true;
+        insight.ShowSocialMediaButtons = false;
+
+        SetAssetCollection(
+            insight,
+            nameof(Insight.DownloadButtonAttachment),
+            "/media/download.pdf");
+
+        _settingServiceMock
+            .Setup(x => x.GetPrintorShareInfo())
+            .ReturnsAsync(new[]
+            {
+                new TestPrintorShareInfo
+                {
+                    DisablePrint = true,
+                    DisableDownload = true,
+                    DisableCopyLinkButton = true,
+                }
+            });
+
+        var result = await _service.GetSidebarDtoAsync(insight, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.ShowPrintButton, Is.False);
+            Assert.That(result.DownloadButtonAttachment, Is.Null);
+            Assert.That(result.ShowCopyLinkButton, Is.True);
+        });
+    }
+
+    [Test]
+    public async Task GetContentPageSidebarDto_SetsNullPublishAndUpdated_WhenSystemDatesAreMinValue()
+    {
+        SetupUsePersonPageTitleSetting(false);
+
+        var insight = CreateInsight(
+            title: "Insight page",
+            showSidebar: true);
+
+        SetPropertyValue(insight.SystemFields, "ContentItemCommonDataFirstPublishedWhen", DateTime.MinValue);
+        SetPropertyValue(insight.SystemFields, "ContentItemCommonDataLastPublishedWhen", DateTime.MinValue);
+
+        SetContentType(insight, "Article");
+        SetCollection(insight, nameof(Insight.RelevantContactPerson), Array.Empty<object>());
+        SetCollection(insight, nameof(Insight.RelatedExternalPeople), Array.Empty<object>());
+
+        SetupCopyLinkSection(insight, showCopyUrlButtonInInsightPage: true);
+
+        var result = await _service.GetContentPageSidebarDto(insight, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.PublishDate, Is.Null);
+            Assert.That(result.UpdatedDate, Is.Null);
+        });
     }
 }
