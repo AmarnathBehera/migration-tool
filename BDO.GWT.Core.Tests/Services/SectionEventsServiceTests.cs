@@ -501,5 +501,69 @@ namespace BDO.GWT.Core.Tests.Services
                 Assert.That(capturedPredicate(regular.Object), Is.False);
             });
         }
+
+        [Test]
+        public async Task GetEventsSectionDtoAsync_UsesFilteringTooltipValue_FromHelper()
+        {
+            var page = new SectionEvents
+            {
+                EventsWebinarsListFilteringEnabled = true,
+                EventsWebinarsListFilters = "eventType",
+            };
+
+            _filteringHelperMock
+                .Setup(x => x.IsFilteringTooltipEnabledAsync(true, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(false);
+
+            var result = await _service.GetEventsSectionDtoAsync(page, CancellationToken.None);
+
+            Assert.That(result.CardsGrid.FilteringTooltipEnabled, Is.False);
+        }
+
+        [Test]
+        public async Task GetFilteredItemsAsync_PassesCancellationToken_ToCardsService()
+        {
+            using var cts = new CancellationTokenSource();
+            var token = cts.Token;
+
+            var sectionPage = new SectionEvents
+            {
+                ShowPastEvents = true,
+                EventsWebinarsListFeaturedPages = new List<IWebPageFieldsSource>(),
+            };
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<SectionEvents>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    token))
+                .ReturnsAsync(new[] { sectionPage });
+
+            _eventWebinarCardsServiceMock
+                .Setup(x => x.GetFilteredItemsAsync(
+                    It.IsAny<CardsQuery>(),
+                    It.IsAny<Action<ContentItemQueryBuilder>?>(),
+                    It.IsAny<Func<IEventOrWebinar, bool>>(),
+                    true,
+                    false,
+                    token))
+                .ReturnsAsync(new PaginationDto<EventsWebinarsCardDto>
+                {
+                    Data = Array.Empty<EventsWebinarsCardDto>(),
+                    TotalCount = 0,
+                });
+
+            var query = new CardsQuery { Filters = new Dictionary<string, string>() };
+            await _service.GetFilteredItemsAsync(query, token);
+
+            _eventWebinarCardsServiceMock.Verify(x => x.GetFilteredItemsAsync(
+                It.IsAny<CardsQuery>(),
+                It.IsAny<Action<ContentItemQueryBuilder>?>(),
+                It.IsAny<Func<IEventOrWebinar, bool>>(),
+                true,
+                false,
+                token), Times.Once);
+        }
     }
 }
