@@ -47,11 +47,5 @@ namespace BDO
 		/// CallToActionButtonUrl.
 		/// </summary>
 		public string CallToActionButtonUrl { get; set; }
-
-
-		/// <summary>
-		/// CallToActionPosition.
-		/// </summary>
-		public string CallToActionPosition { get; set; }
 	}
 }

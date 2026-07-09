@@ -70,6 +70,27 @@
       <schema guid="34bc2c94-d4b6-4c53-a6f4-9b9520a24493" name="34bc2c94-d4b6-4c53-a6f4-9b9520a24493">
         <properties />
       </schema>
+      <field allowempty="true" column="CallToActionPosition" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="3af56f39-526d-4d1c-87e6-a736d4967d99" visible="true">
+        <properties>
+          <defaultvalue>Left</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Call to action position</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.RadioGroup</controlname>
+          <Inline>False</Inline>
+          <Options>
+<![CDATA[
+left;Left
+right;Right
+center;Center
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+      </field>
       <schema guid="65e4cd93-2087-4be4-8787-e7acd5bf632e" name="65e4cd93-2087-4be4-8787-e7acd5bf632e">
         <properties />
       </schema>

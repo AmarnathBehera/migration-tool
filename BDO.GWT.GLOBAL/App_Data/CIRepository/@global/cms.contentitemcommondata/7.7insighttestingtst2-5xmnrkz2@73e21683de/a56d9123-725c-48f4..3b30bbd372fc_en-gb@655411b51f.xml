@@ -3,7 +3,6 @@
   <CallToActionButtonText>CTA button txt</CallToActionButtonText>
   <CallToActionButtonUrl>www.google.com</CallToActionButtonUrl>
   <CallToActionDescription>description of CTA</CallToActionDescription>
-  <CallToActionPosition>right</CallToActionPosition>
   <ContentItemCommonDataContentItemID>
     <CodeName>7.7InsightTestingTST2-5xmnrkz2</CodeName>
     <GUID>646ea181-f1d6-40bf-a6f1-c8f025b49d33</GUID>

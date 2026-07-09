@@ -554,6 +554,13 @@ public class InsightPageServiceTests
         public override bool UsePageTitleToDisplayPersonName { get; set; }
     }
 
+    private sealed class TestPrintorShareInfo : PrintorShareInfo
+    {
+        public override bool DisableDownload { get; set; }
+        public override bool DisablePrint { get; set; }
+        public override bool DisableCopyLinkButton { get; set; }
+    }
+
     private void SetupCopyLinkSection(
         Insight insight,
         bool showCopyUrlButtonInInsightPage)
@@ -669,7 +676,9 @@ public class InsightPageServiceTests
         string content,
         bool showTitle,
         bool showDescription,
-        bool showCallToAction)
+        bool showCallToAction,
+        string? callToActionButtonUrl = null,
+        string? callToActionPosition = null)
     {
         var copyInsightProperty = typeof(Insight).GetProperty(nameof(Insight.CopyInsight));
         if (copyInsightProperty is null)
@@ -688,6 +697,8 @@ public class InsightPageServiceTests
         SetPropertyValue(copyInsight, "ShowCallToAction", showCallToAction);
         SetPropertyValue(copyInsight, "CallToActionDescription", "CTA description");
         SetPropertyValue(copyInsight, "CallToActionButtonText", "CTA button");
+        SetPropertyValue(copyInsight, "CallToActionButtonUrl", callToActionButtonUrl);
+        SetPropertyValue(copyInsight, "CallToActionPosition", callToActionPosition);
         SetPropertyValue(copyInsight, "SharingSourceFirm", "BDO Firm");
 
         SetCollection(copyInsight, "ImageFile", Array.Empty<object>());
@@ -967,5 +978,177 @@ public class InsightPageServiceTests
         {
             backingField.SetValue(target, value);
         }
+    }
+
+    [Test]
+    public async Task GetSidebarDtoAsync_HidesPrintDownloadAndCopy_WhenSettingsDisableFlagsAreTrue()
+    {
+        var insight = CreateInsight(
+            title: "Insight page",
+            showSidebar: true);
+
+        insight.ShowPrintButton = true;
+        insight.ShowSocialMediaButtons = false;
+
+        SetAssetCollection(
+            insight,
+            nameof(Insight.DownloadButtonAttachment),
+            "/media/download.pdf");
+
+        _settingServiceMock
+            .Setup(x => x.GetPrintorShareInfo())
+            .ReturnsAsync(new[]
+            {
+                new TestPrintorShareInfo
+                {
+                    DisablePrint = true,
+                    DisableDownload = true,
+                    DisableCopyLinkButton = true,
+                }
+            });
+
+        var result = await _service.GetSidebarDtoAsync(insight, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.ShowPrintButton, Is.False);
+            Assert.That(result.DownloadButtonAttachment, Is.Null);
+            Assert.That(result.ShowCopyLinkButton, Is.True);
+        });
+    }
+
+    [Test]
+    public async Task GetContentPageSidebarDto_SetsNullPublishAndUpdated_WhenSystemDatesAreMinValue()
+    {
+        SetupUsePersonPageTitleSetting(false);
+
+        var insight = CreateInsight(
+            title: "Insight page",
+            showSidebar: true);
+
+        SetPropertyValue(insight.SystemFields, "ContentItemCommonDataFirstPublishedWhen", DateTime.MinValue);
+        SetPropertyValue(insight.SystemFields, "ContentItemCommonDataLastPublishedWhen", DateTime.MinValue);
+
+        SetContentType(insight, "Article");
+        SetCollection(insight, nameof(Insight.RelevantContactPerson), Array.Empty<object>());
+        SetCollection(insight, nameof(Insight.RelatedExternalPeople), Array.Empty<object>());
+
+        SetupCopyLinkSection(insight, showCopyUrlButtonInInsightPage: true);
+
+        var result = await _service.GetContentPageSidebarDto(insight, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.PublishDate, Is.Null);
+            Assert.That(result.UpdatedDate, Is.Null);
+        });
+    }
+
+    [Test]
+    public async Task GetSidebarExternalPeopleDtosAsync_ReturnsEmpty_WhenNoExternalPeopleAreRetrieved()
+    {
+        SetupContentPages(Array.Empty<ExternalPerson>());
+
+        var linkedExternalPerson = CreateExternalPerson(
+            contentItemGuid: Guid.NewGuid(),
+            metadataTitle: "Linked",
+            firstName: "Ada",
+            surnamePrefix: string.Empty,
+            lastName: "Lovelace",
+            jobTitle: "Consultant",
+            url: "https://example.com/linked");
+
+        var result = await _service.GetSidebarExternalPeopleDtosAsync(
+            new[] { linkedExternalPerson },
+            CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetContentPageDtoAsync_WhenShowSidebarTrue_ReturnsSidebar()
+    {
+        var insight = CreateInsight(
+            title: "Insight page",
+            showSidebar: true);
+
+        SetContentType(insight, "Article");
+        SetCollection(insight, nameof(Insight.RelevantContactPerson), Array.Empty<object>());
+        SetCollection(insight, nameof(Insight.RelatedExternalPeople), Array.Empty<object>());
+
+        SetupCopyLinkSection(insight, showCopyUrlButtonInInsightPage: true);
+        SetupContentPages(Array.Empty<ExternalPerson>());
+
+        var result = await _service.GetContentPageDtoAsync(
+            insight,
+            CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Sidebar, Is.Not.Null);
+            Assert.That(result.Sidebar!.TypeName, Is.EqualTo("Article"));
+        });
+    }
+
+    [Test]
+    public async Task GetContentPageSidebarDto_DeduplicatesRelevantPeople_ByContentItemId()
+    {
+        SetupUsePersonPageTitleSetting(false);
+
+        var insight = CreateInsight(
+            title: "Insight page",
+            showSidebar: true);
+
+        SetContentType(insight, "Article");
+
+        var person1 = CreatePerson(
+            contentItemId: 200,
+            metadataTitle: "Ada Title",
+            firstName: "Ada",
+            surnamePrefix: string.Empty,
+            lastName: "Lovelace",
+            jobTitle: "Developer",
+            url: "/people/ada");
+
+        var personDuplicateId = CreatePerson(
+            contentItemId: 200,
+            metadataTitle: "Ada Duplicate",
+            firstName: "Ada",
+            surnamePrefix: string.Empty,
+            lastName: "Lovelace",
+            jobTitle: "Developer",
+            url: "/people/ada-duplicate");
+
+        SetCollection(insight, nameof(Insight.RelevantContactPerson), person1, personDuplicateId);
+        SetCollection(insight, nameof(Insight.RelatedExternalPeople), Array.Empty<object>());
+
+        SetupCopyLinkSection(insight, showCopyUrlButtonInInsightPage: true);
+        SetupContentPages(Array.Empty<ExternalPerson>());
+
+        var result = await _service.GetContentPageSidebarDto(insight, CancellationToken.None);
+
+        Assert.That(result.RelevantContactPeople, Has.Length.EqualTo(1));
+    }
+
+    [Test]
+    public async Task GetKeyContactsDisplayNames_ReturnsEmpty_WhenNoContactsFound()
+    {
+        SetupUsePersonPageTitleSetting(false);
+        SetupContentPages(Array.Empty<Person>());
+        SetupContentPages(Array.Empty<InternalPerson>());
+
+        var result = await _service.GetKeyContactsDisplayNames(Array.Empty<int>(), CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetExternalPeopleDisplayNames_ReturnsEmpty_WhenNoPeopleFound()
+    {
+        SetupContentPages(Array.Empty<ExternalPerson>());
+
+        var result = await _service.GetExternalPeopleDisplayNames(new List<Guid>(), CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
     }
 }

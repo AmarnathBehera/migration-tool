@@ -132,12 +132,6 @@ namespace BDO
 
 
 		/// <summary>
-		/// CallToActionPosition.
-		/// </summary>
-		public string CallToActionPosition { get; set; }
-
-
-		/// <summary>
 		/// ShowSidebar.
 		/// </summary>
 		public bool ShowSidebar { get; set; }

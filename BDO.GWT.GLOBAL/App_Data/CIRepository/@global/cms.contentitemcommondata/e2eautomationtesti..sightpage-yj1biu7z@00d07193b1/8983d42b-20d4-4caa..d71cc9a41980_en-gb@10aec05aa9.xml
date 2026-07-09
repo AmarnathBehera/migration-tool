@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <cms.contentitemcommondata>
-  <CallToActionPosition>left</CallToActionPosition>
+  <CallToActionButtonText>Call to action button text</CallToActionButtonText>
+  <CallToActionButtonUrl>www.google.com</CallToActionButtonUrl>
+  <CallToActionDescription>Call to action description</CallToActionDescription>
   <ContentItemCommonDataContentItemID>
     <CodeName>E2EAutomationTesting-InsightPage-yj1biu7z</CodeName>
     <GUID>19edc5a1-f073-424f-af9a-7157a12811ed</GUID>
@@ -14,7 +16,7 @@
   <ContentItemCommonDataFirstPublishedWhen>2026-07-02 07:24:19Z</ContentItemCommonDataFirstPublishedWhen>
   <ContentItemCommonDataGUID>8983d42b-20d4-4caa-8a76-d71cc9a41980</ContentItemCommonDataGUID>
   <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
-  <ContentItemCommonDataLastPublishedWhen>2026-07-02 07:34:48Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataLastPublishedWhen>2026-07-09 06:46:14Z</ContentItemCommonDataLastPublishedWhen>
   <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
   <ImageFile>
     <![CDATA[[{"Identifier":"4c186673-7fe7-422a-9db4-e46fe87bab71"}]]]>
@@ -24,7 +26,7 @@
   <ContentItemReferences>
     <cms.contentitemreference>
       <ContentItemReferenceGroupGUID>279701fd-47c3-4ddf-9fbc-ea555ed99a63</ContentItemReferenceGroupGUID>
-      <ContentItemReferenceGUID>cf5e8930-7ffb-4a12-b82b-a5988e4db523</ContentItemReferenceGUID>
+      <ContentItemReferenceGUID>e229ee9d-3f78-468f-af36-1f92fbffa501</ContentItemReferenceGUID>
       <ContentItemReferenceSourceCommonDataID>
         <GUID>8983d42b-20d4-4caa-8a76-d71cc9a41980</GUID>
         <ObjectType>cms.contentitemcommondata</ObjectType>
@@ -37,7 +39,7 @@
     </cms.contentitemreference>
     <cms.contentitemreference>
       <ContentItemReferenceGroupGUID>8cc432f6-6eb0-4818-af00-ecdb2e122836</ContentItemReferenceGroupGUID>
-      <ContentItemReferenceGUID>45803406-03c5-4b3c-8e77-33c563eb3dcf</ContentItemReferenceGUID>
+      <ContentItemReferenceGUID>d63f1826-3efb-482c-ac5f-b131ccefc089</ContentItemReferenceGUID>
       <ContentItemReferenceSourceCommonDataID>
         <GUID>8983d42b-20d4-4caa-8a76-d71cc9a41980</GUID>
         <ObjectType>cms.contentitemcommondata</ObjectType>

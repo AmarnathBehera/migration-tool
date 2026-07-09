@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <cms.contentitemcommondata>
-  <CallToActionPosition>left</CallToActionPosition>
+  <CallToActionButtonText>action button text</CallToActionButtonText>
+  <CallToActionButtonUrl>\~</CallToActionButtonUrl>
+  <CallToActionDescription>Call to action description</CallToActionDescription>
   <ContentItemCommonDataContentItemID>
     <CodeName>CopyInsight-i14o3q0e</CodeName>
     <GUID>be3f76f4-1473-4766-abac-662cb13fa653</GUID>
@@ -14,7 +16,7 @@
   <ContentItemCommonDataFirstPublishedWhen>2026-07-08 08:05:44Z</ContentItemCommonDataFirstPublishedWhen>
   <ContentItemCommonDataGUID>cd04111f-fff4-4581-8e9a-76f1d0dd7840</ContentItemCommonDataGUID>
   <ContentItemCommonDataIsLatest>True</ContentItemCommonDataIsLatest>
-  <ContentItemCommonDataLastPublishedWhen>2026-07-08 08:05:44Z</ContentItemCommonDataLastPublishedWhen>
+  <ContentItemCommonDataLastPublishedWhen>2026-07-09 06:44:00Z</ContentItemCommonDataLastPublishedWhen>
   <ContentItemCommonDataVersionStatus>2</ContentItemCommonDataVersionStatus>
   <ShowCallToAction>True</ShowCallToAction>
 </cms.contentitemcommondata>

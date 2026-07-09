@@ -3,7 +3,6 @@
   <CallToActionButtonText>CTA button txt</CallToActionButtonText>
   <CallToActionButtonUrl>www.google.com</CallToActionButtonUrl>
   <CallToActionDescription>description of CTA</CallToActionDescription>
-  <CallToActionPosition>left</CallToActionPosition>
   <ContentItemCommonDataContentItemID>
     <CodeName>CommentLesEntreprises-enqy1rgm</CodeName>
     <GUID>f5080ab7-e3c5-4a17-b8a3-99a6724b5ab9</GUID>
