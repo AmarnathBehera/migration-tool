@@ -66,8 +66,8 @@ namespace BDO.GWT.Core.Services
                     ContentItemCommonDataFirstPublishedWhen = sys?.ContentItemCommonDataFirstPublishedWhen ?? default,
                     ContentItemCommonDataLastPublishedWhen = sys?.ContentItemCommonDataLastPublishedWhen ?? default
                 },
-                CallToAction = contentPageDto.CallToActionWithPosition.CallToActionDto,
-                CallToActionWithPosition= contentPageDto.CallToActionWithPosition,
+                CallToAction = contentPageDto?.CallToActionWithPosition?.CallToActionDto,
+                CallToActionWithPosition= contentPageDto?.CallToActionWithPosition,
                 BaseWebPage = new BaseWebPage
                 {
                     WebPageItemGUID = sys?.WebPageItemGUID ?? Guid.Empty,
