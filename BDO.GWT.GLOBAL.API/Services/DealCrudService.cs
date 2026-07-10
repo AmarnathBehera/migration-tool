@@ -3,6 +3,8 @@ using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.GLOBAL.API.Data;
+using CMS.ContentEngine;
+using CMS.DataEngine;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
@@ -12,7 +14,7 @@ namespace BDO.GWT.GLOBAL.API.Services;
 
 public interface IDealCrudService
 {
-    Task<ActionResult<IEnumerable<PageOutput<DealPageContent>>>> GetDealPagesAsync(string? culture, bool? onlyPublished, CancellationToken cancellationToken);
+    Task<ActionResult<IEnumerable<PageOutput<DealPageContent>>>> GetDealPagesAsync(int channelId, string? culture, bool? onlyPublished, CancellationToken cancellationToken);
     Task<ActionResult<PageOutput<DealPageContent>>> GetDealPageAsync(Guid pageGUID, CancellationToken cancellationToken);
     Task<ActionResult<PageOutput<DealPageContent>>> CreatePageAsync(int nodeParentID, string? culture, DealPageContent request, CancellationToken cancellationToken);
     Task<ActionResult<PageOutput<DealPageContent>>> CreatePageCultureVersionAsync(Guid pageGUID, string? culture, DealPageContent request, CancellationToken cancellationToken);
@@ -27,6 +29,7 @@ public class DealCrudService : IDealCrudService
     private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly ICultureService _cultureService;
     private readonly IPageContentValidator _pageContentValidator;
+    private readonly IInfoProvider<ChannelInfo> _channelInfoProvider;
 
     private static readonly RetrievePagesParameters _retrieveParameters = new()
     {
@@ -37,21 +40,23 @@ public class DealCrudService : IDealCrudService
         LinkedItemsMaxLevel = 1
     };
 
-    public DealCrudService(IContentService contentRetriever, IValidationState validationState, IWebsiteChannelContext websiteChannelContext, IContentService contentService, ICultureService cultureService, IPageContentValidator pageContentValidator)
+    public DealCrudService(IContentService contentRetriever, IValidationState validationState, IWebsiteChannelContext websiteChannelContext, IContentService contentService, ICultureService cultureService, IPageContentValidator pageContentValidator, IInfoProvider<ChannelInfo> channelInfoProvider)
     {
         _contentRetriever = contentRetriever;
         _validationState = validationState;
         _websiteChannelContext = websiteChannelContext;
         _cultureService = cultureService;
         _pageContentValidator = pageContentValidator;
+        _channelInfoProvider = channelInfoProvider;
     }
 
-    public async Task<ActionResult<IEnumerable<PageOutput<DealPageContent>>>> GetDealPagesAsync(string? culture, bool? onlyPublished, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<PageOutput<DealPageContent>>>> GetDealPagesAsync(int channelId, string? culture, bool? onlyPublished, CancellationToken cancellationToken)
     {
+        var channel = await _channelInfoProvider.GetAsync(channelId);
         var retrieveParameters = new RetrievePagesParameters
         {
             LinkedItemsMaxLevel = 5,
-            ChannelName = _websiteChannelContext.WebsiteChannelName ?? string.Empty,
+            ChannelName = channel.ChannelName,
             LanguageName = string.IsNullOrEmpty(culture) ? "en-gb" : culture,
             IsForPreview = false
         };
@@ -60,14 +65,16 @@ public class DealCrudService : IDealCrudService
         retrieveParameters,
         query =>
         {
-            if (!string.IsNullOrEmpty(culture))
-            {
-                query.Where(w => w.WhereEquals("WebPageItemLanguage", culture));
-            }
-            if (onlyPublished ?? true)
-            {
-                query.Where(w => w.WhereNotEmpty("WebPageItemPublishedVersionHistoryID"));
-            }
+            query.Where(w => w.WhereNotEquals("WebPageItemGUID", new Guid()));
+
+            //if (!string.IsNullOrEmpty(culture))
+            //{
+            //    query.Where(w => w.WhereEquals("ContentLanguage", culture));
+            //}
+            //if (onlyPublished ?? true)
+            //{
+            //    query.Where(w => w.WhereNotEmpty("WebPageItemPublishedVersionHistoryID"));
+            //}
         },
         RetrievalCacheSettings.CacheDisabled,
         cancellationToken);

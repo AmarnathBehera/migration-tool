@@ -39,7 +39,8 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(IEnumerable<PageOutput<DealPageContent>>), MediaTypeNames.Application.Json)]
         public async Task<ActionResult<IEnumerable<PageOutput<DealPageContent>>>> Get(int memberFirmID, string? culture, bool? onlyPublished, CancellationToken cancellationToken)
         {
-            var pages = await _dealCrudService.GetDealPagesAsync(culture, onlyPublished, cancellationToken);
+            var channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
+            var pages = await _dealCrudService.GetDealPagesAsync(channelId, culture, onlyPublished, cancellationToken);
 
             return Ok(pages);
         }

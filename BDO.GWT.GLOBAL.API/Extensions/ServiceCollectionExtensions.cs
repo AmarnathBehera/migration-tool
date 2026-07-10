@@ -46,6 +46,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IWebsiteCulturesService, WebsiteCulturesService>();
         serviceCollection.AddScoped<IPageContentValidator, PageContentValidator>();
         serviceCollection.AddScoped<IMacroResolver, MacroResolver>();
+        serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
         serviceCollection.AddScoped<IDealCrudService, DealCrudService>();
     }
 }
