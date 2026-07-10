@@ -50,6 +50,8 @@ namespace BDO.GWT.Core.Constants
         SectionDeals.CONTENT_TYPE_NAME,
         SectionInsightsPage.CONTENT_TYPE_NAME,
         Insight.CONTENT_TYPE_NAME,
+        SectionBusinessStrategies.CONTENT_TYPE_NAME,
+        BusinessStrategy.CONTENT_TYPE_NAME
     };
     }
 }
