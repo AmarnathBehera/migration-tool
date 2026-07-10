@@ -16,5 +16,4 @@ public class CardsQuery : IPaginationQuery
 
     public string? Order { get; set; }
 
-    public Guid? StateGUID { get; set; }
 }

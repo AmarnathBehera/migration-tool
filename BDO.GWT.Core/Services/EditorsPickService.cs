@@ -3,7 +3,6 @@ using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.Helpers;
-using BDO.GWT.Web.Services;
 using CMS.ContentEngine;
 using CMS.Websites;
 
@@ -22,26 +21,19 @@ public interface IEditorsPickService
         HashSet<ContentItemReference> selectedGuids,
         CardsQuery query,
         CancellationToken cancellationToken);
-
-    Task<ICollection<EditorsPickCardDto>> GetAPIFilteredItemsAsync(
-        CardsQuery query,
-        CancellationToken cancellationToken);
 }
 
 public class EditorsPickService : IEditorsPickService
 {
     private readonly IFilteringHelper _filteringHelper;
     private readonly IEditorsPickCardService _editorsPickCardService;
-    private readonly IReactCachingService _reactCachingService;
 
     public EditorsPickService(
         IFilteringHelper filteringHelper,
-        IEditorsPickCardService editorsPickCardService,
-        IReactCachingService reactCachingService)
+        IEditorsPickCardService editorsPickCardService)
     {
         _filteringHelper = filteringHelper;
         _editorsPickCardService = editorsPickCardService;
-        _reactCachingService = reactCachingService;
     }
 
     public async Task<EditorsPickDto> GetEditorsPickAsync<T>(
@@ -69,10 +61,6 @@ public class EditorsPickService : IEditorsPickService
             new CardsQuery(),
             cancellationToken);
 
-        var stateGuid = Guid.NewGuid();
-        var state = new EditorsPickWidgetState(featuredGuids, selectedGuids);
-        _reactCachingService.StoreObject(stateGuid.ToString(), state);
-
         return new EditorsPickDto
         {
             Title = data.Title,
@@ -94,8 +82,7 @@ public class EditorsPickService : IEditorsPickService
                 : null,
             TopMargin = data.TopMargin ?? string.Empty,
             BottomMargin = data.BottomMargin ?? string.Empty,
-            WidgetID = data.WidgetID,
-            StateGUID = stateGuid
+            WidgetID = data.WidgetID
         };
     }
 
@@ -126,25 +113,5 @@ public class EditorsPickService : IEditorsPickService
             cancellationToken);
 
         return paginationDto.Data;
-    }
-
-    public async Task<ICollection<EditorsPickCardDto>> GetAPIFilteredItemsAsync(
-        CardsQuery query,
-        CancellationToken cancellationToken)
-    {
-        query ??= new CardsQuery();
-
-        var featuredGuids = new HashSet<ContentItemReference>();
-        var selectedGuids = new HashSet<ContentItemReference>();
-
-        if (query.StateGUID.HasValue &&
-            _reactCachingService.TryGetCachedObject<EditorsPickWidgetState>(query.StateGUID.Value.ToString(), out var state) &&
-            state is not null)
-        {
-            featuredGuids = state.FeaturedGuids;
-            selectedGuids = state.SelectedGuids;
-        }
-
-        return await GetFilteredItemsAsync(featuredGuids, selectedGuids, query, cancellationToken);
     }
 }

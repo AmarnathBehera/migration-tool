@@ -223,7 +223,6 @@ public class EditorsPickCardService : IEditorsPickCardService
         return false;
     }
 
-    // In EditorsPickCardService.cs
     private static IEnumerable<string> GetLinkedNames(object source, string propertyName)
     {
         var property = source.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
@@ -236,33 +235,19 @@ public class EditorsPickCardService : IEditorsPickCardService
 
         foreach (var item in items)
         {
-            if (item is null) continue;
-
-            var type = item.GetType();
-
-            // Page-type filters: CardsService uses MetadataTitle → MetadataOGTitle → ContentItemName
-            var metadataTitle = type.GetProperty("MetadataTitle")?.GetValue(item)?.ToString();
-            var metadataOgTitle = type.GetProperty("MetadataOGTitle")?.GetValue(item)?.ToString();
-
-            // ContentItemName lives on SystemFields
-            var systemFields = type.GetProperty("SystemFields")?.GetValue(item);
-            var contentItemName = systemFields?.GetType()
-                .GetProperty("ContentItemName")?.GetValue(systemFields)?.ToString();
-
-            // Tagpage-type filters: CardsService uses Name
-            var name = type.GetProperty("Name")?.GetValue(item)?.ToString();
-            var codeName = type.GetProperty("CodeName")?.GetValue(item)?.ToString();
-
-            // Try all candidates; first non-null wins, mirroring CardsService resolution
-            var resolved = metadataTitle
-                ?? metadataOgTitle
-                ?? contentItemName
-                ?? name
-                ?? codeName;
-
-            if (!string.IsNullOrWhiteSpace(resolved))
+            if (item is null)
             {
-                values.Add(resolved);
+                continue;
+            }
+
+            var name = item.GetType().GetProperty("Name")?.GetValue(item)?.ToString()
+                       ?? item.GetType().GetProperty("CodeName")?.GetValue(item)?.ToString()
+                       ?? item.GetType().GetProperty("MetadataTitle")?.GetValue(item)?.ToString()
+                       ?? item.GetType().GetProperty("MetadataOGTitle")?.GetValue(item)?.ToString();
+
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                values.Add(name);
             }
         }
 
