@@ -111,7 +111,7 @@ public class SectionBusinessStrategiesServiceTests
 
         // Assert
         Assert.That(result.BusinessStrategiesMenu, Is.Not.Empty);
-        Assert.That(result.BusinessStrategiesMenu.Count, Is.GreaterThan(0));
+        Assert.That(result.BusinessStrategiesMenu, Has.Count.GreaterThan(0));
     }
 
     [Test]

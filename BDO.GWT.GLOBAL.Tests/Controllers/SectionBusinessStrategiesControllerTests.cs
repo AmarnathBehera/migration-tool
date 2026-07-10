@@ -547,7 +547,7 @@ public class SectionBusinessStrategiesControllerTests
         var model = viewResult!.Model as SectionBusinessStrategiesDto;
         Assert.Multiple(() =>
         {
-            Assert.That(model!.BusinessStrategiesMenu.Count, Is.EqualTo(2));
+            Assert.That(model!.BusinessStrategiesMenu, Has.Count.EqualTo(2));
             Assert.That(model.BusinessStrategiesMenu[0].Title, Is.EqualTo("Strategy 1"));
             Assert.That(model.BusinessStrategiesMenu[1].Title, Is.EqualTo("Strategy 2"));
             Assert.That(model.BackgroundImageURL, Is.EqualTo("https://example.com/menu-bg.jpg"));
