@@ -39,7 +39,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(IEnumerable<PageOutput<DealPageContent>>), MediaTypeNames.Application.Json)]
         public async Task<ActionResult<IEnumerable<PageOutput<DealPageContent>>>> Get(int memberFirmID, string? culture, bool? onlyPublished, CancellationToken cancellationToken)
         {
-            var channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
+            int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
             var pages = await _dealCrudService.GetDealPagesAsync(channelId, culture, onlyPublished, cancellationToken);
 
             return Ok(pages);
@@ -57,7 +57,8 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageOutput<DealPageContent>), MediaTypeNames.Application.Json)]
         public async Task<ActionResult<PageOutput<DealPageContent>>> Get(int memberFirmID, Guid pageGUID, CancellationToken cancellationToken)
         {
-            var page = await _dealCrudService.GetDealPageAsync(pageGUID, cancellationToken);
+            int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
+            var page = await _dealCrudService.GetDealPageAsync(channelId, pageGUID, cancellationToken);
 
             return Ok(page);
         }
@@ -77,7 +78,8 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         [SwaggerResponse(StatusCodes.Status201Created, null, typeof(PageOutput<DealPageContent>), MediaTypeNames.Application.Json)]
         public async Task<ActionResult<PageOutput<DealPageContent>>> Post(int memberFirmID, [FromQuery][Required] int nodeParentID, [FromQuery][Required] string culture, [FromBody] DealPageContent request, CancellationToken cancellationToken)
         {
-            var pageDto = await _dealCrudService.CreatePageAsync(nodeParentID, culture, request, cancellationToken);
+            int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
+            var pageDto = await _dealCrudService.CreatePageAsync(channelId, nodeParentID, culture, request, cancellationToken);
 
             return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.PageGUID }, pageDto.Value);
         }
@@ -96,7 +98,8 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         [SwaggerResponse(StatusCodes.Status201Created, null, typeof(PageOutput<DealPageContent>), MediaTypeNames.Application.Json)]
         public async Task<ActionResult<PageOutput<DealPageContent>>> CreateNewCultureVersion(int memberFirmID, Guid pageGUID, [FromQuery][Required] string culture, [FromBody] DealPageContent request, CancellationToken cancellationToken)
         {
-            var pageDto = await _dealCrudService.CreatePageCultureVersionAsync(pageGUID, culture, request, cancellationToken);
+            int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
+            var pageDto = await _dealCrudService.CreatePageCultureVersionAsync(channelId, pageGUID, culture, request, cancellationToken);
 
             return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.PageGUID }, pageDto.Value);
         }
@@ -114,7 +117,8 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageOutput<DealPageContent>), MediaTypeNames.Application.Json)]
         public async Task<ActionResult<PageOutput<DealPageContent>>> Put(int memberFirmID, Guid pageGUID, [FromBody] DealPageContent request, CancellationToken cancellationToken)
         {
-            var pageDto = await _dealCrudService.UpdatePageAsync(pageGUID, request, cancellationToken);
+            int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
+            var pageDto = await _dealCrudService.UpdatePageAsync(channelId, pageGUID, request, cancellationToken);
 
             return Ok(pageDto.Value);
         }
@@ -132,7 +136,8 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         [SwaggerResponse(StatusCodes.Status204NoContent, null, typeof(void))]
         public async Task<IActionResult> Delete(int memberFirmID, Guid pageGUID, [FromQuery] bool deleteAllCultures = false, CancellationToken cancellationToken = default)
         {
-            await _dealCrudService.DeletePageAsync(pageGUID, deleteAllCultures, cancellationToken);
+            int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
+            await _dealCrudService.DeletePageAsync(channelId, pageGUID, deleteAllCultures, cancellationToken);
 
             return NoContent();
         }
