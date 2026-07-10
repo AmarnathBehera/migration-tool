@@ -14,16 +14,19 @@ public class MemberFirmMiddleware : IMiddleware
 {
     private readonly IMemberFirmService _memberFirmService;
     private readonly IWebsiteChannelContext _websiteChannelContext;
+    private readonly IGlobalLocationCustomTableDataService _globalLocationCustomTableDataService;
 
     /// <summary>
     /// Initializes a new instance of the MemberFirmMiddleware class with the specified dependencies.
     /// </summary>
     /// <param name="memberFirmService">The member firm service instance.</param>
     /// <param name="websiteChannelContext">The website channel context instance.</param>
-    public MemberFirmMiddleware(IMemberFirmService memberFirmService, IWebsiteChannelContext websiteChannelContext)
+    /// <param name="globalLocationCustomTableDataService">The global location custom table data service instance.</param>
+    public MemberFirmMiddleware(IMemberFirmService memberFirmService, IWebsiteChannelContext websiteChannelContext, IGlobalLocationCustomTableDataService globalLocationCustomTableDataService)
     {
         _memberFirmService = memberFirmService;
         _websiteChannelContext = websiteChannelContext;
+        _globalLocationCustomTableDataService = globalLocationCustomTableDataService;
     }
 
     /// <summary>
@@ -70,7 +73,8 @@ public class MemberFirmMiddleware : IMiddleware
 
             return;
         }
-
+        //Call Global custom table service to check if the member firm exists in the global custom table
+        var globalLocationCustomTableData = await _globalLocationCustomTableDataService.GetLocationsAsync(memberFirmID);
         var memberFirm = await _memberFirmService.GetMemberFirmAsync(memberFirmID, cancellationToken);
         if (memberFirm is null)
         {
