@@ -48,24 +48,31 @@ public class DealCrudService : IDealCrudService
 
     public async Task<ActionResult<IEnumerable<PageOutput<DealPageContent>>>> GetDealPagesAsync(string? culture, bool? onlyPublished, CancellationToken cancellationToken)
     {
+        var retrieveParameters = new RetrievePagesParameters
+        {
+            LinkedItemsMaxLevel = 5,
+            ChannelName = _websiteChannelContext.WebsiteChannelName ?? string.Empty,
+            LanguageName = string.IsNullOrEmpty(culture) ? "en-gb" : culture,
+            IsForPreview = false
+        };
+
         var results = await _contentRetriever.GetPagesAsync<Deal>(
-            _retrieveParameters,
-            query =>
+        retrieveParameters,
+        query =>
+        {
+            if (!string.IsNullOrEmpty(culture))
             {
-                if (!string.IsNullOrEmpty(culture))
-                {
-                    query.Where(w => w.WhereEquals("WebPageItemLanguage", culture));
-                }
-                if (onlyPublished ?? true)
-                {
-                    query.Where(w => w.WhereNotEmpty("WebPageItemPublishedVersionHistoryID"));
-                }
-            },
-            RetrievalCacheSettings.CacheDisabled,
-            cancellationToken);
+                query.Where(w => w.WhereEquals("WebPageItemLanguage", culture));
+            }
+            if (onlyPublished ?? true)
+            {
+                query.Where(w => w.WhereNotEmpty("WebPageItemPublishedVersionHistoryID"));
+            }
+        },
+        RetrievalCacheSettings.CacheDisabled,
+        cancellationToken);
 
         var deals = results.ToList() ?? new List<Deal>();
-
         return deals.Select(MapDealToPageOutput).ToList();
     }
     
