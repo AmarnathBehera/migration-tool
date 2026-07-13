@@ -7,6 +7,7 @@ using BDO.GWT.GLOBAL.API.Middleware;
 using BDO.GWT.GLOBAL.API.Options;
 using BDO.GWT.GLOBAL.API.Services;
 using CMS.MacroEngine;
+using CMS.Websites;
 using CMS.Websites.Routing;
 
 namespace BDO.GWT.GLOBAL.API.Extensions;

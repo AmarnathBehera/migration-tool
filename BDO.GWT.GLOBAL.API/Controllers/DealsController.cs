@@ -50,15 +50,16 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm from which the page should be retrieved.</param>
         /// <param name="pageGUID">Page GUID of an deal page.</param>
+        /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="cancellationToken"></param>
         /// <returns>Returns one deal page.</returns>
         [HttpGet("{pageGUID:guid}")]
         [HasPermission(ApiMethodGroupName.Deals, ApiPermission.Read)]
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageOutput<DealPageContent>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<PageOutput<DealPageContent>>> Get(int memberFirmID, Guid pageGUID, CancellationToken cancellationToken)
+        public async Task<ActionResult<PageOutput<DealPageContent>>> Get(int memberFirmID, Guid pageGUID, [FromQuery][Required] string culture, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-            var page = await _dealCrudService.GetDealPageAsync(channelId, pageGUID, cancellationToken);
+            var page = await _dealCrudService.GetDealPageAsync(channelId, pageGUID, culture, cancellationToken);
 
             return Ok(page);
         }
@@ -89,17 +90,18 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm in which the page should be created.</param>
         /// <param name="pageGUID">Page GUID of the deal to copy content from.</param>
-        /// <param name="culture">Culture of the new page version.</param>
+        /// <param name="fromCulture">Culture of the existing page version.</param>
+        /// <param name="toCulture">Culture of the new page version.</param>
         /// <param name="request">New culture version data.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>New deal page in another culture.</returns>
         [HttpPost("{pageGUID:guid}/CreateNewCultureVersion")]
         [HasPermission(ApiMethodGroupName.Deals, ApiPermission.Manage)]
         [SwaggerResponse(StatusCodes.Status201Created, null, typeof(PageOutput<DealPageContent>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<PageOutput<DealPageContent>>> CreateNewCultureVersion(int memberFirmID, Guid pageGUID, [FromQuery][Required] string culture, [FromBody] DealPageContent request, CancellationToken cancellationToken)
+        public async Task<ActionResult<PageOutput<DealPageContent>>> CreateNewCultureVersion(int memberFirmID, Guid pageGUID, [FromQuery][Required] string fromCulture, [FromQuery][Required] string toCulture, [FromBody] DealPageContent request, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-            var pageDto = await _dealCrudService.CreatePageCultureVersionAsync(channelId, pageGUID, culture, request, cancellationToken);
+            var pageDto = await _dealCrudService.CreatePageCultureVersionAsync(channelId, pageGUID, fromCulture, toCulture, request, cancellationToken);
 
             return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.PageGUID }, pageDto.Value);
         }
@@ -109,16 +111,17 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm in which the page should be modified.</param>
         /// <param name="pageGUID">Page GUID of the deal page.</param>
+        /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="request">Updated deal page data.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>Updated deal page.</returns>
         [HttpPut("{pageGUID:guid}")]
         [HasPermission(ApiMethodGroupName.Deals, ApiPermission.Manage)]
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageOutput<DealPageContent>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<PageOutput<DealPageContent>>> Put(int memberFirmID, Guid pageGUID, [FromBody] DealPageContent request, CancellationToken cancellationToken)
+        public async Task<ActionResult<PageOutput<DealPageContent>>> Put(int memberFirmID, Guid pageGUID, [FromQuery][Required] string culture, [FromBody] DealPageContent request, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-            var pageDto = await _dealCrudService.UpdatePageAsync(channelId, pageGUID, request, cancellationToken);
+            var pageDto = await _dealCrudService.UpdatePageAsync(channelId, pageGUID, culture, request, cancellationToken);
 
             return Ok(pageDto.Value);
         }
@@ -128,16 +131,17 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm in which the page should be deleted.</param>
         /// <param name="pageGUID">Page GUID of the deal.</param>
+        /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="deleteAllCultures">Should all culture versions be deleted of this deal?</param>
         /// <param name="cancellationToken"></param>
         /// <returns>204 No Content.</returns>
         [HttpDelete("{pageGUID:guid}")]
         [HasPermission(ApiMethodGroupName.Deals, ApiPermission.Manage)]
         [SwaggerResponse(StatusCodes.Status204NoContent, null, typeof(void))]
-        public async Task<IActionResult> Delete(int memberFirmID, Guid pageGUID, [FromQuery] bool deleteAllCultures = false, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> Delete(int memberFirmID, Guid pageGUID, [FromQuery][Required] string culture, [FromQuery] bool deleteAllCultures = false, CancellationToken cancellationToken = default)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-            await _dealCrudService.DeletePageAsync(channelId, pageGUID, deleteAllCultures, cancellationToken);
+            await _dealCrudService.DeletePageAsync(channelId, pageGUID, culture, deleteAllCultures, cancellationToken);
 
             return NoContent();
         }
