@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using BDO.GWT.Core;
+﻿using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
 using BDO.GWT.GLOBAL.API.ApiClients;
 using BDO.GWT.GLOBAL.API.Helpers;
@@ -7,8 +6,6 @@ using BDO.GWT.GLOBAL.API.Middleware;
 using BDO.GWT.GLOBAL.API.Options;
 using BDO.GWT.GLOBAL.API.Services;
 using CMS.MacroEngine;
-using CMS.Websites;
-using CMS.Websites.Routing;
 
 namespace BDO.GWT.GLOBAL.API.Extensions;
 
