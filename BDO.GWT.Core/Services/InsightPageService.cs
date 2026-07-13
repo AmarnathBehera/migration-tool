@@ -327,29 +327,57 @@ namespace BDO.GWT.Core.Services
 
             return dtos;
         }
-       
+
         private async Task<bool> GetShowCopyLinkOptionFromSectionPageAsync(Insight insightPage, bool showCopyLinkButton, CancellationToken cancellationToken)
         {
-            var insights = await _contentService.GetPagesAsync<Insight>(new RetrievePagesParameters { }, query => query.Where(w => w.WhereEquals("WebPageItemID", insightPage?.SystemFields.WebPageItemID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
-
-            if (insights is null)
+            var parentPageId = insightPage?.SystemFields.WebPageItemParentID ?? 0;
+           
+            SectionInsightsPage? sectionInsightsPage = await GetSectionInsightsPageByIdAsync(parentPageId, cancellationToken);
+           
+             if (sectionInsightsPage is null)
             {
-                throw new MissingSectionPageException($"'No pages have been found of type '{nameof(Insight)}'.");
+                var groupInsightsPage = (await _contentService.GetPagesAsync<InsightGroup>(
+                    new RetrievePagesParameters { },
+                    query => query.Where(w => w.WhereEquals(nameof(WebPageFields.WebPageItemID), parentPageId)),
+                    RetrievalCacheSettings.CacheDisabled,
+                    cancellationToken)).FirstOrDefault();
+
+                var groupParentId = groupInsightsPage?.SystemFields.WebPageItemParentID ?? 0;
+                if (groupParentId > 0)
+                {
+                    sectionInsightsPage = await GetSectionInsightsPageByIdAsync(groupParentId, cancellationToken);
+
+                    if (sectionInsightsPage is null)
+                    {
+                        var categoryInsightsPage = (await _contentService.GetPagesAsync<InsightCategory>(
+                            new RetrievePagesParameters { },
+                            query => query.Where(w => w.WhereEquals(nameof(WebPageFields.WebPageItemID), groupParentId)),
+                            RetrievalCacheSettings.CacheDisabled,
+                            cancellationToken)).FirstOrDefault();
+
+                        var categoryParentId = categoryInsightsPage?.SystemFields.WebPageItemParentID ?? 0;
+                        if (categoryParentId > 0)
+                        {
+                            sectionInsightsPage = await GetSectionInsightsPageByIdAsync(categoryParentId, cancellationToken);
+                        }
+                    }
+                }
             }
-            var insightpage = insights.FirstOrDefault();
 
-            var sectioninsight = await _contentService.GetPagesAsync<SectionInsightsPage>(new RetrievePagesParameters { }, query => query.Where(w => w.WhereEquals("WebPageItemID", insightpage?.SystemFields.WebPageItemParentID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
-
-            var sectioninsights = sectioninsight.FirstOrDefault();
-
-            if (sectioninsights is null)
-            {
-                throw new MissingSectionPageException($"'No pages have been found of type '{nameof(SectionCareers)}'.");
-            }
-
-
-            return sectioninsights.ShowCopyUrlButtonInInsightPage && showCopyLinkButton;
+            return sectionInsightsPage?.ShowCopyUrlButtonInInsightPage == true && showCopyLinkButton;
         }
+
+        private async Task<SectionInsightsPage?> GetSectionInsightsPageByIdAsync(int webPageItemId, CancellationToken cancellationToken)
+        {
+            return (await _contentService.GetPagesAsync<SectionInsightsPage>(
+                new RetrievePagesParameters { },
+                query => query.Where(w => w.WhereEquals(nameof(WebPageFields.WebPageItemID), webPageItemId)),
+                RetrievalCacheSettings.CacheDisabled,
+                cancellationToken)).FirstOrDefault();
+        }
+
+
+
         private async Task<ArticleSchemaMarkupDto> GetInsightSchemaMarkupDtoAsync(Insight insights, CancellationToken cancellationToken)
         {
             var websiteChannel = await _websiteChannelInfoProvider.GetAsync(_websiteChannelContext.WebsiteChannelID, cancellationToken);

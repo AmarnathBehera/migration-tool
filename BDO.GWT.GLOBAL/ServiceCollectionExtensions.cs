@@ -132,6 +132,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IInsightGroupCardListingPageService, InsightGroupCardListingPageService>();
         serviceCollection.AddScoped<IInsightCategoryCardListingPageService, InsightCategoryCardListingPageService>();
         serviceCollection.AddScoped<IInsightCardService, InsightCardService>();
+        serviceCollection.AddScoped<IInsightCarouselService, InsightCarouselService>();
 
     }
 

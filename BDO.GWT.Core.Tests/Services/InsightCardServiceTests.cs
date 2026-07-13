@@ -80,7 +80,8 @@ public class InsightCardServiceTests
             await _service.GetFilteredItemsAsync(
                 query,
                 parentPath!,
-                null,
+               "en-US",
+                  null,
                 _ => false,
                 CancellationToken.None));
     }
@@ -95,6 +96,7 @@ public class InsightCardServiceTests
         await _service.GetFilteredItemsAsync(
             query,
             "/insights",
+            "en-US",
             null,
             _ => false,
             CancellationToken.None);
@@ -130,6 +132,7 @@ public class InsightCardServiceTests
         await _service.GetFilteredItemsAsync(
             query,
             "/insights",
+            "en-US",
             _ => decoratorCalled = true,
             _ => false,
             CancellationToken.None);
@@ -153,6 +156,7 @@ public class InsightCardServiceTests
         var result = await _service.GetFilteredItemsAsync(
             query,
             "/insights",
+            "en-US",
             null,
             x => x.MetadataTitle == "Featured Insight",
             CancellationToken.None);
@@ -184,6 +188,7 @@ public class InsightCardServiceTests
         var result = await _service.GetFilteredItemsAsync(
             query,
             "/insights",
+            "en-US",
             null,
             _ => false,
             CancellationToken.None);
@@ -223,6 +228,7 @@ public class InsightCardServiceTests
         var result = await _service.GetFilteredItemsAsync(
             query,
             "/insights",
+            "en-US",
             null,
             _ => false,
             CancellationToken.None);
@@ -251,6 +257,7 @@ public class InsightCardServiceTests
         var result = await _service.GetFilteredItemsAsync(
             query,
             "/insights",
+            "en-US",
             null,
             _ => true,
             CancellationToken.None);
@@ -293,6 +300,7 @@ public class InsightCardServiceTests
         var result = await _service.GetFilteredItemsAsync(
             query,
             "/insights",
+            "en-US",
             null,
             _ => false,
             CancellationToken.None);

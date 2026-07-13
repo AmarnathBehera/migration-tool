@@ -16,12 +16,12 @@ namespace BDO.GWT.Core.Tests.Services;
 
 public class InsightPageServiceTests
 {
-    private static readonly int[] ContactIds = [1, 2];
-    private static readonly int[] SingleContactId = [1];
-    private static readonly string[] ExpectedComposedContactNames = ["Ada Lovelace", "Grace van Hopper"];
-    private static readonly string[] ExpectedPersonMetadataTitle = ["Person Metadata Title"];
-    private static readonly string[] ExpectedExternalComposedName = ["Ada van Lovelace"];
-    private static readonly string[] ExpectedExternalMetadataTitle = ["External Metadata Title"];
+    private static readonly int[] ContactIds = new[] { 1, 2 };
+    private static readonly int[] SingleContactId = new[] { 1 };
+    private static readonly string[] ExpectedComposedContactNames = new[] { "Ada Lovelace", "Grace van Hopper" };
+    private static readonly string[] ExpectedPersonMetadataTitle = new[] { "Person Metadata Title" };
+    private static readonly string[] ExpectedExternalComposedName = new[] { "Ada van Lovelace" };
+    private static readonly string[] ExpectedExternalMetadataTitle = new[] { "External Metadata Title" };
 
     private Mock<IContentRetriever> _contentRetrieverMock = null!;
     private Mock<IInfoProvider<WebsiteChannelInfo>> _websiteChannelInfoProviderMock = null!;
