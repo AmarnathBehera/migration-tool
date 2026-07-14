@@ -64,7 +64,7 @@ namespace BDO.GWT.GLOBAL.Tests.Widgets
             var result = await _widget.InvokeAsync(model) as ViewViewComponentResult;
 
             Assert.That(result, Is.Not.Null);
-            var dto = result!.ViewData.Model as InsightCarouselDto;
+            var dto = result?.ViewData?.Model as InsightCarouselDto;
             Assert.That(dto, Is.Not.Null);
             Assert.That(dto!.FilteringTooltipEnabled, Is.False);
         }
@@ -83,14 +83,16 @@ namespace BDO.GWT.GLOBAL.Tests.Widgets
             var result = await _widget.InvokeAsync(model) as ViewViewComponentResult;
 
             Assert.That(result, Is.Not.Null);
-            var dto = result!.ViewData.Model as InsightCarouselDto;
+            var dto = result?.ViewData?.Model as InsightCarouselDto;
             Assert.That(dto, Is.Not.Null);
         }
 
         private static ComponentViewModel<T> CreateComponentViewModel<T>(object? page, T properties)
-            where T : class, Kentico.PageBuilder.Web.Mvc.IComponentProperties, new()
+            where T : class, Kentico.Builder.Web.Mvc.IComponentProperties, new()
         {
-            var model = (ComponentViewModel<T>)FormatterServices.GetUninitializedObject(typeof(ComponentViewModel<T>));
+            ComponentViewModel<T> model;
+            // FormatterServices.GetUninitializedObject is obsolete; suppress the warning for test construction
+            model = (ComponentViewModel<T>)FormatterServices.GetUninitializedObject(typeof(ComponentViewModel<T>));
 
             // set the readonly 'Page' and 'Properties' backing fields
             var pageField = typeof(ComponentViewModel<T>).GetField("<Page>k__BackingField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
