@@ -16,6 +16,7 @@ public interface IInsightCardService
         Action<RetrievePagesQueryParameters>? decorateQuery,
         Func<Insight, bool> isFeatured,
         CancellationToken cancellationToken);
+
 }
 public class InsightCardService : IInsightCardService
 {

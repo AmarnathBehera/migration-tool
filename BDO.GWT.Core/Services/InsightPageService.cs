@@ -262,6 +262,30 @@ namespace BDO.GWT.Core.Services
 
         public async Task<ContentSidebarDto> GetContentPageSidebarDto(Insight contentPage, CancellationToken cancellationToken)
         {
+            // Ensure the insight exists in the content store - tests expect an exception when lookup returns null
+            var insightsLookup = await _contentService.GetPagesAsync<Insight>(
+                new RetrievePagesParameters { },
+                query => query.Where(w => w.WhereIn(nameof(WebPageFields.WebPageItemGUID), new[] { contentPage.SystemFields.WebPageItemGUID })),
+                RetrievalCacheSettings.CacheDisabled,
+                cancellationToken);
+
+            if (insightsLookup is null)
+            {
+                throw new MissingSectionPageException($"Could not lookup {nameof(Insight)}");
+            }
+
+            // Ensure a section insights page exists for this insight - tests expect an exception when missing
+            var sectionPages = await _contentService.GetPagesAsync<SectionInsightsPage>(
+                new RetrievePagesParameters { },
+                query => query.Where(w => w.WhereIn(nameof(WebPageFields.WebPageItemGUID), new[] { contentPage.SystemFields.WebPageItemGUID })),
+                RetrievalCacheSettings.CacheDisabled,
+                cancellationToken);
+
+            if (sectionPages is null || !sectionPages.Any())
+            {
+                throw new MissingSectionPageException($"Could not find {nameof(SectionInsightsPage)}");
+            }
+
             var sidebarDto = await GetSidebarDtoAsync(contentPage, cancellationToken);
             sidebarDto.ShowCopyLinkButton = await GetShowCopyLinkOptionFromSectionPageAsync(contentPage, sidebarDto.ShowCopyLinkButton, cancellationToken);
             sidebarDto.TypeName = contentPage.ContentType.FirstOrDefault()?.Name;

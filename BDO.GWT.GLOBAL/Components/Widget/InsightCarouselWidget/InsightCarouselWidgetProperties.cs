@@ -27,7 +27,7 @@ public class InsightCarouselWidgetProperties : IWidgetProperties
     [CheckBoxComponent(Label = "Enable filtering", Order = 2)]
     public bool FilteringEnabled { get; set; } = true;
 
-    [GeneralSelectorComponent( dataProviderType: typeof(FiltersDataProvider),Label = "Filters", ExplanationText = "Filters that visitor will be able to filter news by.", Order = 3)]
+    [GeneralSelectorComponent( dataProviderType: typeof(FiltersDataProvider),Label = "Filters", ExplanationText = "Filters that visitor will be able to filter insights by.", Order = 3)]
     [VisibleIfTrue(nameof(FilteringEnabled))]
     public List<string> Filters { get; set; } = InsightCarouselWidgetfilter.AllowedFilters.Where(x => x.IsDefault) .Select(x => x.ParameterName).ToList();
 

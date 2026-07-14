@@ -31,7 +31,7 @@ public class InsightCarouselWidget : ViewComponent
     }
 
     public async Task<IViewComponentResult> InvokeAsync(ComponentViewModel<InsightCarouselWidgetProperties> model)
-    {
+   {
         var page = model.Page?.WebPageItemGUID;
 
         if (page is null)
