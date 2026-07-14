@@ -355,40 +355,58 @@ namespace BDO.GWT.Core.Services
         private async Task<bool> GetShowCopyLinkOptionFromSectionPageAsync(Insight insightPage, bool showCopyLinkButton, CancellationToken cancellationToken)
         {
             var parentPageId = insightPage?.SystemFields.WebPageItemParentID ?? 0;
-           
-            SectionInsightsPage? sectionInsightsPage = await GetSectionInsightsPageByIdAsync(parentPageId, cancellationToken);
-           
-             if (sectionInsightsPage is null)
-            {
-                var groupInsightsPage = (await _contentService.GetPagesAsync<InsightGroup>(
-                    new RetrievePagesParameters { },
-                    query => query.Where(w => w.WhereEquals(nameof(WebPageFields.WebPageItemID), parentPageId)),
-                    RetrievalCacheSettings.CacheDisabled,
-                    cancellationToken)).FirstOrDefault();
-
-                var groupParentId = groupInsightsPage?.SystemFields.WebPageItemParentID ?? 0;
-                if (groupParentId > 0)
-                {
-                    sectionInsightsPage = await GetSectionInsightsPageByIdAsync(groupParentId, cancellationToken);
-
-                    if (sectionInsightsPage is null)
-                    {
-                        var categoryInsightsPage = (await _contentService.GetPagesAsync<InsightCategory>(
-                            new RetrievePagesParameters { },
-                            query => query.Where(w => w.WhereEquals(nameof(WebPageFields.WebPageItemID), groupParentId)),
-                            RetrievalCacheSettings.CacheDisabled,
-                            cancellationToken)).FirstOrDefault();
-
-                        var categoryParentId = categoryInsightsPage?.SystemFields.WebPageItemParentID ?? 0;
-                        if (categoryParentId > 0)
-                        {
-                            sectionInsightsPage = await GetSectionInsightsPageByIdAsync(categoryParentId, cancellationToken);
-                        }
-                    }
-                }
-            }
+            var sectionInsightsPage = await FindSectionInsightsPageFromHierarchyAsync(parentPageId, cancellationToken);
 
             return sectionInsightsPage?.ShowCopyUrlButtonInInsightPage == true && showCopyLinkButton;
+        }
+
+        private async Task<SectionInsightsPage?> FindSectionInsightsPageFromHierarchyAsync(int startingParentId, CancellationToken cancellationToken)
+        {
+            // Try the direct parent first
+            if (startingParentId <= 0)
+            {
+                return null;
+            }
+
+            var section = await GetSectionInsightsPageByIdAsync(startingParentId, cancellationToken);
+            if (section is not null)
+            {
+                return section;
+            }
+
+            // Try one level up via InsightGroup
+            var group = (await _contentService.GetPagesAsync<InsightGroup>(
+                new RetrievePagesParameters { },
+                query => query.Where(w => w.WhereEquals(nameof(WebPageFields.WebPageItemID), startingParentId)),
+                RetrievalCacheSettings.CacheDisabled,
+                cancellationToken)).FirstOrDefault();
+
+            var groupParentId = group?.SystemFields.WebPageItemParentID ?? 0;
+            if (groupParentId <= 0)
+            {
+                return null;
+            }
+
+            section = await GetSectionInsightsPageByIdAsync(groupParentId, cancellationToken);
+            if (section is not null)
+            {
+                return section;
+            }
+
+            // Try one more level up via InsightCategory
+            var category = (await _contentService.GetPagesAsync<InsightCategory>(
+                new RetrievePagesParameters { },
+                query => query.Where(w => w.WhereEquals(nameof(WebPageFields.WebPageItemID), groupParentId)),
+                RetrievalCacheSettings.CacheDisabled,
+                cancellationToken)).FirstOrDefault();
+
+            var categoryParentId = category?.SystemFields.WebPageItemParentID ?? 0;
+            if (categoryParentId <= 0)
+            {
+                return null;
+            }
+
+            return await GetSectionInsightsPageByIdAsync(categoryParentId, cancellationToken);
         }
 
         private async Task<SectionInsightsPage?> GetSectionInsightsPageByIdAsync(int webPageItemId, CancellationToken cancellationToken)
