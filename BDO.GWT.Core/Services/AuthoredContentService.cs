@@ -30,6 +30,7 @@ public class AuthoredContentService : IAuthoredContentService
         var parent = (await _contentService.GetPagesAsync<SectionPeoplePage>(
             new RetrievePagesParameters
             {
+                LinkedItemsMaxLevel = 3,
                 LanguageName = _cultureContext.CurrentLanguageTag,
                 UseLanguageFallbacks = false,
             },
