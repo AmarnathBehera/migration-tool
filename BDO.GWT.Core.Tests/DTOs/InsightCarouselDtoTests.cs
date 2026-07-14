@@ -69,7 +69,7 @@ public class InsightCarouselDtoTests
         {
             Assert.That(deserialized, Is.Not.Null);
             Assert.That(deserialized!.Name, Is.EqualTo(filter.Name));
-            Assert.That(deserialized.Options.Length, Is.EqualTo(1));
+            Assert.That(deserialized.Options, Has.Length.EqualTo(1));
             Assert.That(deserialized.Options[0].Label, Is.EqualTo("One"));
         });
     }
@@ -123,9 +123,11 @@ public class InsightCarouselDtoTests
 
         var json = JsonSerializer.Serialize(carousel);
         var deserialized = JsonSerializer.Deserialize<InsightCarouselDto>(json);
-
-        Assert.That(deserialized, Is.Not.Null);
-        Assert.That(deserialized!.FilteringTooltipEnabled, Is.False);
-        Assert.That(deserialized.Items, Is.Empty);
+        Assert.Multiple(() =>
+        {
+            Assert.That(deserialized, Is.Not.Null);
+            Assert.That(deserialized!.FilteringTooltipEnabled, Is.False);
+            Assert.That(deserialized.Items, Is.Empty);
+        });
     }
 }
