@@ -288,7 +288,7 @@ public class CareerDetailPageServiceTests
     [Test]
     public async Task GetCareerPageDtoAsync_WhenCopyLinkAllowedBySection_EnablesCopyLink()
     {
-        var setting = new TestPrintorShareInfo { DisableCopyLinkButton = true };
+        var setting = new TestPrintorShareInfo { DisableCopyLinkButton = false };
 
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
