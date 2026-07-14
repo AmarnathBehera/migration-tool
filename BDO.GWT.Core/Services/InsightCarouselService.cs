@@ -155,7 +155,7 @@ public class InsightCarouselService : IInsightCarouselService
 
         // Removed unused retrieval of all insights (was unused).
         Action<RetrievePagesQueryParameters>? decorateQuery = null;
-        if (whereExpressions.Any())
+        if (whereExpressions.Count > 0)
         {
             decorateQuery = rp =>
             {

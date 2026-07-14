@@ -91,8 +91,10 @@ namespace BDO.GWT.GLOBAL.Tests.Widgets
             where T : class, Kentico.Builder.Web.Mvc.IComponentProperties, new()
         {
             ComponentViewModel<T> model;
-            // FormatterServices.GetUninitializedObject is obsolete; suppress the warning for test construction
+            // FormatterServices.GetUninitializedObject is obsolete; suppress only for this test construction
+#pragma warning disable SYSLIB0050
             model = (ComponentViewModel<T>)FormatterServices.GetUninitializedObject(typeof(ComponentViewModel<T>));
+#pragma warning restore SYSLIB0050
 
             // set the readonly 'Page' and 'Properties' backing fields
             var pageField = typeof(ComponentViewModel<T>).GetField("<Page>k__BackingField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
