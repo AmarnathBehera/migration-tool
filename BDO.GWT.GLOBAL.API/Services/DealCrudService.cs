@@ -149,37 +149,7 @@ public class DealCrudService : IDealCrudService
 
         var deal = await MapDealPageContentToDeal(request, nodeParentID, currentCulture.Language, cancellationToken);
 
-        // Create the page in Kentico CMS
-        var itemData = new ContentItemData(new Dictionary<string, object>
-        {
-            { "MetadataTitle", deal.MetadataTitle ?? string.Empty },
-            { "MetadataShowTitle", deal.MetadataShowTitle },
-            { "MetadataDescription", deal.MetadataDescription ?? string.Empty },
-            { "DealContent", deal.DealContent ?? string.Empty },
-            { "MetadataTeaserImageAltText", deal.MetadataTeaserImageAltText ?? string.Empty },
-            { "ClientName", deal.ClientName ?? string.Empty },
-            { "HeroLayout", deal.HeroLayout ?? string.Empty },
-            { "HeroTitle", deal.HeroTitle ?? string.Empty },
-            { "HeroDescription", deal.HeroDescription ?? string.Empty },
-            { "HeroBackgroundImageAltText", deal.HeroBackgroundImageAltText ?? string.Empty },
-            { "HeroBackgroundImage_MobileAltText", deal.HeroBackgroundImage_MobileAltText ?? string.Empty },
-            { "HeroCallToActionButtonType", deal.HeroCallToActionButtonType ?? string.Empty },
-            { "HeroCallToActionButtonText", deal.HeroCallToActionButtonText ?? string.Empty },
-            { "ShowSidebar", deal.ShowSidebar },
-            { "ShowPrintButton", deal.ShowPrintButton },
-            { "ShowCallToAction", deal.ShowCallToAction },
-            { "CallToActionDescription", deal.CallToActionDescription ?? string.Empty },
-            { "CallToActionButtonText", deal.CallToActionButtonText ?? string.Empty },
-            { "CallToActionButtonUrl", deal.CallToActionButtonUrl ?? string.Empty },
-            { "ShowSocialMediaButtons", deal.ShowSocialMediaButtons },
-            { "SharingOptIn", deal.SharingOptIn },
-            { "DealCountry", deal.DealCountry ?? string.Empty },
-            { "MetadataOGTitle", deal.MetadataOGTitle ?? string.Empty },
-            { "MetadataOGDescription", deal.MetadataOGDescription ?? string.Empty },
-            { "MetadataNofollow", deal.MetadataNofollow },
-            { "MetadataNoindex", deal.MetadataNoindex },
-            { "IncludeInSitemap", deal.IncludeInSitemap },
-        });
+        var itemData = CreateCMSTreeItem(deal);
 
         var contentItemParameters = new ContentItemParameters(Deal.CONTENT_TYPE_NAME, itemData);
         var createParameters = new CreateWebPageParameters(
@@ -202,7 +172,7 @@ public class DealCrudService : IDealCrudService
         };
 
         var createdResult = await _contentRetriever.GetPagesAsync<Deal>(_retrieveNewPage,
-            query => query.Where(w => w.WhereEquals("WebPageItemID", createdPageId)),
+            query => query.Where(w => w.WhereEquals("WebPageID", createdPageId)),
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken);
 
@@ -240,42 +210,13 @@ public class DealCrudService : IDealCrudService
         // Create new culture version data
         var deal = await MapDealPageContentToDeal(request, 0, toCulture, cancellationToken);
 
-        var itemData = new ContentItemData(new Dictionary<string, object>
-        {
-            { "MetadataTitle", deal.MetadataTitle ?? string.Empty },
-            { "MetadataShowTitle", deal.MetadataShowTitle },
-            { "MetadataDescription", deal.MetadataDescription ?? string.Empty },
-            { "DealContent", deal.DealContent ?? string.Empty },
-            { "MetadataTeaserImageAltText", deal.MetadataTeaserImageAltText ?? string.Empty },
-            { "ClientName", deal.ClientName ?? string.Empty },
-            { "HeroLayout", deal.HeroLayout ?? string.Empty },
-            { "HeroTitle", deal.HeroTitle ?? string.Empty },
-            { "HeroDescription", deal.HeroDescription ?? string.Empty },
-            { "HeroBackgroundImageAltText", deal.HeroBackgroundImageAltText ?? string.Empty },
-            { "HeroBackgroundImage_MobileAltText", deal.HeroBackgroundImage_MobileAltText ?? string.Empty },
-            { "HeroCallToActionButtonType", deal.HeroCallToActionButtonType ?? string.Empty },
-            { "HeroCallToActionButtonText", deal.HeroCallToActionButtonText ?? string.Empty },
-            { "ShowSidebar", deal.ShowSidebar },
-            { "ShowPrintButton", deal.ShowPrintButton },
-            { "ShowCallToAction", deal.ShowCallToAction },
-            { "CallToActionDescription", deal.CallToActionDescription ?? string.Empty },
-            { "CallToActionButtonText", deal.CallToActionButtonText ?? string.Empty },
-            { "CallToActionButtonUrl", deal.CallToActionButtonUrl ?? string.Empty },
-            { "ShowSocialMediaButtons", deal.ShowSocialMediaButtons },
-            { "SharingOptIn", deal.SharingOptIn },
-            { "DealCountry", deal.DealCountry ?? string.Empty },
-            { "MetadataOGTitle", deal.MetadataOGTitle ?? string.Empty },
-            { "MetadataOGDescription", deal.MetadataOGDescription ?? string.Empty },
-            { "MetadataNofollow", deal.MetadataNofollow },
-            { "MetadataNoindex", deal.MetadataNoindex },
-            { "IncludeInSitemap", deal.IncludeInSitemap },
-        });
+        var itemData = CreateCMSTreeItem(deal);
 
         // Create language variant for the existing page
         var createVariantParameters = new CMS.Websites.CreateLanguageVariantParameters(
             existingDeal.SystemFields.WebPageItemID,
             toCulture ?? defaultCulture.Language,
-            existingDeal.SystemFields?.WebPageItemName + toCulture ?? "Deal Variant",
+            existingDeal.SystemFields?.ContentItemName ?? "Deal Variant",
             itemData);
 
         await _webPageManager.TryCreateLanguageVariant(createVariantParameters);
@@ -290,7 +231,7 @@ public class DealCrudService : IDealCrudService
         };
 
         var variantResult = await _contentRetriever.GetPagesAsync<Deal>(_retrieveNewVariant,
-            query => query.Where(w => w.WhereEquals("WebPageItemID", existingDeal.SystemFields.WebPageItemID)),
+            query => query.Where(w => w.WhereEquals("WebPageItemGUID", pageGUID)),
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken);
 
@@ -329,36 +270,7 @@ public class DealCrudService : IDealCrudService
         var updatedDeal = await UpdateDealPageContent(existingDeal, request);
 
         // Build ContentItemData for the update
-        var itemData = new ContentItemData(new Dictionary<string, object>
-        {
-            { "MetadataTitle", updatedDeal.MetadataTitle ?? string.Empty },
-            { "MetadataShowTitle", updatedDeal.MetadataShowTitle },
-            { "MetadataDescription", updatedDeal.MetadataDescription ?? string.Empty },
-            { "DealContent", updatedDeal.DealContent ?? string.Empty },
-            { "MetadataTeaserImageAltText", updatedDeal.MetadataTeaserImageAltText ?? string.Empty },
-            { "ClientName", updatedDeal.ClientName ?? string.Empty },
-            { "HeroLayout", updatedDeal.HeroLayout ?? string.Empty },
-            { "HeroTitle", updatedDeal.HeroTitle ?? string.Empty },
-            { "HeroDescription", updatedDeal.HeroDescription ?? string.Empty },
-            { "HeroBackgroundImageAltText", updatedDeal.HeroBackgroundImageAltText ?? string.Empty },
-            { "HeroBackgroundImage_MobileAltText", updatedDeal.HeroBackgroundImage_MobileAltText ?? string.Empty },
-            { "HeroCallToActionButtonType", updatedDeal.HeroCallToActionButtonType ?? string.Empty },
-            { "HeroCallToActionButtonText", updatedDeal.HeroCallToActionButtonText ?? string.Empty },
-            { "ShowSidebar", updatedDeal.ShowSidebar },
-            { "ShowPrintButton", updatedDeal.ShowPrintButton },
-            { "ShowCallToAction", updatedDeal.ShowCallToAction },
-            { "CallToActionDescription", updatedDeal.CallToActionDescription ?? string.Empty },
-            { "CallToActionButtonText", updatedDeal.CallToActionButtonText ?? string.Empty },
-            { "CallToActionButtonUrl", updatedDeal.CallToActionButtonUrl ?? string.Empty },
-            { "ShowSocialMediaButtons", updatedDeal.ShowSocialMediaButtons },
-            { "SharingOptIn", updatedDeal.SharingOptIn },
-            { "DealCountry", updatedDeal.DealCountry ?? string.Empty },
-            { "MetadataOGTitle", updatedDeal.MetadataOGTitle ?? string.Empty },
-            { "MetadataOGDescription", updatedDeal.MetadataOGDescription ?? string.Empty },
-            { "MetadataNofollow", updatedDeal.MetadataNofollow },
-            { "MetadataNoindex", updatedDeal.MetadataNoindex },
-            { "IncludeInSitemap", updatedDeal.IncludeInSitemap },
-        });
+        var itemData = CreateCMSTreeItem(updatedDeal);
 
         // Create a draft, update it, and publish
         await _webPageManager.TryCreateDraft(existingDeal.SystemFields.WebPageItemID, culture);
@@ -633,5 +545,39 @@ public class DealCrudService : IDealCrudService
         _validationState.AddError("culture", ErrorMessage.IncorrectLanguageTagFormat(languageTagString));
 
         return null;
+    }
+
+    private static ContentItemData CreateCMSTreeItem (Deal deal)
+    {
+       return new ContentItemData(new Dictionary<string, object>
+        {
+            { "MetadataTitle", deal.MetadataTitle ?? string.Empty },
+            { "MetadataShowTitle", deal.MetadataShowTitle },
+            { "MetadataDescription", deal.MetadataDescription ?? string.Empty },
+            { "DealContent", deal.DealContent ?? string.Empty },
+            { "MetadataTeaserImageAltText", deal.MetadataTeaserImageAltText ?? string.Empty },
+            { "ClientName", deal.ClientName ?? string.Empty },
+            { "HeroLayout", deal.HeroLayout ?? string.Empty },
+            { "HeroTitle", deal.HeroTitle ?? string.Empty },
+            { "HeroDescription", deal.HeroDescription ?? string.Empty },
+            { "HeroBackgroundImageAltText", deal.HeroBackgroundImageAltText ?? string.Empty },
+            { "HeroBackgroundImage_MobileAltText", deal.HeroBackgroundImage_MobileAltText ?? string.Empty },
+            { "HeroCallToActionButtonType", deal.HeroCallToActionButtonType ?? string.Empty },
+            { "HeroCallToActionButtonText", deal.HeroCallToActionButtonText ?? string.Empty },
+            { "ShowSidebar", deal.ShowSidebar },
+            { "ShowPrintButton", deal.ShowPrintButton },
+            { "ShowCallToAction", deal.ShowCallToAction },
+            { "CallToActionDescription", deal.CallToActionDescription ?? string.Empty },
+            { "CallToActionButtonText", deal.CallToActionButtonText ?? string.Empty },
+            { "CallToActionButtonUrl", deal.CallToActionButtonUrl ?? string.Empty },
+            { "ShowSocialMediaButtons", deal.ShowSocialMediaButtons },
+            { "SharingOptIn", deal.SharingOptIn },
+            { "DealCountry", deal.DealCountry ?? string.Empty },
+            { "MetadataOGTitle", deal.MetadataOGTitle ?? string.Empty },
+            { "MetadataOGDescription", deal.MetadataOGDescription ?? string.Empty },
+            { "MetadataNofollow", deal.MetadataNofollow },
+            { "MetadataNoindex", deal.MetadataNoindex },
+            { "IncludeInSitemap", deal.IncludeInSitemap }
+        });
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BDO.GWT.Core;
+using BDO.GWT.Domain.Core.Constants;
 using BDO.GWT.Domain.Core.Entities;
 using BDO.GWT.GLOBAL.API.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -61,7 +62,7 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
 
         var methodGroups = new List<ApiMethodGroup>
         {
-            new ApiMethodGroup { ID = 1, Name = "forms" }
+            new ApiMethodGroup { ID = 1, Name = ApiMethodGroupName.Deals }
         };
 
         var methodGroup = methodGroups.SingleOrDefault();
@@ -77,7 +78,7 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
 
         var userApiPermissions = new List<UserApiPermission>
         {
-            new UserApiPermission { UserID = 53, ApiMethodGroupID = methodGroup.ID, AllowRead = true, AllowManage = false }
+            new UserApiPermission { UserID = 53, ApiMethodGroupID = methodGroup.ID, AllowRead = true, AllowManage = true }
         };
         var userApiPermission = userApiPermissions.SingleOrDefault();
 
