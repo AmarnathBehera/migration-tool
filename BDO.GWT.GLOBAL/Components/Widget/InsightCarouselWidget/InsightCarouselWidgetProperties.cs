@@ -17,7 +17,8 @@ namespace BDO.GWT.GLOBAL.Components.Widget.InsightCarouselWidget;
 
 public class InsightCarouselWidgetProperties : IWidgetProperties
 {
-  
+    private const string MarginOptions = "0px;None\r\n20px\r\n40px\r\n60px\r\n80px";
+
     [TextInputComponent(Label = "Title", ExplanationText = "Title that will be shown over insight carousel widget.", Order = 0)]
     public string Title { get; set; } = string.Empty;
 
@@ -27,9 +28,12 @@ public class InsightCarouselWidgetProperties : IWidgetProperties
     [CheckBoxComponent(Label = "Enable filtering", Order = 2)]
     public bool FilteringEnabled { get; set; } = true;
 
-    [GeneralSelectorComponent( dataProviderType: typeof(FiltersDataProvider),Label = "Filters", ExplanationText = "Filters that visitor will be able to filter insights by.", Order = 3)]
+    [GeneralSelectorComponent(dataProviderType: typeof(FiltersDataProvider), Label = "Filters", ExplanationText = "Filters that visitor will be able to filter insights by.", Order = 3)]
     [VisibleIfTrue(nameof(FilteringEnabled))]
-    public List<string> Filters { get; set; } = InsightCarouselWidgetfilter.AllowedFilters.Where(x => x.IsDefault) .Select(x => x.ParameterName).ToList();
+    public List<string> Filters { get; set; } = InsightCarouselWidgetFilter.AllowedFilters
+        .Where(x => x.IsDefault)
+        .Select(x => x.ParameterName)
+        .ToList();
 
     [ContentItemSelectorComponent(contentTypeNames: [Insight.CONTENT_TYPE_NAME], Label = "Featured insights", ExplanationText = "Insights that will be tagged as featured and that will appear in front of other insights.", Order = 4)]
     public IEnumerable<ContentItemReference> FeaturedInsights { get; set; } = Enumerable.Empty<ContentItemReference>();
@@ -50,10 +54,10 @@ public class InsightCarouselWidgetProperties : IWidgetProperties
     [DropDownComponent(Label = "See all link URL target", Order = 9, Options = "_self;Same tab\r\n_blank;New tab")]
     public string SeeAllLinkURLTarget { get; set; } = "_self";
 
-    [DropDownComponent(Label = "Top margin", Order = 10, Options = "0px;None\r\n20px\r\n40px\r\n60px\r\n80px")]
+    [DropDownComponent(Label = "Top margin", Order = 10, Options = MarginOptions)]
     public string TopMargin { get; set; } = "0px";
 
-    [DropDownComponent(Label = "Bottom margin", Order = 11, Options = "0px;None\r\n20px\r\n40px\r\n60px\r\n80px")]
+    [DropDownComponent(Label = "Bottom margin", Order = 11, Options = MarginOptions)]
     public string BottomMargin { get; set; } = "0px";
 
     [TextInputComponent(Order = 12, ExplanationText = "ID should be unique from any other ID on the page. If the ID contains multiple words, words must be joined with a '-' (e.g. three-word-id). No other special characters and no spaces.'", Label = "Widget ID")]
@@ -61,11 +65,9 @@ public class InsightCarouselWidgetProperties : IWidgetProperties
       @"^[a-z0-9'-]*$",
       ErrorMessage = "Characters are not allowed.")]
     public string WidgetID { get; set; }
-
-
 }
 
-public static class InsightCarouselWidgetfilter
+public static class InsightCarouselWidgetFilter
 {
     public static readonly (string ParameterName, bool IsDefault)[] AllowedFilters =
     [
@@ -79,10 +81,11 @@ public static class InsightCarouselWidgetfilter
         (FilterParameterName.OfficeLocation, false),
     ];
 }
+
 public class FiltersDataProvider : IGeneralSelectorDataProvider
 {
     private static readonly ObjectSelectorListItem<string>[] Items =
-        EventWebinarFilters.AllowedFilters.Select(x => new ObjectSelectorListItem<string>
+        InsightCarouselWidgetFilter.AllowedFilters.Select(x => new ObjectSelectorListItem<string>
         {
             Value = x.ParameterName,
             Text = x.ParameterName,
