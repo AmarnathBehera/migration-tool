@@ -30,9 +30,9 @@ namespace BDO.GWT.Core.Tests.Services
         {
             _filteringHelperMock = new Mock<IFilteringHelper>();
             _insightCardServiceMock = new Mock<IInsightCardService>();
-            _content_service_init: _contentServiceMock = new Mock<IContentService>();
+            _contentServiceMock = new Mock<IContentService>();
 
-            _filtering_helper_init: _filteringHelperMock.Setup(x => x.IsFilteringTooltipEnabledAsync(It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            _filteringHelperMock.Setup(x => x.IsFilteringTooltipEnabledAsync(It.IsAny<bool>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
             _insightCardServiceMock
@@ -114,10 +114,13 @@ namespace BDO.GWT.Core.Tests.Services
             var query = new CardsQuery { PageType = "UnknownType", CurrentPage = null, PageSize = null };
 
             var result = await _service.GetAPIFilteredItemsAsync(query, CancellationToken.None);
-
-            Assert.That(captured, Is.Not.Null);
-            Assert.That(captured!.CurrentPage, Is.EqualTo(1));
-            Assert.That(captured.PageSize, Is.EqualTo(10));
+            Assert.Multiple(() =>
+            {
+                Assert.That(captured, Is.Not.Null);
+                Assert.That(captured!.CurrentPage, Is.EqualTo(1));
+                Assert.That(captured.PageSize, Is.EqualTo(10));
+            });
+           
         }
 
         [Test]
@@ -132,9 +135,11 @@ namespace BDO.GWT.Core.Tests.Services
                 .ReturnsAsync(new PaginationDto<ContentPageCardDto> { Data = Array.Empty<ContentPageCardDto>(), TotalCount = 0 });
 
             var result = await _service.GetFilteredItemsAsync(page, new HashSet<ContentItemReference>(), new CardsQuery(), CancellationToken.None);
-
-            Assert.That(captured, Is.Not.Null);
-            Assert.That(result, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(captured, Is.Not.Null);
+                Assert.That(result, Is.Not.Null);
+            });
         }
     }
 }

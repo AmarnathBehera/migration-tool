@@ -164,7 +164,7 @@ public class InsightPageServiceTests
             .ReturnsAsync(new[] { categoryParentSection });
 
         // Ensure Insight lookup returns the insight (used in method)
-        _content_service_init: _contentServiceMock
+        _contentServiceMock
             .Setup(x => x.GetPagesAsync<Insight>(
                 It.IsAny<RetrievePagesParameters>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
