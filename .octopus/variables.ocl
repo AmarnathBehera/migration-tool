@@ -54,6 +54,10 @@ variable "appsettings.appInsightsReactConnectionString" {
     value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ai-gwt-xbyk-react-#{environment.abbreviation}-eur-we-connectionstring)" {}
 }
 
+variable "appsettings.appInsightsAPIConnectionString" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ai-gwt-xbyk-api-#{environment.abbreviation}-eur-we-connectionstring)" {}
+}
+
 variable "appsettings.azureAdClientId" {
     value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-cms-app-id)" {}
 }
