@@ -29,16 +29,16 @@ public class DealPageContent : IMetadataContent
     public List<string> SubIndustry { get; set; } = [];
 
     [MaxLength(1000)]
-    public List<int> DealType { get; set; } = [];
+    public List<string> DealType { get; set; } = [];
 
     [Required]
     public DateTime? DateField { get; set; }
 
-    [MaxLength(200)]
-    public string? Size { get; set; }
+    [MaxLength(1000)]
+    public List<string>? Size { get; set; } = [];
 
     [MaxLength(200)]
-    public List<int> MetadataOfficeLocation { get; set; } = [];
+    public string? MetadataOfficeLocation { get; set; }
 
     [MaxLength(99)]
     public string? ClientName { get; set; }
@@ -50,7 +50,7 @@ public class DealPageContent : IMetadataContent
     public List<int> RelatedDeals { get; set; } = [];
 
     [MaxLength(200)]
-    public List<int> MetadataRssCategory { get; set; } = [];
+    public string MetadataRssCategory { get; set; } = string.Empty;
 
     [MaxLength(200)]
     public string? MetadataRssImage { get; set; }
@@ -122,10 +122,10 @@ public class DealPageContent : IMetadataContent
     [MaxLength(200)]
     public string? DealCountry { get; set; }
 
-    public int DisplayedContacts { get; set; }
+    public string DisplayedContacts { get; set; }
 
     [MaxLength(200)]
-    public List<int> RelevantContactPerson { get; set; } = [];
+    public string RelevantContactPerson { get; set; } = string.Empty;
 
     public List<Guid> PeopleSort { get; set; } = [];
 
