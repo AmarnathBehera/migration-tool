@@ -18,15 +18,9 @@ public static class EnumerableExtensions
     /// <exception cref="ArgumentNullException"></exception>
     public static async Task<TResult[]> SelectInParallelAsync<TSource, TResult>(this IEnumerable<TSource> items, Func<TSource, Task<TResult>> selector)
     {
-        if (items == null)
-        {
-            throw new ArgumentNullException(nameof(items));
-        }
+        ArgumentNullException.ThrowIfNull(items);
 
-        if (selector == null)
-        {
-            throw new ArgumentNullException(nameof(selector));
-        }
+        ArgumentNullException.ThrowIfNull(selector);
 
         var tasks = items.Select(selector);
 
@@ -46,15 +40,9 @@ public static class EnumerableExtensions
     /// <exception cref="ArgumentNullException"></exception>
     public static async Task<TResult[]> SelectOneByOneAsync<TSource, TResult>(this IEnumerable<TSource> items, Func<TSource, Task<TResult>> selector)
     {
-        if (items == null)
-        {
-            throw new ArgumentNullException(nameof(items));
-        }
+        ArgumentNullException.ThrowIfNull(items);
 
-        if (selector == null)
-        {
-            throw new ArgumentNullException(nameof(selector));
-        }
+        ArgumentNullException.ThrowIfNull(selector);
 
         var results = new List<TResult>();
 
@@ -152,7 +140,9 @@ public static class EnumerableExtensions
     /// <param name="secondKeySelector"></param>
     /// <param name="elementSelector"></param>
     /// <returns></returns>
+#pragma warning disable S2436
     public static IDictionary<TKey1, IDictionary<TKey2, TElement>> ToNestedDictionary<TSource, TKey1, TKey2, TElement>(this IEnumerable<TSource> source, Func<TSource, TKey1> firstKeySelector, Func<TSource, TKey2> secondKeySelector, Func<TSource, TElement> elementSelector)
+#pragma warning restore S2436
         where TKey1 : notnull
         where TKey2 : notnull
     {

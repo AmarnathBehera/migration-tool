@@ -94,36 +94,6 @@
           </VisibilityConditionConfiguration>
         </visibilityconditiondata>
       </field>
-      <field allowempty="true" column="CallToActionPosition" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6326143a-ad1e-4b2f-a1ac-a57a523062c0" visible="true">
-        <properties>
-          <defaultvalue>left</defaultvalue>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Call to action position</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-          <includeintranslation>True</includeintranslation>
-          <kxp_schema_identifier>34bc2c94-d4b6-4c53-a6f4-9b9520a24493</kxp_schema_identifier>
-        </properties>
-        <settings>
-          <controlname>Kentico.Administration.RadioGroup</controlname>
-          <Inline>False</Inline>
-          <Options>
-<![CDATA[
-left;Left
-right;Right
-center;Center
-]]>
-          </Options>
-          <OptionsValueSeparator>;</OptionsValueSeparator>
-        </settings>
-        <visibilityconditiondata>
-          <VisibilityConditionConfiguration>
-            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
-            <Properties>
-              <PropertyName>ShowCallToAction</PropertyName>
-            </Properties>
-          </VisibilityConditionConfiguration>
-        </visibilityconditiondata>
-      </field>
       <schema guid="b760a373-943b-4321-ac39-d5067101ff82" name="Sidebar">
         <properties>
           <fieldcaption>Sidebar</fieldcaption>

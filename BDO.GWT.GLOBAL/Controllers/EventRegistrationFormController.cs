@@ -18,7 +18,7 @@ public class EventRegistrationFormController : Controller
 
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        var pageDto = await _eventRegistrationFormPageService.GetEventRegistrationFormPageDtoAsync(null, cancellationToken);
+        var pageDto = await _eventRegistrationFormPageService.GetEventRegistrationFormPageDtoAsync(cancellationToken);
 
         return View("~/Views/FormPage/Index.cshtml", pageDto);
     }

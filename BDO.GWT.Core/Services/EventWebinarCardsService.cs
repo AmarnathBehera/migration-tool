@@ -90,6 +90,7 @@ public class EventWebinarCardsService : IEventWebinarCardsService
             var filter = filterParameterData.FilterParameterType switch
             {
                 FilterParameterType.Page => await GetPageFilterAsync(filterParameterName, filterParameterValue),
+                FilterParameterType.Tagpage => await GetTagPageFilterAsync(filterParameterName, filterParameterValue),
                 _ => null,
             };
 
@@ -113,8 +114,6 @@ public class EventWebinarCardsService : IEventWebinarCardsService
 
         return filterName switch
         {
-            FilterParameterName.EventType => x => x.WhereContains(nameof(IEventOrWebinar.EventType), guid),
-            FilterParameterName.BusinessIssue => x => x.WhereContains(nameof(IEventOrWebinar.MetadataBusinessIssues), guid),
             FilterParameterName.Service => x => x.WhereContains(nameof(IEventOrWebinar.MetadataServices), guid),
             FilterParameterName.ServiceArea => x => x.WhereContains(nameof(IEventOrWebinar.MetadataServiceAreas), guid),
             FilterParameterName.IndustryCategory => x => x.WhereContains(nameof(IEventOrWebinar.MetadataIndustryCategories), guid),
@@ -128,6 +127,26 @@ public class EventWebinarCardsService : IEventWebinarCardsService
         };
     }
 
+    private async Task<Action<WhereParameters>?> GetTagPageFilterAsync(string filterName, string filterValue)
+    {
+
+        var page = await _contentService.GetPageByTypeAndNameAsync(
+            FilterUtility.GetFilterParameterData(filterName)!.EntityType, filterValue);
+
+        if (page is null)
+            return null;
+
+        var guid = page.SystemFields.ContentItemGUID.ToString();
+
+        return filterName switch
+        {
+
+            FilterParameterName.EventType => w => w.WhereContains(nameof(IEventOrWebinar.EventType), guid),
+            FilterParameterName.BusinessIssue => x => x.WhereContains(nameof(IEventOrWebinar.MetadataBusinessIssues), guid),
+
+            _ => null,
+        };
+    }
     public async Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(
      CardsQuery cardsQuery,
      Action<ContentItemQueryBuilder>? decorateQuery,

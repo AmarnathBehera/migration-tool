@@ -102,7 +102,7 @@ public class HeaderService : IHeaderService
 
     private async Task<(IEnumerable<LinkItemDto> TopMenu, LinkItemDto? Contact)> BuildTopMenuAsync(CancellationToken cancellationToken)
     {
-        string navRootPath = "/Navigation";
+        string navRootPath = "/";
 
         var pages = (await _contentRetriever.RetrievePages<Navigation>(
             new RetrievePagesParameters { PathMatch = PathMatch.Children(navRootPath,1) },

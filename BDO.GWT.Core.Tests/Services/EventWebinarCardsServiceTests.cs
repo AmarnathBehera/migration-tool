@@ -164,5 +164,170 @@ namespace BDO.GWT.Core.Tests.Services
 
             Assert.That(result, Is.Empty);
         }
+
+        [Test]
+        public async Task GetEventWebinarCardDtosAsync_MapsCoreFields_WhenUrlIsResolved()
+        {
+            _contentServiceMock.Setup(x => x.GetCurrentLanguage()).Returns("en");
+
+            var guid = Guid.NewGuid();
+            var item = new Mock<IEventOrWebinar>();
+            item.SetupGet(x => x.SystemFields).Returns(new WebPageFields { WebPageItemGUID = guid });
+            item.SetupGet(x => x.MetadataTitle).Returns("Event title");
+            item.SetupGet(x => x.MetadataDescription).Returns("<p>Description <strong>text</strong></p>");
+            item.SetupGet(x => x.EventLocationCity).Returns("London");
+            item.SetupGet(x => x.EventDateFrom).Returns(new DateTime(2026, 01, 01, 10, 00, 00, DateTimeKind.Utc));
+            item.SetupGet(x => x.EventDateTo).Returns(new DateTime(2026, 01, 02, 11, 00, 00, DateTimeKind.Utc));
+            item.SetupGet(x => x.EventType).Returns(new[] { new EventType { Name = "Webinar" } });
+
+            _urlRetrieverMock
+                .Setup(x => x.Retrieve(item.Object, "en", It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new WebPageUrl("~/events/test", "https://example.com/events/test"));
+
+            var result = await _service.GetEventWebinarCardDtosAsync(
+                new List<IEventOrWebinar> { item.Object },
+                e => e.SystemFields.WebPageItemGUID == guid,
+                CancellationToken.None);
+
+            Assert.That(result, Has.Length.EqualTo(1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result[0].IsFeatured, Is.True);
+                Assert.That(result[0].Type, Is.EqualTo("Webinar"));
+                Assert.That(result[0].Title, Is.EqualTo("Event title"));
+                Assert.That(result[0].Description, Is.EqualTo("Description text"));
+                Assert.That(result[0].Location, Is.EqualTo("London"));
+                Assert.That(result[0].DateTimeTo, Is.Not.Null);
+                Assert.That(result[0].Link.Title, Is.EqualTo("Webinar"));
+                Assert.That(result[0].Link.URL, Is.EqualTo("/events/test"));
+            });
+        }
+
+        [Test]
+        public async Task GetEventWebinarCardDtosAsync_SetsNullDateToLocationAndDescription_WhenNotProvided()
+        {
+            _contentServiceMock.Setup(x => x.GetCurrentLanguage()).Returns("en");
+
+            var guid = Guid.NewGuid();
+            var sameDay = new DateTime(2026, 01, 01, 10, 00, 00, DateTimeKind.Utc);
+
+            var item = new Mock<IEventOrWebinar>();
+            item.SetupGet(x => x.SystemFields).Returns(new WebPageFields { WebPageItemGUID = guid });
+            item.SetupGet(x => x.MetadataTitle).Returns("Event title");
+            item.SetupGet(x => x.MetadataDescription).Returns(string.Empty);
+            item.SetupGet(x => x.EventLocationCity).Returns(string.Empty);
+            item.SetupGet(x => x.EventDateFrom).Returns(sameDay);
+            item.SetupGet(x => x.EventDateTo).Returns(sameDay.AddHours(2));
+            item.SetupGet(x => x.EventType).Returns(Array.Empty<EventType>());
+
+            _urlRetrieverMock
+                .Setup(x => x.Retrieve(item.Object, "en", It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new WebPageUrl("~/events/test", "https://example.com/events/test"));
+
+            var result = await _service.GetEventWebinarCardDtosAsync(
+                new List<IEventOrWebinar> { item.Object },
+                _ => false,
+                CancellationToken.None);
+
+            Assert.That(result, Has.Length.EqualTo(1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result[0].DateTimeTo, Is.Null);
+                Assert.That(result[0].Location, Is.Null);
+                Assert.That(result[0].Description, Is.Null);
+                Assert.That(result[0].Link.Title, Is.EqualTo(string.Empty));
+            });
+        }
+
+        [Test]
+        public async Task GetEventWebinarCardDtosAsync_UsesCurrentLanguage_ForUrlRetrieval()
+        {
+            _contentServiceMock.Setup(x => x.GetCurrentLanguage()).Returns("fr");
+
+            var guid = Guid.NewGuid();
+            var item = new Mock<IEventOrWebinar>();
+            item.SetupGet(x => x.SystemFields).Returns(new WebPageFields { WebPageItemGUID = guid });
+            item.SetupGet(x => x.MetadataTitle).Returns("Titre");
+            item.SetupGet(x => x.EventDateFrom).Returns(new DateTime(2026, 01, 01, 10, 00, 00, DateTimeKind.Utc));
+            item.SetupGet(x => x.EventDateTo).Returns(new DateTime(2026, 01, 02, 10, 00, 00, DateTimeKind.Utc));
+            item.SetupGet(x => x.EventType).Returns(Array.Empty<EventType>());
+
+            _urlRetrieverMock
+                .Setup(x => x.Retrieve(item.Object, "fr", It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new WebPageUrl("~/events/fr", "https://example.com/events/fr"));
+
+            await _service.GetEventWebinarCardDtosAsync(
+                new List<IEventOrWebinar> { item.Object },
+                _ => false,
+                CancellationToken.None);
+
+            _urlRetrieverMock.Verify(x => x.Retrieve(item.Object, "fr", It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Test]
+        public async Task GetEventWebinarCardDtosAsync_ReturnsOnlyItems_WithResolvedUrls_WhenMixedResults()
+        {
+            _contentServiceMock.Setup(x => x.GetCurrentLanguage()).Returns("en");
+
+            var guidOk = Guid.NewGuid();
+            var guidFail = Guid.NewGuid();
+
+            var okItem = new Mock<IEventOrWebinar>();
+            okItem.SetupGet(x => x.SystemFields).Returns(new WebPageFields { WebPageItemGUID = guidOk });
+            okItem.SetupGet(x => x.MetadataTitle).Returns("OK title");
+            okItem.SetupGet(x => x.EventDateFrom).Returns(new DateTime(2026, 1, 1, 10, 0, 0, DateTimeKind.Utc));
+            okItem.SetupGet(x => x.EventDateTo).Returns(new DateTime(2026, 1, 2, 10, 0, 0, DateTimeKind.Utc));
+            okItem.SetupGet(x => x.EventType).Returns(Array.Empty<EventType>());
+
+            var failedItem = new Mock<IEventOrWebinar>();
+            failedItem.SetupGet(x => x.SystemFields).Returns(new WebPageFields { WebPageItemGUID = guidFail });
+            failedItem.SetupGet(x => x.MetadataTitle).Returns("Fail title");
+            failedItem.SetupGet(x => x.EventDateFrom).Returns(new DateTime(2026, 1, 1, 10, 0, 0, DateTimeKind.Utc));
+            failedItem.SetupGet(x => x.EventDateTo).Returns(new DateTime(2026, 1, 2, 10, 0, 0, DateTimeKind.Utc));
+            failedItem.SetupGet(x => x.EventType).Returns(Array.Empty<EventType>());
+
+            _urlRetrieverMock
+                .Setup(x => x.Retrieve(okItem.Object, "en", It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new WebPageUrl("~/events/ok", "https://example.com/events/ok"));
+
+            _urlRetrieverMock
+                .Setup(x => x.Retrieve(failedItem.Object, "en", It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("no url"));
+
+            var result = await _service.GetEventWebinarCardDtosAsync(
+                new List<IEventOrWebinar> { okItem.Object, failedItem.Object },
+                _ => false,
+                CancellationToken.None);
+
+            Assert.That(result, Has.Length.EqualTo(1));
+            Assert.That(result[0].Title, Is.EqualTo("OK title"));
+        }
+
+        [Test]
+        public async Task GetEventWebinarCardDtosAsync_PassesCancellationToken_ToUrlRetriever()
+        {
+            _contentServiceMock.Setup(x => x.GetCurrentLanguage()).Returns("en");
+
+            using var cts = new CancellationTokenSource();
+            var token = cts.Token;
+
+            var item = new Mock<IEventOrWebinar>();
+            item.SetupGet(x => x.SystemFields).Returns(new WebPageFields { WebPageItemGUID = Guid.NewGuid() });
+            item.SetupGet(x => x.MetadataTitle).Returns("Title");
+            item.SetupGet(x => x.EventDateFrom).Returns(new DateTime(2026, 1, 1, 10, 0, 0, DateTimeKind.Utc));
+            item.SetupGet(x => x.EventDateTo).Returns(new DateTime(2026, 1, 2, 10, 0, 0, DateTimeKind.Utc));
+            item.SetupGet(x => x.EventType).Returns(Array.Empty<EventType>());
+
+            _urlRetrieverMock
+                .Setup(x => x.Retrieve(item.Object, "en", token))
+                .ReturnsAsync(new WebPageUrl("~/events/token", "https://example.com/events/token"));
+
+            await _service.GetEventWebinarCardDtosAsync(
+                new List<IEventOrWebinar> { item.Object },
+                _ => false,
+                token);
+
+            _urlRetrieverMock.Verify(x => x.Retrieve(item.Object, "en", token), Times.Once);
+        }
     }
 }
