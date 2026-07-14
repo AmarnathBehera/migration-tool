@@ -17,16 +17,13 @@ public class ContactPageService : IContactPageService
 {
     private readonly IContentService _contentService;
     private readonly IHeroService _heroService;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
 
     public ContactPageService(
         IContentService contentService,
-        IHeroService heroService,
-        IWebsiteChannelContext websiteChannelContext)
+        IHeroService heroService)
     {
         _contentService = contentService;
         _heroService = heroService;
-        _websiteChannelContext = websiteChannelContext;
     }
 
     public async Task<FormPageDto> GetContactPageDtoAsync(Contact? page, CancellationToken cancellationToken)

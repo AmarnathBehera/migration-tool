@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Section Business Strategies</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="c5f07400-b62f-4575-b869-366adea20629" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="f6176635-3dac-4a42-93d6-f9cb9918f37d" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="96d89c3e-eef4-4e18-8e8c-0854386edcae" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
+        <properties />
+      </schema>
+      <field allowempty="true" column="Menu" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="3c3dada2-79dc-4669-ab45-78a23d996a24" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Menu</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="MenuBackgroundImage" columnprecision="0" columntype="contentitemreference" enabled="true" guid="e68e967b-f07c-47ef-9f3c-c73df153021b" visible="true">
+        <properties>
+          <explanationtext>Recommended size: 1440x800</explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Menu background image</fieldcaption>
+          <fielddescription>Recommended size: 1440x800</fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field column="MenuBackgroundImageAltText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="46971371-ce83-48c4-a0ab-07a348ff4492" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Background image alt text</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>b6cac6be-487b-4d72-b82a-eadaed297432</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-l-grid-2-2</ClassIconClass>
+  <ClassName>BDO.SectionBusinessStrategies</ClassName>
+  <ClassShortName>BDOSectionBusinessStrategies</ClassShortName>
+  <ClassTableName>BDO_SectionBusinessStrategies</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>

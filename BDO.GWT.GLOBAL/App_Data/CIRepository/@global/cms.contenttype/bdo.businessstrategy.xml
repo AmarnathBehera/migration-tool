@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Business Strategy</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="55047b7a-08e6-457f-bb31-5c1e7541ebc7" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="bc94e97d-ec99-4d3b-8d1a-323555f3ae5d" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="d0dc1349-3d82-4826-9d7d-5dd9dad8f50f" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
+        <properties />
+      </schema>
+      <field allowempty="true" column="Menu" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="61f93304-77ca-4e7d-ab50-752a4e4d6680" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Menu</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="MenuShowInSection" columnprecision="0" columntype="boolean" enabled="true" guid="8633bbb5-749d-49b4-8b2c-9d8a3d19cde7" visible="true">
+        <properties>
+          <defaultvalue>True</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show in section menu</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="MenuReadMoreText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="02c76224-fa5e-41b6-bc17-e16e2fcb73a4" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Read more text</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="MenuTileIcon" columnprecision="0" columntype="contentitemreference" enabled="true" guid="fe23f18f-3685-473d-ae5b-b84d9971b18b" visible="true">
+        <properties>
+          <explanationtext>
+            <![CDATA[SVG icon that will be used when showing the page in <strong>Section Business Strategies</strong> page.<br><br>Please use the following:<br><strong>Icon dimension</strong> – 55px wide (height will scale automatically)]]>
+          </explanationtext>
+          <explanationtextashtml>True</explanationtextashtml>
+          <fieldcaption>Tile icon</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["82c5aa19-dd00-4e41-aeda-e2c1166a933e"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>f350df32-e183-46df-9156-68116ac72958</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-doc</ClassIconClass>
+  <ClassName>BDO.BusinessStrategy</ClassName>
+  <ClassShortName>BDOBusinessStrategy</ClassShortName>
+  <ClassTableName>BDO_BusinessStrategy</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>

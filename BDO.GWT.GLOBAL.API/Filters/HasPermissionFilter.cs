@@ -27,11 +27,8 @@ public class HasPermissionAttribute : TypeFilterAttribute
 /// </summary>
 public class HasPermissionFilter : IAsyncAuthorizationFilter
 {
-    //private readonly string _apiMethodGroupName;
     private readonly ApiPermission _permission;
     private readonly IAuthorizationHelper _authorizationHelper;
-    //private readonly IRetriever<ApiMethodGroup> _apiMethodGroupRetriever;
-    //private readonly IRetriever<UserApiPermission> _userApiPermissionRetriever;
 
     /// <summary>
     /// Initializes a new instance of the HasPermissionFilter class.
@@ -39,13 +36,10 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
     /// <param name="authorizationHelper">The authorization helper instance.</param>
     /// <param name="apiMethodGroupName">The name of the API method group.</param>
     /// <param name="permission">The required permission level.</param>
-    public HasPermissionFilter(IAuthorizationHelper authorizationHelper, string apiMethodGroupName, ApiPermission permission) //IRetriever<ApiMethodGroup> apiMethodGroupRetriever, IRetriever<UserApiPermission> userApiPermissionRetriever
+    public HasPermissionFilter(IAuthorizationHelper authorizationHelper, string apiMethodGroupName, ApiPermission permission)
     {
-        //_apiMethodGroupRetriever = apiMethodGroupRetriever;
-        //_apiMethodGroupName = apiMethodGroupName;
         _authorizationHelper = authorizationHelper;
         _permission = permission;
-        //_userApiPermissionRetriever = userApiPermissionRetriever;
     }
 
     /// <summary>
@@ -62,10 +56,6 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
             return;
         }
 
-        var cancellationToken = context.HttpContext.RequestAborted;
-
-        //var methodGroups = await _apiMethodGroupRetriever.RetrieveEntitiesAsync(query => query.Where(x => x.Name == _apiMethodGroupName), cancellationToken);
-
         var methodGroups = new List<ApiMethodGroup>
         {
             new ApiMethodGroup { ID = 1, Name = "weather" }
@@ -80,7 +70,6 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
             return;
         }
 
-        //var userApiPermissions = await _userApiPermissionRetriever.RetrieveEntitiesAsync(query => query.Where(x => x.UserID == user.ID && x.ApiMethodGroupID == methodGroup.ID), cancellationToken);
         var userApiPermissions = new List<UserApiPermission>
         {
             new UserApiPermission { UserID = user.ID, ApiMethodGroupID = methodGroup.ID, AllowRead = true, AllowManage = false }

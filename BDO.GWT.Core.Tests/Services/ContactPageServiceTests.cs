@@ -38,8 +38,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             _service = new ContactPageService(
                 _contentServiceMock.Object,
-                _heroServiceMock.Object,
-                _channelMock.Object);
+                _heroServiceMock.Object);
         }
 
         private void SetupContent(Contact? page)
