@@ -22,6 +22,20 @@ variable "deploy.octopus.workerPool" {
     }
 }
 
+variable "appsettings.aspNetCoreEnvironment" {
+    value "Development" {}
+
+    value "Production" {
+        description = ""
+        environment = ["production"]
+    }
+
+    value "Production" {
+        description = ""
+        environment = ["acceptance", "test-2"]
+    }
+}
+
 variable "appsettings.azureAdTenantId" {
     value "44f4e7a6-4821-44d7-b286-cd90436c6975" {}
 }

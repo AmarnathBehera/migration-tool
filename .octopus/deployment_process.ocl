@@ -268,6 +268,11 @@ step "deploy-api-app-service" {
             Octopus.Action.Azure.AppSettings = <<-EOT
                 [
                   {
+                    "name": "ASPNETCORE_ENVIRONMENT",
+                    "value": "#{appsettings.aspNetCoreEnvironment}",
+                    "slotSetting": false
+                  },
+                  {
                     "name": "AzureAd__Instance",
                     "value": "#{appsettings.azureAdInstance}",
                     "slotSetting": false
