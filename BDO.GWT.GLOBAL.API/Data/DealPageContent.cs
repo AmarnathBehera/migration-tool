@@ -47,7 +47,7 @@ public class DealPageContent : IMetadataContent
     public string? MetadataCanonical { get; set; }
 
     [MaxLength(200)]
-    public string RelatedDeals { get; set; } = [];
+    public string RelatedDeals { get; set; } = string.Empty;
 
     [MaxLength(200)]
     public string MetadataRssCategory { get; set; } = string.Empty;

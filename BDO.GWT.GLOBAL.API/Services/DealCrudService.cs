@@ -176,7 +176,7 @@ public class DealCrudService : IDealCrudService
                                                                contentItemParameters);
 
         // Creates the page in the database
-        MetadataTeaserImageint newPageId = await _webPageManager.Create(createPageParameters, cancellationToken);
+        int newPageId = await _webPageManager.Create(createPageParameters, cancellationToken);
 
         // Update the draft with new content
         if (!await _webPageManager.TryUpdateDraft(newPageId, culture, new UpdateDraftData(itemData)))
