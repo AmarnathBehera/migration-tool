@@ -35,7 +35,7 @@ public static class ReactComponentType
     public const string RssFeeds = "RssFeeds";
     public const string EventsWebinarsDetails = "EventsWebinarsDetails";
     public const string FlexibleContentWidget = "TrendingTopicsCarouselWidget";
-    public const string EditorsPick = "InsightCarousel";
+    public const string EditorsPick = "EditorsPick";
     public const string ContactPageDescriptionText = "ContactPageDescriptionText";
     public const string MultiLinksCardsGrid = "MultiLinksCardsGrid";
     public const string IndustryPrimary = "IndustryPrimary";
@@ -43,6 +43,7 @@ public static class ReactComponentType
     public const string SideBoxNavigation = "SideBoxNavigation";
     public const string LocalNavigationItem = "LocalNavigationItem";
     public const string EventsAndWebinarsCarousel = "EventsAndWebinarsCarousel";
+    public const string InsightCarousel = "InsightCarousel";
     public const string InFocus = "InFocus";
     public const string BusinessStrategiesGrid = "BusinessStrategiesGrid";
 
@@ -83,7 +84,7 @@ public static class ReactComponentType
     public const string RssFeedsGUID = "15085e95-b81e-4db3-b4bf-7c2926a2485c";
     public const string InsightDetailsGUID = "16085e95-b81e-4db3-b4bf-7c2926a2485c";
     public const string EventWebinarCardsGridGUID = "eeb2b6b7-f2df-411b-b55f-c7aac9b22096";
-
+    public const string InsightCarouselGUID = "0453e38f-3e92-4a4d-a424-7ebe6bd641e2";
     public const string ContactPageDescriptionTextGUID = "cd1bc3e5-c6b6-4212-9fab-a86bdc570462";
     public const string ErrorPageContentGUID = "614b9a3d-18d7-43f4-9f8f-a4bc99e99841";
     public const string MultiLinksCardsGridGUID = "a1c3e5b7-d9f2-4a6c-8e0b-1f3a5c7e9d2b";
@@ -139,7 +140,7 @@ public static class ReactComponentType
 //1b8bd96c-4938-4e86-9899-9c2a28f8881d
 //7815a68e-9a0f-4781-8c12-978b422a1d0e
 //4f9226a2-7aa5-48ca-b3ef-a4aa46086cfc
-//0453e38f-3e92-4a4d-a424-7ebe6bd641e2
+//
 //1dbabfab-0e62-4aac-ab68-e1e33145d099
 //7366771f-6ba1-4618-b30d-18ac48ac1486
 //c4a32174-ae22-4eb8-97b4-89c135bce341
