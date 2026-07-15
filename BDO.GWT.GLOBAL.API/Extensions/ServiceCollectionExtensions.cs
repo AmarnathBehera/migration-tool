@@ -1,8 +1,11 @@
-﻿using BDO.GWT.GLOBAL.API.ApiClients;
+﻿using BDO.GWT.Core;
+using BDO.GWT.Core.Services;
+using BDO.GWT.GLOBAL.API.ApiClients;
 using BDO.GWT.GLOBAL.API.Helpers;
 using BDO.GWT.GLOBAL.API.Middleware;
 using BDO.GWT.GLOBAL.API.Options;
 using BDO.GWT.GLOBAL.API.Services;
+using CMS.MacroEngine;
 
 namespace BDO.GWT.GLOBAL.API.Extensions;
 
@@ -17,10 +20,10 @@ public static class ServiceCollectionExtensions
     /// <param name="serviceCollection">The service collection to add services to.</param>
     public static void AddApi(this IServiceCollection serviceCollection)
     {
+        serviceCollection.AddAutoMapper(cfg => { }, AppDomain.CurrentDomain.GetAssemblies());
         serviceCollection.AddHttpClient();
         serviceCollection.AddMemoryCache();
-
-        //serviceCollection.AddScoped<MemberFirmMiddleware>();
+        serviceCollection.AddScoped<MemberFirmMiddleware>();
 
         serviceCollection.AddOptions<MemberFirmServiceOptions>()
             .BindConfiguration("MemberFirmService")
@@ -30,36 +33,18 @@ public static class ServiceCollectionExtensions
             .BindConfiguration("MasterDataApi")
             .ValidateDataAnnotations();
 
-        //serviceCollection.AddOptions<RegionOptions>()
-        //    .BindConfiguration("Region")
-        //    .ValidateDataAnnotations();
-
-        //serviceCollection.AddScoped<IAdvancedSettingsService, AdvancedSettingsService>();
-        //serviceCollection.AddScoped<IAttachmentHistoryService, AttachmentHistoryService>();
+        serviceCollection.AddScoped<IMemberFirmService, MemberFirmService>();
+        serviceCollection.AddScoped<IMasterDataApiClient, MasterDataApiClient>();
+        serviceCollection.AddScoped<IFormCrudService, FormCrudService>();
         serviceCollection.AddScoped<IAuthorizationHelper, AuthorizationHelper>();
-        //serviceCollection.AddScoped<ICareerCrudService, CareerCrudService>();
-        //serviceCollection.AddScoped<IContentService, ContentService>();
-        //serviceCollection.AddScoped<ICultureHelper, CultureHelper>();
-        //serviceCollection.AddScoped<IDealCrudService, DealCrudService>();
-        //serviceCollection.AddScoped<IEntityHelper<Site>, EntityHelper<Site>>();
-        //serviceCollection.AddScoped<IEventLogCrudService, EventLogCrudService>();
-        //serviceCollection.AddScoped<IFormCrudService, FormCrudService>();
-        //serviceCollection.AddScoped<IGlobalSettingCrudService, GlobalSettingCrudService>();
-        //serviceCollection.AddScoped<IInsightCrudService, InsightCrudService>();
-        //serviceCollection.AddScoped<ILicenseKeysCrudService, LicenseKeysCrudService>();
-        //serviceCollection.AddScoped<ILocationOfficeCrudService, LocationOfficeCrudService>();
-        //serviceCollection.AddScoped<IMasterDataApiClient, MasterDataApiClient>();
-        //serviceCollection.AddScoped<IMediaFileCrudService, MediaFileCrudService>();
-        //serviceCollection.AddScoped<IMemberFirmService, MemberFirmService>();
-        //serviceCollection.AddScoped<IPageAttachmentCrudService, PageAttachmentCrudService>();
-        //serviceCollection.AddScoped<IPersonCrudService, PersonCrudService>();
-        //serviceCollection.AddScoped<IScheduledTaskCrudService, ScheduledTaskCrudService>();
-        //serviceCollection.AddScoped<ISectionEventsCrudService, SectionEventsCrudService>();
-        //serviceCollection.AddScoped<ISettingsCrudHelper, SettingsCrudHelper>();
-        //serviceCollection.AddScoped<ISiteCrudService, SiteCrudService>();
-        //serviceCollection.AddScoped<ISiteDomainAliasHelper, SiteDomainAliasHelper>();
-        //serviceCollection.AddScoped<ISiteSettingCrudService, SiteSettingCrudService>();
-        //serviceCollection.AddScoped<IUserApiPermissionsCrudService, UserApiPermissionsCrudService>();
-        //serviceCollection.AddScoped<IUserCrudService, UserCrudService>();
+        serviceCollection.AddScoped<IContentService, ContentService>();
+        serviceCollection.AddScoped<IValidationState, ValidationState>();
+        serviceCollection.AddScoped<ICultureService, CultureService>();
+        serviceCollection.AddScoped<ICultureContext, CultureContext>();
+        serviceCollection.AddScoped<IWebsiteCulturesService, WebsiteCulturesService>();
+        serviceCollection.AddScoped<IPageContentValidator, PageContentValidator>();
+        serviceCollection.AddScoped<IMacroResolver, MacroResolver>();
+        serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
+        serviceCollection.AddScoped<IDealCrudService, DealCrudService>();
     }
 }

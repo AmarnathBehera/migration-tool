@@ -62,14 +62,18 @@ public class MasterDataApiClient : IMasterDataApiClient
 
         if (!response.IsSuccessStatusCode)
         {
+#pragma warning disable S112
             throw new Exception("Failed to retrieve member firms from master data API.");
+#pragma warning restore S112
         }
 
         var memberFirmDataEntries = await response.Content.ReadFromJsonAsync<IEnumerable<MemberFirmData>>(cancellationToken: cancellationToken);
 
         if (memberFirmDataEntries == null)
         {
+#pragma warning disable S112
             throw new NullReferenceException("Member firms data after serialization is null.");
+#pragma warning restore S112
         }
 
         var memberFirms = _mapper.Map<IEnumerable<MemberFirm>>(memberFirmDataEntries);
@@ -91,7 +95,9 @@ public class MasterDataApiClient : IMasterDataApiClient
 
         if (!response.IsSuccessStatusCode)
         {
+#pragma warning disable S112
             throw new Exception("Failed to retrieve fallback member firm from master data.");
+#pragma warning restore S112
         }
 
         var memberFirmData = await response.Content.ReadFromJsonAsync<MemberFirmData>(cancellationToken: cancellationToken);

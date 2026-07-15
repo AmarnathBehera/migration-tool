@@ -1,8 +1,13 @@
-﻿using BDO.GWT.Core;
+﻿using BDO.GWT.Common.Core.Extensions;
+using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
+using BDO.GWT.Domain.Core.Entities;
 using BDO.GWT.GLOBAL.API.Services;
+using CMS.ContentEngine;
+using CMS.DataEngine;
 using CMS.Websites.Routing;
+using Kentico.Content.Web.Mvc;
 using System.Globalization;
 
 namespace BDO.GWT.GLOBAL.API.Middleware;
@@ -12,20 +17,14 @@ namespace BDO.GWT.GLOBAL.API.Middleware;
 /// </summary>
 public class MemberFirmMiddleware : IMiddleware
 {
-    private readonly IMemberFirmService _memberFirmService;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly IGlobalLocationCustomTableDataService _globalLocationCustomTableDataService;
 
     /// <summary>
     /// Initializes a new instance of the MemberFirmMiddleware class with the specified dependencies.
     /// </summary>
-    /// <param name="memberFirmService">The member firm service instance.</param>
-    /// <param name="websiteChannelContext">The website channel context instance.</param>
     /// <param name="globalLocationCustomTableDataService">The global location custom table data service instance.</param>
-    public MemberFirmMiddleware(IMemberFirmService memberFirmService, IWebsiteChannelContext websiteChannelContext, IGlobalLocationCustomTableDataService globalLocationCustomTableDataService)
+    public MemberFirmMiddleware(IGlobalLocationCustomTableDataService globalLocationCustomTableDataService)
     {
-        _memberFirmService = memberFirmService;
-        _websiteChannelContext = websiteChannelContext;
         _globalLocationCustomTableDataService = globalLocationCustomTableDataService;
     }
 
@@ -73,10 +72,19 @@ public class MemberFirmMiddleware : IMiddleware
 
             return;
         }
-        //Call Global custom table service to check if the member firm exists in the global custom table
         var globalLocationCustomTableData = await _globalLocationCustomTableDataService.GetLocationsAsync(memberFirmID);
-        var memberFirm = await _memberFirmService.GetMemberFirmAsync(memberFirmID, cancellationToken);
-        if (memberFirm is null)
+
+        if (globalLocationCustomTableData != null)
+        {
+            if (globalLocationCustomTableData.ChannelId == 0)
+            {
+#pragma warning disable S112
+                throw new NullReferenceException($"Member firm with ID '{globalLocationCustomTableData.ChannelId}' does not have 'channel' property set.");
+#pragma warning restore S112
+            }
+            context.Items["ChannelId"] = globalLocationCustomTableData.ChannelId == 0 ? 1 : globalLocationCustomTableData.ChannelId;
+        }
+        else
         {
             errors["memberFirmID"] = $"Member firm with ID '{memberFirmID}' not found.";
             context.Response.StatusCode = StatusCodes.Status404NotFound;
@@ -84,53 +92,6 @@ public class MemberFirmMiddleware : IMiddleware
 
             return;
         }
-
-        if (memberFirm.Website == null)
-        {
-            throw new NullReferenceException($"Member firm with ID '{memberFirmID}' does not have 'Website' property set.");
-        }
-
-        if (string.IsNullOrEmpty(_websiteChannelContext.WebsiteChannelName))
-        {
-            errors["memberFirmID"] = $"Member firm with ID '{memberFirmID}' not found on this region.";
-            context.Response.StatusCode = StatusCodes.Status404NotFound;
-            await context.Response.WriteAsJsonAsync(errors, cancellationToken: cancellationToken);
-
-            return;
-        }
-
-        // Extract culture from route and initialise Kentico's culture context 
-
-        var culture = context.Request.RouteValues["culture"]?.ToString();
-
-        if (!string.IsNullOrEmpty(culture))
-        {
-            try
-            {
-                // CultureInfo.GetCultureInfo throws CultureNotFoundException for invalid codes
-                var getCulture = CultureInfo.GetCultureInfo(culture);
-
-                CultureInfo.CurrentCulture = getCulture;
-                CultureInfo.CurrentUICulture = getCulture;
-
-            }
-            catch (CultureNotFoundException)
-            {
-                var englishCulture = CultureInfo.GetCultureInfo(LanguageTag.GB.ToString());
-
-                CultureInfo.CurrentCulture = englishCulture;
-                CultureInfo.CurrentUICulture = englishCulture;
-            }               
-
-        }
-        else
-        {
-            var englishCulture = CultureInfo.GetCultureInfo(LanguageTag.GB.ToString());
-
-            CultureInfo.CurrentCulture = englishCulture;
-            CultureInfo.CurrentUICulture = englishCulture;
-        }
-
-            await next(context);
+        await next(context);
     }
 }

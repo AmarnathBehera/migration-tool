@@ -1,3 +1,4 @@
+using BDO.GWT.GLOBAL.API.Constants;
 using BDO.GWT.GLOBAL.API.Extensions;
 using Kentico.Web.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -5,7 +6,8 @@ using Microsoft.Identity.Web;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 
-public class Program
+namespace BDO.GWT.GLOBAL.API;
+public static class Program
 {
     public static void Main(string[] args)
     {
@@ -46,7 +48,7 @@ public class Program
 
             c.EnableAnnotations();
 
-            foreach (var assemblyName in new[] { "BDO.GWT.GLOBAL.API", "BDO.GWT.Core" })
+            foreach (var assemblyName in new[] { ProjectConstants.gwtGlobalAPI, ProjectConstants.gwtCore })
             {
                 c.IncludeXmlComments(System.IO.Path.Combine(AppContext.BaseDirectory, $"{assemblyName}.xml"), true);
             }
@@ -75,6 +77,8 @@ public class Program
         app.UseAuthentication();
 
         app.UseAuthorization();
+
+        app.UseMiddleware<Middleware.MemberFirmMiddleware>();
 
         app.MapControllers();
 
