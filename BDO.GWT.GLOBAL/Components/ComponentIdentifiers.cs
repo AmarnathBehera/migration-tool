@@ -13,6 +13,7 @@
             public const string ExternalNavigation = WidgetPrefix + "ExternalNavigation";
 
             public const string Imagewithtext = WidgetPrefix + "ImageWithText";
+            public const string InsightCarousel = WidgetPrefix + "InsightCarousel";
 
             public const string QuoteCard = WidgetPrefix + "QuoteCard";
 

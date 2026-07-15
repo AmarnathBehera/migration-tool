@@ -1,0 +1,81 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.DTOs.Pages
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model InsightPageDto
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@{
+    var widgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.AccordionWidget,
+        //ComponentIdentifiers.Widgets.DescriptionText,
+        //ComponentIdentifiers.Widgets.EditorsPick
+        ComponentIdentifiers.Widgets.FaqWidget,
+        //ComponentIdentifiers.Widgets.FeaturedEvent,
+        //ComponentIdentifiers.Widgets.FeaturedBusinessSolutions,
+        ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.Imagewithtext,
+      //  ComponentIdentifiers.Widgets.InFocus,
+        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.KeyTakeaways,
+        // ComponentIdentifiers.Widgets.RelatedContentCarousel,
+        // ComponentIdentifiers.Widgets.RelatedContacts,
+        //  ComponentIdentifiers.Widgets.InsightAnimationCard,
+        //ComponentIdentifiers.Widgets.PurposeIcon,
+        //ComponentIdentifiers.Widgets.SubscriptionButton,
+        ComponentIdentifiers.Widgets.InsightCarousel
+    };
+}
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@section SchemaMarkup {
+    @Html.Raw(Model.SchemaMarkup.ToSchemaMarkupJsString())
+}
+
+
+@* @await Html.PartialAsync("_Hero")
+ *@
+@await Html.PartialAsync("_LocalNavigation")
+@(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.InsightDetails,
+        ReactComponentType.InsightDetailsGUID,
+        new
+        {
+            data = Model,
+        },
+        Context.RequestAborted))
+
+@await Html.Kentico().EditableAreaAsync(
+       "mainContent",
+        new EditableAreaOptions
+        {
+            AllowedWidgets = widgetsList
+        })
+
+@if (Model.Authors is not null)
+{
+    <div class="section-container">
+
+        @(await ReactService.RenderComponentAsync(
+            pageId,
+            ReactComponentType.PeopleGrid,
+            ReactComponentType.PeopleGridGUID,
+            new
+            {
+                data = Model.Authors,
+            },
+            Context.RequestAborted))
+    </div>
+}
+@await Html.Kentico().EditableAreaAsync(
+"bottomArea",
+        new EditableAreaOptions
+        {
+            AllowedWidgets = widgetsList
+        })
+

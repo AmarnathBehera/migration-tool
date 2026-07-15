@@ -10,6 +10,8 @@ public class ContentPageDto
 
     public ContentSidebarDto? Sidebar { get; set; }
 
+    public CallToActionWithPositionDto? CallToActionWithPosition { get; set; }
+
     public CallToActionDto? CallToAction { get; set; }
 
     public ContentPageDto() { }

@@ -9,6 +9,7 @@ public class CallToActionDto
 
     public string ButtonUrl { get; set; } = null!;
 
+
 }
 
 //to be used for Insights page where Position field for Call to action is required

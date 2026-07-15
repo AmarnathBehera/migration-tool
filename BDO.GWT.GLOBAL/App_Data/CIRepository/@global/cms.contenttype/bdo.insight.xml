@@ -7,6 +7,9 @@
       <field column="ContentItemDataID" columntype="integer" enabled="true" guid="fe7bd0a5-5b7b-4f2d-9fbf-d8c7d9b3f232" isPK="true" />
       <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="2b6924ae-085a-447c-9728-682a26a79d99" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
       <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="a2349633-908c-4f28-867e-f407b6c535fe" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
       <schema guid="b760a373-943b-4321-ac39-d5067101ff82" name="b760a373-943b-4321-ac39-d5067101ff82">
         <properties />
       </schema>

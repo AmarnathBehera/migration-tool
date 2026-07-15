@@ -169,7 +169,7 @@ public interface ICareerDetailPageService
                 .ContentAttachmentAsset
                 .Url,
             SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page,page.PageTitle, cancellationToken) : null,
-            ShowCopyLinkButton = settingInfo?.DisableCopyLinkButton == true
+            ShowCopyLinkButton = settingInfo?.DisableCopyLinkButton == false
         };
 
         if (sidebarDto.SocialMediaButtons is not null)

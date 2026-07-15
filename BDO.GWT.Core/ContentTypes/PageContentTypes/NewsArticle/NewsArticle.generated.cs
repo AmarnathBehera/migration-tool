@@ -60,12 +60,6 @@ namespace BDO
 
 
 		/// <summary>
-		/// CallToActionPosition.
-		/// </summary>
-		public string CallToActionPosition { get; set; }
-
-
-		/// <summary>
 		/// ShowSidebar.
 		/// </summary>
 		public bool ShowSidebar { get; set; }
@@ -135,6 +129,12 @@ namespace BDO
 		/// IncludeInSitemap.
 		/// </summary>
 		public bool IncludeInSitemap { get; set; }
+
+
+		/// <summary>
+		/// IsSearchExcluded.
+		/// </summary>
+		public bool IsSearchExcluded { get; set; }
 
 
 		/// <summary>
