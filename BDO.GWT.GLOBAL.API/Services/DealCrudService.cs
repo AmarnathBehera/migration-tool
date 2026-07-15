@@ -1,3 +1,4 @@
+using AngleSharp.Dom;
 using BDO.GWT.Common.Core.Exceptions;
 using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
@@ -8,6 +9,7 @@ using CMS.DataEngine;
 using CMS.Membership;
 using CMS.Websites;
 using CMS.Websites.Routing;
+using CMS.Websites.Routing.Internal;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using System.Drawing;
@@ -174,7 +176,7 @@ public class DealCrudService : IDealCrudService
                                                                contentItemParameters);
 
         // Creates the page in the database
-        int newPageId = await _webPageManager.Create(createPageParameters, cancellationToken);
+        MetadataTeaserImageint newPageId = await _webPageManager.Create(createPageParameters, cancellationToken);
 
         // Update the draft with new content
         if (!await _webPageManager.TryUpdateDraft(newPageId, culture, new UpdateDraftData(itemData)))
@@ -415,7 +417,7 @@ public class DealCrudService : IDealCrudService
                 ShowTitle = deal.MetadataShowTitle,
                 MetadataDescription = deal.MetadataDescription,
                 DealContent = deal.DealContent,
-                MetadataTeaserImage = deal.MetadataTeaserImage?.ToString() ?? string.Empty,
+                MetadataTeaserImage = deal.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
                 MetadataTeaserImageAltText = deal.MetadataTeaserImageAltText,
                 Industry = deal.Industry.Select(x => x.Name).ToList(),
                 SubIndustry = deal.SubIndustry.Select(x => x.Name).ToList(),
@@ -425,9 +427,9 @@ public class DealCrudService : IDealCrudService
                 MetadataOfficeLocation = deal.MetadataOfficeLocation,
                 ClientName = deal.ClientName,
                 MetadataCanonical = deal.MetadataCanonical,
-                RelatedDeals = [],
+                RelatedDeals = string.Empty,
                 MetadataRssCategory = deal.DealMetadataRssCategory,
-                MetadataRssImage = deal.DealMetadataRssImage?.ToString() ?? string.Empty,
+                MetadataRssImage = deal.DealMetadataRssImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
                 HeroLayout = deal.HeroLayout ?? string.Empty,
                 HeroTitle = deal.HeroTitle,
                 HeroDescription = deal.HeroDescription,
@@ -513,16 +515,16 @@ public class DealCrudService : IDealCrudService
             { "Culture", culture ?? string.Empty },
             { "MetadataShowTitle", deal.ShowTitle },
             { "DealContent", deal.DealContent ?? string.Empty },
-            { "Industry", string.Join(",", deal.Industry) },
-            { "SubIndustry", string.Join(",", deal.SubIndustry) },
-            { "DealType", string.Join(",", deal.DealType) },
-            { "DateField", deal.DateField },
-            { "Size", string.Join(",", deal.Size) },
+            { "Industry", deal.Industry },
+            { "SubIndustry", deal.SubIndustry },
+            { "DealType", deal.DealType },
+            { "DateField", deal.DateField ?? DateTime.MinValue },
+            { "Size", deal.Size ?? new List<string>() },
             { "MetadataOfficeLocation", deal.MetadataOfficeLocation ?? string.Empty },
             { "ClientName", deal.ClientName ?? string.Empty },
-            { "RelatedDeals", string.Join(",", deal.RelatedDeals)},
+            { "RelatedDeals", deal.RelatedDeals },
             { "DealMetadataRssCategory", deal.MetadataRssCategory ?? string.Empty },
-            { "DealMetadataRssImage", deal.MetadataRssImage ?? string.Empty },
+            { "DealMetadataRssImage", new List<ContentAttachment>(){new ContentAttachment() {ContentAttachmentAsset = new ContentItemAsset() {Url = deal.MetadataRssImage ?? string.Empty}}}},
             { "DealShowSocialMediaButtons", deal.ShowSocialMediaButtons },
             { "SharingOptIn", deal.SharingOptIn },
             { "DealCountry", deal.DealCountry ?? string.Empty },
@@ -534,31 +536,31 @@ public class DealCrudService : IDealCrudService
             { "CallToActionButtonUrl", deal.CallToActionButtonUrl ?? string.Empty },
             { "ShowSidebar", deal.ShowSidebar },
             { "ShowPrintButton", deal.ShowPrintButton },
-            { "DownloadButtonAttachment", deal.DownloadButtonAttachment ?? string.Empty },
+            { "DownloadButtonAttachment",new List<ContentAttachment>(){new ContentAttachment() {ContentAttachmentAsset = new ContentItemAsset() {Url = deal.DownloadButtonAttachment ?? string.Empty}}}},
             { "ShowSocialMediaButtons", deal.ShowSocialMediaButtons },
             { "MetadataOGTitle", deal.MetadataOGTitle ?? string.Empty },
             { "MetadataOGDescription", deal.MetadataOGDescription ?? string.Empty },
-            { "MetadataOGImage", deal.MetadataOGImage ?? string.Empty },
+            { "MetadataOGImage", new List<ContentAttachment>(){new ContentAttachment() {ContentAttachmentAsset = new ContentItemAsset() {Url = deal.MetadataOGImage ?? string.Empty}}}},
             { "MetadataOGTwitterImageSizeCheckbox", deal.MetadataOGTwitterImageSizeCheckbox },
-            { "MetadataOGTwitterImage", deal.MetadataOGTwitterImage ?? string.Empty },
+            { "MetadataOGTwitterImage", new List<ContentAttachment>(){new ContentAttachment() {ContentAttachmentAsset = new ContentItemAsset() {Url = deal.MetadataOGTwitterImage ?? string.Empty}}}},
             { "MetadataNofollow", deal.MetadataNofollow },
             { "MetadataNoindex", deal.MetadataNoindex },
             { "IncludeInSitemap", deal.IncludeInSitemap },
             { "MetadataTitle", deal.MetadataTitle ?? string.Empty },
             { "MetadataDescription", deal.MetadataDescription ?? string.Empty },
-            { "MetadataTeaserImage", deal.MetadataTeaserImage ?? string.Empty },
+            { "MetadataTeaserImage", new List<ContentAttachment>(){new ContentAttachment() {ContentAttachmentAsset = new ContentItemAsset() {Url = deal.MetadataTeaserImage ?? string.Empty}}}},
             { "MetadataTeaserImageAltText", deal.MetadataTeaserImageAltText ?? string.Empty },
             { "MetadataCanonical", deal.MetadataCanonical ?? string.Empty },
             { "HeroLayout", deal.HeroLayout ?? string.Empty },
             { "HeroTitle", deal.HeroTitle ?? string.Empty },
             { "HeroDescription", deal.HeroDescription ?? string.Empty },
-            { "HeroBackgroundImage", deal.HeroBackgroundImage ?? string.Empty },
+            { "HeroBackgroundImage", new List<ContentAttachment>()},
             { "HeroBackgroundImageAltText", deal.HeroBackgroundImageAltText ?? string.Empty },
-            { "HeroBackgroundImage_Mobile", deal.HeroBackgroundImage_Mobile ?? string.Empty },
+            { "HeroBackgroundImage_Mobile", new List<ContentAttachment>() },
             { "HeroBackgroundImage_MobileAltText", deal.HeroBackgroundImage_MobileAltText ?? string.Empty },
-            { "HeroCallToActionButtonType", deal.HeroCallToActionButtonType ?? string.Empty },
+            { "HeroCallToActionButtonType", deal.HeroCallToActionButtonType ?? string.Empty },  
             { "HeroCallToActionButtonText", deal.HeroCallToActionButtonText ?? string.Empty },
-            { "HeroCallToActionButtonUrl", deal.HeroCallToActionButtonUrl ?? string.Empty },
+            { "HeroCallToActionButtonUrl", null },
             { "PageTitle", deal.MetadataTitle ?? string.Empty },
             { "PageDescription", deal.MetadataDescription ?? string.Empty },
             { "PageKeywords", string.Empty },
