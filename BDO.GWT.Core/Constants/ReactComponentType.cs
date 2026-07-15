@@ -52,6 +52,7 @@ public static class ReactComponentType
     public const string BlogPostContent = "BlogPostContent";
     public const string LegalBodyContent = "LegalBodyContent";
     public const string LegalSideBoxNavigation = "LegalSideBoxNavigation";
+    public const string LocalNavigationJS = "LocalNavigationJS";
 
 
 
@@ -109,6 +110,7 @@ public static class ReactComponentType
     public const string SocialMediaGUID = "c58bfb27-7feb-4fdb-94f2-8bca61df250d";
     public const string EditorsPickGUID = "5b72020a-38b5-43b1-9e26-71fd36ee9e29";
     public const string InFocusGUID = "6m72020a-38b5-43b1-9e26-71fd36ee9e20";
+    public const string LocalNavigationJSGUID = "4e110f8b-531c-4d3b-bafb-7c03af83ea0b";
     public const string BusinessStrategiesGridGUID = "8p72020a-38b5-43b1-9e26-71fd36ee9e20";
 }
 
@@ -119,7 +121,7 @@ public static class ReactComponentType
 
 
 //
-//4e110f8b-531c-4d3b-bafb-7c03af83ea0b
+//
 //4772187b-22a3-4888-a7e9-54b3bd9cbd02
 //abfdfcbf-6696-4de8-a409-d9d3ff31a17c
 //8405ba6d-77df-48ee-b4e5-99dc66789f8a
