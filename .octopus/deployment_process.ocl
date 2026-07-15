@@ -268,6 +268,11 @@ step "deploy-api-app-service" {
             Octopus.Action.Azure.AppSettings = <<-EOT
                 [
                   {
+                    "name": "AzureAd__Instance",
+                    "value": "#{appsettings.azureAdInstance}",
+                    "slotSetting": false
+                  },
+                  {
                     "name": "AzureAd__TenantId",
                     "value": "#{appsettings.azureAdTenantId}",
                     "slotSetting": false
