@@ -27,12 +27,7 @@ variable "appsettings.aspNetCoreEnvironment" {
 
     value "Production" {
         description = ""
-        environment = ["production"]
-    }
-
-    value "Production" {
-        description = ""
-        environment = ["acceptance", "test-2"]
+        environment = ["production", "acceptance", "test-2"]
     }
 }
 
