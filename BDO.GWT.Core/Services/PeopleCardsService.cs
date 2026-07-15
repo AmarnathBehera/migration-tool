@@ -215,6 +215,17 @@ public class PeopleCardsService : IPeopleCardsService
             FilterParameterName.City => w => w.WhereContains(nameof(Person.MetadataCity), guid),
             FilterParameterName.Credential => w => w.WhereContains(nameof(Person.PersonCredentials), guid),
             FilterParameterName.ProfileGroup => w => w.WhereContains(nameof(Person.MetadataProfileGroups), guid),
+            FilterParameterName.MicrositeMasterPage => w => w.WhereContains(nameof(Person.MicrositeMasterPagesPerson),guid),
+            FilterParameterName.SpecialtyCategory => w => w.WhereContains(nameof(Person.MetadataSpecialtiesCategories), guid),
+            FilterParameterName.SpecialtyArea => w => w.WhereContains(nameof(Person.MetadataSpecialtiesAreas), guid),
+            FilterParameterName.Specialty => w => w.WhereContains(nameof(Person.MetadataSpecialtiesPages), guid),
+            FilterParameterName.BusinessLine => w => w.WhereContains(nameof(Person.MetadataBusinessLines), guid),
+            FilterParameterName.ServiceArea => w => w.WhereContains(nameof(Person.MetadataServiceAreasPerson), guid),
+            FilterParameterName.Service => w => w.WhereContains(nameof(Person.MetadataServicesPerson), guid),
+            FilterParameterName.SubService => w => w.WhereContains(nameof(Person.MetadataSubServices), guid),
+            FilterParameterName.IndustryPage => w => w.WhereContains(nameof(Person.MetadataIndustriesPerson), guid),
+            FilterParameterName.IndustryService => w => w.WhereContains(nameof(Person.MetadataIndustryServices), guid),
+            FilterParameterName.IndustryCategory => w => w.WhereContains(nameof(Person.MetadataIndustryCategoriesPerson), guid),
             _ => null,
         };
     }
