@@ -36,13 +36,13 @@ public class MemberFirmMiddleware : IMiddleware
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        if (context.User.Identity is not { IsAuthenticated: true })
-        {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            await context.Response.CompleteAsync();
+        //if (context.User.Identity is not { IsAuthenticated: true })
+        //{
+        //    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        //    await context.Response.CompleteAsync();
 
-            return;
-        }
+        //    return;
+        //}
 
         if (!context.Request.Path.StartsWithSegments("/memberFirms", StringComparison.InvariantCultureIgnoreCase))
         {

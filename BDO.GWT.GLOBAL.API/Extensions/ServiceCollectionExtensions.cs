@@ -1,5 +1,6 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
+using BDO.GWT.Core.Services.Footer;
 using BDO.GWT.GLOBAL.API.ApiClients;
 using BDO.GWT.GLOBAL.API.Helpers;
 using BDO.GWT.GLOBAL.API.Middleware;
@@ -46,5 +47,6 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IMacroResolver, MacroResolver>();
         serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
         serviceCollection.AddScoped<IDealCrudService, DealCrudService>();
+        serviceCollection.AddScoped<IFooterService, FooterService>();
     }
 }

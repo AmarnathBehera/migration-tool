@@ -9,6 +9,8 @@ namespace BDO.GWT.Core.Services.Footer;
 public interface IFooterService
 {
     Task<FooterDto?> GetAsync(CancellationToken cancellationToken);
+
+    Task<FooterDto?> GetAsyncForAPI(int channelId, CancellationToken cancellationToken);
 }
 
 public class FooterService : IFooterService
@@ -26,6 +28,43 @@ public class FooterService : IFooterService
 
         var footerLinks = await GetFooterLinks() ?? Enumerable.Empty<FooterLinkDto>();
         var socialLinks = await GetSocialLinks() ?? Enumerable.Empty<SocialButtonDto>();
+
+        //var displaySubscriptionsSectionSetting = await _settingsService.GetCurrentSiteSettingAsync(SettingName.BDO.DisplaySubscriptionsSection, cancellationToken);
+
+        var footerDto = new FooterDto
+        {
+            DisplaySubscriptionsSection = true,//(bool?)displaySubscriptionsSectionSetting?.Value ?? false,
+            SubscriptionButtonLink = (await GetSubscribePageLinkAsync(cancellationToken))?.ToHtmlCompatibleString(),
+            FooterLinks = mandatoryFooterLinks.Concat(footerLinks
+                .Select(link => new FooterLinkDto
+                {
+                    OpenInNewTab = link?.OpenInNewTab ?? false,
+                    Order = link?.Order ?? 0,
+                    Title = link?.Title ?? string.Empty,
+                    URL = link?.URL?.ToString() ?? string.Empty,
+                })
+                .OrderBy(o => o.Order)
+            ).Take(12).ToList(),
+            SocialButtons = socialLinks.Select(link => new SocialButtonDto
+            {
+                AltText = link?.AltText ?? string.Empty,
+                AriaLabel = link?.AriaLabel ?? string.Empty,
+                IconType = link?.IconType ?? string.Empty,
+                //CustomIcon = link.IconType == SocialLinkIconType.Custom ? link.CustomIcon : null,
+                Order = link?.Order ?? 0,
+                URL = link?.URL?.ToString() ?? string.Empty,
+            }).OrderBy(o => o.Order).Take(5).ToList(),
+        };
+
+        return footerDto;
+    }
+
+    public async Task<FooterDto?> GetAsyncForAPI(int channelId, CancellationToken cancellationToken)
+    {
+        var mandatoryFooterLinks = await GetMandatoryFooterLinkDtosForAPIAsync(channelId, cancellationToken);
+
+        var footerLinks = await GetFooterLinks(channelId) ?? Enumerable.Empty<FooterLinkDto>();
+        var socialLinks = await GetSocialLinks(channelId) ?? Enumerable.Empty<SocialButtonDto>();
 
         //var displaySubscriptionsSectionSetting = await _settingsService.GetCurrentSiteSettingAsync(SettingName.BDO.DisplaySubscriptionsSection, cancellationToken);
 
@@ -105,6 +144,40 @@ public class FooterService : IFooterService
         return result;
     }
 
+    private async Task<List<FooterLinkDto>> GetMandatoryFooterLinkDtosForAPIAsync(int channelId, CancellationToken cancellationToken)
+    {
+        string rootPath = "/";
+
+        var pages = (await _contentService.GetPagesAsync<FooterPages>(channelId: channelId,
+        new RetrievePagesParameters { PathMatch = PathMatch.Children(rootPath, 1) },
+        query => query.OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
+        RetrievalCacheSettings.CacheDisabled,
+        cancellationToken
+    ))?.ToList() ?? new List<FooterPages>();
+
+        var allGuids = pages
+            .Where(p => p.FooterLink != null)
+            .SelectMany(p => p.FooterLink?.Select(i => i.WebPageGuid) ?? Enumerable.Empty<Guid>())
+            .Distinct()
+            .ToList();
+
+        var selectedPages = allGuids.Any()
+            ? await _contentService.GetItemsByGUIDAsync(allGuids)
+            : Enumerable.Empty<IWebPageFieldsSource>();
+
+        int order = 0;
+        var result = selectedPages?.Select(page => new FooterLinkDto
+        {
+            Title = (page as IMetadata)?.MetadataTitle ?? string.Empty,
+            OpenInNewTab = false,
+            Order = order--,
+            URL = page?.GetUrl()?.RelativePath?.ToString() ?? string.Empty
+        })
+        .OrderBy(x => x.Order)
+        .ToList() ?? new List<FooterLinkDto>();
+
+        return result;
+    }
     private async Task<IEnumerable<FooterLinkDto?>> GetFooterLinks()
     {
         var footerLinksPages = (await _contentService.GetItemsChannelAsync<FooterLinks>())?.Take(8).ToList() ?? new List<FooterLinks>();
@@ -142,6 +215,42 @@ public class FooterService : IFooterService
         return footerPages;
     }
 
+    private async Task<IEnumerable<FooterLinkDto?>> GetFooterLinks(int channelId)
+    {
+        var footerLinksPages = (await _contentService.GetItemsChannelOnChannelIdAsync<FooterLinks>(channelId: channelId))?.Take(8).ToList() ?? new List<FooterLinks>();
+        var footerPages = new List<FooterLinkDto>();
+
+        var allGuids = footerLinksPages
+      .Where(x => x.TargetURL != null)
+      .SelectMany(x => x.TargetURL?.Select(t => t.SystemFields?.WebPageItemGUID ?? Guid.Empty) ?? Enumerable.Empty<Guid>())
+      .Where(guid => guid != Guid.Empty)
+      .Distinct()
+      .ToList();
+
+        var selectedPages = allGuids.Any()
+            ? await _contentService.GetItemsByGUIDAsync(allGuids)
+            : Enumerable.Empty<IWebPageFieldsSource>();
+
+        var pageUrlMap = selectedPages?.ToDictionary(
+            p => p.SystemFields?.WebPageItemGUID ?? Guid.Empty,
+            p => p.GetUrl()?.RelativePath ?? string.Empty
+        ) ?? new Dictionary<Guid, string>();
+
+        int order = 1;
+        foreach (var link in footerLinksPages)
+        {
+            var guid = link?.TargetURL?.FirstOrDefault()?.SystemFields?.WebPageItemGUID ?? Guid.Empty;
+
+            footerPages.Add(new FooterLinkDto
+            {
+                OpenInNewTab = link?.OpenInNewTab ?? false,
+                Order = order++,
+                Title = link?.Title ?? string.Empty,
+                URL = guid != Guid.Empty && pageUrlMap.TryGetValue(guid, out var url) ? url : string.Empty
+            });
+        }
+        return footerPages;
+    }
     private async Task<IEnumerable<SocialButtonDto?>> GetSocialLinks()
     {
         var socialLinksPages = (await _contentService.GetItemsChannelAsync<SocialLinks>())?.Take(8) ?? Enumerable.Empty<SocialLinks>();
@@ -160,4 +269,21 @@ public class FooterService : IFooterService
             .ToList();
     }
 
+    private async Task<IEnumerable<SocialButtonDto?>> GetSocialLinks(int channelId)
+    {
+        var socialLinksPages = (await _contentService.GetItemsChannelOnChannelIdAsync<SocialLinks>(channelId: channelId ))?.Take(8) ?? Enumerable.Empty<SocialLinks>();
+        int order = 1;
+
+        return socialLinksPages
+            .Select(link => new SocialButtonDto
+            {
+                AltText = link?.Alttext ?? string.Empty,
+                AriaLabel = link?.AriaLabel ?? string.Empty,
+                IconType = link?.Icontype ?? string.Empty,
+                Order = order++,
+                URL = link?.Url?.ToString() ?? "#"
+            })
+            .OrderBy(x => x.Order)
+            .ToList();
+    }
 }

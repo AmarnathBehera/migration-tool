@@ -83,6 +83,29 @@
 
             return results.ToList().AsReadOnly();
         }
+
+        public async Task<IReadOnlyList<T>> GetItemsChannelOnChannelIdAsync<T>(
+   Action<ContentItemQueryBuilder>? configure = null,
+   CancellationToken cancellationToken = default, int channelId = 0)
+   where T : class
+        {
+            var builder = new ContentItemQueryBuilder();
+
+            builder.ForContentType(GetContentTypeName<T>(), subquery =>
+            {
+                subquery.Where(w =>
+                    w.WhereEquals("ContentItemChannelID", channelId));
+            });
+            configure?.Invoke(builder);
+
+            var queryOptions = BuildQueryExecutionOptions();
+
+            var results = await _executor.GetMappedResult<T>(builder, queryOptions, cancellationToken);
+
+            return results.ToList().AsReadOnly();
+        }
+
+
         /// <inheritdoc />
         public async Task<T?> GetItemAsync<T>(
             Guid contentItemGuid,
@@ -466,8 +489,35 @@
         }
 
       
+        /// <summary>
+/// Retrieves web pages of type <typeparamref name="TPage"/> for a specific channel ID.
+/// </summary>
+public async Task<IEnumerable<TPage>> GetPagesAsync<TPage>(
+    int channelId,
+    RetrievePagesParameters parameters,
+    Action<RetrievePagesQueryParameters> queryAction,
+    RetrievalCacheSettings cacheSettings,
+    CancellationToken cancellationToken
+) where TPage : class, IWebPageFieldsSource
+        {
+            // Wrap the original query action to include channelId filter
+            Action<RetrievePagesQueryParameters> decoratedQueryAction = query =>
+            {
+                // Apply the user's query first
+                queryAction?.Invoke(query);
+                
+                // Add channel filter
+                query.Where(w => w.WhereEquals("WebPageItemChannelID", channelId));
+            };
 
-        
+            // Call the extension method with decorated query
+            return await _contentRetriever.RetrievePages<TPage>(
+                parameters,
+                decoratedQueryAction,
+                cacheSettings,
+                cancellationToken
+            );
+        }
     }
 }
 
