@@ -12,10 +12,11 @@ namespace BDO.GWT.Core.Services;
 public interface IInsightCardService
 {
     Task<FilterItemDto<OptionDto>[]> CreateFiltersAsync(HashSet<string> filterParameterNames, string? nodeAliasPath, CancellationToken cancellationToken);
-    Task<PaginationDto<ContentPageCardDto>> GetFilteredItemsAsync (CardsQuery cardsQuery, string parentPath,
+    Task<PaginationDto<ContentPageCardDto>> GetFilteredItemsAsync (CardsQuery cardsQuery, string parentPath, string language,
         Action<RetrievePagesQueryParameters>? decorateQuery,
         Func<Insight, bool> isFeatured,
         CancellationToken cancellationToken);
+
 }
 public class InsightCardService : IInsightCardService
 {
@@ -47,7 +48,7 @@ public class InsightCardService : IInsightCardService
     public async Task<PaginationDto<ContentPageCardDto>> GetFilteredItemsAsync(
     CardsQuery cardsQuery,
     string parentPath,
-    Action<RetrievePagesQueryParameters>? decorateQuery,
+    string language, Action<RetrievePagesQueryParameters>? decorateQuery,
     Func<Insight, bool> isFeatured,
     CancellationToken cancellationToken)
     {

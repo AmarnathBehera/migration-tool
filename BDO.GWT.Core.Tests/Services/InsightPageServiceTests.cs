@@ -16,12 +16,12 @@ namespace BDO.GWT.Core.Tests.Services;
 
 public class InsightPageServiceTests
 {
-    private static readonly int[] ContactIds = [1, 2];
-    private static readonly int[] SingleContactId = [1];
-    private static readonly string[] ExpectedComposedContactNames = ["Ada Lovelace", "Grace van Hopper"];
-    private static readonly string[] ExpectedPersonMetadataTitle = ["Person Metadata Title"];
-    private static readonly string[] ExpectedExternalComposedName = ["Ada van Lovelace"];
-    private static readonly string[] ExpectedExternalMetadataTitle = ["External Metadata Title"];
+    private static readonly int[] ContactIds = new[] { 1, 2 };
+    private static readonly int[] SingleContactId = new[] { 1 };
+    private static readonly string[] ExpectedComposedContactNames = new[] { "Ada Lovelace", "Grace van Hopper" };
+    private static readonly string[] ExpectedPersonMetadataTitle = new[] { "Person Metadata Title" };
+    private static readonly string[] ExpectedExternalComposedName = new[] { "Ada van Lovelace" };
+    private static readonly string[] ExpectedExternalMetadataTitle = new[] { "External Metadata Title" };
 
     private Mock<IContentRetriever> _contentRetrieverMock = null!;
     private Mock<IInfoProvider<WebsiteChannelInfo>> _websiteChannelInfoProviderMock = null!;
@@ -72,6 +72,141 @@ public class InsightPageServiceTests
             _websiteChannelContextMock.Object,
             _settingServiceMock.Object,
             _socialMediaButtonsServiceMock.Object);
+    }
+
+    [Test]
+    public async Task GetContentPageSidebarDto_FindsSectionViaGroupParent_WhenDirectParentHasNoSection()
+    {
+        var insight = CreateInsight(
+            title: "Insight page",
+            showSidebar: true);
+
+        SetContentType(insight, "Article");
+        SetCollection(insight, nameof(Insight.RelevantContactPerson), Array.Empty<object>());
+        SetCollection(insight, nameof(Insight.RelatedExternalPeople), Array.Empty<object>());
+
+        // Section for GUID exists (to allow GetContentPageSidebarDto to proceed)
+        var initialSection = new SectionInsightsPage { ShowCopyUrlButtonInInsightPage = false };
+        // Section found later for group parent
+        var groupParentSection = new SectionInsightsPage { ShowCopyUrlButtonInInsightPage = true };
+
+        // Setup sequence for SectionInsightsPage calls: 1) GUID check -> initialSection, 2) lookup by parentId -> none, 3) lookup by groupParentId -> groupParentSection
+        _contentServiceMock
+            .SetupSequence(x => x.GetPagesAsync<SectionInsightsPage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { initialSection })
+            .ReturnsAsync(Array.Empty<SectionInsightsPage>())
+            .ReturnsAsync(new[] { groupParentSection });
+
+        // Ensure Insight lookup returns the insight (used in method)
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<Insight>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { insight });
+
+        // Setup group found for the parentId with parent pointing to groupParentId
+        var group = new InsightGroup();
+        SetSystemFields(group, contentItemId: 300, contentItemGuid: Guid.NewGuid(), contentItemName: "Group", webPageItemId: 20, webPageParentId: 0, webPageUrlPath: "/group", webPageTreePath: "/group");
+        // group.SystemFields.WebPageItemParentID should be > 0 to trigger lookup
+        SetPropertyValue(group.SystemFields, "WebPageItemParentID", 20);
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<InsightGroup>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { group });
+
+        // Ensure page-level setting causes initial ShowCopyLinkButton to be true so section permission can enable it
+        _settingServiceMock
+            .Setup(x => x.GetPrintorShareInfo())
+            .ReturnsAsync(new[] { new TestPrintorShareInfo { DisableCopyLinkButton = true } });
+
+        // Call
+        var result = await _service.GetContentPageSidebarDto(insight, CancellationToken.None);
+
+        Assert.That(result.ShowCopyLinkButton, Is.True);
+    }
+
+    [Test]
+    public async Task GetContentPageSidebarDto_FindsSectionViaCategoryParent_WhenGroupParentHasNoSection()
+    {
+        var insight = CreateInsight(
+            title: "Insight page",
+            showSidebar: true);
+
+        SetContentType(insight, "Article");
+        SetCollection(insight, nameof(Insight.RelevantContactPerson), Array.Empty<object>());
+        SetCollection(insight, nameof(Insight.RelatedExternalPeople), Array.Empty<object>());
+
+        // Section for GUID exists (to allow GetContentPageSidebarDto to proceed)
+        var initialSection = new SectionInsightsPage { ShowCopyUrlButtonInInsightPage = false };
+        // Section found later for category parent
+        var categoryParentSection = new SectionInsightsPage { ShowCopyUrlButtonInInsightPage = true };
+
+        // Setup sequence for SectionInsightsPage calls: 1) GUID check -> initialSection, 2) lookup by parentId -> none, 3) lookup by groupParentId -> none, 4) lookup by categoryParentId -> categoryParentSection
+        _contentServiceMock
+            .SetupSequence(x => x.GetPagesAsync<SectionInsightsPage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { initialSection })
+            .ReturnsAsync(Array.Empty<SectionInsightsPage>())
+            .ReturnsAsync(Array.Empty<SectionInsightsPage>())
+            .ReturnsAsync(new[] { categoryParentSection });
+
+        // Ensure Insight lookup returns the insight (used in method)
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<Insight>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { insight });
+
+        // Setup group found for the parentId with parent pointing to groupParentId
+        var group = new InsightGroup();
+        SetSystemFields(group, contentItemId: 400, contentItemGuid: Guid.NewGuid(), contentItemName: "Group2", webPageItemId: 30, webPageParentId: 0, webPageUrlPath: "/group2", webPageTreePath: "/group2");
+        SetPropertyValue(group.SystemFields, "WebPageItemParentID", 30);
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<InsightGroup>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { group });
+
+        // Setup category found for the groupParentId with parent pointing to categoryParentId
+        var category = new InsightCategory();
+        SetSystemFields(category, contentItemId: 500, contentItemGuid: Guid.NewGuid(), contentItemName: "Category", webPageItemId: 40, webPageParentId: 0, webPageUrlPath: "/category", webPageTreePath: "/category");
+        SetPropertyValue(category.SystemFields, "WebPageItemParentID", 40);
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<InsightCategory>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { category });
+
+        // Ensure page-level setting causes initial ShowCopyLinkButton to be true so section permission can enable it
+        _settingServiceMock
+            .Setup(x => x.GetPrintorShareInfo())
+            .ReturnsAsync(new[] { new TestPrintorShareInfo { DisableCopyLinkButton = true } });
+
+        // Call
+        var result = await _service.GetContentPageSidebarDto(insight, CancellationToken.None);
+
+        Assert.That(result.ShowCopyLinkButton, Is.True);
     }
 
     [Test]

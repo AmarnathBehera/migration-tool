@@ -1,8 +1,9 @@
 ﻿using BDO;
-using BDO.GWT.GLOBAL.Widgets;
 using BDO.GWT.Core.Components.Widgets.EditorsPickWidget;
+using BDO.GWT.GLOBAL.Components.Widget.InsightCarouselWidget;
 using BDO.GWT.GLOBAL.Components.Widget.KeyTakeawaysWidget;
 using BDO.GWT.GLOBAL.Components.Widget.LocalNavigationWidget;
+using BDO.GWT.GLOBAL.Widgets;
 using BDO.GWT.Web.Components.Widget.TabAccordionWidget;
 using BDO.GWT.Web.Widgets.AccordionWidget;
 using BDO.GWT.Web.Widgets.FaqWidget;
@@ -27,6 +28,7 @@ using Kentico.Forms.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
 
 // Widgets
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.InsightCarousel, typeof(InsightCarouselWidget), "Insight carousel", typeof(InsightCarouselWidgetProperties), AllowCache = true, IconClass = "icon-carousel")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.Imagewithtext, typeof(ImageWithTextWidget), "Image With Text", typeof(ImageWithTextWidgetProperties), AllowCache = true, IconClass = "icon-outdent")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.QuoteCard, typeof(QuoteCardWidget), "Quote Card Widget", typeof(QuoteCardWidgetProperties), AllowCache = true, IconClass = "icon-right-double-quotation-mark")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.ExternalNavigation, typeof(ExternalNavigationWidget), "External Navigation Item", typeof(ExternalNavigationWidgetProperties), AllowCache = true, IconClass = "icon-chain")]

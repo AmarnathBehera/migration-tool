@@ -22,6 +22,7 @@ public class InsightCategoryCardListingPageServiceTests
     private Mock<IFilteringHelper> _filteringHelperMock = null!;
     private Mock<IHeroService> _heroServiceMock = null!;
     private Mock<IWebPageUrlRetriever> _webPageUrlRetrieverMock = null!;
+    private Mock<IContentService> _contentServiceMock = null!;
     private InsightCategoryCardListingPageService _service = null!;
 
     [SetUp]
@@ -33,6 +34,7 @@ public class InsightCategoryCardListingPageServiceTests
         _filteringHelperMock = new Mock<IFilteringHelper>();
         _heroServiceMock = new Mock<IHeroService>();
         _webPageUrlRetrieverMock = new Mock<IWebPageUrlRetriever>();
+        _contentServiceMock = new Mock<IContentService>();
 
         _websiteChannelContextMock
             .Setup(x => x.WebsiteChannelID)
@@ -53,6 +55,7 @@ public class InsightCategoryCardListingPageServiceTests
             .Setup(x => x.GetFilteredItemsAsync(
                 It.IsAny<CardsQuery>(),
                 It.IsAny<string>(),
+                It.IsAny<string>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>?>(),
                 It.IsAny<Func<Insight, bool>>(),
                 It.IsAny<CancellationToken>()))
@@ -66,13 +69,18 @@ public class InsightCategoryCardListingPageServiceTests
             .Setup(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
 
+        _contentServiceMock
+            .Setup(x => x.GetCurrentLanguage())
+            .Returns("en-US");
+
         _service = new InsightCategoryCardListingPageService(
             _insightCardServiceMock.Object,
             _websiteChannelContextMock.Object,
             _contentRetrieverMock.Object,
             _filteringHelperMock.Object,
             _heroServiceMock.Object,
-            _webPageUrlRetrieverMock.Object);
+            _webPageUrlRetrieverMock.Object,
+            _contentServiceMock.Object);
     }
 
     [Test]
@@ -136,10 +144,11 @@ public class InsightCategoryCardListingPageServiceTests
             .Setup(x => x.GetFilteredItemsAsync(
                 It.IsAny<CardsQuery>(),
                 It.IsAny<string>(),
+                It.IsAny<string>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>?>(),
                 It.IsAny<Func<Insight, bool>>(),
                 It.IsAny<CancellationToken>()))
-            .Callback<CardsQuery, string, Action<RetrievePagesQueryParameters>?, Func<Insight, bool>, CancellationToken>((_, parentPath, decorateQuery, _, _) =>
+            .Callback<CardsQuery, string, string, Action<RetrievePagesQueryParameters>?, Func<Insight, bool>, CancellationToken>((_, parentPath, _, decorateQuery, _, _) =>
             {
                 capturedParentPath = parentPath;
                 capturedDecorateQuery = decorateQuery;
@@ -178,10 +187,11 @@ public class InsightCategoryCardListingPageServiceTests
             .Setup(x => x.GetFilteredItemsAsync(
                 It.IsAny<CardsQuery>(),
                 It.IsAny<string>(),
+                It.IsAny<string>(),
                 It.IsAny<Action<RetrievePagesQueryParameters>?>(),
                 It.IsAny<Func<Insight, bool>>(),
                 It.IsAny<CancellationToken>()))
-            .Callback<CardsQuery, string, Action<RetrievePagesQueryParameters>?, Func<Insight, bool>, CancellationToken>((_, _, decorateQuery, _, _) =>
+            .Callback<CardsQuery, string, string, Action<RetrievePagesQueryParameters>?, Func<Insight, bool>, CancellationToken>((_, _, _, decorateQuery, _, _) =>
             {
                 capturedDecorateQuery = decorateQuery;
             })
