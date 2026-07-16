@@ -33,7 +33,7 @@
             CancellationToken cancellationToken = default)
             where T : class;
 
-        Task<IReadOnlyList<T>> GetItemsChannelOnChannelIdAsync<T>(
+        Task<IReadOnlyList<T>> GetItemsChannelOnChannelIdAsync<T>(string cultureName,
             Action<ContentItemQueryBuilder>? configure = null,
             CancellationToken cancellationToken = default, int channelId = 0)
             where T : class;
@@ -68,10 +68,12 @@
         /// </summary>
         Task<IEnumerable<IWebPageFieldsSource>> GetItemsByGUIDAsync(List<Guid> webPageItemGuidsfirst);
 
+        Task<IEnumerable<IWebPageFieldsSource>> GetItemsByGUIDForAPIAsync(List<Guid> webPageItemGuidsfirst, string? channelName, string? cultureName);
         /// <summary>
         //Retrieve page 
         /// </summary>
         Task<IEnumerable<T>> GetContentType<T>(CancellationToken cancellationToken = default) where T : class, IWebPageFieldsSource;
+        Task<IEnumerable<T>> GetContentTypeForAPI<T>(CancellationToken cancellationToken = default, string? channelName = null, string? cultureName = null) where T : class, IWebPageFieldsSource;
 
         Task<IEnumerable<TPage>> GetChildPagesByParentGuidAsync<TPage>(
        int parentGuid,

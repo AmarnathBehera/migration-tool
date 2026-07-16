@@ -2,6 +2,7 @@
 using BDO.GWT.Core.DTOs.Footer;
 using BDO.GWT.Core.Services.Footer;
 using CMS.ContentEngine;
+using CMS.DataEngine;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 using Moq;
@@ -11,13 +12,15 @@ namespace BDO.GWT.Core.Tests.Services
     public class FooterServiceTests
     {
         private Mock<IContentService> _contentServiceMock = null!;
+        private Mock<IInfoProvider<ChannelInfo>> _channelInfoProviderMock = null!;
         private FooterService _service = null!;
 
         [SetUp]
         public void Setup()
         {
             _contentServiceMock = new Mock<IContentService>();
-            _service = new FooterService(_contentServiceMock.Object);
+            _channelInfoProviderMock = new Mock<IInfoProvider<ChannelInfo>>();
+            _service = new FooterService(_contentServiceMock.Object, _channelInfoProviderMock.Object);
         }
 
         #region Helpers

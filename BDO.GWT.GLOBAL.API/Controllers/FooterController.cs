@@ -10,6 +10,7 @@ using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Globalization;
+using BDO.GWT.Core.ValueObjects;
 
 namespace BDO.GWT.GLOBAL.API.Controllers
 {
@@ -25,7 +26,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
     public class FooterController : Controller
     {
         private readonly IFooterService _footerService;
-
+        private static readonly LanguageTag defaultCulture = LanguageTag.GB;
         /// <summary>
         ///constructor for FooterController.
         /// </summary>
@@ -54,9 +55,16 @@ namespace BDO.GWT.GLOBAL.API.Controllers
                 return new FooterDto();
             }
 
+            var culture = (string?)HttpContext.Request.RouteValues["culture"];
+
+            if (culture == null)
+            { 
+              culture = defaultCulture.ToString();
+            }
+
             var channelId = HttpContext.Items["ChannelId"] as int? ?? 1; // Default to 1
 
-            var footer = await _footerService.GetAsyncForAPI(channelId, cancellationToken);
+            var footer = await _footerService.GetAsyncForAPI(channelId, culture, cancellationToken);
 
             return Ok(footer);
         }
