@@ -122,6 +122,8 @@ public class EventWebinarCardsService : IEventWebinarCardsService
             FilterParameterName.SpecialtyCategory => x => x.WhereContains(nameof(IEventOrWebinar.MetadataSpecialtiesCategories), guid),
             FilterParameterName.OfficeLocation => x => x.WhereContains(nameof(IEventOrWebinar.MetadataOfficeLocation), guid),
             FilterParameterName.ShowAllPastEvents => x => x.WhereContains(nameof(IEventOrWebinar.ShowPastEvent), guid),
+            FilterParameterName.MicrositeMasterPage => x => x.WhereContains(nameof(IEventOrWebinar.MicrositeMasterPages), guid),
+            FilterParameterName.MicrositePage => x => x.WhereContains(nameof(IEventOrWebinar.MicrositePages), guid),
 
             _ => null,
         };

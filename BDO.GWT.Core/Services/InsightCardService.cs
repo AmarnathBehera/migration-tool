@@ -229,7 +229,7 @@ public class InsightCardService : IInsightCardService
 }
     private Task<ContentPageCardDto> GetContentPageCardDtoAsync(Insight page, Func<Insight, bool> isFeatured)
     {
-        var imageUrl = page.CopyInsight.FirstOrDefault()?.ImageFile
+        var imageUrl = page.InsightContent.FirstOrDefault()?.ImageFile
         .FirstOrDefault()?
         .ContentAttachmentAsset?
         .Url;
@@ -238,7 +238,7 @@ public class InsightCardService : IInsightCardService
             IsFeatured = isFeatured(page),
             ImageURL = GetAbsoluteAssetUrl(imageUrl),
             isComingSoon = page.ComingSoon,
-            ImageAltText = page.CopyInsight.FirstOrDefault()?.ImageFileAltText,
+            ImageAltText = page.InsightContent.FirstOrDefault()?.ImageFileAltText,
        
             Type = page.ContentType?.FirstOrDefault()?.Name,
             Title = page.MetadataTitle,
