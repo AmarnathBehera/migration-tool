@@ -1118,4 +1118,72 @@ public class InsightPageServiceTests
 
         Assert.That(result, Is.Empty);
     }
+
+    [Test]
+    public void GetCallToActionDto_ReturnsNull_WhenButtonTextIsMissing()
+    {
+        var result = InsightPageService.GetCallToActionDto(
+            callToActionDescription: "CTA description",
+            callToActionButtonText: null,
+            callToActionButtonLink: "https://example.com",
+            CallToActionPosition: "right");
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public void GetCallToActionDto_ReturnsNull_WhenButtonLinkIsMissing()
+    {
+        var result = InsightPageService.GetCallToActionDto(
+            callToActionDescription: "CTA description",
+            callToActionButtonText: "Read more",
+            callToActionButtonLink: null,
+            CallToActionPosition: "right");
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public void GetCallToActionDto_UsesDefaultLeftPosition_WhenPositionIsNull()
+    {
+        var result = InsightPageService.GetCallToActionDto(
+            callToActionDescription: "CTA description",
+            callToActionButtonText: "Read more",
+            callToActionButtonLink: "https://example.com",
+            CallToActionPosition: null);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Position, Is.EqualTo("left"));
+        Assert.That(result.CallToActionDto.ButtonTitle, Is.EqualTo("Read more"));
+        Assert.That(result.CallToActionDto.ButtonUrl, Is.EqualTo("https://example.com"));
+    }
+
+    [Test]
+    public async Task GetSidebarDtoAsync_WhenSocialMediaButtonsExist_ResetsCopyLinkToNull()
+    {
+        var insight = CreateInsight(
+            title: "Insight page",
+            showSidebar: true);
+
+        insight.ShowPrintButton = true;
+        insight.ShowSocialMediaButtons = true;
+
+        _socialMediaButtonsServiceMock
+            .Setup(x => x.GetSocialMediaButtonsDto(
+                insight,
+                insight.PageTitle,
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SocialMediaButtonsDto
+            {
+                EmailButtonUrl = "mailto:test@example.com",
+                ShowCopyLinkButton = true
+            });
+
+        var result = await _service.GetSidebarDtoAsync(
+            insight,
+            CancellationToken.None);
+
+        Assert.That(result.SocialMediaButtons, Is.Not.Null);
+        Assert.That(result.SocialMediaButtons!.ShowCopyLinkButton, Is.Null);
+    }
 }
