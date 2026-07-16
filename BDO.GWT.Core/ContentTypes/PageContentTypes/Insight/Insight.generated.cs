@@ -36,9 +36,9 @@ namespace BDO
 
 
 		/// <summary>
-		/// CopyInsight.
+		/// InsightContent.
 		/// </summary>
-		public IEnumerable<CopyInsight> CopyInsight { get; set; }
+		public IEnumerable<CopyInsight> InsightContent { get; set; }
 
 
 		/// <summary>

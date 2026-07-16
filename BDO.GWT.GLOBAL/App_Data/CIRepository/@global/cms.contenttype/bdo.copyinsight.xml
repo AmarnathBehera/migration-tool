@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <cms.contenttype>
   <ClassContentTypeType>Reusable</ClassContentTypeType>
-  <ClassDisplayName>Copy Insight</ClassDisplayName>
+  <ClassDisplayName>Insight Content</ClassDisplayName>
   <ClassFormDefinition>
     <form>
       <field column="ContentItemDataID" columntype="integer" enabled="true" guid="450abcd5-5d1c-4f85-b9ca-0e212ea8b8db" isPK="true" />
