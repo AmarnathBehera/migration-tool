@@ -36,13 +36,13 @@ public class MemberFirmMiddleware : IMiddleware
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        if (context.User.Identity is not { IsAuthenticated: true })
-        {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            await context.Response.CompleteAsync();
+        //if (context.User.Identity is not { IsAuthenticated: true })
+        //{
+        //    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        //    await context.Response.CompleteAsync();
 
-            return;
-        }
+        //    return;
+        //}
 
         if (!context.Request.Path.StartsWithSegments("/memberFirms", StringComparison.InvariantCultureIgnoreCase))
         {
@@ -76,12 +76,12 @@ public class MemberFirmMiddleware : IMiddleware
 
         if (globalLocationCustomTableData != null)
         {
-            if (globalLocationCustomTableData.ChannelId == 0)
-            {
-#pragma warning disable S112
-                throw new NullReferenceException($"Member firm with ID '{globalLocationCustomTableData.ChannelId}' does not have 'channel' property set.");
-#pragma warning restore S112
-            }
+//            if (globalLocationCustomTableData.ChannelId == 0)
+//            {
+//#pragma warning disable S112
+//                throw new NullReferenceException($"Member firm with ID '{globalLocationCustomTableData.ChannelId}' does not have 'channel' property set.");
+//#pragma warning restore S112
+//            }
             context.Items["ChannelId"] = globalLocationCustomTableData.ChannelId == 0 ? 1 : globalLocationCustomTableData.ChannelId;
         }
         else

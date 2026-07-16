@@ -1,4 +1,3 @@
-using AngleSharp.Dom;
 using BDO.GWT.Common.Core.Exceptions;
 using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
@@ -9,11 +8,8 @@ using CMS.DataEngine;
 using CMS.Membership;
 using CMS.Websites;
 using CMS.Websites.Routing;
-using CMS.Websites.Routing.Internal;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
-using System.Drawing;
-using System.Net.Mime;
 using System.Text.RegularExpressions;
 
 namespace BDO.GWT.GLOBAL.API.Services;
@@ -34,36 +30,25 @@ public class DealCrudService : IDealCrudService
     private readonly IValidationState _validationState;
     private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly ICultureService _cultureService;
-    private readonly IPageContentValidator _pageContentValidator;
     private readonly IInfoProvider<ChannelInfo> _channelInfoProvider;
     private readonly IWebPageManager _webPageManager;
-    private readonly IContentItemManager _contentItemManager;
-    private readonly IWebsiteCulturesService _websiteCulturesService;
     private static readonly LanguageTag defaultCulture = LanguageTag.GB;
     private const string DEAL_CONTENT_TYPE = Deal.CONTENT_TYPE_NAME;
+    private const string WEB_PAGE_GUID = "WebPageItemGUID";
 
-
-#pragma warning disable S107
-    public DealCrudService(IContentService contentRetriever, IValidationState validationState, IWebsiteChannelContext websiteChannelContext, IContentService contentService, ICultureService cultureService, IPageContentValidator pageContentValidator, IInfoProvider<ChannelInfo> channelInfoProvider, IWebPageManagerFactory webPageManagerFactory, IContentItemManagerFactory managerFactory, IUserInfoProvider userInfoProvider, IWebsiteCulturesService websiteCulturesService)
-#pragma warning restore S107
+    public DealCrudService(IContentService contentRetriever, IValidationState validationState, IWebsiteChannelContext websiteChannelContext, ICultureService cultureService, IInfoProvider<ChannelInfo> channelInfoProvider, IWebPageManagerFactory webPageManagerFactory, IUserInfoProvider userInfoProvider)
     {
         UserInfo user = userInfoProvider.Get("administrator");
         _contentRetriever = contentRetriever;
         _validationState = validationState;
         _websiteChannelContext = websiteChannelContext;
         _cultureService = cultureService;
-        _pageContentValidator = pageContentValidator;
         _channelInfoProvider = channelInfoProvider;
-        _contentItemManager = managerFactory.Create(user.UserID);
         _webPageManager = webPageManagerFactory.Create(_websiteChannelContext.WebsiteChannelID == 0 ? 1 : _websiteChannelContext.WebsiteChannelID, user.UserID);
-        _websiteCulturesService = websiteCulturesService;
     }
 
     public async Task<ActionResult<IEnumerable<PageOutput<DealPageContent>>>> GetDealPagesAsync(int channelId, string? culture, bool? onlyPublished, CancellationToken cancellationToken)
     {
-        //var language = ContentLanguageInfo.Provider.Get()
-        //.FirstOrDefault(l => l.ContentLanguageName == culture);
-
         var channel = await _channelInfoProvider.GetAsync(channelId);
 
         var retrieveParameters = new RetrievePagesParameters
@@ -89,12 +74,9 @@ public class DealCrudService : IDealCrudService
         var deals = results.ToList() ?? new List<Deal>();
         return deals.Select(MapDealToPageOutput).ToList();
     }
-    
+
     public async Task<ActionResult<PageOutput<DealPageContent>>> GetDealPageAsync(int channelId, Guid pageGUID, string? culture, CancellationToken cancellationToken)
     {
-        //var language = ContentLanguageInfo.Provider.Get()
-        //.FirstOrDefault(l => l.ContentLanguageName == culture);
-
         var channel = await _channelInfoProvider.GetAsync(channelId);
         var _retrieveCurrentPage = new RetrievePagesParameters
         {
@@ -107,8 +89,7 @@ public class DealCrudService : IDealCrudService
         var result = await _contentRetriever.GetPagesAsync<Deal>(_retrieveCurrentPage,
             query =>
             {
-                query.Where(w => w.WhereEquals("WebPageItemGUID", pageGUID));
-                //query.Where(w => w.WhereEquals("ContentItemCommonDataContentLanguageID", language?.ContentLanguageID));
+                query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID));
             },
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken);
@@ -131,6 +112,7 @@ public class DealCrudService : IDealCrudService
         }
 
         //var currentCulture = await ValidateAndNormalizeSiteCultureAsync(culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+
         var channel = await _channelInfoProvider.GetAsync(channelId);
         var _retrieveCurrentPage = new RetrievePagesParameters
         {
@@ -142,9 +124,6 @@ public class DealCrudService : IDealCrudService
 
         var parentPage = await _contentRetriever.GetPagesAsync<SectionDeals>(_retrieveCurrentPage, query => query
             .Where(w => w.WhereEquals("WebPageItemID", nodeParentID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
-
-        //var parentPage = await _contentRetriever.GetPagesAsync<IWebPageFieldsSource>(_retrieveCurrentPage, query => query
-        //    .Where(w => w.WhereEquals("WebPageItemID", nodeParentID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
 
         if (parentPage == null)
         {
@@ -165,15 +144,11 @@ public class DealCrudService : IDealCrudService
         // The page display name shown in the admin UI
         string pageDisplayName = request.MetadataTitle ?? "New Deal Created by API";
 
-        //var deal = await MapDealPageContentToDeal(request, nodeParentID, culture, cancellationToken);
-
         var itemData = CreateCMSTreeItem(request, nodeParentID, culture);
 
         // Creates a page metadata object
         var contentItemParameters = new ContentItemParameters(DEAL_CONTENT_TYPE, itemData);
-        var createPageParameters = new CreateWebPageParameters(pageDisplayName,
-                                                               culture,
-                                                               contentItemParameters);
+        var createPageParameters = new CreateWebPageParameters(pageDisplayName, culture, contentItemParameters);
 
         // Creates the page in the database
         int newPageId = await _webPageManager.Create(createPageParameters, cancellationToken);
@@ -195,8 +170,7 @@ public class DealCrudService : IDealCrudService
         {
             LinkedItemsMaxLevel = 1,
             ChannelName = channel.ChannelName,
-            LanguageName = culture,
-            IsForPreview = false,
+            LanguageName = culture
         };
 
         var createdResult = await _contentRetriever.GetPagesAsync<Deal>(_retrieveNewPage,
@@ -225,7 +199,7 @@ public class DealCrudService : IDealCrudService
 
         // Get existing page
         var result = await _contentRetriever.GetPagesAsync<Deal>(_retrieveCurrentPage,
-            query => query.Where(w => w.WhereEquals("WebPageItemGUID", pageGUID)),
+            query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken);
 
@@ -242,7 +216,7 @@ public class DealCrudService : IDealCrudService
         var createVariantParameters = new CMS.Websites.CreateLanguageVariantParameters(
             existingDeal.SystemFields.WebPageItemID,
             toCulture ?? defaultCulture.Language,
-            existingDeal.SystemFields?.ContentItemName ?? "Deal Variant",
+            existingDeal.SystemFields?.ContentItemName ?? "Deal culture variant",
             itemData);
 
         // Creates the page in the database
@@ -250,7 +224,7 @@ public class DealCrudService : IDealCrudService
 
         // Publish the updated page
         if (isCreated)
-            _webPageManager.TryPublish(existingDeal.SystemFields.WebPageItemID, toCulture, cancellationToken);
+            await _webPageManager.TryPublish(existingDeal.SystemFields.WebPageItemID, toCulture, cancellationToken);
 
         // Retrieve the created variant and return it
         var _retrieveNewVariant = new RetrievePagesParameters
@@ -262,7 +236,7 @@ public class DealCrudService : IDealCrudService
         };
 
         var variantResult = await _contentRetriever.GetPagesAsync<Deal>(_retrieveNewVariant,
-            query => query.Where(w => w.WhereEquals("WebPageItemGUID", pageGUID)),
+            query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken);
 
@@ -287,7 +261,7 @@ public class DealCrudService : IDealCrudService
 
         // Get existing page
         var result = await _contentRetriever.GetPagesAsync<Deal>(_retrieveCurrentPage,
-            query => query.Where(w => w.WhereEquals("WebPageItemGUID", pageGUID)),
+            query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken);
 
@@ -317,7 +291,7 @@ public class DealCrudService : IDealCrudService
 
         // Retrieve the updated page and return it
         var updatedResult = await _contentRetriever.GetPagesAsync<Deal>(_retrieveCurrentPage,
-            query => query.Where(w => w.WhereEquals("WebPageItemGUID", pageGUID)),
+            query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken);
 
@@ -347,7 +321,7 @@ public class DealCrudService : IDealCrudService
 
                 // Get existing page for this culture
                 var result = await _contentRetriever.GetPagesAsync<Deal>(_retrieveCurrentPage,
-                    query => query.Where(w => w.WhereEquals("WebPageItemGUID", pageGUID)),
+                    query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
                     RetrievalCacheSettings.CacheDisabled,
                     cancellationToken);
 
@@ -357,7 +331,7 @@ public class DealCrudService : IDealCrudService
                     await _webPageManager.Delete(
                         new DeleteWebPageParameters(existingDeal.SystemFields.WebPageItemID, cult.ToString())
                         {
-                            Permanently = true  
+                            Permanently = true
                         });
                 }
             }
@@ -374,7 +348,7 @@ public class DealCrudService : IDealCrudService
 
             // Get existing page
             var result = await _contentRetriever.GetPagesAsync<Deal>(_retrieveCurrentPage,
-                query => query.Where(w => w.WhereEquals("WebPageItemGUID", pageGUID)),
+                query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
 
                 RetrievalCacheSettings.CacheDisabled,
                 cancellationToken);
@@ -451,7 +425,7 @@ public class DealCrudService : IDealCrudService
                 SharingOptIn = deal.SharingOptIn,
                 DealCountry = deal.DealCountry,
                 DisplayedContacts = deal.DisplayedContacts,
-                RelevantContactPerson = string.Empty,
+                RelevantContactPerson = deal.RelevantContactPersonDeal?.FirstOrDefault()?.SystemFields?.ContentItemName,
                 PeopleSort = [],
                 MetadataOGTitle = deal.MetadataOGTitle,
                 MetadataOGDescription = deal.MetadataOGDescription,
@@ -529,14 +503,16 @@ public class DealCrudService : IDealCrudService
             { "SharingOptIn", deal.SharingOptIn },
             { "DealCountry", deal.DealCountry ?? string.Empty },
             { "DisplayedContacts", deal.DisplayedContacts ?? string.Empty },
-            { "RelevantContactPersonDeal", deal.RelevantContactPerson },
+            { "RelevantContactPersonDeal", new List<ContentItemReference>()
+                { new ContentItemReference()
+                        { Identifier = Guid.Parse("c4b1f72e-42d7-41dd-8130-00cd118f5f20")}}},
             { "ShowCallToAction", deal.ShowCallToAction },
             { "CallToActionDescription", deal.CallToActionDescription ?? string.Empty },
             { "CallToActionButtonText", deal.CallToActionButtonText ?? string.Empty },
             { "CallToActionButtonUrl", deal.CallToActionButtonUrl ?? string.Empty },
             { "ShowSidebar", deal.ShowSidebar },
             { "ShowPrintButton", deal.ShowPrintButton },
-            { "DownloadButtonAttachment",new List<ContentAttachment>(){new ContentAttachment() {ContentAttachmentAsset = new ContentItemAsset() {Url = deal.DownloadButtonAttachment ?? string.Empty}}}},
+            { "DownloadButtonAttachment", new List<ContentAttachment>(){new ContentAttachment() {ContentAttachmentAsset = new ContentItemAsset() {Url = deal.DownloadButtonAttachment ?? string.Empty}}}},
             { "ShowSocialMediaButtons", deal.ShowSocialMediaButtons },
             { "MetadataOGTitle", deal.MetadataOGTitle ?? string.Empty },
             { "MetadataOGDescription", deal.MetadataOGDescription ?? string.Empty },
@@ -554,13 +530,15 @@ public class DealCrudService : IDealCrudService
             { "HeroLayout", deal.HeroLayout ?? string.Empty },
             { "HeroTitle", deal.HeroTitle ?? string.Empty },
             { "HeroDescription", deal.HeroDescription ?? string.Empty },
-            { "HeroBackgroundImage", new List<ContentAttachment>()},
+            { "HeroBackgroundImage", new List<ContentAttachment>(){new ContentAttachment() {ContentAttachmentAsset = new ContentItemAsset() {Url = deal.HeroBackgroundImage ?? string.Empty}}}},
             { "HeroBackgroundImageAltText", deal.HeroBackgroundImageAltText ?? string.Empty },
-            { "HeroBackgroundImage_Mobile", new List<ContentAttachment>() },
+            { "HeroBackgroundImage_Mobile", new List<ContentAttachment>(){new ContentAttachment() {ContentAttachmentAsset = new ContentItemAsset() {Url = deal.HeroBackgroundImage_Mobile ?? string.Empty}}}},
             { "HeroBackgroundImage_MobileAltText", deal.HeroBackgroundImage_MobileAltText ?? string.Empty },
-            { "HeroCallToActionButtonType", deal.HeroCallToActionButtonType ?? string.Empty },  
+            { "HeroCallToActionButtonType", deal.HeroCallToActionButtonType ?? string.Empty },
             { "HeroCallToActionButtonText", deal.HeroCallToActionButtonText ?? string.Empty },
-            { "HeroCallToActionButtonUrl", null },
+            { "HeroCallToActionButtonUrl", new List<ContentItemReference>()
+                { new ContentItemReference()
+                        { Identifier = Guid.Parse("c4b1f72e-42d7-41dd-8130-00cd118f5f20")}}},
             { "PageTitle", deal.MetadataTitle ?? string.Empty },
             { "PageDescription", deal.MetadataDescription ?? string.Empty },
             { "PageKeywords", string.Empty },
