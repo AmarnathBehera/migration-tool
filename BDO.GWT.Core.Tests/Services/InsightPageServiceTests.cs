@@ -74,7 +74,7 @@ public class InsightPageServiceTests
             _socialMediaButtonsServiceMock.Object);
     }
 
-   
+
     [Test]
     public async Task GetDisplayNameAsync_ReturnsComposedNameWithPrefix_WhenSettingsUnavailable()
     {
@@ -499,11 +499,14 @@ public class InsightPageServiceTests
                 insight,
                 CancellationToken.None));
 
-        Assert.That(exception, Is.Not.Null);
-        Assert.That(exception!.Message, Does.Contain(nameof(Insight)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception!.Message, Does.Contain(nameof(Insight)));
+        });
     }
 
-   
+
     private void SetupUsePersonPageTitleSetting(bool usePageTitle)
     {
         var setting = new TestOurPeopleInfo
@@ -1152,10 +1155,13 @@ public class InsightPageServiceTests
             callToActionButtonLink: "https://example.com",
             CallToActionPosition: null);
 
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.Position, Is.EqualTo("left"));
-        Assert.That(result.CallToActionDto.ButtonTitle, Is.EqualTo("Read more"));
-        Assert.That(result.CallToActionDto.ButtonUrl, Is.EqualTo("https://example.com"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Position, Is.EqualTo("left"));
+            Assert.That(result.CallToActionDto.ButtonTitle, Is.EqualTo("Read more"));
+            Assert.That(result.CallToActionDto.ButtonUrl, Is.EqualTo("https://example.com"));
+        });
     }
 
     [Test]
@@ -1183,7 +1189,10 @@ public class InsightPageServiceTests
             insight,
             CancellationToken.None);
 
-        Assert.That(result.SocialMediaButtons, Is.Not.Null);
-        Assert.That(result.SocialMediaButtons!.ShowCopyLinkButton, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.SocialMediaButtons, Is.Not.Null);
+            Assert.That(result.SocialMediaButtons!.ShowCopyLinkButton, Is.Null);
+        });
     }
 }
