@@ -487,10 +487,10 @@ public class DealCrudService : IDealCrudService
 
     private async Task<ContentItemData> CreateCMSTreeItem(DealPageContent deal, string? culture, CancellationToken cancellationToken)
     {
-        var industryReferences = await BuildIndustryReferences(deal.Industry, cancellationToken);
-        var subIndustryReferences = await BuildSubIndustryReferences(deal.SubIndustry, cancellationToken);
-        var dealTypeReferences = await BuildDealTypeReferences(deal.DealType, cancellationToken);
-        var sizeReferences = await BuildDealCardRangeReferences(deal.Size, cancellationToken);
+        var industryReferences = await BuildReferencesAsync<DealCardIndustry>(deal.Industry, i => i.Name, cancellationToken);
+        var subIndustryReferences = await BuildReferencesAsync<DealCardSubIndustry>(deal.SubIndustry, s => s.Name, cancellationToken);
+        var dealTypeReferences = await BuildReferencesAsync<DealCardDealType>(deal.DealType, d => d.Name, cancellationToken);
+        var sizeReferences = await BuildReferencesAsync<DealCardRange>(deal.Size, r => r.Name, cancellationToken);
 
         var rssImageReferences = await BuildContentAttachmentImageReferences(deal.MetadataRssImage, cancellationToken);
         var downloadButtonReferences = await BuildContentAttachmentImageReferences(deal.DownloadButtonAttachment, cancellationToken);
@@ -684,11 +684,19 @@ public class DealCrudService : IDealCrudService
     }
 
     /// <summary>
-    /// Selects the Industry content items whose <c>Name</c> matches the supplied identifiers and
-    /// returns them as a list of <see cref="ContentItemReference"/>. Names that do not match any
-    /// existing DealCardIndustry item are ignored.
+    /// Selects the content items of type <typeparamref name="T"/> whose name matches the supplied
+    /// identifiers and returns them as a list of <see cref="ContentItemReference"/>. Names that do
+    /// not match any existing item are ignored.
     /// </summary>
-    private async Task<List<ContentItemReference>> BuildIndustryReferences(IEnumerable<string>? identifiers, CancellationToken cancellationToken)
+    /// <typeparam name="T">The content type to query (e.g. DealCardIndustry, DealCardRange).</typeparam>
+    /// <param name="identifiers">The names to match.</param>
+    /// <param name="nameSelector">Selects the name value used for matching from a content item.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    private async Task<List<ContentItemReference>> BuildReferencesAsync<T>(
+        IEnumerable<string>? identifiers,
+        Func<T, string> nameSelector,
+        CancellationToken cancellationToken)
+        where T : class, IWebPageFieldsSource
     {
         var names = identifiers?
             .Where(name => !string.IsNullOrWhiteSpace(name))
@@ -700,94 +708,13 @@ public class DealCrudService : IDealCrudService
             return new List<ContentItemReference>();
         }
 
-        var industries = await _contentRetriever.GetItemsAsync<DealCardIndustry>(
+        var items = await _contentRetriever.GetItemsAsync<T>(
             builder => builder.Parameters(p => p.Where(w => w.WhereIn("Name", names))),
             cancellationToken);
 
-        return industries
-            .Where(industry => names.Contains(industry.Name, StringComparer.OrdinalIgnoreCase))
-            .Select(industry => new ContentItemReference { Identifier = industry.SystemFields.ContentItemGUID })
-            .ToList();
-    }
-
-    /// <summary>
-    /// Selects the SubIndustry content items whose <c>Name</c> matches the supplied identifiers and
-    /// returns them as a list of <see cref="ContentItemReference"/>. Names that do not match any
-    /// existing DealCardSubIndustry item are ignored.
-    /// </summary>
-    private async Task<List<ContentItemReference>> BuildSubIndustryReferences(IEnumerable<string>? identifiers, CancellationToken cancellationToken)
-    {
-        var names = identifiers?
-            .Where(name => !string.IsNullOrWhiteSpace(name))
-            .Select(name => name.Trim())
-            .ToList() ?? new List<string>();
-
-        if (names.Count == 0)
-        {
-            return new List<ContentItemReference>();
-        }
-
-        var subIndustries = await _contentRetriever.GetItemsAsync<DealCardSubIndustry>(
-            builder => builder.Parameters(p => p.Where(w => w.WhereIn("Name", names))),
-            cancellationToken);
-
-        return subIndustries
-            .Where(subIndustry => names.Contains(subIndustry.Name, StringComparer.OrdinalIgnoreCase))
-            .Select(subIndustry => new ContentItemReference { Identifier = subIndustry.SystemFields.ContentItemGUID })
-            .ToList();
-    }
-
-    /// <summary>
-    /// Selects the DealType content items whose <c>Name</c> matches the supplied identifiers and
-    /// returns them as a list of <see cref="ContentItemReference"/>. Names that do not match any
-    /// existing DealCardDealType item are ignored.
-    /// </summary>
-    private async Task<List<ContentItemReference>> BuildDealTypeReferences(IEnumerable<string>? identifiers, CancellationToken cancellationToken)
-    {
-        var names = identifiers?
-            .Where(name => !string.IsNullOrWhiteSpace(name))
-            .Select(name => name.Trim())
-            .ToList() ?? new List<string>();
-
-        if (names.Count == 0)
-        {
-            return new List<ContentItemReference>();
-        }
-
-        var dealTypes = await _contentRetriever.GetItemsAsync<DealCardDealType>(
-            builder => builder.Parameters(p => p.Where(w => w.WhereIn("Name", names))),
-            cancellationToken);
-
-        return dealTypes
-            .Where(dealType => names.Contains(dealType.Name, StringComparer.OrdinalIgnoreCase))
-            .Select(dealType => new ContentItemReference { Identifier = dealType.SystemFields.ContentItemGUID })
-            .ToList();
-    }
-
-    /// <summary>
-    /// Selects the Size (range) content items whose <c>Name</c> matches the supplied identifiers and
-    /// returns them as a list of <see cref="ContentItemReference"/>. Names that do not match any
-    /// existing DealCardRange item are ignored.
-    /// </summary>
-    private async Task<List<ContentItemReference>> BuildDealCardRangeReferences(IEnumerable<string>? identifiers, CancellationToken cancellationToken)
-    {
-        var names = identifiers?
-            .Where(name => !string.IsNullOrWhiteSpace(name))
-            .Select(name => name.Trim())
-            .ToList() ?? new List<string>();
-
-        if (names.Count == 0)
-        {
-            return new List<ContentItemReference>();
-        }
-
-        var ranges = await _contentRetriever.GetItemsAsync<DealCardRange>(
-            builder => builder.Parameters(p => p.Where(w => w.WhereIn("Name", names))),
-            cancellationToken);
-
-        return ranges
-            .Where(range => names.Contains(range.Name, StringComparer.OrdinalIgnoreCase))
-            .Select(range => new ContentItemReference { Identifier = range.SystemFields.ContentItemGUID })
+        return items
+            .Where(item => names.Contains(nameSelector(item), StringComparer.OrdinalIgnoreCase))
+            .Select(item => new ContentItemReference { Identifier = item.SystemFields.ContentItemGUID })
             .ToList();
     }
 }
