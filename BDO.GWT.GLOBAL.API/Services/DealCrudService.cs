@@ -144,11 +144,14 @@ public class DealCrudService : IDealCrudService
         // The page display name shown in the admin UI
         string pageDisplayName = request.MetadataTitle ?? "New Deal Created by API";
 
-        var itemData = CreateCMSTreeItem(request, nodeParentID, culture);
+        var itemData = await CreateCMSTreeItem(request, culture, cancellationToken);
 
         // Creates a page metadata object
         var contentItemParameters = new ContentItemParameters(DEAL_CONTENT_TYPE, itemData);
-        var createPageParameters = new CreateWebPageParameters(pageDisplayName, culture, contentItemParameters);
+        var createPageParameters = new CreateWebPageParameters(pageDisplayName, culture, contentItemParameters)
+        {
+            ParentWebPageItemID = nodeParentID
+        };
 
         // Creates the page in the database
         int newPageId = await _webPageManager.Create(createPageParameters, cancellationToken);
@@ -170,7 +173,8 @@ public class DealCrudService : IDealCrudService
         {
             LinkedItemsMaxLevel = 1,
             ChannelName = channel.ChannelName,
-            LanguageName = culture
+            LanguageName = culture,
+            IsForPreview = false
         };
 
         var createdResult = await _contentRetriever.GetPagesAsync<Deal>(_retrieveNewPage,
@@ -210,7 +214,7 @@ public class DealCrudService : IDealCrudService
         }
 
         // Create new culture version data
-        var itemData = CreateCMSTreeItem(request, null, toCulture);
+        var itemData = await CreateCMSTreeItem(request, toCulture, cancellationToken);
 
         // Create language variant for the existing page
         var createVariantParameters = new CMS.Websites.CreateLanguageVariantParameters(
@@ -272,7 +276,7 @@ public class DealCrudService : IDealCrudService
         }
 
         // Build ContentItemData for the update
-        var itemData = CreateCMSTreeItem(request, null, culture);
+        var itemData = await CreateCMSTreeItem(request, culture, cancellationToken);
 
         // Create a draft, update it, and publish
         await _webPageManager.TryCreateDraft(existingDeal.SystemFields.WebPageItemID, culture);
@@ -425,7 +429,7 @@ public class DealCrudService : IDealCrudService
                 SharingOptIn = deal.SharingOptIn,
                 DealCountry = deal.DealCountry,
                 DisplayedContacts = deal.DisplayedContacts,
-                RelevantContactPerson = deal.RelevantContactPersonDeal?.FirstOrDefault()?.SystemFields?.ContentItemName,
+                RelevantContactPerson = deal.RelevantContactPersonDeal?.FirstOrDefault()?.SystemFields?.WebPageUrlPath,
                 PeopleSort = [],
                 MetadataOGTitle = deal.MetadataOGTitle,
                 MetadataOGDescription = deal.MetadataOGDescription,
@@ -481,64 +485,75 @@ public class DealCrudService : IDealCrudService
         return null;
     }
 
-    private static ContentItemData CreateCMSTreeItem(DealPageContent deal, int? nodeParentID, string? culture)
+    private async Task<ContentItemData> CreateCMSTreeItem(DealPageContent deal, string? culture, CancellationToken cancellationToken)
     {
+        var industryReferences = await BuildIndustryReferences(deal.Industry, cancellationToken);
+        var subIndustryReferences = await BuildSubIndustryReferences(deal.SubIndustry, cancellationToken);
+        var dealTypeReferences = await BuildDealTypeReferences(deal.DealType, cancellationToken);
+        var sizeReferences = await BuildDealCardRangeReferences(deal.Size, cancellationToken);
+
+        var rssImageReferences = await BuildContentAttachmentImageReferences(deal.MetadataRssImage, cancellationToken);
+        var downloadButtonReferences = await BuildContentAttachmentImageReferences(deal.DownloadButtonAttachment, cancellationToken);
+        var ogImageReferences = await BuildContentAttachmentImageReferences(deal.MetadataOGImage, cancellationToken);
+        var ogTwitterImageReferences = await BuildContentAttachmentImageReferences(deal.MetadataOGTwitterImage, cancellationToken);
+        var teaserImageReferences = await BuildContentAttachmentImageReferences(deal.MetadataTeaserImage, cancellationToken);
+        var heroBackgroundImageReferences = await BuildContentAttachmentImageReferences(deal.HeroBackgroundImage, cancellationToken);
+        var heroBackgroundImageMobileReferences = await BuildContentAttachmentImageReferences(deal.HeroBackgroundImage_Mobile, cancellationToken);
+
+        var relevantContactPersonReferences = await BuildPageAttachmentImageReferences(deal.RelevantContactPerson, cancellationToken);
+        var heroCallToActionButtonUrlReferences = await BuildPageAttachmentImageReferences(deal.HeroCallToActionButtonUrl, cancellationToken);
+
         return new ContentItemData(new Dictionary<string, object>
         {
-            { "NodeParentID", nodeParentID },
             { "Culture", culture ?? string.Empty },
             { "MetadataShowTitle", deal.ShowTitle },
             { "DealContent", deal.DealContent ?? string.Empty },
-            { "Industry", BuildContentItemReferences(deal.Industry) },
-            { "SubIndustry", BuildContentItemReferences(deal.SubIndustry) },
-            { "DealType", BuildContentItemReferences(deal.DealType) },
+            { "Industry", industryReferences },
+            { "SubIndustry", subIndustryReferences },
+            { "DealType", dealTypeReferences },
             { "DateField", deal.DateField ?? DateTime.MinValue },
-            { "Size", BuildContentItemReferences(deal.Size) },
+            { "Size", sizeReferences },
             { "MetadataOfficeLocation", deal.MetadataOfficeLocation ?? string.Empty },
             { "ClientName", deal.ClientName ?? string.Empty },
             { "RelatedDeals", deal.RelatedDeals },
             { "DealMetadataRssCategory", deal.MetadataRssCategory ?? string.Empty },
-            { "DealMetadataRssImage", BuildContentAttachmentReferences(deal.MetadataRssImage) },
+            { "DealMetadataRssImage", rssImageReferences },
             { "DealShowSocialMediaButtons", deal.ShowSocialMediaButtons },
             { "SharingOptIn", deal.SharingOptIn },
             { "DealCountry", deal.DealCountry ?? string.Empty },
             { "DisplayedContacts", deal.DisplayedContacts ?? string.Empty },
-            { "RelevantContactPersonDeal", new List<ContentItemReference>()
-                { new ContentItemReference()
-                        { Identifier = Guid.Parse("c4b1f72e-42d7-41dd-8130-00cd118f5f20")}}},
+            { "RelevantContactPersonDeal", relevantContactPersonReferences },
             { "ShowCallToAction", deal.ShowCallToAction },
             { "CallToActionDescription", deal.CallToActionDescription ?? string.Empty },
             { "CallToActionButtonText", deal.CallToActionButtonText ?? string.Empty },
             { "CallToActionButtonUrl", deal.CallToActionButtonUrl ?? string.Empty },
             { "ShowSidebar", deal.ShowSidebar },
             { "ShowPrintButton", deal.ShowPrintButton },
-            { "DownloadButtonAttachment", BuildContentAttachmentReferences(deal.DownloadButtonAttachment) },
+            { "DownloadButtonAttachment", downloadButtonReferences },
             { "ShowSocialMediaButtons", deal.ShowSocialMediaButtons },
             { "MetadataOGTitle", deal.MetadataOGTitle ?? string.Empty },
             { "MetadataOGDescription", deal.MetadataOGDescription ?? string.Empty },
-            { "MetadataOGImage", BuildContentAttachmentReferences(deal.MetadataOGImage) },
+            { "MetadataOGImage", ogImageReferences },
             { "MetadataOGTwitterImageSizeCheckbox", deal.MetadataOGTwitterImageSizeCheckbox },
-            { "MetadataOGTwitterImage", BuildContentAttachmentReferences(deal.MetadataOGTwitterImage) },
+            { "MetadataOGTwitterImage", ogTwitterImageReferences },
             { "MetadataNofollow", deal.MetadataNofollow },
             { "MetadataNoindex", deal.MetadataNoindex },
             { "IncludeInSitemap", deal.IncludeInSitemap },
             { "MetadataTitle", deal.MetadataTitle ?? string.Empty },
             { "MetadataDescription", deal.MetadataDescription ?? string.Empty },
-            { "MetadataTeaserImage", BuildContentAttachmentReferences(deal.MetadataTeaserImage) },
+            { "MetadataTeaserImage", teaserImageReferences },
             { "MetadataTeaserImageAltText", deal.MetadataTeaserImageAltText ?? string.Empty },
             { "MetadataCanonical", deal.MetadataCanonical ?? string.Empty },
             { "HeroLayout", deal.HeroLayout ?? string.Empty },
             { "HeroTitle", deal.HeroTitle ?? string.Empty },
             { "HeroDescription", deal.HeroDescription ?? string.Empty },
-            { "HeroBackgroundImage", BuildContentAttachmentReferences(deal.HeroBackgroundImage) },
+            { "HeroBackgroundImage", heroBackgroundImageReferences },
             { "HeroBackgroundImageAltText", deal.HeroBackgroundImageAltText ?? string.Empty },
-            { "HeroBackgroundImage_Mobile", BuildContentAttachmentReferences(deal.HeroBackgroundImage_Mobile) },
+            { "HeroBackgroundImage_Mobile", heroBackgroundImageMobileReferences },
             { "HeroBackgroundImage_MobileAltText", deal.HeroBackgroundImage_MobileAltText ?? string.Empty },
             { "HeroCallToActionButtonType", deal.HeroCallToActionButtonType ?? string.Empty },
             { "HeroCallToActionButtonText", deal.HeroCallToActionButtonText ?? string.Empty },
-            { "HeroCallToActionButtonUrl", new List<ContentItemReference>()
-                { new ContentItemReference()
-                        { Identifier = Guid.Parse("c4b1f72e-42d7-41dd-8130-00cd118f5f20")}}},
+            { "HeroCallToActionButtonUrl", heroCallToActionButtonUrlReferences },
             { "PageTitle", deal.MetadataTitle ?? string.Empty },
             { "PageDescription", deal.MetadataDescription ?? string.Empty },
             { "PageKeywords", string.Empty },
@@ -546,29 +561,233 @@ public class DealCrudService : IDealCrudService
     }
 
     /// <summary>
-    /// Builds the content item references expected by image/attachment fields, which link to
-    /// existing reusable <c>ContentAttachment</c> content items. The supplied value must be the
-    /// content item GUID; anything that is not a valid GUID results in an empty (cleared) field.
+    /// Resolves a Content hub image reference from an image URL. Retrieves <c>ContentAttachment</c>
+    /// content items and matches the one whose <c>ContentAttachmentAsset</c> URL corresponds to the
+    /// supplied value, returning it as a list of <see cref="ContentItemReference"/>. A raw content
+    /// item GUID is also accepted. Values that do not match any existing item result in an empty
+    /// (cleared) field.
     /// </summary>
-    private static List<ContentItemReference> BuildContentAttachmentReferences(string? identifier)
+    private async Task<List<ContentItemReference>> BuildContentAttachmentImageReferences(string? identifier, CancellationToken cancellationToken)
     {
-        return Guid.TryParse(identifier, out var guid)
-            ? new List<ContentItemReference> { new ContentItemReference { Identifier = guid } }
-            : new List<ContentItemReference>();
+        if (string.IsNullOrWhiteSpace(identifier))
+        {
+            return new List<ContentItemReference>();
+        }
+
+        var value = identifier.Trim();
+
+        // Accept a raw content item GUID directly.
+        if (Guid.TryParse(value, out var guid))
+        {
+            return new List<ContentItemReference> { new ContentItemReference { Identifier = guid } };
+        }
+
+        // Otherwise treat the value as an image URL and look up the matching ContentAttachment.
+        var attachments = await _contentRetriever.GetItemsAsync<ContentAttachment>(
+            builder => builder.Parameters(p => p.Where(w => w.WhereNotNull("ContentAttachmentAsset"))),
+            cancellationToken);
+
+        var match = attachments.FirstOrDefault(a => UrlsMatch(a.ContentAttachmentAsset?.Url, value));
+
+        return match is null
+            ? new List<ContentItemReference>()
+            : new List<ContentItemReference> { new ContentItemReference { Identifier = match.SystemFields.ContentItemGUID } };
     }
 
     /// <summary>
-    /// Builds the content item references expected by content item reference fields (e.g. Industry,
-    /// SubIndustry, DealType, Size) that link to existing reusable content items. Each supplied value
-    /// must be the content item GUID; any value that is not a valid GUID is ignored.
+    /// Resolves a web page reference from its <c>WebPageUrlPath</c>. Accepts a raw content item GUID
+    /// or a web page URL path, looks up the matching page in the current channel, and returns it as a
+    /// list of <see cref="ContentItemReference"/>. Used by web page reference fields such as
+    /// <c>RelevantContactPersonDeal</c> and <c>HeroCallToActionButtonUrl</c>. Values that do not match
+    /// any existing page result in an empty (cleared) field.
     /// </summary>
-    private static List<ContentItemReference> BuildContentItemReferences(IEnumerable<string>? identifiers)
+    private async Task<List<ContentItemReference>> BuildPageAttachmentImageReferences(string? identifier, CancellationToken cancellationToken)
     {
-        return identifiers?
-            .Select(identifier => Guid.TryParse(identifier, out var guid) ? (Guid?)guid : null)
-            .Where(guid => guid.HasValue)
-            .Select(guid => new ContentItemReference { Identifier = guid!.Value })
-            .ToList()
-            ?? new List<ContentItemReference>();
+        if (string.IsNullOrWhiteSpace(identifier))
+        {
+            return new List<ContentItemReference>();
+        }
+
+        var value = identifier.Trim();
+
+        // Accept a raw content item GUID directly.
+        if (Guid.TryParse(value, out var guid))
+        {
+            return new List<ContentItemReference> { new ContentItemReference { Identifier = guid } };
+        }
+
+        var normalizedPath = value.TrimStart('~');
+        var queryIndex = normalizedPath.IndexOf('?');
+        if (queryIndex >= 0)
+        {
+            normalizedPath = normalizedPath[..queryIndex];
+        }
+        normalizedPath = normalizedPath.TrimEnd('/');
+
+        var parameters = new RetrievePagesParameters
+        {
+            LinkedItemsMaxLevel = 0,
+            ChannelName = _websiteChannelContext.WebsiteChannelName,
+            IsForPreview = false
+        };
+
+        var pages = await _contentRetriever.GetPagesAsync<IWebPageFieldsSource>(
+            parameters,
+            query => query.Where(w => w.WhereEquals("WebPageUrlPath", normalizedPath)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken);
+
+        var match = pages?.FirstOrDefault();
+
+        return match is null
+            ? new List<ContentItemReference>()
+            : new List<ContentItemReference> { new ContentItemReference { Identifier = match.SystemFields.ContentItemGUID } };
+    }
+
+    /// <summary>
+    /// Compares two image URLs for equality, ignoring case, a leading application-relative marker
+    /// (<c>~</c>), and any query string. Falls back to comparing the final path segment (file name).
+    /// </summary>
+    private static bool UrlsMatch(string? assetUrl, string? requestedUrl)
+    {
+        if (string.IsNullOrWhiteSpace(assetUrl) || string.IsNullOrWhiteSpace(requestedUrl))
+        {
+            return false;
+        }
+
+        static string Normalize(string url)
+        {
+            var normalized = url.Trim().TrimStart('~');
+
+            var queryIndex = normalized.IndexOf('?');
+            if (queryIndex >= 0)
+            {
+                normalized = normalized[..queryIndex];
+            }
+
+            return normalized.TrimEnd('/');
+        }
+
+        var normalizedAsset = Normalize(assetUrl);
+        var normalizedRequested = Normalize(requestedUrl);
+
+        if (string.Equals(normalizedAsset, normalizedRequested, StringComparison.OrdinalIgnoreCase)
+            || normalizedAsset.EndsWith(normalizedRequested, StringComparison.OrdinalIgnoreCase)
+            || normalizedRequested.EndsWith(normalizedAsset, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        static string FileName(string url) => url[(url.LastIndexOf('/') + 1)..];
+
+        return string.Equals(FileName(normalizedAsset), FileName(normalizedRequested), StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Selects the Industry content items whose <c>Name</c> matches the supplied identifiers and
+    /// returns them as a list of <see cref="ContentItemReference"/>. Names that do not match any
+    /// existing DealCardIndustry item are ignored.
+    /// </summary>
+    private async Task<List<ContentItemReference>> BuildIndustryReferences(IEnumerable<string>? identifiers, CancellationToken cancellationToken)
+    {
+        var names = identifiers?
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Select(name => name.Trim())
+            .ToList() ?? new List<string>();
+
+        if (names.Count == 0)
+        {
+            return new List<ContentItemReference>();
+        }
+
+        var industries = await _contentRetriever.GetItemsAsync<DealCardIndustry>(
+            builder => builder.Parameters(p => p.Where(w => w.WhereIn("Name", names))),
+            cancellationToken);
+
+        return industries
+            .Where(industry => names.Contains(industry.Name, StringComparer.OrdinalIgnoreCase))
+            .Select(industry => new ContentItemReference { Identifier = industry.SystemFields.ContentItemGUID })
+            .ToList();
+    }
+
+    /// <summary>
+    /// Selects the SubIndustry content items whose <c>Name</c> matches the supplied identifiers and
+    /// returns them as a list of <see cref="ContentItemReference"/>. Names that do not match any
+    /// existing DealCardSubIndustry item are ignored.
+    /// </summary>
+    private async Task<List<ContentItemReference>> BuildSubIndustryReferences(IEnumerable<string>? identifiers, CancellationToken cancellationToken)
+    {
+        var names = identifiers?
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Select(name => name.Trim())
+            .ToList() ?? new List<string>();
+
+        if (names.Count == 0)
+        {
+            return new List<ContentItemReference>();
+        }
+
+        var subIndustries = await _contentRetriever.GetItemsAsync<DealCardSubIndustry>(
+            builder => builder.Parameters(p => p.Where(w => w.WhereIn("Name", names))),
+            cancellationToken);
+
+        return subIndustries
+            .Where(subIndustry => names.Contains(subIndustry.Name, StringComparer.OrdinalIgnoreCase))
+            .Select(subIndustry => new ContentItemReference { Identifier = subIndustry.SystemFields.ContentItemGUID })
+            .ToList();
+    }
+
+    /// <summary>
+    /// Selects the DealType content items whose <c>Name</c> matches the supplied identifiers and
+    /// returns them as a list of <see cref="ContentItemReference"/>. Names that do not match any
+    /// existing DealCardDealType item are ignored.
+    /// </summary>
+    private async Task<List<ContentItemReference>> BuildDealTypeReferences(IEnumerable<string>? identifiers, CancellationToken cancellationToken)
+    {
+        var names = identifiers?
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Select(name => name.Trim())
+            .ToList() ?? new List<string>();
+
+        if (names.Count == 0)
+        {
+            return new List<ContentItemReference>();
+        }
+
+        var dealTypes = await _contentRetriever.GetItemsAsync<DealCardDealType>(
+            builder => builder.Parameters(p => p.Where(w => w.WhereIn("Name", names))),
+            cancellationToken);
+
+        return dealTypes
+            .Where(dealType => names.Contains(dealType.Name, StringComparer.OrdinalIgnoreCase))
+            .Select(dealType => new ContentItemReference { Identifier = dealType.SystemFields.ContentItemGUID })
+            .ToList();
+    }
+
+    /// <summary>
+    /// Selects the Size (range) content items whose <c>Name</c> matches the supplied identifiers and
+    /// returns them as a list of <see cref="ContentItemReference"/>. Names that do not match any
+    /// existing DealCardRange item are ignored.
+    /// </summary>
+    private async Task<List<ContentItemReference>> BuildDealCardRangeReferences(IEnumerable<string>? identifiers, CancellationToken cancellationToken)
+    {
+        var names = identifiers?
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Select(name => name.Trim())
+            .ToList() ?? new List<string>();
+
+        if (names.Count == 0)
+        {
+            return new List<ContentItemReference>();
+        }
+
+        var ranges = await _contentRetriever.GetItemsAsync<DealCardRange>(
+            builder => builder.Parameters(p => p.Where(w => w.WhereIn("Name", names))),
+            cancellationToken);
+
+        return ranges
+            .Where(range => names.Contains(range.Name, StringComparer.OrdinalIgnoreCase))
+            .Select(range => new ContentItemReference { Identifier = range.SystemFields.ContentItemGUID })
+            .ToList();
     }
 }
