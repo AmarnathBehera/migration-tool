@@ -9,6 +9,7 @@ using CMS.Membership;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
+using Kentico.Xperience.Headless.Internal;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
 
@@ -35,6 +36,7 @@ public class DealCrudService : IDealCrudService
     private static readonly LanguageTag defaultCulture = LanguageTag.GB;
     private const string DEAL_CONTENT_TYPE = Deal.CONTENT_TYPE_NAME;
     private const string WEB_PAGE_GUID = "WebPageItemGUID";
+    private string CHANNEL_NAME = string.Empty;
 
     public DealCrudService(IContentService contentRetriever, IValidationState validationState, IWebsiteChannelContext websiteChannelContext, ICultureService cultureService, IInfoProvider<ChannelInfo> channelInfoProvider, IWebPageManagerFactory webPageManagerFactory, IUserInfoProvider userInfoProvider)
     {
@@ -50,6 +52,7 @@ public class DealCrudService : IDealCrudService
     public async Task<ActionResult<IEnumerable<PageOutput<DealPageContent>>>> GetDealPagesAsync(int channelId, string? culture, bool? onlyPublished, CancellationToken cancellationToken)
     {
         var channel = await _channelInfoProvider.GetAsync(channelId);
+        CHANNEL_NAME = channel.ChannelName;
 
         var retrieveParameters = new RetrievePagesParameters
         {
@@ -78,6 +81,8 @@ public class DealCrudService : IDealCrudService
     public async Task<ActionResult<PageOutput<DealPageContent>>> GetDealPageAsync(int channelId, Guid pageGUID, string? culture, CancellationToken cancellationToken)
     {
         var channel = await _channelInfoProvider.GetAsync(channelId);
+        CHANNEL_NAME = channel.ChannelName;
+
         var _retrieveCurrentPage = new RetrievePagesParameters
         {
             LinkedItemsMaxLevel = 1,
@@ -114,6 +119,7 @@ public class DealCrudService : IDealCrudService
         //var currentCulture = await ValidateAndNormalizeSiteCultureAsync(culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
 
         var channel = await _channelInfoProvider.GetAsync(channelId);
+        CHANNEL_NAME = channel.ChannelName;
         var _retrieveCurrentPage = new RetrievePagesParameters
         {
             LinkedItemsMaxLevel = 1,
@@ -193,6 +199,7 @@ public class DealCrudService : IDealCrudService
             return new BadRequestResult();
         }
         var channel = await _channelInfoProvider.GetAsync(channelId);
+        CHANNEL_NAME = channel.ChannelName;
         var _retrieveCurrentPage = new RetrievePagesParameters
         {
             LinkedItemsMaxLevel = 1,
@@ -255,6 +262,7 @@ public class DealCrudService : IDealCrudService
             return new BadRequestResult();
         }
         var channel = await _channelInfoProvider.GetAsync(channelId);
+        CHANNEL_NAME = channel.ChannelName;
         var _retrieveCurrentPage = new RetrievePagesParameters
         {
             LinkedItemsMaxLevel = 1,
@@ -306,7 +314,7 @@ public class DealCrudService : IDealCrudService
     public async Task DeletePageAsync(int channelId, Guid pageGUID, string culture, bool deleteAllCultures, CancellationToken cancellationToken)
     {
         var channel = await _channelInfoProvider.GetAsync(channelId);
-
+        CHANNEL_NAME = channel.ChannelName;
         if (deleteAllCultures)
         {
             // Get all available cultures for the channel
@@ -347,6 +355,7 @@ public class DealCrudService : IDealCrudService
             {
                 LinkedItemsMaxLevel = 1,
                 ChannelName = channel.ChannelName,
+                LanguageName = culture ?? defaultCulture.Language,
                 IsForPreview = false
             };
 
@@ -500,8 +509,8 @@ public class DealCrudService : IDealCrudService
         var heroBackgroundImageReferences = await BuildContentAttachmentImageReferences(deal.HeroBackgroundImage, cancellationToken);
         var heroBackgroundImageMobileReferences = await BuildContentAttachmentImageReferences(deal.HeroBackgroundImage_Mobile, cancellationToken);
 
-        var relevantContactPersonReferences = await BuildPageAttachmentImageReferences(deal.RelevantContactPerson, cancellationToken);
-        var heroCallToActionButtonUrlReferences = await BuildPageAttachmentImageReferences(deal.HeroCallToActionButtonUrl, cancellationToken);
+        var relevantContactPersonReferences = await BuildPageAttachmentImageReferences(deal.RelevantContactPerson, CHANNEL_NAME, culture, cancellationToken);
+        var heroCallToActionButtonUrlReferences = await BuildPageAttachmentImageReferences(deal.HeroCallToActionButtonUrl, CHANNEL_NAME, culture, cancellationToken);
 
         return new ContentItemData(new Dictionary<string, object>
         {
@@ -601,7 +610,7 @@ public class DealCrudService : IDealCrudService
     /// <c>RelevantContactPersonDeal</c> and <c>HeroCallToActionButtonUrl</c>. Values that do not match
     /// any existing page result in an empty (cleared) field.
     /// </summary>
-    private async Task<List<ContentItemReference>> BuildPageAttachmentImageReferences(string? identifier, CancellationToken cancellationToken)
+    private async Task<List<ContentItemReference>> BuildPageAttachmentImageReferences(string? identifier, string? channelName, string? culture, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(identifier))
         {
@@ -627,11 +636,12 @@ public class DealCrudService : IDealCrudService
         var parameters = new RetrievePagesParameters
         {
             LinkedItemsMaxLevel = 0,
-            ChannelName = _websiteChannelContext.WebsiteChannelName,
+            ChannelName = channelName,
+            LanguageName = culture ?? defaultCulture.Language,
             IsForPreview = false
         };
 
-        var pages = await _contentRetriever.GetPagesAsync<IWebPageFieldsSource>(
+        var pages = await _contentRetriever.GetPagesAsync<Person>(
             parameters,
             query => query.Where(w => w.WhereEquals("WebPageUrlPath", normalizedPath)),
             RetrievalCacheSettings.CacheDisabled,
