@@ -144,6 +144,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// tst.
+		/// </summary>
+		public string tst { get; set; }
+
+
+		/// <summary>
 		/// MetadataOGTitle.
 		/// </summary>
 		public string MetadataOGTitle { get; set; }

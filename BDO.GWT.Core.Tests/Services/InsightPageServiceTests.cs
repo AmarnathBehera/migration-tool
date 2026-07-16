@@ -466,7 +466,7 @@ public class InsightPageServiceTests
             showDescription: true,
             showCallToAction: false);
 
-        SetCollection(insight, nameof(Insight.CopyInsight), copyInsight);
+        SetCollection(insight, nameof(Insight.InsightContent), copyInsight);
 
         var result = await _service.GetContentPageDtoAsync(
             insight,
@@ -497,7 +497,7 @@ public class InsightPageServiceTests
             showDescription: false,
             showCallToAction: false);
 
-        SetCollection(insight, nameof(Insight.CopyInsight), copyInsight);
+        SetCollection(insight, nameof(Insight.InsightContent), copyInsight);
 
         var result = await _service.GetContentPageDtoAsync(
             insight,
@@ -519,7 +519,7 @@ public class InsightPageServiceTests
             title: "Insight page",
             showSidebar: false);
 
-        SetCollection(insight, nameof(Insight.CopyInsight), Array.Empty<object>());
+        SetCollection(insight, nameof(Insight.InsightContent), Array.Empty<object>());
 
         var result = await _service.GetContentPageDtoAsync(
             insight,
@@ -786,7 +786,7 @@ public class InsightPageServiceTests
             webPageUrlPath: "/insights/test",
             webPageTreePath: "/Insights/Test");
 
-        SetCollection(insight, nameof(Insight.CopyInsight), CreateCopyInsight(
+        SetCollection(insight, nameof(Insight.InsightContent), CreateCopyInsight(
             title: title,
             description: "<p>Description</p>",
             content: "<p>Content</p>",
@@ -815,7 +815,7 @@ public class InsightPageServiceTests
         string? callToActionButtonUrl = null,
         string? callToActionPosition = null)
     {
-        var copyInsightProperty = typeof(Insight).GetProperty(nameof(Insight.CopyInsight));
+        var copyInsightProperty = typeof(Insight).GetProperty(nameof(Insight.InsightContent));
         if (copyInsightProperty is null)
         {
             throw new InvalidOperationException("CopyInsight property was not found.");

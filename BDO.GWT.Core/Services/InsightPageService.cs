@@ -169,7 +169,7 @@ namespace BDO.GWT.Core.Services
 
         public async Task<ContentPageDto> GetContentPageDtoAsync(Insight contentPage, CancellationToken cancellationToken)
         {
-            var copyInsight = contentPage.CopyInsight?.FirstOrDefault();
+            var copyInsight = contentPage.InsightContent?.FirstOrDefault();
             var dto = new ContentPageDto
             {
                 Title = copyInsight?.ShowInsightTitle == true ? copyInsight.Title : null,
@@ -204,7 +204,7 @@ namespace BDO.GWT.Core.Services
         }
         private static CallToActionWithPositionDto? GetCallToActionDto(Insight contentPage)
         {
-            var copyInsight = contentPage.CopyInsight?.FirstOrDefault();
+            var copyInsight = contentPage.InsightContent?.FirstOrDefault();
 
             return GetCallToActionDto(
                 copyInsight?.CallToActionDescription,
@@ -272,18 +272,6 @@ namespace BDO.GWT.Core.Services
             if (insightsLookup is null)
             {
                 throw new MissingSectionPageException($"Could not lookup {nameof(Insight)}");
-            }
-
-            // Ensure a section insights page exists for this insight - tests expect an exception when missing
-            var sectionPages = await _contentService.GetPagesAsync<SectionInsightsPage>(
-                new RetrievePagesParameters { },
-                query => query.Where(w => w.WhereIn(nameof(WebPageFields.WebPageItemGUID), new[] { contentPage.SystemFields.WebPageItemGUID })),
-                RetrievalCacheSettings.CacheDisabled,
-                cancellationToken);
-
-            if (sectionPages is null || !sectionPages.Any())
-            {
-                throw new MissingSectionPageException($"Could not find {nameof(SectionInsightsPage)}");
             }
 
             var sidebarDto = await GetSidebarDtoAsync(contentPage, cancellationToken);
@@ -454,10 +442,10 @@ namespace BDO.GWT.Core.Services
                 Author = authorNames.Select(a => new PersonSchemaMarkupDto { Name = a }).ToList(),
                 DatePublished = insights.SystemFields.ContentItemCommonDataFirstPublishedWhen,
                 DateModified = insights.SystemFields.ContentItemCommonDataLastPublishedWhen,
-                Description = HtmlHelper.ExtractTextFromHtml(insights.CopyInsight.FirstOrDefault()?.Description),
+                Description = HtmlHelper.ExtractTextFromHtml(insights.InsightContent.FirstOrDefault()?.Description),
                 MainEntityOfPage = presentationUrl,
-                Headline = insights.CopyInsight.FirstOrDefault()?.Title,
-                Image =  insights.CopyInsight.FirstOrDefault()?.ImageFile.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+                Headline = insights.InsightContent.FirstOrDefault()?.Title,
+                Image =  insights.InsightContent.FirstOrDefault()?.ImageFile.FirstOrDefault()?.ContentAttachmentAsset?.Url,
                 Publisher = new OrganizationSchemaMarkupDto
                 {
                     Name = name,
@@ -560,7 +548,7 @@ namespace BDO.GWT.Core.Services
             return new InsightSourceDto
             {
                 Link = insight.MetadataCanonical,
-                FirmName = insight.CopyInsight.FirstOrDefault()?.SharingSourceFirm,
+                FirmName = insight.InsightContent.FirstOrDefault()?.SharingSourceFirm,
                 CopyDate = insight.SystemFields.ContentItemCommonDataFirstPublishedWhen,
             };
         }

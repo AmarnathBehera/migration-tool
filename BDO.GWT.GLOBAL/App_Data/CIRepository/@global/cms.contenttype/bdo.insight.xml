@@ -13,10 +13,10 @@
       <schema guid="b760a373-943b-4321-ac39-d5067101ff82" name="b760a373-943b-4321-ac39-d5067101ff82">
         <properties />
       </schema>
-      <field allowempty="true" column="CopyInsight" columnprecision="0" columntype="contentitemreference" enabled="true" guid="18d0e0e9-085a-4454-afcb-bc433cb8b54e" visible="true">
+      <field allowempty="true" column="InsightContent" columnprecision="0" columntype="contentitemreference" enabled="true" guid="18d0e0e9-085a-4454-afcb-bc433cb8b54e" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Copy Insight </fieldcaption>
+          <fieldcaption>Insight Content</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
         </properties>
         <settings>
