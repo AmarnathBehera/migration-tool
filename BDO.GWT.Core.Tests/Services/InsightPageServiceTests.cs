@@ -1159,8 +1159,8 @@ public class InsightPageServiceTests
         {
             Assert.That(result, Is.Not.Null);
             Assert.That(result!.Position, Is.EqualTo("left"));
-            Assert.That(result.CallToActionDto.ButtonTitle, Is.EqualTo("Read more"));
-            Assert.That(result.CallToActionDto.ButtonUrl, Is.EqualTo("https://example.com"));
+            Assert.That(result.CallToActionDto?.ButtonTitle, Is.EqualTo("Read more"));
+            Assert.That(result.CallToActionDto?.ButtonUrl, Is.EqualTo("https://example.com"));
         });
     }
 
