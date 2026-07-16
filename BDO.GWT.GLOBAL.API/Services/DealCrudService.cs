@@ -489,16 +489,16 @@ public class DealCrudService : IDealCrudService
             { "Culture", culture ?? string.Empty },
             { "MetadataShowTitle", deal.ShowTitle },
             { "DealContent", deal.DealContent ?? string.Empty },
-            { "Industry", deal.Industry },
-            { "SubIndustry", deal.SubIndustry },
-            { "DealType", deal.DealType },
+            { "Industry", BuildContentItemReferences(deal.Industry) },
+            { "SubIndustry", BuildContentItemReferences(deal.SubIndustry) },
+            { "DealType", BuildContentItemReferences(deal.DealType) },
             { "DateField", deal.DateField ?? DateTime.MinValue },
-            { "Size", deal.Size ?? new List<string>() },
+            { "Size", BuildContentItemReferences(deal.Size) },
             { "MetadataOfficeLocation", deal.MetadataOfficeLocation ?? string.Empty },
             { "ClientName", deal.ClientName ?? string.Empty },
             { "RelatedDeals", deal.RelatedDeals },
             { "DealMetadataRssCategory", deal.MetadataRssCategory ?? string.Empty },
-            { "DealMetadataRssImage", new List<ContentAttachment>(){new ContentAttachment() {ContentAttachmentAsset = new ContentItemAsset() {Url = deal.MetadataRssImage ?? string.Empty}}}},
+            { "DealMetadataRssImage", BuildContentAttachmentReferences(deal.MetadataRssImage) },
             { "DealShowSocialMediaButtons", deal.ShowSocialMediaButtons },
             { "SharingOptIn", deal.SharingOptIn },
             { "DealCountry", deal.DealCountry ?? string.Empty },
@@ -512,27 +512,27 @@ public class DealCrudService : IDealCrudService
             { "CallToActionButtonUrl", deal.CallToActionButtonUrl ?? string.Empty },
             { "ShowSidebar", deal.ShowSidebar },
             { "ShowPrintButton", deal.ShowPrintButton },
-            { "DownloadButtonAttachment", new List<ContentAttachment>(){new ContentAttachment() {ContentAttachmentAsset = new ContentItemAsset() {Url = deal.DownloadButtonAttachment ?? string.Empty}}}},
+            { "DownloadButtonAttachment", BuildContentAttachmentReferences(deal.DownloadButtonAttachment) },
             { "ShowSocialMediaButtons", deal.ShowSocialMediaButtons },
             { "MetadataOGTitle", deal.MetadataOGTitle ?? string.Empty },
             { "MetadataOGDescription", deal.MetadataOGDescription ?? string.Empty },
-            { "MetadataOGImage", new List<ContentAttachment>(){new ContentAttachment() {ContentAttachmentAsset = new ContentItemAsset() {Url = deal.MetadataOGImage ?? string.Empty}}}},
+            { "MetadataOGImage", BuildContentAttachmentReferences(deal.MetadataOGImage) },
             { "MetadataOGTwitterImageSizeCheckbox", deal.MetadataOGTwitterImageSizeCheckbox },
-            { "MetadataOGTwitterImage", new List<ContentAttachment>(){new ContentAttachment() {ContentAttachmentAsset = new ContentItemAsset() {Url = deal.MetadataOGTwitterImage ?? string.Empty}}}},
+            { "MetadataOGTwitterImage", BuildContentAttachmentReferences(deal.MetadataOGTwitterImage) },
             { "MetadataNofollow", deal.MetadataNofollow },
             { "MetadataNoindex", deal.MetadataNoindex },
             { "IncludeInSitemap", deal.IncludeInSitemap },
             { "MetadataTitle", deal.MetadataTitle ?? string.Empty },
             { "MetadataDescription", deal.MetadataDescription ?? string.Empty },
-            { "MetadataTeaserImage", new List<ContentAttachment>(){new ContentAttachment() {ContentAttachmentAsset = new ContentItemAsset() {Url = deal.MetadataTeaserImage ?? string.Empty}}}},
+            { "MetadataTeaserImage", BuildContentAttachmentReferences(deal.MetadataTeaserImage) },
             { "MetadataTeaserImageAltText", deal.MetadataTeaserImageAltText ?? string.Empty },
             { "MetadataCanonical", deal.MetadataCanonical ?? string.Empty },
             { "HeroLayout", deal.HeroLayout ?? string.Empty },
             { "HeroTitle", deal.HeroTitle ?? string.Empty },
             { "HeroDescription", deal.HeroDescription ?? string.Empty },
-            { "HeroBackgroundImage", new List<ContentAttachment>(){new ContentAttachment() {ContentAttachmentAsset = new ContentItemAsset() {Url = deal.HeroBackgroundImage ?? string.Empty}}}},
+            { "HeroBackgroundImage", BuildContentAttachmentReferences(deal.HeroBackgroundImage) },
             { "HeroBackgroundImageAltText", deal.HeroBackgroundImageAltText ?? string.Empty },
-            { "HeroBackgroundImage_Mobile", new List<ContentAttachment>(){new ContentAttachment() {ContentAttachmentAsset = new ContentItemAsset() {Url = deal.HeroBackgroundImage_Mobile ?? string.Empty}}}},
+            { "HeroBackgroundImage_Mobile", BuildContentAttachmentReferences(deal.HeroBackgroundImage_Mobile) },
             { "HeroBackgroundImage_MobileAltText", deal.HeroBackgroundImage_MobileAltText ?? string.Empty },
             { "HeroCallToActionButtonType", deal.HeroCallToActionButtonType ?? string.Empty },
             { "HeroCallToActionButtonText", deal.HeroCallToActionButtonText ?? string.Empty },
@@ -543,5 +543,32 @@ public class DealCrudService : IDealCrudService
             { "PageDescription", deal.MetadataDescription ?? string.Empty },
             { "PageKeywords", string.Empty },
         });
+    }
+
+    /// <summary>
+    /// Builds the content item references expected by image/attachment fields, which link to
+    /// existing reusable <c>ContentAttachment</c> content items. The supplied value must be the
+    /// content item GUID; anything that is not a valid GUID results in an empty (cleared) field.
+    /// </summary>
+    private static List<ContentItemReference> BuildContentAttachmentReferences(string? identifier)
+    {
+        return Guid.TryParse(identifier, out var guid)
+            ? new List<ContentItemReference> { new ContentItemReference { Identifier = guid } }
+            : new List<ContentItemReference>();
+    }
+
+    /// <summary>
+    /// Builds the content item references expected by content item reference fields (e.g. Industry,
+    /// SubIndustry, DealType, Size) that link to existing reusable content items. Each supplied value
+    /// must be the content item GUID; any value that is not a valid GUID is ignored.
+    /// </summary>
+    private static List<ContentItemReference> BuildContentItemReferences(IEnumerable<string>? identifiers)
+    {
+        return identifiers?
+            .Select(identifier => Guid.TryParse(identifier, out var guid) ? (Guid?)guid : null)
+            .Where(guid => guid.HasValue)
+            .Select(guid => new ContentItemReference { Identifier = guid!.Value })
+            .ToList()
+            ?? new List<ContentItemReference>();
     }
 }
