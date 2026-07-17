@@ -3,6 +3,7 @@ using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.GLOBAL.API.Data;
+using BDO.GWT.GLOBAL.API.Extensions;
 using BDO.GWT.GLOBAL.API.Helpers;
 using CMS.ContentEngine;
 using CMS.DataEngine;
@@ -32,13 +33,16 @@ public class DealCrudService : IDealCrudService
     private readonly ICultureService _cultureService;
     private readonly IInfoProvider<ChannelInfo> _channelInfoProvider;
     private readonly IWebPageManager _webPageManager;
+    private readonly IMappingHelper _mappingHelper;
+    private readonly IPageContentValidator _pageContentValidator;
     private static readonly LanguageTag defaultCulture = LanguageTag.GB;
     private const string DEAL_CONTENT_TYPE = Deal.CONTENT_TYPE_NAME;
     private const string WEB_PAGE_GUID = "WebPageItemGUID";
     private string CHANNEL_NAME = string.Empty;
-    private readonly IMappingHelper _mappingHelper;
 
-    public DealCrudService(IContentService contentRetriever, IValidationState validationState, IWebsiteChannelContext websiteChannelContext, ICultureService cultureService, IInfoProvider<ChannelInfo> channelInfoProvider, IWebPageManagerFactory webPageManagerFactory, IUserInfoProvider userInfoProvider, IMappingHelper mappingHelper)
+#pragma warning disable S107
+    public DealCrudService(IContentService contentRetriever, IValidationState validationState, IWebsiteChannelContext websiteChannelContext, ICultureService cultureService, IInfoProvider<ChannelInfo> channelInfoProvider, IWebPageManagerFactory webPageManagerFactory, IUserInfoProvider userInfoProvider, IMappingHelper mappingHelper, IPageContentValidator pageContentValidator)
+#pragma warning restore S107
     {
         UserInfo user = userInfoProvider.Get("administrator");
         _contentRetriever = contentRetriever;
@@ -47,31 +51,36 @@ public class DealCrudService : IDealCrudService
         _cultureService = cultureService;
         _channelInfoProvider = channelInfoProvider;
         _mappingHelper = mappingHelper;
+        _pageContentValidator = pageContentValidator;
         _webPageManager = webPageManagerFactory.Create(_websiteChannelContext.WebsiteChannelID == 0 ? 1 : _websiteChannelContext.WebsiteChannelID, user.UserID);
     }
 
     public async Task<ActionResult<IEnumerable<PageOutput<DealPageContent>>>> GetDealPagesAsync(int channelId, string? culture, bool? onlyPublished, CancellationToken cancellationToken)
     {
+        var currentCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+
+        if (string.IsNullOrEmpty(currentCulture.Language))
+        {
+            throw new NotFoundException("Invalid culture specified");
+        }
+
         var channel = await _channelInfoProvider.GetAsync(channelId);
-        CHANNEL_NAME = channel.ChannelName;
+        if (string.IsNullOrEmpty(channel?.ChannelName))
+        {
+            throw new NotFoundException("Channel not found");
+        }
 
         var retrieveParameters = new RetrievePagesParameters
         {
             LinkedItemsMaxLevel = 5,
             ChannelName = channel.ChannelName,
-            LanguageName = culture ?? defaultCulture.Language,
-            IsForPreview = false,
+            LanguageName = currentCulture.Language,
+            IsForPreview = !(onlyPublished ?? true),
         };
 
         var results = await _contentRetriever.GetPagesAsync<Deal>(
         retrieveParameters,
-        query =>
-        {
-            if (onlyPublished ?? true)
-            {
-                query.Where(w => w.WhereNotEquals("ContentItemCommonDataLastPublishedWhen", null));
-            }
-        },
+        query =>{},
         RetrievalCacheSettings.CacheDisabled,
         cancellationToken);
 
@@ -81,14 +90,24 @@ public class DealCrudService : IDealCrudService
 
     public async Task<ActionResult<PageOutput<DealPageContent>>> GetDealPageAsync(int channelId, Guid pageGUID, string? culture, CancellationToken cancellationToken)
     {
+        var currentCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+
+        if (string.IsNullOrEmpty(currentCulture.Language))
+        {
+            throw new NotFoundException("Invalid culture specified");
+        }
+
         var channel = await _channelInfoProvider.GetAsync(channelId);
-        CHANNEL_NAME = channel.ChannelName;
+        if (string.IsNullOrEmpty(channel?.ChannelName))
+        {
+            throw new NotFoundException("Channel not found");
+        }
 
         var _retrieveCurrentPage = new RetrievePagesParameters
         {
             LinkedItemsMaxLevel = 1,
             ChannelName = channel.ChannelName,
-            LanguageName = culture ?? defaultCulture.Language,
+            LanguageName = currentCulture.Language,
             IsForPreview = false
         };
 
@@ -119,7 +138,16 @@ public class DealCrudService : IDealCrudService
 
         var currentCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
 
+        if(string.IsNullOrEmpty(currentCulture.Language))
+        {
+            throw new NotFoundException("Invalid culture specified");
+        }
+
         var channel = await _channelInfoProvider.GetAsync(channelId);
+        if (string.IsNullOrEmpty(channel?.ChannelName))
+        {
+            throw new NotFoundException("Channel not found");
+        }
         CHANNEL_NAME = channel.ChannelName;
         var _retrieveCurrentPage = new RetrievePagesParameters
         {
@@ -144,9 +172,9 @@ public class DealCrudService : IDealCrudService
         //    throw new UnprocessableEntityException();
         //}
 
-        //_pageContentValidator.ValidateAndNormalizePageContent(request);
+        _pageContentValidator.ValidateAndNormalizePageContent(request);
 
-        //_validationState.ThrowIfThereAreErrors();
+        _validationState.ThrowIfThereAreErrors();
 
         // The page display name shown in the admin UI
         string pageDisplayName = request.MetadataTitle ?? "New Deal Created by API";
@@ -166,13 +194,13 @@ public class DealCrudService : IDealCrudService
         // Update the draft with new content
         if (!await _webPageManager.TryUpdateDraft(newPageId, currentCulture.Language, new UpdateDraftData(itemData)))
         {
-            throw new Exception("Failed to update page draft");
+            throw new NotFoundException("Failed to update page draft");
         }
 
         // Publish the updated page
         if (!await _webPageManager.TryPublish(newPageId, currentCulture.Language))
         {
-            throw new Exception("Failed to publish updated page");
+            throw new NotFoundException("Failed to publish updated page");
         }
 
         // Retrieve the created page and return it
@@ -199,13 +227,38 @@ public class DealCrudService : IDealCrudService
         {
             return new BadRequestResult();
         }
+
+        var fromLangCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, fromCulture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+
+        if (string.IsNullOrEmpty(fromLangCulture.Language))
+        {
+            throw new NotFoundException("Invalid from culture specified");
+        }
+
+        var toLangCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, toCulture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+
+        if (string.IsNullOrEmpty(toLangCulture.Language))
+        {
+            throw new NotFoundException("Invalid to culture specified");
+        }
+
         var channel = await _channelInfoProvider.GetAsync(channelId);
+        if (string.IsNullOrEmpty(channel?.ChannelName))
+        {
+            throw new NotFoundException("Channel not found");
+        }
+
+        _pageContentValidator.ValidateAndNormalizePageContent(request);
+
+        _validationState.ThrowIfThereAreErrors();
+
         CHANNEL_NAME = channel.ChannelName;
+
         var _retrieveCurrentPage = new RetrievePagesParameters
         {
             LinkedItemsMaxLevel = 1,
             ChannelName = channel.ChannelName,
-            LanguageName = fromCulture,
+            LanguageName = fromLangCulture.Language,
             IsForPreview = false
         };
 
@@ -227,26 +280,26 @@ public class DealCrudService : IDealCrudService
         // Create language variant for the existing page
         var createVariantParameters = new CMS.Websites.CreateLanguageVariantParameters(
             existingDeal.SystemFields.WebPageItemID,
-            toCulture ?? defaultCulture.Language,
+            toLangCulture.Language,
             existingDeal.SystemFields?.ContentItemName ?? "Deal culture variant",
             itemData);
 
         // Creates the language variant in the database
         if (!await _webPageManager.TryCreateLanguageVariant(createVariantParameters))
         {
-            throw new Exception("Failed to create language variant");
+            throw new NotFoundException("Failed to create language variant");
         }
 
         // Update the draft with new content
-        if (!await _webPageManager.TryUpdateDraft(existingDeal.SystemFields.WebPageItemID, toCulture, new UpdateDraftData(itemData)))
+        if (!await _webPageManager.TryUpdateDraft(existingDeal.SystemFields.WebPageItemID, toLangCulture.Language, new UpdateDraftData(itemData)))
         {
-            throw new Exception("Failed to update page draft");
+            throw new NotFoundException("Failed to update page draft");
         }
 
         // Publish the updated page
-        if (!await _webPageManager.TryPublish(existingDeal.SystemFields.WebPageItemID, toCulture))
+        if (!await _webPageManager.TryPublish(existingDeal.SystemFields.WebPageItemID, toLangCulture.Language))
         {
-            throw new Exception("Failed to publish updated page");
+            throw new NotFoundException("Failed to publish updated page");
         }
 
         // Retrieve the created variant and return it
@@ -254,7 +307,7 @@ public class DealCrudService : IDealCrudService
         {
             LinkedItemsMaxLevel = 1,
             ChannelName = channel.ChannelName,
-            LanguageName = toCulture,
+            LanguageName = toLangCulture.Language,
             IsForPreview = false
         };
 
@@ -273,13 +326,30 @@ public class DealCrudService : IDealCrudService
         {
             return new BadRequestResult();
         }
+
+        var currentCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+
+        if (string.IsNullOrEmpty(currentCulture.Language))
+        {
+            throw new NotFoundException("Invalid culture specified");
+        }
+
         var channel = await _channelInfoProvider.GetAsync(channelId);
+        if (string.IsNullOrEmpty(channel?.ChannelName))
+        {
+            throw new NotFoundException("Channel not found");
+        }
+
+        _pageContentValidator.ValidateAndNormalizePageContent(request);
+
+        _validationState.ThrowIfThereAreErrors();
+
         CHANNEL_NAME = channel.ChannelName;
         var _retrieveCurrentPage = new RetrievePagesParameters
         {
             LinkedItemsMaxLevel = 1,
             ChannelName = channel.ChannelName,
-            LanguageName = culture,
+            LanguageName = currentCulture.Language,
             IsForPreview = false
         };
 
@@ -299,18 +369,18 @@ public class DealCrudService : IDealCrudService
         var itemData = await CreateCMSTreeItem(request, culture, cancellationToken);
 
         // Create a draft, update it, and publish
-        await _webPageManager.TryCreateDraft(existingDeal.SystemFields.WebPageItemID, culture);
+        await _webPageManager.TryCreateDraft(existingDeal.SystemFields.WebPageItemID, currentCulture.Language);
 
         // Update the draft with new content
-        if (!await _webPageManager.TryUpdateDraft(existingDeal.SystemFields.WebPageItemID, culture, new UpdateDraftData(itemData)))
+        if (!await _webPageManager.TryUpdateDraft(existingDeal.SystemFields.WebPageItemID, currentCulture.Language, new UpdateDraftData(itemData)))
         {
-            throw new Exception("Failed to update page draft");
+            throw new NotFoundException("Failed to update page draft");
         }
 
         // Publish the updated page
-        if (!await _webPageManager.TryPublish(existingDeal.SystemFields.WebPageItemID, culture))
+        if (!await _webPageManager.TryPublish(existingDeal.SystemFields.WebPageItemID, currentCulture.Language))
         {
-            throw new Exception("Failed to publish updated page");
+            throw new NotFoundException("Failed to publish updated page");
         }
 
         // Retrieve the updated page and return it
@@ -325,7 +395,18 @@ public class DealCrudService : IDealCrudService
 
     public async Task DeletePageAsync(int channelId, Guid pageGUID, string? culture, bool deleteAllCultures, CancellationToken cancellationToken)
     {
+        var currentCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+
+        if (string.IsNullOrEmpty(currentCulture.Language))
+        {
+            throw new NotFoundException("Invalid culture specified");
+        }
+
         var channel = await _channelInfoProvider.GetAsync(channelId);
+        if (string.IsNullOrEmpty(channel?.ChannelName))
+        {
+            throw new NotFoundException("Channel not found");
+        }
         CHANNEL_NAME = channel.ChannelName;
         if (deleteAllCultures)
         {
@@ -339,7 +420,7 @@ public class DealCrudService : IDealCrudService
                 {
                     LinkedItemsMaxLevel = 1,
                     ChannelName = channel.ChannelName,
-                    LanguageName = cult.ToString(),
+                    LanguageName = currentCulture.Language,
                     IsForPreview = false
                 };
 
@@ -367,7 +448,7 @@ public class DealCrudService : IDealCrudService
             {
                 LinkedItemsMaxLevel = 1,
                 ChannelName = channel.ChannelName,
-                LanguageName = culture ?? defaultCulture.Language,
+                LanguageName = currentCulture.Language,
                 IsForPreview = false
             };
 
@@ -385,7 +466,7 @@ public class DealCrudService : IDealCrudService
             }
 
             await _webPageManager.Delete(
-                new DeleteWebPageParameters(existingDeal.SystemFields.WebPageItemID, culture ?? defaultCulture.Language)
+                new DeleteWebPageParameters(existingDeal.SystemFields.WebPageItemID, currentCulture.Language)
                 {
                     Permanently = true
                 });
@@ -521,63 +602,62 @@ public class DealCrudService : IDealCrudService
         var heroBackgroundImageReferences = await _mappingHelper.BuildContentAttachmentImageReferences(deal.HeroBackgroundImage, cancellationToken);
         var heroBackgroundImageMobileReferences = await _mappingHelper.BuildContentAttachmentImageReferences(deal.HeroBackgroundImage_Mobile, cancellationToken);
 
-        var relevantContactPersonReferences = await _mappingHelper.BuildContentAttachmentPageReferences(deal.RelevantContactPerson, CHANNEL_NAME, culture, cancellationToken);
-        var heroCallToActionButtonUrlReferences = await _mappingHelper.BuildContentAttachmentPageReferences(deal.HeroCallToActionButtonUrl, CHANNEL_NAME, culture, cancellationToken);
+        var relevantContactPersonReferences = await _mappingHelper.BuildContentAttachmentPersonPageReferences(deal.RelevantContactPerson, CHANNEL_NAME, culture, cancellationToken);
+        var heroCallToActionButtonUrlReferences = await _mappingHelper.BuildContentAttachmentPersonPageReferences(deal.HeroCallToActionButtonUrl, CHANNEL_NAME, culture, cancellationToken);
 
         return new ContentItemData(new Dictionary<string, object>
         {
-            { "Culture", culture ?? string.Empty },
-            { "MetadataShowTitle", deal.ShowTitle },
-            { "DealContent", deal.DealContent ?? string.Empty },
-            { "Industry", industryReferences },
-            { "SubIndustry", subIndustryReferences },
-            { "DealType", dealTypeReferences },
-            { "DateField", deal.DateField ?? DateTime.MinValue },
-            { "Size", sizeReferences },
-            { "MetadataOfficeLocation", deal.MetadataOfficeLocation ?? string.Empty },
-            { "ClientName", deal.ClientName ?? string.Empty },
-            { "RelatedDeals", deal.RelatedDeals },
-            { "DealMetadataRssCategory", deal.MetadataRssCategory ?? string.Empty },
-            { "DealMetadataRssImage", rssImageReferences },
-            { "DealShowSocialMediaButtons", deal.ShowSocialMediaButtons },
-            { "SharingOptIn", deal.SharingOptIn },
-            { "DealCountry", deal.DealCountry ?? string.Empty },
-            { "DisplayedContacts", deal.DisplayedContacts ?? string.Empty },
-            { "RelevantContactPersonDeal", relevantContactPersonReferences },
-            { "ShowCallToAction", deal.ShowCallToAction },
-            { "CallToActionDescription", deal.CallToActionDescription ?? string.Empty },
-            { "CallToActionButtonText", deal.CallToActionButtonText ?? string.Empty },
-            { "CallToActionButtonUrl", deal.CallToActionButtonUrl ?? string.Empty },
-            { "ShowSidebar", deal.ShowSidebar },
-            { "ShowPrintButton", deal.ShowPrintButton },
-            { "DownloadButtonAttachment", downloadButtonReferences },
-            { "ShowSocialMediaButtons", deal.ShowSocialMediaButtons },
-            { "MetadataOGTitle", deal.MetadataOGTitle ?? string.Empty },
-            { "MetadataOGDescription", deal.MetadataOGDescription ?? string.Empty },
-            { "MetadataOGImage", ogImageReferences },
-            { "MetadataOGTwitterImageSizeCheckbox", deal.MetadataOGTwitterImageSizeCheckbox },
-            { "MetadataOGTwitterImage", ogTwitterImageReferences },
-            { "MetadataNofollow", deal.MetadataNofollow },
-            { "MetadataNoindex", deal.MetadataNoindex },
-            { "IncludeInSitemap", deal.IncludeInSitemap },
-            { "MetadataTitle", deal.MetadataTitle ?? string.Empty },
-            { "MetadataDescription", deal.MetadataDescription ?? string.Empty },
-            { "MetadataTeaserImage", teaserImageReferences },
-            { "MetadataTeaserImageAltText", deal.MetadataTeaserImageAltText ?? string.Empty },
-            { "MetadataCanonical", deal.MetadataCanonical ?? string.Empty },
-            { "HeroLayout", deal.HeroLayout ?? string.Empty },
-            { "HeroTitle", deal.HeroTitle ?? string.Empty },
-            { "HeroDescription", deal.HeroDescription ?? string.Empty },
-            { "HeroBackgroundImage", heroBackgroundImageReferences },
-            { "HeroBackgroundImageAltText", deal.HeroBackgroundImageAltText ?? string.Empty },
-            { "HeroBackgroundImage_Mobile", heroBackgroundImageMobileReferences },
-            { "HeroBackgroundImage_MobileAltText", deal.HeroBackgroundImage_MobileAltText ?? string.Empty },
-            { "HeroCallToActionButtonType", deal.HeroCallToActionButtonType ?? string.Empty },
-            { "HeroCallToActionButtonText", deal.HeroCallToActionButtonText ?? string.Empty },
-            { "HeroCallToActionButtonUrl", heroCallToActionButtonUrlReferences },
-            { "PageTitle", deal.MetadataTitle ?? string.Empty },
-            { "PageDescription", deal.MetadataDescription ?? string.Empty },
-            { "PageKeywords", string.Empty },
+            { nameof(Deal.MetadataShowTitle), deal.ShowTitle },
+            { nameof(Deal.DealContent), deal.DealContent ?? string.Empty },
+            { nameof(Deal.Industry), industryReferences },
+            { nameof(Deal.SubIndustry), subIndustryReferences },
+            { nameof(Deal.DealType), dealTypeReferences },
+            { nameof(Deal.DateField), deal.DateField ?? DateTime.MinValue },
+            { nameof(Deal.Size), sizeReferences },
+            { nameof(Deal.MetadataOfficeLocation), deal.MetadataOfficeLocation ?? string.Empty },
+            { nameof(Deal.ClientName), deal.ClientName ?? string.Empty },
+            { nameof(Deal.RelatedDeals), deal.RelatedDeals },
+            { nameof(Deal.DealMetadataRssCategory), deal.MetadataRssCategory ?? string.Empty },
+            { nameof(Deal.DealMetadataRssImage), rssImageReferences },
+            { nameof(Deal.DealShowSocialMediaButtons), deal.ShowSocialMediaButtons },
+            { nameof(Deal.SharingOptIn), deal.SharingOptIn },
+            { nameof(Deal.DealCountry), deal.DealCountry ?? string.Empty },
+            { nameof(Deal.DisplayedContacts), deal.DisplayedContacts ?? string.Empty },
+            { nameof(Deal.RelevantContactPersonDeal), relevantContactPersonReferences },
+            { nameof(Deal.ShowCallToAction), deal.ShowCallToAction },
+            { nameof(Deal.CallToActionDescription), deal.CallToActionDescription ?? string.Empty },
+            { nameof(Deal.CallToActionButtonText), deal.CallToActionButtonText ?? string.Empty },
+            { nameof(Deal.CallToActionButtonUrl), deal.CallToActionButtonUrl ?? string.Empty },
+            { nameof(Deal.ShowSidebar), deal.ShowSidebar },
+            { nameof(Deal.ShowPrintButton), deal.ShowPrintButton },
+            { nameof(Deal.DownloadButtonAttachment), downloadButtonReferences },
+            { nameof(Deal.ShowSocialMediaButtons), deal.ShowSocialMediaButtons },
+            { nameof(Deal.MetadataOGTitle), deal.MetadataOGTitle ?? string.Empty },
+            { nameof(Deal.MetadataOGDescription), deal.MetadataOGDescription ?? string.Empty },
+            { nameof(Deal.MetadataOGImage), ogImageReferences },
+            { nameof(Deal.MetadataOGTwitterImageSizeCheckbox), deal.MetadataOGTwitterImageSizeCheckbox },
+            { nameof(Deal.MetadataOGTwitterImage), ogTwitterImageReferences },
+            { nameof(Deal.MetadataNofollow), deal.MetadataNofollow },
+            { nameof(Deal.MetadataNoindex), deal.MetadataNoindex },
+            { nameof(Deal.IncludeInSitemap), deal.IncludeInSitemap },
+            { nameof(Deal.MetadataTitle), deal.MetadataTitle ?? string.Empty },
+            { nameof(Deal.MetadataDescription), deal.MetadataDescription ?? string.Empty },
+            { nameof(Deal.MetadataTeaserImage), teaserImageReferences },
+            { nameof(Deal.MetadataTeaserImageAltText), deal.MetadataTeaserImageAltText ?? string.Empty },
+            { nameof(Deal.MetadataCanonical), deal.MetadataCanonical ?? string.Empty },
+            { nameof(Deal.HeroLayout), deal.HeroLayout ?? string.Empty },
+            { nameof(Deal.HeroTitle), deal.HeroTitle ?? string.Empty },
+            { nameof(Deal.HeroDescription), deal.HeroDescription ?? string.Empty },
+            { nameof(Deal.HeroBackgroundImage), heroBackgroundImageReferences },
+            { nameof(Deal.HeroBackgroundImageAltText), deal.HeroBackgroundImageAltText ?? string.Empty },
+            { nameof(Deal.HeroBackgroundImage_Mobile), heroBackgroundImageMobileReferences },
+            { nameof(Deal.HeroBackgroundImage_MobileAltText), deal.HeroBackgroundImage_MobileAltText ?? string.Empty },
+            { nameof(Deal.HeroCallToActionButtonType), deal.HeroCallToActionButtonType ?? string.Empty },
+            { nameof(Deal.HeroCallToActionButtonText), deal.HeroCallToActionButtonText ?? string.Empty },
+            { nameof(Deal.HeroCallToActionButtonUrl), heroCallToActionButtonUrlReferences },
+            { nameof(Deal.PageTitle), deal.MetadataTitle ?? string.Empty },
+            { nameof(Deal.PageDescription), deal.MetadataDescription ?? string.Empty },
+            { nameof(Deal.PageKeywords), string.Empty },
         });
     }
 

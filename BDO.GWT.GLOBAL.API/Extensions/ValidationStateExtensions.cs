@@ -1,5 +1,5 @@
 ﻿using BDO.GWT.Common.Core.Exceptions;
-using BDO.GWT.Common.Core.Services;
+using BDO.GWT.GLOBAL.API.Services;
 
 namespace BDO.GWT.GLOBAL.API.Extensions;
 
