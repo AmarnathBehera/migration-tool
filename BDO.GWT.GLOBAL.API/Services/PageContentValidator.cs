@@ -163,8 +163,25 @@ public class PageContentValidator : IPageContentValidator
             FieldDataType.Integer => ValidateIntegerFieldDataType(field, controlName, value),
             FieldDataType.LongText => ValidateLongTextFieldDataType(field, controlName, value),
             FieldDataType.Text => ValidateTextFieldDataType(field, controlName, value),
+            FieldDataType.ContentItemReference => ValidateContentItemReferenceFieldDataType(field, controlName, value),
             _ => throw new NotImplementedException($"Validation for field data type '{field.DataType}' is not implemented."),
         };
+    }
+
+    private object? ValidateContentItemReferenceFieldDataType(FormFieldInfo field, string controlName, object? value)
+    {
+        if (string.IsNullOrWhiteSpace(controlName))
+        {
+            throw new ArgumentException(nameof(controlName));
+        }
+
+        // Content item reference values are serialized as strings in the page content DTO
+        // (e.g. RelatedDeals, DisplayedContacts, RelevantContactPerson). Validate the
+        // presence rule and pass the value through unchanged.
+        return ValidateAndNormalizeString(
+            field,
+            value as string,
+            DoNothing);
     }
 
     #region Field data type validation methods
@@ -173,7 +190,7 @@ public class PageContentValidator : IPageContentValidator
     {
         return componentIdentifier switch
         {
-            "kentico.checkbox" =>
+            "kentico.checkbox" or "kentico.administration.checkbox" =>
                 ValidateAndNormalizeBool(
                     field,
                     value as bool?,
@@ -188,7 +205,7 @@ public class PageContentValidator : IPageContentValidator
     {
         return componentIdentifier switch
         {
-            "kentico.datetimeinput" =>
+            "kentico.datetimeinput" or "kentico.administration.dateinput" =>
                 ValidateAndNormalizeDateTime(
                     field,
                     value as DateTime?,
@@ -243,6 +260,7 @@ public class PageContentValidator : IPageContentValidator
             case "kentico.textinput":
             case "kentico.textarea":
             case "kentico.richtext":
+            case "kentico.administration.richtexteditor":
                 return ValidateAndNormalizeString(
                     field,
                     value as string,
@@ -285,10 +303,18 @@ public class PageContentValidator : IPageContentValidator
 
             // Text-based components
             case "kentico.textinput":
+            case "kentico.administration.textinput":
             case "kentico.textarea":
+            case "kentico.administration.textarea":
             case "kentico.emailinput":
             case "kentico.numericinput":
             case "kentico.objectselector":
+            // Admin dropdown selector stores a plain string value.
+            case "kentico.administration.dropdownselector":
+            // Custom SQL-driven dropdown stores a plain string value; its
+            // options are resolved via SQL at runtime, so we normalize the
+            // string without validating against static field options.
+            case "bdo.sqldropdown":
                 return ValidateAndNormalizeString(
                     field,
                     value as string,

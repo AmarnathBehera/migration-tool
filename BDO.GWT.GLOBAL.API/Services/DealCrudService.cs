@@ -148,6 +148,11 @@ public class DealCrudService : IDealCrudService
         {
             throw new NotFoundException("Channel not found");
         }
+
+        _pageContentValidator.ValidateAndNormalizePageContent(request);
+
+        _validationState.ThrowIfThereAreErrors();
+
         CHANNEL_NAME = channel.ChannelName;
         var _retrieveCurrentPage = new RetrievePagesParameters
         {
@@ -171,10 +176,6 @@ public class DealCrudService : IDealCrudService
         //    _validationState.AddUnprocessableEntityError(nameof(nodeParentID), ErrorMessage.ParentPageTypeDoesNotAllowChildPageType(parentPage.GetType(), typeof(IPage)));
         //    throw new UnprocessableEntityException();
         //}
-
-        _pageContentValidator.ValidateAndNormalizePageContent(request);
-
-        _validationState.ThrowIfThereAreErrors();
 
         // The page display name shown in the admin UI
         string pageDisplayName = request.MetadataTitle ?? "New Deal Created by API";
