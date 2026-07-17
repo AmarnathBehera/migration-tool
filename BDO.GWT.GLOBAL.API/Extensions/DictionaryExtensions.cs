@@ -6,12 +6,9 @@ public static class DictionaryExtensions
 {
     public static void AddOrEnrichEntry(this IDictionary<string, object> dictionary, string key, string value, char? separator = ' ')
     {
-        if (!dictionary.TryAdd(key, value))
+        if (!dictionary.TryAdd(key, value) && (dictionary[key] is string))
         {
-            if (dictionary[key] is string)
-            {
-                dictionary[key] += $"{separator}{value}";
-            }
+            dictionary[key] += $"{separator}{value}";
         }
     }
 

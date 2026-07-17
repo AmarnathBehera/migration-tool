@@ -64,7 +64,7 @@ public class DealCrudService : IDealCrudService
             throw new NotFoundException("Invalid culture specified");
         }
 
-        var channel = await _channelInfoProvider.GetAsync(channelId);
+        var channel = await _channelInfoProvider.GetAsync(channelId, cancellationToken);
         if (string.IsNullOrEmpty(channel?.ChannelName))
         {
             throw new NotFoundException("Channel not found");
@@ -84,7 +84,7 @@ public class DealCrudService : IDealCrudService
         RetrievalCacheSettings.CacheDisabled,
         cancellationToken);
 
-        var deals = results.ToList() ?? new List<Deal>();
+        var deals = results.ToList();
         return deals.Select(MapDealToPageOutput).ToList();
     }
 
@@ -97,7 +97,7 @@ public class DealCrudService : IDealCrudService
             throw new NotFoundException("Invalid culture specified");
         }
 
-        var channel = await _channelInfoProvider.GetAsync(channelId);
+        var channel = await _channelInfoProvider.GetAsync(channelId, cancellationToken);
         if (string.IsNullOrEmpty(channel?.ChannelName))
         {
             throw new NotFoundException("Channel not found");
@@ -143,7 +143,7 @@ public class DealCrudService : IDealCrudService
             throw new NotFoundException("Invalid culture specified");
         }
 
-        var channel = await _channelInfoProvider.GetAsync(channelId);
+        var channel = await _channelInfoProvider.GetAsync(channelId, cancellationToken);
         if (string.IsNullOrEmpty(channel?.ChannelName))
         {
             throw new NotFoundException("Channel not found");
@@ -193,13 +193,13 @@ public class DealCrudService : IDealCrudService
         int newPageId = await _webPageManager.Create(createPageParameters, cancellationToken);
 
         // Update the draft with new content
-        if (!await _webPageManager.TryUpdateDraft(newPageId, currentCulture.Locale, new UpdateDraftData(itemData)))
+        if (!await _webPageManager.TryUpdateDraft(newPageId, currentCulture.Locale, new UpdateDraftData(itemData), cancellationToken))
         {
             throw new NotFoundException("Failed to update page draft");
         }
 
         // Publish the updated page
-        if (!await _webPageManager.TryPublish(newPageId, currentCulture.Locale))
+        if (!await _webPageManager.TryPublish(newPageId, currentCulture.Locale, cancellationToken))
         {
             throw new NotFoundException("Failed to publish updated page");
         }
@@ -243,7 +243,7 @@ public class DealCrudService : IDealCrudService
             throw new NotFoundException("Invalid to culture specified");
         }
 
-        var channel = await _channelInfoProvider.GetAsync(channelId);
+        var channel = await _channelInfoProvider.GetAsync(channelId, cancellationToken);
         if (string.IsNullOrEmpty(channel?.ChannelName))
         {
             throw new NotFoundException("Channel not found");
@@ -286,19 +286,19 @@ public class DealCrudService : IDealCrudService
             itemData);
 
         // Creates the language variant in the database
-        if (!await _webPageManager.TryCreateLanguageVariant(createVariantParameters))
+        if (!await _webPageManager.TryCreateLanguageVariant(createVariantParameters, cancellationToken))
         {
             throw new NotFoundException("Failed to create language variant");
         }
 
         // Update the draft with new content
-        if (!await _webPageManager.TryUpdateDraft(existingDeal.SystemFields.WebPageItemID, toLangCulture.Language, new UpdateDraftData(itemData)))
+        if (!await _webPageManager.TryUpdateDraft(existingDeal.SystemFields.WebPageItemID, toLangCulture.Language, new UpdateDraftData(itemData), cancellationToken))
         {
             throw new NotFoundException("Failed to update page draft");
         }
 
         // Publish the updated page
-        if (!await _webPageManager.TryPublish(existingDeal.SystemFields.WebPageItemID, toLangCulture.Language))
+        if (!await _webPageManager.TryPublish(existingDeal.SystemFields.WebPageItemID, toLangCulture.Language, cancellationToken))
         {
             throw new NotFoundException("Failed to publish updated page");
         }
@@ -335,7 +335,7 @@ public class DealCrudService : IDealCrudService
             throw new NotFoundException("Invalid culture specified");
         }
 
-        var channel = await _channelInfoProvider.GetAsync(channelId);
+        var channel = await _channelInfoProvider.GetAsync(channelId, cancellationToken);
         if (string.IsNullOrEmpty(channel?.ChannelName))
         {
             throw new NotFoundException("Channel not found");
@@ -370,16 +370,16 @@ public class DealCrudService : IDealCrudService
         var itemData = await CreateCMSTreeItem(request, culture, cancellationToken);
 
         // Create a draft, update it, and publish
-        await _webPageManager.TryCreateDraft(existingDeal.SystemFields.WebPageItemID, currentCulture.Locale);
+        await _webPageManager.TryCreateDraft(existingDeal.SystemFields.WebPageItemID, currentCulture.Locale, cancellationToken);
 
         // Update the draft with new content
-        if (!await _webPageManager.TryUpdateDraft(existingDeal.SystemFields.WebPageItemID, currentCulture.Locale, new UpdateDraftData(itemData)))
+        if (!await _webPageManager.TryUpdateDraft(existingDeal.SystemFields.WebPageItemID, currentCulture.Locale, new UpdateDraftData(itemData), cancellationToken))
         {
             throw new NotFoundException("Failed to update page draft");
         }
 
         // Publish the updated page
-        if (!await _webPageManager.TryPublish(existingDeal.SystemFields.WebPageItemID, currentCulture.Locale))
+        if (!await _webPageManager.TryPublish(existingDeal.SystemFields.WebPageItemID, currentCulture.Locale, cancellationToken))
         {
             throw new NotFoundException("Failed to publish updated page");
         }
@@ -403,7 +403,7 @@ public class DealCrudService : IDealCrudService
             throw new NotFoundException("Invalid culture specified");
         }
 
-        var channel = await _channelInfoProvider.GetAsync(channelId);
+        var channel = await _channelInfoProvider.GetAsync(channelId, cancellationToken);
         if (string.IsNullOrEmpty(channel?.ChannelName))
         {
             throw new NotFoundException("Channel not found");
@@ -438,7 +438,8 @@ public class DealCrudService : IDealCrudService
                         new DeleteWebPageParameters(existingDeal.SystemFields.WebPageItemID, cult.ToString())
                         {
                             Permanently = true
-                        });
+                        },
+                        cancellationToken);
                 }
             }
         }
@@ -470,7 +471,8 @@ public class DealCrudService : IDealCrudService
                 new DeleteWebPageParameters(existingDeal.SystemFields.WebPageItemID, currentCulture.Locale)
                 {
                     Permanently = true
-                });
+                },
+                cancellationToken);
         }
     }
 

@@ -95,8 +95,11 @@ public class DealsControllerTests
 
         Assert.That(result.Result, Is.InstanceOf<CreatedAtActionResult>());
         var createdResult = (CreatedAtActionResult)result.Result!;
-        Assert.That(createdResult.ActionName, Is.EqualTo("Get"));
-        Assert.That(createdResult.Value, Is.EqualTo(expected));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(createdResult.ActionName, Is.EqualTo("Get"));
+            Assert.That(createdResult.Value, Is.EqualTo(expected));
+        }
 
         _dealCrudServiceMock.Verify(
             x => x.CreatePageAsync(42, 100, "en-gb", request, It.IsAny<CancellationToken>()),

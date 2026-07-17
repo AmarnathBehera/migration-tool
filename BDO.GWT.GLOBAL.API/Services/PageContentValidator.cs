@@ -78,7 +78,7 @@ public class PageContentValidator : IPageContentValidator
     }
 
     private static bool TryGetContentProperty(
-        IReadOnlyDictionary<string, PropertyInfo> contentPropertyByName,
+        ImmutableDictionary<string, PropertyInfo> contentPropertyByName,
         string contentTypeCodeNameSegment,
         string kenticoFieldName,
         out PropertyInfo contentProperty)
@@ -169,7 +169,7 @@ public class PageContentValidator : IPageContentValidator
         };
     }
 
-    private object? ValidateContentItemReferenceFieldDataType(FormFieldInfo field, string controlName, object? value)
+    private string? ValidateContentItemReferenceFieldDataType(FormFieldInfo field, string controlName, object? value)
     {
         if (string.IsNullOrWhiteSpace(controlName))
         {
