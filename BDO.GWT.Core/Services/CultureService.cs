@@ -28,4 +28,13 @@ public class CultureService : ICultureService
 
         return languageTags;
     }
+
+    public async Task<IEnumerable<LanguageTag>> GetSiteCulturesLanguageCodeAsync(int siteID, CancellationToken cancellationToken)
+    {
+        var siteCultures = await _websiteCulturesService.GetWebsiteCulturesAsync();
+
+        var languageTags = siteCultures.Select(x => LanguageTag.Parse(x.CultureCode));
+
+        return languageTags;
+    }
 }

@@ -12,6 +12,8 @@ using Kentico.Content.Web.Mvc;
 using Kentico.Xperience.Headless.Internal;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
+using CMS.Localization;
+using System.Globalization;
 
 namespace BDO.GWT.GLOBAL.API.Services;
 
@@ -116,7 +118,7 @@ public class DealCrudService : IDealCrudService
             return new BadRequestResult();
         }
 
-        //var currentCulture = await ValidateAndNormalizeSiteCultureAsync(culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+        var currentCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
 
         var channel = await _channelInfoProvider.GetAsync(channelId);
         CHANNEL_NAME = channel.ChannelName;
@@ -230,12 +232,23 @@ public class DealCrudService : IDealCrudService
             existingDeal.SystemFields?.ContentItemName ?? "Deal culture variant",
             itemData);
 
-        // Creates the page in the database
-        var isCreated = await _webPageManager.TryCreateLanguageVariant(createVariantParameters);
+        // Creates the language variant in the database
+        if (!await _webPageManager.TryCreateLanguageVariant(createVariantParameters))
+        {
+            throw new Exception("Failed to create language variant");
+        }
+
+        // Update the draft with new content
+        if (!await _webPageManager.TryUpdateDraft(existingDeal.SystemFields.WebPageItemID, toCulture, new UpdateDraftData(itemData)))
+        {
+            throw new Exception("Failed to update page draft");
+        }
 
         // Publish the updated page
-        if (isCreated)
-            await _webPageManager.TryPublish(existingDeal.SystemFields.WebPageItemID, toCulture, cancellationToken);
+        if (!await _webPageManager.TryPublish(existingDeal.SystemFields.WebPageItemID, toCulture))
+        {
+            throw new Exception("Failed to publish updated page");
+        }
 
         // Retrieve the created variant and return it
         var _retrieveNewVariant = new RetrievePagesParameters
@@ -255,7 +268,7 @@ public class DealCrudService : IDealCrudService
         return variantDeal != null ? MapDealToPageOutput(variantDeal) : new BadRequestResult();
     }
 
-    public async Task<ActionResult<PageOutput<DealPageContent>>> UpdatePageAsync(int channelId, Guid pageGUID, string culture, DealPageContent request, CancellationToken cancellationToken)
+    public async Task<ActionResult<PageOutput<DealPageContent>>> UpdatePageAsync(int channelId, Guid pageGUID, string? culture, DealPageContent request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -311,14 +324,14 @@ public class DealCrudService : IDealCrudService
         return updatedPageDeal != null ? MapDealToPageOutput(updatedPageDeal) : new BadRequestResult();
     }
 
-    public async Task DeletePageAsync(int channelId, Guid pageGUID, string culture, bool deleteAllCultures, CancellationToken cancellationToken)
+    public async Task DeletePageAsync(int channelId, Guid pageGUID, string? culture, bool deleteAllCultures, CancellationToken cancellationToken)
     {
         var channel = await _channelInfoProvider.GetAsync(channelId);
         CHANNEL_NAME = channel.ChannelName;
         if (deleteAllCultures)
         {
             // Get all available cultures for the channel
-            var allCultures = await _cultureService.GetCurrentSiteCulturesAsync(cancellationToken);
+            var allCultures = await _cultureService.GetSiteCulturesLanguageCodeAsync(channelId, cancellationToken);
 
             // Delete the page variant for each culture
             foreach (var cult in allCultures)
@@ -373,7 +386,7 @@ public class DealCrudService : IDealCrudService
             }
 
             await _webPageManager.Delete(
-                new DeleteWebPageParameters(existingDeal.SystemFields.WebPageItemID, defaultCulture.Language)
+                new DeleteWebPageParameters(existingDeal.SystemFields.WebPageItemID, culture ?? defaultCulture.Language)
                 {
                     Permanently = true
                 });
@@ -463,7 +476,7 @@ public class DealCrudService : IDealCrudService
         };
     }
 
-    private async Task<LanguageTag?> ValidateAndNormalizeSiteCultureAsync(string languageTagString, CancellationToken cancellationToken)
+    private async Task<LanguageTag?> ValidateAndNormalizeSiteCultureAsync(int channelId, string languageTagString, CancellationToken cancellationToken)
     {
         var languageTag = ValidateAndNormalizeCultureAsync(languageTagString);
 
@@ -472,7 +485,7 @@ public class DealCrudService : IDealCrudService
             return null;
         }
 
-        var siteCultures = (await _cultureService.GetCurrentSiteCulturesAsync(cancellationToken)).ToHashSet();
+        var siteCultures = (await _cultureService.GetSiteCulturesLanguageCodeAsync(channelId, cancellationToken)).ToHashSet();
 
         if (!siteCultures.Contains(languageTag))
         {
