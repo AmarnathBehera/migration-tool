@@ -6,15 +6,15 @@ using System.Text.Json.Serialization;
 namespace BDO.GWT.Core.ValueObjects;
 
 [method: JsonConstructor]
-public record LanguageTag(string Language, string? Script, string Region)
+public record LanguageTag(string Language, string? Script, string Region, string Locale)
 {
-    public static readonly LanguageTag AU = new("en", "AU");
-    public static readonly LanguageTag DE = new("de", "DE");
-    public static readonly LanguageTag GB = new("en", "GB");
-    public static readonly LanguageTag LT = new("lt", "LT");
-    public static readonly LanguageTag US = new("en", "US");
+    public static readonly LanguageTag AU = new("en", "AU", "en-AU");
+    public static readonly LanguageTag DE = new("de", "DE", "de-DE");
+    public static readonly LanguageTag GB = new("en", "GB", "en-GB");
+    public static readonly LanguageTag LT = new("lt", "LT", "lt-LT");
+    public static readonly LanguageTag US = new("en", "US", "en-US");
 
-    public LanguageTag(string Language, string Region) : this(Language, null, Region)
+    public LanguageTag(string Language, string Region, string Locale) : this(Language, null, Region, Locale)
     {
     }
 
@@ -41,7 +41,7 @@ public record LanguageTag(string Language, string? Script, string Region)
                 var language = parts[0].ToLowerInvariant();
                 var region = parts[1].ToUpperInvariant();
 
-                culture = new LanguageTag(language, region);
+                culture = new LanguageTag(language, region, language + "-" + region);
 
                 return true;
             }

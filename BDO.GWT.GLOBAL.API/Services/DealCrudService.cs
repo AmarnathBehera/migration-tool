@@ -59,7 +59,7 @@ public class DealCrudService : IDealCrudService
     {
         var currentCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
 
-        if (string.IsNullOrEmpty(currentCulture.Language))
+        if (string.IsNullOrEmpty(currentCulture.Locale))
         {
             throw new NotFoundException("Invalid culture specified");
         }
@@ -74,7 +74,7 @@ public class DealCrudService : IDealCrudService
         {
             LinkedItemsMaxLevel = 5,
             ChannelName = channel.ChannelName,
-            LanguageName = currentCulture.Language,
+            LanguageName = currentCulture.Locale,
             IsForPreview = !(onlyPublished ?? true),
         };
 
@@ -92,7 +92,7 @@ public class DealCrudService : IDealCrudService
     {
         var currentCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
 
-        if (string.IsNullOrEmpty(currentCulture.Language))
+        if (string.IsNullOrEmpty(currentCulture.Locale))
         {
             throw new NotFoundException("Invalid culture specified");
         }
@@ -107,7 +107,7 @@ public class DealCrudService : IDealCrudService
         {
             LinkedItemsMaxLevel = 1,
             ChannelName = channel.ChannelName,
-            LanguageName = currentCulture.Language,
+            LanguageName = currentCulture.Locale,
             IsForPreview = false
         };
 
@@ -138,7 +138,7 @@ public class DealCrudService : IDealCrudService
 
         var currentCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
 
-        if(string.IsNullOrEmpty(currentCulture.Language))
+        if(string.IsNullOrEmpty(currentCulture.Locale))
         {
             throw new NotFoundException("Invalid culture specified");
         }
@@ -153,7 +153,7 @@ public class DealCrudService : IDealCrudService
         {
             LinkedItemsMaxLevel = 1,
             ChannelName = channel.ChannelName,
-            LanguageName = currentCulture.Language,
+            LanguageName = currentCulture.Locale,
             IsForPreview = false
         };
 
@@ -179,11 +179,11 @@ public class DealCrudService : IDealCrudService
         // The page display name shown in the admin UI
         string pageDisplayName = request.MetadataTitle ?? "New Deal Created by API";
 
-        var itemData = await CreateCMSTreeItem(request, currentCulture.Language, cancellationToken);
+        var itemData = await CreateCMSTreeItem(request, currentCulture.Locale, cancellationToken);
 
         // Creates a page metadata object
         var contentItemParameters = new ContentItemParameters(DEAL_CONTENT_TYPE, itemData);
-        var createPageParameters = new CreateWebPageParameters(pageDisplayName, currentCulture.Language, contentItemParameters)
+        var createPageParameters = new CreateWebPageParameters(pageDisplayName, currentCulture.Locale, contentItemParameters)
         {
             ParentWebPageItemID = nodeParentID
         };
@@ -192,13 +192,13 @@ public class DealCrudService : IDealCrudService
         int newPageId = await _webPageManager.Create(createPageParameters, cancellationToken);
 
         // Update the draft with new content
-        if (!await _webPageManager.TryUpdateDraft(newPageId, currentCulture.Language, new UpdateDraftData(itemData)))
+        if (!await _webPageManager.TryUpdateDraft(newPageId, currentCulture.Locale, new UpdateDraftData(itemData)))
         {
             throw new NotFoundException("Failed to update page draft");
         }
 
         // Publish the updated page
-        if (!await _webPageManager.TryPublish(newPageId, currentCulture.Language))
+        if (!await _webPageManager.TryPublish(newPageId, currentCulture.Locale))
         {
             throw new NotFoundException("Failed to publish updated page");
         }
@@ -208,7 +208,7 @@ public class DealCrudService : IDealCrudService
         {
             LinkedItemsMaxLevel = 1,
             ChannelName = channel.ChannelName,
-            LanguageName = currentCulture.Language,
+            LanguageName = currentCulture.Locale,
             IsForPreview = false
         };
 
@@ -329,7 +329,7 @@ public class DealCrudService : IDealCrudService
 
         var currentCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
 
-        if (string.IsNullOrEmpty(currentCulture.Language))
+        if (string.IsNullOrEmpty(currentCulture.Locale))
         {
             throw new NotFoundException("Invalid culture specified");
         }
@@ -349,7 +349,7 @@ public class DealCrudService : IDealCrudService
         {
             LinkedItemsMaxLevel = 1,
             ChannelName = channel.ChannelName,
-            LanguageName = currentCulture.Language,
+            LanguageName = currentCulture.Locale,
             IsForPreview = false
         };
 
@@ -369,16 +369,16 @@ public class DealCrudService : IDealCrudService
         var itemData = await CreateCMSTreeItem(request, culture, cancellationToken);
 
         // Create a draft, update it, and publish
-        await _webPageManager.TryCreateDraft(existingDeal.SystemFields.WebPageItemID, currentCulture.Language);
+        await _webPageManager.TryCreateDraft(existingDeal.SystemFields.WebPageItemID, currentCulture.Locale);
 
         // Update the draft with new content
-        if (!await _webPageManager.TryUpdateDraft(existingDeal.SystemFields.WebPageItemID, currentCulture.Language, new UpdateDraftData(itemData)))
+        if (!await _webPageManager.TryUpdateDraft(existingDeal.SystemFields.WebPageItemID, currentCulture.Locale, new UpdateDraftData(itemData)))
         {
             throw new NotFoundException("Failed to update page draft");
         }
 
         // Publish the updated page
-        if (!await _webPageManager.TryPublish(existingDeal.SystemFields.WebPageItemID, currentCulture.Language))
+        if (!await _webPageManager.TryPublish(existingDeal.SystemFields.WebPageItemID, currentCulture.Locale))
         {
             throw new NotFoundException("Failed to publish updated page");
         }
@@ -397,7 +397,7 @@ public class DealCrudService : IDealCrudService
     {
         var currentCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
 
-        if (string.IsNullOrEmpty(currentCulture.Language))
+        if (string.IsNullOrEmpty(currentCulture.Locale))
         {
             throw new NotFoundException("Invalid culture specified");
         }
@@ -420,7 +420,7 @@ public class DealCrudService : IDealCrudService
                 {
                     LinkedItemsMaxLevel = 1,
                     ChannelName = channel.ChannelName,
-                    LanguageName = currentCulture.Language,
+                    LanguageName = currentCulture.Locale,
                     IsForPreview = false
                 };
 
@@ -448,7 +448,7 @@ public class DealCrudService : IDealCrudService
             {
                 LinkedItemsMaxLevel = 1,
                 ChannelName = channel.ChannelName,
-                LanguageName = currentCulture.Language,
+                LanguageName = currentCulture.Locale,
                 IsForPreview = false
             };
 
@@ -466,7 +466,7 @@ public class DealCrudService : IDealCrudService
             }
 
             await _webPageManager.Delete(
-                new DeleteWebPageParameters(existingDeal.SystemFields.WebPageItemID, currentCulture.Language)
+                new DeleteWebPageParameters(existingDeal.SystemFields.WebPageItemID, currentCulture.Locale)
                 {
                     Permanently = true
                 });
