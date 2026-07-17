@@ -35,7 +35,7 @@ public class PageContentValidatorTests
         Assert.Multiple(() =>
         {
             Assert.That(resolved, Is.EqualTo(true));
-            Assert.That(args[3], Is.TypeOf<PropertyInfo>());
+            Assert.That(args[3], Is.AssignableTo<PropertyInfo>());
             Assert.That(((PropertyInfo)args[3]!).Name, Is.EqualTo(expectedPropertyName));
         });
     }
