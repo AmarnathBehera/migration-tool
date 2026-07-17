@@ -3,17 +3,14 @@ using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.GLOBAL.API.Data;
+using BDO.GWT.GLOBAL.API.Helpers;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Membership;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
-using Kentico.Xperience.Headless.Internal;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.RegularExpressions;
-using CMS.Localization;
-using System.Globalization;
 
 namespace BDO.GWT.GLOBAL.API.Services;
 
@@ -39,8 +36,9 @@ public class DealCrudService : IDealCrudService
     private const string DEAL_CONTENT_TYPE = Deal.CONTENT_TYPE_NAME;
     private const string WEB_PAGE_GUID = "WebPageItemGUID";
     private string CHANNEL_NAME = string.Empty;
+    private readonly IMappingHelper _mappingHelper;
 
-    public DealCrudService(IContentService contentRetriever, IValidationState validationState, IWebsiteChannelContext websiteChannelContext, ICultureService cultureService, IInfoProvider<ChannelInfo> channelInfoProvider, IWebPageManagerFactory webPageManagerFactory, IUserInfoProvider userInfoProvider)
+    public DealCrudService(IContentService contentRetriever, IValidationState validationState, IWebsiteChannelContext websiteChannelContext, ICultureService cultureService, IInfoProvider<ChannelInfo> channelInfoProvider, IWebPageManagerFactory webPageManagerFactory, IUserInfoProvider userInfoProvider, IMappingHelper mappingHelper)
     {
         UserInfo user = userInfoProvider.Get("administrator");
         _contentRetriever = contentRetriever;
@@ -48,6 +46,7 @@ public class DealCrudService : IDealCrudService
         _websiteChannelContext = websiteChannelContext;
         _cultureService = cultureService;
         _channelInfoProvider = channelInfoProvider;
+        _mappingHelper = mappingHelper;
         _webPageManager = webPageManagerFactory.Create(_websiteChannelContext.WebsiteChannelID == 0 ? 1 : _websiteChannelContext.WebsiteChannelID, user.UserID);
     }
 
@@ -126,7 +125,7 @@ public class DealCrudService : IDealCrudService
         {
             LinkedItemsMaxLevel = 1,
             ChannelName = channel.ChannelName,
-            LanguageName = culture,
+            LanguageName = currentCulture.Language,
             IsForPreview = false
         };
 
@@ -152,11 +151,11 @@ public class DealCrudService : IDealCrudService
         // The page display name shown in the admin UI
         string pageDisplayName = request.MetadataTitle ?? "New Deal Created by API";
 
-        var itemData = await CreateCMSTreeItem(request, culture, cancellationToken);
+        var itemData = await CreateCMSTreeItem(request, currentCulture.Language, cancellationToken);
 
         // Creates a page metadata object
         var contentItemParameters = new ContentItemParameters(DEAL_CONTENT_TYPE, itemData);
-        var createPageParameters = new CreateWebPageParameters(pageDisplayName, culture, contentItemParameters)
+        var createPageParameters = new CreateWebPageParameters(pageDisplayName, currentCulture.Language, contentItemParameters)
         {
             ParentWebPageItemID = nodeParentID
         };
@@ -165,13 +164,13 @@ public class DealCrudService : IDealCrudService
         int newPageId = await _webPageManager.Create(createPageParameters, cancellationToken);
 
         // Update the draft with new content
-        if (!await _webPageManager.TryUpdateDraft(newPageId, culture, new UpdateDraftData(itemData)))
+        if (!await _webPageManager.TryUpdateDraft(newPageId, currentCulture.Language, new UpdateDraftData(itemData)))
         {
             throw new Exception("Failed to update page draft");
         }
 
         // Publish the updated page
-        if (!await _webPageManager.TryPublish(newPageId, culture))
+        if (!await _webPageManager.TryPublish(newPageId, currentCulture.Language))
         {
             throw new Exception("Failed to publish updated page");
         }
@@ -181,7 +180,7 @@ public class DealCrudService : IDealCrudService
         {
             LinkedItemsMaxLevel = 1,
             ChannelName = channel.ChannelName,
-            LanguageName = culture,
+            LanguageName = currentCulture.Language,
             IsForPreview = false
         };
 
@@ -514,16 +513,16 @@ public class DealCrudService : IDealCrudService
         var dealTypeReferences = await BuildReferencesAsync<DealCardDealType>(deal.DealType, d => d.Name, cancellationToken);
         var sizeReferences = await BuildReferencesAsync<DealCardRange>(deal.Size, r => r.Name, cancellationToken);
 
-        var rssImageReferences = await BuildContentAttachmentImageReferences(deal.MetadataRssImage, cancellationToken);
-        var downloadButtonReferences = await BuildContentAttachmentImageReferences(deal.DownloadButtonAttachment, cancellationToken);
-        var ogImageReferences = await BuildContentAttachmentImageReferences(deal.MetadataOGImage, cancellationToken);
-        var ogTwitterImageReferences = await BuildContentAttachmentImageReferences(deal.MetadataOGTwitterImage, cancellationToken);
-        var teaserImageReferences = await BuildContentAttachmentImageReferences(deal.MetadataTeaserImage, cancellationToken);
-        var heroBackgroundImageReferences = await BuildContentAttachmentImageReferences(deal.HeroBackgroundImage, cancellationToken);
-        var heroBackgroundImageMobileReferences = await BuildContentAttachmentImageReferences(deal.HeroBackgroundImage_Mobile, cancellationToken);
+        var rssImageReferences = await _mappingHelper.BuildContentAttachmentImageReferences(deal.MetadataRssImage, cancellationToken);
+        var downloadButtonReferences = await _mappingHelper.BuildContentAttachmentImageReferences(deal.DownloadButtonAttachment, cancellationToken);
+        var ogImageReferences = await _mappingHelper.BuildContentAttachmentImageReferences(deal.MetadataOGImage, cancellationToken);
+        var ogTwitterImageReferences = await _mappingHelper.BuildContentAttachmentImageReferences(deal.MetadataOGTwitterImage, cancellationToken);
+        var teaserImageReferences = await _mappingHelper.BuildContentAttachmentImageReferences(deal.MetadataTeaserImage, cancellationToken);
+        var heroBackgroundImageReferences = await _mappingHelper.BuildContentAttachmentImageReferences(deal.HeroBackgroundImage, cancellationToken);
+        var heroBackgroundImageMobileReferences = await _mappingHelper.BuildContentAttachmentImageReferences(deal.HeroBackgroundImage_Mobile, cancellationToken);
 
-        var relevantContactPersonReferences = await BuildPageAttachmentImageReferences(deal.RelevantContactPerson, CHANNEL_NAME, culture, cancellationToken);
-        var heroCallToActionButtonUrlReferences = await BuildPageAttachmentImageReferences(deal.HeroCallToActionButtonUrl, CHANNEL_NAME, culture, cancellationToken);
+        var relevantContactPersonReferences = await _mappingHelper.BuildContentAttachmentPageReferences(deal.RelevantContactPerson, CHANNEL_NAME, culture, cancellationToken);
+        var heroCallToActionButtonUrlReferences = await _mappingHelper.BuildContentAttachmentPageReferences(deal.HeroCallToActionButtonUrl, CHANNEL_NAME, culture, cancellationToken);
 
         return new ContentItemData(new Dictionary<string, object>
         {
@@ -580,130 +579,6 @@ public class DealCrudService : IDealCrudService
             { "PageDescription", deal.MetadataDescription ?? string.Empty },
             { "PageKeywords", string.Empty },
         });
-    }
-
-    /// <summary>
-    /// Resolves a Content hub image reference from an image URL. Retrieves <c>ContentAttachment</c>
-    /// content items and matches the one whose <c>ContentAttachmentAsset</c> URL corresponds to the
-    /// supplied value, returning it as a list of <see cref="ContentItemReference"/>. A raw content
-    /// item GUID is also accepted. Values that do not match any existing item result in an empty
-    /// (cleared) field.
-    /// </summary>
-    private async Task<List<ContentItemReference>> BuildContentAttachmentImageReferences(string? identifier, CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrWhiteSpace(identifier))
-        {
-            return new List<ContentItemReference>();
-        }
-
-        var value = identifier.Trim();
-
-        // Accept a raw content item GUID directly.
-        if (Guid.TryParse(value, out var guid))
-        {
-            return new List<ContentItemReference> { new ContentItemReference { Identifier = guid } };
-        }
-
-        // Otherwise treat the value as an image URL and look up the matching ContentAttachment.
-        var attachments = await _contentRetriever.GetItemsAsync<ContentAttachment>(
-            builder => builder.Parameters(p => p.Where(w => w.WhereNotNull("ContentAttachmentAsset"))),
-            cancellationToken);
-
-        var match = attachments.FirstOrDefault(a => UrlsMatch(a.ContentAttachmentAsset?.Url, value));
-
-        return match is null
-            ? new List<ContentItemReference>()
-            : new List<ContentItemReference> { new ContentItemReference { Identifier = match.SystemFields.ContentItemGUID } };
-    }
-
-    /// <summary>
-    /// Resolves a web page reference from its <c>WebPageUrlPath</c>. Accepts a raw content item GUID
-    /// or a web page URL path, looks up the matching page in the current channel, and returns it as a
-    /// list of <see cref="ContentItemReference"/>. Used by web page reference fields such as
-    /// <c>RelevantContactPersonDeal</c> and <c>HeroCallToActionButtonUrl</c>. Values that do not match
-    /// any existing page result in an empty (cleared) field.
-    /// </summary>
-    private async Task<List<ContentItemReference>> BuildPageAttachmentImageReferences(string? identifier, string? channelName, string? culture, CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrWhiteSpace(identifier))
-        {
-            return new List<ContentItemReference>();
-        }
-
-        var value = identifier.Trim();
-
-        // Accept a raw content item GUID directly.
-        if (Guid.TryParse(value, out var guid))
-        {
-            return new List<ContentItemReference> { new ContentItemReference { Identifier = guid } };
-        }
-
-        var normalizedPath = value.TrimStart('~');
-        var queryIndex = normalizedPath.IndexOf('?');
-        if (queryIndex >= 0)
-        {
-            normalizedPath = normalizedPath[..queryIndex];
-        }
-        normalizedPath = normalizedPath.TrimEnd('/');
-
-        var parameters = new RetrievePagesParameters
-        {
-            LinkedItemsMaxLevel = 0,
-            ChannelName = channelName,
-            LanguageName = culture ?? defaultCulture.Language,
-            IsForPreview = false
-        };
-
-        var pages = await _contentRetriever.GetPagesAsync<Person>(
-            parameters,
-            query => query.Where(w => w.WhereEquals("WebPageUrlPath", normalizedPath)),
-            RetrievalCacheSettings.CacheDisabled,
-            cancellationToken);
-
-        var match = pages?.FirstOrDefault();
-
-        return match is null
-            ? new List<ContentItemReference>()
-            : new List<ContentItemReference> { new ContentItemReference { Identifier = match.SystemFields.ContentItemGUID } };
-    }
-
-    /// <summary>
-    /// Compares two image URLs for equality, ignoring case, a leading application-relative marker
-    /// (<c>~</c>), and any query string. Falls back to comparing the final path segment (file name).
-    /// </summary>
-    private static bool UrlsMatch(string? assetUrl, string? requestedUrl)
-    {
-        if (string.IsNullOrWhiteSpace(assetUrl) || string.IsNullOrWhiteSpace(requestedUrl))
-        {
-            return false;
-        }
-
-        static string Normalize(string url)
-        {
-            var normalized = url.Trim().TrimStart('~');
-
-            var queryIndex = normalized.IndexOf('?');
-            if (queryIndex >= 0)
-            {
-                normalized = normalized[..queryIndex];
-            }
-
-            return normalized.TrimEnd('/');
-        }
-
-        var normalizedAsset = Normalize(assetUrl);
-        var normalizedRequested = Normalize(requestedUrl);
-
-        if (string.Equals(normalizedAsset, normalizedRequested, StringComparison.OrdinalIgnoreCase)
-            || normalizedAsset.EndsWith(normalizedRequested, StringComparison.OrdinalIgnoreCase)
-            || normalizedRequested.EndsWith(normalizedAsset, StringComparison.OrdinalIgnoreCase))
-        {
-            return true;
-        }
-
-        static string FileName(string url) => url[(url.LastIndexOf('/') + 1)..];
-
-        return string.Equals(FileName(normalizedAsset), FileName(normalizedRequested), StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
