@@ -179,9 +179,9 @@ namespace BDO.GWT.Core.Services
                 dtos.Add(new DealCardDto
                 {
                     Title = deal.MetadataTitle,
-                    Description = deal.MetadataDescription,
+                    Description = HtmlHelper.ExtractTextFromHtml(deal.MetadataDescription),
                     Country = deal.DealCountry,
-                    ImageURL = deal.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+                    ImageURL = deal.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url?.TrimStart('~'),
                     ImageAltText = deal.MetadataTeaserImageAltText,
                     ReadMoreLink = deal.GetUrl().AbsoluteUrl
                 });

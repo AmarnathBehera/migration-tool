@@ -30,7 +30,7 @@ public class GlobalLocationCustomTableDataService : IGlobalLocationCustomTableDa
     }
 
 
-    public async Task<GlobalLocationCustomTableDto?> GetLocationsAsync(int? memberFirmId)
+    public async Task<GlobalLocationCustomTableDto> GetLocationsAsync(int? memberFirmId)
     {
         var locations = new List<GlobalLocationCustomTableDto>();
 

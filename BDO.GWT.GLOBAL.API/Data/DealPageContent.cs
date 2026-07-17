@@ -20,7 +20,7 @@ public class DealPageContent : IMetadataContent
 
     [Required]
     [MaxLength(200)]
-    public string? MetadataTeaserImageAltText { get; set; }
+    public string MetadataTeaserImageAltText { get; set; } = null!;
 
     [MaxLength(1000)]
     public List<string> Industry { get; set; } = [];
@@ -122,7 +122,8 @@ public class DealPageContent : IMetadataContent
     [MaxLength(200)]
     public string? DealCountry { get; set; }
 
-    public string DisplayedContacts { get; set; }
+    [Required]
+    public string DisplayedContacts { get; set; } = string.Empty;
 
     [MaxLength(200)]
     public string RelevantContactPerson { get; set; } = string.Empty;
