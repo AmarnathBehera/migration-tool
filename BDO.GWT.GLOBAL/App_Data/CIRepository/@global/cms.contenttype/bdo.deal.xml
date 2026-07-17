@@ -155,8 +155,7 @@ INNER JOIN dbo.CMS_ContentItemCommonData AS cicd ON lo.ContentItemDataCommonData
           <Script>
 <![CDATA[
     SELECT
-    cicd.MetadataTitle,
-    lo.ContentItemDataCommonDataID
+    cicd.MetadataTitle
 FROM dbo.BDO_Deal AS lo
 INNER JOIN dbo.CMS_ContentItemCommonData AS cicd
     ON lo.ContentItemDataCommonDataID = cicd.ContentItemCommonDataID;
