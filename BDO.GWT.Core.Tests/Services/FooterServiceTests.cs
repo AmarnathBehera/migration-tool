@@ -20,6 +20,11 @@ namespace BDO.GWT.Core.Tests.Services
         {
             _contentServiceMock = new Mock<IContentService>();
             _channelInfoProviderMock = new Mock<IInfoProvider<ChannelInfo>>();
+            // Register the additional interface BEFORE the mock's .Object is accessed below.
+            // The GetAsync(int, CancellationToken?) extension used by FooterService internally
+            // casts the provider to IInfoByIdProvider<ChannelInfo>, so the mock must implement it.
+            // Moq requires As<T>() to be called prior to any .Object access.
+            _channelInfoProviderMock.As<IInfoByIdProvider<ChannelInfo>>();
             _service = new FooterService(_contentServiceMock.Object, _channelInfoProviderMock.Object);
         }
 
@@ -388,6 +393,259 @@ namespace BDO.GWT.Core.Tests.Services
                 WebPageUrlPath = relativePath
             });
             return mock.Object;
+        }
+
+        #endregion
+
+        #region GetAsyncForAPI – general
+
+        // NOTE: Kentico's ChannelInfo derives from AbstractInfoBase, whose property setters
+        // (and its constructor's default-data load) call SetValue -> get_DataClass -> EnsureData,
+        // which lazily resolves services from the CMS IoC container. That container is not
+        // initialized in unit tests, so ANY normal instantiation throws ServiceResolutionException.
+        //
+        // To avoid this entirely we:
+        //   1. Create the instance WITHOUT running any constructor (GetUninitializedObject), and
+        //   2. Override the virtual ChannelName with a plain auto-property so reads/writes never
+        //      touch AbstractInfoBase.GetValue/SetValue.
+        private sealed class TestChannelInfo : ChannelInfo
+        {
+            public override string ChannelName { get; set; } = string.Empty;
+        }
+
+        private void SetupChannelInfo(string channelName = "TestChannel")
+        {
+            // Bypass the ChannelInfo/AbstractInfoBase constructor chain completely.
+            var channelInfo = (TestChannelInfo)System.Runtime.CompilerServices.RuntimeHelpers
+                .GetUninitializedObject(typeof(TestChannelInfo));
+
+            // Safe: sets the override's auto-property backing field, not AbstractInfoBase.SetValue.
+            channelInfo.ChannelName = channelName;
+
+            _channelInfoProviderMock
+                .As<IInfoByIdProvider<ChannelInfo>>()
+                .Setup(x => x.GetAsync(It.IsAny<int>(), It.IsAny<CancellationToken?>()))
+                .ReturnsAsync(channelInfo);
+        }
+
+        private void SetupEmptyDefaultsForAPI()
+        {
+            SetupChannelInfo();
+
+            _contentServiceMock
+                .Setup(x => x.GetItemsChannelOnChannelIdAsync<FooterLinks>(
+                    It.IsAny<string>(),
+                    It.IsAny<Action<ContentItemQueryBuilder>>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<int>()))
+                .ReturnsAsync(new List<FooterLinks>());
+
+            _contentServiceMock
+                .Setup(x => x.GetItemsChannelOnChannelIdAsync<SocialLinks>(
+                    It.IsAny<string>(),
+                    It.IsAny<Action<ContentItemQueryBuilder>>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<int>()))
+                .ReturnsAsync(new List<SocialLinks>());
+
+            _contentServiceMock
+                .Setup(x => x.GetContentTypeForAPI<Subscribe>(
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()))
+                .ReturnsAsync(Enumerable.Empty<Subscribe>());
+
+            _contentServiceMock
+                .Setup(x => x.GetItemsByGUIDForAPIAsync(
+                    It.IsAny<List<Guid>>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()))
+                .ReturnsAsync(new List<IWebPageFieldsSource>());
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<FooterPages>(
+                    It.IsAny<int>(),
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<FooterPages>());
+        }
+
+        [Test]
+        public async Task GetAsyncForAPI_ReturnsFooterDto_WithDefaultValues()
+        {
+            SetupEmptyDefaultsForAPI();
+
+            var result = await _service.GetAsyncForAPI(1, "en-GB", CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result, Is.TypeOf<FooterDto>());
+                Assert.That(result?.FooterLinks, Is.Not.Null);
+                Assert.That(result?.SocialButtons, Is.Not.Null);
+                Assert.That(result?.DisplaySubscriptionsSection, Is.True);
+            });
+        }
+
+        [Test]
+        public async Task GetAsyncForAPI_WhenNoData_ReturnsEmptyCollections()
+        {
+            SetupChannelInfo();
+
+            _contentServiceMock
+                .Setup(x => x.GetItemsChannelOnChannelIdAsync<FooterLinks>(
+                    It.IsAny<string>(),
+                    It.IsAny<Action<ContentItemQueryBuilder>>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<int>()))
+                .ReturnsAsync((IReadOnlyList<FooterLinks>)null!);
+
+            _contentServiceMock
+                .Setup(x => x.GetItemsChannelOnChannelIdAsync<SocialLinks>(
+                    It.IsAny<string>(),
+                    It.IsAny<Action<ContentItemQueryBuilder>>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<int>()))
+                .ReturnsAsync((IReadOnlyList<SocialLinks>)null!);
+
+            _contentServiceMock
+                .Setup(x => x.GetContentTypeForAPI<Subscribe>(
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()))
+                .ReturnsAsync(Enumerable.Empty<Subscribe>());
+
+            _contentServiceMock
+                .Setup(x => x.GetItemsByGUIDForAPIAsync(
+                    It.IsAny<List<Guid>>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()))
+                .ReturnsAsync((IEnumerable<IWebPageFieldsSource>)null!);
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<FooterPages>(
+                    It.IsAny<int>(),
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync((IEnumerable<FooterPages>)null!);
+
+            var result = await _service.GetAsyncForAPI(1, "en-GB", CancellationToken.None);
+
+            Assert.That(result?.FooterLinks, Is.Empty);
+            Assert.That(result?.SocialButtons, Is.Empty);
+        }
+
+        [Test]
+        public async Task GetAsyncForAPI_LimitsFooterLinks_To12()
+        {
+            SetupEmptyDefaultsForAPI();
+
+            var footerLinks = Enumerable.Range(1, 20)
+                .Select(i => new FooterLinks { Title = $"Link {i}" })
+                .ToList();
+
+            _contentServiceMock
+                .Setup(x => x.GetItemsChannelOnChannelIdAsync<FooterLinks>(
+                    It.IsAny<string>(),
+                    It.IsAny<Action<ContentItemQueryBuilder>>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<int>()))
+                .ReturnsAsync(footerLinks);
+
+            var result = await _service.GetAsyncForAPI(1, "en-GB", CancellationToken.None);
+
+            Assert.That(result?.FooterLinks.Count, Is.LessThanOrEqualTo(12));
+        }
+
+        [Test]
+        public async Task GetAsyncForAPI_LimitsSocialButtons_To5()
+        {
+            SetupEmptyDefaultsForAPI();
+
+            var socialLinks = Enumerable.Range(1, 10)
+                .Select(i => new SocialLinks { Alttext = $"Alt {i}" })
+                .ToList();
+
+            _contentServiceMock
+                .Setup(x => x.GetItemsChannelOnChannelIdAsync<SocialLinks>(
+                    It.IsAny<string>(),
+                    It.IsAny<Action<ContentItemQueryBuilder>>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<int>()))
+                .ReturnsAsync(socialLinks);
+
+            var result = await _service.GetAsyncForAPI(1, "en-GB", CancellationToken.None);
+
+            Assert.That(result?.SocialButtons.Count, Is.LessThanOrEqualTo(5));
+        }
+
+        [Test]
+        public void GetAsyncForAPI_WhenDependencyThrows_ExceptionIsPropagated()
+        {
+            SetupChannelInfo();
+
+            _contentServiceMock
+                .Setup(x => x.GetItemsChannelOnChannelIdAsync<FooterLinks>(
+                    It.IsAny<string>(),
+                    It.IsAny<Action<ContentItemQueryBuilder>>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<int>()))
+                .ThrowsAsync(new Exception("service failure"));
+
+            Assert.ThrowsAsync<Exception>(async () =>
+                await _service.GetAsyncForAPI(1, "en-GB", CancellationToken.None));
+        }
+
+        [Test]
+        public async Task GetAsyncForAPI_WhenCultureIsNull_UsesDefaultCulture()
+        {
+            SetupEmptyDefaultsForAPI();
+
+            var result = await _service.GetAsyncForAPI(1, null, CancellationToken.None);
+
+            Assert.That(result, Is.Not.Null);
+
+            // FooterService applies the "GB" default culture fallback (culture ?? defaultCulture.Language)
+            // only when building the mandatory footer links, i.e. on the RetrievePagesParameters.LanguageName
+            // passed to GetPagesAsync<FooterPages>. The raw (null) culture flows to the other calls.
+            _contentServiceMock.Verify(
+                x => x.GetPagesAsync<FooterPages>(
+                    It.IsAny<int>(),
+                    It.Is<RetrievePagesParameters>(p => p.LanguageName == "en"),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
+        [Test]
+        public async Task GetAsyncForAPI_PassesChannelIdAndCulture_ToDependencies()
+        {
+            SetupEmptyDefaultsForAPI();
+
+            var result = await _service.GetAsyncForAPI(42, "fr-FR", CancellationToken.None);
+
+            Assert.That(result, Is.Not.Null);
+
+            _contentServiceMock.Verify(
+                x => x.GetItemsChannelOnChannelIdAsync<FooterLinks>(
+                    It.Is<string>(c => c == "fr-FR"),
+                    It.IsAny<Action<ContentItemQueryBuilder>>(),
+                    It.IsAny<CancellationToken>(),
+                    It.Is<int>(id => id == 42)),
+                Times.Once);
+
+            _contentServiceMock.Verify(
+                x => x.GetItemsChannelOnChannelIdAsync<SocialLinks>(
+                    It.Is<string>(c => c == "fr-FR"),
+                    It.IsAny<Action<ContentItemQueryBuilder>>(),
+                    It.IsAny<CancellationToken>(),
+                    It.Is<int>(id => id == 42)),
+                Times.Once);
         }
 
         #endregion

@@ -85,9 +85,9 @@
         }
 
         public async Task<IReadOnlyList<T>> GetItemsChannelOnChannelIdAsync<T>(string culture,
-   Action<ContentItemQueryBuilder>? configure = null,
-   CancellationToken cancellationToken = default, int channelId = 0)
-   where T : class
+Action<ContentItemQueryBuilder>? configure = null,
+CancellationToken cancellationToken = default, int channelId = 0)
+where T : class
         {
             var builder = new ContentItemQueryBuilder();
             builder.InLanguage(culture, false);//setting to get only the links of pages that are in culture
@@ -101,7 +101,14 @@
 
             var queryOptions = BuildQueryExecutionOptions();
 
-            var results = await _executor.GetMappedResult<T>(builder, queryOptions, cancellationToken);
+            // Use the mockable GetResult overload with an explicit mapper (equivalent to the
+            // GetMappedResult extension, but testable) so the injected IContentQueryModelTypeMapper
+            // performs the automatic content-type-model mapping.
+            var results = await _executor.GetResult<T>(
+                builder,
+                container => _contentQueryModelTypeMapper.Map<T>(container),
+                queryOptions,
+                cancellationToken);
 
             return results.ToList().AsReadOnly();
         }
