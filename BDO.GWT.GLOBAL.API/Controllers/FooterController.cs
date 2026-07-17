@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Globalization;
 using BDO.GWT.Core.ValueObjects;
+using BDO.GWT.GLOBAL.API.Helpers;
 
 namespace BDO.GWT.GLOBAL.API.Controllers
 {
@@ -26,13 +27,15 @@ namespace BDO.GWT.GLOBAL.API.Controllers
     public class FooterController : Controller
     {
         private readonly IFooterService _footerService;
+        private readonly ICultureValidationService _cultureValidationService;
         private static readonly LanguageTag defaultCulture = LanguageTag.GB;
         /// <summary>
         ///constructor for FooterController.
         /// </summary>
-        public FooterController(IFooterService footerService)
+        public FooterController(IFooterService footerService, ICultureValidationService cultureValidationService)
         {
             _footerService = footerService;
+            _cultureValidationService = cultureValidationService;
         }
         /// <summary>
         /// Retrieves the footer data.
@@ -60,6 +63,14 @@ namespace BDO.GWT.GLOBAL.API.Controllers
             if (culture == null)
             { 
               culture = defaultCulture.ToString();
+            }
+            else if (!_cultureValidationService.IsValidCulture(culture))
+            {
+                errors["culture"] = $"Path parameter 'culture' value '{culture}' is not valid.";
+                HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await HttpContext.Response.WriteAsJsonAsync(errors, cancellationToken: cancellationToken);
+
+                return new FooterDto();
             }
 
             var channelId = HttpContext.Items["ChannelId"] as int? ?? 1; // Default to 1

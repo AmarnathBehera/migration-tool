@@ -48,5 +48,6 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
         serviceCollection.AddScoped<IDealCrudService, DealCrudService>();
         serviceCollection.AddScoped<IFooterService, FooterService>();
+        serviceCollection.AddScoped<ICultureValidationService, CultureValidationService>();
     }
 }
