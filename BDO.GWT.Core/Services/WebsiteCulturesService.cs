@@ -40,6 +40,7 @@ namespace BDO.GWT.Core.Services
                 {
                     Name = name,
                     ShortName = shortName,
+                    CultureCode = languageTag,
                     //Url =linkByLanguageTag.TryGetValue(websiteCulture.LanguageTag, out var link) ? link.ToHtmlCompatibleString() : $"/{websiteCulture.LanguageTag}".ToLowerInvariant(),
                 };
             }).ToList();

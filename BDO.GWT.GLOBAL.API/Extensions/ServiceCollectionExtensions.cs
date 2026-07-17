@@ -1,5 +1,11 @@
-﻿using BDO.GWT.GLOBAL.API.Helpers;
+﻿using BDO.GWT.Core;
+using BDO.GWT.Core.Services;
+using BDO.GWT.GLOBAL.API.ApiClients;
+using BDO.GWT.GLOBAL.API.Helpers;
+using BDO.GWT.GLOBAL.API.Middleware;
 using BDO.GWT.GLOBAL.API.Options;
+using BDO.GWT.GLOBAL.API.Services;
+using CMS.MacroEngine;
 
 namespace BDO.GWT.GLOBAL.API.Extensions;
 
@@ -14,8 +20,10 @@ public static class ServiceCollectionExtensions
     /// <param name="serviceCollection">The service collection to add services to.</param>
     public static void AddApi(this IServiceCollection serviceCollection)
     {
+        serviceCollection.AddAutoMapper(cfg => { }, AppDomain.CurrentDomain.GetAssemblies());
         serviceCollection.AddHttpClient();
         serviceCollection.AddMemoryCache();
+        serviceCollection.AddScoped<MemberFirmMiddleware>();
 
         serviceCollection.AddOptions<MemberFirmServiceOptions>()
             .BindConfiguration("MemberFirmService")
@@ -25,7 +33,19 @@ public static class ServiceCollectionExtensions
             .BindConfiguration("MasterDataApi")
             .ValidateDataAnnotations();
 
-        
+        serviceCollection.AddScoped<IMemberFirmService, MemberFirmService>();
+        serviceCollection.AddScoped<IMasterDataApiClient, MasterDataApiClient>();
+        serviceCollection.AddScoped<IFormCrudService, FormCrudService>();
         serviceCollection.AddScoped<IAuthorizationHelper, AuthorizationHelper>();
+        serviceCollection.AddScoped<IContentService, ContentService>();
+        serviceCollection.AddScoped<IValidationState, ValidationState>();
+        serviceCollection.AddScoped<ICultureService, CultureService>();
+        serviceCollection.AddScoped<ICultureContext, CultureContext>();
+        serviceCollection.AddScoped<IWebsiteCulturesService, WebsiteCulturesService>();
+        serviceCollection.AddScoped<IPageContentValidator, PageContentValidator>();
+        serviceCollection.AddScoped<IMacroResolver, MacroResolver>();
+        serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
+        serviceCollection.AddScoped<IMappingHelper, MappingHelper>();
+        serviceCollection.AddScoped<IDealCrudService, DealCrudService>();
     }
 }
