@@ -9,8 +9,8 @@ namespace BDO.GWT.GLOBAL.API.Helpers
 {
     public interface IMappingHelper
     {
-        Task<List<ContentItemReference>> BuildContentAttachmentImageReferences(string? identifier, CancellationToken cancellationToken);
-        Task<List<ContentItemReference>> BuildContentAttachmentPageReferences(string? identifier, string? channelName, string? culture, CancellationToken cancellationToken);
+        Task<List<ContentItemReference>> BuildContentAttachmentImageReferences(string? url, CancellationToken cancellationToken);
+        Task<List<ContentItemReference>> BuildContentAttachmentPersonPageReferences(string? pagePath, string? channelName, string? culture, CancellationToken cancellationToken);
     }
     public class MappingHelper : IMappingHelper
     {
@@ -29,14 +29,14 @@ namespace BDO.GWT.GLOBAL.API.Helpers
         /// item GUID is also accepted. Values that do not match any existing item result in an empty
         /// (cleared) field.
         /// </summary>
-        public async Task<List<ContentItemReference>> BuildContentAttachmentImageReferences(string? identifier, CancellationToken cancellationToken)
+        public async Task<List<ContentItemReference>> BuildContentAttachmentImageReferences(string? url, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(identifier))
+            if (string.IsNullOrWhiteSpace(url))
             {
                 return new List<ContentItemReference>();
             }
 
-            var value = identifier.Trim();
+            var value = url.Trim();
 
             // Accept a raw content item GUID directly.
             if (Guid.TryParse(value, out var guid))
@@ -63,14 +63,14 @@ namespace BDO.GWT.GLOBAL.API.Helpers
         /// <c>RelevantContactPersonDeal</c> and <c>HeroCallToActionButtonUrl</c>. Values that do not match
         /// any existing page result in an empty (cleared) field.
         /// </summary>
-        public async Task<List<ContentItemReference>> BuildContentAttachmentPageReferences(string? identifier, string? channelName, string? culture, CancellationToken cancellationToken)
+        public async Task<List<ContentItemReference>> BuildContentAttachmentPersonPageReferences(string? pagePath, string? channelName, string? culture, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(identifier))
+            if (string.IsNullOrWhiteSpace(pagePath))
             {
                 return new List<ContentItemReference>();
             }
 
-            var value = identifier.Trim();
+            var value = pagePath.Trim();
 
             // Accept a raw content item GUID directly.
             if (Guid.TryParse(value, out var guid))
