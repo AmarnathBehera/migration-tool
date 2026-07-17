@@ -76,12 +76,7 @@ public class MemberFirmMiddleware : IMiddleware
 
         if (globalLocationCustomTableData != null)
         {
-//            if (globalLocationCustomTableData.ChannelId == 0)
-//            {
-//#pragma warning disable S112
-//                throw new NullReferenceException($"Member firm with ID '{globalLocationCustomTableData.ChannelId}' does not have 'channel' property set.");
-//#pragma warning restore S112
-//            }
+
             context.Items["ChannelId"] = globalLocationCustomTableData.ChannelId == 0 ? 1 : globalLocationCustomTableData.ChannelId;
         }
         else
