@@ -74,140 +74,6 @@ public class InsightPageServiceTests
             _socialMediaButtonsServiceMock.Object);
     }
 
-    [Test]
-    public async Task GetContentPageSidebarDto_FindsSectionViaGroupParent_WhenDirectParentHasNoSection()
-    {
-        var insight = CreateInsight(
-            title: "Insight page",
-            showSidebar: true);
-
-        SetContentType(insight, "Article");
-        SetCollection(insight, nameof(Insight.RelevantContactPerson), Array.Empty<object>());
-        SetCollection(insight, nameof(Insight.RelatedExternalPeople), Array.Empty<object>());
-
-        // Section for GUID exists (to allow GetContentPageSidebarDto to proceed)
-        var initialSection = new SectionInsightsPage { ShowCopyUrlButtonInInsightPage = false };
-        // Section found later for group parent
-        var groupParentSection = new SectionInsightsPage { ShowCopyUrlButtonInInsightPage = true };
-
-        // Setup sequence for SectionInsightsPage calls: 1) GUID check -> initialSection, 2) lookup by parentId -> none, 3) lookup by groupParentId -> groupParentSection
-        _contentServiceMock
-            .SetupSequence(x => x.GetPagesAsync<SectionInsightsPage>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new[] { initialSection })
-            .ReturnsAsync(Array.Empty<SectionInsightsPage>())
-            .ReturnsAsync(new[] { groupParentSection });
-
-        // Ensure Insight lookup returns the insight (used in method)
-        _contentServiceMock
-            .Setup(x => x.GetPagesAsync<Insight>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new[] { insight });
-
-        // Setup group found for the parentId with parent pointing to groupParentId
-        var group = new InsightGroup();
-        SetSystemFields(group, contentItemId: 300, contentItemGuid: Guid.NewGuid(), contentItemName: "Group", webPageItemId: 20, webPageParentId: 0, webPageUrlPath: "/group", webPageTreePath: "/group");
-        // group.SystemFields.WebPageItemParentID should be > 0 to trigger lookup
-        SetPropertyValue(group.SystemFields, "WebPageItemParentID", 20);
-
-        _contentServiceMock
-            .Setup(x => x.GetPagesAsync<InsightGroup>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new[] { group });
-
-        // Ensure page-level setting causes initial ShowCopyLinkButton to be true so section permission can enable it
-        _settingServiceMock
-            .Setup(x => x.GetPrintorShareInfo())
-            .ReturnsAsync(new[] { new TestPrintorShareInfo { DisableCopyLinkButton = true } });
-
-        // Call
-        var result = await _service.GetContentPageSidebarDto(insight, CancellationToken.None);
-
-        Assert.That(result.ShowCopyLinkButton, Is.True);
-    }
-
-    [Test]
-    public async Task GetContentPageSidebarDto_FindsSectionViaCategoryParent_WhenGroupParentHasNoSection()
-    {
-        var insight = CreateInsight(
-            title: "Insight page",
-            showSidebar: true);
-
-        SetContentType(insight, "Article");
-        SetCollection(insight, nameof(Insight.RelevantContactPerson), Array.Empty<object>());
-        SetCollection(insight, nameof(Insight.RelatedExternalPeople), Array.Empty<object>());
-
-        // Section for GUID exists (to allow GetContentPageSidebarDto to proceed)
-        var initialSection = new SectionInsightsPage { ShowCopyUrlButtonInInsightPage = false };
-        // Section found later for category parent
-        var categoryParentSection = new SectionInsightsPage { ShowCopyUrlButtonInInsightPage = true };
-
-        // Setup sequence for SectionInsightsPage calls: 1) GUID check -> initialSection, 2) lookup by parentId -> none, 3) lookup by groupParentId -> none, 4) lookup by categoryParentId -> categoryParentSection
-        _contentServiceMock
-            .SetupSequence(x => x.GetPagesAsync<SectionInsightsPage>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new[] { initialSection })
-            .ReturnsAsync(Array.Empty<SectionInsightsPage>())
-            .ReturnsAsync(Array.Empty<SectionInsightsPage>())
-            .ReturnsAsync(new[] { categoryParentSection });
-
-        // Ensure Insight lookup returns the insight (used in method)
-        _contentServiceMock
-            .Setup(x => x.GetPagesAsync<Insight>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new[] { insight });
-
-        // Setup group found for the parentId with parent pointing to groupParentId
-        var group = new InsightGroup();
-        SetSystemFields(group, contentItemId: 400, contentItemGuid: Guid.NewGuid(), contentItemName: "Group2", webPageItemId: 30, webPageParentId: 0, webPageUrlPath: "/group2", webPageTreePath: "/group2");
-        SetPropertyValue(group.SystemFields, "WebPageItemParentID", 30);
-
-        _contentServiceMock
-            .Setup(x => x.GetPagesAsync<InsightGroup>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new[] { group });
-
-        // Setup category found for the groupParentId with parent pointing to categoryParentId
-        var category = new InsightCategory();
-        SetSystemFields(category, contentItemId: 500, contentItemGuid: Guid.NewGuid(), contentItemName: "Category", webPageItemId: 40, webPageParentId: 0, webPageUrlPath: "/category", webPageTreePath: "/category");
-        SetPropertyValue(category.SystemFields, "WebPageItemParentID", 40);
-
-        _contentServiceMock
-            .Setup(x => x.GetPagesAsync<InsightCategory>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new[] { category });
-
-        // Ensure page-level setting causes initial ShowCopyLinkButton to be true so section permission can enable it
-        _settingServiceMock
-            .Setup(x => x.GetPrintorShareInfo())
-            .ReturnsAsync(new[] { new TestPrintorShareInfo { DisableCopyLinkButton = true } });
-
-        // Call
-        var result = await _service.GetContentPageSidebarDto(insight, CancellationToken.None);
-
-        Assert.That(result.ShowCopyLinkButton, Is.True);
-    }
 
     [Test]
     public async Task GetDisplayNameAsync_ReturnsComposedNameWithPrefix_WhenSettingsUnavailable()
@@ -466,7 +332,7 @@ public class InsightPageServiceTests
             showDescription: true,
             showCallToAction: false);
 
-        SetCollection(insight, nameof(Insight.CopyInsight), copyInsight);
+        SetCollection(insight, nameof(Insight.InsightContent), copyInsight);
 
         var result = await _service.GetContentPageDtoAsync(
             insight,
@@ -497,7 +363,7 @@ public class InsightPageServiceTests
             showDescription: false,
             showCallToAction: false);
 
-        SetCollection(insight, nameof(Insight.CopyInsight), copyInsight);
+        SetCollection(insight, nameof(Insight.InsightContent), copyInsight);
 
         var result = await _service.GetContentPageDtoAsync(
             insight,
@@ -519,7 +385,7 @@ public class InsightPageServiceTests
             title: "Insight page",
             showSidebar: false);
 
-        SetCollection(insight, nameof(Insight.CopyInsight), Array.Empty<object>());
+        SetCollection(insight, nameof(Insight.InsightContent), Array.Empty<object>());
 
         var result = await _service.GetContentPageDtoAsync(
             insight,
@@ -633,44 +499,13 @@ public class InsightPageServiceTests
                 insight,
                 CancellationToken.None));
 
-        Assert.That(exception, Is.Not.Null);
-        Assert.That(exception!.Message, Does.Contain(nameof(Insight)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception!.Message, Does.Contain(nameof(Insight)));
+        });
     }
 
-    [Test]
-    public void GetContentPageSidebarDto_ThrowsMissingSectionPageException_WhenSectionPageIsMissing()
-    {
-        var insight = CreateInsight(
-            title: "Insight page",
-            showSidebar: true);
-
-        SetContentType(insight, "Article");
-        SetCollection(insight, nameof(Insight.RelevantContactPerson), Array.Empty<object>());
-        SetCollection(insight, nameof(Insight.RelatedExternalPeople), Array.Empty<object>());
-
-        _contentServiceMock
-            .Setup(x => x.GetPagesAsync<Insight>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new[] { insight });
-
-        _contentServiceMock
-            .Setup(x => x.GetPagesAsync<SectionInsightsPage>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Array.Empty<SectionInsightsPage>());
-
-        var exception = Assert.ThrowsAsync<MissingSectionPageException>(async () =>
-            await _service.GetContentPageSidebarDto(
-                insight,
-                CancellationToken.None));
-
-        Assert.That(exception, Is.Not.Null);
-    }
 
     private void SetupUsePersonPageTitleSetting(bool usePageTitle)
     {
@@ -786,7 +621,7 @@ public class InsightPageServiceTests
             webPageUrlPath: "/insights/test",
             webPageTreePath: "/Insights/Test");
 
-        SetCollection(insight, nameof(Insight.CopyInsight), CreateCopyInsight(
+        SetCollection(insight, nameof(Insight.InsightContent), CreateCopyInsight(
             title: title,
             description: "<p>Description</p>",
             content: "<p>Content</p>",
@@ -815,7 +650,7 @@ public class InsightPageServiceTests
         string? callToActionButtonUrl = null,
         string? callToActionPosition = null)
     {
-        var copyInsightProperty = typeof(Insight).GetProperty(nameof(Insight.CopyInsight));
+        var copyInsightProperty = typeof(Insight).GetProperty(nameof(Insight.InsightContent));
         if (copyInsightProperty is null)
         {
             throw new InvalidOperationException("CopyInsight property was not found.");
@@ -1285,5 +1120,79 @@ public class InsightPageServiceTests
         var result = await _service.GetExternalPeopleDisplayNames(new List<Guid>(), CancellationToken.None);
 
         Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public void GetCallToActionDto_ReturnsNull_WhenButtonTextIsMissing()
+    {
+        var result = InsightPageService.GetCallToActionDto(
+            callToActionDescription: "CTA description",
+            callToActionButtonText: null,
+            callToActionButtonLink: "https://example.com",
+            CallToActionPosition: "right");
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public void GetCallToActionDto_ReturnsNull_WhenButtonLinkIsMissing()
+    {
+        var result = InsightPageService.GetCallToActionDto(
+            callToActionDescription: "CTA description",
+            callToActionButtonText: "Read more",
+            callToActionButtonLink: null,
+            CallToActionPosition: "right");
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public void GetCallToActionDto_UsesDefaultLeftPosition_WhenPositionIsNull()
+    {
+        var result = InsightPageService.GetCallToActionDto(
+            callToActionDescription: "CTA description",
+            callToActionButtonText: "Read more",
+            callToActionButtonLink: "https://example.com",
+            CallToActionPosition: null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Position, Is.EqualTo("left"));
+            Assert.That(result.CallToActionDto?.ButtonTitle, Is.EqualTo("Read more"));
+            Assert.That(result.CallToActionDto?.ButtonUrl, Is.EqualTo("https://example.com"));
+        });
+    }
+
+    [Test]
+    public async Task GetSidebarDtoAsync_WhenSocialMediaButtonsExist_ResetsCopyLinkToNull()
+    {
+        var insight = CreateInsight(
+            title: "Insight page",
+            showSidebar: true);
+
+        insight.ShowPrintButton = true;
+        insight.ShowSocialMediaButtons = true;
+
+        _socialMediaButtonsServiceMock
+            .Setup(x => x.GetSocialMediaButtonsDto(
+                insight,
+                insight.PageTitle,
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SocialMediaButtonsDto
+            {
+                EmailButtonUrl = "mailto:test@example.com",
+                ShowCopyLinkButton = true
+            });
+
+        var result = await _service.GetSidebarDtoAsync(
+            insight,
+            CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.SocialMediaButtons, Is.Not.Null);
+            Assert.That(result.SocialMediaButtons!.ShowCopyLinkButton, Is.Null);
+        });
     }
 }
