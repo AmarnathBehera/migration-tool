@@ -20,6 +20,8 @@ public interface IPageContentValidator
 
 public class PageContentValidator : IPageContentValidator
 {
+    private static readonly string[] OptionsLineSeparators = { "\n", "\r", "\r\n" };
+
     private readonly IMacroResolver _macroResolver;
     private readonly IValidationState _validationState;
 
@@ -173,7 +175,7 @@ public class PageContentValidator : IPageContentValidator
     {
         if (string.IsNullOrWhiteSpace(controlName))
         {
-            throw new ArgumentException(nameof(controlName));
+            throw new ArgumentException("Control name must be provided.", nameof(controlName));
         }
 
         // Content item reference values are serialized as strings in the page content DTO
@@ -221,7 +223,7 @@ public class PageContentValidator : IPageContentValidator
     {
         if (string.IsNullOrWhiteSpace(controlName))
         {
-            throw new ArgumentException(nameof(controlName));
+            throw new ArgumentException("Control name must be provided.", nameof(controlName));
         }
 
         return ValidateAndNormalizeGuid(
@@ -548,7 +550,7 @@ public class PageContentValidator : IPageContentValidator
 
         // List of options
         var resolvedOptions = _macroResolver.ResolveMacros(options);
-        var lines = resolvedOptions.Split(new[] { "\n", "\r", "\r\n" }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var lines = resolvedOptions.Split(OptionsLineSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         var validOptions = lines
             .Select(x => x.Split(";", StringSplitOptions.TrimEntries)[0])
             .ToHashSet();
