@@ -46,18 +46,15 @@ public record LanguageTag(string Language, string? Script, string Region, string
                 return true;
             }
         }
-        else if (parts.Length == 3)
+        else if ((parts.Length == 3) && (IsTwoLetterAlpha(parts[0]) || IsThreeLetterAlpha(parts[0])) && IsFourLetterAlpha(parts[1]) && (IsTwoLetterAlpha(parts[2]) || IsThreeDigitNumeric(parts[2])))
         {
-            if ((IsTwoLetterAlpha(parts[0]) || IsThreeLetterAlpha(parts[0])) && IsFourLetterAlpha(parts[1]) && (IsTwoLetterAlpha(parts[2]) || IsThreeDigitNumeric(parts[2])))
-            {
-                var language = parts[0].ToLowerInvariant();
-                var script = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(parts[1]);
-                var region = parts[2].ToUpperInvariant();
+            var language = parts[0].ToLowerInvariant();
+            var script = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(parts[1]);
+            var region = parts[2].ToUpperInvariant();
 
-                culture = new LanguageTag(language, script, region);
+            culture = new LanguageTag(language, script, region);
 
-                return true;
-            }
+            return true;
         }
 
         return false;

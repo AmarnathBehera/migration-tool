@@ -1,4 +1,5 @@
-﻿using BDO.GWT.GLOBAL.API.Constants;
+﻿using BDO.GWT.Common.Core.Exceptions;
+using BDO.GWT.GLOBAL.API.Constants;
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Extensions;
 using CMS.DataEngine;
@@ -65,7 +66,7 @@ public class PageContentValidator : IPageContentValidator
 
             if (controlName is null)
             {
-                throw new Exception($"Field '{field.Name}' control is invalid.");
+                throw new NotFoundException("Field '{field.Name}' control is invalid.");
             }
 
             var (valueProcessed, newValue) = TryToValidateAndNormalizeValueByControlCssClass(field, value);
