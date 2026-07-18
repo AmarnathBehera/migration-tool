@@ -66,19 +66,20 @@ public class FooterService : IFooterService
 
     public async Task<FooterDto?> GetAsyncForAPI(int channelId, string? culture, CancellationToken cancellationToken)
     {
+        
         var channel = await _channelInfoProvider.GetAsync(channelId);
 
         var mandatoryFooterLinks = await GetMandatoryFooterLinkDtosForAPIAsync(channelId,channel.ChannelName, culture, cancellationToken);
 
+        culture ??= defaultCulture.ToString();
+
         var footerLinks = await GetFooterLinks(channelId, culture) ?? Enumerable.Empty<FooterLinkDto>();
         var socialLinks = await GetSocialLinks(channelId, culture) ?? Enumerable.Empty<SocialButtonDto>();
-
-        //var displaySubscriptionsSectionSetting = await _settingsService.GetCurrentSiteSettingAsync(SettingName.BDO.DisplaySubscriptionsSection, cancellationToken);
-
+              
         var footerDto = new FooterDto
         {
             DisplaySubscriptionsSection = true,//(bool?)displaySubscriptionsSectionSetting?.Value ?? false,
-            SubscriptionButtonLink = (await GetSubscribePageLinkAsyncAPI(channelId, channel.ChannelName, culture, cancellationToken))?.ToHtmlCompatibleString(),
+            SubscriptionButtonLink = (await GetSubscribePageLinkAsyncAPI(channel.ChannelName, culture, cancellationToken))?.ToHtmlCompatibleString(),
             FooterLinks = mandatoryFooterLinks.Concat(footerLinks
                 .Select(link => new FooterLinkDto
                 {
@@ -116,7 +117,7 @@ public class FooterService : IFooterService
         return Link.TryParse(url, out var link) ? link : null;
     }
 
-    private async Task<Link?> GetSubscribePageLinkAsyncAPI(int channelId, string channelName, string? cultureName, CancellationToken cancellationToken)
+    private async Task<Link?> GetSubscribePageLinkAsyncAPI(string channelName, string? cultureName, CancellationToken cancellationToken)
     {
         var subscribePages = await _contentService.GetContentTypeForAPI<Subscribe>(cancellationToken, channelName, cultureName);
         var subscribePage = subscribePages?.FirstOrDefault();
@@ -192,7 +193,7 @@ public class FooterService : IFooterService
             .Distinct()
             .ToList();
        
-        var selectedPages = allGuids.Any()
+        var selectedPages = allGuids.Count > 0
             ? await _contentService.GetItemsByGUIDForAPIAsync(allGuids, channelName: channelName, cultureName: culture )
             : Enumerable.Empty<IWebPageFieldsSource>();
 
@@ -258,7 +259,7 @@ public class FooterService : IFooterService
       .Distinct()
       .ToList();
 
-        var selectedPages = allGuids.Any()
+        var selectedPages = allGuids.Count > 0
             ? await _contentService.GetItemsByGUIDAsync(allGuids)
             : Enumerable.Empty<IWebPageFieldsSource>();
 

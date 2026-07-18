@@ -84,13 +84,13 @@
             return results.ToList().AsReadOnly();
         }
 
-        public async Task<IReadOnlyList<T>> GetItemsChannelOnChannelIdAsync<T>(string culture,
+        public async Task<IReadOnlyList<T>> GetItemsChannelOnChannelIdAsync<T>(string cultureName,
 Action<ContentItemQueryBuilder>? configure = null,
 CancellationToken cancellationToken = default, int channelId = 0)
 where T : class
         {
             var builder = new ContentItemQueryBuilder();
-            builder.InLanguage(culture, false);//setting to get only the links of pages that are in culture
+            builder.InLanguage(cultureName, false);//setting to get only the links of pages that are in culture
             builder.ForContentType(GetContentTypeName<T>(), subquery =>
             {
                 subquery
@@ -406,6 +406,36 @@ where T : class
             );
         }
 
+
+        /// <summary>
+        /// Retrieves web pages of type <typeparamref name="TPage"/> for a specific channel ID.
+        /// </summary>
+        public async Task<IEnumerable<TPage>> GetPagesAsync<TPage>(
+            int channelId,
+            RetrievePagesParameters parameters,
+            Action<RetrievePagesQueryParameters> queryAction,
+            RetrievalCacheSettings cacheSettings,
+            CancellationToken cancellationToken
+        ) where TPage : class, IWebPageFieldsSource
+        {
+            // Wrap the original query action to include channelId filter
+            Action<RetrievePagesQueryParameters> decoratedQueryAction = query =>
+            {
+                // Apply the user's query first
+                queryAction?.Invoke(query);
+
+                // Add channel filter
+                query.Where(w => w.WhereEquals("ContentItemChannelID", channelId));
+            };
+
+            // Call the extension method with decorated query
+            return await _contentRetriever.RetrievePages<TPage>(
+                parameters,
+                decoratedQueryAction,
+                cacheSettings,
+                cancellationToken
+            );
+        }
         public void GetPagesAsync<T>(RetrievePagesParameters retrievePagesParameters, Func<ContentItemQueryBuilder, ContentItemQueryBuilder> func, RetrievalCacheSettings retrievalCacheSettings, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
@@ -529,35 +559,6 @@ where T : class
         }
 
       
-        /// <summary>
-/// Retrieves web pages of type <typeparamref name="TPage"/> for a specific channel ID.
-/// </summary>
-public async Task<IEnumerable<TPage>> GetPagesAsync<TPage>(
-    int channelId,
-    RetrievePagesParameters parameters,
-    Action<RetrievePagesQueryParameters> queryAction,
-    RetrievalCacheSettings cacheSettings,
-    CancellationToken cancellationToken
-) where TPage : class, IWebPageFieldsSource
-        {
-            // Wrap the original query action to include channelId filter
-            Action<RetrievePagesQueryParameters> decoratedQueryAction = query =>
-            {
-                // Apply the user's query first
-                queryAction?.Invoke(query);
-                
-                // Add channel filter
-                query.Where(w => w.WhereEquals("ContentItemChannelID", channelId));
-            };
-
-            // Call the extension method with decorated query
-            return await _contentRetriever.RetrievePages<TPage>(
-                parameters,
-                decoratedQueryAction,
-                cacheSettings,
-                cancellationToken
-            );
-        }
     }
 }
 

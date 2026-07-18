@@ -49,7 +49,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
 
             var errors = new Dictionary<string, string>();
 
-            if (!int.TryParse((string?)HttpContext.Request.RouteValues["memberFirmID"], out var memberFirmID))
+            if (!int.TryParse((string?)HttpContext.Request.RouteValues["memberFirmID"], out _))
             {
                 errors["memberFirmID"] = "Path parameter 'memberFirmID' value must be an integer.";
                 HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
