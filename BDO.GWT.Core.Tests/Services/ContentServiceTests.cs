@@ -268,7 +268,7 @@ namespace BDO.GWT.Core.Tests.Services
                 .ReturnsAsync(expected);
 
             var result = await _service.GetItemsChannelOnChannelIdAsync<TestContentItem>(
-                culture: "en-US",
+                cultureName: "en-US",
                 configure: null,
                 cancellationToken: CancellationToken.None,
                 channelId: 5);
@@ -289,7 +289,7 @@ namespace BDO.GWT.Core.Tests.Services
                 .ReturnsAsync(Enumerable.Empty<TestContentItem>());
 
             var result = await _service.GetItemsChannelOnChannelIdAsync<TestContentItem>(
-                culture: "en-US",
+                cultureName: "en-US",
                 configure: null,
                 cancellationToken: CancellationToken.None,
                 channelId: 5);
@@ -312,7 +312,7 @@ namespace BDO.GWT.Core.Tests.Services
                 .ReturnsAsync(Enumerable.Empty<TestContentItem>());
 
             await _service.GetItemsChannelOnChannelIdAsync<TestContentItem>(
-                culture: "en-GB",
+                cultureName: "en-GB",
                 configure: _ => configureInvoked = true,
                 cancellationToken: CancellationToken.None,
                 channelId: 10);
@@ -338,7 +338,7 @@ namespace BDO.GWT.Core.Tests.Services
                 .ReturnsAsync(Enumerable.Empty<TestContentItem>());
 
             await _service.GetItemsChannelOnChannelIdAsync<TestContentItem>(
-                culture: "en-US",
+                cultureName: "en-US",
                 configure: null,
                 cancellationToken: CancellationToken.None,
                 channelId: 1);
@@ -361,7 +361,7 @@ namespace BDO.GWT.Core.Tests.Services
                 .ReturnsAsync(Enumerable.Empty<TestContentItem>());
 
             await _service.GetItemsChannelOnChannelIdAsync<TestContentItem>(
-                culture: "en-US",
+                cultureName: "en-US",
                 configure: null,
                 cancellationToken: token,
                 channelId: 1);

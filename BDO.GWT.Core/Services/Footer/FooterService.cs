@@ -5,6 +5,7 @@ using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
+using Microsoft.AspNetCore.Http;
 using System.Text.RegularExpressions;
 
 namespace BDO.GWT.Core.Services.Footer;
@@ -29,80 +30,68 @@ public class FooterService : IFooterService
 
     public async Task<FooterDto?> GetAsync(CancellationToken cancellationToken)
     {
-        var mandatoryFooterLinks = await GetMandatoryFooterLinkDtosAsync(cancellationToken);
+        var mandatoryFooterLinks =
+            await GetMandatoryFooterLinkDtosAsync(cancellationToken);
 
-        var footerLinks = await GetFooterLinks() ?? Enumerable.Empty<FooterLinkDto>();
-        var socialLinks = await GetSocialLinks() ?? Enumerable.Empty<SocialButtonDto>();
+        var footerLinks =
+            await GetFooterLinks() ?? Enumerable.Empty<FooterLinkDto>();
 
-        //var displaySubscriptionsSectionSetting = await _settingsService.GetCurrentSiteSettingAsync(SettingName.BDO.DisplaySubscriptionsSection, cancellationToken);
+        var socialLinks =
+            await GetSocialLinks() ?? Enumerable.Empty<SocialButtonDto>();
 
-        var footerDto = new FooterDto
-        {
-            DisplaySubscriptionsSection = true,//(bool?)displaySubscriptionsSectionSetting?.Value ?? false,
-            SubscriptionButtonLink = (await GetSubscribePageLinkAsync(cancellationToken))?.ToHtmlCompatibleString(),
-            FooterLinks = mandatoryFooterLinks.Concat(footerLinks
-                .Select(link => new FooterLinkDto
-                {
-                    OpenInNewTab = link?.OpenInNewTab ?? false,
-                    Order = link?.Order ?? 0,
-                    Title = link?.Title ?? string.Empty,
-                    URL = link?.URL?.ToString() ?? string.Empty,
-                })
-                .OrderBy(o => o.Order)
-            ).Take(12).ToList(),
-            SocialButtons = socialLinks.Select(link => new SocialButtonDto
-            {
-                AltText = link?.AltText ?? string.Empty,
-                AriaLabel = link?.AriaLabel ?? string.Empty,
-                IconType = link?.IconType ?? string.Empty,
-                //CustomIcon = link.IconType == SocialLinkIconType.Custom ? link.CustomIcon : null,
-                Order = link?.Order ?? 0,
-                URL = link?.URL?.ToString() ?? string.Empty,
-            }).OrderBy(o => o.Order).Take(5).ToList(),
-        };
+        var subscribeLink =
+            (await GetSubscribePageLinkAsync(cancellationToken))
+            ?.ToHtmlCompatibleString();
 
-        return footerDto;
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+        return await BuildFooterDtoAsync(
+            mandatoryFooterLinks,
+            footerLinks,
+            socialLinks,
+            subscribeLink);
+#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
     }
 
-    public async Task<FooterDto?> GetAsyncForAPI(int channelId, string? culture, CancellationToken cancellationToken)
+   
+    public async Task<FooterDto?> GetAsyncForAPI(
+    int channelId,
+    string? culture,
+    CancellationToken cancellationToken)
     {
-        
         var channel = await _channelInfoProvider.GetAsync(channelId);
-
-        var mandatoryFooterLinks = await GetMandatoryFooterLinkDtosForAPIAsync(channelId,channel.ChannelName, culture, cancellationToken);
+       
+        var mandatoryFooterLinks =
+            await GetMandatoryFooterLinkDtosForAPIAsync(
+                channelId,
+                channel.ChannelName,
+                culture,
+                cancellationToken);
 
         culture ??= defaultCulture.ToString();
 
-        var footerLinks = await GetFooterLinks(channelId, culture) ?? Enumerable.Empty<FooterLinkDto>();
-        var socialLinks = await GetSocialLinks(channelId, culture) ?? Enumerable.Empty<SocialButtonDto>();
-              
-        var footerDto = new FooterDto
-        {
-            DisplaySubscriptionsSection = true,//(bool?)displaySubscriptionsSectionSetting?.Value ?? false,
-            SubscriptionButtonLink = (await GetSubscribePageLinkAsyncAPI(channel.ChannelName, culture, cancellationToken))?.ToHtmlCompatibleString(),
-            FooterLinks = mandatoryFooterLinks.Concat(footerLinks
-                .Select(link => new FooterLinkDto
-                {
-                    OpenInNewTab = link?.OpenInNewTab ?? false,
-                    Order = link?.Order ?? 0,
-                    Title = link?.Title ?? string.Empty,
-                    URL = link?.URL?.ToString() ?? string.Empty,
-                })
-                .OrderBy(o => o.Order)
-            ).Take(12).ToList(),
-            SocialButtons = socialLinks.Select(link => new SocialButtonDto
-            {
-                AltText = link?.AltText ?? string.Empty,
-                AriaLabel = link?.AriaLabel ?? string.Empty,
-                IconType = link?.IconType ?? string.Empty,
-                //CustomIcon = link.IconType == SocialLinkIconType.Custom ? link.CustomIcon : null,
-                Order = link?.Order ?? 0,
-                URL = link?.URL?.ToString() ?? string.Empty,
-            }).OrderBy(o => o.Order).Take(5).ToList(),
-        };
+        var footerLinks =
+            await GetFooterLinks(channelId, culture)
+            ?? Enumerable.Empty<FooterLinkDto>();
 
-        return footerDto;
+        var socialLinks =
+            await GetSocialLinks(channelId, culture)
+            ?? Enumerable.Empty<SocialButtonDto>();
+
+        var subscribeLink =
+            (await GetSubscribePageLinkAsyncAPI(
+                channel.ChannelName,
+                culture,
+                cancellationToken))
+            ?.ToHtmlCompatibleString();
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+        return await BuildFooterDtoAsync(
+            mandatoryFooterLinks,
+            footerLinks,
+            socialLinks,
+            subscribeLink);
+#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
     }
+    
     private async Task<Link?> GetSubscribePageLinkAsync(CancellationToken cancellationToken)
     {
         var subscribePages = await _contentService.GetContentType<Subscribe>(cancellationToken);
@@ -317,5 +306,43 @@ public class FooterService : IFooterService
             })
             .OrderBy(x => x.Order)
             .ToList();
+    }
+
+    private async Task<FooterDto> BuildFooterDtoAsync(
+    IEnumerable<FooterLinkDto> mandatoryFooterLinks,
+    IEnumerable<FooterLinkDto>? footerLinks,
+    IEnumerable<SocialButtonDto>? socialLinks,
+    string? subscriptionButtonLink)
+    {
+        return new FooterDto
+        {
+            DisplaySubscriptionsSection = true,
+            SubscriptionButtonLink = subscriptionButtonLink,
+            FooterLinks = mandatoryFooterLinks
+                .Concat((footerLinks ?? Enumerable.Empty<FooterLinkDto>())
+                    .Select(link => new FooterLinkDto
+                    {
+                        OpenInNewTab = link?.OpenInNewTab ?? false,
+                        Order = link?.Order ?? 0,
+                        Title = link?.Title ?? string.Empty,
+                        URL = link?.URL?.ToString() ?? string.Empty,
+                    })
+                    .OrderBy(o => o.Order))
+                .Take(12)
+                .ToList(),
+
+            SocialButtons = (socialLinks ?? Enumerable.Empty<SocialButtonDto>())
+                .Select(link => new SocialButtonDto
+                {
+                    AltText = link?.AltText ?? string.Empty,
+                    AriaLabel = link?.AriaLabel ?? string.Empty,
+                    IconType = link?.IconType ?? string.Empty,
+                    Order = link?.Order ?? 0,
+                    URL = link?.URL?.ToString() ?? string.Empty,
+                })
+                .OrderBy(o => o.Order)
+                .Take(5)
+                .ToList()
+        };
     }
 }
