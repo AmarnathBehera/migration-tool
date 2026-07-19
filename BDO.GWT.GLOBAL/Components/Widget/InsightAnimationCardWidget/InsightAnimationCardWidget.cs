@@ -41,7 +41,7 @@ public class InsightAnimationCardWidget: ViewComponent
         {
             Title = model.Properties.Title,
             Description = model.Properties.Description,
-            InsightCards = model.Properties.InsightCards.Select(x => x.Identifier),
+            InsightCards = model.Properties.InsightCards.Select(x => x.Identifier).ToList(),
             openInNewTab = model.Properties.openInNewTab,
             SeeAllLinkText = model.Properties.SeeAllLinkText,
             SeeAllLinkUrl = model.Properties.SeeAllLinkURL,
@@ -51,25 +51,25 @@ public class InsightAnimationCardWidget: ViewComponent
         };
 
 
-      IEnumerable<Insight> insightanimationpages = Enumerable.Empty<Insight>();
+      IEnumerable<InsightAnimationPage> insightanimationpages = Enumerable.Empty<InsightAnimationPage>();
 
-        //if (data.InsightCards.Any())
-        //{
-        //    insightanimationpages = _contentService.RetrievePagesAsync<Insight>(new RetrievePagesParameters { },cancellationToken);
-        //}
+        if (data.InsightCards.Any())
+        {
+            insightanimationpages = await _contentRetriever.RetrievePagesByGuids<InsightAnimationPage>(data.InsightCards,cancellationToken);
+        }
 
         var dto = new InsightAnimationCardDto
         {
             Title = data.Title,
             Description = data.Description,
-            //Items = insightanimationpages.Select(x => new InsightAnimationPageDto
-            //{                
-            //    //Title = x.Title,
-            //    //Description = HtmlHelper.ExtractTextFromHtml(x.Description),
-            //    //ReadMoreIcon = x.Url,
-            //    //ImageURL = channel?.WebsiteChannelName + x.Image?.TrimStart('~'),
-            //    OpenInNewTab = data.openInNewTab
-            //}),            
+            Items = insightanimationpages.Select(x => new InsightAnimationPageDto
+            {
+                Title = x.Title,
+                Description = HtmlHelper.ExtractTextFromHtml(x.Description),
+                ReadMoreIcon = x.Url,
+                ImageURL = x.Image?.FirstOrDefault()?.ContentAttachmentAsset.Url,
+                OpenInNewTab = data.openInNewTab
+            }),
             SeeAllLink = new LinkItemDto
             {
                 Title = data.SeeAllLinkText ?? string.Empty,

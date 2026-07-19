@@ -9,7 +9,7 @@ public class InsightAnimationCardData : BaseWidgetData
 
     public string? Description { get; set; }
 
-    public IEnumerable<Guid> InsightCards { get; set; } = Enumerable.Empty<Guid>();
+    public List<Guid> InsightCards { get; set; } = new List<Guid>();
 
     public string? openInNewTab { get; set; }
 
