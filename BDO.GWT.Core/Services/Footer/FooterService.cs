@@ -108,7 +108,7 @@ public class FooterService : IFooterService
 
     private async Task<Link?> GetSubscribePageLinkAsyncAPI(string channelName, string? cultureName, CancellationToken cancellationToken)
     {
-        var subscribePages = await _contentService.GetContentTypeForAPI<Subscribe>(cancellationToken, channelName, cultureName);
+        var subscribePages = await _contentService.GetContentTypeForAPI<Subscribe>(channelName, cultureName, cancellationToken);
         var subscribePage = subscribePages?.FirstOrDefault();
         if (subscribePage == null)
             return null;
@@ -173,7 +173,7 @@ public class FooterService : IFooterService
 
         var allGuids = ExtractFooterPageGuids(pages);
 
-        var selectedPages = allGuids.Any()
+        var selectedPages = allGuids.Count > 0
             ? await _contentService.GetItemsByGUIDForAPIAsync(
                 allGuids,
                 channelName,
@@ -240,13 +240,13 @@ public class FooterService : IFooterService
             .ToList();
     }
 
-    private async Task<FooterDto> BuildFooterDtoAsync(
+    private static Task<FooterDto> BuildFooterDtoAsync(
     IEnumerable<FooterLinkDto> mandatoryFooterLinks,
     IEnumerable<FooterLinkDto>? footerLinks,
     IEnumerable<SocialButtonDto>? socialLinks,
     string? subscriptionButtonLink)
     {
-        return new FooterDto
+        return Task.FromResult(new FooterDto
         {
             DisplaySubscriptionsSection = true,
             SubscriptionButtonLink = subscriptionButtonLink,
@@ -275,7 +275,7 @@ public class FooterService : IFooterService
                 .OrderBy(o => o.Order)
                 .Take(5)
                 .ToList()
-        };
+        });
     }
 
     private static List<FooterLinkDto> BuildFooterLinks(

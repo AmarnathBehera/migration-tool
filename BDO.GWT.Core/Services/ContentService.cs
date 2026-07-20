@@ -86,7 +86,7 @@
 
         public async Task<IReadOnlyList<T>> GetItemsChannelOnChannelIdAsync<T>(string cultureName,
 Action<ContentItemQueryBuilder>? configure = null,
-CancellationToken cancellationToken = default, int channelId = 0)
+ int channelId = 0, CancellationToken cancellationToken = default)
 where T : class
         {
             var builder = new ContentItemQueryBuilder();
@@ -317,7 +317,7 @@ where T : class
             return await _contentRetriever.RetrievePages<T>(cancellationToken);
         }
 
-        public async Task<IEnumerable<T>> GetContentTypeForAPI<T>(CancellationToken cancellationToken = default, string? channelName = null, string? cultureName = null) where T : class, IWebPageFieldsSource
+        public async Task<IEnumerable<T>> GetContentTypeForAPI<T>( string? channelName = null, string? cultureName = null, CancellationToken cancellationToken = default) where T : class, IWebPageFieldsSource
         {
             var parameters = new RetrievePagesParameters
             {

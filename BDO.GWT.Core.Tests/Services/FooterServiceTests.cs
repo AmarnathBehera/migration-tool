@@ -435,24 +435,24 @@ namespace BDO.GWT.Core.Tests.Services
             _contentServiceMock
                 .Setup(x => x.GetItemsChannelOnChannelIdAsync<FooterLinks>(
                     It.IsAny<string>(),
-                    It.IsAny<Action<ContentItemQueryBuilder>>(),
-                    It.IsAny<CancellationToken>(),
-                    It.IsAny<int>()))
+                    It.IsAny<Action<ContentItemQueryBuilder>>(),                    
+                    It.IsAny<int>(), 
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<FooterLinks>());
 
             _contentServiceMock
                 .Setup(x => x.GetItemsChannelOnChannelIdAsync<SocialLinks>(
                     It.IsAny<string>(),
-                    It.IsAny<Action<ContentItemQueryBuilder>>(),
-                    It.IsAny<CancellationToken>(),
-                    It.IsAny<int>()))
+                    It.IsAny<Action<ContentItemQueryBuilder>>(),                   
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<SocialLinks>());
 
             _contentServiceMock
-                .Setup(x => x.GetContentTypeForAPI<Subscribe>(
-                    It.IsAny<CancellationToken>(),
+                .Setup(x => x.GetContentTypeForAPI<Subscribe>(                    
                     It.IsAny<string>(),
-                    It.IsAny<string>()))
+                    It.IsAny<string>(), 
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Enumerable.Empty<Subscribe>());
 
             _contentServiceMock
@@ -497,24 +497,24 @@ namespace BDO.GWT.Core.Tests.Services
             _contentServiceMock
                 .Setup(x => x.GetItemsChannelOnChannelIdAsync<FooterLinks>(
                     It.IsAny<string>(),
-                    It.IsAny<Action<ContentItemQueryBuilder>>(),
-                    It.IsAny<CancellationToken>(),
-                    It.IsAny<int>()))
+                    It.IsAny<Action<ContentItemQueryBuilder>>(),                    
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync((IReadOnlyList<FooterLinks>)null!);
 
             _contentServiceMock
                 .Setup(x => x.GetItemsChannelOnChannelIdAsync<SocialLinks>(
                     It.IsAny<string>(),
                     It.IsAny<Action<ContentItemQueryBuilder>>(),
-                    It.IsAny<CancellationToken>(),
-                    It.IsAny<int>()))
+                    It.IsAny<int>(), 
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync((IReadOnlyList<SocialLinks>)null!);
 
             _contentServiceMock
-                .Setup(x => x.GetContentTypeForAPI<Subscribe>(
-                    It.IsAny<CancellationToken>(),
+                .Setup(x => x.GetContentTypeForAPI<Subscribe>(                    
                     It.IsAny<string>(),
-                    It.IsAny<string>()))
+                    It.IsAny<string>(), 
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Enumerable.Empty<Subscribe>());
 
             _contentServiceMock
@@ -551,9 +551,9 @@ namespace BDO.GWT.Core.Tests.Services
             _contentServiceMock
                 .Setup(x => x.GetItemsChannelOnChannelIdAsync<FooterLinks>(
                     It.IsAny<string>(),
-                    It.IsAny<Action<ContentItemQueryBuilder>>(),
-                    It.IsAny<CancellationToken>(),
-                    It.IsAny<int>()))
+                    It.IsAny<Action<ContentItemQueryBuilder>>(),                    
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(footerLinks);
 
             var result = await _service.GetAsyncForAPI(1, "en-GB", CancellationToken.None);
@@ -573,9 +573,9 @@ namespace BDO.GWT.Core.Tests.Services
             _contentServiceMock
                 .Setup(x => x.GetItemsChannelOnChannelIdAsync<SocialLinks>(
                     It.IsAny<string>(),
-                    It.IsAny<Action<ContentItemQueryBuilder>>(),
-                    It.IsAny<CancellationToken>(),
-                    It.IsAny<int>()))
+                    It.IsAny<Action<ContentItemQueryBuilder>>(),                    
+                    It.IsAny<int>(), 
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(socialLinks);
 
             var result = await _service.GetAsyncForAPI(1, "en-GB", CancellationToken.None);
@@ -591,9 +591,9 @@ namespace BDO.GWT.Core.Tests.Services
             _contentServiceMock
                 .Setup(x => x.GetItemsChannelOnChannelIdAsync<FooterLinks>(
                     It.IsAny<string>(),
-                    It.IsAny<Action<ContentItemQueryBuilder>>(),
-                    It.IsAny<CancellationToken>(),
-                    It.IsAny<int>()))
+                    It.IsAny<Action<ContentItemQueryBuilder>>(),                   
+                    It.IsAny<int>(), 
+                    It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new Exception("service failure"));
 
             Assert.ThrowsAsync<Exception>(async () =>
@@ -634,17 +634,17 @@ namespace BDO.GWT.Core.Tests.Services
             _contentServiceMock.Verify(
                 x => x.GetItemsChannelOnChannelIdAsync<FooterLinks>(
                     It.Is<string>(c => c == "fr-FR"),
-                    It.IsAny<Action<ContentItemQueryBuilder>>(),
-                    It.IsAny<CancellationToken>(),
-                    It.Is<int>(id => id == 42)),
+                    It.IsAny<Action<ContentItemQueryBuilder>>(),                    
+                    It.Is<int>(id => id == 42),
+                    It.IsAny<CancellationToken>()),
                 Times.Once);
 
             _contentServiceMock.Verify(
                 x => x.GetItemsChannelOnChannelIdAsync<SocialLinks>(
                     It.Is<string>(c => c == "fr-FR"),
-                    It.IsAny<Action<ContentItemQueryBuilder>>(),
-                    It.IsAny<CancellationToken>(),
-                    It.Is<int>(id => id == 42)),
+                    It.IsAny<Action<ContentItemQueryBuilder>>(),                    
+                    It.Is<int>(id => id == 42),
+                    It.IsAny<CancellationToken>()),
                 Times.Once);
         }
 
