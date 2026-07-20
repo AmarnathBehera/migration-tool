@@ -1,4 +1,5 @@
-﻿using BDO.GWT.Core.Data;
+﻿using BDO.GWT.Core;
+using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.Services;
@@ -24,27 +25,31 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
         ];
 
         private Mock<IEventsWebinarsSliderService> _serviceMock = null!;
-        private Mock<IPageContext> _pageContextMock = null!;
+        private Mock<IContentService> _contentServiceMock = null!;
         private Mock<IContentRetriever> _contentRetrieverMock = null!;
         private EventsWebinarsSliderWidget _widget = null!;
+        private DefaultHttpContext _httpContext = null!;
 
         [SetUp]
         public void SetUp()
         {
             _serviceMock = new Mock<IEventsWebinarsSliderService>();
-            _pageContextMock = new Mock<IPageContext>();
+            _contentServiceMock = new Mock<IContentService>();
             _contentRetrieverMock = new Mock<IContentRetriever>();
 
             _widget = new EventsWebinarsSliderWidget(
                 _serviceMock.Object,
-                _pageContextMock.Object,
-                _contentRetrieverMock.Object);
+                _contentRetrieverMock.Object,
+                _contentServiceMock.Object);
+
+            _httpContext = new DefaultHttpContext();
+            _httpContext.RequestAborted = CancellationToken.None;
 
             _widget.ViewComponentContext = new ViewComponentContext
             {
                 ViewContext = new ViewContext
                 {
-                    HttpContext = new DefaultHttpContext(),
+                    HttpContext = _httpContext,
                     ViewData = new ViewDataDictionary(
                         new EmptyModelMetadataProvider(),
                         new ModelStateDictionary())
@@ -53,13 +58,26 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
         }
 
         private static ComponentViewModel<EventsWebinarsSliderWidgetProperties> CreateModel(
-            EventsWebinarsSliderWidgetProperties properties)
+            EventsWebinarsSliderWidgetProperties properties,
+            Guid? pageGuid = null)
         {
             var model = new ComponentViewModel<EventsWebinarsSliderWidgetProperties>();
 
             typeof(ComponentViewModel<EventsWebinarsSliderWidgetProperties>)
                 .GetProperty("Properties")
                 ?.SetValue(model, properties);
+
+            if (pageGuid.HasValue)
+            {
+                var page = new RoutedWebPage
+                {
+                    WebPageItemGUID = pageGuid.Value
+                };
+
+                typeof(ComponentViewModel<EventsWebinarsSliderWidgetProperties>)
+                    .GetProperty("Page")
+                    ?.SetValue(model, page);
+            }
 
             return model;
         }
@@ -75,29 +93,36 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             };
         }
 
-        [Test]
-        public async Task InvokeAsync_WhenCurrentPageIsNull_ReturnsEmptyView()
+        private void SetupContentServiceMock(IWebPageFieldsSource? page = null)
         {
-            _pageContextMock
-                .Setup(x => x.GetCurrentPageAsync<IWebPageFieldsSource>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync((IWebPageFieldsSource?)null);
+            _contentServiceMock
+                .Setup(x => x.GetItemsByGUIDAsync(It.IsAny<List<Guid>>()))
+                .ReturnsAsync(new List<IWebPageFieldsSource> { page ?? new Mock<IWebPageFieldsSource>().Object });
+        }
 
+        [Test]
+        public async Task InvokeAsync_WhenPageIsNull_ReturnsDefaultDto()
+        {
             var model = CreateModel(new EventsWebinarsSliderWidgetProperties());
 
             var result = await _widget.InvokeAsync(model);
 
             var viewResult = result as ViewViewComponentResult;
+            var dto = viewResult?.ViewData?.Model as EventsWebinarsSliderDto;
 
             Assert.Multiple(() =>
             {
                 Assert.That(viewResult, Is.Not.Null);
-
                 Assert.That(
                     viewResult!.ViewName,
                     Is.EqualTo("~/Components/Widget/EventsWebinarsSliderWidget/_EventsWebinarsSliderWidget.cshtml"));
-
-                Assert.That(viewResult.ViewData?.Model, Is.Null);
+                Assert.That(dto, Is.Not.Null);
+                Assert.That(dto!.FilteringTooltipEnabled, Is.False);
             });
+
+            _contentServiceMock.Verify(
+                x => x.GetItemsByGUIDAsync(It.IsAny<List<Guid>>()),
+                Times.Never);
 
             _serviceMock.Verify(
                 x => x.GetEventsWebinarsSliderAsync(
@@ -110,11 +135,10 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
         [Test]
         public async Task InvokeAsync_WithAllProperties_MapsPropertiesToDataCorrectly()
         {
+            var pageGuid = Guid.NewGuid();
             var currentPageMock = new Mock<IWebPageFieldsSource>();
 
-            _pageContextMock
-                .Setup(x => x.GetCurrentPageAsync<IWebPageFieldsSource>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(currentPageMock.Object);
+            SetupContentServiceMock(currentPageMock.Object);
 
             EventsWebinarsSliderData? capturedData = null;
 
@@ -144,7 +168,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
                 WidgetID = "events-widget-1"
             };
 
-            var model = CreateModel(properties);
+            var model = CreateModel(properties, pageGuid);
 
             var result = await _widget.InvokeAsync(model);
 
@@ -178,11 +202,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
         [Test]
         public async Task InvokeAsync_WithEmptyBackgroundAltText_SetsAltTextToNull()
         {
-            var currentPageMock = new Mock<IWebPageFieldsSource>();
-
-            _pageContextMock
-                .Setup(x => x.GetCurrentPageAsync<IWebPageFieldsSource>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(currentPageMock.Object);
+            SetupContentServiceMock();
 
             EventsWebinarsSliderData? capturedData = null;
 
@@ -199,7 +219,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             {
                 Title = "Title",
                 BackgroundImageAltText = string.Empty
-            });
+            }, Guid.NewGuid());
 
             await _widget.InvokeAsync(model);
 
@@ -213,11 +233,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
         [Test]
         public async Task InvokeAsync_WithNullFilters_SetsEmptyFilterCollection()
         {
-            var currentPageMock = new Mock<IWebPageFieldsSource>();
-
-            _pageContextMock
-                .Setup(x => x.GetCurrentPageAsync<IWebPageFieldsSource>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(currentPageMock.Object);
+            SetupContentServiceMock();
 
             EventsWebinarsSliderData? capturedData = null;
 
@@ -233,8 +249,8 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var model = CreateModel(new EventsWebinarsSliderWidgetProperties
             {
                 Title = "Title",
-                Filters = null
-            });
+                Filters = null!
+            }, Guid.NewGuid());
 
             await _widget.InvokeAsync(model);
 
@@ -248,11 +264,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
         [Test]
         public async Task InvokeAsync_ReturnsViewViewComponentResult()
         {
-            var currentPageMock = new Mock<IWebPageFieldsSource>();
-
-            _pageContextMock
-                .Setup(x => x.GetCurrentPageAsync<IWebPageFieldsSource>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(currentPageMock.Object);
+            SetupContentServiceMock();
 
             _serviceMock
                 .Setup(x => x.GetEventsWebinarsSliderAsync(
@@ -264,7 +276,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var model = CreateModel(new EventsWebinarsSliderWidgetProperties
             {
                 Title = "Heading"
-            });
+            }, Guid.NewGuid());
 
             var result = await _widget.InvokeAsync(model);
 
