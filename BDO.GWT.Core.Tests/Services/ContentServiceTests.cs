@@ -253,5 +253,135 @@ namespace BDO.GWT.Core.Tests.Services
                 _modelTypeMapperMock.Object,
                 null!));
         }
+
+        [Test]
+        public async Task GetItemsChannelOnChannelIdAsync_ReturnsMappedResults()
+        {
+            var expected = new List<TestContentItem> { new(), new() };
+
+            _executorMock
+                .Setup(x => x.GetResult<TestContentItem>(
+                    It.IsAny<ContentItemQueryBuilder>(),
+                    It.IsAny<Func<IContentQueryDataContainer, TestContentItem>>(),
+                    It.IsAny<ContentQueryExecutionOptions>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(expected);
+
+            var result = await _service.GetItemsChannelOnChannelIdAsync<TestContentItem>(
+                cultureName: "en-US",
+                configure: null,
+                cancellationToken: CancellationToken.None,
+                channelId: 5);
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(2));
+        }
+
+        [Test]
+        public async Task GetItemsChannelOnChannelIdAsync_WhenNoResults_ReturnsEmptyList()
+        {
+            _executorMock
+                .Setup(x => x.GetResult<TestContentItem>(
+                    It.IsAny<ContentItemQueryBuilder>(),
+                    It.IsAny<Func<IContentQueryDataContainer, TestContentItem>>(),
+                    It.IsAny<ContentQueryExecutionOptions>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Enumerable.Empty<TestContentItem>());
+
+            var result = await _service.GetItemsChannelOnChannelIdAsync<TestContentItem>(
+                cultureName: "en-US",
+                configure: null,
+                cancellationToken: CancellationToken.None,
+                channelId: 5);
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Empty);
+        }
+
+        [Test]
+        public async Task GetItemsChannelOnChannelIdAsync_InvokesConfigureCallback()
+        {
+            var configureInvoked = false;
+
+            _executorMock
+                .Setup(x => x.GetResult<TestContentItem>(
+                    It.IsAny<ContentItemQueryBuilder>(),
+                    It.IsAny<Func<IContentQueryDataContainer, TestContentItem>>(),
+                    It.IsAny<ContentQueryExecutionOptions>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Enumerable.Empty<TestContentItem>());
+
+            await _service.GetItemsChannelOnChannelIdAsync<TestContentItem>(
+                cultureName: "en-GB",
+                configure: _ => configureInvoked = true,
+                cancellationToken: CancellationToken.None,
+                channelId: 10);
+
+            Assert.That(configureInvoked, Is.True);
+        }
+
+        [Test]
+        public async Task GetItemsChannelOnChannelIdAsync_UsesPreviewFlag_FromWebsiteChannelContext()
+        {
+            _websiteChannelContextMock.SetupGet(x => x.IsPreview).Returns(true);
+
+            ContentQueryExecutionOptions? capturedOptions = null;
+
+            _executorMock
+                .Setup(x => x.GetResult<TestContentItem>(
+                    It.IsAny<ContentItemQueryBuilder>(),
+                    It.IsAny<Func<IContentQueryDataContainer, TestContentItem>>(),
+                    It.IsAny<ContentQueryExecutionOptions>(),
+                    It.IsAny<CancellationToken>()))
+                .Callback<ContentItemQueryBuilder, Func<IContentQueryDataContainer, TestContentItem>, ContentQueryExecutionOptions, CancellationToken>(
+                    (_, _, options, _) => capturedOptions = options)
+                .ReturnsAsync(Enumerable.Empty<TestContentItem>());
+
+            await _service.GetItemsChannelOnChannelIdAsync<TestContentItem>(
+                cultureName: "en-US",
+                configure: null,
+                cancellationToken: CancellationToken.None,
+                channelId: 1);
+
+            Assert.That(capturedOptions, Is.Not.Null);
+            Assert.That(capturedOptions!.ForPreview, Is.True);
+        }
+
+        [Test]
+        public async Task GetItemsChannelOnChannelIdAsync_PassesCancellationToken_ToExecutor()
+        {
+            var token = new CancellationTokenSource().Token;
+
+            _executorMock
+                .Setup(x => x.GetResult<TestContentItem>(
+                    It.IsAny<ContentItemQueryBuilder>(),
+                    It.IsAny<Func<IContentQueryDataContainer, TestContentItem>>(),
+                    It.IsAny<ContentQueryExecutionOptions>(),
+                    token))
+                .ReturnsAsync(Enumerable.Empty<TestContentItem>());
+
+            await _service.GetItemsChannelOnChannelIdAsync<TestContentItem>(
+                cultureName: "en-US",
+                configure: null,
+                cancellationToken: token,
+                channelId: 1);
+
+            _executorMock.Verify(
+                x => x.GetResult<TestContentItem>(
+                    It.IsAny<ContentItemQueryBuilder>(),
+                    It.IsAny<Func<IContentQueryDataContainer, TestContentItem>>(),
+                    It.IsAny<ContentQueryExecutionOptions>(),
+                    token),
+                Times.Once);
+        }
+
+        /// <summary>
+        /// Minimal stand-in model exposing the CONTENT_TYPE_NAME convention required by
+        /// ContentService's internal GetContentTypeName&lt;T&gt;() reflection helper.
+        /// </summary>
+        private class TestContentItem
+        {
+            public const string CONTENT_TYPE_NAME = "Test.ContentItem";
+        }
     }
 }
