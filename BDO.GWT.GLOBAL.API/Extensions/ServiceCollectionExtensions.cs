@@ -6,7 +6,9 @@ using BDO.GWT.GLOBAL.API.Helpers;
 using BDO.GWT.GLOBAL.API.Middleware;
 using BDO.GWT.GLOBAL.API.Options;
 using BDO.GWT.GLOBAL.API.Services;
+using BDO.GWT.Web.Core.Services;
 using CMS.MacroEngine;
+using CMS.Websites;
 
 namespace BDO.GWT.GLOBAL.API.Extensions;
 
@@ -50,5 +52,14 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IDealCrudService, DealCrudService>();
         serviceCollection.AddScoped<IFooterService, FooterService>();
         serviceCollection.AddScoped<ICultureValidationService, CultureValidationService>();
+        serviceCollection.AddScoped<ICareerDetailPageService, CareerDetailPageService>();
+        serviceCollection.AddScoped<IHeroService, HeroService>();
+        serviceCollection.AddScoped<ISidebarService, SidebarService>();
+        serviceCollection.AddScoped<ISocialMediaButtonsService, SocialMediaButtonsService>();
+        serviceCollection.AddScoped<ISettingService, SettingService>();
+        serviceCollection.AddScoped<IWebPageUrlResolver, WebPageUrlResolver>();
+        serviceCollection.AddScoped<IHomePageService, HomePageService>();
+        serviceCollection.AddScoped<ICareerCrudService, CareerCrudService>();
+        
     }
 }
