@@ -2,6 +2,7 @@
 using BDO.GWT.GLOBAL.API.Bases;
 using BDO.GWT.GLOBAL.API.Filters;
 using BDO.GWT.GLOBAL.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Mime;
@@ -11,6 +12,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers;
 /// <summary>
 /// Provides methods to read and manage forms.
 /// </summary>
+[AllowAnonymous]
 [ApiController]
 [Route("memberFirms/{memberFirmID:int}/Forms")]
 public class FormsController : EntityControllerBase

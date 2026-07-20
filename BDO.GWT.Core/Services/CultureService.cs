@@ -1,5 +1,4 @@
 ﻿using BDO.GWT.Core.ValueObjects;
-using CMS.Base;
 using CMS.Websites.Routing;
 
 namespace BDO.GWT.Core.Services;
@@ -25,6 +24,15 @@ public class CultureService : ICultureService
         var siteCultures = await _websiteCulturesService.GetWebsiteCulturesAsync();
 
         var languageTags = siteCultures.Select(x => LanguageTag.Parse(x.ShortName));
+
+        return languageTags;
+    }
+
+    public async Task<IEnumerable<LanguageTag>> GetSiteCulturesLanguageCodeAsync(int siteID, CancellationToken cancellationToken)
+    {
+        var siteCultures = await _websiteCulturesService.GetWebsiteCulturesAsync();
+
+        var languageTags = siteCultures.Select(x => LanguageTag.Parse(x.CultureCode));
 
         return languageTags;
     }

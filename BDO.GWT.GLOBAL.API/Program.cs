@@ -78,6 +78,8 @@ public static class Program
 
         app.UseAuthorization();
 
+        app.UseMiddleware<Middleware.MemberFirmMiddleware>();
+
         app.MapControllers();
 
         app.Run();
