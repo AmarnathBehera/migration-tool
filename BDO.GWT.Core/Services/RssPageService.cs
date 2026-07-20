@@ -146,7 +146,7 @@ public class RssPageService : IRssPageService
                 {
                     WebPageItemID = container.WebPageItemID,
                     Title = container.GetValue<string>("MetadataTitle"),
-                    Description = container.GetValue<string>("MetadataDescription"),
+                    Description = HtmlHelper.ExtractTextFromHtml( container.GetValue<string>("MetadataDescription")),
                     LastPublished = container.GetValue<DateTime?>("ContentItemCommonDataLastPublishedWhen"),
                     ImageUrl = container.GetValue<string>("MetadataTeaserImageUrl"),
                 },
