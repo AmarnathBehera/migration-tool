@@ -138,6 +138,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IInsightCardService, InsightCardService>();
         serviceCollection.AddScoped<IInsightCarouselService, InsightCarouselService>();
 
+        serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
     }
 
 }
