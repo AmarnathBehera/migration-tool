@@ -1,15 +1,12 @@
 ﻿
 using BDO.GWT.Web.Widgets;
 using CMS.ContentEngine;
-using Kentico.Components.Web.Mvc.FormComponents;
 using Kentico.Forms.Web.Mvc;
 using Kentico.Xperience.Admin.Base.FormAnnotations;
 using Kentico.Xperience.Admin.Websites.FormAnnotations;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.InsightAnimationCardWidget;
 public class InsightAnimationCardWidgetProperties : BaseWidgetProperties
@@ -20,7 +17,7 @@ public class InsightAnimationCardWidgetProperties : BaseWidgetProperties
     [TextInputComponent( Label = "Description", ExplanationText = "Description that will be shown over insight carousel widget but under title.", Order = 1)]
     public string? Description { get; set; }
 
-    [ContentItemSelectorComponent (contentTypeName:InsightAnimationPage.CONTENT_TYPE_NAME,Label = "Insight Animation Cards", ExplanationText = "Insights that will be added as individual cards.", Order = 2)]
+    [ContentItemSelectorComponent (contentTypeName:InsightAnimationPage.CONTENT_TYPE_NAME, Label = "Insight Animation Cards", ExplanationText = "Insights that will be added as individual cards.", Order = 2)]
     public IEnumerable<ContentItemReference> InsightCards { get; set; } = Enumerable.Empty<ContentItemReference>();
 
     [DropDownComponent( Label = "See all link Target", Order = 3,Options = "_self;Same tab\r\n_blank;New tab")]
@@ -39,33 +36,6 @@ public class InsightAnimationCardWidgetProperties : BaseWidgetProperties
     public string BottomMargin { get; set; } = null!;
 
 
-#pragma warning disable CA1812 // Avoid uninstantiated internal classes - this class is instantiated by Kentico
-//    private class InsightAnimationsConfiguration : FormComponentConfigurator<PageSelector>
-//#pragma warning restore CA1812 // Avoid uninstantiated internal classes - this class is instantiated by Kentico
-//    {
-//        private readonly IPageRetriever<InsightAnimationCard> _sectionInsightsPageRetriever;
 
-//        public InsightAnimationsConfiguration(IPageRetriever<InsightAnimationCard> sectionInsightsPageRetriever)
-//        {
-//            _sectionInsightsPageRetriever = sectionInsightsPageRetriever;
-//        }
-
-//        public override void Configure(PageSelector formComponent, IFormFieldValueProvider formFieldValueProvider)
-//        {
-//            ConfigureAsync(formComponent).Wait();
-//        }
-
-//        private async Task ConfigureAsync(PageSelector formComponent)
-//        {
-//            var insightSections = await _sectionInsightsPageRetriever.RetrievePagesAsync(query => query.Select(x => new { x.NodeAliasPath }));
-//            var insightsSection = insightSections.FirstOrDefault();
-
-//            if (insightsSection != null)
-//            {
-//                formComponent.Properties.RootPath = insightsSection.NodeAliasPath;
-//                formComponent.Properties.MaxPagesLimit = 0;
-//            }
-//        }
-//    }
 }
 
