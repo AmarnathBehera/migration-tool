@@ -80,7 +80,8 @@ public class InsightCardServiceTests
             await _service.GetFilteredItemsAsync(
                 query,
                 parentPath!,
-                null,
+               "en-US",
+                  null,
                 _ => false,
                 CancellationToken.None));
     }
@@ -95,6 +96,7 @@ public class InsightCardServiceTests
         await _service.GetFilteredItemsAsync(
             query,
             "/insights",
+            "en-US",
             null,
             _ => false,
             CancellationToken.None);
@@ -130,6 +132,7 @@ public class InsightCardServiceTests
         await _service.GetFilteredItemsAsync(
             query,
             "/insights",
+            "en-US",
             _ => decoratorCalled = true,
             _ => false,
             CancellationToken.None);
@@ -153,6 +156,7 @@ public class InsightCardServiceTests
         var result = await _service.GetFilteredItemsAsync(
             query,
             "/insights",
+            "en-US",
             null,
             x => x.MetadataTitle == "Featured Insight",
             CancellationToken.None);
@@ -184,6 +188,7 @@ public class InsightCardServiceTests
         var result = await _service.GetFilteredItemsAsync(
             query,
             "/insights",
+            "en-US",
             null,
             _ => false,
             CancellationToken.None);
@@ -223,6 +228,7 @@ public class InsightCardServiceTests
         var result = await _service.GetFilteredItemsAsync(
             query,
             "/insights",
+            "en-US",
             null,
             _ => false,
             CancellationToken.None);
@@ -251,6 +257,7 @@ public class InsightCardServiceTests
         var result = await _service.GetFilteredItemsAsync(
             query,
             "/insights",
+            "en-US",
             null,
             _ => true,
             CancellationToken.None);
@@ -293,6 +300,7 @@ public class InsightCardServiceTests
         var result = await _service.GetFilteredItemsAsync(
             query,
             "/insights",
+            "en-US",
             null,
             _ => false,
             CancellationToken.None);
@@ -370,7 +378,7 @@ public class InsightCardServiceTests
             ComingSoon = comingSoon
         };
 
-        SetEmptyEnumerableProperty(insight, nameof(Insight.CopyInsight));
+        SetEmptyEnumerableProperty(insight, nameof(Insight.InsightContent));
         SetSystemFieldDates(insight, publishedDate ?? DateTime.UtcNow);
 
         return insight;
@@ -480,7 +488,7 @@ public class InsightCardServiceTests
         string imageUrl,
         string imageAltText)
     {
-        var copyInsightProperty = typeof(Insight).GetProperty(nameof(Insight.CopyInsight));
+        var copyInsightProperty = typeof(Insight).GetProperty(nameof(Insight.InsightContent));
         if (copyInsightProperty is null)
         {
             throw new InvalidOperationException("CopyInsight property was not found on Insight.");
@@ -518,7 +526,7 @@ public class InsightCardServiceTests
         var copyInsightArray = Array.CreateInstance(copyInsightType, 1);
         copyInsightArray.SetValue(copyInsight, 0);
 
-        SetPropertyValue(insight, nameof(Insight.CopyInsight), copyInsightArray);
+        SetPropertyValue(insight, nameof(Insight.InsightContent), copyInsightArray);
     }
 
     private static void SetEmptyEnumerableProperty(

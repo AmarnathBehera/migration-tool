@@ -1,4 +1,5 @@
 ﻿using BDO.GWT.Common.Options;
+using BDO.GWT.Core;
 using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.LiveSite.Services;
 using BDO.GWT.Core.Retrievers;
@@ -13,6 +14,7 @@ using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using BDO.GWT.Xperience.Core.Services;
+using CMS.Core;
 using GWTXbyKWeb.Components.Services.SEOOptions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -112,6 +114,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IRssSectionPageService, RssSectionPageService>();
         serviceCollection.AddScoped<IRssPageService, RssPageService>();
         serviceCollection.AddScoped<ISectionDealsPageService, SectionDealsPageService>();
+        serviceCollection.AddScoped<IBusinessStrategyService, BusinessStrategyService>();
+        serviceCollection.AddScoped<ISectionBusinessStrategiesService, SectionBusinessStrategiesService>();
 
         //Widget Service
         serviceCollection.AddScoped<INewsCarouselService, NewsCarouselService>();
@@ -132,7 +136,9 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IInsightGroupCardListingPageService, InsightGroupCardListingPageService>();
         serviceCollection.AddScoped<IInsightCategoryCardListingPageService, InsightCategoryCardListingPageService>();
         serviceCollection.AddScoped<IInsightCardService, InsightCardService>();
+        serviceCollection.AddScoped<IInsightCarouselService, InsightCarouselService>();
 
+        serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
     }
 
 }

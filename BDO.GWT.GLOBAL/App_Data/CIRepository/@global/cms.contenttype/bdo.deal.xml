@@ -155,8 +155,7 @@ INNER JOIN dbo.CMS_ContentItemCommonData AS cicd ON lo.ContentItemDataCommonData
           <Script>
 <![CDATA[
     SELECT
-    cicd.MetadataTitle,
-    lo.ContentItemDataCommonDataID
+    cicd.MetadataTitle
 FROM dbo.BDO_Deal AS lo
 INNER JOIN dbo.CMS_ContentItemCommonData AS cicd
     ON lo.ContentItemDataCommonDataID = cicd.ContentItemCommonDataID;
@@ -198,22 +197,10 @@ INNER JOIN dbo.CMS_ContentItemCommonData AS cicd
       <schema guid="34bc2c94-d4b6-4c53-a6f4-9b9520a24493" name="34bc2c94-d4b6-4c53-a6f4-9b9520a24493">
         <properties />
       </schema>
-      <field allowempty="true" column="DealShowSocialMediaButtons" columnprecision="0" columntype="boolean" enabled="true" guid="e54ba5dc-573d-440a-972e-1c4d83af866f" visible="true">
-        <properties>
-          <defaultvalue>False</defaultvalue>
-          <explanationtext>Should the social media buttons be shown?</explanationtext>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Show social media buttons</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-        </properties>
-        <settings>
-          <controlname>Kentico.Administration.Checkbox</controlname>
-        </settings>
-      </field>
       <field allowempty="true" column="SharingOptIn" columnprecision="0" columntype="boolean" enabled="true" guid="1c988b45-a59b-44f4-81ac-83b7bcb426fd" visible="true">
         <properties>
           <explanationtext>
-            <![CDATA[Only English deal cards are shared on the <br />BDO Global website. ]]>
+            <![CDATA[Only English deal cards are shared on the BDO Global website. ]]>
           </explanationtext>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Share deal on BDO Global website</fieldcaption>

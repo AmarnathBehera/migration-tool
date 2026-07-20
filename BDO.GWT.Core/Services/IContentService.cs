@@ -33,6 +33,11 @@
             CancellationToken cancellationToken = default)
             where T : class;
 
+        Task<IReadOnlyList<T>> GetItemsChannelOnChannelIdAsync<T>(string cultureName,
+            Action<ContentItemQueryBuilder>? configure = null,
+            int channelId = 0, CancellationToken cancellationToken = default)
+            where T : class;
+
         /// <summary>
         /// Returns a single content item of the specified type by its GUID,
         /// or null if not found.
@@ -63,10 +68,12 @@
         /// </summary>
         Task<IEnumerable<IWebPageFieldsSource>> GetItemsByGUIDAsync(List<Guid> webPageItemGuidsfirst);
 
+        Task<IEnumerable<IWebPageFieldsSource>> GetItemsByGUIDForAPIAsync(List<Guid> webPageItemGuidsfirst, string? channelName, string? cultureName);
         /// <summary>
         //Retrieve page 
         /// </summary>
         Task<IEnumerable<T>> GetContentType<T>(CancellationToken cancellationToken = default) where T : class, IWebPageFieldsSource;
+        Task<IEnumerable<T>> GetContentTypeForAPI<T>( string? channelName = null, string? cultureName = null, CancellationToken cancellationToken = default) where T : class, IWebPageFieldsSource;
 
         Task<IEnumerable<TPage>> GetChildPagesByParentGuidAsync<TPage>(
        int parentGuid,
@@ -87,6 +94,14 @@
       CancellationToken cancellationToken = default
            ) where TPage : class, IWebPageFieldsSource;
 
+
+        Task<IEnumerable<TPage>> GetPagesAsync<TPage>(
+   int channelId,
+   RetrievePagesParameters parameters,
+   Action<RetrievePagesQueryParameters> queryAction,
+   RetrievalCacheSettings cacheSettings,
+   CancellationToken cancellationToken
+) where TPage : class, IWebPageFieldsSource;
 
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
         public Task<IEnumerable<T?>?> RetrievePagesAsync<T>(RetrievePagesParameters parameters, CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;

@@ -38,7 +38,7 @@ public static class FilterUtility
         [FilterParameterName.SpecialtyArea] = new("Specialty Area", ResourceStringKey.LiveSite.Filters.SpecialtyArea, typeof(SpecialtiesArea), FilterParameterType.Page),
         [FilterParameterName.Specialty] = new("Specialty", ResourceStringKey.LiveSite.Filters.Specialty, typeof(SpecialtiesPage), FilterParameterType.Page),
         [FilterParameterName.SubIndustry] = new("Sub-Industry", ResourceStringKey.LiveSite.Filters.SubIndustry, typeof(DealCardSubIndustry), FilterParameterType.Page),
-        //[FilterParameterName.SubService] = new("Sub-Service", ResourceStringKey.LiveSite.Filters.SubService, typeof(SubService), FilterParameterType.Page),
+        [FilterParameterName.SubService] = new("Sub-Service", ResourceStringKey.LiveSite.Filters.SubService, typeof(Sub_Service), FilterParameterType.Page),
         [FilterParameterName.Year] = new("Year", ResourceStringKey.LiveSite.Filters.Year, typeof(Deal), FilterParameterType.Field),
     };
     public static FilterParameterData? GetFilterParameterData(string filterParameterName)

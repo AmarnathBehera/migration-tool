@@ -56,7 +56,7 @@ namespace BDO
 		/// <summary>
 		/// MenuTileIcon.
 		/// </summary>
-		public IEnumerable<ContentAttachment> MenuTileIcon { get; set; }
+		public IEnumerable<Icon> MenuTileIcon { get; set; }
 
 
 		/// <summary>

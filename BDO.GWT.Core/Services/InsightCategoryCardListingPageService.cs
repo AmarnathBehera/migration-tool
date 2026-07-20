@@ -29,8 +29,9 @@ public class InsightCategoryCardListingPageService : IInsightCategoryCardListing
     private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly IInsightCardService _insightCardService;
     private readonly IWebPageUrlRetriever _webPageUrlRetriever;
+    private readonly IContentService _contentService;
 
-    public InsightCategoryCardListingPageService(IInsightCardService insightCardService, IWebsiteChannelContext websiteChannelContext, IContentRetriever contentRetriever, IFilteringHelper filteringHelper, IHeroService heroService, IWebPageUrlRetriever webPageUrlRetriever)
+    public InsightCategoryCardListingPageService(IInsightCardService insightCardService, IWebsiteChannelContext websiteChannelContext, IContentRetriever contentRetriever, IFilteringHelper filteringHelper, IHeroService heroService, IWebPageUrlRetriever webPageUrlRetriever, IContentService contentService)
     {
         _filteringHelper = filteringHelper;
         _heroService = heroService;
@@ -38,6 +39,7 @@ public class InsightCategoryCardListingPageService : IInsightCategoryCardListing
         _websiteChannelContext = websiteChannelContext;
         _insightCardService = insightCardService;
         _webPageUrlRetriever = webPageUrlRetriever;
+        _contentService = contentService;
     }
 
     public async Task<InsightCardListingDto> GetInsightPageDtoAsync(InsightCategory insightPage, CancellationToken cancellationToken)
@@ -83,6 +85,7 @@ public class InsightCategoryCardListingPageService : IInsightCategoryCardListing
         return await _insightCardService.GetFilteredItemsAsync(
             cardsQuery,
             treePath,
+           _contentService.GetCurrentLanguage(),
             decorateQuery,
             contentPage => featuredContentPageIds.Contains(contentPage.SystemFields.WebPageItemID),
             cancellationToken);

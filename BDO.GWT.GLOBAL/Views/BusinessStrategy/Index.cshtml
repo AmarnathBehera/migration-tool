@@ -1,0 +1,49 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+
+@model BDO.GWT.Core.DTOs.Pages.BusinessStrategyDto
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+
+    var widgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.AccordionWidget,
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.FaqWidget,
+        ComponentIdentifiers.Widgets.Imagewithtext,
+        ComponentIdentifiers.Widgets.InFocus,
+        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.KeyTakeaways,
+        ComponentIdentifiers.Widgets.Globallocation,
+        ComponentIdentifiers.Widgets.TabAccordion,
+    };
+}
+
+@if (Model != null && pageId != 0)
+    {
+         @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.Hero,
+        ReactComponentType.HeroGUID,
+        new {
+        data = Model.Hero,
+        },
+        Context.RequestAborted))
+    }
+
+@await Html.PartialAsync("_LocalNavigation")
+
+@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
+
+@PageBuilderService.GetPageBuilderScripts(Html)

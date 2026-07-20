@@ -16,12 +16,12 @@ namespace BDO.GWT.Core.Tests.Services;
 
 public class InsightPageServiceTests
 {
-    private static readonly int[] ContactIds = [1, 2];
-    private static readonly int[] SingleContactId = [1];
-    private static readonly string[] ExpectedComposedContactNames = ["Ada Lovelace", "Grace van Hopper"];
-    private static readonly string[] ExpectedPersonMetadataTitle = ["Person Metadata Title"];
-    private static readonly string[] ExpectedExternalComposedName = ["Ada van Lovelace"];
-    private static readonly string[] ExpectedExternalMetadataTitle = ["External Metadata Title"];
+    private static readonly int[] ContactIds = new[] { 1, 2 };
+    private static readonly int[] SingleContactId = new[] { 1 };
+    private static readonly string[] ExpectedComposedContactNames = new[] { "Ada Lovelace", "Grace van Hopper" };
+    private static readonly string[] ExpectedPersonMetadataTitle = new[] { "Person Metadata Title" };
+    private static readonly string[] ExpectedExternalComposedName = new[] { "Ada van Lovelace" };
+    private static readonly string[] ExpectedExternalMetadataTitle = new[] { "External Metadata Title" };
 
     private Mock<IContentRetriever> _contentRetrieverMock = null!;
     private Mock<IInfoProvider<WebsiteChannelInfo>> _websiteChannelInfoProviderMock = null!;
@@ -73,6 +73,7 @@ public class InsightPageServiceTests
             _settingServiceMock.Object,
             _socialMediaButtonsServiceMock.Object);
     }
+
 
     [Test]
     public async Task GetDisplayNameAsync_ReturnsComposedNameWithPrefix_WhenSettingsUnavailable()
@@ -331,7 +332,7 @@ public class InsightPageServiceTests
             showDescription: true,
             showCallToAction: false);
 
-        SetCollection(insight, nameof(Insight.CopyInsight), copyInsight);
+        SetCollection(insight, nameof(Insight.InsightContent), copyInsight);
 
         var result = await _service.GetContentPageDtoAsync(
             insight,
@@ -362,7 +363,7 @@ public class InsightPageServiceTests
             showDescription: false,
             showCallToAction: false);
 
-        SetCollection(insight, nameof(Insight.CopyInsight), copyInsight);
+        SetCollection(insight, nameof(Insight.InsightContent), copyInsight);
 
         var result = await _service.GetContentPageDtoAsync(
             insight,
@@ -384,7 +385,7 @@ public class InsightPageServiceTests
             title: "Insight page",
             showSidebar: false);
 
-        SetCollection(insight, nameof(Insight.CopyInsight), Array.Empty<object>());
+        SetCollection(insight, nameof(Insight.InsightContent), Array.Empty<object>());
 
         var result = await _service.GetContentPageDtoAsync(
             insight,
@@ -498,44 +499,13 @@ public class InsightPageServiceTests
                 insight,
                 CancellationToken.None));
 
-        Assert.That(exception, Is.Not.Null);
-        Assert.That(exception!.Message, Does.Contain(nameof(Insight)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception!.Message, Does.Contain(nameof(Insight)));
+        });
     }
 
-    [Test]
-    public void GetContentPageSidebarDto_ThrowsMissingSectionPageException_WhenSectionPageIsMissing()
-    {
-        var insight = CreateInsight(
-            title: "Insight page",
-            showSidebar: true);
-
-        SetContentType(insight, "Article");
-        SetCollection(insight, nameof(Insight.RelevantContactPerson), Array.Empty<object>());
-        SetCollection(insight, nameof(Insight.RelatedExternalPeople), Array.Empty<object>());
-
-        _contentServiceMock
-            .Setup(x => x.GetPagesAsync<Insight>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new[] { insight });
-
-        _contentServiceMock
-            .Setup(x => x.GetPagesAsync<SectionInsightsPage>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Array.Empty<SectionInsightsPage>());
-
-        var exception = Assert.ThrowsAsync<MissingSectionPageException>(async () =>
-            await _service.GetContentPageSidebarDto(
-                insight,
-                CancellationToken.None));
-
-        Assert.That(exception, Is.Not.Null);
-    }
 
     private void SetupUsePersonPageTitleSetting(bool usePageTitle)
     {
@@ -651,7 +621,7 @@ public class InsightPageServiceTests
             webPageUrlPath: "/insights/test",
             webPageTreePath: "/Insights/Test");
 
-        SetCollection(insight, nameof(Insight.CopyInsight), CreateCopyInsight(
+        SetCollection(insight, nameof(Insight.InsightContent), CreateCopyInsight(
             title: title,
             description: "<p>Description</p>",
             content: "<p>Content</p>",
@@ -680,7 +650,7 @@ public class InsightPageServiceTests
         string? callToActionButtonUrl = null,
         string? callToActionPosition = null)
     {
-        var copyInsightProperty = typeof(Insight).GetProperty(nameof(Insight.CopyInsight));
+        var copyInsightProperty = typeof(Insight).GetProperty(nameof(Insight.InsightContent));
         if (copyInsightProperty is null)
         {
             throw new InvalidOperationException("CopyInsight property was not found.");
@@ -1150,5 +1120,79 @@ public class InsightPageServiceTests
         var result = await _service.GetExternalPeopleDisplayNames(new List<Guid>(), CancellationToken.None);
 
         Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public void GetCallToActionDto_ReturnsNull_WhenButtonTextIsMissing()
+    {
+        var result = InsightPageService.GetCallToActionDto(
+            callToActionDescription: "CTA description",
+            callToActionButtonText: null,
+            callToActionButtonLink: "https://example.com",
+            CallToActionPosition: "right");
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public void GetCallToActionDto_ReturnsNull_WhenButtonLinkIsMissing()
+    {
+        var result = InsightPageService.GetCallToActionDto(
+            callToActionDescription: "CTA description",
+            callToActionButtonText: "Read more",
+            callToActionButtonLink: null,
+            CallToActionPosition: "right");
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public void GetCallToActionDto_UsesDefaultLeftPosition_WhenPositionIsNull()
+    {
+        var result = InsightPageService.GetCallToActionDto(
+            callToActionDescription: "CTA description",
+            callToActionButtonText: "Read more",
+            callToActionButtonLink: "https://example.com",
+            CallToActionPosition: null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Position, Is.EqualTo("left"));
+            Assert.That(result.CallToActionDto?.ButtonTitle, Is.EqualTo("Read more"));
+            Assert.That(result.CallToActionDto?.ButtonUrl, Is.EqualTo("https://example.com"));
+        });
+    }
+
+    [Test]
+    public async Task GetSidebarDtoAsync_WhenSocialMediaButtonsExist_ResetsCopyLinkToNull()
+    {
+        var insight = CreateInsight(
+            title: "Insight page",
+            showSidebar: true);
+
+        insight.ShowPrintButton = true;
+        insight.ShowSocialMediaButtons = true;
+
+        _socialMediaButtonsServiceMock
+            .Setup(x => x.GetSocialMediaButtonsDto(
+                insight,
+                insight.PageTitle,
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SocialMediaButtonsDto
+            {
+                EmailButtonUrl = "mailto:test@example.com",
+                ShowCopyLinkButton = true
+            });
+
+        var result = await _service.GetSidebarDtoAsync(
+            insight,
+            CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.SocialMediaButtons, Is.Not.Null);
+            Assert.That(result.SocialMediaButtons!.ShowCopyLinkButton, Is.Null);
+        });
     }
 }

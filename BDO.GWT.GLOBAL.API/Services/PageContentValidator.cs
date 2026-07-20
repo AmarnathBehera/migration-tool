@@ -1,4 +1,5 @@
-﻿using BDO.GWT.GLOBAL.API.Constants;
+﻿using BDO.GWT.Common.Core.Exceptions;
+using BDO.GWT.GLOBAL.API.Constants;
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Extensions;
 using CMS.ContentEngine;
@@ -19,6 +20,8 @@ public interface IPageContentValidator
 
 public class PageContentValidator : IPageContentValidator
 {
+    private static readonly string[] OptionsLineSeparators = { "\n", "\r", "\r\n" };
+
     private readonly IMacroResolver _macroResolver;
     private readonly IValidationState _validationState;
 
@@ -59,15 +62,50 @@ public class PageContentValidator : IPageContentValidator
 
             if (controlName is null)
             {
-                throw new Exception($"Field '{field.Name}' control is invalid.");
+                throw new NotFoundException("Field '{field.Name}' control is invalid.");
             }
 
             var (valueProcessed, newValue) = TryToValidateAndNormalizeValueByControlCssClass(field, value);
 
             value = valueProcessed ? newValue : ValidateAndNormalizeValueByDataType(field, controlName, value);
 
-            contentPropertyByName[field.Name].SetValue(content, value);
+            contentProperty.SetValue(content, value);
         }
+    }
+
+    private static bool TryGetContentProperty(
+        ImmutableDictionary<string, PropertyInfo> contentPropertyByName,
+        string contentTypeCodeNameSegment,
+        string kenticoFieldName,
+        out PropertyInfo contentProperty)
+    {
+        foreach (var propertyName in GetContentPropertyNameCandidates(contentTypeCodeNameSegment, kenticoFieldName))
+        {
+            if (contentPropertyByName.TryGetValue(propertyName, out contentProperty!))
+            {
+                return true;
+            }
+        }
+
+        contentProperty = null!;
+        return false;
+    }
+
+    private static IEnumerable<string> GetContentPropertyNameCandidates(string contentTypeCodeNameSegment, string kenticoFieldName)
+    {
+        var candidates = new[]
+        {
+            kenticoFieldName,
+            TrimPrefix(kenticoFieldName, contentTypeCodeNameSegment),
+            TrimSuffix(kenticoFieldName, contentTypeCodeNameSegment),
+            TrimPrefix(kenticoFieldName, "Metadata"),
+            TrimPrefix(TrimPrefix(kenticoFieldName, contentTypeCodeNameSegment), "Metadata"),
+            TrimPrefix(TrimSuffix(kenticoFieldName, contentTypeCodeNameSegment), "Metadata"),
+        };
+
+        return candidates
+            .Where(candidate => !string.IsNullOrWhiteSpace(candidate))
+            .Distinct(StringComparer.OrdinalIgnoreCase);
     }
 
     private static (bool, object?) TryToValidateAndNormalizeValueByControlCssClass(FormFieldInfo field, object? value)
@@ -101,8 +139,25 @@ public class PageContentValidator : IPageContentValidator
             FieldDataType.Integer => ValidateIntegerFieldDataType(field, controlName, value),
             FieldDataType.LongText => ValidateLongTextFieldDataType(field, controlName, value),
             FieldDataType.Text => ValidateTextFieldDataType(field, controlName, value),
+            FieldDataType.ContentItemReference => ValidateContentItemReferenceFieldDataType(field, controlName, value),
             _ => throw new NotImplementedException($"Validation for field data type '{field.DataType}' is not implemented."),
         };
+    }
+
+    private string? ValidateContentItemReferenceFieldDataType(FormFieldInfo field, string controlName, object? value)
+    {
+        if (string.IsNullOrWhiteSpace(controlName))
+        {
+            throw new ArgumentException("Control name must be provided.", nameof(controlName));
+        }
+
+        // Content item reference values are serialized as strings in the page content DTO
+        // (e.g. RelatedDeals, DisplayedContacts, RelevantContactPerson). Validate the
+        // presence rule and pass the value through unchanged.
+        return ValidateAndNormalizeString(
+            field,
+            value as string,
+            DoNothing);
     }
 
     #region Field data type validation methods
@@ -111,13 +166,7 @@ public class PageContentValidator : IPageContentValidator
     {
         return componentIdentifier switch
         {
-            "Kentico.CheckBox" =>
-                ValidateAndNormalizeBool(
-                    field,
-                    value as bool?,
-                    DoNothing),
-
-            "kentico.administration.checkbox" =>
+            "kentico.checkbox" or "kentico.administration.checkbox" =>
                 ValidateAndNormalizeBool(
                     field,
                     value as bool?,
@@ -147,7 +196,7 @@ public class PageContentValidator : IPageContentValidator
     {
         return componentIdentifier switch
         {
-            "Kentico.DateTimeInput" =>
+            "kentico.datetimeinput" or "kentico.administration.dateinput" =>
                 ValidateAndNormalizeDateTime(
                     field,
                     value as DateTime?,
@@ -177,7 +226,7 @@ public class PageContentValidator : IPageContentValidator
     {
         if (string.IsNullOrWhiteSpace(controlName))
         {
-            throw new ArgumentException(nameof(controlName));
+            throw new ArgumentException("Control name must be provided.", nameof(controlName));
         }
 
         return ValidateAndNormalizeGuid(
@@ -214,9 +263,10 @@ public class PageContentValidator : IPageContentValidator
                     value as string,
                     ValidateFieldOption);
 
-            case "Kentico.TextInput":
-            case "Kentico.TextArea":
-            case "Kentico.RichText":
+            case "kentico.textinput":
+            case "kentico.textarea":
+            case "kentico.richtext":
+            case "kentico.administration.richtexteditor":
                 return ValidateAndNormalizeString(
                     field,
                     value as string,
@@ -258,12 +308,19 @@ public class PageContentValidator : IPageContentValidator
                     ValidateFieldOption);
 
             // Text-based components
-            case "Kentico.TextInput":
+            case "kentico.textinput":
             case "kentico.administration.textinput":
-            case "Kentico.TextArea":
-            case "Kentico.EmailInput":
-            case "Kentico.NumericInput":
-            case "Kentico.ObjectSelector":
+            case "kentico.textarea":
+            case "kentico.administration.textarea":
+            case "kentico.emailinput":
+            case "kentico.numericinput":
+            case "kentico.objectselector":
+            // Admin dropdown selector stores a plain string value.
+            case "kentico.administration.dropdownselector":
+            // Custom SQL-driven dropdown stores a plain string value; its
+            // options are resolved via SQL at runtime, so we normalize the
+            // string without validating against static field options.
+            case "bdo.sqldropdown":
                 return ValidateAndNormalizeString(
                     field,
                     value as string,
@@ -514,7 +571,7 @@ public class PageContentValidator : IPageContentValidator
 
         // List of options
         var resolvedOptions = _macroResolver.ResolveMacros(options);
-        var lines = resolvedOptions.Split(new[] { "\n", "\r", "\r\n" }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var lines = resolvedOptions.Split(OptionsLineSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         var validOptions = lines
             .Select(x => x.Split(";", StringSplitOptions.TrimEntries)[0])
             .ToHashSet();

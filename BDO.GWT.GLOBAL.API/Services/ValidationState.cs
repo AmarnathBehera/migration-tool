@@ -19,8 +19,8 @@ public interface IValidationState
 
 public class ValidationState : IValidationState
 {
-    private readonly IDictionary<string, string> _errors = new Dictionary<string, string>();
-    private readonly IDictionary<string, string> _unprocessableEntityErrors = new Dictionary<string, string>();
+    private readonly Dictionary<string, string> _errors = new Dictionary<string, string>();
+    private readonly Dictionary<string, string> _unprocessableEntityErrors = new Dictionary<string, string>();
 
     public void AddError(string key, string value)
     {
