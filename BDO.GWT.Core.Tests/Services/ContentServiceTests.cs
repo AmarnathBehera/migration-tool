@@ -274,7 +274,7 @@ namespace BDO.GWT.Core.Tests.Services
                 channelId: 5);
 
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(2));
+            Assert.That(result, Has.Count.EqualTo(2));
         }
 
         [Test]
