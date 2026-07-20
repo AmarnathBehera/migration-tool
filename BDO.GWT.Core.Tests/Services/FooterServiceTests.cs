@@ -534,9 +534,11 @@ namespace BDO.GWT.Core.Tests.Services
                 .ReturnsAsync((IEnumerable<FooterPages>)null!);
 
             var result = await _service.GetAsyncForAPI(1, "en-GB", CancellationToken.None);
-
-            Assert.That(result?.FooterLinks, Is.Empty);
-            Assert.That(result?.SocialButtons, Is.Empty);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result?.FooterLinks, Is.Empty);
+                Assert.That(result?.SocialButtons, Is.Empty);
+            } );
         }
 
         [Test]

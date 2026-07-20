@@ -46,10 +46,13 @@ namespace BDO.GWT.Core.Tests.Services
             // an ArgumentNullException that is caught internally.
             var result = await _service.GetLocationsAsync(1);
 
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.TypeOf<GlobalLocationCustomTableDto>());
-            Assert.That(result.ItemId, Is.EqualTo(0));
-            Assert.That(result.GlobalLocationTitle, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result, Is.TypeOf<GlobalLocationCustomTableDto>());
+                Assert.That(result!.ItemId, Is.EqualTo(0));
+                Assert.That(result.GlobalLocationTitle, Is.Null);
+            });
         }
 
         [Test]
