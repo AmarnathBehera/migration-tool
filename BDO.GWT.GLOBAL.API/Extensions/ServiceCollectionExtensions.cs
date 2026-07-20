@@ -47,5 +47,6 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
         serviceCollection.AddScoped<IMappingHelper, MappingHelper>();
         serviceCollection.AddScoped<IDealCrudService, DealCrudService>();
+        serviceCollection.AddScoped<IPersonCrudService, PersonCrudService>();
     }
 }
