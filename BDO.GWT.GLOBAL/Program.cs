@@ -10,6 +10,7 @@ using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience.Core.Services;
 using BDO.GWT.Xperience.LiveSite.Services;
+using CMS.EmailEngine;
 using Kentico.Activities.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
 using Kentico.Membership;
@@ -29,13 +30,13 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.WebEncoders;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using SendGrid;
 using System;
 using System.Linq;
+using System.Net.Mime;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using XperienceCommunity.MultiChoiceFormControl.Admin.Helpers.Components.MultiChoice;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddKentico(features =>
@@ -126,21 +127,26 @@ if (builder.Environment.IsDevelopment())
         options.AuthenticationOptions.Mode = AdminAuthenticationMode.MaintainForms;
     });
 }
-
-// Add Application Insights telemetry
+// Configures email sending using an SMTP server for system emails
 builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
-// Loads the administration redirect domain (AdminRedirectOptions) from a configuration file section
+if (!builder.Environment.IsDevelopment())
+{
+    builder.Services.AddXperienceSendGrid(options =>
+    {
+        options.ApiKey = builder.Configuration["SendGrid:ApiKey"];
+    });
+}
+else
+{
+    builder.Services.AddXperienceSystemSmtp(options =>
+    {
+        options.Server = new SmtpServer { Host = "smtp.server1.com", Port = 587 };
+        options.Encoding = Encoding.UTF8;
+        options.TransferEncoding = TransferEncoding.QuotedPrintable;
+    });
+}
 builder.Services.Configure<AdminRedirectOptions>(builder.Configuration.GetSection("AdminRedirectOptions"));
-
-// Configures email sending via SendGrid for system emails
-builder.Services.AddXperienceSystemSendGrid();
-// Configures email sending via SendGrid for the fallback situation
-builder.Services.AddXperienceSendGrid();
-
-// Loads the SendGrid API keys from configuration file sections
-builder.Services.ConfigureSystemSendGridClientOptions(builder.Configuration.GetSection("SystemSendGridClientOptions"));
-builder.Services.Configure<SendGridClientOptions>(builder.Configuration.GetSection("FallbackSendGridClientOptions"));
 
 var app = builder.Build();
 
@@ -184,7 +190,6 @@ if (!builder.Environment.IsDevelopment() && builder.Configuration.GetSection("Ad
 app.UseKentico();
 
 app.Kentico().MapRoutes();
-
 app.MapControllerRoute(
     name: "default",
     pattern: $"{{{WebPageRoutingOptions.LANGUAGE_ROUTE_VALUE_KEY}}}/{{controller}}/{{action}}",
