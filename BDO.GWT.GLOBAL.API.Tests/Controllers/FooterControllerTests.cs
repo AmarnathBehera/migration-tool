@@ -71,15 +71,16 @@ public class FooterControllerUnitTests
         // Act
         var result = await _controller.Get(CancellationToken.None);
 
-        using (Assert.EnterMultipleScope())
+        // Assert
+        Assert.Multiple(() =>
         {
-            // Assert
+
             Assert.That(
-                _controller.HttpContext.Response.StatusCode,
-                Is.EqualTo(StatusCodes.Status400BadRequest));
+            _controller.HttpContext.Response.StatusCode,
+            Is.EqualTo(StatusCodes.Status400BadRequest));
 
             Assert.That(result.Value, Is.Not.Null);
-        }
+        });
 
         _mockFooterService.Verify(
             x => x.GetAsyncForAPI(
@@ -103,15 +104,15 @@ public class FooterControllerUnitTests
         // Act
         var result = await _controller.Get(CancellationToken.None);
 
-        using (Assert.EnterMultipleScope())
+        // Assert
+        Assert.Multiple(() =>
         {
-            // Assert
             Assert.That(
-                _controller.HttpContext.Response.StatusCode,
-                Is.EqualTo(StatusCodes.Status400BadRequest));
+            _controller.HttpContext.Response.StatusCode,
+            Is.EqualTo(StatusCodes.Status400BadRequest));
 
             Assert.That(result.Value, Is.Not.Null);
-        }
+        });
 
         _mockFooterService.Verify(
             x => x.GetAsyncForAPI(
