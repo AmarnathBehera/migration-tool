@@ -55,7 +55,7 @@ public class InsightAnimationCardWidget: ViewComponent
 
         if (data.InsightCards.Any())
         {
-            insightanimationpages = await _contentRetriever.RetrievePagesByGuids<InsightAnimationPage>(data.InsightCards,cancellationToken);
+            insightanimationpages = await _contentRetriever.RetrieveContentByGuids<InsightAnimationPage>(data.InsightCards,cancellationToken);
         }
 
         var dto = new InsightAnimationCardDto

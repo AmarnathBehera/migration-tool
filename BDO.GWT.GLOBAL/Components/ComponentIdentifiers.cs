@@ -53,7 +53,7 @@
 
             public const string InFocus = WidgetPrefix + "InFocus";
 
-            public const string InsightAnimationCard = WidgetPrefix + "InsightAnimationCard";
+            public const string InsightAnimationCard = WidgetPrefix + "AnimatedTileCarouselWidget";
 
         }
 

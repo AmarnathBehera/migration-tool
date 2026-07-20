@@ -21,6 +21,7 @@ using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ButtonWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.EditorsPickWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.EventsWebinarsSliderWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ExternalNavigationWidget;
+using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.InsightAnimationCardWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ViewGlobalLocations;
 using BDO.GWT.Xperience.LiveSite.Components.Section;
@@ -50,6 +51,7 @@ using Kentico.PageBuilder.Web.Mvc;
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.EditorsPick,typeof(EditorsPickWidget),"Editors pick widget",typeof(EditorsPickWidgetProperties),AllowCache = true,IconClass = "icon-carousel")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.RelatedContacts, typeof(RelatedContactsWidget), "Related Contacts", typeof(RelatedContactsWidgetProperties), AllowCache = true, IconClass = "icon-app-contact-groups")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.InFocus,typeof(InFocusWidget),"In Focus",typeof(InFocusWidgetProperties),AllowCache = true,IconClass = "icon-tab-vertical")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.InsightAnimationCard,typeof(InsightAnimationCardWidget),"Insight Animation Card Widget",typeof(InsightAnimationCardWidgetProperties),AllowCache = true, IconClass = "icon-carousel")]
 
 // Sections
 [assembly: RegisterSection(identifier: ComponentIdentifiers.Sections.Container,name: "Container",propertiesType: typeof(BaseSectionProperties),customViewName: "~/Components/Section/SectionView/_ContainerSection.cshtml")]
