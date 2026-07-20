@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Moq;
+using System.Reflection;
 
 namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 {
@@ -37,10 +38,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             _contentServiceMock = new Mock<IContentService>();
             _contentRetrieverMock = new Mock<IContentRetriever>();
 
-            _widget = new EventsWebinarsSliderWidget(
-                _serviceMock.Object,
-                _contentRetrieverMock.Object,
-                _contentServiceMock.Object);
+            _widget = CreateWidget();
 
             _httpContext = new DefaultHttpContext();
             _httpContext.RequestAborted = CancellationToken.None;
@@ -55,6 +53,42 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
                         new ModelStateDictionary())
                 }
             };
+        }
+
+        private EventsWebinarsSliderWidget CreateWidget()
+        {
+            var ctor = typeof(EventsWebinarsSliderWidget)
+                .GetConstructors(BindingFlags.Public | BindingFlags.Instance)
+                .OrderByDescending(c => c.GetParameters().Length)
+                .First();
+
+            var args = ctor.GetParameters()
+                .Select(p => ResolveConstructorArgument(p.ParameterType))
+                .ToArray();
+
+            return (EventsWebinarsSliderWidget)Activator.CreateInstance(typeof(EventsWebinarsSliderWidget), args)!;
+        }
+
+        private object ResolveConstructorArgument(Type parameterType)
+        {
+            if (parameterType == typeof(IEventsWebinarsSliderService))
+            {
+                return _serviceMock.Object;
+            }
+
+            if (parameterType == typeof(IContentRetriever))
+            {
+                return _contentRetrieverMock.Object;
+            }
+
+            if (parameterType == typeof(IContentService))
+            {
+                return _contentServiceMock.Object;
+            }
+
+            var mockType = typeof(Mock<>).MakeGenericType(parameterType);
+            var mock = Activator.CreateInstance(mockType)!;
+            return mockType.GetProperty("Object")!.GetValue(mock)!;
         }
 
         private static ComponentViewModel<EventsWebinarsSliderWidgetProperties> CreateModel(
