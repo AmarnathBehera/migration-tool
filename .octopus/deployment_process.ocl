@@ -255,6 +255,80 @@ step "deploy-react-app-service" {
     }
 }
 
+step "deploy-api-app-service" {
+    name = "Deploy API App Service"
+    properties = {
+        Octopus.Action.TargetRoles = "xbyk-api-webapp"
+    }
+    start_trigger = "StartWithPrevious"
+
+    action {
+        action_type = "Octopus.AzureAppService"
+        properties = {
+            Octopus.Action.Azure.AppSettings = <<-EOT
+                [
+                  {
+                    "name": "ASPNETCORE_ENVIRONMENT",
+                    "value": "#{appsettings.aspNetCoreEnvironment}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureAd__Instance",
+                    "value": "#{appsettings.azureAdInstance}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureAd__TenantId",
+                    "value": "#{appsettings.azureAdTenantId}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureAd__ClientId",
+                    "value": "#{appsettings.azureAdClientId}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureAd__ClientSecret",
+                    "value": "#{appsettings.azureAdClientSecret}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                    "value": "#{appsettings.appInsightsAPIConnectionString}",
+                    "slotSetting": false
+                  }
+                ]
+                EOT
+            Octopus.Action.Azure.ConnectionStrings = <<-EOT
+                [
+                   {
+                      "name": "CMSConnectionString",
+                      "value": "#{appsettings.CMSConnectionString}",
+                      "type": "SQLAzure",
+                      "slotSetting": false
+                   }
+                ]
+                EOT
+            Octopus.Action.Azure.DeploymentType = "Package"
+            Octopus.Action.EnabledFeatures = "Octopus.Features.ConfigurationVariables,Octopus.Features.JsonConfigurationVariables,Octopus.Features.ConfigurationTransforms,Octopus.Features.SubstituteInFiles"
+            Octopus.Action.Package.DownloadOnTentacle = "False"
+            Octopus.Action.Package.FeedId = "octopus-server-built-in"
+            Octopus.Action.Package.PackageId = "GWT.XbyK.API.Deploy"
+            OctopusUseBundledTooling = "False"
+        }
+        worker_pool_variable = "deploy.octopus.workerPool"
+
+        packages {
+            acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = "GWT.XbyK.API.Deploy"
+            properties = {
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
 step "restore-kentico-ci-database" {
     name = "Restore Kentico CI Database"
 

@@ -1,10 +1,12 @@
-﻿using BDO.GWT.Core.Data;
+﻿using BDO.GWT.Core;
+using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Services;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,16 +16,16 @@ namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.EventsWebinarsSlide
 public class EventsWebinarsSliderWidget : ViewComponent
 {
     private readonly IEventsWebinarsSliderService _eventsWebinarsSliderService;
-    private readonly IPageContext _pageContext;
     private readonly IContentRetriever _contentRetriever;
+    private readonly IContentService _contentService;
 
     public EventsWebinarsSliderWidget(
         IEventsWebinarsSliderService eventsWebinarsSliderService,
-        IPageContext pageContext, IContentRetriever contentRetriever)
+        IContentRetriever contentRetriever, IContentService contentService)
     {
         _eventsWebinarsSliderService = eventsWebinarsSliderService;
-        _pageContext = pageContext;
         _contentRetriever = contentRetriever;
+        _contentService= contentService;
     }
 
     public async Task<IViewComponentResult> InvokeAsync(
@@ -31,13 +33,7 @@ public class EventsWebinarsSliderWidget : ViewComponent
     {
         var cancellationToken = HttpContext.RequestAborted;
 
-        var currentPage = await _pageContext.GetCurrentPageAsync<IWebPageFieldsSource>(cancellationToken);
-
-        if (currentPage is null)
-        {
-            return View(
-                "~/Components/Widget/EventsWebinarsSliderWidget/_EventsWebinarsSliderWidget.cshtml");
-        }
+       
         var backgroundimageurl = model.Properties.BackgroundImages?.Any() == true
          ? await _contentRetriever.RetrieveContentByGuids<ContentAttachment>(
              model.Properties.BackgroundImages.Select(i => i.Identifier).ToList(),
@@ -61,6 +57,13 @@ public class EventsWebinarsSliderWidget : ViewComponent
             BackgroundImages = backgroundimageurl.FirstOrDefault()?.ContentAttachmentAsset?.Url,
             WidgetID = model.Properties.WidgetID,
         };
+        var page = model.Page?.WebPageItemGUID;
+
+        if (page is null)
+        {
+            return View("~/Components/Widget/EventsWebinarsSliderWidget/_EventsWebinarsSliderWidget.cshtml", new EventsWebinarsSliderDto { FilteringTooltipEnabled = false });
+        }
+        var currentPage = (await _contentService.GetItemsByGUIDAsync(new List<Guid> { page.Value })).FirstOrDefault();
 
         var dto = await _eventsWebinarsSliderService.GetEventsWebinarsSliderAsync(
             currentPage, data, cancellationToken);
