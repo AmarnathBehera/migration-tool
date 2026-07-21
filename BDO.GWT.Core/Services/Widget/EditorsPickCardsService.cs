@@ -1,5 +1,6 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.Core.Constants;
+using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
@@ -94,7 +95,7 @@ public class EditorsPickCardService : IEditorsPickCardService
                 new RetrieveContentOfContentTypesParameters() { LinkedItemsMaxLevel = 2 },
                 cancellationToken);
 
-        var filtered = ApplyFilters(pages, cardsQuery.Filters)
+        var filtered = (await ApplyFiltersAsync(pages, cardsQuery.Filters, cancellationToken))
             .OrderByDescending(isFeatured)
             .ThenByDescending(GetPublishDateUtc)
             .ToArray();
@@ -113,16 +114,48 @@ public class EditorsPickCardService : IEditorsPickCardService
         };
     }
 
-    private static IEnumerable<IWebPageFieldsSource> ApplyFilters(
+    private async Task<IEnumerable<IWebPageFieldsSource>> ApplyFiltersAsync(
         IEnumerable<IWebPageFieldsSource> pages,
-        IDictionary<string, string> filters)
+        IDictionary<string, string> filters,
+        CancellationToken cancellationToken)
     {
         if (filters.Count == 0)
         {
             return pages;
         }
 
+        var resolvedFilters = await ResolveFilterGuidsAsync(filters, cancellationToken);
+
         IEnumerable<IWebPageFieldsSource> filtered = pages;
+
+        foreach (var (filterName, filterGuid) in resolvedFilters)
+        {
+            filtered = filterName switch
+            {
+                FilterParameterName.ContentType => filtered.Where(page =>
+                    HasLinkedItemWithGuid(page, filterGuid, "ContentType")),
+
+                FilterParameterName.BusinessLine => filtered.Where(page =>
+                    HasLinkedItemWithGuid(page, filterGuid, "MetadataBusinessLines", "MetadataBusinessLine")),
+
+                FilterParameterName.ServiceArea => filtered.Where(page =>
+                    HasLinkedItemWithGuid(page, filterGuid, "MetadataServiceAreas")),
+
+                FilterParameterName.IndustryCategory => filtered.Where(page =>
+                    HasLinkedItemWithGuid(page, filterGuid, "MetadataIndustryCategories")),
+
+                _ => filtered
+            };
+        }
+
+        return filtered;
+    }
+
+    private async Task<List<(string FilterName, Guid FilterGuid)>> ResolveFilterGuidsAsync(
+        IDictionary<string, string> filters,
+        CancellationToken cancellationToken)
+    {
+        var resolvedFilters = new List<(string FilterName, Guid FilterGuid)>();
 
         foreach (var (filterName, filterValue) in filters)
         {
@@ -131,26 +164,59 @@ public class EditorsPickCardService : IEditorsPickCardService
                 continue;
             }
 
-            filtered = filterName switch
+            var filterParameterData = FilterUtility.GetFilterParameterData(filterName);
+
+            if (filterParameterData is null)
             {
-                FilterParameterName.ContentType => filtered.Where(page =>
-                    string.Equals(GetPageTypeName(page), filterValue, StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(GetSingleOrLinkedName(page, "ContentType"), filterValue, StringComparison.OrdinalIgnoreCase)),
+                continue;
+            }
 
-                FilterParameterName.BusinessLine => filtered.Where(page =>
-                    HasLinkedValue(page, filterValue, "MetadataBusinessLines", "MetadataBusinessLine")),
+            var page = await _contentService.GetPageByTypeAndNameAsync(
+                filterParameterData.EntityType, filterValue);
 
-                FilterParameterName.ServiceArea => filtered.Where(page =>
-                    HasLinkedValue(page, filterValue, "MetadataServiceAreas")),
-
-                FilterParameterName.IndustryCategory => filtered.Where(page =>
-                    HasLinkedValue(page, filterValue, "MetadataIndustryCategories")),
-
-                _ => filtered
-            };
+            if (page is not null)
+            {
+                resolvedFilters.Add((filterName, page.SystemFields.ContentItemGUID));
+            }
         }
 
-        return filtered;
+        return resolvedFilters;
+    }
+
+    private static bool HasLinkedItemWithGuid(IWebPageFieldsSource page, Guid guid, params string[] propertyNames)
+    {
+        foreach (var propertyName in propertyNames)
+        {
+            var property = page.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+            if (property?.GetValue(page) is not System.Collections.IEnumerable items)
+            {
+                continue;
+            }
+
+            foreach (var item in items)
+            {
+                if (item is null)
+                {
+                    continue;
+                }
+
+                if (item is IWebPageFieldsSource webPageItem &&
+                    webPageItem.SystemFields.ContentItemGUID == guid)
+                {
+                    return true;
+                }
+
+                var systemFieldsProp = item.GetType().GetProperty("SystemFields", BindingFlags.Public | BindingFlags.Instance);
+                var systemFields = systemFieldsProp?.GetValue(item);
+                var guidProp = systemFields?.GetType().GetProperty("ContentItemGUID", BindingFlags.Public | BindingFlags.Instance);
+                if (guidProp?.GetValue(systemFields) is Guid itemGuid && itemGuid == guid)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private async Task<EditorsPickCardDto[]> MapCardsAsync(
@@ -207,20 +273,6 @@ public class EditorsPickCardService : IEditorsPickCardService
         {
             return null;
         }
-    }
-
-    private static bool HasLinkedValue(IWebPageFieldsSource page, string value, params string[] propertyNames)
-    {
-        foreach (var propertyName in propertyNames)
-        {
-            var names = GetLinkedNames(page, propertyName);
-            if (names.Any(x => string.Equals(x, value, StringComparison.OrdinalIgnoreCase)))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private static IEnumerable<string> GetLinkedNames(object source, string propertyName)
