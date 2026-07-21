@@ -14,6 +14,9 @@ namespace BDO.GWT.GLOBAL.API.Helpers
         Task<List<ContentItemReference>> BuildContentAttachmentPersonPageReferences(string? pagePath, string? channelName, string? culture, CancellationToken cancellationToken);
         Task<List<ContentItemReference>> BuildReferencesAsync<T>(
            IEnumerable<string>? identifiers,Func<T, string> nameSelector,
+           CancellationToken cancellationToken) where T : class, IWebPageFieldsSource; 
+        Task<List<ContentItemReference>> BuildReferencesPageAsync<T>(
+           IEnumerable<string>? identifiers, Func<T, string> nameSelector,
            CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
     }
     public class MappingHelper : IMappingHelper
@@ -177,6 +180,31 @@ namespace BDO.GWT.GLOBAL.API.Helpers
 
             var items = await _contentRetriever.GetItemsAsync<T>(
                 builder => builder.Parameters(p => p.Where(w => w.WhereIn("Name", names))),
+                cancellationToken);
+
+            return items
+                .Where(item => names.Contains(nameSelector(item), StringComparer.OrdinalIgnoreCase))
+                .Select(item => new ContentItemReference { Identifier = item.SystemFields.ContentItemGUID })
+                .ToList();
+        }
+        public async Task<List<ContentItemReference>> BuildReferencesPageAsync<T>(
+          IEnumerable<string>? identifiers,
+          Func<T, string> nameSelector,
+          CancellationToken cancellationToken)
+          where T : class, IWebPageFieldsSource
+        {
+            var names = identifiers?
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Select(name => name.Trim())
+                .ToList() ?? new List<string>();
+
+            if (names.Count == 0)
+            {
+                return new List<ContentItemReference>();
+            }
+
+            var items = await _contentRetriever.GetItemsAsync<T>(
+                builder => builder.Parameters(p => p.Where(w => w.WhereIn("MetadataTitle", names))),
                 cancellationToken);
 
             return items

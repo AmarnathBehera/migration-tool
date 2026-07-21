@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BDO.GWT.GLOBAL.API.Data;
 
-public class PersonContent : IMetadataContent
+public class PersonPageContent : IMetadataContent
 {
     [Required]
     [MaxLength(200)]
@@ -54,52 +54,52 @@ public class PersonContent : IMetadataContent
     public bool EnableVCard { get; set; }
 
     [MaxLength(200)]
-    public List<Guid> PersonCredentials { get; set; } = [];
+    public List<String> PersonCredentials { get; set; } = [];
 
     [MaxLength(200)]
-    public List<Guid> MetadataCity { get; set; } = [];
+    public List<String> MetadataCity { get; set; } = [];
 
     [MaxLength(200)]
-    public List<Guid> MetadataOfficeLocation { get; set; } = [];
+    public List<String> MetadataOfficeLocation { get; set; } = [];
 
     [MaxLength(4000)]
-    public List<Guid> MetadataProfileGroups { get; set; } = [];
+    public List<String> MetadataProfileGroups { get; set; } = [];
 
     [MaxLength(4000)]
-    public List<Guid> MetadataBusinessLines { get; set; } = [];
+    public List<String> MetadataBusinessLines { get; set; } = [];
 
     [MaxLength(200)]
-    public List<Guid> MetadataServiceAreas { get; set; } = [];
+    public List<String> MetadataServiceAreas { get; set; } = [];
 
     [MaxLength(200)]
-    public List<Guid> MetadataServices { get; set; } = [];
+    public List<String> MetadataServices { get; set; } = [];
 
     [MaxLength(200)]
-    public List<Guid> MetadataSubServices { get; set; } = [];
+    public List<String> MetadataSubServices { get; set; } = [];
 
     [MaxLength(200)]
-    public List<Guid> MetadataIndustryCategories { get; set; } = [];
+    public List<String> MetadataIndustryCategories { get; set; } = [];
 
     [MaxLength(200)]
-    public List<Guid> MetadataIndustries { get; set; } = [];
+    public List<String> MetadataIndustries { get; set; } = [];
 
     [MaxLength(200)]
-    public List<Guid> MetadataIndustryServices { get; set; } = [];
+    public List<String> MetadataIndustryServices { get; set; } = [];
 
     [MaxLength(200)]
-    public List<Guid> MetadataSpecialtiesCategories { get; set; } = [];
+    public List<String> MetadataSpecialtiesCategories { get; set; } = [];
 
     [MaxLength(200)]
-    public List<Guid> MetadataSpecialtiesAreas { get; set; } = [];
+    public List<String> MetadataSpecialtiesAreas { get; set; } = [];
 
     [MaxLength(200)]
-    public List<Guid> MetadataSpecialtiesPages { get; set; } = [];
+    public List<String> MetadataSpecialtiesPages { get; set; } = [];
 
     [MaxLength(200)]
-    public List<Guid> MicrositeMasterPages { get; set; } = [];
+    public List<String> MicrositeMasterPages { get; set; } = [];
 
     [MaxLength(200)]
-    public List<Guid> MicrositePages { get; set; } = [];
+    public List<String> MicrositePages { get; set; } = [];
 
     [MaxLength(200)]
     public string? Facebook { get; set; }

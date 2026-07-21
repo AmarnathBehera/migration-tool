@@ -17,11 +17,11 @@ namespace BDO.GWT.GLOBAL.API.Services;
 
 public interface IPersonCrudService
 {
-    Task<ActionResult<IEnumerable<PageOutput<PersonContent>>>> GetPersonPagesAsync(int channelId, string? culture, bool? onlyPublished, CancellationToken cancellationToken);
-    Task<ActionResult<PageOutput<PersonContent>>> GetPersonPageAsync(int channelId, Guid pageGUID, string? culture, CancellationToken cancellationToken);
-    Task<ActionResult<PageOutput<PersonContent>>> CreatePageAsync(int channelId, int nodeParentID, string? culture, PersonContent request, CancellationToken cancellationToken);
-    Task<ActionResult<PageOutput<PersonContent>>> CreatePageCultureVersionAsync(int channelId, Guid pageGUID, string? fromCulture, string? toCulture, PersonContent request, CancellationToken cancellationToken);
-    Task<ActionResult<PageOutput<PersonContent>>> UpdatePageAsync(int channelId, Guid pageGUID, string? culture, PersonContent request, CancellationToken cancellationToken);
+    Task<ActionResult<IEnumerable<PageOutput<PersonPageContent>>>> GetPersonPagesAsync(int channelId, string? culture, bool? onlyPublished, CancellationToken cancellationToken);
+    Task<ActionResult<PageOutput<PersonPageContent>>> GetPersonPageAsync(int channelId, Guid pageGUID, string? culture, CancellationToken cancellationToken);
+    Task<ActionResult<PageOutput<PersonPageContent>>> CreatePageAsync(int channelId, int nodeParentID, string? culture, PersonPageContent request, CancellationToken cancellationToken);
+    Task<ActionResult<PageOutput<PersonPageContent>>> CreatePageCultureVersionAsync(int channelId, Guid pageGUID, string? fromCulture, string? toCulture, PersonPageContent request, CancellationToken cancellationToken);
+    Task<ActionResult<PageOutput<PersonPageContent>>> UpdatePageAsync(int channelId, Guid pageGUID, string? culture, PersonPageContent request, CancellationToken cancellationToken);
     Task DeletePageAsync(int channelId, Guid pageGUID, string? culture, bool deleteAllCultures, CancellationToken cancellationToken);
 }
 
@@ -67,7 +67,7 @@ public class PersonCrudService : IPersonCrudService
         _mappingHelper = mappingHelper;
     }
 
-    public async Task<ActionResult<IEnumerable<PageOutput<PersonContent>>>> GetPersonPagesAsync(int channelId, string? culture, bool? onlyPublished, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<PageOutput<PersonPageContent>>>> GetPersonPagesAsync(int channelId, string? culture, bool? onlyPublished, CancellationToken cancellationToken)
     {
         try
         {
@@ -116,7 +116,7 @@ public class PersonCrudService : IPersonCrudService
         }
     }
 
-    public async Task<ActionResult<PageOutput<PersonContent>>> GetPersonPageAsync(int channelId, Guid pageGUID, string? culture, CancellationToken cancellationToken)
+    public async Task<ActionResult<PageOutput<PersonPageContent>>> GetPersonPageAsync(int channelId, Guid pageGUID, string? culture, CancellationToken cancellationToken)
     {
         try
         {
@@ -169,7 +169,7 @@ public class PersonCrudService : IPersonCrudService
         }
     }
 
-    public async Task<ActionResult<PageOutput<PersonContent>>> CreatePageAsync(int channelId, int nodeParentID, string? culture, PersonContent request, CancellationToken cancellationToken)
+    public async Task<ActionResult<PageOutput<PersonPageContent>>> CreatePageAsync(int channelId, int nodeParentID, string? culture, PersonPageContent request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -208,7 +208,7 @@ public class PersonCrudService : IPersonCrudService
                 throw new UnprocessableEntityException();
             }
 
-            _pageContentValidator.ValidateAndNormalizePageContent(request, "Person");
+            _pageContentValidator.ValidateAndNormalizePageContent(request);
 
             _validationState.ThrowIfThereAreErrors();
 
@@ -270,7 +270,7 @@ public class PersonCrudService : IPersonCrudService
         }
     }
 
-    public async Task<ActionResult<PageOutput<PersonContent>>> CreatePageCultureVersionAsync(int channelId, Guid pageGUID, string? fromCulture, string? toCulture, PersonContent request, CancellationToken cancellationToken)
+    public async Task<ActionResult<PageOutput<PersonPageContent>>> CreatePageCultureVersionAsync(int channelId, Guid pageGUID, string? fromCulture, string? toCulture, PersonPageContent request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -299,7 +299,7 @@ public class PersonCrudService : IPersonCrudService
                 throw new NotFoundException("Channel not found");
             }
 
-            _pageContentValidator.ValidateAndNormalizePageContent(request, "Person");
+            _pageContentValidator.ValidateAndNormalizePageContent(request);
 
             _validationState.ThrowIfThereAreErrors();
 
@@ -381,7 +381,7 @@ public class PersonCrudService : IPersonCrudService
         }
     }
 
-    public async Task<ActionResult<PageOutput<PersonContent>>> UpdatePageAsync(int channelId, Guid pageGUID, string? culture, PersonContent request, CancellationToken cancellationToken)
+    public async Task<ActionResult<PageOutput<PersonPageContent>>> UpdatePageAsync(int channelId, Guid pageGUID, string? culture, PersonPageContent request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -403,7 +403,7 @@ public class PersonCrudService : IPersonCrudService
                 throw new NotFoundException("Channel not found");
             }
 
-            _pageContentValidator.ValidateAndNormalizePageContent(request, "Person");
+            _pageContentValidator.ValidateAndNormalizePageContent(request);
 
             _validationState.ThrowIfThereAreErrors();
 
@@ -494,7 +494,7 @@ public class PersonCrudService : IPersonCrudService
                 {
                     LinkedItemsMaxLevel = 1,
                     ChannelName = channel.ChannelName,
-                    LanguageName = currentCulture.Locale,
+                    LanguageName = cult.ToString(),
                     IsForPreview = false
                 };
 
@@ -546,23 +546,24 @@ public class PersonCrudService : IPersonCrudService
         }
     }
 
-    private async Task<ContentItemData> CreatePersonItemData(PersonContent content, int? webPageParentID, string? culture, CancellationToken cancellationToken)
+    private async Task<ContentItemData> CreatePersonItemData(PersonPageContent content, int? webPageParentID, string? culture, CancellationToken cancellationToken)
     {
-        //var PersonCredentials = await _mappingHelper.BuildReferencesAsync<Credentials>(Person.PersonCredentials, i => i.Name, cancellationToken);
-        //var MetadataCity = await _mappingHelper.BuildReferencesAsync<LocationCity>(Person.MetadataCity, s => s.Name, cancellationToken);
-        //var MetadataOfficeLocation = await _mappingHelper.BuildReferencesAsync<LocationOffice>(Person.MetadataOfficeLocation, d => d.Name, cancellationToken);
-        //var MetadataProfileGroups = await _mappingHelper.BuildReferencesAsync<ProfileGroups>(Person.MetadataProfileGroups, r => r.Name, cancellationToken);
-        //var MetadataBusinessLines = await _mappingHelper.BuildReferencesAsync<BusinessLine>(Person.MetadataBusinessLines, i => i.Name, cancellationToken);
-        //var MetadataServiceAreasPerson = await _mappingHelper.BuildReferencesAsync<LocationCity>(Person., s => s.Name, cancellationToken);
-        //var MetadataServicesPerson = await _mappingHelper.BuildReferencesAsync<DealCardDealType>(Person.MetadataOfficeLocation, d => d.Name, cancellationToken);
-        //var MetadataSubServices = await _mappingHelper.BuildReferencesAsync<DealCardRange>(Person.MetadataProfileGroups, r => r.Name, cancellationToken);
-        //var MetadataIndustryCategoriesPerson = await _mappingHelper.BuildReferencesAsync<DealCardIndustry>(Person.PersonCredentials, i => i.Name, cancellationToken);
-        //var MetadataIndustriesPerson = await _mappingHelper.BuildReferencesAsync<DealCardSubIndustry>(Person.MetadataCity, s => s.Name, cancellationToken);
-        //var MetadataIndustryServices = await _mappingHelper.BuildReferencesAsync<DealCardDealType>(Person.MetadataOfficeLocation, d => d.Name, cancellationToken);
-        //var MetadataSpecialtiesCategories = await _mappingHelper.BuildReferencesAsync<DealCardSubIndustry>(Person.MetadataCity, s => s.Name, cancellationToken);
-        //var MetadataSpecialtiesAreas = await _mappingHelper.BuildReferencesAsync<DealCardDealType>(Person.MetadataOfficeLocation, d => d.Name, cancellationToken);
-        //var MicrositeMasterPagesPerson = await _mappingHelper.BuildReferencesAsync<DealCardRange>(Person.MetadataProfileGroups, r => r.Name, cancellationToken);
-        //var MicrositePagesPerson = await _mappingHelper.BuildReferencesAsync<DealCardRange>(Person.MetadataProfileGroups, r => r.Name, cancellationToken);
+        var PersonCredentials = await _mappingHelper.BuildReferencesAsync<Credentials>(content.PersonCredentials, i => i.Name, cancellationToken);
+        var MetadataCity = await _mappingHelper.BuildReferencesPageAsync<LocationCity>(content.MetadataCity, s => s.MetadataTitle, cancellationToken);
+        var MetadataOfficeLocation = await _mappingHelper.BuildReferencesPageAsync<LocationOffice>(content.MetadataOfficeLocation, d => d.MetadataTitle, cancellationToken);
+        var MetadataProfileGroups = await _mappingHelper.BuildReferencesAsync<ProfileGroups>(content.MetadataProfileGroups, r => r.Name, cancellationToken);
+        var MetadataBusinessLines = await _mappingHelper.BuildReferencesPageAsync<BusinessLine>(content.MetadataBusinessLines, i => i.MetadataTitle, cancellationToken);
+        var MetadataServiceAreasPerson = await _mappingHelper.BuildReferencesPageAsync<ServiceArea>(content.MetadataServiceAreas, s => s.MetadataTitle, cancellationToken);
+        var MetadataServicesPerson = await _mappingHelper.BuildReferencesPageAsync<Service>(content.MetadataServices, d => d.MetadataTitle, cancellationToken);
+        var MetadataSubServices = await _mappingHelper.BuildReferencesPageAsync<Sub_Service>(content.MetadataSubServices, r => r.MetadataTitle, cancellationToken);
+        var MetadataIndustryCategoriesPerson = await _mappingHelper.BuildReferencesPageAsync<IndustryCategory>(content.MetadataIndustryCategories, i => i.MetadataTitle, cancellationToken);
+        var MetadataIndustriesPerson = await _mappingHelper.BuildReferencesPageAsync<Industry>(content.MetadataIndustries, s => s.MetadataTitle, cancellationToken);
+        var MetadataIndustryServices = await _mappingHelper.BuildReferencesPageAsync<IndustryService>(content.MetadataIndustryServices, d => d.MetadataTitle, cancellationToken);
+        var MetadataSpecialtiesCategories = await _mappingHelper.BuildReferencesPageAsync<SpecialtiesCategory>(content.MetadataSpecialtiesCategories, s => s.MetadataTitle, cancellationToken);
+        var MetadataSpecialtiesAreas = await _mappingHelper.BuildReferencesPageAsync<SpecialtiesArea>(content.MetadataSpecialtiesAreas, d => d.MetadataTitle, cancellationToken);
+        var MetadataSpecialtiesPages = await _mappingHelper.BuildReferencesPageAsync<SpecialtiesPage>(content.MetadataSpecialtiesPages, r => r.MetadataTitle, cancellationToken);
+        var MicrositeMasterPagesPerson = await _mappingHelper.BuildReferencesPageAsync<MicrositeMasterPage>(content.MicrositeMasterPages, r => r.MetadataTitle, cancellationToken);
+        var MicrositePagesPerson = await _mappingHelper.BuildReferencesPageAsync<MicrositePage>(content.MicrositePages, r => r.MetadataTitle, cancellationToken);
 
 
         var teaserImageReferences = await _mappingHelper.BuildContentAttachmentImageReferences(content.MetadataTeaserImage, cancellationToken);
@@ -587,22 +588,22 @@ public class PersonCrudService : IPersonCrudService
             { nameof(Person.EnableForm), content.EnableForm },
             { nameof(Person.EnableVCard), content.EnableVCard },
 
-            { nameof(Person.PersonCredentials), ToReferences(content.PersonCredentials) },
-            { nameof(Person.MetadataCity), ToReferences(content.MetadataCity) },
-            { nameof(Person.MetadataOfficeLocation), ToReferences(content.MetadataOfficeLocation) },
-            { nameof(Person.MetadataProfileGroups), ToReferences(content.MetadataProfileGroups) },
-            { nameof(Person.MetadataBusinessLines), ToReferences(content.MetadataBusinessLines) },
-            { nameof(Person.MetadataServiceAreasPerson), ToReferences(content.MetadataServiceAreas) },
-            { nameof(Person.MetadataServicesPerson), ToReferences(content.MetadataServices) },
-            { nameof(Person.MetadataSubServices), ToReferences(content.MetadataSubServices) },
-            { nameof(Person.MetadataIndustryCategoriesPerson), ToReferences(content.MetadataIndustryCategories) },
-            { nameof(Person.MetadataIndustriesPerson), ToReferences(content.MetadataIndustries) },
-            { nameof(Person.MetadataIndustryServices), ToReferences(content.MetadataIndustryServices) },
-            { nameof(Person.MetadataSpecialtiesCategories), ToReferences(content.MetadataSpecialtiesCategories) },
-            { nameof(Person.MetadataSpecialtiesAreas), ToReferences(content.MetadataSpecialtiesAreas) },
-            { nameof(Person.MetadataSpecialtiesPages), ToReferences(content.MetadataSpecialtiesPages) },
-            { nameof(Person.MicrositeMasterPagesPerson), ToReferences(content.MicrositeMasterPages) },
-            { nameof(Person.MicrositePagesPerson), ToReferences(content.MicrositePages) },
+            { nameof(Person.PersonCredentials), PersonCredentials },
+            { nameof(Person.MetadataCity), MetadataCity },
+            { nameof(Person.MetadataOfficeLocation), MetadataOfficeLocation },
+            { nameof(Person.MetadataProfileGroups), MetadataProfileGroups },
+            { nameof(Person.MetadataBusinessLines), MetadataBusinessLines },
+            { nameof(Person.MetadataServiceAreasPerson), MetadataServiceAreasPerson },
+            { nameof(Person.MetadataServicesPerson), MetadataServicesPerson },
+            { nameof(Person.MetadataSubServices), MetadataSubServices },
+            { nameof(Person.MetadataIndustryCategoriesPerson), MetadataIndustryCategoriesPerson },
+            { nameof(Person.MetadataIndustriesPerson), MetadataIndustriesPerson },
+            { nameof(Person.MetadataIndustryServices), MetadataIndustryServices },
+            { nameof(Person.MetadataSpecialtiesCategories), MetadataSpecialtiesCategories },
+            { nameof(Person.MetadataSpecialtiesAreas), MetadataSpecialtiesAreas },
+            { nameof(Person.MetadataSpecialtiesPages), MetadataSpecialtiesPages },
+            { nameof(Person.MicrositeMasterPagesPerson), MicrositeMasterPagesPerson },
+            { nameof(Person.MicrositePagesPerson), MicrositePagesPerson },
 
             { nameof(Person.Facebook), content.Facebook ?? string.Empty },
             { nameof(Person.Twitter), content.Twitter ?? string.Empty },
@@ -622,14 +623,9 @@ public class PersonCrudService : IPersonCrudService
         });
     }
 
-    private static IEnumerable<ContentItemReference> ToReferences(List<Guid>? guids)
+    private static PageOutput<PersonPageContent> MapPersonToPageOutput(Person person, string culture)
     {
-        return guids?.Select(guid => new ContentItemReference { Identifier = guid }) ?? [];
-    }
-
-    private static PageOutput<PersonContent> MapPersonToPageOutput(Person person, string culture)
-    {
-        return new PageOutput<PersonContent>
+        return new PageOutput<PersonPageContent>
         {
             General = new PageGeneralOutput
             {
@@ -642,7 +638,7 @@ public class PersonCrudService : IPersonCrudService
                 ContentItemID = person.SystemFields?.ContentItemID ?? 0,
                 Path = person.SystemFields?.WebPageItemTreePath ?? string.Empty
             },
-            Content = new PersonContent
+            Content = new PersonPageContent
             {
                 MetadataTitle = person.MetadataTitle,
                 PersonFirstName = person.PersonFirstName,
@@ -659,22 +655,22 @@ public class PersonCrudService : IPersonCrudService
                 PersonEmail = person.PersonEmail,
                 EnableForm = person.EnableForm,
                 EnableVCard = person.EnableVCard,
-                PersonCredentials = person.PersonCredentials?.Select(c => c.SystemFields?.WebPageItemGUID ?? Guid.Empty).ToList() ?? [],
-                MetadataCity = person.MetadataCity?.Select(c => c.SystemFields?.WebPageItemGUID ?? Guid.Empty).ToList() ?? [],
-                MetadataOfficeLocation = person.MetadataOfficeLocation?.Select(c => c.SystemFields?.WebPageItemGUID ?? Guid.Empty).ToList() ?? [],
-                MetadataProfileGroups = person.MetadataProfileGroups?.Select(c => c.SystemFields?.WebPageItemGUID ?? Guid.Empty).ToList() ?? [],
-                MetadataBusinessLines = person.MetadataBusinessLines?.Select(c => c.SystemFields?.WebPageItemGUID ?? Guid.Empty).ToList() ?? [],
-                MetadataServiceAreas = person.MetadataServiceAreasPerson?.Select(c => c.SystemFields?.WebPageItemGUID ?? Guid.Empty).ToList() ?? [],
-                MetadataServices = person.MetadataServicesPerson?.Select(c => c.SystemFields?.WebPageItemGUID ?? Guid.Empty).ToList() ?? [],
-                MetadataSubServices = person.MetadataSubServices?.Select(c => c.SystemFields?.WebPageItemGUID ?? Guid.Empty).ToList() ?? [],
-                MetadataIndustryCategories = person.MetadataIndustryCategoriesPerson?.Select(c => c.SystemFields?.WebPageItemGUID ?? Guid.Empty).ToList() ?? [],
-                MetadataIndustries = person.MetadataIndustriesPerson?.Select(c => c.SystemFields?.WebPageItemGUID ?? Guid.Empty).ToList() ?? [],
-                MetadataIndustryServices = person.MetadataIndustryServices?.Select(c => c.SystemFields?.WebPageItemGUID ?? Guid.Empty).ToList() ?? [],
-                MetadataSpecialtiesCategories = person.MetadataSpecialtiesCategories?.Select(c => c.SystemFields?.WebPageItemGUID ?? Guid.Empty).ToList() ?? [],
-                MetadataSpecialtiesAreas = person.MetadataSpecialtiesAreas?.Select(c => c.SystemFields?.WebPageItemGUID ?? Guid.Empty).ToList() ?? [],
-                MetadataSpecialtiesPages = person.MetadataSpecialtiesPages?.Select(c => c.SystemFields?.WebPageItemGUID ?? Guid.Empty).ToList() ?? [],
-                MicrositeMasterPages = person.MicrositeMasterPagesPerson?.Select(c => c.SystemFields?.WebPageItemGUID ?? Guid.Empty).ToList() ?? [],
-                MicrositePages = person.MicrositePagesPerson?.Select(c => c.SystemFields?.WebPageItemGUID ?? Guid.Empty).ToList() ?? [],
+                PersonCredentials = person.PersonCredentials.Select(c => c.Name).ToList(),
+                MetadataCity = person.MetadataCity.Select(c => c.MetadataTitle).ToList(),
+                MetadataOfficeLocation = person.MetadataOfficeLocation.Select(c => c.MetadataTitle).ToList(),
+                MetadataProfileGroups = person.MetadataProfileGroups.Select(c => c.Name).ToList(),
+                MetadataBusinessLines = person.MetadataBusinessLines.Select(c => c.MetadataTitle).ToList(),
+                MetadataServiceAreas = person.MetadataServiceAreasPerson.Select(c => c.MetadataTitle).ToList(),
+                MetadataServices = person.MetadataServicesPerson.Select(c => c.MetadataTitle).ToList(),
+                MetadataSubServices = person.MetadataSubServices.Select(c => c.MetadataTitle).ToList(),
+                MetadataIndustryCategories = person.MetadataIndustryCategoriesPerson.Select(c => c.MetadataTitle).ToList(),
+                MetadataIndustries = person.MetadataIndustriesPerson.Select(c => c.MetadataTitle).ToList(),
+                MetadataIndustryServices = person.MetadataIndustryServices.Select(c => c.MetadataTitle).ToList(),
+                MetadataSpecialtiesCategories = person.MetadataSpecialtiesCategories.Select(c => c.MetadataTitle).ToList(),
+                MetadataSpecialtiesAreas = person.MetadataSpecialtiesAreas.Select(c => c.MetadataTitle).ToList(),
+                MetadataSpecialtiesPages = person.MetadataSpecialtiesPages.Select(c => c.MetadataTitle).ToList(),
+                MicrositeMasterPages = person.MicrositeMasterPagesPerson.Select(c => c.MetadataTitle).ToList(),
+                MicrositePages = person.MicrositePagesPerson.Select(c => c.MetadataTitle).ToList(),
                 Facebook = person.Facebook,
                 Twitter = person.Twitter,
                 LinkedIn = person.LinkedIn,

@@ -15,7 +15,6 @@ namespace BDO.GWT.GLOBAL.API.Controllers
     /// <summary>
     /// Provides methods to read and manage people.
     /// </summary>
-    [AllowAnonymous]
     [ApiController]
     [Route("memberFirms/{memberFirmID:int}/People")]
     public class PeopleController : EntityControllerBase
@@ -37,8 +36,8 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// <returns>Returns a list of people.</returns>
         [HttpGet]
         [HasPermission(ApiMethodGroupName.People, ApiPermission.Read)]
-        [SwaggerResponse(StatusCodes.Status200OK, null, typeof(IEnumerable<PageOutput<PersonContent>>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<IEnumerable<PageOutput<PersonContent>>>> Get(int memberFirmID, string? culture, bool? onlyPublished, CancellationToken cancellationToken)
+        [SwaggerResponse(StatusCodes.Status200OK, null, typeof(IEnumerable<PageOutput<PersonPageContent>>), MediaTypeNames.Application.Json)]
+        public async Task<ActionResult<IEnumerable<PageOutput<PersonPageContent>>>> Get(int memberFirmID, string? culture, bool? onlyPublished, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
             var pages = await _personCrudService.GetPersonPagesAsync(channelId, culture, onlyPublished, cancellationToken);
@@ -56,8 +55,8 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// <returns>Returns one person page.</returns>
         [HttpGet("{pageGUID:guid}")]
         [HasPermission(ApiMethodGroupName.People, ApiPermission.Read)]
-        [SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageOutput<PersonContent>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<PageOutput<PersonContent>>> Get(int memberFirmID, Guid pageGUID, [FromQuery][Required] string culture, CancellationToken cancellationToken)
+        [SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageOutput<PersonPageContent>), MediaTypeNames.Application.Json)]
+        public async Task<ActionResult<PageOutput<PersonPageContent>>> Get(int memberFirmID, Guid pageGUID, [FromQuery][Required] string culture, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
             var page = await _personCrudService.GetPersonPageAsync(channelId, pageGUID, culture, cancellationToken);
@@ -77,8 +76,8 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// <returns>Newly created person page.</returns>
         [HttpPost]
         [HasPermission(ApiMethodGroupName.People, ApiPermission.Manage)]
-        [SwaggerResponse(StatusCodes.Status201Created, null, typeof(PageOutput<PersonContent>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<PageOutput<PersonContent>>> Post(int memberFirmID, [FromQuery][Required] int WebPageParentID, [FromQuery][Required] string culture, [FromBody] PersonContent request, CancellationToken cancellationToken)
+        [SwaggerResponse(StatusCodes.Status201Created, null, typeof(PageOutput<PersonPageContent>), MediaTypeNames.Application.Json)]
+        public async Task<ActionResult<PageOutput<PersonPageContent>>> Post(int memberFirmID, [FromQuery][Required] int WebPageParentID, [FromQuery][Required] string culture, [FromBody] PersonPageContent request, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
             var pageDto = await _personCrudService.CreatePageAsync(channelId, WebPageParentID, culture, request, cancellationToken);
@@ -98,8 +97,8 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// <returns>New person page in another culture.</returns>
         [HttpPost("{pageGUID:guid}/CreateNewCultureVersion")]
         [HasPermission(ApiMethodGroupName.People, ApiPermission.Manage)]
-        [SwaggerResponse(StatusCodes.Status201Created, null, typeof(PageOutput<PersonContent>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<PageOutput<PersonContent>>> CreateNewCultureVersion(int memberFirmID, Guid pageGUID, [FromQuery][Required] string fromCulture, [FromQuery][Required] string toCulture, [FromBody] PersonContent request, CancellationToken cancellationToken)
+        [SwaggerResponse(StatusCodes.Status201Created, null, typeof(PageOutput<PersonPageContent>), MediaTypeNames.Application.Json)]
+        public async Task<ActionResult<PageOutput<PersonPageContent>>> CreateNewCultureVersion(int memberFirmID, Guid pageGUID, [FromQuery][Required] string fromCulture, [FromQuery][Required] string toCulture, [FromBody] PersonPageContent request, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
             var pageDto = await _personCrudService.CreatePageCultureVersionAsync(channelId, pageGUID, fromCulture, toCulture, request, cancellationToken);
@@ -118,8 +117,8 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// <returns>Updated person page.</returns>
         [HttpPut("{pageGUID:guid}")]
         [HasPermission(ApiMethodGroupName.People, ApiPermission.Manage)]
-        [SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageOutput<PersonContent>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<PageOutput<PersonContent>>> Put(int memberFirmID, Guid pageGUID, [FromQuery][Required] string culture, [FromBody] PersonContent request, CancellationToken cancellationToken)
+        [SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageOutput<PersonPageContent>), MediaTypeNames.Application.Json)]
+        public async Task<ActionResult<PageOutput<PersonPageContent>>> Put(int memberFirmID, Guid pageGUID, [FromQuery][Required] string culture, [FromBody] PersonPageContent request, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
             var pageDto = await _personCrudService.UpdatePageAsync(channelId, pageGUID, culture, request, cancellationToken);
