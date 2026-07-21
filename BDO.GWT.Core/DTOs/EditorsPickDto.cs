@@ -30,4 +30,8 @@ public class EditorsPickDto : ICardsCarouselDto<EditorsPickCardDto>, IFilterable
     public string? WidgetID { get; set; }
 
     public Guid StateGUID { get; set; }
+
+    public string? FeaturedGuids { get; set; }
+
+    public string? SelectedGuids { get; set; }
 }

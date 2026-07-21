@@ -13,9 +13,9 @@
 @if (Model != null && pageId != 0)
 {
     @(await ReactService.RenderComponentAsync(
-            pageId,
-            ReactComponentType.EditorsPick,
-            ReactComponentType.EditorsPickGUID,
-            new { InsightCarousel = Model },
-            Context.RequestAborted))
+                 pageId,
+                 ReactComponentType.InsightCarousel,
+                 ReactComponentType.InsightCarouselGUID,
+                 new { InsightCarousel = Model },
+                 Context.RequestAborted))
 }
