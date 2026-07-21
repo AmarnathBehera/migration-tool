@@ -75,6 +75,17 @@ namespace XperienceCommunity.Redirects
             set => SetValue(nameof(RedirectTargetWebPageItemGUID), value);
         }
 
+
+        /// <summary>
+        /// Redirect Target url.
+        /// </summary>
+        [DatabaseField]
+        public virtual string RedirectTargetPageURL
+        {
+            get => ValidationHelper.GetString(GetValue(nameof(RedirectTargetPageURL)), String.Empty);
+            set => SetValue(nameof(RedirectTargetPageURL), value);
+        }
+
         /// <summary>
         /// Redirect channel name.
         /// </summary>

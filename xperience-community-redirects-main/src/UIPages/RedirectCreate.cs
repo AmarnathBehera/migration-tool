@@ -1,4 +1,6 @@
 ﻿using CMS.DataEngine;
+using CMS.Websites;
+using CMS.Websites.Routing;
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
 using XperienceCommunity.Redirects.UIPages;
@@ -18,7 +20,8 @@ internal class RedirectCreate : ModelEditPage<RedirectEditModel>
 {
     private RedirectEditModel? _model;
     private readonly IInfoProvider<RedirectInfo> _redirectInfoProvider;
-    private readonly IPageLinkGenerator  _pageLinkGenerator;
+    private readonly IPageLinkGenerator _pageLinkGenerator;
+    private readonly IWebPageUrlRetriever _webPageUrlRetriever;
 
     protected override RedirectEditModel Model => _model ??= new RedirectEditModel();
 
@@ -26,16 +29,18 @@ internal class RedirectCreate : ModelEditPage<RedirectEditModel>
         IFormItemCollectionProvider formItemCollectionProvider,
         IFormDataBinder formDataBinder,
         IPageLinkGenerator pageLinkGenerator,
-        IInfoProvider<RedirectInfo> RedirectInfoProvider)
+        IInfoProvider<RedirectInfo> RedirectInfoProvider,
+        IWebPageUrlRetriever webPageUrlRetriever)
         : base(formItemCollectionProvider, formDataBinder)
     {
         _pageLinkGenerator = pageLinkGenerator;
         _redirectInfoProvider = RedirectInfoProvider;
+        _webPageUrlRetriever = webPageUrlRetriever;
     }
 
     protected override async Task<ICommandResponse> ProcessFormData(RedirectEditModel model, ICollection<IFormItem> formItems)
     {
-        CreateCodeSnippetInfo(model);
+        await CreateCodeSnippetInfo(model);
 
         var navigateResponse = await NavigateToEditPage(model, formItems);
 
@@ -56,11 +61,11 @@ internal class RedirectCreate : ModelEditPage<RedirectEditModel>
         return navigateResponse;
     }
 
-    private void CreateCodeSnippetInfo(RedirectEditModel model)
+    private async Task CreateCodeSnippetInfo(RedirectEditModel model)
     {
         var infoObject = new RedirectInfo();
 
-        model.MapToRedirectInfo(infoObject);
+        await model.MapToRedirectInfo(infoObject, _webPageUrlRetriever);
 
         _redirectInfoProvider.Set(infoObject);
     }

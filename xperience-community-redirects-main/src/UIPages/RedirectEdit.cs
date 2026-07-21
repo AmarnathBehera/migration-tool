@@ -1,5 +1,6 @@
 ﻿using CMS.DataEngine;
 using CMS.Websites;
+using CMS.Websites.Routing;
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
 using XperienceCommunity.Redirects.UIPages;
@@ -19,14 +20,17 @@ internal class RedirectEdit : ModelEditPage<RedirectEditModel>
 {
     private RedirectEditModel? _model;
     private readonly IInfoProvider<RedirectInfo> _redirectInfoProvider;
+    private readonly IWebPageUrlRetriever _webPageUrlRetriever;
 
     public RedirectEdit(
         IFormItemCollectionProvider formItemCollectionProvider,
         IFormDataBinder formDataBinder,
-        IInfoProvider<RedirectInfo> redirectInfoProvider)
+        IInfoProvider<RedirectInfo> redirectInfoProvider,
+        IWebPageUrlRetriever webPageUrlRetriever)
         : base(formItemCollectionProvider, formDataBinder)
     {
         _redirectInfoProvider = redirectInfoProvider;
+        _webPageUrlRetriever = webPageUrlRetriever;
     }
 
     protected override RedirectEditModel Model
@@ -48,7 +52,7 @@ internal class RedirectEdit : ModelEditPage<RedirectEditModel>
             {
                 new() { WebPageGuid = info.RedirectTargetWebPageItemGUID }
             };
-            
+
             _model = new RedirectEditModel()
             {
                 TargetWebPageItem = targetWebPageItems,
@@ -66,7 +70,7 @@ internal class RedirectEdit : ModelEditPage<RedirectEditModel>
     {
         var info = _redirectInfoProvider.Get(ObjectID);
 
-        model.MapToRedirectInfo(info);
+        await model.MapToRedirectInfo(info, _webPageUrlRetriever);
 
         _redirectInfoProvider.Set(info);
 
