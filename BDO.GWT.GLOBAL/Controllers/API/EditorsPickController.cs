@@ -27,8 +27,8 @@ public class EditorsPickController : ControllerBase
     [HttpGet("[action]")]
     public async Task<ActionResult<ICollection<EditorsPickCardDto>>> Items(
         [FromQuery] CardsQuery query,
-        [FromQuery(Name = "featuredGuids")] string? featuredGuids,
-        [FromQuery(Name = "selectedGuids")] string? selectedGuids,
+        [FromQuery(Name = "featuredGuids")] string featuredGuids,
+        [FromQuery(Name = "selectedGuids")] string selectedGuids,
         CancellationToken cancellationToken)
     {
         query.Filters = RequestQueryUtility.ExtractFilterQueryParameters(Request.Query);
@@ -45,7 +45,7 @@ public class EditorsPickController : ControllerBase
         return Ok(result);
     }
 
-    private static HashSet<ContentItemReference> ParseContentItemReferences(string? guidsString)
+    private static HashSet<ContentItemReference> ParseContentItemReferences(string guidsString)
     {
         if (string.IsNullOrWhiteSpace(guidsString))
         {
