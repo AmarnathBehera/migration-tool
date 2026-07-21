@@ -49,17 +49,17 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// Returns a single person having the specified page GUID.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm from which the page should be retrieved.</param>
-        /// <param name="pageGUID">Page GUID of a person page.</param>
+        /// <param name="WebPageItemGuid">Page GUID of a person page.</param>
         /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="cancellationToken"></param>
         /// <returns>Returns one person page.</returns>
-        [HttpGet("{pageGUID:guid}")]
+        [HttpGet("{WebPageItemGuid:guid}")]
         [HasPermission(ApiMethodGroupName.People, ApiPermission.Read)]
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageOutput<PersonPageContent>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<PageOutput<PersonPageContent>>> Get(int memberFirmID, Guid pageGUID, [FromQuery][Required] string culture, CancellationToken cancellationToken)
+        public async Task<ActionResult<PageOutput<PersonPageContent>>> Get(int memberFirmID, Guid WebPageItemGuid, [FromQuery][Required] string culture, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-            var page = await _personCrudService.GetPersonPageAsync(channelId, pageGUID, culture, cancellationToken);
+            var page = await _personCrudService.GetPersonPageAsync(channelId, WebPageItemGuid, culture, cancellationToken);
 
             return Ok(page);
         }
@@ -89,19 +89,19 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// Creates a new culture version of a person page.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm in which the page should be created.</param>
-        /// <param name="pageGUID">Page GUID of the person to copy content from.</param>
+        /// <param name="WebPageItemGuid">Page GUID of the person to copy content from.</param>
         /// <param name="fromCulture">Culture of the existing page version.</param>
         /// <param name="toCulture">Culture of the new page version.</param>
         /// <param name="request">New culture version data.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>New person page in another culture.</returns>
-        [HttpPost("{pageGUID:guid}/CreateNewCultureVersion")]
+        [HttpPost("{WebPageItemGuid:guid}/CreateNewCultureVersion")]
         [HasPermission(ApiMethodGroupName.People, ApiPermission.Manage)]
         [SwaggerResponse(StatusCodes.Status201Created, null, typeof(PageOutput<PersonPageContent>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<PageOutput<PersonPageContent>>> CreateNewCultureVersion(int memberFirmID, Guid pageGUID, [FromQuery][Required] string fromCulture, [FromQuery][Required] string toCulture, [FromBody] PersonPageContent request, CancellationToken cancellationToken)
+        public async Task<ActionResult<PageOutput<PersonPageContent>>> CreateNewCultureVersion(int memberFirmID, Guid WebPageItemGuid, [FromQuery][Required] string fromCulture, [FromQuery][Required] string toCulture, [FromBody] PersonPageContent request, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-            var pageDto = await _personCrudService.CreatePageCultureVersionAsync(channelId, pageGUID, fromCulture, toCulture, request, cancellationToken);
+            var pageDto = await _personCrudService.CreatePageCultureVersionAsync(channelId, WebPageItemGuid, fromCulture, toCulture, request, cancellationToken);
 
             return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.WebPageItemID }, pageDto.Value);
         }
@@ -110,18 +110,18 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// Updates a single person page having the specified page GUID.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm in which the page should be modified.</param>
-        /// <param name="pageGUID">Page GUID of the person page.</param>
+        /// <param name="WebPageItemGuid">Page GUID of the person page.</param>
         /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="request">Updated person page data.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>Updated person page.</returns>
-        [HttpPut("{pageGUID:guid}")]
+        [HttpPut("{WebPageItemGuid:guid}")]
         [HasPermission(ApiMethodGroupName.People, ApiPermission.Manage)]
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageOutput<PersonPageContent>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<PageOutput<PersonPageContent>>> Put(int memberFirmID, Guid pageGUID, [FromQuery][Required] string culture, [FromBody] PersonPageContent request, CancellationToken cancellationToken)
+        public async Task<ActionResult<PageOutput<PersonPageContent>>> Put(int memberFirmID, Guid WebPageItemGuid, [FromQuery][Required] string culture, [FromBody] PersonPageContent request, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-            var pageDto = await _personCrudService.UpdatePageAsync(channelId, pageGUID, culture, request, cancellationToken);
+            var pageDto = await _personCrudService.UpdatePageAsync(channelId, WebPageItemGuid, culture, request, cancellationToken);
 
             return Ok(pageDto.Value);
         }
@@ -130,20 +130,20 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// Deletes a single person page having the specified page GUID.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm in which the page should be deleted.</param>
-        /// <param name="pageGUID">Page GUID of the person.</param>
+        /// <param name="WebPageItemGuid">Page GUID of the person.</param>
         /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="deleteAllCultures">Should all culture versions be deleted of this person?</param>
         /// <param name="cancellationToken"></param>
         /// <returns>204 No Content.</returns>
-        [HttpDelete("{pageGUID:guid}")]
+        [HttpDelete("{WebPageItemGuid:guid}")]
         [HasPermission(ApiMethodGroupName.People, ApiPermission.Manage)]
         [SwaggerResponse(StatusCodes.Status204NoContent, null, typeof(void))]
-        public async Task<IActionResult> Delete(int memberFirmID, Guid pageGUID, [FromQuery][Required] string culture, [FromQuery] bool deleteAllCultures = false, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> Delete(int memberFirmID, Guid WebPageItemGuid, [FromQuery][Required] string culture, [FromQuery] bool deleteAllCultures = false, CancellationToken cancellationToken = default)
         {
             try
             {
                 int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-                await _personCrudService.DeletePageAsync(channelId, pageGUID, culture, deleteAllCultures, cancellationToken);
+                await _personCrudService.DeletePageAsync(channelId, WebPageItemGuid, culture, deleteAllCultures, cancellationToken);
 
                 return Ok("Successfully deleted.");
             }
