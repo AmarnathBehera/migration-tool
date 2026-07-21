@@ -22,8 +22,21 @@ variable "deploy.octopus.workerPool" {
     }
 }
 
+variable "appsettings.aspNetCoreEnvironment" {
+    value "Development" {}
+
+    value "Production" {
+        description = ""
+        environment = ["production", "acceptance", "test-2"]
+    }
+}
+
 variable "appsettings.azureAdTenantId" {
     value "44f4e7a6-4821-44d7-b286-cd90436c6975" {}
+}
+
+variable "appsettings.azureAdInstance" {
+    value "https://login.microsoftonline.com/" {}
 }
 
 variable "appsettings.CMSConnectionString" {
@@ -52,6 +65,10 @@ variable "appsettings.appInsightsMVCConnectionString" {
 
 variable "appsettings.appInsightsReactConnectionString" {
     value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ai-gwt-xbyk-react-#{environment.abbreviation}-eur-we-connectionstring)" {}
+}
+
+variable "appsettings.appInsightsAPIConnectionString" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ai-gwt-xbyk-api-#{environment.abbreviation}-eur-we-connectionstring)" {}
 }
 
 variable "appsettings.azureAdClientId" {
