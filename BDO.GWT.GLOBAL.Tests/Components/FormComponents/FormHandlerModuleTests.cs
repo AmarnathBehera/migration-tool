@@ -1,6 +1,8 @@
 using System.Reflection;
 using BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents;
 using CMS.DataEngine;
+using CMS.EmailLibrary;
+using CMS.Websites.Routing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -77,6 +79,18 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
         }
 
         [Test]
+        [TestCase("/en-gb", "")]
+        [TestCase("/EN-GB", "")]
+        [TestCase("/engb/people", "/engb/people")]
+        [TestCase(" /en-gb/people", " /en-gb/people")]
+        public void RemoveCultureFromPath_HandlesEdgeCases(string input, string expected)
+        {
+            var result = InvokePrivateStatic<string>("RemoveCultureFromPath", input);
+
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [Test]
         public void RemoveCultureFromPath_WithNullInput_ReturnsEmpty()
         {
             var result = InvokePrivateStatic<string>("RemoveCultureFromPath", (string?)null!);
@@ -95,6 +109,16 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             var result = InvokePrivateStatic<string>("NormalizeCulture", input);
 
             Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [Test]
+        [TestCase("   ")]
+        [TestCase("en_GB")]
+        public void NormalizeCulture_LeavesUnexpectedFormatsUntouched(string input)
+        {
+            var result = InvokePrivateStatic<string>("NormalizeCulture", input);
+
+            Assert.That(result, Is.EqualTo(input));
         }
 
         [Test]
@@ -119,6 +143,16 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
         }
 
         [Test]
+        public void GetReferrerUrl_ReturnsEmpty_WhenAccessorIsNull()
+        {
+            SetPrivateField(_module, "_httpContextAccessor", null!);
+
+            var url = InvokePrivate<string>(_module, "GetReferrerUrl");
+
+            Assert.That(url, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
         public void GetReferrerUrl_ReturnsEmpty_WhenHttpContextIsNull()
         {
             _httpContextAccessor.SetupGet(a => a.HttpContext).Returns((HttpContext?)null);
@@ -139,6 +173,55 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             Assert.That(url, Is.EqualTo(string.Empty));
         }
 
+        [Test]
+        public async Task GetCurrentPersonSafelyAsync_ReturnsNull_WhenHttpContextIsUnavailable()
+        {
+            _httpContextAccessor.SetupGet(a => a.HttpContext).Returns((HttpContext?)null);
+
+            var person = await InvokePrivateAsync<object?>(_module, "GetCurrentPersonSafelyAsync");
+
+            Assert.That(person, Is.Null);
+        }
+
+        [Test]
+        public async Task GetCurrentPersonSafelyAsync_ReturnsNull_WhenContentServiceResolutionFails()
+        {
+            var ctx = new DefaultHttpContext
+            {
+                RequestServices = new ServiceCollection().BuildServiceProvider()
+            };
+            _httpContextAccessor.SetupGet(a => a.HttpContext).Returns(ctx);
+
+            var person = await InvokePrivateAsync<object?>(_module, "GetCurrentPersonSafelyAsync");
+
+            Assert.That(person, Is.Null);
+        }
+
+        [Test]
+        public void ResolveFromEmailForCurrentChannel_ReturnsNull_WhenWebsiteChannelIdIsInvalid()
+        {
+            var websiteChannelContext = new Mock<IWebsiteChannelContext>();
+            websiteChannelContext.SetupGet(x => x.WebsiteChannelID).Returns(0);
+
+            var emailInfoProvider = new Mock<IInfoProvider<EmailInfo>>();
+            var channelSettingsProvider = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
+
+            var services = new ServiceCollection();
+            services.AddSingleton(websiteChannelContext.Object);
+            services.AddSingleton(emailInfoProvider.Object);
+            services.AddSingleton(channelSettingsProvider.Object);
+
+            var serviceProvider = services.BuildServiceProvider();
+            var scope = new Mock<IServiceScope>();
+            scope.SetupGet(x => x.ServiceProvider).Returns(serviceProvider);
+
+            _scopeFactory.Setup(x => x.CreateScope()).Returns(scope.Object);
+
+            var fromEmail = InvokePrivate<string?>(_module, "ResolveFromEmailForCurrentChannel");
+
+            Assert.That(fromEmail, Is.Null);
+        }
+
         private static void SetPrivateField(object target, string name, object value)
         {
             var field = target.GetType().GetField(name, PrivateInstance);
@@ -153,6 +236,26 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
 
             Assert.That(mi, Is.Not.Null, $"Private method '{method}' not found.");
             return (T)mi!.Invoke(target, args)!;
+        }
+
+        private static async Task<T> InvokePrivateAsync<T>(object target, string method, params object?[] args)
+        {
+            var mi = target.GetType().GetMethod(method, PrivateInstance);
+
+            Assert.That(mi, Is.Not.Null, $"Private method '{method}' not found.");
+
+            var task = mi!.Invoke(target, args) as Task;
+            Assert.That(task, Is.Not.Null, $"Private method '{method}' did not return a Task.");
+
+            await task!;
+
+            var resultProperty = task.GetType().GetProperty("Result");
+            if (resultProperty == null)
+            {
+                return default!;
+            }
+
+            return (T)resultProperty.GetValue(task)!;
         }
 
         private static T InvokePrivateStatic<T>(string method, params object?[] args)

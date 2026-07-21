@@ -29,7 +29,6 @@ public partial class FormHandlerModule : Module
     private ILogger<FormHandlerModule> _logger;
     private IServiceScopeFactory _scopeFactory;
     private const string EmailKey = "Email";
-
     public FormHandlerModule() : base("CustomFormHandlers")
     {
     }
@@ -110,8 +109,7 @@ public partial class FormHandlerModule : Module
             if (string.IsNullOrWhiteSpace(personTitle))
                 return;
 
-            var person = await GetPersonSafelyAsync(pathWithoutCulture, culture).ConfigureAwait(false);
-
+            var person = await GetCurrentPersonSafelyAsync().ConfigureAwait(false);
             if (person == null || string.IsNullOrWhiteSpace(person.PersonEmail))
                 return;
 
@@ -193,30 +191,31 @@ public partial class FormHandlerModule : Module
             .FirstOrDefault()?.FromEmail;
     }
 
-    private async Task<Person> GetPersonSafelyAsync(string pathWithoutCulture, string culture)
+    private async Task<Person> GetCurrentPersonSafelyAsync()
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(pathWithoutCulture))
+            var httpContext = _httpContextAccessor?.HttpContext;
+            if (httpContext == null)
+            {
+                _logger.LogWarning("No HttpContext available. Cannot resolve current page.");
                 return null;
+            }
 
-            using var scope = _scopeFactory.CreateScope();
-            var contentService = scope.ServiceProvider.GetRequiredService<IContentService>();
+            var contentService = httpContext.RequestServices.GetRequiredService<IContentService>();
 
-            var people = await contentService.GetPagesAsync<Person>(
-                new RetrievePagesParameters(),
-                query => query.Where(w => w.WhereEquals("WebPageItemTreePath", pathWithoutCulture)).TopN(1),
-                RetrievalCacheSettings.CacheDisabled,
+            var person = await contentService.RetrieveCurrentPageAsync<Person>(
+                new RetrieveCurrentPageParameters
+                {
+                    LinkedItemsMaxLevel = 4
+                },
                 CancellationToken.None).ConfigureAwait(false);
 
-            return people?.FirstOrDefault();
+            return person;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex,
-                "Failed to retrieve person for path '{Path}' (culture: '{Culture}').",
-                pathWithoutCulture, culture);
-
+            _logger.LogError(ex, "Failed to retrieve current page as Person.");
             return null;
         }
     }
