@@ -36,25 +36,25 @@ stages:
               projectKey: "bdo_GWT.XbyK.Web"
               projectName: "GWT.XbyK.Web"
               extraProperties: |
-                sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**,**/.deploy/**,**/.octopus/**,**/*.bacpac,**/TestResults/**
+                sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**,**/*.bacpac,**/TestResults/**,/BDO.GWT.GLOBAL/App_Data/**
                 sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/**/coverage.opencover.xml
 
           - task: DotNetCoreCLI@2
-            displayName: Restore CMS Web App
+            displayName: Restore XbyK solution
             inputs:
               command: "restore"
               restoreSolution: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
               feedsToUse: "select"
 
           - task: DotNetCoreCLI@2
-            displayName: Build CMS Web App
+            displayName: Build XbyK solution
             inputs:
               command: "build"
               projects: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
               arguments: "--configuration Release --no-restore"
 
           - task: DotNetCoreCLI@2
-            displayName: "Test CMS Web App with Code Coverage"
+            displayName: "Test XbyK solution with Code Coverage"
             inputs:
               command: "test"
               projects: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
