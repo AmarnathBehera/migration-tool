@@ -20,8 +20,8 @@
     <PackageReference Include="XperienceCommunity.Localization" Version="2.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\xperience-community-redirects-main\src\XperienceCommunity.Redirects.csproj" />
     <ProjectReference Include="..\BDO.GWT.Core\BDO.GWT.Core.csproj" />
+    <ProjectReference Include="..\xperience-community-redirects-main\src\XperienceCommunity.Redirects.csproj" />
   </ItemGroup>
   
 </Project>

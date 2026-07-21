@@ -14,26 +14,14 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <RepositoryType>git</RepositoryType>
         <PackageTags>kentico xperience urlredirects 301redirects</PackageTags>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<Version>1.0.3</Version>
 		<PackageReleaseNotes>Fixed an issue where it was not possible to create redirects</PackageReleaseNotes>
-		<PackageIcon>logo.png</PackageIcon>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="Kentico.Xperience.Admin" Version="31.2.3" />
       <PackageReference Include="Kentico.Xperience.Core" Version="31.2.3" />
-      <None Include="..\images\logo.png">
-        <Pack>True</Pack>
-        <PackagePath></PackagePath>
-        <Link>logo.png</Link>
-      </None>
-	  <None Include="..\README.md" Pack="true" PackagePath="\" />
-	  <ProjectReference Include="..\..\GWT.XbyK.Web\BDO.GWT.Core\BDO.GWT.Core.csproj" />
-	  <None Update="logo.png">
-	    <Pack>True</Pack>
-	    <PackagePath></PackagePath>
-	  </None>
+	  <ProjectReference Include="..\..\BDO.GWT.Core\BDO.GWT.Core.csproj" />
     </ItemGroup>
 
 </Project>

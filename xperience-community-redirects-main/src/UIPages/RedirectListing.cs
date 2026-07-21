@@ -1,15 +1,11 @@
 ﻿using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.Base;
 using CMS.ContentEngine;
-using CMS.ContentEngine.Internal;
-using CMS.DataEngine;
 using CMS.Helpers;
 using CMS.Membership;
 using CMS.Websites;
 using CMS.Websites.Internal;
-using Kentico.Content.Web.Mvc.Routing;
 using Kentico.Xperience.Admin.Base;
-using System.Globalization;
 using XperienceCommunity.Redirects.UIPages;
 
 [assembly: UIPage(
@@ -28,16 +24,16 @@ public class RedirectListing : ListingPage
 
     private readonly IContentQueryExecutor _executor;
     private readonly IWebPageUrlRetriever _webPageUrlRetriever;
-    private readonly IChannelAccessService _channelFilterService;
+    private readonly IChannelAccessService _channelAccessService;
 
     public RedirectListing(
         IContentQueryExecutor executor,
         IWebPageUrlRetriever webPageUrlRetriever,
-        IChannelAccessService channelFilterService)
+        IChannelAccessService channelAccessService)
     {
         _executor = executor;
         _webPageUrlRetriever = webPageUrlRetriever;
-        _channelFilterService = channelFilterService;
+        _channelAccessService = channelAccessService;
     }
 
     public override async Task ConfigurePage()
@@ -51,7 +47,7 @@ public class RedirectListing : ListingPage
             .AddColumn(nameof(RedirectInfo.RedirectChannelName), "Channel", searchable: true);
         PageConfiguration.AddEditRowAction<RedirectEditSection>();
 
-        var accessibleChannelIds = await _channelFilterService.GetAccessibleWebChannelSettingsIdsAsync();
+        var accessibleChannelIds = await _channelAccessService.GetAccessibleWebChannelSettingsIdsAsync();
 
         if (accessibleChannelIds != null)
         {
