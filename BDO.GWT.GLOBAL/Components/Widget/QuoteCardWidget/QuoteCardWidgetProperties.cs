@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace BDO.GWT.Web.Widgets.QuoteCardWidget;
 
-public class QuoteCardWidgetProperties : IWidgetProperties
+public class QuoteCardWidgetProperties : BaseWidgetProperties
 {
     [TextInputComponent(Label = "Heading", Order = 0)]
     public string Heading { get; set; }
@@ -68,7 +68,5 @@ public class QuoteCardWidgetProperties : IWidgetProperties
     [DropDownComponent(Label = "Bottom margin", Order = 14, Options = "0px;None\n20px\n40px\n60px\n80px")]
     public string BottomMargin { get; set; }
 
-    [TextInputComponent(Label = "Widget ID", Order = 15 ,ExplanationText = "ID should be unique from any other ID on the page. If the ID contains multiple words, words must be joined with a '-' (e.g. three-word-id). No other special characters and no spaces.'")]
 
-    public string WidgetID { get; set; }
 }

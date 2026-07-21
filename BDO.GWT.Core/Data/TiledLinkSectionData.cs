@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BDO.GWT.Web.Core.LiveSite.Data;
+namespace BDO.GWT.Core.Data;
 
 public class TiledLinkSectionData : BaseWidgetData
 {
@@ -32,5 +32,5 @@ public class TiledLinkSectionData : BaseWidgetData
 
     public string BottomMargin { get; set; } = null!;
 
-    public List<TilePageDto> TileNodeGuids { get; set; }
+    public List<TilePageDto>? TileNodeGuids { get; set; }
 }
