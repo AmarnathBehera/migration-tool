@@ -199,4 +199,180 @@ public class PersonCrudServiceTests
         var objectResult = (ObjectResult)result.Result!;
         Assert.That(objectResult.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
     }
+
+    [Test]
+    public void PersonCrudService_Implements_IPersonCrudService()
+    {
+        Assert.That(typeof(IPersonCrudService).IsAssignableFrom(typeof(PersonCrudService)), Is.True);
+    }
+
+    [TestCase(0, 0, null)]
+    [TestCase(-1, -1, "")]
+    [TestCase(int.MaxValue, int.MaxValue, "fr-fr")]
+    public async Task CreatePageAsync_WithNullRequest_ReturnsBadRequestResult_Variants(int channelId, int nodeParentID, string? culture)
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        var result = await service.CreatePageAsync(
+            channelId,
+            nodeParentID,
+            culture,
+            request: null!,
+            CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
+    }
+
+    [TestCase(null, null)]
+    [TestCase("en-gb", "fr-fr")]
+    [TestCase("", "")]
+    public async Task CreatePageCultureVersionAsync_WithNullRequest_ReturnsBadRequestResult_Variants(string? fromCulture, string? toCulture)
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        var result = await service.CreatePageCultureVersionAsync(
+            channelId: 1,
+            pageGUID: Guid.NewGuid(),
+            fromCulture,
+            toCulture,
+            request: null!,
+            CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
+    }
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("en-gb")]
+    [TestCase("es-es")]
+    public async Task UpdatePageAsync_WithNullRequest_ReturnsBadRequestResult_Variants(string? culture)
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        var result = await service.UpdatePageAsync(
+            channelId: 1,
+            pageGUID: Guid.NewGuid(),
+            culture,
+            request: null!,
+            CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
+    }
+
+    [Test]
+    public async Task CreatePageAsync_WithNullRequest_HonorsCancelledToken_StillReturnsBadRequest()
+    {
+        var service = CreateServiceWithoutConstructor();
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        // Null guard runs before the token is observed.
+        var result = await service.CreatePageAsync(
+            channelId: 1,
+            nodeParentID: 10,
+            culture: "en-gb",
+            request: null!,
+            cts.Token);
+
+        Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
+    }
+
+    [Test]
+    public async Task UpdatePageAsync_WithNullRequest_HonorsCancelledToken_StillReturnsBadRequest()
+    {
+        var service = CreateServiceWithoutConstructor();
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        var result = await service.UpdatePageAsync(
+            channelId: 1,
+            pageGUID: Guid.NewGuid(),
+            culture: "en-gb",
+            request: null!,
+            cts.Token);
+
+        Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
+    }
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_WithNullRequest_HonorsCancelledToken_StillReturnsBadRequest()
+    {
+        var service = CreateServiceWithoutConstructor();
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        var result = await service.CreatePageCultureVersionAsync(
+            channelId: 1,
+            pageGUID: Guid.NewGuid(),
+            fromCulture: "en-gb",
+            toCulture: "fr-fr",
+            request: null!,
+            cts.Token);
+
+        Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
+    }
+
+    [Test]
+    public async Task CreatePageAsync_WithNullRequest_ReturnsResult_WithNullValue()
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        var result = await service.CreatePageAsync(1, 1, "en-gb", null!, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Result, Is.Not.Null);
+            Assert.That(result.Value, Is.Null);
+        });
+    }
+
+    [Test]
+    public void DeletePageAsync_AllCultures_WhenDependenciesUnavailable_Throws()
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        Assert.ThrowsAsync<NullReferenceException>(async () => await service.DeletePageAsync(
+            channelId: 1,
+            pageGUID: Guid.NewGuid(),
+            culture: "en-gb",
+            deleteAllCultures: true,
+            cancellationToken: CancellationToken.None));
+    }
+
+    [TestCase("en-gb")]
+    [TestCase("fr-fr")]
+    [TestCase("es-es")]
+    public async Task GetPersonPageAsync_WhenDependenciesUnavailable_Returns500_ForAnyCulture(string culture)
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        var result = await service.GetPersonPageAsync(
+            channelId: 1,
+            pageGUID: Guid.NewGuid(),
+            culture,
+            CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+        var objectResult = (ObjectResult)result.Result!;
+        Assert.That(objectResult.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    [TestCase(null)]
+    public async Task GetPersonPagesAsync_WhenDependenciesUnavailable_Returns500_ForAnyPublishedFlag(bool? onlyPublished)
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        var result = await service.GetPersonPagesAsync(
+            channelId: 1,
+            culture: "en-gb",
+            onlyPublished,
+            CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+        var objectResult = (ObjectResult)result.Result!;
+        Assert.That(objectResult.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+    }
 }
