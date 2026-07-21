@@ -451,6 +451,9 @@ stages:
 
           - task: Npm@1
             displayName: "Build React SSR App"
+            env: # Required for step; removed the .env file from GWT.XbyK.UI
+              VITE_SERVER_BASE_DIR: ../GWT.XbyK.ReactServer
+              VITE_SERVER_BASE_URL: http://localhost:3000/
             inputs:
               command: "custom"
               workingDir: "$(Build.SourcesDirectory)/GWT.XbyK.ReactServer"
