@@ -35,7 +35,7 @@ using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using XperienceCommunity.MultiChoiceFormControl.Admin.Helpers.Components.MultiChoice;
-
+using XperienceCommunity.Redirects;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddKentico(features =>
@@ -89,6 +89,7 @@ builder.Services.AddScoped<ISiteConfigurationService, SiteConfigurationService>(
 builder.Services.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllersWithViews();
+builder.Services.AddXperienceCommunityRedirects();
 builder.Services.AddXperienceCommunityLocalization();
 builder.Services.AddAdminExternalAuthenticationProvider(
     authBuilder => authBuilder.AddMicrosoftIdentityWebApp(options =>
@@ -128,19 +129,19 @@ if (builder.Environment.IsDevelopment())
 }
 
 // Add Application Insights telemetry
-builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
+//builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
 // Loads the administration redirect domain (AdminRedirectOptions) from a configuration file section
 builder.Services.Configure<AdminRedirectOptions>(builder.Configuration.GetSection("AdminRedirectOptions"));
 
 // Configures email sending via SendGrid for system emails
-builder.Services.AddXperienceSystemSendGrid();
+//builder.Services.AddXperienceSystemSendGrid();
 // Configures email sending via SendGrid for the fallback situation
-builder.Services.AddXperienceSendGrid();
+//builder.Services.AddXperienceSendGrid();
 
 // Loads the SendGrid API keys from configuration file sections
-builder.Services.ConfigureSystemSendGridClientOptions(builder.Configuration.GetSection("SystemSendGridClientOptions"));
-builder.Services.Configure<SendGridClientOptions>(builder.Configuration.GetSection("FallbackSendGridClientOptions"));
+//builder.Services.ConfigureSystemSendGridClientOptions(builder.Configuration.GetSection("SystemSendGridClientOptions"));
+//builder.Services.Configure<SendGridClientOptions>(builder.Configuration.GetSection("FallbackSendGridClientOptions"));
 
 var app = builder.Build();
 
@@ -182,9 +183,8 @@ if (!builder.Environment.IsDevelopment() && builder.Configuration.GetSection("Ad
 }
 
 app.UseKentico();
-
+app.UseMiddleware<RedirectMiddleware>();
 app.Kentico().MapRoutes();
-
 app.MapControllerRoute(
     name: "default",
     pattern: $"{{{WebPageRoutingOptions.LANGUAGE_ROUTE_VALUE_KEY}}}/{{controller}}/{{action}}",
