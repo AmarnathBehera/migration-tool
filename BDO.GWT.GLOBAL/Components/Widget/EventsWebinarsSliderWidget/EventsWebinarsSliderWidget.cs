@@ -16,16 +16,14 @@ namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.EventsWebinarsSlide
 public class EventsWebinarsSliderWidget : ViewComponent
 {
     private readonly IEventsWebinarsSliderService _eventsWebinarsSliderService;
-    private readonly IPageContext _pageContext;
     private readonly IContentRetriever _contentRetriever;
     private readonly IContentService _contentService;
 
     public EventsWebinarsSliderWidget(
         IEventsWebinarsSliderService eventsWebinarsSliderService,
-        IPageContext pageContext, IContentRetriever contentRetriever, IContentService contentService)
+        IContentRetriever contentRetriever, IContentService contentService)
     {
         _eventsWebinarsSliderService = eventsWebinarsSliderService;
-        _pageContext = pageContext;
         _contentRetriever = contentRetriever;
         _contentService= contentService;
     }
