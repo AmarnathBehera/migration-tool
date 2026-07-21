@@ -54,7 +54,7 @@ public class DealsControllerTests
         var pageGuid = Guid.NewGuid();
         var expected = new PageOutput<DealPageContent>
         {
-            General = new PageGeneralOutput { PageGUID = pageGuid },
+            General = new PageGeneralOutput { WebPageItemGuid = pageGuid },
             Content = new DealPageContent { MetadataTitle = "Deal" },
         };
 
@@ -81,7 +81,7 @@ public class DealsControllerTests
         var request = new DealPageContent { MetadataTitle = "New deal" };
         var expected = new PageOutput<DealPageContent>
         {
-            General = new PageGeneralOutput { PageGUID = Guid.NewGuid() },
+            General = new PageGeneralOutput { WebPageItemGuid = Guid.NewGuid() },
             Content = request,
         };
 
@@ -113,7 +113,7 @@ public class DealsControllerTests
         var request = new DealPageContent { MetadataTitle = "Updated deal" };
         var expected = new PageOutput<DealPageContent>
         {
-            General = new PageGeneralOutput { PageGUID = pageGuid },
+            General = new PageGeneralOutput { WebPageItemGuid = pageGuid },
             Content = request,
         };
 
