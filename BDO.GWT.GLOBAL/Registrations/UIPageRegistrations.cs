@@ -131,7 +131,7 @@ using Kentico.Xperience.Admin.Base;
     order: 9)]
 
 [assembly: UIPage(
-    parentType: typeof(WebChannelSettingsEditSection),
+    parentType: typeof(WebChannelSettingsListingPage),
     slug: "gdpr",
     uiPageType: typeof(GDPRConsentListingPage),
     name: "GDPR",
