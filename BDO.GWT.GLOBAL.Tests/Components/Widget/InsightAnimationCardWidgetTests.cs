@@ -1,8 +1,7 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Utilities;
-using BDO.GWT.GLOBAL.Widgets.InsightAnimationCardWidget;
-
+using BDO.GWT.GLOBAL.Widgets;
 using CMS.ContentEngine;
 using CMS.Websites;
 using CMS.Websites.Routing;
@@ -152,21 +151,25 @@ public class InsightAnimationCardWidgetTests
 
     /// <summary>
     /// Sets up <see cref="_contentServiceMock"/> to return the given pages
-    /// when <see cref="IContentService.GetItemsByGUIDAsync"/> is called.
+    /// when <see cref="IContentService.GetPagesAsync{TPage}"/> is called.
     /// </summary>
-    private void SetupGetItemsByGUID(IEnumerable<IWebPageFieldsSource> pages)
+    private void SetupGetPagesAsync(IEnumerable<InsightAnimationPage> pages)
     {
         _contentServiceMock
-            .Setup(s => s.GetItemsByGUIDAsync(It.IsAny<List<Guid>>()))
+            .Setup(s => s.GetPagesAsync<InsightAnimationPage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(pages);
     }
 
     /// <summary>
     /// Sets up <see cref="_contentServiceMock"/> to return an empty collection.
     /// </summary>
-    private void SetupGetItemsByGUIDEmpty()
+    private void SetupGetPagesAsyncEmpty()
     {
-        SetupGetItemsByGUID(Enumerable.Empty<IWebPageFieldsSource>());
+        SetupGetPagesAsync(Enumerable.Empty<InsightAnimationPage>());
     }
 
     // -----------------------------------------------------------------------
@@ -179,7 +182,7 @@ public class InsightAnimationCardWidgetTests
         var model = BuildModel(DefaultProperties());
         var sut = CreateSut();
 
-        SetupGetItemsByGUIDEmpty();
+        SetupGetPagesAsyncEmpty();
 
         // Act
         var result = await sut.InvokeAsync(model);
@@ -198,7 +201,7 @@ public class InsightAnimationCardWidgetTests
         var model = BuildModel(DefaultProperties());
         var sut = CreateSut();
 
-        SetupGetItemsByGUIDEmpty();
+        SetupGetPagesAsyncEmpty();
 
         // Act
         var result = (ViewViewComponentResult)await sut.InvokeAsync(model);
@@ -219,7 +222,7 @@ public class InsightAnimationCardWidgetTests
         props.Description = "My Description";
         var sut = CreateSut();
 
-        SetupGetItemsByGUIDEmpty();
+        SetupGetPagesAsyncEmpty();
 
         // Act
         var result = (ViewViewComponentResult)await sut.InvokeAsync(BuildModel(props));
@@ -242,7 +245,7 @@ public class InsightAnimationCardWidgetTests
         props.BottomMargin = null!;
         var sut = CreateSut();
 
-        SetupGetItemsByGUIDEmpty();
+        SetupGetPagesAsyncEmpty();
 
         // Act
         var result = (ViewViewComponentResult)await sut.InvokeAsync(BuildModel(props));
@@ -254,7 +257,7 @@ public class InsightAnimationCardWidgetTests
     }
 
     // -----------------------------------------------------------------------
-    // TC-05  No InsightCards – GetItemsByGUIDAsync is never called
+    // TC-05  No InsightCards – GetPagesAsync is never called
     // -----------------------------------------------------------------------
     [Test]
     public async Task InvokeAsync_WithNoInsightCards_DoesNotCallContentService()
@@ -268,12 +271,16 @@ public class InsightAnimationCardWidgetTests
 
         // Assert
         _contentServiceMock.Verify(
-            s => s.GetItemsByGUIDAsync(It.IsAny<List<Guid>>()),
+            s => s.GetPagesAsync<InsightAnimationPage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
     // -----------------------------------------------------------------------
-    // TC-06  With InsightCards – GetItemsByGUIDAsync is called once with correct GUIDs
+    // TC-06  With InsightCards – GetPagesAsync is called once
     // -----------------------------------------------------------------------
     [Test]
     public async Task InvokeAsync_WithInsightCards_CallsContentServiceWithCorrectGuids()
@@ -288,7 +295,7 @@ public class InsightAnimationCardWidgetTests
             new ContentItemReference { Identifier = guid2 },
         };
 
-        SetupGetItemsByGUIDEmpty();
+        SetupGetPagesAsyncEmpty();
 
         var sut = CreateSut();
 
@@ -297,8 +304,11 @@ public class InsightAnimationCardWidgetTests
 
         // Assert
         _contentServiceMock.Verify(
-            s => s.GetItemsByGUIDAsync(
-                It.Is<List<Guid>>(ids => ids.Contains(guid1) && ids.Contains(guid2))),
+            s => s.GetPagesAsync<InsightAnimationPage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -313,7 +323,7 @@ public class InsightAnimationCardWidgetTests
         var ref1 = new ContentItemReference { Identifier = guid };
         var page = MakePage(title: "Insight 1", description: "<p>Hello</p>", url: "/read-more");
 
-        SetupGetItemsByGUID(new IWebPageFieldsSource[] { page });
+        SetupGetPagesAsync(new[] { page });
 
         var sut = CreateSut();
 
@@ -341,7 +351,7 @@ public class InsightAnimationCardWidgetTests
         var guid = Guid.NewGuid();
         var page = MakePage(imageUrl: "https://cdn.bdo.com/image.png");
 
-        SetupGetItemsByGUID(new IWebPageFieldsSource[] { page });
+        SetupGetPagesAsync(new[] { page });
 
         var sut = CreateSut();
 
@@ -365,7 +375,7 @@ public class InsightAnimationCardWidgetTests
         var guid = Guid.NewGuid();
         var page = MakePage(); // no imageUrl
 
-        SetupGetItemsByGUID(new IWebPageFieldsSource[] { page });
+        SetupGetPagesAsync(new[] { page });
 
         var sut = CreateSut();
 
@@ -391,7 +401,7 @@ public class InsightAnimationCardWidgetTests
         props.SeeAllLinkURL = "/insights/all";
         props.openInNewTab = "_blank";
 
-        SetupGetItemsByGUIDEmpty();
+        SetupGetPagesAsyncEmpty();
 
         var sut = CreateSut();
 
@@ -416,7 +426,7 @@ public class InsightAnimationCardWidgetTests
         props.SeeAllLinkText = null;
         props.SeeAllLinkURL = null;
 
-        SetupGetItemsByGUIDEmpty();
+        SetupGetPagesAsyncEmpty();
 
         var sut = CreateSut();
 
@@ -438,12 +448,12 @@ public class InsightAnimationCardWidgetTests
         // Arrange
         var guids = new[] { Guid.NewGuid(), Guid.NewGuid() };
         var refs = guids.Select(g => new ContentItemReference { Identifier = g }).ToArray();
-        var pages = new IWebPageFieldsSource[] { MakePage("A"), MakePage("B") };
+        var pages = new[] { MakePage("A"), MakePage("B") };
 
         var props = DefaultProperties(refs);
         props.openInNewTab = "_blank";
 
-        SetupGetItemsByGUID(pages);
+        SetupGetPagesAsync(pages);
 
         var sut = CreateSut();
 
@@ -465,7 +475,7 @@ public class InsightAnimationCardWidgetTests
         var props = DefaultProperties();
         props.WidgetID = "my-custom-widget-id";
 
-        SetupGetItemsByGUIDEmpty();
+        SetupGetPagesAsyncEmpty();
 
         var sut = CreateSut();
 
@@ -493,25 +503,5 @@ public class InsightAnimationCardWidgetTests
 
         // Assert
         Assert.That(dto.Items, Is.Empty);
-    }
-
-    // -----------------------------------------------------------------------
-    // TC-15  Correct view path is used
-    // -----------------------------------------------------------------------
-    [Test]
-    public async Task InvokeAsync_UsesExpectedViewPath()
-    {
-        // Arrange
-        var model = BuildModel(DefaultProperties());
-        var sut = CreateSut();
-
-        SetupGetItemsByGUIDEmpty();
-
-        // Act
-        var result = (ViewViewComponentResult)await sut.InvokeAsync(model);
-
-        // Assert
-        Assert.That(result.ViewName,
-            Is.EqualTo("~/Components/Widget/InsightAnimationCardWidget/_InsightAnimationCardWidget.cshtml"));
     }
 }

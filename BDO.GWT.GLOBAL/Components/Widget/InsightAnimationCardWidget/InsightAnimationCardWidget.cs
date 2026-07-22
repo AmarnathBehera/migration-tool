@@ -16,7 +16,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.GLOBAL.Widgets.InsightAnimationCardWidget;
+namespace BDO.GWT.GLOBAL.Widgets;
+
 public class InsightAnimationCardWidget: ViewComponent
 {
     private readonly IContentService _contentService;
@@ -52,11 +53,14 @@ public class InsightAnimationCardWidget: ViewComponent
         };
 
 
-      IEnumerable<InsightAnimationPage> insightAnimationPages = Enumerable.Empty<InsightAnimationPage>();
 
-        var pages = data.InsightCards.Any() ? await _contentService.GetItemsByGUIDAsync(data.InsightCards) : Enumerable.Empty<IWebPageFieldsSource>();
 
-         insightAnimationPages = pages.OfType<InsightAnimationPage>().ToList();
+
+         var insightAnimationPages = await _contentService.GetPagesAsync<InsightAnimationPage>(
+                new RetrievePagesParameters { LinkedItemsMaxLevel = 2 },
+                query => query.Where(w => w.WhereIn("ContentItemGUID", data.InsightCards)),
+                RetrievalCacheSettings.CacheDisabled,
+                HttpContext.RequestAborted);
 
 
         var dto = new InsightAnimationCardDto
