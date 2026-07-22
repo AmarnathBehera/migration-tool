@@ -32,7 +32,6 @@ public class InsightAnimationCardWidgetTests
 
     private Mock<IContentService> _contentServiceMock;
     private Mock<IWebsiteChannelContext> _websiteChannelContextMock;
-    private Mock<IContentRetriever> _contentRetrieverMock;
 
     // -----------------------------------------------------------------------
     // Helpers
@@ -43,7 +42,6 @@ public class InsightAnimationCardWidgetTests
     {
         _contentServiceMock = new Mock<IContentService>();
         _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
-        _contentRetrieverMock = new Mock<IContentRetriever>();
 
         // Default: channel context is valid
         _websiteChannelContextMock
@@ -58,8 +56,8 @@ public class InsightAnimationCardWidgetTests
     {
         var widget = new InsightAnimationCardWidget(
             _contentServiceMock.Object,
-            _websiteChannelContextMock.Object,
-            _contentRetrieverMock.Object);
+            _websiteChannelContextMock.Object
+            );
 
         widget.ViewComponentContext = new ViewComponentContext
         {
