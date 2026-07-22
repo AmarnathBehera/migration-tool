@@ -224,21 +224,6 @@ public class PageContentValidator : IPageContentValidator
                 $"Validation for '{field.DataType}'.'{componentIdentifier}' is not implemented.")
         };
     }
-
-    private Guid? ValidateFileFieldDataType(FormFieldInfo field, string componentIdentifier, object? value)
-    {
-        return componentIdentifier switch
-        {
-            "Kentico.FileUploader" =>
-                ValidateAndNormalizeGuid(
-                    field,
-                    value as Guid?,
-                    DoNothing),
-
-            _ => throw new NotImplementedException(
-                $"Validation for '{field.DataType}'.'{componentIdentifier}' is not implemented.")
-        };
-    }
     private Guid? ValidateGuidFieldDataType(FormFieldInfo field, string controlName, object? value)
     {
         if (string.IsNullOrWhiteSpace(controlName))

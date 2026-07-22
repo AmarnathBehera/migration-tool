@@ -34,7 +34,6 @@ public class PersonCrudService : IPersonCrudService
     private readonly IPageContentValidator _pageContentValidator;
     private readonly IInfoProvider<ChannelInfo> _channelInfoProvider;
     private readonly IWebPageManager _webPageManager;
-    private readonly IContentItemManager _contentItemManager;
     private readonly IMappingHelper _mappingHelper;
     private static readonly LanguageTag defaultCulture = LanguageTag.GB;
     private const string PERSON_CONTENT_TYPE = Person.CONTENT_TYPE_NAME;
@@ -49,7 +48,6 @@ public class PersonCrudService : IPersonCrudService
         IPageContentValidator pageContentValidator,
         IInfoProvider<ChannelInfo> channelInfoProvider,
         IWebPageManagerFactory webPageManagerFactory,
-        IContentItemManagerFactory managerFactory,
         IUserInfoProvider userInfoProvider,
         IMappingHelper mappingHelper)
 #pragma warning restore S107
@@ -62,7 +60,6 @@ public class PersonCrudService : IPersonCrudService
         _cultureService = cultureService;
         _pageContentValidator = pageContentValidator;
         _channelInfoProvider = channelInfoProvider;
-        _contentItemManager = managerFactory.Create(user.UserID);
         _webPageManager = webPageManagerFactory.Create(_websiteChannelContext.WebsiteChannelID == 0 ? 1 : _websiteChannelContext.WebsiteChannelID, user.UserID);
         _mappingHelper = mappingHelper;
     }
@@ -215,7 +212,7 @@ public class PersonCrudService : IPersonCrudService
             // The page display name shown in the admin UI
             string pageDisplayName = request.MetadataTitle ?? "New Person Created by API";
 
-            var itemData = await CreatePersonItemData(request, nodeParentID, currentCulture.Locale, cancellationToken);
+            var itemData = await CreatePersonItemData(request, cancellationToken);
 
             // Creates a page metadata object
             var contentItemParameters = new ContentItemParameters(PERSON_CONTENT_TYPE, itemData);
@@ -322,14 +319,20 @@ public class PersonCrudService : IPersonCrudService
             {
                 return new NotFoundResult();
             }
+
+            if (existingPerson.SystemFields is null)
+            {
+                throw new NotFoundException("Page system fields are missing");
+            }
+
             // Create new culture version data
-            var itemData = await CreatePersonItemData(request, existingPerson.SystemFields.WebPageItemParentID, toLangCulture.Locale, cancellationToken);
+            var itemData = await CreatePersonItemData(request, cancellationToken);
 
             // Create language variant for the existing page
             var createVariantParameters = new CMS.Websites.CreateLanguageVariantParameters(
                 existingPerson.SystemFields.WebPageItemID,
                 toLangCulture.Locale,
-                existingPerson.SystemFields?.ContentItemName ?? "Person culture variant",
+                existingPerson.SystemFields.ContentItemName ?? "Person culture variant",
                 itemData);
 
             // Creates the language variant in the database
@@ -426,8 +429,14 @@ public class PersonCrudService : IPersonCrudService
             {
                 return new NotFoundResult();
             }
+
+            if (existingPerson.SystemFields is null)
+            {
+                throw new NotFoundException("Page system fields are missing");
+            }
+
             // Build ContentItemData for the update
-            var itemData = await CreatePersonItemData(request, existingPerson.SystemFields.WebPageItemParentID, currentCulture.Locale, cancellationToken);
+            var itemData = await CreatePersonItemData(request, cancellationToken);
 
             // Create a draft, update it, and publish
             await _webPageManager.TryCreateDraft(existingPerson.SystemFields.WebPageItemID, currentCulture.Locale);
@@ -546,7 +555,7 @@ public class PersonCrudService : IPersonCrudService
         }
     }
 
-    private async Task<ContentItemData> CreatePersonItemData(PersonPageContent content, int? webPageParentID, string? culture, CancellationToken cancellationToken)
+    private async Task<ContentItemData> CreatePersonItemData(PersonPageContent content, CancellationToken cancellationToken)
     {
         var PersonCredentials = await _mappingHelper.BuildReferencesAsync<Credentials>(content.PersonCredentials, i => i.Name, cancellationToken);
         var MetadataCity = await _mappingHelper.BuildReferencesPageAsync<LocationCity>(content.MetadataCity, s => s.MetadataTitle, cancellationToken);

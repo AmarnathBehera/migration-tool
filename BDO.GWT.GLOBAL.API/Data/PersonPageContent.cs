@@ -24,10 +24,10 @@ public class PersonPageContent : IMetadataContent
 
     [MaxLength(200)]
     public string? MetadataTeaserImage { get; set; }
-
+            
     [Required]
     [MaxLength(200)]
-    public string? MetadataTeaserImageAltText { get; set; }
+    public string MetadataTeaserImageAltText { get; set; } = null!;
 
     [MaxLength(2000)]
     public string? MetadataCanonical { get; set; }
