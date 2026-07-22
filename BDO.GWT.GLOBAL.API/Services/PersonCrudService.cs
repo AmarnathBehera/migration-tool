@@ -225,13 +225,13 @@ public class PersonCrudService : IPersonCrudService
             int newPageId = await _webPageManager.Create(createPageParameters, cancellationToken);
 
             // Update the draft with new content
-            if (!await _webPageManager.TryUpdateDraft(newPageId, currentCulture.Locale, new UpdateDraftData(itemData)))
+            if (!await _webPageManager.TryUpdateDraft(newPageId, currentCulture.Locale, new UpdateDraftData(itemData), cancellationToken))
             {
                 throw new NotFoundException("Failed to update page draft");
             }
 
             // Publish the updated page
-            if (!await _webPageManager.TryPublish(newPageId, currentCulture.Locale))
+            if (!await _webPageManager.TryPublish(newPageId, currentCulture.Locale, cancellationToken: cancellationToken))
             {
                 throw new NotFoundException("Failed to publish updated page");
             }
@@ -336,19 +336,19 @@ public class PersonCrudService : IPersonCrudService
                 itemData);
 
             // Creates the language variant in the database
-            if (!await _webPageManager.TryCreateLanguageVariant(createVariantParameters))
+            if (!await _webPageManager.TryCreateLanguageVariant(createVariantParameters, cancellationToken))
             {
                 throw new NotFoundException("Failed to create language variant");
             }
 
             // Update the draft with new content
-            if (!await _webPageManager.TryUpdateDraft(existingPerson.SystemFields.WebPageItemID, toLangCulture.Locale, new UpdateDraftData(itemData)))
+            if (!await _webPageManager.TryUpdateDraft(existingPerson.SystemFields.WebPageItemID, toLangCulture.Locale, new UpdateDraftData(itemData), cancellationToken))
             {
                 throw new NotFoundException("Failed to update page draft");
             }
 
             // Publish the updated page
-            if (!await _webPageManager.TryPublish(existingPerson.SystemFields.WebPageItemID, toLangCulture.Locale))
+            if (!await _webPageManager.TryPublish(existingPerson.SystemFields.WebPageItemID, toLangCulture.Locale, cancellationToken: cancellationToken))
             {
                 throw new NotFoundException("Failed to publish updated page");
             }
@@ -439,16 +439,16 @@ public class PersonCrudService : IPersonCrudService
             var itemData = await CreatePersonItemData(request, cancellationToken);
 
             // Create a draft, update it, and publish
-            await _webPageManager.TryCreateDraft(existingPerson.SystemFields.WebPageItemID, currentCulture.Locale);
+            await _webPageManager.TryCreateDraft(existingPerson.SystemFields.WebPageItemID, currentCulture.Locale, cancellationToken: cancellationToken);
 
             // Update the draft with new content
-            if (!await _webPageManager.TryUpdateDraft(existingPerson.SystemFields.WebPageItemID, currentCulture.Locale, new UpdateDraftData(itemData)))
+            if (!await _webPageManager.TryUpdateDraft(existingPerson.SystemFields.WebPageItemID, currentCulture.Locale, new UpdateDraftData(itemData), cancellationToken))
             {
                 throw new NotFoundException("Failed to update page draft");
             }
 
             // Publish the updated page
-            if (!await _webPageManager.TryPublish(existingPerson.SystemFields.WebPageItemID, currentCulture.Locale))
+            if (!await _webPageManager.TryPublish(existingPerson.SystemFields.WebPageItemID, currentCulture.Locale, cancellationToken: cancellationToken))
             {
                 throw new NotFoundException("Failed to publish updated page");
             }
@@ -520,7 +520,8 @@ public class PersonCrudService : IPersonCrudService
                         new DeleteWebPageParameters(existingPerson.SystemFields.WebPageItemID, cult.ToString())
                         {
                             Permanently = true
-                        });
+                        },
+                        cancellationToken);
                 }
             }
         }
@@ -551,7 +552,8 @@ public class PersonCrudService : IPersonCrudService
                 new DeleteWebPageParameters(existingPerson.SystemFields.WebPageItemID, currentCulture.Locale)
                 {
                     Permanently = true
-                });
+                },
+                cancellationToken);
         }
     }
 
