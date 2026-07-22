@@ -50,5 +50,6 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IDealCrudService, DealCrudService>();
         serviceCollection.AddScoped<IFooterService, FooterService>();
         serviceCollection.AddScoped<ICultureValidationService, CultureValidationService>();
+        serviceCollection.AddScoped<IPersonCrudService, PersonCrudService>();
     }
 }
