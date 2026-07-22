@@ -2,6 +2,7 @@
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.GLOBAL.API.Data;
 using CMS.ContentEngine;
+using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +12,26 @@ namespace BDO.GWT.GLOBAL.API.Helpers
     {
         Task<List<ContentItemReference>> BuildContentAttachmentImageReferences(string? url, CancellationToken cancellationToken);
         Task<List<ContentItemReference>> BuildContentAttachmentPersonPageReferences(string? pagePath, string? channelName, string? culture, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Resolves references to web pages of type <typeparamref name="TPage"/> from their
+        /// <c>WebPageItemID</c> values. Used by multi-select web page reference fields such as
+        /// <c>MetadataRelevantContactPerson</c> and <c>MetadataOfficeLocation</c>.
+        /// </summary>
+        Task<List<ContentItemReference>> BuildWebPageIdReferencesAsync<TPage>(int[]? webPageItemIds, string? channelName, string? culture, CancellationToken cancellationToken)
+            where TPage : class, IWebPageFieldsSource;
+
+        Task<List<ContentItemReference>> BuildWebPageSingleIdReferencesAsync<TPage>(int? webPageItemId, string? channelName, string? culture, CancellationToken cancellationToken)
+            where TPage : class, IWebPageFieldsSource;
+
+        /// <summary>
+        /// Resolves a reference to a reusable content item of type <typeparamref name="TItem"/> by its
+        /// <c>Name</c> field. Accepts a raw content item GUID directly. Used by fields such as
+        /// <c>CareerJobTitle</c>, <c>CareerLevel</c>, and <c>CareerEmploymentType</c>.
+        /// </summary>
+        Task<List<ContentItemReference>> BuildReusableContentItemNameReferenceAsync<TItem>(string? name, CancellationToken cancellationToken)
+            where TItem : class, IContentItemFieldsSource;
+
     }
     public class MappingHelper : IMappingHelper
     {
@@ -101,6 +122,89 @@ namespace BDO.GWT.GLOBAL.API.Helpers
                 cancellationToken);
 
             var match = pages?.FirstOrDefault();
+
+            return match is null
+                ? new List<ContentItemReference>()
+                : new List<ContentItemReference> { new ContentItemReference { Identifier = match.SystemFields.ContentItemGUID } };
+        }
+
+        /// <inheritdoc />
+        public async Task<List<ContentItemReference>> BuildWebPageIdReferencesAsync<TPage>(int[]? webPageItemIds, string? channelName, string? culture, CancellationToken cancellationToken)
+            where TPage : class, IWebPageFieldsSource
+        {
+            if (webPageItemIds is null || webPageItemIds.Length == 0)
+            {
+                return new List<ContentItemReference>();
+            }
+
+            var parameters = new RetrievePagesParameters
+            {
+                LinkedItemsMaxLevel = 0,
+                ChannelName = channelName,
+                LanguageName = culture ?? defaultCulture.Language,
+                IsForPreview = false
+            };
+
+            var pages = await _contentRetriever.GetPagesAsync<TPage>(
+                parameters,
+                query => query.Where(w => w.WhereIn("WebPageItemID", webPageItemIds)),
+                RetrievalCacheSettings.CacheDisabled,
+                cancellationToken);
+
+            return pages?
+                .Select(p => new ContentItemReference { Identifier = p.SystemFields.ContentItemGUID })
+                .ToList() ?? new List<ContentItemReference>();
+        }
+
+        public async Task<List<ContentItemReference>> BuildWebPageSingleIdReferencesAsync<TPage>(int? webPageItemId, string? channelName, string? culture, CancellationToken cancellationToken)
+            where TPage : class, IWebPageFieldsSource
+        {
+            if (webPageItemId is null || webPageItemId == 0)
+            {
+                return new List<ContentItemReference>();
+            }
+
+            var parameters = new RetrievePagesParameters
+            {
+                LinkedItemsMaxLevel = 0,
+                ChannelName = channelName,
+                LanguageName = culture ?? defaultCulture.Language,
+                IsForPreview = false
+            };
+
+            var pages = await _contentRetriever.GetPagesAsync<TPage>(
+                parameters,
+                query => query.Where(w => w.WhereEquals("WebPageItemID", webPageItemId)),
+                RetrievalCacheSettings.CacheDisabled,
+                cancellationToken);
+
+            return pages?
+                .Select(p => new ContentItemReference { Identifier = p.SystemFields.ContentItemGUID })
+                .ToList() ?? new List<ContentItemReference>();
+        }
+
+        /// <inheritdoc />
+        public async Task<List<ContentItemReference>> BuildReusableContentItemNameReferenceAsync<TItem>(string? name, CancellationToken cancellationToken)
+            where TItem : class, IContentItemFieldsSource
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return new List<ContentItemReference>();
+            }
+
+            var value = name.Trim();
+
+            // Accept a raw content item GUID directly.
+            if (Guid.TryParse(value, out var guid))
+            {
+                return new List<ContentItemReference> { new ContentItemReference { Identifier = guid } };
+            }
+
+            var items = await _contentRetriever.GetItemsAsync<TItem>(
+                builder => builder.Parameters(p => p.Where(w => w.WhereEquals("Name", value))),
+                cancellationToken);
+
+            var match = items?.FirstOrDefault();
 
             return match is null
                 ? new List<ContentItemReference>()
