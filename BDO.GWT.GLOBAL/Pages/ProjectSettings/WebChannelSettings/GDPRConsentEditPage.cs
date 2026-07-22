@@ -35,7 +35,6 @@ public class GDPRConsentEditPage : InfoEditPage<GDPRInfo>
             if (WebChannelSettingsId <= 0)
                 return 0;
 
-            // Auto-create an empty GDPRInfo for this channel so the edit form can load.
             var newGDPRInfo = new GDPRInfo
             {
                 GDPRWebChannelSettingID = WebChannelSettingsId,
@@ -45,8 +44,6 @@ public class GDPRConsentEditPage : InfoEditPage<GDPRInfo>
 
             return newGDPRInfo.GDPRID;
         }
-        // ObjectId is derived from WebChannelSettingsId; the setter is required
-        // by the base contract but the supplied value is intentionally ignored.
         set => _ = value;
     }
 
@@ -72,23 +69,21 @@ public class GDPRConsentEditPage : InfoEditPage<GDPRInfo>
 
     public override async Task ConfigurePage()
     {
-        // ✅ Guard: block access if user has no permission for this channel
         bool canAccess = await channelAccessService.CanAccessAsync(WebChannelSettingsId);
         if (!canAccess)
         {
-            // ✅ Correct way to block in XbyK — hide the submit button
-            // and show nothing by returning before base.ConfigurePage()
             PageConfiguration.SubmitConfiguration.Visible = false;
             PageConfiguration.Headline = "Access Denied";
             return;
         }
 
-        PageConfiguration.UIFormName = "emailedit";
+        PageConfiguration.UIFormName = "gdprconsent";
         await base.ConfigurePage();
     }
 
     protected override async Task<ICommandResponse> GetSubmitSuccessResponse(
-        GDPRInfo savedInfoObject, ICollection<IFormItem> items)
+        GDPRInfo savedInfoObject,
+        ICollection<IFormItem> items)
     {
         var result = new EditPageSuccessFormSubmissionResult()
         {
