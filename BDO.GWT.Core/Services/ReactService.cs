@@ -29,9 +29,9 @@ public class ReactService : IReactService
     private readonly IOptions<ReactOptions> _reactOptions;
     //private readonly IPageContext _pageContext;
     private readonly IReactCachingService _reactCachingService;
-    private readonly ILogger _logger;
+    private readonly ILogger<ReactService> _logger;
 
-    public ReactService(IHttpClientFactory httpClientFactory, IOptions<ReactOptions> reactOptions, IReactCachingService reactCachingService, ILogger logger)
+    public ReactService(IHttpClientFactory httpClientFactory, IOptions<ReactOptions> reactOptions, IReactCachingService reactCachingService, ILogger<ReactService> logger)
     {
         _httpClient = httpClientFactory.CreateClient(HttpClientName.React);
         _reactOptions = reactOptions;

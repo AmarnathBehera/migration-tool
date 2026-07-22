@@ -25,7 +25,7 @@ public class ReactServiceTests
     private Mock<HttpMessageHandler> _httpMessageHandlerMock;
     private Mock<IOptions<ReactOptions>> _reactOptionsMock;
     private Mock<IReactCachingService> _reactCachingServiceMock;
-    private Mock<ILogger> _loggerMock;
+    private Mock<ILogger<ReactService>> _loggerMock;
 
     private const int PageId = 1;
     private const string ComponentType = "TestComponent";
@@ -72,7 +72,7 @@ public class ReactServiceTests
                 (factory, key, ct) => factory(ct));
 
         // --- Logger ---
-        _loggerMock = new Mock<ILogger>();
+        _loggerMock = new Mock<ILogger<ReactService>>();
     }
 
     // Convenience factory so each test starts with a fresh service instance.
