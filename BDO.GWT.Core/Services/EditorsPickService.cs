@@ -82,7 +82,10 @@ public class EditorsPickService : IEditorsPickService
                 : null,
             TopMargin = data.TopMargin ?? string.Empty,
             BottomMargin = data.BottomMargin ?? string.Empty,
-            WidgetID = data.WidgetID
+            WidgetID = data.WidgetID,
+            StateGUID = Guid.NewGuid(),
+            FeaturedGuids = string.Join(",", featuredGuids.Select(x => x.Identifier)),
+            SelectedGuids = string.Join(",", selectedGuids.Select(x => x.Identifier)),
         };
     }
 

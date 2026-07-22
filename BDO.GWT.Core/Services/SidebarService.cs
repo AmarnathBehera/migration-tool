@@ -71,6 +71,7 @@ public class SidebarService : ISidebarService
                 ButtonTitle = page.CallToActionButtonText,
                 ButtonUrl = page.CallToActionButtonUrl,
             } : null,
+            Contacts = await GetContentPageAuthorDtosGen(page.RelevantContactPersonDeal.Select(p => p.SystemFields.ContentItemGUID).ToList(), cancellationToken),
         };
 
         if (sidebarDto.SocialMediaButtons is not null)

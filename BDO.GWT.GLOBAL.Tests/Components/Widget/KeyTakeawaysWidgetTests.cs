@@ -1,4 +1,5 @@
-﻿using BDO.GWT.GLOBAL.Components.Widget.KeyTakeawaysWidget;
+﻿using BDO.GWT.Core.DTOs;
+using BDO.GWT.GLOBAL.Components.Widget.KeyTakeawaysWidget;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;

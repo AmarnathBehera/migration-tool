@@ -7,4 +7,6 @@ public class CultureDto
     public string ShortName { get; set; } = null!;
 
     public string Url { get; set; } = null!;
+
+    public string CultureCode { get; set; } = string.Empty;
 }
