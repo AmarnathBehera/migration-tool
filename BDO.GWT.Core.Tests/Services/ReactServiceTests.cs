@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
-using NUnit.Framework;
 using System.IO;
 using System.Net;
 using System.Net.Http.Json;
@@ -21,9 +20,6 @@ namespace BDO.GWT.Core.Tests.Services;
 [TestFixture]
 public class ReactServiceTests
 {
-    // -----------------------------------------------------------------------
-    // Helpers / shared state
-    // -----------------------------------------------------------------------
 
     private Mock<IHttpClientFactory> _httpClientFactoryMock;
     private Mock<HttpMessageHandler> _httpMessageHandlerMock;
@@ -354,10 +350,15 @@ public class ReactServiceTests
             new { }, CancellationToken.None);
 
         // Assert
-        Assert.That(capturedRequest, Is.Not.Null);
-        Assert.That(capturedRequest!.RequestUri!.AbsolutePath,
-            Is.EqualTo($"/api/render/{ComponentType}"));
-        Assert.That(capturedRequest.Method, Is.EqualTo(HttpMethod.Post));
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedRequest, Is.Not.Null);
+            Assert.That(capturedRequest!.RequestUri!.AbsolutePath,
+                Is.EqualTo($"/api/render/{ComponentType}"));
+            Assert.That(capturedRequest.Method, Is.EqualTo(HttpMethod.Post));
+
+        });
+        
     }
 
     // -----------------------------------------------------------------------
