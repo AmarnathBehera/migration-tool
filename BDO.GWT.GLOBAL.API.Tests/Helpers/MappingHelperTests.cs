@@ -14,6 +14,9 @@ public class MappingHelperTests
     private Mock<IContentService> _contentServiceMock = null!;
     private MappingHelper _mappingHelper = null!;
 
+    private static readonly string[] WhitespaceIdentifiersWithNull = new[] { "", "   ", null! };
+    private static readonly string[] WhitespaceIdentifiers = new[] { "", "   " };
+
     [SetUp]
     public void Setup()
     {
@@ -229,7 +232,7 @@ public class MappingHelperTests
     [Test]
     public async Task BuildReferencesAsync_WithOnlyWhitespaceIdentifiers_ReturnsEmptyList_AndNeverQueries()
     {
-        var result = await _mappingHelper.BuildReferencesAsync<Person>(new[] { "", "   ", null! }, p => p.MetadataTitle ?? string.Empty, CancellationToken.None);
+        var result = await _mappingHelper.BuildReferencesAsync<Person>(WhitespaceIdentifiersWithNull, p => p.MetadataTitle ?? string.Empty, CancellationToken.None);
 
         Assert.That(result, Is.Empty);
         _contentServiceMock.Verify(
@@ -251,7 +254,7 @@ public class MappingHelperTests
     [Test]
     public async Task BuildReferencesPageAsync_WithOnlyWhitespaceIdentifiers_ReturnsEmptyList_AndNeverQueries()
     {
-        var result = await _mappingHelper.BuildReferencesPageAsync<Person>(new[] { "", "   " }, p => p.MetadataTitle ?? string.Empty, CancellationToken.None);
+        var result = await _mappingHelper.BuildReferencesPageAsync<Person>(WhitespaceIdentifiers, p => p.MetadataTitle ?? string.Empty, CancellationToken.None);
 
         Assert.That(result, Is.Empty);
         _contentServiceMock.Verify(
