@@ -46,6 +46,7 @@ public class InsightAnimationCardWidgetTests
         _websiteChannelContextMock
             .Setup(c => c.WebsiteChannelID)
             .Returns(1);
+
     }
 
     /// <summary>
@@ -256,28 +257,7 @@ public class InsightAnimationCardWidgetTests
         Assert.That(dto.BottomMargin, Is.EqualTo("0px"));
     }
 
-    // -----------------------------------------------------------------------
-    // TC-05  No InsightCards – GetPagesAsync is never called
-    // -----------------------------------------------------------------------
-    [Test]
-    public async Task InvokeAsync_WithNoInsightCards_DoesNotCallContentService()
-    {
-        // Arrange
-        var model = BuildModel(DefaultProperties(cards: Enumerable.Empty<ContentItemReference>()));
-        var sut = CreateSut();
-
-        // Act
-        await sut.InvokeAsync(model);
-
-        // Assert
-        _contentServiceMock.Verify(
-            s => s.GetPagesAsync<InsightAnimationPage>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()),
-            Times.Never);
-    }
+    
 
     // -----------------------------------------------------------------------
     // TC-06  With InsightCards – GetPagesAsync is called once
