@@ -4,7 +4,9 @@ using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Utilities;
+using CMS.Websites;
 using CMS.Websites.Routing;
+using CommandLine;
 using Kentico.Content.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
@@ -14,23 +16,22 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.InsightAnimationCardWidget;
+namespace BDO.GWT.GLOBAL.Widgets.InsightAnimationCardWidget;
 public class InsightAnimationCardWidget: ViewComponent
 {
     private readonly IContentService _contentService;
     private readonly IWebsiteChannelContext _websiteChannelContext;
-    private readonly IContentRetriever _contentRetriever;
 
-    public InsightAnimationCardWidget(IContentService contentService,IWebsiteChannelContext websiteChannelContext,IContentRetriever contentRetriever)
+
+    public InsightAnimationCardWidget(IContentService contentService,IWebsiteChannelContext websiteChannelContext)
     {
         _contentService = contentService;
         _websiteChannelContext = websiteChannelContext;
-        _contentRetriever = contentRetriever;
+
     }
 
     public async Task<IViewComponentResult> InvokeAsync(ComponentViewModel<InsightAnimationCardWidgetProperties> model)
     {
-        var cancellationToken = HttpContext?.RequestAborted ?? CancellationToken.None;
         var channel = _websiteChannelContext;
         if (channel== null)
         {
@@ -51,18 +52,18 @@ public class InsightAnimationCardWidget: ViewComponent
         };
 
 
-      IEnumerable<InsightAnimationPage> insightanimationpages = Enumerable.Empty<InsightAnimationPage>();
+      IEnumerable<InsightAnimationPage> insightAnimationPages = Enumerable.Empty<InsightAnimationPage>();
 
-        if (data.InsightCards.Any())
-        {
-            insightanimationpages = await _contentRetriever.RetrieveContentByGuids<InsightAnimationPage>(data.InsightCards,cancellationToken);
-        }
+        var pages = data.InsightCards.Any() ? await _contentService.GetItemsByGUIDAsync(data.InsightCards) : Enumerable.Empty<IWebPageFieldsSource>();
+
+         insightAnimationPages = pages.OfType<InsightAnimationPage>().ToList();
+
 
         var dto = new InsightAnimationCardDto
         {
             Title = data.Title,
             Description = data.Description,
-            Items = insightanimationpages.Select(x => new InsightAnimationPageDto
+            Items = insightAnimationPages.Select(x => new InsightAnimationPageDto
             {
                 Title = x.Title,
                 Description = HtmlHelper.ExtractTextFromHtml(x.Description),

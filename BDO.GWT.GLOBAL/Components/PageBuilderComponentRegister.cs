@@ -4,6 +4,7 @@ using BDO.GWT.GLOBAL.Components.Widget.InsightCarouselWidget;
 using BDO.GWT.GLOBAL.Components.Widget.KeyTakeawaysWidget;
 using BDO.GWT.GLOBAL.Components.Widget.LocalNavigationWidget;
 using BDO.GWT.GLOBAL.Widgets;
+using BDO.GWT.GLOBAL.Widgets.InsightAnimationCardWidget;
 using BDO.GWT.Web.Components.Widget.TabAccordionWidget;
 using BDO.GWT.Web.Widgets.AccordionWidget;
 using BDO.GWT.Web.Widgets.FaqWidget;
@@ -21,7 +22,7 @@ using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ButtonWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.EditorsPickWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.EventsWebinarsSliderWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ExternalNavigationWidget;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.InsightAnimationCardWidget;
+
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ViewGlobalLocations;
 using BDO.GWT.Xperience.LiveSite.Components.Section;

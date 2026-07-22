@@ -8,7 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 
-namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.InsightAnimationCardWidget;
+namespace BDO.GWT.GLOBAL.Widgets.InsightAnimationCardWidget;
+
 public class InsightAnimationCardWidgetProperties : BaseWidgetProperties
 {
     [TextInputComponent( Label = "Title", ExplanationText = "Title that will be shown over insight carousel widget.", Order = 0)]
