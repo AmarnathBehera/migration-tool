@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Security.Claims;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.ContentEngine;
 using CMS.DataEngine;
@@ -222,117 +224,233 @@ namespace BDO.GWT.GLOBAL.Tests.Modules
             Assert.That(result, Is.False);
         }
 
-        // ── IChannelAccessService – additional shape ──────────────────────────
+        // ── behavioural: GetAccessibleWebChannelSettingsIdsAsync ──────────────
 
         [Test]
-        public void IChannelAccessService_HasExactlyTwoMethods()
+        public async Task GetAccessibleWebChannelSettingsIdsAsync_WhenUserIsAdministrator_ReturnsNull()
         {
-            Assert.That(typeof(IChannelAccessService).GetMethods(), Has.Length.EqualTo(2));
+            AuthenticateUser("admin", MakeUser(userId: 1, admin: true));
+
+            var result = await _service.GetAccessibleWebChannelSettingsIdsAsync();
+
+            Assert.That(result, Is.Null);
         }
 
         [Test]
-        public void ChannelAccessService_IsNotAbstract()
+        public async Task GetAccessibleWebChannelSettingsIdsAsync_WhenUserHasNoRoles_ReturnsEmpty()
         {
-            Assert.That(typeof(ChannelAccessService).IsAbstract, Is.False);
+            AuthenticateUser("editor", MakeUser(userId: 2, admin: false));
+            SetupUserRoleIds();
+
+            var result = await _service.GetAccessibleWebChannelSettingsIdsAsync();
+
+            Assert.That(result, Is.Empty);
         }
 
         [Test]
-        public void ChannelAccessService_HasPrivateField_ForWebChannelSettingsProvider()
+        public async Task GetAccessibleWebChannelSettingsIdsAsync_WhenRolesDoNotMatchAnyChannel_ReturnsEmpty()
         {
-            var field = typeof(ChannelAccessService)
-                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
-                .FirstOrDefault(f => f.FieldType == typeof(IInfoProvider<WebChannelSettingsInfo>));
+            AuthenticateUser("editor", MakeUser(userId: 3, admin: false));
+            SetupUserRoleIds(10);
+            SetupRoleNames("SomeUnrelatedRole");
+            SetupChannels(("bdoglobal", 5));
 
-            Assert.That(field, Is.Not.Null);
+            var result = await _service.GetAccessibleWebChannelSettingsIdsAsync();
+
+            Assert.That(result, Is.Empty);
         }
 
         [Test]
-        public void ChannelAccessService_HasPrivateField_ForChannelProvider()
+        public async Task GetAccessibleWebChannelSettingsIdsAsync_WhenChannelMatchesButNoWebChannelSettings_ReturnsEmpty()
         {
-            var field = typeof(ChannelAccessService)
-                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
-                .FirstOrDefault(f => f.FieldType == typeof(IInfoProvider<ChannelInfo>));
+            AuthenticateUser("editor", MakeUser(userId: 4, admin: false));
+            SetupUserRoleIds(10);
+            SetupRoleNames("bdoglobal");
+            SetupChannels(("bdoglobal", 5));
+            SetupWebChannelSettings(/* none */);
 
-            Assert.That(field, Is.Not.Null);
+            var result = await _service.GetAccessibleWebChannelSettingsIdsAsync();
+
+            Assert.That(result, Is.Empty);
         }
 
         [Test]
-        public void ChannelAccessService_HasPrivateField_ForUserInfoProvider()
+        public async Task GetAccessibleWebChannelSettingsIdsAsync_WhenRoleEqualsChannelName_ReturnsSettingsIds()
         {
-            var field = typeof(ChannelAccessService)
-                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
-                .FirstOrDefault(f => f.FieldType == typeof(IUserInfoProvider));
+            AuthenticateUser("editor", MakeUser(userId: 5, admin: false));
+            SetupUserRoleIds(10);
+            SetupRoleNames("bdoglobal");
+            SetupChannels(("bdoglobal", 5), ("other", 6));
+            SetupWebChannelSettings(77);
 
-            Assert.That(field, Is.Not.Null);
+            var result = await _service.GetAccessibleWebChannelSettingsIdsAsync();
+
+            Assert.That(result, Is.EqualTo(new[] { 77 }));
         }
 
         [Test]
-        public void ChannelAccessService_HasPrivateField_ForUserRoleProvider()
+        public async Task GetAccessibleWebChannelSettingsIdsAsync_WhenRoleStartsWithChannelPrefix_ReturnsSettingsIds()
         {
-            var field = typeof(ChannelAccessService)
-                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
-                .FirstOrDefault(f => f.FieldType == typeof(IInfoProvider<UserRoleInfo>));
+            AuthenticateUser("editor", MakeUser(userId: 6, admin: false));
+            SetupUserRoleIds(11);
+            SetupRoleNames("bdoglobal-editor");
+            SetupChannels(("bdoglobal", 5));
+            SetupWebChannelSettings(88, 99);
 
-            Assert.That(field, Is.Not.Null);
+            var result = await _service.GetAccessibleWebChannelSettingsIdsAsync();
+
+            Assert.That(result, Is.EqualTo(new[] { 88, 99 }));
+        }
+
+        // ── behavioural: CanAccessAsync ───────────────────────────────────────
+
+        [Test]
+        public async Task CanAccessAsync_WhenUserIsAdministrator_ReturnsTrue()
+        {
+            AuthenticateUser("admin", MakeUser(userId: 7, admin: true));
+
+            var result = await _service.CanAccessAsync(123);
+
+            Assert.That(result, Is.True);
         }
 
         [Test]
-        public void ChannelAccessService_HasPrivateField_ForRoleProvider()
+        public async Task CanAccessAsync_WhenIdIsAccessible_ReturnsTrue()
         {
-            var field = typeof(ChannelAccessService)
-                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
-                .FirstOrDefault(f => f.FieldType == typeof(IInfoProvider<RoleInfo>));
+            AuthenticateUser("editor", MakeUser(userId: 8, admin: false));
+            SetupUserRoleIds(10);
+            SetupRoleNames("bdoglobal");
+            SetupChannels(("bdoglobal", 5));
+            SetupWebChannelSettings(77);
 
-            Assert.That(field, Is.Not.Null);
-        }
+            var result = await _service.CanAccessAsync(77);
 
-        // ── GetAccessibleWebChannelSettingsIdsAsync – IsAsync ─────────────────
-
-        [Test]
-        public void GetAccessibleWebChannelSettingsIdsAsync_IsAsync()
-        {
-            var method = typeof(ChannelAccessService)
-                .GetMethod(nameof(ChannelAccessService.GetAccessibleWebChannelSettingsIdsAsync))!;
-
-            var asyncAttr = method.GetCustomAttributes()
-                .FirstOrDefault(a => a.GetType().Name == "AsyncStateMachineAttribute");
-
-            Assert.That(asyncAttr, Is.Not.Null);
+            Assert.That(result, Is.True);
         }
 
         [Test]
-        public void CanAccessAsync_IsAsync()
+        public async Task CanAccessAsync_WhenIdIsNotAccessible_ReturnsFalse()
         {
-            var method = typeof(ChannelAccessService)
-                .GetMethod(nameof(ChannelAccessService.CanAccessAsync))!;
+            AuthenticateUser("editor", MakeUser(userId: 9, admin: false));
+            SetupUserRoleIds(10);
+            SetupRoleNames("bdoglobal");
+            SetupChannels(("bdoglobal", 5));
+            SetupWebChannelSettings(77);
 
-            var asyncAttr = method.GetCustomAttributes()
-                .FirstOrDefault(a => a.GetType().Name == "AsyncStateMachineAttribute");
-
-            Assert.That(asyncAttr, Is.Not.Null);
-        }
-
-        // ── CanAccessAsync – with valid id in accessible list ─────────────────
-
-        [Test]
-        public async Task CanAccessAsync_WhenHttpContextIsNull_ReturnsFalse()
-        {
-            _httpContextAccessor.SetupGet(a => a.HttpContext).Returns((HttpContext?)null);
-
-            var result = await _service.CanAccessAsync(1);
+            var result = await _service.CanAccessAsync(999);
 
             Assert.That(result, Is.False);
         }
 
-        [Test]
-        public async Task CanAccessAsync_WhenUserNotAuthenticated_ReturnsFalse()
+        // ── helpers ───────────────────────────────────────────────────────────
+
+        private void AuthenticateUser(string userName, UserInfo user)
         {
-            var httpContext = new DefaultHttpContext();
-            _httpContextAccessor.SetupGet(a => a.HttpContext).Returns(httpContext);
+            var ctx = new DefaultHttpContext
+            {
+                User = new ClaimsPrincipal(
+                    new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, userName) }, "TestAuth"))
+            };
+            _httpContextAccessor.SetupGet(a => a.HttpContext).Returns(ctx);
+            _userInfoProvider.Setup(p => p.Get(userName)).Returns(user);
+        }
 
-            var result = await _service.CanAccessAsync(5);
+        private void SetupUserRoleIds(params int[] roleIds)
+        {
+            var query = new Mock<ObjectQuery<UserRoleInfo>>();
+            _userRoleProvider.Setup(p => p.Get()).Returns(query.Object);
+            query.Setup(q => q.WhereEquals(It.IsAny<string>(), It.IsAny<object>())).Returns(query.Object);
+            query.Setup(q => q.Column(It.IsAny<string>())).Returns(query.Object);
+            query.Setup(q => q.GetEnumerableTypedResult(It.IsAny<System.Data.CommandBehavior>(), It.IsAny<bool>()))
+                .Returns(roleIds.Select(id =>
+                {
+                    var ur = Make<TestUserRoleInfo>();
+                    ur.RoleID = id;
+                    return (UserRoleInfo)ur;
+                }).ToList());
+        }
 
-            Assert.That(result, Is.False);
+        private void SetupRoleNames(params string[] roleNames)
+        {
+            var query = new Mock<ObjectQuery<RoleInfo>>();
+            _roleProvider.Setup(p => p.Get()).Returns(query.Object);
+            query.Setup(q => q.WhereIn(It.IsAny<string>(), It.IsAny<ICollection<int>>())).Returns(query.Object);
+            query.Setup(q => q.Column(It.IsAny<string>())).Returns(query.Object);
+            query.Setup(q => q.GetEnumerableTypedResult(It.IsAny<System.Data.CommandBehavior>(), It.IsAny<bool>()))
+                .Returns(roleNames.Select(name =>
+                {
+                    var r = Make<TestRoleInfo>();
+                    r.RoleName = name;
+                    return (RoleInfo)r;
+                }).ToList());
+        }
+
+        private void SetupChannels(params (string name, int id)[] channels)
+        {
+            var query = new Mock<ObjectQuery<ChannelInfo>>();
+            _channelProvider.Setup(p => p.Get()).Returns(query.Object);
+            query.Setup(q => q.GetEnumerableTypedResult(It.IsAny<System.Data.CommandBehavior>(), It.IsAny<bool>()))
+                .Returns(channels.Select(c =>
+                {
+                    var ch = Make<TestChannelInfo>();
+                    ch.ChannelName = c.name;
+                    ch.ChannelID = c.id;
+                    return (ChannelInfo)ch;
+                }).ToList());
+        }
+
+        private void SetupWebChannelSettings(params int[] settingsIds)
+        {
+            var query = new Mock<ObjectQuery<WebChannelSettingsInfo>>();
+            _webChannelSettingsProvider.Setup(p => p.Get()).Returns(query.Object);
+            query.Setup(q => q.WhereIn(It.IsAny<string>(), It.IsAny<ICollection<int>>())).Returns(query.Object);
+            query.Setup(q => q.GetEnumerableTypedResult(It.IsAny<System.Data.CommandBehavior>(), It.IsAny<bool>()))
+                .Returns(settingsIds.Select(id =>
+                {
+                    var s = Make<TestWebChannelSettingsInfo>();
+                    s.WebChannelSettingsID = id;
+                    return (WebChannelSettingsInfo)s;
+                }).ToList());
+        }
+
+        private static UserInfo MakeUser(int userId, bool admin)
+        {
+            var user = Make<TestUserInfo>();
+            user.UserID = userId;
+            user.Admin = admin;
+            return user;
+        }
+
+        private static T Make<T>() => (T)RuntimeHelpers.GetUninitializedObject(typeof(T));
+
+        // Test subclasses override virtual members so reads/writes bypass Kentico's
+        // AbstractInfoBase.GetValue/SetValue, which require an initialised CMS IoC container.
+        private sealed class TestUserInfo : UserInfo
+        {
+            public bool Admin;
+            public override int UserID { get; set; }
+            public override bool IsInRole(string roleName) => Admin;
+        }
+
+        private sealed class TestUserRoleInfo : UserRoleInfo
+        {
+            public override int RoleID { get; set; }
+        }
+
+        private sealed class TestRoleInfo : RoleInfo
+        {
+            public override string RoleName { get; set; } = string.Empty;
+        }
+
+        private sealed class TestChannelInfo : ChannelInfo
+        {
+            public override string ChannelName { get; set; } = string.Empty;
+            public override int ChannelID { get; set; }
+        }
+
+        private sealed class TestWebChannelSettingsInfo : WebChannelSettingsInfo
+        {
+            public override int WebChannelSettingsID { get; set; }
         }
     }
 }

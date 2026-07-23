@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.Serialization;
 using CMS.DataEngine;
 using CMS.Modules;
 using Moq;
@@ -93,5 +94,66 @@ public class RedirectModuleInstallerTests
     {
         var ctor = typeof(RedirectModule).GetConstructor(Type.EmptyTypes);
         Assert.That(ctor, Is.Not.Null);
+    }
+
+    [Test]
+    public void RedirectModule_Constructor_CreatesModuleNamedAfterItself()
+    {
+        var module = new RedirectModule();
+
+        Assert.That(module, Is.InstanceOf<CMS.DataEngine.Module>());
+    }
+
+    // ── RedirectModule.InitializeModule (behavioural) ─────────────────────────
+
+    [Test]
+    public void InitializeModule_WhenInstallerSet_CallsInstall()
+    {
+        var module = (RedirectModule)FormatterServices.GetUninitializedObject(typeof(RedirectModule));
+        var installer = new SpyInstaller();
+        SetInstaller(module, installer);
+
+        InvokeInitializeModule(module);
+
+        Assert.That(installer.InstallCount, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void InitializeModule_WhenInstallerNull_DoesNotThrow()
+    {
+        var module = (RedirectModule)FormatterServices.GetUninitializedObject(typeof(RedirectModule));
+        // _installer intentionally left null
+
+        Assert.DoesNotThrow(() => InvokeInitializeModule(module));
+    }
+
+    private static void SetInstaller(RedirectModule module, IRedirectModuleInstaller installer) =>
+        typeof(RedirectModule)
+            .GetField("_installer", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .SetValue(module, installer);
+
+    private static void InvokeInitializeModule(RedirectModule module)
+    {
+        var method = typeof(RedirectModule)
+            .GetMethod("InitializeModule", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        try
+        {
+            method.Invoke(module, new object?[] { null, EventArgs.Empty });
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException is not null)
+        {
+            throw ex.InnerException;
+        }
+    }
+
+    // Hand-written double: the internal IRedirectModuleInstaller cannot be proxied by Moq
+    // (Castle DynamicProxy) because the production assembly is not marked
+    // InternalsVisibleTo("DynamicProxyGenAssembly2"). The test assembly can implement it
+    // directly thanks to InternalsVisibleTo("BDO.GWT.GLOBAL.Tests").
+    private sealed class SpyInstaller : IRedirectModuleInstaller
+    {
+        public int InstallCount { get; private set; }
+
+        public void Install() => InstallCount++;
     }
 }

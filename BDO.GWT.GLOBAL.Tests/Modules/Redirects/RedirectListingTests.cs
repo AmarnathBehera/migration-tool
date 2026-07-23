@@ -1,12 +1,13 @@
-﻿using System.Reflection;
+﻿
+using System.Reflection;
 using System.Runtime.Serialization;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Websites;
-using Kentico.Xperience.Admin.Base;
 using Moq;
 using XperienceCommunity.Redirects.UIPages;
+using RedirectInfoX = global::XperienceCommunity.Redirects.RedirectInfo;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Redirects;
 
@@ -70,7 +71,7 @@ public class RedirectListingTests
             Is.EqualTo("IInfoProvider`1"));
     }
 
- 
+
 
     // ── methods ─────────────────────────────────────────────────────────────
 
@@ -207,56 +208,201 @@ public class RedirectListingTests
         Assert.That(field.FieldType, Is.EqualTo(typeof(IChannelAccessService)));
     }
 
-  
-
-    // ── MassDelete – parameter types ────────────────────────────────────────
+    // ── MassDelete (behavioural) ──────────────────────────────────────────────
 
     [Test]
-    public void ListingPage_MassDelete_ReturnType_GenericArgument_IsCommandResponse()
+    public void ListingPage_Constructor_StoresInjectedDependencies()
     {
-        var method = typeof(RedirectListing).GetMethod(nameof(RedirectListing.MassDelete))!;
-        var innerType = method.ReturnType.GetGenericArguments()[0];
+        var executor = new Mock<IContentQueryExecutor>().Object;
+        var retriever = new Mock<IWebPageUrlRetriever>().Object;
+        var channelAccess = new Mock<IChannelAccessService>().Object;
+        var provider = new Mock<IInfoProvider<RedirectInfoX>>().Object;
 
-        Assert.That(innerType.Name, Is.EqualTo("ICommandResponse`1"));
+        var listing = new RedirectListing(executor, retriever, channelAccess, provider);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(GetField(listing, "_executor"), Is.SameAs(executor));
+            Assert.That(GetField(listing, "_webPageUrlRetriever"), Is.SameAs(retriever));
+            Assert.That(GetField(listing, "_channelAccessService"), Is.SameAs(channelAccess));
+            Assert.That(GetField(listing, "_redirectInfoProvider"), Is.SameAs(provider));
+        });
     }
 
     [Test]
-    public void ListingPage_Delete_ReturnType_IsTask()
+    public async Task MassDelete_WithNoIdentifiers_ReturnsResponse()
     {
-        var method = typeof(RedirectListing).GetMethod(nameof(RedirectListing.Delete))!;
-
-        Assert.That(method.ReturnType.Name, Is.EqualTo("Task`1"));
-    }
-
-   
-
-    [Test]
-    public async Task MassDelete_WhenEmptyIds_ReturnsResponse()
-    {
-        var channelAccessService = new Mock<IChannelAccessService>();
-        channelAccessService
-            .Setup(s => s.GetAccessibleWebChannelSettingsIdsAsync())
-            .ReturnsAsync((ICollection<int>?)null);
-
-        var redirectInfoProvider = new Mock<IInfoProvider<XperienceCommunity.Redirects.RedirectInfo>>();
-
-        var listing = MakeListing(channelAccessService.Object, redirectInfoProvider.Object);
+        var listing = MakeListing(accessibleIds: null, provider: new Mock<IInfoProvider<RedirectInfoX>>().Object);
 
         var response = await listing.MassDelete(Array.Empty<int>(), CancellationToken.None);
 
         Assert.That(response, Is.Not.Null);
     }
 
-    // ── helpers ─────────────────────────────────────────────────────────────
-
-    private static RedirectListing MakeListing(
-        IChannelAccessService channelAccessService,
-        IInfoProvider<XperienceCommunity.Redirects.RedirectInfo> redirectInfoProvider)
+    [Test]
+    public async Task MassDelete_WhenRedirectNotFound_SkipsWithoutDeleting()
     {
-        return new RedirectListing(
-            Mock.Of<IContentQueryExecutor>(),
-            Mock.Of<IWebPageUrlRetriever>(),
-            channelAccessService,
-            redirectInfoProvider);
+        var provider = new Mock<IInfoProvider<RedirectInfoX>>();
+        provider.As<IInfoByIdProvider<RedirectInfoX>>()
+            .Setup(x => x.Get(It.IsAny<int>()))
+            .Returns((RedirectInfoX?)null);
+
+        var listing = MakeListing(accessibleIds: null, provider: provider.Object);
+
+        var response = await listing.MassDelete(new[] { 1, 2 }, CancellationToken.None);
+
+        Assert.That(response, Is.Not.Null);
+    }
+
+    [Test]
+    public async Task MassDelete_WhenRedirectNotInAccessibleChannel_SkipsIt()
+    {
+        var redirect = MakeRedirect(channelId: 99);
+        var provider = new Mock<IInfoProvider<RedirectInfoX>>();
+        provider.As<IInfoByIdProvider<RedirectInfoX>>()
+            .Setup(x => x.Get(It.IsAny<int>()))
+            .Returns(redirect);
+
+        var listing = MakeListing(accessibleIds: new List<int> { 5 }, provider: provider.Object);
+
+        var response = await listing.MassDelete(new[] { 1 }, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(response, Is.Not.Null);
+            Assert.That(redirect.DeleteCalled, Is.False);
+        });
+    }
+
+    [Test]
+    public async Task MassDelete_WhenRedirectInAccessibleChannel_DeletesIt()
+    {
+        var redirect = MakeRedirect(channelId: 5);
+        var provider = new Mock<IInfoProvider<RedirectInfoX>>();
+        provider.As<IInfoByIdProvider<RedirectInfoX>>()
+            .Setup(x => x.Get(It.IsAny<int>()))
+            .Returns(redirect);
+
+        var listing = MakeListing(accessibleIds: new List<int> { 5 }, provider: provider.Object);
+
+        var response = await listing.MassDelete(new[] { 1 }, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(response, Is.Not.Null);
+            Assert.That(redirect.DeleteCalled, Is.True);
+        });
+    }
+
+    [Test]
+    public async Task MassDelete_WhenGlobalAdmin_DeletesEveryRedirect()
+    {
+        // A null accessible-id collection represents a global administrator: every redirect
+        // is deletable regardless of its channel.
+        var redirect = MakeRedirect(channelId: 42);
+        var provider = new Mock<IInfoProvider<RedirectInfoX>>();
+        provider.As<IInfoByIdProvider<RedirectInfoX>>()
+            .Setup(x => x.Get(It.IsAny<int>()))
+            .Returns(redirect);
+
+        var listing = MakeListing(accessibleIds: null, provider: provider.Object);
+
+        await listing.MassDelete(new[] { 1 }, CancellationToken.None);
+
+        Assert.That(redirect.DeleteCalled, Is.True);
+    }
+
+    // ── GetWebPageUrl / GetDefaultLanguageName (behavioural) ──────────────────
+
+    [Test]
+    public void GetWebPageUrl_WhenGuidIsEmpty_ReturnsPageDeleted()
+    {
+        var listing = MakeListingViaConstructor(
+            new Mock<IContentQueryExecutor>().Object, new Mock<IWebPageUrlRetriever>().Object);
+
+        Assert.That(InvokeGetWebPageUrl(listing, Guid.Empty), Is.EqualTo("Page deleted"));
+    }
+
+    [Test]
+    public void GetDefaultLanguageName_ReturnsConfiguredDefaultLanguage()
+    {
+        KenticoContainerSetup.Reset();
+        SetupDefaultLanguageScalar("en");
+
+        var method = typeof(RedirectListing)
+            .GetMethod("GetDefaultLanguageName", BindingFlags.Static | BindingFlags.NonPublic)!;
+
+        Assert.That(method.Invoke(null, null), Is.EqualTo("en"));
+    }
+
+    // ── helpers ───────────────────────────────────────────────────────────────
+
+    private static RedirectListing MakeListingViaConstructor(IContentQueryExecutor executor, IWebPageUrlRetriever retriever) =>
+        new(executor, retriever, Mock.Of<IChannelAccessService>(), Mock.Of<IInfoProvider<RedirectInfoX>>());
+
+    private static string InvokeGetWebPageUrl(RedirectListing listing, Guid guid)
+    {
+        var method = typeof(RedirectListing)
+            .GetMethod("GetWebPageUrl", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        return (string)method.Invoke(listing, new object?[] { guid, null })!;
+    }
+
+    private static void SetupDefaultLanguageScalar(string name)
+    {
+        var q = new Mock<ObjectQuery<ContentLanguageInfo>>();
+        KenticoContainerSetup.ContentLanguageProvider.Setup(p => p.Get()).Returns(q.Object);
+        q.Setup(x => x.TopN(It.IsAny<int>())).Returns(q.Object);
+        q.Setup(x => x.Column(It.IsAny<string>())).Returns(q.Object);
+        q.Setup(x => x.WhereTrue(It.IsAny<string>())).Returns(q.Object);
+        q.Setup(x => x.GetScalarResult<string>(It.IsAny<string>())).Returns(name);
+    }
+
+    private static RedirectListing MakeListing(ICollection<int>? accessibleIds, IInfoProvider<RedirectInfoX> provider)
+    {
+        var listing = (RedirectListing)FormatterServices.GetUninitializedObject(typeof(RedirectListing));
+
+        var channelAccess = new Mock<IChannelAccessService>();
+        channelAccess.Setup(c => c.GetAccessibleWebChannelSettingsIdsAsync()).ReturnsAsync(accessibleIds);
+
+        SetField(listing, "_channelAccessService", channelAccess.Object);
+        SetField(listing, "_redirectInfoProvider", provider);
+        return listing;
+    }
+
+    private static void SetField(object target, string name, object value) =>
+        typeof(RedirectListing).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!
+            .SetValue(target, value);
+
+    private static object? GetField(object target, string name) =>
+        typeof(RedirectListing).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!
+            .GetValue(target);
+
+    private static FakeRedirectInfo MakeRedirect(int channelId)
+    {
+        var info = (FakeRedirectInfo)FormatterServices.GetUninitializedObject(typeof(FakeRedirectInfo));
+        info.RedirectChannelID = channelId;
+        return info;
+    }
+
+    // Overrides the virtual data field and Delete() so the object can be exercised without
+    // an initialised CMS IoC container (which the real getters/setters and provider require).
+    private sealed class FakeRedirectInfo : RedirectInfoX
+    {
+        private int _channelId;
+
+        public bool DeleteCalled { get; private set; }
+
+        public override int RedirectChannelID
+        {
+            get => _channelId;
+            set => _channelId = value;
+        }
+
+        public override bool Delete()
+        {
+            DeleteCalled = true;
+            return true;
+        }
     }
 }
+

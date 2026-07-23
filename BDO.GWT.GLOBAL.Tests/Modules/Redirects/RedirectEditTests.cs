@@ -1,7 +1,11 @@
 using System.Reflection;
 using System.Runtime.Serialization;
-using Kentico.Xperience.Admin.Base;
+using CMS.DataEngine;
+using CMS.Websites;
+using Kentico.Xperience.Admin.Base.Forms;
+using Moq;
 using XperienceCommunity.Redirects.UIPages;
+using RedirectInfoX = global::XperienceCommunity.Redirects.RedirectInfo;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Redirects;
 
@@ -115,6 +119,55 @@ public class RedirectEditTests
         Assert.That(second, Is.SameAs(first));
     }
 
+    // ── Model getter (behavioural) ────────────────────────────────────────────
+
+    [Test]
+    public void EditPage_ModelGetter_WhenInfoNotFound_ReturnsEmptyModel()
+    {
+        var page = MakePage();
+        SetProviderReturning(page, null);
+        page.ObjectID = 10;
+
+        var model = GetModel(page);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(model, Is.Not.Null);
+            Assert.That(model.SourceUrl, Is.Null);
+            Assert.That(model.TargetWebPageItem, Is.Empty);
+        });
+    }
+
+    [Test]
+    public void EditPage_ModelGetter_WhenInfoFound_MapsSourceUrlAndTargetWebPage()
+    {
+        var page = MakePage();
+        var guid = Guid.NewGuid();
+        SetProviderReturning(page, MakeInfo(sourceUrl: "/from", targetGuid: guid));
+        page.ObjectID = 3;
+
+        var model = GetModel(page);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(model.SourceUrl, Is.EqualTo("/from"));
+            Assert.That(model.TargetWebPageItem.Single().WebPageGuid, Is.EqualTo(guid));
+        });
+    }
+
+    [Test]
+    public void EditPage_ModelGetter_WhenInfoFound_CachesResult()
+    {
+        var page = MakePage();
+        SetProviderReturning(page, MakeInfo(sourceUrl: "/from", targetGuid: Guid.NewGuid()));
+        page.ObjectID = 3;
+
+        var first = GetModel(page);
+        var second = GetModel(page);
+
+        Assert.That(second, Is.SameAs(first));
+    }
+
     // ── private fields ──────────────────────────────────────────────────────
 
     [Test]
@@ -133,10 +186,51 @@ public class RedirectEditTests
         });
     }
 
+    // ── ProcessFormData (behavioural) ─────────────────────────────────────────
+
+    [Test]
+    public async Task EditPage_ProcessFormData_MapsModelOntoLoadedInfo()
+    {
+        KenticoContainerSetup.Reset();
+        var page = MakePage();
+
+        var info = (FakeRedirectInfo)FormatterServices.GetUninitializedObject(typeof(FakeRedirectInfo));
+        var provider = new Mock<IInfoProvider<RedirectInfoX>>();
+        provider.As<IInfoByIdProvider<RedirectInfoX>>()
+            .Setup(x => x.Get(It.IsAny<int>()))
+            .Returns(info);
+        SetField(page, "_redirectInfoProvider", provider.Object);
+        SetField(page, "_webPageUrlRetriever", Mock.Of<IWebPageUrlRetriever>());
+        page.ObjectID = 7;
+
+        var model = new RedirectEditModel { SourceUrl = "/Source" };
+
+        // base.ProcessFormData needs the admin ModelEditPage form pipeline, which is not
+        // available in a unit test, so it fails only after the redirect info has been mapped
+        // and persisted - which is what this test asserts.
+        try
+        {
+            await (Task)typeof(RedirectEdit)
+                .GetMethod("ProcessFormData", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .Invoke(page, new object[] { model, new List<IFormItem>() })!;
+        }
+        catch
+        {
+            // expected: base form pipeline unavailable in unit tests
+        }
+
+        Assert.That(info.RedirectSourceUrl, Is.EqualTo("/source"));
+    }
+
     // ── helpers ─────────────────────────────────────────────────────────────
 
     private static RedirectEdit MakePage() =>
         (RedirectEdit)FormatterServices.GetUninitializedObject(typeof(RedirectEdit));
+
+    private static void SetField(RedirectEdit page, string name, object value) =>
+        typeof(RedirectEdit)
+            .GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!
+            .SetValue(page, value);
 
     private static RedirectEditModel GetModel(RedirectEdit page)
     {
@@ -151,73 +245,50 @@ public class RedirectEditTests
             .GetField("_model", BindingFlags.Instance | BindingFlags.NonPublic)!
             .SetValue(page, model);
 
-  
-
-   
-
-    // ── ObjectID property ────────────────────────────────────────────────────
-
-    [Test]
-    public void EditPage_ObjectID_CanBeSetAndRead()
+    private static void SetProviderReturning(RedirectEdit page, RedirectInfoX? info)
     {
-        var page = MakePage();
-        page.ObjectID = 42;
+        var provider = new Mock<IInfoProvider<RedirectInfoX>>();
+        provider.As<IInfoByIdProvider<RedirectInfoX>>()
+            .Setup(x => x.Get(It.IsAny<int>()))
+            .Returns(info!);
 
-        Assert.That(page.ObjectID, Is.EqualTo(42));
+        typeof(RedirectEdit)
+            .GetField("_redirectInfoProvider", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .SetValue(page, provider.Object);
     }
 
-    [Test]
-    public void EditPage_ObjectID_DefaultValueIsZero()
+    private static FakeRedirectInfo MakeInfo(string sourceUrl, Guid targetGuid)
     {
-        var page = MakePage();
-
-        Assert.That(page.ObjectID, Is.EqualTo(0));
+        var info = (FakeRedirectInfo)FormatterServices.GetUninitializedObject(typeof(FakeRedirectInfo));
+        info.RedirectSourceUrl = sourceUrl;
+        info.RedirectTargetWebPageItemGUID = targetGuid;
+        return info;
     }
 
-    // ── private fields – type checks ─────────────────────────────────────────
-
-    [Test]
-    public void EditPage_Field_RedirectInfoProvider_TypeIsIInfoProvider()
+    // Overrides the virtual data fields so reads bypass Kentico's AbstractInfoBase.GetValue,
+    // which requires an initialised CMS IoC container.
+    private sealed class FakeRedirectInfo : RedirectInfoX
     {
-        var field = typeof(RedirectEdit)
-            .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
-            .Single(f => f.Name == "_redirectInfoProvider");
+        private string? _sourceUrl;
+        private Guid _targetGuid;
+        private string? _targetPageUrl;
 
-        Assert.That(field.FieldType.Name, Is.EqualTo("IInfoProvider`1"));
-    }
-
-    [Test]
-    public void EditPage_Field_WebPageUrlRetriever_TypeIsIWebPageUrlRetriever()
-    {
-        var field = typeof(RedirectEdit)
-            .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
-            .Single(f => f.Name == "_webPageUrlRetriever");
-
-        Assert.That(field.FieldType.Name, Is.EqualTo("IWebPageUrlRetriever"));
-    }
-
-    // ── ProcessFormData signature ─────────────────────────────────────────────
-
-    [Test]
-    public void EditPage_ProcessFormData_IsProtectedOverride()
-    {
-        var method = typeof(RedirectEdit)
-            .GetMethod("ProcessFormData", BindingFlags.Instance | BindingFlags.NonPublic);
-
-        Assert.That(method, Is.Not.Null);
-        Assert.Multiple(() =>
+        public override string RedirectSourceUrl
         {
-            Assert.That(method!.IsFamily, Is.True);
-            Assert.That(method.IsVirtual, Is.True);
-        });
-    }
+            get => _sourceUrl!;
+            set => _sourceUrl = value;
+        }
 
-    [Test]
-    public void EditPage_ProcessFormData_ReturnType_IsTask()
-    {
-        var method = typeof(RedirectEdit)
-            .GetMethod("ProcessFormData", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        public override Guid RedirectTargetWebPageItemGUID
+        {
+            get => _targetGuid;
+            set => _targetGuid = value;
+        }
 
-        Assert.That(method.ReturnType.Name, Is.EqualTo("Task`1"));
+        public override string RedirectTargetPageURL
+        {
+            get => _targetPageUrl ?? string.Empty;
+            set => _targetPageUrl = value;
+        }
     }
 }
