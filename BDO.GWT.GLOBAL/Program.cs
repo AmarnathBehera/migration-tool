@@ -129,19 +129,19 @@ if (builder.Environment.IsDevelopment())
 }
 
 // Add Application Insights telemetry
-//builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
+builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
 // Loads the administration redirect domain (AdminRedirectOptions) from a configuration file section
 builder.Services.Configure<AdminRedirectOptions>(builder.Configuration.GetSection("AdminRedirectOptions"));
 
 // Configures email sending via SendGrid for system emails
-//builder.Services.AddXperienceSystemSendGrid();
+builder.Services.AddXperienceSystemSendGrid();
 // Configures email sending via SendGrid for the fallback situation
-//builder.Services.AddXperienceSendGrid();
+builder.Services.AddXperienceSendGrid();
 
 // Loads the SendGrid API keys from configuration file sections
-//builder.Services.ConfigureSystemSendGridClientOptions(builder.Configuration.GetSection("SystemSendGridClientOptions"));
-//builder.Services.Configure<SendGridClientOptions>(builder.Configuration.GetSection("FallbackSendGridClientOptions"));
+builder.Services.ConfigureSystemSendGridClientOptions(builder.Configuration.GetSection("SystemSendGridClientOptions"));
+builder.Services.Configure<SendGridClientOptions>(builder.Configuration.GetSection("FallbackSendGridClientOptions"));
 
 var app = builder.Build();
 
