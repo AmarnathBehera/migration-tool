@@ -16,7 +16,6 @@ public static class RedirectServiceCollectionExtensions
     {
         services.AddSingleton<IRedirectModuleInstaller, RedirectModuleInstaller>();
         services.AddSingleton<IRedirectService, RedirectService>();
-        services.AddScoped<IChannelFilterService, ChannelFilterService>();
         return services;
     }
 }
