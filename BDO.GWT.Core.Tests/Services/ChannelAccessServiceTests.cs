@@ -1,3 +1,4 @@
+using System.Reflection;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.ContentEngine;
 using CMS.DataEngine;
@@ -40,6 +41,51 @@ namespace BDO.GWT.GLOBAL.Tests.Modules
         public void Service_ImplementsIChannelAccessService()
         {
             Assert.That(_service, Is.InstanceOf<IChannelAccessService>());
+        }
+
+        [Test]
+        public void Service_ExposesExpectedConstructor()
+        {
+            var ctor = typeof(ChannelAccessService).GetConstructors().Single();
+
+            Assert.That(ctor.GetParameters(), Has.Length.EqualTo(6));
+            Assert.Multiple(() =>
+            {
+                Assert.That(ctor.GetParameters()[0].ParameterType, Is.EqualTo(typeof(IInfoProvider<WebChannelSettingsInfo>)));
+                Assert.That(ctor.GetParameters()[1].ParameterType, Is.EqualTo(typeof(IInfoProvider<ChannelInfo>)));
+                Assert.That(ctor.GetParameters()[2].ParameterType, Is.EqualTo(typeof(IUserInfoProvider)));
+                Assert.That(ctor.GetParameters()[3].ParameterType, Is.EqualTo(typeof(IInfoProvider<UserRoleInfo>)));
+                Assert.That(ctor.GetParameters()[4].ParameterType, Is.EqualTo(typeof(IInfoProvider<RoleInfo>)));
+                Assert.That(ctor.GetParameters()[5].ParameterType, Is.EqualTo(typeof(IHttpContextAccessor)));
+            });
+        }
+
+        [Test]
+        public void GetAccessibleWebChannelSettingsIdsAsync_ReturnType_IsTaskOfCollectionOfInt()
+        {
+            var method = typeof(ChannelAccessService).GetMethod(nameof(ChannelAccessService.GetAccessibleWebChannelSettingsIdsAsync));
+
+            Assert.That(method, Is.Not.Null);
+            Assert.That(method!.ReturnType, Is.EqualTo(typeof(Task<ICollection<int>>)));
+        }
+
+        [Test]
+        public void CanAccessAsync_ReturnType_IsTaskOfBoolean()
+        {
+            var method = typeof(ChannelAccessService).GetMethod(nameof(ChannelAccessService.CanAccessAsync));
+
+            Assert.That(method, Is.Not.Null);
+            Assert.That(method!.ReturnType, Is.EqualTo(typeof(Task<bool>)));
+        }
+
+        [Test]
+        public void CanAccessAsync_DeclaresExpectedParameter()
+        {
+            var method = typeof(ChannelAccessService).GetMethod(nameof(ChannelAccessService.CanAccessAsync));
+
+            Assert.That(method, Is.Not.Null);
+            Assert.That(method!.GetParameters(), Has.Length.EqualTo(1));
+            Assert.That(method.GetParameters()[0].ParameterType, Is.EqualTo(typeof(int)));
         }
 
         [Test]
