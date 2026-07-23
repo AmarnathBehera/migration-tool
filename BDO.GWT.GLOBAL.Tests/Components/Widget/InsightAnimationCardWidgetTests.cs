@@ -30,7 +30,7 @@ public class InsightAnimationCardWidgetTests
     // -----------------------------------------------------------------------
 
     private Mock<IContentService> _contentServiceMock;
-    private Mock<IWebsiteChannelContext> _websiteChannelContextMock;
+
 
     // -----------------------------------------------------------------------
     // Helpers
@@ -40,12 +40,8 @@ public class InsightAnimationCardWidgetTests
     public void SetUp()
     {
         _contentServiceMock = new Mock<IContentService>();
-        _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
 
-        // Default: channel context is valid
-        _websiteChannelContextMock
-            .Setup(c => c.WebsiteChannelID)
-            .Returns(1);
+
 
     }
 
@@ -55,8 +51,7 @@ public class InsightAnimationCardWidgetTests
     private InsightAnimationCardWidget CreateSut()
     {
         var widget = new InsightAnimationCardWidget(
-            _contentServiceMock.Object,
-            _websiteChannelContextMock.Object
+            _contentServiceMock.Object
             );
 
         widget.ViewComponentContext = new ViewComponentContext

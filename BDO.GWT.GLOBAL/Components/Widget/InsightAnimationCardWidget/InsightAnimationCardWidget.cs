@@ -21,23 +21,19 @@ namespace BDO.GWT.GLOBAL.Widgets;
 public class InsightAnimationCardWidget: ViewComponent
 {
     private readonly IContentService _contentService;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
 
 
-    public InsightAnimationCardWidget(IContentService contentService,IWebsiteChannelContext websiteChannelContext)
+
+    public InsightAnimationCardWidget(IContentService contentService)
     {
         _contentService = contentService;
-        _websiteChannelContext = websiteChannelContext;
+
 
     }
 
     public async Task<IViewComponentResult> InvokeAsync(ComponentViewModel<InsightAnimationCardWidgetProperties> model)
     {
 
-        if (_websiteChannelContext == null)
-        {
-            throw new NotFoundException($"Site with ID {_websiteChannelContext.WebsiteChannelID} not found.");
-        }
 
         var data = new InsightAnimationCardData
         {
