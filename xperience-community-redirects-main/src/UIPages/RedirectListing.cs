@@ -130,11 +130,11 @@ public class RedirectListing : ListingPage
                         .TopN(1)
                 );
 
-            var result = _executor.GetMappedResult<IWebPageFieldsSource>(pageQuery).Result.FirstOrDefault();
+            var result = _executor.GetMappedResult<IWebPageFieldsSource>(pageQuery).GetAwaiter().GetResult().FirstOrDefault();
 
             if (result != null)
             {
-                string pageUrl = _webPageUrlRetriever.Retrieve(result.SystemFields.WebPageItemID, GetDefaultLanguageName()).Result.RelativePath;
+                string pageUrl = _webPageUrlRetriever.Retrieve(result.SystemFields.WebPageItemID, GetDefaultLanguageName()).GetAwaiter().GetResult().RelativePath;
 
                 if (pageUrl != null)
                 {
@@ -146,7 +146,7 @@ public class RedirectListing : ListingPage
         return "Page deleted";
     }
 
-    private string GetDefaultLanguageName()
+    private static string GetDefaultLanguageName()
     {
         return ContentLanguageInfo.Provider.Get()
             .TopN(1)

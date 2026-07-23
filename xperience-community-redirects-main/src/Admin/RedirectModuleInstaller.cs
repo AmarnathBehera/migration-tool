@@ -134,11 +134,11 @@ internal class RedirectModuleInstaller(IInfoProvider<ResourceInfo> resourceInfoP
     {
         List<RedirectInfo> redirectsWithEmptyGuids = RedirectInfo.Provider.Get().WhereEquals(nameof(RedirectInfo.RedirectGUID), Guid.Empty).ToList();
 
-        if (redirectsWithEmptyGuids.Any())
+        if (redirectsWithEmptyGuids.Count > 0)
         {
             foreach (RedirectInfo redirect in redirectsWithEmptyGuids)
             {
-                redirect.RedirectGUID = new Guid();
+                redirect.RedirectGUID = Guid.NewGuid();
                 redirect.Update();
             }
         }

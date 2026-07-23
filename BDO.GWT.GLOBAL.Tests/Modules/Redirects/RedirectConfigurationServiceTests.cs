@@ -1,6 +1,8 @@
 using System.Reflection;
 using CMS.DataEngine;
 using CMS.Helpers;
+using Microsoft.Extensions.DependencyInjection;
+using XperienceCommunity.Redirects;
 using XperienceCommunity.Redirects.Services;
 using RedirectInfoX = global::XperienceCommunity.Redirects.RedirectInfo;
 
@@ -98,5 +100,64 @@ public class RedirectConfigurationServiceTests
             .FirstOrDefault(f => f.FieldType == typeof(IProgressiveCache));
 
         Assert.That(field, Is.Not.Null);
+    }
+
+    // ── IRedirectService shape ───────────────────────────────────────────────
+
+    [Test]
+    public void IRedirectService_IsPublicInterface()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(typeof(IRedirectService).IsPublic, Is.True);
+            Assert.That(typeof(IRedirectService).IsInterface, Is.True);
+        });
+    }
+
+    [Test]
+    public void IRedirectService_HasExactlyOneMethod()
+    {
+        Assert.That(typeof(IRedirectService).GetMethods(), Has.Length.EqualTo(1));
+    }
+
+    [Test]
+    public void GetRedirects_IsAsync()
+    {
+        var method = typeof(RedirectService).GetMethod(nameof(RedirectService.GetRedirects))!;
+        // async methods are marked with AsyncStateMachineAttribute
+        var asyncAttr = method.GetCustomAttributes()
+            .FirstOrDefault(a => a.GetType().Name == "AsyncStateMachineAttribute");
+        Assert.That(asyncAttr, Is.Not.Null);
+    }
+
+    // ── RedirectServiceCollectionExtensions ──────────────────────────────────
+
+    [Test]
+    public void ServiceCollectionExtensions_TypeExists()
+    {
+        Assert.That(typeof(RedirectServiceCollectionExtensions), Is.Not.Null);
+    }
+
+    [Test]
+    public void ServiceCollectionExtensions_AddXperienceCommunityRedirects_IsPublicStatic()
+    {
+        var method = typeof(RedirectServiceCollectionExtensions)
+            .GetMethod(nameof(RedirectServiceCollectionExtensions.AddXperienceCommunityRedirects));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(method, Is.Not.Null);
+            Assert.That(method!.IsPublic, Is.True);
+            Assert.That(method.IsStatic, Is.True);
+        });
+    }
+
+    [Test]
+    public void ServiceCollectionExtensions_AddXperienceCommunityRedirects_ReturnsIServiceCollection()
+    {
+        var method = typeof(RedirectServiceCollectionExtensions)
+            .GetMethod(nameof(RedirectServiceCollectionExtensions.AddXperienceCommunityRedirects))!;
+
+        Assert.That(method.ReturnType.Name, Is.EqualTo("IServiceCollection"));
     }
 }
