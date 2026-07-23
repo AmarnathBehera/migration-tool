@@ -33,6 +33,12 @@ namespace BDO.GWT.GLOBAL.API.Helpers
         Task<List<ContentItemReference>> BuildReusableContentItemNameReferenceAsync<TItem>(string? name, CancellationToken cancellationToken)
             where TItem : class, IContentItemFieldsSource;
 
+        Task<List<ContentItemReference>> BuildReferencesAsync<T>(
+           IEnumerable<string>? identifiers,Func<T, string> nameSelector,
+           CancellationToken cancellationToken) where T : class, IWebPageFieldsSource; 
+        Task<List<ContentItemReference>> BuildReferencesPageAsync<T>(
+           IEnumerable<string>? identifiers, Func<T, string> nameSelector,
+           CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
     }
     public class MappingHelper : IMappingHelper
     {
@@ -316,6 +322,66 @@ namespace BDO.GWT.GLOBAL.API.Helpers
             static string FileName(string url) => url[(url.LastIndexOf('/') + 1)..];
 
             return string.Equals(FileName(normalizedAsset), FileName(normalizedRequested), StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Selects the content items of type <typeparamref name="T"/> whose name matches the supplied
+        /// identifiers and returns them as a list of <see cref="ContentItemReference"/>. Names that do
+        /// not match any existing item are ignored.
+        /// </summary>
+        /// <typeparam name="T">The content type to query (e.g. DealCardIndustry, DealCardRange).</typeparam>
+        /// <param name="identifiers">The names to match.</param>
+        /// <param name="nameSelector">Selects the name value used for matching from a content item.</param>
+        /// <param name="cancellationToken">A cancellation token.</param>
+        public async Task<List<ContentItemReference>> BuildReferencesAsync<T>(
+            IEnumerable<string>? identifiers,
+            Func<T, string> nameSelector,
+            CancellationToken cancellationToken)
+            where T : class, IWebPageFieldsSource
+        {
+            var names = identifiers?
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Select(name => name.Trim())
+                .ToList() ?? new List<string>();
+
+            if (names.Count == 0)
+            {
+                return new List<ContentItemReference>();
+            }
+
+            var items = await _contentRetriever.GetItemsAsync<T>(
+                builder => builder.Parameters(p => p.Where(w => w.WhereIn("Name", names))),
+                cancellationToken);
+
+            return items
+                .Where(item => names.Contains(nameSelector(item), StringComparer.OrdinalIgnoreCase))
+                .Select(item => new ContentItemReference { Identifier = item.SystemFields.ContentItemGUID })
+                .ToList();
+        }
+        public async Task<List<ContentItemReference>> BuildReferencesPageAsync<T>(
+          IEnumerable<string>? identifiers,
+          Func<T, string> nameSelector,
+          CancellationToken cancellationToken)
+          where T : class, IWebPageFieldsSource
+        {
+            var names = identifiers?
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Select(name => name.Trim())
+                .ToList() ?? new List<string>();
+
+            if (names.Count == 0)
+            {
+                return new List<ContentItemReference>();
+            }
+
+            var items = await _contentRetriever.GetItemsAsync<T>(
+                builder => builder.Parameters(p => p.Where(w => w.WhereIn("MetadataTitle", names))),
+                cancellationToken);
+
+            return items
+                .Where(item => names.Contains(nameSelector(item), StringComparer.OrdinalIgnoreCase))
+                .Select(item => new ContentItemReference { Identifier = item.SystemFields.ContentItemGUID })
+                .ToList();
         }
     }
 }

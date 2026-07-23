@@ -1,5 +1,6 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.Core.Constants;
+using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
@@ -40,6 +41,7 @@ public class EditorsPickCardService : IEditorsPickCardService
     MicrositePage.CONTENT_TYPE_NAME,
     NewsArticle.CONTENT_TYPE_NAME,
     Webinar.CONTENT_TYPE_NAME,
+    Insight.CONTENT_TYPE_NAME
 ];
 
     private readonly Func<IEnumerable<string>, IEnumerable<Guid>, RetrieveContentOfContentTypesParameters, CancellationToken, Task<IEnumerable<IWebPageFieldsSource>>> _retrieveContentByGuidsAsync;
@@ -94,7 +96,7 @@ public class EditorsPickCardService : IEditorsPickCardService
                 new RetrieveContentOfContentTypesParameters() { LinkedItemsMaxLevel = 2 },
                 cancellationToken);
 
-        var filtered = ApplyFilters(pages, cardsQuery.Filters)
+        var filtered = (await ApplyFiltersAsync(pages, cardsQuery.Filters))
             .OrderByDescending(isFeatured)
             .ThenByDescending(GetPublishDateUtc)
             .ToArray();
@@ -113,9 +115,10 @@ public class EditorsPickCardService : IEditorsPickCardService
         };
     }
 
-    private static IEnumerable<IWebPageFieldsSource> ApplyFilters(
+    private static async Task<IEnumerable<IWebPageFieldsSource>> ApplyFiltersAsync(
         IEnumerable<IWebPageFieldsSource> pages,
-        IDictionary<string, string> filters)
+        IDictionary<string, string> filters
+        )
     {
         if (filters.Count == 0)
         {
@@ -134,8 +137,7 @@ public class EditorsPickCardService : IEditorsPickCardService
             filtered = filterName switch
             {
                 FilterParameterName.ContentType => filtered.Where(page =>
-                    string.Equals(GetPageTypeName(page), filterValue, StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(GetSingleOrLinkedName(page, "ContentType"), filterValue, StringComparison.OrdinalIgnoreCase)),
+                    HasLinkedValue(page, filterValue, "ContentType")),
 
                 FilterParameterName.BusinessLine => filtered.Where(page =>
                     HasLinkedValue(page, filterValue, "MetadataBusinessLines", "MetadataBusinessLine")),
@@ -150,7 +152,29 @@ public class EditorsPickCardService : IEditorsPickCardService
             };
         }
 
-        return filtered;
+        return await Task.FromResult(filtered);
+    }
+
+    private static bool HasLinkedValue(IWebPageFieldsSource page, string value, params string[] propertyNames)
+    {
+        foreach (var propertyName in propertyNames)
+        {
+            var names = GetLinkedNames(page, propertyName);
+            if (names.Any(x => string.Equals(x, value, StringComparison.OrdinalIgnoreCase)))
+            {
+                return true;
+            }
+
+            var property = page.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+            if (property?.PropertyType == typeof(string) &&
+                property.GetValue(page) is string stringValue &&
+                string.Equals(stringValue, value, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private async Task<EditorsPickCardDto[]> MapCardsAsync(
@@ -207,20 +231,6 @@ public class EditorsPickCardService : IEditorsPickCardService
         {
             return null;
         }
-    }
-
-    private static bool HasLinkedValue(IWebPageFieldsSource page, string value, params string[] propertyNames)
-    {
-        foreach (var propertyName in propertyNames)
-        {
-            var names = GetLinkedNames(page, propertyName);
-            if (names.Any(x => string.Equals(x, value, StringComparison.OrdinalIgnoreCase)))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private static IEnumerable<string> GetLinkedNames(object source, string propertyName)

@@ -6,6 +6,7 @@ using CMS.DataEngine;
 using CMS.FormEngine;
 using CMS.Helpers;
 using CMS.MacroEngine;
+using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Immutable;
 using System.Reflection;
@@ -166,11 +167,16 @@ public class PageContentValidator : IPageContentValidator
             FieldDataType.Integer => ValidateIntegerFieldDataType(field, controlName, value),
             FieldDataType.LongText => ValidateLongTextFieldDataType(field, controlName, value),
             FieldDataType.Text => ValidateTextFieldDataType(field, controlName, value),
-            FieldDataType.ContentItemReference => ValidateContentItemReferenceFieldDataType(field, controlName, value),
-            _ => throw new NotImplementedException($"Validation for field data type '{field.DataType}' is not implemented."),
+            FieldDataType.ContentItemReference => value switch
+            {
+                string s => ValidateContentItemReferenceFieldDataType(field, controlName, s),
+                IEnumerable<string> list => list
+                    .Select(v => ValidateContentItemReferenceFieldDataType(field, controlName, v))
+                    .ToList(),
+                _ => throw new ArgumentException($"Validation for field data type '{field.DataType}' is not implemented."),
+            }
         };
     }
-
     private string? ValidateContentItemReferenceFieldDataType(FormFieldInfo field, string controlName, object? value)
     {
         if (string.IsNullOrWhiteSpace(controlName))
@@ -218,7 +224,6 @@ public class PageContentValidator : IPageContentValidator
                 $"Validation for '{field.DataType}'.'{componentIdentifier}' is not implemented.")
         };
     }
-
     private Guid? ValidateGuidFieldDataType(FormFieldInfo field, string controlName, object? value)
     {
         if (string.IsNullOrWhiteSpace(controlName))

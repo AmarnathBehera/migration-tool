@@ -61,5 +61,6 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IHomePageService, HomePageService>();
         serviceCollection.AddScoped<ICareerCrudService, CareerCrudService>();
         
+        serviceCollection.AddScoped<IPersonCrudService, PersonCrudService>();
     }
 }
