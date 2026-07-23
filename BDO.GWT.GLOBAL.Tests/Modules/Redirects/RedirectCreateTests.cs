@@ -1,47 +1,161 @@
 using System.Reflection;
+using System.Runtime.Serialization;
 using XperienceCommunity.Redirects.UIPages;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Redirects;
 
 public class RedirectCreateTests
 {
-    [Test]
-    public void CreatePage_InheritsFromModelEditPageOfRedirectEditModel()
-    {
-        var baseType = typeof(RedirectCreate).BaseType;
+    // ── structural ──────────────────────────────────────────────────────────
 
-        Assert.That(baseType, Is.Not.Null);
-        Assert.Multiple(() =>
-        {
-            Assert.That(baseType!.IsGenericType, Is.True);
-            Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(RedirectEditModel)));
-        });
+    [Test]
+    public void CreatePage_InheritsFromModelEditPage()
+    {
+        Assert.That(typeof(RedirectCreate).BaseType!.Name, Is.EqualTo("ModelEditPage`1"));
     }
 
     [Test]
-    public void CreatePage_ExposesExpectedConstructor()
+    public void CreatePage_BaseType_GenericArgument_IsRedirectEditModel()
+    {
+        var genericArg = typeof(RedirectCreate).BaseType!.GetGenericArguments()[0];
+
+        Assert.That(genericArg, Is.EqualTo(typeof(RedirectEditModel)));
+    }
+
+    [Test]
+    public void CreatePage_IsInternalClass()
+    {
+        Assert.That(typeof(RedirectCreate).IsNotPublic, Is.True);
+    }
+
+    [Test]
+    public void CreatePage_HasSinglePublicConstructor()
+    {
+        Assert.That(typeof(RedirectCreate).GetConstructors(), Has.Length.EqualTo(1));
+    }
+
+    [Test]
+    public void CreatePage_Constructor_HasFiveParameters()
     {
         var ctor = typeof(RedirectCreate).GetConstructors().Single();
 
         Assert.That(ctor.GetParameters(), Has.Length.EqualTo(5));
+    }
+
+    [Test]
+    public void CreatePage_Constructor_Parameter0_IsIFormItemCollectionProvider()
+    {
+        var ctor = typeof(RedirectCreate).GetConstructors().Single();
+
+        Assert.That(ctor.GetParameters()[0].ParameterType.Name, Is.EqualTo("IFormItemCollectionProvider"));
+    }
+
+    [Test]
+    public void CreatePage_Constructor_Parameter1_IsIFormDataBinder()
+    {
+        var ctor = typeof(RedirectCreate).GetConstructors().Single();
+
+        Assert.That(ctor.GetParameters()[1].ParameterType.Name, Is.EqualTo("IFormDataBinder"));
+    }
+
+    [Test]
+    public void CreatePage_Constructor_Parameter2_IsIPageLinkGenerator()
+    {
+        var ctor = typeof(RedirectCreate).GetConstructors().Single();
+
+        Assert.That(ctor.GetParameters()[2].ParameterType.Name, Is.EqualTo("IPageLinkGenerator"));
+    }
+
+    [Test]
+    public void CreatePage_Constructor_Parameter3_IsIInfoProvider()
+    {
+        var ctor = typeof(RedirectCreate).GetConstructors().Single();
+
+        Assert.That(ctor.GetParameters()[3].ParameterType.Name, Is.EqualTo("IInfoProvider`1"));
+    }
+
+    [Test]
+    public void CreatePage_Constructor_Parameter4_IsIWebPageUrlRetriever()
+    {
+        var ctor = typeof(RedirectCreate).GetConstructors().Single();
+
+        Assert.That(ctor.GetParameters()[4].ParameterType.Name, Is.EqualTo("IWebPageUrlRetriever"));
+    }
+
+    // ── Model getter ────────────────────────────────────────────────────────
+
+    [Test]
+    public void CreatePage_ModelGetter_CreatesNewModelWhenFieldIsEmpty()
+    {
+        var page = MakePage();
+
+        var model = GetModel(page);
+
         Assert.Multiple(() =>
         {
-            Assert.That(ctor.GetParameters()[0].ParameterType.Name, Is.EqualTo("IFormItemCollectionProvider"));
-            Assert.That(ctor.GetParameters()[1].ParameterType.Name, Is.EqualTo("IFormDataBinder"));
-            Assert.That(ctor.GetParameters()[2].ParameterType.Name, Is.EqualTo("IPageLinkGenerator"));
-            Assert.That(ctor.GetParameters()[3].ParameterType.Name, Is.EqualTo("IInfoProvider`1"));
-            Assert.That(ctor.GetParameters()[4].ParameterType.Name, Is.EqualTo("IWebPageUrlRetriever"));
+            Assert.That(model, Is.Not.Null);
+            Assert.That(model.SourceUrl, Is.Null);
+            Assert.That(model.TargetWebPageItem, Is.Empty);
         });
     }
 
     [Test]
-    public void CreatePage_HasProtectedModelPropertyOfExpectedType()
+    public void CreatePage_ModelGetter_ReturnsSameInstanceOnSecondCall()
+    {
+        var page = MakePage();
+
+        var first = GetModel(page);
+        var second = GetModel(page);
+
+        Assert.That(second, Is.SameAs(first));
+    }
+
+    [Test]
+    public void CreatePage_ModelGetter_ReturnsExistingModelWhenFieldIsAlreadySet()
+    {
+        var page = MakePage();
+        var preset = new RedirectEditModel { SourceUrl = "/preset" };
+        SetModelField(page, preset);
+
+        var actual = GetModel(page);
+
+        Assert.That(actual, Is.SameAs(preset));
+    }
+
+    // ── private fields stored by constructor ────────────────────────────────
+
+    [Test]
+    public void CreatePage_HasExpectedPrivateFields()
+    {
+        var fields = typeof(RedirectCreate)
+            .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+            .Select(f => f.Name)
+            .ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(fields, Does.Contain("_model"));
+            Assert.That(fields, Does.Contain("_redirectInfoProvider"));
+            Assert.That(fields, Does.Contain("_pageLinkGenerator"));
+            Assert.That(fields, Does.Contain("_webPageUrlRetriever"));
+        });
+    }
+
+    // ── helpers ─────────────────────────────────────────────────────────────
+
+    private static RedirectCreate MakePage() =>
+        (RedirectCreate)FormatterServices.GetUninitializedObject(typeof(RedirectCreate));
+
+    private static RedirectEditModel GetModel(RedirectCreate page)
     {
         var prop = typeof(RedirectCreate)
             .GetProperties(BindingFlags.Instance | BindingFlags.NonPublic)
             .Single(p => p.Name == "Model" && p.DeclaringType == typeof(RedirectCreate));
-
-        Assert.That(prop, Is.Not.Null);
-        Assert.That(prop.PropertyType, Is.EqualTo(typeof(RedirectEditModel)));
+        return (RedirectEditModel)prop.GetValue(page)!;
     }
+
+    private static void SetModelField(RedirectCreate page, RedirectEditModel model) =>
+        typeof(RedirectCreate)
+            .GetField("_model", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .SetValue(page, model);
 }
