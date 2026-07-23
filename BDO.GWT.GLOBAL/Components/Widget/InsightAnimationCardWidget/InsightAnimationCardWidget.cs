@@ -33,10 +33,10 @@ public class InsightAnimationCardWidget: ViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync(ComponentViewModel<InsightAnimationCardWidgetProperties> model)
     {
-        var channel = _websiteChannelContext;
-        if (channel== null)
+
+        if (_websiteChannelContext == null)
         {
-            throw new NotFoundException($"Site with ID {channel.WebsiteChannelID} not found.");
+            throw new NotFoundException($"Site with ID {_websiteChannelContext.WebsiteChannelID} not found.");
         }
 
         var data = new InsightAnimationCardData
