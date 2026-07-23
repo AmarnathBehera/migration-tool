@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Moq;
@@ -283,6 +284,224 @@ public class RedirectMiddlewareTests
             nameof(RedirectMiddlewareExtensions.UseXperienceCommunityRedirects))!;
 
         Assert.That(method.ReturnType, Is.EqualTo(typeof(IApplicationBuilder)));
+    }
+
+    // ── ExcludedStartingPaths field ──────────────────────────────────────────
+
+    [Test]
+    public void Middleware_HasExcludedStartingPathsField()
+    {
+        var field = typeof(RedirectMiddleware)
+            .GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+            .FirstOrDefault(f => f.FieldType == typeof(string[]));
+
+        Assert.That(field, Is.Not.Null);
+    }
+
+    [Test]
+    public void Middleware_ExcludedStartingPaths_ContainsAdmin()
+    {
+        var middleware = MakeMiddleware(
+            next: _ => Task.CompletedTask,
+            redirectService: EmptyRedirectService());
+
+        var field = typeof(RedirectMiddleware)
+            .GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+            .Single(f => f.FieldType == typeof(string[]));
+        var paths = (string[])field.GetValue(middleware)!;
+
+        Assert.That(paths, Does.Contain("/admin"));
+    }
+
+    [Test]
+    public void Middleware_ExcludedStartingPaths_ContainsCmsctx()
+    {
+        var middleware = MakeMiddleware(
+            next: _ => Task.CompletedTask,
+            redirectService: EmptyRedirectService());
+
+        var field = typeof(RedirectMiddleware)
+            .GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+            .Single(f => f.FieldType == typeof(string[]));
+        var paths = (string[])field.GetValue(middleware)!;
+
+        Assert.That(paths, Does.Contain("/cmsctx"));
+    }
+
+    [Test]
+    public void Middleware_ExcludedStartingPaths_ContainsGetmedia()
+    {
+        var middleware = MakeMiddleware(
+            next: _ => Task.CompletedTask,
+            redirectService: EmptyRedirectService());
+
+        var field = typeof(RedirectMiddleware)
+            .GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+            .Single(f => f.FieldType == typeof(string[]));
+        var paths = (string[])field.GetValue(middleware)!;
+
+        Assert.That(paths, Does.Contain("/getmedia"));
+    }
+
+    [Test]
+    public void Middleware_ExcludedStartingPaths_ContainsGetcontentasset()
+    {
+        var middleware = MakeMiddleware(
+            next: _ => Task.CompletedTask,
+            redirectService: EmptyRedirectService());
+
+        var field = typeof(RedirectMiddleware)
+            .GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+            .Single(f => f.FieldType == typeof(string[]));
+        var paths = (string[])field.GetValue(middleware)!;
+
+        Assert.That(paths, Does.Contain("/getcontentasset"));
+    }
+
+    // ── InvokeAsync – matched redirect but same source/target ─────────────────
+
+    [Test]
+    public async Task InvokeAsync_HtmlRequest_WithNoMatchingRedirect_CallsNext()
+    {
+        bool nextCalled = false;
+        var redirect = MakeRedirectInfo("/source", Guid.NewGuid());
+        var redirectService = SingleRedirectService(redirect);
+
+        var middleware = MakeMiddleware(
+            next: _ => { nextCalled = true; return Task.CompletedTask; },
+            redirectService: redirectService);
+
+        var context = MakeContext("/unrelated/path");
+
+        await middleware.InvokeAsync(context);
+
+        Assert.That(nextCalled, Is.True);
+    }
+
+    [Test]
+    public async Task InvokeAsync_HtmlRequest_PathCaseInsensitiveNoMatch_CallsNext()
+    {
+        bool nextCalled = false;
+        var redirect = MakeRedirectInfo("/different/path", Guid.NewGuid());
+        var redirectService = SingleRedirectService(redirect);
+
+        var middleware = MakeMiddleware(
+            next: _ => { nextCalled = true; return Task.CompletedTask; },
+            redirectService: redirectService);
+
+        var context = MakeContext("/my/path");
+
+        await middleware.InvokeAsync(context);
+
+        Assert.That(nextCalled, Is.True);
+    }
+
+    // ── InvokeAsync – accept header variations ───────────────────────────────
+
+    [Test]
+    public async Task InvokeAsync_TextHtmlAccept_IsProcessed()
+    {
+        bool nextCalled = false;
+
+        var middleware = MakeMiddleware(
+            next: _ => { nextCalled = true; return Task.CompletedTask; },
+            redirectService: EmptyRedirectService());
+
+        var context = MakeContext("/some/page", accept: "text/html");
+
+        await middleware.InvokeAsync(context);
+
+        Assert.That(nextCalled, Is.True);
+    }
+
+    [Test]
+    public async Task InvokeAsync_ApplicationXmlAccept_CallsNext()
+    {
+        bool nextCalled = false;
+
+        var middleware = MakeMiddleware(
+            next: _ => { nextCalled = true; return Task.CompletedTask; },
+            redirectService: EmptyRedirectService());
+
+        var context = MakeContext("/some/page", accept: "application/xml");
+
+        await middleware.InvokeAsync(context);
+
+        Assert.That(nextCalled, Is.True);
+    }
+
+    [Test]
+    public async Task InvokeAsync_EmptyAcceptHeader_CallsNext()
+    {
+        bool nextCalled = false;
+
+        var middleware = MakeMiddleware(
+            next: _ => { nextCalled = true; return Task.CompletedTask; },
+            redirectService: EmptyRedirectService());
+
+        var context = MakeContext("/some/page", accept: "");
+
+        await middleware.InvokeAsync(context);
+
+        Assert.That(nextCalled, Is.True);
+    }
+
+    // ── RedirectMiddlewareExtensions – additional ────────────────────────────
+
+    [Test]
+    public void Extensions_UseXperienceCommunityRedirects_IsExtensionMethod()
+    {
+        var method = typeof(RedirectMiddlewareExtensions).GetMethod(
+            nameof(RedirectMiddlewareExtensions.UseXperienceCommunityRedirects))!;
+
+        Assert.That(method.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false), Is.True);
+    }
+
+    [Test]
+    public void Extensions_TypeIsPublicStaticClass()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(typeof(RedirectMiddlewareExtensions).IsPublic, Is.True);
+            Assert.That(typeof(RedirectMiddlewareExtensions).IsAbstract, Is.True); // static classes are abstract+sealed
+            Assert.That(typeof(RedirectMiddlewareExtensions).IsSealed, Is.True);
+        });
+    }
+
+    // ── helpers (private) ────────────────────────────────────────────────────
+
+    private static RedirectInfoX MakeRedirectInfo(string sourceUrl, Guid targetGuid)
+    {
+        var info = (FakeRedirectInfoX)FormatterServices.GetUninitializedObject(typeof(FakeRedirectInfoX));
+        info.RedirectSourceUrl = sourceUrl;
+        info.RedirectTargetWebPageItemGUID = targetGuid;
+        return info;
+    }
+
+    private static IRedirectService SingleRedirectService(RedirectInfoX redirect)
+    {
+        var mock = new Mock<IRedirectService>();
+        mock.Setup(s => s.GetRedirects())
+            .Returns(Task.FromResult<IReadOnlyCollection<RedirectInfoX>>(new[] { redirect }));
+        return mock.Object;
+    }
+
+    private sealed class FakeRedirectInfoX : RedirectInfoX
+    {
+        private string? _sourceUrl;
+        private Guid _targetGuid;
+
+        public override string RedirectSourceUrl
+        {
+            get => _sourceUrl ?? string.Empty;
+            set => _sourceUrl = value;
+        }
+
+        public override Guid RedirectTargetWebPageItemGUID
+        {
+            get => _targetGuid;
+            set => _targetGuid = value;
+        }
     }
 
     // ── helpers ─────────────────────────────────────────────────────────────

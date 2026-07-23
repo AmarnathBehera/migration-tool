@@ -175,6 +175,82 @@ public class RedirectEditModelTests
         Assert.That(info.RedirectSourceUrl, Is.EqualTo("/abc/def"));
     }
 
+    // ── RedirectEditModel – annotations ─────────────────────────────────────
+
+    [Test]
+    public void SourceUrl_HasRequiredValidationRuleAttribute()
+    {
+        var prop = typeof(RedirectEditModel).GetProperty(nameof(RedirectEditModel.SourceUrl))!;
+        var attr = prop.GetCustomAttributes()
+            .FirstOrDefault(a => a.GetType().Name == "RequiredValidationRuleAttribute");
+
+        Assert.That(attr, Is.Not.Null);
+    }
+
+    [Test]
+    public void TargetWebPageItem_HasRequiredValidationRuleAttribute()
+    {
+        var prop = typeof(RedirectEditModel).GetProperty(nameof(RedirectEditModel.TargetWebPageItem))!;
+        var attr = prop.GetCustomAttributes()
+            .FirstOrDefault(a => a.GetType().Name == "RequiredValidationRuleAttribute");
+
+        Assert.That(attr, Is.Not.Null);
+    }
+
+    [Test]
+    public void SourceUrl_HasTextInputComponentAttribute()
+    {
+        var prop = typeof(RedirectEditModel).GetProperty(nameof(RedirectEditModel.SourceUrl))!;
+        var attr = prop.GetCustomAttributes()
+            .FirstOrDefault(a => a.GetType().Name == "TextInputComponentAttribute");
+
+        Assert.That(attr, Is.Not.Null);
+    }
+
+    [Test]
+    public void TargetWebPageItem_HasWebPageSelectorComponentAttribute()
+    {
+        var prop = typeof(RedirectEditModel).GetProperty(nameof(RedirectEditModel.TargetWebPageItem))!;
+        var attr = prop.GetCustomAttributes()
+            .FirstOrDefault(a => a.GetType().Name == "WebPageSelectorComponentAttribute");
+
+        Assert.That(attr, Is.Not.Null);
+    }
+
+    [Test]
+    public void SourceUrl_PropertyType_IsNullableString()
+    {
+        var prop = typeof(RedirectEditModel).GetProperty(nameof(RedirectEditModel.SourceUrl))!;
+
+        Assert.That(prop.PropertyType, Is.EqualTo(typeof(string)));
+    }
+
+    [Test]
+    public void TargetWebPageItem_PropertyType_IsIEnumerable()
+    {
+        var prop = typeof(RedirectEditModel).GetProperty(nameof(RedirectEditModel.TargetWebPageItem))!;
+
+        Assert.That(typeof(IEnumerable<WebPageRelatedItem>).IsAssignableFrom(prop.PropertyType), Is.True);
+    }
+
+    // ── MapToRedirectInfo – multiple items in TargetWebPageItem uses first ───
+
+   
+    // ── MapToRedirectInfo – clears target URL before mapping ────────────────
+
+    [Test]
+    public async Task MapToRedirectInfo_AlwaysClearsTargetPageUrlFirst()
+    {
+        var info = MakeFakeInfo();
+        info.RedirectTargetPageURL = "/old-url";
+
+        var model = new RedirectEditModel { SourceUrl = "/new-source" };
+
+        await model.MapToRedirectInfo(info, Mock.Of<IWebPageUrlRetriever>());
+
+        Assert.That(info.RedirectTargetPageURL, Is.Empty);
+    }
+
     // ── helpers ─────────────────────────────────────────────────────────────
 
     private static FakeRedirectInfo MakeFakeInfo() =>

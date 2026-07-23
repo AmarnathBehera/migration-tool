@@ -4,6 +4,7 @@ using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Websites;
+using Kentico.Xperience.Admin.Base;
 using Moq;
 using XperienceCommunity.Redirects.UIPages;
 
@@ -206,5 +207,56 @@ public class RedirectListingTests
         Assert.That(field.FieldType, Is.EqualTo(typeof(IChannelAccessService)));
     }
 
+  
+
+    // ── MassDelete – parameter types ────────────────────────────────────────
+
+    [Test]
+    public void ListingPage_MassDelete_ReturnType_GenericArgument_IsCommandResponse()
+    {
+        var method = typeof(RedirectListing).GetMethod(nameof(RedirectListing.MassDelete))!;
+        var innerType = method.ReturnType.GetGenericArguments()[0];
+
+        Assert.That(innerType.Name, Is.EqualTo("ICommandResponse`1"));
+    }
+
+    [Test]
+    public void ListingPage_Delete_ReturnType_IsTask()
+    {
+        var method = typeof(RedirectListing).GetMethod(nameof(RedirectListing.Delete))!;
+
+        Assert.That(method.ReturnType.Name, Is.EqualTo("Task`1"));
+    }
+
    
+
+    [Test]
+    public async Task MassDelete_WhenEmptyIds_ReturnsResponse()
+    {
+        var channelAccessService = new Mock<IChannelAccessService>();
+        channelAccessService
+            .Setup(s => s.GetAccessibleWebChannelSettingsIdsAsync())
+            .ReturnsAsync((ICollection<int>?)null);
+
+        var redirectInfoProvider = new Mock<IInfoProvider<XperienceCommunity.Redirects.RedirectInfo>>();
+
+        var listing = MakeListing(channelAccessService.Object, redirectInfoProvider.Object);
+
+        var response = await listing.MassDelete(Array.Empty<int>(), CancellationToken.None);
+
+        Assert.That(response, Is.Not.Null);
+    }
+
+    // ── helpers ─────────────────────────────────────────────────────────────
+
+    private static RedirectListing MakeListing(
+        IChannelAccessService channelAccessService,
+        IInfoProvider<XperienceCommunity.Redirects.RedirectInfo> redirectInfoProvider)
+    {
+        return new RedirectListing(
+            Mock.Of<IContentQueryExecutor>(),
+            Mock.Of<IWebPageUrlRetriever>(),
+            channelAccessService,
+            redirectInfoProvider);
+    }
 }

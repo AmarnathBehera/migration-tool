@@ -160,4 +160,311 @@ public class RedirectConfigurationServiceTests
 
         Assert.That(method.ReturnType.Name, Is.EqualTo("IServiceCollection"));
     }
+
+    [Test]
+    public void AddXperienceCommunityRedirects_RegistersIRedirectService()
+    {
+        var services = new ServiceCollection();
+        services.AddXperienceCommunityRedirects();
+
+        var descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(IRedirectService));
+
+        Assert.That(descriptor, Is.Not.Null);
+    }
+
+    [Test]
+    public void AddXperienceCommunityRedirects_RegistersIRedirectModuleInstaller()
+    {
+        var services = new ServiceCollection();
+        services.AddXperienceCommunityRedirects();
+
+        var descriptor = services.FirstOrDefault(d =>
+            d.ServiceType.Name == "IRedirectModuleInstaller");
+
+        Assert.That(descriptor, Is.Not.Null);
+    }
+
+    [Test]
+    public void AddXperienceCommunityRedirects_IRedirectService_RegisteredAsSingleton()
+    {
+        var services = new ServiceCollection();
+        services.AddXperienceCommunityRedirects();
+
+        var descriptor = services.First(d => d.ServiceType == typeof(IRedirectService));
+
+        Assert.That(descriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
+    }
+
+    [Test]
+    public void AddXperienceCommunityRedirects_IRedirectModuleInstaller_RegisteredAsSingleton()
+    {
+        var services = new ServiceCollection();
+        services.AddXperienceCommunityRedirects();
+
+        var descriptor = services.First(d => d.ServiceType.Name == "IRedirectModuleInstaller");
+
+        Assert.That(descriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
+    }
+
+    [Test]
+    public void AddXperienceCommunityRedirects_IRedirectService_ImplementationType_IsRedirectService()
+    {
+        var services = new ServiceCollection();
+        services.AddXperienceCommunityRedirects();
+
+        var descriptor = services.First(d => d.ServiceType == typeof(IRedirectService));
+
+        Assert.That(descriptor.ImplementationType, Is.EqualTo(typeof(RedirectService)));
+    }
+
+    [Test]
+    public void AddXperienceCommunityRedirects_ReturnsSameServiceCollection()
+    {
+        var services = new ServiceCollection();
+        var result = services.AddXperienceCommunityRedirects();
+
+        Assert.That(result, Is.SameAs(services));
+    }
+
+    // ── RedirectService structural ──────────────────────────────────────────
+
+    [Test]
+    public void RedirectService_HasSinglePublicConstructor()
+    {
+        Assert.That(typeof(RedirectService).GetConstructors(), Has.Length.EqualTo(1));
+    }
+
+    [Test]
+    public void RedirectService_Constructor_HasTwoParameters()
+    {
+        Assert.That(typeof(RedirectService).GetConstructors().Single().GetParameters(), Has.Length.EqualTo(2));
+    }
+
+    [Test]
+    public void RedirectService_Constructor_Parameter0_IsIInfoProviderOfRedirectInfo()
+    {
+        var param = typeof(RedirectService).GetConstructors().Single().GetParameters()[0];
+
+        Assert.That(param.ParameterType, Is.EqualTo(typeof(IInfoProvider<RedirectInfoX>)));
+    }
+
+    [Test]
+    public void RedirectService_Constructor_Parameter1_IsIProgressiveCache()
+    {
+        var param = typeof(RedirectService).GetConstructors().Single().GetParameters()[1];
+
+        Assert.That(param.ParameterType.Name, Is.EqualTo("IProgressiveCache"));
+    }
+
+    // ── RedirectInfo shape ───────────────────────────────────────────────────
+
+    [Test]
+    public void RedirectInfo_ObjectType_IsNotNullOrEmpty()
+    {
+        Assert.That(RedirectInfoX.OBJECT_TYPE, Is.Not.Null.And.Not.Empty);
+    }
+
+    [Test]
+    public void RedirectInfo_HasRedirectSourceUrlProperty()
+    {
+        var prop = typeof(RedirectInfoX).GetProperty(nameof(RedirectInfoX.RedirectSourceUrl));
+
+        Assert.That(prop, Is.Not.Null);
+    }
+
+    [Test]
+    public void RedirectInfo_HasRedirectTargetWebPageItemGUIDProperty()
+    {
+        var prop = typeof(RedirectInfoX).GetProperty(nameof(RedirectInfoX.RedirectTargetWebPageItemGUID));
+
+        Assert.That(prop, Is.Not.Null);
+    }
+
+    [Test]
+    public void RedirectInfo_HasRedirectTargetPageURLProperty()
+    {
+        var prop = typeof(RedirectInfoX).GetProperty(nameof(RedirectInfoX.RedirectTargetPageURL));
+
+        Assert.That(prop, Is.Not.Null);
+    }
+
+    [Test]
+    public void RedirectInfo_HasRedirectChannelIDProperty()
+    {
+        var prop = typeof(RedirectInfoX).GetProperty(nameof(RedirectInfoX.RedirectChannelID));
+
+        Assert.That(prop, Is.Not.Null);
+    }
+
+    [Test]
+    public void RedirectInfo_HasRedirectChannelNameProperty()
+    {
+        var prop = typeof(RedirectInfoX).GetProperty(nameof(RedirectInfoX.RedirectChannelName));
+
+        Assert.That(prop, Is.Not.Null);
+    }
+
+    [Test]
+    public void RedirectInfo_HasRedirectGUIDProperty()
+    {
+        var prop = typeof(RedirectInfoX).GetProperty(nameof(RedirectInfoX.RedirectGUID));
+
+        Assert.That(prop, Is.Not.Null);
+    }
+
+    [Test]
+    public void RedirectInfo_HasRedirectIDProperty()
+    {
+        var prop = typeof(RedirectInfoX).GetProperty(nameof(RedirectInfoX.RedirectID));
+
+        Assert.That(prop, Is.Not.Null);
+    }
+
+    [Test]
+    public void RedirectInfo_TYPEINFO_ObjectClassName_IsNotNullOrEmpty()
+    {
+        Assert.That(RedirectInfoX.TYPEINFO.ObjectClassName, Is.Not.Null.And.Not.Empty);
+    }
+
+    // ── RedirectServiceCollectionExtensions – additional ────────────────────
+
+    [Test]
+    public void ServiceCollectionExtensions_AddXperienceCommunityRedirects_HasOneParameter()
+    {
+        var method = typeof(RedirectServiceCollectionExtensions)
+            .GetMethod(nameof(RedirectServiceCollectionExtensions.AddXperienceCommunityRedirects))!;
+
+        Assert.That(method.GetParameters(), Has.Length.EqualTo(1));
+    }
+
+    [Test]
+    public void ServiceCollectionExtensions_AddXperienceCommunityRedirects_Parameter0_IsIServiceCollection()
+    {
+        var param = typeof(RedirectServiceCollectionExtensions)
+            .GetMethod(nameof(RedirectServiceCollectionExtensions.AddXperienceCommunityRedirects))!
+            .GetParameters()[0];
+
+        Assert.That(param.ParameterType.Name, Is.EqualTo("IServiceCollection"));
+    }
+
+    [Test]
+    public void AddXperienceCommunityRedirects_IsExtensionMethod()
+    {
+        var method = typeof(RedirectServiceCollectionExtensions)
+            .GetMethod(nameof(RedirectServiceCollectionExtensions.AddXperienceCommunityRedirects))!;
+
+        Assert.That(method.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false), Is.True);
+    }
+
+    [Test]
+    public void ServiceCollectionExtensions_HasAtLeastOneStaticMethod()
+    {
+        var staticMethods = typeof(RedirectServiceCollectionExtensions)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static);
+
+        Assert.That(staticMethods, Is.Not.Empty);
+    }
+
+    [Test]
+    public void AddXperienceCommunityRedirects_CanBeCalledTwice_WithoutThrowingOnServiceDescriptors()
+    {
+        var services = new ServiceCollection();
+        services.AddXperienceCommunityRedirects();
+
+        Assert.DoesNotThrow(() => services.AddXperienceCommunityRedirects());
+    }
+
+    // ── IRedirectService – additional shape ─────────────────────────────────
+
+    [Test]
+    public void IRedirectService_GetRedirects_HasNoParameters()
+    {
+        var method = typeof(IRedirectService).GetMethod(nameof(IRedirectService.GetRedirects))!;
+
+        Assert.That(method.GetParameters(), Is.Empty);
+    }
+
+    [Test]
+    public void IRedirectService_GetRedirects_ReturnType_IsTaskOfIReadOnlyCollection()
+    {
+        var method = typeof(IRedirectService).GetMethod(nameof(IRedirectService.GetRedirects))!;
+
+        Assert.That(method.ReturnType.Name, Is.EqualTo("Task`1"));
+    }
+
+    // ── RedirectModuleInstaller shape ────────────────────────────────────────
+
+    [Test]
+    public void RedirectModuleInstaller_TypeExists()
+    {
+        var type = typeof(RedirectServiceCollectionExtensions).Assembly
+            .GetTypes()
+            .FirstOrDefault(t => t.Name == "RedirectModuleInstaller");
+
+        Assert.That(type, Is.Not.Null);
+    }
+
+    [Test]
+    public void IRedirectModuleInstaller_TypeExists()
+    {
+        var type = typeof(RedirectServiceCollectionExtensions).Assembly
+            .GetTypes()
+            .FirstOrDefault(t => t.Name == "IRedirectModuleInstaller");
+
+        Assert.That(type, Is.Not.Null);
+    }
+
+    [Test]
+    public void IRedirectModuleInstaller_HasInstallMethod()
+    {
+        var type = typeof(RedirectServiceCollectionExtensions).Assembly
+            .GetTypes()
+            .Single(t => t.Name == "IRedirectModuleInstaller");
+
+        Assert.That(type.GetMethod("Install"), Is.Not.Null);
+    }
+
+    [Test]
+    public void RedirectModuleInstaller_Install_IsVoid()
+    {
+        var type = typeof(RedirectServiceCollectionExtensions).Assembly
+            .GetTypes()
+            .Single(t => t.Name == "RedirectModuleInstaller");
+
+        var method = type.GetMethod("Install");
+
+        Assert.That(method!.ReturnType, Is.EqualTo(typeof(void)));
+    }
+
+    [Test]
+    public void RedirectModuleInstaller_HasSinglePublicConstructor()
+    {
+        var type = typeof(RedirectServiceCollectionExtensions).Assembly
+            .GetTypes()
+            .Single(t => t.Name == "RedirectModuleInstaller");
+
+        Assert.That(type.GetConstructors(), Has.Length.EqualTo(1));
+    }
+
+    [Test]
+    public void RedirectModuleInstaller_Constructor_HasOneParameter_IInfoProvider()
+    {
+        var type = typeof(RedirectServiceCollectionExtensions).Assembly
+            .GetTypes()
+            .Single(t => t.Name == "RedirectModuleInstaller");
+
+        var param = type.GetConstructors().Single().GetParameters()[0];
+
+        Assert.That(param.ParameterType.Name, Is.EqualTo("IInfoProvider`1"));
+    }
+
+    [Test]
+    public void RedirectModuleInstaller_ImplementsIRedirectModuleInstaller()
+    {
+        var assembly = typeof(RedirectServiceCollectionExtensions).Assembly;
+        var installerType = assembly.GetTypes().Single(t => t.Name == "RedirectModuleInstaller");
+        var interfaceType = assembly.GetTypes().Single(t => t.Name == "IRedirectModuleInstaller");
+
+        Assert.That(interfaceType.IsAssignableFrom(installerType), Is.True);
+    }
 }

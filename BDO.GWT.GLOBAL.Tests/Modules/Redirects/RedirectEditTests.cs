@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.Serialization;
+using Kentico.Xperience.Admin.Base;
 using XperienceCommunity.Redirects.UIPages;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Redirects;
@@ -149,4 +150,74 @@ public class RedirectEditTests
         typeof(RedirectEdit)
             .GetField("_model", BindingFlags.Instance | BindingFlags.NonPublic)!
             .SetValue(page, model);
+
+  
+
+   
+
+    // ── ObjectID property ────────────────────────────────────────────────────
+
+    [Test]
+    public void EditPage_ObjectID_CanBeSetAndRead()
+    {
+        var page = MakePage();
+        page.ObjectID = 42;
+
+        Assert.That(page.ObjectID, Is.EqualTo(42));
+    }
+
+    [Test]
+    public void EditPage_ObjectID_DefaultValueIsZero()
+    {
+        var page = MakePage();
+
+        Assert.That(page.ObjectID, Is.EqualTo(0));
+    }
+
+    // ── private fields – type checks ─────────────────────────────────────────
+
+    [Test]
+    public void EditPage_Field_RedirectInfoProvider_TypeIsIInfoProvider()
+    {
+        var field = typeof(RedirectEdit)
+            .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+            .Single(f => f.Name == "_redirectInfoProvider");
+
+        Assert.That(field.FieldType.Name, Is.EqualTo("IInfoProvider`1"));
+    }
+
+    [Test]
+    public void EditPage_Field_WebPageUrlRetriever_TypeIsIWebPageUrlRetriever()
+    {
+        var field = typeof(RedirectEdit)
+            .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+            .Single(f => f.Name == "_webPageUrlRetriever");
+
+        Assert.That(field.FieldType.Name, Is.EqualTo("IWebPageUrlRetriever"));
+    }
+
+    // ── ProcessFormData signature ─────────────────────────────────────────────
+
+    [Test]
+    public void EditPage_ProcessFormData_IsProtectedOverride()
+    {
+        var method = typeof(RedirectEdit)
+            .GetMethod("ProcessFormData", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        Assert.That(method, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(method!.IsFamily, Is.True);
+            Assert.That(method.IsVirtual, Is.True);
+        });
+    }
+
+    [Test]
+    public void EditPage_ProcessFormData_ReturnType_IsTask()
+    {
+        var method = typeof(RedirectEdit)
+            .GetMethod("ProcessFormData", BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+        Assert.That(method.ReturnType.Name, Is.EqualTo("Task`1"));
+    }
 }

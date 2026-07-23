@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.Serialization;
+using Kentico.Xperience.Admin.Base;
 using XperienceCommunity.Redirects.UIPages;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Redirects;
@@ -158,4 +159,70 @@ public class RedirectCreateTests
         typeof(RedirectCreate)
             .GetField("_model", BindingFlags.Instance | BindingFlags.NonPublic)!
             .SetValue(page, model);
+
+ 
+    // ── ProcessFormData signature ─────────────────────────────────────────────
+
+    [Test]
+    public void CreatePage_ProcessFormData_Exists()
+    {
+        var method = typeof(RedirectCreate)
+            .GetMethod("ProcessFormData", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        Assert.That(method, Is.Not.Null);
+    }
+
+    [Test]
+    public void CreatePage_ProcessFormData_IsProtectedOverride()
+    {
+        var method = typeof(RedirectCreate)
+            .GetMethod("ProcessFormData", BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(method.IsFamily, Is.True);
+            Assert.That(method.IsVirtual, Is.True);
+        });
+    }
+
+    [Test]
+    public void CreatePage_ProcessFormData_ReturnType_IsTask()
+    {
+        var method = typeof(RedirectCreate)
+            .GetMethod("ProcessFormData", BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+        Assert.That(method.ReturnType.Name, Is.EqualTo("Task`1"));
+    }
+
+    // ── private fields – type checks ─────────────────────────────────────────
+
+    [Test]
+    public void CreatePage_Field_RedirectInfoProvider_TypeIsIInfoProvider()
+    {
+        var field = typeof(RedirectCreate)
+            .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+            .Single(f => f.Name == "_redirectInfoProvider");
+
+        Assert.That(field.FieldType.Name, Is.EqualTo("IInfoProvider`1"));
+    }
+
+    [Test]
+    public void CreatePage_Field_PageLinkGenerator_TypeIsIPageLinkGenerator()
+    {
+        var field = typeof(RedirectCreate)
+            .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+            .Single(f => f.Name == "_pageLinkGenerator");
+
+        Assert.That(field.FieldType.Name, Is.EqualTo("IPageLinkGenerator"));
+    }
+
+    [Test]
+    public void CreatePage_Field_WebPageUrlRetriever_TypeIsIWebPageUrlRetriever()
+    {
+        var field = typeof(RedirectCreate)
+            .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+            .Single(f => f.Name == "_webPageUrlRetriever");
+
+        Assert.That(field.FieldType.Name, Is.EqualTo("IWebPageUrlRetriever"));
+    }
 }
