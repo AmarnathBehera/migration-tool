@@ -42,11 +42,11 @@ public class EditorsPickWidgetProperties : BaseWidgetProperties
         .ToList();
 
     //NOTE: Modify configuration of the OrderedPageSelector component to allow only specific page types (https://roadmap.kentico.com/c/75-page-selector-allowed-page-types)
-    [ContentItemSelectorComponent(contentTypeNames: [BlogPost.CONTENT_TYPE_NAME, Event.CONTENT_TYPE_NAME, MicrositePage.CONTENT_TYPE_NAME, NewsArticle.CONTENT_TYPE_NAME, Webinar.CONTENT_TYPE_NAME], Label = "Pages", ExplanationText = "Only pages from Blog Posts, Events, Insights, Microsites, News Articles and Webinars will be showcased.\nNote: All content is sorted in descending order - by \"Publish From\" for general content (newest first), and by start date for events (latest upcoming first).", Order = 4)]
+    [ContentItemSelectorComponent(contentTypeNames: [BlogPost.CONTENT_TYPE_NAME, Event.CONTENT_TYPE_NAME, MicrositePage.CONTENT_TYPE_NAME, NewsArticle.CONTENT_TYPE_NAME, Webinar.CONTENT_TYPE_NAME,Insight.CONTENT_TYPE_NAME], Label = "Pages", ExplanationText = "Only pages from Blog Posts, Events, Insights, Microsites, News Articles and Webinars will be showcased.\nNote: All content is sorted in descending order - by \"Publish From\" for general content (newest first), and by start date for events (latest upcoming first).", Order = 4)]
     public IEnumerable<ContentItemReference> Pages { get; set; } = Enumerable.Empty<ContentItemReference>();
 
     //"insight" type missing
-    [ContentItemSelectorComponent(contentTypeNames: [BlogPost.CONTENT_TYPE_NAME, Event.CONTENT_TYPE_NAME, MicrositePage.CONTENT_TYPE_NAME, NewsArticle.CONTENT_TYPE_NAME, Webinar.CONTENT_TYPE_NAME],Label = "Featured pages", ExplanationText = "Only pages from Blog Posts, Events, Insights, Microsites, News Articles and Webinars will be showcased.", Order = 5)]
+    [ContentItemSelectorComponent(contentTypeNames: [BlogPost.CONTENT_TYPE_NAME, Event.CONTENT_TYPE_NAME, MicrositePage.CONTENT_TYPE_NAME, NewsArticle.CONTENT_TYPE_NAME, Webinar.CONTENT_TYPE_NAME,Insight.CONTENT_TYPE_NAME],Label = "Featured pages", ExplanationText = "Only pages from Blog Posts, Events, Insights, Microsites, News Articles and Webinars will be showcased.", Order = 5)]
     public IEnumerable<ContentItemReference> FeaturedPages { get; set; } = Enumerable.Empty<ContentItemReference>();
 
     [ContentItemSelectorComponent(contentTypeName:ContentAttachment.CONTENT_TYPE_NAME, Label = "Background image", Order = 6)]
