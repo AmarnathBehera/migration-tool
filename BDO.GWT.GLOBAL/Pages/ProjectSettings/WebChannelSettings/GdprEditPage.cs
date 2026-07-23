@@ -155,10 +155,15 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
             return await BuildFormCommandResponse(false, "GDPR record not found.");
         }
 
+        if (!gdprContactLookupService.DeleteContactByEmail(gdpr.EmailAddress))
+        {
+            return await BuildFormCommandResponse(false, "No contact found to delete.");
+        }
+
         gdpr.Results = string.Empty;
         GDPRInfoProvider.Set(gdpr);
 
-        return await BuildFormCommandResponse(true, "Results deleted.");
+        return await BuildFormCommandResponse(true, "Contact deleted successfully.");
     }
 }
 

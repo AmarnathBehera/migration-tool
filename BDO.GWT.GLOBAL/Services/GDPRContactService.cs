@@ -13,13 +13,14 @@ public interface IGDPRContactLookupService
 {
     string GetContactAsText(string email);
     string GetContactAsXml(string email);
+    bool DeleteContactByEmail(string email);
 }
 
-public sealed class GDPRContactLookupService : IGDPRContactLookupService
+public sealed class GDPRContactService : IGDPRContactLookupService
 {
     private readonly IInfoProvider<ContactInfo> contactInfoProvider;
 
-    public GDPRContactLookupService(IInfoProvider<ContactInfo> contactInfoProvider)
+    public GDPRContactService(IInfoProvider<ContactInfo> contactInfoProvider)
     {
         this.contactInfoProvider = contactInfoProvider;
     }
@@ -91,6 +92,23 @@ public sealed class GDPRContactLookupService : IGDPRContactLookupService
         );
 
         return xml.ToString();
+    }
+
+    public bool DeleteContactByEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return false;
+        }
+
+        ContactInfo contact = GetContactByEmail(email.Trim());
+        if (contact is null)
+        {
+            return false;
+        }
+
+        contactInfoProvider.Delete(contact);
+        return true;
     }
 
     private ContactInfo GetContactByEmail(string email)
