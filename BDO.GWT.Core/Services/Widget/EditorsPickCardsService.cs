@@ -96,7 +96,7 @@ public class EditorsPickCardService : IEditorsPickCardService
                 new RetrieveContentOfContentTypesParameters() { LinkedItemsMaxLevel = 2 },
                 cancellationToken);
 
-        var filtered = (await ApplyFiltersAsync(pages, cardsQuery.Filters, cancellationToken))
+        var filtered = (await ApplyFiltersAsync(pages, cardsQuery.Filters))
             .OrderByDescending(isFeatured)
             .ThenByDescending(GetPublishDateUtc)
             .ToArray();
@@ -115,10 +115,10 @@ public class EditorsPickCardService : IEditorsPickCardService
         };
     }
 
-    private async Task<IEnumerable<IWebPageFieldsSource>> ApplyFiltersAsync(
+    private static async Task<IEnumerable<IWebPageFieldsSource>> ApplyFiltersAsync(
         IEnumerable<IWebPageFieldsSource> pages,
-        IDictionary<string, string> filters,
-        CancellationToken cancellationToken)
+        IDictionary<string, string> filters
+        )
     {
         if (filters.Count == 0)
         {

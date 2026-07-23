@@ -72,20 +72,6 @@ public class EditorsPickStateStoreTests
     }
 
 
-    //[Test]
-    //public void Save_WithValidGuid_UsesCacheKeyContainingGuid()
-    //{
-    //    var (mock, captured) = BuildPassThroughCacheMock();
-    //    var sut = new EditorsPickStateStore(mock.Object);
-    //    var guid = Guid.NewGuid();
-
-    //    sut.Save(guid, EmptySet, EmptySet);
-
-    //    Assert.That(captured, Has.Count.EqualTo(1));
-    //    Assert.That(captured[0].CacheItemName, Does.Contain("BDO|EditorsPickState|"));
-    //    Assert.That(captured[0].CacheItemName, Does.Contain(guid.ToString()));
-    //}
-
 
     [Test]
     public void Save_WithValidGuid_SetsCacheDurationTo1440Minutes()
@@ -143,8 +129,12 @@ public class EditorsPickStateStoreTests
                 System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)!
             .GetValue(capturedState)!;
 
-        Assert.That(featuredGuids, Is.EquivalentTo(featured));
-        Assert.That(selectedGuids, Is.EquivalentTo(selected));
+        Assert.Multiple(() =>
+        {
+            Assert.That(featuredGuids, Is.EquivalentTo(featured));
+            Assert.That(selectedGuids, Is.EquivalentTo(selected));
+        });
+        
     }
 
 
@@ -173,8 +163,12 @@ public class EditorsPickStateStoreTests
                 System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)!
             .GetValue(capturedState)!;
 
-        Assert.That(featuredGuids, Is.Not.Null.And.Empty);
-        Assert.That(selectedGuids, Is.Not.Null.And.Empty);
+        Assert.Multiple(() =>
+        {
+            Assert.That(featuredGuids, Is.Not.Null.And.Empty);
+            Assert.That(selectedGuids, Is.Not.Null.And.Empty);
+
+        });
     }
 
 
@@ -200,125 +194,13 @@ public class EditorsPickStateStoreTests
             out var featuredGuids,
             out var selectedGuids);
 
-        Assert.That(featuredGuids, Is.Not.Null.And.Empty);
-        Assert.That(selectedGuids, Is.Not.Null.And.Empty);
+        Assert.Multiple(() =>
+        {
+            Assert.That(featuredGuids, Is.Not.Null.And.Empty);
+            Assert.That(selectedGuids, Is.Not.Null.And.Empty);
+        });
     }
 
 
-    //[Test]
-    //public void TryGet_WhenKeyNotInCache_ReturnsFalse()
-    //{
-    //    var mock = new Mock<IProgressiveCache>();
-    //    var sut = new EditorsPickStateStore(mock.Object);
-
-    //    // A freshly generated GUID will never exist in the cache
-    //    var result = sut.TryGet(Guid.NewGuid(), out _, out _);
-
-    //    Assert.That(result, Is.False);
-    //}
-
-
-    //[Test]
-    //public void TryGet_WhenKeyNotInCache_OutParamsAreEmptySets()
-    //{
-    //    var mock = new Mock<IProgressiveCache>();
-    //    var sut = new EditorsPickStateStore(mock.Object);
-
-    //    sut.TryGet(Guid.NewGuid(), out var featuredGuids, out var selectedGuids);
-
-    //    Assert.That(featuredGuids, Is.Not.Null.And.Empty);
-    //    Assert.That(selectedGuids, Is.Not.Null.And.Empty);
-    //}
-
-
-
-    //[Test]
-    //[Category("Integration")]
-    //public void SaveThenTryGet_WithValidGuids_ReturnsTrueAndCorrectReferences()
-    //{
-    //    // Arrange — real IProgressiveCache wired to the in-process cache store
-    //    var realCache = Service.Resolve<IProgressiveCache>();
-    //    var sut = new EditorsPickStateStore(realCache);
-
-    //    var stateGuid = Guid.NewGuid();
-    //    var featured = new[] { Guid.NewGuid(), Guid.NewGuid() };
-    //    var selected = new[] { Guid.NewGuid() };
-
-    //    // Act
-    //    sut.Save(Guid.NewGuid(), MakeRefs(featured), MakeRefs(selected));
-    //    var found = sut.TryGet(stateGuid, out var outFeatured, out var outSelected);
-
-    //    // Assert
-    //    Assert.That(found, Is.True);
-    //    Assert.That(
-    //        outFeatured.Select(r => r.Identifier),
-    //        Is.EquivalentTo(featured));
-    //    Assert.That(
-    //        outSelected.Select(r => r.Identifier),
-    //        Is.EquivalentTo(selected));
-    //}
-
-    //// -----------------------------------------------------------------------
-    //// Round-trip — TC-13  TryGet after Save with empty sets returns true
-    ////                     and empty out params (not null)
-    //// -----------------------------------------------------------------------
-    //[Test]
-    //[Category("Integration")]
-    //public void SaveThenTryGet_WithEmptySets_ReturnsTrueAndEmptyOutParams()
-    //{
-    //    var realCache = Service.Resolve<IProgressiveCache>();
-    //    var sut = new EditorsPickStateStore(realCache);
-    //    var stateGuid = Guid.NewGuid();
-
-    //    sut.Save(stateGuid, EmptySet, EmptySet);
-    //    var found = sut.TryGet(stateGuid, out var outFeatured, out var outSelected);
-
-    //    Assert.That(found, Is.True);
-    //    Assert.That(outFeatured, Is.Not.Null.And.Empty);
-    //    Assert.That(outSelected, Is.Not.Null.And.Empty);
-    //}
-
-    //// -----------------------------------------------------------------------
-    //// Round-trip — TC-14  Two different stateGuids do not share state
-    //// -----------------------------------------------------------------------
-    //[Test]
-    //[Category("Integration")]
-    //public void Save_TwoDifferentGuids_DoNotShareCachedState()
-    //{
-    //    var realCache = Service.Resolve<IProgressiveCache>();
-    //    var sut = new EditorsPickStateStore(realCache);
-
-    //    var guid1 = Guid.NewGuid();
-    //    var guid2 = Guid.NewGuid();
-    //    var refForG1 = Guid.NewGuid();
-
-    //    sut.Save(guid1, MakeRefs(refForG1), EmptySet);
-    //    // guid2 is never saved
-
-    //    sut.TryGet(guid2, out var outFeatured, out _);
-
-    //    Assert.That(outFeatured, Is.Empty,
-    //        "State saved under guid1 must not bleed into guid2's lookup.");
-    //}
-
-    //// -----------------------------------------------------------------------
-    //// ToReferences — TC-15  ContentItemReferences are rebuilt with correct Identifiers
-    ////                (tested indirectly via a Save → TryGet round-trip)
-    //// -----------------------------------------------------------------------
-    //[Test]
-    //[Category("Integration")]
-    //public void TryGet_ReturnsContentItemReferencesWithCorrectIdentifiers()
-    //{
-    //    var realCache = Service.Resolve<IProgressiveCache>();
-    //    var sut = new EditorsPickStateStore(realCache);
-
-    //    var stateGuid = Guid.NewGuid();
-    //    var expectedGuid = Guid.NewGuid();
-
-    //    sut.Save(stateGuid, MakeRefs(expectedGuid), EmptySet);
-    //    sut.TryGet(stateGuid, out var outFeatured, out _);
-
-    //    var reference = outFeatured.Single();
-    //    Assert.That(reference.Identifier, Is.EqualTo(expectedGuid));
-    //}
+    
 }
