@@ -221,5 +221,118 @@ namespace BDO.GWT.GLOBAL.Tests.Modules
 
             Assert.That(result, Is.False);
         }
+
+        // ── IChannelAccessService – additional shape ──────────────────────────
+
+        [Test]
+        public void IChannelAccessService_HasExactlyTwoMethods()
+        {
+            Assert.That(typeof(IChannelAccessService).GetMethods(), Has.Length.EqualTo(2));
+        }
+
+        [Test]
+        public void ChannelAccessService_IsNotAbstract()
+        {
+            Assert.That(typeof(ChannelAccessService).IsAbstract, Is.False);
+        }
+
+        [Test]
+        public void ChannelAccessService_HasPrivateField_ForWebChannelSettingsProvider()
+        {
+            var field = typeof(ChannelAccessService)
+                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+                .FirstOrDefault(f => f.FieldType == typeof(IInfoProvider<WebChannelSettingsInfo>));
+
+            Assert.That(field, Is.Not.Null);
+        }
+
+        [Test]
+        public void ChannelAccessService_HasPrivateField_ForChannelProvider()
+        {
+            var field = typeof(ChannelAccessService)
+                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+                .FirstOrDefault(f => f.FieldType == typeof(IInfoProvider<ChannelInfo>));
+
+            Assert.That(field, Is.Not.Null);
+        }
+
+        [Test]
+        public void ChannelAccessService_HasPrivateField_ForUserInfoProvider()
+        {
+            var field = typeof(ChannelAccessService)
+                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+                .FirstOrDefault(f => f.FieldType == typeof(IUserInfoProvider));
+
+            Assert.That(field, Is.Not.Null);
+        }
+
+        [Test]
+        public void ChannelAccessService_HasPrivateField_ForUserRoleProvider()
+        {
+            var field = typeof(ChannelAccessService)
+                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+                .FirstOrDefault(f => f.FieldType == typeof(IInfoProvider<UserRoleInfo>));
+
+            Assert.That(field, Is.Not.Null);
+        }
+
+        [Test]
+        public void ChannelAccessService_HasPrivateField_ForRoleProvider()
+        {
+            var field = typeof(ChannelAccessService)
+                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+                .FirstOrDefault(f => f.FieldType == typeof(IInfoProvider<RoleInfo>));
+
+            Assert.That(field, Is.Not.Null);
+        }
+
+        // ── GetAccessibleWebChannelSettingsIdsAsync – IsAsync ─────────────────
+
+        [Test]
+        public void GetAccessibleWebChannelSettingsIdsAsync_IsAsync()
+        {
+            var method = typeof(ChannelAccessService)
+                .GetMethod(nameof(ChannelAccessService.GetAccessibleWebChannelSettingsIdsAsync))!;
+
+            var asyncAttr = method.GetCustomAttributes()
+                .FirstOrDefault(a => a.GetType().Name == "AsyncStateMachineAttribute");
+
+            Assert.That(asyncAttr, Is.Not.Null);
+        }
+
+        [Test]
+        public void CanAccessAsync_IsAsync()
+        {
+            var method = typeof(ChannelAccessService)
+                .GetMethod(nameof(ChannelAccessService.CanAccessAsync))!;
+
+            var asyncAttr = method.GetCustomAttributes()
+                .FirstOrDefault(a => a.GetType().Name == "AsyncStateMachineAttribute");
+
+            Assert.That(asyncAttr, Is.Not.Null);
+        }
+
+        // ── CanAccessAsync – with valid id in accessible list ─────────────────
+
+        [Test]
+        public async Task CanAccessAsync_WhenHttpContextIsNull_ReturnsFalse()
+        {
+            _httpContextAccessor.SetupGet(a => a.HttpContext).Returns((HttpContext?)null);
+
+            var result = await _service.CanAccessAsync(1);
+
+            Assert.That(result, Is.False);
+        }
+
+        [Test]
+        public async Task CanAccessAsync_WhenUserNotAuthenticated_ReturnsFalse()
+        {
+            var httpContext = new DefaultHttpContext();
+            _httpContextAccessor.SetupGet(a => a.HttpContext).Returns(httpContext);
+
+            var result = await _service.CanAccessAsync(5);
+
+            Assert.That(result, Is.False);
+        }
     }
 }
