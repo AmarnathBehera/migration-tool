@@ -1,6 +1,7 @@
 ﻿using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.Base;
 using CMS.ContentEngine;
+using CMS.DataEngine;
 using CMS.Helpers;
 using CMS.Membership;
 using CMS.Websites;
@@ -25,15 +26,18 @@ public class RedirectListing : ListingPage
     private readonly IContentQueryExecutor _executor;
     private readonly IWebPageUrlRetriever _webPageUrlRetriever;
     private readonly IChannelAccessService _channelAccessService;
-
+    private readonly IInfoProvider<RedirectInfo> _redirectInfoProvider;
     public RedirectListing(
         IContentQueryExecutor executor,
         IWebPageUrlRetriever webPageUrlRetriever,
-        IChannelAccessService channelAccessService)
+        IChannelAccessService channelAccessService,
+         IInfoProvider<RedirectInfo> redirectInfoProvider)
     {
         _executor = executor;
         _webPageUrlRetriever = webPageUrlRetriever;
         _channelAccessService = channelAccessService;
+        _redirectInfoProvider = redirectInfoProvider;
+
     }
 
     public override async Task ConfigurePage()
@@ -46,7 +50,13 @@ public class RedirectListing : ListingPage
             .AddColumn(nameof(RedirectInfo.RedirectTargetWebPageItemGUID), "Target web page", formatter: GetWebPageUrl)
             .AddColumn(nameof(RedirectInfo.RedirectChannelName), "Channel", searchable: true);
         PageConfiguration.AddEditRowAction<RedirectEditSection>();
-
+        PageConfiguration.MassActions.AddCommandWithConfirmation(
+           label: "Delete",
+           command: nameof(MassDelete),
+           icon: Icons.Bin,
+           confirmation: "Are you sure you want to delete the selected redirect(s)? This cannot be undone.",
+           confirmationButton: "Delete"
+       );
         var accessibleChannelIds = await _channelAccessService.GetAccessibleWebChannelSettingsIdsAsync();
 
         if (accessibleChannelIds != null)
@@ -67,6 +77,42 @@ public class RedirectListing : ListingPage
 
     [PageCommand(Permission = SystemPermissions.DELETE)]
     public override Task<ICommandResponse<RowActionResult>> Delete(int id) => base.Delete(id);
+
+    [PageCommand(Permission = SystemPermissions.DELETE)]
+    public async Task<ICommandResponse<MassActionResult>> MassDelete(IEnumerable<int> identifiers, CancellationToken cancellationToken)
+    {
+        // Re-check channel access server-side for every row - don't rely solely
+        // on the client only having been shown authorized rows
+        var accessibleChannelIds = await _channelAccessService.GetAccessibleWebChannelSettingsIdsAsync();
+
+        int deletedCount = 0;
+        int skippedCount = 0;
+
+        foreach (var id in identifiers)
+        {
+            var redirect = _redirectInfoProvider.Get(id);
+            if (redirect == null)
+            {
+                continue;
+            }
+
+            if (accessibleChannelIds != null && !accessibleChannelIds.Contains(redirect.RedirectChannelID))
+            {
+                skippedCount++;
+                continue;
+            }
+
+            redirect.Delete();
+            deletedCount++;
+        }
+
+        var response = ResponseFrom(new MassActionResult(reload: true));
+
+        return skippedCount > 0
+            ? response.AddWarningMessage($"Deleted {deletedCount} redirect(s). Skipped {skippedCount} you don't have access to.")
+            : response.AddSuccessMessage($"Deleted {deletedCount} redirect(s).");
+    }
+
 
     private string GetWebPageUrl(object objectValue, IDataContainer dataContainer)
     {
