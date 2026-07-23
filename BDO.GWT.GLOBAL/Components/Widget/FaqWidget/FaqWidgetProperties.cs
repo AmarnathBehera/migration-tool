@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace BDO.GWT.Web.Widgets.FaqWidget;
 
-public class FaqWidgetProperties : IWidgetProperties
+public class FaqWidgetProperties : BaseWidgetProperties
 {
     [TextInputComponent(Label = "Title", ExplanationText = "Title that will be shown over FAQ widget.", Order = 0)]
     public string Title { get; set; }
@@ -26,6 +26,5 @@ public class FaqWidgetProperties : IWidgetProperties
     [DropDownComponent(Label = "Bottom margin", Order = 5, Options = "0px;None\r\n20px\r\n40px\r\n60px\r\n80px")]
     public string BottomMargin { get; set; } = "0px";
 
-    [TextInputComponent(Label = "Widget ID", Order = 18, ExplanationText = "ID should be unique from any other ID on the page. If the ID contains multiple words, words must be joined with a '-' (e.g. three-word-id). No other special characters and no spaces.'")]
-    public string WidgetID { get; set; }
+
 }

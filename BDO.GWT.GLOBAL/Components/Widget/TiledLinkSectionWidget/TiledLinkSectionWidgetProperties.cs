@@ -1,4 +1,5 @@
-﻿using CMS.ContentEngine;
+﻿using BDO.GWT.Web.Widgets;
+using CMS.ContentEngine;
 using Kentico.Components.Web.Mvc.FormComponents;
 using Kentico.Forms.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
@@ -10,7 +11,7 @@ using System.Collections.Generic;
 
 namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWidget;
 
-public class TiledLinkSectionWidgetProperties : IWidgetProperties
+public class TiledLinkSectionWidgetProperties : BaseWidgetProperties
 {
 
     [TextInputComponent(Label = "Title", ExplanationText = "Title that will be shown over tiled link section widget.", Order = 0)]
@@ -60,7 +61,4 @@ public class TiledLinkSectionWidgetProperties : IWidgetProperties
     [DropDownComponent(Label = "Bottom margin", Order = 12, Options = "0px;None\n20px\n40px\n60px\n80px")]
     public string? BottomMargin { get; set; }
 
-    [TextInputComponent(Label = "Widget ID", Order = 13, ExplanationText = "ID should be unique from any other ID on the page. If the ID contains multiple words, words must be joined with a '-' (e.g. three-word-id). No other special characters and no spaces.'")]
-
-    public string WidgetID { get; set; }
 }

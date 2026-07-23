@@ -61,6 +61,8 @@ variables:
     value: "BDO.GWT.GLOBAL/GWTXbyKWeb.csproj"
   - name: mvcProjectFilePath
     value: "BDO.GWT.GLOBAL/GWTXbyKWeb.csproj"
+  - name: apiProjectFilePath
+    value: "BDO.GWT.GLOBAL.API/BDO.GWT.GLOBAL.API.csproj"
 
   # Octopus Deploy variables
   - name: octopusSpaceName
@@ -79,8 +81,8 @@ variables:
     value: "GWT.XbyK.CI.Deploy"
   # - name: synAppPackageId
   #   value: "GWT.XbyK.Sync.Deploy"
-  # - name: apiAppPackageId
-  #   value: "GWT.XbyK.API.Deploy"
+  - name: apiAppPackageId
+    value: "GWT.XbyK.API.Deploy"
 
 stages:
   - stage: Versioning
@@ -137,7 +139,7 @@ stages:
 
               # Resolve triggering details
               if [ -z "$(Resources.TriggeringAlias)" ]; then
-                triggerDetails="Manual run by $(Build.RequestedFor)"
+                triggerDetails="Manual run"
               else
                 triggerDetails="$(Resources.TriggeringAlias) / $triggerBranch / Build: $triggerRunId"
               fi
@@ -379,6 +381,49 @@ stages:
               targetPath: "$(octopusPackageOutput)"
               artifact: drop-ci
 
+      - job: BuildAPIApp
+        displayName: "Build and package XbyK API App"
+        pool:
+          vmImage: "ubuntu-latest"
+        variables:
+          selfSourcesDirectory: "$(Build.SourcesDirectory)"
+        steps:
+          - checkout: self
+
+          - task: UseDotNet@2
+            displayName: "Use .NET $(dotnetVersion)"
+            inputs:
+              packageType: "sdk"
+              version: "$(dotnetVersion)"
+              installationPath: $(Agent.ToolsDirectory)/dotnet
+
+          - task: NuGetAuthenticate@1
+            displayName: "Authenticate NuGet"
+
+          - script: dotnet restore $(selfSourcesDirectory)/$(apiProjectFilePath)
+            displayName: "Restore NuGet packages"
+
+          - script: >
+              dotnet publish $(selfSourcesDirectory)/$(apiProjectFilePath)
+              --configuration $(buildConfiguration) --no-restore --output
+              $(publishOutput)
+            displayName: "Publish API solution"
+
+          - task: ArchiveFiles@2
+            displayName: "Create API deployment package"
+            inputs:
+              rootFolderOrFile: "$(publishOutput)"
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: "$(octopusPackageOutput)/$(apiAppPackageId).$(Build.BuildNumber).zip"
+              replaceExistingArchive: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish API package artifact"
+            inputs:
+              targetPath: "$(octopusPackageOutput)"
+              artifact: drop-api
+
       - job: BuildReactApp
         displayName: "Build and package XbyK React SSR App"
         steps:
@@ -406,6 +451,9 @@ stages:
 
           - task: Npm@1
             displayName: "Build React SSR App"
+            env: # Required for step; removed the .env file from GWT.XbyK.UI
+              VITE_SERVER_BASE_DIR: ../GWT.XbyK.ReactServer
+              VITE_SERVER_BASE_URL: http://localhost:3000/
             inputs:
               command: "custom"
               workingDir: "$(Build.SourcesDirectory)/GWT.XbyK.ReactServer"
@@ -471,6 +519,9 @@ stages:
           - download: current
             displayName: "Download CI Deploy package artifact"
             artifact: drop-ci
+          - download: current
+            displayName: "Download API package artifact"
+            artifact: drop-api
 
           - task: OctopusPush@7
             displayName: Push Packages to Octopus
@@ -482,6 +533,7 @@ stages:
                 $(Pipeline.Workspace)/drop-mvc/*.zip
                 $(Pipeline.Workspace)/drop-react/*.zip
                 $(Pipeline.Workspace)/drop-ci/*.zip
+                $(Pipeline.Workspace)/drop-api/*.zip
               Replace: "true"
 
           - task: OctopusBuildInformation@7
@@ -494,6 +546,7 @@ stages:
                 $(mvcAppPackageId)
                 $(reactAppPackageId)
                 $(ciAppPackageId)
+                $(apiAppPackageId)
               PackageVersion: "$(Build.BuildNumber)"
               Replace: OverwriteExisting
 

@@ -73,8 +73,12 @@ public class DealPageService(
             ? sidebarService.GetDealSidebarDtoAsync(dealPage, cancellationToken)
             : null;
 
+
         var hero = await heroService.GetHeroDtoAsync(heroData, cancellationToken);
         var sidebar = sidebarTask is null ? null : await sidebarTask;
+        int displayCount = int.Parse(dealPage.DisplayedContacts);
+        sidebar?.Contacts = sidebar.Contacts.Take(displayCount).ToArray();
+
 
         return new DealDto
         {
