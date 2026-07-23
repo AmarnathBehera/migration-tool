@@ -86,5 +86,26 @@ namespace BDO.GWT.GLOBAL.API.Controllers
             return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.PageGUID }, pageDto.Value);
         }
 
+        /// <summary>
+        /// Creates a new culture version of a career page.
+        /// </summary>
+        /// <param name="memberFirmID">ID of the member firm in which the page should be created.</param>
+        /// <param name="pageGUID">Page GUID of the career to copy content from.</param>
+        /// <param name="fromCulture">Culture of the existing page version.</param>
+        /// <param name="toCulture">Culture of the new page version.</param>
+        /// <param name="request">New culture version data.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>New career page in another culture.</returns>
+        [HttpPost("{pageGUID:guid}/CreateNewCultureVersion")]
+        //[HasPermission(ApiMethodGroupName.Careers, ApiPermission.Manage)]
+        [SwaggerResponse(StatusCodes.Status201Created, null, typeof(PageOutput<CareerPageContent>), MediaTypeNames.Application.Json)]
+        public async Task<ActionResult<PageOutput<CareerPageContent>>> CreateNewCultureVersion(int memberFirmID, Guid pageGUID, [FromQuery][Required] string fromCulture, [FromQuery][Required] string toCulture, [FromBody] CareerPageContent request, CancellationToken cancellationToken)
+        {
+            int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
+            var pageDto = await _careerCrudService.CreateCareerPageCultureVersionAsync(channelId, pageGUID, fromCulture, toCulture, request, cancellationToken);
+
+            return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.PageGUID }, pageDto.Value);
+        }
+
     }
 }

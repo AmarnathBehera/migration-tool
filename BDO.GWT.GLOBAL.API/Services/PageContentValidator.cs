@@ -179,7 +179,7 @@ public class PageContentValidator : IPageContentValidator
         }
 
         // Content item reference values are serialized as strings in the page content DTO
-        // (e.g. RelatedDeals, DisplayedContacts, RelevantContactPerson). Validate the
+        // (e.g. RelatedDeals, DisplayedContacts, RelevantContactPerson, OfficeLocation). Validate the
         // presence rule and pass the value through unchanged.
         return ValidateAndNormalizeString(
             field,

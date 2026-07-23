@@ -13,6 +13,7 @@ using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace BDO.GWT.GLOBAL.API.Services
 {
@@ -154,9 +155,106 @@ namespace BDO.GWT.GLOBAL.API.Services
             return createdCareer != null ? MapCareerToPageOutput(createdCareer) : new BadRequestResult();
         }
 
-        public Task<ActionResult<PageOutput<CareerPageContent>>> CreateCareerPageCultureVersionAsync(int channelId, Guid pageGUID, string? fromCulture, string? toCulture, CareerPageContent request, CancellationToken cancellationToken)
+        public async Task<ActionResult<PageOutput<CareerPageContent>>> CreateCareerPageCultureVersionAsync(int channelId, Guid pageGUID, string? fromCulture, string? toCulture, CareerPageContent request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (request is null)
+            {
+                return new BadRequestResult();
+            }
+
+            var fromLangCulture = await _cultureValidationService.ValidateAndNormalizeSiteCultureAsync(channelId,
+                                                     fromCulture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+
+            if (string.IsNullOrEmpty(fromLangCulture.Locale))
+            {
+                throw new NotFoundException("Invalid culture specified");
+            }
+
+            var toLangCulture = await _cultureValidationService.ValidateAndNormalizeSiteCultureAsync(channelId, 
+                toCulture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+
+            if (string.IsNullOrEmpty(toLangCulture.Language))
+            {
+                throw new NotFoundException("Invalid to culture specified");
+            }
+
+            var channel = await _channelInfoProvider.GetAsync(channelId, cancellationToken);
+            if (string.IsNullOrEmpty(channel?.ChannelName))
+            {
+                throw new NotFoundException("Channel not found");
+            }
+
+            _pageContentValidator.ValidateAndNormalizePageContent(request);
+
+            _validationState.ThrowIfThereAreErrors();
+
+            CHANNEL_NAME = channel.ChannelName;
+            var _retrieveCurrentPage = new RetrievePagesParameters
+            {
+                LinkedItemsMaxLevel = 3,
+                ChannelName = channel.ChannelName,
+                LanguageName = fromLangCulture.Locale,
+                IsForPreview = false
+            };
+
+
+            // Get existing page
+            var result = await _contentRetriever.GetPagesAsync<Career>(_retrieveCurrentPage,
+                query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
+                RetrievalCacheSettings.CacheDisabled,
+                cancellationToken);
+
+            var existingCareer = result?.FirstOrDefault();
+            if (existingCareer is null)
+            {
+                return new NotFoundResult();
+            }
+
+                       
+
+            var itemData = await CreateCMSTreeItem(request, toCulture, cancellationToken);
+
+            // Create language variant for the existing page
+            var createVariantParameters = new CMS.Websites.CreateLanguageVariantParameters(
+                existingCareer.SystemFields.WebPageItemID,
+                toLangCulture.Language,
+                existingCareer.SystemFields?.ContentItemName ?? "Career culture variant",
+                itemData);
+
+            // Creates the language variant in the database
+            if (!await _webPageManager.TryCreateLanguageVariant(createVariantParameters, cancellationToken))
+            {
+                throw new NotFoundException("Failed to create language variant");
+            }
+
+            // Update the draft with new content
+            if (!await _webPageManager.TryUpdateDraft(existingCareer.SystemFields.WebPageItemID, toLangCulture.Language, new UpdateDraftData(itemData), cancellationToken))
+            {
+                throw new NotFoundException("Failed to update page draft");
+            }
+
+            // Publish the updated page
+            if (!await _webPageManager.TryPublish(existingCareer.SystemFields.WebPageItemID, toLangCulture.Language, cancellationToken))
+            {
+                throw new NotFoundException("Failed to publish updated page");
+            }
+
+            // Retrieve the created variant and return it
+            var _retrieveNewVariant = new RetrievePagesParameters
+            {
+                LinkedItemsMaxLevel = 1,
+                ChannelName = channel.ChannelName,
+                LanguageName = toLangCulture.Language,
+                IsForPreview = false
+            };
+
+            var variantResult = await _contentRetriever.GetPagesAsync<Career>(_retrieveNewVariant,
+                query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
+                RetrievalCacheSettings.CacheDisabled,
+                cancellationToken);
+
+            var variantCareer = variantResult?.FirstOrDefault();
+            return variantCareer != null ? MapCareerToPageOutput(variantCareer) : new BadRequestResult();
         }
 
         public Task DeleteCareerPageAsync(int channelId, Guid pageGUID, string? culture, bool deleteAllCultures, CancellationToken cancellationToken)
@@ -332,12 +430,12 @@ namespace BDO.GWT.GLOBAL.API.Services
         private async Task<ContentItemData> CreateCMSTreeItem(CareerPageContent careerContent, string? culture, CancellationToken cancellationToken)
         {
            
-            var downloadButtonReferences = await _mappingHelper.BuildContentAttachmentImageReferences(careerContent.DownloadButtonAttachment, cancellationToken);
-            var ogImageReferences = await _mappingHelper.BuildContentAttachmentImageReferences(careerContent.MetadataOGImage, cancellationToken);
-            var ogTwitterImageReferences = await _mappingHelper.BuildContentAttachmentImageReferences(careerContent .MetadataOGTwitterImage, cancellationToken);
-            var teaserImageReferences = await _mappingHelper.BuildContentAttachmentImageReferences(careerContent.MetadataTeaserImage, cancellationToken);
-            var heroBackgroundImageReferences = await _mappingHelper.BuildContentAttachmentImageReferences(careerContent.HeroBackgroundImage, cancellationToken);
-            var heroBackgroundImageMobileReferences = await _mappingHelper.BuildContentAttachmentImageReferences(careerContent.HeroBackgroundImage_Mobile, cancellationToken);
+            var downloadButtonReferences = await _mappingHelper.BuildContentAttachmentImageReferencesExtGuid(careerContent.DownloadButtonAttachment, cancellationToken);
+            var ogImageReferences = await _mappingHelper.BuildContentAttachmentImageReferencesExtGuid(careerContent.MetadataOGImage, cancellationToken);
+            var ogTwitterImageReferences = await _mappingHelper.BuildContentAttachmentImageReferencesExtGuid(careerContent.MetadataOGTwitterImage, cancellationToken);
+            var teaserImageReferences = await _mappingHelper.BuildContentAttachmentImageReferencesExtGuid(careerContent.MetadataTeaserImage, cancellationToken);
+            var heroBackgroundImageReferences = await _mappingHelper.BuildContentAttachmentImageReferencesExtGuid(careerContent.HeroBackgroundImage, cancellationToken);
+            var heroBackgroundImageMobileReferences = await _mappingHelper.BuildContentAttachmentImageReferencesExtGuid(careerContent.HeroBackgroundImage_Mobile, cancellationToken);
 
             //var relevantContactPersonReferences = await _mappingHelper.BuildWebPageIdReferencesAsync<Person>(careerContent.CareerReference, CHANNEL_NAME, culture, cancellationToken);
             var heroCallToActionButtonUrlReferences = await _mappingHelper.BuildContentAttachmentPersonPageReferences(careerContent.HeroCallToActionButtonUrl, CHANNEL_NAME, culture, cancellationToken);
