@@ -1,5 +1,5 @@
 using System.Reflection;
-using System.Runtime.Serialization;
+using System.Runtime.CompilerServices;
 using CMS.DataEngine;
 using CMS.Websites;
 using Kentico.Xperience.Admin.Base.Forms;
@@ -194,7 +194,7 @@ public class RedirectEditTests
         KenticoContainerSetup.Reset();
         var page = MakePage();
 
-        var info = (FakeRedirectInfo)FormatterServices.GetUninitializedObject(typeof(FakeRedirectInfo));
+        var info = (FakeRedirectInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeRedirectInfo));
         var provider = new Mock<IInfoProvider<RedirectInfoX>>();
         provider.As<IInfoByIdProvider<RedirectInfoX>>()
             .Setup(x => x.Get(It.IsAny<int>()))
@@ -225,7 +225,7 @@ public class RedirectEditTests
     // ── helpers ─────────────────────────────────────────────────────────────
 
     private static RedirectEdit MakePage() =>
-        (RedirectEdit)FormatterServices.GetUninitializedObject(typeof(RedirectEdit));
+        (RedirectEdit)RuntimeHelpers.GetUninitializedObject(typeof(RedirectEdit));
 
     private static void SetField(RedirectEdit page, string name, object value) =>
         typeof(RedirectEdit)
@@ -259,7 +259,7 @@ public class RedirectEditTests
 
     private static FakeRedirectInfo MakeInfo(string sourceUrl, Guid targetGuid)
     {
-        var info = (FakeRedirectInfo)FormatterServices.GetUninitializedObject(typeof(FakeRedirectInfo));
+        var info = (FakeRedirectInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeRedirectInfo));
         info.RedirectSourceUrl = sourceUrl;
         info.RedirectTargetWebPageItemGUID = targetGuid;
         return info;

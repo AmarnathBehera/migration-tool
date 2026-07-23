@@ -12,14 +12,14 @@ using RedirectInfoX = global::XperienceCommunity.Redirects.RedirectInfo;
 namespace BDO.GWT.GLOBAL.Tests;
 
 /// <summary>
-/// Assembly-wide setup that boots a minimal Kentico service container populated with
-/// mock <see cref="IInfoProvider{TInfo}"/> instances. This lets tests exercise production
-/// code that reaches Kentico's static <c>XxxInfo.Provider</c> accessors, which resolve from
-/// this container. NUnit runs tests sequentially (no <c>[Parallelizable]</c>), so tests can
-/// safely reconfigure the shared mocks between runs via <see cref="Reset"/>.
+/// Boots a minimal Kentico service container populated with mock <see cref="IInfoProvider{TInfo}"/>
+/// instances so tests can exercise production code that reaches Kentico's static
+/// <c>XxxInfo.Provider</c> accessors, which resolve from this container. NUnit runs tests
+/// sequentially (no <c>[Parallelizable]</c>), so tests can safely reconfigure the shared mocks
+/// between runs via <see cref="Reset"/>. Initialisation is driven once by
+/// <see cref="KenticoContainerFixture"/>.
 /// </summary>
-[SetUpFixture]
-public class KenticoContainerSetup
+public static class KenticoContainerSetup
 {
     public static Mock<IInfoProvider<RedirectInfoX>> RedirectProvider { get; private set; } = null!;
     public static Mock<IInfoProvider<WebPageItemInfo>> WebPageItemProvider { get; private set; } = null!;
@@ -28,8 +28,7 @@ public class KenticoContainerSetup
     public static Mock<IInfoProvider<ChannelInfo>> ChannelProvider { get; private set; } = null!;
     public static Mock<IInfoProvider<ResourceInfo>> ResourceProvider { get; private set; } = null!;
 
-    [OneTimeSetUp]
-    public void InitContainer()
+    public static void Initialize()
     {
         RedirectProvider = new Mock<IInfoProvider<RedirectInfoX>>();
         WebPageItemProvider = new Mock<IInfoProvider<WebPageItemInfo>>();
@@ -72,4 +71,16 @@ public class KenticoContainerSetup
         ChannelProvider.Reset();
         ResourceProvider.Reset();
     }
+}
+
+/// <summary>
+/// Assembly-wide NUnit fixture that initialises the shared Kentico test container once before any
+/// test runs. Kept separate from <see cref="KenticoContainerSetup"/> so the container helpers are
+/// not exposed as public members on a test fixture.
+/// </summary>
+[SetUpFixture]
+public class KenticoContainerFixture
+{
+    [OneTimeSetUp]
+    public void OneTimeSetUp() => KenticoContainerSetup.Initialize();
 }

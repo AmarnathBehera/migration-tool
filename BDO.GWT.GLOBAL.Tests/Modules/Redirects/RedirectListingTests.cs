@@ -1,6 +1,5 @@
-﻿
-using System.Reflection;
-using System.Runtime.Serialization;
+﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.ContentEngine;
 using CMS.DataEngine;
@@ -13,6 +12,9 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Redirects;
 
 public class RedirectListingTests
 {
+    private static readonly int[] SingleIdentifier = { 1 };
+    private static readonly int[] TwoIdentifiers = { 1, 2 };
+
     // ── structural ──────────────────────────────────────────────────────────
 
     [Test]
@@ -160,7 +162,7 @@ public class RedirectListingTests
     [Test]
     public void ListingPage_ObjectType_ReturnsRedirectObjectType()
     {
-        var page = (RedirectListing)FormatterServices.GetUninitializedObject(typeof(RedirectListing));
+        var page = (RedirectListing)RuntimeHelpers.GetUninitializedObject(typeof(RedirectListing));
         var prop = typeof(RedirectListing).GetProperty(
             "ObjectType", BindingFlags.Instance | BindingFlags.NonPublic);
 
@@ -245,11 +247,11 @@ public class RedirectListingTests
         var provider = new Mock<IInfoProvider<RedirectInfoX>>();
         provider.As<IInfoByIdProvider<RedirectInfoX>>()
             .Setup(x => x.Get(It.IsAny<int>()))
-            .Returns((RedirectInfoX?)null);
+            .Returns((RedirectInfoX)null!);
 
         var listing = MakeListing(accessibleIds: null, provider: provider.Object);
 
-        var response = await listing.MassDelete(new[] { 1, 2 }, CancellationToken.None);
+        var response = await listing.MassDelete(TwoIdentifiers, CancellationToken.None);
 
         Assert.That(response, Is.Not.Null);
     }
@@ -265,7 +267,7 @@ public class RedirectListingTests
 
         var listing = MakeListing(accessibleIds: new List<int> { 5 }, provider: provider.Object);
 
-        var response = await listing.MassDelete(new[] { 1 }, CancellationToken.None);
+        var response = await listing.MassDelete(SingleIdentifier, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -285,7 +287,7 @@ public class RedirectListingTests
 
         var listing = MakeListing(accessibleIds: new List<int> { 5 }, provider: provider.Object);
 
-        var response = await listing.MassDelete(new[] { 1 }, CancellationToken.None);
+        var response = await listing.MassDelete(SingleIdentifier, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -307,7 +309,7 @@ public class RedirectListingTests
 
         var listing = MakeListing(accessibleIds: null, provider: provider.Object);
 
-        await listing.MassDelete(new[] { 1 }, CancellationToken.None);
+        await listing.MassDelete(SingleIdentifier, CancellationToken.None);
 
         Assert.That(redirect.DeleteCalled, Is.True);
     }
@@ -359,10 +361,11 @@ public class RedirectListingTests
 
     private static RedirectListing MakeListing(ICollection<int>? accessibleIds, IInfoProvider<RedirectInfoX> provider)
     {
-        var listing = (RedirectListing)FormatterServices.GetUninitializedObject(typeof(RedirectListing));
+        var listing = (RedirectListing)RuntimeHelpers.GetUninitializedObject(typeof(RedirectListing));
 
         var channelAccess = new Mock<IChannelAccessService>();
-        channelAccess.Setup(c => c.GetAccessibleWebChannelSettingsIdsAsync()).ReturnsAsync(accessibleIds);
+        channelAccess.Setup(c => c.GetAccessibleWebChannelSettingsIdsAsync())
+            .Returns(Task.FromResult<ICollection<int>>(accessibleIds!));
 
         SetField(listing, "_channelAccessService", channelAccess.Object);
         SetField(listing, "_redirectInfoProvider", provider);
@@ -379,7 +382,7 @@ public class RedirectListingTests
 
     private static FakeRedirectInfo MakeRedirect(int channelId)
     {
-        var info = (FakeRedirectInfo)FormatterServices.GetUninitializedObject(typeof(FakeRedirectInfo));
+        var info = (FakeRedirectInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeRedirectInfo));
         info.RedirectChannelID = channelId;
         return info;
     }
@@ -405,4 +408,3 @@ public class RedirectListingTests
         }
     }
 }
-

@@ -1,5 +1,5 @@
 using System.Reflection;
-using System.Runtime.Serialization;
+using System.Runtime.CompilerServices;
 using CMS.DataEngine;
 using CMS.Modules;
 using Moq;
@@ -109,7 +109,7 @@ public class RedirectModuleInstallerTests
     [Test]
     public void InitializeModule_WhenInstallerSet_CallsInstall()
     {
-        var module = (RedirectModule)FormatterServices.GetUninitializedObject(typeof(RedirectModule));
+        var module = (RedirectModule)RuntimeHelpers.GetUninitializedObject(typeof(RedirectModule));
         var installer = new SpyInstaller();
         SetInstaller(module, installer);
 
@@ -121,7 +121,7 @@ public class RedirectModuleInstallerTests
     [Test]
     public void InitializeModule_WhenInstallerNull_DoesNotThrow()
     {
-        var module = (RedirectModule)FormatterServices.GetUninitializedObject(typeof(RedirectModule));
+        var module = (RedirectModule)RuntimeHelpers.GetUninitializedObject(typeof(RedirectModule));
         // _installer intentionally left null
 
         Assert.DoesNotThrow(() => InvokeInitializeModule(module));
@@ -157,3 +157,4 @@ public class RedirectModuleInstallerTests
         public void Install() => InstallCount++;
     }
 }
+

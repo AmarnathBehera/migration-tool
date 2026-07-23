@@ -20,6 +20,9 @@ namespace BDO.GWT.GLOBAL.Tests.Modules
         private Mock<IHttpContextAccessor> _httpContextAccessor = null!;
         private ChannelAccessService _service = null!;
 
+        private static readonly int[] ExpectedSingleSetting = { 77 };
+        private static readonly int[] ExpectedTwoSettings = { 88, 99 };
+
         [SetUp]
         public void Setup()
         {
@@ -285,7 +288,7 @@ namespace BDO.GWT.GLOBAL.Tests.Modules
 
             var result = await _service.GetAccessibleWebChannelSettingsIdsAsync();
 
-            Assert.That(result, Is.EqualTo(new[] { 77 }));
+            Assert.That(result, Is.EqualTo(ExpectedSingleSetting));
         }
 
         [Test]
@@ -299,7 +302,7 @@ namespace BDO.GWT.GLOBAL.Tests.Modules
 
             var result = await _service.GetAccessibleWebChannelSettingsIdsAsync();
 
-            Assert.That(result, Is.EqualTo(new[] { 88, 99 }));
+            Assert.That(result, Is.EqualTo(ExpectedTwoSettings));
         }
 
         // ── behavioural: CanAccessAsync ───────────────────────────────────────
@@ -413,7 +416,7 @@ namespace BDO.GWT.GLOBAL.Tests.Modules
                 }).ToList());
         }
 
-        private static UserInfo MakeUser(int userId, bool admin)
+        private static TestUserInfo MakeUser(int userId, bool admin)
         {
             var user = Make<TestUserInfo>();
             user.UserID = userId;

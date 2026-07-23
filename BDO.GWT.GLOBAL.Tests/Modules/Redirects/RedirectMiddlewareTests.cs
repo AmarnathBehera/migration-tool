@@ -1,6 +1,6 @@
 using System.Data;
 using System.Reflection;
-using System.Runtime.Serialization;
+using System.Runtime.CompilerServices;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Websites;
@@ -466,9 +466,9 @@ public class RedirectMiddlewareTests
             .Returns(() => ((IEnumerable<ContentLanguageInfo>)languages).GetEnumerator());
     }
 
-    private static ContentLanguageInfo MakeLanguage(string name, string culture, bool isDefault)
+    private static TestContentLanguageInfo MakeLanguage(string name, string culture, bool isDefault)
     {
-        var lang = (TestContentLanguageInfo)FormatterServices.GetUninitializedObject(typeof(TestContentLanguageInfo));
+        var lang = (TestContentLanguageInfo)RuntimeHelpers.GetUninitializedObject(typeof(TestContentLanguageInfo));
         lang.ContentLanguageName = name;
         lang.ContentLanguageCultureFormat = culture;
         lang.ContentLanguageIsDefault = isDefault;
@@ -490,7 +490,7 @@ public class RedirectMiddlewareTests
         return mock.Object;
     }
 
-    private static HttpContext MakeContext(string path, string accept = "text/html")
+    private static DefaultHttpContext MakeContext(string path, string accept = "text/html")
     {
         var context = new DefaultHttpContext();
         context.Request.Path = path;
@@ -506,9 +506,9 @@ public class RedirectMiddlewareTests
         return mock.Object;
     }
 
-    private static RedirectInfoX MakeRedirect(string sourceUrl, Guid targetGuid)
+    private static FakeRedirectInfo MakeRedirect(string sourceUrl, Guid targetGuid)
     {
-        var info = (FakeRedirectInfo)FormatterServices.GetUninitializedObject(typeof(FakeRedirectInfo));
+        var info = (FakeRedirectInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeRedirectInfo));
         info.RedirectSourceUrl = sourceUrl;
         info.RedirectTargetWebPageItemGUID = targetGuid;
         return info;

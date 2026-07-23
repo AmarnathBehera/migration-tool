@@ -1,5 +1,5 @@
 using System.Reflection;
-using System.Runtime.Serialization;
+using System.Runtime.CompilerServices;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Websites;
@@ -387,24 +387,24 @@ public class RedirectEditModelTests
         q.Setup(x => x.GetScalarResult<string>(It.IsAny<string>())).Returns(name);
     }
 
-    private static WebPageItemInfo MakeWebPageItem(int id, int websiteChannelId)
+    private static TestWebPageItemInfo MakeWebPageItem(int id, int websiteChannelId)
     {
-        var i = (TestWebPageItemInfo)FormatterServices.GetUninitializedObject(typeof(TestWebPageItemInfo));
+        var i = (TestWebPageItemInfo)RuntimeHelpers.GetUninitializedObject(typeof(TestWebPageItemInfo));
         i.WebPageItemID = id;
         i.WebPageItemWebsiteChannelID = websiteChannelId;
         return i;
     }
 
-    private static WebsiteChannelInfo MakeWebsiteChannel(int channelId)
+    private static TestWebsiteChannelInfo MakeWebsiteChannel(int channelId)
     {
-        var i = (TestWebsiteChannelInfo)FormatterServices.GetUninitializedObject(typeof(TestWebsiteChannelInfo));
+        var i = (TestWebsiteChannelInfo)RuntimeHelpers.GetUninitializedObject(typeof(TestWebsiteChannelInfo));
         i.WebsiteChannelChannelID = channelId;
         return i;
     }
 
-    private static ChannelInfo MakeChannel(int id, string displayName)
+    private static TestChannelInfo MakeChannel(int id, string displayName)
     {
-        var i = (TestChannelInfo)FormatterServices.GetUninitializedObject(typeof(TestChannelInfo));
+        var i = (TestChannelInfo)RuntimeHelpers.GetUninitializedObject(typeof(TestChannelInfo));
         i.ChannelID = id;
         i.ChannelDisplayName = displayName;
         return i;
@@ -428,7 +428,7 @@ public class RedirectEditModelTests
     }
 
     private static FakeRedirectInfo MakeFakeInfo() =>
-        (FakeRedirectInfo)FormatterServices.GetUninitializedObject(typeof(FakeRedirectInfo));
+        (FakeRedirectInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeRedirectInfo));
 
     private sealed class FakeRedirectInfo : XperienceCommunity.Redirects.RedirectInfo
     {

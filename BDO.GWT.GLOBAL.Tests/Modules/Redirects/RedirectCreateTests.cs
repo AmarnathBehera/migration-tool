@@ -1,5 +1,5 @@
 using System.Reflection;
-using System.Runtime.Serialization;
+using System.Runtime.CompilerServices;
 using CMS.DataEngine;
 using CMS.Websites;
 using Kentico.Xperience.Admin.Base;
@@ -172,7 +172,7 @@ public class RedirectCreateTests
     // ── helpers ─────────────────────────────────────────────────────────────
 
     private static RedirectCreate MakePage() =>
-        (RedirectCreate)FormatterServices.GetUninitializedObject(typeof(RedirectCreate));
+        (RedirectCreate)RuntimeHelpers.GetUninitializedObject(typeof(RedirectCreate));
 
     private static void SetField(RedirectCreate page, string name, object value) =>
         typeof(RedirectCreate)
