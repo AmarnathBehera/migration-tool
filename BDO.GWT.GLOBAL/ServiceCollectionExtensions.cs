@@ -139,6 +139,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IInsightCarouselService, InsightCarouselService>();
 
         serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
+        serviceCollection.AddSingleton<IEditorsPickStateStore, EditorsPickStateStore>();
     }
 
 }

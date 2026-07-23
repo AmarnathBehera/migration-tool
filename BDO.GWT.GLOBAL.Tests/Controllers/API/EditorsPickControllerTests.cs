@@ -12,13 +12,15 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers.API;
 public class EditorsPickControllerTests
 {
     private Mock<IEditorsPickService> _serviceMock = null!;
+    private Mock<IEditorsPickStateStore> _stateStoreMock = null!;
     private EditorsPickController _controller = null!;
 
     [SetUp]
     public void Setup()
     {
         _serviceMock = new Mock<IEditorsPickService>();
-        _controller = new EditorsPickController(_serviceMock.Object)
+        _stateStoreMock = new Mock<IEditorsPickStateStore>();
+        _controller = new EditorsPickController(_serviceMock.Object, _stateStoreMock.Object)
         {
             ControllerContext = new ControllerContext
             {
@@ -41,7 +43,7 @@ public class EditorsPickControllerTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expected);
 
-        var result = await _controller.Items(query, "", "", CancellationToken.None);
+        var result = await _controller.Items(query, "", "", null, CancellationToken.None);
 
         var okResult = result.Result as OkObjectResult;
         Assert.Multiple(() =>
@@ -64,7 +66,7 @@ public class EditorsPickControllerTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<EditorsPickCardDto>());
 
-        var result = await _controller.Items(query, "", "", CancellationToken.None);
+        var result = await _controller.Items(query, "", "", null, CancellationToken.None);
 
         var okResult = result.Result as OkObjectResult;
         Assert.Multiple(() =>
@@ -90,7 +92,7 @@ public class EditorsPickControllerTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<EditorsPickCardDto>());
 
-        var result = await _controller.Items(query, featuredGuids, "", CancellationToken.None);
+        var result = await _controller.Items(query, featuredGuids, "", null, CancellationToken.None);
 
         _serviceMock.Verify(x => x.GetFilteredItemsAsync(
             It.Is<HashSet<ContentItemReference>>(s => s.Count == 2),
@@ -114,7 +116,7 @@ public class EditorsPickControllerTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<EditorsPickCardDto>());
 
-        var result = await _controller.Items(query, "", selectedGuids, CancellationToken.None);
+        var result = await _controller.Items(query, "", selectedGuids, null, CancellationToken.None);
 
         _serviceMock.Verify(x => x.GetFilteredItemsAsync(
             It.IsAny<HashSet<ContentItemReference>>(),
@@ -136,7 +138,7 @@ public class EditorsPickControllerTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<EditorsPickCardDto>());
 
-        var result = await _controller.Items(query, "", "", CancellationToken.None);
+        var result = await _controller.Items(query, "", "", null, CancellationToken.None);
 
         _serviceMock.Verify(x => x.GetFilteredItemsAsync(
             It.Is<HashSet<ContentItemReference>>(s => s.Count == 0),
@@ -160,7 +162,7 @@ public class EditorsPickControllerTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<EditorsPickCardDto>());
 
-        var result = await _controller.Items(query, featuredGuids, "", CancellationToken.None);
+        var result = await _controller.Items(query, featuredGuids, "", null, CancellationToken.None);
 
         _serviceMock.Verify(x => x.GetFilteredItemsAsync(
             It.Is<HashSet<ContentItemReference>>(s => s.Count == 1),
@@ -189,7 +191,7 @@ public class EditorsPickControllerTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<EditorsPickCardDto>());
 
-        await _controller.Items(query, "", "", CancellationToken.None);
+        await _controller.Items(query, "", "", null, CancellationToken.None);
 
         Assert.That(query.Filters, Is.Not.Null);
     }
@@ -207,7 +209,7 @@ public class EditorsPickControllerTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<EditorsPickCardDto>());
 
-        var result = await _controller.Items(query, null!, null!, CancellationToken.None);
+        var result = await _controller.Items(query, null!, null!, null, CancellationToken.None);
 
         var okResult = result.Result as OkObjectResult;
         Assert.That(okResult, Is.Not.Null);
@@ -226,7 +228,7 @@ public class EditorsPickControllerTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<EditorsPickCardDto>());
 
-        var result = await _controller.Items(query, "   ", "   ", CancellationToken.None);
+        var result = await _controller.Items(query, "   ", "   ", null, CancellationToken.None);
 
         var okResult = result.Result as OkObjectResult;
         Assert.That(okResult, Is.Not.Null);
@@ -247,7 +249,7 @@ public class EditorsPickControllerTests
                 token))
             .ReturnsAsync(new List<EditorsPickCardDto>());
 
-        await _controller.Items(query, "", "", token);
+        await _controller.Items(query, "", "", null, token);
 
         _serviceMock.Verify(x => x.GetFilteredItemsAsync(
             It.IsAny<HashSet<ContentItemReference>>(),
