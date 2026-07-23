@@ -1,4 +1,5 @@
-﻿using BDO.GWT.Domain.Core.Constants;
+﻿using BDO.GWT.Common.Core.Exceptions;
+using BDO.GWT.Domain.Core.Constants;
 using BDO.GWT.GLOBAL.API.Bases;
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Filters;
@@ -107,5 +108,59 @@ namespace BDO.GWT.GLOBAL.API.Controllers
             return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.WebPageItemGuid }, pageDto.Value);
         }
 
+        /// <summary>
+        /// Updates a single career page having the specified page GUID.
+        /// </summary>
+        /// <param name="memberFirmID">ID of the member firm in which the page should be modified.</param>
+        /// <param name="WebPageItemGuid">Page GUID of the career page.</param>
+        /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
+        /// <param name="request">Updated career page data.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>Updated career page.</returns>
+        [HttpPut("{WebPageItemGuid:guid}")]
+        [HasPermission(ApiMethodGroupName.Careers, ApiPermission.Manage)]
+        [SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageOutput<CareerPageContent>), MediaTypeNames.Application.Json)]
+        public async Task<ActionResult<PageOutput<CareerPageContent>>> Put(int memberFirmID, Guid WebPageItemGuid, [FromQuery][Required] string culture, [FromBody] CareerPageContent    request, CancellationToken cancellationToken)
+        {
+            int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
+            var pageDto = await _careerCrudService.UpdateCareerPageAsync(channelId, WebPageItemGuid, culture, request, cancellationToken);
+
+            return Ok(pageDto.Value);
+        }
+
+        /// <summary>
+        /// Deletes a single career page having the specified page GUID.
+        /// </summary>
+        /// <param name="memberFirmID">ID of the member firm in which the page should be deleted.</param>
+        /// <param name="WebPageItemGuid">Page GUID of the career page.</param>
+        /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
+        /// <param name="deleteAllCultures">Should all culture versions be deleted of this career page?</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>204 No Content.</returns>
+        [HttpDelete("{WebPageItemGuid:guid}")]
+        [HasPermission(ApiMethodGroupName.Careers, ApiPermission.Manage)]
+        [SwaggerResponse(StatusCodes.Status204NoContent, null, typeof(void))]
+        public async Task<IActionResult> Delete(int memberFirmID, Guid WebPageItemGuid, [FromQuery][Required] string culture, [FromQuery] bool deleteAllCultures = false, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
+                await _careerCrudService.DeleteCareerPageAsync(channelId, WebPageItemGuid, culture, deleteAllCultures, cancellationToken);
+
+                return Ok("Successfully deleted.");
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (UnprocessableEntityException)
+            {
+                return UnprocessableEntity("One or more validation errors occurred.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
     }
 }

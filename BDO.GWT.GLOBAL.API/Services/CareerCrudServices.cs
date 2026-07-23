@@ -81,6 +81,7 @@ namespace BDO.GWT.GLOBAL.API.Services
                 throw new NotFoundException("Channel not found");
             }
 
+            // Validate and normalize the page content
             _pageContentValidator.ValidateAndNormalizePageContent(request);
 
             _validationState.ThrowIfThereAreErrors();
@@ -94,6 +95,7 @@ namespace BDO.GWT.GLOBAL.API.Services
                 IsForPreview = false
             };
 
+            //Get the parent page to ensure it exists before creating a new page under it
             var parentPage = await _contentRetriever.GetPagesAsync<Careers>(_retrieveCurrentPage, query => query
                 .Where(w => w.WhereEquals("WebPageItemID", nodeParentID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
 
@@ -230,8 +232,8 @@ namespace BDO.GWT.GLOBAL.API.Services
                 return new NotFoundResult();
             }
 
-                       
 
+            // Create new culture version data
             var itemData = await CreateCMSTreeItem(request, toCulture, cancellationToken);
 
             // Create language variant for the existing page
@@ -277,9 +279,85 @@ namespace BDO.GWT.GLOBAL.API.Services
             return variantCareer != null ? MapCareerToPageOutput(variantCareer) : new BadRequestResult();
         }
 
-        public Task DeleteCareerPageAsync(int channelId, Guid pageGUID, string? culture, bool deleteAllCultures, CancellationToken cancellationToken)
+        public async Task DeleteCareerPageAsync(int channelId, Guid pageGUID, string? culture, bool deleteAllCultures, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var currentCulture = await _cultureValidationService.ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Locale, cancellationToken) ?? defaultCulture;
+
+            if (string.IsNullOrEmpty(currentCulture.Locale))
+            {
+                throw new NotFoundException("Invalid culture specified");
+            }
+
+            var channel = await _channelInfoProvider.GetAsync(channelId);
+            if (string.IsNullOrEmpty(channel?.ChannelName))
+            {
+                throw new NotFoundException("Channel not found");
+            }
+
+            if (deleteAllCultures)
+            {
+                // Get all available cultures for the channel
+                var allCultures = await _cultureService.GetSiteCulturesLanguageCodeAsync(channelId, cancellationToken);
+
+                // Delete the page variant for each culture
+                foreach (var cult in allCultures)
+                {
+                    var _retrieveCurrentPage = new RetrievePagesParameters
+                    {
+                        LinkedItemsMaxLevel = 1,
+                        ChannelName = channel.ChannelName,
+                        LanguageName = cult.ToString(),
+                        IsForPreview = false
+                    };
+
+                    // Get existing page for this culture
+                    var result = await _contentRetriever.GetPagesAsync<Person>(_retrieveCurrentPage,
+                        query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
+                        RetrievalCacheSettings.CacheDisabled,
+                        cancellationToken);
+
+                    var existingPerson = result?.FirstOrDefault();
+                    if (existingPerson is not null)
+                    {
+                        await _webPageManager.Delete(
+                            new DeleteWebPageParameters(existingPerson.SystemFields.WebPageItemID, cult.ToString())
+                            {
+                                Permanently = true
+                            },
+                            cancellationToken);
+                    }
+                }
+            }
+            else
+            {
+                // Delete only the requested culture variant
+                var _retrieveCurrentPage = new RetrievePagesParameters
+                {
+                    LinkedItemsMaxLevel = 1,
+                    ChannelName = channel.ChannelName,
+                    LanguageName = currentCulture.Locale,
+                    IsForPreview = false
+                };
+
+                // Get existing page
+                var result = await _contentRetriever.GetPagesAsync<Person>(_retrieveCurrentPage,
+                    query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
+                    RetrievalCacheSettings.CacheDisabled,
+                    cancellationToken);
+
+                var existingPerson = result?.FirstOrDefault();
+                if (existingPerson is null)
+                {
+                    throw new NotFoundException();
+                }
+
+                await _webPageManager.Delete(
+                    new DeleteWebPageParameters(existingPerson.SystemFields.WebPageItemID, currentCulture.Locale)
+                    {
+                        Permanently = true
+                    },
+                    cancellationToken);
+            }
         }
 
 
@@ -363,9 +441,97 @@ namespace BDO.GWT.GLOBAL.API.Services
             return careerList.Select(MapCareerToPageOutput).ToList();
         }
 
-        public Task<ActionResult<PageOutput<CareerPageContent>>> UpdateCareerPageAsync(int channelId, Guid pageGUID, string? culture, CareerPageContent request, CancellationToken cancellationToken)
+        public async Task<ActionResult<PageOutput<CareerPageContent>>> UpdateCareerPageAsync(int channelId, Guid pageGUID, string? culture, CareerPageContent request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (request is null)
+            {
+                return new BadRequestResult();
+            }
+
+            try
+            {
+                var currentCulture = await _cultureValidationService.ValidateAndNormalizeSiteCultureAsync(channelId, 
+                                                                       culture ?? defaultCulture.Locale, cancellationToken) ?? defaultCulture;
+
+                if (string.IsNullOrEmpty(currentCulture.Locale))
+                {
+                    throw new NotFoundException("Invalid culture specified");
+                }
+
+                var channel = await _channelInfoProvider.GetAsync(channelId);
+                if (string.IsNullOrEmpty(channel?.ChannelName))
+                {
+                    throw new NotFoundException("Channel not found");
+                }
+
+                _pageContentValidator.ValidateAndNormalizePageContent(request);
+
+                _validationState.ThrowIfThereAreErrors();
+
+                var _retrieveCurrentPage = new RetrievePagesParameters
+                {
+                    LinkedItemsMaxLevel = 1,
+                    ChannelName = channel.ChannelName,
+                    LanguageName = currentCulture.Locale,
+                    IsForPreview = false
+                };
+
+                // Get existing page
+                var result = await _contentRetriever.GetPagesAsync<Career>(_retrieveCurrentPage,
+                    query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
+                    RetrievalCacheSettings.CacheDisabled,
+                    cancellationToken);
+
+                var existingCareer = result?.FirstOrDefault();
+                if (existingCareer is null)
+                {
+                    return new NotFoundResult();
+                }
+
+                if (existingCareer.SystemFields is null)
+                {
+                    throw new NotFoundException("Page system fields are missing");
+                }
+
+                // Build ContentItemData for the update
+                var itemData = await CreateCMSTreeItem(request,culture, cancellationToken);
+
+                // Create a draft, update it, and publish
+                await _webPageManager.TryCreateDraft(existingCareer.SystemFields.WebPageItemID, currentCulture.Locale, cancellationToken: cancellationToken);
+
+                // Update the draft with new content
+                if (!await _webPageManager.TryUpdateDraft(existingCareer.SystemFields.WebPageItemID, currentCulture.Locale, new UpdateDraftData(itemData), cancellationToken))
+                {
+                    throw new NotFoundException("Failed to update page draft");
+                }
+
+                // Publish the updated page
+                if (!await _webPageManager.TryPublish(existingCareer.SystemFields.WebPageItemID, currentCulture.Locale, cancellationToken: cancellationToken))
+                {
+                    throw new NotFoundException("Failed to publish updated page");
+                }
+
+                // Retrieve the updated page and return it
+                var updatedResult = await _contentRetriever.GetPagesAsync<Career>(_retrieveCurrentPage,
+                    query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
+                    RetrievalCacheSettings.CacheDisabled,
+                    cancellationToken);
+
+                var updatedCareer = updatedResult?.FirstOrDefault();
+                return updatedCareer != null ? MapCareerToPageOutput(updatedCareer) : new BadRequestResult();
+            }
+            catch (UnprocessableEntityException)
+            {
+                return new UnprocessableEntityObjectResult("One or more validation errors occurred.");
+            }
+            catch (NotFoundException ex)
+            {
+                return new NotFoundObjectResult(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(ex.Message) { StatusCode = StatusCodes.Status500InternalServerError };
+            }
         }
 
         private static PageOutput<CareerPageContent> MapCareerToPageOutput(Career career)
