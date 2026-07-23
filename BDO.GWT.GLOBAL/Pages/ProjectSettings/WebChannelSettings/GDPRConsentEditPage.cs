@@ -16,9 +16,6 @@ public class GDPRConsentEditPage : InfoEditPage<GDPRInfo>
     [PageParameter(typeof(IntPageModelBinder))]
     public int WebChannelSettingsId { get; set; }
 
-    [PageParameter(typeof(StringPageModelBinder))]
-    public string Consent { get; set; }
-
 
     [PageParameter(typeof(IntPageModelBinder))]
     public override int ObjectId
@@ -38,7 +35,7 @@ public class GDPRConsentEditPage : InfoEditPage<GDPRInfo>
             var newGDPRInfo = new GDPRInfo
             {
                 GDPRWebChannelSettingID = WebChannelSettingsId,
-                Consent = Consent
+                Consent = ""
             };
             GDPRInfoProvider.Set(newGDPRInfo);
 
@@ -78,6 +75,7 @@ public class GDPRConsentEditPage : InfoEditPage<GDPRInfo>
         }
 
         PageConfiguration.UIFormName = "gdprconsent";
+        PageConfiguration.Headline = "GDPR Consent";
         await base.ConfigurePage();
     }
 
