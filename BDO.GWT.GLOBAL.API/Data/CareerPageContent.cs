@@ -110,19 +110,21 @@ namespace BDO.GWT.GLOBAL.API.Data
 
         [Required]
         public bool ShowSocialMediaButtons { get; set; }
-        
-        public int CareerContactPeopleID { get; set; }
-        public int[] MetadataRelevantContactPerson { get; set; } = Array.Empty<int>();
-        public int[] MetadataOfficeLocation { get; set; } = Array.Empty<int>();
+        [MaxLength(300)]
+        public List<String> CareerContactPeopleID { get; set; } = new List<String>();
+        [MaxLength(300)]
+        public List<String> MetadataRelevantContactPerson { get; set; } = new List<String>();
+        [MaxLength(300)]
+        public List<String> MetadataOfficeLocation { get; set; } = new List<String>();
 
 
         [MaxLength(50)]
         public string CareerReference { get; set; } = string.Empty;
-
+        [MaxLength(50)]
         public string CareerJobTitle { get; set; } = string.Empty;
-
+        [MaxLength(50)]
         public string CareerLevel { get; set; } = string.Empty;
-
+        [MaxLength(50)]
         public string CareerEmploymentType { get; set; } = string.Empty;
 
         [MaxLength(200)]

@@ -39,6 +39,17 @@ namespace BDO.GWT.GLOBAL.API.Helpers
         Task<List<ContentItemReference>> BuildReferencesPageAsync<T>(
            IEnumerable<string>? identifiers, Func<T, string> nameSelector,
            CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
+
+        Task<List<ContentItemReference>> BuildReferencesCarAsync<T>(
+    IEnumerable<string>? identifiers,
+    Func<T, string> nameSelector,
+    CancellationToken cancellationToken)
+    where T : class, IWebPageFieldsSource;
+        Task<List<ContentItemReference>> BuildReferencesPageCarAsync<T>(
+          IEnumerable<string>? identifiers,
+          Func<T, string> nameSelector,
+          CancellationToken cancellationToken)
+          where T : class, IWebPageFieldsSource;
     }
     public class MappingHelper : IMappingHelper
     {
@@ -381,6 +392,63 @@ namespace BDO.GWT.GLOBAL.API.Helpers
             return items
                 .Where(item => names.Contains(nameSelector(item), StringComparer.OrdinalIgnoreCase))
                 .Select(item => new ContentItemReference { Identifier = item.SystemFields.ContentItemGUID })
+                .ToList();
+        }
+
+        public async Task<List<ContentItemReference>> BuildReferencesCarAsync<T>(
+    IEnumerable<string>? identifiers,
+    Func<T, string> nameSelector,
+    CancellationToken cancellationToken)
+    where T : class, IWebPageFieldsSource
+        {
+            var names = identifiers?
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Select(name => name.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList() ?? new List<string>();
+
+            if (names.Count == 0)
+            {
+                return new List<ContentItemReference>();
+            }
+
+            var items = await _contentRetriever.GetItemsAsync<T>(
+                builder => builder.Parameters(p => p.Where(w => w.WhereIn("Name", names))),
+                cancellationToken);
+
+            return items
+                .Where(item => names.Contains(nameSelector(item), StringComparer.OrdinalIgnoreCase))
+                .Select(item => item.SystemFields.ContentItemGUID)
+                .Distinct()
+                .Select(guid => new ContentItemReference { Identifier = guid })
+                .ToList();
+        }
+        public async Task<List<ContentItemReference>> BuildReferencesPageCarAsync<T>(
+          IEnumerable<string>? identifiers,
+          Func<T, string> nameSelector,
+          CancellationToken cancellationToken)
+          where T : class, IWebPageFieldsSource
+        {
+            var names = identifiers?
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Select(name => name.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList() ?? new List<string>();
+
+            if (names.Count == 0)
+            {
+                return new List<ContentItemReference>();
+            }
+
+            var items = await _contentRetriever.GetItemsAsync<T>(
+                builder => builder.Parameters(p => p.Where(w => w.WhereIn("MetadataTitle", names))),
+                cancellationToken);
+
+            return items
+                .Where(item => names.Contains(nameSelector(item), StringComparer.OrdinalIgnoreCase))
+                .Select(item => item.SystemFields.ContentItemGUID)
+                .Distinct()
+                .Select(guid => new ContentItemReference { Identifier = guid })
                 .ToList();
         }
     }

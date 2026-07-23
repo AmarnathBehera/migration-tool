@@ -83,7 +83,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
             var pageDto = await _careerCrudService.CreateCareerPageAsync(channelId, nodeParentID, culture, request, cancellationToken);
 
-            return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.PageGUID }, pageDto.Value);
+            return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.WebPageItemGuid }, pageDto.Value);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
             var pageDto = await _careerCrudService.CreateCareerPageCultureVersionAsync(channelId, pageGUID, fromCulture, toCulture, request, cancellationToken);
 
-            return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.PageGUID }, pageDto.Value);
+            return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.WebPageItemGuid }, pageDto.Value);
         }
 
     }

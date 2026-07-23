@@ -107,11 +107,31 @@ namespace BDO.GWT.GLOBAL.API.Services
 
                 throw new UnprocessableEntityException(message);
             }
-
-
-
+            
             // The page display name shown in the admin UI
             string pageDisplayName = request.MetadataTitle ?? "New Career Created by API";
+
+            // Generate the URL slug the same way it will be derived by CMS.Websites.WebPageManager
+            // and check for a collision with an existing sibling page before attempting to create it.
+            string urlSlug = GenerateUrlSlug(pageDisplayName);
+
+            var siblingPages = await _contentRetriever.GetPagesAsync<Career>(_retrieveCurrentPage, query => query
+                .Where(w => w.WhereEquals("WebPageItemParentID", nodeParentID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
+
+            bool slugCollision = siblingPages?.Any(p =>
+                string.Equals(GetLastUrlPathSegment(p.SystemFields?.WebPageUrlPath), urlSlug, StringComparison.OrdinalIgnoreCase)) ?? false;
+
+            if (slugCollision)
+            {
+                var collisionMessage = ErrorMessage.PageWithUrlSlugAlreadyExists(urlSlug, nodeParentID);
+
+                _validationState.AddUnprocessableEntityError(
+                    nameof(request.MetadataTitle),
+                    collisionMessage);
+
+                throw new UnprocessableEntityException(collisionMessage);
+            }
+
 
             var itemData = await CreateCMSTreeItem(request, currentCulture.Locale, cancellationToken);
 
@@ -360,12 +380,12 @@ namespace BDO.GWT.GLOBAL.API.Services
                 {
                     Name = career.SystemFields?.WebPageItemName ?? string.Empty,
                     Culture = language?.ContentLanguageName ?? "en-gb",
-                    NodeParentID = career.SystemFields?.WebPageItemParentID ?? 0,
-                    NodeID = career.SystemFields?.WebPageItemParentID ?? 0,
-                    PageID = career.SystemFields?.WebPageItemID ?? 0,
-                    NodeGUID = career.SystemFields?.ContentItemGUID ?? Guid.Empty,
-                    PageGUID = career.SystemFields?.WebPageItemGUID ?? Guid.Empty,
-                    NodeAliasPath = career.SystemFields?.WebPageUrlPath ?? string.Empty
+                    WebPageItemParentID = career.SystemFields?.WebPageItemParentID ?? 0,
+                    ContentItemID = career.SystemFields?.ContentItemID ?? 0,
+                    WebPageItemID = career.SystemFields?.WebPageItemID ?? 0,
+                    ContentItemGuid = career.SystemFields?.ContentItemGUID ?? Guid.Empty,
+                    WebPageItemGuid = career.SystemFields?.WebPageItemGUID ?? Guid.Empty,
+                    Path = career.SystemFields?.WebPageUrlPath ?? string.Empty
                 },
                 Content = new CareerPageContent
                 {
@@ -400,9 +420,9 @@ namespace BDO.GWT.GLOBAL.API.Services
                     MetadataNofollow = career.MetadataNofollow,
                     MetadataNoindex = career.MetadataNoindex,
                     IncludeInSitemap = career.IncludeInSitemap,
-                    CareerContactPeopleID = career.CareerContactPeopleID?.FirstOrDefault()?.SystemFields?.WebPageItemID ?? 0,
-                    MetadataRelevantContactPerson = career.MetadataRelevantContactPerson?.Select(p => p.SystemFields?.WebPageItemID ?? 0).ToArray() ?? Array.Empty<int>(),
-                    MetadataOfficeLocation = career.MetadataOfficeLocation?.Select(o => o.SystemFields?.WebPageItemID ?? 0).ToArray() ?? Array.Empty<int>(),
+                    CareerContactPeopleID = career.CareerContactPeopleID?.Select(p => p.MetadataTitle).ToList() ?? new List<string>(),
+                    MetadataRelevantContactPerson = career.MetadataRelevantContactPerson?.Select(p => p.MetadataTitle).ToList() ?? new List<string>(),
+                    MetadataOfficeLocation = career.MetadataOfficeLocation?.Select(p => p.MetadataTitle).ToList() ?? new List<string>(),
                     CareerReference = career.CareerReference,
                     CareerJobTitle = career.CareerJobTitle?.FirstOrDefault()?.Name ?? string.Empty,
                     CareerLevel = career.CareerLevel?.FirstOrDefault()?.Name ?? string.Empty,
@@ -439,9 +459,9 @@ namespace BDO.GWT.GLOBAL.API.Services
 
             //var relevantContactPersonReferences = await _mappingHelper.BuildWebPageIdReferencesAsync<Person>(careerContent.CareerReference, CHANNEL_NAME, culture, cancellationToken);
             var heroCallToActionButtonUrlReferences = await _mappingHelper.BuildContentAttachmentPersonPageReferences(careerContent.HeroCallToActionButtonUrl, CHANNEL_NAME, culture, cancellationToken);
-            var careerContactPeopleReferences = await _mappingHelper.BuildWebPageSingleIdReferencesAsync<Person>(careerContent.CareerContactPeopleID, CHANNEL_NAME, culture, cancellationToken);
-            var metadataRelevantContactPersonReferences = await _mappingHelper.BuildWebPageIdReferencesAsync<Person>(careerContent.MetadataRelevantContactPerson, CHANNEL_NAME, culture, cancellationToken);
-            var metadataOfficeLocationReferences = await _mappingHelper.BuildWebPageIdReferencesAsync<LocationOffice>(careerContent.MetadataOfficeLocation, CHANNEL_NAME, culture, cancellationToken);
+            var careerContactPeopleReferences = await _mappingHelper.BuildReferencesPageCarAsync<Person>(careerContent.CareerContactPeopleID, d => d.MetadataTitle, cancellationToken);
+            var metadataRelevantContactPersonReferences = await _mappingHelper.BuildReferencesPageCarAsync<Person>(careerContent.MetadataRelevantContactPerson, d => d.MetadataTitle, cancellationToken);
+            var metadataOfficeLocationReferences = await _mappingHelper.BuildReferencesPageCarAsync<LocationOffice>(careerContent.MetadataOfficeLocation, d => d.MetadataTitle, cancellationToken);
 
             var careerJobTitleReferences = await _mappingHelper.BuildReusableContentItemNameReferenceAsync<CareerJobTitle>(careerContent.CareerJobTitle, cancellationToken);
             var careerLevelReferences = await _mappingHelper.BuildReusableContentItemNameReferenceAsync<CareerLevels>(careerContent.CareerLevel, cancellationToken);
@@ -496,6 +516,33 @@ namespace BDO.GWT.GLOBAL.API.Services
         });
         }
 
-      
+        /// <summary>
+        /// Generates a URL slug from a display name using the same conventions Kentico applies
+        /// when a <see cref="CreateWebPageParameters.UrlSlug"/> is not explicitly supplied:
+        /// lower-case, alphanumeric characters separated by single dashes.
+        /// </summary>
+        private static string GenerateUrlSlug(string displayName)
+        {
+            if (string.IsNullOrWhiteSpace(displayName))
+            {
+                return string.Empty;
+            }
+
+            var slug = Regex.Replace(displayName.Trim().ToLowerInvariant(), @"[^a-z0-9]+", "-");
+            return slug.Trim('-');
+        }
+
+        private static string GetLastUrlPathSegment(string? urlPath)
+        {
+            if (string.IsNullOrWhiteSpace(urlPath))
+            {
+                return string.Empty;
+            }
+
+            var segments = urlPath.TrimEnd('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+            return segments.Length > 0 ? segments[^1] : string.Empty;
+        }
+       
+
     }
 }

@@ -126,9 +126,8 @@ if (builder.Environment.IsDevelopment())
         options.AuthenticationOptions.Mode = AdminAuthenticationMode.MaintainForms;
     });
 }
-
-// Add Application Insights telemetry
-builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
+// Configures email sending using an SMTP server for system emails
+//builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
 // Loads the administration redirect domain (AdminRedirectOptions) from a configuration file section
 builder.Services.Configure<AdminRedirectOptions>(builder.Configuration.GetSection("AdminRedirectOptions"));
