@@ -230,8 +230,12 @@ public class InsightAnimationCardWidgetTests
         var dto = (InsightAnimationCardDto)result.ViewData!.Model!;
 
         // Assert
-        Assert.That(dto.Title, Is.EqualTo("My Title"));
-        Assert.That(dto.Description, Is.EqualTo("My Description"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.Title, Is.EqualTo("My Title"));
+            Assert.That(dto.Description, Is.EqualTo("My Description"));
+        });
+        
     }
 
     // -----------------------------------------------------------------------
@@ -253,8 +257,12 @@ public class InsightAnimationCardWidgetTests
         var dto = (InsightAnimationCardDto)result.ViewData!.Model!;
 
         // Assert
-        Assert.That(dto.TopMargin, Is.EqualTo("0px"));
-        Assert.That(dto.BottomMargin, Is.EqualTo("0px"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.TopMargin, Is.EqualTo("0px"));
+            Assert.That(dto.BottomMargin, Is.EqualTo("0px"));
+        });
+
     }
 
     
@@ -314,11 +322,14 @@ public class InsightAnimationCardWidgetTests
         var item = dto.Items.First();
 
         // Assert
-        Assert.That(item.Title, Is.EqualTo("Insight 1"));
-        Assert.That(item.ReadMoreIcon, Is.EqualTo("/read-more"));
-        // Description should have HTML stripped
-        Assert.That(item.Description, Does.Not.Contain("<p>"));
-        Assert.That(item.Description, Does.Contain("Hello"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(item.Title, Is.EqualTo("Insight 1"));
+            Assert.That(item.ReadMoreIcon, Is.EqualTo("/read-more"));
+            // Description should have HTML stripped
+            Assert.That(item.Description, Does.Not.Contain("<p>"));
+            Assert.That(item.Description, Does.Contain("Hello"));
+        }); 
     }
 
     // -----------------------------------------------------------------------
@@ -390,9 +401,12 @@ public class InsightAnimationCardWidgetTests
         var dto = (InsightAnimationCardDto)result.ViewData!.Model!;
 
         // Assert
-        Assert.That(dto.SeeAllLink!.Title, Is.EqualTo("View all insights"));
-        Assert.That(dto.SeeAllLink!.URL, Is.EqualTo("/insights/all"));
-        Assert.That(dto.SeeAllLink!.Target, Is.EqualTo("_blank"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.SeeAllLink!.Title, Is.EqualTo("View all insights"));
+            Assert.That(dto.SeeAllLink!.URL, Is.EqualTo("/insights/all"));
+            Assert.That(dto.SeeAllLink!.Target, Is.EqualTo("_blank"));
+        });
     }
 
     // -----------------------------------------------------------------------
@@ -415,8 +429,11 @@ public class InsightAnimationCardWidgetTests
         var dto = (InsightAnimationCardDto)result.ViewData!.Model!;
 
         // Assert
-        Assert.That(dto.SeeAllLink!.Title, Is.EqualTo(string.Empty));
-        Assert.That(dto.SeeAllLink!.URL, Is.EqualTo(string.Empty));
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.SeeAllLink!.Title, Is.EqualTo(string.Empty));
+            Assert.That(dto.SeeAllLink!.URL, Is.EqualTo(string.Empty));
+        });
     }
 
     // -----------------------------------------------------------------------

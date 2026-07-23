@@ -36,7 +36,7 @@ public class InsightAnimationCardWidget: ViewComponent
         var channel = _websiteChannelContext;
         if (channel== null)
         {
-            throw new NotFoundException($"Site with ID {channel?.WebsiteChannelID} not found.");
+            throw new NotFoundException($"Site with ID {channel.WebsiteChannelID} not found.");
         }
 
         var data = new InsightAnimationCardData
