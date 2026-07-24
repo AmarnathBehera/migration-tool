@@ -87,6 +87,13 @@ public static class Program
                             error = ex.Message
                         });
                         break;
+                    case NotFoundException ex:
+                        context.Response.StatusCode = StatusCodes.Status404NotFound;
+                        await context.Response.WriteAsJsonAsync(new
+                        {
+                            error = ex.Message
+                        });
+                        break;
 
                     default:
                         context.Response.StatusCode = StatusCodes.Status500InternalServerError;

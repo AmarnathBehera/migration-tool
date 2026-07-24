@@ -239,7 +239,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             // Create language variant for the existing page
             var createVariantParameters = new CMS.Websites.CreateLanguageVariantParameters(
                 existingCareer.SystemFields.WebPageItemID,
-                toLangCulture.Language,
+                toLangCulture.Locale,
                 existingCareer.SystemFields?.ContentItemName ?? "Career culture variant",
                 itemData);
 
@@ -250,13 +250,13 @@ namespace BDO.GWT.GLOBAL.API.Services
             }
 
             // Update the draft with new content
-            if (!await _webPageManager.TryUpdateDraft(existingCareer.SystemFields.WebPageItemID, toLangCulture.Language, new UpdateDraftData(itemData), cancellationToken))
+            if (!await _webPageManager.TryUpdateDraft(existingCareer.SystemFields.WebPageItemID, toLangCulture.Locale, new UpdateDraftData(itemData), cancellationToken))
             {
                 throw new NotFoundException("Failed to update page draft");
             }
 
             // Publish the updated page
-            if (!await _webPageManager.TryPublish(existingCareer.SystemFields.WebPageItemID, toLangCulture.Language, cancellationToken))
+            if (!await _webPageManager.TryPublish(existingCareer.SystemFields.WebPageItemID, toLangCulture.Locale, cancellationToken))
             {
                 throw new NotFoundException("Failed to publish updated page");
             }
@@ -266,7 +266,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             {
                 LinkedItemsMaxLevel = 1,
                 ChannelName = channel.ChannelName,
-                LanguageName = toLangCulture.Language,
+                LanguageName = toLangCulture.Locale,
                 IsForPreview = false
             };
 
@@ -550,7 +550,7 @@ namespace BDO.GWT.GLOBAL.API.Services
                     ContentItemID = career.SystemFields?.ContentItemID ?? 0,
                     WebPageItemID = career.SystemFields?.WebPageItemID ?? 0,
                     ContentItemGuid = career.SystemFields?.ContentItemGUID ?? Guid.Empty,
-                    WebPageItemGuid = career.SystemFields?.WebPageItemGUID ?? Guid.Empty,
+                    PageGuid = career.SystemFields?.WebPageItemGUID ?? Guid.Empty,
                     Path = career.SystemFields?.WebPageUrlPath ?? string.Empty
                 },
                 Content = new CareerPageContent
