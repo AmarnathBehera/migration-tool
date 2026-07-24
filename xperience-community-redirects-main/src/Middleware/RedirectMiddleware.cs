@@ -70,7 +70,7 @@ public class RedirectMiddleware
         await context.Response.CompleteAsync();
     }
 
-    private bool IsHtmlRequest(HttpContext context)
+    private static bool IsHtmlRequest(HttpContext context)
     {
         return context.Request.Headers.Accept.ToString()
             .Contains("text/html", StringComparison.OrdinalIgnoreCase);
@@ -91,7 +91,7 @@ public class RedirectMiddleware
         return result.RelativePath.Replace("~", "");
     }
 
-    private ContentLanguageInfo ResolveLanguage(HttpContext context, List<ContentLanguageInfo> languages)
+    private static ContentLanguageInfo ResolveLanguage(HttpContext context, List<ContentLanguageInfo> languages)
     {
         ContentLanguageInfo defaultLanguage = languages.First(l => l.ContentLanguageIsDefault);
 
@@ -115,7 +115,7 @@ public class RedirectMiddleware
         return segment?.ToLower() ?? string.Empty;
     }
 
-    private int? GetWebPageItemId(Guid webPageItemGuid)
+    private static int? GetWebPageItemId(Guid webPageItemGuid)
     {
         return WebPageItemInfo.Provider.Get()
             .TopN(1)
@@ -124,7 +124,7 @@ public class RedirectMiddleware
             .GetScalarResult<int>();
     }
 
-    private IEnumerable<ContentLanguageInfo> GetContentLangauges()
+    private static IEnumerable<ContentLanguageInfo> GetContentLangauges()
     {
         return ContentLanguageInfo.Provider.Get()
             .Columns(nameof(ContentLanguageInfo.ContentLanguageName),
