@@ -15,6 +15,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
     /// <summary>
     /// Provides methods to read and manage people.
     /// </summary>
+    [AllowAnonymous]
     [ApiController]
     [Route("memberFirms/{memberFirmID:int}/People")]
     public class PeopleController : EntityControllerBase
@@ -46,10 +47,10 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         }
 
         /// <summary>
-        /// Returns a single person having the specified page GUID.
+        /// Returns a single person having the specified WebPageItem GUID.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm from which the page should be retrieved.</param>
-        /// <param name="WebPageItemGuid">Page GUID of a person page.</param>
+        /// <param name="WebPageItemGuid">WebPageItem GUID of a person page.</param>
         /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="cancellationToken"></param>
         /// <returns>Returns one person page.</returns>
@@ -68,7 +69,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// Creates a new person page.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm in which the page should be created.</param>
-        /// <param name="WebPageParentID">Node ID of the page that will contain the created person page.
+        /// <param name="WebPageParentID">WebPageParentItem ID of the page that will contain the created person page.
         /// <br/><br/>This value can be taken from <b>Kentico Pages module</b> by selecting the parent. Select <b>General tab</b>, then click <b>Advanced</b>. The <b>Node ID</b> property will contain the required value.</param>
         /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="request">Input data of the new page.</param>
@@ -89,7 +90,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// Creates a new culture version of a person page.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm in which the page should be created.</param>
-        /// <param name="WebPageItemGuid">Page GUID of the person to copy content from.</param>
+        /// <param name="WebPageItemGuid">WebPageItem GUID of the person to copy content from.</param>
         /// <param name="fromCulture">Culture of the existing page version.</param>
         /// <param name="toCulture">Culture of the new page version.</param>
         /// <param name="request">New culture version data.</param>
@@ -110,7 +111,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// Updates a single person page having the specified page GUID.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm in which the page should be modified.</param>
-        /// <param name="WebPageItemGuid">Page GUID of the person page.</param>
+        /// <param name="WebPageItemGuid">WebPageItem GUID of the person page.</param>
         /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="request">Updated person page data.</param>
         /// <param name="cancellationToken"></param>
@@ -130,7 +131,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// Deletes a single person page having the specified page GUID.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm in which the page should be deleted.</param>
-        /// <param name="WebPageItemGuid">Page GUID of the person.</param>
+        /// <param name="WebPageItemGuid">WebPageItem GUID of the person.</param>
         /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="deleteAllCultures">Should all culture versions be deleted of this person?</param>
         /// <param name="cancellationToken"></param>

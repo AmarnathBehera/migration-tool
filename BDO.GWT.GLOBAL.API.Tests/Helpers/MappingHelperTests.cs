@@ -1,8 +1,11 @@
 using BDO.GWT.Core;
+using BDO.GWT.Core.Services;
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Helpers;
+using BDO.GWT.GLOBAL.API.Services;
 using CMS.ContentEngine;
 using CMS.Websites;
+using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Moq;
 using System.Reflection;
@@ -12,6 +15,9 @@ namespace BDO.GWT.GLOBAL.API.Tests.Helpers;
 public class MappingHelperTests
 {
     private Mock<IContentService> _contentServiceMock = null!;
+    private Mock<ICultureService> _cultureServiceMock = null!;
+    private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
+    private Mock<IValidationState> _validationStateMock = null!;
     private MappingHelper _mappingHelper = null!;
 
     private static readonly string[] WhitespaceIdentifiersWithNull = new[] { "", "   ", null! };
@@ -21,7 +27,14 @@ public class MappingHelperTests
     public void Setup()
     {
         _contentServiceMock = new Mock<IContentService>();
-        _mappingHelper = new MappingHelper(_contentServiceMock.Object);
+        _cultureServiceMock = new Mock<ICultureService>();
+        _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
+        _validationStateMock = new Mock<IValidationState>();
+        _mappingHelper = new MappingHelper(
+            _contentServiceMock.Object,
+            _cultureServiceMock.Object,
+            _websiteChannelContextMock.Object,
+            _validationStateMock.Object);
     }
 
     private static MethodInfo GetPrivateStaticMethod(string name) =>

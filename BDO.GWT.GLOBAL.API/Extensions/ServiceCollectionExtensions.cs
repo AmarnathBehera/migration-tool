@@ -34,6 +34,7 @@ public static class ServiceCollectionExtensions
             .BindConfiguration("MasterDataApi")
             .ValidateDataAnnotations();
 
+        //serviceCollection.AddScoped<IPageContext, XperiencePageContext>();
         serviceCollection.AddScoped<IMemberFirmService, MemberFirmService>();
         serviceCollection.AddScoped<IMasterDataApiClient, MasterDataApiClient>();
         serviceCollection.AddScoped<IFormCrudService, FormCrudService>();
@@ -51,5 +52,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IFooterService, FooterService>();
         serviceCollection.AddScoped<ICultureValidationService, CultureValidationService>();
         serviceCollection.AddScoped<IPersonCrudService, PersonCrudService>();
+        serviceCollection.AddScoped<IInsightCrudService, InsightCrudService>();
+        serviceCollection.AddScoped<ISectionEventsCrudService, SectionEventsCrudService>();
     }
 }

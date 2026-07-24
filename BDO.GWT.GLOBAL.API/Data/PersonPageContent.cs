@@ -53,52 +53,52 @@ public class PersonPageContent : IMetadataContent
 
     public bool EnableVCard { get; set; }
 
-    [MaxLength(200)]
+    [MaxLength(300)]
     public List<String> PersonCredentials { get; set; } = [];
 
-    [MaxLength(200)]
+    [MaxLength(300)]
     public List<String> MetadataCity { get; set; } = [];
 
-    [MaxLength(200)]
+    [MaxLength(300)]
     public List<String> MetadataOfficeLocation { get; set; } = [];
 
-    [MaxLength(4000)]
+    [MaxLength(300)]
     public List<String> MetadataProfileGroups { get; set; } = [];
 
-    [MaxLength(4000)]
+    [MaxLength(300)]
     public List<String> MetadataBusinessLines { get; set; } = [];
 
-    [MaxLength(200)]
+    [MaxLength(300)]
     public List<String> MetadataServiceAreas { get; set; } = [];
 
-    [MaxLength(200)]
+    [MaxLength(300)]
     public List<String> MetadataServices { get; set; } = [];
 
-    [MaxLength(200)]
+    [MaxLength(300)]
     public List<String> MetadataSubServices { get; set; } = [];
 
-    [MaxLength(200)]
+    [MaxLength(300)]
     public List<String> MetadataIndustryCategories { get; set; } = [];
 
-    [MaxLength(200)]
+    [MaxLength(300)]
     public List<String> MetadataIndustries { get; set; } = [];
 
-    [MaxLength(200)]
+    [MaxLength(300)]
     public List<String> MetadataIndustryServices { get; set; } = [];
 
-    [MaxLength(200)]
+    [MaxLength(300)]
     public List<String> MetadataSpecialtiesCategories { get; set; } = [];
 
-    [MaxLength(200)]
+    [MaxLength(300)]
     public List<String> MetadataSpecialtiesAreas { get; set; } = [];
 
-    [MaxLength(200)]
+    [MaxLength(300)]
     public List<String> MetadataSpecialtiesPages { get; set; } = [];
 
-    [MaxLength(200)]
+    [MaxLength(300)]
     public List<String> MicrositeMasterPages { get; set; } = [];
 
-    [MaxLength(200)]
+    [MaxLength(300)]
     public List<String> MicrositePages { get; set; } = [];
 
     [MaxLength(200)]

@@ -1,8 +1,11 @@
 ﻿using BDO.GWT.Core;
+using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.GLOBAL.API.Data;
+using BDO.GWT.GLOBAL.API.Services;
 using CMS.ContentEngine;
 using CMS.Websites;
+using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,20 +16,30 @@ namespace BDO.GWT.GLOBAL.API.Helpers
         Task<List<ContentItemReference>> BuildContentAttachmentImageReferences(string? url, CancellationToken cancellationToken);
         Task<List<ContentItemReference>> BuildContentAttachmentPersonPageReferences(string? pagePath, string? channelName, string? culture, CancellationToken cancellationToken);
         Task<List<ContentItemReference>> BuildReferencesAsync<T>(
-           IEnumerable<string>? identifiers,Func<T, string> nameSelector,
-           CancellationToken cancellationToken) where T : class, IWebPageFieldsSource; 
+           IEnumerable<string>? identifiers, Func<T, string> nameSelector,
+           CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
         Task<List<ContentItemReference>> BuildReferencesPageAsync<T>(
            IEnumerable<string>? identifiers, Func<T, string> nameSelector,
            CancellationToken cancellationToken) where T : class, IWebPageFieldsSource;
+
+        Task<LanguageTag?> ValidateAndNormalizeSiteCultureAsync(int channelId, string languageTagString, CancellationToken cancellationToken);
+        LanguageTag? ValidateAndNormalizeCultureAsync(string languageTagString);
+
     }
     public class MappingHelper : IMappingHelper
     {
         private readonly IContentService _contentRetriever;
+        private readonly ICultureService _cultureService;
+        private readonly IWebsiteChannelContext _websiteChannelContext;
+        private readonly IValidationState _validationState;
         private static readonly LanguageTag defaultCulture = LanguageTag.GB;
 
-        public MappingHelper(IContentService contentRetriever)
+        public MappingHelper(IContentService contentRetriever, ICultureService cultureService, IWebsiteChannelContext websiteChannelContext, IValidationState validationState)
         {
             _contentRetriever = contentRetriever;
+            _cultureService = cultureService;
+            _websiteChannelContext = websiteChannelContext;
+            _validationState = validationState;
         }
 
         /// <summary>
@@ -212,5 +225,36 @@ namespace BDO.GWT.GLOBAL.API.Helpers
                 .Select(item => new ContentItemReference { Identifier = item.SystemFields.ContentItemGUID })
                 .ToList();
         }
+        public async Task<LanguageTag?> ValidateAndNormalizeSiteCultureAsync(int channelId, string languageTagString, CancellationToken cancellationToken)
+        {
+            var languageTag = ValidateAndNormalizeCultureAsync(languageTagString);
+
+            if (languageTag == null)
+            {
+                return null;
+            }
+
+            var siteCultures = (await _cultureService.GetSiteCulturesLanguageCodeAsync(channelId, cancellationToken)).ToHashSet();
+
+            if (!siteCultures.Contains(languageTag))
+            {
+                _validationState.AddError("culture", ErrorMessage.DocumentCultureNotAllowedOnSite(languageTag, _websiteChannelContext.WebsiteChannelName, siteCultures));
+            }
+
+            return languageTag;
+        }
+
+        public LanguageTag? ValidateAndNormalizeCultureAsync(string languageTagString)
+        {
+            if (LanguageTag.TryParse(languageTagString, out var languageTag))
+            {
+                return languageTag;
+            }
+
+            _validationState.AddError("culture", ErrorMessage.IncorrectLanguageTagFormat(languageTagString));
+
+            return null;
+        }
+
     }
 }
