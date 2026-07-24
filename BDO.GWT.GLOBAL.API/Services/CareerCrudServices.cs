@@ -311,16 +311,16 @@ namespace BDO.GWT.GLOBAL.API.Services
                     };
 
                     // Get existing page for this culture
-                    var result = await _contentRetriever.GetPagesAsync<Person>(_retrieveCurrentPage,
+                    var result = await _contentRetriever.GetPagesAsync<Career>(_retrieveCurrentPage,
                         query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
                         RetrievalCacheSettings.CacheDisabled,
                         cancellationToken);
 
-                    var existingPerson = result?.FirstOrDefault();
-                    if (existingPerson is not null)
+                    var existingCareer = result?.FirstOrDefault();
+                    if (existingCareer is not null)
                     {
                         await _webPageManager.Delete(
-                            new DeleteWebPageParameters(existingPerson.SystemFields.WebPageItemID, cult.ToString())
+                            new DeleteWebPageParameters(existingCareer.SystemFields.WebPageItemID, cult.ToString())
                             {
                                 Permanently = true
                             },
@@ -333,26 +333,26 @@ namespace BDO.GWT.GLOBAL.API.Services
                 // Delete only the requested culture variant
                 var _retrieveCurrentPage = new RetrievePagesParameters
                 {
-                    LinkedItemsMaxLevel = 1,
+                    LinkedItemsMaxLevel = 3,
                     ChannelName = channel.ChannelName,
                     LanguageName = currentCulture.Locale,
                     IsForPreview = false
                 };
 
                 // Get existing page
-                var result = await _contentRetriever.GetPagesAsync<Person>(_retrieveCurrentPage,
+                var result = await _contentRetriever.GetPagesAsync<Career>(_retrieveCurrentPage,
                     query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
                     RetrievalCacheSettings.CacheDisabled,
                     cancellationToken);
 
-                var existingPerson = result?.FirstOrDefault();
-                if (existingPerson is null)
+                var existingCareer = result?.FirstOrDefault();
+                if (existingCareer is null)
                 {
                     throw new NotFoundException();
                 }
 
                 await _webPageManager.Delete(
-                    new DeleteWebPageParameters(existingPerson.SystemFields.WebPageItemID, currentCulture.Locale)
+                    new DeleteWebPageParameters(existingCareer.SystemFields.WebPageItemID, currentCulture.Locale)
                     {
                         Permanently = true
                     },
@@ -470,7 +470,7 @@ namespace BDO.GWT.GLOBAL.API.Services
 
                 var _retrieveCurrentPage = new RetrievePagesParameters
                 {
-                    LinkedItemsMaxLevel = 1,
+                    LinkedItemsMaxLevel = 3,
                     ChannelName = channel.ChannelName,
                     LanguageName = currentCulture.Locale,
                     IsForPreview = false
@@ -623,8 +623,11 @@ namespace BDO.GWT.GLOBAL.API.Services
             var heroBackgroundImageReferences = await _mappingHelper.BuildContentAttachmentImageReferencesExtGuid(careerContent.HeroBackgroundImage, cancellationToken);
             var heroBackgroundImageMobileReferences = await _mappingHelper.BuildContentAttachmentImageReferencesExtGuid(careerContent.HeroBackgroundImage_Mobile, cancellationToken);
 
-            //var relevantContactPersonReferences = await _mappingHelper.BuildWebPageIdReferencesAsync<Person>(careerContent.CareerReference, CHANNEL_NAME, culture, cancellationToken);
-            var heroCallToActionButtonUrlReferences = await _mappingHelper.BuildContentAttachmentPersonPageReferences(careerContent.HeroCallToActionButtonUrl, CHANNEL_NAME, culture, cancellationToken);
+            
+           //hero call to action url can be any page, so its a costly query to search through all pages
+           //based on url string to set its value. Currently setting it as empty
+            var heroCallToActionButtonUrlReferences = new List<ContentItemReference>();
+           
             var careerContactPeopleReferences = await _mappingHelper.BuildReferencesPageCarAsync<Person>(careerContent.CareerContactPeopleID, d => d.MetadataTitle, cancellationToken);
             var metadataRelevantContactPersonReferences = await _mappingHelper.BuildReferencesPageCarAsync<Person>(careerContent.MetadataRelevantContactPerson, d => d.MetadataTitle, cancellationToken);
             var metadataOfficeLocationReferences = await _mappingHelper.BuildReferencesPageCarAsync<LocationOffice>(careerContent.MetadataOfficeLocation, d => d.MetadataTitle, cancellationToken);
