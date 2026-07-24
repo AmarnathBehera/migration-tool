@@ -3,6 +3,7 @@ using CMS.DataEngine;
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -73,6 +74,7 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
 
         PageConfiguration.UIFormName = "gdprdisplay";
         PageConfiguration.Headline = "GDPR Display";
+        GdprButtonConfiguration.AddCommandActions(PageConfiguration);
 
         await base.ConfigurePage();
     }

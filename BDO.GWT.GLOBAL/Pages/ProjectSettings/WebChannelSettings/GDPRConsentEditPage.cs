@@ -87,7 +87,7 @@ public class GDPRConsentEditPage : InfoEditPage<GDPRInfo>
         {
             Items = await items.OnlyVisible().GetClientProperties(),
             ObjectDisplayName = WebChannelSettingsDisplayName,
-            ObjectId = WebChannelSettingsId,
+            ObjectId = savedInfoObject.GDPRID,
             RefetchAll = RefetchAll
         };
 
