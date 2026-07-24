@@ -13,8 +13,8 @@ public class RedirectMiddleware
     private readonly RequestDelegate _next;
     private readonly IRedirectService _redirectService;
     private readonly IWebPageUrlRetriever _webPageUrlRetriever;
-    
-    private string[] ExcludedStartingPaths = new []
+
+    private readonly string[] ExcludedStartingPaths = new[]
     {
         "/cmsctx",
         "/admin",
@@ -33,81 +33,86 @@ public class RedirectMiddleware
         _next = next;
         _redirectService = redirectService;
     }
-    
+
     public async Task InvokeAsync(HttpContext context)
     {
-        if (!context.Request.Headers.Accept.ToString().Contains("text/html", StringComparison.OrdinalIgnoreCase))
+        if (!IsHtmlRequest(context) || IsExcludedPath(context))
         {
             await _next(context);
             return;
         }
-        
+
         string requestPath = context.Request.Path.Value?.ToLower() ?? string.Empty;
 
-        foreach (string excludedPath in ExcludedStartingPaths)
-        {
-            if (context.Request.Path.StartsWithSegments(excludedPath, StringComparison.OrdinalIgnoreCase))
-            {
-                await _next(context);
-                return;
-            }
-        }
-        
         List<RedirectInfo> allRedirects = (await _redirectService.GetRedirects()).ToList();
+        RedirectInfo? matchingRedirectInfo = allRedirects
+            .FirstOrDefault(r => r.RedirectSourceUrl == requestPath);
 
-        if (allRedirects == null || allRedirects.Count == 0)
+        int? targetWebPageItemId = matchingRedirectInfo is null
+            ? null
+            : GetWebPageItemId(matchingRedirectInfo.RedirectTargetWebPageItemGUID);
+
+        if (!targetWebPageItemId.HasValue)
         {
             await _next(context);
             return;
         }
-        
-        RedirectInfo matchingRedirectInfo = allRedirects.FirstOrDefault(r => r.RedirectSourceUrl == requestPath);
 
-        if (matchingRedirectInfo != null)
+        string targetPageUrl = await GetTargetPageUrlAsync(context, targetWebPageItemId.Value);
+
+        if (requestPath.Equals(targetPageUrl, StringComparison.OrdinalIgnoreCase))
         {
-            int? targetWebPageItemId = GetWebPageItemId(matchingRedirectInfo.RedirectTargetWebPageItemGUID);
-
-            if (targetWebPageItemId.HasValue)
-            {
-                var languages = GetContentLangauges().ToList();
-
-                string firstSegment = context.Request.Path.ToString().Split('/').First();
-
-                if (context.Request.Path.ToString().Split('/').Length > 1)
-                {
-                    firstSegment = context.Request.Path.ToString().Split('/')[1];
-                }
-
-                var currentLanguage = languages.First(l => l.ContentLanguageIsDefault);
-                
-                if (!string.IsNullOrEmpty(firstSegment))
-                {
-                    firstSegment = firstSegment?.ToLower() ?? string.Empty;
-                    
-                    var matchedLanguage = languages.FirstOrDefault(l => 
-                        l.ContentLanguageName.Equals(firstSegment, StringComparison.CurrentCultureIgnoreCase)
-                        || l.ContentLanguageCultureFormat.Equals(firstSegment, StringComparison.CurrentCultureIgnoreCase));
-
-                    if (matchedLanguage != null)
-                    {
-                        currentLanguage = matchedLanguage;
-                    }
-                }
-                
-                string targetPageUrl = _webPageUrlRetriever.Retrieve(targetWebPageItemId.Value, currentLanguage?.ContentLanguageName).Result.RelativePath.Replace("~", "");
-
-                if (!requestPath.Equals(targetPageUrl, StringComparison.OrdinalIgnoreCase))
-                {
-                    context.Response.Redirect(targetPageUrl, permanent: true);
-                
-                    await context.Response.CompleteAsync();
-                    
-                    return;
-                }
-            }
+            await _next(context);
+            return;
         }
 
-        await _next(context);
+        context.Response.Redirect(targetPageUrl, permanent: true);
+        await context.Response.CompleteAsync();
+    }
+
+    private bool IsHtmlRequest(HttpContext context)
+    {
+        return context.Request.Headers.Accept.ToString()
+            .Contains("text/html", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool IsExcludedPath(HttpContext context)
+    {
+        return ExcludedStartingPaths.Any(excludedPath =>
+            context.Request.Path.StartsWithSegments(excludedPath, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private async Task<string> GetTargetPageUrlAsync(HttpContext context, int targetWebPageItemId)
+    {
+        List<ContentLanguageInfo> languages = GetContentLangauges().ToList();
+        ContentLanguageInfo currentLanguage = ResolveLanguage(context, languages);
+
+        var result = await _webPageUrlRetriever.Retrieve(targetWebPageItemId, currentLanguage?.ContentLanguageName);
+        return result.RelativePath.Replace("~", "");
+    }
+
+    private ContentLanguageInfo ResolveLanguage(HttpContext context, List<ContentLanguageInfo> languages)
+    {
+        ContentLanguageInfo defaultLanguage = languages.First(l => l.ContentLanguageIsDefault);
+
+        string firstSegment = GetFirstPathSegment(context);
+        if (string.IsNullOrEmpty(firstSegment))
+        {
+            return defaultLanguage;
+        }
+
+        ContentLanguageInfo? matchedLanguage = languages.FirstOrDefault(l =>
+            l.ContentLanguageName.Equals(firstSegment, StringComparison.CurrentCultureIgnoreCase)
+            || l.ContentLanguageCultureFormat.Equals(firstSegment, StringComparison.CurrentCultureIgnoreCase));
+
+        return matchedLanguage ?? defaultLanguage;
+    }
+
+    private static string GetFirstPathSegment(HttpContext context)
+    {
+        string[] segments = context.Request.Path.ToString().Split('/');
+        string segment = segments.Length > 1 ? segments[1] : segments.First();
+        return segment?.ToLower() ?? string.Empty;
     }
 
     private int? GetWebPageItemId(Guid webPageItemGuid)
@@ -118,7 +123,7 @@ public class RedirectMiddleware
             .WhereEquals(nameof(WebPageItemInfo.WebPageItemGUID), webPageItemGuid)
             .GetScalarResult<int>();
     }
-    
+
     private IEnumerable<ContentLanguageInfo> GetContentLangauges()
     {
         return ContentLanguageInfo.Provider.Get()
