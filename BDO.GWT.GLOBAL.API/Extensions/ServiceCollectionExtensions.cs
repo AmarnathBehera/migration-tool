@@ -7,6 +7,7 @@ using BDO.GWT.GLOBAL.API.Middleware;
 using BDO.GWT.GLOBAL.API.Options;
 using BDO.GWT.GLOBAL.API.Services;
 using BDO.GWT.Web.Core.Services;
+using CMS.Core;
 using CMS.MacroEngine;
 using CMS.Websites;
 
@@ -62,5 +63,6 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ICareerCrudService, CareerCrudService>();
         
         serviceCollection.AddScoped<IPersonCrudService, PersonCrudService>();
+        serviceCollection.AddScoped<IChannelInfoService, ChannelInfoService>();
     }
 }

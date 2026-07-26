@@ -34,6 +34,7 @@ namespace BDO.GWT.GLOBAL.API.Services
         private readonly IWebsiteChannelContext _websiteChannelContext;
         private readonly ICultureService _cultureService;
         private readonly IInfoProvider<ChannelInfo> _channelInfoProvider;
+        private readonly IChannelInfoService _channelInfoService1;
         private readonly IWebPageManager _webPageManager;
         private readonly IMappingHelper _mappingHelper;
         private readonly IPageContentValidator _pageContentValidator;
@@ -46,7 +47,8 @@ namespace BDO.GWT.GLOBAL.API.Services
             IWebsiteChannelContext websiteChannelContext, ICultureService cultureService, 
             IInfoProvider<ChannelInfo> channelInfoProvider,  
             IMappingHelper mappingHelper, IPageContentValidator pageContentValidator, ICultureValidationService cultureValidationService
-            , IWebPageManagerFactory webPageManagerFactory, IUserInfoProvider userInfoProvider)
+            , IWebPageManagerFactory webPageManagerFactory, IUserInfoProvider userInfoProvider,
+            IChannelInfoService channelInfoService)
         {
             UserInfo user = userInfoProvider.Get("administrator");
             _contentRetriever = contentRetriever;
@@ -58,6 +60,8 @@ namespace BDO.GWT.GLOBAL.API.Services
             _mappingHelper = mappingHelper;
             _pageContentValidator = pageContentValidator;
             _cultureValidationService = cultureValidationService;
+            _channelInfoService1 = channelInfoService;
+
 
         }
         public async Task<ActionResult<PageOutput<CareerPageContent>>> CreateCareerPageAsync(int channelId, int nodeParentID, string? culture, CareerPageContent request, CancellationToken cancellationToken)
@@ -75,22 +79,23 @@ namespace BDO.GWT.GLOBAL.API.Services
                 throw new NotFoundException("Invalid culture specified");
             }
 
-            var channel = await _channelInfoProvider.GetAsync(channelId, cancellationToken);
-            if (string.IsNullOrEmpty(channel?.ChannelName))
+            var channelName = await _channelInfoService1.GetChannelNameAsync(channelId, cancellationToken);
+            if (string.IsNullOrEmpty(channelName))
             {
                 throw new NotFoundException("Channel not found");
             }
+
 
             // Validate and normalize the page content
             _pageContentValidator.ValidateAndNormalizePageContent(request);
 
             _validationState.ThrowIfThereAreErrors();
 
-            CHANNEL_NAME = channel.ChannelName;
+            CHANNEL_NAME = channelName;
             var _retrieveCurrentPage = new RetrievePagesParameters
             {
                 LinkedItemsMaxLevel = 3,
-                ChannelName = channel.ChannelName,
+                ChannelName = channelName,
                 LanguageName = currentCulture.Locale,
                 IsForPreview = false
             };
@@ -163,7 +168,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             var _retrieveNewPage = new RetrievePagesParameters
             {
                 LinkedItemsMaxLevel = 1,
-                ChannelName = channel.ChannelName,
+                ChannelName = channelName,
                 LanguageName = currentCulture.Locale,
                 IsForPreview = false
             };
@@ -200,21 +205,23 @@ namespace BDO.GWT.GLOBAL.API.Services
                 throw new NotFoundException("Invalid to culture specified");
             }
 
-            var channel = await _channelInfoProvider.GetAsync(channelId, cancellationToken);
-            if (string.IsNullOrEmpty(channel?.ChannelName))
+
+            var channelName = await _channelInfoService1.GetChannelNameAsync(channelId, cancellationToken);
+            if (string.IsNullOrEmpty(channelName))
             {
                 throw new NotFoundException("Channel not found");
             }
+
 
             _pageContentValidator.ValidateAndNormalizePageContent(request);
 
             _validationState.ThrowIfThereAreErrors();
 
-            CHANNEL_NAME = channel.ChannelName;
+            CHANNEL_NAME = channelName;
             var _retrieveCurrentPage = new RetrievePagesParameters
             {
                 LinkedItemsMaxLevel = 3,
-                ChannelName = channel.ChannelName,
+                ChannelName = channelName,
                 LanguageName = fromLangCulture.Locale,
                 IsForPreview = false
             };
@@ -265,7 +272,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             var _retrieveNewVariant = new RetrievePagesParameters
             {
                 LinkedItemsMaxLevel = 1,
-                ChannelName = channel.ChannelName,
+                ChannelName = channelName   ,
                 LanguageName = toLangCulture.Locale,
                 IsForPreview = false
             };
@@ -288,11 +295,12 @@ namespace BDO.GWT.GLOBAL.API.Services
                 throw new NotFoundException("Invalid culture specified");
             }
 
-            var channel = await _channelInfoProvider.GetAsync(channelId);
-            if (string.IsNullOrEmpty(channel?.ChannelName))
+            var channelName = await _channelInfoService1.GetChannelNameAsync(channelId, cancellationToken);
+            if (string.IsNullOrEmpty(channelName))
             {
                 throw new NotFoundException("Channel not found");
             }
+
 
             if (deleteAllCultures)
             {
@@ -305,7 +313,7 @@ namespace BDO.GWT.GLOBAL.API.Services
                     var _retrieveCurrentPage = new RetrievePagesParameters
                     {
                         LinkedItemsMaxLevel = 1,
-                        ChannelName = channel.ChannelName,
+                        ChannelName = channelName,
                         LanguageName = cult.ToString(),
                         IsForPreview = false
                     };
@@ -334,7 +342,7 @@ namespace BDO.GWT.GLOBAL.API.Services
                 var _retrieveCurrentPage = new RetrievePagesParameters
                 {
                     LinkedItemsMaxLevel = 3,
-                    ChannelName = channel.ChannelName,
+                    ChannelName = channelName,
                     LanguageName = currentCulture.Locale,
                     IsForPreview = false
                 };
@@ -371,16 +379,17 @@ namespace BDO.GWT.GLOBAL.API.Services
                 throw new NotFoundException("Invalid culture specified");
             }
 
-            var channel = await _channelInfoProvider.GetAsync(channelId, cancellationToken);
-            if (string.IsNullOrEmpty(channel?.ChannelName))
+            var channelName = await _channelInfoService1.GetChannelNameAsync(channelId, cancellationToken);
+            if (string.IsNullOrEmpty(channelName))
             {
                 throw new NotFoundException("Channel not found");
             }
 
+                    
             var _retrieveCurrentPage = new RetrievePagesParameters
             {
                 LinkedItemsMaxLevel = 1,
-                ChannelName = channel.ChannelName,
+                ChannelName = channelName,
                 LanguageName = currentCulture.Locale,
                 IsForPreview = false
             };
@@ -413,8 +422,8 @@ namespace BDO.GWT.GLOBAL.API.Services
                 throw new NotFoundException("Invalid culture specified");
             }
 
-            var channel = await _channelInfoProvider.GetAsync(channelId, cancellationToken);
-            if (string.IsNullOrEmpty(channel?.ChannelName))
+            var channelName = await _channelInfoService1.GetChannelNameAsync(channelId, cancellationToken);
+            if (string.IsNullOrEmpty(channelName))
             {
                 throw new NotFoundException("Channel not found");
             }
@@ -422,7 +431,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             var retrieveParameters = new RetrievePagesParameters
             {
                 LinkedItemsMaxLevel = 5,
-                ChannelName = channel.ChannelName,
+                ChannelName = channelName,
                 LanguageName = currentCulture.Locale,
                 IsForPreview = !(onlyPublished ?? true),
             };
@@ -458,8 +467,8 @@ namespace BDO.GWT.GLOBAL.API.Services
                     throw new NotFoundException("Invalid culture specified");
                 }
 
-                var channel = await _channelInfoProvider.GetAsync(channelId);
-                if (string.IsNullOrEmpty(channel?.ChannelName))
+                var channelName = await _channelInfoService1.GetChannelNameAsync(channelId, cancellationToken);
+                if (string.IsNullOrEmpty(channelName))
                 {
                     throw new NotFoundException("Channel not found");
                 }
@@ -471,7 +480,7 @@ namespace BDO.GWT.GLOBAL.API.Services
                 var _retrieveCurrentPage = new RetrievePagesParameters
                 {
                     LinkedItemsMaxLevel = 3,
-                    ChannelName = channel.ChannelName,
+                    ChannelName = channelName,
                     LanguageName = currentCulture.Locale,
                     IsForPreview = false
                 };
