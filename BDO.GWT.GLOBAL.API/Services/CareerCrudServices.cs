@@ -190,7 +190,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             }
 
             var fromLangCulture = await _cultureValidationService.ValidateAndNormalizeSiteCultureAsync(channelId,
-                                                     fromCulture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+                                                     fromCulture ?? defaultCulture.Locale, cancellationToken) ?? defaultCulture;
 
             if (string.IsNullOrEmpty(fromLangCulture.Locale))
             {
@@ -198,9 +198,9 @@ namespace BDO.GWT.GLOBAL.API.Services
             }
 
             var toLangCulture = await _cultureValidationService.ValidateAndNormalizeSiteCultureAsync(channelId, 
-                toCulture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+                toCulture ?? defaultCulture.Locale, cancellationToken) ?? defaultCulture;
 
-            if (string.IsNullOrEmpty(toLangCulture.Language))
+            if (string.IsNullOrEmpty(toLangCulture.Locale))
             {
                 throw new NotFoundException("Invalid to culture specified");
             }
@@ -241,7 +241,7 @@ namespace BDO.GWT.GLOBAL.API.Services
 
 
             // Create new culture version data
-            var itemData = await CreateCMSTreeItem(request, toCulture, cancellationToken);
+            var itemData = await CreateCMSTreeItem(request, toLangCulture.Locale, cancellationToken);
 
             // Create language variant for the existing page
             var createVariantParameters = new CMS.Websites.CreateLanguageVariantParameters(
