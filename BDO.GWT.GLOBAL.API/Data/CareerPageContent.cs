@@ -8,10 +8,7 @@ namespace BDO.GWT.GLOBAL.API.Data
         public string MetadataTitle { get; set; } = string.Empty;
 
         [Required]
-        public string? MetadataDescription { get; set; }
-
-        //[MaxLength(200)]
-        //public string? MetadataMenuGroup { get; set; }
+        public string? MetadataDescription { get; set; }       
 
         [MaxLength(200)]
         public string? MetadataTeaserImage { get; set; }

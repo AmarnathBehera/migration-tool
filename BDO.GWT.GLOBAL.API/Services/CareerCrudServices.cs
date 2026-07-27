@@ -33,7 +33,6 @@ namespace BDO.GWT.GLOBAL.API.Services
         private readonly IValidationState _validationState;
         private readonly IWebsiteChannelContext _websiteChannelContext;
         private readonly ICultureService _cultureService;
-        private readonly IInfoProvider<ChannelInfo> _channelInfoProvider;
         private readonly IChannelInfoService _channelInfoService1;
         private readonly IWebPageManager _webPageManager;
         private readonly IMappingHelper _mappingHelper;
@@ -42,10 +41,9 @@ namespace BDO.GWT.GLOBAL.API.Services
         private static readonly LanguageTag defaultCulture = LanguageTag.GB;
         private const string CAREER_CONTENT_TYPE = Career.CONTENT_TYPE_NAME;
         private const string WEB_PAGE_GUID = "WebPageItemGUID";
-        private string CHANNEL_NAME = string.Empty;
+       
         public CareerCrudService( IContentService contentRetriever, IValidationState validationState, 
-            IWebsiteChannelContext websiteChannelContext, ICultureService cultureService, 
-            IInfoProvider<ChannelInfo> channelInfoProvider,  
+            IWebsiteChannelContext websiteChannelContext, ICultureService cultureService,               
             IMappingHelper mappingHelper, IPageContentValidator pageContentValidator, ICultureValidationService cultureValidationService
             , IWebPageManagerFactory webPageManagerFactory, IUserInfoProvider userInfoProvider,
             IChannelInfoService channelInfoService)
@@ -55,7 +53,6 @@ namespace BDO.GWT.GLOBAL.API.Services
             _validationState = validationState;
             _websiteChannelContext = websiteChannelContext;
             _cultureService = cultureService;
-            _channelInfoProvider = channelInfoProvider;
             _webPageManager = webPageManagerFactory.Create(_websiteChannelContext.WebsiteChannelID == 0 ? 1 : _websiteChannelContext.WebsiteChannelID, user.UserID);
             _mappingHelper = mappingHelper;
             _pageContentValidator = pageContentValidator;
@@ -90,8 +87,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             _pageContentValidator.ValidateAndNormalizePageContent(request);
 
             _validationState.ThrowIfThereAreErrors();
-
-            CHANNEL_NAME = channelName;
+           
             var _retrieveCurrentPage = new RetrievePagesParameters
             {
                 LinkedItemsMaxLevel = 3,
@@ -140,7 +136,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             }
 
 
-            var itemData = await CreateCMSTreeItem(request, currentCulture.Locale, cancellationToken);
+            var itemData = await CreateCMSTreeItem(request, cancellationToken);
 
             // Creates a page metadata object
             var contentItemParameters = new ContentItemParameters(CAREER_CONTENT_TYPE, itemData);
@@ -216,8 +212,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             _pageContentValidator.ValidateAndNormalizePageContent(request);
 
             _validationState.ThrowIfThereAreErrors();
-
-            CHANNEL_NAME = channelName;
+          
             var _retrieveCurrentPage = new RetrievePagesParameters
             {
                 LinkedItemsMaxLevel = 3,
@@ -241,7 +236,7 @@ namespace BDO.GWT.GLOBAL.API.Services
 
 
             // Create new culture version data
-            var itemData = await CreateCMSTreeItem(request, toLangCulture.Locale, cancellationToken);
+            var itemData = await CreateCMSTreeItem(request, cancellationToken);
 
             // Create language variant for the existing page
             var createVariantParameters = new CMS.Websites.CreateLanguageVariantParameters(
@@ -257,13 +252,21 @@ namespace BDO.GWT.GLOBAL.API.Services
             }
 
             // Update the draft with new content
-            if (!await _webPageManager.TryUpdateDraft(existingCareer.SystemFields.WebPageItemID, toLangCulture.Locale, new UpdateDraftData(itemData), cancellationToken))
+            if (existingCareer is null)
+            {
+                throw new NotFoundException("Existing page does not have a valid WebPageItemID");
+            }
+            if(existingCareer.SystemFields?.WebPageItemID == 0)
+            {
+                throw new NotFoundException("Existing page does not have a valid WebPageItemID");
+            }
+            if (!await _webPageManager.TryUpdateDraft(existingCareer.SystemFields?.WebPageItemID ?? 0, toLangCulture.Locale, new UpdateDraftData(itemData), cancellationToken))
             {
                 throw new NotFoundException("Failed to update page draft");
             }
 
             // Publish the updated page
-            if (!await _webPageManager.TryPublish(existingCareer.SystemFields.WebPageItemID, toLangCulture.Locale, cancellationToken))
+            if (!await _webPageManager.TryPublish(existingCareer.SystemFields?.WebPageItemID ?? 0, toLangCulture.Locale, cancellationToken))
             {
                 throw new NotFoundException("Failed to publish updated page");
             }
@@ -503,7 +506,7 @@ namespace BDO.GWT.GLOBAL.API.Services
                 }
 
                 // Build ContentItemData for the update
-                var itemData = await CreateCMSTreeItem(request,culture, cancellationToken);
+                var itemData = await CreateCMSTreeItem(request,cancellationToken);
 
                 // Create a draft, update it, and publish
                 await _webPageManager.TryCreateDraft(existingCareer.SystemFields.WebPageItemID, currentCulture.Locale, cancellationToken: cancellationToken);
@@ -603,8 +606,8 @@ namespace BDO.GWT.GLOBAL.API.Services
                     CareerLevel = career.CareerLevel?.FirstOrDefault()?.Name ?? string.Empty,
                     CareerEmploymentType = career.CareerEmploymentType?.FirstOrDefault()?.Name ?? string.Empty,
                     CareerApplyForm = career.CareerApplyForm,
-                    PublishTo = career.SystemFields.ContentItemCommonDataFirstPublishedWhen,
-                    PublishFrom = career.SystemFields.ContentItemCommonDataLastPublishedWhen,                                   
+                    PublishTo = career.SystemFields?.ContentItemCommonDataFirstPublishedWhen,
+                    PublishFrom = career.SystemFields?.ContentItemCommonDataLastPublishedWhen,                                   
 
                 },
                 Metadata = new PageMetadataOutput
@@ -622,7 +625,7 @@ namespace BDO.GWT.GLOBAL.API.Services
 
         }
 
-        private async Task<ContentItemData> CreateCMSTreeItem(CareerPageContent careerContent, string? culture, CancellationToken cancellationToken)
+        private async Task<ContentItemData> CreateCMSTreeItem(CareerPageContent careerContent, CancellationToken cancellationToken)
         {
            
             var downloadButtonReferences = await _mappingHelper.BuildContentAttachmentImageReferencesExtGuid(careerContent.DownloadButtonAttachment, cancellationToken);
@@ -712,7 +715,7 @@ namespace BDO.GWT.GLOBAL.API.Services
 
         private static string GetLastUrlPathSegment(string? urlPath)
         {
-            if (string.IsNullOrWhiteSpace(urlPath))
+            if (string.IsNullOrWhiteSpace(urlPath))     
             {
                 return string.Empty;
             }

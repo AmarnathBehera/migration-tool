@@ -16,6 +16,9 @@ public class MappingHelperTests
 
     private static readonly string[] WhitespaceIdentifiersWithNull = new[] { "", "   ", null! };
     private static readonly string[] WhitespaceIdentifiers = new[] { "", "   " };
+    private static readonly string[] SampleIdentifiers = new[] { "a", "b" };
+    private static readonly int[] SampleWebPageIds = new[] { 1, 2 };
+    private static readonly int[] SingleWebPageId = new[] { 1 };
 
     [SetUp]
     public void Setup()
@@ -378,7 +381,7 @@ public class MappingHelperTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<Person>());
 
-        var result = await _mappingHelper.BuildWebPageIdReferencesAsync<Person>(new[] { 1, 2 }, "ChannelName", "en-gb", CancellationToken.None);
+        var result = await _mappingHelper.BuildWebPageIdReferencesAsync<Person>(SampleWebPageIds, "ChannelName", "en-gb", CancellationToken.None);
 
         Assert.That(result, Is.Empty);
         _contentServiceMock.Verify(
@@ -404,7 +407,7 @@ public class MappingHelperTests
                 (parameters, _, _, _) => captured = parameters)
             .ReturnsAsync(new List<Person>());
 
-        await _mappingHelper.BuildWebPageIdReferencesAsync<Person>(new[] { 1 }, "ChannelName", null, CancellationToken.None);
+        await _mappingHelper.BuildWebPageIdReferencesAsync<Person>(SingleWebPageId, "ChannelName", null, CancellationToken.None);
 
         Assert.That(captured, Is.Not.Null);
         Assert.That(captured!.LanguageName, Is.EqualTo("en"));
@@ -532,7 +535,7 @@ public class MappingHelperTests
             .Setup(x => x.GetItemsAsync<Person>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<Person>().AsReadOnly());
 
-        var result = await _mappingHelper.BuildReferencesCarAsync<Person>(new[] { "a", "b" }, p => p.MetadataTitle ?? string.Empty, CancellationToken.None);
+        var result = await _mappingHelper.BuildReferencesCarAsync<Person>(SampleIdentifiers, p => p.MetadataTitle ?? string.Empty, CancellationToken.None);
 
         Assert.That(result, Is.Empty);
         _contentServiceMock.Verify(
