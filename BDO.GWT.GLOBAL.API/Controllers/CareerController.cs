@@ -43,7 +43,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
             var page = await _careerCrudService.GetCareerPageAsync(channelId, pageGUID, culture, cancellationToken);
 
-            return Ok(page);
+            return Ok(page.Value);
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
             var pages = await _careerCrudService.GetCareerPagesAsync(channelId, culture, onlyPublished, cancellationToken);
 
-            return Ok(pages);
+            return Ok(pages.Value);
         }
 
         /// <summary>

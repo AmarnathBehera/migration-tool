@@ -27,14 +27,13 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
         private Mock<IValidationState> _validationStateMock;
         private Mock<IWebsiteChannelContext> _websiteChannelContextMock;
         private Mock<ICultureService> _cultureServiceMock;
-        //private Mock<IInfoProvider<ChannelInfo>> _channelInfoProviderMock;
         private Mock<IChannelInfoService> _channelInfoServiceMock;
         private Mock<IWebPageManager> _webPageManagerMock;
         private Mock<IWebPageManagerFactory> _webPageManagerFactoryMock;
         private Mock<IMappingHelper> _mappingHelperMock;
         private Mock<IPageContentValidator> _pageContentValidatorMock;
         private Mock<ICultureValidationService> _cultureValidationServiceMock;
-        private Mock<IUserInfoProvider> _userInfoProviderMock;
+        //private Mock<IUserInfoProvider> _userInfoProviderMock;
 
         [SetUp]
         public void Setup()
@@ -43,14 +42,13 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
             _validationStateMock = new Mock<IValidationState>();
             _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
             _cultureServiceMock = new Mock<ICultureService>();
-            //_channelInfoProviderMock = new Mock<IInfoProvider<ChannelInfo>>();
             _channelInfoServiceMock = new Mock<IChannelInfoService>();
             _webPageManagerMock = new Mock<IWebPageManager>();
             _webPageManagerFactoryMock = new Mock<IWebPageManagerFactory>();
             _mappingHelperMock = new Mock<IMappingHelper>();
             _pageContentValidatorMock = new Mock<IPageContentValidator>();
             _cultureValidationServiceMock = new Mock<ICultureValidationService>();
-            _userInfoProviderMock = new Mock<IUserInfoProvider>();
+            //_userInfoProviderMock = new Mock<IUserInfoProvider>();
         }
 
         private CareerCrudService CreateService()
@@ -64,14 +62,13 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
             SetPrivateField(service, "_contentRetriever", _contentRetrieverMock.Object);
             SetPrivateField(service, "_validationState", _validationStateMock.Object);
             SetPrivateField(service, "_websiteChannelContext", _websiteChannelContextMock.Object);
-            SetPrivateField(service, "_cultureService", _cultureServiceMock.Object);
-            //SetPrivateField(service, "_channelInfoProvider", _channelInfoProviderMock.Object);
+            SetPrivateField(service, "_cultureService", _cultureServiceMock.Object);            
             SetPrivateField(service, "_channelInfoService1", _channelInfoServiceMock.Object);
             SetPrivateField(service, "_webPageManager", _webPageManagerMock.Object);
             SetPrivateField(service, "_mappingHelper", _mappingHelperMock.Object);
             SetPrivateField(service, "_pageContentValidator", _pageContentValidatorMock.Object);
             SetPrivateField(service, "_cultureValidationService", _cultureValidationServiceMock.Object);
-            //SetPrivateField(service, "_userInfoProvider", _userInfoProviderMock.Object);
+            
             return service;
         }
 
@@ -352,8 +349,12 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
             var result = await service.UpdateCareerPageAsync(1, Guid.NewGuid(), "en", new CareerPageContent(), CancellationToken.None);
 
             var objectResult = result.Result as UnprocessableEntityObjectResult;
-            Assert.That(objectResult, Is.Not.Null);
-            Assert.That(objectResult!.StatusCode, Is.EqualTo(422));
+            Assert.Multiple(() =>
+            {
+                Assert.That(objectResult, Is.Not.Null);
+                Assert.That(objectResult!.StatusCode, Is.EqualTo(422));
+            }); 
+           
         }
 
         [Test]
@@ -367,8 +368,13 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
             var result = await service.UpdateCareerPageAsync(1, Guid.NewGuid(), "en", new CareerPageContent(), CancellationToken.None);
 
             var objectResult = result.Result as NotFoundObjectResult;
-            Assert.That(objectResult, Is.Not.Null);
-            Assert.That(objectResult!.Value, Is.EqualTo("Channel not found"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(objectResult, Is.Not.Null);
+                Assert.That(objectResult!.StatusCode, Is.EqualTo(404));
+                Assert.That(objectResult.Value, Is.EqualTo("Channel not found"));
+            });
+   
         }
 
         [Test]
@@ -382,8 +388,11 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
             var result = await service.UpdateCareerPageAsync(1, Guid.NewGuid(), "en", new CareerPageContent(), CancellationToken.None);
 
             var objectResult = result.Result as ObjectResult;
-            Assert.That(objectResult, Is.Not.Null);
-            Assert.That(objectResult!.StatusCode, Is.EqualTo(500));
+            Assert.Multiple(() =>
+            {
+                Assert.That(objectResult, Is.Not.Null);
+                Assert.That(objectResult!.StatusCode, Is.EqualTo(500));
+            });
         }
 
 
