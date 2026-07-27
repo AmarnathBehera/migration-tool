@@ -1,5 +1,8 @@
+using BDO.GWT.Core;
+using BDO.GWT.Core.Services;
 using BDO.GWT.GLOBAL.API.Constants;
 using BDO.GWT.GLOBAL.API.Extensions;
+using BDO.GWT.GLOBAL.Services;
 using Kentico.Web.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
@@ -15,6 +18,8 @@ public static class Program
 
         builder.Services.AddControllersWithViews();
         builder.Services.AddKentico();
+        builder.Services.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
+        builder.Services.AddContentServices();
         builder.Services.AddApi();
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
