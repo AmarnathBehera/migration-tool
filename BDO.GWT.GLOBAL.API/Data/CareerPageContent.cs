@@ -2,6 +2,7 @@
 
 namespace BDO.GWT.GLOBAL.API.Data
 {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class CareerPageContent : IMetadataContent
     {
         [Required]
