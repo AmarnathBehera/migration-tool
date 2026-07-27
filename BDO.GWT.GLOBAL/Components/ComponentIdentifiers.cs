@@ -54,6 +54,8 @@
 
             public const string InFocus = WidgetPrefix + "InFocus";
 
+            public const string InsightAnimationCard = WidgetPrefix + "AnimatedTileCarouselWidget";
+
         }
 
         //sections
