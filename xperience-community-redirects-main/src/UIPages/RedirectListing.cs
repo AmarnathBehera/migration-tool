@@ -1,11 +1,8 @@
 ﻿using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.Base;
-using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Helpers;
 using CMS.Membership;
-using CMS.Websites;
-using CMS.Websites.Internal;
 using Kentico.Xperience.Admin.Base;
 using XperienceCommunity.Redirects.UIPages;
 
@@ -23,21 +20,14 @@ public class RedirectListing : ListingPage
 {
     protected override string ObjectType => RedirectInfo.OBJECT_TYPE;
 
-    private readonly IContentQueryExecutor _executor;
-    private readonly IWebPageUrlRetriever _webPageUrlRetriever;
     private readonly IChannelAccessService _channelAccessService;
     private readonly IInfoProvider<RedirectInfo> _redirectInfoProvider;
     public RedirectListing(
-        IContentQueryExecutor executor,
-        IWebPageUrlRetriever webPageUrlRetriever,
         IChannelAccessService channelAccessService,
-         IInfoProvider<RedirectInfo> redirectInfoProvider)
+        IInfoProvider<RedirectInfo> redirectInfoProvider)
     {
-        _executor = executor;
-        _webPageUrlRetriever = webPageUrlRetriever;
         _channelAccessService = channelAccessService;
         _redirectInfoProvider = redirectInfoProvider;
-
     }
 
     public override async Task ConfigurePage()
@@ -47,7 +37,7 @@ public class RedirectListing : ListingPage
         PageConfiguration.AddEditRowAction<RedirectEdit>();
         PageConfiguration.ColumnConfigurations
             .AddColumn(nameof(RedirectInfo.RedirectSourceUrl), "Source URL", searchable: true)
-            .AddColumn(nameof(RedirectInfo.RedirectTargetWebPageItemGUID), "Target web page", formatter: GetWebPageUrl)
+            .AddColumn(nameof(RedirectInfo.RedirectTargetPageURL), "Target web page", formatter: GetWebPageUrl)
             .AddColumn(nameof(RedirectInfo.RedirectChannelName), "Channel", searchable: true);
         PageConfiguration.AddEditRowAction<RedirectEditSection>();
         PageConfiguration.MassActions.AddCommandWithConfirmation(
@@ -113,46 +103,11 @@ public class RedirectListing : ListingPage
             : response.AddSuccessMessage($"Deleted {deletedCount} redirect(s).");
     }
 
-
+    
     private string GetWebPageUrl(object objectValue, IDataContainer dataContainer)
     {
-        Guid webPageItemGuid = ValidationHelper.GetGuid(objectValue, Guid.Empty);
+        string pageUrl = ValidationHelper.GetString(objectValue, string.Empty);
 
-        if (webPageItemGuid != Guid.Empty)
-        {
-            var pageQuery = new ContentItemQueryBuilder()
-                .ForContentTypes(parameters =>
-                    parameters.ForWebsite([webPageItemGuid], includeUrlPath: false)
-                )
-                .Parameters(parameters =>
-                    parameters
-                        .Columns(nameof(WebPageItemInfo.WebPageItemID))
-                        .TopN(1)
-                );
-
-            var result = _executor.GetMappedResult<IWebPageFieldsSource>(pageQuery).GetAwaiter().GetResult().FirstOrDefault();
-
-            if (result != null)
-            {
-                string pageUrl = _webPageUrlRetriever.Retrieve(result.SystemFields.WebPageItemID, GetDefaultLanguageName()).GetAwaiter().GetResult().RelativePath;
-
-                if (pageUrl != null)
-                {
-                    return pageUrl.Replace("~", "");
-                }
-            }
-        }
-
-        return "Page deleted";
-    }
-
-    private static string GetDefaultLanguageName()
-    {
-        return ContentLanguageInfo.Provider.Get()
-            .TopN(1)
-            .Column(nameof(ContentLanguageInfo.ContentLanguageName))
-            .WhereTrue(nameof(ContentLanguageInfo.ContentLanguageIsDefault))
-            .GetScalarResult<string>();
+        return string.IsNullOrEmpty(pageUrl) ? "Page deleted" : pageUrl;
     }
 }
-

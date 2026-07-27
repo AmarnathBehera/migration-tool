@@ -1,9 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
-using CMS.ContentEngine;
 using CMS.DataEngine;
-using CMS.Websites;
 using Moq;
 using XperienceCommunity.Redirects.UIPages;
 using RedirectInfoX = global::XperienceCommunity.Redirects.RedirectInfo;
@@ -36,40 +34,24 @@ public class RedirectListingTests
     }
 
     [Test]
-    public void ListingPage_Constructor_HasFourParameters()
+    public void ListingPage_Constructor_HasTwoParameters()
     {
-        Assert.That(typeof(RedirectListing).GetConstructors().Single().GetParameters(), Has.Length.EqualTo(4));
+        Assert.That(typeof(RedirectListing).GetConstructors().Single().GetParameters(), Has.Length.EqualTo(2));
     }
 
     [Test]
-    public void ListingPage_Constructor_Parameter0_IsIContentQueryExecutor()
+    public void ListingPage_Constructor_Parameter0_IsIChannelAccessService()
     {
         Assert.That(
             typeof(RedirectListing).GetConstructors().Single().GetParameters()[0].ParameterType.Name,
-            Is.EqualTo("IContentQueryExecutor"));
-    }
-
-    [Test]
-    public void ListingPage_Constructor_Parameter1_IsIWebPageUrlRetriever()
-    {
-        Assert.That(
-            typeof(RedirectListing).GetConstructors().Single().GetParameters()[1].ParameterType.Name,
-            Is.EqualTo("IWebPageUrlRetriever"));
-    }
-
-    [Test]
-    public void ListingPage_Constructor_Parameter2_IsIChannelAccessService()
-    {
-        Assert.That(
-            typeof(RedirectListing).GetConstructors().Single().GetParameters()[2].ParameterType.Name,
             Is.EqualTo("IChannelAccessService"));
     }
 
     [Test]
-    public void ListingPage_Constructor_Parameter3_IsIInfoProvider()
+    public void ListingPage_Constructor_Parameter1_IsIInfoProvider()
     {
         Assert.That(
-            typeof(RedirectListing).GetConstructors().Single().GetParameters()[3].ParameterType.Name,
+            typeof(RedirectListing).GetConstructors().Single().GetParameters()[1].ParameterType.Name,
             Is.EqualTo("IInfoProvider`1"));
     }
 
@@ -183,21 +165,9 @@ public class RedirectListingTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(fields, Does.Contain("_executor"));
-            Assert.That(fields, Does.Contain("_webPageUrlRetriever"));
             Assert.That(fields, Does.Contain("_channelAccessService"));
             Assert.That(fields, Does.Contain("_redirectInfoProvider"));
         });
-    }
-
-    [Test]
-    public void ListingPage_PrivateField_ExecutorType_IsIContentQueryExecutor()
-    {
-        var field = typeof(RedirectListing)
-            .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
-            .Single(f => f.Name == "_executor");
-
-        Assert.That(field.FieldType.Name, Is.EqualTo("IContentQueryExecutor"));
     }
 
     [Test]
@@ -215,17 +185,13 @@ public class RedirectListingTests
     [Test]
     public void ListingPage_Constructor_StoresInjectedDependencies()
     {
-        var executor = new Mock<IContentQueryExecutor>().Object;
-        var retriever = new Mock<IWebPageUrlRetriever>().Object;
         var channelAccess = new Mock<IChannelAccessService>().Object;
         var provider = new Mock<IInfoProvider<RedirectInfoX>>().Object;
 
-        var listing = new RedirectListing(executor, retriever, channelAccess, provider);
+        var listing = new RedirectListing(channelAccess, provider);
 
         Assert.Multiple(() =>
         {
-            Assert.That(GetField(listing, "_executor"), Is.SameAs(executor));
-            Assert.That(GetField(listing, "_webPageUrlRetriever"), Is.SameAs(retriever));
             Assert.That(GetField(listing, "_channelAccessService"), Is.SameAs(channelAccess));
             Assert.That(GetField(listing, "_redirectInfoProvider"), Is.SameAs(provider));
         });
@@ -314,49 +280,34 @@ public class RedirectListingTests
         Assert.That(redirect.DeleteCalled, Is.True);
     }
 
-    // ── GetWebPageUrl / GetDefaultLanguageName (behavioural) ──────────────────
+    // ── GetWebPageUrl (behavioural) ──────────────────────────────────────────
 
     [Test]
-    public void GetWebPageUrl_WhenGuidIsEmpty_ReturnsPageDeleted()
+    public void GetWebPageUrl_WhenUrlIsEmpty_ReturnsPageDeleted()
     {
-        var listing = MakeListingViaConstructor(
-            new Mock<IContentQueryExecutor>().Object, new Mock<IWebPageUrlRetriever>().Object);
+        var listing = MakeListingViaConstructor();
 
-        Assert.That(InvokeGetWebPageUrl(listing, Guid.Empty), Is.EqualTo("Page deleted"));
+        Assert.That(InvokeGetWebPageUrl(listing, string.Empty), Is.EqualTo("Page deleted"));
     }
 
     [Test]
-    public void GetDefaultLanguageName_ReturnsConfiguredDefaultLanguage()
+    public void GetWebPageUrl_WhenUrlIsProvided_ReturnsUrl()
     {
-        KenticoContainerSetup.Reset();
-        SetupDefaultLanguageScalar("en");
+        var listing = MakeListingViaConstructor();
 
-        var method = typeof(RedirectListing)
-            .GetMethod("GetDefaultLanguageName", BindingFlags.Static | BindingFlags.NonPublic)!;
-
-        Assert.That(method.Invoke(null, null), Is.EqualTo("en"));
+        Assert.That(InvokeGetWebPageUrl(listing, "/some/url"), Is.EqualTo("/some/url"));
     }
 
     // ── helpers ───────────────────────────────────────────────────────────────
 
-    private static RedirectListing MakeListingViaConstructor(IContentQueryExecutor executor, IWebPageUrlRetriever retriever) =>
-        new(executor, retriever, Mock.Of<IChannelAccessService>(), Mock.Of<IInfoProvider<RedirectInfoX>>());
+    private static RedirectListing MakeListingViaConstructor() =>
+        new(Mock.Of<IChannelAccessService>(), Mock.Of<IInfoProvider<RedirectInfoX>>());
 
-    private static string InvokeGetWebPageUrl(RedirectListing listing, Guid guid)
+    private static string InvokeGetWebPageUrl(RedirectListing listing, string url)
     {
         var method = typeof(RedirectListing)
             .GetMethod("GetWebPageUrl", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        return (string)method.Invoke(listing, new object?[] { guid, null })!;
-    }
-
-    private static void SetupDefaultLanguageScalar(string name)
-    {
-        var q = new Mock<ObjectQuery<ContentLanguageInfo>>();
-        KenticoContainerSetup.ContentLanguageProvider.Setup(p => p.Get()).Returns(q.Object);
-        q.Setup(x => x.TopN(It.IsAny<int>())).Returns(q.Object);
-        q.Setup(x => x.Column(It.IsAny<string>())).Returns(q.Object);
-        q.Setup(x => x.WhereTrue(It.IsAny<string>())).Returns(q.Object);
-        q.Setup(x => x.GetScalarResult<string>(It.IsAny<string>())).Returns(name);
+        return (string)method.Invoke(listing, new object?[] { url, null })!;
     }
 
     private static RedirectListing MakeListing(ICollection<int>? accessibleIds, IInfoProvider<RedirectInfoX> provider)
