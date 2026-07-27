@@ -263,6 +263,73 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
                 service.DeleteCareerPageAsync(1, Guid.NewGuid(), "en", false, CancellationToken.None));
         }
 
+        [Test]
+        public async Task DeleteCareerPageAsync_SingleCulture_PageExists_CallsDelete()
+        {
+            SetupValidCulture();
+            _channelInfoServiceMock
+                .Setup(x => x.GetChannelNameAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync("TestChannel");
+
+            var career = new Career { SystemFields = new WebPageFields { WebPageItemID = 42 } };
+            SetupGetCareerPages(new[] { career });
+
+            var service = CreateService();
+
+            await service.DeleteCareerPageAsync(1, Guid.NewGuid(), "en", false, CancellationToken.None);
+
+            _webPageManagerMock.Verify(
+                x => x.Delete(It.IsAny<DeleteWebPageParameters>(), It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
+        [Test]
+        public async Task DeleteCareerPageAsync_AllCultures_DeletesEachExistingVariant()
+        {
+            SetupValidCulture();
+            _channelInfoServiceMock
+                .Setup(x => x.GetChannelNameAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync("TestChannel");
+
+            // Two site cultures -> the loop runs twice.
+            _cultureServiceMock
+                .Setup(x => x.GetSiteCulturesLanguageCodeAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<LanguageTag> { LanguageTag.GB, LanguageTag.GB });
+
+            var career = new Career { SystemFields = new WebPageFields { WebPageItemID = 7 } };
+            SetupGetCareerPages(new[] { career });
+
+            var service = CreateService();
+
+            await service.DeleteCareerPageAsync(1, Guid.NewGuid(), "en", true, CancellationToken.None);
+
+            _webPageManagerMock.Verify(
+                x => x.Delete(It.IsAny<DeleteWebPageParameters>(), It.IsAny<CancellationToken>()),
+                Times.Exactly(2));
+        }
+
+        [Test]
+        public async Task DeleteCareerPageAsync_AllCultures_NoVariantFound_DoesNotDelete()
+        {
+            SetupValidCulture();
+            _channelInfoServiceMock
+                .Setup(x => x.GetChannelNameAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync("TestChannel");
+
+            _cultureServiceMock
+                .Setup(x => x.GetSiteCulturesLanguageCodeAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<LanguageTag> { LanguageTag.GB });
+
+            SetupGetCareerPages(Enumerable.Empty<Career>());   // no page for the culture
+
+            var service = CreateService();
+
+            await service.DeleteCareerPageAsync(1, Guid.NewGuid(), "en", true, CancellationToken.None);
+
+            _webPageManagerMock.Verify(
+                x => x.Delete(It.IsAny<DeleteWebPageParameters>(), It.IsAny<CancellationToken>()),
+                Times.Never);
+        }
         #endregion
 
         #region GetCareerPageAsync
