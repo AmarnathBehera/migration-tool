@@ -34,6 +34,11 @@ public static class ErrorMessage
         return $"Cannot find page with page GUID '{pageGUID}'.";
     }
 
+    public static string PageWithUrlSlugAlreadyExists(string urlSlug, int nodeParentID)
+    {
+        return $"A page with URL slug '{urlSlug}' already exists under parent node ID '{nodeParentID}' for this language.";
+    }
+
     public static string ParentPageTypeDoesNotAllowChildPageType(Type parentPageType, Type childPageType)
     {
         return $"Parent page type '{parentPageType.Name}' does not allow child page type '{childPageType.Name}'.";

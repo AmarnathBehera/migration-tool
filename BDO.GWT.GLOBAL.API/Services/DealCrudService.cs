@@ -491,7 +491,7 @@ public class DealCrudService : IDealCrudService
                 ContentItemID = deal.SystemFields?.ContentItemID ?? 0,
                 WebPageItemID = deal.SystemFields?.WebPageItemID ?? 0,
                 ContentItemGuid = deal.SystemFields?.ContentItemGUID ?? Guid.Empty,
-                WebPageItemGuid = deal.SystemFields?.WebPageItemGUID ?? Guid.Empty,
+                PageGuid = deal.SystemFields?.WebPageItemGUID ?? Guid.Empty,
                 Path = deal.SystemFields?.WebPageUrlPath ?? string.Empty
             },
             Content = new DealPageContent
