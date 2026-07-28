@@ -93,6 +93,7 @@
             serviceCollection.AddScoped<IInsightPageService, InsightPageService>();
             serviceCollection.AddScoped<IInsightCardService, InsightCardService>();
             serviceCollection.AddScoped<IInsightCarouselService, InsightCarouselService>();
+            serviceCollection.AddScoped<IEditorsPickStateStore, EditorsPickStateStore>();
 
             serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
             serviceCollection.AddScoped<IEventWebinarPageService, EventWebinarPageService>();

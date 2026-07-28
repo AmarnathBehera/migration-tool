@@ -55,5 +55,6 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IInsightCrudService, InsightCrudService>();
         serviceCollection.AddScoped<ISectionEventsCrudService, SectionEventsCrudService>();
         serviceCollection.AddScoped<ILocationOfficeCrudService, LocationOfficeCrudService>();
+        serviceCollection.AddScoped<IGlobalSettingCrudService, GlobalSettingCrudService>();
     }
 }
