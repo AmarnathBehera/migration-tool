@@ -55,7 +55,7 @@ public class PeopleControllerTests
         var pageGuid = Guid.NewGuid();
         var expected = new PageOutput<PersonPageContent>
         {
-            General = new PageGeneralOutput { WebPageItemGuid = pageGuid },
+            General = new PageGeneralOutput { PageGuid = pageGuid },
             Content = new PersonPageContent { MetadataTitle = "Person" },
         };
 
@@ -82,7 +82,7 @@ public class PeopleControllerTests
         var request = new PersonPageContent { MetadataTitle = "New person" };
         var expected = new PageOutput<PersonPageContent>
         {
-            General = new PageGeneralOutput { WebPageItemGuid = Guid.NewGuid() },
+            General = new PageGeneralOutput { PageGuid = Guid.NewGuid() },
             Content = request,
         };
 
@@ -114,7 +114,7 @@ public class PeopleControllerTests
         var request = new PersonPageContent { MetadataTitle = "Person FR" };
         var expected = new PageOutput<PersonPageContent>
         {
-            General = new PageGeneralOutput { WebPageItemGuid = pageGuid },
+            General = new PageGeneralOutput { PageGuid = pageGuid },
             Content = request,
         };
 
@@ -146,7 +146,7 @@ public class PeopleControllerTests
         var request = new PersonPageContent { MetadataTitle = "Updated person" };
         var expected = new PageOutput<PersonPageContent>
         {
-            General = new PageGeneralOutput { WebPageItemGuid = pageGuid },
+            General = new PageGeneralOutput { PageGuid = pageGuid },
             Content = request,
         };
 
@@ -299,7 +299,7 @@ public class PeopleControllerTests
         var pageGuid = Guid.NewGuid();
         var expected = new PageOutput<PersonPageContent>
         {
-            General = new PageGeneralOutput { WebPageItemGuid = pageGuid },
+            General = new PageGeneralOutput { PageGuid = pageGuid },
             Content = new PersonPageContent { MetadataTitle = "Person" },
         };
         var serviceResult = new ActionResult<PageOutput<PersonPageContent>>(expected);
@@ -341,7 +341,7 @@ public class PeopleControllerTests
         var request = new PersonPageContent { MetadataTitle = "New person" };
         var expected = new PageOutput<PersonPageContent>
         {
-            General = new PageGeneralOutput { WebPageItemGuid = Guid.NewGuid() },
+            General = new PageGeneralOutput { PageGuid = Guid.NewGuid() },
             Content = request,
         };
         var serviceResult = new ActionResult<PageOutput<PersonPageContent>>(expected);
@@ -385,7 +385,7 @@ public class PeopleControllerTests
         var request = new PersonPageContent { MetadataTitle = "Person FR" };
         var expected = new PageOutput<PersonPageContent>
         {
-            General = new PageGeneralOutput { WebPageItemGuid = pageGuid },
+            General = new PageGeneralOutput { PageGuid = pageGuid },
             Content = request,
         };
         var serviceResult = new ActionResult<PageOutput<PersonPageContent>>(expected);
@@ -429,7 +429,7 @@ public class PeopleControllerTests
         var request = new PersonPageContent { MetadataTitle = "Updated person" };
         var expected = new PageOutput<PersonPageContent>
         {
-            General = new PageGeneralOutput { WebPageItemGuid = pageGuid },
+            General = new PageGeneralOutput { PageGuid = pageGuid },
             Content = request,
         };
         var serviceResult = new ActionResult<PageOutput<PersonPageContent>>(expected);
