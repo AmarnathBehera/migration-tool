@@ -10,6 +10,9 @@ using Kentico.Xperience.Admin.Base.FormAnnotations;
 using Kentico.Xperience.Admin.Base.Forms;
 using Kentico.Xperience.Admin.Websites.FormAnnotations;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BDO.GWT.Web.Components.Widget.TabAccordionWidget;
 
@@ -26,7 +29,7 @@ public class HeroWidgetProperties : BaseWidgetProperties
 
     [ContentItemSelectorComponent(contentTypeName: ContentAttachment.CONTENT_TYPE_NAME, Label = "Background image", ExplanationText = "Recommended size: 1440x400", Order = 3)]
     [VisibleIfNotEqualTo(nameof(Layout), HeroLayout.Banner)]
-    public ContentItemReference BackgroundImage { get; set; } 
+    public IEnumerable<ContentItemReference> BackgroundImage { get; set; } = Enumerable.Empty<ContentItemReference>();
 
     [TextInputComponent( Label = "Background image alt text", Order = 4)]
     [VisibleIfNotEqualTo(nameof(Layout),HeroLayout.Banner)]
@@ -34,7 +37,7 @@ public class HeroWidgetProperties : BaseWidgetProperties
 
     [ContentItemSelectorComponent(contentTypeName: ContentAttachment.CONTENT_TYPE_NAME, Label = "Mobile background image", ExplanationText = "Recommended size: 720x1280", Order = 5)]
     [VisibleIfNotEqualTo(nameof(Layout), HeroLayout.Banner)]
-    public ContentItemReference MobileBackgroundImage { get; set; }
+    public IEnumerable<ContentItemReference> MobileBackgroundImage { get; set; } = Enumerable.Empty<ContentItemReference>();
 
     [TextInputComponent( Label = "Background image alt text", Order = 6)]
     [VisibleIfNotEqualTo(nameof(Layout), HeroLayout.Banner)]

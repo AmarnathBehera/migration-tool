@@ -30,10 +30,11 @@ public class HeroWidget : ViewComponent
 
         // Resolve background image URL
         Link backgroundImageUrl = null;
-        if (model.Properties?.BackgroundImage != null)
+        if (model.Properties?.BackgroundImage.Any() == true)
         {
+
             var attachment = await _contentService.GetItemAsync<ContentAttachment>(
-                model.Properties.BackgroundImage.Identifier,
+                model.Properties.BackgroundImage.FirstOrDefault().Identifier,
                 cancellationToken);
 
             backgroundImageUrl = attachment?.ContentAttachmentAsset?.Url is string url
@@ -43,10 +44,10 @@ public class HeroWidget : ViewComponent
 
         // Resolve mobile background image URL
         Link mobileBackgroundImageUrl = null;
-        if (model.Properties?.MobileBackgroundImage != null)
+        if (model.Properties?.MobileBackgroundImage.Any() == true)
         {
             var mobileAttachment = await _contentService.GetItemAsync<ContentAttachment>(
-                model.Properties.MobileBackgroundImage.Identifier,
+                model.Properties.MobileBackgroundImage.FirstOrDefault().Identifier,
                 cancellationToken);
 
             mobileBackgroundImageUrl = mobileAttachment?.ContentAttachmentAsset?.Url is string mobileUrl
