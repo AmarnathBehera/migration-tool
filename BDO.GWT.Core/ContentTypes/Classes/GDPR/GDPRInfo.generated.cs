@@ -1,7 +1,5 @@
 using System;
 using System.Data;
-using System.Collections.Generic;
-using System.Linq;
 
 using CMS;
 using CMS.DataEngine;
@@ -30,10 +28,6 @@ namespace BDO
         public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(IInfoProvider<GDPRInfo>), OBJECT_TYPE, "BDO.GDPR", "GDPRID", null, null, null, null, null, null, null)
         {
             TouchCacheDependencies = true,
-            DependsOn = new List<ObjectDependency>()
-            {
-                new ObjectDependency("GDPRWebChannelSettingID", "bdo.webchannelsettings", ObjectDependencyEnum.Required),
-            },
         };
 
 
@@ -52,9 +46,9 @@ namespace BDO
         /// GDPR web channel setting ID.
         /// </summary>
         [DatabaseField]
-        public virtual int GDPRWebChannelSettingID
+        public virtual string GDPRWebChannelSettingID
         {
-            get => ValidationHelper.GetInteger(GetValue(nameof(GDPRWebChannelSettingID)), 0);
+            get => ValidationHelper.GetString(GetValue(nameof(GDPRWebChannelSettingID)), String.Empty);
             set => SetValue(nameof(GDPRWebChannelSettingID), value);
         }
 

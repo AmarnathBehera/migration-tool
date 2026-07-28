@@ -3,9 +3,9 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
-using CMS.ContactManagement;
 using CMS.DataEngine;
 using CMS.Helpers;
+using CMS.Membership;
 
 namespace BDO.GWT.GLOBAL.Services;
 
@@ -18,41 +18,40 @@ public interface IGDPRContactLookupService
 
 public sealed class GDPRContactService : IGDPRContactLookupService
 {
-    private readonly IInfoProvider<ContactInfo> contactInfoProvider;
+    private readonly IInfoProvider<UserInfo> UserInfoProvider;
 
-    public GDPRContactService(IInfoProvider<ContactInfo> contactInfoProvider)
+    public GDPRContactService(IInfoProvider<UserInfo> UserInfoProvider)
     {
-        this.contactInfoProvider = contactInfoProvider;
+        this.UserInfoProvider = UserInfoProvider;
     }
 
     public string GetContactAsText(string email)
     {
-        ContactInfo contact = GetContactByEmail(email);
-        if (contact is null)
+        UserInfo user = GetUserByEmail(email);
+        if (user is null)
         {
             return $"No OM Contact found for email: {email}";
         }
 
-        int contactId = ValidationHelper.GetInteger(contact.GetValue("ContactID"), 0);
-        string contactLastName = ValidationHelper.GetString(contact.GetValue("ContactLastName"), string.Empty);
-        string contactEmail = ValidationHelper.GetString(contact.GetValue("ContactEmail"), string.Empty);
-        int contactGender = ValidationHelper.GetInteger(contact.GetValue("ContactGender"), 0);
-        int contactMonitored = ValidationHelper.GetBoolean(contact.GetValue("ContactMonitored"), false) ? 1 : 0;
-        Guid contactGuid = ValidationHelper.GetGuid(contact.GetValue("ContactGUID"), Guid.Empty);
-        DateTime contactLastModified = ValidationHelper.GetDateTime(contact.GetValue("ContactLastModified"), DateTime.MinValue);
-        DateTime contactCreated = ValidationHelper.GetDateTime(contact.GetValue("ContactCreated"), DateTime.MinValue);
+        int userId = ValidationHelper.GetInteger(user.GetValue("UserID"), 0);
+        string userLastName = ValidationHelper.GetString(user.GetValue("LastName"), string.Empty);
+        string userEmail = ValidationHelper.GetString(user.GetValue("UserName"), string.Empty);
+        int userEnabled = ValidationHelper.GetBoolean(user.GetValue("UserEnabled"), false) ? 1 : 0;
+        Guid userGuid = ValidationHelper.GetGuid(user.GetValue("UserGUID"), Guid.Empty);
+        DateTime userLastModified = ValidationHelper.GetDateTime(user.GetValue("UserLastModified"), DateTime.MinValue);
+        DateTime userCreated = ValidationHelper.GetDateTime(user.GetValue("UserCreated"), DateTime.MinValue);
 
         var builder = new StringBuilder();
         builder.AppendLine("Site Activity:");
         builder.AppendLine("\tOM Contact");
-        builder.AppendLine($"\t\tContact ID:\t{contactId}");
-        builder.AppendLine($"\t\tContact Last Name:\t{contactLastName}");
-        builder.AppendLine($"\t\tContact Email:\t{contactEmail}");
-        builder.AppendLine($"\t\tContact Gender:\t{contactGender}");
-        builder.AppendLine($"\t\tContact Monitored:\t{contactMonitored}");
-        builder.AppendLine($"\t\tContact GUID:\t{contactGuid.ToString().ToUpperInvariant()}");
-        builder.AppendLine($"\t\tContact Last Modified:\t{FormatDate(contactLastModified)}");
-        builder.AppendLine($"\t\tContact Created:\t{FormatDate(contactCreated)}");
+        builder.AppendLine($"\t\tContact ID:\t{userId}");
+        builder.AppendLine($"\t\tContact Last Name:\t{userLastName}");
+        builder.AppendLine($"\t\tContact Email:\t{userEmail}");
+        builder.AppendLine($"\t\tContact Gender:\t{0}");
+        builder.AppendLine($"\t\tContact Monitored:\t{userEnabled}");
+        builder.AppendLine($"\t\tContact GUID:\t{userGuid.ToString().ToUpperInvariant()}");
+        builder.AppendLine($"\t\tContact Last Modified:\t{FormatDate(userLastModified)}");
+        builder.AppendLine($"\t\tContact Created:\t{FormatDate(userCreated)}");
         builder.AppendLine("\t\tOM Activity:");
 
         return builder.ToString().TrimEnd();
@@ -60,33 +59,32 @@ public sealed class GDPRContactService : IGDPRContactLookupService
 
     public string GetContactAsXml(string email)
     {
-        ContactInfo contact = GetContactByEmail(email);
-        if (contact is null)
+        UserInfo user = GetUserByEmail(email);
+        if (user is null)
         {
             return "<XML>\n  <OM_Contact />\n</XML>";
         }
 
-        int contactId = ValidationHelper.GetInteger(contact.GetValue("ContactID"), 0);
-        string contactLastName = ValidationHelper.GetString(contact.GetValue("ContactLastName"), string.Empty);
-        string contactEmail = ValidationHelper.GetString(contact.GetValue("ContactEmail"), string.Empty);
-        int contactGender = ValidationHelper.GetInteger(contact.GetValue("ContactGender"), 0);
-        int contactMonitored = ValidationHelper.GetBoolean(contact.GetValue("ContactMonitored"), false) ? 1 : 0;
-        string contactGuid = ValidationHelper.GetGuid(contact.GetValue("ContactGUID"), Guid.Empty).ToString().ToUpperInvariant();
-        DateTime contactLastModified = ValidationHelper.GetDateTime(contact.GetValue("ContactLastModified"), DateTime.MinValue);
-        DateTime contactCreated = ValidationHelper.GetDateTime(contact.GetValue("ContactCreated"), DateTime.MinValue);
+        int userId = ValidationHelper.GetInteger(user.GetValue("UserID"), 0);
+        string userLastName = ValidationHelper.GetString(user.GetValue("LastName"), string.Empty);
+        string userEmail = ValidationHelper.GetString(user.GetValue("UserName"), string.Empty);
+        int userEnabled = ValidationHelper.GetBoolean(user.GetValue("UserEnabled"), false) ? 1 : 0;
+        string userGuid = ValidationHelper.GetGuid(user.GetValue("UserGUID"), Guid.Empty).ToString().ToUpperInvariant();
+        DateTime userLastModified = ValidationHelper.GetDateTime(user.GetValue("UserModifiedWhen"), DateTime.MinValue);
+        DateTime userCreated = ValidationHelper.GetDateTime(user.GetValue("UserCreated"), DateTime.MinValue);
 
         XElement xml = new(
             "XML",
             new XElement(
                 "OM_Contact",
-                new XElement("ContactID", contactId),
-                new XElement("ContactLastName", contactLastName),
-                new XElement("ContactEmail", contactEmail),
-                new XElement("ContactGender", contactGender),
-                new XElement("ContactMonitored", contactMonitored),
-                new XElement("ContactGUID", contactGuid),
-                new XElement("ContactLastModified", FormatDate(contactLastModified)),
-                new XElement("ContactCreated", FormatDate(contactCreated)),
+                new XElement("ContactID", userId),
+                new XElement("ContactLastName", userLastName),
+                new XElement("ContactEmail", userEmail),
+                new XElement("ContactGender", 0),
+                new XElement("ContactMonitored", userEnabled),
+                new XElement("ContactGUID", userGuid),
+                new XElement("ContactLastModified", FormatDate(userLastModified)),
+                new XElement("ContactCreated", FormatDate(userCreated)),
                 new XElement("OM_Activity")
             )
         );
@@ -101,22 +99,22 @@ public sealed class GDPRContactService : IGDPRContactLookupService
             return false;
         }
 
-        ContactInfo contact = GetContactByEmail(email.Trim());
-        if (contact is null)
+        UserInfo user = GetUserByEmail(email.Trim());
+        if (user is null)
         {
             return false;
         }
 
-        contactInfoProvider.Delete(contact);
+        UserInfoProvider.Delete(user);
         return true;
     }
 
-    private ContactInfo GetContactByEmail(string email)
+    private UserInfo GetUserByEmail(string email)
     {
-        return contactInfoProvider
+        return UserInfoProvider
             .Get()
-            .WhereEquals("ContactEmail", email)
-            .OrderByDescending("ContactLastModified")
+            .WhereEquals("UserName", email)
+            .OrderByDescending("UserLastModified")
             .FirstOrDefault();
     }
 

@@ -34,7 +34,7 @@ public class GDPRConsentEditPage : InfoEditPage<GDPRInfo>
 
             var newGDPRInfo = new GDPRInfo
             {
-                GDPRWebChannelSettingID = WebChannelSettingsId,
+                GDPRWebChannelSettingID = WebChannelSettingsId.ToString(),
                 Consent = ""
             };
             GDPRInfoProvider.Set(newGDPRInfo);

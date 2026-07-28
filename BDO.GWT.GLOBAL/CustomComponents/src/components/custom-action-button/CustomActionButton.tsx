@@ -17,7 +17,7 @@ export const CustomActionButton = ({
     const [isDeleting, setIsDeleting] = React.useState(false);
 
     const initialCommand: GdprCommand = commandName ?? commandType ?? 'FetchTextData';
-    const [selectedCommand, setSelectedCommand] = React.useState<GdprCommand>(initialCommand);
+    const [selectedCommand, setSelectedCommand] = React.useState(initialCommand);
 
     const commandUi: Record<GdprCommand, { label: string; title: string; className: string; loadingText: string }> = {
         FetchTextData: {
@@ -41,16 +41,16 @@ export const CustomActionButton = ({
     };
 
     const readEmailAddress = (): string => {
-        const directMatch = document.querySelector<HTMLInputElement>(
+        const directMatch = document.querySelector(
             'input[name$="EmailAddress"], input[id*="EmailAddress"], input[aria-label="Email Address"]'
-        );
+        ) as HTMLInputElement | null;
 
         if (directMatch?.value?.trim()) {
             return directMatch.value.trim();
         }
 
         const labels = Array.from(document.querySelectorAll('label'));
-        const emailLabel = labels.find(labelElement =>
+        const emailLabel = labels.find(labelElement =>  
             (labelElement.textContent || '').trim().toLowerCase().startsWith('email address')
         );
 
@@ -81,6 +81,20 @@ export const CustomActionButton = ({
         return `/admin-api/custom-action/${routeMap[command]}?email=${encodeURIComponent(email)}`;
     };
 
+    const writeResultToTextarea = (result: string): void => {
+        const textarea = document.querySelector(
+            'textarea[name$="Results"], textarea[id*="Results"], textarea[aria-label="Results"]'
+        ) as HTMLTextAreaElement | null;
+
+        if (!textarea) {
+            return;
+        }
+
+        textarea.value = result;
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        textarea.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+
     const runCommand = async (command: GdprCommand) => {
         const email = readEmailAddress();
         if (!email) {
@@ -105,12 +119,15 @@ export const CustomActionButton = ({
             const payload = await response.json() as { result?: string };
 
             if (!response.ok) {
+                writeResultToTextarea(payload.result || 'Action failed.');
                 alert(payload.result || 'Action failed.');
                 return;
             }
 
+            writeResultToTextarea(payload.result || 'Action completed.');
             alert(payload.result || 'Action completed.');
         } catch {
+            writeResultToTextarea(isDeleteCommand ? 'Delete action failed.' : 'Custom action failed.');
             alert(isDeleteCommand ? 'Delete action failed.' : 'Custom action failed.');
         } finally {
             if (isDeleteCommand) {

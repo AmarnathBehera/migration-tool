@@ -3,18 +3,14 @@
   <ClassDisplayName>GDPR</ClassDisplayName>
   <ClassFormDefinition>
     <form>
-      <field column="GDPRID" columntype="integer" enabled="true" guid="4543e4cb-4493-400b-8575-a2047ac95725" isPK="true" />
-      <field column="GDPRWebChannelSettingID" columnprecision="0" columntype="integer" enabled="true" guid="c5f292b5-544c-46d1-80f6-da1d17734d25" refobjtype="bdo.webchannelsettings" reftype="Required">
-        <properties>
-          <defaultvalue>0</defaultvalue>
-        </properties>
-      </field>
-      <field allowempty="true" column="EmailAddress" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="d5228965-2cfa-47a0-ae30-a5cc7baa75a0" />
-      <field allowempty="true" column="Results" columnprecision="0" columntype="longtext" enabled="true" guid="a53b08bf-4368-4243-a00c-85532c97c0df" />
-      <field allowempty="true" column="Consent" columnprecision="0" columntype="richtexthtml" enabled="true" guid="1d5a49c8-d900-46d1-81c3-a79798c2f445" />
+      <field column="GDPRID" columntype="integer" enabled="true" guid="fe505917-4331-4a13-b5ae-a7a57b5e001e" isPK="true" />
+      <field column="GDPRWebChannelSettingID" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7fd735ce-c213-4876-8d6d-f1eaf3a6b2ae" />
+      <field allowempty="true" column="EmailAddress" columnprecision="0" columnsize="1000" columntype="text" enabled="true" guid="2def7a23-1dfd-4e98-85a3-2f2e81d28b74" />
+      <field allowempty="true" column="Results" columnprecision="0" columntype="longtext" enabled="true" guid="4b7b3a83-cea5-455d-bb23-c1ac31e01131" />
+      <field allowempty="true" column="Consent" columnprecision="0" columntype="richtexthtml" enabled="true" guid="ddaf3f44-5542-4dd5-8536-09662daf2e91" />
     </form>
   </ClassFormDefinition>
-  <ClassGUID>8012b321-b912-48c2-87ca-cacbb74c592b</ClassGUID>
+  <ClassGUID>dca57e58-66cb-4400-9f4f-10a2bf2650b6</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
   <ClassName>BDO.GDPR</ClassName>
   <ClassResourceID>
