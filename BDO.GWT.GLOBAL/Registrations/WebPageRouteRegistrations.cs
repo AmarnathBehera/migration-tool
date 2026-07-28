@@ -360,6 +360,15 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     ContentTypeNames = new[] { "BDO.InsightCategory" },
     IconClass = "xp-market")]
 
+[assembly: RegisterWebPageRoute(Subscribe.CONTENT_TYPE_NAME, typeof(SubscribeController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: Subscribe.CONTENT_TYPE_NAME,
+    name: "Home Page Content Type Template",
+    customViewName: "~/Views/Subscribe/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.Subscribe" },
+    IconClass = "xp-market")]
+
 [assembly: RegisterWebPageRoute(SectionRss.CONTENT_TYPE_NAME, typeof(SectionRssController))]
 [assembly: RegisterWebPageRoute(Sitemap.CONTENT_TYPE_NAME, typeof(SitemapPageController))]
 [assembly: RegisterWebPageRoute(Rss.CONTENT_TYPE_NAME, typeof(RssController))]

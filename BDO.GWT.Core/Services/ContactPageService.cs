@@ -1,9 +1,7 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
-using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
 using BDO.GWT.Core.ValueObjects;
-using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 
 namespace BDO.GWT.Web.Core.Services;
