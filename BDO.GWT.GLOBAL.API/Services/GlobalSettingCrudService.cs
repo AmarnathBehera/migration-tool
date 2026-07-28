@@ -2,10 +2,6 @@
 using BDO.GWT.GLOBAL.API.Queries;
 using CMS.Base;
 using CMS.DataEngine;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BDO.GWT.GLOBAL.API.Services;
 
