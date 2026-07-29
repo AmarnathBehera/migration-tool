@@ -8,7 +8,7 @@ namespace BDO.GWT.GLOBAL.API.Services;
 public interface IGlobalSettingCrudService
 {
     Task<GlobalSettingOutput[]> GetGlobalSettings(SettingsQuery settingsQuery, CancellationToken cancellationToken);
-    Task<GlobalSettingOutput> GetGlobalSetting(string settingCodeName, CancellationToken cancellationToken);
+    Task<GlobalSettingOutput?> GetGlobalSetting(string settingCodeName, CancellationToken cancellationToken);
 }
 
 public class GlobalSettingCrudService : IGlobalSettingCrudService
@@ -67,7 +67,7 @@ public class GlobalSettingCrudService : IGlobalSettingCrudService
 
         return outputs;
     }
-    public async Task<GlobalSettingOutput> GetGlobalSetting(string settingCodeName, CancellationToken cancellationToken)
+    public async Task<GlobalSettingOutput?> GetGlobalSetting(string settingCodeName, CancellationToken cancellationToken)
     {
         if (settingCodeName == "BDO.Globalsettingskey")
         {
@@ -85,7 +85,7 @@ public class GlobalSettingCrudService : IGlobalSettingCrudService
             return globalEventsnWebinars.Select(ToGlobalSettingOutput).FirstOrDefault();
         }
 
-        return null; // or throw, depending on how you want "unknown code name" handled
+        return null;
     }
 
     private static GlobalSettingOutput ToGlobalSettingOutput(GlobalsettingskeyInfo setting)
