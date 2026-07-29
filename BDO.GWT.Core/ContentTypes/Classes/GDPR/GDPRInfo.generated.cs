@@ -54,28 +54,6 @@ namespace BDO
 
 
         /// <summary>
-        /// Email address.
-        /// </summary>
-        [DatabaseField]
-        public virtual string EmailAddress
-        {
-            get => ValidationHelper.GetString(GetValue(nameof(EmailAddress)), String.Empty);
-            set => SetValue(nameof(EmailAddress), value, String.Empty);
-        }
-
-
-        /// <summary>
-        /// Results.
-        /// </summary>
-        [DatabaseField]
-        public virtual string Results
-        {
-            get => ValidationHelper.GetString(GetValue(nameof(Results)), String.Empty);
-            set => SetValue(nameof(Results), value, String.Empty);
-        }
-
-
-        /// <summary>
         /// Consent.
         /// </summary>
         [DatabaseField]
