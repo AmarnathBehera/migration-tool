@@ -138,6 +138,11 @@ public class HeaderService : IHeaderService
             cancellationToken
         ))?.ToList() ?? new List<Navigation>();
 
+        if (pages.Count == 0)
+        {
+            return (Enumerable.Empty<LinkItemDto>(), null);
+        }
+
         var allGuids = pages
             .Where(p => p.TopMenu != null)
             .SelectMany(p => p.TopMenu?.Select(i => i.WebPageGuid) ?? Enumerable.Empty<Guid>())
@@ -145,6 +150,11 @@ public class HeaderService : IHeaderService
             .ToList();
 
         var selectedPages = allGuids.Any() ? await _contentService.GetItemsByGUIDAsync(allGuids) : Enumerable.Empty<IWebPageFieldsSource>();
+
+        if(selectedPages == null || !selectedPages.Any())
+        {
+            return (Enumerable.Empty<LinkItemDto>(), null);
+        }
 
         var topMenuItems = selectedPages
             .Select(item => new LinkItemDto
@@ -175,6 +185,11 @@ public class HeaderService : IHeaderService
                               ?? new List<NavigationFirstLevelItem>();
 
         var megaMenu = new List<FirstLevelMenuItemDto>();
+
+        if(firstLevelItems == null || firstLevelItems.Count == 0)
+        {
+            return megaMenu;
+        }
 
         foreach (var first in firstLevelItems.Where(f => f != null))
         {
@@ -209,6 +224,11 @@ public class HeaderService : IHeaderService
 
         var secondLevelDtos = new List<SecondLevelMenuItemDto>();
 
+        if(secondLevelItems == null || secondLevelItems.Count == 0)
+        {
+            return secondLevelDtos;
+        }
+
         foreach (var second in secondLevelItems.Where(s => s != null))
         {
             var secondUrls = second.TargetURL?.Select(u => u?.WebPageGuid ?? Guid.Empty).Where(g => g != Guid.Empty).ToList()
@@ -237,6 +257,11 @@ public class HeaderService : IHeaderService
 
         var thirdLevelDtos = new List<ThirdLevelMenuItemDto>();
 
+        if(thirdLevelItems == null || thirdLevelItems.Count == 0)
+        {
+            return thirdLevelDtos;
+        }
+
         foreach (var third in thirdLevelItems.Where(t => t != null))
         {
             var thirdUrls = third.TargetURL?.Select(u => u?.WebPageGuid ?? Guid.Empty).Where(g => g != Guid.Empty).ToList()
@@ -259,6 +284,11 @@ public class HeaderService : IHeaderService
     {
         var featuredItems = (await _contentService.GetChildPagesByParentGuidAsync<NavigationFeaturedItem>(parentId))?.ToList()
                             ?? new List<NavigationFeaturedItem>();
+
+        if(featuredItems == null || featuredItems.Count == 0)
+        {
+            return new List<FeaturedMenuItemDto>();
+        }
 
         var featuredDtos = new List<FeaturedMenuItemDto>();
 
