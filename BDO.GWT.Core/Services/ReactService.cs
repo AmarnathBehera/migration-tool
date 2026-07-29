@@ -9,6 +9,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.DTOs;
+using Microsoft.Extensions.Logging;
 
 namespace BDO.GWT.Core.Services;
 
@@ -28,13 +29,15 @@ public class ReactService : IReactService
     private readonly IOptions<ReactOptions> _reactOptions;
     //private readonly IPageContext _pageContext;
     private readonly IReactCachingService _reactCachingService;
+    private readonly ILogger<ReactService> _logger;
 
-    public ReactService(IHttpClientFactory httpClientFactory, IOptions<ReactOptions> reactOptions, IReactCachingService reactCachingService)
+    public ReactService(IHttpClientFactory httpClientFactory, IOptions<ReactOptions> reactOptions, IReactCachingService reactCachingService, ILogger<ReactService> logger)
     {
         _httpClient = httpClientFactory.CreateClient(HttpClientName.React);
         _reactOptions = reactOptions;
         //_pageContext = pageContext;
         _reactCachingService = reactCachingService;
+        _logger = logger;
     }
 
     public async Task<IHtmlContent> RenderComponentAsync<TProps>(int pageId, string componentType, string persistentUniqueIdentifier, TProps props, CancellationToken cancellationToken)
@@ -77,6 +80,22 @@ public class ReactService : IReactService
         var response = await _httpClient.PostAsJsonAsync(url, dto, cancellationToken);
 
         await HttpResponseUtility.EnsureResponseIsSuccessfulAsync(response, cancellationToken);
+        var content = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            _logger.LogError(
+            "React renderer returned an empty response. Component: {ComponentType}, Url: {Url}, StatusCode: {StatusCode}, PropsType: {PropsType}",
+            componentType,
+            url,
+            response.StatusCode,
+            typeof(TProps).FullName);
+            return new ReactResponseBodyDto
+            {
+                ContainerId = string.Empty,
+                HtmlContent = string.Empty
+            };
+        }
 
         var body = await response.Content.ReadFromJsonAsync<ReactResponseBodyDto>(cancellationToken);
 

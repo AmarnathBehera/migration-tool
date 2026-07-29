@@ -22,7 +22,7 @@ stages:
     jobs:
       - job: Build
         condition: true
-        displayName: "Build and Test XbyK CMS App"
+        displayName: "Build and Test XbyK solution"
         pool:
           vmImage: "ubuntu-latest"
         steps:
@@ -34,20 +34,20 @@ stages:
               installationPath: $(Agent.ToolsDirectory)/dotnet
 
           - task: DotNetCoreCLI@2
-            displayName: Restore CMS Web App
+            displayName: Restore XbyK solution
             inputs:
               command: "restore"
               restoreSolution: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
               feedsToUse: "select"
 
           - task: DotNetCoreCLI@2
-            displayName: Build CMS Web App
+            displayName: Build XbyK solution
             inputs:
               command: "build"
               projects: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
 
           - task: DotNetCoreCLI@2
-            displayName: "Test CMS Web App with Code Coverage"
+            displayName: "Test XbyK solution with Code Coverage"
             inputs:
               command: "test"
               projects: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"

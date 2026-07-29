@@ -140,6 +140,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IGDPRUserLookupService, GDPRUserService>();
 
         serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
+        serviceCollection.AddSingleton<IEditorsPickStateStore, EditorsPickStateStore>();
     }
 
 }

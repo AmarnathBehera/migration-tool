@@ -30,6 +30,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BDO.GWT.GLOBAL\GWTXbyKWeb.csproj" />
 	  <ProjectReference Include="..\BDO.GWT.Core\BDO.GWT.Core.csproj" />
+	  <ProjectReference Include="..\xperience-community-redirects-main\src\XperienceCommunity.Redirects.csproj" />
 
   </ItemGroup>
 

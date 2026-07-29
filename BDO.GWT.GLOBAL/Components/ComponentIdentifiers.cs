@@ -13,6 +13,7 @@
             public const string ExternalNavigation = WidgetPrefix + "ExternalNavigation";
 
             public const string Imagewithtext = WidgetPrefix + "ImageWithText";
+
             public const string InsightCarousel = WidgetPrefix + "InsightCarousel";
 
             public const string QuoteCard = WidgetPrefix + "QuoteCard";
@@ -52,6 +53,10 @@
             public const string EditorsPick = WidgetPrefix + "EditorsPick";
 
             public const string InFocus = WidgetPrefix + "InFocus";
+
+            public const string InsightAnimationCard = WidgetPrefix + "AnimatedTileCarouselWidget";
+
+            public const string Hero = WidgetPrefix + "Hero";
 
         }
 

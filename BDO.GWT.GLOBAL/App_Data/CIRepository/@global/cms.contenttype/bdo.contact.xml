@@ -113,6 +113,7 @@ embedCode;Embed Code
   </ClassFormDefinition>
   <ClassGUID>74635906-cb04-4ffd-9936-9dcde92c7f58</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-mobile</ClassIconClass>
   <ClassName>BDO.Contact</ClassName>
   <ClassShortName>BDOContact</ClassShortName>
   <ClassTableName>BDO_Contact</ClassTableName>

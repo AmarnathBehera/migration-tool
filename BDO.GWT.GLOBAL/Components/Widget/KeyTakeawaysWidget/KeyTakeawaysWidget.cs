@@ -1,4 +1,5 @@
-﻿using Kentico.PageBuilder.Web.Mvc;
+﻿using BDO.GWT.Core.DTOs;
+using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 

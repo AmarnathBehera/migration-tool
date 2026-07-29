@@ -3,6 +3,7 @@ import type { CustomDropdownProps } from '@model/customDropdown';
 
 export const BDOSQLDropdown = (props: CustomDropdownProps) => {
     const displayLabel = props.fieldLabel || props.label;
+    const isReadOnly = props.disabled === true;
 
     return (
         <div className="mb-6 font-display">
@@ -12,10 +13,12 @@ export const BDOSQLDropdown = (props: CustomDropdownProps) => {
                     {displayLabel}
                 </label>
             )}
+
             <select
                 value={props.value ?? ''}
-                onChange={e => props.onChange && props.onChange(e.target.value)}
-                className={`w-full py-2.5 pl-4 pr-9 rounded-full text-sm leading-snug bg-white cursor-pointer outline-none appearance-none border box-border transition-colors duration-200 text-[#151515] select-chevron ${props.invalid ? 'border-error' : 'border-[#8C8C8C] hover:border-black'}`}
+                onChange={e => !isReadOnly && props.onChange && props.onChange(e.target.value)}
+                disabled={isReadOnly}
+                className={`w-full py-2.5 pl-4 pr-9 rounded-full text-sm leading-snug outline-none appearance-none border box-border transition-colors duration-200 text-label select-chevron ${isReadOnly ? 'bg-[#F5F5F5] border-[#D0D0D0] cursor-default' : `bg-white cursor-pointer ${props.invalid ? 'border-error' : 'border-[#8C8C8C] hover:border-black'}`}`}
             >
                 <option value="">{props.defaultValue ?? 'Choose an option'}</option>
                 {props.options?.map((item, index) => (
