@@ -262,13 +262,18 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
         return await BuildFormCommandResponse(true, "Data fetched successfully.", results);
     }
 
-    // "Copy" button: returns the stored results so the client can copy them to the clipboard.
+    // "Copy" button: returns the stored results as a success message.
     [PageCommand]
-    public async Task<ICommandResponse<GdprResultsResult>> Copy(string parameter)
+    public async Task<ICommandResponse> Copy(string parameter)
     {
         var results = await ResolveResultsAsync(parameter);
 
-        return ResponseFrom(new GdprResultsResult { Results = results });
+        if (string.IsNullOrWhiteSpace(results))
+        {
+            return await BuildFormCommandResponse(false, "No results available to copy.");
+        }
+
+        return await BuildFormCommandResponse(true, results);
     }
 
     // "Delete" button: clears the stored results.
@@ -296,7 +301,3 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
     }
 }
 
-public class GdprResultsResult
-{
-    public string Results { get; set; } = string.Empty;
-}
