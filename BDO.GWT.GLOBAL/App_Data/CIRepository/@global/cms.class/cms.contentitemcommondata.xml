@@ -1307,7 +1307,7 @@ MicrositePage;Microsite Page
           <controlname>Kentico.Administration.DateTimeInput</controlname>
         </settings>
       </field>
-      <schema guid="8412bdf1-4ba5-4fc9-8d9b-7cf930b5c243" name="BDO.LocationandUserInformation">
+		<schema guid="8412bdf1-4ba5-4fc9-8d9b-7cf930b5c243" name="BDO.Locationandcontactinformation">
         <properties>
           <fieldcaption>Location and contact information</fieldcaption>
         </properties>

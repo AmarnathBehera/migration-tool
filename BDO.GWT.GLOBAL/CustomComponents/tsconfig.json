@@ -4,7 +4,6 @@
     "module": "ESNext",
     "moduleResolution": "node",
     "jsx": "react",
-    "types": [],
     "strict": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -17,6 +16,6 @@
       "@styles/*": [ "./src/styles/*" ]
     }
   },
-  "include": [ "./**/*.ts", "./**/*.tsx", "./**/*.d.ts" ],
+  "include": [ "./**/*.ts", "./**/*.tsx" ],
   "exclude": [ "node_modules", "dist" ]
 }

@@ -140,7 +140,7 @@ using Kentico.Xperience.Admin.Base;
 
 [assembly: UIPage(
     parentType: typeof(WebChannelSettingsEditSection),
-    slug: "keys",
+    slug: "gdprconsents",
     uiPageType: typeof(GDPRConsentEditPage),
     name: "GDPR Consents",
     templateName: TemplateNames.EDIT,
