@@ -9,18 +9,18 @@ using CMS.Membership;
 
 namespace BDO.GWT.GLOBAL.Services;
 
-public interface IGDPRContactLookupService
+public interface IGDPRUserLookupService
 {
     string GetContactAsText(string email);
     string GetContactAsXml(string email);
     bool DeleteContactByEmail(string email);
 }
 
-public sealed class GDPRContactService : IGDPRContactLookupService
+public sealed class GDPRUserService : IGDPRUserLookupService
 {
     private readonly IInfoProvider<UserInfo> UserInfoProvider;
 
-    public GDPRContactService(IInfoProvider<UserInfo> UserInfoProvider)
+    public GDPRUserService(IInfoProvider<UserInfo> UserInfoProvider)
     {
         this.UserInfoProvider = UserInfoProvider;
     }
