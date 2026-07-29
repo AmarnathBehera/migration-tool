@@ -57,6 +57,15 @@ namespace BDO.GWT.Core.Tests.Services
                 .Setup(x => x.BuildAsync(It.IsAny<HttpContext>()))
                 .ThrowsAsync(new Exception());
 
+            // Make the cache actually invoke the factory delegate so the
+            // exception thrown inside BuildHeaderAsync can propagate.
+            _progressiveCacheMock
+                .Setup(x => x.LoadAsync(
+                    It.IsAny<Func<CacheSettings, Task<HeaderDto?>>>(),
+                    It.IsAny<CacheSettings>()))
+                .Returns((Func<CacheSettings, Task<HeaderDto?>> factory, CacheSettings settings) =>
+                    factory(settings));
+
             Assert.ThrowsAsync<Exception>(async () =>
                 await _service.GetAsync(_contentServiceMock.Object, CancellationToken.None));
         }
@@ -66,6 +75,16 @@ namespace BDO.GWT.Core.Tests.Services
         {
             // Arrange
             var fakeHomePageUrl = "/home";
+
+            // Make the cache actually invoke the factory delegate so that
+            // BuildHeaderAsync runs and a real HeaderDto is returned.
+            _progressiveCacheMock
+                .Setup(x => x.LoadAsync(
+                    It.IsAny<Func<CacheSettings, Task<HeaderDto?>>>(),
+                    It.IsAny<CacheSettings>()))
+                .Returns((Func<CacheSettings, Task<HeaderDto?>> factory, CacheSettings settings) =>
+                    factory(settings));
+
             _homePageServiceMock
                 .Setup(x => x.GetHomePageUrl(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(fakeHomePageUrl);
