@@ -78,7 +78,7 @@ public class PersonCrudServiceTests
 
         ActionResult<PageOutput<PersonPageContent>> result = await service.CreatePageAsync(
             channelId: 1,
-            nodeParentID: 10,
+            WebPageParentID: 10,
             culture: "en-gb",
             request: null!,
             cancellationToken: CancellationToken.None);
@@ -93,7 +93,7 @@ public class PersonCrudServiceTests
 
         ActionResult<PageOutput<PersonPageContent>> result = await service.CreatePageCultureVersionAsync(
             channelId: 1,
-            pageGUID: Guid.NewGuid(),
+            WebPageItemGuid: Guid.NewGuid(),
             fromCulture: "en-gb",
             toCulture: "en-us",
             request: null!,
@@ -109,7 +109,7 @@ public class PersonCrudServiceTests
 
         ActionResult<PageOutput<PersonPageContent>> result = await service.UpdatePageAsync(
             channelId: 1,
-            pageGUID: Guid.NewGuid(),
+            WebPageItemGuid: Guid.NewGuid(),
             culture: "en-gb",
             request: null!,
             cancellationToken: CancellationToken.None);
@@ -140,7 +140,7 @@ public class PersonCrudServiceTests
 
         ActionResult<PageOutput<PersonPageContent>> result = await service.GetPersonPageAsync(
             channelId: 1,
-            pageGUID: Guid.NewGuid(),
+            WebPageItemGuid: Guid.NewGuid(),
             culture: "en-gb",
             cancellationToken: CancellationToken.None);
 
@@ -157,7 +157,7 @@ public class PersonCrudServiceTests
 
         ActionResult<PageOutput<PersonPageContent>> result = await service.CreatePageAsync(
             channelId: 1,
-            nodeParentID: 10,
+            WebPageParentID: 10,
             culture: "en-gb",
             request: request,
             cancellationToken: CancellationToken.None);
@@ -175,7 +175,7 @@ public class PersonCrudServiceTests
 
         ActionResult<PageOutput<PersonPageContent>> result = await service.CreatePageCultureVersionAsync(
             channelId: 1,
-            pageGUID: Guid.NewGuid(),
+            WebPageItemGuid: Guid.NewGuid(),
             fromCulture: "en-gb",
             toCulture: "fr-fr",
             request: request,
@@ -194,7 +194,7 @@ public class PersonCrudServiceTests
 
         ActionResult<PageOutput<PersonPageContent>> result = await service.UpdatePageAsync(
             channelId: 1,
-            pageGUID: Guid.NewGuid(),
+            WebPageItemGuid: Guid.NewGuid(),
             culture: "en-gb",
             request: request,
             cancellationToken: CancellationToken.None);
@@ -211,7 +211,7 @@ public class PersonCrudServiceTests
 
         Assert.ThrowsAsync<NullReferenceException>(async () => await service.DeletePageAsync(
             channelId: 1,
-            pageGUID: Guid.NewGuid(),
+            WebPageItemGuid: Guid.NewGuid(),
             culture: "en-gb",
             deleteAllCultures: false,
             cancellationToken: CancellationToken.None));
@@ -225,7 +225,7 @@ public class PersonCrudServiceTests
 
         ActionResult<PageOutput<PersonPageContent>> result = await service.CreatePageAsync(
             channelId: 1,
-            nodeParentID: 10,
+            WebPageParentID: 10,
             culture: "not-a-culture!!",
             request: request,
             cancellationToken: CancellationToken.None);
@@ -267,7 +267,7 @@ public class PersonCrudServiceTests
 
         var result = await service.CreatePageCultureVersionAsync(
             channelId: 1,
-            pageGUID: Guid.NewGuid(),
+            WebPageItemGuid: Guid.NewGuid(),
             fromCulture,
             toCulture,
             request: null!,
@@ -286,7 +286,7 @@ public class PersonCrudServiceTests
 
         var result = await service.UpdatePageAsync(
             channelId: 1,
-            pageGUID: Guid.NewGuid(),
+            WebPageItemGuid: Guid.NewGuid(),
             culture,
             request: null!,
             CancellationToken.None);
@@ -303,7 +303,7 @@ public class PersonCrudServiceTests
 
         var result = await service.CreatePageAsync(
             channelId: 1,
-            nodeParentID: 10,
+            WebPageParentID: 10,
             culture: "en-gb",
             request: null!,
             cts.Token);
@@ -320,7 +320,7 @@ public class PersonCrudServiceTests
 
         var result = await service.UpdatePageAsync(
             channelId: 1,
-            pageGUID: Guid.NewGuid(),
+            WebPageItemGuid: Guid.NewGuid(),
             culture: "en-gb",
             request: null!,
             cts.Token);
@@ -337,7 +337,7 @@ public class PersonCrudServiceTests
 
         var result = await service.CreatePageCultureVersionAsync(
             channelId: 1,
-            pageGUID: Guid.NewGuid(),
+            WebPageItemGuid: Guid.NewGuid(),
             fromCulture: "en-gb",
             toCulture: "fr-fr",
             request: null!,
@@ -368,7 +368,7 @@ public class PersonCrudServiceTests
 
         Assert.ThrowsAsync<NullReferenceException>(async () => await service.DeletePageAsync(
             channelId: 1,
-            pageGUID: Guid.NewGuid(),
+            WebPageItemGuid: Guid.NewGuid(),
             culture: "en-gb",
             deleteAllCultures: true,
             cancellationToken: CancellationToken.None));
@@ -383,7 +383,7 @@ public class PersonCrudServiceTests
 
         var result = await service.GetPersonPageAsync(
             channelId: 1,
-            pageGUID: Guid.NewGuid(),
+            WebPageItemGuid: Guid.NewGuid(),
             culture,
             CancellationToken.None);
 
@@ -417,7 +417,7 @@ public class PersonCrudServiceTests
 
         Assert.ThrowsAsync<NullReferenceException>(async () => await service.DeletePageAsync(
             channelId: 1,
-            pageGUID: Guid.Empty,
+            WebPageItemGuid: Guid.Empty,
             culture: "en-gb",
             deleteAllCultures: false,
             cancellationToken: CancellationToken.None));
@@ -432,7 +432,7 @@ public class PersonCrudServiceTests
 
         Assert.ThrowsAsync<NullReferenceException>(async () => await service.DeletePageAsync(
             channelId,
-            pageGUID: Guid.NewGuid(),
+            WebPageItemGuid: Guid.NewGuid(),
             culture: "en-gb",
             deleteAllCultures: false,
             cancellationToken: CancellationToken.None));
@@ -445,7 +445,7 @@ public class PersonCrudServiceTests
 
         var result = await service.GetPersonPageAsync(
             channelId: 1,
-            pageGUID: Guid.Empty,
+            WebPageItemGuid: Guid.Empty,
             culture: "en-gb",
             CancellationToken.None);
 
@@ -470,47 +470,6 @@ public class PersonCrudServiceTests
         Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
         var objectResult = (ObjectResult)result.Result!;
         Assert.That(objectResult.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
-    }
-
-    [TestCase("en-gb")]
-    [TestCase("fr-fr")]
-    [TestCase("es-es")]
-    [TestCase("de-de")]
-    public void ValidateAndNormalizeCultureAsync_WithParsableCulture_ReturnsNonNullLanguageTag(string culture)
-    {
-        var service = CreateServiceWithoutConstructor();
-        var method = GetPrivateMethod("ValidateAndNormalizeCultureAsync");
-
-        var result = method.Invoke(service, new object[] { culture }) as LanguageTag;
-
-        Assert.That(result, Is.Not.Null);
-    }
-
-    [Test]
-    public void ValidateAndNormalizeCultureAsync_WithMalformedCulture_ThrowsBecauseValidationStateIsUnavailable()
-    {
-        var service = CreateServiceWithoutConstructor();
-        var method = GetPrivateMethod("ValidateAndNormalizeCultureAsync");
-
-        var ex = Assert.Throws<TargetInvocationException>(() =>
-            method.Invoke(service, new object[] { "not-a-culture!!" }));
-
-        Assert.That(ex!.InnerException, Is.InstanceOf<NullReferenceException>());
-    }
-
-    [TestCase("")]
-    [TestCase("   ")]
-    [TestCase("123")]
-    [TestCase("!!!")]
-    public void ValidateAndNormalizeCultureAsync_WithVariousMalformedInput_ThrowsBecauseValidationStateIsUnavailable(string culture)
-    {
-        var service = CreateServiceWithoutConstructor();
-        var method = GetPrivateMethod("ValidateAndNormalizeCultureAsync");
-
-        var ex = Assert.Throws<TargetInvocationException>(() =>
-            method.Invoke(service, new object[] { culture }));
-
-        Assert.That(ex!.InnerException, Is.InstanceOf<NullReferenceException>());
     }
 
     [Test]

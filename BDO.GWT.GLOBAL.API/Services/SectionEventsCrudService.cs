@@ -600,7 +600,7 @@ public class SectionEventsCrudService : ISectionEventsCrudService
                 Name = page.SystemFields?.WebPageItemName ?? string.Empty,
                 Culture = culture ?? string.Empty,
                 WebPageItemParentID = page.SystemFields?.WebPageItemParentID ?? 0,
-                WebPageItemGuid = page.SystemFields?.WebPageItemGUID ?? Guid.Empty,
+                PageGuid = page.SystemFields?.WebPageItemGUID ?? Guid.Empty,
                 WebPageItemID = page.SystemFields?.WebPageItemID ?? 0,
                 ContentItemGuid = page.SystemFields?.ContentItemGUID ?? Guid.Empty,
                 ContentItemID = page.SystemFields?.ContentItemID ?? 0,

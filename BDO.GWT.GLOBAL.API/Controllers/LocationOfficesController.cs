@@ -47,20 +47,20 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         }
 
         /// <summary>
-        /// Returns a single location office having the specified WebPageItem GUID.
+        /// Returns a single location office having the specified Page GUID.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm from which the page should be retrieved.</param>
-        /// <param name="WebPageItemGuid">WebPageItem GUID of a location office page.</param>
+        /// <param name="PageGuid">Page GUID of a location office page.</param>
         /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="cancellationToken"></param>
         /// <returns>Returns one location office page.</returns>
-        [HttpGet("{WebPageItemGuid:guid}")]
+        [HttpGet("{PageGuid:guid}")]
         [HasPermission(ApiMethodGroupName.LocationOffices, ApiPermission.Read)]
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageOutput<LocationOfficePageContent>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<PageOutput<LocationOfficePageContent>>> Get(int memberFirmID, Guid WebPageItemGuid, [FromQuery][Required] string culture, CancellationToken cancellationToken)
+        public async Task<ActionResult<PageOutput<LocationOfficePageContent>>> Get(int memberFirmID, Guid PageGuid, [FromQuery][Required] string culture, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-            var page = await _locationOfficeCrudService.GetPageAsync(channelId, WebPageItemGuid, culture, cancellationToken);
+            var page = await _locationOfficeCrudService.GetPageAsync(channelId, PageGuid, culture, cancellationToken);
 
             return Ok(page);
         }
@@ -83,46 +83,46 @@ namespace BDO.GWT.GLOBAL.API.Controllers
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
             var pageDto = await _locationOfficeCrudService.CreatePageAsync(channelId, WebPageParentID, culture, request, cancellationToken);
 
-            return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.WebPageItemGuid }, pageDto.Value);
+            return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.PageGuid }, pageDto.Value);
         }
 
         /// <summary>
         /// Creates a new culture version of a location office page.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm in which the page should be created.</param>
-        /// <param name="WebPageItemGuid">WebPageItem GUID of the location office to copy content from.</param>
+        /// <param name="PageGuid">Page GUID of the location office to copy content from.</param>
         /// <param name="fromCulture">Culture of the existing page version.</param>
         /// <param name="toCulture">Culture of the new page version.</param>
         /// <param name="request">New culture version data.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>New location office page in another culture.</returns>
-        [HttpPost("{WebPageItemGuid:guid}/CreateNewCultureVersion")]
+        [HttpPost("{PageGuid:guid}/CreateNewCultureVersion")]
         [HasPermission(ApiMethodGroupName.LocationOffices, ApiPermission.Manage)]
         [SwaggerResponse(StatusCodes.Status201Created, null, typeof(PageOutput<LocationOfficePageContent>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<PageOutput<LocationOfficePageContent>>> CreateNewCultureVersion(int memberFirmID, Guid WebPageItemGuid, [FromQuery][Required] string fromCulture, [FromQuery][Required] string toCulture, [FromBody] LocationOfficePageContent request, CancellationToken cancellationToken)
+        public async Task<ActionResult<PageOutput<LocationOfficePageContent>>> CreateNewCultureVersion(int memberFirmID, Guid PageGuid, [FromQuery][Required] string fromCulture, [FromQuery][Required] string toCulture, [FromBody] LocationOfficePageContent request, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-            var pageDto = await _locationOfficeCrudService.CreatePageCultureVersionAsync(channelId, WebPageItemGuid, fromCulture, toCulture, request, cancellationToken);
+            var pageDto = await _locationOfficeCrudService.CreatePageCultureVersionAsync(channelId, PageGuid, fromCulture, toCulture, request, cancellationToken);
 
-            return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.WebPageItemID }, pageDto.Value);
+            return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.PageGuid }, pageDto.Value);
         }
 
         /// <summary>
         /// Updates a single location office page having the specified page GUID.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm in which the page should be modified.</param>
-        /// <param name="WebPageItemGuid">WebPageItem GUID of the location office page.</param>
+        /// <param name="PageGuid">Page GUID of the location office page.</param>
         /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="request">Updated location office page data.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>Updated location office page.</returns>
-        [HttpPut("{WebPageItemGuid:guid}")]
+        [HttpPut("{PageGuid:guid}")]
         [HasPermission(ApiMethodGroupName.LocationOffices, ApiPermission.Manage)]
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageOutput<LocationOfficePageContent>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<PageOutput<LocationOfficePageContent>>> Put(int memberFirmID, Guid WebPageItemGuid, [FromQuery][Required] string culture, [FromBody] LocationOfficePageContent request, CancellationToken cancellationToken)
+        public async Task<ActionResult<PageOutput<LocationOfficePageContent>>> Put(int memberFirmID, Guid PageGuid, [FromQuery][Required] string culture, [FromBody] LocationOfficePageContent request, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-            var pageDto = await _locationOfficeCrudService.UpdatePageAsync(channelId, WebPageItemGuid, culture, request, cancellationToken);
+            var pageDto = await _locationOfficeCrudService.UpdatePageAsync(channelId, PageGuid, culture, request, cancellationToken);
 
             return Ok(pageDto.Value);
         }
@@ -131,20 +131,20 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// Deletes a single location office page having the specified page GUID.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm in which the page should be deleted.</param>
-        /// <param name="WebPageItemGuid">WebPageItem GUID of the location office.</param>
+        /// <param name="PageGuid">Page GUID of the location office.</param>
         /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="deleteAllCultures">Should all culture versions be deleted of this location office?</param>
         /// <param name="cancellationToken"></param>
         /// <returns>204 No Content.</returns>
-        [HttpDelete("{WebPageItemGuid:guid}")]
+        [HttpDelete("{PageGuid:guid}")]
         [HasPermission(ApiMethodGroupName.LocationOffices, ApiPermission.Manage)]
         [SwaggerResponse(StatusCodes.Status204NoContent, null, typeof(void))]
-        public async Task<IActionResult> Delete(int memberFirmID, Guid WebPageItemGuid, [FromQuery][Required] string culture, [FromQuery] bool deleteAllCultures = false, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> Delete(int memberFirmID, Guid PageGuid, [FromQuery][Required] string culture, [FromQuery] bool deleteAllCultures = false, CancellationToken cancellationToken = default)
         {
             try
             {
                 int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-                await _locationOfficeCrudService.DeletePageAsync(channelId, WebPageItemGuid, culture, deleteAllCultures, cancellationToken);
+                await _locationOfficeCrudService.DeletePageAsync(channelId, PageGuid, culture, deleteAllCultures, cancellationToken);
 
                 return Ok("Successfully deleted.");
             }

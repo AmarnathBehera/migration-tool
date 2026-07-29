@@ -635,7 +635,7 @@ public class InsightCrudService : IInsightCrudService
                 Name = insight.SystemFields?.WebPageItemName ?? string.Empty,
                 Culture = culture ?? string.Empty,
                 WebPageItemParentID = insight.SystemFields?.WebPageItemParentID ?? 0,
-                WebPageItemGuid = insight.SystemFields?.WebPageItemGUID ?? Guid.Empty,
+                PageGuid = insight.SystemFields?.WebPageItemGUID ?? Guid.Empty,
                 WebPageItemID = insight.SystemFields?.WebPageItemID ?? 0,
                 ContentItemGuid = insight.SystemFields?.ContentItemGUID ?? Guid.Empty,
                 ContentItemID = insight.SystemFields?.ContentItemID ?? 0,

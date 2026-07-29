@@ -50,17 +50,17 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// Returns a single insight having the specified page GUID.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm from which the page should be retrieved.</param>
-        /// <param name="WebPageItemGuid">WebPageItem GUID of an insight page.</param>
+        /// <param name="PageGuid">Page GUID of an insight page.</param>
         /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="cancellationToken"></param>
         /// <returns>Returns one insight page.</returns>
-        [HttpGet("{WebPageItemGuid:guid}")]
+        [HttpGet("{PageGuid:guid}")]
         [HasPermission(ApiMethodGroupName.Insights, ApiPermission.Read)]
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageOutput<InsightPageContent>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<PageOutput<InsightPageContent>>> Get(int memberFirmID, Guid WebPageItemGuid, [FromQuery][Required] string culture, CancellationToken cancellationToken)
+        public async Task<ActionResult<PageOutput<InsightPageContent>>> Get(int memberFirmID, Guid PageGuid, [FromQuery][Required] string culture, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-            var page = await _insightCrudService.GetInsightPageAsync(channelId, WebPageItemGuid, culture, cancellationToken);
+            var page = await _insightCrudService.GetInsightPageAsync(channelId, PageGuid, culture, cancellationToken);
 
             return Ok(page);
         }
@@ -83,46 +83,46 @@ namespace BDO.GWT.GLOBAL.API.Controllers
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
             var pageDto = await _insightCrudService.CreatePageAsync(channelId, WebPageParentID, culture, request, cancellationToken);
 
-            return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.WebPageItemGuid }, pageDto.Value);
+            return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.PageGuid }, pageDto.Value);
         }
 
         /// <summary>
         /// Creates a new culture version of an insight page.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm in which the page should be created.</param>
-        /// <param name="WebPageItemGuid">WebPageItem GUID of the insight to copy content from.</param>
+        /// <param name="PageGuid">Page GUID of the insight to copy content from.</param>
         /// <param name="fromCulture">Culture of the existing page version.</param>
         /// <param name="toCulture">Culture of the new page version.</param>
         /// <param name="request">New culture version data.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>New insight page in another culture.</returns>
-        [HttpPost("{WebPageItemGuid:guid}/CreateNewCultureVersion")]
+        [HttpPost("{PageGuid:guid}/CreateNewCultureVersion")]
         [HasPermission(ApiMethodGroupName.Insights, ApiPermission.Manage)]
         [SwaggerResponse(StatusCodes.Status201Created, null, typeof(PageOutput<InsightPageContent>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<PageOutput<InsightPageContent>>> CreateNewCultureVersion(int memberFirmID, Guid WebPageItemGuid, [FromQuery][Required] string fromCulture, [FromQuery][Required] string toCulture, [FromBody] InsightPageContent request, CancellationToken cancellationToken)
+        public async Task<ActionResult<PageOutput<InsightPageContent>>> CreateNewCultureVersion(int memberFirmID, Guid PageGuid, [FromQuery][Required] string fromCulture, [FromQuery][Required] string toCulture, [FromBody] InsightPageContent request, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-            var pageDto = await _insightCrudService.CreatePageCultureVersionAsync(channelId, WebPageItemGuid, fromCulture, toCulture, request, cancellationToken);
+            var pageDto = await _insightCrudService.CreatePageCultureVersionAsync(channelId, PageGuid, fromCulture, toCulture, request, cancellationToken);
 
-            return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.WebPageItemGuid }, pageDto.Value);
+            return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.PageGuid }, pageDto.Value);
         }
 
         /// <summary>
         /// Updates a single insight page having the specified page GUID.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm in which the page should be modified.</param>
-        /// <param name="WebPageItemGuid">WebPageItem GUID of the insight page.</param>
+        /// <param name="PageGuid">Page GUID of the insight page.</param>
         /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="request">Updated insight page data.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>Updated insight page.</returns>
-        [HttpPut("{WebPageItemGuid:guid}")]
+        [HttpPut("{PageGuid:guid}")]
         [HasPermission(ApiMethodGroupName.Insights, ApiPermission.Manage)]
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageOutput<InsightPageContent>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<PageOutput<InsightPageContent>>> Put(int memberFirmID, Guid WebPageItemGuid, [FromQuery][Required] string culture, [FromBody] InsightPageContent request, CancellationToken cancellationToken)
+        public async Task<ActionResult<PageOutput<InsightPageContent>>> Put(int memberFirmID, Guid PageGuid, [FromQuery][Required] string culture, [FromBody] InsightPageContent request, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-            var pageDto = await _insightCrudService.UpdatePageAsync(channelId, WebPageItemGuid, culture, request, cancellationToken);
+            var pageDto = await _insightCrudService.UpdatePageAsync(channelId, PageGuid, culture, request, cancellationToken);
 
             return Ok(pageDto.Value);
         }
@@ -131,20 +131,20 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// Deletes a single insight page having the specified page GUID.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm in which the page should be deleted.</param>
-        /// <param name="WebPageItemGuid">WebPageItem GUID of the insight.</param>
+        /// <param name="PageGuid">Page GUID of the insight.</param>
         /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="deleteAllCultures">Should all culture versions be deleted of this insight?</param>
         /// <param name="cancellationToken"></param>
         /// <returns>204 No Content.</returns>
-        [HttpDelete("{WebPageItemGuid:guid}")]
+        [HttpDelete("{PageGuid:guid}")]
         [HasPermission(ApiMethodGroupName.Insights, ApiPermission.Manage)]
         [SwaggerResponse(StatusCodes.Status204NoContent, null, typeof(void))]
-        public async Task<IActionResult> Delete(int memberFirmID, Guid WebPageItemGuid, [FromQuery][Required] string culture, [FromQuery] bool deleteAllCultures = false, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> Delete(int memberFirmID, Guid PageGuid, [FromQuery][Required] string culture, [FromQuery] bool deleteAllCultures = false, CancellationToken cancellationToken = default)
         {
             try
             {
                 int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-                await _insightCrudService.DeletePageAsync(channelId, WebPageItemGuid, culture, deleteAllCultures, cancellationToken);
+                await _insightCrudService.DeletePageAsync(channelId, PageGuid, culture, deleteAllCultures, cancellationToken);
 
                 return Ok("Successfully deleted.");
             }

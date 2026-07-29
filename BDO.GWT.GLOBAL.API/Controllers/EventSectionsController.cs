@@ -60,18 +60,18 @@ public class EventSectionsController : EntityControllerBase
     /// Returns a single section events having the specified page GUID.
     /// </summary>
     /// <param name="memberFirmID">ID of the member firm from which the page should be retrieved.</param>
-    /// <param name="WebPageItemGuid">WebPageItem GUID of an section events page.</param>
+    /// <param name="PageGuid">Page GUID of an section events page.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>Returns one section events page.</returns>
-    [HttpGet("{WebPageItemGuid:guid}")]
+    [HttpGet("{PageGuid:guid}")]
     [HasPermission(ApiMethodGroupName.EventSections, ApiPermission.Read)]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageOutput<SectionEventsPageContent>), MediaTypeNames.Application.Json)]
-    public async Task<ActionResult<PageOutput<SectionEventsPageContent>>> Get(int memberFirmID, Guid WebPageItemGuid, [FromQuery][Required] string culture, CancellationToken cancellationToken)
+    public async Task<ActionResult<PageOutput<SectionEventsPageContent>>> Get(int memberFirmID, Guid PageGuid, [FromQuery][Required] string culture, CancellationToken cancellationToken)
     {
         try
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-            var page = await _sectionEventsCrudService.GetPageAsync(channelId, WebPageItemGuid, culture, cancellationToken);
+            var page = await _sectionEventsCrudService.GetPageAsync(channelId, PageGuid, culture, cancellationToken);
 
             return Ok(page);
         }
@@ -105,7 +105,7 @@ public class EventSectionsController : EntityControllerBase
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
             var pageDto = await _sectionEventsCrudService.CreatePageAsync(channelId,WebPageParentID, culture, request, cancellationToken);
 
-            return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.WebPageItemGuid }, pageDto);
+            return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.PageGuid }, pageDto);
         }
         catch (NotFoundException ex)
         {
@@ -125,23 +125,23 @@ public class EventSectionsController : EntityControllerBase
     /// Creates a new culture version of a section events page.
     /// </summary>
     /// <param name="memberFirmID">ID of the member firm in which the page should be created.</param>
-    /// <param name="WebPageItemGuid">WebPageItem GUID of the section events to copy content from.</param>
+    /// <param name="PageGuid">Page GUID of the section events to copy content from.</param>
     /// <param name="fromCulture">Culture of the old page version.</param>
     /// <param name="toCulture">Culture of the new page version.</param>
     /// <param name="request">New culture version data.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>New section events page in another culture.</returns>
-    [HttpPost("{WebPageItemGuid:guid}/CreateNewCultureVersion")]
+    [HttpPost("{PageGuid:guid}/CreateNewCultureVersion")]
     [HasPermission(ApiMethodGroupName.EventSections, ApiPermission.Manage)]
     [SwaggerResponse(StatusCodes.Status201Created, null, typeof(PageOutput<SectionEventsPageContent>), MediaTypeNames.Application.Json)]
-    public async Task<ActionResult<PageOutput<SectionEventsPageContent>>> CreateNewCultureVersion(int memberFirmID, Guid WebPageItemGuid, [FromQuery][Required] string fromCulture, [FromQuery][Required] string toCulture, [FromBody] SectionEventsPageContent request, CancellationToken cancellationToken)
+    public async Task<ActionResult<PageOutput<SectionEventsPageContent>>> CreateNewCultureVersion(int memberFirmID, Guid PageGuid, [FromQuery][Required] string fromCulture, [FromQuery][Required] string toCulture, [FromBody] SectionEventsPageContent request, CancellationToken cancellationToken)
     {
         try
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-            var pageDto = await _sectionEventsCrudService.CreatePageCultureVersionAsync(channelId, WebPageItemGuid, fromCulture, toCulture, request, cancellationToken);
+            var pageDto = await _sectionEventsCrudService.CreatePageCultureVersionAsync(channelId, PageGuid, fromCulture, toCulture, request, cancellationToken);
 
-            return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.WebPageItemGuid }, pageDto);
+            return CreatedAtAction(nameof(Get), new { memberFirmID, pageDto.Value?.General?.PageGuid }, pageDto);
         }
         catch (NotFoundException ex)
         {
@@ -161,19 +161,19 @@ public class EventSectionsController : EntityControllerBase
     /// Updates a single section events page having the specified page GUID.
     /// </summary>
     /// <param name="memberFirmID">ID of the member firm in which the page should be modified.</param>
-    /// <param name="WebPageItemGuid">WebPageItem GUID of the section events page.</param>
+    /// <param name="PageGuid">Page GUID of the section events page.</param>
     /// <param name="request">Updated section events page data.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>Updated section events page.</returns>
-    [HttpPut("{WebPageItemGuid:guid}")]
+    [HttpPut("{PageGuid:guid}")]
     [HasPermission(ApiMethodGroupName.EventSections, ApiPermission.Manage)]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageOutput<SectionEventsPageContent>), MediaTypeNames.Application.Json)]
-    public async Task<ActionResult<PageOutput<SectionEventsPageContent>>> Put(int memberFirmID, Guid WebPageItemGuid, [FromQuery][Required] string culture, [FromBody] SectionEventsPageContent request, CancellationToken cancellationToken)
+    public async Task<ActionResult<PageOutput<SectionEventsPageContent>>> Put(int memberFirmID, Guid PageGuid, [FromQuery][Required] string culture, [FromBody] SectionEventsPageContent request, CancellationToken cancellationToken)
     {
         try
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-            var pageDto = await _sectionEventsCrudService.UpdatePageAsync(channelId, WebPageItemGuid, culture, request, cancellationToken);
+            var pageDto = await _sectionEventsCrudService.UpdatePageAsync(channelId, PageGuid, culture, request, cancellationToken);
 
             return Ok(pageDto);
         }
@@ -195,19 +195,19 @@ public class EventSectionsController : EntityControllerBase
     /// Deletes a single section events page having the specified page GUID.
     /// </summary>
     /// <param name="memberFirmID">ID of the member firm in which the page should be deleted.</param>
-    /// <param name="WebPageItemGuid">WebPageItem GUID of the section events.</param>
+    /// <param name="PageGuid">Page GUID of the section events.</param>
     /// <param name="deleteAllCultures">Should all culture versions be deleted of this section events?</param>
     /// <param name="cancellationToken"></param>
     /// <returns>204 No Content.</returns>
-    [HttpDelete("{WebPageItemGuid:guid}")]
+    [HttpDelete("{PageGuid:guid}")]
     [HasPermission(ApiMethodGroupName.EventSections, ApiPermission.Manage)]
     [SwaggerResponse(StatusCodes.Status204NoContent, null, typeof(void))]
-    public async Task<IActionResult> Delete(int memberFirmID, Guid WebPageItemGuid, [FromQuery][Required] string culture, [FromQuery] bool deleteAllCultures = false, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Delete(int memberFirmID, Guid PageGuid, [FromQuery][Required] string culture, [FromQuery] bool deleteAllCultures = false, CancellationToken cancellationToken = default)
     {
         try
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-            await _sectionEventsCrudService.DeletePageAsync(channelId, WebPageItemGuid, culture, deleteAllCultures, cancellationToken);
+            await _sectionEventsCrudService.DeletePageAsync(channelId, PageGuid, culture, deleteAllCultures, cancellationToken);
 
             return Ok("Successfully deleted.");
         }

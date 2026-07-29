@@ -595,7 +595,7 @@ public class LocationOfficeCrudService : ILocationOfficeCrudService
                 Name = office.SystemFields?.WebPageItemName ?? string.Empty,
                 Culture = culture ?? string.Empty,
                 WebPageItemParentID = office.SystemFields?.WebPageItemParentID ?? 0,
-                WebPageItemGuid = office.SystemFields?.WebPageItemGUID ?? Guid.Empty,
+                PageGuid = office.SystemFields?.WebPageItemGUID ?? Guid.Empty,
                 WebPageItemID = office.SystemFields?.WebPageItemID ?? 0,
                 ContentItemGuid = office.SystemFields?.ContentItemGUID ?? Guid.Empty,
                 ContentItemID = office.SystemFields?.ContentItemID ?? 0,
