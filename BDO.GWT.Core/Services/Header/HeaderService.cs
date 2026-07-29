@@ -1,5 +1,6 @@
 ﻿using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Header;
+using CMS.Helpers;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
@@ -23,6 +24,7 @@ public class HeaderService : IHeaderService
     private readonly IWebsiteChannelContext _websiteChannel;
     private readonly ILocalizedUrlsBuilder _localizedUrlsBuilder;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IProgressiveCache _cache;
 
     public HeaderService(
         IContentService contentService,
@@ -31,7 +33,8 @@ public class HeaderService : IHeaderService
         IWebsiteCulturesService websiteCulturesService,
         IWebsiteChannelContext websiteChannel,
         ILocalizedUrlsBuilder localizedUrlsBuilder,
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor,
+        IProgressiveCache cache)
     {
         _contentService = contentService;
         _contentRetriever = contentRetriever;
@@ -40,8 +43,32 @@ public class HeaderService : IHeaderService
         _websiteChannel = websiteChannel;
         _localizedUrlsBuilder = localizedUrlsBuilder;
         _httpContextAccessor = httpContextAccessor;
+        _cache = cache;
     }
     public async Task<HeaderDto?> GetAsync(IContentService contentservice, CancellationToken cancellationToken)
+    {
+        var cacheSettings = new CacheSettings(
+            cacheMinutes: 20,
+            cacheItemNameParts:
+            [
+                nameof(HeaderService),
+                _websiteChannel.WebsiteChannelName,
+                // language part – use whatever culture value the header varies by
+            ])
+        {
+            GetCacheDependency = () => CacheHelper.GetCacheDependency(new[]
+            {
+                $"webpageitem|bychannel|{_websiteChannel.WebsiteChannelName}"
+                // optionally narrow to the navigation content types
+            })
+        };
+
+        return await _cache.LoadAsync(
+            async _ => await BuildHeaderAsync(cancellationToken),
+            cacheSettings);
+    }
+
+    private async Task<HeaderDto?> BuildHeaderAsync(CancellationToken cancellationToken)
     {
         var topMenu = await BuildTopMenuAsync(cancellationToken);
 
