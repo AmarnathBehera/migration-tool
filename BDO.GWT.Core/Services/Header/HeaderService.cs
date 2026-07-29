@@ -151,7 +151,7 @@ public class HeaderService : IHeaderService
 
         var selectedPages = allGuids.Any() ? await _contentService.GetItemsByGUIDAsync(allGuids) : Enumerable.Empty<IWebPageFieldsSource>();
 
-        if(selectedPages == null || !selectedPages.Any())
+        if(!selectedPages.Any())
         {
             return (Enumerable.Empty<LinkItemDto>(), null);
         }
@@ -186,7 +186,7 @@ public class HeaderService : IHeaderService
 
         var megaMenu = new List<FirstLevelMenuItemDto>();
 
-        if(firstLevelItems == null || firstLevelItems.Count == 0)
+        if(firstLevelItems.Count == 0)
         {
             return megaMenu;
         }
@@ -224,7 +224,7 @@ public class HeaderService : IHeaderService
 
         var secondLevelDtos = new List<SecondLevelMenuItemDto>();
 
-        if(secondLevelItems == null || secondLevelItems.Count == 0)
+        if(secondLevelItems.Count == 0)
         {
             return secondLevelDtos;
         }
@@ -257,7 +257,7 @@ public class HeaderService : IHeaderService
 
         var thirdLevelDtos = new List<ThirdLevelMenuItemDto>();
 
-        if(thirdLevelItems == null || thirdLevelItems.Count == 0)
+        if(thirdLevelItems.Count == 0)
         {
             return thirdLevelDtos;
         }
@@ -285,7 +285,7 @@ public class HeaderService : IHeaderService
         var featuredItems = (await _contentService.GetChildPagesByParentGuidAsync<NavigationFeaturedItem>(parentId))?.ToList()
                             ?? new List<NavigationFeaturedItem>();
 
-        if(featuredItems == null || featuredItems.Count == 0)
+        if( featuredItems.Count == 0)
         {
             return new List<FeaturedMenuItemDto>();
         }
