@@ -1,3 +1,4 @@
+using BDO.GWT.Common.Core.Exceptions;
 using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
 using BDO.GWT.GLOBAL.API.Constants;
@@ -5,6 +6,7 @@ using BDO.GWT.GLOBAL.API.Extensions;
 using BDO.GWT.GLOBAL.Services;
 using Kentico.Web.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.Identity.Web;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
@@ -75,6 +77,35 @@ public static class Program
             });
         }
 
+        app.UseExceptionHandler(errorApp =>
+        {
+            errorApp.Run(async context =>
+            {
+                var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+
+                switch (exception)
+                {
+                    case UnprocessableEntityException ex:
+                        context.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
+                        await context.Response.WriteAsJsonAsync(new
+                        {
+                            error = ex.Message
+                        });
+                        break;
+                    case NotFoundException ex:
+                        context.Response.StatusCode = StatusCodes.Status404NotFound;
+                        await context.Response.WriteAsJsonAsync(new
+                        {
+                            error = ex.Message
+                        });
+                        break;
+
+                    default:
+                        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                        break;
+                }
+            });
+        });
         app.UseHttpsRedirection();
 
         app.UseKentico();
