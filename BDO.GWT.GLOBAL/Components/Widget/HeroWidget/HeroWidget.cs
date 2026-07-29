@@ -1,13 +1,9 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.ValueObjects;
-using BDO.GWT.Web.Core.Data;
 using BDO.GWT.Web.Core.Services;
-using CMS.ContentEngine;
-using Kentico.Content.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -34,7 +30,7 @@ public class HeroWidget : ViewComponent
         {
 
             var attachment = await _contentService.GetItemAsync<ContentAttachment>(
-                model.Properties.BackgroundImage.FirstOrDefault().Identifier,
+                model.Properties.BackgroundImage.First().Identifier,
                 cancellationToken);
 
             backgroundImageUrl = attachment?.ContentAttachmentAsset?.Url is string url
@@ -47,7 +43,7 @@ public class HeroWidget : ViewComponent
         if (model.Properties?.MobileBackgroundImage.Any() == true)
         {
             var mobileAttachment = await _contentService.GetItemAsync<ContentAttachment>(
-                model.Properties.MobileBackgroundImage.FirstOrDefault().Identifier,
+                model.Properties.MobileBackgroundImage.First().Identifier,
                 cancellationToken);
 
             mobileBackgroundImageUrl = mobileAttachment?.ContentAttachmentAsset?.Url is string mobileUrl

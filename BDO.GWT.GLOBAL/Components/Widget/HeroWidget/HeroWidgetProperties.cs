@@ -1,16 +1,10 @@
-﻿
-using BDO;
-using BDO.GWT.Core.Constants;
+﻿using BDO.GWT.Core.Constants;
 using BDO.GWT.Web.Widgets;
 using CMS.ContentEngine;
 using Kentico.Forms.Web.Mvc;
-
-//using Kentico.Forms.Web.Mvc;
 using Kentico.Xperience.Admin.Base.FormAnnotations;
 using Kentico.Xperience.Admin.Base.Forms;
 using Kentico.Xperience.Admin.Websites.FormAnnotations;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
