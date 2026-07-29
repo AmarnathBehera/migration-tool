@@ -5,7 +5,7 @@ using BDO.GWT.GLOBAL.Components.Widget.InsightCarouselWidget;
 using BDO.GWT.GLOBAL.Components.Widget.KeyTakeawaysWidget;
 using BDO.GWT.GLOBAL.Components.Widget.LocalNavigationWidget;
 using BDO.GWT.GLOBAL.Widgets;
-
+using BDO.GWT.Web.Components.Widget.HeroWidget;
 using BDO.GWT.Web.Components.Widget.TabAccordionWidget;
 using BDO.GWT.Web.Widgets.AccordionWidget;
 using BDO.GWT.Web.Widgets.FaqWidget;

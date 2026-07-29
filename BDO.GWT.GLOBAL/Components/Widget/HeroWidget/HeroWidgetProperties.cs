@@ -14,7 +14,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BDO.GWT.Web.Components.Widget.TabAccordionWidget;
+namespace BDO.GWT.Web.Components.Widget.HeroWidget;
 
 public class HeroWidgetProperties : BaseWidgetProperties
 {

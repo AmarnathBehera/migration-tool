@@ -11,7 +11,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.Web.Components.Widget.TabAccordionWidget;
+namespace BDO.GWT.Web.Components.Widget.HeroWidget;
 
 public class HeroWidget : ViewComponent
 {
