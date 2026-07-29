@@ -16,6 +16,9 @@ public class MappingHelperTests
 
     private static readonly string[] WhitespaceIdentifiersWithNull = new[] { "", "   ", null! };
     private static readonly string[] WhitespaceIdentifiers = new[] { "", "   " };
+    private static readonly string[] SampleIdentifiers = new[] { "a", "b" };
+    private static readonly int[] SampleWebPageIds = new[] { 1, 2 };
+    private static readonly int[] SingleWebPageId = new[] { 1 };
 
     [SetUp]
     public void Setup()
@@ -255,6 +258,306 @@ public class MappingHelperTests
     public async Task BuildReferencesPageAsync_WithOnlyWhitespaceIdentifiers_ReturnsEmptyList_AndNeverQueries()
     {
         var result = await _mappingHelper.BuildReferencesPageAsync<Person>(WhitespaceIdentifiers, p => p.MetadataTitle ?? string.Empty, CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<Person>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    // ---------------------------------------------------------------------
+    // BuildContentAttachmentImageReferencesExtGuid
+    // ---------------------------------------------------------------------
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("   ")]
+    public async Task BuildImageReferencesExtGuid_WithNullOrWhitespace_ReturnsEmpty_AndNeverQueries(string? url)
+    {
+        var result = await _mappingHelper.BuildContentAttachmentImageReferencesExtGuid(url, CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<ContentAttachment>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildImageReferencesExtGuid_WithRawGuidThatExists_ReturnsThatGuid()
+    {
+        var guid = Guid.NewGuid();
+        _contentServiceMock
+            .Setup(x => x.GetItemsAsync<ContentAttachment>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<ContentAttachment> { new ContentAttachment() }.AsReadOnly());
+
+        var result = await _mappingHelper.BuildContentAttachmentImageReferencesExtGuid($"  {guid}  ", CancellationToken.None);
+
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Identifier, Is.EqualTo(guid));
+    }
+
+    [Test]
+    public async Task BuildImageReferencesExtGuid_WithRawGuidThatDoesNotExist_ReturnsEmpty()
+    {
+        var guid = Guid.NewGuid();
+        _contentServiceMock
+            .Setup(x => x.GetItemsAsync<ContentAttachment>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<ContentAttachment>().AsReadOnly());
+
+        var result = await _mappingHelper.BuildContentAttachmentImageReferencesExtGuid(guid.ToString(), CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public async Task BuildImageReferencesExtGuid_WithGetContentAssetUrlThatExists_ReturnsExtractedGuid()
+    {
+        var guid = Guid.NewGuid();
+        _contentServiceMock
+            .Setup(x => x.GetItemsAsync<ContentAttachment>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<ContentAttachment> { new ContentAttachment() }.AsReadOnly());
+
+        var url = $"~/getContentAsset/{guid}/abc/foo.jpg?width=100";
+        var result = await _mappingHelper.BuildContentAttachmentImageReferencesExtGuid(url, CancellationToken.None);
+
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Identifier, Is.EqualTo(guid));
+    }
+
+    [Test]
+    public async Task BuildImageReferencesExtGuid_WithUnmatchedUrl_ReturnsEmpty()
+    {
+        _contentServiceMock
+            .Setup(x => x.GetItemsAsync<ContentAttachment>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<ContentAttachment>().AsReadOnly());
+
+        var result = await _mappingHelper.BuildContentAttachmentImageReferencesExtGuid("no-match.jpg", CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+    }
+
+    // ---------------------------------------------------------------------
+    // BuildWebPageIdReferencesAsync
+    // ---------------------------------------------------------------------
+
+    [Test]
+    public async Task BuildWebPageIdReferences_WithNullIds_ReturnsEmpty_AndNeverQueries()
+    {
+        var result = await _mappingHelper.BuildWebPageIdReferencesAsync<Person>(null, "ChannelName", "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildWebPageIdReferences_WithEmptyArray_ReturnsEmpty_AndNeverQueries()
+    {
+        var result = await _mappingHelper.BuildWebPageIdReferencesAsync<Person>(Array.Empty<int>(), "ChannelName", "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildWebPageIdReferences_WhenNoPagesFound_ReturnsEmpty_AndQueriesOnce()
+    {
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Person>());
+
+        var result = await _mappingHelper.BuildWebPageIdReferencesAsync<Person>(SampleWebPageIds, "ChannelName", "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task BuildWebPageIdReferences_WithNullCulture_UsesDefaultCulture()
+    {
+        RetrievePagesParameters? captured = null;
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<RetrievePagesParameters, Action<RetrievePagesQueryParameters>, RetrievalCacheSettings, CancellationToken>(
+                (parameters, _, _, _) => captured = parameters)
+            .ReturnsAsync(new List<Person>());
+
+        await _mappingHelper.BuildWebPageIdReferencesAsync<Person>(SingleWebPageId, "ChannelName", null, CancellationToken.None);
+
+        Assert.That(captured, Is.Not.Null);
+        Assert.That(captured!.LanguageName, Is.EqualTo("en"));
+    }
+
+    // ---------------------------------------------------------------------
+    // BuildWebPageSingleIdReferencesAsync
+    // ---------------------------------------------------------------------
+
+    [TestCase(null)]
+    [TestCase(0)]
+    public async Task BuildWebPageSingleIdReferences_WithNullOrZero_ReturnsEmpty_AndNeverQueries(int? id)
+    {
+        var result = await _mappingHelper.BuildWebPageSingleIdReferencesAsync<Person>(id, "ChannelName", "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildWebPageSingleIdReferences_WhenNoPageFound_ReturnsEmpty_AndQueriesOnce()
+    {
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Person>());
+
+        var result = await _mappingHelper.BuildWebPageSingleIdReferencesAsync<Person>(5, "ChannelName", "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    // ---------------------------------------------------------------------
+    // BuildReusableContentItemNameReferenceAsync
+    // ---------------------------------------------------------------------
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("   ")]
+    public async Task BuildReusableContentItemNameReference_WithNullOrWhitespace_ReturnsEmpty_AndNeverQueries(string? name)
+    {
+        var result = await _mappingHelper.BuildReusableContentItemNameReferenceAsync<ContentAttachment>(name, CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<ContentAttachment>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildReusableContentItemNameReference_WithRawGuid_ReturnsThatGuid_AndNeverQueries()
+    {
+        var guid = Guid.NewGuid();
+
+        var result = await _mappingHelper.BuildReusableContentItemNameReferenceAsync<ContentAttachment>($"  {guid}  ", CancellationToken.None);
+
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Identifier, Is.EqualTo(guid));
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<ContentAttachment>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildReusableContentItemNameReference_WhenNoItemMatches_ReturnsEmpty_AndQueriesOnce()
+    {
+        _contentServiceMock
+            .Setup(x => x.GetItemsAsync<ContentAttachment>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<ContentAttachment>().AsReadOnly());
+
+        var result = await _mappingHelper.BuildReusableContentItemNameReferenceAsync<ContentAttachment>("SomeName", CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<ContentAttachment>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    // ---------------------------------------------------------------------
+    // BuildReferencesCarAsync / BuildReferencesPageCarAsync
+    // ---------------------------------------------------------------------
+
+    [TestCase(null)]
+    public async Task BuildReferencesCarAsync_WithNullIdentifiers_ReturnsEmpty_AndNeverQueries(string[]? identifiers)
+    {
+        var result = await _mappingHelper.BuildReferencesCarAsync<Person>(identifiers, p => p.MetadataTitle ?? string.Empty, CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<Person>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildReferencesCarAsync_WithOnlyWhitespaceIdentifiers_ReturnsEmpty_AndNeverQueries()
+    {
+        var result = await _mappingHelper.BuildReferencesCarAsync<Person>(WhitespaceIdentifiersWithNull, p => p.MetadataTitle ?? string.Empty, CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<Person>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildReferencesCarAsync_WhenNoItemsMatch_ReturnsEmpty_AndQueriesOnce()
+    {
+        _contentServiceMock
+            .Setup(x => x.GetItemsAsync<Person>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Person>().AsReadOnly());
+
+        var result = await _mappingHelper.BuildReferencesCarAsync<Person>(SampleIdentifiers, p => p.MetadataTitle ?? string.Empty, CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<Person>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [TestCase(null)]
+    public async Task BuildReferencesPageCarAsync_WithNullIdentifiers_ReturnsEmpty_AndNeverQueries(string[]? identifiers)
+    {
+        var result = await _mappingHelper.BuildReferencesPageCarAsync<Person>(identifiers, p => p.MetadataTitle ?? string.Empty, CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<Person>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildReferencesPageCarAsync_WithOnlyWhitespaceIdentifiers_ReturnsEmpty_AndNeverQueries()
+    {
+        var result = await _mappingHelper.BuildReferencesPageCarAsync<Person>(WhitespaceIdentifiers, p => p.MetadataTitle ?? string.Empty, CancellationToken.None);
 
         Assert.That(result, Is.Empty);
         _contentServiceMock.Verify(

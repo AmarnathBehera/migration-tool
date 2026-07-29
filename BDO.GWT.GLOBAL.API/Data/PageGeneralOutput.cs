@@ -14,7 +14,7 @@ public class PageGeneralOutput
 
     public Guid ContentItemGuid { get; set; }
 
-    public Guid WebPageItemGuid { get; set; }
+    public Guid PageGuid { get; set; }
 
     public string Path { get; set; } = null!;
 }
