@@ -56,6 +56,8 @@
 
             public const string InsightAnimationCard = WidgetPrefix + "AnimatedTileCarouselWidget";
 
+            public const string Hero = WidgetPrefix + "Hero";
+
         }
 
         //sections
