@@ -35,7 +35,7 @@ using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using XperienceCommunity.MultiChoiceFormControl.Admin.Helpers.Components.MultiChoice;
-
+using XperienceCommunity.Redirects;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddKentico(features =>
@@ -89,6 +89,7 @@ builder.Services.AddScoped<ISiteConfigurationService, SiteConfigurationService>(
 builder.Services.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllersWithViews();
+builder.Services.AddXperienceCommunityRedirects();
 builder.Services.AddXperienceCommunityLocalization();
 builder.Services.AddAdminExternalAuthenticationProvider(
     authBuilder => authBuilder.AddMicrosoftIdentityWebApp(options =>
@@ -182,9 +183,8 @@ if (!builder.Environment.IsDevelopment() && builder.Configuration.GetSection("Ad
 }
 
 app.UseKentico();
-
+app.UseMiddleware<RedirectMiddleware>();
 app.Kentico().MapRoutes();
-
 app.MapControllerRoute(
     name: "default",
     pattern: $"{{{WebPageRoutingOptions.LANGUAGE_ROUTE_VALUE_KEY}}}/{{controller}}/{{action}}",

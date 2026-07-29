@@ -18,10 +18,14 @@ namespace BDO.GWT.Web.Controllers;
 public class EditorsPickController : ControllerBase
 {
     private readonly IEditorsPickService _editorsPickService;
+    private readonly IEditorsPickStateStore _stateStore;
 
-    public EditorsPickController(IEditorsPickService editorsPickService)
+    public EditorsPickController(
+        IEditorsPickService editorsPickService,
+        IEditorsPickStateStore stateStore)
     {
         _editorsPickService = editorsPickService;
+        _stateStore = stateStore;
     }
 
     [HttpGet("[action]")]
@@ -29,12 +33,24 @@ public class EditorsPickController : ControllerBase
         [FromQuery] CardsQuery query,
         [FromQuery(Name = "featuredGuids")] string featuredGuids,
         [FromQuery(Name = "selectedGuids")] string selectedGuids,
+        [FromQuery(Name = "state")] Guid? state,
         CancellationToken cancellationToken)
     {
         query.Filters = RequestQueryUtility.ExtractFilterQueryParameters(Request.Query);
 
         var featured = ParseContentItemReferences(featuredGuids);
         var selected = ParseContentItemReferences(selectedGuids);
+
+        // The shared React carousel component only round-trips the widget state GUID on the filter
+        // request, so restore the configured page GUIDs from the server-side state store when the
+        // explicit query parameters are not supplied.
+        if (selected.Count == 0 && featured.Count == 0 &&
+            state.HasValue &&
+            _stateStore.TryGet(state.Value, out var storedFeatured, out var storedSelected))
+        {
+            featured = storedFeatured;
+            selected = storedSelected;
+        }
 
         var result = await _editorsPickService.GetFilteredItemsAsync(
             featured,

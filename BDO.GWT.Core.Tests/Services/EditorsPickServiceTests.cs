@@ -14,6 +14,7 @@ public class EditorsPickServiceTests
 {
     private Mock<IFilteringHelper> _filteringHelperMock = null!;
     private Mock<IEditorsPickCardService> _editorsPickCardServiceMock = null!;
+    private Mock<IEditorsPickStateStore> _stateStoreMock = null!;
     private EditorsPickService _service = null!;
 
     private sealed class TestPage : IWebPageFieldsSource
@@ -26,10 +27,12 @@ public class EditorsPickServiceTests
     {
         _filteringHelperMock = new Mock<IFilteringHelper>();
         _editorsPickCardServiceMock = new Mock<IEditorsPickCardService>();
+        _stateStoreMock = new Mock<IEditorsPickStateStore>();
 
         _service = new EditorsPickService(
             _filteringHelperMock.Object,
-            _editorsPickCardServiceMock.Object);
+            _editorsPickCardServiceMock.Object,
+            _stateStoreMock.Object);
     }
 
     private static EditorsPickData CreateData(

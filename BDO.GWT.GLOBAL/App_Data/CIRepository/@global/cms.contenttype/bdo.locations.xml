@@ -13,7 +13,7 @@
       <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
         <properties />
       </schema>
-      <field column="DescriptionText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="78263149-20ed-4e79-a127-0bae1cf4772f" visible="true">
+      <field allowempty="true" column="DescriptionText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="78263149-20ed-4e79-a127-0bae1cf4772f" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Description text</fieldcaption>
@@ -46,7 +46,7 @@
           <controlname>Kentico.Administration.RichTextEditor</controlname>
         </settings>
       </field>
-      <field column="LocalLocations" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="2a662a50-6062-4187-8b38-25408042e18e" visible="true">
+      <field allowempty="true" column="LocalLocations" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="2a662a50-6062-4187-8b38-25408042e18e" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Local locations</fieldcaption>
@@ -68,7 +68,7 @@
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
-      <field column="GlobalLocationsBanner" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="2743cf82-3d56-44eb-b02d-820372d7132c" visible="true">
+      <field allowempty="true" column="GlobalLocationsBanner" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="2743cf82-3d56-44eb-b02d-820372d7132c" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Global locations banner</fieldcaption>

@@ -27,13 +27,16 @@ public class EditorsPickService : IEditorsPickService
 {
     private readonly IFilteringHelper _filteringHelper;
     private readonly IEditorsPickCardService _editorsPickCardService;
+    private readonly IEditorsPickStateStore _stateStore;
 
     public EditorsPickService(
         IFilteringHelper filteringHelper,
-        IEditorsPickCardService editorsPickCardService)
+        IEditorsPickCardService editorsPickCardService,
+        IEditorsPickStateStore stateStore)
     {
         _filteringHelper = filteringHelper;
         _editorsPickCardService = editorsPickCardService;
+        _stateStore = stateStore;
     }
 
     public async Task<EditorsPickDto> GetEditorsPickAsync<T>(
@@ -61,6 +64,10 @@ public class EditorsPickService : IEditorsPickService
             new CardsQuery(),
             cancellationToken);
 
+        var stateGuid = Guid.NewGuid();
+
+        _stateStore.Save(stateGuid, featuredGuids, selectedGuids);
+
         return new EditorsPickDto
         {
             Title = data.Title,
@@ -83,7 +90,7 @@ public class EditorsPickService : IEditorsPickService
             TopMargin = data.TopMargin ?? string.Empty,
             BottomMargin = data.BottomMargin ?? string.Empty,
             WidgetID = data.WidgetID,
-            StateGUID = Guid.NewGuid(),
+            StateGUID = stateGuid,
             FeaturedGuids = string.Join(",", featuredGuids.Select(x => x.Identifier)),
             SelectedGuids = string.Join(",", selectedGuids.Select(x => x.Identifier)),
         };

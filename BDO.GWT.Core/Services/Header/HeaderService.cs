@@ -1,5 +1,6 @@
 ﻿using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Header;
+using CMS.Helpers;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
@@ -23,6 +24,7 @@ public class HeaderService : IHeaderService
     private readonly IWebsiteChannelContext _websiteChannel;
     private readonly ILocalizedUrlsBuilder _localizedUrlsBuilder;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IProgressiveCache _cache;
 
     public HeaderService(
         IContentService contentService,
@@ -31,7 +33,8 @@ public class HeaderService : IHeaderService
         IWebsiteCulturesService websiteCulturesService,
         IWebsiteChannelContext websiteChannel,
         ILocalizedUrlsBuilder localizedUrlsBuilder,
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor,
+        IProgressiveCache cache)
     {
         _contentService = contentService;
         _contentRetriever = contentRetriever;
@@ -40,8 +43,32 @@ public class HeaderService : IHeaderService
         _websiteChannel = websiteChannel;
         _localizedUrlsBuilder = localizedUrlsBuilder;
         _httpContextAccessor = httpContextAccessor;
+        _cache = cache;
     }
     public async Task<HeaderDto?> GetAsync(IContentService contentservice, CancellationToken cancellationToken)
+    {
+        var cacheSettings = new CacheSettings(
+            cacheMinutes: 20,
+            cacheItemNameParts:
+            [
+                nameof(HeaderService),
+                _websiteChannel.WebsiteChannelName,
+                // language part – use whatever culture value the header varies by
+            ])
+        {
+            GetCacheDependency = () => CacheHelper.GetCacheDependency(new[]
+            {
+                $"webpageitem|bychannel|{_websiteChannel.WebsiteChannelName}"
+                // optionally narrow to the navigation content types
+            })
+        };
+
+        return await _cache.LoadAsync(
+            async _ => await BuildHeaderAsync(cancellationToken),
+            cacheSettings);
+    }
+
+    private async Task<HeaderDto?> BuildHeaderAsync(CancellationToken cancellationToken)
     {
         var topMenu = await BuildTopMenuAsync(cancellationToken);
 
@@ -111,6 +138,11 @@ public class HeaderService : IHeaderService
             cancellationToken
         ))?.ToList() ?? new List<Navigation>();
 
+        if (pages.Count == 0)
+        {
+            return (Enumerable.Empty<LinkItemDto>(), null);
+        }
+
         var allGuids = pages
             .Where(p => p.TopMenu != null)
             .SelectMany(p => p.TopMenu?.Select(i => i.WebPageGuid) ?? Enumerable.Empty<Guid>())
@@ -118,6 +150,11 @@ public class HeaderService : IHeaderService
             .ToList();
 
         var selectedPages = allGuids.Any() ? await _contentService.GetItemsByGUIDAsync(allGuids) : Enumerable.Empty<IWebPageFieldsSource>();
+
+        if(!selectedPages.Any())
+        {
+            return (Enumerable.Empty<LinkItemDto>(), null);
+        }
 
         var topMenuItems = selectedPages
             .Select(item => new LinkItemDto
@@ -148,6 +185,11 @@ public class HeaderService : IHeaderService
                               ?? new List<NavigationFirstLevelItem>();
 
         var megaMenu = new List<FirstLevelMenuItemDto>();
+
+        if(firstLevelItems.Count == 0)
+        {
+            return megaMenu;
+        }
 
         foreach (var first in firstLevelItems.Where(f => f != null))
         {
@@ -182,6 +224,11 @@ public class HeaderService : IHeaderService
 
         var secondLevelDtos = new List<SecondLevelMenuItemDto>();
 
+        if(secondLevelItems.Count == 0)
+        {
+            return secondLevelDtos;
+        }
+
         foreach (var second in secondLevelItems.Where(s => s != null))
         {
             var secondUrls = second.TargetURL?.Select(u => u?.WebPageGuid ?? Guid.Empty).Where(g => g != Guid.Empty).ToList()
@@ -210,6 +257,11 @@ public class HeaderService : IHeaderService
 
         var thirdLevelDtos = new List<ThirdLevelMenuItemDto>();
 
+        if(thirdLevelItems.Count == 0)
+        {
+            return thirdLevelDtos;
+        }
+
         foreach (var third in thirdLevelItems.Where(t => t != null))
         {
             var thirdUrls = third.TargetURL?.Select(u => u?.WebPageGuid ?? Guid.Empty).Where(g => g != Guid.Empty).ToList()
@@ -232,6 +284,11 @@ public class HeaderService : IHeaderService
     {
         var featuredItems = (await _contentService.GetChildPagesByParentGuidAsync<NavigationFeaturedItem>(parentId))?.ToList()
                             ?? new List<NavigationFeaturedItem>();
+
+        if( featuredItems.Count == 0)
+        {
+            return new List<FeaturedMenuItemDto>();
+        }
 
         var featuredDtos = new List<FeaturedMenuItemDto>();
 

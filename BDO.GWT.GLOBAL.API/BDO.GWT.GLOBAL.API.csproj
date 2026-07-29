@@ -18,5 +18,9 @@
   <ItemGroup>
     <ProjectReference Include="..\BDO.GWT.Core\BDO.GWT.Core.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="BDO.GWT.GLOBAL.API.Tests" />
+  </ItemGroup>
 	
 </Project>

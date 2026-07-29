@@ -6,15 +6,15 @@ public class PageGeneralOutput
 
     public string Culture { get; set; } = null!;
 
-    public int? NodeParentID { get; set; }
+    public int? WebPageItemParentID { get; set; }
 
-    public int NodeID { get; set; }
+    public int WebPageItemID { get; set; }
 
-    public int PageID { get; set; }
+    public int ContentItemID { get; set; }
 
-    public Guid NodeGUID { get; set; }
+    public Guid ContentItemGuid { get; set; }
 
-    public Guid PageGUID { get; set; }
+    public Guid PageGuid { get; set; }
 
-    public string NodeAliasPath { get; set; } = null!;
+    public string Path { get; set; } = null!;
 }
