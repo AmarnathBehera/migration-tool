@@ -7,9 +7,9 @@ namespace BDO.GWT.Web.Controllers;
 [Route("admin-api/custom-action")]
 public class GdprButtonController : ControllerBase
 {
-    private readonly IGDPRContactLookupService gdprContactLookupService;
+    private readonly IGDPRUserLookupService gdprContactLookupService;
 
-    public GdprButtonController(IGDPRContactLookupService gdprContactLookupService)
+    public GdprButtonController(IGDPRUserLookupService gdprContactLookupService)
     {
         this.gdprContactLookupService = gdprContactLookupService;
     }

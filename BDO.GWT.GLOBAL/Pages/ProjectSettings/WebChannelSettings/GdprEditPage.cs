@@ -15,7 +15,7 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
     private readonly IInfoProvider<GDPRInfo> GDPRInfoProvider;
     private readonly IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider;
     private readonly IChannelAccessService channelAccessService;
-    private readonly IGDPRContactLookupService gdprContactLookupService;
+    private readonly IGDPRUserLookupService gdprUserLookupService;
     private readonly IHttpContextAccessor httpContextAccessor;
     protected override string ObjectType => GDPRInfo.OBJECT_TYPE;
 
@@ -55,14 +55,14 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
         IInfoProvider<GDPRInfo> GDPRInfoProvider,
         IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider,
         IChannelAccessService channelAccessService,
-        IGDPRContactLookupService gdprContactLookupService,
+        IGDPRUserLookupService gdprUserLookupService,
         IHttpContextAccessor httpContextAccessor)
             : base(formComponentMapper, formDataBinder)
     {
         this.GDPRInfoProvider = GDPRInfoProvider;
         this.webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
         this.channelAccessService = channelAccessService;
-        this.gdprContactLookupService = gdprContactLookupService;
+        this.gdprUserLookupService = gdprUserLookupService;
         this.httpContextAccessor = httpContextAccessor;
     }
 
@@ -236,7 +236,7 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
             return await BuildFormCommandResponse(false, "Email address is empty.");
         }
 
-        var results = gdprContactLookupService.GetContactAsText(emailAddress);
+        var results = gdprUserLookupService.GetContactAsText(emailAddress);
 
         return await BuildFormCommandResponse(true, "Data fetched successfully.", results);
     }
@@ -257,7 +257,7 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
             return await BuildFormCommandResponse(false, "Email address is empty.");
         }
 
-        var results = gdprContactLookupService.GetContactAsXml(emailAddress);
+        var results = gdprUserLookupService.GetContactAsXml(emailAddress);
 
         return await BuildFormCommandResponse(true, "Data fetched successfully.", results);
     }
@@ -287,7 +287,7 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
             return await BuildFormCommandResponse(false, "Email address is empty.");
         }
 
-        if (!gdprContactLookupService.DeleteContactByEmail(emailAddress))
+        if (!gdprUserLookupService.DeleteContactByEmail(emailAddress))
         {
             return await BuildFormCommandResponse(false, "No contact found to delete.");
         }
