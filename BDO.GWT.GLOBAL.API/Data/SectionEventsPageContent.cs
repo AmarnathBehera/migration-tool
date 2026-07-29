@@ -16,7 +16,7 @@ public class SectionEventsPageContent : IMetadataContent
 
     [Required]
     [MaxLength(200)]
-    public string? MetadataTeaserImageAltText { get; set; }
+    public string MetadataTeaserImageAltText { get; set; } = null!;
 
     [MaxLength(2000)]
     public string? MetadataCanonical { get; set; }

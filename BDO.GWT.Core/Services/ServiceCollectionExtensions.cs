@@ -40,7 +40,7 @@
             serviceCollection.AddSingleton<IReactCachingService, ReactCachingService>();
             serviceCollection.AddScoped<ITileContentService, TileContentService>();
             serviceCollection.AddScoped<IFlexibleContentService, FlexibleContentService>();
-            serviceCollection.AddScoped<IButtonUrlRetriever, ButtonUrlRetriever>(); ;
+            serviceCollection.AddScoped<IButtonUrlRetriever, ButtonUrlRetriever>();
             serviceCollection.AddScoped<ISectionPeoplePageService, SectionPeoplePageService>();
             serviceCollection.AddScoped<ICardsService, CardsService>();
             serviceCollection.AddScoped<IPeopleCardsService, PeopleCardsService>();

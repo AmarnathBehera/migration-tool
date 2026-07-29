@@ -308,7 +308,11 @@ public class PageContentValidator : IPageContentValidator
                     field,
                     value as string,
                     ValidateFieldOption);
-
+            case "kentico.administration.radiogroup":   // <-- added
+                return ValidateAndNormalizeString(
+                    field,
+                    value as string,
+                    ValidateFieldOption);
             // Text-based components
             case "kentico.textinput":
             case "kentico.administration.textinput":

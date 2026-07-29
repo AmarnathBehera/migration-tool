@@ -15,7 +15,7 @@ public class LocationOfficePageContent : IMetadataContent
 
     [Required]
     [MaxLength(200)]
-    public string? MetadataTeaserImageAltText { get; set; }
+    public string MetadataTeaserImageAltText { get; set; } = null!;
 
     [Required]
     [MaxLength(200)]

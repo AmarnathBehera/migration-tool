@@ -29,7 +29,6 @@ public class LocationOfficeCrudService : ILocationOfficeCrudService
 {
     private readonly IContentService _contentRetriever;
     private readonly IValidationState _validationState;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly ICultureService _cultureService;
     private readonly IPageContentValidator _pageContentValidator;
     private readonly IInfoProvider<ChannelInfo> _channelInfoProvider;
@@ -56,11 +55,10 @@ public class LocationOfficeCrudService : ILocationOfficeCrudService
 
         _contentRetriever = contentRetriever;
         _validationState = validationState;
-        _websiteChannelContext = websiteChannelContext;
         _cultureService = cultureService;
         _pageContentValidator = pageContentValidator;
         _channelInfoProvider = channelInfoProvider;
-        _webPageManager = webPageManagerFactory.Create(_websiteChannelContext.WebsiteChannelID == 0 ? 1 : _websiteChannelContext.WebsiteChannelID, user.UserID);
+        _webPageManager = webPageManagerFactory.Create(websiteChannelContext.WebsiteChannelID == 0 ? 1 : websiteChannelContext.WebsiteChannelID, user.UserID);
         _mappingHelper = mappingHelper;
     }
 
@@ -195,9 +193,6 @@ public class LocationOfficeCrudService : ILocationOfficeCrudService
                 LanguageName = currentCulture.Locale,
                 IsForPreview = false
             };
-
-            // NOTE: placeholder parent lookup — replace LocationOffice with the actual
-            // parent container type (mirrors SectionPeoplePage being the parent for Person).
             var parentPage = await _contentRetriever.GetPagesAsync<LocationOffice>(_retrieveCurrentPage, query => query
                 .Where(w => w.WhereEquals("WebPageItemID", WebPageParentID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
 
