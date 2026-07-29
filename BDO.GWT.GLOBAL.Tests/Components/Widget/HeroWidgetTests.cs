@@ -175,7 +175,7 @@ public class HeroWidgetTests
             .Setup(s => s.GetItemAsync<ContentAttachment>(imageId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(attachment);
 
-        HeroData capturedData = null;
+        HeroData? capturedData = null;
         _heroServiceMock
             .Setup(s => s.GetHeroDtoAsync(It.IsAny<HeroData>(), It.IsAny<CancellationToken>()))
             .Callback<HeroData, CancellationToken>((d, _) => capturedData = d)
@@ -185,7 +185,7 @@ public class HeroWidgetTests
         await _widget.InvokeAsync(model);
 
         // Assert
-        Assert.That(capturedData.BackgroundImage, Is.Null);
+        Assert.That(capturedData?.BackgroundImage, Is.Null);
     }
 
     [Test]
@@ -209,8 +209,13 @@ public class HeroWidgetTests
 
         // Assert
         var viewResult = result as ViewViewComponentResult;
-        Assert.That(viewResult, Is.Not.Null);
-        Assert.That(viewResult!.ViewName, Is.EqualTo("~/Components/Widget/HeroWidget/_HeroWidget.cshtml"));
+        Assert.Multiple(() =>
+        {
+
+            Assert.That(viewResult, Is.Not.Null);
+            Assert.That(viewResult!.ViewName, Is.EqualTo("~/Components/Widget/HeroWidget/_HeroWidget.cshtml"));
+        });
+        
     }
 
     [Test]
@@ -228,7 +233,7 @@ public class HeroWidgetTests
         };
         var model = BuildModel(props);
 
-        HeroData capturedData = null;
+        HeroData? capturedData = null;
         _heroServiceMock
             .Setup(s => s.GetHeroDtoAsync(It.IsAny<HeroData>(), It.IsAny<CancellationToken>()))
             .Callback<HeroData, CancellationToken>((d, _) => capturedData = d)
@@ -238,7 +243,7 @@ public class HeroWidgetTests
         await _widget.InvokeAsync(model);
 
         // Assert
-        Assert.That(capturedData.WidgetID, Is.EqualTo(widgetId));
+        Assert.That(capturedData?.WidgetID, Is.EqualTo(widgetId));
     }
 
     // -------------------------------------------------------------------------
@@ -262,8 +267,12 @@ public class HeroWidgetTests
         var dto = await service.GetHeroDtoAsync(data);
 
         // Assert
-        Assert.That(dto.BackgroundImage, Is.Null);
-        Assert.That(dto.MobileBackgroundImage, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.BackgroundImage, Is.Null);
+            Assert.That(dto.MobileBackgroundImage, Is.Null);
+        });
+        
     }
 
     [Test]
@@ -285,10 +294,13 @@ public class HeroWidgetTests
         var dto = await service.GetHeroDtoAsync(data);
 
         // Assert
-        Assert.That(dto.BackgroundImage, Is.Not.Null);
-        Assert.That(dto.BackgroundImageAltText, Is.EqualTo("Hero alt"));
-        Assert.That(dto.MobileBackgroundImage, Is.Not.Null);
-        Assert.That(dto.MobileBackgroundImageAltText, Is.EqualTo("Mobile alt"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.BackgroundImage, Is.Not.Null);
+            Assert.That(dto.BackgroundImageAltText, Is.EqualTo("Hero alt"));
+            Assert.That(dto.MobileBackgroundImage, Is.Not.Null);
+            Assert.That(dto.MobileBackgroundImageAltText, Is.EqualTo("Mobile alt"));
+        });
     }
 
     [Test]
@@ -308,9 +320,12 @@ public class HeroWidgetTests
         var dto = await service.GetHeroDtoAsync(data);
 
         // Assert
-        Assert.That(dto.CtaButtonText, Is.Null);
-        Assert.That(dto.CtaButtonUrl, Is.Null);
-        Assert.That(dto.CtaButtonUrlTarget, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.CtaButtonText, Is.Null);
+            Assert.That(dto.CtaButtonUrl, Is.Null);
+            Assert.That(dto.CtaButtonUrlTarget, Is.Null);
+        });
     }
 
     [Test]
@@ -331,9 +346,12 @@ public class HeroWidgetTests
         var dto = await service.GetHeroDtoAsync(data);
 
         // Assert
-        Assert.That(dto.CtaButtonText, Is.EqualTo("Learn More"));
-        Assert.That(dto.CtaButtonUrl, Is.Not.Null);
-        Assert.That(dto.CtaButtonUrlTarget, Is.EqualTo("_blank"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.CtaButtonText, Is.EqualTo("Learn More"));
+            Assert.That(dto.CtaButtonUrl, Is.Not.Null);
+            Assert.That(dto.CtaButtonUrlTarget, Is.EqualTo("_blank"));
+        });
     }
 
     [Test]
@@ -352,8 +370,11 @@ public class HeroWidgetTests
         var dto = await service.GetHeroDtoAsync(data);
 
         // Assert
-        Assert.That(dto.CtaButtonText, Is.Null);
-        Assert.That(dto.CtaButtonUrl, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.CtaButtonText, Is.Null);
+            Assert.That(dto.CtaButtonUrl, Is.Null);
+        });
     }
 
     [Test]
@@ -374,9 +395,12 @@ public class HeroWidgetTests
         var dto = await service.GetHeroDtoAsync(data);
 
         // Assert
-        Assert.That(dto.Layout, Is.EqualTo(HeroLayout.Hero));
-        Assert.That(dto.Title, Is.EqualTo("Welcome to BDO"));
-        Assert.That(dto.Description, Is.EqualTo("Your trusted partner"));
-        Assert.That(dto.WidgetID, Is.EqualTo("hero-42"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.Layout, Is.EqualTo(HeroLayout.Hero));
+            Assert.That(dto.Title, Is.EqualTo("Welcome to BDO"));
+            Assert.That(dto.Description, Is.EqualTo("Your trusted partner"));
+            Assert.That(dto.WidgetID, Is.EqualTo("hero-42"));
+        });
     }
 }
