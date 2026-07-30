@@ -1,6 +1,21 @@
-import React from 'react';
+import React, { useState } from "react";
+import { Button, TextBox } from "@kentico/xperience-admin-components";
+import { usePageCommand } from "@kentico/xperience-admin-base";
 
 type GdprCommand = 'FetchTextData' | 'FetchXmlData' | 'Delete';
+
+console.log("CustomActionButton loaded");
+
+const Commands: Record<GdprCommand, GdprCommand> = {
+    FetchTextData: 'FetchTextData',
+    FetchXmlData: 'FetchXmlData',
+    Delete: 'Delete',
+};
+
+interface GdprCommandData {
+    EmailAddress: string;
+    Results: string;
+}
 
 interface CustomActionButtonProps {
     commandName?: GdprCommand;
@@ -13,143 +28,42 @@ export const CustomActionButton = ({
     commandType,
     showSelector = true
 }: CustomActionButtonProps) => {
-    const [isRunning, setIsRunning] = React.useState(false);
-    const [isDeleting, setIsDeleting] = React.useState(false);
-
+    alert("CustomActionButton rendered");
     const initialCommand: GdprCommand = commandName ?? commandType ?? 'FetchTextData';
-    const [selectedCommand, setSelectedCommand] = React.useState(initialCommand);
+    const [selectedCommand, setSelectedCommand] = useState<GdprCommand>(initialCommand);
+    const [emailAddress, setEmailAddress] = useState("");
 
-    const commandUi: Record<GdprCommand, { label: string; title: string; className: string; loadingText: string }> = {
-        FetchTextData: {
-            label: 'Search to Text',
-            title: 'Search contact as text',
-            className: 'px-4 py-2 rounded-full text-sm font-medium text-white bg-[#2f55be] hover:bg-[#2649a8]',
-            loadingText: 'Running...'
-        },
-        FetchXmlData: {
-            label: 'Search to XML',
-            title: 'Search contact as XML',
-            className: 'px-4 py-2 rounded-full text-sm font-medium text-[#2f2f2f] bg-[#bcc4d1] hover:bg-[#aeb7c5]',
-            loadingText: 'Running...'
-        },
-        Delete: {
-            label: 'Delete User',
-            title: 'Delete contact',
-            className: 'px-4 py-2 rounded-full text-sm font-medium text-black bg-[#ebebeb] hover:bg-[#dfdfdf]',
-            loadingText: 'Deleting...'
+    const { execute: invokeFetchText } = usePageCommand(Commands.FetchTextData);
+    const { execute: invokeFetchXml } = usePageCommand(Commands.FetchXmlData);
+    const { execute: invokeDelete } = usePageCommand(Commands.Delete);
+
+    // Key must match the C# command parameter name ("data").
+    const invokeCommand = (command: GdprCommand) => {
+        const data: GdprCommandData = { EmailAddress: emailAddress, Results: "" };
+        console.log("Sending payload:", data);
+        switch (command) {
+            case 'FetchTextData':
+                return invokeFetchText({ parameter: data });
+            case 'FetchXmlData':
+                return invokeFetchXml({ parameter: data });
+            case 'Delete':
+                return invokeDelete({ parameter: data });
         }
     };
 
-    const readEmailAddress = (): string => {
-        const directMatch = document.querySelector(
-            'input[name$="EmailAddress"], input[id*="EmailAddress"], input[aria-label="Email Address"]'
-        ) as HTMLInputElement | null;
-
-        if (directMatch?.value?.trim()) {
-            return directMatch.value.trim();
-        }
-
-        const labels = Array.from(document.querySelectorAll('label'));
-        const emailLabel = labels.find(labelElement =>  
-            (labelElement.textContent || '').trim().toLowerCase().startsWith('email address')
-        );
-
-        if (!emailLabel) {
-            return '';
-        }
-
-        const forId = emailLabel.getAttribute('for');
-        if (forId) {
-            const labelledInput = document.getElementById(forId) as HTMLInputElement | null;
-            if (labelledInput?.value?.trim()) {
-                return labelledInput.value.trim();
-            }
-        }
-
-        const formFieldContainer = emailLabel.closest('div');
-        const nestedInput = formFieldContainer?.querySelector('input') as HTMLInputElement | null;
-        return nestedInput?.value?.trim() || '';
+    const commandLabels: Record<GdprCommand, string> = {
+        FetchTextData: 'Search to Text',
+        FetchXmlData: 'Search to XML',
+        Delete: 'Delete User',
     };
-
-    const getEndpointUrl = (command: GdprCommand, email: string): string => {
-        const routeMap: Record<GdprCommand, string> = {
-            FetchTextData: 'searchtotext',
-            FetchXmlData: 'searchtoxml',
-            Delete: 'deleteuser'
-        };
-
-        return `/admin-api/custom-action/${routeMap[command]}?email=${encodeURIComponent(email)}`;
-    };
-
-    const writeResultToTextarea = (result: string): void => {
-        const textarea = document.querySelector(
-            'textarea[name$="Results"], textarea[id*="Results"], textarea[aria-label="Results"]'
-        ) as HTMLTextAreaElement | null;
-
-        if (!textarea) {
-            return;
-        }
-
-        textarea.value = result;
-        textarea.dispatchEvent(new Event('input', { bubbles: true }));
-        textarea.dispatchEvent(new Event('change', { bubbles: true }));
-    };
-
-    const runCommand = async (command: GdprCommand) => {
-        const email = readEmailAddress();
-        if (!email) {
-            alert('Email address is required.');
-            return;
-        }
-
-        const isDeleteCommand = command === 'Delete';
-
-        if (isDeleteCommand) {
-            setIsDeleting(true);
-        } else {
-            setIsRunning(true);
-        }
-
-        try {
-            const response = await fetch(getEndpointUrl(command, email), {
-                method: isDeleteCommand ? 'DELETE' : 'GET',
-                credentials: 'include'
-            });
-
-            const payload = await response.json() as { result?: string };
-
-            if (!response.ok) {
-                writeResultToTextarea(payload.result || 'Action failed.');
-                alert(payload.result || 'Action failed.');
-                return;
-            }
-
-            writeResultToTextarea(payload.result || 'Action completed.');
-            alert(payload.result || 'Action completed.');
-        } catch {
-            writeResultToTextarea(isDeleteCommand ? 'Delete action failed.' : 'Custom action failed.');
-            alert(isDeleteCommand ? 'Delete action failed.' : 'Custom action failed.');
-        } finally {
-            if (isDeleteCommand) {
-                setIsDeleting(false);
-            } else {
-                setIsRunning(false);
-            }
-        }
-    };
-
-    const isDeleteCommand = selectedCommand === 'Delete';
-    const isBusy = isRunning || isDeleting;
-    const ui = commandUi[selectedCommand];
 
     return (
-        <div className="flex items-center gap-2">
+        <div>
+            <TextBox value={emailAddress} onChange={e => setEmailAddress(e.target.value)} />
             {showSelector && (
                 <select
                     value={selectedCommand}
-                    onChange={(event) => setSelectedCommand(event.target.value as GdprCommand)}
-                    disabled={isBusy}
-                    className="px-3 py-2 rounded-full text-sm border border-[#bcc4d1] bg-white text-[#2f2f2f]"
+                    onChange={e => setSelectedCommand(e.target.value as GdprCommand)}
                     title="Select command"
                 >
                     <option value="FetchTextData">Search to Text</option>
@@ -157,17 +71,7 @@ export const CustomActionButton = ({
                     <option value="Delete">Delete User</option>
                 </select>
             )}
-
-            <button
-                type="button"
-                onClick={() => runCommand(selectedCommand)}
-                disabled={isBusy}
-                className={ui.className}
-                title={ui.title}
-                data-command={selectedCommand}
-            >
-                {isBusy && isDeleteCommand ? ui.loadingText : isBusy ? 'Running...' : ui.label}
-            </button>
+            <Button label={commandLabels[selectedCommand]} onClick={() => invokeCommand(selectedCommand)} />
         </div>
     );
 };
