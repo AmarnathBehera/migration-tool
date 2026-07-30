@@ -426,7 +426,7 @@ public class SectionDealsPageServiceTests
         SetupSectionDealsPages(Array.Empty<SectionDeals>());
 
         Assert.ThrowsAsync<MissingSectionPageException>(async () =>
-            await _service.GetSectionDealsDealPaginationDtoAsync(
+            await _service.GetSectionDealsDealPaginationDtoAsync( "de-de",
                 Guid.NewGuid(),
                 new CardsQuery(),
                 CancellationToken.None));
@@ -439,7 +439,7 @@ public class SectionDealsPageServiceTests
         var pageGuid = Guid.NewGuid();
 
         var ex = Assert.ThrowsAsync<MissingSectionPageException>(async () =>
-            await _service.GetSectionDealsDealPaginationDtoAsync(
+            await _service.GetSectionDealsDealPaginationDtoAsync("en-gb",
                 pageGuid,
                 new CardsQuery(),
                 CancellationToken.None));
@@ -469,7 +469,7 @@ public class SectionDealsPageServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedPagination);
 
-        var result = await _service.GetSectionDealsDealPaginationDtoAsync(
+        var result = await _service.GetSectionDealsDealPaginationDtoAsync("fr-fr",
             page.SystemFields.ContentItemGUID,
             new CardsQuery(),
             CancellationToken.None);
@@ -488,14 +488,14 @@ public class SectionDealsPageServiceTests
         _dealCardsServiceMock
             .Setup(x => x.GetFilteredItemsAsync(
                 It.IsAny<SectionDeals>(),
-                It.IsAny<string>(),
+                "en-gb",
                 It.IsAny<CardsQuery>(),
                 It.IsAny<Action<CMS.ContentEngine.ContentItemQueryBuilder>>(),
                 It.IsAny<Func<Deal, bool>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PaginationDto<DealCardDto> { Data = Array.Empty<DealCardDto>(), TotalCount = 0 });
 
-        await _service.GetSectionDealsDealPaginationDtoAsync(
+        await _service.GetSectionDealsDealPaginationDtoAsync("fr-fr",
             page.SystemFields.ContentItemGUID,
             new CardsQuery(),
             CancellationToken.None);
@@ -534,7 +534,7 @@ public class SectionDealsPageServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PaginationDto<DealCardDto> { Data = Array.Empty<DealCardDto>(), TotalCount = 0 });
 
-        await _service.GetSectionDealsDealPaginationDtoAsync(
+        await _service.GetSectionDealsDealPaginationDtoAsync("fr-fr",
             page.SystemFields.ContentItemGUID,
             query,
             CancellationToken.None);
@@ -571,7 +571,7 @@ public class SectionDealsPageServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PaginationDto<DealCardDto> { Data = Array.Empty<DealCardDto>(), TotalCount = 0 });
 
-        await _service.GetSectionDealsDealPaginationDtoAsync(
+        await _service.GetSectionDealsDealPaginationDtoAsync("en-gb",
             page.SystemFields.ContentItemGUID,
             new CardsQuery(),
             CancellationToken.None);
@@ -579,8 +579,8 @@ public class SectionDealsPageServiceTests
         _contentServiceMock.Verify(
             x => x.GetPagesAsync<SectionDeals>(
                 It.Is<RetrievePagesParameters>(p =>
-                    p.LanguageName == "de-de" &&
-                    p.UseLanguageFallbacks == false),
+                    p.LanguageName == "en-gb" &&
+                    !p.UseLanguageFallbacks ),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()),
@@ -615,7 +615,7 @@ public class SectionDealsPageServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedPagination);
 
-        var result = await _service.GetSectionDealsDealPaginationDtoAsync(
+        var result = await _service.GetSectionDealsDealPaginationDtoAsync("fr-fr",
             page.SystemFields.ContentItemGUID,
             new CardsQuery(),
             CancellationToken.None);
