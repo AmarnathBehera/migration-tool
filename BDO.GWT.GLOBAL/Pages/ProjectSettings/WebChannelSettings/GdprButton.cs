@@ -12,7 +12,7 @@ internal static class GdprButtonConfiguration
             {
                 Label = "Search to Text",
                 Identifier = "search-to-text",
-                Parameter = nameof(GDPREditPage.FetchTextData),
+                Parameter = nameof(GDPRInfoPage.FetchTextData),
                 Icon = "Search",
                 Title = "Search contact and load text"
             }));
@@ -22,7 +22,7 @@ internal static class GdprButtonConfiguration
             {
                 Label = "Search to XML",
                 Identifier = "search-to-xml",
-                Parameter = nameof(GDPREditPage.FetchXmlData),
+                Parameter = nameof(GDPRInfoPage.FetchXmlData),
                 Icon = "CodeTags",
                 Title = "Search contact and load XML"
             }));
@@ -32,7 +32,7 @@ internal static class GdprButtonConfiguration
             {
                 Label = "Delete",
                 Identifier = "delete-user",
-                Parameter = nameof(GDPREditPage.Delete),
+                Parameter = nameof(GDPRInfoPage.Delete),
                 Icon = "Bin",
                 Title = "Delete contact by email"
             }));
@@ -42,7 +42,7 @@ internal static class GdprButtonConfiguration
             {
                 Label = "Copy",
                 Identifier = "copy-user",
-                Parameter = nameof(GDPREditPage.Copy),
+                Parameter = nameof(GDPRInfoPage.Copy),
                 Icon = "Copy",
                 Title = "Copy GDPR results"
             }));

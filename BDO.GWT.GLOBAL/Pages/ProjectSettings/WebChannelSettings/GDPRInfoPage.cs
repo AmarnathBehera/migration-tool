@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 
-public class GDPREditPage : InfoEditPage<GDPRInfo>
+public class GDPRInfoPage : InfoEditPage<GDPRInfo>
 {
     private readonly IInfoProvider<GDPRInfo> gdprInfoProvider;
     private readonly IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider;
@@ -45,7 +45,7 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
         set => _ = value;
     }
 
-    public GDPREditPage(
+    public GDPRInfoPage(
         IFormComponentMapper formComponentMapper,
         IFormDataBinder formDataBinder,
         IInfoProvider<GDPRInfo> gdprInfoProvider,

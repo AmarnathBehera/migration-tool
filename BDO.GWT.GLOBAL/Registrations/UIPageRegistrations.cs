@@ -133,7 +133,7 @@ using Kentico.Xperience.Admin.Base;
 [assembly: UIPage(
     parentType: typeof(WebChannelSettingsEditSection),
     slug: "gdpr",
-    uiPageType: typeof(GDPREditPage),
+    uiPageType: typeof(GDPRInfoPage),
     name: "GDPR",
     templateName: TemplateNames.EDIT,
     order: 10)]
