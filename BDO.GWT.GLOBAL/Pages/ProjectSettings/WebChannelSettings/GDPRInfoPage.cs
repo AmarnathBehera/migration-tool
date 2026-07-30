@@ -2,9 +2,9 @@
 using CMS.DataEngine;
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
+using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
@@ -15,7 +15,6 @@ public class GDPRInfoPage : InfoEditPage<GDPRInfo>
     private readonly IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider;
     private readonly IChannelAccessService channelAccessService;
     private readonly IGDPRUserLookupService gdprUserLookupService;
-    private readonly IHttpContextAccessor httpContextAccessor;
     protected override string ObjectType => GDPRInfo.OBJECT_TYPE;
 
     [PageParameter(typeof(IntPageModelBinder))]
@@ -51,15 +50,13 @@ public class GDPRInfoPage : InfoEditPage<GDPRInfo>
         IInfoProvider<GDPRInfo> gdprInfoProvider,
         IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider,
         IChannelAccessService channelAccessService,
-        IGDPRUserLookupService gdprUserLookupService,
-        IHttpContextAccessor httpContextAccessor)
+        IGDPRUserLookupService gdprUserLookupService)
             : base(formComponentMapper, formDataBinder)
     {
         this.gdprInfoProvider = gdprInfoProvider;
         this.webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
         this.channelAccessService = channelAccessService;
         this.gdprUserLookupService = gdprUserLookupService;
-        this.httpContextAccessor = httpContextAccessor;
     }
 
     public override async Task ConfigurePage()
@@ -89,95 +86,31 @@ public class GDPRInfoPage : InfoEditPage<GDPRInfo>
         .WhereEquals(nameof(GDPRInfo.GDPRWebChannelSettingID), WebChannelSettingsId)
         .FirstOrDefault();
 
-    private async Task<string> ResolveEmailAddressAsync(string fromData = null)
+    // Reads a submitted (unsaved) form field value sent with the command.
+    private static string GetFormValue(FormSubmissionCommandArguments args, params string[] fieldNames)
     {
-        if (!string.IsNullOrWhiteSpace(fromData))
-            return fromData.Trim();
+        if (args?.Data is null)
+            return string.Empty;
 
-        static string ReadFirstNonEmpty(StringValues values)
-            => values.FirstOrDefault(v => !string.IsNullOrWhiteSpace(v))?.Trim() ?? string.Empty;
-
-        var request = httpContextAccessor.HttpContext?.Request;
-        string[] keys = { "EmailAddress", "emailAddress", "Email", "email" };
-
-        if (request != null)
+        foreach (var fieldName in fieldNames)
         {
-            foreach (var key in keys)
-            {
-                if (request.Query.TryGetValue(key, out var queryValue))
-                {
-                    var value = ReadFirstNonEmpty(queryValue);
-                    if (!string.IsNullOrWhiteSpace(value))
-                    {
-                        return value;
-                    }
-                }
-            }
-
-            if (request.HasFormContentType)
-            {
-                var form = await request.ReadFormAsync();
-                foreach (var key in keys)
-                {
-                    if (form.TryGetValue(key, out var formValue))
-                    {
-                        var value = ReadFirstNonEmpty(formValue);
-                        if (!string.IsNullOrWhiteSpace(value))
-                        {
-                            return value;
-                        }
-                    }
-                }
-            }
+            var match = args.Data.FirstOrDefault(kvp => string.Equals(kvp.Key, fieldName, StringComparison.OrdinalIgnoreCase));
+            var value = ConvertToString(match.Value);
+            if (!string.IsNullOrWhiteSpace(value))
+                return value.Trim();
         }
 
         return string.Empty;
     }
 
-    private async Task<string> ResolveResultsAsync(string fromData = null)
+    private static string ConvertToString(object value) => value switch
     {
-        if (!string.IsNullOrWhiteSpace(fromData))
-            return fromData;
-
-        static string ReadFirstNonEmpty(StringValues values)
-            => values.FirstOrDefault(v => !string.IsNullOrWhiteSpace(v)) ?? string.Empty;
-
-        var request = httpContextAccessor.HttpContext?.Request;
-        string[] keys = { "Results", "results" };
-
-        if (request != null)
-        {
-            foreach (var key in keys)
-            {
-                if (request.Query.TryGetValue(key, out var queryValue))
-                {
-                    var value = ReadFirstNonEmpty(queryValue);
-                    if (!string.IsNullOrEmpty(value))
-                    {
-                        return value;
-                    }
-                }
-            }
-
-            if (request.HasFormContentType)
-            {
-                var form = await request.ReadFormAsync();
-                foreach (var key in keys)
-                {
-                    if (form.TryGetValue(key, out var formValue))
-                    {
-                        var value = ReadFirstNonEmpty(formValue);
-                        if (!string.IsNullOrEmpty(value))
-                        {
-                            return value;
-                        }
-                    }
-                }
-            }
-        }
-
-        return string.Empty;
-    }
+        null => string.Empty,
+        string s => s,
+        JsonElement { ValueKind: JsonValueKind.String } je => je.GetString() ?? string.Empty,
+        JsonElement je => je.ToString(),
+        _ => value.ToString() ?? string.Empty
+    };
 
     private async Task<ICommandResponse> BuildFormCommandResponse(bool success, string message, string results = null)
     {
@@ -198,23 +131,24 @@ public class GDPRInfoPage : InfoEditPage<GDPRInfo>
     }
 
     [PageCommand]
-    public async Task<ICommandResponse> SendValue(GdprCommandData data)
+    public async Task<ICommandResponse> SendValue(FormSubmissionCommandArguments args)
     {
-        if (string.IsNullOrWhiteSpace(data?.EmailAddress))
+        var emailAddress = GetFormValue(args, "EmailAddress", "Email");
+        if (string.IsNullOrWhiteSpace(emailAddress))
             return await BuildFormCommandResponse(false, "Email address is empty.");
 
-        return await BuildFormCommandResponse(true, "Value received.", data.EmailAddress);
+        return await BuildFormCommandResponse(true, "Value received.", emailAddress);
     }
 
     // "Search to Text" button: looks up the contact and stores the plain-text result.
     [PageCommand]
-    public async Task<ICommandResponse> FetchTextData(GdprCommandData data)
+    public async Task<ICommandResponse> FetchTextData(FormSubmissionCommandArguments args)
     {
         var gdpr = GetCurrentGDPRInfo();
         if (gdpr is null)
             return await BuildFormCommandResponse(false, "GDPR record not found.");
 
-        var emailAddress = await ResolveEmailAddressAsync(data?.EmailAddress);
+        var emailAddress = GetFormValue(args, "EmailAddress", "Email");
         if (string.IsNullOrWhiteSpace(emailAddress))
             return await BuildFormCommandResponse(false, "Email address is empty.");
 
@@ -225,13 +159,13 @@ public class GDPRInfoPage : InfoEditPage<GDPRInfo>
 
     // "Search to XML" button: looks up the contact and stores the XML result.
     [PageCommand]
-    public async Task<ICommandResponse> FetchXmlData(GdprCommandData data)
+    public async Task<ICommandResponse> FetchXmlData(FormSubmissionCommandArguments args)
     {
         var gdpr = GetCurrentGDPRInfo();
         if (gdpr is null)
             return await BuildFormCommandResponse(false, "GDPR record not found.");
 
-        var emailAddress = await ResolveEmailAddressAsync(data?.EmailAddress);
+        var emailAddress = GetFormValue(args, "EmailAddress", "Email");
         if (string.IsNullOrWhiteSpace(emailAddress))
             return await BuildFormCommandResponse(false, "Email address is empty.");
 
@@ -242,9 +176,9 @@ public class GDPRInfoPage : InfoEditPage<GDPRInfo>
 
     // "Copy" button: returns the stored results as a success message.
     [PageCommand]
-    public async Task<ICommandResponse> Copy(GdprCommandData data)
+    public async Task<ICommandResponse> Copy(FormSubmissionCommandArguments args)
     {
-        var results = await ResolveResultsAsync(data?.Results);
+        var results = GetFormValue(args, "Results");
 
         if (string.IsNullOrWhiteSpace(results))
             return await BuildFormCommandResponse(false, "No results available to copy.");
@@ -254,13 +188,13 @@ public class GDPRInfoPage : InfoEditPage<GDPRInfo>
 
     // "Delete" button: clears the stored results.
     [PageCommand]
-    public async Task<ICommandResponse> Delete(GdprCommandData data)
+    public async Task<ICommandResponse> Delete(FormSubmissionCommandArguments args)
     {
         var gdpr = GetCurrentGDPRInfo();
         if (gdpr is null)
             return await BuildFormCommandResponse(false, "GDPR record not found.");
 
-        var emailAddress = await ResolveEmailAddressAsync(data?.EmailAddress);
+        var emailAddress = GetFormValue(args, "EmailAddress", "Email");
         if (string.IsNullOrWhiteSpace(emailAddress))
             return await BuildFormCommandResponse(false, "Email address is empty.");
 
