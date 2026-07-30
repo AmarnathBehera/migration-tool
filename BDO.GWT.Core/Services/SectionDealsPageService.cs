@@ -20,7 +20,7 @@ public interface ISectionDealsPageService
 {
     Task<SectionDealsDto> GetSectionDealsDtoAsync(CancellationToken cancellationToken);
 
-    Task<PaginationDto<DealCardDto>> GetSectionDealsDealPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken);
+    Task<PaginationDto<DealCardDto>> GetSectionDealsDealPaginationDtoAsync(string language,Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken);
 }
 
 public class SectionDealsPageService : ISectionDealsPageService
@@ -123,12 +123,12 @@ public class SectionDealsPageService : ISectionDealsPageService
         return dto;
     }
 
-    public async Task<PaginationDto<DealCardDto>> GetSectionDealsDealPaginationDtoAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken)
+    public async Task<PaginationDto<DealCardDto>> GetSectionDealsDealPaginationDtoAsync(string language,Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken)
     {
         var sectionDeal = (await _contentRetriever.GetPagesAsync<SectionDeals>(
             new RetrievePagesParameters
             {
-                LanguageName = _cultureContext.CurrentLanguageTag,
+                LanguageName = language,
                 UseLanguageFallbacks = false
             },
            query => query
