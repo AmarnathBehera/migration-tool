@@ -9,6 +9,8 @@
     "clean": "node -e \"require('fs').rmSync('../wwwroot/Admin/adminresources/bdo.custom.components',{recursive:true,force:true})\""
   },
   "dependencies": {
+    "@kentico/xperience-admin-base": "^31.7.1",
+    "@kentico/xperience-admin-components": "^31.7.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

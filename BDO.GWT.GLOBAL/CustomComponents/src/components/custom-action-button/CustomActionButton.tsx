@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, TextBox } from "@kentico/xperience-admin-components";
+import { Button, InputBase } from "@kentico/xperience-admin-components";
 import { usePageCommand } from "@kentico/xperience-admin-base";
 
 type GdprCommand = 'FetchTextData' | 'FetchXmlData' | 'Delete';
@@ -33,21 +33,20 @@ export const CustomActionButton = ({
     const [selectedCommand, setSelectedCommand] = useState<GdprCommand>(initialCommand);
     const [emailAddress, setEmailAddress] = useState("");
 
-    const { execute: invokeFetchText } = usePageCommand(Commands.FetchTextData);
-    const { execute: invokeFetchXml } = usePageCommand(Commands.FetchXmlData);
-    const { execute: invokeDelete } = usePageCommand(Commands.Delete);
+    const { execute: invokeFetchText } = usePageCommand<void, GdprCommandData>(Commands.FetchTextData);
+    const { execute: invokeFetchXml } = usePageCommand<void, GdprCommandData>(Commands.FetchXmlData);
+    const { execute: invokeDelete } = usePageCommand<void, GdprCommandData>(Commands.Delete);
 
-    // Key must match the C# command parameter name ("data").
     const invokeCommand = (command: GdprCommand) => {
         const data: GdprCommandData = { EmailAddress: emailAddress, Results: "" };
         console.log("Sending payload:", data);
         switch (command) {
             case 'FetchTextData':
-                return invokeFetchText({ parameter: data });
+                return invokeFetchText(data);
             case 'FetchXmlData':
-                return invokeFetchXml({ parameter: data });
+                return invokeFetchXml(data);
             case 'Delete':
-                return invokeDelete({ parameter: data });
+                return invokeDelete(data);
         }
     };
 
@@ -59,7 +58,12 @@ export const CustomActionButton = ({
 
     return (
         <div>
-            <TextBox value={emailAddress} onChange={e => setEmailAddress(e.target.value)} />
+            <InputBase
+                value={emailAddress}
+                onChange={(event) => {
+                    setEmailAddress(event.target.value);
+                }}
+            />
             {showSelector && (
                 <select
                     value={selectedCommand}
