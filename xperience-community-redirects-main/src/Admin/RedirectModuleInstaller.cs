@@ -87,7 +87,7 @@ internal class RedirectModuleInstaller(IInfoProvider<ResourceInfo> resourceInfoP
         };
         formItem.SetComponentName(WebPageSelectorComponent.IDENTIFIER);
         formInfo.AddFormItem(formItem);
-        
+
         formItem = new FormFieldInfo
         {
             Name = nameof(RedirectInfo.RedirectGUID),
@@ -95,6 +95,42 @@ internal class RedirectModuleInstaller(IInfoProvider<ResourceInfo> resourceInfoP
             DataType = FieldDataType.Guid,
             Enabled = true,
             AllowEmpty = false,
+        };
+        formInfo.AddFormItem(formItem);
+
+        // Resolved target page URL. Populated by RedirectEditModel.MapToRedirectInfo
+        // and used by the listing/redirect middleware. Not shown in the edit form.
+        formItem = new FormFieldInfo
+        {
+            Name = nameof(RedirectInfo.RedirectTargetPageURL),
+            Visible = false,
+            DataType = FieldDataType.LongText,
+            Enabled = true,
+            AllowEmpty = true,
+        };
+        formInfo.AddFormItem(formItem);
+
+        // Channel display name of the resolved target page. Used by the listing column.
+        formItem = new FormFieldInfo
+        {
+            Name = nameof(RedirectInfo.RedirectChannelName),
+            Visible = false,
+            DataType = FieldDataType.Text,
+            Size = 200,
+            Enabled = true,
+            AllowEmpty = true,
+        };
+        formInfo.AddFormItem(formItem);
+
+        // Channel ID of the resolved target page. Used to filter the listing by
+        // the user's accessible web channel settings.
+        formItem = new FormFieldInfo
+        {
+            Name = nameof(RedirectInfo.RedirectChannelID),
+            Visible = false,
+            DataType = FieldDataType.Integer,
+            Enabled = true,
+            AllowEmpty = true,
         };
         formInfo.AddFormItem(formItem);
 
@@ -126,7 +162,7 @@ internal class RedirectModuleInstaller(IInfoProvider<ResourceInfo> resourceInfoP
             info.ClassFormDefinition = form.GetXmlDefinition();
         }
     }
-    
+
     /// <summary>
     /// Retrospectively populates the RedirectGUID field for records created using version < v1.0.3 of this package
     /// </summary>
