@@ -1,6 +1,4 @@
-﻿using CMS.Core;
-using CMS.DataEngine;
-using CMS.EventLog;
+﻿using CMS.DataEngine;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Xperience.Admin.Base;
@@ -42,8 +40,6 @@ internal class RedirectCreate : ModelEditPage<RedirectEditModel>
 
     protected override async Task<ICommandResponse> ProcessFormData(RedirectEditModel model, ICollection<IFormItem> formItems)
     {
-        Service.Resolve<IEventLogService>().LogInformation("Redirect", "CREATE_START", "Redirect creation started");
-
         await CreateCodeSnippetInfo(model);
 
         var navigateResponse = await NavigateToEditPage(model, formItems);
