@@ -21,11 +21,13 @@ public class FooterService : IFooterService
 {
     private readonly IContentService _contentService;
     private readonly IInfoProvider<ChannelInfo> _channelInfoProvider;
+    private readonly IWebPageUrlResolver _urlResolver;
     private static readonly LanguageTag defaultCulture = LanguageTag.GB;
-    public FooterService(IContentService contentService, IInfoProvider<ChannelInfo> channelInfoProvider)
+    public FooterService(IContentService contentService, IInfoProvider<ChannelInfo> channelInfoProvider, IWebPageUrlResolver urlResolver)
     {
         _contentService = contentService;
         _channelInfoProvider = channelInfoProvider;
+        _urlResolver = urlResolver;
     }
 
     public async Task<FooterDto?> GetAsync(CancellationToken cancellationToken)
@@ -129,7 +131,9 @@ public class FooterService : IFooterService
         var pages = (await _contentService.GetPagesAsync<FooterPages>(
             new RetrievePagesParameters
             {
-                PathMatch = PathMatch.Children(rootPath, 1)
+                PathMatch = PathMatch.Children(rootPath, 1),
+                LinkedItemsMaxLevel = 2
+               
             },
             query => query.OrderBy(
                 nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
@@ -137,13 +141,37 @@ public class FooterService : IFooterService
             cancellationToken))
             ?.ToList() ?? [];
 
-        var allGuids = ExtractFooterPageGuids(pages);
+        var linkedItems = pages
+            .Where(p => p.FooterLink != null)
+            .SelectMany(p => p.FooterLink ?? Enumerable.Empty<IContentItemFieldsSource>())
+            .ToList();
 
-        var selectedPages = allGuids.Any()
-            ? await _contentService.GetItemsByGUIDAsync(allGuids)
-            : Enumerable.Empty<IWebPageFieldsSource>();
+        var footerLinks = linkedItems
+            .OfType<IWebPageFieldsSource>()   // keep only web pages (they have a URL)
+            .Select(page => new FooterLinkDto
+            {
+                Title = (page as IMetadata)?.MetadataTitle
+                        ?? string.Empty,
+                URL = _urlResolver.GetRelativePath(page) ?? string.Empty
+            })
+            .ToList();
 
-        return BuildFooterLinks(selectedPages);
+        if(footerLinks.Count > 0)
+        {
+            return footerLinks;
+        }
+        else
+        {
+            return new List<FooterLinkDto>
+            {
+                new FooterLinkDto
+                {
+                    Title = "",
+                    URL = ""
+                },                
+            };
+        }
+      
     }
    
     private async Task<List<FooterLinkDto>> GetMandatoryFooterLinkDtosForAPIAsync(
@@ -158,7 +186,7 @@ public class FooterService : IFooterService
             channelId: channelId,
             new RetrievePagesParameters
             {
-                LinkedItemsMaxLevel = 4,
+                LinkedItemsMaxLevel = 2,
                 ChannelName = channelName,
                 LanguageName = culture ?? defaultCulture.Language,
                 IsForPreview = false,
@@ -171,16 +199,36 @@ public class FooterService : IFooterService
             cancellationToken))
             ?.ToList() ?? [];
 
-        var allGuids = ExtractFooterPageGuids(pages);
+        var linkedItems = pages
+           .Where(p => p.FooterLink != null)
+           .SelectMany(p => p.FooterLink ?? Enumerable.Empty<IContentItemFieldsSource>())
+           .ToList();
 
-        var selectedPages = allGuids.Count > 0
-            ? await _contentService.GetItemsByGUIDForAPIAsync(
-                allGuids,
-                channelName,
-                culture)
-            : Enumerable.Empty<IWebPageFieldsSource>();
+        var footerLinks = linkedItems
+           .OfType<IWebPageFieldsSource>()   // keep only web pages (they have a URL)
+           .Select(page => new FooterLinkDto
+           {
+               Title = (page as IMetadata)?.MetadataTitle
+                       ?? string.Empty,
+               URL = _urlResolver.GetRelativePath(page) ?? string.Empty
+           })
+           .ToList();
 
-        return BuildFooterLinks(selectedPages);
+        if (footerLinks.Count > 0)
+        {
+            return footerLinks;
+        }
+        else
+        {
+            return new List<FooterLinkDto>
+            {
+                new FooterLinkDto
+                {
+                    Title = "",
+                    URL = ""
+                },
+            };
+        }
     }
 
     private async Task<IEnumerable<FooterLinkDto?>> GetFooterLinks()
@@ -295,16 +343,32 @@ public class FooterService : IFooterService
             .ToList();
     }
 
-    private static List<Guid> ExtractFooterPageGuids(
-    IEnumerable<FooterPages> pages)
+    private static List<FooterLinkDto> BuildFooterLinks(
+    IEnumerable<IContentItemFieldsSource> selectedPages)
     {
-        return pages
-            .Where(p => p.FooterLink != null)
-            .SelectMany(p => p.FooterLink?.Select(i => i.WebPageGuid)
-                            ?? Enumerable.Empty<Guid>())
-            .Distinct()
+        int order = 0;
+
+        return selectedPages
+            .Select(page => new FooterLinkDto
+            {
+                Title = (page as IMetadata)?.MetadataTitle ?? string.Empty,
+                OpenInNewTab = false,
+                Order = order--,
+                URL = page.SystemFields.ContentItemName ?? string.Empty
+            })
+            .OrderBy(x => x.Order)
             .ToList();
     }
+    //private static List<Guid> ExtractFooterPageGuids(
+    //IEnumerable<FooterPages> pages)
+    //{
+    //    return pages
+    //        .Where(p => p.FooterLink != null)
+    //        .SelectMany(p => p.FooterLink?.Select(i => i.WebPageGuid)
+    //                        ?? Enumerable.Empty<Guid>())
+    //        .Distinct()
+    //        .ToList();
+    //}
 
     private async Task<IEnumerable<FooterLinkDto?>> BuildFooterLinksAsync(
     IEnumerable<FooterLinks> footerLinksPages)

@@ -13,6 +13,7 @@ namespace BDO.GWT.Core.Tests.Services
     {
         private Mock<IContentService> _contentServiceMock = null!;
         private Mock<IInfoProvider<ChannelInfo>> _channelInfoProviderMock = null!;
+        private Mock<IWebPageUrlResolver> _urlResolverMock = null!;
         private FooterService _service = null!;
 
         [SetUp]
@@ -20,12 +21,13 @@ namespace BDO.GWT.Core.Tests.Services
         {
             _contentServiceMock = new Mock<IContentService>();
             _channelInfoProviderMock = new Mock<IInfoProvider<ChannelInfo>>();
+            _urlResolverMock = new Mock<IWebPageUrlResolver>();
             // Register the additional interface BEFORE the mock's .Object is accessed below.
             // The GetAsync(int, CancellationToken?) extension used by FooterService internally
             // casts the provider to IInfoByIdProvider<ChannelInfo>, so the mock must implement it.
             // Moq requires As<T>() to be called prior to any .Object access.
             _channelInfoProviderMock.As<IInfoByIdProvider<ChannelInfo>>();
-            _service = new FooterService(_contentServiceMock.Object, _channelInfoProviderMock.Object);
+            _service = new FooterService(_contentServiceMock.Object, _channelInfoProviderMock.Object, _urlResolverMock.Object);
         }
 
         #region Helpers
@@ -55,6 +57,10 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<RetrievalCacheSettings>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<FooterPages>());
+
+            _urlResolverMock
+                .Setup(x => x.GetRelativePath(It.IsAny<IWebPageFieldsSource>()))
+                .Returns(string.Empty);
         }
 
         #endregion
