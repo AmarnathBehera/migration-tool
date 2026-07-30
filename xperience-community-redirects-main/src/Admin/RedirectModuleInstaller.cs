@@ -98,42 +98,6 @@ internal class RedirectModuleInstaller(IInfoProvider<ResourceInfo> resourceInfoP
         };
         formInfo.AddFormItem(formItem);
 
-        // Resolved target page URL. Populated by RedirectEditModel.MapToRedirectInfo
-        // and used by the listing/redirect middleware. Not shown in the edit form.
-        formItem = new FormFieldInfo
-        {
-            Name = nameof(RedirectInfo.RedirectTargetPageURL),
-            Visible = false,
-            DataType = FieldDataType.LongText,
-            Enabled = true,
-            AllowEmpty = true,
-        };
-        formInfo.AddFormItem(formItem);
-
-        // Channel display name of the resolved target page. Used by the listing column.
-        formItem = new FormFieldInfo
-        {
-            Name = nameof(RedirectInfo.RedirectChannelName),
-            Visible = false,
-            DataType = FieldDataType.Text,
-            Size = 200,
-            Enabled = true,
-            AllowEmpty = true,
-        };
-        formInfo.AddFormItem(formItem);
-
-        // Channel ID of the resolved target page. Used to filter the listing by
-        // the user's accessible web channel settings.
-        formItem = new FormFieldInfo
-        {
-            Name = nameof(RedirectInfo.RedirectChannelID),
-            Visible = false,
-            DataType = FieldDataType.Integer,
-            Enabled = true,
-            AllowEmpty = true,
-        };
-        formInfo.AddFormItem(formItem);
-
         SetFormDefinition(info, formInfo);
 
         if (info.HasChanged)

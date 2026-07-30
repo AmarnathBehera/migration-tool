@@ -1,7 +1,5 @@
 ﻿using CMS.ContentEngine;
-using CMS.Core;
 using CMS.DataEngine;
-using CMS.EventLog;
 using CMS.Websites;
 using CMS.Websites.Internal;
 using CMS.Websites.Routing;
@@ -35,15 +33,12 @@ internal class RedirectEditModel
     /// </summary>
     public async Task MapToRedirectInfo(RedirectInfo info, IWebPageUrlRetriever webPageUrlRetriever)
     {
-        var eventLog = Service.Resolve<IEventLogService>();
-
         info.RedirectSourceUrl = SourceUrl?.ToLower();
         info.RedirectTargetPageURL = string.Empty;
 
         var targetPage = TargetWebPageItem.FirstOrDefault();
         if (targetPage is null)
         {
-            eventLog.LogError("Redirect", "TARGET_NULL", "No target web page item selected on the form.");
             return;
         }
 
@@ -58,22 +53,16 @@ internal class RedirectEditModel
 
         if (webPageItem is null)
         {
-            eventLog.LogError("Redirect", "WEBPAGE_NULL", $"WebPageItemInfo not found for GUID '{targetPage.WebPageGuid}'.");
             return;
         }
 
         var websiteChannel = WebsiteChannelInfo.Provider.Get(webPageItem.WebPageItemWebsiteChannelID);
         if (websiteChannel is null)
         {
-            eventLog.LogError("Redirect", "WEBSITE_CHANNEL_NULL", $"WebsiteChannelInfo not found for WebsiteChannelID '{webPageItem.WebPageItemWebsiteChannelID}'.");
             return;
         }
 
         var channel = ChannelInfo.Provider.Get(websiteChannel.WebsiteChannelChannelID);
-        if (channel is null)
-        {
-            eventLog.LogError("Redirect", "CHANNEL_NULL", $"ChannelInfo not found for ChannelID '{websiteChannel.WebsiteChannelChannelID}'.");
-        }
         info.RedirectChannelID = channel?.ChannelID ?? 0;
         info.RedirectChannelName = channel?.ChannelDisplayName;
 
@@ -85,7 +74,6 @@ internal class RedirectEditModel
 
         if (string.IsNullOrWhiteSpace(defaultLanguageName))
         {
-            eventLog.LogError("Redirect", "LANGUAGE_NULL", "No default ContentLanguage found.");
             return;
         }
 
@@ -93,20 +81,13 @@ internal class RedirectEditModel
         {
             var urlResult = await webPageUrlRetriever.Retrieve(webPageItem.WebPageItemID, defaultLanguageName);
             info.RedirectTargetPageURL = urlResult.RelativePath?.Replace("~", "") ?? string.Empty;
-            eventLog.LogInformation("Redirect", "URL_FOUND", $"Resolved target URL: '{info.RedirectTargetPageURL}'.");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // Target page has no resolvable URL in the default language/channel context
             // (e.g. unpublished, folder-only, or reordered content). Leave the field empty
             // rather than failing the save.
             info.RedirectTargetPageURL = string.Empty;
-            eventLog.LogError("Redirect", "URL_EXCEPTION", ex.Message);
         }
-
-        eventLog.LogInformation(
-            "Redirect",
-            "FINAL_VALUES",
-            $"ChannelID='{info.RedirectChannelID}', ChannelName='{info.RedirectChannelName}', TargetPageURL='{info.RedirectTargetPageURL}'.");
     }
 }
