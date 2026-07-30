@@ -4,7 +4,6 @@ using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,7 +11,7 @@ namespace BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 
 public class GDPREditPage : InfoEditPage<GDPRInfo>
 {
-    private readonly IInfoProvider<GDPRInfo> GDPRInfoProvider;
+    private readonly IInfoProvider<GDPRInfo> gdprInfoProvider;
     private readonly IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider;
     private readonly IChannelAccessService channelAccessService;
     private readonly IGDPRUserLookupService gdprUserLookupService;
@@ -27,7 +26,7 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
     {
         get
         {
-            var existing = GDPRInfoProvider.Get()
+            var existing = gdprInfoProvider.Get()
                 .WhereEquals(nameof(GDPRInfo.GDPRWebChannelSettingID), WebChannelSettingsId)
                 .FirstOrDefault();
 
@@ -38,11 +37,8 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
                 return 0;
 
             // Auto-create an empty GDPRInfo for this channel so the edit form can load.
-            var newGDPRInfo = new GDPRInfo
-            {
-                GDPRWebChannelSettingID = WebChannelSettingsId.ToString()
-            };
-            GDPRInfoProvider.Set(newGDPRInfo);
+            var newGDPRInfo = new GDPRInfo { GDPRWebChannelSettingID = WebChannelSettingsId.ToString() };
+            gdprInfoProvider.Set(newGDPRInfo);
 
             return newGDPRInfo.GDPRID;
         }
@@ -52,14 +48,14 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
     public GDPREditPage(
         IFormComponentMapper formComponentMapper,
         IFormDataBinder formDataBinder,
-        IInfoProvider<GDPRInfo> GDPRInfoProvider,
+        IInfoProvider<GDPRInfo> gdprInfoProvider,
         IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider,
         IChannelAccessService channelAccessService,
         IGDPRUserLookupService gdprUserLookupService,
         IHttpContextAccessor httpContextAccessor)
             : base(formComponentMapper, formDataBinder)
     {
-        this.GDPRInfoProvider = GDPRInfoProvider;
+        this.gdprInfoProvider = gdprInfoProvider;
         this.webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
         this.channelAccessService = channelAccessService;
         this.gdprUserLookupService = gdprUserLookupService;
@@ -88,8 +84,10 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
     }
 
 
-    // Loads the GDPR record currently bound to the edit form.
-    private GDPRInfo GetCurrentGDPRInfo() => GDPRInfoProvider.Get(ObjectId);
+    // Loads the GDPR record currently bound to this channel.
+    private GDPRInfo GetCurrentGDPRInfo() => gdprInfoProvider.Get()
+        .WhereEquals(nameof(GDPRInfo.GDPRWebChannelSettingID), WebChannelSettingsId)
+        .FirstOrDefault();
 
     private async Task<string> ResolveEmailAddressAsync(string fromData = null)
     {
@@ -192,13 +190,9 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
         });
 
         if (success)
-        {
-            response.AddSuccessMessage(message);
-        }
+            response.AddSuccessMessage(results ?? message);
         else
-        {
             response.AddErrorMessage(message);
-        }
 
         return response;
     }
@@ -207,9 +201,7 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
     public async Task<ICommandResponse> SendValue(GdprCommandData data)
     {
         if (string.IsNullOrWhiteSpace(data?.EmailAddress))
-        {
             return await BuildFormCommandResponse(false, "Email address is empty.");
-        }
 
         return await BuildFormCommandResponse(true, "Value received.", data.EmailAddress);
     }
@@ -220,15 +212,11 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
     {
         var gdpr = GetCurrentGDPRInfo();
         if (gdpr is null)
-        {
             return await BuildFormCommandResponse(false, "GDPR record not found.");
-        }
 
         var emailAddress = await ResolveEmailAddressAsync(data?.EmailAddress);
         if (string.IsNullOrWhiteSpace(emailAddress))
-        {
             return await BuildFormCommandResponse(false, "Email address is empty.");
-        }
 
         var results = gdprUserLookupService.GetContactAsText(emailAddress);
 
@@ -241,15 +229,11 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
     {
         var gdpr = GetCurrentGDPRInfo();
         if (gdpr is null)
-        {
             return await BuildFormCommandResponse(false, "GDPR record not found.");
-        }
 
         var emailAddress = await ResolveEmailAddressAsync(data?.EmailAddress);
         if (string.IsNullOrWhiteSpace(emailAddress))
-        {
             return await BuildFormCommandResponse(false, "Email address is empty.");
-        }
 
         var results = gdprUserLookupService.GetContactAsXml(emailAddress);
 
@@ -263,9 +247,7 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
         var results = await ResolveResultsAsync(data?.Results);
 
         if (string.IsNullOrWhiteSpace(results))
-        {
             return await BuildFormCommandResponse(false, "No results available to copy.");
-        }
 
         return await BuildFormCommandResponse(true, results);
     }
@@ -276,20 +258,14 @@ public class GDPREditPage : InfoEditPage<GDPRInfo>
     {
         var gdpr = GetCurrentGDPRInfo();
         if (gdpr is null)
-        {
             return await BuildFormCommandResponse(false, "GDPR record not found.");
-        }
 
         var emailAddress = await ResolveEmailAddressAsync(data?.EmailAddress);
         if (string.IsNullOrWhiteSpace(emailAddress))
-        {
             return await BuildFormCommandResponse(false, "Email address is empty.");
-        }
 
         if (!gdprUserLookupService.DeleteContactByEmail(emailAddress))
-        {
             return await BuildFormCommandResponse(false, "No contact found to delete.");
-        }
 
         return await BuildFormCommandResponse(true, "Contact deleted successfully.");
     }
