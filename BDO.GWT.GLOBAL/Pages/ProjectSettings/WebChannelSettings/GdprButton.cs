@@ -45,18 +45,5 @@ internal static class GdprButtonConfiguration
         {
             SubmitFormData = true
         });
-
-        pageConfiguration.AdditionalActions.Add(new ButtonEditTemplateActionComponent(
-            new Kentico.Xperience.Admin.Base.Action(ActionType.Command)
-            {
-                Label = "Copy",
-                Identifier = "copy-user",
-                Parameter = nameof(GDPRInfoPage.Copy),
-                Icon = "Copy",
-                Title = "Copy GDPR results"
-            })
-        {
-            SubmitFormData = true
-        });
     }
 }
