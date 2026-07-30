@@ -143,7 +143,7 @@ public class SectionDealsPageService : ISectionDealsPageService
             throw new MissingSectionPageException($"'{nameof(SectionDeals)} page with GUID '{pageGuid}' not found.");
         }
 
-        var paginationDto = await _dealCardsService.GetFilteredItemsAsync(sectionDeal, _cultureContext.CurrentLanguageTag, cardsQuery, null, _ => false, cancellationToken);
+        var paginationDto = await _dealCardsService.GetFilteredItemsAsync(sectionDeal, language, cardsQuery, null, _ => false, cancellationToken);
 
         return paginationDto;
     }
