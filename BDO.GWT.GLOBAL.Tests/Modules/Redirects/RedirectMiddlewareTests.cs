@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using XperienceCommunity.Redirects;
 using XperienceCommunity.Redirects.Services;
-using RedirectInfoX = XperienceCommunity.Redirects.RedirectInfo;
+using RedirectInfoX = BDO.RedirectInfo;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Redirects;
 

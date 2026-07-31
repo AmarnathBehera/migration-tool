@@ -1,4 +1,5 @@
-﻿using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
+using BDO;
+using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.Base;
 using CMS.DataEngine;
 using CMS.Helpers;

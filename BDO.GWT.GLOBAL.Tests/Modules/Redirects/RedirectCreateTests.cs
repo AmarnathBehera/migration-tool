@@ -6,7 +6,7 @@ using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
 using Moq;
 using XperienceCommunity.Redirects.UIPages;
-using RedirectInfoX = global::XperienceCommunity.Redirects.RedirectInfo;
+using RedirectInfoX = global::BDO.RedirectInfo;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Redirects;
 
