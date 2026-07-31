@@ -218,7 +218,7 @@ public class FooterService : IFooterService
         return MapSocialButtons(socialLinksPages);
     }
 
-    private static IEnumerable<SocialButtonDto?> MapSocialButtons(IEnumerable<SocialLinks> socialLinksPages)
+    private static List<SocialButtonDto> MapSocialButtons(IEnumerable<SocialLinks> socialLinksPages)
     {
         int order = 1;
 
