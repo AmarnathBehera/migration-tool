@@ -253,9 +253,6 @@ namespace BDO.GWT.Core.Tests.Services
 
         #region FooterLinkDto – mapped from FooterLinks channel items
 
-       
-
-
         [Test]
         public async Task GetAsync_FooterLinks_Order_IsAssignedSequentially()
         {
@@ -399,6 +396,21 @@ namespace BDO.GWT.Core.Tests.Services
                 WebPageUrlPath = relativePath
             });
             return mock.Object;
+        }
+
+        /// <summary>
+        /// Creates a linked footer-link item that is both an <see cref="IWebPageFieldsSource"/>
+        /// (so it survives the OfType filter) and an <see cref="IMetadata"/> (so MetadataTitle maps).
+        /// </summary>
+        private static IContentItemFieldsSource CreateMandatoryFooterLinkSource(string metadataTitle)
+        {
+            var mock = new Mock<IWebPageFieldsSource>();
+            mock.As<IContentItemFieldsSource>();
+            mock.As<IMetadata>()
+                .Setup(m => m.MetadataTitle)
+                .Returns(metadataTitle);
+
+            return (IContentItemFieldsSource)mock.Object;
         }
 
         #endregion
@@ -654,6 +666,92 @@ namespace BDO.GWT.Core.Tests.Services
                     It.Is<int>(id => id == 42),
                     It.IsAny<CancellationToken>()),
                 Times.Once);
+        }
+
+        #endregion
+
+        #region GetAsyncForAPI – mandatory footer links from page items
+
+        [Test]
+        public async Task GetAsyncForAPIMapsMandatoryFooterLinksFromFooterPages()
+        {
+            SetupEmptyDefaultsForAPI();
+
+            var pages = new List<FooterPages>
+            {
+                new FooterPages
+                {
+                    Title = "Root",
+                    FooterLink = new List<IContentItemFieldsSource>
+                    {
+                        CreateMandatoryFooterLinkSource("Privacy Policy")
+                    }
+                }
+            };
+
+            _urlResolverMock
+                .Setup(x => x.GetRelativePath(It.IsAny<IWebPageFieldsSource>()))
+                .Returns("/privacy");
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<FooterPages>(
+                    It.IsAny<int>(),
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(pages);
+
+            var result = await _service.GetAsyncForAPI(1, "en-GB", CancellationToken.None);
+
+            var mandatory = result?.FooterLinks.FirstOrDefault(l => l.Title == "Privacy Policy");
+            Assert.That(mandatory, Is.Not.Null);
+            Assert.That(mandatory!.URL, Is.EqualTo("/privacy"));
+        }
+
+        
+       
+
+        [Test]
+        public async Task GetAsyncForAPI_MandatoryFooterLinks_UsesFallbacks_WhenTitleNullAndNoUrl()
+        {
+            SetupEmptyDefaultsForAPI();
+
+            var pages = new List<FooterPages>
+            {
+                new FooterPages
+                {
+                    Title = "Root",
+                    FooterLink = new List<IContentItemFieldsSource>
+                    {
+                        CreateMandatoryFooterLinkSource(null!)
+                    }
+                }
+            };
+
+            // GetRelativePath returns null -> URL should fall back to string.Empty.
+            _urlResolverMock
+                .Setup(x => x.GetRelativePath(It.IsAny<IWebPageFieldsSource>()))
+                .Returns((string)null!);
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<FooterPages>(
+                    It.IsAny<int>(),
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(pages);
+
+            var result = await _service.GetAsyncForAPI(1, "en-GB", CancellationToken.None);
+
+            var mandatory = result?.FooterLinks.FirstOrDefault();
+            Assert.Multiple(() =>
+            {
+                Assert.That(mandatory, Is.Not.Null);
+                Assert.That(mandatory!.Title, Is.EqualTo(string.Empty));
+                Assert.That(mandatory!.URL, Is.EqualTo(string.Empty));
+            });
         }
 
         #endregion
