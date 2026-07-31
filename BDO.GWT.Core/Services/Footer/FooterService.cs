@@ -23,6 +23,7 @@ public class FooterService : IFooterService
     private readonly IInfoProvider<ChannelInfo> _channelInfoProvider;
     private readonly IWebPageUrlResolver _urlResolver;
     private static readonly LanguageTag defaultCulture = LanguageTag.GB;
+    private const string MandatoryFooterRootPath = "/";
     public FooterService(IContentService contentService, IInfoProvider<ChannelInfo> channelInfoProvider, IWebPageUrlResolver urlResolver)
     {
         _contentService = contentService;
@@ -54,14 +55,14 @@ public class FooterService : IFooterService
 #pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
     }
 
-   
+
     public async Task<FooterDto?> GetAsyncForAPI(
     int channelId,
     string? culture,
     CancellationToken cancellationToken)
     {
         var channel = await _channelInfoProvider.GetAsync(channelId);
-       
+
         var mandatoryFooterLinks =
             await GetMandatoryFooterLinkDtosForAPIAsync(
                 channelId,
@@ -93,24 +94,21 @@ public class FooterService : IFooterService
             subscribeLink);
 #pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
     }
-    
+
     private async Task<Link?> GetSubscribePageLinkAsync(CancellationToken cancellationToken)
     {
         var subscribePages = await _contentService.GetContentType<Subscribe>(cancellationToken);
-        var subscribePage = subscribePages?.FirstOrDefault();
-        if (subscribePage == null)
-            return null;
-
-        var url = subscribePage.GetUrl()?.AbsoluteUrl;
-        if (string.IsNullOrEmpty(url))
-            return null;
-
-        return Link.TryParse(url, out var link) ? link : null;
+        return BuildSubscribeLink(subscribePages);
     }
 
     private async Task<Link?> GetSubscribePageLinkAsyncAPI(string channelName, string? cultureName, CancellationToken cancellationToken)
     {
         var subscribePages = await _contentService.GetContentTypeForAPI<Subscribe>(channelName, cultureName, cancellationToken);
+        return BuildSubscribeLink(subscribePages);
+    }
+
+    private static Link? BuildSubscribeLink(IEnumerable<Subscribe>? subscribePages)
+    {
         var subscribePage = subscribePages?.FirstOrDefault();
         if (subscribePage == null)
             return null;
@@ -121,19 +119,15 @@ public class FooterService : IFooterService
 
         return Link.TryParse(url, out var link) ? link : null;
     }
-   
 
     private async Task<List<FooterLinkDto>> GetMandatoryFooterLinkDtosAsync(
     CancellationToken cancellationToken)
     {
-        const string rootPath = "/";
-
         var pages = (await _contentService.GetPagesAsync<FooterPages>(
             new RetrievePagesParameters
             {
-                PathMatch = PathMatch.Children(rootPath, 1),
+                PathMatch = PathMatch.Children(MandatoryFooterRootPath, 1),
                 LinkedItemsMaxLevel = 2
-
             },
             query => query.OrderBy(
                 nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
@@ -141,32 +135,15 @@ public class FooterService : IFooterService
             cancellationToken))
             ?.ToList() ?? [];
 
-        var linkedItems = pages
-            .Where(p => p.FooterLink != null)
-            .SelectMany(p => p.FooterLink ?? Enumerable.Empty<IContentItemFieldsSource>())
-            .ToList();
-
-        var footerLinks = linkedItems
-            .OfType<IWebPageFieldsSource>()   // keep only web pages (they have a URL)
-            .Select(page => new FooterLinkDto
-            {
-                Title = (page as IMetadata)?.MetadataTitle
-                        ?? string.Empty,
-                URL = _urlResolver.GetRelativePath(page) ?? string.Empty
-            })
-            .ToList();
-
-        return footerLinks;
+        return MapMandatoryFooterLinks(pages);
     }
-   
+
     private async Task<List<FooterLinkDto>> GetMandatoryFooterLinkDtosForAPIAsync(
     int channelId,
     string channelName,
     string? culture,
     CancellationToken cancellationToken)
     {
-        const string rootPath = "/";
-
         var pages = (await _contentService.GetPagesAsync<FooterPages>(
             channelId: channelId,
             new RetrievePagesParameters
@@ -176,7 +153,7 @@ public class FooterService : IFooterService
                 LanguageName = culture ?? defaultCulture.Language,
                 IsForPreview = false,
                 UseLanguageFallbacks = false,
-                PathMatch = PathMatch.Children(rootPath, 1)
+                PathMatch = PathMatch.Children(MandatoryFooterRootPath, 1)
             },
             query => query.OrderBy(
                 nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
@@ -184,22 +161,21 @@ public class FooterService : IFooterService
             cancellationToken))
             ?.ToList() ?? [];
 
-        var linkedItems = pages
-           .Where(p => p.FooterLink != null)
-           .SelectMany(p => p.FooterLink ?? Enumerable.Empty<IContentItemFieldsSource>())
-           .ToList();
+        return MapMandatoryFooterLinks(pages);
+    }    
 
-        var footerLinks = linkedItems
-           .OfType<IWebPageFieldsSource>()   // keep only web pages (they have a URL)
-           .Select(page => new FooterLinkDto
-           {
-               Title = (page as IMetadata)?.MetadataTitle
-                       ?? string.Empty,
-               URL = _urlResolver.GetRelativePath(page) ?? string.Empty
-           })
-           .ToList();
-
-        return footerLinks;
+    private List<FooterLinkDto> MapMandatoryFooterLinks(IEnumerable<FooterPages> pages)
+    {
+        return pages
+            .Where(p => p.FooterLink != null)
+            .SelectMany(p => p.FooterLink ?? Enumerable.Empty<IContentItemFieldsSource>())
+            .OfType<IWebPageFieldsSource>()   // keep only web pages (they have a URL)
+            .Select(page => new FooterLinkDto
+            {
+                Title = (page as IMetadata)?.MetadataTitle ?? string.Empty,
+                URL = _urlResolver.GetRelativePath(page) ?? string.Empty
+            })
+            .ToList();
     }
 
     private async Task<IEnumerable<FooterLinkDto?>> GetFooterLinks()
@@ -210,7 +186,7 @@ public class FooterService : IFooterService
 
         return await BuildFooterLinksAsync(footerLinksPages);
     }
-    
+
     private async Task<IEnumerable<FooterLinkDto?>> GetFooterLinks(
     int channelId,
     string cultureName)
@@ -223,27 +199,27 @@ public class FooterService : IFooterService
 
         return await BuildFooterLinksAsync(footerLinksPages);
     }
+
     private async Task<IEnumerable<SocialButtonDto?>> GetSocialLinks()
     {
-        var socialLinksPages = (await _contentService.GetItemsChannelAsync<SocialLinks>())?.Take(8) ?? Enumerable.Empty<SocialLinks>();
-        int order = 1;
+        var socialLinksPages =
+            (await _contentService.GetItemsChannelAsync<SocialLinks>())?.Take(8)
+            ?? Enumerable.Empty<SocialLinks>();
 
-        return socialLinksPages
-            .Select(link => new SocialButtonDto
-            {
-                AltText = link?.Alttext ?? string.Empty,
-                AriaLabel = link?.AriaLabel ?? string.Empty,
-                IconType = link?.Icontype ?? string.Empty,
-                Order = order++,
-                URL = link?.Url?.ToString() ?? "#"
-            })
-            .OrderBy(x => x.Order)
-            .ToList();
+        return MapSocialButtons(socialLinksPages);
     }
 
     private async Task<IEnumerable<SocialButtonDto?>> GetSocialLinks(int channelId, string cultureName)
     {
-        var socialLinksPages = (await _contentService.GetItemsChannelOnChannelIdAsync<SocialLinks>(cultureName: cultureName, channelId: channelId))?.Take(8) ?? Enumerable.Empty<SocialLinks>();
+        var socialLinksPages =
+            (await _contentService.GetItemsChannelOnChannelIdAsync<SocialLinks>(cultureName: cultureName, channelId: channelId))?.Take(8)
+            ?? Enumerable.Empty<SocialLinks>();
+
+        return MapSocialButtons(socialLinksPages);
+    }
+
+    private static IEnumerable<SocialButtonDto?> MapSocialButtons(IEnumerable<SocialLinks> socialLinksPages)
+    {
         int order = 1;
 
         return socialLinksPages
@@ -295,8 +271,8 @@ public class FooterService : IFooterService
                 .Take(5)
                 .ToList()
         });
-    }    
-   
+    }
+
     private async Task<IEnumerable<FooterLinkDto?>> BuildFooterLinksAsync(
     IEnumerable<FooterLinks> footerLinksPages)
     {
