@@ -44,6 +44,6 @@ namespace BDO
 		/// <summary>
 		/// TopMenu.
 		/// </summary>
-		public IEnumerable<WebPageRelatedItem> TopMenu { get; set; }
+		public IEnumerable<IWebPageFieldsSource> TopMenu { get; set; }
 	}
 }

@@ -4,6 +4,7 @@ using CMS.Helpers;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
+using Kentico.Content.Web.Mvc.Routing;
 using Microsoft.AspNetCore.Http;
 
 namespace BDO.GWT.Core.Services.Header;
@@ -25,6 +26,7 @@ public class HeaderService : IHeaderService
     private readonly ILocalizedUrlsBuilder _localizedUrlsBuilder;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IProgressiveCache _cache;
+    private readonly IPreferredLanguageRetriever _preferredLanguageRetriever;
 
     public HeaderService(
         IContentService contentService,
@@ -34,7 +36,8 @@ public class HeaderService : IHeaderService
         IWebsiteChannelContext websiteChannel,
         ILocalizedUrlsBuilder localizedUrlsBuilder,
         IHttpContextAccessor httpContextAccessor,
-        IProgressiveCache cache)
+        IProgressiveCache cache,
+        IPreferredLanguageRetriever preferredLanguageRetriever)
     {
         _contentService = contentService;
         _contentRetriever = contentRetriever;
@@ -44,16 +47,22 @@ public class HeaderService : IHeaderService
         _localizedUrlsBuilder = localizedUrlsBuilder;
         _httpContextAccessor = httpContextAccessor;
         _cache = cache;
+        _preferredLanguageRetriever = preferredLanguageRetriever;
     }
     public async Task<HeaderDto?> GetAsync(IContentService contentservice, CancellationToken cancellationToken)
     {
+        // The header (menus, contact, etc.) is language-specific, so the current
+        // culture MUST be part of the cache key. Without it, the first language to
+        // populate the cache is served to every other language on the channel.
+        var languageName = _preferredLanguageRetriever.Get();
+
         var cacheSettings = new CacheSettings(
-            cacheMinutes: 20,
+            cacheMinutes: 10,
             cacheItemNameParts:
             [
                 nameof(HeaderService),
                 _websiteChannel.WebsiteChannelName,
-                // language part – use whatever culture value the header varies by
+                languageName // language part – header varies by culture
             ])
         {
             GetCacheDependency = () => CacheHelper.GetCacheDependency(new[]
@@ -132,7 +141,7 @@ public class HeaderService : IHeaderService
         string navRootPath = "/";
 
         var pages = (await _contentRetriever.RetrievePages<Navigation>(
-            new RetrievePagesParameters { PathMatch = PathMatch.Children(navRootPath,1) },
+            new RetrievePagesParameters { PathMatch = PathMatch.Children(navRootPath, 1) },
             query => query.OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken
@@ -143,26 +152,12 @@ public class HeaderService : IHeaderService
             return (Enumerable.Empty<LinkItemDto>(), null);
         }
 
-        var allGuids = pages
-            .Where(p => p.TopMenu != null)
-            .SelectMany(p => p.TopMenu?.Select(i => i.WebPageGuid) ?? Enumerable.Empty<Guid>())
-            .Distinct()
-            .ToList();
+        var topMenuItems = MapTopMenuLinks(pages);
 
-        var selectedPages = allGuids.Any() ? await _contentService.GetItemsByGUIDAsync(allGuids) : Enumerable.Empty<IWebPageFieldsSource>();
-
-        if(!selectedPages.Any())
+        if (topMenuItems.Count == 0)
         {
             return (Enumerable.Empty<LinkItemDto>(), null);
         }
-
-        var topMenuItems = selectedPages
-            .Select(item => new LinkItemDto
-            {
-                Title = (item as IMetadata)?.MetadataTitle ?? string.Empty,
-                URL = item?.GetUrl()?.RelativePath?.ToString() ?? string.Empty
-            })
-            .ToList();
 
         var contactPage = (await _contentRetriever.RetrievePages<Contact>(
             new RetrievePagesParameters { },
@@ -179,6 +174,20 @@ public class HeaderService : IHeaderService
 
         return (topMenuItems, linkItemDto);
     }
+
+    private static List<LinkItemDto> MapTopMenuLinks(IEnumerable<Navigation> pages)
+    {
+        return pages
+            .Where(p => p.TopMenu != null)
+            .SelectMany(p => p.TopMenu ?? Enumerable.Empty<IWebPageFieldsSource>())
+            .Select(page => new LinkItemDto
+            {
+                Title = (page as IMetadata)?.MetadataTitle ?? string.Empty,
+                URL = page?.GetUrl()?.RelativePath?.ToString() ?? string.Empty
+            })
+            .ToList();
+    }
+
     protected virtual async Task<IEnumerable<FirstLevelMenuItemDto>> BuildMegaMenuAsync(CancellationToken cancellationToken = default)
     {
         var firstLevelItems = (await _contentService.GetContentType<NavigationFirstLevelItem>(cancellationToken))?.ToList()
@@ -186,21 +195,13 @@ public class HeaderService : IHeaderService
 
         var megaMenu = new List<FirstLevelMenuItemDto>();
 
-        if(firstLevelItems.Count == 0)
+        if (firstLevelItems.Count == 0)
         {
             return megaMenu;
         }
 
         foreach (var first in firstLevelItems.Where(f => f != null))
         {
-            var firstLevelUrls = first.TargetURL?.Select(u => u?.WebPageGuid ?? Guid.Empty)
-                                    .Where(g => g != Guid.Empty)
-                                    .ToList() ?? new List<Guid>();
-
-            var firstSelectedPages = firstLevelUrls.Any()
-                ? await _contentService.GetItemsByGUIDAsync(firstLevelUrls)
-                : Enumerable.Empty<IWebPageFieldsSource>();
-
             var secondLevelDtos = await BuildSecondLevelAsync(first.SystemFields?.WebPageItemID ?? 0, cancellationToken);
 
             var featuredDtos = await BuildFeaturedLevelAsync(first.SystemFields?.WebPageItemID ?? 0, cancellationToken);
@@ -210,7 +211,7 @@ public class HeaderService : IHeaderService
                 Title = first.Title ?? string.Empty,
                 Children = secondLevelDtos,
                 Featured = featuredDtos,
-                URL = firstSelectedPages.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty
+                URL = first.TargetURL?.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty
             });
         }
 
@@ -224,25 +225,19 @@ public class HeaderService : IHeaderService
 
         var secondLevelDtos = new List<SecondLevelMenuItemDto>();
 
-        if(secondLevelItems.Count == 0)
+        if (secondLevelItems.Count == 0)
         {
             return secondLevelDtos;
         }
 
         foreach (var second in secondLevelItems.Where(s => s != null))
         {
-            var secondUrls = second.TargetURL?.Select(u => u?.WebPageGuid ?? Guid.Empty).Where(g => g != Guid.Empty).ToList()
-                             ?? new List<Guid>();
-            var secondSelectedPages = secondUrls.Any()
-                ? await _contentRetriever.RetrieveAllPagesByGuids<IWebPageFieldsSource>(secondUrls)
-                : Enumerable.Empty<IWebPageFieldsSource>();
-
             var thirdLevelDtos = await BuildThirdLevelAsync(second.SystemFields?.WebPageItemID ?? 0);
 
             secondLevelDtos.Add(new SecondLevelMenuItemDto
             {
                 Title = second.Title ?? string.Empty,
-                URL = secondSelectedPages.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty,
+                URL = second.TargetURL?.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty,
                 Children = thirdLevelDtos
             });
         }
@@ -257,23 +252,17 @@ public class HeaderService : IHeaderService
 
         var thirdLevelDtos = new List<ThirdLevelMenuItemDto>();
 
-        if(thirdLevelItems.Count == 0)
+        if (thirdLevelItems.Count == 0)
         {
             return thirdLevelDtos;
         }
 
         foreach (var third in thirdLevelItems.Where(t => t != null))
         {
-            var thirdUrls = third.TargetURL?.Select(u => u?.WebPageGuid ?? Guid.Empty).Where(g => g != Guid.Empty).ToList()
-                            ?? new List<Guid>();
-            var thirdSelectedPages = thirdUrls.Any()
-                ? await _contentRetriever.RetrieveAllPagesByGuids<IWebPageFieldsSource>(thirdUrls)
-                : Enumerable.Empty<IWebPageFieldsSource>();
-
             thirdLevelDtos.Add(new ThirdLevelMenuItemDto
             {
                 Title = third.Title ?? string.Empty,
-                URL = thirdSelectedPages.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty
+                URL = third.TargetURL?.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty
             });
         }
 
@@ -285,7 +274,7 @@ public class HeaderService : IHeaderService
         var featuredItems = (await _contentService.GetChildPagesByParentGuidAsync<NavigationFeaturedItem>(parentId))?.ToList()
                             ?? new List<NavigationFeaturedItem>();
 
-        if( featuredItems.Count == 0)
+        if (featuredItems.Count == 0)
         {
             return new List<FeaturedMenuItemDto>();
         }
@@ -294,13 +283,6 @@ public class HeaderService : IHeaderService
 
         foreach (var featured in featuredItems.Where(f => f != null))
         {
-            var featuredUrls = featured.TargetURL?.Select(u => u?.WebPageGuid ?? Guid.Empty).Where(g => g != Guid.Empty).ToList()
-                               ?? new List<Guid>();
-            var selectedPagesFeatured = featuredUrls.Any()
-                ? await _contentRetriever.RetrieveAllPagesByGuids<IWebPageFieldsSource>(featuredUrls)
-                : Enumerable.Empty<IWebPageFieldsSource>();
-
-
             string imageUrl = string.Empty;
             if (featured.Image != null)
             {
@@ -315,7 +297,7 @@ public class HeaderService : IHeaderService
             {
                 Title = featured.Title ?? string.Empty,
                 Description = featured.Description ?? string.Empty,
-                URL = selectedPagesFeatured.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty,
+                URL = featured.TargetURL?.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty,
                 ImageURL = imageUrl,
                 ImageAltText = featured.ImageAltText,
             });
@@ -324,5 +306,20 @@ public class HeaderService : IHeaderService
         return featuredDtos;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
