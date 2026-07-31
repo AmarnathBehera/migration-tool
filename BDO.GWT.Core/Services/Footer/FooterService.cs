@@ -133,7 +133,7 @@ public class FooterService : IFooterService
             {
                 PathMatch = PathMatch.Children(rootPath, 1),
                 LinkedItemsMaxLevel = 2
-               
+
             },
             query => query.OrderBy(
                 nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
@@ -156,22 +156,7 @@ public class FooterService : IFooterService
             })
             .ToList();
 
-        if(footerLinks.Count > 0)
-        {
-            return footerLinks;
-        }
-        else
-        {
-            return new List<FooterLinkDto>
-            {
-                new FooterLinkDto
-                {
-                    Title = "",
-                    URL = ""
-                },                
-            };
-        }
-      
+        return footerLinks;
     }
    
     private async Task<List<FooterLinkDto>> GetMandatoryFooterLinkDtosForAPIAsync(
@@ -214,21 +199,7 @@ public class FooterService : IFooterService
            })
            .ToList();
 
-        if (footerLinks.Count > 0)
-        {
-            return footerLinks;
-        }
-        else
-        {
-            return new List<FooterLinkDto>
-            {
-                new FooterLinkDto
-                {
-                    Title = "",
-                    URL = ""
-                },
-            };
-        }
+        return footerLinks;
     }
 
     private async Task<IEnumerable<FooterLinkDto?>> GetFooterLinks()
@@ -324,52 +295,8 @@ public class FooterService : IFooterService
                 .Take(5)
                 .ToList()
         });
-    }
-
-    private static List<FooterLinkDto> BuildFooterLinks(
-    IEnumerable<IWebPageFieldsSource> selectedPages)
-    {
-        int order = 0;
-
-        return selectedPages
-            .Select(page => new FooterLinkDto
-            {
-                Title = (page as IMetadata)?.MetadataTitle ?? string.Empty,
-                OpenInNewTab = false,
-                Order = order--,
-                URL = page?.GetUrl()?.RelativePath?.ToString() ?? string.Empty
-            })
-            .OrderBy(x => x.Order)
-            .ToList();
-    }
-
-    private static List<FooterLinkDto> BuildFooterLinks(
-    IEnumerable<IContentItemFieldsSource> selectedPages)
-    {
-        int order = 0;
-
-        return selectedPages
-            .Select(page => new FooterLinkDto
-            {
-                Title = (page as IMetadata)?.MetadataTitle ?? string.Empty,
-                OpenInNewTab = false,
-                Order = order--,
-                URL = page.SystemFields.ContentItemName ?? string.Empty
-            })
-            .OrderBy(x => x.Order)
-            .ToList();
-    }
-    //private static List<Guid> ExtractFooterPageGuids(
-    //IEnumerable<FooterPages> pages)
-    //{
-    //    return pages
-    //        .Where(p => p.FooterLink != null)
-    //        .SelectMany(p => p.FooterLink?.Select(i => i.WebPageGuid)
-    //                        ?? Enumerable.Empty<Guid>())
-    //        .Distinct()
-    //        .ToList();
-    //}
-
+    }    
+   
     private async Task<IEnumerable<FooterLinkDto?>> BuildFooterLinksAsync(
     IEnumerable<FooterLinks> footerLinksPages)
     {
