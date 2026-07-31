@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="ContentTypes\Classes\Redirect\" />
     <Folder Include="Repositories\" />
   </ItemGroup>
 </Project>
