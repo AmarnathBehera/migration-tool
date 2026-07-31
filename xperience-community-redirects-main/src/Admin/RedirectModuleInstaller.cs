@@ -87,7 +87,7 @@ internal class RedirectModuleInstaller(IInfoProvider<ResourceInfo> resourceInfoP
         };
         formItem.SetComponentName(WebPageSelectorComponent.IDENTIFIER);
         formInfo.AddFormItem(formItem);
-        
+
         formItem = new FormFieldInfo
         {
             Name = nameof(RedirectInfo.RedirectGUID),
@@ -126,7 +126,7 @@ internal class RedirectModuleInstaller(IInfoProvider<ResourceInfo> resourceInfoP
             info.ClassFormDefinition = form.GetXmlDefinition();
         }
     }
-    
+
     /// <summary>
     /// Retrospectively populates the RedirectGUID field for records created using version < v1.0.3 of this package
     /// </summary>

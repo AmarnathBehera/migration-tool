@@ -28,7 +28,9 @@ namespace GWTXbyKWeb.Controllers.API
         {
             query.Filters = RequestQueryUtility.ExtractFilterQueryParameters(Request.Query);
 
-            var dto = await _sectionDealsPageService.GetSectionDealsDealPaginationDtoAsync(pageGuid, query, cancellationToken);
+            var language = RouteData.Values[CultureInjectorAttribute.RouteParameter]?.ToString();
+
+            var dto = await _sectionDealsPageService.GetSectionDealsDealPaginationDtoAsync(language, pageGuid, query, cancellationToken);
 
             return Ok(dto);
         }
