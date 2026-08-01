@@ -27,6 +27,7 @@ public class HeaderService : IHeaderService
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IProgressiveCache _cache;
     private readonly IPreferredLanguageRetriever _preferredLanguageRetriever;
+    private readonly IWebPageUrlResolver _urlResolver;
 
     public HeaderService(
         IContentService contentService,
@@ -37,7 +38,8 @@ public class HeaderService : IHeaderService
         ILocalizedUrlsBuilder localizedUrlsBuilder,
         IHttpContextAccessor httpContextAccessor,
         IProgressiveCache cache,
-        IPreferredLanguageRetriever preferredLanguageRetriever)
+        IPreferredLanguageRetriever preferredLanguageRetriever,
+        IWebPageUrlResolver urlResolver)
     {
         _contentService = contentService;
         _contentRetriever = contentRetriever;
@@ -48,6 +50,7 @@ public class HeaderService : IHeaderService
         _httpContextAccessor = httpContextAccessor;
         _cache = cache;
         _preferredLanguageRetriever = preferredLanguageRetriever;
+        _urlResolver = urlResolver;
     }
     public async Task<HeaderDto?> GetAsync(IContentService contentservice, CancellationToken cancellationToken)
     {
@@ -141,7 +144,11 @@ public class HeaderService : IHeaderService
         string navRootPath = "/";
 
         var pages = (await _contentRetriever.RetrievePages<Navigation>(
-            new RetrievePagesParameters { PathMatch = PathMatch.Children(navRootPath, 1) },
+            new RetrievePagesParameters
+            {
+                PathMatch = PathMatch.Children(navRootPath, 1),
+                LinkedItemsMaxLevel = 2   // <-- required so p.TopMenu (linked pages) is populated
+            },
             query => query.OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken
@@ -175,7 +182,7 @@ public class HeaderService : IHeaderService
         return (topMenuItems, linkItemDto);
     }
 
-    private static List<LinkItemDto> MapTopMenuLinks(IEnumerable<Navigation> pages)
+    private List<LinkItemDto> MapTopMenuLinks(IEnumerable<Navigation> pages)
     {
         return pages
             .Where(p => p.TopMenu != null)
@@ -183,7 +190,7 @@ public class HeaderService : IHeaderService
             .Select(page => new LinkItemDto
             {
                 Title = (page as IMetadata)?.MetadataTitle ?? string.Empty,
-                URL = page?.GetUrl()?.RelativePath?.ToString() ?? string.Empty
+                URL = _urlResolver.GetRelativePath(page) ?? string.Empty
             })
             .ToList();
     }
@@ -306,6 +313,54 @@ public class HeaderService : IHeaderService
         return featuredDtos;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

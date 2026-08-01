@@ -23,6 +23,7 @@ namespace BDO.GWT.Core.Tests.Services
         private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
         private Mock<IProgressiveCache> _progressiveCacheMock = null!;
         private Mock<IPreferredLanguageRetriever> _preferredLanguageRetrieverMock = null!;
+        private Mock<IWebPageUrlResolver> _urlResolverMock = null!;
         private HeaderService _service = null!;
 
         [SetUp]
@@ -37,6 +38,7 @@ namespace BDO.GWT.Core.Tests.Services
             _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
             _preferredLanguageRetrieverMock = new Mock<IPreferredLanguageRetriever>();
             _progressiveCacheMock = new Mock<IProgressiveCache>();
+            _urlResolverMock = new Mock<IWebPageUrlResolver>();
             _service = new HeaderService(
                 _contentServiceMock.Object,
                 _contentRetrieverMock.Object,
@@ -46,7 +48,8 @@ namespace BDO.GWT.Core.Tests.Services
                 _localizedUrlsBuilderMock.Object,
                 _httpContextAccessorMock.Object,
                 _progressiveCacheMock.Object,
-                _preferredLanguageRetrieverMock.Object
+                _preferredLanguageRetrieverMock.Object,
+                _urlResolverMock.Object
             );
         }
 
