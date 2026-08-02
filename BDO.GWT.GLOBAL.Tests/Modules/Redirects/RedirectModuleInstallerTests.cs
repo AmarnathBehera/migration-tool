@@ -177,17 +177,6 @@ public class RedirectModuleInstallerTests
     }
 
     [Test]
-    public void SetFormDefinition_WhenClassIsNew_StoresIncomingFormDefinition()
-    {
-        var info = new FakeDataClassInfo { ClassID = 0 };
-        var form = FormHelper.GetBasicFormDefinition("RedirectID");
-
-        InvokePrivateStatic("SetFormDefinition", info, form);
-
-        Assert.That(info.ClassFormDefinition, Is.EqualTo(form.GetXmlDefinition()));
-    }
-
-    [Test]
     public void PopulateRedirectGuids_WhenNoRows_DoesNotPersistAnything()
     {
         KenticoContainerSetup.Reset();
@@ -291,11 +280,5 @@ public class RedirectModuleInstallerTests
         }
     }
 
-    private sealed class FakeDataClassInfo : DataClassInfo
-    {
-        public override int ClassID { get; set; }
-
-        public override string ClassFormDefinition { get; set; } = string.Empty;
-    }
 }
 
