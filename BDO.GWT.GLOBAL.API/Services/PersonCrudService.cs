@@ -643,7 +643,7 @@ public class PersonCrudService : IPersonCrudService
                 Name = person.SystemFields?.WebPageItemName ?? string.Empty,
                 Culture = culture ?? string.Empty,
                 WebPageItemParentID = person.SystemFields?.WebPageItemParentID ?? 0,
-                WebPageItemGuid = person.SystemFields?.WebPageItemGUID ?? Guid.Empty,
+                PageGuid = person.SystemFields?.WebPageItemGUID ?? Guid.Empty,
                 WebPageItemID = person.SystemFields?.WebPageItemID ?? 0,
                 ContentItemGuid = person.SystemFields?.ContentItemGUID ?? Guid.Empty,
                 ContentItemID = person.SystemFields?.ContentItemID ?? 0,
