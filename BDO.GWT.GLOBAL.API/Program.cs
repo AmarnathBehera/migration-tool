@@ -9,7 +9,6 @@ using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 
 namespace BDO.GWT.GLOBAL.API;
-
 public static class Program
 {
     public static void Main(string[] args)
