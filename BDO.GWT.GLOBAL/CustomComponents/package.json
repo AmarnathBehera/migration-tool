@@ -5,7 +5,7 @@
   "description": "Custom React components (form controls, widgets) for the BDO Xperience by Kentico admin UI.",
   "scripts": {
     "build": "webpack --mode=production",
-    "dev": "webpack --mode=development --watch",
+    "build:dev": "webpack --mode=development --watch",
     "clean": "node -e \"require('fs').rmSync('../wwwroot/Admin/adminresources/bdo.custom.components',{recursive:true,force:true})\""
   },
   "dependencies": {

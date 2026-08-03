@@ -59,11 +59,10 @@ public class GDPRControlComponent
             return Task.FromResult(new GdprCommandResult { Success = false, Message = "Email address is empty." });
 
         bool deleted = gdprUserLookupService.DeleteContactByEmail(data.Trim());
-        return Task.FromResult(new GdprCommandResult
-        {
-            Success = deleted,
-            Message = deleted ? "Personal data successfully deleted." : "No personal data found for the given email."
-        });
+        if (!deleted)
+            return Task.FromResult(new GdprCommandResult { Success = false, Message = $"No personal data found for {data.Trim()}." });
+
+        return Task.FromResult(new GdprCommandResult { Success = true, Message = "Personal data successfully deleted." });
     }
 }
 

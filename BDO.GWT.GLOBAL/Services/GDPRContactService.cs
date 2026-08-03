@@ -65,12 +65,12 @@ public sealed class GDPRUserService : IGDPRUserLookupService
         if (string.IsNullOrWhiteSpace(email))
             return false;
 
-        // Confirm personal data exists before proceeding.
-        if (string.IsNullOrWhiteSpace(FetchPersonalDataXml(email)) &&
-            !userInfoProvider.Get().WhereEquals("Email", email).Any())
+        var users = userInfoProvider.Get().WhereEquals("Email", email).GetEnumerableTypedResult().ToList();
+        var hasXmlData = !string.IsNullOrWhiteSpace(FetchPersonalDataXml(email));
+
+        if (!users.Any() && !hasXmlData)
             return false;
 
-        var users = userInfoProvider.Get().WhereEquals("Email", email);
         foreach (var user in users)
             userInfoProvider.Delete(user);
 
