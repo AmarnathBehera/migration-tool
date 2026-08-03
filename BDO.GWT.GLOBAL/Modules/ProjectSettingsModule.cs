@@ -13,9 +13,5 @@ namespace BDO.GWT.Xperience.Modules
         {
         }
 
-        protected override void OnInit()
-        {
-            base.OnInit();
-        }
     }
 }

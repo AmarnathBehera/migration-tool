@@ -9,7 +9,7 @@ namespace BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 
 public class GDPRConsentEditPage : InfoEditPage<GDPRInfo>
 {
-    private readonly IInfoProvider<GDPRInfo> GDPRInfoProvider;
+    private readonly IInfoProvider<GDPRInfo> gdprInfoProvider;
     private readonly IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider;
     private readonly IChannelAccessService channelAccessService;
 
@@ -22,7 +22,7 @@ public class GDPRConsentEditPage : InfoEditPage<GDPRInfo>
     {
         get
         {
-            var existing = GDPRInfoProvider.Get()
+            var existing = gdprInfoProvider.Get()
                 .WhereEquals(nameof(GDPRInfo.GDPRWebChannelSettingID), WebChannelSettingsId)
                 .FirstOrDefault();
 
@@ -35,9 +35,9 @@ public class GDPRConsentEditPage : InfoEditPage<GDPRInfo>
             var newGDPRInfo = new GDPRInfo
             {
                 GDPRWebChannelSettingID = WebChannelSettingsId.ToString(),
-                Consent = ""
+                Consent = string.Empty
             };
-            GDPRInfoProvider.Set(newGDPRInfo);
+            gdprInfoProvider.Set(newGDPRInfo);
 
             return newGDPRInfo.GDPRID;
         }
@@ -52,7 +52,7 @@ public class GDPRConsentEditPage : InfoEditPage<GDPRInfo>
         IChannelAccessService channelAccessService)
             : base(formComponentMapper, formDataBinder)
     {
-        this.GDPRInfoProvider = GDPRInfoProvider;
+        this.gdprInfoProvider = GDPRInfoProvider;
         this.webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
         this.channelAccessService = channelAccessService;
     }

@@ -11,7 +11,6 @@ namespace BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 public class GDPRInfoPage : InfoEditPage<GDPRInfo>
 {
     private readonly IInfoProvider<GDPRInfo> gdprInfoProvider;
-    private readonly IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider;
     private readonly IChannelAccessService channelAccessService;
     private readonly IGDPRUserLookupService gdprUserLookupService;
     protected override string ObjectType => GDPRInfo.OBJECT_TYPE;
@@ -52,13 +51,11 @@ public class GDPRInfoPage : InfoEditPage<GDPRInfo>
         IFormComponentMapper formComponentMapper,
         IFormDataBinder formDataBinder,
         IInfoProvider<GDPRInfo> gdprInfoProvider,
-        IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider,
         IChannelAccessService channelAccessService,
         IGDPRUserLookupService gdprUserLookupService)
             : base(formComponentMapper, formDataBinder)
     {
         this.gdprInfoProvider = gdprInfoProvider;
-        this.webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
         this.channelAccessService = channelAccessService;
         this.gdprUserLookupService = gdprUserLookupService;
     }
@@ -75,11 +72,9 @@ public class GDPRInfoPage : InfoEditPage<GDPRInfo>
 
         PageConfiguration.UIFormName = "gdprdisplay";
         PageConfiguration.Headline = "GDPR Display";
-        PageConfiguration.SubmitConfiguration.Visible = false;
 
         await base.ConfigurePage();
 
-        // Keep this page command-only (no Save button).
         PageConfiguration.SubmitConfiguration.Visible = false;
     }
 
@@ -119,7 +114,6 @@ public class GDPRInfoPage : InfoEditPage<GDPRInfo>
 
         var results = gdprUserLookupService.GetContactAsText(emailAddress.Trim());
 
-        //return await BuildFormCommandResponse(true, "Data fetched successfully.", results);
         return await BuildFormCommandResponse(true, results);
     }
 
@@ -156,8 +150,3 @@ public class GDPRInfoPage : InfoEditPage<GDPRInfo>
         return await BuildFormCommandResponse(true, "Contact deleted successfully.");
     }
 }
-
-//public sealed class GdprCommandData
-//{
-//    public string EmailAddress { get; set; } = string.Empty;
-//}

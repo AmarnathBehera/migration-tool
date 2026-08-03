@@ -66,7 +66,7 @@ public class GDPRControlComponent
 public class GdprCommandResult
 {
     public bool Success { get; set; }
-    public string Message { get; set; }
+    public string Message { get; set; } = string.Empty;
 }
 
 public class GDPRControlProperties : FormComponentProperties
@@ -75,5 +75,5 @@ public class GDPRControlProperties : FormComponentProperties
 
 public class GDPRControlClientProperties : FormComponentClientProperties<string>
 {
-    public string FieldLabel { get; set; }
+    public string FieldLabel { get; set; } = string.Empty;
 }

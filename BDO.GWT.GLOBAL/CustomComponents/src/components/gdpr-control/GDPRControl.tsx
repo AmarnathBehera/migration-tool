@@ -46,7 +46,6 @@ export const GDPRControl = (props: FormComponentProps) => {
 
         try {
             await navigator.clipboard.writeText(results);
-            setCopyLabel("Copied!");
         } catch (err) {
             console.error("Copy failed:", err);
             setCopyLabel("Copy failed");
