@@ -1,6 +1,6 @@
 import '@styles/index.css';
 import { BDOSQLDropdown } from '@components/custom-dropdown/CustomDropdown';
-import { CustomActionButton } from '@components/custom-action-button/CustomActionButton';
+import { GDPRControl } from '~/components/gdpr-control/GDPRControl';
 import { FieldGroupSeparator } from '@components/field-group-separator/FieldGroupSeparator';
 
 if (typeof document !== 'undefined') {
@@ -16,7 +16,7 @@ if (typeof document !== 'undefined') {
 export {
     BDOSQLDropdown,
     BDOSQLDropdown as BDOSQLDropdownFormComponent,
-    CustomActionButton,
-    CustomActionButton as CustomActionButtonFormComponent,
+    GDPRControl,
+    GDPRControl as GDPRControlFormComponent,
     FieldGroupSeparator as FieldGroupSeparatorFormComponent,
 };

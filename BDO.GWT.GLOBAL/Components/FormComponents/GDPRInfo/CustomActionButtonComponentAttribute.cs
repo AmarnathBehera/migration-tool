@@ -2,7 +2,7 @@
 
 namespace GWTXbyKWeb.Components.FormComponents.GDPRInfo
 {
-    public class CustomActionButtonComponentAttribute : FormComponentAttribute
+    public class GDPRControlComponentAttribute : FormComponentAttribute
     {
     }
 }

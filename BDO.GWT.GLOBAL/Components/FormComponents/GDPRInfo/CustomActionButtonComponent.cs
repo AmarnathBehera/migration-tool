@@ -4,29 +4,29 @@ using Kentico.Xperience.Admin.Base.Forms;
 using System.Threading.Tasks;
 
 [assembly: RegisterFormComponent(
-    CustomActionButtonComponent.IDENTIFIER,
-    typeof(CustomActionButtonComponent),
+    GDPRControlComponent.IDENTIFIER,
+    typeof(GDPRControlComponent),
     "GDPR Action Button"
 )]
 
 namespace GWTXbyKWeb.Components.FormComponents.GDPRInfo;
 
-[ComponentAttribute(typeof(CustomActionButtonComponentAttribute))]
-public class CustomActionButtonComponent
-    : FormComponent<CustomActionButtonProperties, CustomActionButtonClientProperties, string>
+[ComponentAttribute(typeof(GDPRControlComponentAttribute))]
+public class GDPRControlComponent
+    : FormComponent<GDPRControlProperties, GDPRControlClientProperties, string>
 {
     public const string IDENTIFIER = "BDO.GdprActionButton";
 
     private readonly IGDPRUserLookupService gdprUserLookupService;
 
-    public CustomActionButtonComponent(IGDPRUserLookupService gdprUserLookupService)
+    public GDPRControlComponent(IGDPRUserLookupService gdprUserLookupService)
     {
         this.gdprUserLookupService = gdprUserLookupService;
     }
 
-    public override string ClientComponentName => "@bdo/custom-components/CustomActionButton";
+    public override string ClientComponentName => "@bdo/custom-components/GDPRControl";
 
-    protected override async Task ConfigureClientProperties(CustomActionButtonClientProperties clientProperties)
+    protected override async Task ConfigureClientProperties(GDPRControlClientProperties clientProperties)
     {
         await base.ConfigureClientProperties(clientProperties);
         clientProperties.FieldLabel = clientProperties.Label;
@@ -73,11 +73,11 @@ public class GdprCommandResult
     public string Message { get; set; }
 }
 
-public class CustomActionButtonProperties : FormComponentProperties
+public class GDPRControlProperties : FormComponentProperties
 {
 }
 
-public class CustomActionButtonClientProperties : FormComponentClientProperties<string>
+public class GDPRControlClientProperties : FormComponentClientProperties<string>
 {
     public string FieldLabel { get; set; }
 }

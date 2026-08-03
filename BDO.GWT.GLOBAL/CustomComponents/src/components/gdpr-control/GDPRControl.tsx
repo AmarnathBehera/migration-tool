@@ -9,7 +9,7 @@ interface GdprCommandResult {
     message: string;
 }
 
-export const CustomActionButton = (props: FormComponentProps) => {
+export const GDPRControl = (props: FormComponentProps) => {
     const [emailAddress, setEmailAddress] = useState("");
     const [results, setResults] = useState("");
     const [errorMessage, setErrorMessage] = useState("");

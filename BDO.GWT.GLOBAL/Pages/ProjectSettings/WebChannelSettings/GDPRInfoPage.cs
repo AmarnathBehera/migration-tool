@@ -45,7 +45,7 @@ public class GDPRInfoPage : InfoEditPage<GDPRInfo>
 
     // The single field on this page: renders the custom widget
     // (email input + Search/Delete buttons + results area, all client-side).
-    [CustomActionButtonComponentAttribute(Label = "")]
+    [GDPRControlComponentAttribute(Label = "")]
     public string GdprLookup { get; set; } = string.Empty;
 
     public GDPRInfoPage(
