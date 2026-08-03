@@ -4,26 +4,22 @@ import { useFormComponentCommandProvider, FormComponentProps } from "@kentico/xp
 
 type GdprCommand = 'FetchTextData' | 'FetchXmlData' | 'Delete';
 
-interface FormCommandResponse {
-    messages?: Array<{ level: string; message: string }>;
+interface GdprCommandResult {
+    success: boolean;
+    message: string;
 }
 
 export const CustomActionButton = (props: FormComponentProps) => {
     const [emailAddress, setEmailAddress] = useState("");
     const [results, setResults] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [copyLabel, setCopyLabel] = useState("Copy");
 
     const { executeCommand } = useFormComponentCommandProvider();
-    interface GdprCommandResult {
-        success: boolean;
-        message: string;
-    }
 
     const invokeCommand = async (commandName: GdprCommand) => {
         setErrorMessage("");
 
-        // props itself satisfies FieldInfo (FormComponentProps extends FieldInfo) —
-        // no separate "fieldInfo" prop exists to destructure.
         const result = await executeCommand<GdprCommandResult, string>(
             props,
             commandName,
@@ -45,6 +41,21 @@ export const CustomActionButton = (props: FormComponentProps) => {
         }
     };
 
+    const handleCopy = async () => {
+        if (!results) return;
+
+        try {
+            await navigator.clipboard.writeText(results);
+            setCopyLabel("Copied!");
+        } catch (err) {
+            console.error("Copy failed:", err);
+            setCopyLabel("Copy failed");
+        }
+
+        // Reset the label back after a moment.
+        setTimeout(() => setCopyLabel("Copy"), 1500);
+    };
+
     const commandLabels: Record<GdprCommand, string> = {
         FetchTextData: 'Search to Text',
         FetchXmlData: 'Search to XML',
@@ -64,7 +75,8 @@ export const CustomActionButton = (props: FormComponentProps) => {
             <Button label={commandLabels.FetchTextData} onClick={() => invokeCommand("FetchTextData")} />
             <Button label={commandLabels.FetchXmlData} onClick={() => invokeCommand("FetchXmlData")} />
             <Button label={commandLabels.Delete} onClick={() => invokeCommand("Delete")} />
-
+            <Button label={copyLabel} onClick={handleCopy} disabled={!results} />
+            {errorMessage && <div style={{ color: "red" }}>{errorMessage}</div>}
             <br />
             <label>
                 Results:
@@ -75,8 +87,6 @@ export const CustomActionButton = (props: FormComponentProps) => {
                     style={{ width: "100%", minHeight: "250px", padding: "10px", resize: "vertical" }}
                 />
             </label>
-
-            {errorMessage && <div style={{ color: "red" }}>{errorMessage}</div>}
         </div>
     );
 };
