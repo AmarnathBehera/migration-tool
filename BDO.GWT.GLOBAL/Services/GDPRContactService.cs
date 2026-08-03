@@ -1,10 +1,9 @@
-using System;
-using System.Globalization;
-using System.Linq;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Text;
 using System.Xml.Linq;
 using CMS.DataEngine;
-using CMS.Helpers;
 using CMS.Membership;
 
 namespace BDO.GWT.GLOBAL.Services;
@@ -18,113 +17,175 @@ public interface IGDPRUserLookupService
 
 public sealed class GDPRUserService : IGDPRUserLookupService
 {
-    private readonly IInfoProvider<UserInfo> UserInfoProvider;
+    private readonly IInfoProvider<UserInfo> userInfoProvider;
 
-    public GDPRUserService(IInfoProvider<UserInfo> UserInfoProvider)
+    public GDPRUserService(IInfoProvider<UserInfo> userInfoProvider)
     {
-        this.UserInfoProvider = UserInfoProvider;
+        this.userInfoProvider = userInfoProvider;
     }
 
     public string GetContactAsText(string email)
     {
-        UserInfo user = GetUserByEmail(email);
-        if (user is null)
+        string xml = FetchPersonalDataXml(email);
+        if (string.IsNullOrWhiteSpace(xml))
+            return $"There was no result returned for the given email {email}.";
+
+        try
         {
-            return $"No OM Contact found for email: {email}";
+            var root = XElement.Parse(xml);
+            using var sw = new StringWriter();
+            FormatRootToText(sw, root);
+            return sw.ToString();
         }
-
-        int userId = ValidationHelper.GetInteger(user.GetValue("UserID"), 0);
-        string userLastName = ValidationHelper.GetString(user.GetValue("LastName"), string.Empty);
-        string userEmail = ValidationHelper.GetString(user.GetValue("UserName"), string.Empty);
-        int userEnabled = ValidationHelper.GetBoolean(user.GetValue("UserEnabled"), false) ? 1 : 0;
-        Guid userGuid = ValidationHelper.GetGuid(user.GetValue("UserGUID"), Guid.Empty);
-        DateTime userLastModified = ValidationHelper.GetDateTime(user.GetValue("UserLastModified"), DateTime.MinValue);
-        DateTime userCreated = ValidationHelper.GetDateTime(user.GetValue("UserCreated"), DateTime.MinValue);
-
-        var builder = new StringBuilder();
-        builder.AppendLine("Site Activity:");
-        builder.AppendLine("\tOM Contact");
-        builder.AppendLine($"\t\tContact ID:\t{userId}");
-        builder.AppendLine($"\t\tContact Last Name:\t{userLastName}");
-        builder.AppendLine($"\t\tContact Email:\t{userEmail}");
-        builder.AppendLine($"\t\tContact Gender:\t{0}");
-        builder.AppendLine($"\t\tContact Monitored:\t{userEnabled}");
-        builder.AppendLine($"\t\tContact GUID:\t{userGuid.ToString().ToUpperInvariant()}");
-        builder.AppendLine($"\t\tContact Last Modified:\t{FormatDate(userLastModified)}");
-        builder.AppendLine($"\t\tContact Created:\t{FormatDate(userCreated)}");
-        builder.AppendLine("\t\tOM Activity:");
-
-        return builder.ToString().TrimEnd();
+        catch
+        {
+            return $"There was no result returned for the given email {email}.";
+        }
     }
 
     public string GetContactAsXml(string email)
     {
-        UserInfo user = GetUserByEmail(email);
-        if (user is null)
+        string xml = FetchPersonalDataXml(email);
+        if (string.IsNullOrWhiteSpace(xml))
+            return "<XML />";
+
+        try
         {
-            return "<XML>\n  <OM_Contact />\n</XML>";
+            return XElement.Parse(xml).ToString(SaveOptions.None);
         }
-
-        int userId = ValidationHelper.GetInteger(user.GetValue("UserID"), 0);
-        string userLastName = ValidationHelper.GetString(user.GetValue("LastName"), string.Empty);
-        string userEmail = ValidationHelper.GetString(user.GetValue("UserName"), string.Empty);
-        int userEnabled = ValidationHelper.GetBoolean(user.GetValue("UserEnabled"), false) ? 1 : 0;
-        string userGuid = ValidationHelper.GetGuid(user.GetValue("UserGUID"), Guid.Empty).ToString().ToUpperInvariant();
-        DateTime userLastModified = ValidationHelper.GetDateTime(user.GetValue("UserModifiedWhen"), DateTime.MinValue);
-        DateTime userCreated = ValidationHelper.GetDateTime(user.GetValue("UserCreated"), DateTime.MinValue);
-
-        XElement xml = new(
-            "XML",
-            new XElement(
-                "OM_Contact",
-                new XElement("ContactID", userId),
-                new XElement("ContactLastName", userLastName),
-                new XElement("ContactEmail", userEmail),
-                new XElement("ContactGender", 0),
-                new XElement("ContactMonitored", userEnabled),
-                new XElement("ContactGUID", userGuid),
-                new XElement("ContactLastModified", FormatDate(userLastModified)),
-                new XElement("ContactCreated", FormatDate(userCreated)),
-                new XElement("OM_Activity")
-            )
-        );
-
-        return xml.ToString();
+        catch
+        {
+            return "<XML />";
+        }
     }
 
     public bool DeleteContactByEmail(string email)
     {
         if (string.IsNullOrWhiteSpace(email))
-        {
             return false;
+
+        bool deleted = false;
+        var users = userInfoProvider.Get().WhereEquals("Email", email);
+        foreach (var user in users)
+        {
+            userInfoProvider.Delete(user);
+            deleted = true;
         }
 
-        UserInfo user = GetUserByEmail(email.Trim());
-        if (user is null)
-        {
-            return false;
-        }
-
-        UserInfoProvider.Delete(user);
-        return true;
+        SanitizePersonalData(email);
+        return deleted;
     }
 
-    private UserInfo GetUserByEmail(string email)
+    private static string FetchPersonalDataXml(string email)
     {
-        return UserInfoProvider
-            .Get()
-            .WhereEquals("UserName", email)
-            .OrderByDescending("UserLastModified")
-            .FirstOrDefault();
+        var parameters = new QueryDataParameters
+        {
+            { "@email_address", email.Replace("'", "''") }
+        };
+
+        var sb = new StringBuilder();
+        using var reader = ConnectionHelper.ExecuteReader(
+            "dbo.BDO_GetPersonalData",
+            parameters,
+            QueryTypeEnum.StoredProcedure,
+            CommandBehavior.Default);
+
+        while (reader.Read())
+            sb.Append(reader.GetString(0));
+
+        return sb.ToString();
     }
 
-    private static string FormatDate(DateTime dateTime)
+    private static void SanitizePersonalData(string email)
     {
-        if (dateTime == DateTime.MinValue)
+        var parameters = new QueryDataParameters
         {
-            return string.Empty;
+            { "@email_address", email.Replace("'", "''") }
+        };
+
+        ConnectionHelper.ExecuteNonQuery(
+            "dbo.BDO_GDPR_SanitizePersonalData",
+            parameters,
+            QueryTypeEnum.StoredProcedure);
+    }
+
+    private static void FormatRootToText(TextWriter dst, XElement root)
+    {
+        var activities = new List<XElement>();
+        var forms = new List<XElement>();
+
+        foreach (var el in root.Elements())
+        {
+            if (el.Name.LocalName.Length >= 4 &&
+                string.Compare(el.Name.LocalName[..4], "Form", System.StringComparison.InvariantCultureIgnoreCase) == 0)
+                forms.Add(el);
+            else
+                activities.Add(el);
         }
 
-        return dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffffff", CultureInfo.InvariantCulture);
+        dst.WriteLine("Site Activity:");
+        foreach (var activity in activities)
+        {
+            dst.WriteLine($"\t{FormatName(activity.Name.LocalName)}");
+            FormatElement(dst, activity, indent: 2);
+        }
+
+        if (forms.Count > 0)
+        {
+            dst.WriteLine("Forms Completed:");
+            foreach (var form in forms)
+            {
+                dst.WriteLine($"\t{FormatName(form.Name.LocalName)}:");
+                FormatElement(dst, form, indent: 2);
+                dst.WriteLine();
+            }
+        }
+    }
+
+    private static void FormatElement(TextWriter dst, XElement ele, int indent = 0)
+    {
+        string pfx = new string('\t', indent);
+
+        foreach (XAttribute field in ele.Attributes())
+            dst.WriteLine($"{pfx}{FormatName(field.Name.LocalName)}:  {field.Value}");
+
+        foreach (var child in ele.Elements())
+        {
+            dst.Write($"{pfx}{FormatName(child.Name.LocalName)}:");
+            if (child.HasElements || child.HasAttributes)
+            {
+                dst.WriteLine();
+                FormatElement(dst, child, indent + 1);
+            }
+            if (!string.IsNullOrWhiteSpace(child.Value) && !child.HasElements)
+                dst.WriteLine($"  {child.Value}");
+            else
+                dst.WriteLine();
+        }
+    }
+
+    private static string FormatName(string oldName)
+    {
+        var sb = new StringBuilder();
+        bool isCap = true;
+        foreach (char c in oldName)
+        {
+            if (char.IsUpper(c))
+            {
+                if (isCap) sb.Append(c);
+                else { sb.Append($" {c}"); isCap = true; }
+            }
+            else if (c == '_' || c == '-')
+            {
+                sb.Append(' ');
+                isCap = true;
+            }
+            else
+            {
+                sb.Append(c);
+                isCap = false;
+            }
+        }
+        return sb.ToString();
     }
 }
