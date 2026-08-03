@@ -1,8 +1,10 @@
 ﻿using BDO.GWT.GLOBAL.Services;
 using GWTXbyKWeb.Components.FormComponents.GDPRInfo;
 using Kentico.Xperience.Admin.Base.Forms;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
+[assembly: InternalsVisibleTo("BDO.GWT.GLOBAL.Tests")]
 [assembly: RegisterFormComponent(
     GDPRControlComponent.IDENTIFIER,
     typeof(GDPRControlComponent),
@@ -33,36 +35,47 @@ public class GDPRControlComponent
     }
 
     [FormComponentCommand]
-    public Task<GdprCommandResult> FetchTextData(string data)
-    {
-        if (string.IsNullOrWhiteSpace(data))
-            return Task.FromResult(new GdprCommandResult { Success = false, Message = "Email address is empty." });
-
-        var results = gdprUserLookupService.GetContactAsText(data.Trim());
-        return Task.FromResult(new GdprCommandResult { Success = true, Message = results });
-    }
+    public Task<GdprCommandResult> FetchTextData(string data) =>
+        Task.FromResult(GdprCommandHandler.HandleFetchText(gdprUserLookupService, data));
 
     [FormComponentCommand]
-    public Task<GdprCommandResult> FetchXmlData(string data)
-    {
-        if (string.IsNullOrWhiteSpace(data))
-            return Task.FromResult(new GdprCommandResult { Success = false, Message = "Email address is empty." });
-
-        var results = gdprUserLookupService.GetContactAsXml(data.Trim());
-        return Task.FromResult(new GdprCommandResult { Success = true, Message = results });
-    }
+    public Task<GdprCommandResult> FetchXmlData(string data) =>
+        Task.FromResult(GdprCommandHandler.HandleFetchXml(gdprUserLookupService, data));
 
     [FormComponentCommand]
-    public Task<GdprCommandResult> Delete(string data)
+    public Task<GdprCommandResult> Delete(string data) =>
+        Task.FromResult(GdprCommandHandler.HandleDelete(gdprUserLookupService, data));
+}
+
+// Extracted so command logic is testable without Kentico's IoC container.
+internal static class GdprCommandHandler
+{
+    internal static GdprCommandResult HandleFetchText(IGDPRUserLookupService service, string data)
     {
         if (string.IsNullOrWhiteSpace(data))
-            return Task.FromResult(new GdprCommandResult { Success = false, Message = "Email address is empty." });
+            return new GdprCommandResult { Success = false, Message = "Email address is empty." };
 
-        bool deleted = gdprUserLookupService.DeleteContactByEmail(data.Trim());
+        return new GdprCommandResult { Success = true, Message = service.GetContactAsText(data.Trim()) };
+    }
+
+    internal static GdprCommandResult HandleFetchXml(IGDPRUserLookupService service, string data)
+    {
+        if (string.IsNullOrWhiteSpace(data))
+            return new GdprCommandResult { Success = false, Message = "Email address is empty." };
+
+        return new GdprCommandResult { Success = true, Message = service.GetContactAsXml(data.Trim()) };
+    }
+
+    internal static GdprCommandResult HandleDelete(IGDPRUserLookupService service, string data)
+    {
+        if (string.IsNullOrWhiteSpace(data))
+            return new GdprCommandResult { Success = false, Message = "Email address is empty." };
+
+        bool deleted = service.DeleteContactByEmail(data.Trim());
         if (!deleted)
-            return Task.FromResult(new GdprCommandResult { Success = false, Message = $"No personal data found for {data.Trim()}." });
+            return new GdprCommandResult { Success = false, Message = $"No personal data found for {data.Trim()}." };
 
-        return Task.FromResult(new GdprCommandResult { Success = true, Message = "Personal data successfully deleted." });
+        return new GdprCommandResult { Success = true, Message = "Personal data successfully deleted." };
     }
 }
 

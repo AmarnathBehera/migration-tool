@@ -7,16 +7,14 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents.GDPRInfo;
 public class GDPRControlComponentTests
 {
     private Mock<IGDPRUserLookupService> _serviceMock = null!;
-    private GDPRControlComponent _component = null!;
 
     [SetUp]
     public void Setup()
     {
         _serviceMock = new Mock<IGDPRUserLookupService>();
-        _component = new GDPRControlComponent(_serviceMock.Object);
     }
 
-    // IDENTIFIER
+    // IDENTIFIER — static constant, no instantiation required
 
     [Test]
     public void IDENTIFIER_HasExpectedValue()
@@ -24,14 +22,14 @@ public class GDPRControlComponentTests
         Assert.That(GDPRControlComponent.IDENTIFIER, Is.EqualTo("BDO.GdprActionButton"));
     }
 
-    // FetchTextData
+    // HandleFetchText
 
     [TestCase(null)]
     [TestCase("")]
     [TestCase("   ")]
-    public async Task FetchTextData_WhenEmailIsNullOrWhitespace_ReturnsFailureWithMessage(string? email)
+    public void HandleFetchText_WhenEmailIsNullOrWhitespace_ReturnsFailureWithMessage(string? email)
     {
-        var result = await _component.FetchTextData(email!);
+        var result = GdprCommandHandler.HandleFetchText(_serviceMock.Object, email!);
 
         Assert.Multiple(() =>
         {
@@ -42,40 +40,40 @@ public class GDPRControlComponentTests
     }
 
     [Test]
-    public async Task FetchTextData_WithValidEmail_CallsServiceAndReturnsSuccess()
+    public void HandleFetchText_WithValidEmail_CallsServiceAndReturnsSuccess()
     {
         const string email = "user@example.com";
-        const string expectedText = "Site Activity:\n\tOM Contact";
-        _serviceMock.Setup(s => s.GetContactAsText(email)).Returns(expectedText);
+        const string expected = "Site Activity:\n\tOM Contact";
+        _serviceMock.Setup(s => s.GetContactAsText(email)).Returns(expected);
 
-        var result = await _component.FetchTextData(email);
+        var result = GdprCommandHandler.HandleFetchText(_serviceMock.Object, email);
 
         Assert.Multiple(() =>
         {
             Assert.That(result.Success, Is.True);
-            Assert.That(result.Message, Is.EqualTo(expectedText));
+            Assert.That(result.Message, Is.EqualTo(expected));
         });
         _serviceMock.Verify(s => s.GetContactAsText(email), Times.Once);
     }
 
     [Test]
-    public async Task FetchTextData_TrimsEmailBeforeCallingService()
+    public void HandleFetchText_TrimsEmailBeforeCallingService()
     {
         _serviceMock.Setup(s => s.GetContactAsText("user@example.com")).Returns("data");
 
-        await _component.FetchTextData("  user@example.com  ");
+        GdprCommandHandler.HandleFetchText(_serviceMock.Object, "  user@example.com  ");
 
         _serviceMock.Verify(s => s.GetContactAsText("user@example.com"), Times.Once);
     }
 
-    // FetchXmlData
+    // HandleFetchXml
 
     [TestCase(null)]
     [TestCase("")]
     [TestCase("   ")]
-    public async Task FetchXmlData_WhenEmailIsNullOrWhitespace_ReturnsFailureWithMessage(string? email)
+    public void HandleFetchXml_WhenEmailIsNullOrWhitespace_ReturnsFailureWithMessage(string? email)
     {
-        var result = await _component.FetchXmlData(email!);
+        var result = GdprCommandHandler.HandleFetchXml(_serviceMock.Object, email!);
 
         Assert.Multiple(() =>
         {
@@ -86,13 +84,13 @@ public class GDPRControlComponentTests
     }
 
     [Test]
-    public async Task FetchXmlData_WithValidEmail_CallsServiceAndReturnsSuccess()
+    public void HandleFetchXml_WithValidEmail_CallsServiceAndReturnsSuccess()
     {
         const string email = "user@example.com";
         const string expectedXml = "<XML><OM_Contact /></XML>";
         _serviceMock.Setup(s => s.GetContactAsXml(email)).Returns(expectedXml);
 
-        var result = await _component.FetchXmlData(email);
+        var result = GdprCommandHandler.HandleFetchXml(_serviceMock.Object, email);
 
         Assert.Multiple(() =>
         {
@@ -103,23 +101,23 @@ public class GDPRControlComponentTests
     }
 
     [Test]
-    public async Task FetchXmlData_TrimsEmailBeforeCallingService()
+    public void HandleFetchXml_TrimsEmailBeforeCallingService()
     {
         _serviceMock.Setup(s => s.GetContactAsXml("user@example.com")).Returns("<XML />");
 
-        await _component.FetchXmlData("  user@example.com  ");
+        GdprCommandHandler.HandleFetchXml(_serviceMock.Object, "  user@example.com  ");
 
         _serviceMock.Verify(s => s.GetContactAsXml("user@example.com"), Times.Once);
     }
 
-    // Delete
+    // HandleDelete
 
     [TestCase(null)]
     [TestCase("")]
     [TestCase("   ")]
-    public async Task Delete_WhenEmailIsNullOrWhitespace_ReturnsFailureWithMessage(string? email)
+    public void HandleDelete_WhenEmailIsNullOrWhitespace_ReturnsFailureWithMessage(string? email)
     {
-        var result = await _component.Delete(email!);
+        var result = GdprCommandHandler.HandleDelete(_serviceMock.Object, email!);
 
         Assert.Multiple(() =>
         {
@@ -130,12 +128,12 @@ public class GDPRControlComponentTests
     }
 
     [Test]
-    public async Task Delete_WhenDataFound_ReturnsSuccessMessage()
+    public void HandleDelete_WhenDataFound_ReturnsSuccessMessage()
     {
         const string email = "user@example.com";
         _serviceMock.Setup(s => s.DeleteContactByEmail(email)).Returns(true);
 
-        var result = await _component.Delete(email);
+        var result = GdprCommandHandler.HandleDelete(_serviceMock.Object, email);
 
         Assert.Multiple(() =>
         {
@@ -145,26 +143,26 @@ public class GDPRControlComponentTests
     }
 
     [Test]
-    public async Task Delete_WhenNoDataFound_ReturnsNotFoundMessage()
+    public void HandleDelete_WhenNoDataFound_ReturnsNotFoundMessage()
     {
         const string email = "ghost@example.com";
         _serviceMock.Setup(s => s.DeleteContactByEmail(email)).Returns(false);
 
-        var result = await _component.Delete(email);
+        var result = GdprCommandHandler.HandleDelete(_serviceMock.Object, email);
 
         Assert.Multiple(() =>
         {
             Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo("No personal data found for the given email."));
+            Assert.That(result.Message, Is.EqualTo($"No personal data found for {email}."));
         });
     }
 
     [Test]
-    public async Task Delete_TrimsEmailBeforeCallingService()
+    public void HandleDelete_TrimsEmailBeforeCallingService()
     {
         _serviceMock.Setup(s => s.DeleteContactByEmail("user@example.com")).Returns(true);
 
-        await _component.Delete("  user@example.com  ");
+        GdprCommandHandler.HandleDelete(_serviceMock.Object, "  user@example.com  ");
 
         _serviceMock.Verify(s => s.DeleteContactByEmail("user@example.com"), Times.Once);
     }
@@ -187,3 +185,4 @@ public class GDPRControlComponentTests
         Assert.That(result.Success, Is.False);
     }
 }
+
