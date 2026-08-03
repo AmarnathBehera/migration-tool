@@ -1,9 +1,5 @@
 {
   "devDependencies": {
     "webpack-cli": "^7.0.2"
-  },
-  "dependencies": {
-    "@kentico/xperience-admin-base": "^31.7.0",
-    "@kentico/xperience-admin-components": "^31.7.0"
   }
 }
