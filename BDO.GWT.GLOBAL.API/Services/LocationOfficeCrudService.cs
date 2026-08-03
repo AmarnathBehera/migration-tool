@@ -615,7 +615,6 @@ public class LocationOfficeCrudService : ILocationOfficeCrudService
                 LocationLatitude = office.LocationLatitude,
                 LocationLongitude = office.LocationLongitude,
                 LocationEmail = office.LocationEmail,
-                //LocationType = office.LocationType,
                 LocationPhone = office.LocationPhone,
                 LocationFax = office.LocationFax,
                 OpeningHours = office.OpeningHours,

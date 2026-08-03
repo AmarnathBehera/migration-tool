@@ -1,5 +1,4 @@
-﻿using BDO.GWT.GLOBAL.API.Data;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace BDO.GWT.GLOBAL.API.Data;
 
