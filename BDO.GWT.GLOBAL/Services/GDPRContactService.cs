@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using CMS.DataEngine;
@@ -62,6 +63,11 @@ public sealed class GDPRUserService : IGDPRUserLookupService
     public bool DeleteContactByEmail(string email)
     {
         if (string.IsNullOrWhiteSpace(email))
+            return false;
+
+        // Confirm personal data exists before proceeding.
+        if (string.IsNullOrWhiteSpace(FetchPersonalDataXml(email)) &&
+            !userInfoProvider.Get().WhereEquals("Email", email).Any())
             return false;
 
         var users = userInfoProvider.Get().WhereEquals("Email", email);
