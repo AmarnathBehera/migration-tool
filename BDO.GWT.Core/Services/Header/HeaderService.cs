@@ -28,7 +28,7 @@ public class HeaderService : IHeaderService
     private readonly IProgressiveCache _cache;
     private readonly IPreferredLanguageRetriever _preferredLanguageRetriever;
     private readonly IWebPageUrlResolver _urlResolver;
-
+    private readonly string navRootPath = "/";
     public HeaderService(
         IContentService contentService,
         IContentRetriever contentRetriever,
@@ -140,9 +140,7 @@ public class HeaderService : IHeaderService
     }
 
     private async Task<(IEnumerable<LinkItemDto> TopMenu, LinkItemDto? Contact)> BuildTopMenuAsync(CancellationToken cancellationToken)
-    {
-        string navRootPath = "/";
-
+    {        
         var pages = (await _contentRetriever.RetrievePages<Navigation>(
             new RetrievePagesParameters
             {
@@ -167,7 +165,7 @@ public class HeaderService : IHeaderService
         }
 
         var contactPage = (await _contentRetriever.RetrievePages<Contact>(
-            new RetrievePagesParameters { },
+            new RetrievePagesParameters { PathMatch = PathMatch.Children(navRootPath, 1) },
             query => query.OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken
@@ -196,9 +194,17 @@ public class HeaderService : IHeaderService
     }
 
     protected virtual async Task<IEnumerable<FirstLevelMenuItemDto>> BuildMegaMenuAsync(CancellationToken cancellationToken = default)
-    {
-        var firstLevelItems = (await _contentService.GetContentType<NavigationFirstLevelItem>(cancellationToken))?.ToList()
-                              ?? new List<NavigationFirstLevelItem>();
+    {       
+        var firstLevelItems = (await _contentRetriever.RetrievePages<NavigationFirstLevelItem>(
+            new RetrievePagesParameters
+            {
+                PathMatch = PathMatch.Children(navRootPath, 1),
+                LinkedItemsMaxLevel = 2   // <-- required so p.TopMenu (linked pages) is populated
+            },
+            query => query.OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken
+        ))?.ToList() ?? new List<NavigationFirstLevelItem>();
 
         var megaMenu = new List<FirstLevelMenuItemDto>();
 
