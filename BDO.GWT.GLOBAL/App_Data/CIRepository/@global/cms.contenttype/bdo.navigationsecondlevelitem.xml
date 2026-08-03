@@ -17,17 +17,29 @@
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
-      <field column="TargetURL" columnprecision="0" columntype="webpages" enabled="true" guid="2d6deeea-f72e-4cc7-8323-6bb393097d35" visible="true">
+      <field allowempty="true" column="TargetURL" columnprecision="0" columntype="contentitemreference" enabled="true" guid="2d6deeea-f72e-4cc7-8323-6bb393097d35" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Target URL</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
         </properties>
         <settings>
-          <controlname>Kentico.Administration.WebPageSelector</controlname>
-          <MaximumPages>1</MaximumPages>
-          <Sortable>False</Sortable>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["b70d2494-90c7-42c5-a7d6-44da7013729b","f350df32-e183-46df-9156-68116ac72958","1ddec4b5-dabe-4e5d-a38a-1cf710c59244","b6a2aff8-7c0d-446a-be33-221a26bcac37","e95256dc-44da-4237-a5d0-2f39834f7755"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>10</MaximumItems>
+          <MinimumItems>1</MinimumItems>
+          <SelectionType>contentTypes</SelectionType>
         </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>Please select one page</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
       </field>
     </form>
   </ClassFormDefinition>
