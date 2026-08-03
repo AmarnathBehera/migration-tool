@@ -6,6 +6,5 @@
   <Project Path="BDO.GWT.GLOBAL.API.Tests/BDO.GWT.GLOBAL.API.Tests.csproj" Id="54a32d67-1f7e-45f4-b538-5621e3dd8bdd" />
   <Project Path="BDO.GWT.GLOBAL.API/BDO.GWT.GLOBAL.API.csproj" Id="4a2ae184-6013-4d62-adb6-b4bb404040a1" />
   <Project Path="BDO.GWT.GLOBAL.Tests/BDO.GWT.GLOBAL.Tests.csproj" />
-  <Project Path="xperience-community-redirects-main/src/XperienceCommunity.Redirects.csproj" />
 
 </Solution>
