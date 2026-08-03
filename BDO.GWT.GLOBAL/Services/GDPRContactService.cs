@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using CMS.DataEngine;
@@ -47,7 +48,7 @@ public sealed class GDPRUserService : IGDPRUserLookupService
     {
         string xml = FetchPersonalDataXml(email);
         if (string.IsNullOrWhiteSpace(xml))
-            return "There was no result returned for the given email {email}.";
+            return $"There was no result returned for the given email {email}.";
 
         try
         {
@@ -55,7 +56,7 @@ public sealed class GDPRUserService : IGDPRUserLookupService
         }
         catch
         {
-            return "There was no result returned for the given email {email}.";
+            return $"There was no result returned for the given email {email}.";
         }
     }
 
@@ -64,7 +65,12 @@ public sealed class GDPRUserService : IGDPRUserLookupService
         if (string.IsNullOrWhiteSpace(email))
             return false;
 
-        var users = userInfoProvider.Get().WhereEquals("Email", email);
+        var users = userInfoProvider.Get().WhereEquals("Email", email).GetEnumerableTypedResult().ToList();
+        var hasXmlData = !string.IsNullOrWhiteSpace(FetchPersonalDataXml(email));
+
+        if (!users.Any() && !hasXmlData)
+            return false;
+
         foreach (var user in users)
             userInfoProvider.Delete(user);
 
