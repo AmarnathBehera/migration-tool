@@ -1,10 +1,9 @@
 ﻿using BDO.GWT.GLOBAL.Services;
 using CMS.DataEngine;
+using GWTXbyKWeb.Components.FormComponents.GDPRInfo;
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
-using System;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
@@ -44,6 +43,11 @@ public class GDPRInfoPage : InfoEditPage<GDPRInfo>
         set => _ = value;
     }
 
+    // The single field on this page: renders the custom widget
+    // (email input + Search/Delete buttons + results area, all client-side).
+    [CustomActionButtonComponentAttribute(Label = "")]
+    public string GdprLookup { get; set; } = string.Empty;
+
     public GDPRInfoPage(
         IFormComponentMapper formComponentMapper,
         IFormDataBinder formDataBinder,
@@ -72,7 +76,6 @@ public class GDPRInfoPage : InfoEditPage<GDPRInfo>
         PageConfiguration.UIFormName = "gdprdisplay";
         PageConfiguration.Headline = "GDPR Display";
         PageConfiguration.SubmitConfiguration.Visible = false;
-        GdprButtonConfiguration.AddCommandActions(PageConfiguration);
 
         await base.ConfigurePage();
 
@@ -80,37 +83,10 @@ public class GDPRInfoPage : InfoEditPage<GDPRInfo>
         PageConfiguration.SubmitConfiguration.Visible = false;
     }
 
-
     // Loads the GDPR record currently bound to this channel.
     private GDPRInfo GetCurrentGDPRInfo() => gdprInfoProvider.Get()
         .WhereEquals(nameof(GDPRInfo.GDPRWebChannelSettingID), WebChannelSettingsId)
         .FirstOrDefault();
-
-    // Reads a submitted (unsaved) form field value sent with the command.
-    private static string GetFormValue(FormSubmissionCommandArguments args, params string[] fieldNames)
-    {
-        if (args?.Data is null)
-            return string.Empty;
-
-        foreach (var fieldName in fieldNames)
-        {
-            var match = args.Data.FirstOrDefault(kvp => string.Equals(kvp.Key, fieldName, StringComparison.OrdinalIgnoreCase));
-            var value = ConvertToString(match.Value);
-            if (!string.IsNullOrWhiteSpace(value))
-                return value.Trim();
-        }
-
-        return string.Empty;
-    }
-
-    private static string ConvertToString(object value) => value switch
-    {
-        null => string.Empty,
-        string s => s,
-        JsonElement { ValueKind: JsonValueKind.String } je => je.GetString() ?? string.Empty,
-        JsonElement je => je.ToString(),
-        _ => value.ToString() ?? string.Empty
-    };
 
     private async Task<ICommandResponse> BuildFormCommandResponse(bool success, string message, string results = null)
     {
@@ -130,84 +106,58 @@ public class GDPRInfoPage : InfoEditPage<GDPRInfo>
         return response;
     }
 
+    // "Search to Text" — looks up the contact and returns the plain-text result.
     [PageCommand]
-    public async Task<ICommandResponse> SendValue(FormSubmissionCommandArguments args)
-    {
-        var emailAddress = GetFormValue(args, "EmailAddress", "Email");
-        if (string.IsNullOrWhiteSpace(emailAddress))
-            return await BuildFormCommandResponse(false, "Email address is empty.");
-
-        return await BuildFormCommandResponse(true, "Value received.", emailAddress);
-    }
-
-    // "Search to Text" button: looks up the contact and stores the plain-text result.
-    [PageCommand]
-    public async Task<ICommandResponse> FetchTextData(FormSubmissionCommandArguments args)
+    public async Task<ICommandResponse> FetchTextData(string emailAddress)
     {
         var gdpr = GetCurrentGDPRInfo();
         if (gdpr is null)
             return await BuildFormCommandResponse(false, "GDPR record not found.");
 
-        var emailAddress = GetFormValue(args, "EmailAddress", "Email");
         if (string.IsNullOrWhiteSpace(emailAddress))
             return await BuildFormCommandResponse(false, "Email address is empty.");
 
-        var results = gdprUserLookupService.GetContactAsText(emailAddress);
+        var results = gdprUserLookupService.GetContactAsText(emailAddress.Trim());
 
-        return await BuildFormCommandResponse(true, "Data fetched successfully.", results);
-    }
-
-    // "Search to XML" button: looks up the contact and stores the XML result.
-    [PageCommand]
-    public async Task<ICommandResponse> FetchXmlData(FormSubmissionCommandArguments args)
-    {
-        var gdpr = GetCurrentGDPRInfo();
-        if (gdpr is null)
-            return await BuildFormCommandResponse(false, "GDPR record not found.");
-
-        var emailAddress = GetFormValue(args, "EmailAddress", "Email");
-        if (string.IsNullOrWhiteSpace(emailAddress))
-            return await BuildFormCommandResponse(false, "Email address is empty.");
-
-        var results = gdprUserLookupService.GetContactAsXml(emailAddress);
-
-        return await BuildFormCommandResponse(true, "Data fetched successfully.", results);
-    }
-
-    // "Copy" button: returns the stored results as a success message.
-    [PageCommand]
-    public async Task<ICommandResponse> Copy(FormSubmissionCommandArguments args)
-    {
-        var results = GetFormValue(args, "Results");
-
-        if (string.IsNullOrWhiteSpace(results))
-            return await BuildFormCommandResponse(false, "No results available to copy.");
-
+        //return await BuildFormCommandResponse(true, "Data fetched successfully.", results);
         return await BuildFormCommandResponse(true, results);
     }
 
-    // "Delete" button: clears the stored results.
+    // "Search to XML" — looks up the contact and returns the XML result.
     [PageCommand]
-    public async Task<ICommandResponse> Delete(FormSubmissionCommandArguments args)
+    public async Task<ICommandResponse> FetchXmlData(string emailAddress)
     {
         var gdpr = GetCurrentGDPRInfo();
         if (gdpr is null)
             return await BuildFormCommandResponse(false, "GDPR record not found.");
 
-        var emailAddress = GetFormValue(args, "EmailAddress", "Email");
         if (string.IsNullOrWhiteSpace(emailAddress))
             return await BuildFormCommandResponse(false, "Email address is empty.");
 
-        if (!gdprUserLookupService.DeleteContactByEmail(emailAddress))
+        var results = gdprUserLookupService.GetContactAsXml(emailAddress.Trim());
+
+        return await BuildFormCommandResponse(true, "Data fetched successfully.", results);
+    }
+
+    // "Delete" — deletes the contact by email.
+    [PageCommand]
+    public async Task<ICommandResponse> Delete(string emailAddress)
+    {
+        var gdpr = GetCurrentGDPRInfo();
+        if (gdpr is null)
+            return await BuildFormCommandResponse(false, "GDPR record not found.");
+
+        if (string.IsNullOrWhiteSpace(emailAddress))
+            return await BuildFormCommandResponse(false, "Email address is empty.");
+
+        if (!gdprUserLookupService.DeleteContactByEmail(emailAddress.Trim()))
             return await BuildFormCommandResponse(false, "No contact found to delete.");
 
         return await BuildFormCommandResponse(true, "Contact deleted successfully.");
     }
 }
 
-public sealed class GdprCommandData
-{
-    public string EmailAddress { get; set; } = string.Empty;
-    public string Results { get; set; } = string.Empty;
-}
-
+//public sealed class GdprCommandData
+//{
+//    public string EmailAddress { get; set; } = string.Empty;
+//}

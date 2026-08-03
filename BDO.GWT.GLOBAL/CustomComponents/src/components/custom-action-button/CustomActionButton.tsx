@@ -1,52 +1,47 @@
 import React, { useState } from "react";
 import { Button, InputBase } from "@kentico/xperience-admin-components";
-import { usePageCommand } from "@kentico/xperience-admin-base";
+import { useFormComponentCommandProvider, FormComponentProps } from "@kentico/xperience-admin-base";
 
 type GdprCommand = 'FetchTextData' | 'FetchXmlData' | 'Delete';
 
-console.log("CustomActionButton loaded");
-
-const Commands: Record<GdprCommand, GdprCommand> = {
-    FetchTextData: 'FetchTextData',
-    FetchXmlData: 'FetchXmlData',
-    Delete: 'Delete',
-};
-
-interface GdprCommandData {
-    EmailAddress: string;
-    Results: string;
+interface FormCommandResponse {
+    messages?: Array<{ level: string; message: string }>;
 }
 
-interface CustomActionButtonProps {
-    commandName?: GdprCommand;
-    commandType?: GdprCommand;
-    showSelector?: boolean;
-}
-
-export const CustomActionButton = ({
-    commandName,
-    commandType,
-    showSelector = true
-}: CustomActionButtonProps) => {
-    alert("CustomActionButton rendered");
-    const initialCommand: GdprCommand = commandName ?? commandType ?? 'FetchTextData';
-    const [selectedCommand, setSelectedCommand] = useState<GdprCommand>(initialCommand);
+export const CustomActionButton = (props: FormComponentProps) => {
     const [emailAddress, setEmailAddress] = useState("");
+    const [results, setResults] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
-    const { execute: invokeFetchText } = usePageCommand<void, GdprCommandData>(Commands.FetchTextData);
-    const { execute: invokeFetchXml } = usePageCommand<void, GdprCommandData>(Commands.FetchXmlData);
-    const { execute: invokeDelete } = usePageCommand<void, GdprCommandData>(Commands.Delete);
+    const { executeCommand } = useFormComponentCommandProvider();
+    interface GdprCommandResult {
+        success: boolean;
+        message: string;
+    }
 
-    const invokeCommand = (command: GdprCommand) => {
-        const data: GdprCommandData = { EmailAddress: emailAddress, Results: "" };
-        console.log("Sending payload:", data);
-        switch (command) {
-            case 'FetchTextData':
-                return invokeFetchText(data);
-            case 'FetchXmlData':
-                return invokeFetchXml(data);
-            case 'Delete':
-                return invokeDelete(data);
+    const invokeCommand = async (commandName: GdprCommand) => {
+        setErrorMessage("");
+
+        // props itself satisfies FieldInfo (FormComponentProps extends FieldInfo) —
+        // no separate "fieldInfo" prop exists to destructure.
+        const result = await executeCommand<GdprCommandResult, string>(
+            props,
+            commandName,
+            emailAddress
+        );
+
+        console.log("executeCommand result:", result);
+
+        if (commandName === "Delete") {
+            setResults("");
+        }
+
+        if (!result) return;
+
+        if (result.success) {
+            setResults(result.message);
+        } else {
+            setErrorMessage(result.message);
         }
     };
 
@@ -58,24 +53,30 @@ export const CustomActionButton = ({
 
     return (
         <div>
-            <InputBase
-                value={emailAddress}
-                onChange={(event) => {
-                    setEmailAddress(event.target.value);
-                }}
-            />
-            {showSelector && (
-                <select
-                    value={selectedCommand}
-                    onChange={e => setSelectedCommand(e.target.value as GdprCommand)}
-                    title="Select command"
-                >
-                    <option value="FetchTextData">Search to Text</option>
-                    <option value="FetchXmlData">Search to XML</option>
-                    <option value="Delete">Delete User</option>
-                </select>
-            )}
-            <Button label={commandLabels[selectedCommand]} onClick={() => invokeCommand(selectedCommand)} />
+            <label>
+                Email Address:
+                <InputBase
+                    value={emailAddress}
+                    onChange={(event) => setEmailAddress(event.target.value)}
+                />
+            </label>
+
+            <Button label={commandLabels.FetchTextData} onClick={() => invokeCommand("FetchTextData")} />
+            <Button label={commandLabels.FetchXmlData} onClick={() => invokeCommand("FetchXmlData")} />
+            <Button label={commandLabels.Delete} onClick={() => invokeCommand("Delete")} />
+
+            <br />
+            <label>
+                Results:
+                <textarea
+                    value={results}
+                    readOnly
+                    rows={10}
+                    style={{ width: "100%", minHeight: "250px", padding: "10px", resize: "vertical" }}
+                />
+            </label>
+
+            {errorMessage && <div style={{ color: "red" }}>{errorMessage}</div>}
         </div>
     );
 };

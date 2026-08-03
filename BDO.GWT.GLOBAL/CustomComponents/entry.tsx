@@ -17,5 +17,6 @@ export {
     BDOSQLDropdown,
     BDOSQLDropdown as BDOSQLDropdownFormComponent,
     CustomActionButton,
+    CustomActionButton as CustomActionButtonFormComponent,
     FieldGroupSeparator as FieldGroupSeparatorFormComponent,
 };
