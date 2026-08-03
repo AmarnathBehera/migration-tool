@@ -224,7 +224,11 @@ public class HeaderService : IHeaderService
                 Title = first.Title ?? string.Empty,
                 Children = secondLevelDtos,
                 Featured = featuredDtos,
-                URL = first.TargetURL?.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty
+                URL = first.TargetURL?
+                    .OfType<IWebPageFieldsSource>()
+                    .FirstOrDefault()?
+                    .SystemFields?.WebPageUrlPath
+                    ?? string.Empty
             });
         }
 
@@ -319,6 +323,70 @@ public class HeaderService : IHeaderService
         return featuredDtos;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

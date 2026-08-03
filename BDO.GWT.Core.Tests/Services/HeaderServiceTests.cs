@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using CMS.Helpers;
 using Moq;
 using Kentico.Content.Web.Mvc.Routing;
+using CMS.ContentEngine;
 
 namespace BDO.GWT.Core.Tests.Services
 {
@@ -100,6 +101,10 @@ namespace BDO.GWT.Core.Tests.Services
                 .SetupGet(x => x.HttpContext)
                 .Returns(new DefaultHttpContext());
 
+            _preferredLanguageRetrieverMock
+                .Setup(x => x.Get())
+                .Returns("en");
+
             _localizedUrlsBuilderMock
                 .Setup(x => x.BuildAsync(It.IsAny<HttpContext>()))
                 .ReturnsAsync(new List<LocalizedUrl>
@@ -130,9 +135,19 @@ namespace BDO.GWT.Core.Tests.Services
                 .Setup(x => x.GetDisplayName(_websiteChannelContextMock.Object))
                 .Returns("BDO Global");
 
-            _contentServiceMock
-                .Setup(x => x.GetContentType<NavigationFirstLevelItem>(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<NavigationFirstLevelItem> { new() { Title = "FirstLevel" } });
+            // BuildMegaMenuAsync now resolves first-level nav items via
+            // IContentRetriever.RetrievePages (bound with linked items),
+            // not via IContentService.GetContentType.
+            var firstLevelItem = new NavigationFirstLevelItem { Title = "FirstLevel" };
+
+            _contentRetrieverMock
+                .Setup(x => x.RetrievePages<NavigationFirstLevelItem, NavigationFirstLevelItem>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<Func<IContentQueryDataContainer, NavigationFirstLevelItem, Task<NavigationFirstLevelItem>>>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<NavigationFirstLevelItem> { firstLevelItem });
 
             // Act
             var headerDto = await _service.GetAsync(_contentServiceMock.Object, CancellationToken.None);
@@ -187,14 +202,34 @@ namespace BDO.GWT.Core.Tests.Services
         public async Task BuildMegaMenuAsync_ReturnsFirstLevelMenu()
         {
             // Arrange
-            var firstLevelItem = new NavigationFirstLevelItem { Title = "FirstLevel" };
-            _contentServiceMock
-                .Setup(s => s.GetContentType<NavigationFirstLevelItem>(It.IsAny<CancellationToken>()))
+            var targetPage = new NavigationFirstLevelItem
+            {
+                Title = "TargetPage",
+                SystemFields = new WebPageFields { WebPageUrlPath = "/first-level" }
+            };
+
+            var firstLevelItem = new NavigationFirstLevelItem
+            {
+                Title = "FirstLevel",
+                SystemFields = new WebPageFields { WebPageItemID = 1 },
+                TargetURL = new List<IWebPageFieldsSource> { targetPage }
+            };
+
+            // BuildMegaMenuAsync now resolves first-level items via
+            // IContentRetriever.RetrievePages (with linked items bound),
+            // not via IContentService.GetContentType/GetItemsByGUIDAsync.
+            _contentRetrieverMock
+                .Setup(x => x.RetrievePages<NavigationFirstLevelItem, NavigationFirstLevelItem>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<Func<IContentQueryDataContainer, NavigationFirstLevelItem, Task<NavigationFirstLevelItem>>>(),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<NavigationFirstLevelItem> { firstLevelItem });
 
-            _contentServiceMock
-                .Setup(s => s.GetItemsByGUIDAsync(It.IsAny<List<Guid>>()))
-                .ReturnsAsync(Enumerable.Empty<IWebPageFieldsSource>());
+            // Second-level / featured-level lookups are left unmocked on purpose;
+            // GetChildPagesByParentGuidAsync returns null by default, and the
+            // service methods already fall back to empty lists.
 
             // Act
             var method = _service.GetType()
@@ -209,6 +244,7 @@ namespace BDO.GWT.Core.Tests.Services
                 Assert.That(megaMenu, Is.Not.Null);
                 Assert.That(megaMenu.Any(), Is.True);
                 Assert.That(megaMenu.First().Title, Is.EqualTo("FirstLevel"));
+                Assert.That(megaMenu.First().URL, Is.EqualTo("/first-level"));
                 Assert.That(megaMenu.First().Children, Is.Empty);
                 Assert.That(megaMenu.First().Featured, Is.Null.Or.Empty);
             });
