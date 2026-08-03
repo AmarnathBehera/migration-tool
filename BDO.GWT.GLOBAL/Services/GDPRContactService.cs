@@ -38,7 +38,7 @@ public sealed class GDPRUserService : IGDPRUserLookupService
             FormatRootToText(sw, root);
             return sw.ToString();
         }
-        catch
+        catch (System.Xml.XmlException)
         {
             return $"There was no result returned for the given email {email}.";
         }
@@ -54,7 +54,7 @@ public sealed class GDPRUserService : IGDPRUserLookupService
         {
             return XElement.Parse(xml).ToString(SaveOptions.None);
         }
-        catch
+        catch (System.Xml.XmlException)
         {
             return $"There was no result returned for the given email {email}.";
         }
@@ -112,15 +112,14 @@ public sealed class GDPRUserService : IGDPRUserLookupService
             QueryTypeEnum.StoredProcedure);
     }
 
-    private static void FormatRootToText(TextWriter dst, XElement root)
+    private static void FormatRootToText(StringWriter dst, XElement root)
     {
         var activities = new List<XElement>();
         var forms = new List<XElement>();
 
         foreach (var el in root.Elements())
         {
-            if (el.Name.LocalName.Length >= 4 &&
-                string.Compare(el.Name.LocalName[..4], "Form", System.StringComparison.InvariantCultureIgnoreCase) == 0)
+            if (el.Name.LocalName.StartsWith("Form", System.StringComparison.OrdinalIgnoreCase))
                 forms.Add(el);
             else
                 activities.Add(el);

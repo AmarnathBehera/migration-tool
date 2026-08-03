@@ -56,6 +56,7 @@ export const GDPRControl = (props: FormComponentProps) => {
                 setResults("");
                 setFetchedEmail("");
                 setSuccessMessage(result.message);
+                setTimeout(() => setSuccessMessage(""), 3000);
             } else {
                 setResults(result.message);
                 setFetchedEmail(emailAddress.trim());
@@ -82,7 +83,7 @@ export const GDPRControl = (props: FormComponentProps) => {
         try {
             await navigator.clipboard.writeText(results);
             setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
+            setTimeout(() => setCopied(false), 3000);
         } catch (err) {
             console.error("Copy failed:", err);
         }
