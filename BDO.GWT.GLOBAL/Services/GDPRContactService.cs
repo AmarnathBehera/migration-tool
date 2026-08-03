@@ -47,7 +47,7 @@ public sealed class GDPRUserService : IGDPRUserLookupService
     {
         string xml = FetchPersonalDataXml(email);
         if (string.IsNullOrWhiteSpace(xml))
-            return "<XML />";
+            return "There was no result returned for the given email {email}.";
 
         try
         {
@@ -55,7 +55,7 @@ public sealed class GDPRUserService : IGDPRUserLookupService
         }
         catch
         {
-            return "<XML />";
+            return "There was no result returned for the given email {email}.";
         }
     }
 
@@ -64,16 +64,13 @@ public sealed class GDPRUserService : IGDPRUserLookupService
         if (string.IsNullOrWhiteSpace(email))
             return false;
 
-        bool deleted = false;
         var users = userInfoProvider.Get().WhereEquals("Email", email);
         foreach (var user in users)
-        {
             userInfoProvider.Delete(user);
-            deleted = true;
-        }
 
+        // Sanitize always runs regardless of whether a CMS user existed.
         SanitizePersonalData(email);
-        return deleted;
+        return true;
     }
 
     private static string FetchPersonalDataXml(string email)

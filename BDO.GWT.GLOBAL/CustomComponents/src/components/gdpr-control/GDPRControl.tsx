@@ -59,7 +59,7 @@ export const GDPRControl = (props: FormComponentProps) => {
     const commandLabels: Record<GdprCommand, string> = {
         FetchTextData: 'Search to Text',
         FetchXmlData: 'Search to XML',
-        Delete: 'Delete User',
+        Delete: 'Delete',
     };
 
     return (

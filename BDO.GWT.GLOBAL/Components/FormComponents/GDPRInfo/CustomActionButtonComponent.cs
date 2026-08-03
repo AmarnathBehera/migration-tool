@@ -58,12 +58,8 @@ public class GDPRControlComponent
         if (string.IsNullOrWhiteSpace(data))
             return Task.FromResult(new GdprCommandResult { Success = false, Message = "Email address is empty." });
 
-        var deleted = gdprUserLookupService.DeleteContactByEmail(data.Trim());
-        return Task.FromResult(new GdprCommandResult
-        {
-            Success = deleted,
-            Message = deleted ? "Contact deleted successfully." : "No contact found to delete."
-        });
+        gdprUserLookupService.DeleteContactByEmail(data.Trim());
+        return Task.FromResult(new GdprCommandResult { Success = true, Message = "Personal data successfully deleted." });
     }
 }
 
