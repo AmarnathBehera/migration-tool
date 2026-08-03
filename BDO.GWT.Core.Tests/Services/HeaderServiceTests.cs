@@ -8,6 +8,7 @@ using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using CMS.Helpers;
 using Moq;
+using Kentico.Content.Web.Mvc.Routing;
 
 namespace BDO.GWT.Core.Tests.Services
 {
@@ -21,6 +22,8 @@ namespace BDO.GWT.Core.Tests.Services
         private Mock<ILocalizedUrlsBuilder> _localizedUrlsBuilderMock = null!;
         private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
         private Mock<IProgressiveCache> _progressiveCacheMock = null!;
+        private Mock<IPreferredLanguageRetriever> _preferredLanguageRetrieverMock = null!;
+        private Mock<IWebPageUrlResolver> _urlResolverMock = null!;
         private HeaderService _service = null!;
 
         [SetUp]
@@ -33,7 +36,9 @@ namespace BDO.GWT.Core.Tests.Services
             _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
             _localizedUrlsBuilderMock = new Mock<ILocalizedUrlsBuilder>();
             _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+            _preferredLanguageRetrieverMock = new Mock<IPreferredLanguageRetriever>();
             _progressiveCacheMock = new Mock<IProgressiveCache>();
+            _urlResolverMock = new Mock<IWebPageUrlResolver>();
             _service = new HeaderService(
                 _contentServiceMock.Object,
                 _contentRetrieverMock.Object,
@@ -42,7 +47,9 @@ namespace BDO.GWT.Core.Tests.Services
                 _websiteChannelContextMock.Object,
                 _localizedUrlsBuilderMock.Object,
                 _httpContextAccessorMock.Object,
-                _progressiveCacheMock.Object
+                _progressiveCacheMock.Object,
+                _preferredLanguageRetrieverMock.Object,
+                _urlResolverMock.Object
             );
         }
 
