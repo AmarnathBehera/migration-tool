@@ -17,17 +17,29 @@
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
-      <field column="TargetURL" columnprecision="0" columntype="webpages" enabled="true" guid="4d03e12d-f3d0-4e89-9c5f-9b57a53ba0c6" visible="true">
+      <field allowempty="true" column="TargetURL" columnprecision="0" columntype="contentitemreference" enabled="true" guid="4d03e12d-f3d0-4e89-9c5f-9b57a53ba0c6" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Target URL</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
         </properties>
         <settings>
-          <controlname>Kentico.Administration.WebPageSelector</controlname>
-          <MaximumPages>1</MaximumPages>
-          <Sortable>False</Sortable>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["392e5450-56f2-49da-96a0-fc49215599d8","b1d1ea96-03a2-4a44-82f7-92973086a93b","7de84a06-569a-4dac-b701-55df640a4a49","c9ad5d32-9b92-477d-abd0-6b732dc1e86f","afb8a1ec-5001-46e6-8e98-4b9e28995e48","d7c0b1af-52c7-4f1b-b856-6aec846290cb","a15c3744-bd53-4359-b3a8-9fd52bd0c611","9aa28716-067c-4436-acf7-bb894b843c0b","b6cac6be-487b-4d72-b82a-eadaed297432","ceb7b7b1-256e-4158-96cf-a33fcbe96c2c","ddbf4830-0766-4cff-a420-f0ca936fd21f"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>10</MaximumItems>
+          <MinimumItems>1</MinimumItems>
+          <SelectionType>contentTypes</SelectionType>
         </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>Please select one page</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
       </field>
     </form>
   </ClassFormDefinition>
