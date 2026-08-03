@@ -112,7 +112,7 @@ public sealed class GDPRUserService : IGDPRUserLookupService
             QueryTypeEnum.StoredProcedure);
     }
 
-    private static void FormatRootToText(TextWriter dst, XElement root)
+    private static void FormatRootToText(StringWriter dst, XElement root)
     {
         var activities = new List<XElement>();
         var forms = new List<XElement>();
