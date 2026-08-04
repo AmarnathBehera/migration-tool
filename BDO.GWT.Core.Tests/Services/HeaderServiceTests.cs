@@ -227,6 +227,13 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<NavigationFirstLevelItem> { firstLevelItem });
 
+            // URL resolution for the target page now goes through the
+            // injected, mockable IWebPageUrlResolver rather than the
+            // static (IoC-container-dependent) GetUrl() extension method.
+            _urlResolverMock
+                .Setup(x => x.GetRelativePath(targetPage))
+                .Returns("/first-level");
+
             // Second-level / featured-level lookups are left unmocked on purpose;
             // GetChildPagesByParentGuidAsync returns null by default, and the
             // service methods already fall back to empty lists.

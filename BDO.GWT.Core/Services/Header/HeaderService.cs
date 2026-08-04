@@ -170,14 +170,14 @@ public class HeaderService : IHeaderService
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken
         ))?.FirstOrDefault();
-
-        var linkItemDto = new LinkItemDto
-        {
-            Title = contactPage?.MetadataTitle ?? string.Empty,
-            URL = contactPage?.GetUrl()?.RelativePath?.ToString() ?? string.Empty
-        };
-
-        return (topMenuItems, linkItemDto);
+       
+            var linkItemDto = new LinkItemDto
+            {
+                Title = contactPage?.MetadataTitle ?? string.Empty,
+                URL = contactPage?.GetUrl()?.RelativePath ?? string.Empty
+            };
+            return (topMenuItems, linkItemDto);
+             
     }
 
     private List<LinkItemDto> MapTopMenuLinks(IEnumerable<Navigation> pages)
@@ -219,16 +219,18 @@ public class HeaderService : IHeaderService
 
             var featuredDtos = await BuildFeaturedLevelAsync(first.SystemFields?.WebPageItemID ?? 0, cancellationToken);
 
+            var targetPage = first.TargetURL?
+                .OfType<IWebPageFieldsSource>()
+                .FirstOrDefault();
+
             megaMenu.Add(new FirstLevelMenuItemDto
             {
                 Title = first.Title ?? string.Empty,
                 Children = secondLevelDtos,
                 Featured = featuredDtos,
-                URL = first.TargetURL?
-                    .OfType<IWebPageFieldsSource>()
-                    .FirstOrDefault()?
-                    .SystemFields?.WebPageUrlPath
-                    ?? string.Empty
+                URL = targetPage != null
+                    ? _urlResolver.GetRelativePath(targetPage) ?? string.Empty
+                    : string.Empty
             });
         }
 
@@ -323,6 +325,134 @@ public class HeaderService : IHeaderService
         return featuredDtos;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
