@@ -137,6 +137,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IInsightCategoryCardListingPageService, InsightCategoryCardListingPageService>();
         serviceCollection.AddScoped<IInsightCardService, InsightCardService>();
         serviceCollection.AddScoped<IInsightCarouselService, InsightCarouselService>();
+        serviceCollection.AddScoped<IGDPRUserLookupService, GDPRUserService>();
 
         serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
         serviceCollection.AddSingleton<IEditorsPickStateStore, EditorsPickStateStore>();
