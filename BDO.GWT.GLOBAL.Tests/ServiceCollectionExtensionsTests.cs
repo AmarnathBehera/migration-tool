@@ -153,6 +153,7 @@ public class ServiceCollectionExtensionsTests
     [TestCase(typeof(ISitemapXmlRenderer), typeof(SitemapXmlRenderer))]
     [TestCase(typeof(ILanguageProvider), typeof(LanguageProvider))]
     [TestCase(typeof(IPageNodeProvider), typeof(PageNodeProvider))]
+    [TestCase(typeof(IGDPRUserLookupService), typeof(GDPRUserService))]
     public void AddXperience_RegistersScopedService(Type serviceType, Type implementationType)
     {
         _services.AddXperience();
