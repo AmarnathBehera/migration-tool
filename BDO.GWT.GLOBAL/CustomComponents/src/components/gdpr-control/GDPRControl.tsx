@@ -51,30 +51,31 @@ export const GDPRControl = (props: FormComponentProps) => {
 
         if (!result) return;
 
-        if (result.success) {
-            if (commandName === "Delete") {
-                setResults("");
-                setFetchedEmail("");
-                setSuccessMessage(result.message);
-                setTimeout(() => setSuccessMessage(""), 3000);
-            } else {
-                setResults(result.message);
-                setFetchedEmail(emailAddress.trim());
-            }
-        } else {
+        if (!result.success) {
             setErrorMessage(result.message);
+            return;
+        }
+
+        if (commandName === "Delete") {
+            setResults("");
+            setFetchedEmail("");
+            setSuccessMessage(result.message);
+            setTimeout(() => setSuccessMessage(""), 3000);
+        } else {
+            setResults(result.message);
+            setFetchedEmail(emailAddress.trim());
         }
     };
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
         if (!validateEmailInput()) return;
         if (!window.confirm("Are you sure you want to delete the personal data for this email address? This action cannot be undone.")) return;
-        invokeCommand("Delete");
+        await invokeCommand("Delete");
     };
 
-    const handleSearch = (commandName: GdprCommand) => {
+    const handleSearch = async (commandName: GdprCommand) => {
         if (!validateEmailInput()) return;
-        invokeCommand(commandName);
+        await invokeCommand(commandName);
     };
 
     const handleCopy = async () => {
@@ -84,8 +85,8 @@ export const GDPRControl = (props: FormComponentProps) => {
             await navigator.clipboard.writeText(results);
             setCopied(true);
             setTimeout(() => setCopied(false), 3000);
-        } catch (err) {
-            console.error("Copy failed:", err);
+        } catch {
+            setErrorMessage("Failed to copy to clipboard. Please copy the results manually.");
         }
     };
 
