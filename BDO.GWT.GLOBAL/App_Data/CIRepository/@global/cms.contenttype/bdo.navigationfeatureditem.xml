@@ -38,7 +38,7 @@
             <![CDATA[["b70d2494-90c7-42c5-a7d6-44da7013729b","1ddec4b5-dabe-4e5d-a38a-1cf710c59244","afb8b736-7f16-4a85-ab17-081c7833188c","4a8412a4-b16a-4e13-85f3-1bd503c0043e"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
-          <MaximumItems>5</MaximumItems>
+          <MaximumItems>1</MaximumItems>
           <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
