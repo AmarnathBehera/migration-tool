@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>GDPR</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="GDPRID" columntype="integer" enabled="true" guid="fe505917-4331-4a13-b5ae-a7a57b5e001e" isPK="true" />
+      <field column="GDPRWebChannelSettingID" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7fd735ce-c213-4876-8d6d-f1eaf3a6b2ae" />
+      <field allowempty="true" column="Consent" columnprecision="0" columntype="richtexthtml" enabled="true" guid="ddaf3f44-5542-4dd5-8536-09662daf2e91" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>dca57e58-66cb-4400-9f4f-10a2bf2650b6</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.GDPR</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_GDPR</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>
