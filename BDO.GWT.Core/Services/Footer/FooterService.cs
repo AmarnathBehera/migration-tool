@@ -232,11 +232,7 @@ public class FooterService : IFooterService
 
     private async Task<IEnumerable<SocialButtonDto?>> GetSocialLinks(CancellationToken cancellationToken)
     {
-        //var socialLinksPages =
-        //    (await _contentService.GetItemsChannelAsync<SocialLinks>())?.Take(8)
-        //    ?? Enumerable.Empty<SocialLinks>();
-
-        var socialLinksPages = (await _contentService.GetPagesAsync<SocialLinks>(
+         var socialLinksPages = (await _contentService.GetPagesAsync<SocialLinks>(
             new RetrievePagesParameters
             {
                 PathMatch = PathMatch.Children(MandatoryFooterRootPath, 2),
@@ -315,64 +311,5 @@ public class FooterService : IFooterService
         });
     }
 
-    private async Task<IEnumerable<FooterLinkDto?>> BuildFooterLinksAsync(
-    IEnumerable<FooterLinks> footerLinksPages)
-    {
-        var pages = footerLinksPages.Take(8).ToList();
-
-        var allGuids = pages
-            .Where(x => x.TargetURL != null)
-            .SelectMany(x =>
-                x.TargetURL?.Select(t => t.SystemFields?.WebPageItemGUID ?? Guid.Empty)
-                ?? Enumerable.Empty<Guid>())
-            .Where(guid => guid != Guid.Empty)
-            .Distinct()
-            .ToList();
-
-        var selectedPages = allGuids.Any()
-            ? await _contentService.GetItemsByGUIDAsync(allGuids)
-            : Enumerable.Empty<IWebPageFieldsSource>();
-
-        var pageUrlMap = selectedPages.ToDictionary(
-            p => p.SystemFields?.WebPageItemGUID ?? Guid.Empty,
-            p => p.GetUrl()?.RelativePath ?? string.Empty);
-
-        int order = 1;
-
-        return pages.Select(link =>
-        {
-            var guid = link?.TargetURL?.FirstOrDefault()?.SystemFields?.WebPageItemGUID
-                       ?? Guid.Empty;
-
-            return new FooterLinkDto
-            {
-                OpenInNewTab = link?.OpenInNewTab ?? false,
-                Order = order++,
-                Title = link?.Title ?? string.Empty,
-                URL = guid != Guid.Empty &&
-                      pageUrlMap.TryGetValue(guid, out var url)
-                        ? url
-                        : string.Empty
-            };
-        }).ToList();
-    }
-
-    //private List<FooterLinkDto> MapFooterLinks(IEnumerable<FooterLinks> footerLinksPages)
-    //{
-    //    int order = 1;
-
-    //   var footerTargetLInk = footerLinksPages.
-
-    //    var targetPage = link.TargetURL?.FirstOrDefault();
-
-    //    return new FooterLinkDto
-    //    {
-    //        OpenInNewTab = link.OpenInNewTab,
-    //        Order = order++,
-    //        Title = link.Title ?? string.Empty,
-    //        URL = targetPage != null
-    //            ? _urlResolver.GetRelativePath(targetPage) ?? string.Empty
-    //            : string.Empty
-    //    };
-    //}
+    
 }
