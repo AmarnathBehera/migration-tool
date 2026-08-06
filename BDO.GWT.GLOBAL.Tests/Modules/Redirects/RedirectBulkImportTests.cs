@@ -188,6 +188,94 @@ public class RedirectBulkImportTests
         Assert.That(method!.ReturnType, Is.EqualTo(typeof(string)));
     }
 
+    [Test]
+    public void GetDelimiter_CommaAndDefaultCases_AreHandled()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(RedirectBulkImport.GetDelimiter("comma"), Is.EqualTo(','));
+            Assert.That(RedirectBulkImport.GetDelimiter("semicolon"), Is.EqualTo(';'));
+            Assert.That(RedirectBulkImport.GetDelimiter("anything"), Is.EqualTo(';'));
+        });
+    }
+
+    [Test]
+    public void ParseCsvRows_RemovesEmptyLines_AndHeader()
+    {
+        var rows = RedirectBulkImport.ParseCsvRows("Source;Target\r\n  /a;/b  \r\n\r\n/c;/d", hasHeaderRow: true);
+
+        Assert.That(rows, Is.EqualTo(new[] { "/a;/b", "/c;/d" }));
+    }
+
+    [Test]
+    public void ParseCsvRows_WhenNoHeader_KeepsFirstRow()
+    {
+        var rows = RedirectBulkImport.ParseCsvRows("/a;/b\n/c;/d", hasHeaderRow: false);
+
+        Assert.That(rows, Is.EqualTo(new[] { "/a;/b", "/c;/d" }));
+    }
+
+    [Test]
+    public void BuildSummary_WhenAllCountersPresent_ContainsAllSegments()
+    {
+        var summary = RedirectBulkImport.BuildSummary(imported: 2, duplicates: 1, notFound: 3, malformed: 4);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(summary, Does.Contain("Imported 2 redirect(s)."));
+            Assert.That(summary, Does.Contain("Skipped 1 duplicate(s)."));
+            Assert.That(summary, Does.Contain("3 row(s) had a target URL that could not be matched to a page."));
+            Assert.That(summary, Does.Contain("4 row(s) were malformed."));
+        });
+    }
+
+    [Test]
+    public void BuildSummary_WhenOnlyImported_ContainsImportedSegmentOnly()
+    {
+        var summary = RedirectBulkImport.BuildSummary(imported: 1, duplicates: 0, notFound: 0, malformed: 0);
+
+        Assert.That(summary, Is.EqualTo("Imported 1 redirect(s)."));
+    }
+
+    [Test]
+    public void TryParseImportRow_WhenMalformed_ReturnsFalse()
+    {
+        var parsed = RedirectBulkImport.TryParseImportRow("single-column", ';', out var source, out var target);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(parsed, Is.False);
+            Assert.That(source, Is.EqualTo(string.Empty));
+            Assert.That(target, Is.EqualTo(string.Empty));
+        });
+    }
+
+    [Test]
+    public void TryParseImportRow_WhenValid_NormalizesValues()
+    {
+        var parsed = RedirectBulkImport.TryParseImportRow("\"/My-Source\";\"~/Target/Page/\"", ';', out var source, out var target);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(parsed, Is.True);
+            Assert.That(source, Is.EqualTo("/my-source"));
+            Assert.That(target, Is.EqualTo("/target/page"));
+        });
+    }
+
+    [Test]
+    public void TryParseImportRow_WhenSourceOrTargetEmpty_ReturnsFalse()
+    {
+        var parsed = RedirectBulkImport.TryParseImportRow(" ; ", ';', out var source, out var target);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(parsed, Is.False);
+            Assert.That(source, Is.EqualTo(string.Empty));
+            Assert.That(target, Is.EqualTo(string.Empty));
+        });
+    }
+
     private static RedirectBulkImport MakePage() =>
         (RedirectBulkImport)RuntimeHelpers.GetUninitializedObject(typeof(RedirectBulkImport));
 

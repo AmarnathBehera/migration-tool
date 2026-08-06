@@ -34,6 +34,50 @@ internal class RedirectBulkImport : ModelEditPage<RedirectBulkImportModel>
     private const int PageSize = 500;
     private const int MaxRows =200;
 
+    internal static char GetDelimiter(string delimiter) => delimiter == "comma" ? ',' : ';';
+
+    internal static List<string> ParseCsvRows(string csvData, bool hasHeaderRow)
+    {
+        var rows = (csvData ?? string.Empty)
+            .Split(LineSeparators, StringSplitOptions.RemoveEmptyEntries)
+            .Select(line => line.Trim())
+            .Where(line => line.Length > 0)
+            .ToList();
+
+        if (hasHeaderRow && rows.Count > 0)
+        {
+            rows.RemoveAt(0);
+        }
+
+        return rows;
+    }
+
+    internal static string BuildSummary(int imported, int duplicates, int notFound, int malformed)
+    {
+        var summary = $"Imported {imported} redirect(s).";
+        if (duplicates > 0) summary += $" Skipped {duplicates} duplicate(s).";
+        if (notFound > 0) summary += $" {notFound} row(s) had a target URL that could not be matched to a page.";
+        if (malformed > 0) summary += $" {malformed} row(s) were malformed.";
+        return summary;
+    }
+
+    internal static bool TryParseImportRow(string row, char delimiter, out string sourceUrl, out string targetUrl)
+    {
+        sourceUrl = string.Empty;
+        targetUrl = string.Empty;
+
+        var columns = row.Split(delimiter);
+        if (columns.Length < 2)
+        {
+            return false;
+        }
+
+        sourceUrl = columns[0].Trim().Trim('"').ToLowerInvariant();
+        targetUrl = NormalizeUrl(columns[1].Trim().Trim('"'));
+
+        return !(string.IsNullOrWhiteSpace(sourceUrl) || string.IsNullOrWhiteSpace(targetUrl));
+    }
+
     private readonly record struct PageUrlLookupRow(int WebPageItemID, Guid WebPageItemGUID);
 
     private readonly IInfoProvider<RedirectInfo> _redirectInfoProvider;
@@ -84,11 +128,7 @@ internal class RedirectBulkImport : ModelEditPage<RedirectBulkImportModel>
             return response.AddErrorMessage("The selected site could not be found.");
         }
 
-        char delimiter = model.Delimiter switch
-        {
-            "comma" => ',',
-            _ => ';',
-        };
+        char delimiter = GetDelimiter(model.Delimiter);
 
         var defaultLanguageName = GetDefaultLanguageName();
 
@@ -97,16 +137,7 @@ internal class RedirectBulkImport : ModelEditPage<RedirectBulkImportModel>
             return response.AddErrorMessage("No default content language is configured.");
         }
 
-        var rows = (model.CsvData ?? string.Empty)
-            .Split(LineSeparators, StringSplitOptions.RemoveEmptyEntries)
-            .Select(line => line.Trim())
-            .Where(line => line.Length > 0)
-            .ToList();
-
-        if (model.HasHeaderRow && rows.Count > 0)
-        {
-            rows.RemoveAt(0);
-        }
+        var rows = ParseCsvRows(model.CsvData, model.HasHeaderRow);
 
         if (rows.Count == 0)
         {
@@ -154,18 +185,7 @@ internal class RedirectBulkImport : ModelEditPage<RedirectBulkImportModel>
 
             foreach (var row in rows)
             {
-                var columns = row.Split(delimiter);
-
-                if (columns.Length < 2)
-                {
-                    malformed++;
-                    continue;
-                }
-
-                string sourceUrl = columns[0].Trim().Trim('"').ToLowerInvariant();
-                string targetUrl = NormalizeUrl(columns[1].Trim().Trim('"'));
-
-                if (string.IsNullOrWhiteSpace(sourceUrl) || string.IsNullOrWhiteSpace(targetUrl))
+                if (!TryParseImportRow(row, delimiter, out string sourceUrl, out string targetUrl))
                 {
                     malformed++;
                     continue;
@@ -211,10 +231,7 @@ internal class RedirectBulkImport : ModelEditPage<RedirectBulkImportModel>
                 "The import failed partway through and no redirects were saved. Check the Event Log for details.");
         }
 
-        var summary = $"Imported {imported} redirect(s).";
-        if (duplicates > 0) summary += $" Skipped {duplicates} duplicate(s).";
-        if (notFound > 0) summary += $" {notFound} row(s) had a target URL that could not be matched to a page.";
-        if (malformed > 0) summary += $" {malformed} row(s) were malformed.";
+        var summary = BuildSummary(imported, duplicates, notFound, malformed);
 
         return (duplicates > 0 || notFound > 0 || malformed > 0)
             ? response.AddWarningMessage(summary)
