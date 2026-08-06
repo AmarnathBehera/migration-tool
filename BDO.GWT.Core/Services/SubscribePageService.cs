@@ -22,21 +22,19 @@ public interface ISubscribePageService
 public class SubscribePageService : ISubscribePageService
 {
     private readonly IHeroService _heroService;
-    private readonly IPageUrlService _pageUrlService;
     private readonly IContentRetriever _contentRetriever;
     private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly IInfoProvider<WebsiteCaptchaSettingsInfo> _captchaSettingsProvider;
 
     // IMPORTANT: keep these aligned with values stored in WebsiteCaptchaSettingsReCaptchaVersion
-    private const int RecaptchaVersionV2 = 1;
-    private const int RecaptchaVersionV3 = 2;
+    private const int RecaptchaVersionV2 = 2;
+    private const int RecaptchaVersionV3 = 3;
 
     private readonly IInfoProvider<ContactGroupInfo> _recipientListInfoProvider;
 
-    public SubscribePageService(IInfoProvider<ContactGroupInfo> recipientListInfoProvider,IWebsiteChannelContext websiteChannelContext, IHeroService heroService, IPageUrlService pageUrlService, IContentRetriever contentRetriever, IInfoProvider<WebsiteCaptchaSettingsInfo> captchaSettingsProvider)
+    public SubscribePageService(IInfoProvider<ContactGroupInfo> recipientListInfoProvider,IWebsiteChannelContext websiteChannelContext, IHeroService heroService,IContentRetriever contentRetriever, IInfoProvider<WebsiteCaptchaSettingsInfo> captchaSettingsProvider)
     {
         _heroService = heroService;
-        _pageUrlService = pageUrlService;
         _contentRetriever = contentRetriever;
         _websiteChannelContext = websiteChannelContext;
         _captchaSettingsProvider = captchaSettingsProvider;
@@ -140,19 +138,15 @@ public class SubscribePageService : ISubscribePageService
     private string? GetRecaptchaPublicKey(Subscribe subscribePage, CancellationToken cancellationToken)
     {
         int channelId = _websiteChannelContext.WebsiteChannelID;
-        int recaptchaVersion = subscribePage.RecaptchaUseV3 ? RecaptchaVersionV3 : RecaptchaVersionV2;
-
+        int expectedVersion = subscribePage.RecaptchaUseV3 ? RecaptchaVersionV3 : RecaptchaVersionV2;
         var captchaSettings = _captchaSettingsProvider
-            .Get()
-            .WhereEquals(
-                nameof(WebsiteCaptchaSettingsInfo.WebsiteCaptchaSettingsWebsiteChannelID),
-                channelId)
-            .WhereEquals(
-                nameof(WebsiteCaptchaSettingsInfo.WebsiteCaptchaSettingsReCaptchaVersion),
-                recaptchaVersion)
-            .TopN(1)
-            .FirstOrDefault();
+                .Get()
+                .WhereEquals(
+                    nameof(WebsiteCaptchaSettingsInfo.WebsiteCaptchaSettingsWebsiteChannelID),
+                    channelId)
+                .TopN(1)
+                .FirstOrDefault();
 
-        return captchaSettings?.WebsiteCaptchaSettingsReCaptchaSiteKey;
+         return captchaSettings?.WebsiteCaptchaSettingsReCaptchaSiteKey;
     }
 }

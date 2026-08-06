@@ -368,7 +368,33 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     customViewName: "~/Views/Subscribe/Index.cshtml",
     ContentTypeNames = new[] { "BDO.Subscribe" },
     IconClass = "xp-market")]
+[assembly: RegisterWebPageRoute(SubscribeConfirm.CONTENT_TYPE_NAME, typeof(SubscribeConfirmController))]
 
+
+[assembly: RegisterPageTemplate(
+    identifier: SubscribeConfirm.CONTENT_TYPE_NAME,
+    name: "Subscribe Confirm Content Type Template",
+    customViewName: "~/Views/SubscribeConfirm/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.Insight" },
+    IconClass = "xp-market")]
+[assembly: RegisterWebPageRoute(SubscribeRemove.CONTENT_TYPE_NAME, typeof(SubscribeConfirmController))]
+
+
+[assembly: RegisterPageTemplate(
+    identifier: SubscribeRemove.CONTENT_TYPE_NAME,
+    name: "Subscribe remove Content Type Template",
+    customViewName: "~/Views/SubscribeRemove/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.Insight" },
+    IconClass = "xp-market")]
+
+[assembly: RegisterWebPageRoute(ThankYouConversionPage.CONTENT_TYPE_NAME, typeof(ThankYouConversionPageController))]
+
+[assembly: RegisterPageTemplate(
+    identifier: ThankYouConversionPage.CONTENT_TYPE_NAME,
+    name: "Subscribe remove Content Type Template",
+    customViewName: "~/Views/ThankYouConversionPage/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.ThankYouConversionPage" },
+    IconClass = "xp-market")]
 [assembly: RegisterWebPageRoute(SectionRss.CONTENT_TYPE_NAME, typeof(SectionRssController))]
 [assembly: RegisterWebPageRoute(Sitemap.CONTENT_TYPE_NAME, typeof(SitemapPageController))]
 [assembly: RegisterWebPageRoute(Rss.CONTENT_TYPE_NAME, typeof(RssController))]

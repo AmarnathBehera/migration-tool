@@ -1,4 +1,4 @@
-﻿using BDO.GWT.Core;
+using BDO.GWT.Core;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
 using BDO.GWT.Core.Services;
@@ -79,7 +79,7 @@ public class XperiencePageContext : IPageContext
         var canRetrieve = _webPageDataContextRetriever.TryRetrieve(out var ctx);
 
         if (!canRetrieve || ctx.WebPage == null)
-            return null;
+            return CreateEmptyMetaDataSEOItemsDto();
 
 
         var webPageItemId = ctx.WebPage.WebPageItemID;
@@ -110,7 +110,7 @@ public class XperiencePageContext : IPageContext
         var page = pages?.Select(MapToMetaDataSEOItemsDto).FirstOrDefault();
 
         if (page == null)
-            return null;
+            return CreateEmptyMetaDataSEOItemsDto();
 
         var request = _httpContextAccessor.HttpContext?.Request;
         if (request != null)
@@ -120,49 +120,45 @@ public class XperiencePageContext : IPageContext
 
     }
 
+    private static MetaDataSEOItemsDto CreateEmptyMetaDataSEOItemsDto() => new()
+    {
+        MetaData = new MetaDataDto(),
+        OGMetaData = new OGMetaDataDto(),
+        SEOItemsDto = new SearchAndSEODto(),
+        PageMetaData = new PageMetaDataDto()
+    };
+
     private static MetaDataSEOItemsDto MapToMetaDataSEOItemsDto(IWebPageFieldsSource p)
     {
-        var result = new MetaDataSEOItemsDto();
+        var result = CreateEmptyMetaDataSEOItemsDto();
 
         if (p is IMetadata metadata)
         {
-            result.MetaData = new MetaDataDto
-            {
-                MetaTitle = metadata.MetadataTitle,
-                MetaDescription = metadata.MetadataDescription,
-                MetaTeaserImageAltText = metadata.MetadataTeaserImageAltText,
-                MetaCanonical = metadata.MetadataCanonical,
-            };
+            result.MetaData.MetaTitle = metadata.MetadataTitle;
+            result.MetaData.MetaDescription = metadata.MetadataDescription;
+            result.MetaData.MetaTeaserImageAltText = metadata.MetadataTeaserImageAltText;
+            result.MetaData.MetaCanonical = metadata.MetadataCanonical;
         }
 
         if (p is IOGMetadataFields ogMetadata)
         {
-            result.OGMetaData = new OGMetaDataDto
-            {
-                MetadataOGTitle = ogMetadata.MetadataOGTitle,
-                MetadataOGDescription = ogMetadata.MetadataOGDescription,
-                MetadataOGImage = ogMetadata.MetadataOGImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
-            };
+            result.OGMetaData.MetadataOGTitle = ogMetadata.MetadataOGTitle;
+            result.OGMetaData.MetadataOGDescription = ogMetadata.MetadataOGDescription;
+            result.OGMetaData.MetadataOGImage = ogMetadata.MetadataOGImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
         }
 
         if (p is ISearchAndSEO seo)
         {
-            result.SEOItemsDto = new SearchAndSEODto
-            {
-                IncludeInSitemap = seo.IncludeInSitemap,
-                MetadataNofollow = seo.MetadataNofollow,
-                MetadataNoindex = seo.MetadataNoindex
-            };
+            result.SEOItemsDto.IncludeInSitemap = seo.IncludeInSitemap;
+            result.SEOItemsDto.MetadataNofollow = seo.MetadataNofollow;
+            result.SEOItemsDto.MetadataNoindex = seo.MetadataNoindex;
         }
 
         if (p is IPageMetadata pageMetaData)
         {
-            result.PageMetaData = new PageMetaDataDto
-            {
-                PageTitle = pageMetaData.PageTitle,
-                PageDescription = pageMetaData.PageDescription,
-                PageKeywords = pageMetaData.PageKeywords
-            };
+            result.PageMetaData.PageTitle = pageMetaData.PageTitle;
+            result.PageMetaData.PageDescription = pageMetaData.PageDescription;
+            result.PageMetaData.PageKeywords = pageMetaData.PageKeywords;
         }
 
         return result;

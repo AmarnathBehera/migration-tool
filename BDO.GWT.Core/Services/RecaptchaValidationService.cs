@@ -60,7 +60,7 @@ namespace BDO.GWT.Core.Services
         protected virtual string? GetRecaptchaPrivateKey(bool isV3)
         {
             int channelId = _websiteChannelContext.WebsiteChannelID;
-            string expectedVersion = isV3 ? RecaptchaVersionV3 : RecaptchaVersionV2;
+            int expectedVersion = isV3 ? 1 : 0; // replace with actual enum values
 
             var captchaSettings = _captchaSettingsProvider
                 .Get()

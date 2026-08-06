@@ -53,7 +53,7 @@ public static class ReactComponentType
     public const string LegalBodyContent = "LegalBodyContent";
     public const string LegalSideBoxNavigation = "LegalSideBoxNavigation";
     public const string LocalNavigationJS = "LocalNavigationJS";
-    public const string SubscribeForm = "SubscribePageFooter";
+    public const string SubscribeForm = "SubscribeForm";
 
 
 

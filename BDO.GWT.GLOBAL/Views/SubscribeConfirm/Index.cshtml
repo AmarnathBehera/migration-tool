@@ -1,0 +1,44 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using BDO.GWT.Domain.Core.Constants
+@using BDO.GWT.Web.Core.LiveSite.Services
+@using BDO.GWT.Xperience.LiveSite.Services
+@using Kentico.Content.Web.Mvc
+@using Microsoft.AspNetCore.Antiforgery
+@inject IAntiforgery Antiforgery
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    var widgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.InsightCarousel,
+        //ComponentIdentifiers.Widgets.InsightAnimationCard,
+        ComponentIdentifiers.Widgets.FlexibleBanner,
+        ComponentIdentifiers.Widgets.Button,
+        ComponentIdentifiers.Widgets.QuoteCard,
+        ComponentIdentifiers.Widgets.Imagewithtext,
+        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.Form,
+    };
+}
+
+
+
+<div class="section-container py-20 pb-4">
+    @Html.Raw(Model.Message)
+</div>
+
+
+@await Html.Kentico().EditableAreaAsync(
+"mainContent",
+        new EditableAreaOptions
+        {
+            AllowedWidgets = widgetsList
+        })

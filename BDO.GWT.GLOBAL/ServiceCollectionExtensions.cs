@@ -1,4 +1,5 @@
 ﻿using BDO.GWT.Common.Options;
+using BDO.GWT.Common.Core.Services;
 using BDO.GWT.Core;
 using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.LiveSite.Services;
@@ -7,12 +8,15 @@ using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Services.Footer;
 using BDO.GWT.Core.Services.Header;
 using BDO.GWT.Core.Services.Widget;
+using BDO.GWT.Domain.Core.Helpers;
+using BDO.GWT.Domain.Core.Services;
 using BDO.GWT.GLOBAL.Components.FormComponents.CustomDropdown;
 using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
+using BDO.GWT.Xperience.Core.LiveSite.Services;
 using BDO.GWT.Xperience.Core.Services;
 using CMS.Core;
 using GWTXbyKWeb.Components.Services.SEOOptions;
@@ -139,7 +143,18 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IInsightCarouselService, InsightCarouselService>();
         serviceCollection.AddScoped<ISubscribePageService, SubscribePageService>();
         serviceCollection.AddScoped<IPageUrlService, PageUrlService>();
+        serviceCollection.AddScoped<ISubscribeFormService, SubscribeFormService>();
+        serviceCollection.AddScoped<IHashSaltProvider, HashSaltProvider>();
+        serviceCollection.AddScoped<IHashValidator, HashValidator>();
+        serviceCollection.AddScoped<IDateTimeProvider, DateTimeProvider>();
+        serviceCollection.AddScoped<IMarketingContactManagementService, MarketingContactManagementService>();
+        serviceCollection.AddScoped<INewsletterSubscriptionService, NewsletterSubscriptionService>();
+        serviceCollection.AddScoped<ISubscribeConfirmPageService, SubscribeConfirmPageService>();
         serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
+        serviceCollection.AddScoped<ISubscribePageService, SubscribePageService>();
+        serviceCollection.AddScoped<ISubServicesPageService, SubServicesPageService>();
+        serviceCollection.AddScoped<IVisitorContext, VisitorContext>();
+        serviceCollection.AddScoped<ICookieConsentService, CookieConsentService>();
     }
 
 }
