@@ -24,11 +24,10 @@ public interface ISectionEventsCrudService
     Task<ActionResult<PageOutput<SectionEventsPageContent>>> UpdatePageAsync(int channelId, Guid WebPageItemGuid, string? culture, SectionEventsPageContent request, CancellationToken cancellationToken);
     Task DeletePageAsync(int channelId, Guid WebPageItemGuid, string? culture, bool deleteAllCultures, CancellationToken cancellationToken);
 }
-public class SectionEventsCrudService : ISectionEventsCrudService   
+public class SectionEventsCrudService : ISectionEventsCrudService
 {
     private readonly IContentService _contentRetriever;
     private readonly IValidationState _validationState;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly ICultureService _cultureService;
     private readonly IPageContentValidator _pageContentValidator;
     private readonly IInfoProvider<ChannelInfo> _channelInfoProvider;
@@ -55,11 +54,10 @@ public class SectionEventsCrudService : ISectionEventsCrudService
 
         _contentRetriever = contentRetriever;
         _validationState = validationState;
-        _websiteChannelContext = websiteChannelContext;
         _cultureService = cultureService;
         _pageContentValidator = pageContentValidator;
         _channelInfoProvider = channelInfoProvider;
-        _webPageManager = webPageManagerFactory.Create(_websiteChannelContext.WebsiteChannelID == 0 ? 1 : _websiteChannelContext.WebsiteChannelID, user.UserID);
+        _webPageManager = webPageManagerFactory.Create(websiteChannelContext.WebsiteChannelID == 0 ? 1 : websiteChannelContext.WebsiteChannelID, user.UserID);
         _mappingHelper = mappingHelper;
     }
 
@@ -96,7 +94,13 @@ public class SectionEventsCrudService : ISectionEventsCrudService
 
             var sectionEvents = results?.ToList() ?? new List<SectionEvents>();
 
-            return sectionEvents.Select(page => MapSectionEventsToPageOutput(page, currentCulture.Locale)).ToList();
+            var pageOutputs = new List<PageOutput<SectionEventsPageContent>>();
+            foreach (var page in sectionEvents)
+            {
+                pageOutputs.Add(await MapSectionEventsToPageOutput(page, channel.ChannelName, currentCulture.Locale, cancellationToken));
+            }
+
+            return pageOutputs;
         }
         catch (NotFoundException ex)
         {
@@ -149,7 +153,7 @@ public class SectionEventsCrudService : ISectionEventsCrudService
                 return new NotFoundResult();
             }
 
-            return MapSectionEventsToPageOutput(sectionEventsPage, currentCulture.Locale);
+            return await MapSectionEventsToPageOutput(sectionEventsPage, channel.ChannelName, currentCulture.Locale, cancellationToken);
         }
         catch (NotFoundException ex)
         {
@@ -164,7 +168,7 @@ public class SectionEventsCrudService : ISectionEventsCrudService
             return new ObjectResult(ex.Message) { StatusCode = StatusCodes.Status500InternalServerError };
         }
     }
-        
+
     public async Task<ActionResult<PageOutput<SectionEventsPageContent>>> CreatePageAsync(int channelId, int WebPageParentID, string? culture, SectionEventsPageContent request, CancellationToken cancellationToken)
     {
         if (request is null)
@@ -195,16 +199,23 @@ public class SectionEventsCrudService : ISectionEventsCrudService
                 IsForPreview = false
             };
 
-            // NOTE: verify the parent-page content type this section is expected to live under.
-            // Using a generic web page lookup here as a placeholder — replace SectionEventsPage
-            // with the correct parent container type if different (mirrors SectionPeoplePage in PersonCrudService).
-            var parentPage = await _contentRetriever.GetPagesAsync<SectionEvents>(_retrieveCurrentPage, query => query
+            if (WebPageParentID != 0)
+            {
+                var parentPage = await _contentRetriever.GetPagesAsync<SectionEvents>(_retrieveCurrentPage, query => query
                 .Where(w => w.WhereEquals("WebPageItemID", WebPageParentID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
 
-            if (parentPage == null)
+                if (parentPage == null)
+                {
+                    _validationState.AddUnprocessableEntityError(nameof(WebPageParentID), ErrorMessage.ParentWithNodeIdNotFound(WebPageParentID));
+                    throw new UnprocessableEntityException();
+                }
+            }
+
+            if (request.EventsWebinarsListFilters is { Count: > 0 })
             {
-                _validationState.AddUnprocessableEntityError(nameof(WebPageParentID), ErrorMessage.ParentWithNodeIdNotFound(WebPageParentID));
-                throw new UnprocessableEntityException();
+                request.EventsWebinarsListFilters = request.EventsWebinarsListFilters
+                    .SelectMany(f => (f ?? string.Empty).Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
             }
 
             _pageContentValidator.ValidateAndNormalizePageContent(request);
@@ -213,7 +224,7 @@ public class SectionEventsCrudService : ISectionEventsCrudService
 
             string pageDisplayName = request.MetadataTitle ?? "New Section Events Page Created by API";
 
-            var itemData = await CreateSectionEventsItemData(request, cancellationToken);
+            var itemData = await CreateSectionEventsItemData(request, channel.ChannelName, currentCulture.Locale, cancellationToken);
 
             var contentItemParameters = new ContentItemParameters(SECTION_EVENTS_CONTENT_TYPE, itemData);
             var createPageParameters = new CreateWebPageParameters(pageDisplayName, currentCulture.Locale, contentItemParameters)
@@ -247,7 +258,9 @@ public class SectionEventsCrudService : ISectionEventsCrudService
                 cancellationToken);
 
             var createdPage = createdResult?.FirstOrDefault();
-            return createdPage != null ? MapSectionEventsToPageOutput(createdPage, currentCulture.Locale) : new BadRequestResult();
+            return createdPage != null
+                ? await MapSectionEventsToPageOutput(createdPage, channel.ChannelName, currentCulture.Locale, cancellationToken)
+                : new BadRequestResult();
         }
         catch (UnprocessableEntityException)
         {
@@ -293,6 +306,14 @@ public class SectionEventsCrudService : ISectionEventsCrudService
                 throw new NotFoundException("Channel not found");
             }
 
+
+            if (request.EventsWebinarsListFilters is { Count: > 0 })
+            {
+                request.EventsWebinarsListFilters = request.EventsWebinarsListFilters
+                    .SelectMany(f => (f ?? string.Empty).Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            }
+
             _pageContentValidator.ValidateAndNormalizePageContent(request);
 
             _validationState.ThrowIfThereAreErrors();
@@ -321,7 +342,7 @@ public class SectionEventsCrudService : ISectionEventsCrudService
                 throw new NotFoundException("Page system fields are missing");
             }
 
-            var itemData = await CreateSectionEventsItemData(request, cancellationToken);
+            var itemData = await CreateSectionEventsItemData(request, channel.ChannelName, toLangCulture.Locale, cancellationToken);
 
             var createVariantParameters = new CMS.Websites.CreateLanguageVariantParameters(
                 existingPage.SystemFields.WebPageItemID,
@@ -358,7 +379,9 @@ public class SectionEventsCrudService : ISectionEventsCrudService
                 cancellationToken);
 
             var variantPage = variantResult?.FirstOrDefault();
-            return variantPage != null ? MapSectionEventsToPageOutput(variantPage, toLangCulture.Locale) : new BadRequestResult();
+            return variantPage != null
+                ? await MapSectionEventsToPageOutput(variantPage, channel.ChannelName, toLangCulture.Locale, cancellationToken)
+                : new BadRequestResult();
         }
         catch (UnprocessableEntityException)
         {
@@ -424,7 +447,7 @@ public class SectionEventsCrudService : ISectionEventsCrudService
                 throw new NotFoundException("Page system fields are missing");
             }
 
-            var itemData = await CreateSectionEventsItemData(request, cancellationToken);
+            var itemData = await CreateSectionEventsItemData(request, channel.ChannelName, currentCulture.Locale, cancellationToken);
 
             await _webPageManager.TryCreateDraft(existingPage.SystemFields.WebPageItemID, currentCulture.Locale, cancellationToken: cancellationToken);
 
@@ -444,7 +467,9 @@ public class SectionEventsCrudService : ISectionEventsCrudService
                 cancellationToken);
 
             var updatedPage = updatedResult?.FirstOrDefault();
-            return updatedPage != null ? MapSectionEventsToPageOutput(updatedPage, currentCulture.Locale) : new BadRequestResult();
+            return updatedPage != null
+                ? await MapSectionEventsToPageOutput(updatedPage, channel.ChannelName, currentCulture.Locale, cancellationToken)
+                : new BadRequestResult();
         }
         catch (UnprocessableEntityException)
         {
@@ -536,11 +561,19 @@ public class SectionEventsCrudService : ISectionEventsCrudService
         }
     }
 
-    private async Task<ContentItemData> CreateSectionEventsItemData(SectionEventsPageContent content, CancellationToken cancellationToken)
+    private async Task<ContentItemData> CreateSectionEventsItemData(
+        SectionEventsPageContent content,
+        string channelName,
+        string culture,
+        CancellationToken cancellationToken)
     {
-        // ASSUMPTION: featured pages are page references; adjust the referenced type
-        // (currently a placeholder "SectionEventsPage") once you confirm what they point to.
-        var eventsWebinarsListFeaturedPages = await _mappingHelper.BuildReferencesPageAsync<SectionEvents>(content.EventsWebinarsListFeaturedPages, s => s.MetadataTitle, cancellationToken);
+        //var heroCallToActionButtonUrlReferences = await _mappingHelper.BuildWebPageUrlPathReferenceAsync<SectionEvents>(
+        //    content.HeroCallToActionButtonUrl, channelName, culture, cancellationToken);
+        //var eventsWebinarsListAdvancedSearchLinkUrlReferences = await _mappingHelper.BuildContentAttachmentPersonPageReferences(
+         //  content.EventsWebinarsListAdvancedSearchLinkUrl, channelName, culture, cancellationToken);
+
+        var eventsWebinarsListFeaturedPages = await _mappingHelper.BuildFeaturedEventOrWebinarReferencesAsync(
+    content.EventsWebinarsListFeaturedPages, channelName, culture, cancellationToken);
 
         var teaserImageReferences = await _mappingHelper.BuildContentAttachmentImageReferences(content.MetadataTeaserImage, cancellationToken);
         var heroBackgroundImageReferences = await _mappingHelper.BuildContentAttachmentImageReferences(content.HeroBackgroundImage, cancellationToken);
@@ -565,16 +598,16 @@ public class SectionEventsCrudService : ISectionEventsCrudService
             { nameof(SectionEvents.HeroBackgroundImage_MobileAltText), content.HeroBackgroundImage_MobileAltText ?? string.Empty },
             { nameof(SectionEvents.HeroCallToActionButtonType), content.HeroCallToActionButtonType ?? string.Empty },
             { nameof(SectionEvents.HeroCallToActionButtonText), content.HeroCallToActionButtonText ?? string.Empty },
-            { nameof(SectionEvents.HeroCallToActionButtonUrl), content.HeroCallToActionButtonUrl ?? string.Empty },
+            //{ nameof(SectionEvents.HeroCallToActionButtonUrl), heroCallToActionButtonUrlReferences },
 
             { nameof(SectionEvents.EventsWebinarsListTitle), content.EventsWebinarsListTitle ?? string.Empty },
             { nameof(SectionEvents.EventsWebinarsListDescription), content.EventsWebinarsListDescription ?? string.Empty },
             { nameof(SectionEvents.EventsWebinarsListFilteringEnabled), content.EventsWebinarsListFilteringEnabled },
-            { nameof(SectionEvents.EventsWebinarsListFilters), content.EventsWebinarsListFilters },
+            { nameof(SectionEvents.EventsWebinarsListFilters), NormalizeFilters(content.EventsWebinarsListFilters) },
             { nameof(SectionEvents.EventsWebinarsListFeaturedPages), eventsWebinarsListFeaturedPages },
             { nameof(SectionEvents.EventsWebinarsListAdvancedSearchDescription), content.EventsWebinarsListAdvancedSearchDescription ?? string.Empty },
             { nameof(SectionEvents.EventsWebinarsListAdvancedSearchLinkText), content.EventsWebinarsListAdvancedSearchLinkText ?? string.Empty },
-            { nameof(SectionEvents.EventsWebinarsListAdvancedSearchLinkUrl), content.EventsWebinarsListAdvancedSearchLinkUrl ?? string.Empty },
+            //{ nameof(SectionEvents.EventsWebinarsListAdvancedSearchLinkUrl), eventsWebinarsListAdvancedSearchLinkUrlReferences },
             { nameof(SectionEvents.ShowPastEvents), content.ShowPastEvents },
 
             { nameof(SectionEvents.MetadataOGTitle), content.MetadataOGTitle ?? string.Empty },
@@ -590,9 +623,22 @@ public class SectionEventsCrudService : ISectionEventsCrudService
             { nameof(SectionEvents.PageKeywords), string.Empty },
         });
     }
-
-    private static PageOutput<SectionEventsPageContent> MapSectionEventsToPageOutput(SectionEvents page, string culture)
+    private static string NormalizeFilters(IEnumerable<string>? filters)
     {
+        if (filters is null) return string.Empty;
+        var tokens = filters
+            .Where(f => !string.IsNullOrWhiteSpace(f))
+            .Distinct(StringComparer.OrdinalIgnoreCase);
+        return string.Join(';', tokens);
+    }
+
+    private async Task<PageOutput<SectionEventsPageContent>> MapSectionEventsToPageOutput(
+        SectionEvents page, string channelName, string culture, CancellationToken cancellationToken)
+    {
+        var advancedSearchLinkPath = await _mappingHelper.ResolveWebPageRelatedItemPathAsync(
+            page.EventsWebinarsListAdvancedSearchLinkUrl?.FirstOrDefault(),
+            channelName, culture, cancellationToken);
+
         return new PageOutput<SectionEventsPageContent>
         {
             General = new PageGeneralOutput
@@ -623,16 +669,23 @@ public class SectionEventsCrudService : ISectionEventsCrudService
                 HeroBackgroundImage_MobileAltText = page.HeroBackgroundImage_MobileAltText,
                 HeroCallToActionButtonType = page.HeroCallToActionButtonType,
                 HeroCallToActionButtonText = page.HeroCallToActionButtonText,
-                //HeroCallToActionButtonUrl = page.HeroCallToActionButtonUrl,
+                HeroCallToActionButtonUrl = page.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageItemTreePath ?? string.Empty,
 
                 EventsWebinarsListTitle = page.EventsWebinarsListTitle,
                 EventsWebinarsListDescription = page.EventsWebinarsListDescription,
                 EventsWebinarsListFilteringEnabled = page.EventsWebinarsListFilteringEnabled,
-                //EventsWebinarsListFilters = page.EventsWebinarsListFilters?.ToHashSet() ?? [],
-                //EventsWebinarsListFeaturedPages = page.EventsWebinarsListFeaturedPages.Select(c => c.MetadataTitle).ToList(),
+                EventsWebinarsListFilters = string.IsNullOrWhiteSpace(page.EventsWebinarsListFilters)
+                    ? new HashSet<string>()
+                    : page.EventsWebinarsListFilters
+                        .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                        .ToHashSet(),
+                EventsWebinarsListFeaturedPages = page.EventsWebinarsListFeaturedPages?
+                    .OfType<IMetadata>()
+                    .Select(c => c.MetadataTitle)
+                    .ToList() ?? new List<string>(),
                 EventsWebinarsListAdvancedSearchDescription = page.EventsWebinarsListAdvancedSearchDescription,
                 EventsWebinarsListAdvancedSearchLinkText = page.EventsWebinarsListAdvancedSearchLinkText,
-                //EventsWebinarsListAdvancedSearchLinkUrl = page.EventsWebinarsListAdvancedSearchLinkUrl,
+                EventsWebinarsListAdvancedSearchLinkUrl = advancedSearchLinkPath ?? string.Empty,
                 ShowPastEvents = page.ShowPastEvents,
 
                 MetadataOGTitle = page.MetadataOGTitle,

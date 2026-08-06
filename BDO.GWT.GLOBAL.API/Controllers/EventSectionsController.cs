@@ -15,7 +15,7 @@ namespace BDO.GWT.Web.Core.API.Controllers;
 /// <summary>
 /// Provides methods to read and manage event sections.
 /// </summary>
-[AllowAnonymous]
+[ApiController]
 [Route("memberFirms/{memberFirmID:int}/EventSections")]
 public class EventSectionsController : EntityControllerBase
 {
@@ -61,6 +61,7 @@ public class EventSectionsController : EntityControllerBase
     /// </summary>
     /// <param name="memberFirmID">ID of the member firm from which the page should be retrieved.</param>
     /// <param name="PageGuid">Page GUID of an section events page.</param>
+    /// <param name="culture">Culture of the page.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>Returns one section events page.</returns>
     [HttpGet("{PageGuid:guid}")]
@@ -162,6 +163,7 @@ public class EventSectionsController : EntityControllerBase
     /// </summary>
     /// <param name="memberFirmID">ID of the member firm in which the page should be modified.</param>
     /// <param name="PageGuid">Page GUID of the section events page.</param>
+    /// <param name="culture">Culture of the page.</param>
     /// <param name="request">Updated section events page data.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>Updated section events page.</returns>
@@ -196,6 +198,7 @@ public class EventSectionsController : EntityControllerBase
     /// </summary>
     /// <param name="memberFirmID">ID of the member firm in which the page should be deleted.</param>
     /// <param name="PageGuid">Page GUID of the section events.</param>
+    /// <param name="culture">Culture of the page.</param>
     /// <param name="deleteAllCultures">Should all culture versions be deleted of this section events?</param>
     /// <param name="cancellationToken"></param>
     /// <returns>204 No Content.</returns>

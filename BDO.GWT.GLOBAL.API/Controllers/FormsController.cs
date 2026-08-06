@@ -12,7 +12,6 @@ namespace BDO.GWT.GLOBAL.API.Controllers;
 /// <summary>
 /// Provides methods to read and manage forms.
 /// </summary>
-[AllowAnonymous]
 [ApiController]
 [Route("memberFirms/{memberFirmID:int}/Forms")]
 public class FormsController : EntityControllerBase

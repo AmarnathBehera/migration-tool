@@ -1,9 +1,9 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
-using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Services;
 using CMS.ContentEngine;
+using CMS.ContentEngine.Internal;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
@@ -56,6 +56,17 @@ namespace BDO.GWT.GLOBAL.API.Helpers
 
         Task<LanguageTag?> ValidateAndNormalizeSiteCultureAsync(int channelId, string languageTagString, CancellationToken cancellationToken);
         LanguageTag? ValidateAndNormalizeCultureAsync(string languageTagString);
+
+        Task<List<ContentItemReference>> BuildWebPageUrlPathReferenceAsync<TPage>(
+    string? pagePathOrGuid, string? channelName, string? culture, CancellationToken cancellationToken)
+    where TPage : class, IWebPageFieldsSource;
+
+        Task<string?> ResolveWebPageRelatedItemPathAsync(
+    WebPageRelatedItem? item, string? channelName, string? culture, CancellationToken cancellationToken);
+
+        Task<List<ContentItemReference>> BuildFeaturedEventOrWebinarReferencesAsync(
+        IEnumerable<string>? identifiers, string? channelName, string? culture, CancellationToken cancellationToken);
+
 
     }
     public class MappingHelper : IMappingHelper
@@ -495,6 +506,117 @@ namespace BDO.GWT.GLOBAL.API.Helpers
 
             return null;
         }
+        public async Task<List<ContentItemReference>> BuildWebPageUrlPathReferenceAsync<TPage>(
+    string? pagePathOrGuid, string? channelName, string? culture, CancellationToken cancellationToken)
+    where TPage : class, IWebPageFieldsSource
+        {
+            if (string.IsNullOrWhiteSpace(pagePathOrGuid))
+            {
+                return new List<ContentItemReference>();
+            }
 
+            var value = pagePathOrGuid.Trim();
+
+            if (Guid.TryParse(value, out var guid))
+            {
+                return new List<ContentItemReference> { new ContentItemReference { Identifier = guid } };
+            }
+
+            var normalizedPath = value.TrimStart('~');
+            var queryIndex = normalizedPath.IndexOf('?');
+            if (queryIndex >= 0) normalizedPath = normalizedPath[..queryIndex];
+            normalizedPath = normalizedPath.TrimEnd('/');
+
+            var parameters = new RetrievePagesParameters
+            {
+                LinkedItemsMaxLevel = 0,
+                ChannelName = channelName,
+                LanguageName = culture ?? defaultCulture.Language,
+                IsForPreview = false
+            };
+
+            var pages = await _contentRetriever.GetPagesAsync<TPage>(
+                parameters,
+                query => query.Where(w => w.WhereEquals("WebPageUrlPath", normalizedPath)),
+                RetrievalCacheSettings.CacheDisabled,
+                cancellationToken);
+
+            var match = pages?.FirstOrDefault();
+
+            return match is null
+                ? new List<ContentItemReference>()
+                : new List<ContentItemReference> { new ContentItemReference { Identifier = match.SystemFields.ContentItemGUID } };
+        }
+        public async Task<string?> ResolveWebPageRelatedItemPathAsync(
+    WebPageRelatedItem? item, string? channelName, string? culture, CancellationToken cancellationToken)
+        {
+            if (item is null)
+            {
+                return null;
+            }
+
+            var parameters = new RetrievePagesParameters
+            {
+                LinkedItemsMaxLevel = 0,
+                ChannelName = channelName,
+                LanguageName = culture ?? defaultCulture.Language,
+                IsForPreview = false
+            };
+
+            var pages = await _contentRetriever.GetPagesAsync<SectionEvents>(
+                parameters,
+                query => query.Where(w => w.WhereEquals("WebPageItemGUID", item.WebPageGuid)),
+                RetrievalCacheSettings.CacheDisabled,
+                cancellationToken);
+
+            return pages?.FirstOrDefault()?.SystemFields?.WebPageItemTreePath;
+        }
+        public async Task<List<ContentItemReference>> BuildFeaturedEventOrWebinarReferencesAsync(
+    IEnumerable<string>? identifiers, string? channelName, string? culture, CancellationToken cancellationToken)
+        {
+            var names = identifiers?
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Select(name => name.Trim())
+                .ToList() ?? new List<string>();
+
+            if (names.Count == 0)
+            {
+                return new List<ContentItemReference>();
+            }
+
+            var parameters = new RetrievePagesParameters
+            {
+                LinkedItemsMaxLevel = 0,
+                ChannelName = channelName,
+                LanguageName = culture ?? defaultCulture.Language,
+                IsForPreview = false
+            };
+
+            var eventPages = await _contentRetriever.GetPagesAsync<Event>(
+                parameters,
+                query => query.Where(w => w.WhereIn("MetadataTitle", names)),
+                RetrievalCacheSettings.CacheDisabled,
+                cancellationToken);
+
+            var webinarPages = await _contentRetriever.GetPagesAsync<Webinar>(
+                parameters,
+                query => query.Where(w => w.WhereIn("MetadataTitle", names)),
+                RetrievalCacheSettings.CacheDisabled,
+                cancellationToken);
+
+            var references = new List<ContentItemReference>();
+
+            if (eventPages is not null)
+            {
+                references.AddRange(eventPages.Select(p => new ContentItemReference { Identifier = p.SystemFields.ContentItemGUID }));
+            }
+
+            if (webinarPages is not null)
+            {
+                references.AddRange(webinarPages.Select(p => new ContentItemReference { Identifier = p.SystemFields.ContentItemGUID }));
+            }
+
+            return references;
+        }
     }
 }
