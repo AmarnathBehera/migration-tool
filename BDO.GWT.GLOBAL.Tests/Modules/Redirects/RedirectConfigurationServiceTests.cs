@@ -6,7 +6,7 @@ using Moq;
 using XperienceCommunity.Redirects;
 using XperienceCommunity.Redirects.Admin;
 using XperienceCommunity.Redirects.Services;
-using RedirectInfoX = global::XperienceCommunity.Redirects.RedirectInfo;
+using RedirectInfoX = global::BDO.RedirectInfo;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Redirects;
 

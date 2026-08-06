@@ -1,3 +1,4 @@
+using BDO;
 using CMS.ContentEngine;
 using CMS.Websites;
 using CMS.Websites.Internal;
@@ -84,7 +85,7 @@ public class RedirectMiddleware
 
     private async Task<string> GetTargetPageUrlAsync(HttpContext context, int targetWebPageItemId)
     {
-        List<ContentLanguageInfo> languages = GetContentLangauges().ToList();
+        List<ContentLanguageInfo> languages = GetContentLangauges();
         ContentLanguageInfo currentLanguage = ResolveLanguage(context, languages);
 
         var result = await _webPageUrlRetriever.Retrieve(targetWebPageItemId, currentLanguage?.ContentLanguageName);
@@ -124,7 +125,7 @@ public class RedirectMiddleware
             .GetScalarResult<int>();
     }
 
-    private static IEnumerable<ContentLanguageInfo> GetContentLangauges()
+    private static List<ContentLanguageInfo> GetContentLangauges()
     {
         return ContentLanguageInfo.Provider.Get()
             .Columns(nameof(ContentLanguageInfo.ContentLanguageName),

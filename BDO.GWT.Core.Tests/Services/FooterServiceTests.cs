@@ -13,6 +13,7 @@ namespace BDO.GWT.Core.Tests.Services
     {
         private Mock<IContentService> _contentServiceMock = null!;
         private Mock<IInfoProvider<ChannelInfo>> _channelInfoProviderMock = null!;
+        private Mock<IWebPageUrlResolver> _urlResolverMock = null!;
         private FooterService _service = null!;
 
         [SetUp]
@@ -20,12 +21,13 @@ namespace BDO.GWT.Core.Tests.Services
         {
             _contentServiceMock = new Mock<IContentService>();
             _channelInfoProviderMock = new Mock<IInfoProvider<ChannelInfo>>();
+            _urlResolverMock = new Mock<IWebPageUrlResolver>();
             // Register the additional interface BEFORE the mock's .Object is accessed below.
             // The GetAsync(int, CancellationToken?) extension used by FooterService internally
             // casts the provider to IInfoByIdProvider<ChannelInfo>, so the mock must implement it.
             // Moq requires As<T>() to be called prior to any .Object access.
             _channelInfoProviderMock.As<IInfoByIdProvider<ChannelInfo>>();
-            _service = new FooterService(_contentServiceMock.Object, _channelInfoProviderMock.Object);
+            _service = new FooterService(_contentServiceMock.Object, _channelInfoProviderMock.Object, _urlResolverMock.Object);
         }
 
         #region Helpers
@@ -55,6 +57,10 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<RetrievalCacheSettings>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<FooterPages>());
+
+            _urlResolverMock
+                .Setup(x => x.GetRelativePath(It.IsAny<IWebPageFieldsSource>()))
+                .Returns(string.Empty);
         }
 
         #endregion
@@ -187,7 +193,11 @@ namespace BDO.GWT.Core.Tests.Services
         public void GetAsync_WhenDependencyThrows_ExceptionIsPropagated()
         {
             _contentServiceMock
-                .Setup(x => x.GetItemsChannelAsync<FooterLinks>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.GetPagesAsync<FooterPages>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new Exception("service failure"));
 
             Assert.ThrowsAsync<Exception>(async () =>
@@ -247,9 +257,6 @@ namespace BDO.GWT.Core.Tests.Services
 
         #region FooterLinkDto – mapped from FooterLinks channel items
 
-       
-
-
         [Test]
         public async Task GetAsync_FooterLinks_Order_IsAssignedSequentially()
         {
@@ -290,34 +297,41 @@ namespace BDO.GWT.Core.Tests.Services
         [Test]
         public async Task GetAsync_FooterLinks_WhenTargetUrlGuidIsEmpty_MapsEmptyUrl()
         {
+            // Target page whose title maps to "No Target" but resolves to an empty URL
+            var targetMock = new Mock<IWebPageFieldsSource>();
+            targetMock.As<IMetadata>()
+                .Setup(m => m.MetadataTitle)
+                .Returns("No Target");
+
             var footerLinks = new List<FooterLinks>
             {
                 new FooterLinks
                 {
                     Title = "No Target",
                     OpenInNewTab = false,
-                    TargetURL = new List<IWebPageFieldsSource>
-                    {
-                        CreateWebPageSource(Guid.Empty, "/")
-                    }
+                    TargetURL = new List<IWebPageFieldsSource> { targetMock.Object }
                 }
             };
 
             _contentServiceMock
-                .Setup(x => x.GetItemsChannelAsync<FooterLinks>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.GetPagesAsync<FooterLinks>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(footerLinks);
 
             _contentServiceMock
-                .Setup(x => x.GetItemsChannelAsync<SocialLinks>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.GetPagesAsync<SocialLinks>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<SocialLinks>());
 
             _contentServiceMock
                 .Setup(x => x.GetContentType<Subscribe>(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Enumerable.Empty<Subscribe>());
-
-            _contentServiceMock
-                .Setup(x => x.GetItemsByGUIDAsync(It.IsAny<List<Guid>>()))
-                .ReturnsAsync(new List<IWebPageFieldsSource>());
 
             _contentServiceMock
                 .Setup(x => x.GetPagesAsync<FooterPages>(
@@ -326,6 +340,11 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<RetrievalCacheSettings>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<FooterPages>());
+
+            // Resolver returns empty -> URL should map to string.Empty
+            _urlResolverMock
+                .Setup(x => x.GetRelativePath(It.IsAny<IWebPageFieldsSource>()))
+                .Returns(string.Empty);
 
             var result = await _service.GetAsync(CancellationToken.None);
 
@@ -337,31 +356,41 @@ namespace BDO.GWT.Core.Tests.Services
         [Test]
         public async Task GetAsync_FooterLinks_WhenNullTitle_MapsFallbackEmpty()
         {
+            // Target page whose MetadataTitle is null -> should map to string.Empty
+            var targetMock = new Mock<IWebPageFieldsSource>();
+            targetMock.As<IMetadata>()
+                .Setup(m => m.MetadataTitle)
+                .Returns((string)null!);
+
             var footerLinks = new List<FooterLinks>
             {
                 new FooterLinks
                 {
                     Title = null!,
                     OpenInNewTab = false,
-                    TargetURL = Enumerable.Empty<IWebPageFieldsSource>()
+                    TargetURL = new List<IWebPageFieldsSource> { targetMock.Object }
                 }
             };
 
             _contentServiceMock
-                .Setup(x => x.GetItemsChannelAsync<FooterLinks>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.GetPagesAsync<FooterLinks>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(footerLinks);
 
             _contentServiceMock
-                .Setup(x => x.GetItemsChannelAsync<SocialLinks>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.GetPagesAsync<SocialLinks>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<SocialLinks>());
 
             _contentServiceMock
                 .Setup(x => x.GetContentType<Subscribe>(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Enumerable.Empty<Subscribe>());
-
-            _contentServiceMock
-                .Setup(x => x.GetItemsByGUIDAsync(It.IsAny<List<Guid>>()))
-                .ReturnsAsync(new List<IWebPageFieldsSource>());
 
             _contentServiceMock
                 .Setup(x => x.GetPagesAsync<FooterPages>(
@@ -370,6 +399,10 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<RetrievalCacheSettings>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<FooterPages>());
+
+            _urlResolverMock
+                .Setup(x => x.GetRelativePath(It.IsAny<IWebPageFieldsSource>()))
+                .Returns(string.Empty);
 
             var result = await _service.GetAsync(CancellationToken.None);
 
@@ -393,6 +426,21 @@ namespace BDO.GWT.Core.Tests.Services
                 WebPageUrlPath = relativePath
             });
             return mock.Object;
+        }
+
+        /// <summary>
+        /// Creates a linked footer-link item that is both an <see cref="IWebPageFieldsSource"/>
+        /// (so it survives the OfType filter) and an <see cref="IMetadata"/> (so MetadataTitle maps).
+        /// </summary>
+        private static IContentItemFieldsSource CreateMandatoryFooterLinkSource(string metadataTitle)
+        {
+            var mock = new Mock<IWebPageFieldsSource>();
+            mock.As<IContentItemFieldsSource>();
+            mock.As<IMetadata>()
+                .Setup(m => m.MetadataTitle)
+                .Returns(metadataTitle);
+
+            return (IContentItemFieldsSource)mock.Object;
         }
 
         #endregion
@@ -648,6 +696,92 @@ namespace BDO.GWT.Core.Tests.Services
                     It.Is<int>(id => id == 42),
                     It.IsAny<CancellationToken>()),
                 Times.Once);
+        }
+
+        #endregion
+
+        #region GetAsyncForAPI – mandatory footer links from page items
+
+        [Test]
+        public async Task GetAsyncForAPIMapsMandatoryFooterLinksFromFooterPages()
+        {
+            SetupEmptyDefaultsForAPI();
+
+            var pages = new List<FooterPages>
+            {
+                new FooterPages
+                {
+                    Title = "Root",
+                    FooterLink = new List<IContentItemFieldsSource>
+                    {
+                        CreateMandatoryFooterLinkSource("Privacy Policy")
+                    }
+                }
+            };
+
+            _urlResolverMock
+                .Setup(x => x.GetRelativePath(It.IsAny<IWebPageFieldsSource>()))
+                .Returns("/privacy");
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<FooterPages>(
+                    It.IsAny<int>(),
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(pages);
+
+            var result = await _service.GetAsyncForAPI(1, "en-GB", CancellationToken.None);
+
+            var mandatory = result?.FooterLinks.FirstOrDefault(l => l.Title == "Privacy Policy");
+            Assert.That(mandatory, Is.Not.Null);
+            Assert.That(mandatory!.URL, Is.EqualTo("/privacy"));
+        }
+
+        
+       
+
+        [Test]
+        public async Task GetAsyncForAPI_MandatoryFooterLinks_UsesFallbacks_WhenTitleNullAndNoUrl()
+        {
+            SetupEmptyDefaultsForAPI();
+
+            var pages = new List<FooterPages>
+            {
+                new FooterPages
+                {
+                    Title = "Root",
+                    FooterLink = new List<IContentItemFieldsSource>
+                    {
+                        CreateMandatoryFooterLinkSource(null!)
+                    }
+                }
+            };
+
+            // GetRelativePath returns null -> URL should fall back to string.Empty.
+            _urlResolverMock
+                .Setup(x => x.GetRelativePath(It.IsAny<IWebPageFieldsSource>()))
+                .Returns((string)null!);
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<FooterPages>(
+                    It.IsAny<int>(),
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(pages);
+
+            var result = await _service.GetAsyncForAPI(1, "en-GB", CancellationToken.None);
+
+            var mandatory = result?.FooterLinks.FirstOrDefault();
+            Assert.Multiple(() =>
+            {
+                Assert.That(mandatory, Is.Not.Null);
+                Assert.That(mandatory!.Title, Is.EqualTo(string.Empty));
+                Assert.That(mandatory!.URL, Is.EqualTo(string.Empty));
+            });
         }
 
         #endregion

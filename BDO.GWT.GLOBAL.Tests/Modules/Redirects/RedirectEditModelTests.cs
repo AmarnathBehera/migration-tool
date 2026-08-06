@@ -430,7 +430,7 @@ public class RedirectEditModelTests
     private static FakeRedirectInfo MakeFakeInfo() =>
         (FakeRedirectInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeRedirectInfo));
 
-    private sealed class FakeRedirectInfo : XperienceCommunity.Redirects.RedirectInfo
+    private sealed class FakeRedirectInfo : BDO.RedirectInfo
     {
         private string? _sourceUrl;
         private Guid _targetGuid;

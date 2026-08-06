@@ -130,3 +130,19 @@ using Kentico.Xperience.Admin.Base;
     templateName: TemplateNames.EDIT,
     order: 9)]
 
+[assembly: UIPage(
+    parentType: typeof(WebChannelSettingsEditSection),
+    slug: "gdpr",
+    uiPageType: typeof(GDPRInfoPage),
+    name: "GDPR",
+    templateName: TemplateNames.EDIT,
+    order: 10)]
+
+[assembly: UIPage(
+    parentType: typeof(WebChannelSettingsEditSection),
+    slug: "gdprconsents",
+    uiPageType: typeof(GDPRConsentEditPage),
+    name: "GDPR Consents",
+    templateName: TemplateNames.EDIT,
+    order: 11)]
+

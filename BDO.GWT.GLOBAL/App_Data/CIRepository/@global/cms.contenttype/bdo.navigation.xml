@@ -17,17 +17,29 @@
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
-      <field column="TopMenu" columnprecision="0" columntype="webpages" enabled="true" guid="adf73ed4-de42-40fd-a4bb-04c56032d8ee" visible="true">
+      <field allowempty="true" column="TopMenu" columnprecision="0" columntype="contentitemreference" enabled="true" guid="adf73ed4-de42-40fd-a4bb-04c56032d8ee" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>TopMenu</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
         </properties>
         <settings>
-          <controlname>Kentico.Administration.WebPageSelector</controlname>
-          <MaximumPages>5</MaximumPages>
-          <Sortable>True</Sortable>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["ceb7b7b1-256e-4158-96cf-a33fcbe96c2c","afb8a1ec-5001-46e6-8e98-4b9e28995e48","7de84a06-569a-4dac-b701-55df640a4a49","afbf6f00-540b-44f1-b40b-ea7975a6185e","a15c3744-bd53-4359-b3a8-9fd52bd0c611"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>5</MaximumItems>
+          <MinimumItems>1</MinimumItems>
+          <SelectionType>contentTypes</SelectionType>
         </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>Please select one page</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
       </field>
     </form>
   </ClassFormDefinition>

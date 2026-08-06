@@ -1,4 +1,4 @@
-﻿using CMS.ContentEngine;
+using CMS.ContentEngine;
 using CMS.Core;
 using CMS.DataEngine;
 using CMS.Helpers;
@@ -7,7 +7,7 @@ using CMS.Websites;
 using CMS.Websites.Internal;
 using Moq;
 using CoreService = global::CMS.Core.Service;
-using RedirectInfoX = global::XperienceCommunity.Redirects.RedirectInfo;
+using RedirectInfoX = global::BDO.RedirectInfo;
 
 namespace BDO.GWT.GLOBAL.Tests;
 
