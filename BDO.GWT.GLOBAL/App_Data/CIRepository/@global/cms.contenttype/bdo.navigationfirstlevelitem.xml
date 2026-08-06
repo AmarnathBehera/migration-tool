@@ -25,7 +25,7 @@
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["392e5450-56f2-49da-96a0-fc49215599d8","b1d1ea96-03a2-4a44-82f7-92973086a93b","7de84a06-569a-4dac-b701-55df640a4a49","c9ad5d32-9b92-477d-abd0-6b732dc1e86f","afb8a1ec-5001-46e6-8e98-4b9e28995e48","d7c0b1af-52c7-4f1b-b856-6aec846290cb","a15c3744-bd53-4359-b3a8-9fd52bd0c611","9aa28716-067c-4436-acf7-bb894b843c0b","b6cac6be-487b-4d72-b82a-eadaed297432","ceb7b7b1-256e-4158-96cf-a33fcbe96c2c","ddbf4830-0766-4cff-a420-f0ca936fd21f"]]]>
+            <![CDATA[["392e5450-56f2-49da-96a0-fc49215599d8","b1d1ea96-03a2-4a44-82f7-92973086a93b","7de84a06-569a-4dac-b701-55df640a4a49","c9ad5d32-9b92-477d-abd0-6b732dc1e86f","afb8a1ec-5001-46e6-8e98-4b9e28995e48","d7c0b1af-52c7-4f1b-b856-6aec846290cb","a15c3744-bd53-4359-b3a8-9fd52bd0c611","9aa28716-067c-4436-acf7-bb894b843c0b","b6cac6be-487b-4d72-b82a-eadaed297432","ceb7b7b1-256e-4158-96cf-a33fcbe96c2c","ddbf4830-0766-4cff-a420-f0ca936fd21f","4cbaa98f-42c8-4bf3-9bd4-21805730b520","2d1bdba2-9ca8-42ab-a783-33007f1f3e3b"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <MaximumItems>1</MaximumItems>

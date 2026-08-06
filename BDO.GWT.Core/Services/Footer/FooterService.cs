@@ -1,4 +1,5 @@
-﻿using BDO.GWT.Core.DTOs;
+﻿using BDO.GWT.Common.Core.Extensions;
+using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Footer;
 using BDO.GWT.Core.ValueObjects;
 using CMS.ContentEngine;
@@ -37,10 +38,10 @@ public class FooterService : IFooterService
             await GetMandatoryFooterLinkDtosAsync(cancellationToken);
 
         var footerLinks =
-            await GetFooterLinks() ?? Enumerable.Empty<FooterLinkDto>();
+            await GetFooterLinks(cancellationToken) ?? Enumerable.Empty<FooterLinkDto>();
 
         var socialLinks =
-            await GetSocialLinks() ?? Enumerable.Empty<SocialButtonDto>();
+            await GetSocialLinks(cancellationToken) ?? Enumerable.Empty<SocialButtonDto>();
 
         var subscribeLink =
             (await GetSubscribePageLinkAsync(cancellationToken))
@@ -133,7 +134,7 @@ public class FooterService : IFooterService
                 nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken))
-            ?.ToList() ?? [];
+            ?.ToList() ?? new List<FooterPages>();
 
         return MapMandatoryFooterLinks(pages);
     }
@@ -178,13 +179,32 @@ public class FooterService : IFooterService
             .ToList();
     }
 
-    private async Task<IEnumerable<FooterLinkDto?>> GetFooterLinks()
+    private async Task<IEnumerable<FooterLinkDto?>> GetFooterLinks(CancellationToken cancellationToken)
     {
-        var footerLinksPages =
-            await _contentService.GetItemsChannelAsync<FooterLinks>()
-            ?? Enumerable.Empty<FooterLinks>();
+        var footerLinksPages = (await _contentService.GetPagesAsync<FooterLinks>(
+            new RetrievePagesParameters
+            {
+                PathMatch = PathMatch.Children(MandatoryFooterRootPath, 2),
+                LinkedItemsMaxLevel = 2
+            },
+            query => query.OrderBy(
+                nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken))
+            ?.ToList() ?? new List<FooterLinks>();
 
-        return await BuildFooterLinksAsync(footerLinksPages);
+
+        var footerTargetLinks =  (from link in footerLinksPages
+                                  from target in link.TargetURL ?? Enumerable.Empty<IWebPageFieldsSource>()
+                                  select new FooterLinkDto
+                                  {
+                                      OpenInNewTab = link.OpenInNewTab,
+                                      Order = link.SystemFields?.WebPageItemOrder ?? 0,
+                                      Title = (target as IMetadata)?.MetadataTitle ?? string.Empty,
+                                      URL = _urlResolver.GetRelativePath(target) ?? string.Empty
+                                  }).ToList();
+
+        return footerTargetLinks;
     }
 
     private async Task<IEnumerable<FooterLinkDto?>> GetFooterLinks(
@@ -197,14 +217,32 @@ public class FooterService : IFooterService
                 channelId: channelId)
             ?? Enumerable.Empty<FooterLinks>();
 
-        return await BuildFooterLinksAsync(footerLinksPages);
+        var footerTargetLinks = (from link in footerLinksPages
+                                 from target in link.TargetURL ?? Enumerable.Empty<IWebPageFieldsSource>()
+                                 select new FooterLinkDto
+                                 {
+                                     OpenInNewTab = link.OpenInNewTab,
+                                     Order = link.SystemFields?.WebPageItemOrder ?? 0,
+                                     Title = (target as IMetadata)?.MetadataTitle ?? string.Empty,
+                                     URL = _urlResolver.GetRelativePath(target) ?? string.Empty
+                                 }).ToList();
+
+        return footerTargetLinks;
     }
 
-    private async Task<IEnumerable<SocialButtonDto?>> GetSocialLinks()
+    private async Task<IEnumerable<SocialButtonDto?>> GetSocialLinks(CancellationToken cancellationToken)
     {
-        var socialLinksPages =
-            (await _contentService.GetItemsChannelAsync<SocialLinks>())?.Take(8)
-            ?? Enumerable.Empty<SocialLinks>();
+         var socialLinksPages = (await _contentService.GetPagesAsync<SocialLinks>(
+            new RetrievePagesParameters
+            {
+                PathMatch = PathMatch.Children(MandatoryFooterRootPath, 2),
+                LinkedItemsMaxLevel = 2
+            },
+            query => query.OrderBy(
+                nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken))
+            ?.ToList() ?? new List<SocialLinks>();
 
         return MapSocialButtons(socialLinksPages);
     }
@@ -273,45 +311,5 @@ public class FooterService : IFooterService
         });
     }
 
-    private async Task<IEnumerable<FooterLinkDto?>> BuildFooterLinksAsync(
-    IEnumerable<FooterLinks> footerLinksPages)
-    {
-        var pages = footerLinksPages.Take(8).ToList();
-
-        var allGuids = pages
-            .Where(x => x.TargetURL != null)
-            .SelectMany(x =>
-                x.TargetURL?.Select(t => t.SystemFields?.WebPageItemGUID ?? Guid.Empty)
-                ?? Enumerable.Empty<Guid>())
-            .Where(guid => guid != Guid.Empty)
-            .Distinct()
-            .ToList();
-
-        var selectedPages = allGuids.Any()
-            ? await _contentService.GetItemsByGUIDAsync(allGuids)
-            : Enumerable.Empty<IWebPageFieldsSource>();
-
-        var pageUrlMap = selectedPages.ToDictionary(
-            p => p.SystemFields?.WebPageItemGUID ?? Guid.Empty,
-            p => p.GetUrl()?.RelativePath ?? string.Empty);
-
-        int order = 1;
-
-        return pages.Select(link =>
-        {
-            var guid = link?.TargetURL?.FirstOrDefault()?.SystemFields?.WebPageItemGUID
-                       ?? Guid.Empty;
-
-            return new FooterLinkDto
-            {
-                OpenInNewTab = link?.OpenInNewTab ?? false,
-                Order = order++,
-                Title = link?.Title ?? string.Empty,
-                URL = guid != Guid.Empty &&
-                      pageUrlMap.TryGetValue(guid, out var url)
-                        ? url
-                        : string.Empty
-            };
-        }).ToList();
-    }
+    
 }
