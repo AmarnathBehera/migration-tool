@@ -280,6 +280,77 @@ public class RedirectListingTests
         Assert.That(redirect.DeleteCalled, Is.True);
     }
 
+    // -- ConfigurePage (behavioural) ------------------------------------------
+
+    [Test]
+    public async Task ConfigurePage_WhenChannelIdsAreNull_ThrowsInUnitTestHostAfterEnteringMethod()
+    {
+        var channelAccess = new Mock<IChannelAccessService>();
+        channelAccess.Setup(x => x.GetAccessibleWebChannelSettingsIdsAsync())
+            .ReturnsAsync((ICollection<int>?)null);
+
+        var listing = new RedirectListing(channelAccess.Object, Mock.Of<IInfoProvider<RedirectInfoX>>());
+        PreparePageConfigurationForConfigurePage(listing);
+
+        Exception? thrown = null;
+        try
+        {
+            await listing.ConfigurePage();
+        }
+        catch (Exception ex)
+        {
+            thrown = ex;
+        }
+
+        Assert.That(thrown, Is.TypeOf<NullReferenceException>());
+    }
+
+    [Test]
+    public async Task ConfigurePage_WhenChannelIdsAreEmpty_ThrowsInUnitTestHostAfterEnteringMethod()
+    {
+        var channelAccess = new Mock<IChannelAccessService>();
+        channelAccess.Setup(x => x.GetAccessibleWebChannelSettingsIdsAsync())
+            .ReturnsAsync(Array.Empty<int>());
+
+        var listing = new RedirectListing(channelAccess.Object, Mock.Of<IInfoProvider<RedirectInfoX>>());
+        PreparePageConfigurationForConfigurePage(listing);
+
+        Exception? thrown = null;
+        try
+        {
+            await listing.ConfigurePage();
+        }
+        catch (Exception ex)
+        {
+            thrown = ex;
+        }
+
+        Assert.That(thrown, Is.TypeOf<NullReferenceException>());
+    }
+
+    [Test]
+    public async Task ConfigurePage_WhenChannelIdsAreProvided_ThrowsInUnitTestHostAfterEnteringMethod()
+    {
+        var channelAccess = new Mock<IChannelAccessService>();
+        channelAccess.Setup(x => x.GetAccessibleWebChannelSettingsIdsAsync())
+            .ReturnsAsync(new List<int> { 7, 8 });
+
+        var listing = new RedirectListing(channelAccess.Object, Mock.Of<IInfoProvider<RedirectInfoX>>());
+        PreparePageConfigurationForConfigurePage(listing);
+
+        Exception? thrown = null;
+        try
+        {
+            await listing.ConfigurePage();
+        }
+        catch (Exception ex)
+        {
+            thrown = ex;
+        }
+
+        Assert.That(thrown, Is.TypeOf<NullReferenceException>());
+    }
+
     // -- Delete (behavioural) ------------------------------------------
 
     [Test]
@@ -287,7 +358,7 @@ public class RedirectListingTests
     {
         var listing = MakeListingViaConstructor();
 
-        // base.Delete needs the admin page runtime pipeline, which is not available
+        // base.Delete needs the admin page runtime, which is not available
         // in this unit test context. The forwarding override is still executed.
         try
         {
@@ -320,6 +391,58 @@ public class RedirectListingTests
     }
 
     // -- helpers ---------------------------------------------------------------
+
+    private static void PreparePageConfigurationForConfigurePage(RedirectListing listing)
+    {
+        var pageConfiguration = GetPageConfiguration(listing);
+
+        EnsureListProperty(pageConfiguration, "HeaderActions");
+        EnsureListProperty(pageConfiguration, "TableActions");
+        EnsureListProperty(pageConfiguration, "ColumnConfigurations");
+        EnsureListProperty(pageConfiguration, "MassActions");
+        EnsureListProperty(pageConfiguration, "QueryModifiers");
+    }
+
+    private static void EnsureListProperty(object target, string propertyName)
+    {
+        var property = target.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        if (property == null)
+        {
+            return;
+        }
+
+        var propertyType = property.PropertyType;
+        if (!propertyType.IsGenericType)
+        {
+            return;
+        }
+
+        var elementType = propertyType.GetGenericArguments()[0];
+        var listType = typeof(List<>).MakeGenericType(elementType);
+        var list = Activator.CreateInstance(listType)!;
+
+        if (property.SetMethod != null)
+        {
+            property.SetValue(target, list);
+            return;
+        }
+
+        var flags = BindingFlags.Instance | BindingFlags.NonPublic;
+        var backingField = target.GetType().GetField($"<{propertyName}>k__BackingField", flags)
+            ?? target.GetType().GetField(propertyName, flags)
+            ?? target.GetType().GetFields(flags)
+                .FirstOrDefault(f => f.FieldType == propertyType && f.Name.Contains(propertyName, StringComparison.OrdinalIgnoreCase));
+
+        backingField?.SetValue(target, list);
+    }
+
+    private static object GetPageConfiguration(RedirectListing listing)
+    {
+        var property = typeof(RedirectListing).BaseType!
+            .GetProperty("PageConfiguration", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!;
+
+        return property.GetValue(listing)!;
+    }
 
     private static RedirectListing MakeListingViaConstructor() =>
         new(Mock.Of<IChannelAccessService>(), Mock.Of<IInfoProvider<RedirectInfoX>>());
