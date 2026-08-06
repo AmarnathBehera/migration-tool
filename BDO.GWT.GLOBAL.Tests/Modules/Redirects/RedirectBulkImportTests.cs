@@ -1,10 +1,12 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using BDO.GWT.GLOBAL.Tests;
 using CMS.ContentEngine;
 using CMS.Core;
 using CMS.DataEngine;
 using CMS.Websites;
 using Kentico.Xperience.Admin.Base;
+using Moq;
 using XperienceCommunity.Redirects.UIPages;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Redirects;
@@ -276,6 +278,70 @@ public class RedirectBulkImportTests
         });
     }
 
+    [Test]
+    public async Task BuildChannelUrlLookupAsync_WhenExecutorReturnsNoPages_ReturnsEmptyLookup()
+    {
+        var page = MakePage();
+
+        var executor = DispatchProxy.Create<IContentQueryExecutor, ContentQueryExecutorProxy>();
+        ContentQueryExecutorProxy.GetProxy(executor).OnInvoke = method =>
+        {
+            var returnType = method.ReturnType;
+            if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
+            {
+                var payloadType = returnType.GetGenericArguments()[0];
+                if (payloadType.IsGenericType && payloadType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                {
+                    var itemType = payloadType.GetGenericArguments()[0];
+                    var emptySequence = typeof(Enumerable)
+                        .GetMethod(nameof(Enumerable.Empty))!
+                        .MakeGenericMethod(itemType)
+                        .Invoke(null, null)!;
+
+                    return typeof(Task)
+                        .GetMethod(nameof(Task.FromResult))!
+                        .MakeGenericMethod(payloadType)
+                        .Invoke(null, [emptySequence])!;
+                }
+            }
+
+            return GetDefaultReturnValue(returnType);
+        };
+
+        SetField(page, "_executor", executor);
+        SetField(page, "_webPageUrlRetriever", Mock.Of<IWebPageUrlRetriever>());
+        SetField(page, "_eventLogService", Mock.Of<IEventLogService>());
+
+        var lookup = await InvokePrivateAsync<Dictionary<string, (Guid Guid, string Url)>>(
+            page,
+            "BuildChannelUrlLookupAsync",
+            "global-channel",
+            "en");
+
+        Assert.That(lookup, Is.Empty);
+    }
+
+    [Test]
+    public void GetDefaultLanguageName_WhenDefaultLanguageExists_ReturnsLanguageName()
+    {
+        var query = new Mock<ObjectQuery<ContentLanguageInfo>>();
+        query.Setup(x => x.TopN(1)).Returns(query.Object);
+        query.Setup(x => x.Column(nameof(ContentLanguageInfo.ContentLanguageName))).Returns(query.Object);
+        query.Setup(x => x.WhereTrue(nameof(ContentLanguageInfo.ContentLanguageIsDefault))).Returns(query.Object);
+        query.Setup(x => x.GetScalarResult<string>()).Returns("en");
+
+        KenticoContainerSetup.ContentLanguageProvider
+            .Setup(x => x.Get())
+            .Returns(query.Object);
+
+        var method = typeof(RedirectBulkImport)
+            .GetMethod("GetDefaultLanguageName", BindingFlags.Static | BindingFlags.NonPublic)!;
+
+        var result = (string)method.Invoke(null, null)!;
+
+        Assert.That(result, Is.EqualTo("en"));
+    }
+
     private static RedirectBulkImport MakePage() =>
         (RedirectBulkImport)RuntimeHelpers.GetUninitializedObject(typeof(RedirectBulkImport));
 
@@ -299,5 +365,62 @@ public class RedirectBulkImportTests
             .GetMethod("NormalizeUrl", BindingFlags.Static | BindingFlags.NonPublic)!;
 
         return (string)method.Invoke(null, [value])!;
+    }
+
+    private static async Task<T> InvokePrivateAsync<T>(object target, string methodName, params object[] args)
+    {
+        var method = target.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var task = (Task)method.Invoke(target, args)!;
+        await task;
+
+        return (T)task.GetType().GetProperty("Result")!.GetValue(task)!;
+    }
+
+    private static object? GetDefaultReturnValue(Type returnType)
+    {
+        if (returnType == typeof(void))
+        {
+            return null;
+        }
+
+        if (returnType == typeof(Task))
+        {
+            return Task.CompletedTask;
+        }
+
+        if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
+        {
+            var payloadType = returnType.GetGenericArguments()[0];
+            object? payload = payloadType.IsValueType ? Activator.CreateInstance(payloadType) : null;
+            return typeof(Task)
+                .GetMethod(nameof(Task.FromResult))!
+                .MakeGenericMethod(payloadType)
+                .Invoke(null, [payload]);
+        }
+
+        return returnType.IsValueType ? Activator.CreateInstance(returnType) : null;
+    }
+
+    private static void SetField(object target, string fieldName, object value) =>
+        typeof(RedirectBulkImport)
+            .GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)!
+            .SetValue(target, value);
+
+    private class ContentQueryExecutorProxy : DispatchProxy
+    {
+        public Func<MethodInfo, object?>? OnInvoke { get; set; }
+
+        protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
+        {
+            if (targetMethod == null)
+            {
+                return null;
+            }
+
+            return OnInvoke?.Invoke(targetMethod) ?? GetDefaultReturnValue(targetMethod.ReturnType);
+        }
+
+        public static ContentQueryExecutorProxy GetProxy(IContentQueryExecutor proxy) =>
+            (ContentQueryExecutorProxy)(object)proxy;
     }
 }
