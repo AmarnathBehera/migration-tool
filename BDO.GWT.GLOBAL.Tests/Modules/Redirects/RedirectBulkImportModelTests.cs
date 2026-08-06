@@ -1,4 +1,5 @@
 using Kentico.Xperience.Admin.Base.FormAnnotations;
+using XperienceCommunity.Redirects.Services;
 using XperienceCommunity.Redirects.UIPages;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Redirects;

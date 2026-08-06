@@ -32,7 +32,7 @@ internal class RedirectBulkImport : ModelEditPage<RedirectBulkImportModel>
 {
     private static readonly char[] LineSeparators = { '\r', '\n' };
     private const int PageSize = 500;
-    private const int MaxRows =200;
+    private const int MaxRows = 200;
 
     internal static char GetDelimiter(string delimiter) => delimiter == "comma" ? ',' : ';';
 
@@ -111,25 +111,12 @@ internal class RedirectBulkImport : ModelEditPage<RedirectBulkImportModel>
     {
         var response = await base.ProcessFormData(model, formItems);
 
-        if (!int.TryParse(model.WebsiteChannelName, out int selectedChannelId))
+        if (!TryResolveChannel(model.WebsiteChannelName, out var websiteChannel, out var channel, out string channelError))
         {
-            return response.AddErrorMessage("The selected site is invalid.");
-        }
-
-        var websiteChannel = _websiteChannelInfoProvider.Get()
-            .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelChannelID), selectedChannelId)
-            .TopN(1)
-            .FirstOrDefault();
-
-        var channel = ChannelInfo.Provider.Get(selectedChannelId);
-
-        if (websiteChannel == null || channel == null)
-        {
-            return response.AddErrorMessage("The selected site could not be found.");
+            return response.AddErrorMessage(channelError);
         }
 
         char delimiter = GetDelimiter(model.Delimiter);
-
         var defaultLanguageName = GetDefaultLanguageName();
 
         if (string.IsNullOrEmpty(defaultLanguageName))
@@ -138,16 +125,11 @@ internal class RedirectBulkImport : ModelEditPage<RedirectBulkImportModel>
         }
 
         var rows = ParseCsvRows(model.CsvData, model.HasHeaderRow);
+        string? rowsValidationError = GetRowsValidationError(rows.Count);
 
-        if (rows.Count == 0)
+        if (!string.IsNullOrEmpty(rowsValidationError))
         {
-            return response.AddErrorMessage("No CSV rows were found to import.");
-        }
-
-        if (rows.Count > MaxRows)
-        {
-            return response.AddErrorMessage(
-                $"This import contains {rows.Count} rows, which exceeds the {MaxRows}-row limit for a single import. Split the CSV into smaller batches.");
+            return response.AddErrorMessage(rowsValidationError);
         }
 
         Dictionary<string, (Guid Guid, string Url)> urlLookup;
@@ -165,8 +147,6 @@ internal class RedirectBulkImport : ModelEditPage<RedirectBulkImportModel>
                 "The import could not resolve page URLs for the selected site. Check the Event Log for details.");
         }
 
-        // Load every existing source URL for this channel ONCE, up front, instead of
-        // issuing a separate DB query per CSV row inside the loop below. This is the
         var existingSourceUrls = new HashSet<string>(
             _redirectInfoProvider.Get()
                 .WhereEquals(nameof(RedirectInfo.RedirectChannelID), websiteChannel.WebsiteChannelChannelID)
@@ -174,58 +154,25 @@ internal class RedirectBulkImport : ModelEditPage<RedirectBulkImportModel>
                 .GetListResult<string>(),
             StringComparer.OrdinalIgnoreCase);
 
-        int imported = 0, duplicates = 0, notFound = 0, malformed = 0;
+        int imported;
+        int duplicates;
+        int notFound;
+        int malformed;
 
         try
         {
-            // Wraps every insert in a single transaction so that an
-            // unexpected failure partway through rolls back the whole
-            // batch instead of leaving a half-imported set of redirects.
-            using var transaction = new CMSTransactionScope();
-
-            foreach (var row in rows)
-            {
-                if (!TryParseImportRow(row, delimiter, out string sourceUrl, out string targetUrl))
-                {
-                    malformed++;
-                    continue;
-                }
-
-                // In-memory check against the pre-loaded set. Also catches duplicate
-                // source URLs that appear more than once within the same CSV, since
-                // we add each newly-imported URL back into the set below.
-                if (existingSourceUrls.Contains(sourceUrl))
-                {
-                    duplicates++;
-                    continue;
-                }
-
-                if (!urlLookup.TryGetValue(targetUrl, out var targetPage))
-                {
-                    notFound++;
-                    continue;
-                }
-
-                var redirect = new RedirectInfo
-                {
-                    RedirectSourceUrl = sourceUrl,
-                    RedirectTargetWebPageItemGUID = targetPage.Guid,
-                    RedirectChannelID = websiteChannel.WebsiteChannelChannelID,
-                    RedirectChannelName = channel.ChannelDisplayName,
-                    RedirectTargetPageURL = targetPage.Url
-                };
-
-                _redirectInfoProvider.Set(redirect);
-                existingSourceUrls.Add(sourceUrl);
-                imported++;
-            }
-
-            transaction.Commit();
+            (imported, duplicates, notFound, malformed) = ImportRows(
+                rows,
+                delimiter,
+                existingSourceUrls,
+                urlLookup,
+                websiteChannel,
+                channel);
         }
         catch (Exception ex)
         {
             _eventLogService.LogException(nameof(RedirectBulkImport), "IMPORT", ex,
-                additionalMessage: $"Bulk redirect import failed for channel '{channel.ChannelName}' after {imported} row(s). Transaction rolled back.");
+                additionalMessage: $"Bulk redirect import failed for channel '{channel.ChannelName}'. Transaction rolled back.");
 
             return response.AddErrorMessage(
                 "The import failed partway through and no redirects were saved. Check the Event Log for details.");
@@ -238,6 +185,103 @@ internal class RedirectBulkImport : ModelEditPage<RedirectBulkImportModel>
             : response.AddSuccessMessage(summary);
     }
 
+    private bool TryResolveChannel(string websiteChannelName, out WebsiteChannelInfo websiteChannel, out ChannelInfo channel, out string errorMessage)
+    {
+        websiteChannel = null!;
+        channel = null!;
+        errorMessage = string.Empty;
+
+        if (!int.TryParse(websiteChannelName, out int selectedChannelId))
+        {
+            errorMessage = "The selected site is invalid.";
+            return false;
+        }
+
+        websiteChannel = _websiteChannelInfoProvider.Get()
+            .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelChannelID), selectedChannelId)
+            .TopN(1)
+            .FirstOrDefault();
+
+        channel = ChannelInfo.Provider.Get(selectedChannelId);
+
+        if (websiteChannel == null || channel == null)
+        {
+            errorMessage = "The selected site could not be found.";
+            return false;
+        }
+
+        return true;
+    }
+
+    private static string? GetRowsValidationError(int rowCount)
+    {
+        if (rowCount == 0)
+        {
+            return "No CSV rows were found to import.";
+        }
+
+        if (rowCount > MaxRows)
+        {
+            return $"This import contains {rowCount} rows, which exceeds the {MaxRows}-row limit for a single import. Split the CSV into smaller batches.";
+        }
+
+        return null;
+    }
+
+    private (int Imported, int Duplicates, int NotFound, int Malformed) ImportRows(
+        IEnumerable<string> rows,
+        char delimiter,
+        HashSet<string> existingSourceUrls,
+        Dictionary<string, (Guid Guid, string Url)> urlLookup,
+        WebsiteChannelInfo websiteChannel,
+        ChannelInfo channel)
+    {
+        int imported = 0;
+        int duplicates = 0;
+        int notFound = 0;
+        int malformed = 0;
+
+        using var transaction = new CMSTransactionScope();
+
+        foreach (var row in rows)
+        {
+            if (!TryParseImportRow(row, delimiter, out string sourceUrl, out string targetUrl))
+            {
+                malformed++;
+                continue;
+            }
+
+            if (existingSourceUrls.Contains(sourceUrl))
+            {
+                duplicates++;
+                continue;
+            }
+
+            if (!urlLookup.TryGetValue(targetUrl, out var targetPage))
+            {
+                notFound++;
+                continue;
+            }
+
+            var redirect = new RedirectInfo
+            {
+                RedirectSourceUrl = sourceUrl,
+                RedirectTargetWebPageItemGUID = targetPage.Guid,
+                RedirectChannelID = websiteChannel.WebsiteChannelChannelID,
+                RedirectChannelName = channel.ChannelDisplayName,
+                RedirectTargetPageURL = targetPage.Url
+            };
+
+            _redirectInfoProvider.Set(redirect);
+            existingSourceUrls.Add(sourceUrl);
+            imported++;
+        }
+
+        transaction.Commit();
+
+        return (imported, duplicates, notFound, malformed);
+    }
+
     /// <summary>
     /// Resolves the current system URL of every page in the given channel and
     /// returns a dictionary keyed by normalized URL, for fast reverse lookup.
@@ -248,8 +292,9 @@ internal class RedirectBulkImport : ModelEditPage<RedirectBulkImportModel>
         var lookup = new Dictionary<string, (Guid Guid, string Url)>(StringComparer.OrdinalIgnoreCase);
 
         int offset = 0;
+        bool hasMorePages;
 
-        while (true)
+        do
         {
             var pageQuery = new ContentItemQueryBuilder()
                 .ForContentTypes(parameters =>
@@ -264,49 +309,48 @@ internal class RedirectBulkImport : ModelEditPage<RedirectBulkImportModel>
                 rowData => new PageUrlLookupRow(rowData.WebPageItemID, rowData.WebPageItemGUID)))
                 .ToList();
 
-            if (pages.Count == 0)
-            {
-                break;
-            }
-
             foreach (var page in pages)
             {
-                try
-                {
-                    var urlResult = await _webPageUrlRetriever.Retrieve(page.WebPageItemID, languageName);
-                    string relativeUrl = urlResult.RelativePath?.Replace("~", "") ?? string.Empty;
-
-                    if (string.IsNullOrEmpty(relativeUrl))
-                    {
-                        continue;
-                    }
-
-                    string normalizedUrl = NormalizeUrl(relativeUrl);
-
-                    if (!lookup.TryAdd(normalizedUrl, (page.WebPageItemGUID, relativeUrl)))
-                    {
-                        // Two pages resolved to the same URL - flag it rather than
-                        // silently keeping the first and risking a wrong redirect target.
-                        _eventLogService.LogWarning(nameof(RedirectBulkImport), "URLCOLLISION",
-                            $"Multiple pages in channel '{websiteChannelName}' resolve to the URL '{relativeUrl}'. Page {page.WebPageItemGUID} was ignored in favor of an earlier match.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _eventLogService.LogException(nameof(RedirectBulkImport), "RESOLVEURL", ex,
-                        additionalMessage: $"Could not resolve the URL of page {page.WebPageItemGUID} in channel '{websiteChannelName}'.");
-                }
+                await TryAddPageUrlToLookupAsync(lookup, page, websiteChannelName, languageName);
             }
 
-            if (pages.Count < PageSize)
-            {
-                break;
-            }
-
+            hasMorePages = pages.Count == PageSize;
             offset += PageSize;
         }
+        while (hasMorePages);
 
         return lookup;
+    }
+
+    private async Task TryAddPageUrlToLookupAsync(
+        Dictionary<string, (Guid Guid, string Url)> lookup,
+        PageUrlLookupRow page,
+        string websiteChannelName,
+        string languageName)
+    {
+        try
+        {
+            var urlResult = await _webPageUrlRetriever.Retrieve(page.WebPageItemID, languageName);
+            string relativeUrl = urlResult.RelativePath?.Replace("~", "") ?? string.Empty;
+
+            if (string.IsNullOrEmpty(relativeUrl))
+            {
+                return;
+            }
+
+            string normalizedUrl = NormalizeUrl(relativeUrl);
+
+            if (!lookup.TryAdd(normalizedUrl, (page.WebPageItemGUID, relativeUrl)))
+            {
+                _eventLogService.LogWarning(nameof(RedirectBulkImport), "URLCOLLISION",
+                    $"Multiple pages in channel '{websiteChannelName}' resolve to the URL '{relativeUrl}'. Page {page.WebPageItemGUID} was ignored in favor of an earlier match.");
+            }
+        }
+        catch (Exception ex)
+        {
+            _eventLogService.LogException(nameof(RedirectBulkImport), "RESOLVEURL", ex,
+                additionalMessage: $"Could not resolve the URL of page {page.WebPageItemGUID} in channel '{websiteChannelName}'.");
+        }
     }
 
     private static string NormalizeUrl(string url)

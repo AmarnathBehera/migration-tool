@@ -5,6 +5,7 @@ using CMS.ContentEngine;
 using CMS.DataEngine;
 using Kentico.Xperience.Admin.Base.FormAnnotations;
 using Moq;
+using XperienceCommunity.Redirects.Services;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Redirects;
 
