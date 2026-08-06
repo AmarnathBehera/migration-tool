@@ -68,7 +68,7 @@ public class CsvFileUploadComponentTests
             .Where(a => a.GetType().Name == "RegisterFormComponentAttribute")
             .ToList();
 
-        Assert.That(attrs.Count, Is.GreaterThan(0));
+        Assert.That(attrs, Is.Not.Empty);
     }
 
     [Test]

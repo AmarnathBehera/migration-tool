@@ -13,6 +13,8 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Redirects;
 
 public class RedirectBulkImportTests
 {
+    private static readonly string[] ExpectedParsedRows = ["/a;/b", "/c;/d"];
+
     [Test]
     public void Page_IsInternalClass()
     {
@@ -206,7 +208,7 @@ public class RedirectBulkImportTests
     {
         var rows = RedirectBulkImport.ParseCsvRows("Source;Target\r\n  /a;/b  \r\n\r\n/c;/d", hasHeaderRow: true);
 
-        Assert.That(rows, Is.EqualTo(new[] { "/a;/b", "/c;/d" }));
+        Assert.That(rows, Is.EqualTo(ExpectedParsedRows));
     }
 
     [Test]
@@ -214,7 +216,7 @@ public class RedirectBulkImportTests
     {
         var rows = RedirectBulkImport.ParseCsvRows("/a;/b\n/c;/d", hasHeaderRow: false);
 
-        Assert.That(rows, Is.EqualTo(new[] { "/a;/b", "/c;/d" }));
+        Assert.That(rows, Is.EqualTo(ExpectedParsedRows));
     }
 
     [Test]
@@ -342,6 +344,37 @@ public class RedirectBulkImportTests
         Assert.That(result, Is.EqualTo("en"));
     }
 
+    [Test]
+    public async Task TryAddPageUrlToLookupAsync_WhenUrlRetrieverThrows_LogsResolveUrlException()
+    {
+        var page = MakePage();
+        var pageGuid = Guid.NewGuid();
+        var lookup = new Dictionary<string, (Guid Guid, string Url)>(StringComparer.OrdinalIgnoreCase);
+
+        var retriever = new Mock<IWebPageUrlRetriever>();
+        retriever
+            .Setup(x => x.Retrieve(42, "en"))
+            .Throws(new InvalidOperationException("boom"));
+
+        var eventLog = new Mock<IEventLogService>();
+
+        SetField(page, "_webPageUrlRetriever", retriever.Object);
+        SetField(page, "_eventLogService", eventLog.Object);
+
+        var pageRow = CreatePageUrlLookupRow(42, pageGuid);
+
+        await InvokePrivateTaskAsync(
+            page,
+            "TryAddPageUrlToLookupAsync",
+            lookup,
+            pageRow,
+            "global-channel",
+            "en");
+
+        Assert.That(eventLog.Invocations, Is.Not.Empty);
+        Assert.That(lookup, Is.Empty);
+    }
+
     private static RedirectBulkImport MakePage() =>
         (RedirectBulkImport)RuntimeHelpers.GetUninitializedObject(typeof(RedirectBulkImport));
 
@@ -365,6 +398,19 @@ public class RedirectBulkImportTests
             .GetMethod("NormalizeUrl", BindingFlags.Static | BindingFlags.NonPublic)!;
 
         return (string)method.Invoke(null, [value])!;
+    }
+
+    private static object CreatePageUrlLookupRow(int id, Guid guid)
+    {
+        var type = typeof(RedirectBulkImport).GetNestedType("PageUrlLookupRow", BindingFlags.NonPublic)!;
+        return Activator.CreateInstance(type, [id, guid])!;
+    }
+
+    private static async Task InvokePrivateTaskAsync(object target, string methodName, params object[] args)
+    {
+        var method = target.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var task = (Task)method.Invoke(target, args)!;
+        await task;
     }
 
     private static async Task<T> InvokePrivateAsync<T>(object target, string methodName, params object[] args)

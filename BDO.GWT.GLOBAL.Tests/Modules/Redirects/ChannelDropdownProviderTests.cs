@@ -11,6 +11,10 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Redirects;
 
 public class ChannelDropdownProviderTests
 {
+    private static readonly string[] ExpectedChannelValues = ["10", "20"];
+    private static readonly string[] ExpectedChannelTexts = ["Global", "US"];
+    private static readonly int[] FilteredChannelIds = [5, 8];
+
     [Test]
     public void Provider_Constructor_StoresDependencies()
     {
@@ -39,7 +43,7 @@ public class ChannelDropdownProviderTests
 
         var accessService = new Mock<IChannelAccessService>();
         accessService.Setup(x => x.GetAccessibleWebChannelSettingsIdsAsync())
-            .ReturnsAsync((ICollection<int>?)null);
+            .Returns(() => Task.FromResult<ICollection<int>>(null!));
 
         var infoProvider = new Mock<IInfoProvider<ChannelInfo>>();
         infoProvider.Setup(x => x.Get()).Returns(query.Object);
@@ -50,8 +54,8 @@ public class ChannelDropdownProviderTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(result.Select(x => x.Value), Is.EqualTo(new[] { "10", "20" }));
-            Assert.That(result.Select(x => x.Text), Is.EqualTo(new[] { "Global", "US" }));
+            Assert.That(result.Select(x => x.Value), Is.EqualTo(ExpectedChannelValues));
+            Assert.That(result.Select(x => x.Text), Is.EqualTo(ExpectedChannelTexts));
         });
 
         query.Verify(x => x.WhereEquals(nameof(ChannelInfo.ChannelType), "Website"), Times.Once);
@@ -93,7 +97,7 @@ public class ChannelDropdownProviderTests
 
         var accessService = new Mock<IChannelAccessService>();
         accessService.Setup(x => x.GetAccessibleWebChannelSettingsIdsAsync())
-            .ReturnsAsync(new List<int> { 5, 8 });
+            .ReturnsAsync(new List<int>(FilteredChannelIds));
 
         var infoProvider = new Mock<IInfoProvider<ChannelInfo>>();
         infoProvider.Setup(x => x.Get()).Returns(query.Object);
@@ -112,7 +116,7 @@ public class ChannelDropdownProviderTests
         query.Verify(x => x.WhereEquals(nameof(ChannelInfo.ChannelType), "Website"), Times.Once);
         query.Verify(x => x.WhereEquals(nameof(ChannelInfo.ChannelID), -1), Times.Never);
         query.Verify(
-            x => x.WhereIn(nameof(ChannelInfo.ChannelID), It.Is<List<int>>(ids => ids.SequenceEqual(new[] { 5, 8 }))),
+            x => x.WhereIn(nameof(ChannelInfo.ChannelID), It.Is<List<int>>(ids => ids.SequenceEqual(FilteredChannelIds))),
             Times.Once);
     }
 
@@ -133,7 +137,7 @@ public class ChannelDropdownProviderTests
     {
         var accessService = new Mock<IChannelAccessService>();
         accessService.Setup(x => x.GetAccessibleWebChannelSettingsIdsAsync())
-            .ReturnsAsync((ICollection<int>?)null);
+            .Returns(() => Task.FromResult<ICollection<int>>(null!));
 
         var infoProvider = new Mock<IInfoProvider<ChannelInfo>>();
         infoProvider.Setup(x => x.Get())
@@ -163,7 +167,7 @@ public class ChannelDropdownProviderTests
         return query;
     }
 
-    private static ChannelInfo CreateChannel(int id, string displayName)
+    private static FakeChannelInfo CreateChannel(int id, string displayName)
     {
         var channel = (FakeChannelInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeChannelInfo));
         channel.ChannelID = id;

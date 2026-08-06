@@ -202,14 +202,15 @@ internal class RedirectBulkImport : ModelEditPage<RedirectBulkImportModel>
             .TopN(1)
             .FirstOrDefault();
 
-        channel = ChannelInfo.Provider.Get(selectedChannelId);
+        var resolvedChannel = ChannelInfo.Provider.Get(selectedChannelId);
 
-        if (websiteChannel == null || channel == null)
+        if (websiteChannel == null || resolvedChannel == null)
         {
             errorMessage = "The selected site could not be found.";
             return false;
         }
 
+        channel = resolvedChannel;
         return true;
     }
 
@@ -362,12 +363,12 @@ internal class RedirectBulkImport : ModelEditPage<RedirectBulkImportModel>
 
         string normalized = url.Trim().Replace("~", "");
 
-        if (!normalized.StartsWith("/"))
+        if (!normalized.StartsWith('/'))
         {
             normalized = "/" + normalized;
         }
 
-        if (normalized.Length > 1 && normalized.EndsWith("/"))
+        if (normalized.Length > 1 && normalized.EndsWith('/'))
         {
             normalized = normalized.TrimEnd('/');
         }

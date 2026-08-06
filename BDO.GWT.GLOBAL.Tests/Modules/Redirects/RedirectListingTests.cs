@@ -287,7 +287,7 @@ public class RedirectListingTests
     {
         var channelAccess = new Mock<IChannelAccessService>();
         channelAccess.Setup(x => x.GetAccessibleWebChannelSettingsIdsAsync())
-            .ReturnsAsync((ICollection<int>?)null);
+            .Returns(() => Task.FromResult<ICollection<int>>(null!));
 
         var listing = new RedirectListing(channelAccess.Object, Mock.Of<IInfoProvider<RedirectInfoX>>());
         PreparePageConfigurationForConfigurePage(listing);

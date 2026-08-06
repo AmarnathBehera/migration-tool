@@ -6,7 +6,9 @@ export const CsvFileUpload = (props: CsvFileUploadProps = {}) => {
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (!file) return;
+        if (!file) {
+            return;
+        }
 
         const reader = new FileReader();
         reader.onload = (event) => {
@@ -19,6 +21,13 @@ export const CsvFileUpload = (props: CsvFileUploadProps = {}) => {
     };
 
     const isReadOnly = props?.disabled === true;
+    let containerStateClass = 'border-[#8C8C8C] bg-white hover:border-black';
+
+    if (isReadOnly) {
+        containerStateClass = 'bg-[#F5F5F5] border-[#D0D0D0]';
+    } else if (props?.invalid) {
+        containerStateClass = 'border-error bg-white';
+    }
 
     return (
         <div className="mb-6 font-display">
@@ -30,7 +39,7 @@ export const CsvFileUpload = (props: CsvFileUploadProps = {}) => {
             )}
 
             <div
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-full border box-border transition-colors duration-200 ${isReadOnly ? 'bg-[#F5F5F5] border-[#D0D0D0]' : props?.invalid ? 'border-error bg-white' : 'border-[#8C8C8C] bg-white hover:border-black'}`}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-full border box-border transition-colors duration-200 ${containerStateClass}`}
             >
                 <button
                     type="button"
