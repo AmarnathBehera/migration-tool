@@ -197,19 +197,20 @@ internal class RedirectBulkImport : ModelEditPage<RedirectBulkImportModel>
             return false;
         }
 
-        websiteChannel = _websiteChannelInfoProvider.Get()
+        WebsiteChannelInfo? resolvedWebsiteChannel = _websiteChannelInfoProvider.Get()
             .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelChannelID), selectedChannelId)
             .TopN(1)
             .FirstOrDefault();
 
-        var resolvedChannel = ChannelInfo.Provider.Get(selectedChannelId);
+        ChannelInfo? resolvedChannel = ChannelInfo.Provider.Get(selectedChannelId);
 
-        if (websiteChannel == null || resolvedChannel == null)
+        if (resolvedWebsiteChannel == null || resolvedChannel == null)
         {
             errorMessage = "The selected site could not be found.";
             return false;
         }
 
+        websiteChannel = resolvedWebsiteChannel;
         channel = resolvedChannel;
         return true;
     }
