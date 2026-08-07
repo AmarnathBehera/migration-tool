@@ -737,15 +737,15 @@ namespace BDO.GWT.GLOBAL.API.Helpers
         public async Task<List<ContentItemReference>> BuildOrUpdateCopyInsightReferencesAsync(
             List<string>? items, CancellationToken cancellationToken)
         {
-            if (items is null || !items.Any())
+            if (items is null || items.Count == 0)
             {
-                return new List<ContentItemReference>();        
+                return new List<ContentItemReference>();
             }
 
             var result = new List<ContentItemReference>();
 
             var matches = await _contentRetriever.GetItemsAsync<CopyInsight>(
-                    builder => builder.Parameters(p => p.Where(w => w.WhereEquals("Title", items.First()))),
+                    builder => builder.Parameters(p => p.Where(w => w.WhereEquals("Title", items[0]))),
                     cancellationToken);
 
             var match = matches?.FirstOrDefault();

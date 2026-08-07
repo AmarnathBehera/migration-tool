@@ -567,11 +567,6 @@ public class SectionEventsCrudService : ISectionEventsCrudService
         string culture,
         CancellationToken cancellationToken)
     {
-        //var heroCallToActionButtonUrlReferences = await _mappingHelper.BuildWebPageUrlPathReferenceAsync<SectionEvents>(
-        //    content.HeroCallToActionButtonUrl, channelName, culture, cancellationToken);
-        //var eventsWebinarsListAdvancedSearchLinkUrlReferences = await _mappingHelper.BuildContentAttachmentPersonPageReferences(
-         //  content.EventsWebinarsListAdvancedSearchLinkUrl, channelName, culture, cancellationToken);
-
         var eventsWebinarsListFeaturedPages = await _mappingHelper.BuildFeaturedEventOrWebinarReferencesAsync(
     content.EventsWebinarsListFeaturedPages, channelName, culture, cancellationToken);
 
