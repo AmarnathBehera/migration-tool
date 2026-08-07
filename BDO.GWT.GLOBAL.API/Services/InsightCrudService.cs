@@ -12,6 +12,8 @@ using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BDO.GWT.GLOBAL.API.Services;
 
@@ -29,7 +31,6 @@ public class InsightCrudService : IInsightCrudService
 {
     private readonly IContentService _contentRetriever;
     private readonly IValidationState _validationState;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly ICultureService _cultureService;
     private readonly IPageContentValidator _pageContentValidator;
     private readonly IInfoProvider<ChannelInfo> _channelInfoProvider;
@@ -56,11 +57,10 @@ public class InsightCrudService : IInsightCrudService
 
         _contentRetriever = contentRetriever;
         _validationState = validationState;
-        _websiteChannelContext = websiteChannelContext;
         _cultureService = cultureService;
         _pageContentValidator = pageContentValidator;
         _channelInfoProvider = channelInfoProvider;
-        _webPageManager = webPageManagerFactory.Create(_websiteChannelContext.WebsiteChannelID == 0 ? 1 : _websiteChannelContext.WebsiteChannelID, user.UserID);
+        _webPageManager = webPageManagerFactory.Create(websiteChannelContext.WebsiteChannelID == 0 ? 1 : websiteChannelContext.WebsiteChannelID, user.UserID);
         _mappingHelper = mappingHelper;
     }
 
@@ -212,7 +212,7 @@ public class InsightCrudService : IInsightCrudService
             // The page display name shown in the admin UI
             string pageDisplayName = request.MetadataTitle ?? "New Insight Created by API";
 
-            var itemData = await CreateInsightItemData(request, cancellationToken);
+            var itemData = await CreateInsightItemData(request, channel.ChannelName, currentCulture.Locale, cancellationToken);
 
             // Creates a page metadata object
             var contentItemParameters = new ContentItemParameters(INSIGHT_CONTENT_TYPE, itemData);
@@ -326,7 +326,7 @@ public class InsightCrudService : IInsightCrudService
             }
 
             // Create new culture version data
-            var itemData = await CreateInsightItemData(request, cancellationToken);
+            var itemData = await CreateInsightItemData(request, channel.ChannelName, toLangCulture.Locale, cancellationToken);
 
             // Create language variant for the existing page
             var createVariantParameters = new CMS.Websites.CreateLanguageVariantParameters(
@@ -436,7 +436,7 @@ public class InsightCrudService : IInsightCrudService
             }
 
             // Build ContentItemData for the update
-            var itemData = await CreateInsightItemData(request, cancellationToken);
+            var itemData = await CreateInsightItemData(request, channel.ChannelName, currentCulture.Locale, cancellationToken);
 
             // Create a draft, update it, and publish
             await _webPageManager.TryCreateDraft(existingInsight.SystemFields.WebPageItemID, currentCulture.Locale, cancellationToken: cancellationToken);
@@ -557,7 +557,13 @@ public class InsightCrudService : IInsightCrudService
         }
     }
 
-    private async Task<ContentItemData> CreateInsightItemData(InsightPageContent content, CancellationToken cancellationToken)
+    /// <summary>
+    /// Builds the <see cref="ContentItemData"/> used to create or update an <see cref="Insight"/> page
+    /// from the incoming API request. <paramref name="channelName"/> and <paramref name="culture"/> are
+    /// required to resolve page-reference fields (e.g. <see cref="InsightPageContent.RelevantContactPerson"/>)
+    /// that must be looked up within a specific channel/language context.
+    /// </summary>
+    private async Task<ContentItemData> CreateInsightItemData(InsightPageContent content, string? channelName, string? culture, CancellationToken cancellationToken)
     {
         var metadataBusinessIssues = await _mappingHelper.BuildReferencesAsync<Businessissue>(content.MetadataBusinessIssues, x => x.Name, cancellationToken);
         var contentType = await _mappingHelper.BuildReferencesAsync<Contenttypes>(content.ContentType, x => x.Name, cancellationToken);
@@ -574,13 +580,17 @@ public class InsightCrudService : IInsightCrudService
         var micrositePages = await _mappingHelper.BuildReferencesPageAsync<MicrositePage>(content.MicrositePages, x => x.MetadataTitle, cancellationToken);
         var insights = await _mappingHelper.BuildReferencesPageAsync<Insight>(content.Insights, x => x.MetadataTitle, cancellationToken);
 
+        var metadataRssCategory = await _mappingHelper.BuildReferencesPageAsync<MicrositePlaceholder>(content.MetadataRssCategory, x => x.MicrositeTitle, cancellationToken);
+        var relevantContactPerson = await _mappingHelper.BuildFeaturedPersonOrInternalReferencesAsync(content.RelevantContactPerson, channelName, culture, cancellationToken);
+        var relatedExternalPeople = await _mappingHelper.BuildReferencesPageAsync<ExternalPerson>(content.RelatedExternalPeople, x => x.MetadataTitle, cancellationToken);
+
         var teaserImage = await _mappingHelper.BuildContentAttachmentImageReferences(content.MetadataTeaserImage, cancellationToken);
-        var image = await _mappingHelper.BuildContentAttachmentImageReferences(content.Image, cancellationToken);
         var ogImage = await _mappingHelper.BuildContentAttachmentImageReferences(content.MetadataOGImage, cancellationToken);
         var ogTwitterImage = await _mappingHelper.BuildContentAttachmentImageReferences(content.MetadataOGTwitterImage, cancellationToken);
 
-        //var downloadAttachment = await _mappingHelper.BuildContentAttachmentReferences(content.DownloadButtonAttachment, cancellationToken);
-        //var insightAttachment = await _mappingHelper.BuildContentAttachmentReferences(content.InsightAttachment, cancellationToken);
+        var downloadAttachment = await _mappingHelper.BuildContentAttachmentImageReferences(content.DownloadButtonAttachment, cancellationToken);
+        var metadataRssImage = await _mappingHelper.BuildContentAttachmentImageReferences(content.MetadataRssImage, cancellationToken);
+        var insightContent = await _mappingHelper.BuildOrUpdateCopyInsightReferencesAsync(content.InsightContent, cancellationToken);
 
         return new ContentItemData(new Dictionary<string, object>
         {
@@ -595,7 +605,7 @@ public class InsightCrudService : IInsightCrudService
             { nameof(Insight.ShowSocialMediaButtons), content.ShowSocialMediaButtons },
             { nameof(Insight.ShowAuthorsAtTheTop), content.ShowAuthorsAtTheTop },
             { nameof(Insight.UseNarrowLayout), content.UseNarrowLayout },
-            //{ nameof(Insight.DownloadButtonAttachment), downloadAttachment },
+            { nameof(Insight.DownloadButtonAttachment), downloadAttachment },
 
             { nameof(Insight.MetadataBusinessIssues), metadataBusinessIssues },
             { nameof(Insight.ContentType), contentType },
@@ -622,7 +632,18 @@ public class InsightCrudService : IInsightCrudService
             { nameof(Insight.IncludeInSitemap), content.IncludeInSitemap },
 
             { nameof(Insight.PageTitle), content.MetadataTitle ?? string.Empty },
+            { nameof(Insight.PageDescription), content.MetadataDescription ?? string.Empty },
             { nameof(Insight.PageKeywords), string.Empty },
+
+            { nameof(Insight.InsightContent), insightContent },
+            { nameof(Insight.Sharingbuttons), content.Sharingbuttons ?? string.Empty },
+            { nameof(Insight.ShowInsightPrintButton), content.ShowInsightPrintButton },
+            { nameof(Insight.Layoutwithoutsidebar), content.Layoutwithoutsidebar ?? string.Empty },
+            { nameof(Insight.IsSearchExcluded), content.IsSearchExcluded },
+            { nameof(Insight.MetadataRssCategory), metadataRssCategory },
+            { nameof(Insight.MetadataRssImage), metadataRssImage },
+            { nameof(Insight.RelevantContactPerson), relevantContactPerson },
+            { nameof(Insight.RelatedExternalPeople), relatedExternalPeople },
         });
     }
 
@@ -654,7 +675,10 @@ public class InsightCrudService : IInsightCrudService
                 ShowSocialMediaButtons = insight.ShowSocialMediaButtons,
                 UseNarrowLayout = insight.UseNarrowLayout,
                 ShowAuthorsAtTheTop = insight.ShowAuthorsAtTheTop,
+                DownloadButtonAttachment=insight.DownloadButtonAttachment?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+                //MetadataRssImage = insight.MetadataRssImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
                 MetadataBusinessIssues = insight.MetadataBusinessIssues.Select(c => c.Name).ToList(),
+                ContentType = insight.ContentType.Select(c => c.Name).ToList(),
                 MetadataBusinessLines = insight.MetadataBusinessLine.Select(c => c.MetadataTitle).ToList(),
                 MetadataServiceAreas = insight.MetadataServiceAreas.Select(c => c.MetadataTitle).ToList(),
                 MetadataServices = insight.MetadataServices.Select(c => c.MetadataTitle).ToList(),
@@ -666,11 +690,28 @@ public class InsightCrudService : IInsightCrudService
                 MetadataOfficeLocation = insight.MetadataOfficeLocation.Select(c => c.MetadataTitle).ToList(),
                 MicrositeMasterPages = insight.MicrositeMasterPages.Select(c => c.MetadataTitle).ToList(),
                 MicrositePages = insight.MicrositePages.Select(c => c.MetadataTitle).ToList(),
-                IncludeInSitemap = insight.IncludeInSitemap,
+                Insights= insight.Insights.Select(c => c.MetadataTitle).ToList(),
+                MetadataOGTitle = insight.MetadataOGTitle,
+                MetadataOGDescription = insight.MetadataOGDescription,
+                MetadataOGImage = insight.MetadataOGImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+                MetadataOGTwitterImage = insight.MetadataOGTwitterImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+                MetadataOGTwitterImageSizeCheckbox = insight.MetadataOGTwitterImageSizeCheckbox,
                 MetadataNofollow = insight.MetadataNofollow,
                 MetadataNoindex = insight.MetadataNoindex,
+                IncludeInSitemap = insight.IncludeInSitemap,
                 PublishFrom = insight.SystemFields?.ContentItemCommonDataFirstPublishedWhen,
                 PublishTo = insight.SystemFields?.ContentItemCommonDataLastPublishedWhen,
+                InsightContent = insight.InsightContent.Select(c => c.Title).ToList(),
+                Sharingbuttons = insight.Sharingbuttons,
+                ShowInsightPrintButton = insight.ShowInsightPrintButton,
+                Layoutwithoutsidebar = insight.Layoutwithoutsidebar,
+                IsSearchExcluded = insight.IsSearchExcluded,
+                MetadataRssCategory = insight.MetadataRssCategory.Select(c => c.MicrositeTitle).ToList(),
+                RelevantContactPerson = insight.RelevantContactPerson?
+                    .OfType<IMetadata>()
+                    .Select(c => c.MetadataTitle)
+                    .ToList() ?? new List<string>(),
+                RelatedExternalPeople = insight.RelatedExternalPeople.Select(c => c.MetadataTitle).ToList(),
             },
             Metadata = new PageMetadataOutput
             {

@@ -185,7 +185,7 @@ public class PageContentValidator : IPageContentValidator
                     .Select(i => ValidateWebPageRelatedItem(field, controlName, i))
                     .ToList(),
                 _ => throw new ArgumentException(
-                    $"Validation for field data type '{field.DataType}' is not implemented, value type was '{value?.GetType().FullName ?? "null"}'."),
+                    $"Validation for field data type '{field.DataType}' is not implemented, value type was '{value.GetType().FullName}'."),
             },
         };
     }
@@ -430,8 +430,9 @@ public class PageContentValidator : IPageContentValidator
                     value as List<int>,
                     DoNothing);
 
-            // Label/read-only field
+            // Label/read-only / decorative field
             case "kentico.label":
+            case "bdo.gwt.admin.fieldgroupseparator":
                 return null;
 
             default:
