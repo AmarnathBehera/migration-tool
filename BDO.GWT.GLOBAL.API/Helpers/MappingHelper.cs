@@ -744,11 +744,11 @@ namespace BDO.GWT.GLOBAL.API.Helpers
 
             var result = new List<ContentItemReference>();
 
-            var matches = await _contentRetriever.GetItemsAsync<CopyInsight>(
+            var matches = (await _contentRetriever.GetItemsAsync<CopyInsight>(
                     builder => builder.Parameters(p => p.Where(w => w.WhereEquals("Title", items[0]))),
-                    cancellationToken);
+                    cancellationToken))?.ToList();
 
-            var match = matches?.FirstOrDefault();
+            var match = matches is { Count: > 0 } ? matches[0] : null;
 
             if (match is not null)
             {

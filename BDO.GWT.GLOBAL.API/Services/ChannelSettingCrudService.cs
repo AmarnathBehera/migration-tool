@@ -1,7 +1,9 @@
 ﻿using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Queries;
+using BDO.GWT.Web.Core.API.Data;
 using CMS.Base;
 using CMS.DataEngine;
+using System.Text.Json;
 
 namespace BDO.GWT.GLOBAL.API.Services;
 
@@ -10,9 +12,6 @@ public interface IChannelSettingCrudService
     Task<ChannelSettingOutput[]> GetChannelSettings(SettingsQuery settingsQuery, CancellationToken cancellationToken);
 
     Task<ChannelSettingOutput[]?> GetChannelSetting(string codeName, CancellationToken cancellationToken);
-
-  //  Task<ChannelSettingOutput> SetChannelSetting(string codeName, ChannelSettingInput input, CancellationToken cancellationToken);
-
 }
 
 public class ChannelSettingCrudService : IChannelSettingCrudService
@@ -161,6 +160,7 @@ public class ChannelSettingCrudService : IChannelSettingCrudService
 
         return null;
     }
+
     private static ChannelSettingOutput ToChannelSettingOutput(WebChannelSnippetInfo setting) =>
         new() { CodeName = setting.ClassName, DisplayName = "Include Custom Scripts", InheritFromGlobalSettings = false, Type = "WebChannelSnippet", Value = ToFieldDictionary(setting) };
 

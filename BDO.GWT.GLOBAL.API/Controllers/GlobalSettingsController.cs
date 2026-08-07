@@ -53,20 +53,4 @@ public class GlobalSettingsController : EntityControllerBase
 
         return Ok(globalSetting);
     }
-
-    /// <summary>
-    /// Updates a single global setting having the specified code name.
-    /// </summary>
-    /// <param name="codeName">Code name of the global setting.</param>
-    /// <param name="input">Updated global setting data.</param>
-    /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>Updated global setting.</returns>
-    //[HttpPut("{codeName}")]
-    //[SwaggerResponse(StatusCodes.Status200OK, null, typeof(GlobalSettingOutput), MediaTypeNames.Application.Json)]
-    //public async Task<ActionResult<GlobalSettingOutput>> SetGlobalSetting(string codeName, [FromBody] GlobalSettingInput input, CancellationToken cancellationToken)
-    //{
-    //    var globalSetting = await _globalSettingCrudService.SetGlobalSetting(codeName, input, cancellationToken);
-
-    //    return Ok(globalSetting);
-    //}
 }

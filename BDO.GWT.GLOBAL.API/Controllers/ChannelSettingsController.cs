@@ -1,5 +1,4 @@
-﻿using BDO.GWT.Domain.Core.Enums;
-using BDO.GWT.GLOBAL.API.Bases;
+﻿using BDO.GWT.GLOBAL.API.Bases;
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Queries;
 using BDO.GWT.GLOBAL.API.Services;
@@ -53,22 +52,5 @@ namespace BDO.GWT.GLOBAL.API.Controllers
 
             return Ok(channelSetting);
         }
-
-        // <summary>
-        // Updates a single channel setting having the specified code name.
-        // </summary>
-        // <param name = "memberFirmID" > ID of the member firm for which the channel setting should be set.</param>
-        // <param name = "codeName" > Code name of the channel setting.</param>
-        // <param name = "input" > Updated channel setting data.</param>
-        // <param name = "cancellationToken" > Cancellation token.</param>
-        // <returns>Updated channel setting.</returns>
-        //[HttpPut("{codeName}")]
-        //[SwaggerResponse(StatusCodes.Status200OK, null, typeof(ChannelSettingOutput), MediaTypeNames.Application.Json)]
-        //public async Task<ActionResult<ChannelSettingOutput>> SetChannelSetting(int memberFirmID, string codeName, [FromBody] ChannelSettingInput input, CancellationToken cancellationToken)
-        //{
-        //    var channelSetting = await _channelSettingCrudService.SetChannelSetting(codeName, input, cancellationToken);
-
-        //    return Ok(channelSetting);
-        //}
     }
 }

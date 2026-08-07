@@ -109,19 +109,6 @@ public class UserCrudService : IUserCrudService
         var context = await BuildContextAsync(cancellationToken);
 
         return ToUserOutput(user, context);
-
-        //var contextUser = await GetContextUserAsync(cancellationToken);
-
-        //using (new CMSActionContext(contextUser))
-        //{
-        //    await _userInfoProvider.SetAsync(user, cancellationToken);
-
-        //    await SyncUserRolesAsync(user.UserID, userInput.Roles, cancellationToken);
-        //}
-
-        //var context = await BuildContextAsync(cancellationToken);
-
-        //return ToUserOutput(user, context);
     }
 
     // ---------- UPDATE ----------

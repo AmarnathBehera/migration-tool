@@ -16,12 +16,10 @@ namespace BDO.GWT.GLOBAL.API.Controllers;
 [Route("memberFirms/{memberFirmID:int}/People")]
 public class UsersController : EntityControllerBase
 {
-    private readonly IUserApiPermissionsCrudService _userApiPermissionsCrudService;
     private readonly IUserCrudService _userCrudService;
 
-    public UsersController(IUserApiPermissionsCrudService userApiPermissionsCrudService, IUserCrudService userCrudService)
+    public UsersController( IUserCrudService userCrudService)
     {
-        _userApiPermissionsCrudService = userApiPermissionsCrudService;
         _userCrudService = userCrudService;
     }
 
@@ -100,37 +98,4 @@ public class UsersController : EntityControllerBase
 
         return NoContent();
     }
-
-    // <summary>
-    // Returns user API permissions by endpoint group name.
-    // </summary>
-    // <param name="memberFirmID">ID of the member firm for which the permissions should be retrieved.</param>
-    // <param name="userGUID">GUID of the user for which the permissions should be retrieved.</param>
-    // <param name="cancellationToken">Cancellation token.</param>
-    // <returns>User API permissions by API endpoint group name.</returns>
-    //[HttpGet("memberFirms/{memberFirmID:int}/Users/{userGUID:guid}/ApiPermissions")]
-    //[SwaggerResponse(StatusCodes.Status200OK, null, typeof(IDictionary<string, ApiEndpointGroupPermissions>), MediaTypeNames.Application.Json)]
-    //public async Task<ActionResult<IDictionary<string, ApiEndpointGroupPermissions>>> GetApiPermissions(int memberFirmID, Guid userGUID, CancellationToken cancellationToken)
-    //{
-    //    var userApiPermissionsByEndpointGroupName = await _userApiPermissionsCrudService.GetUserApiPermissionsByEndpointGroupNameAsync(userGUID, cancellationToken);
-
-    //    return Ok(userApiPermissionsByEndpointGroupName);
-    //}
-
-    // <summary>
-    // Sets user API permissions by endpoint group name.
-    // </summary>
-    // <param name="memberFirmID">ID of the member firm for which the permissions should be set.</param>
-    // <param name="userGUID">GUID of the user for which the permissions should be set.</param>
-    // <param name="userApiPermissionsByEndpointGroupNameInput">User API permissions by API endpoint group name.</param>
-    // <param name="cancellationToken">Cancellation token.</param>
-    // <returns>Updated user API permissions by API endpoint group name.</returns>
-    //[HttpPut("memberFirms/{memberFirmID:int}/Users/{userGUID:guid}/ApiPermissions")]
-    //[SwaggerResponse(StatusCodes.Status200OK, null, typeof(IDictionary<string, ApiEndpointGroupPermissions>), MediaTypeNames.Application.Json)]
-    //public async Task<ActionResult<IDictionary<string, ApiEndpointGroupPermissions>>> SetApiPermissions(int memberFirmID, Guid userGUID, IDictionary<string, ApiEndpointGroupPermissions> userApiPermissionsByEndpointGroupNameInput, CancellationToken cancellationToken)
-    //{
-    //    var userApiPermissionsByEndpointGroupName = await _userApiPermissionsCrudService.SetUserApiPermissionsByEndpointGroupNameAsync(userGUID, userApiPermissionsByEndpointGroupNameInput, cancellationToken);
-
-    //    return Ok(userApiPermissionsByEndpointGroupName);
-    //}
 }
