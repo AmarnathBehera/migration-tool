@@ -6,7 +6,6 @@ using BDO.GWT.Web.Core.LiveSite.Data;
 using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Xperience.Core.LiveSite.Services;
 using BDO.GWT.Xperience.Core.Services;
-using Kentico.Content.Web.Mvc;
 using Moq;
 
 namespace BDO.GWT.Core.Tests.Services;
@@ -14,7 +13,7 @@ namespace BDO.GWT.Core.Tests.Services;
 public class SubscribeFormServiceTests
 {
     private Mock<INewsletterSubscriptionService> _newsletterSubscriptionServiceMock = null!;
-    private Mock<IContentRetriever> _contentRetrieverMock = null!;
+    private Mock<IContentService> _contentServiceMock = null!;
     private Mock<IRecaptchaValidationService> _recaptchaValidationServiceMock = null!;
     private SubscribeFormService _service = null!;
 
@@ -24,12 +23,12 @@ public class SubscribeFormServiceTests
     public void Setup()
     {
         _newsletterSubscriptionServiceMock = new Mock<INewsletterSubscriptionService>();
-        _contentRetrieverMock = new Mock<IContentRetriever>();
+        _contentServiceMock = new Mock<IContentService>();
         _recaptchaValidationServiceMock = new Mock<IRecaptchaValidationService>();
 
         _service = new SubscribeFormService(
             _newsletterSubscriptionServiceMock.Object,
-            _contentRetrieverMock.Object,
+            _contentServiceMock.Object,
             _recaptchaValidationServiceMock.Object);
     }
 
@@ -66,14 +65,14 @@ public class SubscribeFormServiceTests
 
     private void SetupContentRetriever(Subscribe? page)
     {
-        var pages = page is null
-            ? Array.Empty<Subscribe>()
+        IEnumerable<Subscribe> pages = page is null
+            ? []
             : [page];
 
-        _contentRetrieverMock
-            .Setup(r => r.RetrieveAllPagesByGuids<Subscribe>(
-                It.IsAny<Guid[]>(),
-                cancellationToken: It.IsAny<CancellationToken>()))
+        _contentServiceMock
+            .Setup(s => s.GetPagesByGuidsAsync<Subscribe>(
+                It.IsAny<IEnumerable<Guid>>(),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(pages);
     }
 
@@ -298,10 +297,11 @@ public class SubscribeFormServiceTests
         var page = BuildSubscribePage();
         var formData = ValidFormData();
 
-        _contentRetrieverMock
-            .Setup(r => r.RetrieveAllPagesByGuids<Subscribe>(
-                It.IsAny<Guid[]>(), cancellationToken: token))
-            .ReturnsAsync([page]);
+        _contentServiceMock
+            .Setup(s => s.GetPagesByGuidsAsync<Subscribe>(
+                It.IsAny<IEnumerable<Guid>>(),
+                token))
+            .ReturnsAsync(new[] { page });
         _recaptchaValidationServiceMock
             .Setup(r => r.ValidateAsync(It.IsAny<bool>(), It.IsAny<decimal>(), It.IsAny<string>(), token))
             .ReturnsAsync(true);
@@ -311,8 +311,10 @@ public class SubscribeFormServiceTests
 
         await _service.SubscribeToNewslettersAsync(PageGuid, formData, token);
 
-        _contentRetrieverMock.Verify(
-            r => r.RetrieveAllPagesByGuids<Subscribe>(It.IsAny<Guid[]>(), cancellationToken: token),
+        _contentServiceMock.Verify(
+            s => s.GetPagesByGuidsAsync<Subscribe>(
+                It.IsAny<IEnumerable<Guid>>(),
+                token),
             Times.Once);
         _recaptchaValidationServiceMock.Verify(
             r => r.ValidateAsync(It.IsAny<bool>(), It.IsAny<decimal>(), It.IsAny<string>(), token),

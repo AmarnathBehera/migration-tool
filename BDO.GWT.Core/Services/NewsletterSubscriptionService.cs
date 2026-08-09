@@ -5,7 +5,12 @@ using BDO.GWT.Web.Core.Data;
 using BDO.GWT.Web.Core.Data.Queries;
 using CMS.ContactManagement;
 using CMS.DataEngine;
+using CMS.EmailEngine;
+using CMS.EmailLibrary;
 using CMS.EmailMarketing;
+using CMS.Websites.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System.Globalization;
 using System.Linq;
 
@@ -19,7 +24,7 @@ public interface INewsletterSubscriptionService
 }
 
 public class NewsletterSubscriptionService(
-    IHashValidator hashValidator,
+    IHashValidator hashValidator, IServiceScopeFactory scopeFactory,
     IMarketingContactManagementService marketingContactManagementService,
     IInfoProvider<ContactGroupInfo> recipientListInfoProvider,
     IInfoProvider<ContactGroupMemberInfo> contactGroupMemberInfoProvider,
@@ -30,6 +35,8 @@ public class NewsletterSubscriptionService(
     private readonly IInfoProvider<ContactGroupInfo> _recipientListInfoProvider = recipientListInfoProvider;
     private readonly IInfoProvider<ContactGroupMemberInfo> _contactGroupMemberInfoProvider = contactGroupMemberInfoProvider;
     private readonly IInfoProvider<EmailSubscriptionConfirmationInfo> _emailSubscriptionConfirmationInfoProvider = emailSubscriptionConfirmationInfoProvider;
+    private IServiceScopeFactory _scopeFactory = scopeFactory;
+    private const string EmailKey = "Email";
 
     public async Task<bool> SubscribeToNewslettersAsync(NewsletterSubscriptionData newsletterSubscriptionData, CancellationToken cancellationToken)
     {
@@ -71,10 +78,6 @@ public class NewsletterSubscriptionService(
                 ContactGroupMemberFromManual = true,
             };
             member.Insert();
-
-            // Double opt-in: confirmation starts unapproved until ConfirmSubscriptionForNewsletterAsync flips it.
-            // If a given recipient list doesn't require double opt-in, insert with IsApproved = true instead —
-            // you'll need a way to know that per recipient list (e.g. a flag on RecipientListSettingsInfo or your own config).
             var confirmation = new EmailSubscriptionConfirmationInfo
             {
                 EmailSubscriptionConfirmationContactID = contact.ContactID,
@@ -83,11 +86,24 @@ public class NewsletterSubscriptionService(
                 EmailSubscriptionConfirmationDate = DateTime.Now,
             };
             confirmation.Insert();
+            var emailConfig = EmailTemplateInfo.Provider.Get("SubscribeToNewsletters");
+            
+            string fromEmail = ResolveFromEmailForCurrentChannel();
+           
+            var email = new EmailMessage
+            {
+                From = fromEmail,
+                Recipients = newsletterSubscriptionData.Email,
+                EmailFormat = EmailFormatEnum.Html
+            };
 
-            // TODO: send your own confirmation email here (with hash link) if double opt-in applies —
-            // the SendConfirmationEmail/AllowOptIn flags from SubscribeSettings have no direct equivalent;
-            // you own this step now.
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+                await emailService.SendEmail(email).ConfigureAwait(false);
+            }
         }
+     
 
         return true;
     }
@@ -173,4 +189,28 @@ public class NewsletterSubscriptionService(
 
         await _marketingContactManagementService.UpdateMarketingContactAsync(contact, cancellationToken);
     }
+
+    private string ResolveFromEmailForCurrentChannel()
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var websiteChannelContext = scope.ServiceProvider.GetRequiredService<IWebsiteChannelContext>();
+        var webChannelSettingsInfoProvider = scope.ServiceProvider.GetRequiredService<IInfoProvider<WebChannelSettingsInfo>>();
+        var emailInfoProvider = scope.ServiceProvider.GetRequiredService<IInfoProvider<EmailInfo>>();
+
+        int currentWebsiteID = websiteChannelContext.WebsiteChannelID;
+       
+        var currentChannelSettings = webChannelSettingsInfoProvider
+            .Get()
+            .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), currentWebsiteID)
+            .TopN(1)
+            .FirstOrDefault();
+
+        return emailInfoProvider.Get()
+            .WhereEquals(nameof(EmailInfo.DisplayName), EmailKey)
+            .WhereEquals(nameof(EmailInfo.EmailSettingsWebChannelSettingID), currentChannelSettings.WebChannelSettingsID)
+            .TopN(1)
+            .GetEnumerableTypedResult()
+            .FirstOrDefault()?.FromEmail;
+    }
+
 }

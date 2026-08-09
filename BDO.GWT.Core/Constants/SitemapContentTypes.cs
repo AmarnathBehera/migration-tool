@@ -72,6 +72,11 @@ namespace BDO.GWT.Core.Constants
         BusinessStrategy.CONTENT_TYPE_NAME,
         SectionBusinessStrategies.CONTENT_TYPE_NAME,
         Subscribe.CONTENT_TYPE_NAME,
+        SubscribeConfirm.CONTENT_TYPE_NAME,
+        SubscribeRemove.CONTENT_TYPE_NAME,
+        SubService.CONTENT_TYPE_NAME,
+        ThankYouConversionPage.CONTENT_TYPE_NAME,
+        ThankYouConversionPages.CONTENT_TYPE_NAME,
     };
     }
 }

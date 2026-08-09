@@ -79,7 +79,7 @@ public class XperiencePageContext : IPageContext
         var canRetrieve = _webPageDataContextRetriever.TryRetrieve(out var ctx);
 
         if (!canRetrieve || ctx.WebPage == null)
-            return CreateEmptyMetaDataSEOItemsDto();
+            return null;
 
 
         var webPageItemId = ctx.WebPage.WebPageItemID;
@@ -110,7 +110,7 @@ public class XperiencePageContext : IPageContext
         var page = pages?.Select(MapToMetaDataSEOItemsDto).FirstOrDefault();
 
         if (page == null)
-            return CreateEmptyMetaDataSEOItemsDto();
+            return null;
 
         var request = _httpContextAccessor.HttpContext?.Request;
         if (request != null)

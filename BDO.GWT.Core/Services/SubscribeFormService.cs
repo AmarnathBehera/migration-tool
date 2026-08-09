@@ -1,11 +1,11 @@
 ﻿using BDO;
+using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Domain.Core.Utilities;
 using BDO.GWT.Web.Core.Data;
 using BDO.GWT.Web.Core.LiveSite.Data;
 using BDO.GWT.Xperience.Core.LiveSite.Services;
 using BDO.GWT.Xperience.Core.Services;
-using Kentico.Content.Web.Mvc;
 
 namespace BDO.GWT.Web.Core.LiveSite.Services;
 
@@ -17,13 +17,13 @@ public interface ISubscribeFormService
 public class SubscribeFormService : ISubscribeFormService
 {
     private readonly INewsletterSubscriptionService _newsletterSubscriptionService;
-    private readonly IContentRetriever _contentRetriever;
+    private readonly IContentService _contentService;
     private readonly IRecaptchaValidationService _recaptchaValidationService;
 
-    public SubscribeFormService(INewsletterSubscriptionService newsletterSubscriptionService, IContentRetriever contentRetriever, IRecaptchaValidationService recaptchaValidationService)
+    public SubscribeFormService(INewsletterSubscriptionService newsletterSubscriptionService, IContentService contentService, IRecaptchaValidationService recaptchaValidationService)
     {
         _newsletterSubscriptionService = newsletterSubscriptionService;
-        _contentRetriever = contentRetriever;
+        _contentService = contentService;
         _recaptchaValidationService = recaptchaValidationService;
     }
 
@@ -41,7 +41,7 @@ public class SubscribeFormService : ISubscribeFormService
 
     private async Task<bool> ValidateSubscribeFormData(Guid pageGuid, NewsletterSubscriptionFormData newsletterSubscriptionFormData, CancellationToken cancellationToken)
     {
-        var pages = await _contentRetriever.RetrieveAllPagesByGuids<Subscribe>([pageGuid], cancellationToken: cancellationToken);
+        var pages = await _contentService.GetPagesByGuidsAsync<Subscribe>([pageGuid], cancellationToken);
         var subscribePage = pages.FirstOrDefault();
 
         if (subscribePage is null || !ValidateFields(subscribePage, newsletterSubscriptionFormData))
