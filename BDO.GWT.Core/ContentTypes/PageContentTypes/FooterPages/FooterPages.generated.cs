@@ -44,6 +44,6 @@ namespace BDO
 		/// <summary>
 		/// FooterLink.
 		/// </summary>
-		public IEnumerable<WebPageRelatedItem> FooterLink { get; set; }
+		public IEnumerable<IContentItemFieldsSource> FooterLink { get; set; }
 	}
 }

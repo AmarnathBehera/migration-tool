@@ -339,14 +339,18 @@ where T : class
                 throw new ArgumentException("Parent GUID must be provided", nameof(parentGuid));
 
             var childPages = await _contentRetriever.RetrievePages<TPage>(
-                new RetrievePagesParameters { LinkedItemsMaxLevel = 5 },
-            query =>
-            {
-                // Filter by parent GUID
-                query.Where(w => w.WhereEquals("WebPageItemParentID", parentGuid))
-                     .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder));
-            },
-                cacheSettings: RetrievalCacheSettings.CacheDisabled, // Use the predefined disabled cache
+                new RetrievePagesParameters
+                {
+                    LinkedItemsMaxLevel = 5,
+                    LanguageName = _cultureContext.CurrentLanguageTag, // resolve to the current request culture (e.g. "fr")
+                    UseLanguageFallbacks = true                        // set false if you do NOT want fallback to default language
+                },
+                query =>
+                {
+                    query.Where(w => w.WhereEquals("WebPageItemParentID", parentGuid))
+                         .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder));
+                },
+                cacheSettings: RetrievalCacheSettings.CacheDisabled,
                 cancellationToken: cancellationToken
             );
 

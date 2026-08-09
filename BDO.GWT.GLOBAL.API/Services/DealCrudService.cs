@@ -487,12 +487,12 @@ public class DealCrudService : IDealCrudService
             {
                 Name = deal.SystemFields?.WebPageItemName ?? string.Empty,
                 Culture = language?.ContentLanguageName ?? "en-gb",
-                NodeParentID = deal.SystemFields?.WebPageItemParentID ?? 0,
-                NodeID = deal.SystemFields?.WebPageItemParentID ?? 0,
-                PageID = deal.SystemFields?.WebPageItemID ?? 0,
-                NodeGUID = deal.SystemFields?.ContentItemGUID ?? Guid.Empty,
-                PageGUID = deal.SystemFields?.WebPageItemGUID ?? Guid.Empty,
-                NodeAliasPath = deal.SystemFields?.WebPageUrlPath ?? string.Empty
+                WebPageItemParentID = deal.SystemFields?.WebPageItemParentID ?? 0,
+                ContentItemID = deal.SystemFields?.ContentItemID ?? 0,
+                WebPageItemID = deal.SystemFields?.WebPageItemID ?? 0,
+                ContentItemGuid = deal.SystemFields?.ContentItemGUID ?? Guid.Empty,
+                PageGuid = deal.SystemFields?.WebPageItemGUID ?? Guid.Empty,
+                Path = deal.SystemFields?.WebPageUrlPath ?? string.Empty
             },
             Content = new DealPageContent
             {
@@ -592,10 +592,10 @@ public class DealCrudService : IDealCrudService
 
     private async Task<ContentItemData> CreateCMSTreeItem(DealPageContent deal, string? culture, CancellationToken cancellationToken)
     {
-        var industryReferences = await BuildReferencesAsync<DealCardIndustry>(deal.Industry, i => i.Name, cancellationToken);
-        var subIndustryReferences = await BuildReferencesAsync<DealCardSubIndustry>(deal.SubIndustry, s => s.Name, cancellationToken);
-        var dealTypeReferences = await BuildReferencesAsync<DealCardDealType>(deal.DealType, d => d.Name, cancellationToken);
-        var sizeReferences = await BuildReferencesAsync<DealCardRange>(deal.Size, r => r.Name, cancellationToken);
+        var industryReferences = await _mappingHelper.BuildReferencesAsync<DealCardIndustry>(deal.Industry, i => i.Name, cancellationToken);
+        var subIndustryReferences = await _mappingHelper.BuildReferencesAsync<DealCardSubIndustry>(deal.SubIndustry, s => s.Name, cancellationToken);
+        var dealTypeReferences = await _mappingHelper.BuildReferencesAsync<DealCardDealType>(deal.DealType, d => d.Name, cancellationToken);
+        var sizeReferences = await _mappingHelper.BuildReferencesAsync<DealCardRange>(deal.Size, r => r.Name, cancellationToken);
 
         var rssImageReferences = await _mappingHelper.BuildContentAttachmentImageReferences(deal.MetadataRssImage, cancellationToken);
         var downloadButtonReferences = await _mappingHelper.BuildContentAttachmentImageReferences(deal.DownloadButtonAttachment, cancellationToken);
@@ -662,40 +662,5 @@ public class DealCrudService : IDealCrudService
             { nameof(Deal.PageDescription), deal.MetadataDescription ?? string.Empty },
             { nameof(Deal.PageKeywords), string.Empty },
         });
-    }
-
-    /// <summary>
-    /// Selects the content items of type <typeparamref name="T"/> whose name matches the supplied
-    /// identifiers and returns them as a list of <see cref="ContentItemReference"/>. Names that do
-    /// not match any existing item are ignored.
-    /// </summary>
-    /// <typeparam name="T">The content type to query (e.g. DealCardIndustry, DealCardRange).</typeparam>
-    /// <param name="identifiers">The names to match.</param>
-    /// <param name="nameSelector">Selects the name value used for matching from a content item.</param>
-    /// <param name="cancellationToken">A cancellation token.</param>
-    private async Task<List<ContentItemReference>> BuildReferencesAsync<T>(
-        IEnumerable<string>? identifiers,
-        Func<T, string> nameSelector,
-        CancellationToken cancellationToken)
-        where T : class, IWebPageFieldsSource
-    {
-        var names = identifiers?
-            .Where(name => !string.IsNullOrWhiteSpace(name))
-            .Select(name => name.Trim())
-            .ToList() ?? new List<string>();
-
-        if (names.Count == 0)
-        {
-            return new List<ContentItemReference>();
-        }
-
-        var items = await _contentRetriever.GetItemsAsync<T>(
-            builder => builder.Parameters(p => p.Where(w => w.WhereIn("Name", names))),
-            cancellationToken);
-
-        return items
-            .Where(item => names.Contains(nameSelector(item), StringComparer.OrdinalIgnoreCase))
-            .Select(item => new ContentItemReference { Identifier = item.SystemFields.ContentItemGUID })
-            .ToList();
     }
 }

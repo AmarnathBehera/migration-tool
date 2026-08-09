@@ -70,6 +70,7 @@ namespace BDO.GWT.Core.Constants
         SectionBusinessStrategies.CONTENT_TYPE_NAME,
         Sitemap.CONTENT_TYPE_NAME,
         BusinessStrategy.CONTENT_TYPE_NAME,
+        InsightAnimationPage.CONTENT_TYPE_NAME
         SectionBusinessStrategies.CONTENT_TYPE_NAME,
         Subscribe.CONTENT_TYPE_NAME,
         SubscribeConfirm.CONTENT_TYPE_NAME,

@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.resource>
+  <ResourceDescription>Allows 301 redirects to be added for web pages</ResourceDescription>
+  <ResourceDisplayName>Redirects</ResourceDisplayName>
+  <ResourceGUID>82f385c0-e18a-48b4-8b9b-abfae0c8c600</ResourceGUID>
+  <ResourceIsInDevelopment>False</ResourceIsInDevelopment>
+  <ResourceName>XperienceCommunity.Redirect</ResourceName>
+</cms.resource>

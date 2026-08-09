@@ -141,6 +141,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IInsightCategoryCardListingPageService, InsightCategoryCardListingPageService>();
         serviceCollection.AddScoped<IInsightCardService, InsightCardService>();
         serviceCollection.AddScoped<IInsightCarouselService, InsightCarouselService>();
+        serviceCollection.AddScoped<IGDPRUserLookupService, GDPRUserService>();
+
         serviceCollection.AddScoped<ISubscribePageService, SubscribePageService>();
         serviceCollection.AddScoped<IPageUrlService, PageUrlService>();
         serviceCollection.AddScoped<ISubscribeFormService, SubscribeFormService>();
@@ -151,6 +153,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<INewsletterSubscriptionService, NewsletterSubscriptionService>();
         serviceCollection.AddScoped<ISubscribeConfirmPageService, SubscribeConfirmPageService>();
         serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
+        serviceCollection.AddSingleton<IEditorsPickStateStore, EditorsPickStateStore>();
         serviceCollection.AddScoped<ISubscribePageService, SubscribePageService>();
         serviceCollection.AddScoped<ISubServicesPageService, SubServicesPageService>();
         serviceCollection.AddScoped<IVisitorContext, VisitorContext>();
