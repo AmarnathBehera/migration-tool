@@ -15,7 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -95,9 +94,6 @@ public partial class FormHandlerModule : Module
             string absoluteUrl = GetReferrerUrl();
             if (string.IsNullOrWhiteSpace(absoluteUrl))
                 return;
-
-            var uri = new Uri(absoluteUrl);
-            string nodeAliasPath = uri.AbsolutePath.TrimEnd('/');
 
             string personTitle = absoluteUrl.TrimEnd('/').Split('/').Last().Replace("-", " ");
             if (string.IsNullOrWhiteSpace(personTitle))
@@ -217,27 +213,4 @@ public partial class FormHandlerModule : Module
     private string GetReferrerUrl()
         => _httpContextAccessor?.HttpContext?.Request.Headers.Referer.ToString()
            ?? string.Empty;
-
-    private static string RemoveCultureFromPath(string nodeAliasPath)
-    {
-        if (string.IsNullOrWhiteSpace(nodeAliasPath))
-            return string.Empty;
-
-        return CulturePrefixRegex().Replace(nodeAliasPath, string.Empty);
-    }
-
-    private static string NormalizeCulture(string culture)
-    {
-        if (string.IsNullOrWhiteSpace(culture) || !culture.Contains('-'))
-            return culture;
-
-        var parts = culture.Split('-');
-        return $"{parts[0].ToLowerInvariant()}-{parts[1].ToUpperInvariant()}";
-    }
-
-    [GeneratedRegex(@"^[a-zA-Z]{2}-[a-zA-Z]{2}$")]
-    private static partial Regex CultureRegex();
-
-    [GeneratedRegex(@"^/[a-z]{2}-[a-z]{2}", RegexOptions.IgnoreCase)]
-    private static partial Regex CulturePrefixRegex();
 }
