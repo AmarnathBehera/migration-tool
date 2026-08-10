@@ -345,6 +345,210 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             Assert.That(fromEmail, Is.Null);
         }
 
+        // ??? Assembly attribute ???????????????????????????????????????????????????
+
+        [Test]
+        public void Assembly_HasRegisterModuleAttributeForFormHandlerModule()
+        {
+            // Verify that the assembly carrying FormHandlerModule is decorated with
+            // at least one [RegisterModule] assembly-level attribute that targets
+            // FormHandlerModule (checked by inspecting constructor arguments via reflection,
+            // so we remain resilient to CMS SDK attribute shape changes).
+            var asm = typeof(FormHandlerModule).Assembly;
+
+            var found = asm.GetCustomAttributesData()
+                           .Any(a =>
+                               a.AttributeType.Name == "RegisterModuleAttribute" &&
+                               a.ConstructorArguments.Any(arg =>
+                                   arg.Value is Type t && t == typeof(FormHandlerModule)));
+
+            Assert.That(found, Is.True,
+                "Expected [assembly: RegisterModule(typeof(FormHandlerModule))] to be present.");
+        }
+
+        // ??? Private fields are injected correctly ????????????????????????????????
+
+        [Test]
+        public void Setup_InjectsHttpContextAccessor()
+        {
+            var field = typeof(FormHandlerModule).GetField("_httpContextAccessor", PrivateInstance);
+            Assert.That(field, Is.Not.Null);
+            Assert.That(field!.GetValue(_module), Is.SameAs(_httpContextAccessor.Object));
+        }
+
+        [Test]
+        public void Setup_InjectsLogger()
+        {
+            var field = typeof(FormHandlerModule).GetField("_logger", PrivateInstance);
+            Assert.That(field, Is.Not.Null);
+            Assert.That(field!.GetValue(_module), Is.InstanceOf<ILogger<FormHandlerModule>>());
+        }
+
+        [Test]
+        public void Setup_InjectsScopeFactory()
+        {
+            var field = typeof(FormHandlerModule).GetField("_scopeFactory", PrivateInstance);
+            Assert.That(field, Is.Not.Null);
+            Assert.That(field!.GetValue(_module), Is.SameAs(_scopeFactory.Object));
+        }
+
+        // ??? CultureRegex ?????????????????????????????????????????????????????????
+
+        [Test]
+        [TestCase("en-gb", true)]
+        [TestCase("EN-GB", true)]
+        [TestCase("fr-FR", true)]
+        [TestCase("zh-CN", true)]
+        [TestCase("ar-SA", true)]
+        public void CultureRegex_MatchesValidCultureTags(string input, bool expectedMatch)
+        {
+            var method = typeof(FormHandlerModule).GetMethod("CultureRegex", PrivateStatic);
+            Assert.That(method, Is.Not.Null, "CultureRegex() method not found.");
+
+            var regex = (System.Text.RegularExpressions.Regex)method!.Invoke(null, null)!;
+
+            Assert.That(regex.IsMatch(input), Is.EqualTo(expectedMatch));
+        }
+
+        [Test]
+        [TestCase("english")]           // no hyphen
+        [TestCase("en")]                // no hyphen, single part
+        [TestCase("en-gb-extra")]       // three parts
+        [TestCase("e-gb")]              // first part only 1 char
+        [TestCase("en-g")]              // second part only 1 char
+        [TestCase("123-gb")]            // digits
+        [TestCase("")]                  // empty
+        public void CultureRegex_DoesNotMatchInvalidCultureTags(string input)
+        {
+            var method = typeof(FormHandlerModule).GetMethod("CultureRegex", PrivateStatic);
+            Assert.That(method, Is.Not.Null, "CultureRegex() method not found.");
+
+            var regex = (System.Text.RegularExpressions.Regex)method!.Invoke(null, null)!;
+
+            Assert.That(regex.IsMatch(input), Is.False);
+        }
+
+        // ??? CulturePrefixRegex ???????????????????????????????????????????????????
+
+        [Test]
+        [TestCase("/en-gb/people")]
+        [TestCase("/EN-GB/people")]
+        [TestCase("/fr-fr/contact")]
+        [TestCase("/zh-cn")]
+        public void CulturePrefixRegex_MatchesPathsWithCulturePrefix(string input)
+        {
+            var method = typeof(FormHandlerModule).GetMethod("CulturePrefixRegex", PrivateStatic);
+            Assert.That(method, Is.Not.Null, "CulturePrefixRegex() method not found.");
+
+            var regex = (System.Text.RegularExpressions.Regex)method!.Invoke(null, null)!;
+
+            Assert.That(regex.IsMatch(input), Is.True);
+        }
+
+        [Test]
+        [TestCase("/people/en-gb")]     // culture not at start
+        [TestCase("/english/contact")]  // not a 2-letter code
+        [TestCase("en-gb/contact")]     // no leading slash
+        [TestCase("")]                  // empty
+        public void CulturePrefixRegex_DoesNotMatchPathsWithoutCulturePrefix(string input)
+        {
+            var method = typeof(FormHandlerModule).GetMethod("CulturePrefixRegex", PrivateStatic);
+            Assert.That(method, Is.Not.Null, "CulturePrefixRegex() method not found.");
+
+            var regex = (System.Text.RegularExpressions.Regex)method!.Invoke(null, null)!;
+
+            Assert.That(regex.IsMatch(input), Is.False);
+        }
+
+        // ??? GetReferrerUrl – further cases ???????????????????????????????????????
+
+        [Test]
+        public void GetReferrerUrl_ReturnsRefererHeader_WithFragment()
+        {
+            var ctx = new DefaultHttpContext();
+            ctx.Request.Headers.Referer = "https://example.com/en-gb/page#section1";
+            _httpContextAccessor.SetupGet(a => a.HttpContext).Returns(ctx);
+
+            var url = InvokePrivate<string>(_module, "GetReferrerUrl");
+
+            Assert.That(url, Is.EqualTo("https://example.com/en-gb/page#section1"));
+        }
+
+        [Test]
+        public void GetReferrerUrl_ReturnsRefererHeader_WithPort()
+        {
+            var ctx = new DefaultHttpContext();
+            ctx.Request.Headers.Referer = "https://example.com:8080/en-gb/people";
+            _httpContextAccessor.SetupGet(a => a.HttpContext).Returns(ctx);
+
+            var url = InvokePrivate<string>(_module, "GetReferrerUrl");
+
+            Assert.That(url, Is.EqualTo("https://example.com:8080/en-gb/people"));
+        }
+
+        [Test]
+        public void GetReferrerUrl_ReturnsRefererHeader_WhenRootPath()
+        {
+            var ctx = new DefaultHttpContext();
+            ctx.Request.Headers.Referer = "https://example.com/";
+            _httpContextAccessor.SetupGet(a => a.HttpContext).Returns(ctx);
+
+            var url = InvokePrivate<string>(_module, "GetReferrerUrl");
+
+            Assert.That(url, Is.EqualTo("https://example.com/"));
+        }
+
+        // ??? NormalizeCulture – further cases ????????????????????????????????????
+
+        [Test]
+        public void NormalizeCulture_SingleHyphen_ReturnsNormalizedTwoParts()
+        {
+            // Input is "-" ? parts[0]="" parts[1]=""
+            var result = InvokePrivateStatic<string>("NormalizeCulture", "-");
+
+            // Both parts are empty; result should be "-"
+            Assert.That(result, Is.EqualTo("-"));
+        }
+
+        [Test]
+        [TestCase("JA-JP", "ja-JP")]
+        [TestCase("ko-KR", "ko-KR")]
+        [TestCase("RU-RU", "ru-RU")]
+        public void NormalizeCulture_CoversMiscLocales(string input, string expected)
+        {
+            var result = InvokePrivateStatic<string>("NormalizeCulture", input);
+
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        // ??? RemoveCultureFromPath – further boundary cases ???????????????????????
+
+        [Test]
+        public void RemoveCultureFromPath_OnlyCultureSegmentWithTrailingSlash_ReturnsSlash()
+        {
+            // "/en-gb/" ? the culture prefix "/en-gb" is stripped, leaving "/"
+            var result = InvokePrivateStatic<string>("RemoveCultureFromPath", "/en-gb/");
+
+            Assert.That(result, Is.EqualTo("/"));
+        }
+
+        [Test]
+        public void RemoveCultureFromPath_PathWithMultipleSegmentsAfterCulture_StripsOnlyPrefix()
+        {
+            var result = InvokePrivateStatic<string>("RemoveCultureFromPath", "/fr-fr/a/b/c/d/e");
+
+            Assert.That(result, Is.EqualTo("/a/b/c/d/e"));
+        }
+
+        [Test]
+        public void RemoveCultureFromPath_CultureTagInMiddleOfPath_IsNotStripped()
+        {
+            // Only the leading culture prefix should be removed.
+            var result = InvokePrivateStatic<string>("RemoveCultureFromPath", "/people/en-gb/profile");
+
+            Assert.That(result, Is.EqualTo("/people/en-gb/profile"));
+        }
+
         private static void SetPrivateField(object target, string name, object value)
         {
             var field = target.GetType().GetField(name, PrivateInstance);
