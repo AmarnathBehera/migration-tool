@@ -158,4 +158,55 @@ public class ChannelSettingCrudServiceTests
 
         Assert.That(output.Type, Is.EqualTo("CustomType"));
     }
+
+    [Test]
+    public void ChannelSettingInput_DefaultValues_AreInitialized()
+    {
+        var input = new BDO.GWT.Web.Core.API.Data.ChannelSettingInput
+        {
+            InheritFromGlobalSettings = false
+        };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(input.InheritFromGlobalSettings, Is.False);
+            Assert.That(input.Value, Is.Null);
+        });
+    }
+
+    [Test]
+    public void ChannelSettingInput_InheritFromGlobalSettings_CanBeSetToTrue()
+    {
+        var input = new BDO.GWT.Web.Core.API.Data.ChannelSettingInput
+        {
+            InheritFromGlobalSettings = true
+        };
+
+        Assert.That(input.InheritFromGlobalSettings, Is.True);
+    }
+
+    [Test]
+    public void ChannelSettingInput_Value_CanBeSet()
+    {
+        var value = new Dictionary<string, object> { ["key"] = "val" };
+        var input = new BDO.GWT.Web.Core.API.Data.ChannelSettingInput
+        {
+            InheritFromGlobalSettings = false,
+            Value = value
+        };
+
+        Assert.That(input.Value, Is.SameAs(value));
+    }
+
+    [Test]
+    public void ChannelSettingInput_Value_CanBeString()
+    {
+        var input = new BDO.GWT.Web.Core.API.Data.ChannelSettingInput
+        {
+            InheritFromGlobalSettings = true,
+            Value = "some-value"
+        };
+
+        Assert.That(input.Value, Is.EqualTo("some-value"));
+    }
 }

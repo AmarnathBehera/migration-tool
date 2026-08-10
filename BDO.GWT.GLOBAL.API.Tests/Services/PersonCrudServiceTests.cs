@@ -128,9 +128,11 @@ public class PersonCrudServiceTests
             onlyPublished: true,
             cancellationToken: CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        var objectResult = (ObjectResult)result.Result!;
-        Assert.That(objectResult.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
     }
 
     [Test]
@@ -144,9 +146,11 @@ public class PersonCrudServiceTests
             culture: "en-gb",
             cancellationToken: CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        var objectResult = (ObjectResult)result.Result!;
-        Assert.That(objectResult.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
     }
 
     [Test]
@@ -162,9 +166,11 @@ public class PersonCrudServiceTests
             request: request,
             cancellationToken: CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        var objectResult = (ObjectResult)result.Result!;
-        Assert.That(objectResult.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
     }
 
     [Test]
@@ -181,9 +187,11 @@ public class PersonCrudServiceTests
             request: request,
             cancellationToken: CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        var objectResult = (ObjectResult)result.Result!;
-        Assert.That(objectResult.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
     }
 
     [Test]
@@ -199,9 +207,11 @@ public class PersonCrudServiceTests
             request: request,
             cancellationToken: CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        var objectResult = (ObjectResult)result.Result!;
-        Assert.That(objectResult.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
     }
 
     [Test]
@@ -230,9 +240,11 @@ public class PersonCrudServiceTests
             request: request,
             cancellationToken: CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        var objectResult = (ObjectResult)result.Result!;
-        Assert.That(objectResult.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
     }
 
     [Test]
@@ -387,9 +399,11 @@ public class PersonCrudServiceTests
             culture,
             CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        var objectResult = (ObjectResult)result.Result!;
-        Assert.That(objectResult.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
     }
 
     [TestCase(true)]
@@ -405,9 +419,11 @@ public class PersonCrudServiceTests
             onlyPublished,
             CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        var objectResult = (ObjectResult)result.Result!;
-        Assert.That(objectResult.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
     }
 
     [Test]
@@ -449,9 +465,11 @@ public class PersonCrudServiceTests
             culture: "en-gb",
             CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        var objectResult = (ObjectResult)result.Result!;
-        Assert.That(objectResult.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
     }
 
     [Test]
@@ -467,9 +485,11 @@ public class PersonCrudServiceTests
             onlyPublished: true,
             cts.Token);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        var objectResult = (ObjectResult)result.Result!;
-        Assert.That(objectResult.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
     }
 
     [Test]

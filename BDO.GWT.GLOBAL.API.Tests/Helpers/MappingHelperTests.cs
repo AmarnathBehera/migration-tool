@@ -577,4 +577,595 @@ public class MappingHelperTests
             x => x.GetItemsAsync<Person>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
+
+    [Test]
+    public async Task BuildReferencesPageCarAsync_WhenNoItemsMatch_ReturnsEmpty_AndQueriesOnce()
+    {
+        _contentServiceMock
+            .Setup(x => x.GetItemsAsync<Person>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Person>().AsReadOnly());
+
+        var result = await _mappingHelper.BuildReferencesPageCarAsync<Person>(SampleIdentifiers, p => p.MetadataTitle ?? string.Empty, CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<Person>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    // ---------------------------------------------------------------------
+    // BuildReferencesAsync / BuildReferencesPageAsync - query path
+    // ---------------------------------------------------------------------
+
+    [Test]
+    public async Task BuildReferencesAsync_WhenNoItemsMatch_ReturnsEmpty_AndQueriesOnce()
+    {
+        _contentServiceMock
+            .Setup(x => x.GetItemsAsync<Person>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Person>().AsReadOnly());
+
+        var result = await _mappingHelper.BuildReferencesAsync<Person>(SampleIdentifiers, p => p.MetadataTitle ?? string.Empty, CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<Person>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task BuildReferencesPageAsync_WhenNoItemsMatch_ReturnsEmpty_AndQueriesOnce()
+    {
+        _contentServiceMock
+            .Setup(x => x.GetItemsAsync<Person>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Person>().AsReadOnly());
+
+        var result = await _mappingHelper.BuildReferencesPageAsync<Person>(SampleIdentifiers, p => p.MetadataTitle ?? string.Empty, CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<Person>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    // ---------------------------------------------------------------------
+    // BuildWebPageSingleIdReferencesAsync - additional paths
+    // ---------------------------------------------------------------------
+
+    [Test]
+    public async Task BuildWebPageSingleIdReferences_WithNullCulture_UsesDefaultCulture()
+    {
+        RetrievePagesParameters? captured = null;
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<RetrievePagesParameters, Action<RetrievePagesQueryParameters>, RetrievalCacheSettings, CancellationToken>(
+                (parameters, _, _, _) => captured = parameters)
+            .ReturnsAsync(new List<Person>());
+
+        await _mappingHelper.BuildWebPageSingleIdReferencesAsync<Person>(5, "ChannelName", null, CancellationToken.None);
+
+        Assert.That(captured, Is.Not.Null);
+        Assert.That(captured!.LanguageName, Is.EqualTo("en"));
+    }
+
+    // ---------------------------------------------------------------------
+    // BuildReusableContentItemReferencesAsync
+    // ---------------------------------------------------------------------
+
+    [Test]
+    public async Task BuildReusableContentItemReferencesAsync_WithNullIdentifiers_ReturnsEmpty_AndNeverQueries()
+    {
+        var result = await _mappingHelper.BuildReusableContentItemReferencesAsync<ContentAttachment>(
+            null, a => a.SystemFields.ContentItemName ?? string.Empty, CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<ContentAttachment>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildReusableContentItemReferencesAsync_WithOnlyWhitespaceIdentifiers_ReturnsEmpty_AndNeverQueries()
+    {
+        var result = await _mappingHelper.BuildReusableContentItemReferencesAsync<ContentAttachment>(
+            WhitespaceIdentifiers, a => a.SystemFields.ContentItemName ?? string.Empty, CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<ContentAttachment>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildReusableContentItemReferencesAsync_WhenNoItemsMatch_ReturnsEmpty_AndQueriesOnce()
+    {
+        _contentServiceMock
+            .Setup(x => x.GetItemsAsync<ContentAttachment>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<ContentAttachment>().AsReadOnly());
+
+        var result = await _mappingHelper.BuildReusableContentItemReferencesAsync<ContentAttachment>(
+            SampleIdentifiers, a => a.SystemFields.ContentItemName ?? string.Empty, CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<ContentAttachment>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    // ---------------------------------------------------------------------
+    // ValidateAndNormalizeCultureAsync
+    // ---------------------------------------------------------------------
+
+    [TestCase("en-gb")]
+    [TestCase("en-us")]
+    [TestCase("en")]
+    public void ValidateAndNormalizeCultureAsync_WithValidTag_ReturnsLanguageTag(string tag)
+    {
+        var result = _mappingHelper.ValidateAndNormalizeCultureAsync(tag);
+
+        Assert.That(result, Is.Not.Null);
+    }
+
+    [Test]
+    public void ValidateAndNormalizeCultureAsync_WithInvalidTag_ReturnsNull_AndAddsError()
+    {
+        var result = _mappingHelper.ValidateAndNormalizeCultureAsync("not-a-real-culture-xyz-123");
+
+        Assert.That(result, Is.Null);
+        _validationStateMock.Verify(x => x.AddError(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+    }
+
+    // ---------------------------------------------------------------------
+    // ValidateAndNormalizeSiteCultureAsync
+    // ---------------------------------------------------------------------
+
+    [Test]
+    public async Task ValidateAndNormalizeSiteCultureAsync_WithValidCultureInSite_ReturnsLanguageTag_AndNoError()
+    {
+        var tag = "en-gb";
+        _cultureServiceMock
+            .Setup(x => x.GetSiteCulturesLanguageCodeAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { BDO.GWT.Core.ValueObjects.LanguageTag.GB });
+
+        var result = await _mappingHelper.ValidateAndNormalizeSiteCultureAsync(1, tag, CancellationToken.None);
+
+        Assert.That(result, Is.Not.Null);
+        _validationStateMock.Verify(x => x.AddError(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Test]
+    public async Task ValidateAndNormalizeSiteCultureAsync_WithCultureNotInSite_ReturnsLanguageTag_AndAddsError()
+    {
+        _cultureServiceMock
+            .Setup(x => x.GetSiteCulturesLanguageCodeAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<BDO.GWT.Core.ValueObjects.LanguageTag>());
+
+        var result = await _mappingHelper.ValidateAndNormalizeSiteCultureAsync(1, "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.Not.Null);
+        _validationStateMock.Verify(x => x.AddError(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+    }
+
+    [Test]
+    public async Task ValidateAndNormalizeSiteCultureAsync_WithInvalidCultureTag_ReturnsNull_AndAddsError()
+    {
+        var result = await _mappingHelper.ValidateAndNormalizeSiteCultureAsync(1, "not-valid-xyz", CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+        _cultureServiceMock.Verify(
+            x => x.GetSiteCulturesLanguageCodeAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    // ---------------------------------------------------------------------
+    // BuildWebPageUrlPathReferenceAsync
+    // ---------------------------------------------------------------------
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("   ")]
+    public async Task BuildWebPageUrlPathReferenceAsync_WithNullOrWhitespace_ReturnsEmpty_AndNeverQueries(string? path)
+    {
+        var result = await _mappingHelper.BuildWebPageUrlPathReferenceAsync<Person>(path, "ChannelName", "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildWebPageUrlPathReferenceAsync_WithRawGuid_ReturnsThatGuid_AndNeverQueries()
+    {
+        var guid = Guid.NewGuid();
+
+        var result = await _mappingHelper.BuildWebPageUrlPathReferenceAsync<Person>(guid.ToString(), "ChannelName", "en-gb", CancellationToken.None);
+
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Identifier, Is.EqualTo(guid));
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildWebPageUrlPathReferenceAsync_WhenNoPageMatches_ReturnsEmpty_AndQueriesOnce()
+    {
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Person>());
+
+        var result = await _mappingHelper.BuildWebPageUrlPathReferenceAsync<Person>("/people/unknown", "ChannelName", "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task BuildWebPageUrlPathReferenceAsync_WithNullCulture_UsesDefaultCulture()
+    {
+        RetrievePagesParameters? captured = null;
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<RetrievePagesParameters, Action<RetrievePagesQueryParameters>, RetrievalCacheSettings, CancellationToken>(
+                (p, _, _, _) => captured = p)
+            .ReturnsAsync(new List<Person>());
+
+        await _mappingHelper.BuildWebPageUrlPathReferenceAsync<Person>("~/people/jane-doe?ref=1", "ChannelName", null, CancellationToken.None);
+
+        Assert.That(captured, Is.Not.Null);
+        Assert.That(captured!.LanguageName, Is.EqualTo("en"));
+    }
+
+    // ---------------------------------------------------------------------
+    // ResolveWebPageRelatedItemPathAsync
+    // ---------------------------------------------------------------------
+
+    [Test]
+    public async Task ResolveWebPageRelatedItemPathAsync_WithNullItem_ReturnsNull_AndNeverQueries()
+    {
+        var result = await _mappingHelper.ResolveWebPageRelatedItemPathAsync(null, "ChannelName", "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<SectionEvents>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task ResolveWebPageRelatedItemPathAsync_WhenNoPageMatches_ReturnsNull_AndQueriesOnce()
+    {
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<SectionEvents>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<SectionEvents>());
+
+        var item = new WebPageRelatedItem { WebPageGuid = Guid.NewGuid() };
+        var result = await _mappingHelper.ResolveWebPageRelatedItemPathAsync(item, "ChannelName", "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<SectionEvents>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task ResolveWebPageRelatedItemPathAsync_WithNullCulture_UsesDefaultCulture()
+    {
+        RetrievePagesParameters? captured = null;
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<SectionEvents>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<RetrievePagesParameters, Action<RetrievePagesQueryParameters>, RetrievalCacheSettings, CancellationToken>(
+                (p, _, _, _) => captured = p)
+            .ReturnsAsync(new List<SectionEvents>());
+
+        await _mappingHelper.ResolveWebPageRelatedItemPathAsync(
+            new WebPageRelatedItem { WebPageGuid = Guid.NewGuid() }, "ChannelName", null, CancellationToken.None);
+
+        Assert.That(captured, Is.Not.Null);
+        Assert.That(captured!.LanguageName, Is.EqualTo("en"));
+    }
+
+    // ---------------------------------------------------------------------
+    // BuildFeaturedEventOrWebinarReferencesAsync
+    // ---------------------------------------------------------------------
+
+    [Test]
+    public async Task BuildFeaturedEventOrWebinarReferencesAsync_WithNullIdentifiers_ReturnsEmpty_AndNeverQueries()
+    {
+        var result = await _mappingHelper.BuildFeaturedEventOrWebinarReferencesAsync(null, "ChannelName", "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<Event>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildFeaturedEventOrWebinarReferencesAsync_WithOnlyWhitespaceIdentifiers_ReturnsEmpty_AndNeverQueries()
+    {
+        var result = await _mappingHelper.BuildFeaturedEventOrWebinarReferencesAsync(WhitespaceIdentifiers, "ChannelName", "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<Event>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildFeaturedEventOrWebinarReferencesAsync_WhenNoPagesMatch_ReturnsEmpty_AndQueriesBothTypes()
+    {
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<Event>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Event>());
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<Webinar>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Webinar>());
+
+        var result = await _mappingHelper.BuildFeaturedEventOrWebinarReferencesAsync(SampleIdentifiers, "ChannelName", "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<Event>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<Webinar>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task BuildFeaturedEventOrWebinarReferencesAsync_WithNullCulture_UsesDefaultCulture()
+    {
+        RetrievePagesParameters? captured = null;
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<Event>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<RetrievePagesParameters, Action<RetrievePagesQueryParameters>, RetrievalCacheSettings, CancellationToken>(
+                (p, _, _, _) => captured = p)
+            .ReturnsAsync(new List<Event>());
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<Webinar>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Webinar>());
+
+        await _mappingHelper.BuildFeaturedEventOrWebinarReferencesAsync(SampleIdentifiers, "ChannelName", null, CancellationToken.None);
+
+        Assert.That(captured, Is.Not.Null);
+        Assert.That(captured!.LanguageName, Is.EqualTo("en"));
+    }
+
+    // ---------------------------------------------------------------------
+    // BuildFeaturedPersonOrInternalReferencesAsync
+    // ---------------------------------------------------------------------
+
+    [Test]
+    public async Task BuildFeaturedPersonOrInternalReferencesAsync_WithNullIdentifiers_ReturnsEmpty_AndNeverQueries()
+    {
+        var result = await _mappingHelper.BuildFeaturedPersonOrInternalReferencesAsync(null, "ChannelName", "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildFeaturedPersonOrInternalReferencesAsync_WithOnlyWhitespaceIdentifiers_ReturnsEmpty_AndNeverQueries()
+    {
+        var result = await _mappingHelper.BuildFeaturedPersonOrInternalReferencesAsync(WhitespaceIdentifiers, "ChannelName", "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildFeaturedPersonOrInternalReferencesAsync_WhenNoPagesMatch_ReturnsEmpty_AndQueriesBothTypes()
+    {
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Person>());
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<InternalPerson>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<InternalPerson>());
+
+        var result = await _mappingHelper.BuildFeaturedPersonOrInternalReferencesAsync(SampleIdentifiers, "ChannelName", "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<InternalPerson>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task BuildFeaturedPersonOrInternalReferencesAsync_WithNullCulture_UsesDefaultCulture()
+    {
+        RetrievePagesParameters? captured = null;
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<RetrievePagesParameters, Action<RetrievePagesQueryParameters>, RetrievalCacheSettings, CancellationToken>(
+                (p, _, _, _) => captured = p)
+            .ReturnsAsync(new List<Person>());
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<InternalPerson>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<InternalPerson>());
+
+        await _mappingHelper.BuildFeaturedPersonOrInternalReferencesAsync(SampleIdentifiers, "ChannelName", null, CancellationToken.None);
+
+        Assert.That(captured, Is.Not.Null);
+        Assert.That(captured!.LanguageName, Is.EqualTo("en"));
+    }
+
+    // ---------------------------------------------------------------------
+    // BuildOrUpdateCopyInsightReferencesAsync
+    // ---------------------------------------------------------------------
+
+    [Test]
+    public async Task BuildOrUpdateCopyInsightReferencesAsync_WithNullItems_ReturnsEmpty_AndNeverQueries()
+    {
+        var result = await _mappingHelper.BuildOrUpdateCopyInsightReferencesAsync(null, CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<CopyInsight>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildOrUpdateCopyInsightReferencesAsync_WithEmptyList_ReturnsEmpty_AndNeverQueries()
+    {
+        var result = await _mappingHelper.BuildOrUpdateCopyInsightReferencesAsync(new List<string>(), CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<CopyInsight>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task BuildOrUpdateCopyInsightReferencesAsync_WhenNoMatchFound_ReturnsEmpty_AndQueriesOnce()
+    {
+        _contentServiceMock
+            .Setup(x => x.GetItemsAsync<CopyInsight>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<CopyInsight>().AsReadOnly());
+
+        var result = await _mappingHelper.BuildOrUpdateCopyInsightReferencesAsync(new List<string> { "Some content" }, CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<CopyInsight>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task BuildOrUpdateCopyInsightReferencesAsync_WhenMatchFound_ReturnsReference_AndQueriesOnce()
+    {
+        var guid = Guid.NewGuid();
+        var copyInsight = new CopyInsight();
+        typeof(CopyInsight)
+            .GetProperty("SystemFields")!
+            .SetValue(copyInsight, new ContentItemFields { ContentItemGUID = guid });
+
+        _contentServiceMock
+            .Setup(x => x.GetItemsAsync<CopyInsight>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<CopyInsight> { copyInsight }.AsReadOnly());
+
+        var result = await _mappingHelper.BuildOrUpdateCopyInsightReferencesAsync(new List<string> { "Some content" }, CancellationToken.None);
+
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Identifier, Is.EqualTo(guid));
+        _contentServiceMock.Verify(
+            x => x.GetItemsAsync<CopyInsight>(It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
 }

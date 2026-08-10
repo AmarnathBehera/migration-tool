@@ -72,7 +72,180 @@ public class InsightCrudServiceTests
     {
         var content = new InsightPageContent();
 
-        Assert.That(content, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(content, Is.Not.Null);
+            Assert.That(content.InsightContent, Is.Empty);
+            Assert.That(content.MetadataBusinessIssues, Is.Empty);
+            Assert.That(content.ContentType, Is.Empty);
+            Assert.That(content.MetadataBusinessLines, Is.Empty);
+            Assert.That(content.MetadataServiceAreas, Is.Empty);
+            Assert.That(content.MetadataServices, Is.Empty);
+            Assert.That(content.MetadataIndustryCategories, Is.Empty);
+            Assert.That(content.MetadataIndustries, Is.Empty);
+            Assert.That(content.MetadataSpecialtiesCategories, Is.Empty);
+            Assert.That(content.MetadataSpecialtiesAreas, Is.Empty);
+            Assert.That(content.MetadataSpecialtiesPages, Is.Empty);
+            Assert.That(content.MetadataOfficeLocation, Is.Empty);
+            Assert.That(content.MicrositeMasterPages, Is.Empty);
+            Assert.That(content.MicrositePages, Is.Empty);
+            Assert.That(content.MetadataRssCategory, Is.Empty);
+            Assert.That(content.Insights, Is.Empty);
+            Assert.That(content.RelevantContactPerson, Is.Empty);
+            Assert.That(content.RelatedExternalPeople, Is.Empty);
+        });
+    }
+
+    [Test]
+    public void InsightPageContent_StringProperties_CanBeSet()
+    {
+        var content = new InsightPageContent
+        {
+            MetadataTitle = "Test Title",
+            MetadataTeaserImageAltText = "Alt text",
+            MetadataDescription = "A description",
+            MetadataTeaserImage = "image.jpg",
+            MetadataCanonical = "https://example.com",
+            Sharingbuttons = "twitter,linkedin",
+            Layoutwithoutsidebar = "wide",
+            DownloadButtonAttachment = "file.pdf",
+            MetadataRssImage = "rss.jpg",
+            MetadataOGTitle = "OG Title",
+            MetadataOGDescription = "OG Desc",
+            MetadataOGImage = "og.jpg",
+            MetadataOGTwitterImage = "tw.jpg",
+            RedirectOnUnpublish = "/redirect",
+            PageDescription = "Page desc",
+            PageKeywords = "keyword1,keyword2"
+        };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(content.MetadataTitle, Is.EqualTo("Test Title"));
+            Assert.That(content.MetadataTeaserImageAltText, Is.EqualTo("Alt text"));
+            Assert.That(content.MetadataDescription, Is.EqualTo("A description"));
+            Assert.That(content.MetadataTeaserImage, Is.EqualTo("image.jpg"));
+            Assert.That(content.MetadataCanonical, Is.EqualTo("https://example.com"));
+            Assert.That(content.Sharingbuttons, Is.EqualTo("twitter,linkedin"));
+            Assert.That(content.Layoutwithoutsidebar, Is.EqualTo("wide"));
+            Assert.That(content.DownloadButtonAttachment, Is.EqualTo("file.pdf"));
+            Assert.That(content.MetadataRssImage, Is.EqualTo("rss.jpg"));
+            Assert.That(content.MetadataOGTitle, Is.EqualTo("OG Title"));
+            Assert.That(content.MetadataOGDescription, Is.EqualTo("OG Desc"));
+            Assert.That(content.MetadataOGImage, Is.EqualTo("og.jpg"));
+            Assert.That(content.MetadataOGTwitterImage, Is.EqualTo("tw.jpg"));
+            Assert.That(content.RedirectOnUnpublish, Is.EqualTo("/redirect"));
+            Assert.That(content.PageDescription, Is.EqualTo("Page desc"));
+            Assert.That(content.PageKeywords, Is.EqualTo("keyword1,keyword2"));
+        });
+    }
+
+    [Test]
+    public void InsightPageContent_BoolProperties_CanBeSet()
+    {
+        var content = new InsightPageContent
+        {
+            MetadataTitle = "T",
+            MetadataTeaserImageAltText = "A",
+            ComingSoon = true,
+            ShowSidebar = true,
+            ShowPrintButton = true,
+            ShowInsightPrintButton = true,
+            ShowSocialMediaButtons = true,
+            UseNarrowLayout = true,
+            ShowAuthorsAtTheTop = true,
+            IsSearchExcluded = true,
+            MetadataOGTwitterImageSizeCheckbox = true,
+            MetadataNofollow = true,
+            MetadataNoindex = true,
+            IncludeInSitemap = true
+        };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(content.ComingSoon, Is.True);
+            Assert.That(content.ShowSidebar, Is.True);
+            Assert.That(content.ShowPrintButton, Is.True);
+            Assert.That(content.ShowInsightPrintButton, Is.True);
+            Assert.That(content.ShowSocialMediaButtons, Is.True);
+            Assert.That(content.UseNarrowLayout, Is.True);
+            Assert.That(content.ShowAuthorsAtTheTop, Is.True);
+            Assert.That(content.IsSearchExcluded, Is.True);
+            Assert.That(content.MetadataOGTwitterImageSizeCheckbox, Is.True);
+            Assert.That(content.MetadataNofollow, Is.True);
+            Assert.That(content.MetadataNoindex, Is.True);
+            Assert.That(content.IncludeInSitemap, Is.True);
+        });
+    }
+
+    [Test]
+    public void InsightPageContent_ListProperties_CanBePopulated()
+    {
+        var content = new InsightPageContent
+        {
+            MetadataTitle = "T",
+            MetadataTeaserImageAltText = "A",
+            InsightContent = ["item1"],
+            MetadataBusinessIssues = ["bi1"],
+            ContentType = ["ct1"],
+            MetadataBusinessLines = ["bl1"],
+            MetadataServiceAreas = ["sa1"],
+            MetadataServices = ["svc1"],
+            MetadataIndustryCategories = ["ic1"],
+            MetadataIndustries = ["ind1"],
+            MetadataSpecialtiesCategories = ["sc1"],
+            MetadataSpecialtiesAreas = ["spa1"],
+            MetadataSpecialtiesPages = ["sp1"],
+            MetadataOfficeLocation = ["ol1"],
+            MicrositeMasterPages = ["mmp1"],
+            MicrositePages = ["mp1"],
+            MetadataRssCategory = ["rss1"],
+            Insights = ["ins1"],
+            RelevantContactPerson = ["rcp1"],
+            RelatedExternalPeople = ["rep1"]
+        };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(content.InsightContent, Has.Count.EqualTo(1));
+            Assert.That(content.MetadataBusinessIssues, Has.Count.EqualTo(1));
+            Assert.That(content.ContentType, Has.Count.EqualTo(1));
+            Assert.That(content.MetadataBusinessLines, Has.Count.EqualTo(1));
+            Assert.That(content.MetadataServiceAreas, Has.Count.EqualTo(1));
+            Assert.That(content.MetadataServices, Has.Count.EqualTo(1));
+            Assert.That(content.MetadataIndustryCategories, Has.Count.EqualTo(1));
+            Assert.That(content.MetadataIndustries, Has.Count.EqualTo(1));
+            Assert.That(content.MetadataSpecialtiesCategories, Has.Count.EqualTo(1));
+            Assert.That(content.MetadataSpecialtiesAreas, Has.Count.EqualTo(1));
+            Assert.That(content.MetadataSpecialtiesPages, Has.Count.EqualTo(1));
+            Assert.That(content.MetadataOfficeLocation, Has.Count.EqualTo(1));
+            Assert.That(content.MicrositeMasterPages, Has.Count.EqualTo(1));
+            Assert.That(content.MicrositePages, Has.Count.EqualTo(1));
+            Assert.That(content.MetadataRssCategory, Has.Count.EqualTo(1));
+            Assert.That(content.Insights, Has.Count.EqualTo(1));
+            Assert.That(content.RelevantContactPerson, Has.Count.EqualTo(1));
+            Assert.That(content.RelatedExternalPeople, Has.Count.EqualTo(1));
+        });
+    }
+
+    [Test]
+    public void InsightPageContent_DateProperties_CanBeSet()
+    {
+        var from = new DateTime(2024, 1, 1);
+        var to = new DateTime(2024, 12, 31);
+        var content = new InsightPageContent
+        {
+            MetadataTitle = "T",
+            MetadataTeaserImageAltText = "A",
+            PublishFrom = from,
+            PublishTo = to
+        };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(content.PublishFrom, Is.EqualTo(from));
+            Assert.That(content.PublishTo, Is.EqualTo(to));
+        });
     }
 
     [Test]
@@ -100,8 +273,11 @@ public class InsightCrudServiceTests
 
         var result = await service.GetInsightPagesAsync(1, "en-gb", true, CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
     }
 
     [Test]
@@ -111,8 +287,11 @@ public class InsightCrudServiceTests
 
         var result = await service.GetInsightPagesAsync(1, null, null, CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
     }
 
     [Test]
@@ -122,8 +301,11 @@ public class InsightCrudServiceTests
 
         var result = await service.GetInsightPageAsync(1, Guid.NewGuid(), "en-gb", CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
     }
 
     [Test]

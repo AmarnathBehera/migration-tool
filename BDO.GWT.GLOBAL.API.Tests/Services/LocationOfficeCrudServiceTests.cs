@@ -271,8 +271,11 @@ public class LocationOfficeCrudServiceTests
 
         var result = await service.GetPagesAsync(1, "en-gb", true, CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
     }
 
     [Test]
@@ -282,8 +285,11 @@ public class LocationOfficeCrudServiceTests
 
         var result = await service.GetPagesAsync(1, null, null, CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
     }
 
     [Test]
@@ -293,8 +299,11 @@ public class LocationOfficeCrudServiceTests
 
         var result = await service.GetPageAsync(1, Guid.NewGuid(), "en-gb", CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
     }
 
     [Test]

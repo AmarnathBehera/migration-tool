@@ -120,4 +120,37 @@ public class GlobalSettingCrudServiceTests
     {
         Assert.That(typeof(IGlobalSettingCrudService).IsAssignableFrom(typeof(GlobalSettingCrudService)), Is.True);
     }
+
+    [Test]
+    public void GlobalSettingInput_DefaultValue_IsNull()
+    {
+        var input = new GlobalSettingInput();
+
+        Assert.That(input.Value, Is.Null);
+    }
+
+    [Test]
+    public void GlobalSettingInput_Value_CanBeSet()
+    {
+        var value = new Dictionary<string, object> { ["key"] = "val" };
+        var input = new GlobalSettingInput { Value = value };
+
+        Assert.That(input.Value, Is.SameAs(value));
+    }
+
+    [Test]
+    public void GlobalSettingInput_Value_CanBeString()
+    {
+        var input = new GlobalSettingInput { Value = "test-value" };
+
+        Assert.That(input.Value, Is.EqualTo("test-value"));
+    }
+
+    [Test]
+    public void GlobalSettingInput_Value_CanBeInteger()
+    {
+        var input = new GlobalSettingInput { Value = 42 };
+
+        Assert.That(input.Value, Is.EqualTo(42));
+    }
 }
