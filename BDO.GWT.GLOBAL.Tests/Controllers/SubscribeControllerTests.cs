@@ -172,4 +172,38 @@ public class SubscribeControllerTests
                 It.IsAny<CancellationToken>()),
             Times.Once);
     }
+
+    // ??? Null page passthrough ????????????????????????????????????????????????
+
+    [Test]
+    public async Task Index_WhenCurrentPageIsNull_StillCallsSubscribePageService()
+    {
+        SetupCurrentPage(null);
+        _subscribePageServiceMock
+            .Setup(s => s.GetSubscribeDtoAsync(null, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SubscribeDto());
+
+        var result = await _controller.Index(CancellationToken.None);
+
+        Assert.That(result, Is.InstanceOf<ViewResult>());
+        _subscribePageServiceMock.Verify(
+            s => s.GetSubscribeDtoAsync(null, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    // ??? Constructor null guards ???????????????????????????????????????????????
+
+    [Test]
+    public void Constructor_ThrowsArgumentNullException_WhenSubscribePageServiceIsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new SubscribeController(null!, _contentServiceMock.Object));
+    }
+
+    [Test]
+    public void Constructor_ThrowsArgumentNullException_WhenContentServiceIsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new SubscribeController(_subscribePageServiceMock.Object, null!));
+    }
 }

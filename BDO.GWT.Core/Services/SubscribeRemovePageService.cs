@@ -16,7 +16,7 @@ public class SubscribeRemovePageService : ISubscribeRemovePageService
 
     public SubscribeRemovePageService(INewsletterSubscriptionService newsletterSubscriptionService)
     {
-        _newsletterSubscriptionService = newsletterSubscriptionService;
+        _newsletterSubscriptionService = newsletterSubscriptionService ?? throw new ArgumentNullException(nameof(newsletterSubscriptionService));
     }
 
     public async Task<SubscribeRemoveDto> GetSubscribeRemoveDtoAsync(SubscribeRemove subscribeRemovePage, SubscribeRemoveQuery subscribeRemoveQuery, CancellationToken cancellationToken)
@@ -27,6 +27,7 @@ public class SubscribeRemovePageService : ISubscribeRemovePageService
         var subscribeConfirmDto = new SubscribeRemoveDto
         {
             Message = message,
+            IsSuccess = didSuccessfullyUnsubscribe,
         };
 
         return subscribeConfirmDto;

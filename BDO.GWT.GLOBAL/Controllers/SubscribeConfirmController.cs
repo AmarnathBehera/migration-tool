@@ -3,6 +3,7 @@ using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Web.Core.LiveSite.Services;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,8 +16,8 @@ public class SubscribeConfirmController : Controller
 
     public SubscribeConfirmController(IContentService contentRetriever, ISubscribeConfirmPageService subscribeConfirmPageService)
     {
-        _contentRetriever = contentRetriever;
-        _subscribeConfirmPageService = subscribeConfirmPageService;
+        _contentRetriever = contentRetriever ?? throw new ArgumentNullException(nameof(contentRetriever));
+        _subscribeConfirmPageService = subscribeConfirmPageService ?? throw new ArgumentNullException(nameof(subscribeConfirmPageService));
     }
 
     public async Task<IActionResult> Index([FromQuery] SubscribeConfirmQuery subscribeConfirmQuery, CancellationToken cancellationToken)

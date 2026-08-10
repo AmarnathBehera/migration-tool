@@ -22,9 +22,9 @@ public class SubscribeFormService : ISubscribeFormService
 
     public SubscribeFormService(INewsletterSubscriptionService newsletterSubscriptionService, IContentService contentService, IRecaptchaValidationService recaptchaValidationService)
     {
-        _newsletterSubscriptionService = newsletterSubscriptionService;
-        _contentService = contentService;
-        _recaptchaValidationService = recaptchaValidationService;
+        _newsletterSubscriptionService = newsletterSubscriptionService ?? throw new ArgumentNullException(nameof(newsletterSubscriptionService));
+        _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
+        _recaptchaValidationService = recaptchaValidationService ?? throw new ArgumentNullException(nameof(recaptchaValidationService));
     }
 
     public async Task<bool> SubscribeToNewslettersAsync(Guid pageGuid, NewsletterSubscriptionFormData newsletterSubscriptionFormData, CancellationToken cancellationToken)

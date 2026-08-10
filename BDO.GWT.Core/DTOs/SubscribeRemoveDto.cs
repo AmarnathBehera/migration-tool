@@ -3,4 +3,5 @@
 public class SubscribeRemoveDto
 {
     public string? Message { get; set; }
+    public bool IsSuccess { get; set; }
 }

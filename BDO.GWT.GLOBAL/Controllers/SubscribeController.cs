@@ -2,6 +2,7 @@
 using BDO.GWT.Core.Services;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,8 +15,8 @@ public class SubscribeController : Controller
 
     public SubscribeController(ISubscribePageService subscribePageService, IContentService contentRetriever)
     {
-        _subscribePageService = subscribePageService;
-        _contentRetriever = contentRetriever;
+        _subscribePageService = subscribePageService ?? throw new ArgumentNullException(nameof(subscribePageService));
+        _contentRetriever = contentRetriever ?? throw new ArgumentNullException(nameof(contentRetriever));
     }
 
     public async Task<IActionResult> Index(CancellationToken cancellationToken)

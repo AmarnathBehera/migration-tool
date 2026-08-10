@@ -345,4 +345,159 @@ public class SubscribeFormServiceTests
             r => r.ValidateAsync(It.IsAny<bool>(), It.IsAny<decimal>(), "my-token", It.IsAny<CancellationToken>()),
             Times.Once);
     }
+
+    // ??? Constructor null guards ???????????????????????????????????????????????
+
+    [Test]
+    public void Constructor_ThrowsArgumentNullException_WhenNewsletterSubscriptionServiceIsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new SubscribeFormService(
+                null!,
+                _contentServiceMock.Object,
+                _recaptchaValidationServiceMock.Object));
+    }
+
+    [Test]
+    public void Constructor_ThrowsArgumentNullException_WhenContentServiceIsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new SubscribeFormService(
+                _newsletterSubscriptionServiceMock.Object,
+                null!,
+                _recaptchaValidationServiceMock.Object));
+    }
+
+    [Test]
+    public void Constructor_ThrowsArgumentNullException_WhenRecaptchaValidationServiceIsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new SubscribeFormService(
+                _newsletterSubscriptionServiceMock.Object,
+                _contentServiceMock.Object,
+                null!));
+    }
+
+    // ??? Whitespace validation ?????????????????????????????????????????????????
+
+    [Test]
+    public async Task SubscribeToNewslettersAsync_ReturnsFalse_WhenFirstNameIsWhitespace()
+    {
+        var page = BuildSubscribePage();
+        SetupContentRetriever(page);
+        var data = ValidFormData();
+        data.FirstName = "   ";
+
+        var result = await _service.SubscribeToNewslettersAsync(PageGuid, data, CancellationToken.None);
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public async Task SubscribeToNewslettersAsync_ReturnsFalse_WhenLastNameIsWhitespace()
+    {
+        var page = BuildSubscribePage();
+        SetupContentRetriever(page);
+        var data = ValidFormData();
+        data.LastName = "   ";
+
+        var result = await _service.SubscribeToNewslettersAsync(PageGuid, data, CancellationToken.None);
+
+        Assert.That(result, Is.False);
+    }
+
+    // ??? Optional fields that should NOT block ?????????????????????????????????
+
+    [Test]
+    public async Task SubscribeToNewslettersAsync_DoesNotFail_WhenOptionalJobTitleIsEmpty()
+    {
+        var page = BuildSubscribePage(showJobTitle: true, isJobTitleRequired: false);
+        SetupContentRetriever(page);
+        SetupRecaptcha(true);
+        _newsletterSubscriptionServiceMock
+            .Setup(s => s.SubscribeToNewslettersAsync(It.IsAny<NewsletterSubscriptionFormData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        var data = ValidFormData();
+        data.JobTitle = null;
+
+        var result = await _service.SubscribeToNewslettersAsync(PageGuid, data, CancellationToken.None);
+
+        Assert.That(result, Is.True);
+    }
+
+    [Test]
+    public async Task SubscribeToNewslettersAsync_DoesNotFail_WhenOptionalCountryIsNull()
+    {
+        var page = BuildSubscribePage(showCountry: true, isCountryRequired: false);
+        SetupContentRetriever(page);
+        SetupRecaptcha(true);
+        _newsletterSubscriptionServiceMock
+            .Setup(s => s.SubscribeToNewslettersAsync(It.IsAny<NewsletterSubscriptionFormData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        var data = ValidFormData();
+        data.CountryGuid = null;
+
+        var result = await _service.SubscribeToNewslettersAsync(PageGuid, data, CancellationToken.None);
+
+        Assert.That(result, Is.True);
+    }
+
+    [Test]
+    public async Task SubscribeToNewslettersAsync_PassesRecaptchaV3Flag_FromSubscribePage()
+    {
+        var page = BuildSubscribePage(recaptchaUseV3: true, recaptchaScore: 0.7m);
+        SetupContentRetriever(page);
+        _recaptchaValidationServiceMock
+            .Setup(r => r.ValidateAsync(true, 0.7m, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        _newsletterSubscriptionServiceMock
+            .Setup(s => s.SubscribeToNewslettersAsync(It.IsAny<NewsletterSubscriptionFormData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        var result = await _service.SubscribeToNewslettersAsync(PageGuid, ValidFormData(), CancellationToken.None);
+
+        Assert.That(result, Is.True);
+        _recaptchaValidationServiceMock.Verify(
+            r => r.ValidateAsync(true, 0.7m, It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task SubscribeToNewslettersAsync_ReturnsFalse_WhenEmailIsNullOrEmpty()
+    {
+        var page = BuildSubscribePage();
+        SetupContentRetriever(page);
+        var data = ValidFormData();
+        data.Email = string.Empty;
+
+        var result = await _service.SubscribeToNewslettersAsync(PageGuid, data, CancellationToken.None);
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public async Task SubscribeToNewslettersAsync_ReturnsFalse_WhenCompanyIsWhitespace_AndRequired()
+    {
+        var page = BuildSubscribePage(showCompany: true, isCompanyRequired: true);
+        SetupContentRetriever(page);
+        var data = ValidFormData();
+        data.Company = "   ";
+
+        var result = await _service.SubscribeToNewslettersAsync(PageGuid, data, CancellationToken.None);
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public async Task SubscribeToNewslettersAsync_ReturnsFalse_WhenJobTitleIsWhitespace_AndRequired()
+    {
+        var page = BuildSubscribePage(showJobTitle: true, isJobTitleRequired: true);
+        SetupContentRetriever(page);
+        var data = ValidFormData();
+        data.JobTitle = "   ";
+
+        var result = await _service.SubscribeToNewslettersAsync(PageGuid, data, CancellationToken.None);
+
+        Assert.That(result, Is.False);
+    }
 }

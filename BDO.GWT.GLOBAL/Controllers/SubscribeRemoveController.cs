@@ -3,6 +3,7 @@ using BDO.GWT.Web.Core.Data.Queries;
 using BDO.GWT.Web.Core.LiveSite.Services;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,8 +16,8 @@ public class SubscribeRemoveController : Controller
 
     public SubscribeRemoveController(ISubscribeRemovePageService subscribeRemovePageService, IContentService contentRetriever)
     {
-        _subscribeRemovePageService = subscribeRemovePageService;
-        _contentRetriever = contentRetriever;
+        _subscribeRemovePageService = subscribeRemovePageService ?? throw new ArgumentNullException(nameof(subscribeRemovePageService));
+        _contentRetriever = contentRetriever ?? throw new ArgumentNullException(nameof(contentRetriever));
     }
 
     public async Task<IActionResult> Index([FromQuery] SubscribeRemoveQuery subscribeRemoveQuery, CancellationToken cancellationToken)

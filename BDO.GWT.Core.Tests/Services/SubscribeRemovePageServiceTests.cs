@@ -132,4 +132,59 @@ public class SubscribeRemovePageServiceTests
         Assert.ThrowsAsync<InvalidOperationException>(
             () => _service.GetSubscribeRemoveDtoAsync(page, query, CancellationToken.None));
     }
+
+    // ??? Constructor null guard ????????????????????????????????????????????????
+
+    [Test]
+    public void Constructor_ThrowsArgumentNullException_WhenNewsletterSubscriptionServiceIsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new SubscribeRemovePageService(null!));
+    }
+
+    // ??? IsSuccess flag coverage ???????????????????????????????????????????????
+
+    [Test]
+    public async Task GetSubscribeRemoveDtoAsync_SetsIsSuccessTrue_WhenUnsubscribeSucceeds()
+    {
+        var page = BuildPage();
+        var query = BuildQuery();
+        _newsletterSubscriptionServiceMock
+            .Setup(s => s.UnsubscribeFromNewsletterAsync(query, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        var result = await _service.GetSubscribeRemoveDtoAsync(page, query, CancellationToken.None);
+
+        Assert.That(result.IsSuccess, Is.True);
+    }
+
+    [Test]
+    public async Task GetSubscribeRemoveDtoAsync_SetsIsSuccessFalse_WhenUnsubscribeFails()
+    {
+        var page = BuildPage();
+        var query = BuildQuery();
+        _newsletterSubscriptionServiceMock
+            .Setup(s => s.UnsubscribeFromNewsletterAsync(query, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
+        var result = await _service.GetSubscribeRemoveDtoAsync(page, query, CancellationToken.None);
+
+        Assert.That(result.IsSuccess, Is.False);
+    }
+
+    [Test]
+    public async Task GetSubscribeRemoveDtoAsync_UsesSuccessMessage_WhenResultIsTrue()
+    {
+        const string successMsg = "Goodbye!";
+        var page = BuildPage(successMsg: successMsg, failMsg: "Error");
+        var query = BuildQuery();
+        _newsletterSubscriptionServiceMock
+            .Setup(s => s.UnsubscribeFromNewsletterAsync(query, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        var result = await _service.GetSubscribeRemoveDtoAsync(page, query, CancellationToken.None);
+
+        Assert.That(result.Message, Is.EqualTo(successMsg));
+        Assert.That(result.Message, Is.Not.EqualTo("Error"));
+    }
 }

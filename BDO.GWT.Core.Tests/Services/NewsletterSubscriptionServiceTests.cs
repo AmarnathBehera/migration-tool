@@ -335,4 +335,121 @@ public class NewsletterSubscriptionServiceTests
 
         _recipientListInfoProviderMock.Verify(p => p.Get(), Times.Never);
     }
+
+    // ??? Service construction / structure ?????????????????????????????????????
+
+    [Test]
+    public void Service_ImplementsINewsletterSubscriptionService()
+    {
+        Assert.That(_service, Is.InstanceOf<INewsletterSubscriptionService>());
+    }
+
+    [Test]
+    public void Service_ExposesSubscribeToNewslettersAsync()
+    {
+        var method = typeof(NewsletterSubscriptionService)
+            .GetMethod(nameof(NewsletterSubscriptionService.SubscribeToNewslettersAsync));
+
+        Assert.That(method, Is.Not.Null);
+    }
+
+    [Test]
+    public void Service_ExposesConfirmSubscriptionForNewsletterAsync()
+    {
+        var method = typeof(NewsletterSubscriptionService)
+            .GetMethod(nameof(NewsletterSubscriptionService.ConfirmSubscriptionForNewsletterAsync));
+
+        Assert.That(method, Is.Not.Null);
+    }
+
+    [Test]
+    public void Service_ExposesUnsubscribeFromNewsletterAsync()
+    {
+        var method = typeof(NewsletterSubscriptionService)
+            .GetMethod(nameof(NewsletterSubscriptionService.UnsubscribeFromNewsletterAsync));
+
+        Assert.That(method, Is.Not.Null);
+    }
+
+    // ??? UnsubscribeFromNewsletterAsync – additional input guard branches ??????
+
+    [Test]
+    public async Task UnsubscribeFromNewsletterAsync_ReturnsFalse_WhenEmailIsNull()
+    {
+        var query = BuildRemoveQuery(email: null!);
+
+        var result = await _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None);
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public async Task UnsubscribeFromNewsletterAsync_ReturnsFalse_WhenHashIsNull()
+    {
+        var query = BuildRemoveQuery(hash: null!);
+
+        var result = await _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None);
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public async Task UnsubscribeFromNewsletterAsync_DoesNotCallHashValidator_WhenEmailIsEmpty()
+    {
+        var query = BuildRemoveQuery(email: string.Empty);
+
+        await _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None);
+
+        _hashValidatorMock.Verify(
+            h => h.ValidateEmailHash(It.IsAny<string>(), It.IsAny<string>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task UnsubscribeFromNewsletterAsync_DoesNotCallHashValidator_WhenGuidIsEmpty()
+    {
+        var query = BuildRemoveQuery(newsletterGuid: Guid.Empty);
+
+        await _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None);
+
+        _hashValidatorMock.Verify(
+            h => h.ValidateEmailHash(It.IsAny<string>(), It.IsAny<string>()),
+            Times.Never);
+    }
+
+    // ??? ConfirmSubscriptionForNewsletterAsync – additional guard branches ?????
+
+    [Test]
+    public async Task ConfirmSubscriptionForNewsletterAsync_ReturnsFalse_WhenDateTimeIsEmpty()
+    {
+        var query = BuildConfirmQuery(dateTime: string.Empty);
+
+        var result = await _service.ConfirmSubscriptionForNewsletterAsync(query, "TestSite", CancellationToken.None);
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public async Task ConfirmSubscriptionForNewsletterAsync_ReturnsFalse_WhenDateTimeIsValidButConfirmationNotFound()
+    {
+        // Valid date format: ddMMyyyyHHmmss
+        var query = BuildConfirmQuery(dateTime: "01012024120000");
+        SetupConfirmationQuery([]);
+
+        var result = await _service.ConfirmSubscriptionForNewsletterAsync(query, "TestSite", CancellationToken.None);
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public async Task ConfirmSubscriptionForNewsletterAsync_DoesNotQueryProvider_WhenHashIsEmpty()
+    {
+        var query = BuildConfirmQuery(subscriptionHash: string.Empty);
+
+        await _service.ConfirmSubscriptionForNewsletterAsync(query, "TestSite", CancellationToken.None);
+
+        _emailSubscriptionConfirmationInfoProviderMock.Verify(
+            p => p.Get(),
+            Times.Never);
+    }
 }

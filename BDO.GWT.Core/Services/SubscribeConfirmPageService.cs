@@ -20,8 +20,8 @@ public class SubscribeConfirmPageService : ISubscribeConfirmPageService
 
     public SubscribeConfirmPageService(ISiteContext siteContext, INewsletterSubscriptionService newsletterSubscriptionService)
     {
-        _siteContext = siteContext;
-        _newsletterSubscriptionService = newsletterSubscriptionService;
+        _siteContext = siteContext ?? throw new ArgumentNullException(nameof(siteContext));
+        _newsletterSubscriptionService = newsletterSubscriptionService ?? throw new ArgumentNullException(nameof(newsletterSubscriptionService));
     }
 
     public async Task<SubscribeConfirmDto> GetSubscribeConfirmDtoAsync(SubscribeConfirm subscribeConfirmPage, SubscribeConfirmQuery subscribeConfirmQuery, CancellationToken cancellationToken)
