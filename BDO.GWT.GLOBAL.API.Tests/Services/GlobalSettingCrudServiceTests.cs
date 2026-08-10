@@ -1,6 +1,7 @@
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Queries;
 using BDO.GWT.GLOBAL.API.Services;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace BDO.GWT.GLOBAL.API.Tests.Services;
@@ -71,5 +72,52 @@ public class GlobalSettingCrudServiceTests
         var query = new SettingsQuery { DisplayName = displayName };
 
         Assert.That(query.DisplayName, Is.EqualTo(displayName));
+    }
+
+    [Test]
+    public void GetGlobalSettings_WhenDependenciesUnavailable_Throws()
+    {
+        var service = (GlobalSettingCrudService)RuntimeHelpers.GetUninitializedObject(typeof(GlobalSettingCrudService));
+        var query = new SettingsQuery();
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.GetGlobalSettings(query, CancellationToken.None));
+    }
+
+    [Test]
+    public void GetGlobalSettings_WithDisplayNameFilter_WhenDependenciesUnavailable_Throws()
+    {
+        var service = (GlobalSettingCrudService)RuntimeHelpers.GetUninitializedObject(typeof(GlobalSettingCrudService));
+        var query = new SettingsQuery { DisplayName = "Cookiebot" };
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.GetGlobalSettings(query, CancellationToken.None));
+    }
+
+    [Test]
+    public void GetGlobalSetting_WhenDependenciesUnavailable_Throws()
+    {
+        var service = (GlobalSettingCrudService)RuntimeHelpers.GetUninitializedObject(typeof(GlobalSettingCrudService));
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.GetGlobalSetting("BDO.Cookiebot", CancellationToken.None));
+    }
+
+    [Test]
+    public void GlobalSettingCrudService_Interface_HasExpectedMethods()
+    {
+        var interfaceType = typeof(IGlobalSettingCrudService);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(interfaceType.GetMethod("GetGlobalSettings"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("GetGlobalSetting"), Is.Not.Null);
+        });
+    }
+
+    [Test]
+    public void GlobalSettingCrudService_ImplementsInterface()
+    {
+        Assert.That(typeof(IGlobalSettingCrudService).IsAssignableFrom(typeof(GlobalSettingCrudService)), Is.True);
     }
 }

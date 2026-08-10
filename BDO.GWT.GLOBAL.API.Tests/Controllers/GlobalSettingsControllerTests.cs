@@ -68,7 +68,7 @@ public class GlobalSettingsControllerTests
 
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
         var okResult = (OkObjectResult)result.Result!;
-        Assert.That(((GlobalSettingOutput[])okResult.Value!).Length, Is.EqualTo(0));
+        Assert.That((GlobalSettingOutput[])okResult.Value!, Has.Length.EqualTo(0));
     }
 
     [Test]

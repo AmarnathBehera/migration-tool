@@ -1,6 +1,8 @@
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace BDO.GWT.GLOBAL.API.Tests.Services;
@@ -88,6 +90,73 @@ public class InsightCrudServiceTests
         {
             Assert.That(output.General.PageGuid, Is.EqualTo(guid));
             Assert.That(output.Content, Is.SameAs(content));
+        });
+    }
+
+    [Test]
+    public async Task GetInsightPagesAsync_WhenDependenciesUnavailable_ReturnsInternalServerError()
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        var result = await service.GetInsightPagesAsync(1, "en-gb", true, CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+        Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+    }
+
+    [Test]
+    public async Task GetInsightPagesAsync_WithNullCulture_WhenDependenciesUnavailable_ReturnsInternalServerError()
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        var result = await service.GetInsightPagesAsync(1, null, null, CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+        Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+    }
+
+    [Test]
+    public async Task GetInsightPageAsync_WhenDependenciesUnavailable_ReturnsInternalServerError()
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        var result = await service.GetInsightPageAsync(1, Guid.NewGuid(), "en-gb", CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+        Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+    }
+
+    [Test]
+    public void DeletePageAsync_WhenDependenciesUnavailable_Throws()
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.DeletePageAsync(1, Guid.NewGuid(), "en-gb", false, CancellationToken.None));
+    }
+
+    [Test]
+    public void DeletePageAsync_WithDeleteAllCultures_WhenDependenciesUnavailable_Throws()
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.DeletePageAsync(1, Guid.NewGuid(), "en-gb", true, CancellationToken.None));
+    }
+
+    [Test]
+    public void InsightCrudService_Interface_HasExpectedMethods()
+    {
+        var interfaceType = typeof(IInsightCrudService);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(interfaceType.GetMethod("GetInsightPagesAsync"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("GetInsightPageAsync"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("CreatePageAsync"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("CreatePageCultureVersionAsync"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("UpdatePageAsync"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("DeletePageAsync"), Is.Not.Null);
         });
     }
 }

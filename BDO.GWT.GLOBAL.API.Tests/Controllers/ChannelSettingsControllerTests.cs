@@ -69,7 +69,7 @@ public class ChannelSettingsControllerTests
 
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
         var okResult = (OkObjectResult)result.Result!;
-        Assert.That(((ChannelSettingOutput[])okResult.Value!).Length, Is.EqualTo(0));
+        Assert.That((ChannelSettingOutput[])okResult.Value!, Has.Length.EqualTo(0));
     }
 
     [Test]

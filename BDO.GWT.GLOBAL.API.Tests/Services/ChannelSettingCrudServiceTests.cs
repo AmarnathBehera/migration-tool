@@ -1,6 +1,7 @@
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Queries;
 using BDO.GWT.GLOBAL.API.Services;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace BDO.GWT.GLOBAL.API.Tests.Services;
@@ -101,5 +102,60 @@ public class ChannelSettingCrudServiceTests
         };
 
         Assert.That(output.CodeName, Is.EqualTo(codeName));
+    }
+
+    [Test]
+    public void GetChannelSettings_WhenDependenciesUnavailable_Throws()
+    {
+        var service = (ChannelSettingCrudService)RuntimeHelpers.GetUninitializedObject(typeof(ChannelSettingCrudService));
+        var query = new SettingsQuery();
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.GetChannelSettings(query, CancellationToken.None));
+    }
+
+    [Test]
+    public void GetChannelSettings_WithDisplayNameFilter_WhenDependenciesUnavailable_Throws()
+    {
+        var service = (ChannelSettingCrudService)RuntimeHelpers.GetUninitializedObject(typeof(ChannelSettingCrudService));
+        var query = new SettingsQuery { DisplayName = "Email" };
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.GetChannelSettings(query, CancellationToken.None));
+    }
+
+    [Test]
+    public void GetChannelSetting_WhenDependenciesUnavailable_Throws()
+    {
+        var service = (ChannelSettingCrudService)RuntimeHelpers.GetUninitializedObject(typeof(ChannelSettingCrudService));
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.GetChannelSetting("BDO.Email", CancellationToken.None));
+    }
+
+    [Test]
+    public void ChannelSettingCrudService_Interface_HasExpectedMethods()
+    {
+        var interfaceType = typeof(IChannelSettingCrudService);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(interfaceType.GetMethod("GetChannelSettings"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("GetChannelSetting"), Is.Not.Null);
+        });
+    }
+
+    [Test]
+    public void ChannelSettingOutput_Type_CanBeSetToAnyString()
+    {
+        var output = new ChannelSettingOutput
+        {
+            CodeName = "BDO.Test",
+            DisplayName = "Test",
+            InheritFromGlobalSettings = false,
+            Type = "CustomType"
+        };
+
+        Assert.That(output.Type, Is.EqualTo("CustomType"));
     }
 }

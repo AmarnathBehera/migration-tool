@@ -1,5 +1,6 @@
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Services;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace BDO.GWT.GLOBAL.API.Tests.Services;
@@ -7,12 +8,112 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services;
 [TestFixture]
 public class UserCrudServiceTests
 {
+    private static UserCrudService CreateServiceWithoutConstructor() =>
+        (UserCrudService)RuntimeHelpers.GetUninitializedObject(typeof(UserCrudService));
+
     [Test]
     public void UserCrudService_ImplementsIUserCrudService()
     {
-        var service = (UserCrudService)RuntimeHelpers.GetUninitializedObject(typeof(UserCrudService));
+        var service = CreateServiceWithoutConstructor();
 
         Assert.That(service, Is.InstanceOf<IUserCrudService>());
+    }
+
+    [Test]
+    public void UserCrudService_Interface_HasExpectedMethods()
+    {
+        var interfaceType = typeof(IUserCrudService);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(interfaceType.GetMethod("GetUsersAsync"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("GetUserAsync"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("CreateUserAsync"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("UpdateUserAsync"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("DeleteUserAsync"), Is.Not.Null);
+        });
+    }
+
+    [Test]
+    public void GetUsersAsync_WhenDependenciesUnavailable_Throws()
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.GetUsersAsync("jdoe", CancellationToken.None));
+    }
+
+    [Test]
+    public void GetUsersAsync_WithNullUserName_WhenDependenciesUnavailable_Throws()
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.GetUsersAsync(null, CancellationToken.None));
+    }
+
+    [Test]
+    public void GetUserAsync_WhenDependenciesUnavailable_Throws()
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.GetUserAsync(Guid.NewGuid(), CancellationToken.None));
+    }
+
+    [Test]
+    public void GetUserAsync_WithEmptyGuid_WhenDependenciesUnavailable_Throws()
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.GetUserAsync(Guid.Empty, CancellationToken.None));
+    }
+
+    [Test]
+    public void CreateUserAsync_WhenDependenciesUnavailable_Throws()
+    {
+        var service = CreateServiceWithoutConstructor();
+        var input = new UserInput
+        {
+            General = new UserGeneralInput { UserName = "newuser" }
+        };
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.CreateUserAsync(input, CancellationToken.None));
+    }
+
+    [Test]
+    public void UpdateUserAsync_WhenDependenciesUnavailable_Throws()
+    {
+        var service = CreateServiceWithoutConstructor();
+        var input = new UserInput
+        {
+            General = new UserGeneralInput { UserName = "updateduser" }
+        };
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.UpdateUserAsync(Guid.NewGuid(), input, CancellationToken.None));
+    }
+
+    [Test]
+    public void DeleteUserAsync_WhenDependenciesUnavailable_Throws()
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.DeleteUserAsync(Guid.NewGuid(), CancellationToken.None));
+    }
+
+    [TestCase("jdoe")]
+    [TestCase("admin")]
+    [TestCase("")]
+    public void GetUsersAsync_WithVariousUserNames_WhenDependenciesUnavailable_Throws(string userName)
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.GetUsersAsync(userName, CancellationToken.None));
     }
 
     [Test]

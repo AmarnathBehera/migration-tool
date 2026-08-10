@@ -120,4 +120,82 @@ public class ChannelCrudServiceTests
 
         Assert.That(output.Cultures, Has.Length.EqualTo(2));
     }
+
+    [Test]
+    public void GetEntitiesAsync_WhenDependenciesUnavailable_Throws()
+    {
+        var service = (ChannelCrudService)RuntimeHelpers.GetUninitializedObject(typeof(ChannelCrudService));
+        var query = new ChannelsQuery();
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.GetEntitiesAsync(query, CancellationToken.None));
+    }
+
+    [Test]
+    public void GetEntitiesAsync_WithAdministrationDomain_WhenDependenciesUnavailable_Throws()
+    {
+        var service = (ChannelCrudService)RuntimeHelpers.GetUninitializedObject(typeof(ChannelCrudService));
+        var query = new ChannelsQuery { AdministrationDomain = "example.com" };
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.GetEntitiesAsync(query, CancellationToken.None));
+    }
+
+    [Test]
+    public void GetEntityAsync_WhenDependenciesUnavailable_Throws()
+    {
+        var service = (ChannelCrudService)RuntimeHelpers.GetUninitializedObject(typeof(ChannelCrudService));
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.GetEntityAsync(Guid.NewGuid(), CancellationToken.None));
+    }
+
+    [Test]
+    public void GetEntityAsync_WithEmptyGuid_WhenDependenciesUnavailable_Throws()
+    {
+        var service = (ChannelCrudService)RuntimeHelpers.GetUninitializedObject(typeof(ChannelCrudService));
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.GetEntityAsync(Guid.Empty, CancellationToken.None));
+    }
+
+    [Test]
+    public void ChannelCrudService_Interface_HasExpectedMethods()
+    {
+        var interfaceType = typeof(IChannelCrudService);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(interfaceType.GetMethod("GetEntitiesAsync"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("GetEntityAsync"), Is.Not.Null);
+        });
+    }
+
+    [Test]
+    public void SiteGeneralOutput_DefaultContentCulture_IsNullByDefault()
+    {
+        var output = new SiteGeneralOutput
+        {
+            ID = 1,
+            GUID = Guid.NewGuid(),
+            DisplayName = "Test",
+            CodeName = "test",
+            WebsitedomainresentationURL = "https://test.com"
+        };
+
+        Assert.That(output.DefaultContentCulture, Is.Null);
+    }
+
+    [Test]
+    public void ChannelsQuery_MultipleInstances_AreIndependent()
+    {
+        var q1 = new ChannelsQuery { AdministrationDomain = "a.com" };
+        var q2 = new ChannelsQuery { AdministrationDomain = "b.com" };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(q1.AdministrationDomain, Is.EqualTo("a.com"));
+            Assert.That(q2.AdministrationDomain, Is.EqualTo("b.com"));
+        });
+    }
 }
