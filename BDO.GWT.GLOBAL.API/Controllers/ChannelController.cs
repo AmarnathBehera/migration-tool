@@ -27,8 +27,8 @@ public class ChannelController : EntityControllerBase
     /// Returns all channels.
     /// </summary>
     /// <param name = "query" > Query parameters.</param>
-    /// <param name = "cancellationToken" ></ param >
-    /// < returns > Returns a list of channels.</returns>
+    /// <param name = "cancellationToken" ></param >
+    /// <returns > Returns a list of channels.</returns>
     [HttpGet]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(IEnumerable<ChannelOutput>), MediaTypeNames.Application.Json)]
     public async Task<ActionResult<IEnumerable<ChannelOutput>>> GetChannelsAsync([FromQuery] ChannelsQuery query, CancellationToken cancellationToken)
