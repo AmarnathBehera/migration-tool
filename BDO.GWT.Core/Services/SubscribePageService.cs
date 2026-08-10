@@ -88,7 +88,7 @@ public class SubscribePageService : ISubscribePageService
             SubscribeFormDto = subscribePage.FormType == "form" ? new SubscribeFormDto
             {
                 IsV3 = subscribePage.RecaptchaUseV3,
-                SiteKey = GetRecaptchaPublicKey(subscribePage) ?? string.Empty,
+                SiteKey = GetRecaptchaPublicKey() ?? string.Empty,
                 EndpointRoute = $"newsletter/subscribe/{subscribePage.SystemFields.WebPageItemGUID}",
                 RedirectUrl = redirectLink ?? string.Empty,
                 Newsletters = await GetAllSiteNewsletterOptionDtos(),
@@ -130,7 +130,7 @@ public class SubscribePageService : ISubscribePageService
             })
             .ToArray());
     }
-    private string? GetRecaptchaPublicKey(Subscribe subscribePage)
+    private string? GetRecaptchaPublicKey()
     {
         int channelId = _websiteChannelContext.WebsiteChannelID;
         var captchaSettings = _captchaSettingsProvider

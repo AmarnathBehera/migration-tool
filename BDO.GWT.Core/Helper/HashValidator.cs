@@ -17,7 +17,8 @@ public class HashValidator : IHashValidator
 
     public HashValidator(IHashSaltProvider hashSaltProvider)
     {
-        _hashSalt = hashSaltProvider.HashSalt;
+        _hashSalt = hashSaltProvider.HashSalt
+            ?? throw new InvalidOperationException("Configuration value 'CMSHashStringSalt' is required.");
     }
 
     public bool ValidateEmailHash(string email, string hash)

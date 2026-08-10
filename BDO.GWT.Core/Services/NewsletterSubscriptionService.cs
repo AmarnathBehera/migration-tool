@@ -86,8 +86,8 @@ public class NewsletterSubscriptionService(
                 EmailSubscriptionConfirmationDate = DateTime.Now,
             };
             confirmation.Insert();
-            string fromEmail = ResolveFromEmailForCurrentChannel();
-           
+            var fromEmail = ResolveFromEmailForCurrentChannel() ?? string.Empty;
+
             var email = new EmailMessage
             {
                 From = fromEmail,

@@ -3,6 +3,8 @@ using BDO.GWT.Web.Core.LiveSite.Services;
 using CMS.Helpers;
 using Microsoft.AspNetCore.Http;
 
+#pragma warning disable CS0618 // CookieHelper is obsolete; retained intentionally until Kentico cookie accessor migration.
+
 namespace BDO.GWT.Xperience.Core.LiveSite.Services;
 public interface ICookieConsentService
 {
@@ -69,3 +71,5 @@ public class CookieConsentService : ICookieConsentService
         }
     }
 }
+
+#pragma warning restore CS0618
