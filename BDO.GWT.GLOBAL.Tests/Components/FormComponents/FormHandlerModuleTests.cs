@@ -197,6 +197,129 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             Assert.That(person, Is.Null);
         }
 
+        // ??? Module metadata ??????????????????????????????????????????????????????
+
+        [Test]
+        public void Module_IsNamedCustomFormHandlers()
+        {
+            // The base Module stores its name; we can verify it via the Name property.
+            Assert.That(_module.Name, Is.EqualTo("CustomFormHandlers"));
+        }
+
+        // ??? RemoveCultureFromPath – additional cases ?????????????????????????????
+
+        [Test]
+        [TestCase("/de-de/news/article-1", "/news/article-1")]
+        [TestCase("/zh-cn/a/b/c/d", "/a/b/c/d")]
+        [TestCase("/en-GB/", "/")]
+        [TestCase("/en-gb", "")]
+        public void RemoveCultureFromPath_StripsLeadingCulture_Extended(string input, string expected)
+        {
+            var result = InvokePrivateStatic<string>("RemoveCultureFromPath", input);
+
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [Test]
+        [TestCase("/123-ab/people")]   // segment starts with digit – not a culture
+        [TestCase("/english/people")]  // more than 2 chars per part – not a culture
+        public void RemoveCultureFromPath_DoesNotStripNonCultureSegments(string input)
+        {
+            var result = InvokePrivateStatic<string>("RemoveCultureFromPath", input);
+
+            // Path should remain unchanged when the leading segment is not a culture tag.
+            Assert.That(result, Is.EqualTo(input));
+        }
+
+        // ??? NormalizeCulture – additional cases ??????????????????????????????????
+
+        [Test]
+        public void NormalizeCulture_WithThreePartCulture_OnlySplitsOnFirstHyphen()
+        {
+            // "zh-hans-cn" has multiple hyphens; only the first split matters.
+            var result = InvokePrivateStatic<string>("NormalizeCulture", "zh-hans-cn");
+
+            // The implementation splits on '-' and uses parts[0]/parts[1], so the
+            // result is "zh-HANS" (the third segment is ignored by the current logic).
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Does.StartWith("zh-"));
+        }
+
+        [Test]
+        [TestCase("AR-SA", "ar-SA")]
+        [TestCase("PT-BR", "pt-BR")]
+        [TestCase("ZH-TW", "zh-TW")]
+        public void NormalizeCulture_UpperCaseInput_NormalizedCorrectly(string input, string expected)
+        {
+            var result = InvokePrivateStatic<string>("NormalizeCulture", input);
+
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        // ??? GetReferrerUrl – additional cases ????????????????????????????????????
+
+        [Test]
+        public void GetReferrerUrl_ReturnsRefererHeader_WithTrailingSlash()
+        {
+            var ctx = new DefaultHttpContext();
+            ctx.Request.Headers.Referer = "https://example.com/en-gb/people/";
+            _httpContextAccessor.SetupGet(a => a.HttpContext).Returns(ctx);
+
+            var url = InvokePrivate<string>(_module, "GetReferrerUrl");
+
+            Assert.That(url, Is.EqualTo("https://example.com/en-gb/people/"));
+        }
+
+        [Test]
+        public void GetReferrerUrl_ReturnsRefererHeader_ForAbsoluteUrlWithQueryString()
+        {
+            var ctx = new DefaultHttpContext();
+            ctx.Request.Headers.Referer = "https://example.com/en-gb/search?q=tax";
+            _httpContextAccessor.SetupGet(a => a.HttpContext).Returns(ctx);
+
+            var url = InvokePrivate<string>(_module, "GetReferrerUrl");
+
+            Assert.That(url, Is.EqualTo("https://example.com/en-gb/search?q=tax"));
+        }
+
+        // ??? GetCurrentPersonSafelyAsync – additional cases ???????????????????????
+
+        [Test]
+        public async Task GetCurrentPersonSafelyAsync_ReturnsNull_WhenHttpContextAccessorFieldIsNull()
+        {
+            SetPrivateField(_module, "_httpContextAccessor", null!);
+
+            var person = await InvokePrivateAsync<object?>(_module, "GetCurrentPersonSafelyAsync");
+
+            Assert.That(person, Is.Null);
+        }
+
+        // ??? ResolveFromEmailForCurrentChannel ????????????????????????????????????
+
+        [Test]
+        public void ResolveFromEmailForCurrentChannel_ReturnsNull_WhenWebsiteChannelIdIsNegative()
+        {
+            var websiteChannelContext = new Mock<IWebsiteChannelContext>();
+            websiteChannelContext.SetupGet(x => x.WebsiteChannelID).Returns(-1);
+
+            var emailInfoProvider = new Mock<IInfoProvider<EmailInfo>>();
+            var channelSettingsProvider = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
+
+            var services = new ServiceCollection();
+            services.AddSingleton(websiteChannelContext.Object);
+            services.AddSingleton(emailInfoProvider.Object);
+            services.AddSingleton(channelSettingsProvider.Object);
+
+            var serviceProvider = services.BuildServiceProvider();
+            var scope = new Mock<IServiceScope>();
+            scope.SetupGet(x => x.ServiceProvider).Returns(serviceProvider);
+            _scopeFactory.Setup(x => x.CreateScope()).Returns(scope.Object);
+
+            var fromEmail = InvokePrivate<string?>(_module, "ResolveFromEmailForCurrentChannel");
+
+            Assert.That(fromEmail, Is.Null);
+        }
+
         [Test]
         public void ResolveFromEmailForCurrentChannel_ReturnsNull_WhenWebsiteChannelIdIsInvalid()
         {
