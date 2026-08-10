@@ -318,14 +318,6 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 
 [assembly: RegisterWebPageRoute(Webinar.CONTENT_TYPE_NAME, typeof(WebinarController))]
 
-[assembly: RegisterPageTemplate(
-    identifier: Webinar.CONTENT_TYPE_NAME,
-    name: "Webinar  Content Type Template",
-    customViewName: "~/Views/EventWebinar/Index.cshtml",
-    ContentTypeNames = new[] { "BDO.Webinar" },
-    IconClass = "xp-market")]
-
-[assembly: RegisterWebPageRoute(Insight.CONTENT_TYPE_NAME, typeof(InsightController))]
 
 
 [assembly: RegisterPageTemplate(
@@ -334,15 +326,16 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     customViewName: "~/Views/InsightPage/Index.cshtml",
     ContentTypeNames = new[] { "BDO.Insight" },
     IconClass = "xp-market")]
+[assembly: RegisterWebPageRoute(Insight.CONTENT_TYPE_NAME, typeof(InsightController))]
 
 
-[assembly: RegisterWebPageRoute(SectionInsightsPage.CONTENT_TYPE_NAME, typeof(InsightSectionController))]
 [assembly: RegisterPageTemplate(
     identifier: SectionInsightsPage.CONTENT_TYPE_NAME,
     name: "Insight Content Type Template",
     customViewName: "~/Views/InsightListing/Index.cshtml",
     ContentTypeNames = new[] { "BDO.SectionInsightsPage" },
     IconClass = "xp-market")]
+[assembly: RegisterWebPageRoute(SectionInsightsPage.CONTENT_TYPE_NAME, typeof(InsightSectionController))]
 
 [assembly: RegisterWebPageRoute(InsightGroup.CONTENT_TYPE_NAME, typeof(InsightGroupController))]
 [assembly: RegisterPageTemplate(
