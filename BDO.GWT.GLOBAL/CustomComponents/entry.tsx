@@ -2,6 +2,7 @@ import '@styles/index.css';
 import { BDOSQLDropdown } from '@components/custom-dropdown/CustomDropdown';
 import { GDPRControl } from '~/components/gdpr-control/GDPRControl';
 import { FieldGroupSeparator } from '@components/field-group-separator/FieldGroupSeparator';
+import { CsvFileUpload } from '@components/csv-file-upload/CsvFileUpload';
 
 if (typeof document !== 'undefined') {
     const cssHref = '/Admin/adminresources/bdo.custom.components/entry.css';
@@ -19,4 +20,6 @@ export {
     GDPRControl,
     GDPRControl as GDPRControlFormComponent,
     FieldGroupSeparator as FieldGroupSeparatorFormComponent,
+    CsvFileUpload,
+    CsvFileUpload as CsvFileUploadFormComponent,
 };
