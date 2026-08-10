@@ -98,12 +98,6 @@ public partial class FormHandlerModule : Module
 
             var uri = new Uri(absoluteUrl);
             string nodeAliasPath = uri.AbsolutePath.TrimEnd('/');
-            string pathWithoutCulture = RemoveCultureFromPath(nodeAliasPath);
-
-            string[] parts = nodeAliasPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            string culture = parts.Length > 0 && CultureRegex().IsMatch(parts[0])
-                ? NormalizeCulture(parts[0])
-                : "en-GB";
 
             string personTitle = absoluteUrl.TrimEnd('/').Split('/').Last().Replace("-", " ");
             if (string.IsNullOrWhiteSpace(personTitle))
