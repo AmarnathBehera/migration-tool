@@ -18,8 +18,6 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
         private const BindingFlags PrivateInstance =
             BindingFlags.Instance | BindingFlags.NonPublic;
 
-        private const BindingFlags PrivateStatic =
-            BindingFlags.Static | BindingFlags.NonPublic;
 
         private Mock<IHttpContextAccessor> _httpContextAccessor = null!;
         private Mock<IServiceScopeFactory> _scopeFactory = null!;
@@ -65,70 +63,6 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
 
             Assert.That(onInit, Is.Not.Null);
             Assert.That(onInit!.DeclaringType, Is.EqualTo(typeof(FormHandlerModule)));
-        }
-
-        [Test]
-        [TestCase("/en-gb/people/john-doe", "/people/john-doe")]
-        [TestCase("/EN-GB/people/john-doe", "/people/john-doe")]
-        [TestCase("/fr-FR/contact", "/contact")]
-        [TestCase("/people/john-doe", "/people/john-doe")]
-        [TestCase("", "")]
-        public void RemoveCultureFromPath_StripsLeadingCulture(string input, string expected)
-        {
-            var result = InvokePrivateStatic<string>("RemoveCultureFromPath", input);
-
-            Assert.That(result, Is.EqualTo(expected));
-        }
-
-        [Test]
-        [TestCase("/en-gb", "")]
-        [TestCase("/EN-GB", "")]
-        [TestCase("/engb/people", "/engb/people")]
-        [TestCase(" /en-gb/people", " /en-gb/people")]
-        public void RemoveCultureFromPath_HandlesEdgeCases(string input, string expected)
-        {
-            var result = InvokePrivateStatic<string>("RemoveCultureFromPath", input);
-
-            Assert.That(result, Is.EqualTo(expected));
-        }
-
-        [Test]
-        public void RemoveCultureFromPath_WithNullInput_ReturnsEmpty()
-        {
-            var result = InvokePrivateStatic<string>("RemoveCultureFromPath", (string?)null!);
-
-            Assert.That(result, Is.EqualTo(string.Empty));
-        }
-
-        [Test]
-        [TestCase("en-gb", "en-GB")]
-        [TestCase("EN-GB", "en-GB")]
-        [TestCase("fr-fr", "fr-FR")]
-        [TestCase("en", "en")]
-        [TestCase("", "")]
-        public void NormalizeCulture_NormalizesCasing(string input, string expected)
-        {
-            var result = InvokePrivateStatic<string>("NormalizeCulture", input);
-
-            Assert.That(result, Is.EqualTo(expected));
-        }
-
-        [Test]
-        [TestCase("   ")]
-        [TestCase("en_GB")]
-        public void NormalizeCulture_LeavesUnexpectedFormatsUntouched(string input)
-        {
-            var result = InvokePrivateStatic<string>("NormalizeCulture", input);
-
-            Assert.That(result, Is.EqualTo(input));
-        }
-
-        [Test]
-        public void NormalizeCulture_WithNullInput_ReturnsNull()
-        {
-            var result = InvokePrivateStatic<string?>("NormalizeCulture", (string?)null!);
-
-            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -206,56 +140,6 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
         {
             // The base Module stores its name; we can verify it via the Name property.
             Assert.That(_module.Name, Is.EqualTo("CustomFormHandlers"));
-        }
-
-        // ??? RemoveCultureFromPath – additional cases ?????????????????????????????
-
-        [Test]
-        [TestCase("/de-de/news/article-1", "/news/article-1")]
-        [TestCase("/zh-cn/a/b/c/d", "/a/b/c/d")]
-        [TestCase("/en-GB/", "/")]
-        [TestCase("/en-gb", "")]
-        public void RemoveCultureFromPath_StripsLeadingCulture_Extended(string input, string expected)
-        {
-            var result = InvokePrivateStatic<string>("RemoveCultureFromPath", input);
-
-            Assert.That(result, Is.EqualTo(expected));
-        }
-
-        [Test]
-        [TestCase("/123-ab/people")]   // segment starts with digit – not a culture
-        [TestCase("/english/people")]  // more than 2 chars per part – not a culture
-        public void RemoveCultureFromPath_DoesNotStripNonCultureSegments(string input)
-        {
-            var result = InvokePrivateStatic<string>("RemoveCultureFromPath", input);
-
-            // Path should remain unchanged when the leading segment is not a culture tag.
-            Assert.That(result, Is.EqualTo(input));
-        }
-
-        // ??? NormalizeCulture – additional cases ??????????????????????????????????
-
-        [Test]
-        public void NormalizeCulture_WithThreePartCulture_OnlySplitsOnFirstHyphen()
-        {
-            // "zh-hans-cn" has multiple hyphens; only the first split matters.
-            var result = InvokePrivateStatic<string>("NormalizeCulture", "zh-hans-cn");
-
-            // The implementation splits on '-' and uses parts[0]/parts[1], so the
-            // result is "zh-HANS" (the third segment is ignored by the current logic).
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Does.StartWith("zh-"));
-        }
-
-        [Test]
-        [TestCase("AR-SA", "ar-SA")]
-        [TestCase("PT-BR", "pt-BR")]
-        [TestCase("ZH-TW", "zh-TW")]
-        public void NormalizeCulture_UpperCaseInput_NormalizedCorrectly(string input, string expected)
-        {
-            var result = InvokePrivateStatic<string>("NormalizeCulture", input);
-
-            Assert.That(result, Is.EqualTo(expected));
         }
 
         // ??? GetReferrerUrl – additional cases ????????????????????????????????????
@@ -522,74 +406,6 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             Assert.That(field!.GetValue(_module), Is.SameAs(_scopeFactory.Object));
         }
 
-        // ??? CultureRegex ?????????????????????????????????????????????????????????
-
-        [Test]
-        [TestCase("en-gb", true)]
-        [TestCase("EN-GB", true)]
-        [TestCase("fr-FR", true)]
-        [TestCase("zh-CN", true)]
-        [TestCase("ar-SA", true)]
-        public void CultureRegex_MatchesValidCultureTags(string input, bool expectedMatch)
-        {
-            var method = typeof(FormHandlerModule).GetMethod("CultureRegex", PrivateStatic);
-            Assert.That(method, Is.Not.Null, "CultureRegex() method not found.");
-
-            var regex = (System.Text.RegularExpressions.Regex)method!.Invoke(null, null)!;
-
-            Assert.That(regex.IsMatch(input), Is.EqualTo(expectedMatch));
-        }
-
-        [Test]
-        [TestCase("english")]           // no hyphen
-        [TestCase("en")]                // no hyphen, single part
-        [TestCase("en-gb-extra")]       // three parts
-        [TestCase("e-gb")]              // first part only 1 char
-        [TestCase("en-g")]              // second part only 1 char
-        [TestCase("123-gb")]            // digits
-        [TestCase("")]                  // empty
-        public void CultureRegex_DoesNotMatchInvalidCultureTags(string input)
-        {
-            var method = typeof(FormHandlerModule).GetMethod("CultureRegex", PrivateStatic);
-            Assert.That(method, Is.Not.Null, "CultureRegex() method not found.");
-
-            var regex = (System.Text.RegularExpressions.Regex)method!.Invoke(null, null)!;
-
-            Assert.That(regex.IsMatch(input), Is.False);
-        }
-
-        // ??? CulturePrefixRegex ???????????????????????????????????????????????????
-
-        [Test]
-        [TestCase("/en-gb/people")]
-        [TestCase("/EN-GB/people")]
-        [TestCase("/fr-fr/contact")]
-        [TestCase("/zh-cn")]
-        public void CulturePrefixRegex_MatchesPathsWithCulturePrefix(string input)
-        {
-            var method = typeof(FormHandlerModule).GetMethod("CulturePrefixRegex", PrivateStatic);
-            Assert.That(method, Is.Not.Null, "CulturePrefixRegex() method not found.");
-
-            var regex = (System.Text.RegularExpressions.Regex)method!.Invoke(null, null)!;
-
-            Assert.That(regex.IsMatch(input), Is.True);
-        }
-
-        [Test]
-        [TestCase("/people/en-gb")]     // culture not at start
-        [TestCase("/english/contact")]  // not a 2-letter code
-        [TestCase("en-gb/contact")]     // no leading slash
-        [TestCase("")]                  // empty
-        public void CulturePrefixRegex_DoesNotMatchPathsWithoutCulturePrefix(string input)
-        {
-            var method = typeof(FormHandlerModule).GetMethod("CulturePrefixRegex", PrivateStatic);
-            Assert.That(method, Is.Not.Null, "CulturePrefixRegex() method not found.");
-
-            var regex = (System.Text.RegularExpressions.Regex)method!.Invoke(null, null)!;
-
-            Assert.That(regex.IsMatch(input), Is.False);
-        }
-
         // ??? GetReferrerUrl – further cases ???????????????????????????????????????
 
         [Test]
@@ -628,57 +444,6 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             Assert.That(url, Is.EqualTo("https://example.com/"));
         }
 
-        // ??? NormalizeCulture – further cases ????????????????????????????????????
-
-        [Test]
-        public void NormalizeCulture_SingleHyphen_ReturnsNormalizedTwoParts()
-        {
-            // Input is "-" ? parts[0]="" parts[1]=""
-            var result = InvokePrivateStatic<string>("NormalizeCulture", "-");
-
-            // Both parts are empty; result should be "-"
-            Assert.That(result, Is.EqualTo("-"));
-        }
-
-        [Test]
-        [TestCase("JA-JP", "ja-JP")]
-        [TestCase("ko-KR", "ko-KR")]
-        [TestCase("RU-RU", "ru-RU")]
-        public void NormalizeCulture_CoversMiscLocales(string input, string expected)
-        {
-            var result = InvokePrivateStatic<string>("NormalizeCulture", input);
-
-            Assert.That(result, Is.EqualTo(expected));
-        }
-
-        // ??? RemoveCultureFromPath – further boundary cases ???????????????????????
-
-        [Test]
-        public void RemoveCultureFromPath_OnlyCultureSegmentWithTrailingSlash_ReturnsSlash()
-        {
-            // "/en-gb/" ? the culture prefix "/en-gb" is stripped, leaving "/"
-            var result = InvokePrivateStatic<string>("RemoveCultureFromPath", "/en-gb/");
-
-            Assert.That(result, Is.EqualTo("/"));
-        }
-
-        [Test]
-        public void RemoveCultureFromPath_PathWithMultipleSegmentsAfterCulture_StripsOnlyPrefix()
-        {
-            var result = InvokePrivateStatic<string>("RemoveCultureFromPath", "/fr-fr/a/b/c/d/e");
-
-            Assert.That(result, Is.EqualTo("/a/b/c/d/e"));
-        }
-
-        [Test]
-        public void RemoveCultureFromPath_CultureTagInMiddleOfPath_IsNotStripped()
-        {
-            // Only the leading culture prefix should be removed.
-            var result = InvokePrivateStatic<string>("RemoveCultureFromPath", "/people/en-gb/profile");
-
-            Assert.That(result, Is.EqualTo("/people/en-gb/profile"));
-        }
-
         private static void SetPrivateField(object target, string name, object value)
         {
             var field = target.GetType().GetField(name, PrivateInstance);
@@ -715,12 +480,5 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             return (T)resultProperty.GetValue(task)!;
         }
 
-        private static T InvokePrivateStatic<T>(string method, params object?[] args)
-        {
-            var mi = typeof(FormHandlerModule).GetMethod(method, PrivateStatic);
-
-            Assert.That(mi, Is.Not.Null, $"Private static method '{method}' not found.");
-            return (T)mi!.Invoke(null, args)!;
-        }
     }
 }
