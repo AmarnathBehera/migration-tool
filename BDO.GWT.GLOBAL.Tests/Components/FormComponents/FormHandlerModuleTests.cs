@@ -427,30 +427,18 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
         // ??? ResolveFromEmailForCurrentChannel – no settings found ????????????????
 
         [Test]
-        public void ResolveFromEmailForCurrentChannel_ReturnsNull_WhenChannelSettingsNotFound()
+        public void ResolveFromEmailForCurrentChannel_ThrowsWhenPastChannelIdGuard_WithValidChannelId()
         {
-            // Exercises: if (currentChannelSettings == null) { ... return null; }
-            // Use a valid channel ID (> 0) so we pass the first guard, but the settings
-            // provider returns an empty query result so currentChannelSettings is null.
+            // Exercises the code path past the channel-ID guard (ID > 0).
+            // Because ObjectQuery<T> (returned by IInfoProvider<T>.Get()) cannot be mocked
+            // and will throw a NullReferenceException when called without a real Kentico
+            // database, we assert that the exception is thrown *after* the guard (i.e.,
+            // the method did not return early due to ID ? 0).
+            // The inner exception surfaced via TargetInvocationException is a
+            // NullReferenceException from Kentico's ObjectQuery pipeline.
             var websiteChannelContext = new Mock<IWebsiteChannelContext>();
             websiteChannelContext.SetupGet(x => x.WebsiteChannelID).Returns(42);
 
-            // Build a real (empty) ObjectQuery-compatible result by returning a provider
-            // whose .Get() chain yields no rows. We stub the provider so that any call
-            // to its Get() chain raises a controlled exception to prevent Kentico DB access,
-            // then verify the method returns null in that error path (which maps to the
-            // catch path in real usage when no rows exist).
-            // A simpler approach: mock the provider so it throws, which the method does
-            // NOT catch — so we instead verify the null-settings branch by having the
-            // provider return no matching objects via a mock that returns an empty enumerable.
-
-            // Because ObjectQuery<T> is not easily mockable, we cover this branch by
-            // ensuring the provider itself throws (simulating a missing settings record),
-            // which causes the overall method to propagate the exception. The branch
-            // "currentChannelSettings == null ? return null" is best exercised through the
-            // ResolveFromEmailForCurrentChannel_ReturnsNull_WhenWebsiteChannelIdIsInvalid
-            // test above (channel ID ? 0). Here we document the complementary negative-ID
-            // variant to confirm both ?0 values are guarded identically.
             var emailInfoProvider = new Mock<IInfoProvider<EmailInfo>>();
             var channelSettingsProvider = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
 
@@ -464,11 +452,13 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             scope.SetupGet(x => x.ServiceProvider).Returns(sp);
             _scopeFactory.Setup(x => x.CreateScope()).Returns(scope.Object);
 
-            // The provider's Get() returns a real ObjectQuery which will throw trying to
-            // hit the DB. We expect an exception here – the important thing is the code
-            // reaches past the channel-ID guard, confirming the ID=42 path is taken.
-            Assert.Throws<Exception>(() =>
+            // InvokePrivate wraps exceptions in TargetInvocationException.
+            // The inner exception proves code advanced past the channel-ID guard.
+            var tex = Assert.Throws<TargetInvocationException>(() =>
                 InvokePrivate<string?>(_module, "ResolveFromEmailForCurrentChannel"));
+
+            Assert.That(tex!.InnerException, Is.Not.Null,
+                "Expected an inner exception from the ObjectQuery pipeline.");
         }
 
         // ??? FormItem_InsertAfterHandler – guard paths ????????????????????????????
