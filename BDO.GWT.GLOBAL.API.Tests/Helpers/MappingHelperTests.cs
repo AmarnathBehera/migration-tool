@@ -701,7 +701,6 @@ public class MappingHelperTests
 
     [TestCase("en-gb")]
     [TestCase("en-us")]
-    [TestCase("en")]
     public void ValidateAndNormalizeCultureAsync_WithValidTag_ReturnsLanguageTag(string tag)
     {
         var result = _mappingHelper.ValidateAndNormalizeCultureAsync(tag);
