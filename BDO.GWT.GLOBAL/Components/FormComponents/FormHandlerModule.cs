@@ -15,7 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,7 +28,6 @@ public partial class FormHandlerModule : Module
     private ILogger<FormHandlerModule> _logger;
     private IServiceScopeFactory _scopeFactory;
     private const string EmailKey = "Email";
-
     public FormHandlerModule() : base("CustomFormHandlers")
     {
     }
@@ -97,21 +95,11 @@ public partial class FormHandlerModule : Module
             if (string.IsNullOrWhiteSpace(absoluteUrl))
                 return;
 
-            var uri = new Uri(absoluteUrl);
-            string nodeAliasPath = uri.AbsolutePath.TrimEnd('/');
-            string pathWithoutCulture = RemoveCultureFromPath(nodeAliasPath);
-
-            string[] parts = nodeAliasPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            string culture = parts.Length > 0 && CultureRegex().IsMatch(parts[0])
-                ? NormalizeCulture(parts[0])
-                : "en-GB";
-
             string personTitle = absoluteUrl.TrimEnd('/').Split('/').Last().Replace("-", " ");
             if (string.IsNullOrWhiteSpace(personTitle))
                 return;
 
-            var person = await GetPersonSafelyAsync(pathWithoutCulture, culture).ConfigureAwait(false);
-
+            var person = await GetCurrentPersonSafelyAsync().ConfigureAwait(false);
             if (person == null || string.IsNullOrWhiteSpace(person.PersonEmail))
                 return;
 
@@ -193,30 +181,31 @@ public partial class FormHandlerModule : Module
             .FirstOrDefault()?.FromEmail;
     }
 
-    private async Task<Person> GetPersonSafelyAsync(string pathWithoutCulture, string culture)
+    private async Task<Person> GetCurrentPersonSafelyAsync()
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(pathWithoutCulture))
+            var httpContext = _httpContextAccessor?.HttpContext;
+            if (httpContext == null)
+            {
+                _logger.LogWarning("No HttpContext available. Cannot resolve current page.");
                 return null;
+            }
 
-            using var scope = _scopeFactory.CreateScope();
-            var contentService = scope.ServiceProvider.GetRequiredService<IContentService>();
+            var contentService = httpContext.RequestServices.GetRequiredService<IContentService>();
 
-            var people = await contentService.GetPagesAsync<Person>(
-                new RetrievePagesParameters(),
-                query => query.Where(w => w.WhereEquals("WebPageItemTreePath", pathWithoutCulture)).TopN(1),
-                RetrievalCacheSettings.CacheDisabled,
+            var person = await contentService.RetrieveCurrentPageAsync<Person>(
+                new RetrieveCurrentPageParameters
+                {
+                    LinkedItemsMaxLevel = 4
+                },
                 CancellationToken.None).ConfigureAwait(false);
 
-            return people?.FirstOrDefault();
+            return person;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex,
-                "Failed to retrieve person for path '{Path}' (culture: '{Culture}').",
-                pathWithoutCulture, culture);
-
+            _logger.LogError(ex, "Failed to retrieve current page as Person.");
             return null;
         }
     }
@@ -224,27 +213,4 @@ public partial class FormHandlerModule : Module
     private string GetReferrerUrl()
         => _httpContextAccessor?.HttpContext?.Request.Headers.Referer.ToString()
            ?? string.Empty;
-
-    private static string RemoveCultureFromPath(string nodeAliasPath)
-    {
-        if (string.IsNullOrWhiteSpace(nodeAliasPath))
-            return string.Empty;
-
-        return CulturePrefixRegex().Replace(nodeAliasPath, string.Empty);
-    }
-
-    private static string NormalizeCulture(string culture)
-    {
-        if (string.IsNullOrWhiteSpace(culture) || !culture.Contains('-'))
-            return culture;
-
-        var parts = culture.Split('-');
-        return $"{parts[0].ToLowerInvariant()}-{parts[1].ToUpperInvariant()}";
-    }
-
-    [GeneratedRegex(@"^[a-zA-Z]{2}-[a-zA-Z]{2}$")]
-    private static partial Regex CultureRegex();
-
-    [GeneratedRegex(@"^/[a-z]{2}-[a-z]{2}", RegexOptions.IgnoreCase)]
-    private static partial Regex CulturePrefixRegex();
 }

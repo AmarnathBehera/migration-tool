@@ -1,13 +1,9 @@
-﻿using BDO.GWT.Core;
-using BDO.GWT.Core.Services;
-using BDO.GWT.Core.Services.Footer;
+﻿using BDO.GWT.Core.Services;
 using BDO.GWT.GLOBAL.API.ApiClients;
 using BDO.GWT.GLOBAL.API.Helpers;
 using BDO.GWT.GLOBAL.API.Middleware;
 using BDO.GWT.GLOBAL.API.Options;
 using BDO.GWT.GLOBAL.API.Services;
-using BDO.GWT.Web.Core.Services;
-using CMS.Core;
 using CMS.MacroEngine;
 using CMS.Websites;
 
@@ -40,29 +36,24 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IMemberFirmService, MemberFirmService>();
         serviceCollection.AddScoped<IMasterDataApiClient, MasterDataApiClient>();
         serviceCollection.AddScoped<IFormCrudService, FormCrudService>();
-        serviceCollection.AddScoped<IAuthorizationHelper, AuthorizationHelper>();
-        serviceCollection.AddScoped<IContentService, ContentService>();
         serviceCollection.AddScoped<IValidationState, ValidationState>();
-        serviceCollection.AddScoped<ICultureService, CultureService>();
-        serviceCollection.AddScoped<ICultureContext, CultureContext>();
-        serviceCollection.AddScoped<IWebsiteCulturesService, WebsiteCulturesService>();
+        serviceCollection.AddScoped<IAuthorizationHelper, AuthorizationHelper>();
+
         serviceCollection.AddScoped<IPageContentValidator, PageContentValidator>();
         serviceCollection.AddScoped<IMacroResolver, MacroResolver>();
-        serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
         serviceCollection.AddScoped<IMappingHelper, MappingHelper>();
-        serviceCollection.AddScoped<IDealCrudService, DealCrudService>();
-        serviceCollection.AddScoped<IFooterService, FooterService>();
+        serviceCollection.AddScoped<ICultureService, CultureService>();
         serviceCollection.AddScoped<ICultureValidationService, CultureValidationService>();
-        serviceCollection.AddScoped<ICareerDetailPageService, CareerDetailPageService>();
-        serviceCollection.AddScoped<IHeroService, HeroService>();
-        serviceCollection.AddScoped<ISidebarService, SidebarService>();
-        serviceCollection.AddScoped<ISocialMediaButtonsService, SocialMediaButtonsService>();
-        serviceCollection.AddScoped<ISettingService, SettingService>();
-        serviceCollection.AddScoped<IWebPageUrlResolver, WebPageUrlResolver>();
-        serviceCollection.AddScoped<IHomePageService, HomePageService>();
+
         serviceCollection.AddScoped<ICareerCrudService, CareerCrudService>();
-        
         serviceCollection.AddScoped<IPersonCrudService, PersonCrudService>();
+        serviceCollection.AddScoped<IInsightCrudService, InsightCrudService>();
+        serviceCollection.AddScoped<ISectionEventsCrudService, SectionEventsCrudService>();
+        serviceCollection.AddScoped<ILocationOfficeCrudService, LocationOfficeCrudService>();
+        serviceCollection.AddScoped<IGlobalSettingCrudService, GlobalSettingCrudService>();
+        serviceCollection.AddScoped<IChannelSettingCrudService, ChannelSettingCrudService>();
+        serviceCollection.AddScoped<IChannelCrudService, ChannelCrudService>();
         serviceCollection.AddScoped<IChannelInfoService, ChannelInfoService>();
+        serviceCollection.AddScoped<IUserCrudService, UserCrudService>();
     }
 }
