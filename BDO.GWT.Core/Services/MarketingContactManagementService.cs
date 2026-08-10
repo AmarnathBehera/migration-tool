@@ -15,16 +15,13 @@ public interface IMarketingContactManagementService
 public class MarketingContactManagementService : IMarketingContactManagementService
 {
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IInfoProvider<ContactGroupInfo> _recipientListInfoProvider;
     private readonly IInfoProvider<ContactInfo> _contactInfoProvider;
 
     public MarketingContactManagementService(
         IDateTimeProvider dateTimeProvider,
-        IInfoProvider<ContactGroupInfo> recipientListInfoProvider,
         IInfoProvider<ContactInfo> contactInfoProvider)
     {
         _dateTimeProvider = dateTimeProvider;
-        _recipientListInfoProvider = recipientListInfoProvider;
         _contactInfoProvider = contactInfoProvider;
     }
 

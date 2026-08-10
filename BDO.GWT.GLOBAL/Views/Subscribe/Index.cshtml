@@ -14,16 +14,6 @@
     var pageContext = WebPageDataContextRetriever.Retrieve();
     var pageId = pageContext.WebPage.WebPageItemID;
 }
-@{
-    var widgetsList = new[]
-    {
-        ComponentIdentifiers.Widgets.Button,
-        ComponentIdentifiers.Widgets.FlexibleBanner,
-        ComponentIdentifiers.Widgets.Form,
-        ComponentIdentifiers.Widgets.RichText,
-      //  ComponentIdentifiers.Widgets.ViewGlobalLocations,
-    };
-}
 @(await ReactService.RenderComponentAsync(
     pageId,
     ReactComponentType.Hero,

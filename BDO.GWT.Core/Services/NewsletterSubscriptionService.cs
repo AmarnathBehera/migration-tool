@@ -35,7 +35,7 @@ public class NewsletterSubscriptionService(
     private readonly IInfoProvider<ContactGroupInfo> _recipientListInfoProvider = recipientListInfoProvider;
     private readonly IInfoProvider<ContactGroupMemberInfo> _contactGroupMemberInfoProvider = contactGroupMemberInfoProvider;
     private readonly IInfoProvider<EmailSubscriptionConfirmationInfo> _emailSubscriptionConfirmationInfoProvider = emailSubscriptionConfirmationInfoProvider;
-    private IServiceScopeFactory _scopeFactory = scopeFactory;
+    private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
     private const string EmailKey = "Email";
 
     public async Task<bool> SubscribeToNewslettersAsync(NewsletterSubscriptionData newsletterSubscriptionData, CancellationToken cancellationToken)
@@ -86,8 +86,6 @@ public class NewsletterSubscriptionService(
                 EmailSubscriptionConfirmationDate = DateTime.Now,
             };
             confirmation.Insert();
-            var emailConfig = EmailTemplateInfo.Provider.Get("SubscribeToNewsletters");
-            
             string fromEmail = ResolveFromEmailForCurrentChannel();
            
             var email = new EmailMessage
@@ -111,7 +109,7 @@ public class NewsletterSubscriptionService(
     public async Task<bool> ConfirmSubscriptionForNewsletterAsync(SubscribeConfirmQuery subscribeConfirmQuery, string siteName, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(subscribeConfirmQuery.SubscriptionHash) ||
-            !DateTime.TryParseExact(subscribeConfirmQuery.DateTime, "ddMMyyyyHHmmss", CultureInfo.InvariantCulture, DateTimeStyles.None, out var requestDateTime))
+            !DateTime.TryParseExact(subscribeConfirmQuery.DateTime, "ddMMyyyyHHmmss", CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
         {
             return false;
         }
@@ -190,7 +188,7 @@ public class NewsletterSubscriptionService(
         await _marketingContactManagementService.UpdateMarketingContactAsync(contact, cancellationToken);
     }
 
-    private string ResolveFromEmailForCurrentChannel()
+    private string? ResolveFromEmailForCurrentChannel()
     {
         using var scope = _scopeFactory.CreateScope();
         var websiteChannelContext = scope.ServiceProvider.GetRequiredService<IWebsiteChannelContext>();
@@ -205,6 +203,11 @@ public class NewsletterSubscriptionService(
             .TopN(1)
             .FirstOrDefault();
 
+        if (currentChannelSettings is null)
+        {
+            return null;
+        }
+
         return emailInfoProvider.Get()
             .WhereEquals(nameof(EmailInfo.DisplayName), EmailKey)
             .WhereEquals(nameof(EmailInfo.EmailSettingsWebChannelSettingID), currentChannelSettings.WebChannelSettingsID)
@@ -212,5 +215,4 @@ public class NewsletterSubscriptionService(
             .GetEnumerableTypedResult()
             .FirstOrDefault()?.FromEmail;
     }
-
 }

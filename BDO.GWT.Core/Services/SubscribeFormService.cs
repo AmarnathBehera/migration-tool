@@ -73,21 +73,4 @@ public class SubscribeFormService : ISubscribeFormService
         }
     }
 
-    private static bool IsValidEmail(string? email)
-    {
-        if (string.IsNullOrWhiteSpace(email))
-        {
-            return false;
-        }
-
-        try
-        {
-            _ = new System.Net.Mail.MailAddress(email);
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
-    }
 }

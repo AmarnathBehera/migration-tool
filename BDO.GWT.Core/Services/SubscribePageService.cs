@@ -26,10 +26,6 @@ public class SubscribePageService : ISubscribePageService
     private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly IInfoProvider<WebsiteCaptchaSettingsInfo> _captchaSettingsProvider;
 
-    // IMPORTANT: keep these aligned with values stored in WebsiteCaptchaSettingsReCaptchaVersion
-    private const int RecaptchaVersionV2 = 2;
-    private const int RecaptchaVersionV3 = 3;
-
     private readonly IInfoProvider<ContactGroupInfo> _recipientListInfoProvider;
 
     public SubscribePageService(IInfoProvider<ContactGroupInfo> recipientListInfoProvider,IWebsiteChannelContext websiteChannelContext, IHeroService heroService,IContentRetriever contentRetriever, IInfoProvider<WebsiteCaptchaSettingsInfo> captchaSettingsProvider)
@@ -92,10 +88,10 @@ public class SubscribePageService : ISubscribePageService
             SubscribeFormDto = subscribePage.FormType == "form" ? new SubscribeFormDto
             {
                 IsV3 = subscribePage.RecaptchaUseV3,
-                SiteKey = GetRecaptchaPublicKey(subscribePage, cancellationToken) ?? string.Empty,
+                SiteKey = GetRecaptchaPublicKey(subscribePage) ?? string.Empty,
                 EndpointRoute = $"newsletter/subscribe/{subscribePage.SystemFields.WebPageItemGUID}",
                 RedirectUrl = redirectLink ?? string.Empty,
-                Newsletters = await GetAllSiteNewsletterOptionDtos(cancellationToken),
+                Newsletters = await GetAllSiteNewsletterOptionDtos(),
                // Countries = await GetAllCountriesOptionDtos(cancellationToken),
                 ShowCompanyField = subscribePage.ShowCompanyField,
                 IsCompanyRequired = subscribePage.IsCompanyRequired,
@@ -112,8 +108,7 @@ public class SubscribePageService : ISubscribePageService
 
 
 
-    private async Task<BDO.GWT.Core.DTOs.OptionDto[]> GetAllSiteNewsletterOptionDtos(
-     CancellationToken cancellationToken)
+    private Task<BDO.GWT.Core.DTOs.OptionDto[]> GetAllSiteNewsletterOptionDtos()
     {
         var recipientLists = _recipientListInfoProvider.Get()
             .Columns(
@@ -125,7 +120,7 @@ public class SubscribePageService : ISubscribePageService
             .Where(list => !string.IsNullOrWhiteSpace(list.ContactGroupName))
             .ToList();
 
-        return recipientLists
+        return Task.FromResult(recipientLists
             .Select(list => new BDO.GWT.Core.DTOs.OptionDto
             {
                 Value = list.ContactGroupGUID.ToString(),
@@ -133,12 +128,11 @@ public class SubscribePageService : ISubscribePageService
                     ? list.ContactGroupName
                     : list.ContactGroupDisplayName
             })
-            .ToArray();
+            .ToArray());
     }
-    private string? GetRecaptchaPublicKey(Subscribe subscribePage, CancellationToken cancellationToken)
+    private string? GetRecaptchaPublicKey(Subscribe subscribePage)
     {
         int channelId = _websiteChannelContext.WebsiteChannelID;
-        int expectedVersion = subscribePage.RecaptchaUseV3 ? RecaptchaVersionV3 : RecaptchaVersionV2;
         var captchaSettings = _captchaSettingsProvider
                 .Get()
                 .WhereEquals(

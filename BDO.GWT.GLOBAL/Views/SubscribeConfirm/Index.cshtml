@@ -9,11 +9,6 @@
 @inject IAntiforgery Antiforgery
 
 @inject IReactService ReactService
-@inject IWebPageDataContextRetriever WebPageDataContextRetriever
-@{
-    var pageContext = WebPageDataContextRetriever.Retrieve();
-    var pageId = pageContext.WebPage.WebPageItemID;
-}
 @{
     var widgetsList = new[]
     {

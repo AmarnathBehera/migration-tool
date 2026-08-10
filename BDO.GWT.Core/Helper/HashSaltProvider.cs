@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 namespace BDO.GWT.Xperience.Core.Services;
 public interface IHashSaltProvider
 {
-    public string HashSalt { get; }
+    public string? HashSalt { get; }
 }
 public class HashSaltProvider : IHashSaltProvider
 {
@@ -17,5 +17,5 @@ public class HashSaltProvider : IHashSaltProvider
         _configuration = configuration;
     }
 
-    public string HashSalt => _configuration[HashSaltSettingKey];
+    public string? HashSalt => _configuration[HashSaltSettingKey];
 }

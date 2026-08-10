@@ -6,15 +6,9 @@
 @model BDO.GWT.Core.DTOs.SubServicePageDto
 
 @inject IReactService ReactService
-@inject IWebPageDataContextRetriever WebPageDataContextRetriever
 @inject IPageBuilderService PageBuilderService
 @inject ICookieConsentService CookieConsentService
 
-
-@{
-    var pageContext = WebPageDataContextRetriever.Retrieve();
-    var pageId = pageContext.WebPage.WebPageItemID;
-}
 
 @{
     var widgetsList = new[]
