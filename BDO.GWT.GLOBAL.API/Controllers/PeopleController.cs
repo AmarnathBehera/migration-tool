@@ -46,10 +46,10 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         }
 
         /// <summary>
-        /// Returns a single person having the specified page GUID.
+        /// Returns a single person having the specified WebPageItem GUID.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm from which the page should be retrieved.</param>
-        /// <param name="WebPageItemGuid">Page GUID of a person page.</param>
+        /// <param name="WebPageItemGuid">WebPageItem GUID of a person page.</param>
         /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="cancellationToken"></param>
         /// <returns>Returns one person page.</returns>
@@ -68,7 +68,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// Creates a new person page.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm in which the page should be created.</param>
-        /// <param name="WebPageParentID">Node ID of the page that will contain the created person page.
+        /// <param name="WebPageParentID">WebPageParentItem ID of the page that will contain the created person page.
         /// <br/><br/>This value can be taken from <b>Kentico Pages module</b> by selecting the parent. Select <b>General tab</b>, then click <b>Advanced</b>. The <b>Node ID</b> property will contain the required value.</param>
         /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="request">Input data of the new page.</param>

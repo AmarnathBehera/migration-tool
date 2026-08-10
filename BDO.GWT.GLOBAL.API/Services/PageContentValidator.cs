@@ -6,6 +6,7 @@ using CMS.DataEngine;
 using CMS.FormEngine;
 using CMS.Helpers;
 using CMS.MacroEngine;
+using CMS.Websites;
 using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Immutable;
@@ -174,8 +175,46 @@ public class PageContentValidator : IPageContentValidator
                     .Select(v => ValidateContentItemReferenceFieldDataType(field, controlName, v))
                     .ToList(),
                 _ => throw new ArgumentException($"Validation for field data type '{field.DataType}' is not implemented."),
-            }
+            },
+            FieldDataType.WebPages => value switch
+            {
+                null => ValidateWebPageRelatedItem(field, controlName, null),
+                string s => ValidateWebPagePathString(field, controlName, s),
+                WebPageRelatedItem item => ValidateWebPageRelatedItem(field, controlName, item),
+                IEnumerable<WebPageRelatedItem> items => items
+                    .Select(i => ValidateWebPageRelatedItem(field, controlName, i))
+                    .ToList(),
+                _ => throw new ArgumentException(
+                    $"Validation for field data type '{field.DataType}' is not implemented, value type was '{value.GetType().FullName}'."),
+            },
         };
+    }
+    private string? ValidateWebPagePathString(FormFieldInfo field, string controlName, string? value)
+    {
+        if (string.IsNullOrWhiteSpace(controlName))
+        {
+            throw new ArgumentException("Control name must be provided.", nameof(controlName));
+        }
+
+        // WebPages-typed fields arrive at this layer as a raw tree path/GUID string from the DTO. The
+        // actual WebPageRelatedItem resolution happens later in CreateSectionEventsItemData via
+        // IMappingHelper.BuildWebPageRelatedItemReferenceAsync — this only validates presence and passes
+        // the string through unchanged.
+        return ValidateAndNormalizeString(field, value, DoNothing);
+    }
+    private WebPageRelatedItem? ValidateWebPageRelatedItem(FormFieldInfo field, string controlName, WebPageRelatedItem? value)
+    {
+        if (string.IsNullOrWhiteSpace(controlName))
+        {
+            throw new ArgumentException("Control name must be provided.", nameof(controlName));
+        }
+
+        if (!field.AllowEmpty && (value is null || value.WebPageGuid == Guid.Empty))
+        {
+            _validationState.AddError(field.Name, FormErrorMessage.EmptyValue);
+        }
+
+        return value;
     }
     private string? ValidateContentItemReferenceFieldDataType(FormFieldInfo field, string controlName, object? value)
     {
@@ -308,7 +347,11 @@ public class PageContentValidator : IPageContentValidator
                     field,
                     value as string,
                     ValidateFieldOption);
-
+            case "kentico.administration.radiogroup":   // <-- added
+                return ValidateAndNormalizeString(
+                    field,
+                    value as string,
+                    ValidateFieldOption);
             // Text-based components
             case "kentico.textinput":
             case "kentico.administration.textinput":
@@ -341,6 +384,12 @@ public class PageContentValidator : IPageContentValidator
 
             // Multiple choice
             case "kentico.multiplechoice":
+                return ValidateAndNormalizeMultipleValues(
+                    field,
+                    value as HashSet<string>,
+                    ValidateFieldOptions);
+
+            case "xperiencecommunity.multichoiceformcontrol.multichoice":
                 return ValidateAndNormalizeMultipleValues(
                     field,
                     value as HashSet<string>,
@@ -381,8 +430,9 @@ public class PageContentValidator : IPageContentValidator
                     value as List<int>,
                     DoNothing);
 
-            // Label/read-only field
+            // Label/read-only / decorative field
             case "kentico.label":
+            case "bdo.gwt.admin.fieldgroupseparator":
                 return null;
 
             default:
