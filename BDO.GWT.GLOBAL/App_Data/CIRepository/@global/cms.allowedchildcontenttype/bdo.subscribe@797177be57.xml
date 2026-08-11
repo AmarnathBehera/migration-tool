@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.Subscribe</CodeName>
+    <GUID>2294b5d1-7695-4868-bcff-00b9d7373a97</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.SubscribeConfirm">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.SubscribeConfirm</CodeName>
+        <GUID>1d59794e-3c8e-49a6-9635-e716ef8d6040</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.SubscribeRemove">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.SubscribeRemove</CodeName>
+        <GUID>ce34ab35-e1f6-4c58-a802-08db14d65bbc</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>
