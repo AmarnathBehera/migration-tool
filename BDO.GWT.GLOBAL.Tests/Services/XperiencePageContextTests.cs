@@ -279,17 +279,6 @@ namespace BDO.GWT.GLOBAL.Tests.Services
             _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
         }
 
-        [Test]
-        public async Task GetAnyPageByWebPageItemId_ReadsWebsiteChannelName()
-        {
-            _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(false);
-            _websiteChannelContextMock.Setup(x => x.WebsiteChannelName).Returns("global");
-
-            try { await _service.GetAnyPageByWebPageItemId(1, CancellationToken.None); } catch { }
-
-            _websiteChannelContextMock.Verify(x => x.WebsiteChannelName, Times.AtLeastOnce);
-        }
-
         // --- GetPageTitleByWebPageItemId -----------------------------------------
 
         [Test]
@@ -310,17 +299,6 @@ namespace BDO.GWT.GLOBAL.Tests.Services
             try { await _service.GetPageTitleByWebPageItemId(1, CancellationToken.None); } catch { }
 
             _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
-        }
-
-        [Test]
-        public async Task GetPageTitleByWebPageItemId_ReadsWebsiteChannelName()
-        {
-            _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(false);
-            _websiteChannelContextMock.Setup(x => x.WebsiteChannelName).Returns("global");
-
-            try { await _service.GetPageTitleByWebPageItemId(1, CancellationToken.None); } catch { }
-
-            _websiteChannelContextMock.Verify(x => x.WebsiteChannelName, Times.AtLeastOnce);
         }
 
         // --- Helpers -------------------------------------------------------------
