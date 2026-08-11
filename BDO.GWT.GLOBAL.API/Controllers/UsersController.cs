@@ -17,12 +17,10 @@ namespace BDO.GWT.GLOBAL.API.Controllers;
 [Route("memberFirms/{memberFirmID:int}/Users")]
 public class UsersController : EntityControllerBase
 {
-    private readonly IUserApiPermissionsCrudService _userApiPermissionsCrudService;
     private readonly IUserCrudService _userCrudService;
 
-    public UsersController(IUserApiPermissionsCrudService userApiPermissionsCrudService, IUserCrudService userCrudService)
+    public UsersController(IUserCrudService userCrudService)
     {
-        _userApiPermissionsCrudService = userApiPermissionsCrudService;
         _userCrudService = userCrudService;
     }
     // <summary>
