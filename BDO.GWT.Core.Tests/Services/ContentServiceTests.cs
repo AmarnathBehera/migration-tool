@@ -547,5 +547,15 @@ namespace BDO.GWT.Core.Tests.Services
 
         /// <summary>A type that deliberately does NOT expose CONTENT_TYPE_NAME.</summary>
         private class TypeWithoutContentTypeName { }
+
+        [Test]
+        public void GetPagesAsync_NonGenericContentBuilderOverload_ThrowsNotImplementedException()
+        {
+            Assert.Throws<NotImplementedException>(() => _service.GetPagesAsync<TestContentItem>(
+                new RetrievePagesParameters(),
+                builder => builder,
+                RetrievalCacheSettings.CacheDisabled,
+                CancellationToken.None));
+        }
     }
 }
