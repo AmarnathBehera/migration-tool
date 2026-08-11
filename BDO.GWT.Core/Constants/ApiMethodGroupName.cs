@@ -19,4 +19,9 @@ public static class ApiMethodGroupName
     public const string PageAttachments = "PageAttachments";
     public const string People = "People";
     public const string Users = "Users";
+    public const string Channel = "Channel";
+    public const string ChannelSettings = "ChannelSettings";
+    public const string Footer = "Footer";
+    public const string GlobalSettings = "GlobalSettings";
+
 }
