@@ -1,0 +1,19 @@
+@using Kentico.Forms.Web.Mvc
+@using Kentico.Web.Mvc
+@model BDO.GWT.GLOBAL.Components.FormComponents.RecipientList.RecipientListDropdownComponent
+@{
+    var htmlAttributes = ViewData.Kentico().GetEditorHtmlAttributes();
+    if (htmlAttributes.ContainsKey("class"))
+    {
+        htmlAttributes["class"] += " filled-in";
+    }
+    else
+    {
+        htmlAttributes["class"] = "filled-in";
+    }
+}
+<p>
+    <label>
+        @Html.DropDownListFor(m => m.Value, Model.Options, "Select recipient list", htmlAttributes)
+    </label>
+</p>

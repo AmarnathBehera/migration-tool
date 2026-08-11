@@ -64,12 +64,20 @@ namespace BDO.GWT.Core.Constants
         InsightCategory.CONTENT_TYPE_NAME,
         InsightGroup.CONTENT_TYPE_NAME,
         Insight.CONTENT_TYPE_NAME,
+        InsightAnimationPage.CONTENT_TYPE_NAME,
         SectionInsightsPage.CONTENT_TYPE_NAME,
         BusinessStrategy.CONTENT_TYPE_NAME,
         SectionBusinessStrategies.CONTENT_TYPE_NAME,
         Sitemap.CONTENT_TYPE_NAME,
         BusinessStrategy.CONTENT_TYPE_NAME,
-        InsightAnimationPage.CONTENT_TYPE_NAME
+        InsightAnimationPage.CONTENT_TYPE_NAME,
+        SectionBusinessStrategies.CONTENT_TYPE_NAME,
+        Subscribe.CONTENT_TYPE_NAME,
+        SubscribeConfirm.CONTENT_TYPE_NAME,
+        SubscribeRemove.CONTENT_TYPE_NAME,
+        SubService.CONTENT_TYPE_NAME,
+        ThankYouConversionPage.CONTENT_TYPE_NAME,
+        ThankYouConversionPages.CONTENT_TYPE_NAME,
     };
     }
 }
