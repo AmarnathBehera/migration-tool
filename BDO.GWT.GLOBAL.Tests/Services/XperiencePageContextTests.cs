@@ -1,6 +1,4 @@
-ï»¿using BDO.GWT.Core;
-using BDO.GWT.Core.DTOs;
-using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
+using BDO.GWT.Core;
 using BDO.GWT.GLOBAL.Services;
 using CMS.ContentEngine;
 using CMS.Websites;
@@ -17,12 +15,12 @@ namespace BDO.GWT.GLOBAL.Tests.Services
 {
     public class XperiencePageContextTests
     {
-        private Mock<IHttpContextAccessor> _httpContextAccessorMock;
-        private Mock<IWebPageDataContextRetriever> _webPageDataContextRetrieverMock;
-        private Mock<IPageBuilderDataContextRetriever> _pageBuilderDataContextRetrieverMock;
-        private Mock<IWebsiteChannelContext> _websiteChannelContextMock;
-        private Mock<IContentQueryExecutor> _queryExecutorMock;       
-        private XperiencePageContext _service;
+        private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
+        private Mock<IWebPageDataContextRetriever> _webPageDataContextRetrieverMock = null!;
+        private Mock<IPageBuilderDataContextRetriever> _pageBuilderDataContextRetrieverMock = null!;
+        private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
+        private Mock<IContentQueryExecutor> _queryExecutorMock = null!;
+        private XperiencePageContext _service = null!;
 
         [SetUp]
         public void Setup()
@@ -32,17 +30,16 @@ namespace BDO.GWT.GLOBAL.Tests.Services
             _pageBuilderDataContextRetrieverMock = new Mock<IPageBuilderDataContextRetriever>();
             _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
             _queryExecutorMock = new Mock<IContentQueryExecutor>();
-            
 
             _service = new XperiencePageContext(
                 _httpContextAccessorMock.Object,
                 _webPageDataContextRetrieverMock.Object,
                 _pageBuilderDataContextRetrieverMock.Object,
                 _websiteChannelContextMock.Object,
-                _queryExecutorMock.Object
-                
-            );
+                _queryExecutorMock.Object);
         }
+
+        // --- IsInPreviewMode -----------------------------------------------------
 
         [Test]
         public void IsInPreviewMode_ReturnsTrue_WhenChannelIsPreview()
@@ -60,12 +57,16 @@ namespace BDO.GWT.GLOBAL.Tests.Services
             Assert.That(_service.IsInPreviewMode, Is.False);
         }
 
+        // --- IsInPageBuilderMode -------------------------------------------------
+
         [Test]
         public void IsInPageBuilderMode_ReturnsTrue_WhenEditMode()
         {
             var httpContext = new DefaultHttpContext();
             _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
-            _pageBuilderDataContextRetrieverMock.Setup(x => x.Retrieve()).Returns(new PageBuilderDataContext { EditMode = true });
+            _pageBuilderDataContextRetrieverMock
+                .Setup(x => x.Retrieve())
+                .Returns(new PageBuilderDataContext { EditMode = true });
 
             Assert.That(_service.IsInPageBuilderMode, Is.True);
         }
@@ -73,7 +74,9 @@ namespace BDO.GWT.GLOBAL.Tests.Services
         [Test]
         public void IsInPageBuilderMode_ReturnsFalse_WhenNoHttpContext()
         {
-            _httpContextAccessorMock.Setup(x => x.HttpContext).Returns((Microsoft.AspNetCore.Http.HttpContext)null);
+            _httpContextAccessorMock
+                .Setup(x => x.HttpContext)
+                .Returns((Microsoft.AspNetCore.Http.HttpContext)null);
 
             Assert.That(_service.IsInPageBuilderMode, Is.False);
         }
@@ -83,15 +86,32 @@ namespace BDO.GWT.GLOBAL.Tests.Services
         {
             var httpContext = new DefaultHttpContext();
             _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
-            _pageBuilderDataContextRetrieverMock.Setup(x => x.Retrieve()).Returns(new PageBuilderDataContext { EditMode = false });
+            _pageBuilderDataContextRetrieverMock
+                .Setup(x => x.Retrieve())
+                .Returns(new PageBuilderDataContext { EditMode = false });
 
             Assert.That(_service.IsInPageBuilderMode, Is.False);
         }
 
         [Test]
+        public void IsInPageBuilderMode_ReturnsFalse_WhenEditModeFalseAndHttpContextPresent()
+        {
+            var httpContext = new DefaultHttpContext();
+            _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
+            _pageBuilderDataContextRetrieverMock
+                .Setup(x => x.Retrieve())
+                .Returns(new PageBuilderDataContext { EditMode = false });
+
+            Assert.That(_service.IsInPageBuilderMode, Is.False);
+        }
+
+        // --- GetCurrentPageAsync -------------------------------------------------
+
+        [Test]
         public async Task GetCurrentPageAsync_ReturnsNull_WhenNoContext()
         {
-            _webPageDataContextRetrieverMock.Setup(x => x.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
+            _webPageDataContextRetrieverMock
+                .Setup(x => x.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
                 .Returns(false);
 
             var result = await _service.GetCurrentPageAsync<object>();
@@ -100,15 +120,87 @@ namespace BDO.GWT.GLOBAL.Tests.Services
         }
 
         [Test]
+        public async Task GetCurrentPageAsync_CallsTryRetrieve_WhenInvoked()
+        {
+            _webPageDataContextRetrieverMock
+                .Setup(x => x.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
+                .Returns(false);
+
+            await _service.GetCurrentPageAsync<object>(CancellationToken.None);
+
+            _webPageDataContextRetrieverMock.Verify(
+                x => x.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny),
+                Times.Once);
+        }
+
+        [Test]
+        public async Task GetCurrentPageAsync_DoesNotCallQueryExecutor_WhenNoContext()
+        {
+            // GetMappedWebPageResult / GetWebPageResult are extension methods — Moq cannot
+            // intercept them. We verify the interface itself has zero calls when context is absent.
+            _webPageDataContextRetrieverMock
+                .Setup(x => x.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
+                .Returns(false);
+
+            await _service.GetCurrentPageAsync<object>(CancellationToken.None);
+
+            _queryExecutorMock.VerifyNoOtherCalls();
+        }
+
+        // --- GetCurrentPageMetadataAsync -----------------------------------------
+
+        [Test]
         public async Task GetCurrentPageMetadataAsync_ReturnsNull_WhenNoContext()
         {
-            _webPageDataContextRetrieverMock.Setup(x => x.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
+            _webPageDataContextRetrieverMock
+                .Setup(x => x.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
                 .Returns(false);
 
             var result = await _service.GetCurrentPageMetadataAsync();
 
             Assert.That(result, Is.Null);
         }
+
+        [Test]
+        public async Task GetCurrentPageMetadataAsync_CallsTryRetrieve_WhenInvoked()
+        {
+            _webPageDataContextRetrieverMock
+                .Setup(x => x.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
+                .Returns(false);
+
+            await _service.GetCurrentPageMetadataAsync(CancellationToken.None);
+
+            _webPageDataContextRetrieverMock.Verify(
+                x => x.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny),
+                Times.Once);
+        }
+
+        [Test]
+        public async Task GetCurrentPageMetadataAsync_DoesNotCallQueryExecutor_WhenNoContext()
+        {
+            _webPageDataContextRetrieverMock
+                .Setup(x => x.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
+                .Returns(false);
+
+            await _service.GetCurrentPageMetadataAsync(CancellationToken.None);
+
+            _queryExecutorMock.VerifyNoOtherCalls();
+        }
+
+        [Test]
+        public async Task GetCurrentPageMetadataAsync_ReadsIsPreview_WhenContextPresent()
+        {
+            _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(true);
+            var ctx = BuildWebPageDataContext();
+            SetupWebPageDataContext(ctx);
+
+            // Extension method call will throw without a real DB — swallow it.
+            try { await _service.GetCurrentPageMetadataAsync(CancellationToken.None); } catch { }
+
+            _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
+        }
+
+        // --- GetCurrentPageBasePropertiesAsync -----------------------------------
 
         [Test]
         public async Task GetCurrentPageBasePropertiesAsync_WhenNoContext_ReturnsEmptyBaseWebPage()
@@ -140,431 +232,95 @@ namespace BDO.GWT.GLOBAL.Tests.Services
         }
 
         [Test]
-        public async Task GetAnyPageByWebPageItemId_WhenPreviewMode_UsesPreviewOptions()
+        public async Task GetCurrentPageBasePropertiesAsync_CallsTryRetrieve_WhenInvoked()
         {
-            _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(true);
+            _webPageDataContextRetrieverMock
+                .Setup(x => x.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
+                .Returns(false);
 
-            try { await _service.GetAnyPageByWebPageItemId(1, CancellationToken.None); } catch { }
+            await _service.GetCurrentPageBasePropertiesAsync(CancellationToken.None);
 
-            _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
-        }
-
-        [Test]
-        public async Task GetAnyPageByWebPageItemId_WhenNotPreviewMode_UsesLiveOptions()
-        {
-            _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(false);
-
-            try { await _service.GetAnyPageByWebPageItemId(1, CancellationToken.None); } catch { }
-
-            _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
-        }
-
-        [Test]
-        public async Task GetPageTitleByWebPageItemId_WhenPreviewMode_UsesPreviewOptions()
-        {
-            _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(true);
-
-            try { await _service.GetPageTitleByWebPageItemId(1, CancellationToken.None); } catch { }
-
-            _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
-        }
-
-        [Test]
-        public async Task GetPageTitleByWebPageItemId_WhenNotPreviewMode_UsesLiveOptions()
-        {
-            _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(false);
-
-            try { await _service.GetPageTitleByWebPageItemId(1, CancellationToken.None); } catch { }
-
-            _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
-        }
-
-        // --- IsInPageBuilderMode (edge cases) ------------------------------------
-
-        [Test]
-        public void IsInPageBuilderMode_ReturnsFalse_WhenEditModeFalseAndHttpContextPresent()
-        {
-            var httpContext = new DefaultHttpContext();
-            _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
-            _pageBuilderDataContextRetrieverMock
-                .Setup(x => x.Retrieve())
-                .Returns(new PageBuilderDataContext { EditMode = false });
-
-            Assert.That(_service.IsInPageBuilderMode, Is.False);
-        }
-
-        // --- GetCurrentPageAsync -------------------------------------------------
-
-        [Test]
-        public async Task GetCurrentPageAsync_CallsQueryExecutor_WhenContextRetrieved()
-        {
-            var ctx = BuildWebPageDataContext();
-            SetupWebPageDataContext(ctx);
-
-            _queryExecutorMock
-                .Setup(e => e.GetMappedWebPageResult<object>(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync([]);
-
-            var result = await _service.GetCurrentPageAsync<object>(CancellationToken.None);
-
-            _queryExecutorMock.Verify(
-                e => e.GetMappedWebPageResult<object>(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    It.IsAny<CancellationToken>()),
+            _webPageDataContextRetrieverMock.Verify(
+                x => x.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny),
                 Times.Once);
         }
 
         [Test]
-        public async Task GetCurrentPageAsync_ReturnsNull_WhenQueryReturnsEmpty()
+        public async Task GetCurrentPageBasePropertiesAsync_DoesNotCallQueryExecutor_WhenNoContext()
         {
-            var ctx = BuildWebPageDataContext();
-            SetupWebPageDataContext(ctx);
+            _webPageDataContextRetrieverMock
+                .Setup(x => x.TryRetrieve(out It.Ref<WebPageDataContext>.IsAny))
+                .Returns(false);
 
-            _queryExecutorMock
-                .Setup(e => e.GetMappedWebPageResult<object>(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync([]);
+            await _service.GetCurrentPageBasePropertiesAsync(CancellationToken.None);
 
-            var result = await _service.GetCurrentPageAsync<object>(CancellationToken.None);
-
-            Assert.That(result, Is.Null);
-        }
-
-        [Test]
-        public async Task GetCurrentPageAsync_PassesCancellationToken_ToQueryExecutor()
-        {
-            using var cts = new CancellationTokenSource();
-            var token = cts.Token;
-            var ctx = BuildWebPageDataContext();
-            SetupWebPageDataContext(ctx);
-
-            _queryExecutorMock
-                .Setup(e => e.GetMappedWebPageResult<object>(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    token))
-                .ReturnsAsync([]);
-
-            await _service.GetCurrentPageAsync<object>(token);
-
-            _queryExecutorMock.Verify(
-                e => e.GetMappedWebPageResult<object>(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    token),
-                Times.Once);
-        }
-
-        // --- GetCurrentPageMetadataAsync -----------------------------------------
-
-        [Test]
-        public async Task GetCurrentPageMetadataAsync_ReturnsNull_WhenQueryReturnsEmpty()
-        {
-            var ctx = BuildWebPageDataContext();
-            SetupWebPageDataContext(ctx);
-
-            _queryExecutorMock
-                .Setup(e => e.GetMappedWebPageResult<IWebPageFieldsSource>(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync([]);
-
-            var result = await _service.GetCurrentPageMetadataAsync(CancellationToken.None);
-
-            Assert.That(result, Is.Null);
-        }
-
-        [Test]
-        public async Task GetCurrentPageMetadataAsync_CallsQueryExecutor_WhenContextRetrieved()
-        {
-            var ctx = BuildWebPageDataContext();
-            SetupWebPageDataContext(ctx);
-
-            _queryExecutorMock
-                .Setup(e => e.GetMappedWebPageResult<IWebPageFieldsSource>(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync([]);
-
-            await _service.GetCurrentPageMetadataAsync(CancellationToken.None);
-
-            _queryExecutorMock.Verify(
-                e => e.GetMappedWebPageResult<IWebPageFieldsSource>(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    It.IsAny<CancellationToken>()),
-                Times.Once);
-        }
-
-        [Test]
-        public async Task GetCurrentPageMetadataAsync_UsesPreviewFlag_FromWebsiteChannelContext()
-        {
-            _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(true);
-            var ctx = BuildWebPageDataContext();
-            SetupWebPageDataContext(ctx);
-
-            _queryExecutorMock
-                .Setup(e => e.GetMappedWebPageResult<IWebPageFieldsSource>(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync([]);
-
-            await _service.GetCurrentPageMetadataAsync(CancellationToken.None);
-
-            _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
-        }
-
-        [Test]
-        public async Task GetCurrentPageMetadataAsync_PassesCancellationToken_ToQueryExecutor()
-        {
-            using var cts = new CancellationTokenSource();
-            var token = cts.Token;
-            var ctx = BuildWebPageDataContext();
-            SetupWebPageDataContext(ctx);
-
-            _queryExecutorMock
-                .Setup(e => e.GetMappedWebPageResult<IWebPageFieldsSource>(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    token))
-                .ReturnsAsync([]);
-
-            await _service.GetCurrentPageMetadataAsync(token);
-
-            _queryExecutorMock.Verify(
-                e => e.GetMappedWebPageResult<IWebPageFieldsSource>(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    token),
-                Times.Once);
-        }
-
-        // --- GetCurrentPageBasePropertiesAsync -----------------------------------
-
-        [Test]
-        public async Task GetCurrentPageBasePropertiesAsync_CallsQueryExecutor_WhenContextRetrieved()
-        {
-            var ctx = BuildWebPageDataContext();
-            SetupWebPageDataContext(ctx);
-
-            _queryExecutorMock
-                .Setup(e => e.GetWebPageResult(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<Func<IWebPageContentQueryDataContainer, BaseWebPage>>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync([]);
-
-            var result = await _service.GetCurrentPageBasePropertiesAsync(CancellationToken.None);
-
-            _queryExecutorMock.Verify(
-                e => e.GetWebPageResult(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<Func<IWebPageContentQueryDataContainer, BaseWebPage>>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    It.IsAny<CancellationToken>()),
-                Times.Once);
-        }
-
-        [Test]
-        public async Task GetCurrentPageBasePropertiesAsync_ReturnsEmptyBaseWebPage_WhenQueryReturnsEmpty()
-        {
-            var ctx = BuildWebPageDataContext();
-            SetupWebPageDataContext(ctx);
-
-            _queryExecutorMock
-                .Setup(e => e.GetWebPageResult(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<Func<IWebPageContentQueryDataContainer, BaseWebPage>>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync([]);
-
-            var result = await _service.GetCurrentPageBasePropertiesAsync(CancellationToken.None);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.Not.Null);
-                Assert.That(result.WebPageItemParentID, Is.EqualTo(0));
-                Assert.That(result.WebPageItemTreePath, Is.Null);
-            });
-        }
-
-        [Test]
-        public async Task GetCurrentPageBasePropertiesAsync_PassesCancellationToken_ToQueryExecutor()
-        {
-            using var cts = new CancellationTokenSource();
-            var token = cts.Token;
-            var ctx = BuildWebPageDataContext();
-            SetupWebPageDataContext(ctx);
-
-            _queryExecutorMock
-                .Setup(e => e.GetWebPageResult(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<Func<IWebPageContentQueryDataContainer, BaseWebPage>>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    token))
-                .ReturnsAsync([]);
-
-            await _service.GetCurrentPageBasePropertiesAsync(token);
-
-            _queryExecutorMock.Verify(
-                e => e.GetWebPageResult(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<Func<IWebPageContentQueryDataContainer, BaseWebPage>>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    token),
-                Times.Once);
+            _queryExecutorMock.VerifyNoOtherCalls();
         }
 
         // --- GetAnyPageByWebPageItemId -------------------------------------------
 
         [Test]
-        public async Task GetAnyPageByWebPageItemId_ReturnsNull_WhenQueryReturnsEmpty()
+        public async Task GetAnyPageByWebPageItemId_WhenPreviewMode_ReadsIsPreview()
         {
-            _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(false);
-            _websiteChannelContextMock.Setup(x => x.WebsiteChannelName).Returns("global");
+            _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(true);
 
-            _queryExecutorMock
-                .Setup(e => e.GetMappedWebPageResult<IWebPageFieldsSource>(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync([]);
+            try { await _service.GetAnyPageByWebPageItemId(1, CancellationToken.None); } catch { }
 
-            var result = await _service.GetAnyPageByWebPageItemId(99, CancellationToken.None);
-
-            Assert.That(result, Is.Null);
+            _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
         }
 
         [Test]
-        public async Task GetAnyPageByWebPageItemId_CallsQueryExecutor_Once()
+        public async Task GetAnyPageByWebPageItemId_WhenNotPreviewMode_ReadsIsPreview()
         {
             _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(false);
-            _websiteChannelContextMock.Setup(x => x.WebsiteChannelName).Returns("global");
 
-            _queryExecutorMock
-                .Setup(e => e.GetMappedWebPageResult<IWebPageFieldsSource>(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync([]);
+            try { await _service.GetAnyPageByWebPageItemId(1, CancellationToken.None); } catch { }
 
-            await _service.GetAnyPageByWebPageItemId(1, CancellationToken.None);
-
-            _queryExecutorMock.Verify(
-                e => e.GetMappedWebPageResult<IWebPageFieldsSource>(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    It.IsAny<CancellationToken>()),
-                Times.Once);
+            _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
         }
 
         [Test]
-        public async Task GetAnyPageByWebPageItemId_PassesCancellationToken_ToQueryExecutor()
+        public async Task GetAnyPageByWebPageItemId_ReadsWebsiteChannelName()
         {
-            using var cts = new CancellationTokenSource();
-            var token = cts.Token;
             _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(false);
             _websiteChannelContextMock.Setup(x => x.WebsiteChannelName).Returns("global");
 
-            _queryExecutorMock
-                .Setup(e => e.GetMappedWebPageResult<IWebPageFieldsSource>(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    token))
-                .ReturnsAsync([]);
+            try { await _service.GetAnyPageByWebPageItemId(1, CancellationToken.None); } catch { }
 
-            await _service.GetAnyPageByWebPageItemId(1, token);
-
-            _queryExecutorMock.Verify(
-                e => e.GetMappedWebPageResult<IWebPageFieldsSource>(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    token),
-                Times.Once);
+            _websiteChannelContextMock.Verify(x => x.WebsiteChannelName, Times.AtLeastOnce);
         }
 
         // --- GetPageTitleByWebPageItemId -----------------------------------------
 
         [Test]
-        public async Task GetPageTitleByWebPageItemId_ReturnsNull_WhenQueryReturnsEmpty()
+        public async Task GetPageTitleByWebPageItemId_WhenPreviewMode_ReadsIsPreview()
         {
-            _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(false);
-            _websiteChannelContextMock.Setup(x => x.WebsiteChannelName).Returns("global");
+            _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(true);
 
-            _queryExecutorMock
-                .Setup(e => e.GetWebPageResult(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<Func<IWebPageContentQueryDataContainer, string>>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync([]);
+            try { await _service.GetPageTitleByWebPageItemId(1, CancellationToken.None); } catch { }
 
-            var result = await _service.GetPageTitleByWebPageItemId(1, CancellationToken.None);
-
-            Assert.That(result, Is.Null);
+            _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
         }
 
         [Test]
-        public async Task GetPageTitleByWebPageItemId_CallsQueryExecutor_Once()
+        public async Task GetPageTitleByWebPageItemId_WhenNotPreviewMode_ReadsIsPreview()
         {
             _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(false);
-            _websiteChannelContextMock.Setup(x => x.WebsiteChannelName).Returns("global");
 
-            _queryExecutorMock
-                .Setup(e => e.GetWebPageResult(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<Func<IWebPageContentQueryDataContainer, string>>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync([]);
+            try { await _service.GetPageTitleByWebPageItemId(1, CancellationToken.None); } catch { }
 
-            await _service.GetPageTitleByWebPageItemId(1, CancellationToken.None);
-
-            _queryExecutorMock.Verify(
-                e => e.GetWebPageResult(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<Func<IWebPageContentQueryDataContainer, string>>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    It.IsAny<CancellationToken>()),
-                Times.Once);
+            _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
         }
 
         [Test]
-        public async Task GetPageTitleByWebPageItemId_PassesCancellationToken_ToQueryExecutor()
+        public async Task GetPageTitleByWebPageItemId_ReadsWebsiteChannelName()
         {
-            using var cts = new CancellationTokenSource();
-            var token = cts.Token;
             _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(false);
             _websiteChannelContextMock.Setup(x => x.WebsiteChannelName).Returns("global");
 
-            _queryExecutorMock
-                .Setup(e => e.GetWebPageResult(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<Func<IWebPageContentQueryDataContainer, string>>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    token))
-                .ReturnsAsync([]);
+            try { await _service.GetPageTitleByWebPageItemId(1, CancellationToken.None); } catch { }
 
-            await _service.GetPageTitleByWebPageItemId(1, token);
-
-            _queryExecutorMock.Verify(
-                e => e.GetWebPageResult(
-                    It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<Func<IWebPageContentQueryDataContainer, string>>(),
-                    It.IsAny<ContentQueryExecutionOptions>(),
-                    token),
-                Times.Once);
+            _websiteChannelContextMock.Verify(x => x.WebsiteChannelName, Times.AtLeastOnce);
         }
 
         // --- Helpers -------------------------------------------------------------

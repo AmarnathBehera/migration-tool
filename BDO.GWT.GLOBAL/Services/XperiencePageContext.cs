@@ -37,7 +37,6 @@ public class XperiencePageContext : IPageContext
         _pageBuilderDataContextRetriever = pageBuilderDataContextRetriever;
         _websiteChannelContext = websiteChannelContext;
         _queryExecutor = queryExecutor;
-       
     }
 
     public bool IsInPreviewMode => _websiteChannelContext.IsPreview;
@@ -209,7 +208,6 @@ public class XperiencePageContext : IPageContext
               WebPageItemParentID = item.WebPageItemParentID,
               WebPageItemTreePath = item.WebPageItemTreePath
           },
-
           new ContentQueryExecutionOptions(),
           cancellationToken);
         var curPageMeta = result.FirstOrDefault() ?? new BaseWebPage();

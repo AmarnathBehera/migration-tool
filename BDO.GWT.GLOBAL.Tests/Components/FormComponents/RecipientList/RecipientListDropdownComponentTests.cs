@@ -18,6 +18,11 @@ public class RecipientListDropdownComponentTests
     {
         _recipientListInfoProviderMock = new Mock<IInfoProvider<ContactGroupInfo>>();
         _component = new RecipientListDropdownComponent(_recipientListInfoProviderMock.Object);
+
+        // Use reflection to set the protected Properties property
+        var prop = typeof(FormComponent<RecipientListDropdownProperties, string>)
+            .GetProperty("Properties", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+        prop!.SetValue(_component, new RecipientListDropdownProperties());
     }
 
     // --- IDENTIFIER --------------------------------------------------------------
@@ -145,14 +150,13 @@ public class RecipientListDropdownComponentTests
     [Test]
     public void Options_CallsGet_OnInfoProvider()
     {
-        // ObjectQuery<T> cannot be seeded with test data without a real Kentico DB.
-        // We verify the provider's Get() is invoked and let the pipeline throw naturally.
+        // ObjectQuery<T> cannot be instantiated without a real Kentico DI container.
+        // Make Get() throw immediately so no ObjectQuery is ever constructed, yet
+        // we can still assert that Get() was called exactly once.
         _recipientListInfoProviderMock
             .Setup(p => p.Get())
-            .Returns(new ObjectQuery<ContactGroupInfo>());
+            .Throws(new InvalidOperationException("no DB"));
 
-        // Act — access Options; the ObjectQuery pipeline will throw internally
-        // because there is no DB, but we only care that Get() was called.
         try { _ = _component.Options.ToList(); } catch { }
 
         _recipientListInfoProviderMock.Verify(p => p.Get(), Times.Once);
@@ -211,3 +215,4 @@ public class RecipientListDropdownComponentTests
             "Expected [assembly: RegisterFormComponent(IDENTIFIER, ...)] to be present.");
     }
 }
+
