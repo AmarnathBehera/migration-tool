@@ -13,23 +13,24 @@ namespace BDO.GWT.GLOBAL.API.Controllers;
 // </summary>
 [AllowAnonymous]
 [ApiController]
-[Route("memberFirms/{memberFirmID:int}/People")]
+[Route("memberFirms/{memberFirmID:int}/Users")]
 public class UsersController : EntityControllerBase
 {
+    private readonly IUserApiPermissionsCrudService _userApiPermissionsCrudService;
     private readonly IUserCrudService _userCrudService;
 
-    public UsersController( IUserCrudService userCrudService)
+    public UsersController(IUserApiPermissionsCrudService userApiPermissionsCrudService, IUserCrudService userCrudService)
     {
+        _userApiPermissionsCrudService = userApiPermissionsCrudService;
         _userCrudService = userCrudService;
     }
-
     // <summary>
     // Returns all users.
     // </summary>
     // <param name="userName">User name of the user.</param>
     // <param name="cancellationToken"></param>
     // <returns>Returns a list of users.</returns>
-    [HttpGet("Users")]
+    [HttpGet]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(IEnumerable<UserOutput>), MediaTypeNames.Application.Json)]
     public async Task<ActionResult<IEnumerable<UserOutput>>> Get([FromQuery] string? userName, CancellationToken cancellationToken)
     {
@@ -44,7 +45,7 @@ public class UsersController : EntityControllerBase
     // <param name="userGUID">GUID of the user you want to retrieve.</param>
     // <param name="cancellationToken"></param>
     // <returns>Returns one user.</returns>
-    [HttpGet("Users/{userGUID:guid}")]
+    [HttpGet("{userGUID:guid}")]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(UserOutput), MediaTypeNames.Application.Json)]
     public async Task<ActionResult<UserOutput>> Get(Guid userGUID, CancellationToken cancellationToken)
     {
@@ -59,7 +60,7 @@ public class UsersController : EntityControllerBase
     // <param name="userInput">Input data of the new user.</param>
     // <param name="cancellationToken"></param>
     // <returns>Newly created user.</returns>
-    [HttpPost("Users")]
+    [HttpPost]
     [SwaggerResponse(StatusCodes.Status201Created, null, typeof(UserOutput), MediaTypeNames.Application.Json)]
     public async Task<ActionResult<UserOutput>> Post(int memberFirmID, [FromBody] UserInput userInput, CancellationToken cancellationToken)
     {
@@ -75,7 +76,7 @@ public class UsersController : EntityControllerBase
     // <param name="userInput">Updated user data.</param>
     // <param name="cancellationToken"></param>
     // <returns>Updated user.</returns>
-    [HttpPut("Users/{userGUID:guid}")]
+    [HttpPut("{userGUID:guid}")]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(UserOutput), MediaTypeNames.Application.Json)]
     public async Task<ActionResult<UserOutput>> Put(Guid userGUID, [FromBody] UserInput userInput, CancellationToken cancellationToken)
     {
@@ -90,7 +91,7 @@ public class UsersController : EntityControllerBase
     // <param name="userGUID">GUID of the user.</param>
     // <param name="cancellationToken"></param>
     // <returns>204 No Content.</returns>
-    [HttpDelete("Users/{userGUID:guid}")]
+    [HttpDelete("{userGUID:guid}")]
     [SwaggerResponse(StatusCodes.Status204NoContent, null, typeof(void))]
     public async Task<IActionResult> Delete(Guid userGUID, CancellationToken cancellationToken)
     {
@@ -98,4 +99,19 @@ public class UsersController : EntityControllerBase
 
         return NoContent();
     }
+    /// <summary>
+    /// Returns user API permissions by endpoint group name.
+    /// </summary>
+    /// <param name="memberFirmID">ID of the member firm for which the permissions should be retrieved.</param>
+    /// <param name="userGUID">GUID of the user for which the permissions should be retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>User API permissions by API endpoint group name.</returns>
+    //[HttpGet("{userGUID:guid}/ApiPermissions")]
+    //[SwaggerResponse(StatusCodes.Status200OK, null, typeof(IDictionary<string, ApiEndpointGroupPermissions>), MediaTypeNames.Application.Json)]
+    //public async Task<ActionResult<IDictionary<string, ApiEndpointGroupPermissions>>> GetApiPermissions(int memberFirmID, Guid userGUID, CancellationToken cancellationToken)
+    //{
+    //    var userApiPermissionsByEndpointGroupName = await _userApiPermissionsCrudService.GetUserApiPermissionsByEndpointGroupNameAsync(userGUID, cancellationToken);
+
+    //    return Ok(userApiPermissionsByEndpointGroupName);
+    //}
 }
