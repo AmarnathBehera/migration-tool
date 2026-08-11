@@ -1,6 +1,8 @@
 ﻿using BDO.GWT.Core.DTOs.Footer;
 using BDO.GWT.Core.Services.Footer;
 using BDO.GWT.Core.ValueObjects;
+using BDO.GWT.Domain.Core.Constants;
+using BDO.GWT.GLOBAL.API.Filters;
 using BDO.GWT.GLOBAL.API.Helpers;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
@@ -46,6 +48,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// </summary>
 
         [HttpGet]
+        [HasPermission(ApiMethodGroupName.Footer, ApiPermission.Read)]
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(FooterDto), MediaTypeNames.Application.Json)]        
         public async Task<ActionResult<FooterDto>> Get(CancellationToken cancellationToken)
         {
