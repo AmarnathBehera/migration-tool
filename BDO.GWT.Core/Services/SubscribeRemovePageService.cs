@@ -23,7 +23,11 @@ public class SubscribeRemovePageService : ISubscribeRemovePageService
     {
         var didSuccessfullyUnsubscribe = await _newsletterSubscriptionService.UnsubscribeFromNewsletterAsync(subscribeRemoveQuery, cancellationToken);
 
-        var message = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(didSuccessfullyUnsubscribe ? subscribeRemovePage.SuccessfulUnubscribeMessage : subscribeRemovePage.UnsuccessfulUnsubscribeMessage);
+        var rawMessage = didSuccessfullyUnsubscribe
+            ? subscribeRemovePage?.SuccessfulUnubscribeMessage
+            : subscribeRemovePage?.UnsuccessfulUnsubscribeMessage;
+
+        var message = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(rawMessage ?? string.Empty);
         var subscribeConfirmDto = new SubscribeRemoveDto
         {
             Message = message,

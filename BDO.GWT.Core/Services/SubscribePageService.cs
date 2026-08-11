@@ -40,71 +40,82 @@ public class SubscribePageService : ISubscribePageService
 
     public async Task<SubscribeDto> GetSubscribeDtoAsync(Subscribe? subscribePage, CancellationToken cancellationToken)
     {
-        var redirectPageGuid = subscribePage.RedirectPageOnFormSubmission?.FirstOrDefault()?.WebPageGuid;
-        var redirectPages = redirectPageGuid.HasValue && redirectPageGuid.Value != Guid.Empty
-            ? await _contentRetriever.RetrieveAllPagesByGuids<IWebPageFieldsSource>([redirectPageGuid.Value], cancellationToken: cancellationToken)
-            : Enumerable.Empty<IWebPageFieldsSource>();
-
-        var redirectLink = redirectPages.FirstOrDefault()?.GetUrl()?.RelativePath;
-
-        var dto = new SubscribeDto
+    if (subscribePage is null)
+    {
+        return new SubscribeDto
         {
-            Hero = await _heroService.GetHeroDtoAsync(new HeroData
-            {
-                Layout = subscribePage.HeroLayout,
-                Title = subscribePage.HeroTitle,
-                Description = subscribePage.HeroDescription,
-
-                BackgroundImage = subscribePage.HeroBackgroundImage?
-                    .FirstOrDefault()?
-                    .ContentAttachmentAsset?
-                    .Url is string bgUrl
-                        ? Link.Parse(bgUrl)
-                        : null,
-
-                BackgroundImageAltText = subscribePage.HeroBackgroundImageAltText,
-
-                MobileBackgroundImage = subscribePage.HeroBackgroundImage_Mobile?
-                    .FirstOrDefault()?
-                    .ContentAttachmentAsset?
-                    .Url is string mobileUrl
-                        ? Link.Parse(mobileUrl)
-                        : null,
-
-                MobileBackgroundImageAltText = subscribePage.HeroBackgroundImage_MobileAltText,
-
-                CallToActionButtonType = subscribePage.HeroCallToActionButtonType,
-                CallToActionButtonText = subscribePage.HeroCallToActionButtonText,
-
-                CallToActionButtonUrl = subscribePage.HeroCallToActionButtonUrl?
-                    .FirstOrDefault()?
-                    .SystemFields?
-                    .WebPageUrlPath is string ctaPath
-                        ? Link.Parse(ctaPath)
-                        : null
-            }, cancellationToken),
-            FormType = subscribePage.FormType,
-            EmbedCode = subscribePage.EmbedCode,
-            SubscribeFormDto = subscribePage.FormType == "form" ? new SubscribeFormDto
-            {
-                IsV3 = subscribePage.RecaptchaUseV3,
-                SiteKey = GetRecaptchaPublicKey() ?? string.Empty,
-                EndpointRoute = $"newsletter/subscribe/{subscribePage.SystemFields.WebPageItemGUID}",
-                RedirectUrl = redirectLink ?? string.Empty,
-                Newsletters = await GetAllSiteNewsletterOptionDtos(),
-               // Countries = await GetAllCountriesOptionDtos(cancellationToken),
-                ShowCompanyField = subscribePage.ShowCompanyField,
-                IsCompanyRequired = subscribePage.IsCompanyRequired,
-                ShowJobTitleField = subscribePage.ShowJobTitleField,
-                IsJobTitleRequired = subscribePage.IsJobTitleRequired,
-                ShowCountryField = subscribePage.ShowCountryField,
-                IsCountryRequired = subscribePage.IsCountryRequired,
-                AddConsentToForm = subscribePage.AddConsentToForm,
-            } : null,
+            Hero = new BDO.GWT.Web.Core.DTOs.HeroDto { Layout = string.Empty },
+            FormType = null,
+            EmbedCode = null,
+            SubscribeFormDto = null,
         };
-
-        return dto;
     }
+
+    var redirectPageGuid = subscribePage.RedirectPageOnFormSubmission?.FirstOrDefault()?.WebPageGuid;
+    var redirectPages = redirectPageGuid.HasValue && redirectPageGuid.Value != Guid.Empty
+        ? await _contentRetriever.RetrieveAllPagesByGuids<IWebPageFieldsSource>([redirectPageGuid.Value], cancellationToken: cancellationToken)
+        : Enumerable.Empty<IWebPageFieldsSource>();
+
+    var redirectLink = redirectPages.FirstOrDefault()?.GetUrl()?.RelativePath;
+
+    var dto = new SubscribeDto
+    {
+        Hero = await _heroService.GetHeroDtoAsync(new HeroData
+        {
+            Layout = subscribePage.HeroLayout,
+            Title = subscribePage.HeroTitle,
+            Description = subscribePage.HeroDescription,
+
+            BackgroundImage = subscribePage.HeroBackgroundImage?
+                .FirstOrDefault()?
+                .ContentAttachmentAsset?
+                .Url is string bgUrl
+                    ? Link.Parse(bgUrl)
+                    : null,
+
+            BackgroundImageAltText = subscribePage.HeroBackgroundImageAltText,
+
+            MobileBackgroundImage = subscribePage.HeroBackgroundImage_Mobile?
+                .FirstOrDefault()?
+                .ContentAttachmentAsset?
+                .Url is string mobileUrl
+                    ? Link.Parse(mobileUrl)
+                    : null,
+
+            MobileBackgroundImageAltText = subscribePage.HeroBackgroundImage_MobileAltText,
+
+            CallToActionButtonType = subscribePage.HeroCallToActionButtonType,
+            CallToActionButtonText = subscribePage.HeroCallToActionButtonText,
+
+            CallToActionButtonUrl = subscribePage.HeroCallToActionButtonUrl?
+                .FirstOrDefault()?
+                .SystemFields?
+                .WebPageUrlPath is string ctaPath
+                    ? Link.Parse(ctaPath)
+                    : null
+        }, cancellationToken),
+        FormType = subscribePage.FormType,
+        EmbedCode = subscribePage.EmbedCode,
+        SubscribeFormDto = subscribePage.FormType == "form" ? new SubscribeFormDto
+        {
+            IsV3 = subscribePage.RecaptchaUseV3,
+            SiteKey = GetRecaptchaPublicKey() ?? string.Empty,
+            EndpointRoute = $"newsletter/subscribe/{subscribePage.SystemFields.WebPageItemGUID}",
+            RedirectUrl = redirectLink ?? string.Empty,
+            Newsletters = await GetAllSiteNewsletterOptionDtos(),
+            // Countries = await GetAllCountriesOptionDtos(cancellationToken),
+            ShowCompanyField = subscribePage.ShowCompanyField,
+            IsCompanyRequired = subscribePage.IsCompanyRequired,
+            ShowJobTitleField = subscribePage.ShowJobTitleField,
+            IsJobTitleRequired = subscribePage.IsJobTitleRequired,
+            ShowCountryField = subscribePage.ShowCountryField,
+            IsCountryRequired = subscribePage.IsCountryRequired,
+            AddConsentToForm = subscribePage.AddConsentToForm,
+        } : null,
+    };
+
+    return dto;
+}
 
 
 
