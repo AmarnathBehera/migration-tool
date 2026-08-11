@@ -1,5 +1,7 @@
-﻿using BDO.GWT.GLOBAL.API.Bases;
+﻿using BDO.GWT.Domain.Core.Constants;
+using BDO.GWT.GLOBAL.API.Bases;
 using BDO.GWT.GLOBAL.API.Data;
+using BDO.GWT.GLOBAL.API.Filters;
 using BDO.GWT.GLOBAL.API.Queries;
 using BDO.GWT.GLOBAL.API.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +11,6 @@ using System.Net.Mime;
 
 namespace BDO.GWT.GLOBAL.API.Controllers
 {
-    [AllowAnonymous]
     [ApiController]
     [Route("memberFirms/{memberFirmID:int}/ChannelSettings")]
     public class ChannelSettingsController : EntityControllerBase
@@ -29,6 +30,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Returns a list of channel settings.</returns>
         [HttpGet]
+        [HasPermission(ApiMethodGroupName.ChannelSettings, ApiPermission.Read)]
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(ChannelSettingOutput[]), MediaTypeNames.Application.Json)]
         public async Task<ActionResult<ChannelSettingOutput[]>> GetChannelSettings(int memberFirmID, [FromQuery] SettingsQuery query, CancellationToken cancellationToken)
         {
@@ -45,6 +47,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Returns one channel setting.</returns>
         [HttpGet("{codeName}")]
+        [HasPermission(ApiMethodGroupName.ChannelSettings, ApiPermission.Read)]
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(ChannelSettingOutput), MediaTypeNames.Application.Json)]
         public async Task<ActionResult<ChannelSettingOutput[]>> GetChannelSetting(int memberFirmID, string codeName, CancellationToken cancellationToken)
         {
