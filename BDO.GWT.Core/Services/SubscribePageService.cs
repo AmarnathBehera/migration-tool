@@ -16,7 +16,7 @@ namespace BDO.GWT.Core.Services;
 
 public interface ISubscribePageService
 {
-    Task<SubscribeDto> GetSubscribeDtoAsync(Subscribe subscribePage, CancellationToken cancellationToken);
+    Task<SubscribeDto> GetSubscribeDtoAsync(Subscribe? subscribePage, CancellationToken cancellationToken);
 }
 
 public class SubscribePageService : ISubscribePageService
@@ -38,7 +38,7 @@ public class SubscribePageService : ISubscribePageService
 
     }
 
-    public async Task<SubscribeDto> GetSubscribeDtoAsync(Subscribe subscribePage, CancellationToken cancellationToken)
+    public async Task<SubscribeDto> GetSubscribeDtoAsync(Subscribe? subscribePage, CancellationToken cancellationToken)
     {
         var redirectPageGuid = subscribePage.RedirectPageOnFormSubmission?.FirstOrDefault()?.WebPageGuid;
         var redirectPages = redirectPageGuid.HasValue && redirectPageGuid.Value != Guid.Empty

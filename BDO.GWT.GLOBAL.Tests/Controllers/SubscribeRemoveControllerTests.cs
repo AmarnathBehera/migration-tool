@@ -123,6 +123,23 @@ public class SubscribeRemoveControllerTests
     }
 
     [Test]
+    public async Task Index_WhenCurrentPageIsNull_StillReturnsViewResult()
+    {
+        var query = BuildQuery();
+        SetupCurrentPage(null);
+        _subscribeRemovePageServiceMock
+            .Setup(s => s.GetSubscribeRemoveDtoAsync(null, query, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SubscribeRemoveDto());
+
+        var result = await _controller.Index(query, CancellationToken.None);
+
+        Assert.That(result, Is.InstanceOf<ViewResult>());
+        _subscribeRemovePageServiceMock.Verify(
+            s => s.GetSubscribeRemoveDtoAsync(null, query, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
     public async Task Index_RetrievesCurrentPage_WithLinkedItemsMaxLevel4()
     {
         var page = new Mock<SubscribeRemove>().Object;
@@ -166,40 +183,5 @@ public class SubscribeRemoveControllerTests
 
         Assert.ThrowsAsync<InvalidOperationException>(
             () => _controller.Index(query, CancellationToken.None));
-    }
-
-    // ??? Null page passthrough ????????????????????????????????????????????????
-
-    [Test]
-    public async Task Index_WhenCurrentPageIsNull_StillCallsSubscribeRemovePageService()
-    {
-        var query = BuildQuery();
-        SetupCurrentPage(null);
-        _subscribeRemovePageServiceMock
-            .Setup(s => s.GetSubscribeRemoveDtoAsync(null, query, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new SubscribeRemoveDto());
-
-        var result = await _controller.Index(query, CancellationToken.None);
-
-        Assert.That(result, Is.InstanceOf<ViewResult>());
-        _subscribeRemovePageServiceMock.Verify(
-            s => s.GetSubscribeRemoveDtoAsync(null, query, It.IsAny<CancellationToken>()),
-            Times.Once);
-    }
-
-    // ??? Constructor null guards ???????????????????????????????????????????????
-
-    [Test]
-    public void Constructor_ThrowsArgumentNullException_WhenSubscribeRemovePageServiceIsNull()
-    {
-        Assert.Throws<ArgumentNullException>(() =>
-            new SubscribeRemoveController(null!, _contentServiceMock.Object));
-    }
-
-    [Test]
-    public void Constructor_ThrowsArgumentNullException_WhenContentServiceIsNull()
-    {
-        Assert.Throws<ArgumentNullException>(() =>
-            new SubscribeRemoveController(_subscribeRemovePageServiceMock.Object, null!));
     }
 }

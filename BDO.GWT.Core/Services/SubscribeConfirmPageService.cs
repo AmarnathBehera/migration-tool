@@ -10,7 +10,7 @@ namespace BDO.GWT.Web.Core.LiveSite.Services;
 
 public interface ISubscribeConfirmPageService
 {
-    Task<SubscribeConfirmDto> GetSubscribeConfirmDtoAsync(SubscribeConfirm subscribeConfirmPage, SubscribeConfirmQuery subscribeConfirmQuery, CancellationToken cancellationToken);
+    Task<SubscribeConfirmDto> GetSubscribeConfirmDtoAsync(SubscribeConfirm? subscribeConfirmPage, SubscribeConfirmQuery subscribeConfirmQuery, CancellationToken cancellationToken);
 }
 
 public class SubscribeConfirmPageService : ISubscribeConfirmPageService
@@ -20,11 +20,11 @@ public class SubscribeConfirmPageService : ISubscribeConfirmPageService
 
     public SubscribeConfirmPageService(ISiteContext siteContext, INewsletterSubscriptionService newsletterSubscriptionService)
     {
-        _siteContext = siteContext ?? throw new ArgumentNullException(nameof(siteContext));
-        _newsletterSubscriptionService = newsletterSubscriptionService ?? throw new ArgumentNullException(nameof(newsletterSubscriptionService));
+        _siteContext = siteContext;
+        _newsletterSubscriptionService = newsletterSubscriptionService;
     }
 
-    public async Task<SubscribeConfirmDto> GetSubscribeConfirmDtoAsync(SubscribeConfirm subscribeConfirmPage, SubscribeConfirmQuery subscribeConfirmQuery, CancellationToken cancellationToken)
+    public async Task<SubscribeConfirmDto> GetSubscribeConfirmDtoAsync(SubscribeConfirm? subscribeConfirmPage, SubscribeConfirmQuery subscribeConfirmQuery, CancellationToken cancellationToken)
     {
         var didSuccessfullySubscribe = await _newsletterSubscriptionService.ConfirmSubscriptionForNewsletterAsync(subscribeConfirmQuery, _siteContext.CurrentSiteName, cancellationToken);
 

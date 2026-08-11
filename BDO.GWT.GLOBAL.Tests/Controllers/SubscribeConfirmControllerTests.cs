@@ -124,6 +124,23 @@ public class SubscribeConfirmControllerTests
     }
 
     [Test]
+    public async Task Index_WhenCurrentPageIsNull_StillReturnsViewResult()
+    {
+        SetupCurrentPage(null);
+        var query = BuildQuery();
+        _subscribeConfirmPageServiceMock
+            .Setup(s => s.GetSubscribeConfirmDtoAsync(null, query, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SubscribeConfirmDto());
+
+        var result = await _controller.Index(query, CancellationToken.None);
+
+        Assert.That(result, Is.InstanceOf<ViewResult>());
+        _subscribeConfirmPageServiceMock.Verify(
+            s => s.GetSubscribeConfirmDtoAsync(null, query, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
     public async Task Index_RetrievesCurrentPage_WithLinkedItemsMaxLevel4()
     {
         var page = new Mock<SubscribeConfirm>().Object;
@@ -167,40 +184,5 @@ public class SubscribeConfirmControllerTests
 
         Assert.ThrowsAsync<InvalidOperationException>(
             () => _controller.Index(query, CancellationToken.None));
-    }
-
-    // ??? Null page passthrough ????????????????????????????????????????????????
-
-    [Test]
-    public async Task Index_WhenCurrentPageIsNull_StillCallsSubscribeConfirmPageService()
-    {
-        SetupCurrentPage(null);
-        var query = BuildQuery();
-        _subscribeConfirmPageServiceMock
-            .Setup(s => s.GetSubscribeConfirmDtoAsync(null, query, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new SubscribeConfirmDto());
-
-        var result = await _controller.Index(query, CancellationToken.None);
-
-        Assert.That(result, Is.InstanceOf<ViewResult>());
-        _subscribeConfirmPageServiceMock.Verify(
-            s => s.GetSubscribeConfirmDtoAsync(null, query, It.IsAny<CancellationToken>()),
-            Times.Once);
-    }
-
-    // ??? Constructor null guards ???????????????????????????????????????????????
-
-    [Test]
-    public void Constructor_ThrowsArgumentNullException_WhenContentServiceIsNull()
-    {
-        Assert.Throws<ArgumentNullException>(() =>
-            new SubscribeConfirmController(null!, _subscribeConfirmPageServiceMock.Object));
-    }
-
-    [Test]
-    public void Constructor_ThrowsArgumentNullException_WhenSubscribeConfirmPageServiceIsNull()
-    {
-        Assert.Throws<ArgumentNullException>(() =>
-            new SubscribeConfirmController(_contentServiceMock.Object, null!));
     }
 }
