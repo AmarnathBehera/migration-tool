@@ -229,6 +229,39 @@ public class NewsletterSubscriptionServiceTests
             () => _service.ConfirmSubscriptionForNewsletterAsync(query, "TestSite", CancellationToken.None));
     }
 
+    [Test]
+    public async Task ConfirmSubscriptionForNewsletterAsync_DoesNotCallConfirmationProvider_WhenSubscriptionHashIsEmpty()
+    {
+        var query = BuildConfirmQuery(subscriptionHash: string.Empty);
+
+        var result = await _service.ConfirmSubscriptionForNewsletterAsync(query, "TestSite", CancellationToken.None);
+
+        Assert.That(result, Is.False);
+        _emailSubscriptionConfirmationInfoProviderMock.Verify(p => p.Get(), Times.Never);
+    }
+
+    [Test]
+    public async Task ConfirmSubscriptionForNewsletterAsync_DoesNotCallConfirmationProvider_WhenDateTimeIsInvalidFormat()
+    {
+        var query = BuildConfirmQuery(dateTime: "invalid");
+
+        var result = await _service.ConfirmSubscriptionForNewsletterAsync(query, "TestSite", CancellationToken.None);
+
+        Assert.That(result, Is.False);
+        _emailSubscriptionConfirmationInfoProviderMock.Verify(p => p.Get(), Times.Never);
+    }
+
+    [Test]
+    public async Task ConfirmSubscriptionForNewsletterAsync_DoesNotCallConfirmationProvider_WhenSubscriptionHashIsNull()
+    {
+        var query = BuildConfirmQuery(subscriptionHash: null!);
+
+        var result = await _service.ConfirmSubscriptionForNewsletterAsync(query, "TestSite", CancellationToken.None);
+
+        Assert.That(result, Is.False);
+        _emailSubscriptionConfirmationInfoProviderMock.Verify(p => p.Get(), Times.Never);
+    }
+
     // --- UnsubscribeFromNewsletterAsync -----------------------------------------
 
     [Test]
@@ -334,5 +367,38 @@ public class NewsletterSubscriptionServiceTests
         await _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None);
 
         _recipientListInfoProviderMock.Verify(p => p.Get(), Times.Never);
+    }
+
+    [Test]
+    public async Task UnsubscribeFromNewsletterAsync_DoesNotValidateHash_WhenEmailIsEmpty()
+    {
+        var query = BuildRemoveQuery(email: string.Empty);
+
+        var result = await _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None);
+
+        Assert.That(result, Is.False);
+        _hashValidatorMock.Verify(h => h.ValidateEmailHash(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Test]
+    public async Task UnsubscribeFromNewsletterAsync_DoesNotValidateHash_WhenNewsletterGuidIsEmpty()
+    {
+        var query = BuildRemoveQuery(newsletterGuid: Guid.Empty);
+
+        var result = await _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None);
+
+        Assert.That(result, Is.False);
+        _hashValidatorMock.Verify(h => h.ValidateEmailHash(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Test]
+    public async Task UnsubscribeFromNewsletterAsync_DoesNotValidateHash_WhenHashIsEmpty()
+    {
+        var query = BuildRemoveQuery(hash: string.Empty);
+
+        var result = await _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None);
+
+        Assert.That(result, Is.False);
+        _hashValidatorMock.Verify(h => h.ValidateEmailHash(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 }
