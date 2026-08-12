@@ -17,9 +17,6 @@ namespace BDO.GWT.Core.Services
 
     public class RecaptchaValidationService : IRecaptchaValidationService
     {
-        private const string RecaptchaVersionV2 = "RecaptchaV2";
-        private const string RecaptchaVersionV3 = "RecaptchaV3";
-
         private readonly IWebsiteChannelContext _websiteChannelContext;
         private readonly IInfoProvider<WebsiteCaptchaSettingsInfo> _captchaSettingsProvider;
 
