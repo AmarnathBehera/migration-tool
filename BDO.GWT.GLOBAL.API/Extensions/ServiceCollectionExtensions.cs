@@ -55,5 +55,6 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IChannelCrudService, ChannelCrudService>();
         serviceCollection.AddScoped<IChannelInfoService, ChannelInfoService>();
         serviceCollection.AddScoped<IUserCrudService, UserCrudService>();
+        serviceCollection.AddScoped<IContentService1, ContentService1>();
     }
 }
