@@ -533,6 +533,14 @@ where T : class
             return result.FirstOrDefault();
         }
 
+        public async Task<IEnumerable<T>> GetPagesByGuidsAsync<T>(
+            IEnumerable<Guid> guids,
+            CancellationToken cancellationToken = default)
+            where T : class, IWebPageFieldsSource
+        {
+            return await _contentRetriever.RetrieveAllPagesByGuids<T>(guids.ToList(), cancellationToken: cancellationToken);
+        }
+
         public async Task<IEnumerable<IContentItemFieldsSource>> RetrieveButtonUrlAsync(
             IEnumerable<Guid> guids,
             string[] contentTypes)

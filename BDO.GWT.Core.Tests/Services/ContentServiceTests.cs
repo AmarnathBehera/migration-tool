@@ -375,6 +375,167 @@ namespace BDO.GWT.Core.Tests.Services
                 Times.Once);
         }
 
+        // -------------------------------------------------------------------------
+        // GetCurrentLanguage
+        // -------------------------------------------------------------------------
+
+        [Test]
+        public void GetCurrentLanguage_ReturnsCurrentLanguageTag()
+        {
+            var lang = _service.GetCurrentLanguage();
+
+            Assert.That(lang, Is.EqualTo("en-US"));
+        }
+
+        [Test]
+        public void GetCurrentLanguage_ReflectsChangedLanguageTag()
+        {
+            _cultureContextMock.SetupGet(x => x.CurrentLanguageTag).Returns("fr-FR");
+
+            Assert.That(_service.GetCurrentLanguage(), Is.EqualTo("fr-FR"));
+        }
+
+        // -------------------------------------------------------------------------
+        // EnsureAbsoluteUrl
+        // -------------------------------------------------------------------------
+
+        [Test]
+        public void EnsureAbsoluteUrl_ReturnsNull_WhenUrlIsNull()
+        {
+            var result = _service.EnsureAbsoluteUrl(null);
+
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public void EnsureAbsoluteUrl_ReturnsEmpty_WhenUrlIsEmpty()
+        {
+            var result = _service.EnsureAbsoluteUrl(string.Empty);
+
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void EnsureAbsoluteUrl_ReturnsWhitespace_WhenUrlIsWhitespace()
+        {
+            var result = _service.EnsureAbsoluteUrl("   ");
+
+            Assert.That(result, Is.EqualTo("   "));
+        }
+
+        [Test]
+        public void EnsureAbsoluteUrl_ReturnsUnchanged_WhenUrlStartsWithHttps()
+        {
+            const string url = "https://example.com/path";
+
+            var result = _service.EnsureAbsoluteUrl(url);
+
+            Assert.That(result, Is.EqualTo(url));
+        }
+
+        [Test]
+        public void EnsureAbsoluteUrl_ReturnsUnchanged_WhenUrlStartsWithHttp()
+        {
+            const string url = "http://example.com/path";
+
+            var result = _service.EnsureAbsoluteUrl(url);
+
+            Assert.That(result, Is.EqualTo(url));
+        }
+
+        [Test]
+        public void EnsureAbsoluteUrl_ReturnsUnchanged_WhenUrlStartsWithSlash()
+        {
+            const string url = "/relative/path";
+
+            var result = _service.EnsureAbsoluteUrl(url);
+
+            Assert.That(result, Is.EqualTo(url));
+        }
+
+        [Test]
+        public void EnsureAbsoluteUrl_PrependsHttps_WhenUrlHasNoScheme()
+        {
+            const string url = "example.com/path";
+
+            var result = _service.EnsureAbsoluteUrl(url);
+
+            Assert.That(result, Is.EqualTo("https://example.com/path"));
+        }
+
+        [Test]
+        public void EnsureAbsoluteUrl_PrependsHttps_WhenUrlIsJustDomain()
+        {
+            var result = _service.EnsureAbsoluteUrl("example.com");
+
+            Assert.That(result, Is.EqualTo("https://example.com"));
+        }
+
+        [Test]
+        public void EnsureAbsoluteUrl_HttpScheme_IsCaseInsensitive()
+        {
+            const string url = "HTTP://example.com";
+
+            var result = _service.EnsureAbsoluteUrl(url);
+
+            Assert.That(result, Is.EqualTo(url));
+        }
+
+        [Test]
+        public void EnsureAbsoluteUrl_HttpsScheme_IsCaseInsensitive()
+        {
+            const string url = "HTTPS://example.com";
+
+            var result = _service.EnsureAbsoluteUrl(url);
+
+            Assert.That(result, Is.EqualTo(url));
+        }
+
+        // -------------------------------------------------------------------------
+        // GetItemsByTypesAsync – type without CONTENT_TYPE_NAME throws
+        // -------------------------------------------------------------------------
+
+        [Test]
+        public void GetItemsByTypesAsync_ThrowsInvalidOperationException_WhenTypeHasNoCONTENT_TYPE_NAME()
+        {
+            Assert.ThrowsAsync<InvalidOperationException>(
+                () => _service.GetItemsByTypesAsync(
+                    new[] { typeof(TypeWithoutContentTypeName) },
+                    1,
+                    CancellationToken.None));
+        }
+
+        // -------------------------------------------------------------------------
+        // GetItemsChannelOnChannelIdAsync – ForPreview false
+        // -------------------------------------------------------------------------
+
+        [Test]
+        public async Task GetItemsChannelOnChannelIdAsync_WhenPreviewIsFalse_ForPreviewIsFalse()
+        {
+            _websiteChannelContextMock.SetupGet(x => x.IsPreview).Returns(false);
+
+            ContentQueryExecutionOptions? capturedOptions = null;
+
+            _executorMock
+                .Setup(x => x.GetResult<TestContentItem>(
+                    It.IsAny<ContentItemQueryBuilder>(),
+                    It.IsAny<Func<IContentQueryDataContainer, TestContentItem>>(),
+                    It.IsAny<ContentQueryExecutionOptions>(),
+                    It.IsAny<CancellationToken>()))
+                .Callback<ContentItemQueryBuilder, Func<IContentQueryDataContainer, TestContentItem>, ContentQueryExecutionOptions, CancellationToken>(
+                    (_, _, options, _) => capturedOptions = options)
+                .ReturnsAsync(Enumerable.Empty<TestContentItem>());
+
+            await _service.GetItemsChannelOnChannelIdAsync<TestContentItem>(
+                cultureName: "en-US",
+                configure: null,
+                cancellationToken: CancellationToken.None,
+                channelId: 1);
+
+            Assert.That(capturedOptions, Is.Not.Null);
+            Assert.That(capturedOptions!.ForPreview, Is.False);
+        }
+
         /// <summary>
         /// Minimal stand-in model exposing the CONTENT_TYPE_NAME convention required by
         /// ContentService's internal GetContentTypeName&lt;T&gt;() reflection helper.
@@ -382,6 +543,19 @@ namespace BDO.GWT.Core.Tests.Services
         private class TestContentItem
         {
             public const string CONTENT_TYPE_NAME = "Test.ContentItem";
+        }
+
+        /// <summary>A type that deliberately does NOT expose CONTENT_TYPE_NAME.</summary>
+        private class TypeWithoutContentTypeName { }
+
+        [Test]
+        public void GetPagesAsync_NonGenericContentBuilderOverload_ThrowsNotImplementedException()
+        {
+            Assert.Throws<NotImplementedException>(() => _service.GetPagesAsync<TestContentItem>(
+                new RetrievePagesParameters(),
+                builder => builder,
+                RetrievalCacheSettings.CacheDisabled,
+                CancellationToken.None));
         }
     }
 }
