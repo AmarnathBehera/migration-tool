@@ -475,63 +475,19 @@ namespace BDO.GWT.GLOBAL.API.Helpers
                 .ToList();
         }
 
-        public async Task<List<ContentItemReference>> BuildReferencesCarAsync<T>(
+        public Task<List<ContentItemReference>> BuildReferencesCarAsync<T>(
             IEnumerable<string>? identifiers,
             Func<T, string> nameSelector,
             CancellationToken cancellationToken)
-            where T : class, IWebPageFieldsSource
-        {
-            var names = identifiers?
-                .Where(name => !string.IsNullOrWhiteSpace(name))
-                .Select(name => name.Trim())
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList() ?? new List<string>();
+            where T : class, IWebPageFieldsSource =>
+            BuildReferencesAsync(identifiers, nameSelector, cancellationToken);
 
-            if (names.Count == 0)
-            {
-                return new List<ContentItemReference>();
-            }
-
-            var items = await _contentRetriever.GetItemsAsync<T>(
-                builder => builder.Parameters(p => p.Where(w => w.WhereIn("Name", names))),
-                cancellationToken);
-
-            return items
-                .Where(item => names.Contains(nameSelector(item), StringComparer.OrdinalIgnoreCase))
-                .Select(item => item.SystemFields.ContentItemGUID)
-                .Distinct()
-                .Select(guid => new ContentItemReference { Identifier = guid })
-                .ToList();
-        }
-
-        public async Task<List<ContentItemReference>> BuildReferencesPageCarAsync<T>(
+        public Task<List<ContentItemReference>> BuildReferencesPageCarAsync<T>(
             IEnumerable<string>? identifiers,
             Func<T, string> nameSelector,
             CancellationToken cancellationToken)
-            where T : class, IWebPageFieldsSource
-        {
-            var names = identifiers?
-                .Where(name => !string.IsNullOrWhiteSpace(name))
-                .Select(name => name.Trim())
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList() ?? new List<string>();
-
-            if (names.Count == 0)
-            {
-                return new List<ContentItemReference>();
-            }
-
-            var items = await _contentRetriever.GetItemsAsync<T>(
-                builder => builder.Parameters(p => p.Where(w => w.WhereIn("MetadataTitle", names))),
-                cancellationToken);
-
-            return items
-                .Where(item => names.Contains(nameSelector(item), StringComparer.OrdinalIgnoreCase))
-                .Select(item => item.SystemFields.ContentItemGUID)
-                .Distinct()
-                .Select(guid => new ContentItemReference { Identifier = guid })
-                .ToList();
-        }
+            where T : class, IWebPageFieldsSource =>
+            BuildReferencesPageAsync(identifiers, nameSelector, cancellationToken);
 
         public async Task<LanguageTag?> ValidateAndNormalizeSiteCultureAsync(int channelId, string languageTagString, CancellationToken cancellationToken)
         {

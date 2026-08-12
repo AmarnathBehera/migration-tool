@@ -76,7 +76,7 @@ namespace BDO.GWT.GLOBAL.Tests.Services
         {
             _httpContextAccessorMock
                 .Setup(x => x.HttpContext)
-                .Returns((Microsoft.AspNetCore.Http.HttpContext)null);
+                .Returns((HttpContext?)null);
 
             Assert.That(_service.IsInPageBuilderMode, Is.False);
         }

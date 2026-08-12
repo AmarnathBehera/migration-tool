@@ -51,8 +51,7 @@ public class HashValidatorTests
 
     private static string ComputeExpectedHash(string value)
     {
-        using var sha256 = SHA256.Create();
         var bytes = Encoding.UTF8.GetBytes(value);
-        return Convert.ToHexString(sha256.ComputeHash(bytes)).ToLower();
+        return Convert.ToHexString(SHA256.HashData(bytes)).ToLower();
     }
 }
