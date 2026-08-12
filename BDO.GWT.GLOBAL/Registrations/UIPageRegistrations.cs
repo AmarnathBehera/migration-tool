@@ -37,6 +37,14 @@ using Kentico.Xperience.Admin.Base;
     templateName: TemplateNames.EDIT,
     order: 2)]
 
+[assembly: UIPage(
+    parentType: typeof(GlobalSettings),
+    slug: "api-permission",
+    uiPageType: typeof(ApiPermissionEditPage),
+    name: "API Permission",
+    templateName: TemplateNames.EDIT,
+    order: 2)]
+
 
 
 

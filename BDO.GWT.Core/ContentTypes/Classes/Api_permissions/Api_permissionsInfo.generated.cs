@@ -1,7 +1,5 @@
 using System;
 using System.Data;
-using System.Collections.Generic;
-using System.Linq;
 
 using CMS;
 using CMS.DataEngine;
@@ -30,10 +28,6 @@ namespace BDO
         public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(IInfoProvider<Api_permissionsInfo>), OBJECT_TYPE, "bdo.api_permissions", "Api_permissionsID", null, null, null, null, null, null, null)
         {
             TouchCacheDependencies = true,
-            DependsOn = new List<ObjectDependency>()
-            {
-                new ObjectDependency("Channel", "cms.channel", ObjectDependencyEnum.RequiredHasDefault),
-            },
         };
 
 
@@ -52,9 +46,9 @@ namespace BDO
         /// Channel.
         /// </summary>
         [DatabaseField]
-        public virtual int Channel
+        public virtual string Channel
         {
-            get => ValidationHelper.GetInteger(GetValue(nameof(Channel)), 0);
+            get => ValidationHelper.GetString(GetValue(nameof(Channel)), String.Empty);
             set => SetValue(nameof(Channel), value);
         }
 
