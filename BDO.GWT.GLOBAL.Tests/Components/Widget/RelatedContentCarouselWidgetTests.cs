@@ -215,7 +215,7 @@ public class RelatedContentCarouselWidgetTests
             Assert.That(capturedData.SelectedPageTypes, Contains.Item(nameof(NewsArticle)));
             Assert.That(capturedData.SelectedPageTypes, Contains.Item(nameof(Webinar)));
             Assert.That(capturedData.SelectedPageTypes, Contains.Item(nameof(MicrositePage)));
-        })
+        });
     }
 
     [Test]

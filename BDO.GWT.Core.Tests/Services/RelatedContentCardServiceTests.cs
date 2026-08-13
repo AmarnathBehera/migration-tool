@@ -434,7 +434,7 @@ public class RelatedContentCardServiceTests
     [Test]
     public async Task GetFilteredItemsAsync_DecorateQueryIsInvoked()
     {
-
+        bool decorateCalled = false;
         Action<RetrievePagesQueryParameters> decorateQuery = _ => decorateCalled = true;
 
         // Simple setup — no Callback needed, just verify our delegate gets called
