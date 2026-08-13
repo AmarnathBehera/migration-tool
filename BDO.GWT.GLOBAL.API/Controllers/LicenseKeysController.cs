@@ -61,7 +61,7 @@ public class LicenseKeysController : EntityControllerBase
     /// <returns>204 No Content.</returns>
     [HttpDelete("{licenseKeyID:int}")]
     [SwaggerResponse(StatusCodes.Status204NoContent, null, typeof(void))]
-    public async Task<IActionResult> Delete(int licenseKeyID, CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete(CancellationToken cancellationToken)
     {
         await _licenseKeysCrudService.DeleteLicenseKeyAsync(cancellationToken);
 

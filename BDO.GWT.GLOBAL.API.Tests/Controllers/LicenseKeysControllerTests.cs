@@ -146,7 +146,7 @@ public class LicenseKeysControllerTests
             .Setup(x => x.DeleteLicenseKeyAsync(It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
-        var result = await _controller.Delete(1, CancellationToken.None);
+        var result = await _controller.Delete(CancellationToken.None);
 
         Assert.That(result, Is.InstanceOf<NoContentResult>());
     }
@@ -158,7 +158,7 @@ public class LicenseKeysControllerTests
             .Setup(x => x.DeleteLicenseKeyAsync(It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
-        await _controller.Delete(1, CancellationToken.None);
+        await _controller.Delete(CancellationToken.None);
 
         _licenseKeysCrudServiceMock.Verify(
             x => x.DeleteLicenseKeyAsync(It.IsAny<CancellationToken>()),
