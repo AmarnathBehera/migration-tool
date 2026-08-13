@@ -12,7 +12,6 @@ namespace BDO.GWT.GLOBAL.API.Controllers;
 /// Provides methods to read and manage license keys.
 /// </summary>
 /// 
-[AllowAnonymous]
 [ApiController]
 //[AuthorizeUserPrivilegeLevel(UserPrivilegeLevel.GlobalAdministrator)]
 [Route("memberFirms/{memberFirmID:int}/LicenseKeys")]
@@ -59,7 +58,7 @@ public class LicenseKeysController : EntityControllerBase
     /// </summary>
     /// <param name="cancellationToken"></param>
     /// <returns>204 No Content.</returns>
-    [HttpDelete("{licenseKeyID:int}")]
+    [HttpDelete]
     [SwaggerResponse(StatusCodes.Status204NoContent, null, typeof(void))]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken)
     {
