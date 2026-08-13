@@ -294,7 +294,7 @@ step "deploy-api-app-service" {
                   },
                                     {
                     "name": "AzureAd__Audience",
-                    "value": "api://#{appsettings.apiAppAudience}",
+                    "value": "#{appsettings.apiAppAudience}",
                     "slotSetting": false
                   },
                   {
