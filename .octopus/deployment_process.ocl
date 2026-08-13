@@ -284,12 +284,17 @@ step "deploy-api-app-service" {
                   },
                   {
                     "name": "AzureAd__ClientId",
-                    "value": "#{appsettings.azureAdClientId}",
+                    "value": "#{appsettings.azureAdApiClientId}",
                     "slotSetting": false
                   },
                   {
                     "name": "AzureAd__ClientSecret",
-                    "value": "#{appsettings.azureAdClientSecret}",
+                    "value": "#{appsettings.azureAdApiClientSecret}",
+                    "slotSetting": false
+                  },
+                                    {
+                    "name": "AzureAd__Audience",
+                    "value": "api://#{appsettings.azureAdApiClientSecret}",
                     "slotSetting": false
                   },
                   {
