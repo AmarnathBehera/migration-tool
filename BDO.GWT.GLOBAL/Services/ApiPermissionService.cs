@@ -1,7 +1,6 @@
 using BDO;
 using CMS.DataEngine;
 using CMS.Membership;
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -14,7 +13,7 @@ public interface IApiPermissionService
     IReadOnlyList<MethodGroupOption> GetMethodGroups();
     IReadOnlyList<MatrixRow> GetMatrixByUser(int userId);
     IReadOnlyList<MatrixRow> GetMatrixByMethodGroup(int methodGroupId);
-    void SetPermission(int userId, int methodGroupId, string permissionType, bool allow);
+    void SetPermission(int userId, int methodGroupId, bool allowRead, bool allowManage);
 }
 
 public sealed class ApiPermissionService : IApiPermissionService
@@ -100,35 +99,35 @@ public sealed class ApiPermissionService : IApiPermissionService
         }).ToList();
     }
 
-    public void SetPermission(int userId, int methodGroupId, string permissionType, bool allow)
+    public void SetPermission(int userId, int methodGroupId, bool allowRead, bool allowManage)
     {
-        var record = GetPermissionRecord(userId, methodGroupId);
-
-        var read = record != null && HasFlag(record.FilterBy, ReadFlag);
-        var manage = record != null && HasFlag(record.FilterBy, ManageFlag);
-
-        if (string.Equals(permissionType, ReadFlag, StringComparison.OrdinalIgnoreCase))
-        {
-            read = allow;
-        }
-        else if (string.Equals(permissionType, ManageFlag, StringComparison.OrdinalIgnoreCase))
-        {
-            manage = allow;
-        }
-
-        var filterBy = BuildFilterBy(read, manage);
-
-        if (record == null)
-        {
-            record = new Api_permissionsInfo
+        var record = GetPermissionRecord(userId, methodGroupId)
+            ?? new Api_permissionsInfo
             {
                 User = userId.ToString(CultureInfo.InvariantCulture),
                 MethodGroup = methodGroupId.ToString(CultureInfo.InvariantCulture),
+                APIPermissionWebChannelSettingID = ResolveWebChannelSettingId(),
             };
+
+        record.Read = allowRead;
+        record.Manage = allowManage;
+
+        permissionProvider.Set(record);
+    }
+
+    // The edit page persists the current WebChannelSettingsId on the backing record; reuse it.
+    private string ResolveWebChannelSettingId()
+    {
+        foreach (var record in permissionProvider.Get())
+        {
+            var settingId = record.APIPermissionWebChannelSettingID;
+            if (!string.IsNullOrEmpty(settingId))
+            {
+                return settingId;
+            }
         }
 
-        record.FilterBy = filterBy;
-        permissionProvider.Set(record);
+        return "0";
     }
 
     private Dictionary<(int UserId, int MethodGroupId), (bool Read, bool Manage)> GetPermissionLookup()
@@ -142,7 +141,7 @@ public sealed class ApiPermissionService : IApiPermissionService
                 continue;
             }
 
-            lookup[(userId, methodGroupId)] = (HasFlag(record.FilterBy, ReadFlag), HasFlag(record.FilterBy, ManageFlag));
+            lookup[(userId, methodGroupId)] = (record.Read, record.Manage);
         }
 
         return lookup;
@@ -167,30 +166,6 @@ public sealed class ApiPermissionService : IApiPermissionService
         return int.TryParse(record.User, out userId)
             && int.TryParse(record.MethodGroup, out methodGroupId);
     }
-
-    private static bool HasFlag(string filterBy, string flag) =>
-        (filterBy ?? string.Empty)
-            .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Any(f => string.Equals(f, flag, StringComparison.OrdinalIgnoreCase));
-
-    private static string BuildFilterBy(bool read, bool manage)
-    {
-        var flags = new List<string>();
-        if (read)
-        {
-            flags.Add(ReadFlag);
-        }
-
-        if (manage)
-        {
-            flags.Add(ManageFlag);
-        }
-
-        return string.Join(';', flags);
-    }
-
-    private const string ReadFlag = "read";
-    private const string ManageFlag = "manage";
 
     private static string GetDisplayName(UserInfo user)
     {

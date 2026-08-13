@@ -5,9 +5,10 @@
     <form>
       <field column="Api_permissionsID" columntype="integer" enabled="true" guid="6fbd237e-c0ea-4fb0-a4c3-faef8ba40095" isPK="true" />
       <field column="APIPermissionWebChannelSettingID" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="c3c6e82d-e3f7-478f-9d0d-d406db08a445" />
-      <field allowempty="true" column="Permission" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7c9a5b8a-0793-4cad-831f-8c05fffb3850" />
       <field allowempty="true" column="MethodGroup" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="9a586340-ca73-4228-b66e-6025b3e53288" />
       <field allowempty="true" column="User" columnprecision="0" columntype="longtext" enabled="true" guid="000f510f-973e-494d-bb77-c53b06325891" />
+      <field allowempty="true" column="Read" columnprecision="0" columntype="boolean" enabled="true" guid="7c9a5b8a-0793-4cad-831f-8c05fffb3850" />
+      <field allowempty="true" column="Manage" columnprecision="0" columntype="boolean" enabled="true" guid="6d4c07b8-0c1c-4723-91ed-9bdfb8006177" />
     </form>
   </ClassFormDefinition>
   <ClassGUID>82520283-f987-45b4-bb6e-6204f70f34b4</ClassGUID>

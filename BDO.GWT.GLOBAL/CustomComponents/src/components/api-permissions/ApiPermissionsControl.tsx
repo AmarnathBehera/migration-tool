@@ -76,14 +76,18 @@ export const ApiPermissionsControl = (props: FormComponentProps) => {
         userId: number, methodGroupId: number,
         permType: "read" | "manage", allow: boolean
     ) => {
+        const current = matrix.find(r => r.userId === userId && r.methodGroupId === methodGroupId);
+        const allowRead = permType === "read" ? allow : (current?.allowRead ?? false);
+        const allowManage = permType === "manage" ? allow : (current?.allowManage ?? false);
+
         setMatrix(prev => prev.map(row =>
             row.userId === userId && row.methodGroupId === methodGroupId
-                ? { ...row, [permType === "read" ? "allowRead" : "allowManage"]: allow }
+                ? { ...row, allowRead, allowManage }
                 : row
         ));
         await executeCommand<ToggleResult, string>(
             props, "TogglePermission",
-            JSON.stringify({ userId, methodGroupId, permissionType: permType, allow })
+            JSON.stringify({ userId, methodGroupId, allowRead, allowManage })
         );
     };
 

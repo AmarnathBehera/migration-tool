@@ -54,17 +54,6 @@ namespace BDO
 
 
         /// <summary>
-        /// Permission.
-        /// </summary>
-        [DatabaseField]
-        public virtual string Permission
-        {
-            get => ValidationHelper.GetString(GetValue(nameof(Permission)), String.Empty);
-            set => SetValue(nameof(Permission), value, String.Empty);
-        }
-
-
-        /// <summary>
         /// Method group.
         /// </summary>
         [DatabaseField]
@@ -83,6 +72,28 @@ namespace BDO
         {
             get => ValidationHelper.GetString(GetValue(nameof(User)), String.Empty);
             set => SetValue(nameof(User), value, String.Empty);
+        }
+
+
+        /// <summary>
+        /// Read.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool Read
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(Read)), false);
+            set => SetValue(nameof(Read), value);
+        }
+
+
+        /// <summary>
+        /// Manage.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool Manage
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(Manage)), false);
+            set => SetValue(nameof(Manage), value);
         }
 
 

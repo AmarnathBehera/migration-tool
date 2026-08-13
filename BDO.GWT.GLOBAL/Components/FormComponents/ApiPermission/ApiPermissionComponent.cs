@@ -94,8 +94,8 @@ internal static class ApiPermissionCommandHandler
         service.SetPermission(
             request.UserId,
             request.MethodGroupId,
-            request.PermissionType,
-            request.Allow);
+            request.AllowRead,
+            request.AllowManage);
 
         return new TogglePermissionResult { Success = true, Message = string.Empty };
     }
@@ -122,8 +122,8 @@ public class TogglePermissionRequest
 {
     public int UserId { get; set; }
     public int MethodGroupId { get; set; }
-    public string PermissionType { get; set; } = string.Empty;
-    public bool Allow { get; set; }
+    public bool AllowRead { get; set; }
+    public bool AllowManage { get; set; }
 }
 
 public class TogglePermissionResult
