@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useFormComponentCommandProvider, FormComponentProps } from "@kentico/xperience-admin-base";
 
-interface ChannelOption { id: number; displayName: string; }
 interface UserOption    { id: number; displayName: string; }
 interface MethodGroupOption { id: number; displayName: string; description: string; }
 
@@ -15,7 +14,6 @@ interface MatrixRow {
 }
 
 interface InitResult {
-    channels: ChannelOption[];
     users: UserOption[];
     methodGroups: MethodGroupOption[];
 }
@@ -25,12 +23,10 @@ interface ToggleResult { success: boolean; message: string; }
 type FilterType = "users" | "methodgroup";
 
 export const ApiPermissionsControl = (props: FormComponentProps) => {
-    const [channels, setChannels]         = useState<ChannelOption[]>([]);
     const [users, setUsers]               = useState<UserOption[]>([]);
     const [methodGroups, setMethodGroups] = useState<MethodGroupOption[]>([]);
     const [matrix, setMatrix]             = useState<MatrixRow[]>([]);
 
-    const [channelId, setChannelId]   = useState<number>(0);
     const [filterType, setFilterType] = useState<FilterType>("users");
     const [selectedId, setSelectedId] = useState<number>(0);
     const [searchText, setSearchText] = useState<string>("");
@@ -44,29 +40,27 @@ export const ApiPermissionsControl = (props: FormComponentProps) => {
         (async () => {
             const result = await executeCommand<InitResult, string>(props, "Initialize", "");
             if (!result) return;
-            setChannels(result.channels ?? []);
             setUsers(result.users ?? []);
             setMethodGroups(result.methodGroups ?? []);
-            setChannelId(result.channels?.[0]?.id ?? 0);
             setSelectedId(result.users?.[0]?.id ?? 0);
             setInitialized(true);
         })();
     }, []);
 
-    const loadMatrix = useCallback(async (ft: FilterType, sid: number, chId: number) => {
+    const loadMatrix = useCallback(async (ft: FilterType, sid: number) => {
         if (sid <= 0) return;
         setLoading(true);
         const result = await executeCommand<LoadMatrixResult, string>(
             props, "LoadMatrix",
-            JSON.stringify({ filterType: ft, selectedId: sid, channelId: chId })
+            JSON.stringify({ filterType: ft, selectedId: sid })
         );
         setMatrix(result?.rows ?? []);
         setLoading(false);
     }, [executeCommand, props]);
 
     useEffect(() => {
-        if (initialized) loadMatrix(filterType, selectedId, channelId);
-    }, [filterType, selectedId, channelId, initialized]);
+        if (initialized) loadMatrix(filterType, selectedId);
+    }, [filterType, selectedId, initialized]);
 
     const handleFilterTypeChange = (newFilter: FilterType) => {
         setFilterType(newFilter);
@@ -89,7 +83,7 @@ export const ApiPermissionsControl = (props: FormComponentProps) => {
         ));
         await executeCommand<ToggleResult, string>(
             props, "TogglePermission",
-            JSON.stringify({ userId, methodGroupId, channelId, permissionType: permType, allow })
+            JSON.stringify({ userId, methodGroupId, permissionType: permType, allow })
         );
     };
 
@@ -107,17 +101,6 @@ export const ApiPermissionsControl = (props: FormComponentProps) => {
             {/* ── Filter bar ── */}
             <table style={filterTableStyle}>
                 <tbody>
-                    <tr>
-                        <td style={filterLabelStyle}>Channel:</td>
-                        <td>
-                            <select style={filterSelectStyle} value={channelId}
-                                onChange={e => setChannelId(Number(e.target.value))}>
-                                {channels.map(c => (
-                                    <option key={c.id} value={c.id}>{c.displayName}</option>
-                                ))}
-                            </select>
-                        </td>
-                    </tr>
                     <tr>
                         <td style={filterLabelStyle}>Filter by:</td>
                         <td>
@@ -150,18 +133,22 @@ export const ApiPermissionsControl = (props: FormComponentProps) => {
                     <thead>
                         <tr style={headerRowStyle}>
                             <th style={searchThStyle}>
-                                <input
-                                    type="text"
-                                    placeholder="Search…"
-                                    value={searchText}
-                                    onChange={e => setSearchText(e.target.value)}
-                                    onKeyDown={e => { if (e.key === "Enter") setAppliedSearch(searchText); }}
-                                    style={searchInputStyle}
-                                />
-                                <button style={searchBtnStyle}
-                                    onClick={() => setAppliedSearch(searchText)}>
-                                    Search
-                                </button>
+                                {filterType === "methodgroup" && (
+                                    <>
+                                        <input
+                                            type="text"
+                                            placeholder="Search…"
+                                            value={searchText}
+                                            onChange={e => setSearchText(e.target.value)}
+                                            onKeyDown={e => { if (e.key === "Enter") setAppliedSearch(searchText); }}
+                                            style={searchInputStyle}
+                                        />
+                                        <button style={searchBtnStyle}
+                                            onClick={() => setAppliedSearch(searchText)}>
+                                            Search
+                                        </button>
+                                    </>
+                                )}
                             </th>
                             <th style={checkThStyle}>Read</th>
                             <th style={checkThStyle}>Manage</th>

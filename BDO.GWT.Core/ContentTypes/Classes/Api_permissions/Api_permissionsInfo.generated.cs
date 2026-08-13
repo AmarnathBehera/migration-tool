@@ -43,24 +43,24 @@ namespace BDO
 
 
         /// <summary>
-        /// Channel.
+        /// API permission web channel setting ID.
         /// </summary>
         [DatabaseField]
-        public virtual string Channel
+        public virtual string APIPermissionWebChannelSettingID
         {
-            get => ValidationHelper.GetString(GetValue(nameof(Channel)), String.Empty);
-            set => SetValue(nameof(Channel), value);
+            get => ValidationHelper.GetString(GetValue(nameof(APIPermissionWebChannelSettingID)), String.Empty);
+            set => SetValue(nameof(APIPermissionWebChannelSettingID), value);
         }
 
 
         /// <summary>
-        /// Filter by.
+        /// Permission.
         /// </summary>
         [DatabaseField]
-        public virtual string FilterBy
+        public virtual string Permission
         {
-            get => ValidationHelper.GetString(GetValue(nameof(FilterBy)), String.Empty);
-            set => SetValue(nameof(FilterBy), value);
+            get => ValidationHelper.GetString(GetValue(nameof(Permission)), String.Empty);
+            set => SetValue(nameof(Permission), value, String.Empty);
         }
 
 
@@ -71,7 +71,7 @@ namespace BDO
         public virtual string MethodGroup
         {
             get => ValidationHelper.GetString(GetValue(nameof(MethodGroup)), String.Empty);
-            set => SetValue(nameof(MethodGroup), value);
+            set => SetValue(nameof(MethodGroup), value, String.Empty);
         }
 
 
@@ -82,7 +82,7 @@ namespace BDO
         public virtual string User
         {
             get => ValidationHelper.GetString(GetValue(nameof(User)), String.Empty);
-            set => SetValue(nameof(User), value);
+            set => SetValue(nameof(User), value, String.Empty);
         }
 
 

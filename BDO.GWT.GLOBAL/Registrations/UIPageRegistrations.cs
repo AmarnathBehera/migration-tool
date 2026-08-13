@@ -3,6 +3,7 @@ using BDO.GWT.Xperience.Admin.Pages.ProjectSettings;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.GlobalSettings;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using GWTXbyKWeb.Pages.ProjectSettings.GlobalSettings;
+using GWTXbyKWeb.Pages.ProjectSettings.WebChannelSettings;
 using Kentico.Xperience.Admin.Base;
 
 [assembly: UIPage(
@@ -34,14 +35,6 @@ using Kentico.Xperience.Admin.Base;
     slug: "events-webinar",
     uiPageType: typeof(GlobalEventsWebinarEditPage),
     name: "Events & Webinar",
-    templateName: TemplateNames.EDIT,
-    order: 2)]
-
-[assembly: UIPage(
-    parentType: typeof(GlobalSettings),
-    slug: "api-permission",
-    uiPageType: typeof(ApiPermissionEditPage),
-    name: "API Permission",
     templateName: TemplateNames.EDIT,
     order: 2)]
 
@@ -153,4 +146,12 @@ using Kentico.Xperience.Admin.Base;
     name: "GDPR Consents",
     templateName: TemplateNames.EDIT,
     order: 11)]
+
+[assembly: UIPage(
+    parentType: typeof(WebChannelSettingsEditSection),
+    slug: "api-permission",
+    uiPageType: typeof(ApiPermissionEditPage),
+    name: "API Permission",
+    templateName: TemplateNames.EDIT,
+    order: 12)]
 

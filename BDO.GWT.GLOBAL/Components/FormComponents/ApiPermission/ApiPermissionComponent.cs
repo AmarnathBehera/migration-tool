@@ -63,7 +63,6 @@ internal static class ApiPermissionCommandHandler
     {
         return new ApiPermissionsInitResult
         {
-            Channels = new List<ChannelOption>(service.GetChannels()),
             Users = new List<UserOption>(service.GetUsers()),
             MethodGroups = new List<MethodGroupOption>(service.GetMethodGroups()),
         };
@@ -78,8 +77,8 @@ internal static class ApiPermissionCommandHandler
         }
 
         var rows = request.FilterType == "methodgroup"
-            ? service.GetMatrixByMethodGroup(request.SelectedId, request.ChannelId)
-            : service.GetMatrixByUser(request.SelectedId, request.ChannelId);
+            ? service.GetMatrixByMethodGroup(request.SelectedId)
+            : service.GetMatrixByUser(request.SelectedId);
 
         return new LoadMatrixResult { Rows = new List<MatrixRow>(rows) };
     }
@@ -95,7 +94,6 @@ internal static class ApiPermissionCommandHandler
         service.SetPermission(
             request.UserId,
             request.MethodGroupId,
-            request.ChannelId,
             request.PermissionType,
             request.Allow);
 
@@ -105,7 +103,6 @@ internal static class ApiPermissionCommandHandler
 
 public class ApiPermissionsInitResult
 {
-    public List<ChannelOption> Channels { get; set; } = new();
     public List<UserOption> Users { get; set; } = new();
     public List<MethodGroupOption> MethodGroups { get; set; } = new();
 }
@@ -114,7 +111,6 @@ public class LoadMatrixRequest
 {
     public string FilterType { get; set; } = "users";
     public int SelectedId { get; set; }
-    public int ChannelId { get; set; }
 }
 
 public class LoadMatrixResult
@@ -126,7 +122,6 @@ public class TogglePermissionRequest
 {
     public int UserId { get; set; }
     public int MethodGroupId { get; set; }
-    public int ChannelId { get; set; }
     public string PermissionType { get; set; } = string.Empty;
     public bool Allow { get; set; }
 }
