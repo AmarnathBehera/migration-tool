@@ -27,4 +27,8 @@ public static class ApiMethodGroupName
     public const string Deals = "Deals";
     public const string MediaFile = "Media File";
     public const string Channel = "Channel";
+    public const string Careers = "Careers";
+    public const string Footer = "Footer";
+    public const string ChannelSettings = "ChannelSettings";
+    public const string GlobalSettings = "GlobalSettings";
 }
