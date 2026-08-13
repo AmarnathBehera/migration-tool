@@ -14,16 +14,15 @@ namespace BDO.GWT.GLOBAL.API.Controllers;
 // Provides methods to read and manage users.
 // </summary>
 [ApiController]
-[Route("memberFirms/{memberFirmID:int}/People")]
+[Route("memberFirms/{memberFirmID:int}/Users")]
 public class UsersController : EntityControllerBase
 {
     private readonly IUserCrudService _userCrudService;
 
-    public UsersController( IUserCrudService userCrudService)
+    public UsersController(IUserCrudService userCrudService)
     {
         _userCrudService = userCrudService;
     }
-
     // <summary>
     // Returns all users.
     // </summary>
