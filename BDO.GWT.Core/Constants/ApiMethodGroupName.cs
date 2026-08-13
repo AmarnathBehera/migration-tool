@@ -26,5 +26,5 @@ public static class ApiMethodGroupName
     public const string LocationOffices = "Location Offices";
     public const string Deals = "Deals";
     public const string MediaFile = "Media File";
-
+    public const string Channel = "Channel";
 }
