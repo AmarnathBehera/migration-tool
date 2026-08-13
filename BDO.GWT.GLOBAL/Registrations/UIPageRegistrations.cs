@@ -1,5 +1,4 @@
 ﻿using BDO.GWT.Xperience;
-using BDO.GWT.Xperience.Admin.Pages.ProjectSettings;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.GlobalSettings;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using GWTXbyKWeb.Pages.ProjectSettings.GlobalSettings;

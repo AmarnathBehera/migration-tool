@@ -1,4 +1,5 @@
 using BDO;
+using BDO.GWT.Domain.Core.Constants;
 using CMS.DataEngine;
 using CMS.Membership;
 using System.Collections.Generic;
@@ -20,24 +21,24 @@ public sealed class ApiPermissionService : IApiPermissionService
 {
     private static readonly IReadOnlyList<MethodGroupOption> MethodGroups = new List<MethodGroupOption>
     {
-        new() { Id = 1,  DisplayName = "Users" },
-        new() { Id = 2,  DisplayName = "Events" },
-        new() { Id = 3,  DisplayName = "Insights" },
-        new() { Id = 4,  DisplayName = "News" },
-        new() { Id = 5,  DisplayName = "People" },
-        new() { Id = 6,  DisplayName = "Webinars" },
-        new() { Id = 7,  DisplayName = "Business lines" },
-        new() { Id = 8,  DisplayName = "Services" },
-        new() { Id = 9,  DisplayName = "Service sections" },
-        new() { Id = 10, DisplayName = "Service areas" },
-        new() { Id = 11, DisplayName = "Event sections" },
-        new() { Id = 12, DisplayName = "Content" },
-        new() { Id = 13, DisplayName = "Career Job Opportunities" },
-        new() { Id = 14, DisplayName = "Forms" },
-        new() { Id = 15, DisplayName = "Page Attachments" },
-        new() { Id = 16, DisplayName = "Location Offices" },
-        new() { Id = 17, DisplayName = "Deals" },
-        new() { Id = 18, DisplayName = "Media File" },
+        new() { Id = 1, DisplayName = ApiMethodGroupName.Users },
+        new() { Id = 2, DisplayName = ApiMethodGroupName.Events },
+        new() { Id = 3, DisplayName = ApiMethodGroupName.Insights },
+        new() { Id = 4, DisplayName = ApiMethodGroupName.News },
+        new() { Id = 5, DisplayName = ApiMethodGroupName.People },
+        new() { Id = 6, DisplayName = ApiMethodGroupName.Webinars },
+        new() { Id = 7, DisplayName = ApiMethodGroupName.BusinessLines },
+        new() { Id = 8, DisplayName = ApiMethodGroupName.Services },
+        new() { Id = 9, DisplayName = ApiMethodGroupName.ServiceSections },
+        new() { Id = 10, DisplayName = ApiMethodGroupName.ServiceAreas },
+        new() { Id = 11, DisplayName = ApiMethodGroupName.EventSections },
+        new() { Id = 12, DisplayName = ApiMethodGroupName.Content },
+        new() { Id = 13, DisplayName = ApiMethodGroupName.CareerJobOpportunities },
+        new() { Id = 14, DisplayName = ApiMethodGroupName.Forms },
+        new() { Id = 15, DisplayName = ApiMethodGroupName.PageAttachments },
+        new() { Id = 16, DisplayName = ApiMethodGroupName.LocationOffices },
+        new() { Id = 17, DisplayName = ApiMethodGroupName.Deals },
+        new() { Id = 18, DisplayName = ApiMethodGroupName.MediaFile },
     };
 
     private readonly IInfoProvider<UserInfo> userProvider;
@@ -105,10 +106,11 @@ public sealed class ApiPermissionService : IApiPermissionService
             ?? new Api_permissionsInfo
             {
                 User = userId.ToString(CultureInfo.InvariantCulture),
-                MethodGroup = methodGroupId.ToString(CultureInfo.InvariantCulture),
+                MethodGroup = GetMethodGroupName(methodGroupId),
                 APIPermissionWebChannelSettingID = webChannelSettingId.ToString(CultureInfo.InvariantCulture),
             };
 
+        record.MethodGroup = GetMethodGroupName(methodGroupId);
         record.Read = allowRead;
         record.Manage = allowManage;
 
@@ -154,9 +156,19 @@ public sealed class ApiPermissionService : IApiPermissionService
     private static bool TryParseKey(Api_permissionsInfo record, out int userId, out int methodGroupId)
     {
         methodGroupId = 0;
-        return int.TryParse(record.User, out userId)
-            && int.TryParse(record.MethodGroup, out methodGroupId);
+        if (!int.TryParse(record.User, out userId))
+        {
+            return false;
+        }
+
+        methodGroupId = MethodGroups.FirstOrDefault(group =>
+            group.DisplayName == record.MethodGroup)?.Id ?? 0;
+        return methodGroupId > 0;
     }
+
+    private static string GetMethodGroupName(int methodGroupId) =>
+        MethodGroups.FirstOrDefault(group => group.Id == methodGroupId)?.DisplayName
+        ?? methodGroupId.ToString(CultureInfo.InvariantCulture);
 
     private static string GetDisplayName(UserInfo user)
     {
