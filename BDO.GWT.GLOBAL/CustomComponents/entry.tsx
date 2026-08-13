@@ -1,4 +1,3 @@
-// @ts-expect-error - CSS side-effect import has no type declarations
 import '@styles/index.css';
 import { BDOSQLDropdown } from '@components/custom-dropdown/CustomDropdown';
 import { GDPRControl } from '~/components/gdpr-control/GDPRControl';

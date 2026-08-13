@@ -47,8 +47,6 @@ public class ApiPermissionComponent
     [FormComponentCommand]
     public Task<TogglePermissionResult> TogglePermission(string toggleJson)
         => Task.FromResult(ApiPermissionCommandHandler.HandleTogglePermission(apiPermissionService, toggleJson));
-
-    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 }
 
 public class ApiPermissionProperties : FormComponentProperties
