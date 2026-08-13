@@ -24,7 +24,9 @@ export const ApiPermissionsControl = (props: ApiPermissionsProps) => {
     useEffect(() => {
         (async () => {
             const result = await executeCommand<InitResult, string>(props, "Initialize", "");
-            if (!result) return;
+            if (!result) {
+                return;
+            }
             setUsers(result.users ?? []);
             setMethodGroups(result.methodGroups ?? []);
             setSelectedId(result.users?.[0]?.id ?? 0);
@@ -33,7 +35,9 @@ export const ApiPermissionsControl = (props: ApiPermissionsProps) => {
     }, []);
 
     const loadMatrix = useCallback(async (ft: FilterType, sid: number) => {
-        if (sid <= 0) return;
+        if (sid <= 0) {
+            return;
+        }
         setLoading(true);
         const result = await executeCommand<LoadMatrixResult, string>(
             props, "LoadMatrix",
@@ -44,7 +48,9 @@ export const ApiPermissionsControl = (props: ApiPermissionsProps) => {
     }, [executeCommand, props, webChannelSettingId]);
 
     useEffect(() => {
-        if (initialized) loadMatrix(filterType, selectedId);
+        if (initialized) {
+            loadMatrix(filterType, selectedId);
+        }
     }, [filterType, selectedId, initialized]);
 
     const handleFilterTypeChange = (newFilter: FilterType) => {
@@ -121,7 +127,7 @@ export const ApiPermissionsControl = (props: ApiPermissionsProps) => {
 
             {filterType === "methodgroup" && (
                 <div className="flex items-center gap-2 mb-4">
-                    <div className="flex-1 max-w-xs" onKeyDown={e => { if (e.key === "Enter") setAppliedSearch(searchText); }}>
+                    <div className="flex-1 max-w-xs" onKeyDown={e => { if (e.key === "Enter") { setAppliedSearch(searchText); } }}>
                         <InputBase
                             value={searchText}
                             onChange={e => setSearchText(e.target.value)}
@@ -144,7 +150,7 @@ export const ApiPermissionsControl = (props: ApiPermissionsProps) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {loading ? (
+                    {loading && (
                         <tr>
                             <td colSpan={3} className="p-4">
                                 <div className="flex items-center gap-2 text-muted">
@@ -153,11 +159,13 @@ export const ApiPermissionsControl = (props: ApiPermissionsProps) => {
                                 </div>
                             </td>
                         </tr>
-                    ) : filteredMatrix.length === 0 ? (
+                    )}
+                    {!loading && filteredMatrix.length === 0 && (
                         <tr>
                             <td colSpan={3} className="p-4 text-muted">No data found.</td>
                         </tr>
-                    ) : filteredMatrix.map(row => (
+                    )}
+                    {!loading && filteredMatrix.length > 0 && filteredMatrix.map(row => (
                         <tr key={`${row.userId}-${row.methodGroupId}`} className="border-b border-[#eee]">
                             <td className="py-1.5 px-3 text-body">
                                 {filterType === "users" ? row.methodGroupName : row.userDisplayName}
