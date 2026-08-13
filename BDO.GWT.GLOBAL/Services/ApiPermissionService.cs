@@ -11,9 +11,9 @@ public interface IApiPermissionService
 {
     IReadOnlyList<UserOption> GetUsers();
     IReadOnlyList<MethodGroupOption> GetMethodGroups();
-    IReadOnlyList<MatrixRow> GetMatrixByUser(int userId);
-    IReadOnlyList<MatrixRow> GetMatrixByMethodGroup(int methodGroupId);
-    void SetPermission(int userId, int methodGroupId, bool allowRead, bool allowManage);
+    IReadOnlyList<MatrixRow> GetMatrixByUser(int userId, int webChannelSettingId);
+    IReadOnlyList<MatrixRow> GetMatrixByMethodGroup(int methodGroupId, int webChannelSettingId);
+    void SetPermission(int userId, int methodGroupId, bool allowRead, bool allowManage, int webChannelSettingId);
 }
 
 public sealed class ApiPermissionService : IApiPermissionService
@@ -59,9 +59,9 @@ public sealed class ApiPermissionService : IApiPermissionService
 
     public IReadOnlyList<MethodGroupOption> GetMethodGroups() => MethodGroups;
 
-    public IReadOnlyList<MatrixRow> GetMatrixByUser(int userId)
+    public IReadOnlyList<MatrixRow> GetMatrixByUser(int userId, int webChannelSettingId)
     {
-        var permissions = GetPermissionLookup();
+        var permissions = GetPermissionLookup(webChannelSettingId);
 
         return MethodGroups.Select(g =>
         {
@@ -77,10 +77,10 @@ public sealed class ApiPermissionService : IApiPermissionService
         }).ToList();
     }
 
-    public IReadOnlyList<MatrixRow> GetMatrixByMethodGroup(int methodGroupId)
+    public IReadOnlyList<MatrixRow> GetMatrixByMethodGroup(int methodGroupId, int webChannelSettingId)
     {
         var group = MethodGroups.FirstOrDefault(g => g.Id == methodGroupId);
-        var permissions = GetPermissionLookup();
+        var permissions = GetPermissionLookup(webChannelSettingId);
 
         var users = userProvider.Get().OrderBy(nameof(UserInfo.UserName)).ToList();
 
@@ -99,14 +99,14 @@ public sealed class ApiPermissionService : IApiPermissionService
         }).ToList();
     }
 
-    public void SetPermission(int userId, int methodGroupId, bool allowRead, bool allowManage)
+    public void SetPermission(int userId, int methodGroupId, bool allowRead, bool allowManage, int webChannelSettingId)
     {
-        var record = GetPermissionRecord(userId, methodGroupId)
+        var record = GetPermissionRecord(userId, methodGroupId, webChannelSettingId)
             ?? new Api_permissionsInfo
             {
                 User = userId.ToString(CultureInfo.InvariantCulture),
                 MethodGroup = methodGroupId.ToString(CultureInfo.InvariantCulture),
-                APIPermissionWebChannelSettingID = ResolveWebChannelSettingId(),
+                APIPermissionWebChannelSettingID = webChannelSettingId.ToString(CultureInfo.InvariantCulture),
             };
 
         record.Read = allowRead;
@@ -115,28 +115,14 @@ public sealed class ApiPermissionService : IApiPermissionService
         permissionProvider.Set(record);
     }
 
-    // The edit page persists the current WebChannelSettingsId on the backing record; reuse it.
-    private string ResolveWebChannelSettingId()
-    {
-        foreach (var record in permissionProvider.Get())
-        {
-            var settingId = record.APIPermissionWebChannelSettingID;
-            if (!string.IsNullOrEmpty(settingId))
-            {
-                return settingId;
-            }
-        }
-
-        return "0";
-    }
-
-    private Dictionary<(int UserId, int MethodGroupId), (bool Read, bool Manage)> GetPermissionLookup()
+    private Dictionary<(int UserId, int MethodGroupId), (bool Read, bool Manage)> GetPermissionLookup(int webChannelSettingId)
     {
         var lookup = new Dictionary<(int, int), (bool, bool)>();
 
         foreach (var record in permissionProvider.Get())
         {
-            if (!TryParseKey(record, out var userId, out var methodGroupId))
+            if (!MatchesChannel(record, webChannelSettingId)
+                || !TryParseKey(record, out var userId, out var methodGroupId))
             {
                 continue;
             }
@@ -147,11 +133,13 @@ public sealed class ApiPermissionService : IApiPermissionService
         return lookup;
     }
 
-    private Api_permissionsInfo GetPermissionRecord(int userId, int methodGroupId)
+    private Api_permissionsInfo GetPermissionRecord(int userId, int methodGroupId, int webChannelSettingId)
     {
         foreach (var record in permissionProvider.Get())
         {
-            if (TryParseKey(record, out var u, out var m) && u == userId && m == methodGroupId)
+            if (MatchesChannel(record, webChannelSettingId)
+                && TryParseKey(record, out var u, out var m)
+                && u == userId && m == methodGroupId)
             {
                 return record;
             }
@@ -159,6 +147,9 @@ public sealed class ApiPermissionService : IApiPermissionService
 
         return null;
     }
+
+    private static bool MatchesChannel(Api_permissionsInfo record, int webChannelSettingId) =>
+        int.TryParse(record.APIPermissionWebChannelSettingID, out var id) && id == webChannelSettingId;
 
     private static bool TryParseKey(Api_permissionsInfo record, out int userId, out int methodGroupId)
     {

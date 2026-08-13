@@ -5,6 +5,7 @@ using CMS.DataEngine;
 using GWTXbyKWeb.Components.FormComponents.ApiPermissions;
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -26,10 +27,14 @@ public class ApiPermissionEditPage : InfoEditPage<Api_permissionsInfo>
         get
         {
             var existing = apiPermissionInfoProvider.Get()
+                .WhereEquals(nameof(Api_permissionsInfo.APIPermissionWebChannelSettingID), WebChannelSettingsId)
                 .LastOrDefault();
 
             if (existing != null)
                 return existing.Api_permissionsID;
+
+            if (WebChannelSettingsId <= 0)
+                return 0;
 
             // Auto-create an empty record so the edit form can load.
             var api_PermissionsInfo = new Api_permissionsInfo{APIPermissionWebChannelSettingID = WebChannelSettingsId.ToString()};
@@ -74,6 +79,18 @@ public class ApiPermissionEditPage : InfoEditPage<Api_permissionsInfo>
         await base.ConfigurePage();
 
         PageConfiguration.SubmitConfiguration.Visible = false;
+    }
+
+    // Propagates the current WebChannelSettingsId to the matrix form component so commands can scope by channel.
+    protected override async Task<ICollection<IFormItem>> GetFormItems()
+    {
+        var items = await base.GetFormItems();
+        foreach (var component in items.OfType<ApiPermissionComponent>())
+        {
+            component.Properties.WebChannelSettingId = WebChannelSettingsId;
+        }
+
+        return items;
     }
 
     // Returns channels, users, and method groups to populate the filter dropdowns.

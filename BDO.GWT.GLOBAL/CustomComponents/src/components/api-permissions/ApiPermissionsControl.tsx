@@ -22,7 +22,13 @@ interface LoadMatrixResult { rows: MatrixRow[]; }
 interface ToggleResult { success: boolean; message: string; }
 type FilterType = "users" | "methodgroup";
 
-export const ApiPermissionsControl = (props: FormComponentProps) => {
+interface ApiPermissionsProps extends FormComponentProps {
+    webChannelSettingId?: number;
+}
+
+export const ApiPermissionsControl = (props: ApiPermissionsProps) => {
+    const webChannelSettingId = props.webChannelSettingId ?? 0;
+
     const [users, setUsers]               = useState<UserOption[]>([]);
     const [methodGroups, setMethodGroups] = useState<MethodGroupOption[]>([]);
     const [matrix, setMatrix]             = useState<MatrixRow[]>([]);
@@ -52,11 +58,11 @@ export const ApiPermissionsControl = (props: FormComponentProps) => {
         setLoading(true);
         const result = await executeCommand<LoadMatrixResult, string>(
             props, "LoadMatrix",
-            JSON.stringify({ filterType: ft, selectedId: sid })
+            JSON.stringify({ filterType: ft, selectedId: sid, webChannelSettingId })
         );
         setMatrix(result?.rows ?? []);
         setLoading(false);
-    }, [executeCommand, props]);
+    }, [executeCommand, props, webChannelSettingId]);
 
     useEffect(() => {
         if (initialized) loadMatrix(filterType, selectedId);
@@ -87,7 +93,7 @@ export const ApiPermissionsControl = (props: FormComponentProps) => {
         ));
         await executeCommand<ToggleResult, string>(
             props, "TogglePermission",
-            JSON.stringify({ userId, methodGroupId, allowRead, allowManage })
+            JSON.stringify({ userId, methodGroupId, allowRead, allowManage, webChannelSettingId })
         );
     };
 

@@ -33,6 +33,7 @@ public class ApiPermissionComponent
     protected override async Task ConfigureClientProperties(ApiPermissionClientProperties clientProperties)
     {
         await base.ConfigureClientProperties(clientProperties);
+        clientProperties.WebChannelSettingId = Properties.WebChannelSettingId;
     }
 
     [FormComponentCommand]
@@ -50,9 +51,15 @@ public class ApiPermissionComponent
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 }
 
-public class ApiPermissionProperties : FormComponentProperties { }
+public class ApiPermissionProperties : FormComponentProperties
+{
+    public int WebChannelSettingId { get; set; }
+}
 
-public class ApiPermissionClientProperties : FormComponentClientProperties<string> { }
+public class ApiPermissionClientProperties : FormComponentClientProperties<string>
+{
+    public int WebChannelSettingId { get; set; }
+}
 
 // Extracted so command logic is testable without Kentico's IoC container.
 internal static class ApiPermissionCommandHandler
@@ -77,8 +84,8 @@ internal static class ApiPermissionCommandHandler
         }
 
         var rows = request.FilterType == "methodgroup"
-            ? service.GetMatrixByMethodGroup(request.SelectedId)
-            : service.GetMatrixByUser(request.SelectedId);
+            ? service.GetMatrixByMethodGroup(request.SelectedId, request.WebChannelSettingId)
+            : service.GetMatrixByUser(request.SelectedId, request.WebChannelSettingId);
 
         return new LoadMatrixResult { Rows = new List<MatrixRow>(rows) };
     }
@@ -95,7 +102,8 @@ internal static class ApiPermissionCommandHandler
             request.UserId,
             request.MethodGroupId,
             request.AllowRead,
-            request.AllowManage);
+            request.AllowManage,
+            request.WebChannelSettingId);
 
         return new TogglePermissionResult { Success = true, Message = string.Empty };
     }
@@ -111,6 +119,7 @@ public class LoadMatrixRequest
 {
     public string FilterType { get; set; } = "users";
     public int SelectedId { get; set; }
+    public int WebChannelSettingId { get; set; }
 }
 
 public class LoadMatrixResult
@@ -124,6 +133,7 @@ public class TogglePermissionRequest
     public int MethodGroupId { get; set; }
     public bool AllowRead { get; set; }
     public bool AllowManage { get; set; }
+    public int WebChannelSettingId { get; set; }
 }
 
 public class TogglePermissionResult
