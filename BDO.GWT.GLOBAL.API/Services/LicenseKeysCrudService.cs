@@ -1,7 +1,5 @@
 ﻿using BDO.GWT.GLOBAL.API.Data;
 using CMS.DataEngine;
-using System.Text;
-using System.Text.Json;
 
 namespace BDO.GWT.GLOBAL.API.Services;
 
@@ -60,31 +58,4 @@ public class LicenseKeysCrudService : ILicenseKeysCrudService
             Key = settingsKey.KeyValue
         };
     }
-
-    private static LicenseKeyPayload? TryDecodePayload(string? rawKeyValue)
-    {
-        if (string.IsNullOrEmpty(rawKeyValue))
-        {
-            return null;
-        }
-
-        try
-        {
-            var envelopeJson = Encoding.UTF8.GetString(Convert.FromBase64String(rawKeyValue));
-            var envelope = JsonSerializer.Deserialize<LicenseKeyEnvelope>(envelopeJson);
-
-            if (envelope?.Data is null)
-            {
-                return null;
-            }
-
-            return JsonSerializer.Deserialize<LicenseKeyPayload>(envelope.Data);
-        }
-        catch (Exception)
-        {
-            // Malformed/unexpected key format — surface as "unknown" rather than throwing,
-            // since this is best-effort metadata extraction, not license validation.
-            return null;
-        }
-    }    
 }

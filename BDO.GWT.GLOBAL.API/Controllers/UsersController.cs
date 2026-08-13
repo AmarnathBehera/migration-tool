@@ -103,19 +103,4 @@ public class UsersController : EntityControllerBase
 
         return NoContent();
     }
-    /// <summary>
-    /// Returns user API permissions by endpoint group name.
-    /// </summary>
-    /// <param name="memberFirmID">ID of the member firm for which the permissions should be retrieved.</param>
-    /// <param name="userGUID">GUID of the user for which the permissions should be retrieved.</param>
-    /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>User API permissions by API endpoint group name.</returns>
-    //[HttpGet("{userGUID:guid}/ApiPermissions")]
-    //[SwaggerResponse(StatusCodes.Status200OK, null, typeof(IDictionary<string, ApiEndpointGroupPermissions>), MediaTypeNames.Application.Json)]
-    //public async Task<ActionResult<IDictionary<string, ApiEndpointGroupPermissions>>> GetApiPermissions(int memberFirmID, Guid userGUID, CancellationToken cancellationToken)
-    //{
-    //    var userApiPermissionsByEndpointGroupName = await _userApiPermissionsCrudService.GetUserApiPermissionsByEndpointGroupNameAsync(userGUID, cancellationToken);
-
-    //    return Ok(userApiPermissionsByEndpointGroupName);
-    //}
 }

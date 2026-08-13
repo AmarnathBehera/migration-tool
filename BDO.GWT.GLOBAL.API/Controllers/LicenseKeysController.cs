@@ -28,7 +28,6 @@ public class LicenseKeysController : EntityControllerBase
     /// <summary>
     /// Returns all license keys.
     /// </summary>
-    /// <param name="domain">Domain of the license.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>Returns a list of license keys.</returns>
     [HttpGet]
@@ -62,7 +61,7 @@ public class LicenseKeysController : EntityControllerBase
     /// <returns>204 No Content.</returns>
     [HttpDelete("{licenseKeyID:int}")]
     [SwaggerResponse(StatusCodes.Status204NoContent, null, typeof(void))]
-    public async Task<IActionResult> Delete(CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete(int licenseKeyID, CancellationToken cancellationToken)
     {
         await _licenseKeysCrudService.DeleteLicenseKeyAsync(cancellationToken);
 
