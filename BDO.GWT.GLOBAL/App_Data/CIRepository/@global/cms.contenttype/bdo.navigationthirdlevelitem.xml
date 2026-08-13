@@ -25,7 +25,7 @@
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["b6a2aff8-7c0d-446a-be33-221a26bcac37","b3459cfa-8a48-48e5-af1f-eca5d79dd087","43fcea42-e42d-4773-95dc-b415ea3e7547","28ba1415-0ac5-40c2-bb50-ec5ee5532674","1ab55e4f-344f-4d36-a64b-5812140fcfa3","1ddec4b5-dabe-4e5d-a38a-1cf710c59244","81fa7e92-5ecc-4b38-a9d9-0246c97567d7","1972aba8-80f8-4d07-bfa2-7f088d2f4219"]]]>
+            <![CDATA[["b6a2aff8-7c0d-446a-be33-221a26bcac37","b3459cfa-8a48-48e5-af1f-eca5d79dd087","43fcea42-e42d-4773-95dc-b415ea3e7547","28ba1415-0ac5-40c2-bb50-ec5ee5532674","1ab55e4f-344f-4d36-a64b-5812140fcfa3","1ddec4b5-dabe-4e5d-a38a-1cf710c59244","81fa7e92-5ecc-4b38-a9d9-0246c97567d7","1972aba8-80f8-4d07-bfa2-7f088d2f4219","3c5bfaa6-f77c-46a6-947b-87ab1bb8404b"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <MaximumItems>1</MaximumItems>
