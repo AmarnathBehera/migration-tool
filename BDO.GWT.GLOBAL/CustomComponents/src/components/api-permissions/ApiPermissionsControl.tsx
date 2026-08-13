@@ -84,15 +84,16 @@ export const ApiPermissionsControl = (props: ApiPermissionsProps) => {
 
     const options = useMemo(() => filterType === "users" ? users : methodGroups, [filterType, users, methodGroups]);
 
-    const filteredMatrix = useMemo(() =>
-        appliedSearch.trim()
-            ? matrix.filter(row => {
-                const name = filterType === "users" ? row.methodGroupName : row.userDisplayName;
-                return name.toLowerCase().includes(appliedSearch.toLowerCase());
-            })
-            : matrix,
-        [matrix, appliedSearch, filterType]
-    );
+    const getRowLabel = (row: MatrixRow) =>
+        filterType === "users" ? row.methodGroupName : row.userDisplayName;
+
+    const filteredMatrix = useMemo(() => {
+        if (!appliedSearch.trim()) {
+            return matrix;
+        }
+        const search = appliedSearch.toLowerCase();
+        return matrix.filter(row => getRowLabel(row).toLowerCase().includes(search));
+    }, [matrix, appliedSearch, filterType]);
 
     return (
         <div className="font-display">
@@ -168,7 +169,7 @@ export const ApiPermissionsControl = (props: ApiPermissionsProps) => {
                     {!loading && filteredMatrix.length > 0 && filteredMatrix.map(row => (
                         <tr key={`${row.userId}-${row.methodGroupId}`} className="border-b border-[#eee]">
                             <td className="py-1.5 px-3 text-body">
-                                {filterType === "users" ? row.methodGroupName : row.userDisplayName}
+                                {getRowLabel(row)}
                             </td>
                             <td className="py-1.5 px-4 text-center">
                                 <Checkbox
