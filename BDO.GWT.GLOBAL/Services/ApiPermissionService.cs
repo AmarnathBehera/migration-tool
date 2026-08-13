@@ -2,6 +2,7 @@ using BDO;
 using BDO.GWT.Domain.Core.Constants;
 using CMS.DataEngine;
 using CMS.Membership;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -41,20 +42,31 @@ public sealed class ApiPermissionService : IApiPermissionService
         new() { Id = 18, DisplayName = ApiMethodGroupName.MediaFile },
     };
 
-    private readonly IInfoProvider<UserInfo> userProvider;
-    private readonly IInfoProvider<Api_permissionsInfo> permissionProvider;
+    private readonly Func<IEnumerable<UserInfo>> getUsers;
+    private readonly Func<IEnumerable<Api_permissionsInfo>> getPermissions;
+    private readonly Action<Api_permissionsInfo> setPermission;
 
     public ApiPermissionService(
         IInfoProvider<UserInfo> userProvider,
         IInfoProvider<Api_permissionsInfo> permissionProvider)
     {
-        this.userProvider = userProvider;
-        this.permissionProvider = permissionProvider;
+        getUsers = () => userProvider.Get();
+        getPermissions = () => permissionProvider.Get();
+        setPermission = permissionProvider.Set;
+    }
+
+    internal ApiPermissionService(
+        Func<IEnumerable<UserInfo>> getUsers,
+        Func<IEnumerable<Api_permissionsInfo>> getPermissions,
+        Action<Api_permissionsInfo> setPermission)
+    {
+        this.getUsers = getUsers;
+        this.getPermissions = getPermissions;
+        this.setPermission = setPermission;
     }
 
     public IReadOnlyList<UserOption> GetUsers() =>
-        userProvider.Get()
-            .OrderBy(nameof(UserInfo.UserName))
+        System.Linq.Enumerable.OrderBy<UserInfo, string>(getUsers(), user => user.UserName)
             .Select(u => new UserOption { Id = u.UserID, DisplayName = GetDisplayName(u) })
             .ToList();
 
@@ -83,7 +95,7 @@ public sealed class ApiPermissionService : IApiPermissionService
         var group = MethodGroups.FirstOrDefault(g => g.Id == methodGroupId);
         var permissions = GetPermissionLookup(webChannelSettingId);
 
-        var users = userProvider.Get().OrderBy(nameof(UserInfo.UserName)).ToList();
+        var users = System.Linq.Enumerable.OrderBy<UserInfo, string>(getUsers(), user => user.UserName).ToList();
 
         return users.Select(u =>
         {
@@ -114,14 +126,14 @@ public sealed class ApiPermissionService : IApiPermissionService
         record.Read = allowRead;
         record.Manage = allowManage;
 
-        permissionProvider.Set(record);
+        setPermission(record);
     }
 
     private Dictionary<(int UserId, int MethodGroupId), (bool Read, bool Manage)> GetPermissionLookup(int webChannelSettingId)
     {
         var lookup = new Dictionary<(int, int), (bool, bool)>();
 
-        foreach (var record in permissionProvider.Get())
+        foreach (var record in getPermissions())
         {
             if (!MatchesChannel(record, webChannelSettingId)
                 || !TryParseKey(record, out var userId, out var methodGroupId))
@@ -137,7 +149,7 @@ public sealed class ApiPermissionService : IApiPermissionService
 
     private Api_permissionsInfo GetPermissionRecord(int userId, int methodGroupId, int webChannelSettingId)
     {
-        foreach (var record in permissionProvider.Get())
+        foreach (var record in getPermissions())
         {
             if (MatchesChannel(record, webChannelSettingId)
                 && TryParseKey(record, out var u, out var m)
