@@ -147,10 +147,13 @@ public class RelatedContentCarouselServiceTests
 
         var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage, data, CancellationToken.None);
 
-        Assert.That(dto.SeeAllLink, Is.Not.Null);
-        Assert.That(dto.SeeAllLink.Title, Is.EqualTo("See All"));
-        Assert.That(dto.SeeAllLink.URL, Is.EqualTo("/insights"));
-        Assert.That(dto.SeeAllLink.Target, Is.EqualTo("_blank"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.SeeAllLink, Is.Not.Null);
+            Assert.That(dto.SeeAllLink.Title, Is.EqualTo("See All"));
+            Assert.That(dto.SeeAllLink.URL, Is.EqualTo("/insights"));
+            Assert.That(dto.SeeAllLink.Target, Is.EqualTo("_blank"));
+        });
     }
 
     [Test]
@@ -227,8 +230,11 @@ public class RelatedContentCarouselServiceTests
 
         await _sut.GetRelatedContentCarouselDtoAsync(currentPage, data, CancellationToken.None);
 
-        Assert.That(capturedQuery, Is.Not.Null);
-        Assert.That(capturedQuery!.SelectedPageTypes, Is.EquivalentTo(selectedTypes));
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedQuery, Is.Not.Null);
+            Assert.That(capturedQuery!.SelectedPageTypes, Is.EquivalentTo(selectedTypes));
+        });
     }
 
     [Test]
@@ -244,11 +250,14 @@ public class RelatedContentCarouselServiceTests
 
         var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage, data, CancellationToken.None);
 
-        Assert.That(dto.Title, Is.EqualTo("Test Title"));
-        Assert.That(dto.Description, Is.EqualTo("Test Description"));
-        Assert.That(dto.TopMargin, Is.EqualTo("mt-4"));
-        Assert.That(dto.BottomMargin, Is.EqualTo("mb-4"));
-        Assert.That(dto.WidgetID, Is.EqualTo("widget-123"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.Title, Is.EqualTo("Test Title"));
+            Assert.That(dto.Description, Is.EqualTo("Test Description"));
+            Assert.That(dto.TopMargin, Is.EqualTo("mt-4"));
+            Assert.That(dto.BottomMargin, Is.EqualTo("mb-4"));
+            Assert.That(dto.WidgetID, Is.EqualTo("widget-123"));
+        });
     }
 
     // -------------------------------------------------------------------------
@@ -281,8 +290,11 @@ public class RelatedContentCarouselServiceTests
 
         await _sut.GetAPIFilteredItemsAsync(query, CancellationToken.None);
 
-        Assert.That(capturedQuery, Is.Not.Null);
-        Assert.That(capturedQuery!.SelectedPageTypes, Is.EquivalentTo(query.SelectedPageTypes));
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedQuery, Is.Not.Null);
+            Assert.That(capturedQuery!.SelectedPageTypes, Is.EquivalentTo(query.SelectedPageTypes));
+        });
     }
 
     [Test]
