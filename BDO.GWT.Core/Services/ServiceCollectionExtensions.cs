@@ -128,6 +128,8 @@
             serviceCollection.AddScoped<ISitemapService, SitemapService>();
             serviceCollection.AddScoped<ILanguageProvider, LanguageProvider>();
             serviceCollection.AddScoped<IPageNodeProvider, PageNodeProvider>();
+            serviceCollection.AddScoped<IRelatedContentCardService, RelatedContentCardService>();
+            serviceCollection.AddScoped<IRelatedContentCarouselService, RelatedContentCarouselService>();
 
             return serviceCollection;
         }
