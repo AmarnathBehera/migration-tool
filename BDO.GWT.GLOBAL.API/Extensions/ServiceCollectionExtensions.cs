@@ -35,7 +35,6 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.AddScoped<IMemberFirmService, MemberFirmService>();
         serviceCollection.AddScoped<IMasterDataApiClient, MasterDataApiClient>();
-        serviceCollection.AddScoped<IFormCrudService, FormCrudService>();
         serviceCollection.AddScoped<IValidationState, ValidationState>();
         serviceCollection.AddScoped<IAuthorizationHelper, AuthorizationHelper>();
 
@@ -45,6 +44,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ICultureService, CultureService>();
         serviceCollection.AddScoped<ICultureValidationService, CultureValidationService>();
 
+        serviceCollection.AddScoped<IFormCrudService, FormCrudService>();
+        serviceCollection.AddScoped<IDealCrudService, DealCrudService>();
         serviceCollection.AddScoped<ICareerCrudService, CareerCrudService>();
         serviceCollection.AddScoped<IPersonCrudService, PersonCrudService>();
         serviceCollection.AddScoped<IInsightCrudService, InsightCrudService>();
@@ -55,5 +56,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IChannelCrudService, ChannelCrudService>();
         serviceCollection.AddScoped<IChannelInfoService, ChannelInfoService>();
         serviceCollection.AddScoped<IUserCrudService, UserCrudService>();
+        serviceCollection.AddScoped<IUserApiPermissionsCrudService, UserApiPermissionsCrudService>();
+        serviceCollection.AddScoped<ILicenseKeysCrudService, LicenseKeysCrudService>();
+        serviceCollection.AddScoped<IScheduledTaskCrudService, ScheduledTaskCrudService>();
     }
 }
