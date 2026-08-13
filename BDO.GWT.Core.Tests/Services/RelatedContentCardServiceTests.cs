@@ -36,7 +36,7 @@ public class RelatedContentCardServiceTests
         _webPageUrlResolverMock = new Mock<IWebPageUrlResolver>();
         _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
 
-        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns((HttpContext)null);
+        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns((HttpContext)null!);
         _webPageUrlResolverMock
             .Setup(x => x.GetAbsoluteUrl(It.IsAny<IWebPageFieldsSource>()))
             .Returns("/some-url");
@@ -92,7 +92,7 @@ public class RelatedContentCardServiceTests
         };
 
         Assert.ThrowsAsync<ArgumentException>(() =>
-            _sut.GetFilteredItemsAsync(query, null, "en-gb", null, _ => false, CancellationToken.None));
+            _sut.GetFilteredItemsAsync(query, string.Empty, "en-gb", null, _ => false, CancellationToken.None));
     }
 
     // -------------------------------------------------------------------------
@@ -434,7 +434,7 @@ public class RelatedContentCardServiceTests
     [Test]
     public async Task GetFilteredItemsAsync_DecorateQueryIsInvoked()
     {
-        var decorateCalled = false;
+
         Action<RetrievePagesQueryParameters> decorateQuery = _ => decorateCalled = true;
 
         // Simple setup — no Callback needed, just verify our delegate gets called

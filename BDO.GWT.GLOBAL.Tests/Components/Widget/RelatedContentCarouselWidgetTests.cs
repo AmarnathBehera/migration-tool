@@ -205,14 +205,17 @@ public class RelatedContentCarouselWidgetTests
 
         await _sut.InvokeAsync(model);
 
-        Assert.That(capturedData, Is.Not.Null);
-        Assert.That(capturedData!.SelectedPageTypes, Is.Not.Empty);
-        Assert.That(capturedData.SelectedPageTypes, Contains.Item(nameof(Insight)));
-        Assert.That(capturedData.SelectedPageTypes, Contains.Item(nameof(BlogPost)));
-        Assert.That(capturedData.SelectedPageTypes, Contains.Item(nameof(Event)));
-        Assert.That(capturedData.SelectedPageTypes, Contains.Item(nameof(NewsArticle)));
-        Assert.That(capturedData.SelectedPageTypes, Contains.Item(nameof(Webinar)));
-        Assert.That(capturedData.SelectedPageTypes, Contains.Item(nameof(MicrositePage)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedData, Is.Not.Null);
+            Assert.That(capturedData!.SelectedPageTypes, Is.Not.Empty);
+            Assert.That(capturedData.SelectedPageTypes, Contains.Item(nameof(Insight)));
+            Assert.That(capturedData.SelectedPageTypes, Contains.Item(nameof(BlogPost)));
+            Assert.That(capturedData.SelectedPageTypes, Contains.Item(nameof(Event)));
+            Assert.That(capturedData.SelectedPageTypes, Contains.Item(nameof(NewsArticle)));
+            Assert.That(capturedData.SelectedPageTypes, Contains.Item(nameof(Webinar)));
+            Assert.That(capturedData.SelectedPageTypes, Contains.Item(nameof(MicrositePage)));
+        })
     }
 
     [Test]
@@ -257,10 +260,13 @@ public class RelatedContentCarouselWidgetTests
 
         await _sut.InvokeAsync(model);
 
-        Assert.That(capturedData!.Filters, Is.Not.Empty);
-        Assert.That(capturedData.Filters, Contains.Item(FilterParameterName.ContentType));
-        Assert.That(capturedData.Filters, Contains.Item(FilterParameterName.BusinessLine));
-        Assert.That(capturedData.Filters, Contains.Item(FilterParameterName.IndustryCategory));
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedData!.Filters, Is.Not.Empty);
+            Assert.That(capturedData.Filters, Contains.Item(FilterParameterName.ContentType));
+            Assert.That(capturedData.Filters, Contains.Item(FilterParameterName.BusinessLine));
+            Assert.That(capturedData.Filters, Contains.Item(FilterParameterName.IndustryCategory));
+        });
     }
 
     [Test]
@@ -316,15 +322,18 @@ public class RelatedContentCarouselWidgetTests
 
         await _sut.InvokeAsync(model);
 
-        Assert.That(capturedData, Is.Not.Null);
-        Assert.That(capturedData!.Title, Is.EqualTo("My Title"));
-        Assert.That(capturedData.Description, Is.EqualTo("My Description"));
-        Assert.That(capturedData.FilteringEnabled, Is.True);
-        Assert.That(capturedData.SeeAllLinkText, Is.EqualTo("See All"));
-        Assert.That(capturedData.SeeAllLinkUrl, Is.EqualTo("/all"));
-        Assert.That(capturedData.SeeAllLinkURLTarget, Is.EqualTo("_blank"));
-        Assert.That(capturedData.TopMargin, Is.EqualTo("20px"));
-        Assert.That(capturedData.BottomMargin, Is.EqualTo("40px"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedData, Is.Not.Null);
+            Assert.That(capturedData!.Title, Is.EqualTo("My Title"));
+            Assert.That(capturedData.Description, Is.EqualTo("My Description"));
+            Assert.That(capturedData.FilteringEnabled, Is.True);
+            Assert.That(capturedData.SeeAllLinkText, Is.EqualTo("See All"));
+            Assert.That(capturedData.SeeAllLinkUrl, Is.EqualTo("/all"));
+            Assert.That(capturedData.SeeAllLinkURLTarget, Is.EqualTo("_blank"));
+            Assert.That(capturedData.TopMargin, Is.EqualTo("20px"));
+            Assert.That(capturedData.BottomMargin, Is.EqualTo("40px"));
+        });
     }
 
     [Test]
@@ -535,6 +544,6 @@ public class RelatedContentCarouselWidgetTests
 
     private class FakePage : IWebPageFieldsSource
     {
-        public WebPageFields SystemFields { get; set; }
+        public WebPageFields SystemFields { get; set; } = null!;
     }
 }

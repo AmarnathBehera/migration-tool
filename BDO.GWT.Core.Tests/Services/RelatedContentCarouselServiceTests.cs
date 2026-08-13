@@ -150,9 +150,9 @@ public class RelatedContentCarouselServiceTests
         Assert.Multiple(() =>
         {
             Assert.That(dto.SeeAllLink, Is.Not.Null);
-            Assert.That(dto.SeeAllLink.Title, Is.EqualTo("See All"));
-            Assert.That(dto.SeeAllLink.URL, Is.EqualTo("/insights"));
-            Assert.That(dto.SeeAllLink.Target, Is.EqualTo("_blank"));
+            Assert.That(dto.SeeAllLink?.Title, Is.EqualTo("See All"));
+            Assert.That(dto.SeeAllLink?.URL, Is.EqualTo("/insights"));
+            Assert.That(dto.SeeAllLink?.Target, Is.EqualTo("_blank"));
         });
     }
 
@@ -193,7 +193,7 @@ public class RelatedContentCarouselServiceTests
 
         var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage, data, CancellationToken.None);
 
-        Assert.That(dto.SeeAllLink.Target, Is.EqualTo("_self"));
+        Assert.That(dto.SeeAllLink?.Target, Is.EqualTo("_self"));
     }
 
     [Test]
@@ -326,7 +326,7 @@ public class RelatedContentCarouselServiceTests
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<Func<IWebPageFieldsSource, bool>>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync((PaginationDto<ContentPageCardDto>)null);
+            .ReturnsAsync((PaginationDto<ContentPageCardDto>)null!);
 
         var result = await _sut.GetAPIFilteredItemsAsync(query, CancellationToken.None);
 
@@ -493,7 +493,7 @@ public class RelatedContentCarouselServiceTests
         return new RelatedContentCarouselData
         {
             FilteringEnabled = filteringEnabled,
-            Filters = filters,
+            Filters = filters ?? new HashSet<string>(),
             SelectedPageTypes = selectedPageTypes ?? new List<string> { nameof(Insight) },
             FeaturedPageNodeGuids = new List<ContentItemReference>()
         };
