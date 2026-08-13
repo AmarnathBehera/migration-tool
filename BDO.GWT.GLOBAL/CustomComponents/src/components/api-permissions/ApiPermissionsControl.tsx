@@ -1,43 +1,22 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useFormComponentCommandProvider, FormComponentProps } from "@kentico/xperience-admin-base";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { Button, Checkbox, InputBase, Spinner } from "@kentico/xperience-admin-components";
+import { useFormComponentCommandProvider } from "@kentico/xperience-admin-base";
+import type { ApiPermissionsProps, FilterType, InitResult, LoadMatrixResult, MatrixRow, MethodGroupOption, ToggleResult, UserOption } from "@model/apiPermissions";
 
-interface UserOption    { id: number; displayName: string; }
-interface MethodGroupOption { id: number; displayName: string; description: string; }
-
-interface MatrixRow {
-    userId: number;
-    methodGroupId: number;
-    userDisplayName: string;
-    methodGroupName: string;
-    allowRead: boolean;
-    allowManage: boolean;
-}
-
-interface InitResult {
-    users: UserOption[];
-    methodGroups: MethodGroupOption[];
-}
-
-interface LoadMatrixResult { rows: MatrixRow[]; }
-interface ToggleResult { success: boolean; message: string; }
-type FilterType = "users" | "methodgroup";
-
-interface ApiPermissionsProps extends FormComponentProps {
-    webChannelSettingId?: number;
-}
+const selectClasses = "w-full py-2.5 pl-4 pr-9 rounded-full text-sm leading-snug outline-none appearance-none border box-border transition-colors duration-200 text-label select-chevron bg-white cursor-pointer border-[#8C8C8C] hover:border-black";
 
 export const ApiPermissionsControl = (props: ApiPermissionsProps) => {
     const webChannelSettingId = props.webChannelSettingId ?? 0;
 
-    const [users, setUsers]               = useState<UserOption[]>([]);
+    const [users, setUsers] = useState<UserOption[]>([]);
     const [methodGroups, setMethodGroups] = useState<MethodGroupOption[]>([]);
-    const [matrix, setMatrix]             = useState<MatrixRow[]>([]);
+    const [matrix, setMatrix] = useState<MatrixRow[]>([]);
 
     const [filterType, setFilterType] = useState<FilterType>("users");
     const [selectedId, setSelectedId] = useState<number>(0);
     const [searchText, setSearchText] = useState<string>("");
     const [appliedSearch, setAppliedSearch] = useState<string>("");
-    const [loading, setLoading]       = useState(false);
+    const [loading, setLoading] = useState(false);
     const [initialized, setInitialized] = useState(false);
 
     const { executeCommand } = useFormComponentCommandProvider();
@@ -97,111 +76,108 @@ export const ApiPermissionsControl = (props: ApiPermissionsProps) => {
         );
     };
 
-    const options = filterType === "users" ? users : methodGroups;
+    const options = useMemo(() => filterType === "users" ? users : methodGroups, [filterType, users, methodGroups]);
 
-    const filteredMatrix = appliedSearch.trim()
-        ? matrix.filter(row => {
-            const name = filterType === "users" ? row.methodGroupName : row.userDisplayName;
-            return name.toLowerCase().includes(appliedSearch.toLowerCase());
-        })
-        : matrix;
+    const filteredMatrix = useMemo(() =>
+        appliedSearch.trim()
+            ? matrix.filter(row => {
+                const name = filterType === "users" ? row.methodGroupName : row.userDisplayName;
+                return name.toLowerCase().includes(appliedSearch.toLowerCase());
+            })
+            : matrix,
+        [matrix, appliedSearch, filterType]
+    );
 
     return (
-        <div style={{ padding: "16px", fontFamily: "inherit" }}>
-            {/* ── Filter bar ── */}
-            <table style={filterTableStyle}>
+        <div className="font-display">
+            <div className="mb-4">
+                <label className="block mb-2 text-sm font-normal text-label leading-4">
+                    Filter by
+                </label>
+                <select
+                    value={filterType}
+                    onChange={e => handleFilterTypeChange(e.target.value as FilterType)}
+                    className={selectClasses}
+                >
+                    <option value="users">Users</option>
+                    <option value="methodgroup">Method group</option>
+                </select>
+            </div>
+
+            <div className="mb-6">
+                <label className="block mb-2 text-sm font-normal text-label leading-4">
+                    {filterType === "users" ? "User" : "Method group"}
+                </label>
+                <select
+                    value={selectedId}
+                    onChange={e => setSelectedId(Number(e.target.value))}
+                    className={selectClasses}
+                >
+                    {options.map(o => (
+                        <option key={o.id} value={o.id}>{o.displayName}</option>
+                    ))}
+                </select>
+            </div>
+
+            {filterType === "methodgroup" && (
+                <div className="flex items-center gap-2 mb-4">
+                    <div className="flex-1 max-w-xs" onKeyDown={e => { if (e.key === "Enter") setAppliedSearch(searchText); }}>
+                        <InputBase
+                            value={searchText}
+                            onChange={e => setSearchText(e.target.value)}
+                            placeholder="Search…"
+                        />
+                    </div>
+                    <Button label="Search" onClick={() => setAppliedSearch(searchText)} />
+                    {appliedSearch && (
+                        <Button label="Clear" onClick={() => { setAppliedSearch(""); setSearchText(""); }} />
+                    )}
+                </div>
+            )}
+
+            <table className="w-full border-collapse text-sm">
+                <thead>
+                    <tr className="bg-[#e8e8e8]">
+                        <th className="py-2 px-3 text-left border-b border-separator font-semibold text-heading">&nbsp;</th>
+                        <th className="py-2 px-4 text-center border-b border-separator font-semibold text-heading w-[80px]">Read</th>
+                        <th className="py-2 px-4 text-center border-b border-separator font-semibold text-heading w-[80px]">Manage</th>
+                    </tr>
+                </thead>
                 <tbody>
-                    <tr>
-                        <td style={filterLabelStyle}>Filter by:</td>
-                        <td>
-                            <select style={filterSelectStyle} value={filterType}
-                                onChange={e => handleFilterTypeChange(e.target.value as FilterType)}>
-                                <option value="users">Users</option>
-                                <option value="methodgroup">Method group</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style={filterLabelStyle}>
-                            {filterType === "users" ? "User:" : "Method group:"}
-                        </td>
-                        <td>
-                            <select style={filterSelectStyle} value={selectedId}
-                                onChange={e => setSelectedId(Number(e.target.value))}>
-                                {options.map(o => (
-                                    <option key={o.id} value={o.id}>{o.displayName}</option>
-                                ))}
-                            </select>
-                        </td>
-                    </tr>
+                    {loading ? (
+                        <tr>
+                            <td colSpan={3} className="p-4">
+                                <div className="flex items-center gap-2 text-muted">
+                                    <Spinner />
+                                    <span>Loading…</span>
+                                </div>
+                            </td>
+                        </tr>
+                    ) : filteredMatrix.length === 0 ? (
+                        <tr>
+                            <td colSpan={3} className="p-4 text-muted">No data found.</td>
+                        </tr>
+                    ) : filteredMatrix.map(row => (
+                        <tr key={`${row.userId}-${row.methodGroupId}`} className="border-b border-[#eee]">
+                            <td className="py-1.5 px-3 text-body">
+                                {filterType === "users" ? row.methodGroupName : row.userDisplayName}
+                            </td>
+                            <td className="py-1.5 px-4 text-center">
+                                <Checkbox
+                                    checked={row.allowRead}
+                                    onChange={(_, checked) => handleToggle(row.userId, row.methodGroupId, "read", checked)}
+                                />
+                            </td>
+                            <td className="py-1.5 px-4 text-center">
+                                <Checkbox
+                                    checked={row.allowManage}
+                                    onChange={(_, checked) => handleToggle(row.userId, row.methodGroupId, "manage", checked)}
+                                />
+                            </td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
-
-            {/* ── Grid ── */}
-            <div style={{ marginTop: "16px" }}>
-                <table style={gridStyle}>
-                    <thead>
-                        <tr style={headerRowStyle}>
-                            <th style={searchThStyle}>
-                                {filterType === "methodgroup" && (
-                                    <>
-                                        <input
-                                            type="text"
-                                            placeholder="Search…"
-                                            value={searchText}
-                                            onChange={e => setSearchText(e.target.value)}
-                                            onKeyDown={e => { if (e.key === "Enter") setAppliedSearch(searchText); }}
-                                            style={searchInputStyle}
-                                        />
-                                        <button style={searchBtnStyle}
-                                            onClick={() => setAppliedSearch(searchText)}>
-                                            Search
-                                        </button>
-                                    </>
-                                )}
-                            </th>
-                            <th style={checkThStyle}>Read</th>
-                            <th style={checkThStyle}>Manage</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
-                            <tr><td colSpan={3} style={{ padding: "12px", color: "#888" }}>Loading…</td></tr>
-                        ) : filteredMatrix.length === 0 ? (
-                            <tr><td colSpan={3} style={{ padding: "12px", color: "#999" }}>No data found.</td></tr>
-                        ) : filteredMatrix.map(row => (
-                            <tr key={`${row.userId}-${row.methodGroupId}`} style={dataRowStyle}>
-                                <td style={nameTdStyle}>
-                                    {filterType === "users" ? row.methodGroupName : row.userDisplayName}
-                                </td>
-                                <td style={checkTdStyle}>
-                                    <input type="checkbox" checked={row.allowRead}
-                                        onChange={e => handleToggle(row.userId, row.methodGroupId, "read", e.target.checked)} />
-                                </td>
-                                <td style={checkTdStyle}>
-                                    <input type="checkbox" checked={row.allowManage}
-                                        onChange={e => handleToggle(row.userId, row.methodGroupId, "manage", e.target.checked)} />
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
         </div>
     );
 };
-
-const filterTableStyle:  React.CSSProperties = { borderCollapse: "collapse", marginBottom: "4px" };
-const filterLabelStyle:  React.CSSProperties = { paddingRight: "12px", fontWeight: 600, whiteSpace: "nowrap", textAlign: "right", paddingBottom: "6px" };
-const filterSelectStyle: React.CSSProperties = { padding: "4px 8px", border: "1px solid #ccc", borderRadius: "4px", minWidth: "240px", marginBottom: "6px" };
-
-const gridStyle:      React.CSSProperties = { width: "100%", borderCollapse: "collapse", fontSize: "13px" };
-const headerRowStyle: React.CSSProperties = { backgroundColor: "#e8e8e8" };
-const searchThStyle:  React.CSSProperties = { padding: "6px 10px", textAlign: "left", borderBottom: "1px solid #ccc" };
-const checkThStyle:   React.CSSProperties = { padding: "6px 16px", textAlign: "center", borderBottom: "1px solid #ccc", fontWeight: 600, width: "70px" };
-const dataRowStyle:   React.CSSProperties = { borderBottom: "1px solid #eee" };
-const nameTdStyle:    React.CSSProperties = { padding: "6px 10px" };
-const checkTdStyle:   React.CSSProperties = { padding: "6px", textAlign: "center" };
-
-const searchInputStyle: React.CSSProperties = { padding: "3px 6px", border: "1px solid #ccc", borderRadius: "3px", marginRight: "6px", width: "140px" };
-const searchBtnStyle:   React.CSSProperties = { padding: "3px 10px", border: "1px solid #999", borderRadius: "3px", backgroundColor: "#f0f0f0", cursor: "pointer" };

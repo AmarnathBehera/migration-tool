@@ -21,8 +21,8 @@ export const BDOSQLDropdown = (props: CustomDropdownProps) => {
                 className={`w-full py-2.5 pl-4 pr-9 rounded-full text-sm leading-snug outline-none appearance-none border box-border transition-colors duration-200 text-label select-chevron ${isReadOnly ? 'bg-[#F5F5F5] border-[#D0D0D0] cursor-default' : `bg-white cursor-pointer ${props.invalid ? 'border-error' : 'border-[#8C8C8C] hover:border-black'}`}`}
             >
                 <option value="">{props.defaultValue ?? 'Choose an option'}</option>
-                {props.options?.map((item, index) => (
-                    <option key={index} value={item.text}>
+                {props.options?.map(item => (
+                    <option key={item.value} value={item.text}>
                         {item.text}
                     </option>
                 ))}
