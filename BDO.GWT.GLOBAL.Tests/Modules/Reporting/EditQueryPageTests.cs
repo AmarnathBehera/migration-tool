@@ -35,7 +35,8 @@ public class EditQueryPageTests
     [Test]
     public void Page_InheritsFromPage_Templated()
     {
-        Assert.That(typeof(Page<>).IsAssignableFrom(typeof(EditQuery).GetGenericTypeDefinition()), Is.False);
+        // Avoid calling GetGenericTypeDefinition on a non-generic type which throws InvalidOperationException
+        Assert.That(typeof(Page<>).IsAssignableFrom(typeof(EditQuery)), Is.False);
         // Instead assert that EditQuery inherits from Page<EditSqlTemplateClientProperties>
         Assert.That(typeof(Page<EditSqlTemplateClientProperties>).IsAssignableFrom(typeof(EditQuery)), Is.True);
     }
