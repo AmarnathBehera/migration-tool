@@ -1,6 +1,5 @@
 ﻿using CMS.Base;
 using CMS.Core;
-using CMS.DataEngine;
 using CMS.Helpers;
 using CMS.Membership;
 using Kentico.Xperience.Admin.Base;
@@ -17,9 +16,7 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
     ISqlBrowserResultProvider sqlBrowserQueryProvider,
     ISqlBrowserExporter sqlBrowserExporter,
     IEventLogService eventLogService,
-    IUIPermissionEvaluator permissionEvaluator,
-    IPageLinkGenerator pageLinkGenerator,
-    IInfoProvider<ReportingReportInfo> savedQueryProvider) : DataContainerListingPage
+    IPageLinkGenerator pageLinkGenerator) : DataContainerListingPage
     {
         [PageParameter(typeof(IntPageModelBinder))]
         public int ReportingChannelSettingId { get; set; }
@@ -57,7 +54,6 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
         [PageCommand(Permission = ReportingReportListingPage.EXPORT_PERMISSION)]
         public async Task<ICommandResponse> Export(ExportConfirmationDialogModel model)
         {
-            string? exportedPath = null;
             var exportType = model.ExportType?.ToLower() switch
             {
                 "csv" => SqlBrowserExportType.Csv,

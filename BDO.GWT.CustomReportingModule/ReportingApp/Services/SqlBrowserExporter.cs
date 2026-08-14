@@ -34,7 +34,7 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
             var columns = resultProvider.GetColumnNames().ToArray();
             var rows = await resultProvider.GetRowsAsDynamic();
 
-            if (!columns.Any())
+            if (columns.Length == 0)
             {
                 return (Array.Empty<byte>(), string.Empty, "application/octet-stream");
             }
@@ -46,10 +46,7 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
 
                 string json = JsonSerializer.Serialize(
                     list,
-                    new JsonSerializerOptions
-                    {
-                        WriteIndented = true
-                    });
+                    IndentedJsonOptions);
 
                 return (
                     Encoding.UTF8.GetBytes(json),
@@ -105,5 +102,10 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
                 "App_Data",
                 "Export");
         }
+
+        private static readonly JsonSerializerOptions IndentedJsonOptions = new()
+        {
+            WriteIndented = true
+        };
     }
 }

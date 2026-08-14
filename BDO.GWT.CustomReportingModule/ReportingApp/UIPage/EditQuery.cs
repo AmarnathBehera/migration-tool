@@ -1,6 +1,5 @@
 ﻿using CMS.Core;
 using CMS.DataEngine;
-using CMS.Helpers;
 using CMS.Membership;
 using Kentico.Xperience.Admin.Base;
 using System.Text.RegularExpressions;
@@ -11,10 +10,8 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
     [UIEvaluatePermission(SystemPermissions.VIEW)]
     public class EditQuery(
       IEventLogService eventLogService,
-      IProgressiveCache cache,
       ISqlBrowserResultProvider sqlBrowserResultProvider,
       ISqlBrowserExporter sqlBrowserExporter,
-      IPageLinkGenerator pageLinkGenerator,
       IInfoProvider<ReportingReportInfo> savedQueryProvider)
       : Page<EditSqlTemplateClientProperties>
     {

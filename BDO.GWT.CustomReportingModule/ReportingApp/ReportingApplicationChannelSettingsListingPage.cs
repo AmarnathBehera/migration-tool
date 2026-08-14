@@ -52,7 +52,7 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
         //Creates a new StateChannelSettingInfo for the provided channel if none exists.
         private void EnsureChannelSetting(List<ReportingChannelSettingInfo> currentChannelSettings, ChannelInfo channel)
         {
-            if (currentChannelSettings.Count() == 0)
+            if (currentChannelSettings.Any())
             {
                 var newSetting = new ReportingChannelSettingInfo
                 {

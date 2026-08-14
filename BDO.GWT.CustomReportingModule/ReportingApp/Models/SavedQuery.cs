@@ -22,7 +22,6 @@
             ID = source.ReportingReportID;
             Name = source.ReportingReportDisplayName;
             Text = source.ReportingReportQuery;
-            //Order = source.Repor;
         }
     }
 }
