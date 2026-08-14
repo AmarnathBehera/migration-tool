@@ -58,6 +58,12 @@ namespace BDO.GWT.Core.Constants
         Blog.CONTENT_TYPE_NAME,
         BlogContributors.CONTENT_TYPE_NAME,
         BlogPost.CONTENT_TYPE_NAME,
+        Subscribe.CONTENT_TYPE_NAME,
+        SubscribeRemove.CONTENT_TYPE_NAME,
+        SubscribeConfirm.CONTENT_TYPE_NAME,
+        InsightSubscriptionConfirmationPage.CONTENT_TYPE_NAME,
+        Insightunsubscriptionpage.CONTENT_TYPE_NAME,
+        ThankYouConversionPage.CONTENT_TYPE_NAME
     };
     }
 }
