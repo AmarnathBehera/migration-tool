@@ -91,7 +91,6 @@ public class NewsletterSubscriptionService(
                 Subject = "Newsletter Subscription Confirmation",
                 EmailFormat = EmailFormatEnum.Html
             };
-            var subscribe = newsletterSubscriptionData.NewsletterGuids;
             using (var scope = _scopeFactory.CreateScope())
             {
                 var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
