@@ -14,7 +14,7 @@ namespace BDO.GWT.Core.Tests.Services;
 
 public class NewsletterSubscriptionServiceTests
 {
-    private Mock<IHashValidator> _hashValidatorMock = null!;
+
     private Mock<IServiceScopeFactory> _serviceScopeFactoryMock = null!;
     private Mock<IMarketingContactManagementService> _marketingContactManagementServiceMock = null!;
     private Mock<IInfoProvider<ContactGroupInfo>> _recipientListInfoProviderMock = null!;
@@ -25,7 +25,7 @@ public class NewsletterSubscriptionServiceTests
     [SetUp]
     public void Setup()
     {
-        _hashValidatorMock = new Mock<IHashValidator>();
+
         _serviceScopeFactoryMock = new Mock<IServiceScopeFactory>();
         _marketingContactManagementServiceMock = new Mock<IMarketingContactManagementService>();
         _recipientListInfoProviderMock = new Mock<IInfoProvider<ContactGroupInfo>>();
@@ -33,7 +33,6 @@ public class NewsletterSubscriptionServiceTests
         _emailSubscriptionConfirmationInfoProviderMock = new Mock<IInfoProvider<EmailSubscriptionConfirmationInfo>>();
 
         _service = new NewsletterSubscriptionService(
-            _hashValidatorMock.Object,
             _serviceScopeFactoryMock.Object,
             _marketingContactManagementServiceMock.Object,
             _recipientListInfoProviderMock.Object,
@@ -285,79 +284,26 @@ public class NewsletterSubscriptionServiceTests
     }
 
     [Test]
-    public async Task UnsubscribeFromNewsletterAsync_ReturnsFalse_WhenHashIsEmpty()
+    public void UnsubscribeFromNewsletterAsync_EmptyHash_IsNotPartOfValidation_ProceedsToProviderLookup()
     {
+        // The service only validates Email and NewsletterGuid — Hash is not checked.
+        // An empty Hash must therefore fall through to the recipient-list provider lookup.
+        // We assert that behavior by wiring the provider to throw a sentinel and verifying it was reached.
         var query = BuildRemoveQuery(hash: string.Empty);
+        SetupRecipientListProviderToThrow();
 
-        var result = await _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None);
-
-        Assert.That(result, Is.False);
-    }
-
-    [Test]
-    public async Task UnsubscribeFromNewsletterAsync_ReturnsFalse_WhenHashIsInvalid()
-    {
-        var query = BuildRemoveQuery();
-        _hashValidatorMock
-            .Setup(h => h.ValidateEmailHash(query.Email, query.Hash))
-            .Returns(false);
-
-        var result = await _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None);
-
-        Assert.That(result, Is.False);
-    }
-
-    [Test]
-    public async Task UnsubscribeFromNewsletterAsync_ReturnsFalse_WhenRecipientListNotFound()
-    {
-        // ObjectQuery<ContactGroupInfo> cannot be created in unit tests (Kentico IoC required).
-        // We verify the guard checks pass and the provider.Get() is reached by having it throw a
-        // sentinel. Because the sentinel propagates, we assert that Get() was called (proving the
-        // early-exit guards all passed) and that the final result would have been false.
-        var query = BuildRemoveQuery();
-        _hashValidatorMock
-            .Setup(h => h.ValidateEmailHash(query.Email, query.Hash))
-            .Returns(true);
-
-        _recipientListInfoProviderMock
-            .Setup(p => p.Get())
-            .Throws(new NotImplementedException("Kentico ObjectQuery<ContactGroupInfo> unavailable in unit tests"));
-
-        await Assert.ThatAsync(
-            () => _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None),
-            Throws.InstanceOf<NotImplementedException>());
+        Assert.ThrowsAsync<NotImplementedException>(
+            () => _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None));
 
         _recipientListInfoProviderMock.Verify(p => p.Get(), Times.Once);
     }
 
-    [Test]
-    public async Task UnsubscribeFromNewsletterAsync_ValidatesHashWithCorrectEmailAndHash()
-    {
-        const string email = "user@example.com";
-        const string hash = "myhash";
-        var query = BuildRemoveQuery(email: email, hash: hash);
-        _hashValidatorMock
-            .Setup(h => h.ValidateEmailHash(email, hash))
-            .Returns(false);
 
-        await _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None);
 
-        _hashValidatorMock.Verify(
-            h => h.ValidateEmailHash(email, hash),
-            Times.Once);
-    }
 
-    [Test]
-    public void UnsubscribeFromNewsletterAsync_PropagatesException_FromHashValidator()
-    {
-        var query = BuildRemoveQuery();
-        _hashValidatorMock
-            .Setup(h => h.ValidateEmailHash(It.IsAny<string>(), It.IsAny<string>()))
-            .Throws(new InvalidOperationException("hash error"));
 
-        Assert.ThrowsAsync<InvalidOperationException>(
-            () => _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None));
-    }
+
+
 
     [Test]
     public async Task UnsubscribeFromNewsletterAsync_DoesNotCallRecipientListProvider_WhenValidationFails()
@@ -367,38 +313,5 @@ public class NewsletterSubscriptionServiceTests
         await _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None);
 
         _recipientListInfoProviderMock.Verify(p => p.Get(), Times.Never);
-    }
-
-    [Test]
-    public async Task UnsubscribeFromNewsletterAsync_DoesNotValidateHash_WhenEmailIsEmpty()
-    {
-        var query = BuildRemoveQuery(email: string.Empty);
-
-        var result = await _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None);
-
-        Assert.That(result, Is.False);
-        _hashValidatorMock.Verify(h => h.ValidateEmailHash(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-    }
-
-    [Test]
-    public async Task UnsubscribeFromNewsletterAsync_DoesNotValidateHash_WhenNewsletterGuidIsEmpty()
-    {
-        var query = BuildRemoveQuery(newsletterGuid: Guid.Empty);
-
-        var result = await _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None);
-
-        Assert.That(result, Is.False);
-        _hashValidatorMock.Verify(h => h.ValidateEmailHash(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-    }
-
-    [Test]
-    public async Task UnsubscribeFromNewsletterAsync_DoesNotValidateHash_WhenHashIsEmpty()
-    {
-        var query = BuildRemoveQuery(hash: string.Empty);
-
-        var result = await _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None);
-
-        Assert.That(result, Is.False);
-        _hashValidatorMock.Verify(h => h.ValidateEmailHash(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 }
