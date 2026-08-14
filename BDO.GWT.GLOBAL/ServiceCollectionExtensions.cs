@@ -40,6 +40,9 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IMicrositePageService, MicrositePageService>();
         serviceCollection.AddScoped<IBreadcrumbsService, BreadcrumbsService>();
         serviceCollection.AddScoped<IMicrositeHeaderService, MicrositeHeaderService>();
+
+        serviceCollection.AddScoped<IGDPRUserLookupService, GDPRUserService>();
+        serviceCollection.AddScoped<IApiPermissionService, ApiPermissionService>();
     }
 
 }

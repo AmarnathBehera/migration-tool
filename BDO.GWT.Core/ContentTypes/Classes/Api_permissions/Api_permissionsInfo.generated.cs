@@ -1,7 +1,5 @@
 using System;
 using System.Data;
-using System.Collections.Generic;
-using System.Linq;
 
 using CMS;
 using CMS.DataEngine;
@@ -30,10 +28,6 @@ namespace BDO
         public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(IInfoProvider<Api_permissionsInfo>), OBJECT_TYPE, "bdo.api_permissions", "Api_permissionsID", null, null, null, null, null, null, null)
         {
             TouchCacheDependencies = true,
-            DependsOn = new List<ObjectDependency>()
-            {
-                new ObjectDependency("Channel", "cms.channel", ObjectDependencyEnum.RequiredHasDefault),
-            },
         };
 
 
@@ -49,24 +43,13 @@ namespace BDO
 
 
         /// <summary>
-        /// Channel.
+        /// API permission web channel setting ID.
         /// </summary>
         [DatabaseField]
-        public virtual int Channel
+        public virtual string APIPermissionWebChannelSettingID
         {
-            get => ValidationHelper.GetInteger(GetValue(nameof(Channel)), 0);
-            set => SetValue(nameof(Channel), value);
-        }
-
-
-        /// <summary>
-        /// Filter by.
-        /// </summary>
-        [DatabaseField]
-        public virtual string FilterBy
-        {
-            get => ValidationHelper.GetString(GetValue(nameof(FilterBy)), String.Empty);
-            set => SetValue(nameof(FilterBy), value);
+            get => ValidationHelper.GetString(GetValue(nameof(APIPermissionWebChannelSettingID)), String.Empty);
+            set => SetValue(nameof(APIPermissionWebChannelSettingID), value);
         }
 
 
@@ -77,7 +60,7 @@ namespace BDO
         public virtual string MethodGroup
         {
             get => ValidationHelper.GetString(GetValue(nameof(MethodGroup)), String.Empty);
-            set => SetValue(nameof(MethodGroup), value);
+            set => SetValue(nameof(MethodGroup), value, String.Empty);
         }
 
 
@@ -88,7 +71,29 @@ namespace BDO
         public virtual string User
         {
             get => ValidationHelper.GetString(GetValue(nameof(User)), String.Empty);
-            set => SetValue(nameof(User), value);
+            set => SetValue(nameof(User), value, String.Empty);
+        }
+
+
+        /// <summary>
+        /// Read.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool Read
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(Read)), false);
+            set => SetValue(nameof(Read), value);
+        }
+
+
+        /// <summary>
+        /// Manage.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool Manage
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(Manage)), false);
+            set => SetValue(nameof(Manage), value);
         }
 
 
