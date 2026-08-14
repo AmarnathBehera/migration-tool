@@ -57,47 +57,34 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
             // Only allow SELECT queries (skip leading comments/whitespace and inspect first token)
             static string? GetFirstTokenSkippingComments(string sql)
             {
-                if (string.IsNullOrEmpty(sql))
+                if (string.IsNullOrWhiteSpace(sql))
                 {
                     return null;
                 }
 
-                int i = 0;
-                int len = sql.Length;
-                while (i < len)
+                int index = 0;
+
+                while (index < sql.Length)
                 {
-                    // skip whitespace
-                    while (i < len && char.IsWhiteSpace(sql[i])) i++;
-                    if (i >= len) break;
+                    SkipWhitespace(sql, ref index);
 
-                    // skip line comment -- until end of line
-                    if (i + 1 < len && sql[i] == '-' && sql[i + 1] == '-')
+                    if (index >= sql.Length)
                     {
-                        i += 2;
-                        while (i < len && sql[i] != '\n') i++;
+                        return null;
+                    }
+
+                    if (SkipLineComment(sql, ref index) || SkipBlockComment(sql, ref index))
+                    {
                         continue;
                     }
 
-                    // skip block comment /* ... */
-                    if (i + 1 < len && sql[i] == '/' && sql[i + 1] == '*')
+                    string? token = ReadToken(sql, ref index);
+                    if (!string.IsNullOrEmpty(token))
                     {
-                        i += 2;
-                        while (i + 1 < len && !(sql[i] == '*' && sql[i + 1] == '/')) i++;
-                        if (i + 1 < len) i += 2;
-                        continue;
+                        return token;
                     }
 
-                    // next token starts here
-                    int start = i;
-                    while (i < len && (char.IsLetter(sql[i]) || sql[i] == '_')) i++;
-                    if (start == i) // no letter token
-                    {
-                        // consume a non-letter char and continue
-                        i++;
-                        continue;
-                    }
-
-                    return sql.Substring(start, i - start);
+                    index++;
                 }
 
                 return null;
@@ -123,6 +110,72 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
             return Task.FromResult(response.AddSuccessMessage("Query executed."));
         }
 
+        private static void SkipWhitespace(string sql, ref int index)
+        {
+            while (index < sql.Length && char.IsWhiteSpace(sql[index]))
+            {
+                index++;
+            }
+        }
+
+        private static bool SkipLineComment(string sql, ref int index)
+        {
+            if (index + 1 >= sql.Length ||
+                sql[index] != '-' ||
+                sql[index + 1] != '-')
+            {
+                return false;
+            }
+
+            index += 2;
+
+            while (index < sql.Length && sql[index] != '\n')
+            {
+                index++;
+            }
+
+            return true;
+        }
+
+        private static bool SkipBlockComment(string sql, ref int index)
+        {
+            if (index + 1 >= sql.Length ||
+                sql[index] != '/' ||
+                sql[index + 1] != '*')
+            {
+                return false;
+            }
+
+            index += 2;
+
+            while (index + 1 < sql.Length &&
+                   !(sql[index] == '*' && sql[index + 1] == '/'))
+            {
+                index++;
+            }
+
+            if (index + 1 < sql.Length)
+            {
+                index += 2;
+            }
+
+            return true;
+        }
+
+        private static string? ReadToken(string sql, ref int index)
+        {
+            int start = index;
+
+            while (index < sql.Length &&
+                   (char.IsLetter(sql[index]) || sql[index] == '_'))
+            {
+                index++;
+            }
+
+            return start == index
+                ? null
+                : sql.Substring(start, index - start);
+        }
         [PageCommand]
         public Task<ICommandResponse<SavedQuery?>> RenameQuery(SavedQuery query)
         {
