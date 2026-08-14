@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.AddHttpClient();
         serviceCollection.AddScoped<IPageContext, XperiencePageContext>();
+        serviceCollection.AddScoped<IMicrositeHeaderService, MicrositeHeaderService>();
         serviceCollection.AddScoped<XperiencePageContext>();
         serviceCollection.AddScoped<IWebsiteContext, WebsiteContext>();
         serviceCollection.ConfigureOptions<SEOOptionsSetup>();
