@@ -38,6 +38,9 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IBreadcrumbsService, BreadcrumbsService>();
         serviceCollection.AddScoped<IMicrositeHeaderService, MicrositeHeaderService>();
 
+        serviceCollection.AddScoped<IGDPRUserLookupService, GDPRUserService>();
+        serviceCollection.AddScoped<IApiPermissionService, ApiPermissionService>();
+
         // Register Custom Reporting services
         serviceCollection.AddSingleton<ISqlBrowserResultProvider, SqlBrowserResultProvider>();
         serviceCollection.AddSingleton<ISqlBrowserExporter, SqlBrowserExporter>();
