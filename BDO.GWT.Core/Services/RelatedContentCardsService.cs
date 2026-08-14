@@ -371,7 +371,7 @@ public class RelatedContentCardService : IRelatedContentCardService
             isComingSoon = false,
             ImageAltText = null,
             Type = type,
-            Title = title,
+            Title = title ?? string.Empty,
             Date = page.SystemFields.ContentItemCommonDataLastPublishedWhen
                    ?? page.SystemFields.ContentItemCommonDataFirstPublishedWhen,
             UpdatedOnDate = null,

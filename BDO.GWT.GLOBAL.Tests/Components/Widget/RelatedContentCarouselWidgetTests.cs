@@ -527,7 +527,7 @@ public class RelatedContentCarouselWidgetTests
         return viewModel;
     }
 
-    private static IWebPageFieldsSource CreateFakePage(Guid guid)
+    private static FakePage CreateFakePage(Guid guid)
     {
         var fields = (WebPageFields)RuntimeHelpers.GetUninitializedObject(typeof(WebPageFields));
         SetProperty(fields, nameof(WebPageFields.ContentItemGUID), guid);
