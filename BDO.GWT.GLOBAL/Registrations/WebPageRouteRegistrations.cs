@@ -370,7 +370,7 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
     customViewName: "~/Views/SubscribeConfirm/Index.cshtml",
     ContentTypeNames = new[] { "BDO.Insight" },
     IconClass = "xp-market")]
-[assembly: RegisterWebPageRoute(SubscribeRemove.CONTENT_TYPE_NAME, typeof(SubscribeConfirmController))]
+[assembly: RegisterWebPageRoute(SubscribeRemove.CONTENT_TYPE_NAME, typeof(SubscribeRemoveController))]
 
 
 [assembly: RegisterPageTemplate(

@@ -6,13 +6,10 @@ using BDO.GWT.Web.Core.Data.Queries;
 using CMS.ContactManagement;
 using CMS.DataEngine;
 using CMS.EmailEngine;
-using CMS.EmailLibrary;
 using CMS.EmailMarketing;
 using CMS.Websites.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System.Globalization;
-using System.Linq;
 
 namespace BDO.GWT.Xperience.Core.LiveSite.Services;
 
@@ -24,13 +21,12 @@ public interface INewsletterSubscriptionService
 }
 
 public class NewsletterSubscriptionService(
-    IHashValidator hashValidator, IServiceScopeFactory scopeFactory,
+    IServiceScopeFactory scopeFactory,
     IMarketingContactManagementService marketingContactManagementService,
     IInfoProvider<ContactGroupInfo> recipientListInfoProvider,
     IInfoProvider<ContactGroupMemberInfo> contactGroupMemberInfoProvider,
     IInfoProvider<EmailSubscriptionConfirmationInfo> emailSubscriptionConfirmationInfoProvider) : INewsletterSubscriptionService
 {
-    private readonly IHashValidator _hashValidator = hashValidator;
     private readonly IMarketingContactManagementService _marketingContactManagementService = marketingContactManagementService;
     private readonly IInfoProvider<ContactGroupInfo> _recipientListInfoProvider = recipientListInfoProvider;
     private readonly IInfoProvider<ContactGroupMemberInfo> _contactGroupMemberInfoProvider = contactGroupMemberInfoProvider;
@@ -92,9 +88,10 @@ public class NewsletterSubscriptionService(
             {
                 From = fromEmail,
                 Recipients = newsletterSubscriptionData.Email,
+                Subject = "Newsletter Subscription Confirmation",
                 EmailFormat = EmailFormatEnum.Html
             };
-
+            var subscribe = newsletterSubscriptionData.NewsletterGuids;
             using (var scope = _scopeFactory.CreateScope())
             {
                 var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
@@ -135,10 +132,7 @@ public class NewsletterSubscriptionService(
     public async Task<bool> UnsubscribeFromNewsletterAsync(SubscribeRemoveQuery subscribeRemoveQuery, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(subscribeRemoveQuery.Email) ||
-            subscribeRemoveQuery.NewsletterGuid == Guid.Empty ||
-            string.IsNullOrEmpty(subscribeRemoveQuery.Hash) ||
-            !_hashValidator.ValidateEmailHash(subscribeRemoveQuery.Email, subscribeRemoveQuery.Hash))
-        {
+            subscribeRemoveQuery.NewsletterGuid == Guid.Empty)     {
             return false;
         }
 
