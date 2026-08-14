@@ -71,12 +71,23 @@ variable "appsettings.appInsightsAPIConnectionString" {
     value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ai-gwt-xbyk-api-#{environment.abbreviation}-eur-we-connectionstring)" {}
 }
 
-variable "appsettings.azureAdClientId" {
+variable "appsettings.cmsAppClientId" {
     value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-cms-app-id)" {}
 }
 
-variable "appsettings.azureAdClientSecret" {
+variable "appsettings.cmsAppClientSecret" {
     value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-cms-app-secret)" {}
+}
+variable "appsettings.apiAppClientId" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-api-app-id)" {}
+}
+
+variable "appsettings.apiAppClientSecret" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-api-app-secret)" {}
+}
+
+variable "appsettings.apiAppAudience" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-api-app-audience)" {}
 }
 
 variable "appsettings.CMSAzureSharedKey" {

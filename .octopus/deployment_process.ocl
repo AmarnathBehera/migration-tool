@@ -41,12 +41,12 @@ step "deploy-cms-app-service" {
                   },
                   {
                     "name": "AzureAd__ClientId",
-                    "value": "#{appsettings.azureAdClientId}",
+                    "value": "#{appsettings.cmsAppClientId}",
                     "slotSetting": false
                   },
                     {
                     "name": "AzureAd__ClientSecret",
-                    "value": "#{appsettings.azureAdClientSecret}",
+                    "value": "#{appsettings.cmsAppClientSecret}",
                     "slotSetting": false
                   },
                   {
@@ -160,12 +160,12 @@ step "deploy-mvc-app-service" {
                   },
                   {
                     "name": "AzureAd__ClientId",
-                    "value": "#{appsettings.azureAdClientId}",
+                    "value": "#{appsettings.cmsAppClientId}",
                     "slotSetting": false
                   },
                     {
                     "name": "AzureAd__ClientSecret",
-                    "value": "#{appsettings.azureAdClientSecret}",
+                    "value": "#{appsettings.cmsAppClientSecret}",
                     "slotSetting": false
                   },
                   {
@@ -284,12 +284,17 @@ step "deploy-api-app-service" {
                   },
                   {
                     "name": "AzureAd__ClientId",
-                    "value": "#{appsettings.azureAdClientId}",
+                    "value": "#{appsettings.apiAppClientId}",
                     "slotSetting": false
                   },
                   {
                     "name": "AzureAd__ClientSecret",
-                    "value": "#{appsettings.azureAdClientSecret}",
+                    "value": "#{appsettings.apiAppClientSecret}",
+                    "slotSetting": false
+                  },
+                                    {
+                    "name": "AzureAd__Audience",
+                    "value": "#{appsettings.apiAppAudience}",
                     "slotSetting": false
                   },
                   {
