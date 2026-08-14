@@ -146,7 +146,6 @@
             serviceCollection.AddScoped<ISiteContext, SiteContext>();
             serviceCollection.AddScoped<IVisitorContext, VisitorContext>();
             serviceCollection.AddScoped<IHashSaltProvider, HashSaltProvider>();
-            serviceCollection.AddScoped<IHashValidator, HashValidator>();
             serviceCollection.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
             serviceCollection.AddScoped<ICultureService, CultureService>();
             serviceCollection.AddScoped<IChannelAccessService, ChannelAccessService>();
