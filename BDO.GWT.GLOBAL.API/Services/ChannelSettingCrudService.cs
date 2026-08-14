@@ -25,6 +25,7 @@ public class ChannelSettingCrudService : IChannelSettingCrudService
     private readonly IInfoProvider<FilteringInfo> _filteringInfoProvider;
     private readonly IInfoProvider<OurPeopleInfo> _ourPeopleInfoProvider;
 
+#pragma warning disable S107
     public ChannelSettingCrudService(
         IInfoProvider<WebChannelSnippetInfo> webChannelSnippetInfoProvider,
         IInfoProvider<EmailInfo> emailInfoProvider,
@@ -34,6 +35,7 @@ public class ChannelSettingCrudService : IChannelSettingCrudService
         IInfoProvider<PrintorShareInfo> printorShareInfoProvider,
         IInfoProvider<FilteringInfo> filteringInfoProvider,
         IInfoProvider<OurPeopleInfo> ourPeopleInfoProvider)
+#pragma warning restore S107
     {
         _webChannelSnippetInfoProvider = webChannelSnippetInfoProvider;
         _emailInfoProvider = emailInfoProvider;

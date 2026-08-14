@@ -58,6 +58,8 @@
 
             public const string Hero = WidgetPrefix + "Hero";
 
+            public const string RelatedContentCarousel = WidgetPrefix + "RelatedContentCarousel";
+
         }
 
         //sections

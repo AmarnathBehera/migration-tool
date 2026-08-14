@@ -29,6 +29,7 @@ public class UserCrudService : IUserCrudService
     private readonly IInfoProvider<ChannelInfo> _channelInfoProvider;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
+#pragma warning disable S107
     public UserCrudService(
         IInfoProvider<UserInfo> userInfoProvider,
         IInfoProvider<UserRoleInfo> userRoleInfoProvider,
@@ -38,6 +39,7 @@ public class UserCrudService : IUserCrudService
         IInfoProvider<WebsiteChannelInfo> websiteChannelInfoProvider,
         IInfoProvider<ChannelInfo> channelInfoProvider,
         IHttpContextAccessor httpContextAccessor)
+#pragma warning restore S107
     {
         _userInfoProvider = userInfoProvider;
         _userRoleInfoProvider = userRoleInfoProvider;

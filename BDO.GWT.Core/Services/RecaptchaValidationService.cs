@@ -17,9 +17,6 @@ namespace BDO.GWT.Core.Services
 
     public class RecaptchaValidationService : IRecaptchaValidationService
     {
-        private const string RecaptchaVersionV2 = "RecaptchaV2";
-        private const string RecaptchaVersionV3 = "RecaptchaV3";
-
         private readonly IWebsiteChannelContext _websiteChannelContext;
         private readonly IInfoProvider<WebsiteCaptchaSettingsInfo> _captchaSettingsProvider;
 
@@ -60,7 +57,7 @@ namespace BDO.GWT.Core.Services
         protected virtual string? GetRecaptchaPrivateKey(bool isV3)
         {
             int channelId = _websiteChannelContext.WebsiteChannelID;
-            string expectedVersion = isV3 ? RecaptchaVersionV3 : RecaptchaVersionV2;
+            int expectedVersion = isV3 ? 1 : 0; // replace with actual enum values
 
             var captchaSettings = _captchaSettingsProvider
                 .Get()

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.ThankYouConversionPages</CodeName>
+    <GUID>ee6c5f62-7206-443a-8b01-6968b35d5560</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.ThankYouConversionPage">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.ThankYouConversionPage</CodeName>
+        <GUID>df55a00f-7d8c-40ac-945c-2628fd44c833</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>
