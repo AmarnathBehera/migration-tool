@@ -149,7 +149,6 @@
             serviceCollection.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
             serviceCollection.AddScoped<ICultureService, CultureService>();
             serviceCollection.AddScoped<IChannelAccessService, ChannelAccessService>();
-            serviceCollection.AddScoped<IMicrositeHeaderService, MicrositeHeaderService>();
             serviceCollection.AddScoped<IDateTimeProvider, DateTimeProvider>();
             serviceCollection.AddScoped<IRelatedContentCardService, RelatedContentCardService>();
             serviceCollection.AddScoped<IRelatedContentCarouselService, RelatedContentCarouselService>();
