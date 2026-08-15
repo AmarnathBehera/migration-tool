@@ -40,18 +40,20 @@ public class SectionDealsPageService : ISectionDealsPageService
 
     public async Task<SectionDealsDto> GetSectionDealsDtoAsync(CancellationToken cancellationToken)
     {
-        var results = await _contentRetriever.GetPagesAsync<SectionDeals>(
-           new RetrievePagesParameters
-           {
-               LinkedItemsMaxLevel = 5
-           },
-           query => query
-               .Where(w => w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID))
-               .TopN(1),
-           RetrievalCacheSettings.CacheDisabled,
-           cancellationToken);
+        //var results = await _contentRetriever.GetPagesAsync<SectionDeals>(
+        //   new RetrievePagesParameters
+        //   {
+        //       LinkedItemsMaxLevel = 5
+        //   },
+        //   query => query
+        //       .Where(w => w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID))
+        //       .TopN(1),
+        //   RetrievalCacheSettings.CacheDisabled,
+        //   cancellationToken);
 
-        var page = results?.FirstOrDefault();
+        var page = await _contentRetriever.RetrieveCurrentPageAsync<SectionDeals>(
+            new RetrieveCurrentPageParameters() { LinkedItemsMaxLevel = 5},
+            cancellationToken);
         if (page is null)
         {
             return new SectionDealsDto
