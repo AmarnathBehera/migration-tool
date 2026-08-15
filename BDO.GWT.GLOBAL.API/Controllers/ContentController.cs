@@ -22,13 +22,14 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         {
             _contentService = contentService;
         }
-        [AllowAnonymous]
         [HttpGet("categories", Name = "GetContentCategories")]
-        //[HasPermission(ApiMethodGroupName.Content, ApiPermission.Read)]
+        [HasPermission(ApiMethodGroupName.Content, ApiPermission.Read)]
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(IEnumerable<ContentCategoryDto>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<IEnumerable<ContentCategoryDto>>> GetContentCategories([FromRoute] int memberFirmId, [FromRoute] string culture, CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<ContentCategoryDto>>> GetContentCategories(int memberFirmId,string? culture, CancellationToken cancellationToken)
         {
-            var dtos = await _contentService.GetContentCategoriesAsync(culture, cancellationToken);
+            int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
+
+            var dtos = await _contentService.GetContentCategoriesAsync(channelId,culture, cancellationToken);
 
             return Ok(dtos);
         }
