@@ -55,6 +55,7 @@ namespace BDO.GWT.Core.Constants
         MicrositePage.CONTENT_TYPE_NAME,
         SectionMicrosites.CONTENT_TYPE_NAME,
         Deal.CONTENT_TYPE_NAME,
+        RemoteDeal.CONTENT_TYPE_NAME,
         SectionDeals.CONTENT_TYPE_NAME,
         Blog.CONTENT_TYPE_NAME,
         BlogPost.CONTENT_TYPE_NAME,
@@ -76,6 +77,7 @@ namespace BDO.GWT.Core.Constants
         SubscribeConfirm.CONTENT_TYPE_NAME,
         SubscribeRemove.CONTENT_TYPE_NAME,
         SubService.CONTENT_TYPE_NAME,
+        Search.CONTENT_TYPE_NAME,
         ThankYouConversionPage.CONTENT_TYPE_NAME,
         ThankYouConversionPages.CONTENT_TYPE_NAME,
     };

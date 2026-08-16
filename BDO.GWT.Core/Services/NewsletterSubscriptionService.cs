@@ -1,4 +1,6 @@
-﻿using BDO.GWT.Core.Data.Queries;
+﻿using BDO;
+using BDO.GWT.Core;
+using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Domain.Core.Helpers;
 using BDO.GWT.Domain.Core.Services;
 using BDO.GWT.Web.Core.Data;
@@ -6,16 +8,25 @@ using BDO.GWT.Web.Core.Data.Queries;
 using CMS.ContactManagement;
 using CMS.DataEngine;
 using CMS.EmailEngine;
+using CMS.EmailLibrary;
 using CMS.EmailMarketing;
+using CMS.FormEngine;
+using CMS.MacroEngine;
+using CMS.OnlineForms;
+using CMS.Websites;
 using CMS.Websites.Routing;
+using Kentico.Content.Web.Mvc;
+using Kentico.Content.Web.Mvc.Routing;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
+using System.Web;
 
 namespace BDO.GWT.Xperience.Core.LiveSite.Services;
 
 public interface INewsletterSubscriptionService
 {
-    Task<bool> SubscribeToNewslettersAsync(NewsletterSubscriptionData newsletterSubscriptionData, CancellationToken cancellationToken);
+    Task<bool> SubscribeToNewslettersAsync(NewsletterSubscriptionData newsletterSubscriptionData, CancellationToken cancellationToken, Guid? subscribePageGuid = null);
     Task<bool> ConfirmSubscriptionForNewsletterAsync(SubscribeConfirmQuery subscribeConfirmQuery, string siteName, CancellationToken cancellationToken);
     Task<bool> UnsubscribeFromNewsletterAsync(SubscribeRemoveQuery subscribeRemoveQuery, CancellationToken cancellationToken);
 }
@@ -34,7 +45,7 @@ public class NewsletterSubscriptionService(
     private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
     private const string EmailKey = "Email";
 
-    public async Task<bool> SubscribeToNewslettersAsync(NewsletterSubscriptionData newsletterSubscriptionData, CancellationToken cancellationToken)
+    public async Task<bool> SubscribeToNewslettersAsync(NewsletterSubscriptionData newsletterSubscriptionData, CancellationToken cancellationToken, Guid? subscribePageGuid = null)
     {
         var contact = await _marketingContactManagementService.GetMarketingContactByEmailAsync(newsletterSubscriptionData.Email, cancellationToken);
 
@@ -52,6 +63,7 @@ public class NewsletterSubscriptionService(
             .OrderBy(nameof(ContactGroupInfo.ContactGroupDisplayName))
             .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
             .ToList();
+
         foreach (var recipientList in recipientLists)
         {
             var alreadyMember = (await _contactGroupMemberInfoProvider.Get()
@@ -74,6 +86,7 @@ public class NewsletterSubscriptionService(
                 ContactGroupMemberFromManual = true,
             };
             member.Insert();
+
             var confirmation = new EmailSubscriptionConfirmationInfo
             {
                 EmailSubscriptionConfirmationContactID = contact.ContactID,
@@ -82,22 +95,44 @@ public class NewsletterSubscriptionService(
                 EmailSubscriptionConfirmationDate = DateTime.Now,
             };
             confirmation.Insert();
+
             var fromEmail = ResolveFromEmailForCurrentChannel() ?? string.Empty;
+            var emailConfig = EmailTemplateInfo.Provider.Get("SubscribeConfirm");
+            if (emailConfig is null)
+            {
+                return false;
+            }
+            string templateBody = emailConfig.EmailTemplateCode;
+
+            var baseUnsubscribeUrl = await ResolveSubscribeRemoveRelativeUrlAsync(subscribePageGuid, cancellationToken) ?? "/Subscribe/Remove";
+            var unsubscribeUrl = QueryHelpers.AddQueryString(baseUnsubscribeUrl, new Dictionary<string, string?>
+            {
+                ["email"] = newsletterSubscriptionData.Email,
+                ["newsletterGuid"] = recipientList.ContactGroupGUID.ToString(),
+            });
+
+            var safeFirstName = HttpUtility.HtmlEncode(newsletterSubscriptionData.FirstName);
+            var safeRecipientList = HttpUtility.HtmlEncode(recipientList.ContactGroupDisplayName);
+            var safeUnsubscribeUrl = HttpUtility.HtmlAttributeEncode(unsubscribeUrl);
+            using var scope = _scopeFactory.CreateScope();
+
+            var rawBody =
+                $"<p><strong>Hello</strong> {safeFirstName}</p>" +
+                $"<p><strong>you have been subscribed to:</strong> {safeRecipientList}</p>" +
+                $"<p><a href='{safeUnsubscribeUrl}'>Unsubscribe</a></p>";
 
             var email = new EmailMessage
             {
                 From = fromEmail,
                 Recipients = newsletterSubscriptionData.Email,
                 Subject = "Newsletter Subscription Confirmation",
-                EmailFormat = EmailFormatEnum.Html
+                EmailFormat = EmailFormatEnum.Html,
+                Body = rawBody
             };
-            using (var scope = _scopeFactory.CreateScope())
-            {
-                var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
-                await emailService.SendEmail(email).ConfigureAwait(false);
-            }
+
+            var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+            await emailService.SendEmail(email).ConfigureAwait(false);
         }
-     
 
         return true;
     }
@@ -179,6 +214,43 @@ public class NewsletterSubscriptionService(
         }
 
         await _marketingContactManagementService.UpdateMarketingContactAsync(contact, cancellationToken);
+    }
+
+    private async Task<string?> ResolveSubscribeRemoveRelativeUrlAsync(Guid? subscribePageGuid, CancellationToken cancellationToken)
+    {
+        if (!subscribePageGuid.HasValue || subscribePageGuid.Value == Guid.Empty)
+        {
+            return null;
+        }
+
+        using var scope = _scopeFactory.CreateScope();
+        var contentService = scope.ServiceProvider.GetRequiredService<IContentService>();
+        var urlRetriever = scope.ServiceProvider.GetRequiredService<IWebPageUrlRetriever>();
+        var languageRetriever = scope.ServiceProvider.GetRequiredService<IPreferredLanguageRetriever>();
+
+        var subscribePage = (await contentService.GetPagesByGuidsAsync<Subscribe>([subscribePageGuid.Value], cancellationToken))
+            .FirstOrDefault();
+
+        if (subscribePage?.SystemFields is null)
+        {
+            return null;
+        }
+
+        var subscribeRemovePage = (await contentService.GetContentType<SubscribeRemove>(cancellationToken))
+            .FirstOrDefault(p => p.SystemFields?.WebPageItemParentID == subscribePage.SystemFields.WebPageItemID);
+
+        if (subscribeRemovePage?.SystemFields is null)
+        {
+            return null;
+        }
+
+        var languageName = languageRetriever.Get();
+        var url = await urlRetriever.Retrieve(
+            subscribeRemovePage,
+            languageName,
+            cancellationToken);
+
+        return url.AbsoluteUrl;
     }
 
     private string? ResolveFromEmailForCurrentChannel()
