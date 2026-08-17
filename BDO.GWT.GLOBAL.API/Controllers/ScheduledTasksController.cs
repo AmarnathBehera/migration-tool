@@ -11,7 +11,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers;
 /// <summary>
 /// Provides methods to read and manage scheduled tasks.
 /// </summary>
-
+[AllowAnonymous]
 [ApiController]
 //[AuthorizeUserPrivilegeLevel(UserPrivilegeLevel.GlobalAdministrator)]
 [Route("memberFirms/{memberFirmID:int}/ScheduledTasks")]

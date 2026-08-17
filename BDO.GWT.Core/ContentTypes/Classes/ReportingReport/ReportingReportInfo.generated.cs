@@ -1,5 +1,7 @@
 using System;
 using System.Data;
+using System.Collections.Generic;
+using System.Linq;
 
 using CMS;
 using CMS.DataEngine;
@@ -28,6 +30,10 @@ namespace BDO
         public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(IInfoProvider<ReportingReportInfo>), OBJECT_TYPE, "BDO.ReportingReport", "ReportingReportID", null, "ReportingReportGUID", "ReportingReportCodeName", "ReportingReportDisplayName", null, null, null)
         {
             TouchCacheDependencies = true,
+            DependsOn = new List<ObjectDependency>()
+            {
+                new ObjectDependency("ReportingReportChannelSettingsID", "bdo.reportingchannelsetting", ObjectDependencyEnum.Required),
+            },
         };
 
 

@@ -11,6 +11,9 @@ e976c09ac3b67e8d9aeb1734effd16b32121c8d5:BDO.GWT.GLOBAL/appsettings.json:azure-a
 5df48c4f8b739d1e5ae9e2c906d47655a3490d6b:BDO.GWT.GLOBAL/appsettings.json:azure-ad-client-secret:38
 4665cbe5b358d0548ebc3d8e5e4ed0f30af5d2ea:BDO.GWT.GLOBAL/appsettings.json:generic-api-key:15
 5df48c4f8b739d1e5ae9e2c906d47655a3490d6b:BDO.GWT.GLOBAL/appsettings.json:generic-api-key:16
+8a8fcd6dd5b8e53bbdc75909d62e20b34c69b6fe:BDO.GWT.GLOBAL/appsettings.json:azure-ad-client-secret:33
+8a8fcd6dd5b8e53bbdc75909d62e20b34c69b6fe:BDO.GWT.GLOBAL.API/appsettings.json:generic-api-key:15
+8a8fcd6dd5b8e53bbdc75909d62e20b34c69b6fe:BDO.GWT.GLOBAL/appsettings.json:generic-api-key:15
 
 # Added storage account shared key into appsettings.json; key has been removed and rotated.
 e976c09ac3b67e8d9aeb1734effd16b32121c8d5:BDO.GWT.GLOBAL/appsettings.json:generic-api-key:15

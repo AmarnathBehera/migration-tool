@@ -48,12 +48,6 @@ namespace BDO
 
 
 		/// <summary>
-		/// Form.
-		/// </summary>
-		public string Form { get; set; }
-
-
-		/// <summary>
 		/// EmbedCode.
 		/// </summary>
 		public string EmbedCode { get; set; }

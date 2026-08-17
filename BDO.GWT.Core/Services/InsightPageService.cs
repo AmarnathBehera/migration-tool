@@ -48,6 +48,14 @@ namespace BDO.GWT.Core.Services
         public async Task<InsightPageDto> GetInsightPageDtoAsync(Insight? page, CancellationToken cancellationToken)
         {
             var insightPage = await _contentRetriever.RetrieveCurrentPage<Insight>(new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
+            if (insightPage is null)
+            {
+                return new InsightPageDto(new ContentPageDto())
+                {
+                    SchemaMarkup = new ArticleSchemaMarkupDto()
+                };
+            }
+
             var contentPageDto = await GetContentPageDtoAsync(insightPage, cancellationToken);
             var sys = insightPage.SystemFields;
            
@@ -240,18 +248,27 @@ namespace BDO.GWT.Core.Services
         }
         public async Task<SidebarExternalPersonDto[]> GetSidebarExternalPeopleDtosAsync(IEnumerable<ExternalPerson> externalPeopleNodeGuids, CancellationToken cancellationToken)
         {
-            var guids = externalPeopleNodeGuids.Select(x => x.SystemFields.ContentItemGUID).ToList();
-            
+            var guids = (externalPeopleNodeGuids ?? Enumerable.Empty<ExternalPerson>())
+                .Select(x => x.SystemFields.ContentItemGUID)
+                .ToList();
+
+            if (guids.Count == 0)
+            {
+                return Array.Empty<SidebarExternalPersonDto>();
+            }
+
             var externalPeople = await _contentService.GetPagesAsync<ExternalPerson>(
                 new RetrievePagesParameters { },
                 query => query.Where(w => w.WhereIn("ContentItemGUID", guids)),
                 RetrievalCacheSettings.CacheDisabled,
                 cancellationToken
             );
-            
-            var dtos = await Task.WhenAll(externalPeople.Select(async externalPerson => new SidebarExternalPersonDto
+
+            var safeExternalPeople = externalPeople ?? Enumerable.Empty<ExternalPerson>();
+
+            var dtos = await Task.WhenAll(safeExternalPeople.Select(async externalPerson => new SidebarExternalPersonDto
             {
-                Image = PageHelper.GetImageDto(externalPerson.ImageFile.FirstOrDefault()?.ContentAttachmentAsset?.Url, externalPerson.ImageFileAltText),
+                Image = PageHelper.GetImageDto(externalPerson.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset?.Url, externalPerson.ImageFileAltText),
                 FullName = await GetDisplayNameAsync(externalPerson),
                 JobTitle = externalPerson.JobTitle,
                 Url = externalPerson.Url,
@@ -283,7 +300,7 @@ namespace BDO.GWT.Core.Services
             
             sidebarDto.RelevantContactPeople = await GetContentPageAuthorDtos(contentPage);
 
-            sidebarDto.RelatedExternalPeople = await GetSidebarExternalPeopleDtosAsync(contentPage.RelatedExternalPeople, cancellationToken);
+            sidebarDto.RelatedExternalPeople = await GetSidebarExternalPeopleDtosAsync(contentPage.RelatedExternalPeople ?? Enumerable.Empty<ExternalPerson>(), cancellationToken);
 
             return sidebarDto;
         }
@@ -413,7 +430,7 @@ namespace BDO.GWT.Core.Services
             var websiteChannel = await _websiteChannelInfoProvider.GetAsync(_websiteChannelContext.WebsiteChannelID, cancellationToken);
             var presentationUrl = websiteChannel?.WebsiteChannelDomain;
             var authorNames = new List<string>();
-            if (insights.RelevantContactPerson.Any())
+            if (insights.RelevantContactPerson?.Any() == true)
             {
                 var relevantContactIds = insights.RelevantContactPerson
                     .Select(p => ((IContentItemFieldsSource)p).SystemFields.ContentItemID)
@@ -422,7 +439,7 @@ namespace BDO.GWT.Core.Services
                 authorNames.AddRange(contactNames);
             }
 
-            if (insights.RelatedExternalPeople.Any())
+            if (insights.RelatedExternalPeople?.Any() == true)
             {
                 var guids = insights.RelatedExternalPeople
                .Select(x => x.SystemFields.ContentItemGUID).ToList();
