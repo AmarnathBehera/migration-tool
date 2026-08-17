@@ -13,6 +13,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers;
 // <summary>
 // Provides methods to read and manage users.
 // </summary>
+[AllowAnonymous]
 [ApiController]
 [Route("memberFirms/{memberFirmID:int}/Users")]
 public class UsersController : EntityControllerBase

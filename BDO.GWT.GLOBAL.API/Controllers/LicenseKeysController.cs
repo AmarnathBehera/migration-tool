@@ -1,5 +1,7 @@
-﻿using BDO.GWT.GLOBAL.API.Bases;
+﻿using BDO.GWT.Domain.Core.Constants;
+using BDO.GWT.GLOBAL.API.Bases;
 using BDO.GWT.GLOBAL.API.Data;
+using BDO.GWT.GLOBAL.API.Filters;
 using BDO.GWT.GLOBAL.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +14,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers;
 /// Provides methods to read and manage license keys.
 /// </summary>
 /// 
+[AllowAnonymous]
 [ApiController]
 //[AuthorizeUserPrivilegeLevel(UserPrivilegeLevel.GlobalAdministrator)]
 [Route("memberFirms/{memberFirmID:int}/LicenseKeys")]
@@ -30,6 +33,7 @@ public class LicenseKeysController : EntityControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns>Returns a list of license keys.</returns>
     [HttpGet]
+    [HasPermission(ApiMethodGroupName.LicenseKeys, ApiPermission.Read)]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(IEnumerable<LicenseKeyOutput>), MediaTypeNames.Application.Json)]
     public async Task<ActionResult<IEnumerable<LicenseKeyOutput>>> Get(CancellationToken cancellationToken)
     {
@@ -45,6 +49,7 @@ public class LicenseKeysController : EntityControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns>Newly created license key.</returns>
     [HttpPost]
+    [HasPermission(ApiMethodGroupName.LicenseKeys, ApiPermission.Manage)]
     [SwaggerResponse(StatusCodes.Status201Created, null, typeof(LicenseKeyOutput), MediaTypeNames.Application.Json)]
     public async Task<ActionResult<LicenseKeyOutput>> Post([FromBody] LicenseKeyInput licenseKeyInput, CancellationToken cancellationToken)
     {
@@ -59,6 +64,7 @@ public class LicenseKeysController : EntityControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns>204 No Content.</returns>
     [HttpDelete]
+    [HasPermission(ApiMethodGroupName.LicenseKeys, ApiPermission.Manage)]
     [SwaggerResponse(StatusCodes.Status204NoContent, null, typeof(void))]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken)
     {
