@@ -13,5 +13,26 @@
         <ObjectType>cms.contenttype</ObjectType>
       </AllowedChildContentTypeChildID>
     </Binding>
+    <Binding id="cms.contenttype_BDO.SectionBlogs">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.SectionBlogs</CodeName>
+        <GUID>b1d1ea96-03a2-4a44-82f7-92973086a93b</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.SectionDeals">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.SectionDeals</CodeName>
+        <GUID>c9ad5d32-9b92-477d-abd0-6b732dc1e86f</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.SectionSpecialties">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.SectionSpecialties</CodeName>
+        <GUID>4cbaa98f-42c8-4bf3-9bd4-21805730b520</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
   </Bindings>
 </cms.allowedchildcontenttype>
