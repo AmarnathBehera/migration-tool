@@ -1,13 +1,7 @@
-﻿using BDO.GWT.Core;
-using BDO.GWT.Domain.Core.Constants;
+﻿using BDO.GWT.Domain.Core.Constants;
 using BDO.GWT.Domain.Core.Entities;
-using BDO.GWT.Domain.Core.Retrievers;
-using CMS.Membership;
-using CMS.Membership.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BDO.GWT.GLOBAL.API.Helpers;
 
@@ -30,7 +24,7 @@ public interface IAuthorizationHelper
 public class AuthorizationHelper : IAuthorizationHelper
 {
     /// <inheritdoc />
-    public Task<User?> AuthorizeUserAsync(AuthorizationFilterContext context)
+    public async Task<User?> AuthorizeUserAsync(AuthorizationFilterContext context)
     {
         var identity = context.HttpContext.User.Identity;
 
@@ -40,7 +34,7 @@ public class AuthorizationHelper : IAuthorizationHelper
         {
             context.Result = new UnauthorizedResult();
 
-            return Task.FromResult<User?>(null);
+            return await Task.FromResult<User?>(null);
         }
 
         var user = new User
@@ -49,6 +43,6 @@ public class AuthorizationHelper : IAuthorizationHelper
             PrivilegeLevel = Domain.Core.Enums.UserPrivilegeLevel.GlobalAdministrator,
         };
 
-        return Task.FromResult<User?>(user);
+        return await Task.FromResult<User?>(user);
     }
 }

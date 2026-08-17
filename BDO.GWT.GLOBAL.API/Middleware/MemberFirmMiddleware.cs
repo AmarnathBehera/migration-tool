@@ -1,5 +1,4 @@
 ﻿using BDO.GWT.Core.Services;
-using System.Security.Claims;
 
 namespace BDO.GWT.GLOBAL.API.Middleware;
 
@@ -29,14 +28,12 @@ public class MemberFirmMiddleware : IMiddleware
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        // Authentication is enforced per-endpoint via [Authorize]; only capture the identifier when present.
-        if (context.User.Identity is { IsAuthenticated: true })
+        if (context.User.Identity is not { IsAuthenticated: true })
         {
-            context.Items[UserIdentifierItemKey] = context.User.FindFirst(ClaimTypes.Email)?.Value
-                ?? context.User.FindFirst("email")?.Value
-                ?? context.User.FindFirst("preferred_username")?.Value
-                ?? context.User.FindFirst("upn")?.Value
-                ?? context.User.Identity.Name;
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            await context.Response.CompleteAsync();
+
+            return;
         }
 
         if (!context.Request.Path.StartsWithSegments("/memberFirms", StringComparison.InvariantCultureIgnoreCase))

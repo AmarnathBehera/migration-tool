@@ -1,5 +1,4 @@
-﻿using BDO;
-using BDO.GWT.GLOBAL.API.Helpers;
+﻿using BDO.GWT.GLOBAL.API.Helpers;
 using CMS.DataEngine;
 using CMS.Membership;
 using Microsoft.AspNetCore.Mvc;
@@ -97,15 +96,6 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
 
         if (userApiPermission == null)
         {
-            context.HttpContext.RequestServices
-                .GetRequiredService<ILoggerFactory>()
-                .CreateLogger("HasPermissionFilter")
-                .LogWarning("No API permission match for user '{User}' (ID {UserId}) in method group '{MethodGroup}'. Stored candidates: {Candidates}.",
-                    user.UserName,
-                    currentUserId,
-                    _apiMethodGroupName,
-                    string.Join(" | ", groupPermissions.Select(permission => permission.User)));
-
             context.Result = new ForbidResult();
 
             return;
@@ -120,7 +110,7 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
 
         if (!allowed)
         {
-            context.Result = new ForbidResult();
+            context.Result = new UnauthorizedResult();
         }
     }
 
