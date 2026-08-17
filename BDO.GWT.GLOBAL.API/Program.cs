@@ -20,7 +20,6 @@ public static class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        builder.WebHost.UseUrls("https://localhost:5211");
 
         builder.Services.AddControllersWithViews()
             .AddJsonOptions(options =>

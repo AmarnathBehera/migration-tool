@@ -96,7 +96,7 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
 
         if (userApiPermission == null)
         {
-            context.Result = new ForbidResult();
+            context.Result = new UnauthorizedResult();
 
             return;
         }
