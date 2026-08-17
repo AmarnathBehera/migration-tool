@@ -34,7 +34,7 @@ public class RedirectListing : ListingPage
     public override async Task ConfigurePage()
     {
         PageConfiguration.HeaderActions.AddLink<RedirectCreate>("New redirect");
-        PageConfiguration.HeaderActions.AddLink<RedirectBulkImport>("Bulk import");
+        PageConfiguration.HeaderActions.AddLink<RedirectBulkImport>("Bulk Import");
         PageConfiguration.TableActions.AddDeleteAction(nameof(Delete));
         PageConfiguration.AddEditRowAction<RedirectEdit>();
         PageConfiguration.ColumnConfigurations

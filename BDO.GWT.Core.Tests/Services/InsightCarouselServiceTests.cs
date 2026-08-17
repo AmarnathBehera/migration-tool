@@ -23,6 +23,7 @@ namespace BDO.GWT.Core.Tests.Services
         private Mock<IFilteringHelper> _filteringHelperMock = null!;
         private Mock<IInsightCardService> _insightCardServiceMock = null!;
         private Mock<IContentService> _contentServiceMock = null!;
+        private Mock<IInsightCarouselStateStore> _stateStoreMock = null!;
         private InsightCarouselService _service = null!;
 
         [SetUp]
@@ -31,6 +32,7 @@ namespace BDO.GWT.Core.Tests.Services
             _filteringHelperMock = new Mock<IFilteringHelper>();
             _insightCardServiceMock = new Mock<IInsightCardService>();
             _contentServiceMock = new Mock<IContentService>();
+            _stateStoreMock = new Mock<IInsightCarouselStateStore>();
 
             _filteringHelperMock.Setup(x => x.IsFilteringTooltipEnabledAsync(It.IsAny<bool>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
@@ -39,7 +41,11 @@ namespace BDO.GWT.Core.Tests.Services
                 .Setup(x => x.GetFilteredItemsAsync(It.IsAny<CardsQuery>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Action<RetrievePagesQueryParameters>?>(), It.IsAny<Func<Insight, bool>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new PaginationDto<ContentPageCardDto> { Data = Array.Empty<ContentPageCardDto>(), TotalCount = 0 });
 
-            _service = new InsightCarouselService(_filteringHelperMock.Object, _insightCardServiceMock.Object, _contentServiceMock.Object);
+            _service = new InsightCarouselService(
+                _filteringHelperMock.Object,
+                _insightCardServiceMock.Object,
+                _contentServiceMock.Object,
+                _stateStoreMock.Object);
         }
 
         private class DummyPage : IWebPageFieldsSource
@@ -71,7 +77,7 @@ namespace BDO.GWT.Core.Tests.Services
                 Title = "T",
                 Description = "D",
                 FilteringEnabled = true,
-                Filters = new HashSet<string>{ "businessLine" },
+                Filters = new HashSet<string> { "businessLine" },
             };
 
             var dto = await _service.GetInsightCarouselAsync(currentPage, data, CancellationToken.None);
@@ -81,7 +87,9 @@ namespace BDO.GWT.Core.Tests.Services
                 Assert.That(dto.Title, Is.EqualTo("T"));
                 Assert.That(dto.Filters, Is.Not.Null);
                 Assert.That(dto.Items!.Count(), Is.EqualTo(1));
+                Assert.That(dto.StateGUID, Is.Not.EqualTo(Guid.Empty));
                 _insightCardServiceMock.Verify(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()), Times.Once);
+                _stateStoreMock.Verify(x => x.Save(dto.StateGUID, It.IsAny<HashSet<ContentItemReference>>()), Times.Once);
             });
         }
 
@@ -113,14 +121,32 @@ namespace BDO.GWT.Core.Tests.Services
 
             var query = new CardsQuery { PageType = "UnknownType", CurrentPage = null, PageSize = null };
 
-            var result = await _service.GetAPIFilteredItemsAsync(query, CancellationToken.None);
+            await _service.GetAPIFilteredItemsAsync(query, CancellationToken.None);
             Assert.Multiple(() =>
             {
                 Assert.That(captured, Is.Not.Null);
                 Assert.That(captured!.CurrentPage, Is.EqualTo(1));
                 Assert.That(captured.PageSize, Is.EqualTo(10));
             });
-           
+        }
+
+        [Test]
+        public async Task GetAPIFilteredItemsAsync_WithState_UsesStateStore()
+        {
+            var stateGuid = Guid.NewGuid();
+            var query = new CardsQuery { State = stateGuid };
+
+            _stateStoreMock
+                .Setup(x => x.TryGet(stateGuid, out It.Ref<HashSet<ContentItemReference>>.IsAny))
+                .Returns((Guid _, out HashSet<ContentItemReference> featured) =>
+                {
+                    featured = new HashSet<ContentItemReference> { new() { Identifier = Guid.NewGuid() } };
+                    return true;
+                });
+
+            await _service.GetAPIFilteredItemsAsync(query, CancellationToken.None);
+
+            _stateStoreMock.Verify(x => x.TryGet(stateGuid, out It.Ref<HashSet<ContentItemReference>>.IsAny), Times.Once);
         }
 
         [Test]

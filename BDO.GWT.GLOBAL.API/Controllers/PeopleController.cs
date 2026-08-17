@@ -15,6 +15,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
     /// <summary>
     /// Provides methods to read and manage people.
     /// </summary>
+    [AllowAnonymous]
     [ApiController]
     [Route("memberFirms/{memberFirmID:int}/People")]
     public class PeopleController : EntityControllerBase

@@ -108,7 +108,7 @@ public class SubscribeFormServiceTests
         await _service.SubscribeToNewslettersAsync(PageGuid, ValidFormData(), CancellationToken.None);
 
         _newsletterSubscriptionServiceMock.Verify(
-            s => s.SubscribeToNewslettersAsync(It.IsAny<NewsletterSubscriptionFormData>(), It.IsAny<CancellationToken>()),
+            s => s.SubscribeToNewslettersAsync(It.IsAny<NewsletterSubscriptionFormData>(), It.IsAny<CancellationToken>(), It.IsAny<Guid?>()),
             Times.Never);
     }
 
@@ -201,7 +201,7 @@ public class SubscribeFormServiceTests
         SetupContentRetriever(page);
         SetupRecaptcha(true);
         _newsletterSubscriptionServiceMock
-            .Setup(s => s.SubscribeToNewslettersAsync(It.IsAny<NewsletterSubscriptionFormData>(), It.IsAny<CancellationToken>()))
+            .Setup(s => s.SubscribeToNewslettersAsync(It.IsAny<NewsletterSubscriptionFormData>(), It.IsAny<CancellationToken>(), It.IsAny<Guid?>()))
             .ReturnsAsync(true);
         var data = ValidFormData();
         data.Company = null;
@@ -235,7 +235,7 @@ public class SubscribeFormServiceTests
         await _service.SubscribeToNewslettersAsync(PageGuid, ValidFormData(), CancellationToken.None);
 
         _newsletterSubscriptionServiceMock.Verify(
-            s => s.SubscribeToNewslettersAsync(It.IsAny<NewsletterSubscriptionFormData>(), It.IsAny<CancellationToken>()),
+            s => s.SubscribeToNewslettersAsync(It.IsAny<NewsletterSubscriptionFormData>(), It.IsAny<CancellationToken>(), It.IsAny<Guid?>()),
             Times.Never);
     }
 
@@ -248,7 +248,7 @@ public class SubscribeFormServiceTests
         SetupContentRetriever(page);
         SetupRecaptcha(true);
         _newsletterSubscriptionServiceMock
-            .Setup(s => s.SubscribeToNewslettersAsync(It.IsAny<NewsletterSubscriptionFormData>(), It.IsAny<CancellationToken>()))
+            .Setup(s => s.SubscribeToNewslettersAsync(It.IsAny<NewsletterSubscriptionFormData>(), It.IsAny<CancellationToken>(), It.IsAny<Guid?>()))
             .ReturnsAsync(true);
 
         var result = await _service.SubscribeToNewslettersAsync(PageGuid, ValidFormData(), CancellationToken.None);
@@ -263,7 +263,7 @@ public class SubscribeFormServiceTests
         SetupContentRetriever(page);
         SetupRecaptcha(true);
         _newsletterSubscriptionServiceMock
-            .Setup(s => s.SubscribeToNewslettersAsync(It.IsAny<NewsletterSubscriptionFormData>(), It.IsAny<CancellationToken>()))
+            .Setup(s => s.SubscribeToNewslettersAsync(It.IsAny<NewsletterSubscriptionFormData>(), It.IsAny<CancellationToken>(), It.IsAny<Guid?>()))
             .ReturnsAsync(false);
 
         var result = await _service.SubscribeToNewslettersAsync(PageGuid, ValidFormData(), CancellationToken.None);
@@ -279,13 +279,13 @@ public class SubscribeFormServiceTests
         SetupRecaptcha(true);
         var formData = ValidFormData();
         _newsletterSubscriptionServiceMock
-            .Setup(s => s.SubscribeToNewslettersAsync(formData, It.IsAny<CancellationToken>()))
+            .Setup(s => s.SubscribeToNewslettersAsync(formData, It.IsAny<CancellationToken>(), It.IsAny<Guid?>()))
             .ReturnsAsync(true);
 
         await _service.SubscribeToNewslettersAsync(PageGuid, formData, CancellationToken.None);
 
         _newsletterSubscriptionServiceMock.Verify(
-            s => s.SubscribeToNewslettersAsync(formData, It.IsAny<CancellationToken>()),
+            s => s.SubscribeToNewslettersAsync(formData, It.IsAny<CancellationToken>(), PageGuid),
             Times.Once);
     }
 
@@ -306,7 +306,7 @@ public class SubscribeFormServiceTests
             .Setup(r => r.ValidateAsync(It.IsAny<bool>(), It.IsAny<decimal>(), It.IsAny<string>(), token))
             .ReturnsAsync(true);
         _newsletterSubscriptionServiceMock
-            .Setup(s => s.SubscribeToNewslettersAsync(formData, token))
+            .Setup(s => s.SubscribeToNewslettersAsync(formData, token, PageGuid))
             .ReturnsAsync(true);
 
         await _service.SubscribeToNewslettersAsync(PageGuid, formData, token);
@@ -320,7 +320,7 @@ public class SubscribeFormServiceTests
             r => r.ValidateAsync(It.IsAny<bool>(), It.IsAny<decimal>(), It.IsAny<string>(), token),
             Times.Once);
         _newsletterSubscriptionServiceMock.Verify(
-            s => s.SubscribeToNewslettersAsync(formData, token),
+            s => s.SubscribeToNewslettersAsync(formData, token, PageGuid),
             Times.Once);
     }
 
@@ -336,7 +336,7 @@ public class SubscribeFormServiceTests
             .Setup(r => r.ValidateAsync(It.IsAny<bool>(), It.IsAny<decimal>(), "my-token", It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
         _newsletterSubscriptionServiceMock
-            .Setup(s => s.SubscribeToNewslettersAsync(formData, It.IsAny<CancellationToken>()))
+            .Setup(s => s.SubscribeToNewslettersAsync(formData, It.IsAny<CancellationToken>(), It.IsAny<Guid?>()))
             .ReturnsAsync(true);
 
         await _service.SubscribeToNewslettersAsync(PageGuid, formData, CancellationToken.None);
