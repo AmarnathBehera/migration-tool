@@ -220,7 +220,7 @@ public class XperiencePageContext : IPageContext
     /// Fetches any page by its ID, regardless of content type.
     /// Returns null if not found.
     /// </summary>
-    public async Task<IWebPageFieldsSource> GetAnyPageByWebPageItemId(int webPageItemId, CancellationToken cancellationToken)
+    public async Task<IWebPageFieldsSource> GetAnyPageByWebPageItemId(int webPageItemId, string languageName, CancellationToken cancellationToken)
     {
         var options = new ContentQueryExecutionOptions
         {
@@ -237,7 +237,7 @@ public class XperiencePageContext : IPageContext
              nameof(IWebPageContentQueryDataContainer.WebPageItemID),
              webPageItemId))
          .TopN(1)
-     );
+     ).InLanguage(languageName);
 
         var results = await _queryExecutor.GetMappedWebPageResult<IWebPageFieldsSource>(builder, options, cancellationToken);
         return results.FirstOrDefault();
@@ -248,7 +248,7 @@ public class XperiencePageContext : IPageContext
     /// Gets the display title for a page by its ID.
     /// Falls back through Title → MetadataTitle → internal page name.
     /// </summary>
-    public async Task<string> GetPageTitleByWebPageItemId(int webPageItemId, CancellationToken cancellationToken)
+    public async Task<string> GetPageTitleByWebPageItemId(int webPageItemId, string languageName, CancellationToken cancellationToken)
     {
         var builder = new ContentItemQueryBuilder()
             .ForContentTypes(config => config
@@ -258,7 +258,7 @@ public class XperiencePageContext : IPageContext
                 .Where(w => w.WhereEquals(
                     nameof(IWebPageContentQueryDataContainer.WebPageItemID), webPageItemId))
                 .TopN(1)
-            );
+            ).InLanguage(languageName); ;
 
         var results = await _queryExecutor.GetWebPageResult(
             builder,
