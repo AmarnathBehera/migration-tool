@@ -1,7 +1,6 @@
-﻿using BDO.GWT.Core;
-using BDO.GWT.Domain.Core.Constants;
-using BDO.GWT.Domain.Core.Entities;
+﻿using BDO;
 using BDO.GWT.GLOBAL.API.Helpers;
+using CMS.DataEngine;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -28,18 +27,23 @@ public class HasPermissionAttribute : TypeFilterAttribute
 /// </summary>
 public class HasPermissionFilter : IAsyncAuthorizationFilter
 {
+    private readonly string _apiMethodGroupName;
     private readonly ApiPermission _permission;
     private readonly IAuthorizationHelper _authorizationHelper;
+    private readonly IInfoProvider<Api_permissionsInfo> _apiPermissionsProvider;
 
     /// <summary>
     /// Initializes a new instance of the HasPermissionFilter class.
     /// </summary>
     /// <param name="authorizationHelper">The authorization helper instance.</param>
+    /// <param name="apiPermissionsProvider">The provider for the API permissions table.</param>
     /// <param name="apiMethodGroupName">The name of the API method group.</param>
     /// <param name="permission">The required permission level.</param>
-    public HasPermissionFilter(IAuthorizationHelper authorizationHelper, string apiMethodGroupName, ApiPermission permission)
+    public HasPermissionFilter(IAuthorizationHelper authorizationHelper, IInfoProvider<Api_permissionsInfo> apiPermissionsProvider, string apiMethodGroupName, ApiPermission permission)
     {
         _authorizationHelper = authorizationHelper;
+        _apiPermissionsProvider = apiPermissionsProvider;
+        _apiMethodGroupName = apiMethodGroupName;
         _permission = permission;
     }
 
@@ -50,37 +54,21 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-        //var user = await _authorizationHelper.AuthorizeUserAsync(context);
+        var user = await _authorizationHelper.AuthorizeUserAsync(context);
 
-        //if (user is null)
-        //{
-        //    return;
-        //}
-
-        //var cancellationToken = context.HttpContext.RequestAborted;
-        //var methodGroups = await _apiMethodGroupRetriever.RetrieveEntitiesAsync(query => query.Where(x => x.Name == _apiMethodGroupName), cancellationToken);
-
-        var methodGroups = new List<ApiMethodGroup>
+        if (user is null)
         {
-            new ApiMethodGroup { ID = 1, Name = ApiMethodGroupName.Deals }
-        };
-
-        var methodGroup = methodGroups.SingleOrDefault();
-
-        if (methodGroup == null)
-        {
-            context.Result = new ForbidResult();
-
             return;
         }
 
-        //var userApiPermissions = await _userApiPermissionRetriever.RetrieveEntitiesAsync(query => query.Where(x => x.UserID == user.ID && x.ApiMethodGroupID == methodGroup.ID), cancellationToken);
+        var cancellationToken = context.HttpContext.RequestAborted;
 
-        var userApiPermissions = new List<UserApiPermission>
-        {
-            new UserApiPermission { UserID = 53, ApiMethodGroupID = methodGroup.ID, AllowRead = true, AllowManage = true }
-        };
-        var userApiPermission = userApiPermissions.SingleOrDefault();
+        var permissions = await _apiPermissionsProvider.Get()
+            .WhereEquals(nameof(Api_permissionsInfo.MethodGroup), _apiMethodGroupName)
+            .WhereEquals(nameof(Api_permissionsInfo.User), user.UserName)
+            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
+
+        var userApiPermission = permissions.FirstOrDefault();
 
         if (userApiPermission == null)
         {
@@ -91,8 +79,8 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
 
         var allowed = _permission switch
         {
-            ApiPermission.Read => userApiPermission.AllowRead,
-            ApiPermission.Manage => userApiPermission.AllowManage,
+            ApiPermission.Read => userApiPermission.Read,
+            ApiPermission.Manage => userApiPermission.Manage,
             _ => false,
         };
 

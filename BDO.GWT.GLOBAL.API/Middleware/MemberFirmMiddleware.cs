@@ -1,14 +1,5 @@
-﻿using BDO.GWT.Common.Core.Extensions;
-using BDO.GWT.Core;
-using BDO.GWT.Core.Services;
-using BDO.GWT.Core.ValueObjects;
-using BDO.GWT.Domain.Core.Entities;
-using BDO.GWT.GLOBAL.API.Services;
-using CMS.ContentEngine;
-using CMS.DataEngine;
-using CMS.Websites.Routing;
-using Kentico.Content.Web.Mvc;
-using System.Globalization;
+﻿using BDO.GWT.Core.Services;
+using System.Security.Claims;
 
 namespace BDO.GWT.GLOBAL.API.Middleware;
 
@@ -17,6 +8,8 @@ namespace BDO.GWT.GLOBAL.API.Middleware;
 /// </summary>
 public class MemberFirmMiddleware : IMiddleware
 {
+    internal const string UserIdentifierItemKey = "UserIdentifier";
+
     private readonly IGlobalLocationCustomTableDataService _globalLocationCustomTableDataService;
 
     /// <summary>
@@ -36,13 +29,15 @@ public class MemberFirmMiddleware : IMiddleware
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        //if (context.User.Identity is not { IsAuthenticated: true })
-        //{
-        //    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-        //    await context.Response.CompleteAsync();
-
-        //    return;
-        //}
+        // Authentication is enforced per-endpoint via [Authorize]; only capture the identifier when present.
+        if (context.User.Identity is { IsAuthenticated: true })
+        {
+            context.Items[UserIdentifierItemKey] = context.User.FindFirst(ClaimTypes.Email)?.Value
+                ?? context.User.FindFirst("email")?.Value
+                ?? context.User.FindFirst("preferred_username")?.Value
+                ?? context.User.FindFirst("upn")?.Value
+                ?? context.User.Identity.Name;
+        }
 
         if (!context.Request.Path.StartsWithSegments("/memberFirms", StringComparison.InvariantCultureIgnoreCase))
         {
