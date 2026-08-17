@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.Web.Core.LiveSite.Controllers.API;
+namespace BDO.GWT.Web.Controllers.API;
 
 [Route($"api/{{{CultureInjectorAttribute.RouteParameter}}}/[controller]")]
 public class EditorsPickController : ControllerBase
