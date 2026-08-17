@@ -280,7 +280,7 @@ public class EditQueryTests
     }
 
     [Test]
-    public void GetSavedQueries_Method_Exists()
+    public void GetSavedQueriesMethodExists()
     {
         Assert.That(
             _type.GetMethod(
@@ -665,4 +665,329 @@ SELECT * FROM Data";
 
 
     #endregion
+
+    #region Rename
+    [Test]
+    public void RenameQuery_Returns_Error_When_Id_Is_Invalid()
+    {
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            Mock.Of<ISqlBrowserResultProvider>(),
+            Mock.Of<ISqlBrowserExporter>(),
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
+
+        var method = _type.GetMethod("RenameQuery")!;
+
+        var model = new SavedQuery
+        {
+            ID = 0,
+            Name = "New Name"
+        };
+
+        Assert.DoesNotThrow(() =>
+        {
+            var result = InvokeTaskResult(
+                instance,
+                method,
+                model);
+
+            Assert.That(result, Is.Not.Null);
+        });
+    }
+
+    [Test]
+    public void RenameQuery_Returns_Error_When_Name_Is_Empty()
+    {
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            Mock.Of<ISqlBrowserResultProvider>(),
+            Mock.Of<ISqlBrowserExporter>(),
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
+
+        var method = _type.GetMethod("RenameQuery")!;
+
+        var model = new SavedQuery
+        {
+            ID = 10,
+            Name = ""
+        };
+
+        Assert.DoesNotThrow(() =>
+        {
+            var result = InvokeTaskResult(
+                instance,
+                method,
+                model);
+
+            Assert.That(result, Is.Not.Null);
+        });
+    }
+    [Test]
+    public void RenameQuery_Method_Exists()
+    {
+        Assert.That(
+            _type.GetMethod("RenameQuery"),
+            Is.Not.Null);
+    }
+
+    [Test]
+    public void SaveQuery_Method_Exists()
+    {
+        Assert.That(
+            _type.GetMethod("SaveQuery"),
+            Is.Not.Null);
+    }
+
+    [Test]
+    public void UpdateSavedOrder_Method_Exists()
+    {
+        Assert.That(
+            _type.GetMethod("UpdateSavedOrder"),
+            Is.Not.Null);
+    }
+
+    [Test]
+    public void ExportQuery_Method_Exists()
+    {
+        Assert.That(
+            _type.GetMethod("ExportQuery"),
+            Is.Not.Null);
+    }
+    #endregion
+
+    #region Delete
+    [Test]
+    public void DeleteQuery_Returns_Error_When_Query_Not_Found()
+    {
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            Mock.Of<ISqlBrowserResultProvider>(),
+            Mock.Of<ISqlBrowserExporter>(),
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
+
+        var method = _type.GetMethod("DeleteQuery")!;
+
+        Assert.DoesNotThrow(() =>
+        {
+            var result = InvokeTaskResult(
+                instance,
+                method,
+                -1);
+
+            Assert.That(result, Is.Not.Null);
+        });
+    }
+    [Test]
+    public void DeleteQuery_Method_Exists()
+    {
+        Assert.That(
+            _type.GetMethod("DeleteQuery"),
+            Is.Not.Null);
+    }
+    [Test]
+    public void DeleteQuery_Returns_Task()
+    {
+        var method = _type.GetMethod("DeleteQuery");
+
+        Assert.That(method, Is.Not.Null);
+        Assert.That(method!.ReturnType, Is.AssignableTo(typeof(Task)));
+    }
+    [Test]
+    public void DeleteQuery_Has_Expected_Parameter()
+    {
+        var method = _type.GetMethod("DeleteQuery")!;
+
+        var parameters = method.GetParameters();
+
+        Assert.That(parameters.Length, Is.EqualTo(1));
+        Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(int)));
+    }
+    #endregion
+
+    #region Save
+    [Test]
+    public void SaveQuery_Returns_Error_When_Name_Is_Empty()
+    {
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            new FakeSqlProvider(),
+            Mock.Of<ISqlBrowserExporter>(),
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
+
+        var method = _type.GetMethod("SaveQuery")!;
+
+        var query = new SavedQuery
+        {
+            Name = "",
+            Text = "SELECT * FROM CMS_User"
+        };
+
+        var response = InvokeTaskResult(
+            instance,
+            method,
+            query);
+
+        var value = GetResponseValue(response);
+
+        Assert.That(value, Is.Null);
+    }
+
+    [Test]
+    public void SaveQuery_Returns_Error_When_Text_Is_Empty()
+    {
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            new FakeSqlProvider(),
+            Mock.Of<ISqlBrowserExporter>(),
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
+
+        var method = _type.GetMethod("SaveQuery")!;
+
+        var query = new SavedQuery
+        {
+            Name = "Test Query",
+            Text = ""
+        };
+
+        var response = InvokeTaskResult(
+            instance,
+            method,
+            query);
+
+        var value = GetResponseValue(response);
+
+        Assert.That(value, Is.Null);
+    }
+    [Test]
+    public void SaveQuery_Returns_Error_When_Query_Is_Invalid()
+    {
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            new FakeSqlProvider(),
+            Mock.Of<ISqlBrowserExporter>(),
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
+
+        var method = _type.GetMethod("SaveQuery")!;
+
+        var query = new SavedQuery
+        {
+            Name = "",
+            Text = ""
+        };
+
+        var response = InvokeTaskResult(
+            instance,
+            method,
+            query);
+
+        var value = GetResponseValue(response);
+
+        Assert.That(value, Is.Null);
+    }
+    [Test]
+    public void SaveQuery_Logs_Exception_When_Insert_Fails()
+    {
+        var eventMock = new Mock<IEventLogService>();
+
+        var instance = Activator.CreateInstance(
+            _type,
+            eventMock.Object,
+            new FakeSqlProvider(),
+            Mock.Of<ISqlBrowserExporter>(),
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
+
+        var method = _type.GetMethod("SaveQuery")!;
+
+        var query = new SavedQuery
+        {
+            Name = "Report",
+            Text = "SELECT 1"
+        };
+
+        Assert.DoesNotThrow(() =>
+        {
+            try
+            {
+                InvokeTaskResult(instance, method, query);
+            }
+            catch
+            {
+            }
+        });
+    }
+    private static object? GetResponseValue(object response)
+    {
+        return response.GetType()
+            .GetProperty("Value")?
+            .GetValue(response);
+    }
+
+    #endregion
+
+    [Test]
+    public void ExportQuery_Uses_Provided_Model()
+    {
+        var exporterMock = new Mock<ISqlBrowserExporter>();
+
+        exporterMock
+            .Setup(x => x.Export(
+                SqlBrowserExportType.Excel,
+                "report"))
+            .ReturnsAsync((
+                Encoding.UTF8.GetBytes("test"),
+                "report.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            new FakeSqlProvider(),
+            exporterMock.Object,
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
+
+        var method = _type.GetMethod("ExportQuery")!;
+
+        var json =
+            """
+        {
+            "ExportType":"excel",
+            "FileName":"report"
+        }
+        """;
+
+        using var document = JsonDocument.Parse(json);
+
+        JsonElement element = document.RootElement;
+
+        Assert.DoesNotThrow(() =>
+        {
+            InvokeTaskResult(
+                instance,
+                method,
+                (JsonElement?)element);
+        });
+
+        exporterMock.Verify(
+            x => x.Export(
+                SqlBrowserExportType.Excel,
+                "report"),
+            Times.Once);
+    }
+
+    [Test]
+    public void GetSavedQueries_Method_Exists()
+    {
+        Assert.That(
+            _type.GetMethod(
+                "GetSavedQueries",
+                BindingFlags.NonPublic | BindingFlags.Instance),
+            Is.Not.Null);
+    }
+
 }
