@@ -102,7 +102,6 @@ public class NewsletterSubscriptionService(
             {
                 return false;
             }
-            string templateBody = emailConfig.EmailTemplateCode;
 
             var baseUnsubscribeUrl = await ResolveSubscribeRemoveRelativeUrlAsync(subscribePageGuid, cancellationToken) ?? "/Subscribe/Remove";
             var unsubscribeUrl = QueryHelpers.AddQueryString(baseUnsubscribeUrl, new Dictionary<string, string?>
