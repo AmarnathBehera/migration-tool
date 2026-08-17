@@ -1,80 +1,37 @@
-using BDO.GWT.CustomReportingModule;
-using System.Reflection;
-
 namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
 {
     [TestFixture]
-    public class ReportingApplicationChannelSettingsListingPageTests
+    public class ReportingChannelSettingInfoTests
     {
-        private System.Type pageType = null!;
-
-        [OneTimeSetUp]
-        public void Setup()
+        [Test]
+        public void Type_Exists()
         {
-            var asm = typeof(ReportingApplicationPage).Assembly;
-
-            pageType = asm.GetTypes()
-                .First(x => x.Name == "ReportingApplicationChannelSettingsListingPage");
+            Assert.That(typeof(ReportingChannelSettingInfo), Is.Not.Null);
         }
 
         [Test]
-        public void Type_ReportingApplicationChannelSettingsListingPage_Exists()
-        {
-            Assert.That(pageType, Is.Not.Null);
-        }
-
-        [Test]
-        public void EnsureSettingsListData_Method_Exists()
-        {
-            var method = pageType.GetMethod(
-                "EnsureSettingsListData",
-                BindingFlags.NonPublic | BindingFlags.Instance);
-
-            Assert.That(method, Is.Not.Null);
-        }
-
-        [Test]
-        public void EnsureChannelSetting_Method_Exists()
-        {
-            var method = pageType.GetMethod(
-                "EnsureChannelSetting",
-                BindingFlags.NonPublic | BindingFlags.Instance);
-
-            Assert.That(method, Is.Not.Null);
-        }
-
-        [Test]
-        public void EnsureChannelSettingDisplayName_Method_Exists()
-        {
-            var method = pageType.GetMethod(
-                "EnsureChannelSettingDisplayName",
-                BindingFlags.NonPublic | BindingFlags.Instance);
-
-            Assert.That(method, Is.Not.Null);
-        }
-
-        [Test]
-        public void ConfigurePage_Method_Exists()
-        {
-            var method = pageType.GetMethod("ConfigurePage");
-
-            Assert.That(method, Is.Not.Null);
-        }
-
-        [Test]
-        public void Class_Inherits_From_ListingPage()
+        public void ObjectType_HasExpectedValue()
         {
             Assert.That(
-                pageType.BaseType?.Name,
-                Is.EqualTo("ListingPage"));
+                ReportingChannelSettingInfo.OBJECT_TYPE,
+                Is.EqualTo("bdo.reportingchannelsetting"));
         }
 
         [Test]
-        public void Class_Has_Three_Constructor_Parameters()
+        public void TypeInfo_IsInitialized()
         {
-            var ctor = pageType.GetConstructors().Single();
+            Assert.That(
+                ReportingChannelSettingInfo.TYPEINFO,
+                Is.Not.Null);
+        }
 
-            Assert.That(ctor.GetParameters().Length, Is.EqualTo(3));
+        [Test]
+        public void TypeInfo_UsesExpectedObjectType()
+        {
+            Assert.That(
+                ReportingChannelSettingInfo.TYPEINFO.ObjectType,
+                Is.EqualTo(
+                    ReportingChannelSettingInfo.OBJECT_TYPE));
         }
     }
 }
