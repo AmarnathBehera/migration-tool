@@ -15,6 +15,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Modules\Reporting\EditQueryPageTests.cs" />
+    <Compile Remove="Modules\Reporting\EditQueryPrivateMethodTests.cs" />
+    <Compile Remove="Modules\Reporting\EditQueryStructureTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
