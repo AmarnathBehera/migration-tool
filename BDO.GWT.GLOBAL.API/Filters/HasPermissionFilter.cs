@@ -27,6 +27,8 @@ public class HasPermissionAttribute : TypeFilterAttribute
 /// </summary>
 public class HasPermissionFilter : IAsyncAuthorizationFilter
 {
+    private static readonly char[] UserSeparators = [';', ',', '|', '\n', '\r'];
+
     private readonly string _apiMethodGroupName;
     private readonly ApiPermission _permission;
     private readonly IAuthorizationHelper _authorizationHelper;
@@ -121,7 +123,7 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
             return false;
         }
 
-        var entries = storedUsers.Split(new[] { ';', ',', '|', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var entries = storedUsers.Split(UserSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
         return entries.Any(entry => string.Equals(entry, identifier, StringComparison.OrdinalIgnoreCase));
     }
