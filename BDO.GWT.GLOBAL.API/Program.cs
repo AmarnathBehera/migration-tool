@@ -69,6 +69,15 @@ public static class Program
 
                     return Task.CompletedTask;
                 },
+                OnAuthenticationFailed = context =>
+                {
+                    context.HttpContext.RequestServices
+                        .GetRequiredService<ILoggerFactory>()
+                        .CreateLogger("JwtBearerAuthentication")
+                        .LogWarning(context.Exception, "JWT authentication failed for {RequestPath}.", context.Request.Path);
+
+                    return Task.CompletedTask;
+                },
             };
         });
 

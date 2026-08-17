@@ -1,6 +1,7 @@
 ﻿using BDO;
 using BDO.GWT.GLOBAL.API.Helpers;
 using CMS.DataEngine;
+using CMS.Membership;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -31,18 +32,21 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
     private readonly ApiPermission _permission;
     private readonly IAuthorizationHelper _authorizationHelper;
     private readonly IInfoProvider<Api_permissionsInfo> _apiPermissionsProvider;
+    private readonly IInfoProvider<UserInfo> _userInfoProvider;
 
     /// <summary>
     /// Initializes a new instance of the HasPermissionFilter class.
     /// </summary>
     /// <param name="authorizationHelper">The authorization helper instance.</param>
     /// <param name="apiPermissionsProvider">The provider for the API permissions table.</param>
+    /// <param name="userInfoProvider">The provider for Kentico users.</param>
     /// <param name="apiMethodGroupName">The name of the API method group.</param>
     /// <param name="permission">The required permission level.</param>
-    public HasPermissionFilter(IAuthorizationHelper authorizationHelper, IInfoProvider<Api_permissionsInfo> apiPermissionsProvider, string apiMethodGroupName, ApiPermission permission)
+    public HasPermissionFilter(IAuthorizationHelper authorizationHelper, IInfoProvider<Api_permissionsInfo> apiPermissionsProvider, IInfoProvider<UserInfo> userInfoProvider, string apiMethodGroupName, ApiPermission permission)
     {
         _authorizationHelper = authorizationHelper;
         _apiPermissionsProvider = apiPermissionsProvider;
+        _userInfoProvider = userInfoProvider;
         _apiMethodGroupName = apiMethodGroupName;
         _permission = permission;
     }
@@ -63,15 +67,45 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
 
         var cancellationToken = context.HttpContext.RequestAborted;
 
-        var permissions = await _apiPermissionsProvider.Get()
+        // The permission User column stores the Kentico user ID, so resolve the caller's ID from their username.
+        var currentUser = (await _userInfoProvider.Get()
+                .WhereEquals(nameof(UserInfo.UserName), user.UserName)
+                .TopN(1)
+                .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
+            .FirstOrDefault()
+            ?? (await _userInfoProvider.Get()
+                .WhereEquals(nameof(UserInfo.Email), user.UserName)
+                .TopN(1)
+                .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
+            .FirstOrDefault();
+
+        if (currentUser is null)
+        {
+            context.Result = new ForbidResult();
+
+            return;
+        }
+
+        var currentUserId = currentUser.UserID.ToString();
+
+        // The User column is free-form long text and may hold a delimited list of user IDs.
+        var groupPermissions = await _apiPermissionsProvider.Get()
             .WhereEquals(nameof(Api_permissionsInfo.MethodGroup), _apiMethodGroupName)
-            .WhereEquals(nameof(Api_permissionsInfo.User), user.UserName)
             .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
 
-        var userApiPermission = permissions.FirstOrDefault();
+        var userApiPermission = groupPermissions.FirstOrDefault(permission => MatchesUser(permission.User, currentUserId));
 
         if (userApiPermission == null)
         {
+            context.HttpContext.RequestServices
+                .GetRequiredService<ILoggerFactory>()
+                .CreateLogger("HasPermissionFilter")
+                .LogWarning("No API permission match for user '{User}' (ID {UserId}) in method group '{MethodGroup}'. Stored candidates: {Candidates}.",
+                    user.UserName,
+                    currentUserId,
+                    _apiMethodGroupName,
+                    string.Join(" | ", groupPermissions.Select(permission => permission.User)));
+
             context.Result = new ForbidResult();
 
             return;
@@ -88,5 +122,17 @@ public class HasPermissionFilter : IAsyncAuthorizationFilter
         {
             context.Result = new ForbidResult();
         }
+    }
+
+    private static bool MatchesUser(string storedUsers, string? identifier)
+    {
+        if (string.IsNullOrWhiteSpace(storedUsers) || string.IsNullOrWhiteSpace(identifier))
+        {
+            return false;
+        }
+
+        var entries = storedUsers.Split(new[] { ';', ',', '|', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        return entries.Any(entry => string.Equals(entry, identifier, StringComparison.OrdinalIgnoreCase));
     }
 }
