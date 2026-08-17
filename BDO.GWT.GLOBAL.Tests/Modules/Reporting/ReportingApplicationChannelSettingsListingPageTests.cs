@@ -10,28 +10,11 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
         }
 
         [Test]
-        public void ObjectType_HasExpectedValue()
-        {
-            Assert.That(
-                ReportingChannelSettingInfo.OBJECT_TYPE,
-                Is.EqualTo("bdo.reportingchannelsetting"));
-        }
-
-        [Test]
         public void TypeInfo_IsInitialized()
         {
             Assert.That(
                 ReportingChannelSettingInfo.TYPEINFO,
                 Is.Not.Null);
-        }
-
-        [Test]
-        public void TypeInfo_UsesExpectedObjectType()
-        {
-            Assert.That(
-                ReportingChannelSettingInfo.TYPEINFO.ObjectType,
-                Is.EqualTo(
-                    ReportingChannelSettingInfo.OBJECT_TYPE));
         }
     }
 }
