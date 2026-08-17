@@ -24,7 +24,7 @@ public class WidgetIdValidationRuleProperties : ValidationRuleProperties
 // ── Rule ────────────────────────────────────────────────────────────────────
 
 [ValidationRuleAttribute(typeof(WidgetIdValidationRuleAttribute))]
-public class WidgetIdValidationRule : ValidationRule<WidgetIdValidationRuleProperties, string>
+public partial class WidgetIdValidationRule : ValidationRule<WidgetIdValidationRuleProperties, string>
 {
     public const string IDENTIFIER = "BDO.GWT.WidgetIdValidationRule";
 
