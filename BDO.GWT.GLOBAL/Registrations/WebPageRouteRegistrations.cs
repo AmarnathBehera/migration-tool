@@ -319,16 +319,6 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 [assembly: RegisterWebPageRoute(Webinar.CONTENT_TYPE_NAME, typeof(WebinarController))]
 
 [assembly: RegisterPageTemplate(
-    identifier: Webinar.CONTENT_TYPE_NAME,
-    name: "Webinar  Content Type Template",
-    customViewName: "~/Views/EventWebinar/Index.cshtml",
-    ContentTypeNames = new[] { "BDO.Webinar" },
-    IconClass = "xp-market")]
-
-[assembly: RegisterWebPageRoute(Insight.CONTENT_TYPE_NAME, typeof(InsightController))]
-
-
-[assembly: RegisterPageTemplate(
     identifier: Insight.CONTENT_TYPE_NAME,
     name: "Insight Content Type Template",
     customViewName: "~/Views/InsightPage/Index.cshtml",
@@ -367,3 +357,4 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 
 [assembly: RegisterWebPageRoute(BusinessStrategy.CONTENT_TYPE_NAME, typeof(BusinessStrategyController), ActionName = nameof(BusinessStrategyController.Index))]
 [assembly: RegisterWebPageRoute(SectionBusinessStrategies.CONTENT_TYPE_NAME, typeof(SectionBusinessStrategiesController), ActionName = nameof(SectionBusinessStrategiesController.Index))]
+[assembly: RegisterWebPageRoute(Search.CONTENT_TYPE_NAME, typeof(SearchController), ActionName = nameof(SearchController.Index))]
