@@ -1,13 +1,7 @@
-﻿using BDO.GWT.Core;
-using BDO.GWT.Domain.Core.Constants;
+﻿using BDO.GWT.Domain.Core.Constants;
 using BDO.GWT.Domain.Core.Entities;
-using BDO.GWT.Domain.Core.Retrievers;
-using CMS.Membership;
-using CMS.Membership.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BDO.GWT.GLOBAL.API.Helpers;
 
@@ -29,52 +23,26 @@ public interface IAuthorizationHelper
 /// </summary>
 public class AuthorizationHelper : IAuthorizationHelper
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    /// <summary>
-    /// Initializes a new instance of the AuthorizationHelper class with the specified HTTP context accessor.
-    /// </summary>
-    /// <param name="httpContextAccessor">The HTTP context accessor instance.</param>
-    public AuthorizationHelper(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
-
     /// <inheritdoc />
     public async Task<User?> AuthorizeUserAsync(AuthorizationFilterContext context)
     {
         var identity = context.HttpContext.User.Identity;
 
-        if (identity == null)
+        var userName = identity?.Name ?? context.HttpContext.User.FindFirst(CustomClaimTypes.AppId)?.Value;
+
+        if (string.IsNullOrEmpty(userName))
         {
             context.Result = new UnauthorizedResult();
 
-            return null;
+            return await Task.FromResult<User?>(null);
         }
 
-        var userName = identity.Name ?? context.HttpContext.User.FindFirst(CustomClaimTypes.AppId)?.Value;
-
-        if (userName == null)
+        var user = new User
         {
-            context.Result = new UnauthorizedResult();
+            UserName = userName,
+            PrivilegeLevel = Domain.Core.Enums.UserPrivilegeLevel.GlobalAdministrator,
+        };
 
-            return null;
-        }
-
-        var username = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
-        var user = new User();
-
-        if (string.IsNullOrEmpty(username))
-        {
-            context.Result = new ForbidResult();
-
-            return null;
-        }
-        else
-        {
-            user.PrivilegeLevel = Domain.Core.Enums.UserPrivilegeLevel.GlobalAdministrator;
-        }
-
-        return user;
+        return await Task.FromResult<User?>(user);
     }
 }
