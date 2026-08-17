@@ -10,6 +10,8 @@ public class CardsQuery : IPaginationQuery
 
     public string? PageType { get; set; }
 
+    public Guid? State { get; set; }
+
     public int? CurrentPage { get; set; }
 
     public int? PageSize { get; set; }

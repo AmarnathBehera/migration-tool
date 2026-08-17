@@ -13,6 +13,13 @@
         <ObjectType>cms.contenttype</ObjectType>
       </AllowedChildContentTypeChildID>
     </Binding>
+    <Binding id="cms.contenttype_BDO.Locations">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.Locations</CodeName>
+        <GUID>afbf6f00-540b-44f1-b40b-ea7975a6185e</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
     <Binding id="cms.contenttype_BDO.SocialPages">
       <AllowedChildContentTypeChildID>
         <CodeName>BDO.SocialPages</CodeName>

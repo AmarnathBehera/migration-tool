@@ -15,6 +15,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
     /// <summary>
     /// Provides methods to read and manage insights.
     /// </summary>
+    [AllowAnonymous]
     [ApiController]
     [Route("memberFirms/{memberFirmID:int}/Insights")]
     public class InsightsController : EntityControllerBase

@@ -264,7 +264,7 @@ namespace BDO.GWT.GLOBAL.Tests.Services
         {
             _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(true);
 
-            try { await _service.GetAnyPageByWebPageItemId(1, CancellationToken.None); } catch { }
+            try { await _service.GetAnyPageByWebPageItemId(1, "en", CancellationToken.None); } catch { }
 
             _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
         }
@@ -274,19 +274,19 @@ namespace BDO.GWT.GLOBAL.Tests.Services
         {
             _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(false);
 
-            try { await _service.GetAnyPageByWebPageItemId(1, CancellationToken.None); } catch { }
+            try { await _service.GetAnyPageByWebPageItemId(1, "en", CancellationToken.None); } catch { }
 
             _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
         }
 
-        // --- GetPageTitleByWebPageItemId -----------------------------------------
+        // --- GetPageTitleByWebPageItemId
 
         [Test]
         public async Task GetPageTitleByWebPageItemId_WhenPreviewMode_ReadsIsPreview()
         {
             _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(true);
 
-            try { await _service.GetPageTitleByWebPageItemId(1, CancellationToken.None); } catch { }
+            try { await _service.GetPageTitleByWebPageItemId(1, "en", CancellationToken.None); } catch { }
 
             _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
         }
@@ -296,12 +296,12 @@ namespace BDO.GWT.GLOBAL.Tests.Services
         {
             _websiteChannelContextMock.Setup(x => x.IsPreview).Returns(false);
 
-            try { await _service.GetPageTitleByWebPageItemId(1, CancellationToken.None); } catch { }
+            try { await _service.GetPageTitleByWebPageItemId(1, "en", CancellationToken.None); } catch { }
 
             _websiteChannelContextMock.Verify(x => x.IsPreview, Times.AtLeastOnce);
         }
 
-        // --- Helpers -------------------------------------------------------------
+        // --- Helpers
 
         private static WebPageDataContext BuildWebPageDataContext()
         {

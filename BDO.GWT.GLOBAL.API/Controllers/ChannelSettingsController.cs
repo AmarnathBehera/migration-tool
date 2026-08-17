@@ -11,6 +11,7 @@ using System.Net.Mime;
 
 namespace BDO.GWT.GLOBAL.API.Controllers
 {
+    [AllowAnonymous]
     [ApiController]
     [Route("memberFirms/{memberFirmID:int}/ChannelSettings")]
     public class ChannelSettingsController : EntityControllerBase

@@ -15,6 +15,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
     /// <summary>
     /// Provides methods to read and manage careers.
     /// </summary>
+    [AllowAnonymous]
     [ApiController]
     [Route("memberFirms/{memberFirmID:int}/Careers")]
     public class CareerController : EntityControllerBase

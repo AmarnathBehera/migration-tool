@@ -66,7 +66,7 @@ namespace BDO.GWT.Core.Services
             ancestors.Add((page.WebPageItemName, currentPage.WebPageItemID));
 
             // Walk up the content tree until we hit the root or HomePage
-            var current = await _pageContext.GetAnyPageByWebPageItemId(parentPageID, cancellationToken);
+            var current = await _pageContext.GetAnyPageByWebPageItemId(parentPageID, ctx.WebPage.LanguageName, cancellationToken);
             while (parentPageID > 0 && current != null)
             {     //checking the valid url for each page to insert it in breadcrumb
                     var pageUrl = await _pageUrlRetriever.Retrieve(
@@ -87,7 +87,7 @@ namespace BDO.GWT.Core.Services
                 parentPageID = current.SystemFields.WebPageItemParentID;
                 if (parentPageID > 0)
                 {
-                    current = await _pageContext.GetAnyPageByWebPageItemId(parentPageID, cancellationToken);
+                    current = await _pageContext.GetAnyPageByWebPageItemId(parentPageID, ctx.WebPage.LanguageName,cancellationToken);
                 }
             }
             var isMicrositeContentType = currentPage.ContentTypeName == MicrositeMasterPage.CONTENT_TYPE_NAME
@@ -103,7 +103,7 @@ namespace BDO.GWT.Core.Services
             foreach (var (_, webPageItemId) in ancestors)
             {
                 var url = await _pageUrlRetriever.Retrieve(webPageItemId, ctx.WebPage.LanguageName, cancellationToken: cancellationToken);
-                var title = await _pageContext.GetPageTitleByWebPageItemId(webPageItemId, cancellationToken);
+                var title = await _pageContext.GetPageTitleByWebPageItemId(webPageItemId, ctx.WebPage.LanguageName, cancellationToken);
 
                 links.Add(new LinkItemDto
                 {

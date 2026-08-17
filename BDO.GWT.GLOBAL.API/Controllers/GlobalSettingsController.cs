@@ -14,6 +14,7 @@ namespace BDO.GWT.Web.Core.API.Controllers;
 /// <summary>
 /// Provides methods to read and manage global settings.
 /// </summary>
+[AllowAnonymous]
 [ApiController]
 [Route("memberFirms/{memberFirmID:int}/GlobalSettings")]
 public class GlobalSettingsController : EntityControllerBase
