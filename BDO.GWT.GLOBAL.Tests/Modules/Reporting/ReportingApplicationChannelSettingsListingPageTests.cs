@@ -14,17 +14,55 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
             var asm = typeof(ReportingApplicationPage).Assembly;
 
             pageType = asm.GetTypes()
-                .First(t => t.Name == "ReportingApplicationChannelSettingsListingPage");
+                .First(x => x.Name == "ReportingApplicationChannelSettingsListingPage");
         }
 
         [Test]
-        public void Type_Exists()
+        public void Type_ReportingApplicationChannelSettingsListingPage_Exists()
         {
             Assert.That(pageType, Is.Not.Null);
         }
 
         [Test]
-        public void Inherits_From_ListingPage()
+        public void EnsureSettingsListData_Method_Exists()
+        {
+            var method = pageType.GetMethod(
+                "EnsureSettingsListData",
+                BindingFlags.NonPublic | BindingFlags.Instance);
+
+            Assert.That(method, Is.Not.Null);
+        }
+
+        [Test]
+        public void EnsureChannelSetting_Method_Exists()
+        {
+            var method = pageType.GetMethod(
+                "EnsureChannelSetting",
+                BindingFlags.NonPublic | BindingFlags.Instance);
+
+            Assert.That(method, Is.Not.Null);
+        }
+
+        [Test]
+        public void EnsureChannelSettingDisplayName_Method_Exists()
+        {
+            var method = pageType.GetMethod(
+                "EnsureChannelSettingDisplayName",
+                BindingFlags.NonPublic | BindingFlags.Instance);
+
+            Assert.That(method, Is.Not.Null);
+        }
+
+        [Test]
+        public void ConfigurePage_Method_Exists()
+        {
+            var method = pageType.GetMethod("ConfigurePage");
+
+            Assert.That(method, Is.Not.Null);
+        }
+
+        [Test]
+        public void Class_Inherits_From_ListingPage()
         {
             Assert.That(
                 pageType.BaseType?.Name,
@@ -32,53 +70,11 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
         }
 
         [Test]
-        public void Has_EnsureSettingsListData_Method()
-        {
-            var method = pageType.GetMethod(
-                "EnsureSettingsListData",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-
-            Assert.That(method, Is.Not.Null);
-        }
-
-        [Test]
-        public void Has_EnsureChannelSetting_Method()
-        {
-            var method = pageType.GetMethod(
-                "EnsureChannelSetting",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-
-            Assert.That(method, Is.Not.Null);
-        }
-
-        [Test]
-        public void Has_EnsureChannelSettingDisplayName_Method()
-        {
-            var method = pageType.GetMethod(
-                "EnsureChannelSettingDisplayName",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-
-            Assert.That(method, Is.Not.Null);
-        }
-
-        [Test]
-        public void Has_ConfigurePage_Method()
-        {
-            var method = pageType.GetMethod(
-                "ConfigurePage",
-                BindingFlags.Instance | BindingFlags.Public);
-
-            Assert.That(method, Is.Not.Null);
-        }
-
-        [Test]
-        public void Constructor_Has_Three_Parameters()
+        public void Class_Has_Three_Constructor_Parameters()
         {
             var ctor = pageType.GetConstructors().Single();
 
-            Assert.That(
-                ctor.GetParameters().Length,
-                Is.EqualTo(3));
+            Assert.That(ctor.GetParameters().Length, Is.EqualTo(3));
         }
     }
 }

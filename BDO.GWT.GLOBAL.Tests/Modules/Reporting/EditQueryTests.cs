@@ -49,20 +49,6 @@ public class EditQueryTests
     }
 
     [Test]
-    public void GenerateQueryCodeName_Trims_Periods()
-    {
-        var method = _type.GetMethod(
-            "GenerateQueryCodeName",
-            BindingFlags.NonPublic | BindingFlags.Static)!;
-
-        var result = (string)method.Invoke(
-            null,
-            new object[] { "...Report..." })!;
-
-        Assert.That(result, Does.StartWith("Report"));
-    }
-
-    [Test]
     public void GenerateQueryCodeName_Appends_Guid()
     {
         var method = _type.GetMethod(

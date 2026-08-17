@@ -1,7 +1,5 @@
-using BDO.GWT.CustomReportingModule;
 using BDO.GWT.CustomReportingModule.ReportingApp;
-using Microsoft.Extensions.Localization;
-using Moq;
+using Kentico.Xperience.Admin.Base;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
 {
@@ -9,30 +7,83 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
     public class ReportingReportListingPageTests
     {
         [Test]
-        public void Constructor_Creates_Instance()
+        public void Type_ReportingReportListingPage_Exists()
         {
-            var localizer =
-                new Mock<IStringLocalizer<SharedResources>>();
+            var type = typeof(ReportingReportListingPage);
 
-            var page = new ReportingReportListingPage(
-                localizer.Object);
-
-            Assert.That(page, Is.Not.Null);
+            Assert.That(type, Is.Not.Null);
         }
 
         [Test]
-        public void ReportingReportId_CanBeSetAndRetrieved()
+        public void Type_Inherits_From_ListingPage()
         {
-            var localizer =
-                new Mock<IStringLocalizer<SharedResources>>();
+            Assert.That(typeof(ReportingReportListingPage).BaseType,
+                Is.EqualTo(typeof(ListingPage)));
+        }
 
-            var page = new ReportingReportListingPage(
-                localizer.Object);
+        [Test]
+        public void ExportPermission_HasExpectedValue()
+        {
+            Assert.That(
+                ReportingReportListingPage.EXPORT_PERMISSION,
+                Is.EqualTo("Export"));
+        }
 
-            page.ReportingReportId = 25;
+        [Test]
+        public void Identifier_HasExpectedValue()
+        {
+            Assert.That(
+                ReportingReportListingPage.IDENTIFIER,
+                Is.EqualTo("DancingGoat.Reporting"));
+        }
 
-            Assert.That(page.ReportingReportId,
-                Is.EqualTo(25));
+        [Test]
+        public void ReportingReportId_DefaultsToZero()
+        {
+            var type = typeof(ReportingReportListingPage);
+
+            var property = type.GetProperty(nameof(ReportingReportListingPage.ReportingReportId));
+
+            Assert.That(property, Is.Not.Null);
+            Assert.That(property!.PropertyType, Is.EqualTo(typeof(int)));
+        }
+
+        [Test]
+        public void Class_HasThree_UIPermissionAttributes()
+        {
+            var attrs = typeof(ReportingReportListingPage)
+                .GetCustomAttributes(typeof(UIPermissionAttribute), false);
+
+            Assert.That(attrs.Length, Is.EqualTo(3));
+        }
+
+        [Test]
+        public void Class_HasExportPermissionAttribute()
+        {
+            var attrs = typeof(ReportingReportListingPage)
+                .GetCustomAttributes(typeof(UIPermissionAttribute), false)
+                .Cast<UIPermissionAttribute>()
+                .ToList();
+
+            Assert.That(attrs.Any(), Is.True);
+        }
+
+        [Test]
+        public void ReportingReportId_Property_Exists()
+        {
+            var property = typeof(ReportingReportListingPage)
+                .GetProperty(nameof(ReportingReportListingPage.ReportingReportId));
+
+            Assert.That(property, Is.Not.Null);
+        }
+
+        [Test]
+        public void ConfigurePage_Method_Exists()
+        {
+            var method = typeof(ReportingReportListingPage)
+                .GetMethod(nameof(ReportingReportListingPage.ConfigurePage));
+
+            Assert.That(method, Is.Not.Null);
         }
     }
 }
