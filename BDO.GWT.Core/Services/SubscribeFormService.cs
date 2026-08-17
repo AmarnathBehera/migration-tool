@@ -34,7 +34,7 @@ public class SubscribeFormService : ISubscribeFormService
             return false;
         }
 
-        var subscriptionSuccessful = await _newsletterSubscriptionService.SubscribeToNewslettersAsync(newsletterSubscriptionFormData, cancellationToken);
+        var subscriptionSuccessful = await _newsletterSubscriptionService.SubscribeToNewslettersAsync(newsletterSubscriptionFormData, cancellationToken, pageGuid);
 
         return subscriptionSuccessful;
     }
