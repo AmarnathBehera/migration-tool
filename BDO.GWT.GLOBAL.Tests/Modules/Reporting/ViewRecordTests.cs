@@ -1,8 +1,6 @@
-using NUnit.Framework;
-using System.Linq;
 using BDO.GWT.CustomReportingModule;
 
-namespace BDO.GWT.CustomReportingModule.Tests.Generated
+namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
 {
     public class ViewRecordTests
     {

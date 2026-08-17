@@ -1,17 +1,31 @@
-using NUnit.Framework;
-using System.Linq;
-using BDO.GWT.CustomReportingModule;
+using BDO.GWT.CustomReportingModule.ReportingApp;
 
-namespace BDO.GWT.CustomReportingModule.Tests.Generated
+namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
 {
+    [TestFixture]
     public class EditQueryModelTests
     {
         [Test]
-        public void Type_EditQueryModel_Exists()
+        public void QueryText_CanBeSetAndRetrieved()
         {
-            var asm = typeof(ReportingApplicationPage).Assembly;
-            var t = asm.GetTypes().FirstOrDefault(x => x.Name == "EditQueryModel");
-            Assert.That(t, Is.Not.Null);
+            // Arrange
+            var model = new EditQueryModel();
+
+            // Act
+            model.QueryText = "SELECT * FROM CMS_User";
+
+            // Assert
+            Assert.That(model.QueryText, Is.EqualTo("SELECT * FROM CMS_User"));
+        }
+
+        [Test]
+        public void QueryText_DefaultsToNull()
+        {
+            // Arrange
+            var model = new EditQueryModel();
+
+            // Assert
+            Assert.That(model.QueryText, Is.Null);
         }
     }
 }

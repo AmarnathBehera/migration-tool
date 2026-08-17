@@ -1,17 +1,47 @@
-using NUnit.Framework;
-using System.Linq;
-using BDO.GWT.CustomReportingModule;
+using BDO.GWT.CustomReportingModule.ReportingApp;
 
-namespace BDO.GWT.CustomReportingModule.Tests.Generated
+namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
 {
+    [TestFixture]
     public class DatabaseTableTests
     {
         [Test]
-        public void Type_DatabaseTable_Exists()
+        public void Constructor_ShouldInitializeColumnsToEmptyCollection()
         {
-            var asm = typeof(ReportingApplicationPage).Assembly;
-            var t = asm.GetTypes().FirstOrDefault(x => x.Name == "DatabaseTable");
-            Assert.That(t, Is.Not.Null);
+            var table = new DatabaseTable();
+
+            Assert.That(table.Columns, Is.Not.Null);
+            Assert.That(table.Columns, Is.Empty);
+        }
+
+        [Test]
+        public void Name_CanBeSetAndRetrieved()
+        {
+            var table = new DatabaseTable();
+
+            table.Name = "CMS_User";
+
+            Assert.That(table.Name, Is.EqualTo("CMS_User"));
+        }
+
+        [Test]
+        public void Columns_CanBeSetAndRetrieved()
+        {
+            var table = new DatabaseTable();
+
+            var columns = new[] { "UserID", "UserName" };
+
+            table.Columns = columns;
+
+            Assert.That(table.Columns, Is.EqualTo(columns));
+        }
+
+        [Test]
+        public void Name_DefaultsToNull()
+        {
+            var table = new DatabaseTable();
+
+            Assert.That(table.Name, Is.Null);
         }
     }
 }

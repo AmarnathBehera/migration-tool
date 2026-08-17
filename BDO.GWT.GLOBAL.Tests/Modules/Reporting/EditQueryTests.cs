@@ -1,17 +1,44 @@
-using NUnit.Framework;
-using System.Linq;
 using BDO.GWT.CustomReportingModule;
+using System.Reflection;
 
-namespace BDO.GWT.CustomReportingModule.Tests.Generated
+namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
 {
+    [TestFixture]
     public class EditQueryTests
     {
+        private Type? editQueryType;
+
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            var asm = typeof(ReportingApplicationPage).Assembly;
+            editQueryType = asm.GetTypes().FirstOrDefault(t => t.Name == "EditQuery");
+        }
+
         [Test]
         public void Type_EditQuery_Exists()
         {
-            var asm = typeof(ReportingApplicationPage).Assembly;
-            var t = asm.GetTypes().FirstOrDefault(x => x.Name == "EditQuery");
-            Assert.That(t, Is.Not.Null);
+            Assert.That(editQueryType, Is.Not.Null);
+        }
+
+        [Test]
+        public void GenerateQueryCodeName_Method_Exists()
+        {
+            var method = editQueryType?.GetMethod(
+                "GenerateQueryCodeName",
+                BindingFlags.NonPublic | BindingFlags.Static);
+
+            Assert.That(method, Is.Not.Null);
+        }
+
+        [Test]
+        public void GetSavedQueries_Method_Exists()
+        {
+            var method = editQueryType?.GetMethod(
+                "GetSavedQueries",
+                BindingFlags.NonPublic | BindingFlags.Instance);
+
+            Assert.That(method, Is.Not.Null);
         }
     }
 }
