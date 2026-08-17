@@ -28,9 +28,8 @@ public class WidgetIdValidationRule : ValidationRule<WidgetIdValidationRulePrope
 {
     public const string IDENTIFIER = "BDO.GWT.WidgetIdValidationRule";
 
-    private static readonly Regex WidgetIdRegex = new(
-        @"^[a-z0-9]+(-[a-z0-9]+)*$",
-        RegexOptions.CultureInvariant | RegexOptions.Compiled);
+    [GeneratedRegex(@"^[a-z0-9]+(-[a-z0-9]+)*$", RegexOptions.CultureInvariant)]
+    private static partial Regex WidgetIdRegex();
 
     public override Task<ValidationResult> Validate(string value, IFormFieldValueProvider formFieldValueProvider)
     {
@@ -39,7 +38,7 @@ public class WidgetIdValidationRule : ValidationRule<WidgetIdValidationRulePrope
             return ValidationResult.SuccessResult();
         }
 
-        return WidgetIdRegex.IsMatch(value)
+        return WidgetIdRegex().IsMatch(value)
             ? ValidationResult.SuccessResult()
             : ValidationResult.FailResult("Only lowercase letters, numbers and single hyphens are allowed (e.g. three-word-id).");
     }
