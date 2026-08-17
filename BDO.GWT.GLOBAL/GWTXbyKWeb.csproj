@@ -9,10 +9,7 @@
   <ItemGroup>
     <EmbeddedResource Include="wwwroot\PageBuilder\Admin\**" />
   </ItemGroup>
-  <ItemGroup>
-    <None Remove="CustomComponents\src\components\custom-reporting\EditQuery.tsx" />
-    <None Remove="CustomComponents\src\components\custom-reporting\EditQueryTemplate.tsx" />
-  </ItemGroup>
+ 
   <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Admin" Version="31.2.3" />
     <PackageReference Include="kentico.xperience.azurestorage" Version="31.2.3" />
@@ -27,10 +24,6 @@
     <ProjectReference Include="..\BDO.GWT.Core\BDO.GWT.Core.csproj" />
     <ProjectReference Include="..\BDO.GWT.CustomReportingModule\BDO.GWT.CustomReportingModule.csproj" />
     <ProjectReference Include="..\xperience-community-redirects-main\src\XperienceCommunity.Redirects.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptCompile Include="CustomComponents\src\components\custom-reporting\EditQuery.tsx" />
-    <TypeScriptCompile Include="CustomComponents\src\components\custom-reporting\EditQueryTemplate.tsx" />
   </ItemGroup>
   
 </Project>
