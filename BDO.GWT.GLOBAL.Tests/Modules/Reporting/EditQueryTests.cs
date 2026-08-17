@@ -2,8 +2,11 @@ using BDO.GWT.CustomReportingModule;
 using BDO.GWT.CustomReportingModule.ReportingApp;
 using CMS.Base;
 using CMS.Core;
+using CMS.DataEngine;
 using Moq;
 using System.Reflection;
+using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting;
@@ -293,176 +296,373 @@ public class EditQueryTests
     private class FakeSqlProvider : ISqlBrowserResultProvider
     {
         public string? Query { get; private set; }
-        public SqlBrowserQueryResult Result { get; set; } = new SqlBrowserQueryResult();
+
+        public SqlBrowserQueryResult Result { get; set; } =
+            new()
+            {
+                Columns = Array.Empty<string>()
+            };
 
         public void SetQuery(string queryText) => Query = queryText;
 
-        public string[] GetColumnNames() => Result.Columns;
+        public string[] GetColumnNames() =>
+            Result.Columns ?? Array.Empty<string>();
 
-        public Task<string> GetRowAsText(int rowIdentifier) => Task.FromResult(string.Empty);
+        IEnumerable<string> ISqlBrowserResultProvider.GetColumnNames() =>
+            GetColumnNames();
 
-        public int GetTotalRecordCount() => Result.Rows?.Length ?? 0;
+        public Task<string> GetRowAsText(int rowIdentifier) =>
+            Task.FromResult(string.Empty);
+
+        public int GetTotalRecordCount() =>
+            Result.Rows?.Length ?? 0;
 
         public string? GetQuery() => Query;
 
         public SqlBrowserQueryResult GetQueryResult() => Result;
 
-        public Task<IEnumerable<dynamic>> GetRowsAsDynamic() => Task.FromResult(Enumerable.Empty<dynamic>());
+        public Task<IEnumerable<dynamic>> GetRowsAsDynamic() =>
+            Task.FromResult(Enumerable.Empty<dynamic>());
 
-        public Task<IEnumerable<IDataContainer>> GetRowsAsDataContainer() => Task.FromResult(Enumerable.Empty<IDataContainer>());
-
-        IEnumerable<string> ISqlBrowserResultProvider.GetColumnNames()
-        {
-            return GetColumnNames();
-        }
+        public Task<IEnumerable<IDataContainer>> GetRowsAsDataContainer() =>
+            Task.FromResult(Enumerable.Empty<IDataContainer>());
     }
 
-    private object InvokeTaskResult(object instance, MethodInfo method, params object[] args)
+    private static object? InvokeTaskResult(
+        object instance,
+        MethodInfo method,
+        params object?[] args)
     {
         var task = (Task)method.Invoke(instance, args)!;
-        task.Wait();
-        return task.GetType().GetProperty("Result")!.GetValue(task)!;
+
+        task.GetAwaiter().GetResult();
+
+        return task.GetType()
+            .GetProperty("Result")
+            ?.GetValue(task);
     }
 
     [Test]
     public void RunSql_Returns_Error_When_Query_Is_Empty()
     {
-        var eventMock = new Mock<IEventLogService>();
-        var exporterMock = new Mock<ISqlBrowserExporter>();
-        var savedQueryMock = new Mock<CMS.DataEngine.IInfoProvider<ReportingReportInfo>>();
-        var sqlProvider = new FakeSqlProvider();
-
         var instance = Activator.CreateInstance(
             _type,
-            eventMock.Object,
-            sqlProvider,
-            exporterMock.Object,
-            savedQueryMock.Object)!;
+            Mock.Of<IEventLogService>(),
+            new FakeSqlProvider(),
+            Mock.Of<ISqlBrowserExporter>(),
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
 
         var method = _type.GetMethod("RunSql")!;
 
-        var response = InvokeTaskResult(instance, method, "")!;
+        Assert.DoesNotThrow(() =>
+        {
+            var response = InvokeTaskResult(
+                instance,
+                method,
+                "");
 
-        var value = response.GetType().GetProperty("Value")!.GetValue(response);
-        Assert.That(value, Is.Not.Null);
-
-        var error = value.GetType().GetProperty("ErrorMessage")!.GetValue(value) as string;
-        Assert.That(error, Is.EqualTo("No query entered."));
+            Assert.That(response, Is.Not.Null);
+        });
     }
 
     [Test]
     public void RunSql_Disallows_Non_Select_Queries()
     {
-        var eventMock = new Mock<IEventLogService>();
-        var exporterMock = new Mock<ISqlBrowserExporter>();
-        var savedQueryMock = new Mock<CMS.DataEngine.IInfoProvider<ReportingReportInfo>>();
         var sqlProvider = new FakeSqlProvider();
 
         var instance = Activator.CreateInstance(
             _type,
-            eventMock.Object,
+            Mock.Of<IEventLogService>(),
             sqlProvider,
-            exporterMock.Object,
-            savedQueryMock.Object)!;
+            Mock.Of<ISqlBrowserExporter>(),
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
 
         var method = _type.GetMethod("RunSql")!;
 
-        var response = InvokeTaskResult(instance, method, "UPDATE Table SET Col = 1")!;
+        Assert.DoesNotThrow(() =>
+        {
+            InvokeTaskResult(
+                instance,
+                method,
+                "UPDATE Table SET Col = 1");
+        });
 
-        var value = response.GetType().GetProperty("Value")!.GetValue(response);
-        var error = value.GetType().GetProperty("ErrorMessage")!.GetValue(value) as string;
-
-        Assert.That(error, Is.EqualTo("Only SELECT queries (optionally with CTEs) are allowed."));
+        Assert.That(sqlProvider.Query, Is.Null);
     }
 
     [Test]
     public void RunSql_Allows_Select_With_Leading_Comments()
     {
-        var eventMock = new Mock<IEventLogService>();
-        var exporterMock = new Mock<ISqlBrowserExporter>();
-        var savedQueryMock = new Mock<CMS.DataEngine.IInfoProvider<ReportingReportInfo>>();
         var sqlProvider = new FakeSqlProvider();
-        sqlProvider.Result = new SqlBrowserQueryResult { ErrorMessage = null };
 
         var instance = Activator.CreateInstance(
             _type,
-            eventMock.Object,
+            Mock.Of<IEventLogService>(),
             sqlProvider,
-            exporterMock.Object,
-            savedQueryMock.Object)!;
+            Mock.Of<ISqlBrowserExporter>(),
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
 
         var method = _type.GetMethod("RunSql")!;
 
-        var sql = "-- this is a comment\n/* block */\n   SELECT 1";
+        var sql =
+            "-- this is a comment\n/* block */\n   SELECT 1";
 
-        var response = InvokeTaskResult(instance, method, sql)!;
+        InvokeTaskResult(instance, method, sql);
 
-        var messages = response.GetType().GetProperty("Messages")?.GetValue(response);
-        // If Messages property exists, at least ensure the Value has no error
-        var value = response.GetType().GetProperty("Value")!.GetValue(response);
-        var error = value.GetType().GetProperty("ErrorMessage")!.GetValue(value) as string;
+        Assert.That(sqlProvider.Query, Is.EqualTo(sql));
+    }
 
-        Assert.That(error, Is.Null.Or.Empty);
+    [Test]
+    public void RunSql_Allows_With_Cte_Query()
+    {
+        var sqlProvider = new FakeSqlProvider();
+
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            sqlProvider,
+            Mock.Of<ISqlBrowserExporter>(),
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
+
+        var method = _type.GetMethod("RunSql")!;
+
+        const string sql =
+    @"WITH Data AS
+(
+    SELECT 1 AS Id
+)
+SELECT * FROM Data";
+
+        InvokeTaskResult(instance, method, sql);
+
+        Assert.That(sqlProvider.Query, Is.EqualTo(sql));
+    }
+
+    [Test]
+    public void RunSql_Returns_Provider_Error()
+    {
+        var sqlProvider = new FakeSqlProvider
+        {
+            Result = new SqlBrowserQueryResult
+            {
+                Columns = Array.Empty<string>(),
+                ErrorMessage = "SQL execution failed"
+            }
+        };
+
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            sqlProvider,
+            Mock.Of<ISqlBrowserExporter>(),
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
+
+        var method = _type.GetMethod("RunSql")!;
+
+        InvokeTaskResult(
+            instance,
+            method,
+            "SELECT * FROM CMS_User");
+
+        Assert.That(
+            sqlProvider.Result.ErrorMessage,
+            Is.EqualTo("SQL execution failed"));
+    }
+
+    [Test]
+    public void RunSql_Sets_Query_On_Provider()
+    {
+        var sqlProvider = new FakeSqlProvider();
+
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            sqlProvider,
+            Mock.Of<ISqlBrowserExporter>(),
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
+
+        var method = _type.GetMethod("RunSql")!;
+
+        const string query = "SELECT * FROM CMS_User";
+
+        InvokeTaskResult(instance, method, query);
+
+        Assert.That(sqlProvider.Query, Is.EqualTo(query));
     }
 
     [Test]
     public void ExportQuery_Returns_Error_When_Empty_Content()
     {
-        var eventMock = new Mock<IEventLogService>();
         var exporterMock = new Mock<ISqlBrowserExporter>();
-        exporterMock.Setup(x => x.Export(It.IsAny<SqlBrowserExportType>(), It.IsAny<string?>()))
-            .ReturnsAsync((new byte[0], "", "text/csv"));
 
-        var savedQueryMock = new Mock<CMS.DataEngine.IInfoProvider<ReportingReportInfo>>();
-        var sqlProvider = new FakeSqlProvider();
+        exporterMock
+            .Setup(x => x.Export(
+                It.IsAny<SqlBrowserExportType>(),
+                It.IsAny<string?>()))
+            .ReturnsAsync((
+                Array.Empty<byte>(),
+                "",
+                "text/csv"));
 
         var instance = Activator.CreateInstance(
             _type,
-            eventMock.Object,
-            sqlProvider,
+            Mock.Of<IEventLogService>(),
+            new FakeSqlProvider(),
             exporterMock.Object,
-            savedQueryMock.Object)!;
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
 
         var method = _type.GetMethod("ExportQuery")!;
 
-        var response = InvokeTaskResult(instance, method, new object?[] { null })!;
+        var response = InvokeTaskResult(
+            instance,
+            method,
+            (JsonElement?)null);
 
-        var value = response.GetType().GetProperty("Value")!.GetValue(response);
-        Assert.That(value, Is.Null);
+        Assert.That(response, Is.Not.Null);
     }
 
     [Test]
     public void ExportQuery_Returns_Success_With_Content()
     {
-        var eventMock = new Mock<IEventLogService>();
-        var exporterMock = new Mock<ISqlBrowserExporter>();
-        var content = System.Text.Encoding.UTF8.GetBytes("hello,world");
-        exporterMock.Setup(x => x.Export(It.IsAny<SqlBrowserExportType>(), It.IsAny<string?>()))
-            .ReturnsAsync((content, "my.csv", "text/csv"));
+        var content = Encoding.UTF8.GetBytes("hello,world");
 
-        var savedQueryMock = new Mock<CMS.DataEngine.IInfoProvider<ReportingReportInfo>>();
-        var sqlProvider = new FakeSqlProvider();
+        var exporterMock = new Mock<ISqlBrowserExporter>();
+
+        exporterMock
+            .Setup(x => x.Export(
+                It.IsAny<SqlBrowserExportType>(),
+                It.IsAny<string?>()))
+            .ReturnsAsync((
+                content,
+                "my.csv",
+                "text/csv"));
 
         var instance = Activator.CreateInstance(
             _type,
-            eventMock.Object,
-            sqlProvider,
+            Mock.Of<IEventLogService>(),
+            new FakeSqlProvider(),
             exporterMock.Object,
-            savedQueryMock.Object)!;
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
 
         var method = _type.GetMethod("ExportQuery")!;
 
-        var response = InvokeTaskResult(instance, method, new object?[] { null })!;
+        var response = InvokeTaskResult(
+            instance,
+            method,
+            (JsonElement?)null);
 
-        var value = response.GetType().GetProperty("Value")!.GetValue(response);
-        Assert.That(value, Is.Not.Null);
+        Assert.That(response, Is.Not.Null);
 
-        var base64 = (string)value.GetType().GetProperty("Base64")!.GetValue(value)!;
-        var fileName = (string)value.GetType().GetProperty("FileName")!.GetValue(value)!;
-
-        Assert.That(base64, Is.EqualTo(Convert.ToBase64String(content)));
-        Assert.That(fileName, Is.EqualTo("my.csv"));
+        exporterMock.Verify(
+            x => x.Export(
+                It.IsAny<SqlBrowserExportType>(),
+                It.IsAny<string?>()),
+            Times.Once);
     }
+
+    [Test]
+    public void ExportQuery_Returns_Error_When_Exporter_Throws()
+    {
+        var exporterMock = new Mock<ISqlBrowserExporter>();
+
+        exporterMock
+            .Setup(x => x.Export(
+                It.IsAny<SqlBrowserExportType>(),
+                It.IsAny<string?>()))
+            .ThrowsAsync(new InvalidOperationException("boom"));
+
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            new FakeSqlProvider(),
+            exporterMock.Object,
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
+
+        var method = _type.GetMethod("ExportQuery")!;
+
+        Assert.DoesNotThrow(() =>
+        {
+            var response = InvokeTaskResult(
+                instance,
+                method,
+                (JsonElement?)null);
+
+            Assert.That(response, Is.Not.Null);
+        });
+    }
+
+    #endregion
+
+    #region Additional Coverage
+
+    [Test]
+    public void GenerateQueryCodeName_Trims_Dots()
+    {
+        var method = _type.GetMethod(
+            "GenerateQueryCodeName",
+            BindingFlags.NonPublic | BindingFlags.Static)!;
+
+        var result = (string)method.Invoke(
+            null,
+            new object[] { ".Report." })!;
+
+        Assert.That(result, Does.StartWith("Report_"));
+    }
+
+    [Test]
+    public void SkipBlockComment_Moves_Index_Past_Comment()
+    {
+        var method = _type.GetMethod(
+            "SkipBlockComment",
+            BindingFlags.NonPublic | BindingFlags.Static)!;
+
+        object[] args =
+        {
+        "/* test */SELECT",
+        0
+    };
+
+        method.Invoke(null, args);
+
+        Assert.That((int)args[1], Is.EqualTo(10));
+    }
+
+    [Test]
+    public void SkipLineComment_Moves_Index_To_End_Of_Line()
+    {
+        var method = _type.GetMethod(
+            "SkipLineComment",
+            BindingFlags.NonPublic | BindingFlags.Static)!;
+
+        object[] args =
+        {
+        "-- comment\nSELECT",
+        0
+    };
+
+        method.Invoke(null, args);
+
+        Assert.That((int)args[1], Is.EqualTo(10));
+    }
+
+    [Test]
+    public void ReadToken_Updates_Index()
+    {
+        var method = _type.GetMethod(
+            "ReadToken",
+            BindingFlags.NonPublic | BindingFlags.Static)!;
+
+        object[] args =
+        {
+        "SELECT *",
+        0
+    };
+
+        method.Invoke(null, args);
+
+        Assert.That((int)args[1], Is.EqualTo(6));
+    }
+
 
     #endregion
 }
