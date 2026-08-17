@@ -258,7 +258,7 @@ public class XperiencePageContext : IPageContext
                 .Where(w => w.WhereEquals(
                     nameof(IWebPageContentQueryDataContainer.WebPageItemID), webPageItemId))
                 .TopN(1)
-            ).InLanguage(languageName); ;
+            ).InLanguage(languageName);
 
         var results = await _queryExecutor.GetWebPageResult(
             builder,
