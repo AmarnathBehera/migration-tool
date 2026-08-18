@@ -901,6 +901,37 @@ SELECT * FROM Data";
     #endregion
 
     [Test]
+    public void GenerateQueryCodeName_When_Name_Is_Only_Dots_Returns_Query()
+    {
+        var method = _type.GetMethod(
+            "GenerateQueryCodeName",
+            BindingFlags.NonPublic | BindingFlags.Static)!;
+
+        var result = (string)method.Invoke(
+            null,
+            new object[] { "..." })!;
+
+        Assert.That(result, Does.StartWith("Query_"));
+    }
+    [Test]
+    public void ReadToken_Returns_Underscore_Prefixed_Token()
+    {
+        var method = _type.GetMethod(
+            "ReadToken",
+            BindingFlags.NonPublic | BindingFlags.Static)!;
+
+        object[] args =
+        {
+        "_TestToken",
+        0
+    };
+
+        var result = method.Invoke(null, args);
+
+        Assert.That(result, Is.EqualTo("_TestToken"));
+    }
+
+    [Test]
     public void ExportQuery_Uses_Provided_Model()
     {
         var exporterMock = new Mock<ISqlBrowserExporter>();

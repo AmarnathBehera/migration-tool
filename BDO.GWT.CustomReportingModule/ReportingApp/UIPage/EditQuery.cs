@@ -247,21 +247,14 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
                 .GetEnumerableTypedResult()
                 .ToList();
 
-            if (existingQueries.Any())
+            if (existingQueries.Count > 0)
             {
                 newOrder = existingQueries.Count;
             }
 
             try
             {
-                var newQuery = new ReportingReportInfo
-                {
-                    ReportingReportDisplayName = query.Name,
-                    ReportingReportCodeName = GenerateQueryCodeName(query.Name),
-                    ReportingReportChannelSettingsID = ReportingChannelSettingId,
-                    ReportingReportQuery = query.Text,
-                    ReportingReportGUID = Guid.NewGuid()
-                };
+                var newQuery = CreateReportInfo(query);
 
                 newQuery.Insert();
 
@@ -284,7 +277,17 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
                         .AddErrorMessage(ex.Message));
             }
         }
-
+        private ReportingReportInfo CreateReportInfo(SavedQuery query)
+        {
+            return new ReportingReportInfo
+            {
+                ReportingReportDisplayName = query.Name,
+                ReportingReportCodeName = GenerateQueryCodeName(query.Name),
+                ReportingReportChannelSettingsID = ReportingChannelSettingId,
+                ReportingReportQuery = query.Text,
+                ReportingReportGUID = Guid.NewGuid()
+            };
+        }
         [PageCommand]
         public async Task<ICommandResponse<bool>> UpdateSavedOrder(
             SavedQuery[] newOrder)
@@ -350,10 +353,16 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
                     _ => SqlBrowserExportType.Csv
                 };
 
-                var requestedFileName = string.IsNullOrWhiteSpace(model?.FileName)
-                    ? $"export-{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.{(exportType == SqlBrowserExportType.Excel ? "xlsx" : exportType == SqlBrowserExportType.Json ? "json" : "csv")}"
-                    : model.FileName;
+                var extension = exportType switch
+                {
+                    SqlBrowserExportType.Excel => "xlsx",
+                    SqlBrowserExportType.Json => "json",
+                    _ => "csv"
+                };
 
+                var requestedFileName = string.IsNullOrWhiteSpace(model?.FileName)
+                    ? $"export-{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.{extension}"
+                    : model.FileName;
                 var (content, returnedFileName, contentType) = await sqlBrowserExporter.Export(exportType, requestedFileName);
 
                 if (content == null || content.Length == 0)

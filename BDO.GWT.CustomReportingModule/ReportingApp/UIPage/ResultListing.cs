@@ -6,9 +6,7 @@ using Kentico.Xperience.Admin.Base;
 
 namespace BDO.GWT.CustomReportingModule.ReportingApp
 {
-    /// <summary>
-    /// Listing UI page which displays the results of a SQL query.
-    /// </summary>
+
     [UINavigation(true)]
     [UIEvaluatePermission(SystemPermissions.VIEW)]
 
@@ -22,15 +20,12 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
         public int ReportingChannelSettingId { get; set; }
         public override async Task ConfigurePage()
         {
-            // If no query is set, expose a header action to let the user enter one and show the "No results" callout.
-            // Open the full editor so the user can enter SQL in a dedicated window.
-            // Use OpenEditQuery which navigates to the EditQuery page (provides editor, execute, save/delete).
+
             PageConfiguration.HeaderActions.AddCommand(
                 "Enter query",
                 nameof(OpenEditQuery),
                 "Open SQL editor to compose and run a query for the current channel");
 
-            // Provide a quick navigation back to the channel list instead of opening the channel selector
             PageConfiguration.HeaderActions.AddCommandWithConfirmation(
                 "Back to channel",
                 nameof(BackToChannel),
@@ -68,7 +63,7 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
 
             try
             {
-                var (content, returnedFileName, contentType) = await sqlBrowserExporter.Export(exportType, model.FileName);
+                var (content, returnedFileName, _) = await sqlBrowserExporter.Export(exportType, model.FileName);
 
                 if (content == null || content.Length == 0)
                 {
@@ -78,8 +73,22 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
                 var exportDir = sqlBrowserExporter.GetExportDirectory() ?? Path.GetTempPath();
                 Directory.CreateDirectory(exportDir);
 
+                var extension = exportType switch
+                {
+                    SqlBrowserExportType.Excel => "xlsx",
+                    SqlBrowserExportType.Json => "json",
+                    _ => "csv"
+                };
+
+                var defaultFileName =
+                    $"export-{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.{extension}";
+
+                var requestedFileName = string.IsNullOrWhiteSpace(model.FileName)
+                    ? defaultFileName
+                    : model.FileName;
+
                 var finalFileName = string.IsNullOrWhiteSpace(returnedFileName)
-                    ? (string.IsNullOrWhiteSpace(model.FileName) ? $"export-{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.{(exportType == SqlBrowserExportType.Excel ? "xlsx" : exportType == SqlBrowserExportType.Json ? "json" : "csv")}" : model.FileName)
+                    ? requestedFileName
                     : returnedFileName;
 
                 var finalPath = Path.Combine(exportDir, finalFileName);
@@ -117,7 +126,7 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
             var channelId = CMS.Helpers.QueryHelper.GetString("channelId", null);
             if (!string.IsNullOrEmpty(channelId))
             {
-                url += (url.Contains("?") ? "&" : "?") + $"channelId={channelId}";
+                url += (url.Contains('?') ? '&' : '?') + $"channelId={channelId}";
             }
 
             return Task.FromResult((ICommandResponse)NavigateTo(url));
