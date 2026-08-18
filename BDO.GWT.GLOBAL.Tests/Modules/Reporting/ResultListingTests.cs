@@ -1,174 +1,228 @@
 using BDO.GWT.CustomReportingModule.ReportingApp;
+using CMS.Base;
+using CMS.Core;
 using Kentico.Xperience.Admin.Base;
+using Moq;
+using System.Reflection;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
 {
     [TestFixture]
     public class ResultListingTests
     {
-        [Test]
-        public void Type_ResultListing_Exists()
+        private Mock<ISqlBrowserResultProvider> _queryProvider;
+        private Mock<ISqlBrowserExporter> _exporter;
+        private Mock<IEventLogService> _eventLog;
+        private Mock<IPageLinkGenerator> _pageLinkGenerator;
+
+        private ResultListing _sut;
+
+        [SetUp]
+        public void Setup()
         {
-            Assert.That(typeof(ResultListing), Is.Not.Null);
+            _queryProvider = new Mock<ISqlBrowserResultProvider>();
+            _exporter = new Mock<ISqlBrowserExporter>();
+            _eventLog = new Mock<IEventLogService>();
+            _pageLinkGenerator = new Mock<IPageLinkGenerator>();
+
+            _pageLinkGenerator
+                .Setup(x => x.GetPath<ResultListing>())
+                .Returns("/resultlisting");
+
+            _pageLinkGenerator
+                .Setup(x => x.GetPath<EditQuery>())
+                .Returns("/editquery");
+
+            _sut = new ResultListing(
+                _queryProvider.Object,
+                _exporter.Object,
+                _eventLog.Object,
+                _pageLinkGenerator.Object);
         }
 
         [Test]
-        public void Type_Inherits_From_DataContainerListingPage()
+        public async Task Export_InvalidExportType_ReturnsResponse()
         {
-            Assert.That(
-                typeof(ResultListing).BaseType,
-                Is.EqualTo(typeof(DataContainerListingPage)));
+            var model = new ExportConfirmationDialogModel
+            {
+                ExportType = "invalid"
+            };
+
+            var result = await _sut.Export(model);
+
+            Assert.That(result, Is.Not.Null);
         }
 
         [Test]
-        public void ReportingChannelSettingId_Property_Exists()
+        public async Task Export_EmptyContent_ReturnsResponse()
         {
-            var property = typeof(ResultListing)
-                .GetProperty(nameof(ResultListing.ReportingChannelSettingId));
+            _exporter
+                .Setup(x => x.Export(
+                    It.IsAny<SqlBrowserExportType>(),
+                    It.IsAny<string>()))
+                .ReturnsAsync((
+                    Array.Empty<byte>(),
+                    "file.csv",
+                    string.Empty));
 
-            Assert.That(property, Is.Not.Null);
-            Assert.That(property!.PropertyType, Is.EqualTo(typeof(int)));
+            var model = new ExportConfirmationDialogModel
+            {
+                ExportType = "csv"
+            };
+
+            var result = await _sut.Export(model);
+
+            Assert.That(result, Is.Not.Null);
         }
 
         [Test]
-        public void Class_Has_UINavigation_Attribute()
+        public async Task Export_WhenExporterThrows_LogsException()
         {
-            var attribute = typeof(ResultListing)
-                .GetCustomAttributes(typeof(UINavigationAttribute), false)
-                .FirstOrDefault();
+            _exporter
+                .Setup(x => x.Export(
+                    It.IsAny<SqlBrowserExportType>(),
+                    It.IsAny<string>()))
+                .ThrowsAsync(new Exception("boom"));
 
-            Assert.That(attribute, Is.Not.Null);
+            var model = new ExportConfirmationDialogModel
+            {
+                ExportType = "csv"
+            };
+
+            await _sut.Export(model);
+
+            _eventLog.Verify(
+                x => x.LogException(
+                    nameof(ResultListing),
+                    nameof(ResultListing.Export),
+                    It.IsAny<Exception>()),
+                Times.Once);
         }
 
         [Test]
-        public void Class_Has_UIEvaluatePermission_Attribute()
+        public async Task SubmitQuery_WithEmptyQuery_ReturnsResponse()
         {
-            var attribute = typeof(ResultListing)
-                .GetCustomAttributes(typeof(UIEvaluatePermissionAttribute), false)
-                .FirstOrDefault();
+            var model = new EditQueryModel
+            {
+                QueryText = string.Empty
+            };
 
-            Assert.That(attribute, Is.Not.Null);
+            var result = await _sut.SubmitQuery(model);
+
+            Assert.That(result, Is.Not.Null);
         }
 
         [Test]
-        public void ConfigurePage_Method_Exists()
+        public async Task SubmitQuery_WithValidQuery_CallsSetQuery()
         {
-            var method = typeof(ResultListing)
-                .GetMethod(nameof(ResultListing.ConfigurePage));
+            _pageLinkGenerator
+                .Setup(x => x.GetPath<ResultListing>())
+                .Returns("/resultlisting");
 
-            Assert.That(method, Is.Not.Null);
+            var model = new EditQueryModel
+            {
+                QueryText = "SELECT * FROM CMS_User"
+            };
+
+            await _sut.SubmitQuery(model);
+
+            _queryProvider.Verify(
+                x => x.SetQuery("SELECT * FROM CMS_User"),
+                Times.Once);
         }
 
         [Test]
-        public void Export_Method_Exists()
+        public async Task OpenEditQuery_WithChannelId_CallsSetQuery()
         {
-            var method = typeof(ResultListing)
-                .GetMethod(nameof(ResultListing.Export));
+            _sut.ReportingChannelSettingId = 5;
 
-            Assert.That(method, Is.Not.Null);
+            await _sut.OpenEditQuery();
+
+            _queryProvider.Verify(
+                x => x.SetQuery(It.Is<string>(
+                    s => s.Contains("ChannelID = 5"))),
+                Times.Once);
         }
 
         [Test]
-        public void SubmitQuery_Method_Exists()
+        public async Task OpenEditQuery_ReturnsNavigationResponse()
         {
-            var method = typeof(ResultListing)
-                .GetMethod(nameof(ResultListing.SubmitQuery));
+            var result = await _sut.OpenEditQuery();
 
-            Assert.That(method, Is.Not.Null);
+            Assert.That(result, Is.Not.Null);
         }
 
         [Test]
-        public void OpenEditQuery_Method_Exists()
+        public async Task BackToChannel_ReturnsNavigationResponse()
         {
-            var method = typeof(ResultListing)
-                .GetMethod(nameof(ResultListing.OpenEditQuery));
+            var result = await _sut.BackToChannel();
 
-            Assert.That(method, Is.Not.Null);
+            Assert.That(result, Is.Not.Null);
         }
 
         [Test]
-        public void BackToChannel_Method_Exists()
+        public async Task LoadDataContainers_ReturnsProviderResults()
         {
-            var method = typeof(ResultListing)
-                .GetMethod(nameof(ResultListing.BackToChannel));
+            var expected =
+                new List<IDataContainer>();
 
-            Assert.That(method, Is.Not.Null);
-        }
+            _queryProvider
+                .Setup(x => x.GetRowsAsDataContainer())
+                .ReturnsAsync(expected);
 
-        [Test]
-        public void GetIdentifier_Method_Exists()
-        {
-            var method = typeof(ResultListing)
-                .GetMethod(
-                    "GetIdentifier",
-                    System.Reflection.BindingFlags.Instance |
-                    System.Reflection.BindingFlags.NonPublic);
-
-            Assert.That(method, Is.Not.Null);
-        }
-
-        [Test]
-        public void LoadDataContainers_Method_Exists()
-        {
             var method = typeof(ResultListing)
                 .GetMethod(
                     "LoadDataContainers",
-                    System.Reflection.BindingFlags.Instance |
-                    System.Reflection.BindingFlags.NonPublic);
+                    BindingFlags.Instance |
+                    BindingFlags.NonPublic);
 
-            Assert.That(method, Is.Not.Null);
+            var task =
+                (Task<IEnumerable<IDataContainer>>)method!
+                    .Invoke(
+                        _sut,
+                        new object[]
+                        {
+                            CancellationToken.None
+                        })!;
+
+            var result = await task;
+
+            Assert.That(result, Is.SameAs(expected));
         }
 
         [Test]
-        public void Export_Method_Has_PageCommand_Attribute()
+        public void GetIdentifier_ReturnsExpectedValue()
         {
+            var container = new Mock<IDataContainer>();
+
+            container
+                .Setup(x =>
+                    x[SqlBrowserResultProvider
+                        .ROW_IDENTIFIER_COLUMN])
+                .Returns(99);
+
             var method = typeof(ResultListing)
-                .GetMethod(nameof(ResultListing.Export));
+                .GetMethod(
+                    "GetIdentifier",
+                    BindingFlags.Instance |
+                    BindingFlags.NonPublic);
 
-            var attribute = method?
-                .GetCustomAttributes(typeof(PageCommandAttribute), false)
-                .FirstOrDefault();
+            var result = method!.Invoke(
+                _sut,
+                new object[]
+                {
+                    container.Object
+                });
 
-            Assert.That(attribute, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(99));
         }
 
         [Test]
-        public void SubmitQuery_Method_Has_PageCommand_Attribute()
+        public async Task ConfigurePage_CompletesSuccessfully()
         {
-            var method = typeof(ResultListing)
-                .GetMethod(nameof(ResultListing.SubmitQuery));
+            await _sut.ConfigurePage();
 
-            var attribute = method?
-                .GetCustomAttributes(typeof(PageCommandAttribute), false)
-                .FirstOrDefault();
-
-            Assert.That(attribute, Is.Not.Null);
-        }
-
-        [Test]
-        public void OpenEditQuery_Method_Has_PageCommand_Attribute()
-        {
-            var method = typeof(ResultListing)
-                .GetMethod(nameof(ResultListing.OpenEditQuery));
-
-            var attribute = method?
-                .GetCustomAttributes(typeof(PageCommandAttribute), false)
-                .FirstOrDefault();
-
-            Assert.That(attribute, Is.Not.Null);
-        }
-
-        [Test]
-        public void BackToChannel_Method_Has_PageCommand_Attribute()
-        {
-            var method = typeof(ResultListing)
-                .GetMethod(nameof(ResultListing.BackToChannel));
-
-            var attribute = method?
-                .GetCustomAttributes(typeof(PageCommandAttribute), false)
-                .FirstOrDefault();
-
-            Assert.That(attribute, Is.Not.Null);
+            Assert.Pass();
         }
     }
 }

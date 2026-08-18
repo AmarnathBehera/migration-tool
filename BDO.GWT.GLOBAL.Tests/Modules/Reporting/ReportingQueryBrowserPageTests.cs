@@ -77,5 +77,35 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
 
             Assert.That(attributes.Length, Is.GreaterThan(0));
         }
+
+        [Test]
+        public void ReportingChannelSettingId_GetterAndSetter_WorkCorrectly()
+        {
+            // Arrange
+            var page = new ReportingQueryBrowserPage();
+            const int expectedValue = 123;
+
+            // Act
+            page.ReportingChannelSettingId = expectedValue;
+
+            // Assert
+            Assert.That(page.ReportingChannelSettingId, Is.EqualTo(expectedValue));
+        }
+        [TestCase(0)]
+        [TestCase(1)]
+        [TestCase(123)]
+        [TestCase(int.MaxValue)]
+        [TestCase(int.MinValue)]
+        public void ReportingChannelSettingId_GetterAndSetter_ReturnsAssignedValue(int value)
+        {
+            // Arrange
+            var page = new ReportingQueryBrowserPage();
+
+            // Act
+            page.ReportingChannelSettingId = value;
+
+            // Assert
+            Assert.That(page.ReportingChannelSettingId, Is.EqualTo(value));
+        }
     }
 }

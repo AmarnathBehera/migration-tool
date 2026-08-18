@@ -165,9 +165,65 @@ public class SqlBrowserResultProviderTests
     }
 
     [Test]
-    public void ISqlBrowserResultProvider_ExposesGetRowsAsDataContainer()
+    public async Task GetRowsAsDataContainer_WithResult_ReturnsMappedContainers()
     {
-        Assert.That(typeof(ISqlBrowserResultProvider).GetMethod(nameof(ISqlBrowserResultProvider.GetRowsAsDataContainer)), Is.Not.Null);
+        // Arrange
+        var service = CreateService();
+
+        var table = new DataTable();
+        table.Columns.Add("Id", typeof(int));
+        table.Columns.Add("Name", typeof(string));
+        table.Columns.Add("IsActive", typeof(bool));
+
+        table.Rows.Add(101, "John", true);
+        table.Rows.Add(102, "Jane", false);
+
+        var dataSet = new DataSet();
+        dataSet.Tables.Add(table);
+
+        typeof(SqlBrowserResultProvider)
+            .GetField("_result", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .SetValue(service, dataSet);
+
+        // Act
+        var containers = (await service.GetRowsAsDataContainer()).ToList();
+
+        // Assert
+        Assert.That(containers, Has.Count.EqualTo(2));
+
+        var firstContainer = containers[0];
+        var secondContainer = containers[1];
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(
+                firstContainer[SqlBrowserResultProvider.ROW_IDENTIFIER_COLUMN],
+                Is.EqualTo(0));
+
+            Assert.That(
+                secondContainer[SqlBrowserResultProvider.ROW_IDENTIFIER_COLUMN],
+                Is.EqualTo(1));
+
+            Assert.That(firstContainer["Id"], Is.EqualTo(101));
+            Assert.That(firstContainer["Name"], Is.EqualTo("John"));
+            Assert.That(firstContainer["IsActive"], Is.EqualTo(true));
+
+            Assert.That(secondContainer["Id"], Is.EqualTo(102));
+            Assert.That(secondContainer["Name"], Is.EqualTo("Jane"));
+            Assert.That(secondContainer["IsActive"], Is.EqualTo(false));
+        });
+    }
+
+
+    private static string GetRowIdentifierColumn()
+    {
+        return (string)typeof(SqlBrowserResultProvider)
+            .GetField(
+                "ROW_IDENTIFIER_COLUMN",
+                BindingFlags.Static |
+                BindingFlags.Public |
+                BindingFlags.NonPublic)!
+            .GetValue(null)!;
     }
 
     // ────── behavior: initialization ─────────────────────────────────────────────────────────────
@@ -262,7 +318,110 @@ public class SqlBrowserResultProviderTests
         Assert.That(result.Columns, Is.Not.Null);
         Assert.That(result.Rows, Is.Not.Null);
     }
+    [Test]
+    public void GetQueryResult_WithPopulatedResult_ReturnsColumnsAndRowsAsStrings()
+    {
+        // Arrange
+        var service = CreateService();
 
+        var table = new DataTable();
+        table.Columns.Add("Id", typeof(int));
+        table.Columns.Add("Name", typeof(string));
+        table.Columns.Add("IsActive", typeof(bool));
+        table.Columns.Add("Description", typeof(string));
+
+        table.Rows.Add(101, "John", true, "First user");
+        table.Rows.Add(102, "Jane", false, DBNull.Value);
+
+        var dataSet = new DataSet();
+        dataSet.Tables.Add(table);
+
+        typeof(SqlBrowserResultProvider)
+            .GetField(
+                "_result",
+                BindingFlags.Instance | BindingFlags.NonPublic)!
+            .SetValue(service, dataSet);
+
+        // Act
+        var result = service.GetQueryResult();
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(
+                result.Columns,
+                Is.EqualTo(new[]
+                {
+                "Id",
+                "Name",
+                "IsActive",
+                "Description"
+                }));
+
+            Assert.That(result.Rows, Has.Length.EqualTo(2));
+
+            Assert.That(
+                result.Rows[0],
+                Is.EqualTo(new[]
+                {
+                "101",
+                "John",
+                bool.TrueString,
+                "First user"
+                }));
+
+            Assert.That(
+                result.Rows[1],
+                Is.EqualTo(new[]
+                {
+                "102",
+                "Jane",
+                bool.FalseString,
+                string.Empty
+                }));
+        });
+    }
+
+    [Test]
+    public void GetQueryResult_WhenValidatorThrows_ReturnsExceptionMessage()
+    {
+        // Arrange
+        var mockEventLog = new Mock<IEventLogService>();
+        var mockValidator = new Mock<ISqlQueryValidator>();
+
+        const string query = "SELECT * FROM Users";
+        const string exceptionMessage = "SQL validation failed unexpectedly.";
+
+        var expectedException = new InvalidOperationException(exceptionMessage);
+
+        mockValidator
+            .Setup(x => x.ValidateSqlStatement(query))
+            .Throws(expectedException);
+
+        var service = new SqlBrowserResultProvider(
+            mockEventLog.Object,
+            mockValidator.Object);
+
+        service.SetQuery(query);
+
+        // Act
+        var result = service.GetQueryResult();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.ErrorMessage, Is.EqualTo(exceptionMessage));
+            Assert.That(result.Columns, Is.Empty);
+            Assert.That(result.Rows, Is.Empty);
+        });
+
+        mockValidator.Verify(
+            x => x.ValidateSqlStatement(query),
+            Times.Once);
+    }
     // ────── behavior: row text formatting ────────────────────────────────────────────────────────
 
     [Test]
@@ -347,4 +506,90 @@ public class SqlBrowserResultProviderTests
         var mockValidator = new Mock<ISqlQueryValidator>();
         return new SqlBrowserResultProvider(mockEventLog.Object, mockValidator.Object);
     }
+    [Test]
+    public async Task GetRowsAsDynamic_WithResult_ReturnsRowsMappedByColumnName()
+    {
+        // Arrange
+        var service = CreateService();
+
+        var table = new DataTable();
+        table.Columns.Add("Id", typeof(int));
+        table.Columns.Add("Name", typeof(string));
+        table.Columns.Add("IsActive", typeof(bool));
+
+        table.Rows.Add(1, "John", true);
+        table.Rows.Add(2, "Jane", false);
+
+        var dataSet = new DataSet();
+        dataSet.Tables.Add(table);
+
+        typeof(SqlBrowserResultProvider)
+            .GetField("_result", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .SetValue(service, dataSet);
+
+        // Act
+        // ToList() is required to execute the deferred Select projection.
+        var rows = (await service.GetRowsAsDynamic()).ToList();
+
+        // Assert
+        Assert.That(rows, Has.Count.EqualTo(2));
+
+        var firstRow = (IDictionary<string, object>)rows[0];
+        var secondRow = (IDictionary<string, object>)rows[1];
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(firstRow, Has.Count.EqualTo(3));
+            Assert.That(firstRow.ContainsKey("Id"), Is.True);
+            Assert.That(firstRow.ContainsKey("Name"), Is.True);
+            Assert.That(firstRow.ContainsKey("IsActive"), Is.True);
+
+            Assert.That(firstRow["Id"], Is.EqualTo(1));
+            Assert.That(firstRow["Name"], Is.EqualTo("John"));
+            Assert.That(firstRow["IsActive"], Is.EqualTo(true));
+
+            Assert.That(secondRow["Id"], Is.EqualTo(2));
+            Assert.That(secondRow["Name"], Is.EqualTo("Jane"));
+            Assert.That(secondRow["IsActive"], Is.EqualTo(false));
+        });
+    }
+    [Test]
+    public async Task GetRowsAsDynamic_WithDatabaseNull_PreservesDBNullValue()
+    {
+        // Arrange
+        var service = CreateService();
+
+        var table = new DataTable();
+        table.Columns.Add("Id", typeof(int));
+        table.Columns.Add("Description", typeof(string));
+
+        table.Rows.Add(1, DBNull.Value);
+
+        var dataSet = new DataSet();
+        dataSet.Tables.Add(table);
+
+        typeof(SqlBrowserResultProvider)
+            .GetField("_result", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .SetValue(service, dataSet);
+
+        // Act
+        var rows = (await service.GetRowsAsDynamic()).ToList();
+
+        // Assert
+        Assert.That(rows, Has.Count.EqualTo(1));
+
+        var row = (IDictionary<string, object>)rows.Single();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(row["Id"], Is.EqualTo(1));
+            Assert.That(row["Description"], Is.EqualTo(DBNull.Value));
+        });
+    }
+}
+
+internal class SqlQueryValidationResult : ValidationResult
+{
+    public bool IsValid { get; set; }
+    public string ErrorMessage { get; set; }
 }
