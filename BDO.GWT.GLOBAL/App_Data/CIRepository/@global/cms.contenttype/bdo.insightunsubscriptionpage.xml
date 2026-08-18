@@ -1,17 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <cms.contenttype>
-  <ClassContentTypeType>Headless</ClassContentTypeType>
+  <ClassContentTypeType>Website</ClassContentTypeType>
   <ClassDisplayName>Insight unsubscription page</ClassDisplayName>
   <ClassFormDefinition>
     <form>
-      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="f58181aa-64ff-4385-8eee-aabda77e982b" isPK="true" />
-      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="9758c94c-ffa3-4c9a-a11a-d6c59abde838" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
-      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="e6400b79-71e4-4de6-82d1-ebad502071d8" isunique="true" system="true" />
-      <field column="Custom" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6d3c13f4-90ea-4063-99b9-d3d2785e4fe8" visible="true">
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="f14f0188-2a87-4f1f-a052-e5a8d48f6040" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="5ae190ef-3100-4ab0-92c8-92f4240c1148" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="07684742-c121-4035-8642-b0853f29ae65" isunique="true" system="true" />
+      <field column="Custom" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="fcf6ecd0-8aac-4954-b043-9f051c9315a6" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Custom</fieldcaption>
+          <fieldcaption>Name</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
@@ -19,12 +20,11 @@
       </field>
     </form>
   </ClassFormDefinition>
-  <ClassGUID>3796c70d-d283-4efa-b932-6d31f024baa7</ClassGUID>
+  <ClassGUID>276ddf6c-90ce-4263-bc61-475fdf0c7325</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
-  <ClassIconClass>xp-circle</ClassIconClass>
-  <ClassName>BDO.InsightUnsubscriptionPage</ClassName>
-  <ClassShortName>BDOInsightUnsubscriptionPage</ClassShortName>
-  <ClassTableName>BDO_InsightUnsubscriptionPage</ClassTableName>
+  <ClassName>BDO.Insightunsubscriptionpage</ClassName>
+  <ClassShortName>BDOInsightunsubscriptionpage</ClassShortName>
+  <ClassTableName>BDO_Insightunsubscriptionpage</ClassTableName>
   <ClassType>Content</ClassType>
   <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
 </cms.contenttype>
