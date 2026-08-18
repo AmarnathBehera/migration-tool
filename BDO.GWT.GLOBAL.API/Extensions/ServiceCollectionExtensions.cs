@@ -59,6 +59,6 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IUserApiPermissionsCrudService, UserApiPermissionsCrudService>();
         serviceCollection.AddScoped<ILicenseKeysCrudService, LicenseKeysCrudService>();
         serviceCollection.AddScoped<IScheduledTaskCrudService, ScheduledTaskCrudService>();
-        serviceCollection.AddScoped<IContentService1, ContentService1>();
+        serviceCollection.AddScoped<IContentCategoryService, ContentCategoryService>();
     }
 }
