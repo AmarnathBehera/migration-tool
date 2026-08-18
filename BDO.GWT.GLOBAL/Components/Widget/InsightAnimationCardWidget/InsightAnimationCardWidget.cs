@@ -68,7 +68,7 @@ public class InsightAnimationCardWidget: ViewComponent
                 Title = x.Title,
                 Description = HtmlHelper.ExtractTextFromHtml(x.Description),
                 ReadMoreIcon = x.Url,
-                ImageURL = x.Image?.FirstOrDefault()?.ContentAttachmentAsset.Url,
+                ImageURL = x.Image?.FirstOrDefault()?.ContentAttachmentAsset.Url.TrimStart('~'),
                 OpenInNewTab = data.openInNewTab
             }),
             SeeAllLink = new LinkItemDto
