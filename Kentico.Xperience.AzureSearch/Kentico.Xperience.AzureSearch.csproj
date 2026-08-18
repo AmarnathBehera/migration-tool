@@ -27,18 +27,32 @@
 		<!-- Requires that npm run build or npm run build:dev was executed _before_ the .NET build -->
 	</ItemGroup>
 
-	<Target Name="NpmInstall" BeforeTargets="NpmBuildClient" Condition=" '$(Configuration)|$(Platform)' != 'Debug|AnyCPU' ">
-		<Exec Command="npm ci --no-audit --no-fund" WorkingDirectory="$(MSBuildProjectDirectory)\Admin\Client" />
-	</Target>
-	<Target Name="NpmBuildClient" BeforeTargets="BeforeBuild" Condition=" '$(Configuration)|$(Platform)' != 'Debug|AnyCPU' ">
-		<Exec Command="npm run build" WorkingDirectory="$(MSBuildProjectDirectory)\Admin\Client" />
+	<Target Name="NpmInstall" BeforeTargets="NpmBuildClient"
+        Inputs="Admin\Client\package.json;Admin\Client\package-lock.json"
+        Outputs="Admin\Client\node_modules\.install-stamp">
+    <Exec Command="npm ci --no-audit --no-fund" WorkingDirectory="$(MSBuildProjectDirectory)\Admin\Client" />
+    <Touch Files="Admin\Client\node_modules\.install-stamp" AlwaysCreate="true" />
+</Target>
 
-		<ItemGroup>
-			<AdminClientPath Include="Admin\Client\dist\**">
-				<ProjectName>xperience-integrations-azuresearch</ProjectName>
-			</AdminClientPath>
-		</ItemGroup>
-	</Target>
+<Target Name="NpmBuildClient" BeforeTargets="BeforeBuild"
+        Inputs="@(NpmClientSourceFiles)"
+        Outputs="Admin\Client\dist\entry.js">
+    <ItemGroup>
+        <NpmClientSourceFiles Include="Admin\Client\src\**\*.*;Admin\Client\webpack.config.js;Admin\Client\package.json" />
+    </ItemGroup>
+    <Exec Command="npm run build" WorkingDirectory="$(MSBuildProjectDirectory)\Admin\Client" />
+</Target>
+
+<!-- Always runs, every build, regardless of whether NpmBuildClient's Exec was skipped -->
+<Target Name="RegisterAdminClientPath" BeforeTargets="BeforeBuild" AfterTargets="NpmBuildClient">
+    <ItemGroup>
+        <AdminClientPath Include="Admin\Client\dist\**">
+            <ProjectName>xperience-integrations-azuresearch</ProjectName>
+        </AdminClientPath>
+    </ItemGroup>
+</Target>
+
+      
 
 	<ItemGroup>
 		<PackageReference Include="Azure.Search.Documents" />
