@@ -21,6 +21,8 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
 
         protected override string ObjectType => ReportingChannelSettingInfo.OBJECT_TYPE;
 
+        public static object FormatterServices { get; internal set; }
+
         public ReportingApplicationChannelSettingsListingPage(IInfoProvider<ChannelInfo> channelInfoProvider,
             IInfoProvider<ReportingChannelSettingInfo> reportingChannelSettingInfoProvider,
             IStringLocalizer<SharedResources> stringLocalizer) : base()
@@ -31,7 +33,6 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
             EnsureSettingsListData();
         }
 
-        //Creates necessary settings objects if they do not exist, and ensures proper channel names.
         private void EnsureSettingsListData()
         {
             var channels = channelInfoProvider.Get();
@@ -49,7 +50,6 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
 
             }
         }
-        //Creates a new StateChannelSettingInfo for the provided channel if none exists.
         private void EnsureChannelSetting(List<ReportingChannelSettingInfo> currentChannelSettings, ChannelInfo channel)
         {
             if (currentChannelSettings.Count == 0)
@@ -64,7 +64,6 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
             }
         }
 
-        //Updates display name of provided WebChannelSettingsInfo to match its channel if they are different.
         private void EnsureChannelSettingDisplayName(ChannelInfo channel, ReportingChannelSettingInfo? currentChannelSetting)
         {
             if (currentChannelSetting != null && !channel.ChannelDisplayName.Equals(currentChannelSetting.ReportingChannelSettingsDisplayName))

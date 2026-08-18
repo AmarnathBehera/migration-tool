@@ -7,13 +7,11 @@ using System.Text;
 
 namespace BDO.GWT.CustomReportingModule.ReportingApp
 {
-    /// <summary>
-    /// Default implementation of <see cref="ISqlBrowserResultProvider"/>.
-    /// </summary>
+
     public class SqlBrowserResultProvider(IEventLogService eventLogService, ISqlQueryValidator validator) : ISqlBrowserResultProvider
     {
         private string? query;
-        private DataSet? result;
+        private DataSet? _result;
         private string? errorMessage;
         public const string ROW_IDENTIFIER_COLUMN = $"{nameof(SqlBrowserResultProvider)}_result_identifier";
 
@@ -23,10 +21,10 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
 
             if (ResultsAreEmpty())
             {
-                return [];
+                return Array.Empty<string>();
             }
 
-            return result!.Tables[0].Columns.OfType<DataColumn>().Select(c => c.ColumnName);
+            return _result!.Tables[0].Columns.OfType<DataColumn>().Select(c => c.ColumnName);
         }
 
 
@@ -39,7 +37,7 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
                 throw new InvalidOperationException($"Failed to load row {rowIdentifier}");
             }
 
-            var row = result!.Tables[0].Rows[rowIdentifier] ?? throw new InvalidOperationException($"Failed to load row {rowIdentifier}");
+            var row = _result!.Tables[0].Rows[rowIdentifier] ?? throw new InvalidOperationException($"Failed to load row {rowIdentifier}");
             var textResult = new StringBuilder();
             foreach (string col in GetColumnNames())
             {
@@ -63,7 +61,7 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
                 return 0;
             }
 
-            return result!.Tables[0].Rows.Count;
+            return _result!.Tables[0].Rows.Count;
         }
 
 
@@ -77,7 +75,7 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
             }
 
             var columnNames = GetColumnNames();
-            var containers = result!.Tables[0].Rows.OfType<DataRow>().Select((row, i) =>
+            var containers = _result!.Tables[0].Rows.OfType<DataRow>().Select((row, i) =>
             {
                 var data = new DataContainer
                 {
@@ -105,7 +103,7 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
             }
 
             var columnNames = GetColumnNames();
-            var dynamics = result!.Tables[0].Rows.OfType<DataRow>().Select(row =>
+            var dynamics = _result!.Tables[0].Rows.OfType<DataRow>().Select(row =>
             {
                 var obj = new ExpandoObject();
                 foreach (string col in columnNames)
@@ -136,7 +134,7 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
             }
 
             var columnNames = GetColumnNames().ToArray();
-            var rows = result!.Tables[0]
+            var rows = _result!.Tables[0]
                 .Rows
                 .OfType<DataRow>()
                 .Select(row => columnNames.Select(column => row[column]?.ToString() ?? string.Empty).ToArray())
@@ -153,25 +151,22 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
 
         public void SetQuery(string queryText)
         {
-            result = null;
+            _result = null;
             errorMessage = null;
             query = queryText;
         }
 
 
-        /// <summary>
-        /// Ensures <see cref="result"/> is not null and if so, sets it by executing the underlying query.
-        /// </summary>
         private void EnsureResult()
         {
-            if (result is not null)
+            if (_result is not null)
             {
                 return;
             }
 
             if (string.IsNullOrEmpty(query))
             {
-                result = new DataSet();
+                _result = new DataSet();
                 errorMessage = "No query entered.";
                 eventLogService.LogWarning(nameof(SqlBrowserResultProvider), nameof(EnsureResult),
                     $"No query present in {nameof(SqlBrowserResultProvider)}");
@@ -188,7 +183,7 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
                 }
                 else if (!validationResult.IsValid)
                 {
-                    result = new DataSet();
+                    _result = new DataSet();
                     errorMessage = validationResult.ErrorMessage;
                     eventLogService.LogWarning(nameof(SqlBrowserResultProvider), nameof(EnsureResult),
                         $"User attempted to execute invalid query:{Environment.NewLine}{query}{Environment.NewLine}Error: {validationResult.ErrorMessage}");
@@ -196,23 +191,20 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
                     return;
                 }
 
-                result = ConnectionHelper.ExecuteQuery(query, null, QueryTypeEnum.SQLQuery);
+                _result = ConnectionHelper.ExecuteQuery(query, null, QueryTypeEnum.SQLQuery);
                 eventLogService.LogInformation(nameof(SqlBrowserResultProvider), nameof(EnsureResult),
                     $"User executed query:{Environment.NewLine}{query}");
             }
             catch (Exception ex)
             {
-                result = new DataSet();
+                _result = new DataSet();
                 errorMessage = ex.Message;
                 eventLogService.LogException(nameof(SqlBrowserResultProvider), nameof(EnsureResult), ex);
             }
         }
 
 
-        /// <summary>
-        /// Returns true if <see cref="result"/> is null or contains no tables.
-        /// </summary>
-        private bool ResultsAreEmpty() => result is null || result.Tables.Count == 0;
+        private bool ResultsAreEmpty() => _result is null || _result.Tables.Count == 0;
     }
 
 }

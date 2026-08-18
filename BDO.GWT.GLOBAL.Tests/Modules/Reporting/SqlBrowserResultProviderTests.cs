@@ -1,6 +1,8 @@
 using BDO.GWT.CustomReportingModule.ReportingApp;
 using CMS.Core;
 using Moq;
+using System.Data;
+using System.Reflection;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting;
 
@@ -300,5 +302,49 @@ public class SqlBrowserResultProviderTests
         var rows = await service.GetRowsAsDataContainer();
 
         Assert.That(rows, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetRowAsText_WithValidRow_ReturnsFormattedText()
+    {
+        // Arrange
+        var mockEventLog = new Mock<IEventLogService>();
+        var mockValidator = new Mock<ISqlQueryValidator>();
+
+        var service = new SqlBrowserResultProvider(
+            mockEventLog.Object,
+            mockValidator.Object);
+
+        var table = new DataTable();
+        table.Columns.Add("Id");
+        table.Columns.Add("Name");
+
+        var row = table.NewRow();
+        row["Id"] = 1;
+        row["Name"] = "John";
+        table.Rows.Add(row);
+
+        var dataSet = new DataSet();
+        dataSet.Tables.Add(table);
+
+        // Inject private field
+        typeof(SqlBrowserResultProvider)
+            .GetField("_result", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .SetValue(service, dataSet);
+
+        // Act
+        var result = await service.GetRowAsText(0);
+
+        // Assert
+        Assert.That(result, Does.Contain("Id: 1"));
+        Assert.That(result, Does.Contain("Name: John"));
+    }
+
+
+    private SqlBrowserResultProvider CreateService()
+    {
+        var mockEventLog = new Mock<IEventLogService>();
+        var mockValidator = new Mock<ISqlQueryValidator>();
+        return new SqlBrowserResultProvider(mockEventLog.Object, mockValidator.Object);
     }
 }
