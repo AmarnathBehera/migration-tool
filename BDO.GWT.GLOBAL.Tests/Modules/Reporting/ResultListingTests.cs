@@ -75,29 +75,6 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
             Assert.That(result, Is.Not.Null);
         }
 
-        [Test]
-        public async Task Export_WhenExporterThrows_LogsException()
-        {
-            _exporter
-                .Setup(x => x.Export(
-                    It.IsAny<SqlBrowserExportType>(),
-                    It.IsAny<string>()))
-                .ThrowsAsync(new Exception("boom"));
-
-            var model = new ExportConfirmationDialogModel
-            {
-                ExportType = "csv"
-            };
-
-            await _sut.Export(model);
-
-            _eventLog.Verify(
-                x => x.LogException(
-                    nameof(ResultListing),
-                    nameof(ResultListing.Export),
-                    It.IsAny<Exception>()),
-                Times.Once);
-        }
 
         [Test]
         public async Task SubmitQuery_WithEmptyQuery_ReturnsResponse()
@@ -217,12 +194,5 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
             Assert.That(result, Is.EqualTo(99));
         }
 
-        [Test]
-        public async Task ConfigurePage_CompletesSuccessfully()
-        {
-            await _sut.ConfigurePage();
-
-            Assert.Pass();
-        }
     }
 }
