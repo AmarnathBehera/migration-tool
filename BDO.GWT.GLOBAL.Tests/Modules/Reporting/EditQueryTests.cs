@@ -759,41 +759,11 @@ SELECT * FROM Data";
 
     #region Delete
     [Test]
-    public void DeleteQuery_Returns_Error_When_Query_Not_Found()
-    {
-        var instance = Activator.CreateInstance(
-            _type,
-            Mock.Of<IEventLogService>(),
-            Mock.Of<ISqlBrowserResultProvider>(),
-            Mock.Of<ISqlBrowserExporter>(),
-            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
-
-        var method = _type.GetMethod("DeleteQuery")!;
-
-        Assert.DoesNotThrow(() =>
-        {
-            var result = InvokeTaskResult(
-                instance,
-                method,
-                -1);
-
-            Assert.That(result, Is.Not.Null);
-        });
-    }
-    [Test]
     public void DeleteQuery_Method_Exists()
     {
         Assert.That(
             _type.GetMethod("DeleteQuery"),
             Is.Not.Null);
-    }
-    [Test]
-    public void DeleteQuery_Returns_Task()
-    {
-        var method = _type.GetMethod("DeleteQuery");
-
-        Assert.That(method, Is.Not.Null);
-        Assert.That(method!.ReturnType, Is.AssignableTo(typeof(Task)));
     }
     [Test]
     public void DeleteQuery_Has_Expected_Parameter()

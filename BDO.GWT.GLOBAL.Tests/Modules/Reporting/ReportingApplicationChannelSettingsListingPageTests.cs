@@ -1,4 +1,5 @@
 using BDO.GWT.CustomReportingModule;
+using BDO.GWT.CustomReportingModule.ReportingApp;
 using System.Reflection;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
@@ -76,5 +77,28 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
 
             Assert.That(ctor.GetParameters().Length, Is.EqualTo(3));
         }
+
+        [Test]
+        public void ObjectType_Returns_ReportingChannelSettingInfo_ObjectType()
+        {
+            var page = (ReportingApplicationChannelSettingsListingPage)
+                System.Runtime.Serialization.FormatterServices
+                    .GetUninitializedObject(typeof(ReportingApplicationChannelSettingsListingPage));
+
+            var property = typeof(ReportingApplicationChannelSettingsListingPage)
+                .GetProperty(
+                    "ObjectType",
+                    BindingFlags.Instance |
+                    BindingFlags.NonPublic);
+
+            Assert.That(property, Is.Not.Null);
+
+            var result = property!.GetValue(page);
+
+            Assert.That(
+                result,
+                Is.EqualTo(ReportingChannelSettingInfo.OBJECT_TYPE));
+        }
+
     }
 }
