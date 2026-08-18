@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Remote Deal</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="daa10e80-99cc-4c9a-a673-54509dd4c7e8" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="35782c2b-f6df-4f32-a498-3925a9dc6c49" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="d91b74bb-242c-42ad-9af6-026a74c87238" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <field allowempty="true" column="Industry" columnprecision="0" columntype="contentitemreference" enabled="true" guid="50c2e190-7b1f-4f9a-90c8-7c56331a06e9" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Industry</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["bdd17a11-079d-4afa-9490-c8c2f90f8353"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="SubIndustry" columnprecision="0" columntype="contentitemreference" enabled="true" guid="aa68bc2b-5119-47f4-8fdb-4774935d3c77" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Sub Industry</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["cdab0d33-430e-407a-ad3e-f0a5ac05d5e0"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="DealType" columnprecision="0" columntype="contentitemreference" enabled="true" guid="12976424-75e0-47a6-9da9-e5fc94d3d596" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Deal type</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["cfe5a014-3dc5-4df5-8727-b21e91016436"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field column="DateField" columnprecision="0" columntype="date" enabled="true" guid="fccb3ab6-3950-4e0d-b491-96766d1bfea4" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Date</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.DateInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="DealCountry" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="2ca558ad-9b54-4520-905d-8c11cd554a61" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Country</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field column="OriginalSiteGUID" columnprecision="0" columntype="guid" enabled="true" guid="e8a55b62-3a44-4e6c-ae05-ba23632868f8" />
+      <field column="OriginalPageGUID" columnprecision="0" columntype="guid" enabled="true" guid="0eb1c802-e534-4502-853b-84229dd50e2f" />
+      <field column="OriginalPageURL" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="4524a57c-3f2f-4818-a195-cc35a9672e61" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Original page URL</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextWithLabel</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="OriginalModifiedWhen" columnprecision="7" columntype="datetime" enabled="true" guid="ca635be9-102a-4322-a371-196e5b341416" />
+      <field allowempty="true" column="ForceUpdateOnNextSync" columnprecision="0" columntype="boolean" enabled="true" guid="d86af259-3eab-4642-a1ea-a6f7be3c0cfb" visible="true">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+          <explanationtext>
+            <![CDATA[Check this checkbox to force update of this deal on the next synchronization cycle. This checkbox is automatically unchecked when the update is finished.]]>
+          </explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Force update on next sync</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>1977d31f-d844-4267-aeb3-ed0e2465b30d</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-rotate-double-right</ClassIconClass>
+  <ClassName>BDO.RemoteDeal</ClassName>
+  <ClassShortName>BDORemoteDeal</ClassShortName>
+  <ClassTableName>BDO_RemoteDeal</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>
