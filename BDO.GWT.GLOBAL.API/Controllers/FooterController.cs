@@ -25,7 +25,6 @@ namespace BDO.GWT.GLOBAL.API.Controllers
     //Footer API Controller, this will retun the footer content for the website based on the current culture and channel context.
     //The footer content will be retrieved from the CMS and will be returned in json format to be consumed by caller.
     //[Authorize]
-    [AllowAnonymous]
     [ApiController]
     [Route("/memberFirms/{memberFirmID:int}/{culture}/[controller]")]
 
@@ -49,7 +48,6 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// </summary>
 
         [HttpGet]
-        [HasPermission(ApiMethodGroupName.Footer, ApiPermission.Read)]
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(FooterDto), MediaTypeNames.Application.Json)]        
         public async Task<ActionResult<FooterDto>> Get(CancellationToken cancellationToken)
         {
