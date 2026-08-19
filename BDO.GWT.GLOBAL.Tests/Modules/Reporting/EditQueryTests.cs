@@ -772,7 +772,7 @@ SELECT * FROM Data";
 
         var parameters = method.GetParameters();
 
-        Assert.That(parameters.Length, Is.EqualTo(1));
+        Assert.That(parameters, Has.Length.EqualTo(1));
         Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(int)));
     }
     #endregion
@@ -801,7 +801,7 @@ SELECT * FROM Data";
             method,
             query);
 
-        var value = GetResponseValue(response);
+        var value = GetResponseValue(response!);
 
         Assert.That(value, Is.Null);
     }
@@ -829,7 +829,7 @@ SELECT * FROM Data";
             method,
             query);
 
-        var value = GetResponseValue(response);
+        var value = GetResponseValue(response!);
 
         Assert.That(value, Is.Null);
     }
@@ -856,7 +856,7 @@ SELECT * FROM Data";
             method,
             query);
 
-        var value = GetResponseValue(response);
+        var value = GetResponseValue(response!);
 
         Assert.That(value, Is.Null);
     }

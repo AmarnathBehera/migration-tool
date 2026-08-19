@@ -132,8 +132,11 @@ public class SqlBrowserResultProviderTests
         var method = typeof(ISqlBrowserResultProvider).GetMethod(nameof(ISqlBrowserResultProvider.SetQuery));
         var parameters = method!.GetParameters();
 
-        Assert.That(parameters, Has.Length.EqualTo(1));
-        Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(string)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(parameters, Has.Length.EqualTo(1));
+            Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(string)));
+        });
     }
 
     [Test]
@@ -206,11 +209,11 @@ public class SqlBrowserResultProviderTests
 
             Assert.That(firstContainer["Id"], Is.EqualTo(101));
             Assert.That(firstContainer["Name"], Is.EqualTo("John"));
-            Assert.That(firstContainer["IsActive"], Is.EqualTo(true));
+            Assert.That(firstContainer["IsActive"], Is.True);
 
             Assert.That(secondContainer["Id"], Is.EqualTo(102));
             Assert.That(secondContainer["Name"], Is.EqualTo("Jane"));
-            Assert.That(secondContainer["IsActive"], Is.EqualTo(false));
+            Assert.That(secondContainer["IsActive"], Is.False);
         });
     }
 
@@ -318,6 +321,13 @@ public class SqlBrowserResultProviderTests
         Assert.That(result.Columns, Is.Not.Null);
         Assert.That(result.Rows, Is.Not.Null);
     }
+    private static readonly string[] ExpectedColumns =
+    {
+        "Id",
+        "Name",
+        "IsActive",
+        "Description"
+    };
     [Test]
     public void GetQueryResult_WithPopulatedResult_ReturnsColumnsAndRowsAsStrings()
     {
@@ -349,39 +359,31 @@ public class SqlBrowserResultProviderTests
         Assert.That(result, Is.Not.Null);
 
         Assert.Multiple(() =>
-        {
-            Assert.That(
-                result.Columns,
-                Is.EqualTo(new[]
-                {
-                "Id",
-                "Name",
-                "IsActive",
-                "Description"
-                }));
+            {
+                Assert.That(result.Columns, Is.EqualTo(ExpectedColumns));
 
-            Assert.That(result.Rows, Has.Length.EqualTo(2));
+                Assert.That(result.Rows, Has.Length.EqualTo(2));
 
-            Assert.That(
-                result.Rows[0],
-                Is.EqualTo(new[]
-                {
+                Assert.That(
+                    result.Rows[0],
+                    Is.EqualTo(new[]
+                    {
                 "101",
                 "John",
                 bool.TrueString,
                 "First user"
-                }));
+                    }));
 
-            Assert.That(
-                result.Rows[1],
-                Is.EqualTo(new[]
-                {
+                Assert.That(
+                    result.Rows[1],
+                    Is.EqualTo(new[]
+                    {
                 "102",
                 "Jane",
                 bool.FalseString,
                 string.Empty
-                }));
-        });
+                    }));
+            });
     }
 
     [Test]
@@ -500,7 +502,7 @@ public class SqlBrowserResultProviderTests
     }
 
 
-    private SqlBrowserResultProvider CreateService()
+    private static SqlBrowserResultProvider CreateService()
     {
         var mockEventLog = new Mock<IEventLogService>();
         var mockValidator = new Mock<ISqlQueryValidator>();
@@ -546,11 +548,11 @@ public class SqlBrowserResultProviderTests
 
             Assert.That(firstRow["Id"], Is.EqualTo(1));
             Assert.That(firstRow["Name"], Is.EqualTo("John"));
-            Assert.That(firstRow["IsActive"], Is.EqualTo(true));
+            Assert.That(firstRow["IsActive"], Is.True);
 
             Assert.That(secondRow["Id"], Is.EqualTo(2));
             Assert.That(secondRow["Name"], Is.EqualTo("Jane"));
-            Assert.That(secondRow["IsActive"], Is.EqualTo(false));
+            Assert.That(secondRow["IsActive"], Is.False);
         });
     }
     [Test]
@@ -586,10 +588,4 @@ public class SqlBrowserResultProviderTests
             Assert.That(row["Description"], Is.EqualTo(DBNull.Value));
         });
     }
-}
-
-internal class SqlQueryValidationResult : ValidationResult
-{
-    public bool IsValid { get; set; }
-    public string ErrorMessage { get; set; }
 }

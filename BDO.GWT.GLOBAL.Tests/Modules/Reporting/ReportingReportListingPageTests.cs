@@ -54,7 +54,7 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
             var attrs = typeof(ReportingReportListingPage)
                 .GetCustomAttributes(typeof(UIPermissionAttribute), false);
 
-            Assert.That(attrs.Length, Is.EqualTo(3));
+            Assert.That(attrs, Has.Length.EqualTo(3));
         }
 
         [Test]
@@ -65,7 +65,7 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
                 .Cast<UIPermissionAttribute>()
                 .ToList();
 
-            Assert.That(attrs.Any(), Is.True);
+            Assert.That(attrs.Count, Is.GreaterThan(0));
         }
 
         [Test]

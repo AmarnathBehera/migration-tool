@@ -21,10 +21,12 @@ public class ViewRecordTests
         var ctor = typeof(ViewRecord).GetConstructors().Single();
 
         var parameters = ctor.GetParameters();
-
-        Assert.That(parameters.Length, Is.EqualTo(2));
-        Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(IFormDataBinder)));
-        Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(ISqlBrowserResultProvider)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(parameters, Has.Length.EqualTo(2));
+            Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(IFormDataBinder)));
+            Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(ISqlBrowserResultProvider)));
+        });
     }
 
     [Test]
@@ -33,10 +35,13 @@ public class ViewRecordTests
         var method = typeof(ViewRecord)
             .GetMethod(nameof(ViewRecord.ConfigureTemplateProperties));
 
-        Assert.That(method, Is.Not.Null);
-        Assert.That(
-            method!.ReturnType,
-            Is.EqualTo(typeof(Task<EditTemplateClientProperties>)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(method, Is.Not.Null);
+            Assert.That(
+                method!.ReturnType,
+                Is.EqualTo(typeof(Task<EditTemplateClientProperties>)));
+        });
     }
 
     [Test]
@@ -44,11 +49,13 @@ public class ViewRecordTests
     {
         var method = typeof(ViewRecord)
             .GetMethod(nameof(ViewRecord.ConfigurePage));
-
-        Assert.That(method, Is.Not.Null);
-        Assert.That(
-            method!.ReturnType,
-            Is.EqualTo(typeof(Task)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(method, Is.Not.Null);
+            Assert.That(
+                method!.ReturnType,
+                Is.EqualTo(typeof(Task)));
+        });
     }
 
     [Test]
@@ -56,10 +63,12 @@ public class ViewRecordTests
     {
         var property = typeof(ViewRecord)
             .GetProperty(nameof(ViewRecord.RecordId));
-
-        Assert.That(property, Is.Not.Null);
-        Assert.That(property!.CanRead, Is.True);
-        Assert.That(property.CanWrite, Is.True);
+        Assert.Multiple(() =>
+        {
+            Assert.That(property, Is.Not.Null);
+            Assert.That(property!.CanRead, Is.True);
+            Assert.That(property.CanWrite, Is.True);
+        });
     }
 
     [Test]
@@ -68,8 +77,11 @@ public class ViewRecordTests
         var property = typeof(ViewRecord)
             .GetProperty(nameof(ViewRecord.ReportingChannelSettingId));
 
-        Assert.That(property, Is.Not.Null);
-        Assert.That(property!.CanRead, Is.True);
-        Assert.That(property.CanWrite, Is.True);
+        Assert.Multiple(() =>
+        {
+            Assert.That(property, Is.Not.Null);
+            Assert.That(property!.CanRead, Is.True);
+            Assert.That(property.CanWrite, Is.True);
+        });
     }
 }

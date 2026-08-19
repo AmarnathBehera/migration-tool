@@ -22,10 +22,13 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
         {
             var query = new SavedQuery();
 
-            Assert.That(query.ID, Is.EqualTo(0));
-            Assert.That(query.Name, Is.Null);
-            Assert.That(query.Text, Is.Null);
-            Assert.That(query.Order, Is.EqualTo(0));
+            Assert.Multiple(() =>
+            {
+                Assert.That(query.ID, Is.EqualTo(0));
+                Assert.That(query.Name, Is.Null);
+                Assert.That(query.Text, Is.Null);
+                Assert.That(query.Order, Is.EqualTo(0));
+            });
         }
 
         [Test]
@@ -79,10 +82,13 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
                 Order = 2
             };
 
-            Assert.That(query.ID, Is.EqualTo(10));
-            Assert.That(query.Name, Is.EqualTo("Users Report"));
-            Assert.That(query.Text, Is.EqualTo("SELECT * FROM CMS_User"));
-            Assert.That(query.Order, Is.EqualTo(2));
+            Assert.Multiple(() =>
+            {
+                Assert.That(query.ID, Is.EqualTo(10));
+                Assert.That(query.Name, Is.EqualTo("Users Report"));
+                Assert.That(query.Text, Is.EqualTo("SELECT * FROM CMS_User"));
+                Assert.That(query.Order, Is.EqualTo(2));
+            });
         }
     }
 }

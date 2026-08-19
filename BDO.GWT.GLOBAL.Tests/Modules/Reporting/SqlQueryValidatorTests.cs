@@ -47,9 +47,11 @@ public class SqlQueryValidatorTests
     {
         var method = typeof(ISqlQueryValidator).GetMethod(nameof(ISqlQueryValidator.ValidateSqlStatement));
         var parameters = method!.GetParameters();
-
-        Assert.That(parameters, Has.Length.EqualTo(1));
-        Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(string)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(parameters, Has.Length.EqualTo(1));
+            Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(string)));
+        });
     }
 
     [Test]
@@ -68,8 +70,11 @@ public class SqlQueryValidatorTests
         var service = new SqlQueryValidator();
         var result = service.ValidateSqlStatement("SELECT * FROM Users");
 
-        Assert.That(result.IsValid, Is.True);
-        Assert.That(result.ErrorMessage, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.ErrorMessage, Is.Null);
+        });
     }
 
     [Test]
@@ -78,8 +83,11 @@ public class SqlQueryValidatorTests
         var service = new SqlQueryValidator();
         var result = service.ValidateSqlStatement("DECLARE @id INT SELECT @id");
 
-        Assert.That(result.IsValid, Is.True);
-        Assert.That(result.ErrorMessage, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.ErrorMessage, Is.Null);
+        });
     }
 
     [Test]
@@ -88,8 +96,11 @@ public class SqlQueryValidatorTests
         var service = new SqlQueryValidator();
         var result = service.ValidateSqlStatement(string.Empty);
 
-        Assert.That(result.IsValid, Is.False);
-        Assert.That(result.ErrorMessage, Is.EqualTo("SQL is empty"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(result.ErrorMessage, Is.EqualTo("SQL is empty"));
+        });
     }
 
     [Test]
@@ -98,8 +109,11 @@ public class SqlQueryValidatorTests
         var service = new SqlQueryValidator();
         var result = service.ValidateSqlStatement("   \t\n   ");
 
-        Assert.That(result.IsValid, Is.False);
-        Assert.That(result.ErrorMessage, Is.EqualTo("SQL is empty"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(result.ErrorMessage, Is.EqualTo("SQL is empty"));
+        });
     }
 
     [Test]
@@ -108,8 +122,11 @@ public class SqlQueryValidatorTests
         var service = new SqlQueryValidator();
         var result = service.ValidateSqlStatement("DROP TABLE Users");
 
-        Assert.That(result.IsValid, Is.False);
-        Assert.That(result.ErrorMessage, Is.EqualTo("Destructive or multi-statement SQL is not allowed."));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(result.ErrorMessage, Is.EqualTo("Destructive or multi-statement SQL is not allowed."));
+        });
     }
 
     [Test]
@@ -118,8 +135,11 @@ public class SqlQueryValidatorTests
         var service = new SqlQueryValidator();
         var result = service.ValidateSqlStatement("drop table Users");
 
-        Assert.That(result.IsValid, Is.False);
-        Assert.That(result.ErrorMessage, Is.EqualTo("Destructive or multi-statement SQL is not allowed."));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(result.ErrorMessage, Is.EqualTo("Destructive or multi-statement SQL is not allowed."));
+        });
     }
 
     [Test]
@@ -128,8 +148,11 @@ public class SqlQueryValidatorTests
         var service = new SqlQueryValidator();
         var result = service.ValidateSqlStatement("TRUNCATE TABLE Users");
 
-        Assert.That(result.IsValid, Is.False);
-        Assert.That(result.ErrorMessage, Is.EqualTo("Destructive or multi-statement SQL is not allowed."));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(result.ErrorMessage, Is.EqualTo("Destructive or multi-statement SQL is not allowed."));
+        });
     }
 
     [Test]
@@ -138,8 +161,11 @@ public class SqlQueryValidatorTests
         var service = new SqlQueryValidator();
         var result = service.ValidateSqlStatement("SELECT * FROM Users; DELETE FROM Users");
 
-        Assert.That(result.IsValid, Is.False);
-        Assert.That(result.ErrorMessage, Is.EqualTo("Destructive or multi-statement SQL is not allowed."));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(result.ErrorMessage, Is.EqualTo("Destructive or multi-statement SQL is not allowed."));
+        });
     }
 
     [Test]
@@ -148,8 +174,11 @@ public class SqlQueryValidatorTests
         var service = new SqlQueryValidator();
         var result = service.ValidateSqlStatement("SELECT * FROM Users;");
 
-        Assert.That(result.IsValid, Is.False);
-        Assert.That(result.ErrorMessage, Is.EqualTo("Destructive or multi-statement SQL is not allowed."));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(result.ErrorMessage, Is.EqualTo("Destructive or multi-statement SQL is not allowed."));
+        });
     }
 
     // ────── behavior: edge cases ─────────────────────────────────────────────────────────────────

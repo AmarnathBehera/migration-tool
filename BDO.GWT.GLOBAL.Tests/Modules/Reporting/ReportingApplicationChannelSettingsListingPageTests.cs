@@ -4,6 +4,7 @@ using CMS.DataEngine;
 using Microsoft.Extensions.Localization;
 using Moq;
 using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
 {
@@ -45,7 +46,7 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
                 .GetConstructors()
                 .Single();
 
-            Assert.That(ctor.GetParameters().Length, Is.EqualTo(3));
+            Assert.That(ctor.GetParameters(), Has.Length.EqualTo(3));
         }
 
         [Test]
@@ -100,7 +101,7 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
         {
             var page =
                 (ReportingApplicationChannelSettingsListingPage)
-                System.Runtime.Serialization.FormatterServices
+                FormatterServices
                     .GetUninitializedObject(
                         typeof(ReportingApplicationChannelSettingsListingPage));
 

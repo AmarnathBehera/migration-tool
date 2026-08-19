@@ -144,8 +144,11 @@ public class SqlBrowserExporterTests
         var service = new SqlBrowserExporter(mockEnv.Object, mockResultProvider.Object);
         var path = service.GetExportDirectory();
 
-        Assert.That(path, Does.EndWith("Export"));
-        Assert.That(path, Does.Contain("App_Data"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(path, Does.EndWith("Export"));
+            Assert.That(path, Does.Contain("App_Data"));
+        });
     }
 
     [Test]
@@ -159,8 +162,11 @@ public class SqlBrowserExporterTests
         var service = new SqlBrowserExporter(mockEnv.Object, mockResultProvider.Object);
         var path = service.GetExportDirectory();
 
-        Assert.That(path, Does.Contain("App_Data"));
-        Assert.That(path, Does.EndWith("Export"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(path, Does.Contain("App_Data"));
+            Assert.That(path, Does.EndWith("Export"));
+        });
     }
 
     // ────── behavior: Export with no columns ─────────────────────────────────────────────────────
@@ -177,9 +183,12 @@ public class SqlBrowserExporterTests
         var service = new SqlBrowserExporter(mockEnv.Object, mockResultProvider.Object);
         var (content, fileName, contentType) = await service.Export(SqlBrowserExportType.Csv);
 
-        Assert.That(content, Is.Empty);
-        Assert.That(fileName, Is.Empty);
-        Assert.That(contentType, Is.EqualTo("application/octet-stream"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(content, Is.Empty);
+            Assert.That(fileName, Is.Empty);
+            Assert.That(contentType, Is.EqualTo("application/octet-stream"));
+        });
     }
 
     // ────── behavior: Export to CSV ──────────────────────────────────────────────────────────────
@@ -196,8 +205,11 @@ public class SqlBrowserExporterTests
         var service = new SqlBrowserExporter(mockEnv.Object, mockResultProvider.Object);
         var (content, fileName, contentType) = await service.Export(SqlBrowserExportType.Csv);
 
-        Assert.That(fileName, Does.EndWith(".csv"));
-        Assert.That(contentType, Is.EqualTo("text/csv"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(fileName, Does.EndWith(".csv"));
+            Assert.That(contentType, Is.EqualTo("text/csv"));
+        });
     }
 
     [Test]
@@ -212,9 +224,12 @@ public class SqlBrowserExporterTests
         var service = new SqlBrowserExporter(mockEnv.Object, mockResultProvider.Object);
         var (content, fileName, contentType) = await service.Export(SqlBrowserExportType.Csv, "MyReport");
 
-        Assert.That(fileName, Does.StartWith("MyReport"));
-        Assert.That(fileName, Does.EndWith(".csv"));
-        Assert.That(contentType, Is.EqualTo("text/csv"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(fileName, Does.StartWith("MyReport"));
+            Assert.That(fileName, Does.EndWith(".csv"));
+            Assert.That(contentType, Is.EqualTo("text/csv"));
+        });
     }
 
     [Test]
@@ -247,8 +262,11 @@ public class SqlBrowserExporterTests
         var service = new SqlBrowserExporter(mockEnv.Object, mockResultProvider.Object);
         var (content, fileName, contentType) = await service.Export(SqlBrowserExportType.Json);
 
-        Assert.That(fileName, Does.EndWith(".json"));
-        Assert.That(contentType, Is.EqualTo("application/json"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(fileName, Does.EndWith(".json"));
+            Assert.That(contentType, Is.EqualTo("application/json"));
+        });
     }
 
     [Test]
@@ -263,8 +281,11 @@ public class SqlBrowserExporterTests
         var service = new SqlBrowserExporter(mockEnv.Object, mockResultProvider.Object);
         var (_, fileName, _) = await service.Export(SqlBrowserExportType.Json, "MyData.json");
 
-        Assert.That(fileName, Does.StartWith("MyData"));
-        Assert.That(fileName, Does.EndWith(".json"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(fileName, Does.StartWith("MyData"));
+            Assert.That(fileName, Does.EndWith(".json"));
+        });
     }
 
     // ────── behavior: Export to Excel ────────────────────────────────────────────────────────────
@@ -296,8 +317,11 @@ public class SqlBrowserExporterTests
         var service = new SqlBrowserExporter(mockEnv.Object, mockResultProvider.Object);
         var (_, fileName, _) = await service.Export(SqlBrowserExportType.Excel, "Report.xlsx");
 
-        Assert.That(fileName, Does.StartWith("Report"));
-        Assert.That(fileName, Does.EndWith(".xlsx"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(fileName, Does.StartWith("Report"));
+            Assert.That(fileName, Does.EndWith(".xlsx"));
+        });
     }
 
     // ────── behavior: Export with unknown type ──────────────────────────────────────────────────

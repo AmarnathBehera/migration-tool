@@ -75,7 +75,7 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
             var attributes = typeof(ReportingQueryBrowserPage)
                 .GetCustomAttributes(false);
 
-            Assert.That(attributes.Length, Is.GreaterThan(0));
+            Assert.That(attributes, Has.Length.GreaterThan(0));
         }
 
         [Test]

@@ -1,6 +1,6 @@
 using BDO.GWT.CustomReportingModule.ReportingApp;
-using Kentico.Xperience.Admin.Base;
 using CMS.Core;
+using Kentico.Xperience.Admin.Base;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting;
 
@@ -19,10 +19,13 @@ public class ResultListingPageTests
         Assert.That(ctors, Has.Length.EqualTo(1));
         var parameters = ctors.Single().GetParameters();
         Assert.That(parameters, Has.Length.EqualTo(4));
-        Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(ISqlBrowserResultProvider)));
-        Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(ISqlBrowserExporter)));
-        Assert.That(parameters[2].ParameterType, Is.EqualTo(typeof(IEventLogService)));
-        Assert.That(parameters[3].ParameterType, Is.EqualTo(typeof(IPageLinkGenerator)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(ISqlBrowserResultProvider)));
+            Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(ISqlBrowserExporter)));
+            Assert.That(parameters[2].ParameterType, Is.EqualTo(typeof(IEventLogService)));
+            Assert.That(parameters[3].ParameterType, Is.EqualTo(typeof(IPageLinkGenerator)));
+        });
     }
 
     [Test]
@@ -33,10 +36,13 @@ public class ResultListingPageTests
         var submit = typeof(ResultListing).GetMethod("SubmitQuery");
         var open = typeof(ResultListing).GetMethod("OpenEditQuery");
 
-        Assert.That(export, Is.Not.Null);
-        Assert.That(back, Is.Not.Null);
-        Assert.That(submit, Is.Not.Null);
-        Assert.That(open, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(export, Is.Not.Null);
+            Assert.That(back, Is.Not.Null);
+            Assert.That(submit, Is.Not.Null);
+            Assert.That(open, Is.Not.Null);
+        });
 
         // Export signature
         Assert.That(export!.ReturnType, Is.EqualTo(typeof(Task<ICommandResponse>)));
