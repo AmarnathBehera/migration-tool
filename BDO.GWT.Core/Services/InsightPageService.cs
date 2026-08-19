@@ -287,12 +287,14 @@ namespace BDO.GWT.Core.Services
             {
                 throw new MissingSectionPageException($"Could not lookup {nameof(Insight)}");
             }
-
+            var firstPublished = contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen ?? DateTime.MinValue;
+            var lastPublished = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen ?? DateTime.MinValue;
+ 
             var sidebarDto = await GetSidebarDtoAsync(contentPage, cancellationToken);
             sidebarDto.ShowCopyLinkButton = await GetShowCopyLinkOptionFromSectionPageAsync(contentPage, sidebarDto.ShowCopyLinkButton, cancellationToken);
             sidebarDto.TypeName = contentPage.ContentType.FirstOrDefault()?.Name;
-            sidebarDto.PublishDate = contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen == DateTime.MinValue ? null : contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen;
-            sidebarDto.UpdatedDate = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen == DateTime.MinValue ? null : contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen;
+            sidebarDto.PublishDate = Normalize(firstPublished) == DateTime.MinValue ? null : firstPublished;
+            sidebarDto.UpdatedDate = lastPublished == DateTime.MinValue || Normalize(firstPublished) == Normalize(lastPublished) ? null : lastPublished;
             sidebarDto.RelevantContactPeopleTitle = ResourceStringKey.LiveSite.Insights.Authors;
             
             sidebarDto.RelevantContactPeople = await GetContentPageAuthorDtos(contentPage);
@@ -301,6 +303,10 @@ namespace BDO.GWT.Core.Services
 
             return sidebarDto;
         }
+        static DateTime? Normalize(DateTime dt) =>
+    dt == DateTime.MinValue
+        ? null
+        : (DateTime?)new DateTime(dt.Ticks - (dt.Ticks % TimeSpan.TicksPerSecond), DateTimeKind.Utc);
         private async Task<SidebarPersonDto[]> GetContentPageAuthorDtos(Insight contentPage)
         {
            
@@ -580,6 +586,12 @@ namespace BDO.GWT.Core.Services
                 return null;
             }
 
+            var firmName = insight.InsightContent.FirstOrDefault()?.SharingSourceFirm;
+
+            // Only return InsightSource for copied/syndicated insights
+            // that have a source firm — same logic as KX13's OriginalSiteGuid check
+            if (string.IsNullOrWhiteSpace(firmName))
+                return null;
             return new InsightSourceDto
             {
                 Link = insight.MetadataCanonical,
