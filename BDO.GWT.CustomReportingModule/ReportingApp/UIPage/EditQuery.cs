@@ -312,8 +312,12 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
             return ResponseFrom(true);
         }
 
-        private static string GenerateQueryCodeName(string displayName)
+        private static string GenerateQueryCodeName(string? displayName)
         {
+            if (string.IsNullOrWhiteSpace(displayName))
+            {
+                displayName = "Query";
+            }
             string codeName = Regex.Replace(displayName, "[^a-zA-Z0-9_.-]", "_");
             codeName = codeName.Trim('.');
 

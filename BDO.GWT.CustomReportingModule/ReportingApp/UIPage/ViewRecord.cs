@@ -6,9 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace BDO.GWT.CustomReportingModule.ReportingApp
 {
-    /// <summary>
-    /// Edit UI page which displays a database record in a dialog window.
-    /// </summary>
+
     [UINavigation(false)]
     [UIBreadcrumbs(false)]
     [UIPageLocation(PageLocationEnum.Dialog)]
@@ -20,10 +18,6 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
         private const string EOL_REPLACEMENT = "#EOL#";
         private readonly Regex newLineRegex = RegexHelper.GetRegex(@"(<br[ ]?/>)|([\r]?\n)");
 
-
-        /// <summary>
-        /// Identifier of the result record to view.
-        /// </summary>
         [PageParameter(typeof(IntPageModelBinder))]
         public int RecordId { get; set; }
 

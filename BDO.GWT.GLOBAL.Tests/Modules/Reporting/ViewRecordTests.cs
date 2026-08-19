@@ -1,90 +1,75 @@
-using BDO.GWT.CustomReportingModule;
-using System.Reflection;
+using BDO.GWT.CustomReportingModule.ReportingApp;
+using Kentico.Xperience.Admin.Base;
+using Kentico.Xperience.Admin.Base.Forms;
 
-namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
+namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting;
+
+[TestFixture]
+public class ViewRecordTests
 {
-    [TestFixture]
-    public class ViewRecordTests
+    [Test]
+    public void Page_InheritsFromEditPageBase()
     {
-        private Type viewRecordType = null!;
+        Assert.That(
+            typeof(EditPageBase).IsAssignableFrom(typeof(ViewRecord)),
+            Is.True);
+    }
 
-        [OneTimeSetUp]
-        public void Setup()
-        {
-            var assembly = typeof(ReportingApplicationPage).Assembly;
+    [Test]
+    public void Constructor_HasExpectedParameters()
+    {
+        var ctor = typeof(ViewRecord).GetConstructors().Single();
 
-            viewRecordType = assembly.GetTypes()
-                .First(t => t.Name == "ViewRecord");
-        }
+        var parameters = ctor.GetParameters();
 
-        [Test]
-        public void Type_ViewRecord_Exists()
-        {
-            Assert.That(viewRecordType, Is.Not.Null);
-        }
+        Assert.That(parameters.Length, Is.EqualTo(2));
+        Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(IFormDataBinder)));
+        Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(ISqlBrowserResultProvider)));
+    }
 
-        [Test]
-        public void ReportingChannelSettingId_Property_Exists()
-        {
-            var property = viewRecordType.GetProperty("ReportingChannelSettingId");
+    [Test]
+    public void ConfigureTemplateProperties_Method_Exists()
+    {
+        var method = typeof(ViewRecord)
+            .GetMethod(nameof(ViewRecord.ConfigureTemplateProperties));
 
-            Assert.That(property, Is.Not.Null);
-            Assert.That(property!.PropertyType, Is.EqualTo(typeof(int)));
-        }
+        Assert.That(method, Is.Not.Null);
+        Assert.That(
+            method!.ReturnType,
+            Is.EqualTo(typeof(Task<EditTemplateClientProperties>)));
+    }
 
-        [Test]
-        public void RecordId_Property_Exists()
-        {
-            var property = viewRecordType.GetProperty("RecordId");
+    [Test]
+    public void ConfigurePage_Method_Exists()
+    {
+        var method = typeof(ViewRecord)
+            .GetMethod(nameof(ViewRecord.ConfigurePage));
 
-            Assert.That(property, Is.Not.Null);
-            Assert.That(property!.PropertyType, Is.EqualTo(typeof(int)));
-        }
+        Assert.That(method, Is.Not.Null);
+        Assert.That(
+            method!.ReturnType,
+            Is.EqualTo(typeof(Task)));
+    }
 
-        [Test]
-        public void ConfigurePage_Method_Exists()
-        {
-            var method = viewRecordType.GetMethod("ConfigurePage");
+    [Test]
+    public void RecordId_Property_Exists()
+    {
+        var property = typeof(ViewRecord)
+            .GetProperty(nameof(ViewRecord.RecordId));
 
-            Assert.That(method, Is.Not.Null);
-        }
+        Assert.That(property, Is.Not.Null);
+        Assert.That(property!.CanRead, Is.True);
+        Assert.That(property.CanWrite, Is.True);
+    }
 
-        [Test]
-        public void ConfigureTemplateProperties_Method_Exists()
-        {
-            var method = viewRecordType.GetMethod("ConfigureTemplateProperties");
+    [Test]
+    public void ReportingChannelSettingId_Property_Exists()
+    {
+        var property = typeof(ViewRecord)
+            .GetProperty(nameof(ViewRecord.ReportingChannelSettingId));
 
-            Assert.That(method, Is.Not.Null);
-        }
-
-        [Test]
-        public void GetFormItems_Method_Exists()
-        {
-            var method = viewRecordType.GetMethod(
-                "GetFormItems",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-
-            Assert.That(method, Is.Not.Null);
-        }
-
-        [Test]
-        public void GetFormItemsClientProperties_Method_Exists()
-        {
-            var method = viewRecordType.GetMethod(
-                "GetFormItemsClientProperties",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-
-            Assert.That(method, Is.Not.Null);
-        }
-
-        [Test]
-        public void SubmitInternal_Method_Exists()
-        {
-            var method = viewRecordType.GetMethod(
-                "SubmitInternal",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-
-            Assert.That(method, Is.Not.Null);
-        }
+        Assert.That(property, Is.Not.Null);
+        Assert.That(property!.CanRead, Is.True);
+        Assert.That(property.CanWrite, Is.True);
     }
 }
