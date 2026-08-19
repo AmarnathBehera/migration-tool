@@ -1,4 +1,5 @@
 ﻿using BDO.GWT.Common.Exceptions;
+using BDO.GWT.Core;
 using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
@@ -72,6 +73,19 @@ public class SectionDealsPageServiceTests
             },
         };
 
+    /// <summary>
+    /// Mocks RetrieveCurrentPageAsync — used by GetSectionDealsDtoAsync.
+    /// </summary>
+    private void SetupCurrentPage(SectionDeals? page) =>
+        _contentServiceMock
+            .Setup(x => x.RetrieveCurrentPageAsync<SectionDeals>(
+                It.IsAny<RetrieveCurrentPageParameters>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(page);
+
+    /// <summary>
+    /// Mocks GetPagesAsync — used by GetSectionDealsDealPaginationDtoAsync.
+    /// </summary>
     private void SetupSectionDealsPages(IEnumerable<SectionDeals> pages) =>
         _contentServiceMock
             .Setup(x => x.GetPagesAsync<SectionDeals>(
@@ -86,7 +100,7 @@ public class SectionDealsPageServiceTests
     [Test]
     public async Task GetSectionDealsDtoAsync_WhenNoPageFound_ReturnsEmptyDto()
     {
-        SetupSectionDealsPages(Array.Empty<SectionDeals>());
+        SetupCurrentPage(null);
 
         var result = await _service.GetSectionDealsDtoAsync(CancellationToken.None);
 
@@ -100,30 +114,9 @@ public class SectionDealsPageServiceTests
     }
 
     [Test]
-    public async Task GetSectionDealsDtoAsync_WhenPagesIsNull_ReturnsEmptyDto()
-    {
-        _contentServiceMock
-            .Setup(x => x.GetPagesAsync<SectionDeals>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync((IEnumerable<SectionDeals>?)null);
-
-        var result = await _service.GetSectionDealsDtoAsync(CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Filters, Is.Empty);
-            Assert.That(result.PageSize, Is.EqualTo(12));
-            Assert.That(result.ApiEndpoint, Is.Empty);
-        });
-    }
-
-    [Test]
     public async Task GetSectionDealsDtoAsync_WhenPageExists_ReturnsDefaultPageSize12()
     {
-        SetupSectionDealsPages(new[] { CreateDefaultSectionDealsPage() });
+        SetupCurrentPage(CreateDefaultSectionDealsPage());
 
         var result = await _service.GetSectionDealsDtoAsync(CancellationToken.None);
 
@@ -134,7 +127,7 @@ public class SectionDealsPageServiceTests
     public async Task GetSectionDealsDtoAsync_WhenPageExists_SetsApiEndpointWithContentItemGuid()
     {
         var page = CreateDefaultSectionDealsPage();
-        SetupSectionDealsPages(new[] { page });
+        SetupCurrentPage(page);
 
         var result = await _service.GetSectionDealsDtoAsync(CancellationToken.None);
 
@@ -142,18 +135,15 @@ public class SectionDealsPageServiceTests
     }
 
     [Test]
-    public async Task GetSectionDealsDtoAsync_QueriesCurrentChannelOnly()
+    public async Task GetSectionDealsDtoAsync_CallsRetrieveCurrentPageWithLinkedItemsMaxLevel5()
     {
-        _websiteChannelContextMock.Setup(c => c.WebsiteChannelID).Returns(42);
-        SetupSectionDealsPages(Array.Empty<SectionDeals>());
+        SetupCurrentPage(null);
 
         await _service.GetSectionDealsDtoAsync(CancellationToken.None);
 
         _contentServiceMock.Verify(
-            x => x.GetPagesAsync<SectionDeals>(
-                It.Is<RetrievePagesParameters>(p => p.LinkedItemsMaxLevel == 5),
-                It.Is<Action<RetrievePagesQueryParameters>>(q => q != null),
-                It.IsAny<RetrievalCacheSettings>(),
+            x => x.RetrieveCurrentPageAsync<SectionDeals>(
+                It.Is<RetrieveCurrentPageParameters>(p => p.LinkedItemsMaxLevel == 5),
                 It.IsAny<CancellationToken>()),
             Times.Once);
     }
@@ -161,7 +151,7 @@ public class SectionDealsPageServiceTests
     [Test]
     public async Task GetSectionDealsDtoAsync_WhenFilteringDisabled_ReturnsEmptyFiltersList()
     {
-        SetupSectionDealsPages(new[] { CreateDefaultSectionDealsPage(filteringEnabled: false) });
+        SetupCurrentPage(CreateDefaultSectionDealsPage(filteringEnabled: false));
 
         var result = await _service.GetSectionDealsDtoAsync(CancellationToken.None);
 
@@ -171,16 +161,12 @@ public class SectionDealsPageServiceTests
     [Test]
     public async Task GetSectionDealsDtoAsync_WhenIsGlobal_UsesGlobalSectionDealsFilters()
     {
-        SetupSectionDealsPages(new[]
-        {
-            CreateDefaultSectionDealsPage(
-                isGlobal: true,
-                filteringEnabled: true,
-                globalFilters: "dealType;industry",
-                sectionFilters: "country;year"),
-        });
+        SetupCurrentPage(CreateDefaultSectionDealsPage(
+            isGlobal: true,
+            filteringEnabled: true,
+            globalFilters: "dealType;industry",
+            sectionFilters: "country;year"));
 
-        // Mock empty options to avoid internal filter-building logic
         _contentServiceMock
             .Setup(x => x.GetPagesAsync<DealCardDealType>(
                 It.IsAny<RetrievePagesParameters>(),
@@ -199,7 +185,7 @@ public class SectionDealsPageServiceTests
 
         await _service.GetSectionDealsDtoAsync(CancellationToken.None);
 
-        // Verify that at least DealCardDealType and DealCardIndustry were queried (from global filters)
+        // DealCardDealType and DealCardIndustry come from globalFilters, not sectionFilters
         _contentServiceMock.Verify(
             x => x.GetPagesAsync<DealCardDealType>(
                 It.IsAny<RetrievePagesParameters>(),
@@ -212,16 +198,12 @@ public class SectionDealsPageServiceTests
     [Test]
     public async Task GetSectionDealsDtoAsync_WhenNotGlobal_UsesSectionDealsFilters()
     {
-        SetupSectionDealsPages(new[]
-        {
-            CreateDefaultSectionDealsPage(
-                isGlobal: false,
-                filteringEnabled: true,
-                globalFilters: "dealType;industry",
-                sectionFilters: "country;year"),
-        });
+        SetupCurrentPage(CreateDefaultSectionDealsPage(
+            isGlobal: false,
+            filteringEnabled: true,
+            globalFilters: "dealType;industry",
+            sectionFilters: "country;year"));
 
-        // Mock empty items to avoid runtime dependencies
         _contentServiceMock
             .Setup(x => x.GetItemsByTypesAsync(
                 It.IsAny<Type[]>(),
@@ -231,20 +213,17 @@ public class SectionDealsPageServiceTests
 
         var result = await _service.GetSectionDealsDtoAsync(CancellationToken.None);
 
-        // Result should attempt to build filters for "country" and "year" from SectionDealsFilters
+        // SectionDealsFilters ("country;year") are used, not globalFilters
         Assert.That(result.Filters, Is.Not.Null);
     }
 
     [Test]
     public async Task GetSectionDealsDtoAsync_FiltersAreSemicolonSeparated()
     {
-        SetupSectionDealsPages(new[]
-        {
-            CreateDefaultSectionDealsPage(
-                isGlobal: false,
-                filteringEnabled: true,
-                sectionFilters: "dealType;industry;country"),
-        });
+        SetupCurrentPage(CreateDefaultSectionDealsPage(
+            isGlobal: false,
+            filteringEnabled: true,
+            sectionFilters: "dealType;industry;country"));
 
         _contentServiceMock
             .Setup(x => x.GetPagesAsync<DealCardDealType>(
@@ -271,21 +250,16 @@ public class SectionDealsPageServiceTests
 
         var result = await _service.GetSectionDealsDtoAsync(CancellationToken.None);
 
-
         Assert.That(result.Filters?.Count(), Is.EqualTo(3));
-
     }
 
     [Test]
     public async Task GetSectionDealsDtoAsync_EmptyFilterString_YieldsEmptyFilterSet()
     {
-        SetupSectionDealsPages(new[]
-        {
-            CreateDefaultSectionDealsPage(
-                isGlobal: false,
-                filteringEnabled: true,
-                sectionFilters: ""),
-        });
+        SetupCurrentPage(CreateDefaultSectionDealsPage(
+            isGlobal: false,
+            filteringEnabled: true,
+            sectionFilters: ""));
 
         var result = await _service.GetSectionDealsDtoAsync(CancellationToken.None);
 
@@ -295,13 +269,10 @@ public class SectionDealsPageServiceTests
     [Test]
     public async Task GetSectionDealsDtoAsync_WhitespaceOnlyFilterString_YieldsEmptyFilterSet()
     {
-        SetupSectionDealsPages(new[]
-        {
-            CreateDefaultSectionDealsPage(
-                isGlobal: false,
-                filteringEnabled: true,
-                sectionFilters: "   "),
-        });
+        SetupCurrentPage(CreateDefaultSectionDealsPage(
+            isGlobal: false,
+            filteringEnabled: true,
+            sectionFilters: "   "));
 
         var result = await _service.GetSectionDealsDtoAsync(CancellationToken.None);
 
@@ -313,13 +284,10 @@ public class SectionDealsPageServiceTests
     {
         _cultureContextMock.Setup(c => c.CurrentLanguageTag).Returns("en-gb");
 
-        SetupSectionDealsPages(new[]
-        {
-            CreateDefaultSectionDealsPage(
-                isGlobal: false,
-                filteringEnabled: true,
-                sectionFilters: $"{FilterParameterName.DealType};{FilterParameterName.Industry};{FilterParameterName.SubIndustry}"),
-        });
+        SetupCurrentPage(CreateDefaultSectionDealsPage(
+            isGlobal: false,
+            filteringEnabled: true,
+            sectionFilters: $"{FilterParameterName.DealType};{FilterParameterName.Industry};{FilterParameterName.SubIndustry}"));
 
         _contentServiceMock
             .Setup(x => x.GetPagesAsync<DealCardDealType>(
@@ -347,7 +315,6 @@ public class SectionDealsPageServiceTests
 
         var result = await _service.GetSectionDealsDtoAsync(CancellationToken.None);
 
-        // The GB language path keeps dealType, industry, subIndustry as-is
         Assert.That(result.Filters?.Count(), Is.EqualTo(3));
     }
 
@@ -356,13 +323,10 @@ public class SectionDealsPageServiceTests
     {
         _cultureContextMock.Setup(c => c.CurrentLanguageTag).Returns("de-de");
 
-        SetupSectionDealsPages(new[]
-        {
-            CreateDefaultSectionDealsPage(
-                isGlobal: false,
-                filteringEnabled: true,
-                sectionFilters: $"{FilterParameterName.DealType};{FilterParameterName.Industry}"),
-        });
+        SetupCurrentPage(CreateDefaultSectionDealsPage(
+            isGlobal: false,
+            filteringEnabled: true,
+            sectionFilters: $"{FilterParameterName.DealType};{FilterParameterName.Industry}"));
 
         _contentServiceMock
             .Setup(x => x.GetPagesAsync<DealCardDealType>(
@@ -382,10 +346,8 @@ public class SectionDealsPageServiceTests
 
         var result = await _service.GetSectionDealsDtoAsync(CancellationToken.None);
 
-
         Assert.That(result.Filters, Is.Not.Null);
         Assert.That(result.Filters?.Count(), Is.GreaterThan(0));
-
     }
 
     [Test]
@@ -393,13 +355,10 @@ public class SectionDealsPageServiceTests
     {
         _cultureContextMock.Setup(c => c.CurrentLanguageTag).Returns("invalid-tag");
 
-        SetupSectionDealsPages(new[]
-            {
-                CreateDefaultSectionDealsPage(
-                    isGlobal: false,
-                    filteringEnabled: true,
-                    sectionFilters: FilterParameterName.DealType),
-            });
+        SetupCurrentPage(CreateDefaultSectionDealsPage(
+            isGlobal: false,
+            filteringEnabled: true,
+            sectionFilters: FilterParameterName.DealType));
 
         _contentServiceMock
             .Setup(x => x.GetPagesAsync<DealCardDealType>(
@@ -411,11 +370,8 @@ public class SectionDealsPageServiceTests
 
         var result = await _service.GetSectionDealsDtoAsync(CancellationToken.None);
 
-        // TryParse fails → uses original filter set
-
         Assert.That(result.Filters, Is.Not.Null);
         Assert.That(result.Filters?.Count(), Is.EqualTo(1));
-
     }
 
     // ── GetSectionDealsDealPaginationDtoAsync ───────────────────────────────
@@ -426,7 +382,8 @@ public class SectionDealsPageServiceTests
         SetupSectionDealsPages(Array.Empty<SectionDeals>());
 
         Assert.ThrowsAsync<MissingSectionPageException>(async () =>
-            await _service.GetSectionDealsDealPaginationDtoAsync( "de-de",
+            await _service.GetSectionDealsDealPaginationDtoAsync(
+                "de-de",
                 Guid.NewGuid(),
                 new CardsQuery(),
                 CancellationToken.None));
@@ -439,7 +396,8 @@ public class SectionDealsPageServiceTests
         var pageGuid = Guid.NewGuid();
 
         var ex = Assert.ThrowsAsync<MissingSectionPageException>(async () =>
-            await _service.GetSectionDealsDealPaginationDtoAsync("en-gb",
+            await _service.GetSectionDealsDealPaginationDtoAsync(
+                "en-gb",
                 pageGuid,
                 new CardsQuery(),
                 CancellationToken.None));
@@ -469,7 +427,8 @@ public class SectionDealsPageServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedPagination);
 
-        var result = await _service.GetSectionDealsDealPaginationDtoAsync("fr-fr",
+        var result = await _service.GetSectionDealsDealPaginationDtoAsync(
+            "fr-fr",
             page.SystemFields.ContentItemGUID,
             new CardsQuery(),
             CancellationToken.None);
@@ -478,28 +437,28 @@ public class SectionDealsPageServiceTests
     }
 
     [Test]
-    public async Task GetSectionDealsDealPaginationDtoAsync_PassesCurrentLanguageTagToService()
+    public async Task GetSectionDealsDealPaginationDtoAsync_PassesLanguageParamToService()
     {
-        _cultureContextMock.Setup(c => c.CurrentLanguageTag).Returns("fr-fr");
-
         var page = CreateDefaultSectionDealsPage();
         SetupSectionDealsPages(new[] { page });
 
         _dealCardsServiceMock
             .Setup(x => x.GetFilteredItemsAsync(
                 It.IsAny<SectionDeals>(),
-                "en-gb",
+                It.IsAny<string>(),
                 It.IsAny<CardsQuery>(),
                 It.IsAny<Action<CMS.ContentEngine.ContentItemQueryBuilder>>(),
                 It.IsAny<Func<Deal, bool>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PaginationDto<DealCardDto> { Data = Array.Empty<DealCardDto>(), TotalCount = 0 });
 
-        await _service.GetSectionDealsDealPaginationDtoAsync("fr-fr",
+        await _service.GetSectionDealsDealPaginationDtoAsync(
+            "fr-fr",
             page.SystemFields.ContentItemGUID,
             new CardsQuery(),
             CancellationToken.None);
 
+        // The language passed as a route param must flow through to IDealCardsService
         _dealCardsServiceMock.Verify(
             x => x.GetFilteredItemsAsync(
                 It.IsAny<SectionDeals>(),
@@ -534,7 +493,8 @@ public class SectionDealsPageServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PaginationDto<DealCardDto> { Data = Array.Empty<DealCardDto>(), TotalCount = 0 });
 
-        await _service.GetSectionDealsDealPaginationDtoAsync("fr-fr",
+        await _service.GetSectionDealsDealPaginationDtoAsync(
+            "fr-fr",
             page.SystemFields.ContentItemGUID,
             query,
             CancellationToken.None);
@@ -554,10 +514,8 @@ public class SectionDealsPageServiceTests
     }
 
     [Test]
-    public async Task GetSectionDealsDealPaginationDtoAsync_QueriesWithCurrentLanguageAndNoFallbacks()
+    public async Task GetSectionDealsDealPaginationDtoAsync_QueriesWithPassedLanguageAndNoFallbacks()
     {
-        _cultureContextMock.Setup(c => c.CurrentLanguageTag).Returns("de-de");
-
         var page = CreateDefaultSectionDealsPage();
         SetupSectionDealsPages(new[] { page });
 
@@ -571,16 +529,18 @@ public class SectionDealsPageServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PaginationDto<DealCardDto> { Data = Array.Empty<DealCardDto>(), TotalCount = 0 });
 
-        await _service.GetSectionDealsDealPaginationDtoAsync("en-gb",
+        await _service.GetSectionDealsDealPaginationDtoAsync(
+            "en-gb",
             page.SystemFields.ContentItemGUID,
             new CardsQuery(),
             CancellationToken.None);
 
+        // The SectionDeals lookup must use the route language with no fallbacks
         _contentServiceMock.Verify(
             x => x.GetPagesAsync<SectionDeals>(
                 It.Is<RetrievePagesParameters>(p =>
                     p.LanguageName == "en-gb" &&
-                    !p.UseLanguageFallbacks ),
+                    !p.UseLanguageFallbacks),
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()),
@@ -615,7 +575,8 @@ public class SectionDealsPageServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedPagination);
 
-        var result = await _service.GetSectionDealsDealPaginationDtoAsync("fr-fr",
+        var result = await _service.GetSectionDealsDealPaginationDtoAsync(
+            "fr-fr",
             page.SystemFields.ContentItemGUID,
             new CardsQuery(),
             CancellationToken.None);

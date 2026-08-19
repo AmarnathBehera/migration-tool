@@ -236,13 +236,10 @@ namespace BDO.GWT.Core.Services
                     .ContentAttachmentAsset
                     .Url,
                 SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page, page.PageTitle, cancellationToken) : null,
-                ShowCopyLinkButton = settingInfo?.DisableCopyLinkButton == true
+                ShowCopyLinkButton = settingInfo?.DisableCopyLinkButton != true
             };
 
-            if (sidebarDto.SocialMediaButtons is not null)
-            {
-                sidebarDto.SocialMediaButtons.ShowCopyLinkButton = null;
-            }
+            
 
             return sidebarDto;
         }
@@ -366,53 +363,74 @@ namespace BDO.GWT.Core.Services
         }
 
         private async Task<SectionInsightsPage?> FindSectionInsightsPageFromHierarchyAsync(int startingParentId, CancellationToken cancellationToken)
+
         {
+
             // Try the direct parent first
+
             if (startingParentId <= 0)
+
             {
+
                 return null;
+
             }
 
             var section = await GetSectionInsightsPageByIdAsync(startingParentId, cancellationToken);
+
             if (section is not null)
+
             {
+
                 return section;
+
             }
 
             // Try one level up via InsightGroup
+
             var group = (await _contentService.GetPagesAsync<InsightGroup>(
+
                 new RetrievePagesParameters { },
+
                 query => query.Where(w => w.WhereEquals(nameof(WebPageFields.WebPageItemID), startingParentId)),
+
                 RetrievalCacheSettings.CacheDisabled,
+
                 cancellationToken)).FirstOrDefault();
 
             var groupParentId = group?.SystemFields.WebPageItemParentID ?? 0;
-            if (groupParentId <= 0)
-            {
-                return null;
-            }
+
 
             section = await GetSectionInsightsPageByIdAsync(groupParentId, cancellationToken);
+
             if (section is not null)
+
             {
+
                 return section;
+
             }
 
             // Try one more level up via InsightCategory
+
             var category = (await _contentService.GetPagesAsync<InsightCategory>(
+
                 new RetrievePagesParameters { },
-                query => query.Where(w => w.WhereEquals(nameof(WebPageFields.WebPageItemID), groupParentId)),
+
+                query => query.Where(w => w.WhereEquals(nameof(WebPageFields.WebPageItemID), startingParentId)),
+
                 RetrievalCacheSettings.CacheDisabled,
+
                 cancellationToken)).FirstOrDefault();
 
             var categoryParentId = category?.SystemFields.WebPageItemParentID ?? 0;
-            if (categoryParentId <= 0)
-            {
-                return null;
-            }
+
 
             return await GetSectionInsightsPageByIdAsync(categoryParentId, cancellationToken);
+
         }
+
+
 
         private async Task<SectionInsightsPage?> GetSectionInsightsPageByIdAsync(int webPageItemId, CancellationToken cancellationToken)
         {
