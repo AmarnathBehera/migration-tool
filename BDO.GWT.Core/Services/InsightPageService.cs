@@ -56,6 +56,7 @@ namespace BDO.GWT.Core.Services
                 };
             }
 
+            
             var contentPageDto = await GetContentPageDtoAsync(insightPage, cancellationToken);
             var sys = insightPage.SystemFields;
            
@@ -203,6 +204,7 @@ namespace BDO.GWT.Core.Services
                     Description = callToActionDescription,
                     ButtonTitle = callToActionButtonText,
                     ButtonUrl = callToActionButtonLink,
+                    Position = CallToActionPosition ?? "left"
                 },
                 Position = CallToActionPosition ?? "left"
             };
