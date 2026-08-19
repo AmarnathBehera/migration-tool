@@ -15,7 +15,6 @@ namespace BDO.GWT.Web.Core.API.Controllers;
 /// <summary>
 /// Provides methods to read and manage event sections.
 /// </summary>
-[AllowAnonymous]
 [ApiController]
 [Route("memberFirms/{memberFirmID:int}/EventSections")]
 public class EventSectionsController : EntityControllerBase

@@ -197,6 +197,17 @@ INNER JOIN dbo.CMS_ContentItemCommonData AS cicd
       <schema guid="34bc2c94-d4b6-4c53-a6f4-9b9520a24493" name="34bc2c94-d4b6-4c53-a6f4-9b9520a24493">
         <properties />
       </schema>
+      <field allowempty="true" column="ContentSharingSeperator" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="f28f0082-8d74-48b1-8e06-c74e67a3e718" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Content sharing options</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
       <field allowempty="true" column="SharingOptIn" columnprecision="0" columntype="boolean" enabled="true" guid="1c988b45-a59b-44f4-81ac-83b7bcb426fd" visible="true">
         <properties>
           <explanationtext>
@@ -219,6 +230,17 @@ INNER JOIN dbo.CMS_ContentItemCommonData AS cicd
         </properties>
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="AuthorInformationSeperator" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="68fcc55e-68e4-49a5-ab11-87602e8e9725" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Author Information</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
         </settings>
       </field>
       <field allowempty="true" column="DisplayedContacts" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="e9cf71ba-0d1e-4072-86f4-825b92dc854f" visible="true">

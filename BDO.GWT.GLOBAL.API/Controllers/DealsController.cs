@@ -14,8 +14,6 @@ namespace BDO.GWT.GLOBAL.API.Controllers
     /// <summary>
     /// Provides methods to read and manage deals.
     /// </summary>
-    [AllowAnonymous]
-    [ApiController]
     [Route("memberFirms/{memberFirmID:int}/Deals")]
     public class DealsController : EntityControllerBase
     {

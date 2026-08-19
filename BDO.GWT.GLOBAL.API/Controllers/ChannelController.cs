@@ -13,7 +13,6 @@ namespace BDO.GWT.Web.Core.API.Controllers;
 /// <summary>
 /// Provides methods to read and manage channels.
 /// </summary>
-[AllowAnonymous]
 [ApiController]
 [Route("memberFirms/{memberFirmID:int}/Channels")]
 public class ChannelController : EntityControllerBase
@@ -32,7 +31,6 @@ public class ChannelController : EntityControllerBase
     /// <param name = "cancellationToken" ></param >
     /// <returns > Returns a list of channels.</returns>
     [HttpGet]
-    [HasPermission(ApiMethodGroupName.Channel, ApiPermission.Read)]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(IEnumerable<ChannelOutput>), MediaTypeNames.Application.Json)]
     public async Task<ActionResult<IEnumerable<ChannelOutput>>> GetChannelsAsync([FromQuery] ChannelsQuery query, CancellationToken cancellationToken)
     {
@@ -48,7 +46,6 @@ public class ChannelController : EntityControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns>Returns one channel.</returns>
     [HttpGet("{channelGUID:guid}")]
-    [HasPermission(ApiMethodGroupName.Channel, ApiPermission.Read)]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(ChannelOutput), MediaTypeNames.Application.Json)]
     public async Task<ActionResult<ChannelOutput>> GetChannelAsync(Guid channelGUID, CancellationToken cancellationToken)
     {

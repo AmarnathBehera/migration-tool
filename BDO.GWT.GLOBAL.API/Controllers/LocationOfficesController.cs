@@ -15,7 +15,6 @@ namespace BDO.GWT.GLOBAL.API.Controllers
     // <summary>
     // Provides methods to read and manage location offices.
     // </summary>
-    [AllowAnonymous]
     [ApiController]
     [Route("memberFirms/{memberFirmID:int}/LocationOffices")]
     public class LocationOfficesController : EntityControllerBase
