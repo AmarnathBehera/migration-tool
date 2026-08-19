@@ -34,22 +34,29 @@ namespace BDO.GWT.Core.Mappers
         private static readonly IDictionary<Type, string> PageClassNameByPageType = new Dictionary<Type, string>();
         private static readonly IDictionary<string, Type> PageTypeByPageClassName = new Dictionary<string, Type>();
 
-        //static KenticoTypeMapper()
-        //{
-        //    foreach (var (pageType, data) in DataByPageType)
-        //    {
-        //        if (data.TreeNodeType != null)
-        //        {
-        //            PageTypeByTreeNodeType[data.TreeNodeType] = pageType;
-        //        }
+        
+        static KenticoTypeMapper()
+        {
+            // Scan all loaded assemblies for non-abstract, non-interface types that implement IWebPageFieldsSource
+            // (i.e., generated Kentico Xperience page type classes).
+            var pageTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(a => a.GetTypes())
+                .Where(t => typeof(IWebPageFieldsSource).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface);
 
-        //        if (data.ClassName != null)
-        //        {
-        //            PageClassNameByPageType[pageType] = data.ClassName;
-        //            PageTypeByPageClassName[data.ClassName] = pageType;
-        //        }
-        //    }
-        //}
+            foreach (var pageType in pageTypes)
+            {
+                // Each generated page type class exposes a public static CONTENT_TYPE_NAME field
+                // containing the Kentico content type's class name.
+                var classNameField = pageType.GetField("CONTENT_TYPE_NAME", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                if (classNameField?.GetValue(null) is string className)
+                {
+                    // Build lookups in both directions so the mapper can resolve
+                    // a page type from a class name and vice versa.
+                    PageClassNameByPageType[pageType] = className;
+                    PageTypeByPageClassName[className] = pageType;
+                }
+            }
+        }
         public string GetClassNameFromPageType(Type pageType)
         {
             if (PageClassNameByPageType.TryGetValue(pageType, out var className))

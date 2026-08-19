@@ -195,27 +195,49 @@ namespace BDO.GWT.Core.Services
                 SortBy = GetSortByFilter(),
             };
 
-            //var response = await _searchService.SearchAsync<SearchDocument>(searchText, q =>
-            //{
-            //    q.Select(x => new { x.Title, x.MetadataDescription, x.NodeAliasPath }); // -> DocumentPageTitle, MetadataDescription, Url
-            //    q.Take(20);
-            //}, cancellationToken);
-
-            // response.Documents -> each has Title, MetadataDescription (description), NodeAliasPath (url)
+            
 
             return dto;
         }
 
-        private Task<FilterItemDto<SearchFacetOptionDto>> GetFiltersAsync(string searchText, CancellationToken cancellationToken)
+        private async Task<FilterItemDto<SearchFacetOptionDto>> GetFiltersAsync(string searchText, CancellationToken cancellationToken)
         {
-            var emptyFilter = FilterDtoUtility.CreateFilterItemDto(
-                FilterItemType.Select,
-                FilterByFilterName,
-                ResourceStringKey.LiveSite.FilterBy,
-                null,
-                Array.Empty<SearchFacetOptionDto>());
+            var searchResponse = await _searchService.SearchAsync<SearchDocument>(searchText, q =>
+            {
+                q.IncludeFacet(x => x.ClassName, 100);
+                //q.OnlyPublishedPages(_dateTimeProvider);
+                q.Where(x => x.LanguageTag == _cultureContext.CurrentLanguageTag);
+                q.Take(0);
+            }, cancellationToken);
 
-            return Task.FromResult(emptyFilter);
+            var pageGroupKeys = PageTypesByPageGroupKey.Keys;
+
+            var facetsByClassName = searchResponse.Facets[nameof(SearchDocument.ClassName)]
+                .Where(x => x is { Value: string })
+                .GroupBy(x => GetPageTypeGroupKeyByClassName((string)x.Value!));
+
+            var joinedData = pageGroupKeys.GroupJoin(
+                facetsByClassName,
+                pageGroupKey => pageGroupKey,
+                facetGroup => facetGroup.Key,
+                (pageGroupKey, facetGroup) => (PageGroupKey: pageGroupKey, FacetGroup: facetGroup.DefaultIfEmpty())
+            );
+
+            var searchFilterDtos = joinedData.Select(x =>
+            {
+                var dto = new SearchFacetOptionDto
+                {
+                    Label = ResourceStringByPageTypeGroupKey[x.PageGroupKey],
+                    Value = x.PageGroupKey,
+                    Count = x.FacetGroup.Sum(y => y?.Sum(z => z.Count) ?? 0),
+                };
+
+                return dto;
+            }).ToArray();
+
+            var filterItemDto = FilterDtoUtility.CreateFilterItemDto(FilterItemType.Select, FilterByFilterName, ResourceStringKey.LiveSite.FilterBy, null, searchFilterDtos);
+
+            return filterItemDto;
         }
 
         private static FilterItemDto<OptionDto> GetSortByFilter()
