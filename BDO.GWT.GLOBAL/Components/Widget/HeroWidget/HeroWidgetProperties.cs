@@ -6,6 +6,7 @@ using Kentico.Xperience.Admin.Base.FormAnnotations;
 using Kentico.Xperience.Admin.Base.Forms;
 using Kentico.Xperience.Admin.Websites.FormAnnotations;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace BDO.GWT.Web.Components.Widget.HeroWidget;
@@ -21,20 +22,24 @@ public class HeroWidgetProperties : BaseWidgetProperties
     [TextAreaComponent( Label = "Description", Order = 2)]
     public string Description { get; set; }
 
-    [ContentItemSelectorComponent(contentTypeName: ContentAttachment.CONTENT_TYPE_NAME, Label = "Background image", ExplanationText = "Recommended size: 1440x400", Order = 3)]
+    [ContentItemSelectorComponent(contentTypeName: ContentAttachment.CONTENT_TYPE_NAME, Label = "Background image", ExplanationText = "Recommended size: 1440x400", Order = 3, MaximumItems =1)]
     [VisibleIfNotEqualTo(nameof(Layout), HeroLayout.Banner)]
+    [RequiredValidationRule]
     public IEnumerable<ContentItemReference> BackgroundImage { get; set; } = Enumerable.Empty<ContentItemReference>();
 
     [TextInputComponent( Label = "Background image alt text", Order = 4)]
     [VisibleIfNotEqualTo(nameof(Layout),HeroLayout.Banner)]
+    [RequiredValidationRule]
     public string BackgroundImageAltText { get; set; } = "";
 
-    [ContentItemSelectorComponent(contentTypeName: ContentAttachment.CONTENT_TYPE_NAME, Label = "Mobile background image", ExplanationText = "Recommended size: 720x1280", Order = 5)]
+    [ContentItemSelectorComponent(contentTypeName: ContentAttachment.CONTENT_TYPE_NAME, Label = "Mobile background image", ExplanationText = "Recommended size: 720x1280", Order = 5,MaximumItems =1)]
     [VisibleIfNotEqualTo(nameof(Layout), HeroLayout.Banner)]
+    [RequiredValidationRule]
     public IEnumerable<ContentItemReference> MobileBackgroundImage { get; set; } = Enumerable.Empty<ContentItemReference>();
 
     [TextInputComponent( Label = "Background image alt text", Order = 6)]
     [VisibleIfNotEqualTo(nameof(Layout), HeroLayout.Banner)]
+    [RequiredValidationRule]
     public string MobileBackgroundImageAltText { get; set; } = "";
 
     [RadioGroupComponent( Label = "CTA button type", Order = 7,Options = $"{CallToActionButtonType.None};None\r\n{CallToActionButtonType.Primary};Primary\r\n{CallToActionButtonType.Secondary};Secondary\r\n{CallToActionButtonType.Tertiary};Tertiary")]
