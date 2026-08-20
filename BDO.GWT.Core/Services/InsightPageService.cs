@@ -248,7 +248,9 @@ namespace BDO.GWT.Core.Services
         public async Task<SidebarExternalPersonDto[]> GetSidebarExternalPeopleDtosAsync(IEnumerable<ExternalPerson> externalPeopleNodeGuids, CancellationToken cancellationToken)
         {
             var guids = (externalPeopleNodeGuids ?? Enumerable.Empty<ExternalPerson>())
-                .Select(x => x.SystemFields.ContentItemGUID)
+                .Select(x => x.SystemFields?.ContentItemGUID ?? Guid.Empty)
+                .Where(x => x != Guid.Empty)
+                .Distinct()
                 .ToList();
 
             if (guids.Count == 0)
@@ -257,7 +259,7 @@ namespace BDO.GWT.Core.Services
             }
 
             var externalPeople = await _contentService.GetPagesAsync<ExternalPerson>(
-                new RetrievePagesParameters { },
+                new RetrievePagesParameters { LinkedItemsMaxLevel = 2 },
                 query => query.Where(w => w.WhereIn("ContentItemGUID", guids)),
                 RetrievalCacheSettings.CacheDisabled,
                 cancellationToken
@@ -271,7 +273,7 @@ namespace BDO.GWT.Core.Services
                 FullName = await GetDisplayNameAsync(externalPerson),
                 JobTitle = externalPerson.JobTitle,
                 Url = externalPerson.Url,
-            }));
+            })).ConfigureAwait(false);
 
             return dtos;
         }
