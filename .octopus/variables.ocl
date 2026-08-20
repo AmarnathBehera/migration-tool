@@ -114,7 +114,6 @@ variable "appsettings.SystemSendGridClientApiKey" {
     value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-sendgrid-apikey)" {}
 }
 
-# Indirection to the "GWT-Xbyk VS" library variable set so the APIM script only needs project-scoped names.
 variable "apim.subscriptionId" {
     value "#{gwt-xbyk-azure-apim-subscription-id}" {}
 }
@@ -127,7 +126,6 @@ variable "apim.serviceName" {
     value "#{gwt-xbyk-azure-apim-resourceName}" {}
 }
 
-# Passthrough of the "Azure Defaults" tenant common variable template, resolved per-tenant at deploy time.
 variable "geography.abbreviation" {
     value "#{geography.abbreviation}" {}
 }
