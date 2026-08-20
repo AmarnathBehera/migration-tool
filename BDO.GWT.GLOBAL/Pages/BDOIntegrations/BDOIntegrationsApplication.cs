@@ -10,7 +10,7 @@ namespace BDO.GWT.Xperience;
 [UIPermission(SystemPermissions.DELETE)]
 [UIPermission(SystemPermissions.UPDATE)]
 // The class must inherit from the ApplicationPage base class.
-public class BDOIntegrationsApplication : ApplicationPage
+public class BdoIntegrationsApplication : ApplicationPage
 {
     public const string IDENTIFIER = "BDO.BDOIntegrations";
 }

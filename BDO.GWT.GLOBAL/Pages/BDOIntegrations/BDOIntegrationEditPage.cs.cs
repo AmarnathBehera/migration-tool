@@ -6,20 +6,20 @@ using Kentico.Xperience.Admin.Base.Forms;
 using System.Threading.Tasks;
 
 [assembly: UIPage(
-    parentType: typeof(BDOIntegrationsEditSection),
+    parentType: typeof(BdoIntegrationsEditSection),
     slug: "edit",
-    uiPageType: typeof(BDOIntegrationEditPage),
+    uiPageType: typeof(BdoIntegrationEditPage),
     name: "Edit Form Submission subscription",
     templateName: TemplateNames.EDIT,
     order: 0)]
 namespace GWTXbyKWeb.Pages.BDOIntegrations
 {
-    public class BDOIntegrationEditPage : InfoEditPage<FormSubmissionSubscriptionsInfo>
+    public class BdoIntegrationEditPage : InfoEditPage<FormSubmissionSubscriptionsInfo>
     {
         [PageParameter(typeof(IntPageModelBinder))]
         public override int ObjectId { get; set; }
 
-        public BDOIntegrationEditPage(IFormComponentMapper formComponentMapper,
+        public BdoIntegrationEditPage(IFormComponentMapper formComponentMapper,
             IFormDataBinder formDataBinder)
             : base(formComponentMapper, formDataBinder)
         {

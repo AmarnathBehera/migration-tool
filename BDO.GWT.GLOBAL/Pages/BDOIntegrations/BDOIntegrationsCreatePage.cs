@@ -6,17 +6,17 @@ using Kentico.Xperience.Admin.Base.Forms;
 using System.Threading.Tasks;
 
 [assembly: UIPage(
-    parentType: typeof(BDOIntegrationListingPage),
+    parentType: typeof(BdoIntegrationListingPage),
     slug: "create",
-    uiPageType: typeof(BDOIntegrationsCreatePage),
+    uiPageType: typeof(BdoIntegrationsCreatePage),
     name: "Create Form Submission Integration",
     templateName: TemplateNames.EDIT,
     order: 20)]
 namespace GWTXbyKWeb.Pages.BDOIntegrations
 {
-    public class BDOIntegrationsCreatePage : CreatePage<FormSubmissionSubscriptionsInfo, BDOIntegrationsEditSection>
+    public class BdoIntegrationsCreatePage : CreatePage<FormSubmissionSubscriptionsInfo, BdoIntegrationsEditSection>
     {
-        public BDOIntegrationsCreatePage(IFormComponentMapper formComponentMapper,
+        public BdoIntegrationsCreatePage(IFormComponentMapper formComponentMapper,
             IFormDataBinder formDataBinder,
             IPageLinkGenerator pageLinkGenerator)
             : base(formComponentMapper, formDataBinder, pageLinkGenerator)

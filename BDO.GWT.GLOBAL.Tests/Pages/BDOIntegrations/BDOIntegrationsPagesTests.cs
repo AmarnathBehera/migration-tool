@@ -17,19 +17,19 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         [Test]
         public void BDOIntegrationsApplication_InheritsFromApplicationPage()
         {
-            Assert.That(typeof(BDOIntegrationsApplication).BaseType, Is.EqualTo(typeof(ApplicationPage)));
+            Assert.That(typeof(BdoIntegrationsApplication).BaseType, Is.EqualTo(typeof(ApplicationPage)));
         }
 
         [Test]
         public void BDOIntegrationsApplication_Identifier_IsExpectedValue()
         {
-            Assert.That(BDOIntegrationsApplication.IDENTIFIER, Is.EqualTo("BDO.BDOIntegrations"));
+            Assert.That(BdoIntegrationsApplication.IDENTIFIER, Is.EqualTo("BDO.BDOIntegrations"));
         }
 
         [Test]
         public void BDOIntegrationsApplication_HasExpectedUiPermissions()
         {
-            var permissions = typeof(BDOIntegrationsApplication)
+            var permissions = typeof(BdoIntegrationsApplication)
                 .GetCustomAttributesData()
                 .Where(a => a.AttributeType.Name == "UIPermissionAttribute")
                 .Select(a => a.ConstructorArguments.FirstOrDefault().Value?.ToString())
@@ -47,13 +47,13 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         [Test]
         public void BDOIntegrationListingPage_InheritsFromListingPage()
         {
-            Assert.That(typeof(BDOIntegrationListingPage).BaseType, Is.EqualTo(typeof(ListingPage)));
+            Assert.That(typeof(BdoIntegrationListingPage).BaseType, Is.EqualTo(typeof(ListingPage)));
         }
 
         [Test]
         public void BDOIntegrationListingPage_ObjectType_ReturnsFormSubmissionSubscriptionsObjectType()
         {
-            var page = new TestableBDOIntegrationListingPage();
+            var page = new TestableBdoIntegrationListingPage();
 
             Assert.That(page.ExposedObjectType, Is.EqualTo(FormSubmissionSubscriptionsInfo.OBJECT_TYPE));
         }
@@ -61,19 +61,19 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         [Test]
         public void BDOIntegrationListingPage_ConfigurePage_IsOverridden()
         {
-            var method = typeof(BDOIntegrationListingPage).GetMethod(
-                nameof(BDOIntegrationListingPage.ConfigurePage),
+            var method = typeof(BdoIntegrationListingPage).GetMethod(
+                nameof(BdoIntegrationListingPage.ConfigurePage),
                 BindingFlags.Instance | BindingFlags.Public);
 
             Assert.That(method, Is.Not.Null);
-            Assert.That(method!.DeclaringType, Is.EqualTo(typeof(BDOIntegrationListingPage)));
+            Assert.That(method!.DeclaringType, Is.EqualTo(typeof(BdoIntegrationListingPage)));
         }
 
         [Test]
         public void BDOIntegrationListingPage_Delete_HasDeletePermissionPageCommand()
         {
-            var deleteMethod = typeof(BDOIntegrationListingPage).GetMethod(
-                nameof(BDOIntegrationListingPage.Delete),
+            var deleteMethod = typeof(BdoIntegrationListingPage).GetMethod(
+                nameof(BdoIntegrationListingPage.Delete),
                 BindingFlags.Instance | BindingFlags.Public);
 
             Assert.That(deleteMethod, Is.Not.Null);
@@ -94,21 +94,21 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         [Test]
         public void BDOIntegrationsCreatePage_InheritsFromCreatePage()
         {
-            var baseType = typeof(BDOIntegrationsCreatePage).BaseType;
+            var baseType = typeof(BdoIntegrationsCreatePage).BaseType;
 
             Assert.That(baseType, Is.Not.Null);
             Assert.Multiple(() =>
             {
                 Assert.That(baseType!.IsGenericType, Is.True);
                 Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(FormSubmissionSubscriptionsInfo)));
-                Assert.That(baseType.GetGenericArguments()[1], Is.EqualTo(typeof(BDOIntegrationsEditSection)));
+                Assert.That(baseType.GetGenericArguments()[1], Is.EqualTo(typeof(BdoIntegrationsEditSection)));
             });
         }
 
         [Test]
         public void BDOIntegrationsCreatePage_ExposesExpectedConstructor()
         {
-            var ctor = typeof(BDOIntegrationsCreatePage).GetConstructor(new[]
+            var ctor = typeof(BdoIntegrationsCreatePage).GetConstructor(new[]
             {
                 typeof(IFormComponentMapper),
                 typeof(IFormDataBinder),
@@ -121,18 +121,18 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         [Test]
         public void BDOIntegrationsCreatePage_ConfigurePage_IsOverridden()
         {
-            var method = typeof(BDOIntegrationsCreatePage).GetMethod(
-                nameof(BDOIntegrationsCreatePage.ConfigurePage),
+            var method = typeof(BdoIntegrationsCreatePage).GetMethod(
+                nameof(BdoIntegrationsCreatePage.ConfigurePage),
                 BindingFlags.Instance | BindingFlags.Public);
 
             Assert.That(method, Is.Not.Null);
-            Assert.That(method!.DeclaringType, Is.EqualTo(typeof(BDOIntegrationsCreatePage)));
+            Assert.That(method!.DeclaringType, Is.EqualTo(typeof(BdoIntegrationsCreatePage)));
         }
 
         [Test]
         public void BDOIntegrationsEditSection_InheritsFromEditSectionPage()
         {
-            var baseType = typeof(BDOIntegrationsEditSection).BaseType;
+            var baseType = typeof(BdoIntegrationsEditSection).BaseType;
 
             Assert.That(baseType, Is.Not.Null);
             Assert.Multiple(() =>
@@ -145,7 +145,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         [Test]
         public void BDOIntegrationEditPage_InheritsFromInfoEditPage()
         {
-            var baseType = typeof(BDOIntegrationEditPage).BaseType;
+            var baseType = typeof(BdoIntegrationEditPage).BaseType;
 
             Assert.That(baseType, Is.Not.Null);
             Assert.Multiple(() =>
@@ -158,7 +158,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         [Test]
         public void BDOIntegrationEditPage_ExposesExpectedConstructor()
         {
-            var ctor = typeof(BDOIntegrationEditPage).GetConstructor(new[]
+            var ctor = typeof(BdoIntegrationEditPage).GetConstructor(new[]
             {
                 typeof(IFormComponentMapper),
                 typeof(IFormDataBinder),
@@ -170,8 +170,8 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         [Test]
         public void BDOIntegrationEditPage_ObjectId_HasPageParameterAttributeWithIntModelBinder()
         {
-            var objectIdProperty = typeof(BDOIntegrationEditPage).GetProperty(
-                nameof(BDOIntegrationEditPage.ObjectId),
+            var objectIdProperty = typeof(BdoIntegrationEditPage).GetProperty(
+                nameof(BdoIntegrationEditPage.ObjectId),
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
 
             Assert.That(objectIdProperty, Is.Not.Null);
@@ -187,20 +187,20 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         [Test]
         public void BDOIntegrationEditPage_ConfigurePage_IsOverridden()
         {
-            var method = typeof(BDOIntegrationEditPage).GetMethod(
-                nameof(BDOIntegrationEditPage.ConfigurePage),
+            var method = typeof(BdoIntegrationEditPage).GetMethod(
+                nameof(BdoIntegrationEditPage.ConfigurePage),
                 BindingFlags.Instance | BindingFlags.Public);
 
             Assert.That(method, Is.Not.Null);
-            Assert.That(method!.DeclaringType, Is.EqualTo(typeof(BDOIntegrationEditPage)));
+            Assert.That(method!.DeclaringType, Is.EqualTo(typeof(BdoIntegrationEditPage)));
         }
 
         [Test]
         public void Assembly_HasExpectedUiPageRegistration_ForBDOIntegrationListingPage()
         {
             AssertUiPageAttribute(
-                uiPageType: typeof(BDOIntegrationListingPage),
-                parentType: typeof(BDOIntegrationsApplication),
+                uiPageType: typeof(BdoIntegrationListingPage),
+                parentType: typeof(BdoIntegrationsApplication),
                 slug: "BDO-Integrations",
                 name: "BDO Integrations",
                 templateName: TemplateNames.LISTING,
@@ -211,8 +211,8 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         public void Assembly_HasExpectedUiPageRegistration_ForBDOIntegrationsCreatePage()
         {
             AssertUiPageAttribute(
-                uiPageType: typeof(BDOIntegrationsCreatePage),
-                parentType: typeof(BDOIntegrationListingPage),
+                uiPageType: typeof(BdoIntegrationsCreatePage),
+                parentType: typeof(BdoIntegrationListingPage),
                 slug: "create",
                 name: "Create Form Submission Integration",
                 templateName: TemplateNames.EDIT,
@@ -223,8 +223,8 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         public void Assembly_HasExpectedUiPageRegistration_ForBDOIntegrationsEditSection()
         {
             AssertUiPageAttribute(
-                uiPageType: typeof(BDOIntegrationsEditSection),
-                parentType: typeof(BDOIntegrationListingPage),
+                uiPageType: typeof(BdoIntegrationsEditSection),
+                parentType: typeof(BdoIntegrationListingPage),
                 slug: PageParameterConstants.PARAMETERIZED_SLUG,
                 name: "Edit",
                 templateName: TemplateNames.SECTION_LAYOUT,
@@ -235,8 +235,8 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         public void Assembly_HasExpectedUiPageRegistration_ForBDOIntegrationEditPage()
         {
             AssertUiPageAttribute(
-                uiPageType: typeof(BDOIntegrationEditPage),
-                parentType: typeof(BDOIntegrationsEditSection),
+                uiPageType: typeof(BdoIntegrationEditPage),
+                parentType: typeof(BdoIntegrationsEditSection),
                 slug: "edit",
                 name: "Edit Form Submission subscription",
                 templateName: TemplateNames.EDIT,
@@ -246,8 +246,8 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         [Test]
         public void BDOIntegrationListingPage_ConfigurePage_ContainsAllExpectedColumnsAndActions()
         {
-            var configureMethod = typeof(BDOIntegrationListingPage).GetMethod(
-                nameof(BDOIntegrationListingPage.ConfigurePage),
+            var configureMethod = typeof(BdoIntegrationListingPage).GetMethod(
+                nameof(BdoIntegrationListingPage.ConfigurePage),
                 BindingFlags.Instance | BindingFlags.Public);
 
             Assert.That(configureMethod, Is.Not.Null);
@@ -270,15 +270,15 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
                 Assert.That(literals, Does.Contain("Method"));
                 Assert.That(literals, Does.Contain("Endpoint"));
                 Assert.That(literals, Does.Contain("New setting"));
-                Assert.That(literals, Does.Contain(nameof(BDOIntegrationListingPage.Delete)));
+                Assert.That(literals, Does.Contain(nameof(BdoIntegrationListingPage.Delete)));
             });
         }
 
         [Test]
         public void BDOIntegrationsCreatePage_ConfigurePage_UsesExpectedUiFormName()
         {
-            var configureMethod = typeof(BDOIntegrationsCreatePage).GetMethod(
-                nameof(BDOIntegrationsCreatePage.ConfigurePage),
+            var configureMethod = typeof(BdoIntegrationsCreatePage).GetMethod(
+                nameof(BdoIntegrationsCreatePage.ConfigurePage),
                 BindingFlags.Instance | BindingFlags.Public);
 
             Assert.That(configureMethod, Is.Not.Null);
@@ -291,8 +291,8 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         [Test]
         public void BDOIntegrationEditPage_ConfigurePage_UsesExpectedUiFormName()
         {
-            var configureMethod = typeof(BDOIntegrationEditPage).GetMethod(
-                nameof(BDOIntegrationEditPage.ConfigurePage),
+            var configureMethod = typeof(BdoIntegrationEditPage).GetMethod(
+                nameof(BdoIntegrationEditPage.ConfigurePage),
                 BindingFlags.Instance | BindingFlags.Public);
 
             Assert.That(configureMethod, Is.Not.Null);
@@ -305,7 +305,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         [Test]
         public async Task BDOIntegrationListingPage_ConfigurePage_ExecutesConfigurationLines_ForCoverage()
         {
-            var page = (BDOIntegrationListingPage)RuntimeHelpers.GetUninitializedObject(typeof(BDOIntegrationListingPage));
+            var page = (BdoIntegrationListingPage)RuntimeHelpers.GetUninitializedObject(typeof(BdoIntegrationListingPage));
             PreparePageConfigurationForConfigurePage(page);
 
             try
@@ -326,7 +326,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         [Test]
         public async Task BDOIntegrationListingPage_Delete_InvokesForwardingPath_ForCoverage()
         {
-            var page = (BDOIntegrationListingPage)RuntimeHelpers.GetUninitializedObject(typeof(BDOIntegrationListingPage));
+            var page = (BdoIntegrationListingPage)RuntimeHelpers.GetUninitializedObject(typeof(BdoIntegrationListingPage));
 
             try
             {
@@ -343,7 +343,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         [Test]
         public async Task BDOIntegrationsCreatePage_ConfigurePage_SetsExpectedUiFormName_ForCoverage()
         {
-            var page = (BDOIntegrationsCreatePage)RuntimeHelpers.GetUninitializedObject(typeof(BDOIntegrationsCreatePage));
+            var page = (BdoIntegrationsCreatePage)RuntimeHelpers.GetUninitializedObject(typeof(BdoIntegrationsCreatePage));
             PreparePageConfigurationForConfigurePage(page);
 
             try
@@ -364,7 +364,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         [Test]
         public async Task BDOIntegrationEditPage_ConfigurePage_SetsExpectedUiFormName_AndObjectIdIsReadable_ForCoverage()
         {
-            var page = (BDOIntegrationEditPage)RuntimeHelpers.GetUninitializedObject(typeof(BDOIntegrationEditPage));
+            var page = (BdoIntegrationEditPage)RuntimeHelpers.GetUninitializedObject(typeof(BdoIntegrationEditPage));
             PreparePageConfigurationForConfigurePage(page);
             page.ObjectId = 99;
 
@@ -599,7 +599,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
             }
         }
 
-        private sealed class TestableBDOIntegrationListingPage : BDOIntegrationListingPage
+        private sealed class TestableBdoIntegrationListingPage : BdoIntegrationListingPage
         {
             public string ExposedObjectType => ObjectType;
         }

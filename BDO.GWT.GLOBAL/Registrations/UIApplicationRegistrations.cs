@@ -13,8 +13,8 @@ using Kentico.Xperience.Admin.Base.UIPages;
     templateName: TemplateNames.SECTION_LAYOUT)]
 
 [assembly: UIApplication(
-    identifier: BDOIntegrationsApplication.IDENTIFIER,
-    type: typeof(BDOIntegrationsApplication),
+    identifier: BdoIntegrationsApplication.IDENTIFIER,
+    type: typeof(BdoIntegrationsApplication),
     slug: "BDOIntegrations",
     name: "BDO Integrations",
     category: BaseApplicationCategories.CONFIGURATION,

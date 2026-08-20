@@ -5,9 +5,9 @@ using GWTXbyKWeb.Pages.BDOIntegrations;
 using Kentico.Xperience.Admin.Base;
 using System.Threading.Tasks;
 [assembly: UIPage(
-    parentType: typeof(BDOIntegrationsApplication),
+    parentType: typeof(BdoIntegrationsApplication),
     slug: "BDO-Integrations",
-    uiPageType: typeof(BDOIntegrationListingPage),
+    uiPageType: typeof(BdoIntegrationListingPage),
     name: "BDO Integrations",
     templateName: TemplateNames.LISTING,
     order: 0)]
@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace GWTXbyKWeb.Pages.BDOIntegrations
 {
 
-    public class BDOIntegrationListingPage : ListingPage
+    public class BdoIntegrationListingPage : ListingPage
     {
         protected override string ObjectType => FormSubmissionSubscriptionsInfo.OBJECT_TYPE;
 
@@ -30,11 +30,11 @@ namespace GWTXbyKWeb.Pages.BDOIntegrations
 
             // Add a "New settings" button at the top. This will navigate the user to a "create" page.
             // We will define it in the next section.
-            PageConfiguration.HeaderActions.AddLink<BDOIntegrationsCreatePage>("New setting");
+            PageConfiguration.HeaderActions.AddLink<BdoIntegrationsCreatePage>("New setting");
 
             // Add an "Edit" row action. This will navigate the user to a "edit" section for a specific instance of GlobalSettingsKeyInfo object.
             // We will define it in the next section.
-            PageConfiguration.AddEditRowAction<BDOIntegrationsEditSection>();
+            PageConfiguration.AddEditRowAction<BdoIntegrationsEditSection>();
 
             // Define a "Delete" action for the user with sufficient permissions to remove an existing setting.
             PageConfiguration.TableActions
