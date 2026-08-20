@@ -11,3 +11,12 @@ using Kentico.Xperience.Admin.Base.UIPages;
     category: BaseApplicationCategories.CONFIGURATION,
     icon: Icons.BoxCogwheel,
     templateName: TemplateNames.SECTION_LAYOUT)]
+
+[assembly: UIApplication(
+    identifier: BDOIntegrationsApplication.IDENTIFIER,
+    type: typeof(BDOIntegrationsApplication),
+    slug: "BDOIntegrations",
+    name: "BDO Integrations",
+    category: BaseApplicationCategories.CONFIGURATION,
+    icon: Icons.BoxCogwheel,
+    templateName: TemplateNames.SECTION_LAYOUT)]
