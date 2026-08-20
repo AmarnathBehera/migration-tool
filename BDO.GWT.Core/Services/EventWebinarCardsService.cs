@@ -25,12 +25,14 @@ public interface IEventWebinarCardsService
 
     Task<EventsWebinarsCardDto[]> GetEventWebinarCardDtosAsync(
         ICollection<IEventOrWebinar> eventsAndWebinars,
+        string lang,
         Func<IEventOrWebinar, bool> isFeatured,
         CancellationToken cancellationToken);
 
 
     Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(
         CardsQuery cardsQuery,
+        string language,
         Action<ContentItemQueryBuilder>? decorateQuery,
         Func<IEventOrWebinar, bool> isFeatured,
         bool showPastPages,
@@ -151,6 +153,7 @@ public class EventWebinarCardsService : IEventWebinarCardsService
     }
     public async Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(
      CardsQuery cardsQuery,
+     string lang,
      Action<ContentItemQueryBuilder>? decorateQuery,
      Func<IEventOrWebinar, bool> isFeatured,
      bool showPastPages,
@@ -158,7 +161,7 @@ public class EventWebinarCardsService : IEventWebinarCardsService
      CancellationToken cancellationToken)
     {
         var filterWhereExpressions = await GetFilterParameterWhereExpressionsAsync(cardsQuery.Filters);
-        var language = _contentService.GetCurrentLanguage();
+        var language = lang ?? _contentService.GetCurrentLanguage();
         var channel = _websiteChannelContext.WebsiteChannelName;
 
         ContentItemQueryBuilder BuildQuery(string contentTypeName)
@@ -221,7 +224,7 @@ public class EventWebinarCardsService : IEventWebinarCardsService
         ];
 
         var paginated = PaginationHelper.Paginate(ordered, cardsQuery).ToList();
-        var dtos = await GetEventWebinarCardDtosAsync(paginated, isFeatured, cancellationToken);
+        var dtos = await GetEventWebinarCardDtosAsync(paginated, language, isFeatured, cancellationToken);
 
         return new PaginationDto<EventsWebinarsCardDto>
         {
@@ -234,10 +237,11 @@ public class EventWebinarCardsService : IEventWebinarCardsService
 
     public async Task<EventsWebinarsCardDto[]> GetEventWebinarCardDtosAsync(
         ICollection<IEventOrWebinar> eventsAndWebinars,
+        string lang,
         Func<IEventOrWebinar, bool> isFeatured,
         CancellationToken cancellationToken)
     {
-        var language = _contentService.GetCurrentLanguage();
+        var language = lang ?? _contentService.GetCurrentLanguage();
 
         var urlTasks = eventsAndWebinars.Select(async x =>
         {
