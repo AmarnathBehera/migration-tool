@@ -21,8 +21,8 @@ namespace BDO.GWT.Core.DTOs.Cards
         public DateTime? EventDateFrom { get; set; }
         public DateTime? EventDateTo { get; set; }
         public string? EventLocationTitle { get; set; }       
-        public Link? InsightImage { get; set; }
-        public string? InsightImageAltText { get; set; }
+        //public Link? InsightImage { get; set; }
+        //public string? InsightImageAltText { get; set; }
         public DateTimeOffset? PublishFrom { get; set; }
         public DateTimeOffset? PublishTo { get; set; }
         public DateTime CreatedWhen { get; set; }

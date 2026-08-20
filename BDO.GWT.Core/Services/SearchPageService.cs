@@ -154,7 +154,7 @@ namespace BDO.GWT.Core.Services
 
                 if (!string.IsNullOrEmpty(query.FilterBy) && PageTypesByPageGroupKey.TryGetValue(query.FilterBy, out var pageTypes))
                 {
-                    var classNames = pageTypes.Select(x => _typeMapper.GetClassNameFromPageType(x).ToLowerInvariant());
+                    var classNames = pageTypes.Select(x => _typeMapper.GetClassNameFromPageType(x)).ToList();
                     q.Where(x => classNames.Contains(x.ClassName));
                 }
 

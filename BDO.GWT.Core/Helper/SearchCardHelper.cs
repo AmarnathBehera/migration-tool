@@ -43,15 +43,15 @@ namespace BDO.GWT.Core.Helpers
 
         private static readonly Dictionary<Type, SearchCardType> SearchCardTypeByPageType = PageTypesBySearchCardType.InvertKeyAndListValueDictionary();
 
-        //private readonly IContentPageCardHelper<InsightCardDto> _insightCardHelper;
+        private readonly IContentPageCardHelper<Insight> _insightCardHelper;
         private readonly ICultureContext _cultureContext;
         private readonly IEventWebinarCardsService _eventWebinarCardsService;
         private readonly IPageUrlService _pageUrlService;
         private readonly ITypeMapper _typeMapper;
 
-        public SearchCardHelper(  ICultureContext cultureContext, IEventWebinarCardsService eventWebinarCardsService, IPageUrlService pageUrlService, ITypeMapper typeMapper)
+        public SearchCardHelper(IContentPageCardHelper<Insight> insightCardHelper, ICultureContext cultureContext, IEventWebinarCardsService eventWebinarCardsService, IPageUrlService pageUrlService, ITypeMapper typeMapper)
         {
-            //_insightCardHelper = insightCardHelper; 
+            _insightCardHelper = insightCardHelper; 
             _cultureContext = cultureContext;
             _eventWebinarCardsService = eventWebinarCardsService;
             _pageUrlService = pageUrlService;
@@ -92,27 +92,29 @@ namespace BDO.GWT.Core.Helpers
         {
             return searchCardType switch
             {
-                //SearchCardType.Insight => WrapCards(await MapInsightCardsAsync(searchDocuments, cancellationToken), SearchCardType.Insight),
+                SearchCardType.Insight => WrapCards(await MapInsightCardsAsync(searchDocuments, cancellationToken), SearchCardType.Insight),
                 SearchCardType.EventsAndWebinars => WrapCards(await MapEventAndWebinarCardsAsync(searchDocuments, cancellationToken), SearchCardType.EventsAndWebinars),
                 SearchCardType.Generic => WrapCards(await MapGenericCardsAsync(searchDocuments.ToList(), cancellationToken), SearchCardType.Generic),
                 _ => throw new ArgumentOutOfRangeException(nameof(searchCardType), searchCardType, null),
             };
         }
 
-        //private async Task<IEnumerable<ContentPageCardDto>> MapInsightCardsAsync(IEnumerable<SearchDocument> documents, CancellationToken cancellationToken)
-        //{
-        //    var insights = documents.Select(x => new InsightCardDto
-        //    {
-        //        NodeId = x.NodeId,
-        //        InsightImage = x.InsightImage ?? throw new InvalidOperationException($"{nameof(SearchDocument.InsightImage)} is null for {nameof(Insight)} with NodeID: {x.NodeId}"),
-        //        InsightImageAltText = x.InsightImageAltText ?? throw new InvalidOperationException($"{nameof(SearchDocument.InsightImageAltText)} is null for {nameof(Insight)} with NodeID: {x.NodeId}"),
-        //        MetadataTitle = x.MetadataTitle,
-        //        //PublishFrom = x.PublishFrom,
-        //        MetadataDescription = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(x.MetadataDescription),
-        //    }).ToList();
+        private async Task<IEnumerable<InsightSearchCardDto>> MapInsightCardsAsync(IEnumerable<SearchDocument> documents, CancellationToken cancellationToken)
+        {
+            var insights = documents.Select(x => new InsightSearchCardDto
+            {
+                NodeId = x.NodeId,
+                InsightImage = x.InsightImage ?? throw new InvalidOperationException($"{nameof(SearchDocument.InsightImage)} is null for {nameof(Insight)} with NodeID: {x.NodeId}"),
+                InsightImageAltText = x.InsightImageAltText ?? throw new InvalidOperationException($"{nameof(SearchDocument.InsightImageAltText)} is null for {nameof(Insight)} with NodeID: {x.NodeId}"),
+                MetadataTitle = x.MetadataTitle,
+                //PublishFrom = x.PublishFrom,
+                MetadataDescription = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(x.MetadataDescription),
+            }).ToList();
 
-        //    return await _insightCardHelper.GetContentPageCardListAsync(insights, _cultureContext.CurrentLanguageTag, _ => false, cancellationToken);
-        //}
+            //return await _insightCardHelper.GetContentPageCardListAsync(insights, _cultureContext.CurrentLanguageTag, _ => false, cancellationToken);
+
+            return insights;
+        }
 
         private async Task<IEnumerable<EventsWebinarsCardDto>> MapEventAndWebinarCardsAsync(IEnumerable<SearchDocument> documents, CancellationToken cancellationToken)
         {
