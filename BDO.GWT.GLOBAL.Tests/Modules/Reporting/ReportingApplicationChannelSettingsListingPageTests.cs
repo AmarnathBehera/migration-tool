@@ -4,7 +4,7 @@ using CMS.DataEngine;
 using Microsoft.Extensions.Localization;
 using Moq;
 using System.Reflection;
-using System.Runtime.Serialization;
+using System.Runtime.CompilerServices;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
 {
@@ -101,9 +101,9 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
         {
             var page =
                 (ReportingApplicationChannelSettingsListingPage)
-                FormatterServices
-                    .GetUninitializedObject(
-                        typeof(ReportingApplicationChannelSettingsListingPage));
+                    RuntimeHelpers
+                        .GetUninitializedObject(
+                            typeof(ReportingApplicationChannelSettingsListingPage));
 
             var property = typeof(ReportingApplicationChannelSettingsListingPage)
                 .GetProperty(

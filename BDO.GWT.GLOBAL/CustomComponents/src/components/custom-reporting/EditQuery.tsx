@@ -1,4 +1,4 @@
-﻿import React, { RefObject, useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
     BarItemDraggable,
     BarItemGroup,
@@ -8,8 +8,6 @@ import {
     Card,
     Cols,
     Column,
-    DropDownSelectMenu,
-    MenuItem,
     Row,
     Spacing,
     Stack,
@@ -120,20 +118,20 @@ export const EditQuery = (props: EditQueryClientProperties) => {
 
             // If the payload is a primitive string, treat it as base64 content (legacy behavior)
             if (typeof payload === 'string') {
-                const base64 = payload;
-                const fileName = model.fileName ? model.fileName : `export-${Date.now()}.dat`;
-                const contentType = 'application/octet-stream';
+                const legacyBase64 = payload;
+                const legacyFileName = model.fileName ? model.fileName : `export-${Date.now()}.dat`;
+                const legacyContentType = 'application/octet-stream';
 
-                const href = `data:${contentType};base64,${base64}`;
-                const link = document.createElement('a');
-                link.style.display = 'none';
-                link.href = href;
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                const legacyHref = `data:${legacyContentType};base64,${legacyBase64}`;
+                const legacyLink = document.createElement('a');
+                legacyLink.style.display = 'none';
+                legacyLink.href = legacyHref;
+                legacyLink.download = legacyFileName;
+                document.body.appendChild(legacyLink);
+                legacyLink.click();
+                document.body.removeChild(legacyLink);
 
-                notify(`Export downloaded: ${fileName}`);
+                notify(`Export downloaded: ${legacyFileName}`);
                 return;
             }
 
@@ -255,23 +253,6 @@ export const EditQuery = (props: EditQueryClientProperties) => {
         notify('Query copied to editor');
     };
 
-    const generateQuery = (table: DatabaseTable) => {
-        if (!textAreaRef.current) {
-            return;
-        }
-
-        const q = `
-SELECT ${table.columns.join(', ')}
-FROM ${table.name}
-WHERE ChannelID = ${props.reportingChannelSettingId}
-`.trim();
-
-        setQueryText(q);
-        textAreaRef.current.textContent = q;
-
-        notify('Channel filtered SQL generated');
-    };
-
     const clearClick = () => {
         if (!textAreaRef.current) {
             return;
@@ -348,8 +329,8 @@ WHERE ChannelID = ${props.reportingChannelSettingId}
         if (!updateSuccessful) {
             updateQueryOrder(
                 newQueries,
-                destinationIndex,
-                sourceIndex
+                sourceIndex,
+                destinationIndex
             );
         }
     };

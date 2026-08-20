@@ -65,7 +65,7 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
                 .Cast<UIPermissionAttribute>()
                 .ToList();
 
-            Assert.That(attrs.Count, Is.GreaterThan(0));
+            Assert.That(attrs, Has.Count.GreaterThan(0));
         }
 
         [Test]

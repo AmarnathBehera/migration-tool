@@ -19,8 +19,11 @@ public class ViewRecordPageTests
         Assert.That(ctors, Has.Length.EqualTo(1));
         var parameters = ctors.Single().GetParameters();
         Assert.That(parameters, Has.Length.EqualTo(2));
-        Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(IFormDataBinder)));
-        Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(ISqlBrowserResultProvider)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(IFormDataBinder)));
+            Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(ISqlBrowserResultProvider)));
+        });
     }
 
     [Test]

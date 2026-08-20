@@ -8,7 +8,7 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
 {
     [UINavigation(true)]
     [UIEvaluatePermission(SystemPermissions.VIEW)]
-    public class EditQuery(
+    public partial class EditQuery(
       IEventLogService eventLogService,
       ISqlBrowserResultProvider sqlBrowserResultProvider,
       ISqlBrowserExporter sqlBrowserExporter,
@@ -312,13 +312,16 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
             return ResponseFrom(true);
         }
 
+        [GeneratedRegex("[^a-zA-Z0-9_.-]")]
+        private static partial Regex CodeNameSanitizer();
+
         private static string GenerateQueryCodeName(string? displayName)
         {
             if (string.IsNullOrWhiteSpace(displayName))
             {
                 displayName = "Query";
             }
-            string codeName = Regex.Replace(displayName, "[^a-zA-Z0-9_.-]", "_");
+            string codeName = CodeNameSanitizer().Replace(displayName, "_");
             codeName = codeName.Trim('.');
 
             if (string.IsNullOrWhiteSpace(codeName))

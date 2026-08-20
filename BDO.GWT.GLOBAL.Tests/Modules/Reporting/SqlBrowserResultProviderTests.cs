@@ -317,9 +317,12 @@ public class SqlBrowserResultProviderTests
         var service = new SqlBrowserResultProvider(mockEventLog.Object, mockValidator.Object);
         var result = service.GetQueryResult();
 
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result.Columns, Is.Not.Null);
-        Assert.That(result.Rows, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Columns, Is.Not.Null);
+            Assert.That(result.Rows, Is.Not.Null);
+        });
     }
     private static readonly string[] ExpectedColumns =
     {

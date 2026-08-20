@@ -12,8 +12,11 @@ using System.Text.RegularExpressions;
 namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting;
 
 [TestFixture]
-public class EditQueryTests
+public partial class EditQueryTests
 {
+    [GeneratedRegex(@"^Report_[a-fA-F0-9]{32}$")]
+    private static partial Regex ReportCodeNamePattern();
+
     private Type _type = null!;
 
     [OneTimeSetUp]
@@ -67,9 +70,7 @@ public class EditQueryTests
             new object[] { "Report" })!;
 
         Assert.That(
-            Regex.IsMatch(
-                result,
-                @"^Report_[a-fA-F0-9]{32}$"),
+            ReportCodeNamePattern().IsMatch(result),
             Is.True);
     }
 
