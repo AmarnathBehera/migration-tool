@@ -295,8 +295,8 @@ namespace BDO.GWT.Core.Services
             var sidebarDto = await GetSidebarDtoAsync(contentPage, cancellationToken);
             sidebarDto.ShowCopyLinkButton = await GetShowCopyLinkOptionFromSectionPageAsync(contentPage, sidebarDto.ShowCopyLinkButton, cancellationToken);
             sidebarDto.TypeName = contentPage.ContentType.FirstOrDefault()?.Name;
-            sidebarDto.PublishDate = Normalize(firstPublished) == DateTime.MinValue ? null : firstPublished;
-            sidebarDto.UpdatedDate = lastPublished == DateTime.MinValue || Normalize(firstPublished) == Normalize(lastPublished) ? null : lastPublished;
+            sidebarDto.PublishDate = Normalize(firstPublished) is null ? null : firstPublished;
+            sidebarDto.UpdatedDate = Normalize(lastPublished) is null || Normalize(firstPublished) == Normalize(lastPublished) ? null : lastPublished;
             sidebarDto.RelevantContactPeopleTitle = ResourceStringKey.LiveSite.Insights.Authors;
             
             sidebarDto.RelevantContactPeople = await GetContentPageAuthorDtos(contentPage);
