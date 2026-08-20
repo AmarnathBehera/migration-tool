@@ -47,11 +47,13 @@ public class HeroWidgetProperties : BaseWidgetProperties
 
     [TextInputComponent( Label = "CTA button text", Order = 8)]
     [VisibleIfNotEqualTo(nameof(CtaButtonType),  CallToActionButtonType.None)]
+    [RequiredValidationRule]
     public string CtaButtonText { get; set; } = "";
 
     [UrlSelectorComponent( Label = "CTA button URL", Order = 9)]
 
     [VisibleIfNotEqualTo(nameof(CtaButtonType),  CallToActionButtonType.None)]
+    [RequiredValidationRule]
     public string CtaButtonUrl { get; set; } = "";
 
     [DropDownComponent( Label = "CTA button URLTarget", Order = 10,Options = "_self;Same tab\r\n_blank;New tab")]
