@@ -32,9 +32,4 @@ public class KeyTakeawaysWidgetProperties : IWidgetProperties
     [DropDownComponent( Label = "Bottom margin", Order = 6,Options = "0px;None\r\n20px\r\n40px\r\n60px\r\n80px")]
     public string BottomMargin { get; set; } = "0px";
 
-    [TextInputComponent(Order = 999, ExplanationText = "ID should be unique from any other ID on the page. If the ID contains multiple words, words must be joined with a '-' (e.g. three-word-id). No other special characters and no spaces.'", Label = "Widget ID")]
-    [RegularExpression(
-        @"^[a-z0-9'-]*$",
-        ErrorMessage = "Characters are not allowed.")]
-    public string WidgetID { get; set; }
 }
