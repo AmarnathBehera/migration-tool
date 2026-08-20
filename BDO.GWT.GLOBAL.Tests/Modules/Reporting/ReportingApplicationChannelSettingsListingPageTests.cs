@@ -171,31 +171,118 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
             Assert.That(attribute, Is.Not.Null);
         }
 
-        [Test]
-        public void FormatterServices_Property_Exists()
-        {
-            var property = typeof(ReportingApplicationChannelSettingsListingPage)
-                .GetProperty(nameof(ReportingApplicationChannelSettingsListingPage.FormatterServices));
+        #region EnsureChannelSetting behavioral
 
-            Assert.That(property, Is.Not.Null);
+        [Test]
+        public void EnsureChannelSetting_Has_Expected_Parameters()
+        {
+            var method = typeof(ReportingApplicationChannelSettingsListingPage)
+                .GetMethod(
+                    "EnsureChannelSetting",
+                    BindingFlags.NonPublic | BindingFlags.Instance)!;
+
+            var parameters = method.GetParameters();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(parameters, Has.Length.EqualTo(2));
+                Assert.That(
+                    parameters[0].ParameterType,
+                    Is.EqualTo(typeof(List<ReportingChannelSettingInfo>)));
+                Assert.That(
+                    parameters[1].ParameterType,
+                    Is.EqualTo(typeof(CMS.ContentEngine.ChannelInfo)));
+            });
         }
 
         [Test]
-        public void FormatterServices_Property_Has_Getter()
+        public void EnsureChannelSetting_DoesNotCreate_When_SettingExists()
         {
-            var property = typeof(ReportingApplicationChannelSettingsListingPage)
-                .GetProperty(nameof(ReportingApplicationChannelSettingsListingPage.FormatterServices));
+            var existing = (ReportingChannelSettingInfo)
+                RuntimeHelpers.GetUninitializedObject(typeof(ReportingChannelSettingInfo));
+            var settings = new List<ReportingChannelSettingInfo> { existing };
+            var channel = (CMS.ContentEngine.ChannelInfo)
+                RuntimeHelpers.GetUninitializedObject(typeof(CMS.ContentEngine.ChannelInfo));
 
-            Assert.That(property?.CanRead, Is.True);
+            var page = (ReportingApplicationChannelSettingsListingPage)
+                RuntimeHelpers.GetUninitializedObject(
+                    typeof(ReportingApplicationChannelSettingsListingPage));
+
+            typeof(ReportingApplicationChannelSettingsListingPage)
+                .GetField(
+                    "reportingChannelSettingInfoProvider",
+                    BindingFlags.NonPublic | BindingFlags.Instance)!
+                .SetValue(page, settingProviderMock.Object);
+
+            var method = typeof(ReportingApplicationChannelSettingsListingPage)
+                .GetMethod(
+                    "EnsureChannelSetting",
+                    BindingFlags.NonPublic | BindingFlags.Instance)!;
+
+            // List has 1 entry => Count != 0 => method exits early, no Set call, no ChannelInfo property access
+            method.Invoke(page, new object[] { settings, channel });
+
+            settingProviderMock.Verify(
+                p => p.Set(It.IsAny<ReportingChannelSettingInfo>()),
+                Times.Never);
+        }
+
+        #endregion
+
+        #region EnsureChannelSettingDisplayName behavioral
+
+        [Test]
+        public void EnsureChannelSettingDisplayName_Has_Expected_Parameters()
+        {
+            var method = typeof(ReportingApplicationChannelSettingsListingPage)
+                .GetMethod(
+                    "EnsureChannelSettingDisplayName",
+                    BindingFlags.NonPublic | BindingFlags.Instance)!;
+
+            var parameters = method.GetParameters();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(parameters, Has.Length.EqualTo(2));
+                Assert.That(
+                    parameters[0].ParameterType,
+                    Is.EqualTo(typeof(CMS.ContentEngine.ChannelInfo)));
+                Assert.That(
+                    parameters[1].ParameterType,
+                    Is.EqualTo(typeof(ReportingChannelSettingInfo)));
+            });
         }
 
         [Test]
-        public void FormatterServices_Property_Has_Setter()
+        public void EnsureChannelSettingDisplayName_DoesNotUpdate_When_Setting_IsNull()
         {
-            var property = typeof(ReportingApplicationChannelSettingsListingPage)
-                .GetProperty(nameof(ReportingApplicationChannelSettingsListingPage.FormatterServices));
+            // When currentChannelSetting is null the method exits immediately — no ChannelInfo property access
+            var channel = (CMS.ContentEngine.ChannelInfo)
+                RuntimeHelpers.GetUninitializedObject(typeof(CMS.ContentEngine.ChannelInfo));
 
-            Assert.That(property?.CanWrite, Is.True);
+            var page = (ReportingApplicationChannelSettingsListingPage)
+                RuntimeHelpers.GetUninitializedObject(
+                    typeof(ReportingApplicationChannelSettingsListingPage));
+
+            typeof(ReportingApplicationChannelSettingsListingPage)
+                .GetField(
+                    "reportingChannelSettingInfoProvider",
+                    BindingFlags.NonPublic | BindingFlags.Instance)!
+                .SetValue(page, settingProviderMock.Object);
+
+            var method = typeof(ReportingApplicationChannelSettingsListingPage)
+                .GetMethod(
+                    "EnsureChannelSettingDisplayName",
+                    BindingFlags.NonPublic | BindingFlags.Instance)!;
+
+            Assert.DoesNotThrow(() =>
+                method.Invoke(page, new object[] { channel, (ReportingChannelSettingInfo?)null! }));
+
+            settingProviderMock.Verify(
+                p => p.Set(It.IsAny<ReportingChannelSettingInfo>()),
+                Times.Never);
         }
+
+        #endregion
     }
 }

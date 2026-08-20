@@ -992,4 +992,151 @@ SELECT * FROM Data";
             Is.Not.Null);
     }
 
+    #region Notify
+
+    [Test]
+    public void Notify_Method_Exists()
+    {
+        Assert.That(
+            _type.GetMethod("Notify"),
+            Is.Not.Null);
+    }
+
+    [Test]
+    public void Notify_Returns_Response()
+    {
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            new FakeSqlProvider(),
+            Mock.Of<ISqlBrowserExporter>(),
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
+
+        var method = _type.GetMethod("Notify")!;
+
+        Assert.DoesNotThrow(() =>
+        {
+            var response = InvokeTaskResult(instance, method, "test message");
+            Assert.That(response, Is.Not.Null);
+        });
+    }
+
+    #endregion
+
+    #region RenameQuery additional
+
+    [Test]
+    public void RenameQuery_Calls_Provider_Get_When_Input_Is_Valid()
+    {
+        var providerMock = new Mock<IInfoProvider<ReportingReportInfo>>();
+        var queryMock = new Mock<ObjectQuery<ReportingReportInfo>>();
+        queryMock.Setup(q => q.TopN(It.IsAny<int>())).Returns(queryMock.Object);
+        queryMock.Setup(q => q.WhereEquals(It.IsAny<string>(), It.IsAny<object>())).Returns(queryMock.Object);
+        providerMock.Setup(p => p.Get()).Returns(queryMock.Object);
+
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            new FakeSqlProvider(),
+            Mock.Of<ISqlBrowserExporter>(),
+            providerMock.Object)!;
+
+        var method = _type.GetMethod("RenameQuery")!;
+        var model = new SavedQuery { ID = 99, Name = "New Name" };
+
+        // Will throw when ObjectQuery is actually enumerated (no DB), but provider.Get() is called
+        try { InvokeTaskResult(instance, method, model); } catch { }
+
+        providerMock.Verify(p => p.Get(), Times.Once);
+    }
+
+    #endregion
+
+    #region DeleteQuery additional
+
+    [Test]
+    public void DeleteQuery_Calls_Provider_Get_When_Input_Is_Valid()
+    {
+        var providerMock = new Mock<IInfoProvider<ReportingReportInfo>>();
+        var queryMock = new Mock<ObjectQuery<ReportingReportInfo>>();
+        queryMock.Setup(q => q.TopN(It.IsAny<int>())).Returns(queryMock.Object);
+        queryMock.Setup(q => q.WhereEquals(It.IsAny<string>(), It.IsAny<object>())).Returns(queryMock.Object);
+        providerMock.Setup(p => p.Get()).Returns(queryMock.Object);
+
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            new FakeSqlProvider(),
+            Mock.Of<ISqlBrowserExporter>(),
+            providerMock.Object)!;
+
+        var method = _type.GetMethod("DeleteQuery")!;
+
+        // Will throw when ObjectQuery is actually enumerated (no DB), but provider.Get() is called
+        try { InvokeTaskResult(instance, method, 42); } catch { }
+
+        providerMock.Verify(p => p.Get(), Times.Once);
+    }
+
+    #endregion
+
+    #region ExportQuery additional
+
+    [Test]
+    public void ExportQuery_Uses_Json_Export_Type()
+    {
+        var content = Encoding.UTF8.GetBytes("[{\"id\":1}]");
+
+        var exporterMock = new Mock<ISqlBrowserExporter>();
+        exporterMock
+            .Setup(x => x.Export(SqlBrowserExportType.Json, It.IsAny<string?>()))
+            .ReturnsAsync((content, "export.json", "application/json"));
+
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            new FakeSqlProvider(),
+            exporterMock.Object,
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
+
+        var method = _type.GetMethod("ExportQuery")!;
+
+        var json = """
+        {
+            "ExportType":"json",
+            "FileName":"export.json"
+        }
+        """;
+
+        using var document = JsonDocument.Parse(json);
+        JsonElement element = document.RootElement;
+
+        Assert.DoesNotThrow(() =>
+        {
+            InvokeTaskResult(instance, method, (JsonElement?)element);
+        });
+
+        exporterMock.Verify(
+            x => x.Export(SqlBrowserExportType.Json, "export.json"),
+            Times.Once);
+    }
+
+    #endregion
+
+    #region SkipBlockComment edge cases
+
+    [Test]
+    public void SkipBlockComment_Unterminated_Does_Not_Throw()
+    {
+        var method = _type.GetMethod(
+            "SkipBlockComment",
+            BindingFlags.NonPublic | BindingFlags.Static)!;
+
+        object[] args = { "/* unterminated comment", 0 };
+
+        Assert.DoesNotThrow(() => method.Invoke(null, args));
+    }
+
+    #endregion
+
 }

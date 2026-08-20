@@ -21,9 +21,8 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
 
         protected override string ObjectType => ReportingChannelSettingInfo.OBJECT_TYPE;
 
-        public static object FormatterServices { get; internal set; } = new();
-
-        public ReportingApplicationChannelSettingsListingPage(IInfoProvider<ChannelInfo> channelInfoProvider,
+        public ReportingApplicationChannelSettingsListingPage(
+            IInfoProvider<ChannelInfo> channelInfoProvider,
             IInfoProvider<ReportingChannelSettingInfo> reportingChannelSettingInfoProvider,
             IStringLocalizer<SharedResources> stringLocalizer) : base()
         {
