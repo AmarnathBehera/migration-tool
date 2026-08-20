@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Reporting Channel Setting</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ReportingChannelSettingID" columntype="integer" enabled="true" guid="13e79216-8c02-43a5-8e99-bdebc604d083" isPK="true" />
+      <field column="ReportingChannelSettingsDisplayName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="3b400f97-f851-4419-9acf-6e22d61193d8" />
+      <field column="ReportingChannelSettingsUId" columnprecision="0" columntype="integer" enabled="true" guid="76835ef8-1b9d-43a8-beac-c8dc49b44acc" refobjtype="cms.channel" reftype="Required" />
+      <field column="ReportingChannelSettingsGUID" columnprecision="0" columntype="guid" enabled="true" guid="75288bff-b3b4-4642-8d68-c4b538bead0c" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>102ebe5a-15cd-4283-922a-0ed8c96458cd</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.ReportingChannelSetting</ClassName>
+  <ClassResourceID>
+    <CodeName>ReportingApplication</CodeName>
+    <GUID>bdd1c3fd-8fb1-451c-b386-9b05228a7569</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_ReportingChannelSetting</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

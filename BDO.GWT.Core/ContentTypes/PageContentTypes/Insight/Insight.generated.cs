@@ -84,24 +84,6 @@ namespace BDO
 
 
 		/// <summary>
-		/// Sharingbuttons.
-		/// </summary>
-		public string Sharingbuttons { get; set; }
-
-
-		/// <summary>
-		/// ShowInsightPrintButton.
-		/// </summary>
-		public bool ShowInsightPrintButton { get; set; }
-
-
-		/// <summary>
-		/// DownloadInsightButtonAttachment.
-		/// </summary>
-		public IEnumerable<ContentAttachment> DownloadInsightButtonAttachment { get; set; }
-
-
-		/// <summary>
 		/// Layoutwithoutsidebar.
 		/// </summary>
 		public string Layoutwithoutsidebar { get; set; }

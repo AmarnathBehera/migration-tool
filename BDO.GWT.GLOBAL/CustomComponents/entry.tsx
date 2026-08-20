@@ -26,3 +26,6 @@ export {
     ApiPermissionsControl,
     ApiPermissionsControl as ApiPermissionsControlFormComponent,
 };
+export { EditQueryTemplate as EditQuery, EditQueryTemplate } from '@components/custom-reporting/EditQuery';
+export { EditQueryTemplate as default } from '@components/custom-reporting/EditQuery';
+export * from '@components/custom-reporting/EditQueryTemplate';
