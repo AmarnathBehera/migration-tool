@@ -104,12 +104,25 @@ public class SitemapPageService : ISitemapPageService
 
     private async Task<List<SitemapPageNode>> GetAllSitemapPagesAsync(CancellationToken cancellationToken)
     {
-        var tasks = SitemapContentTypes.SitemapPages.Select(contentTypeName =>
-            QuerySitemapPagesAsync(contentTypeName, cancellationToken));
+        var results = new List<SitemapPageNode>();
 
-        var results = await Task.WhenAll(tasks);
+        foreach (var contentTypeName in SitemapContentTypes.SitemapPages)
+        {
+            try
+            {
+                var pages = await QuerySitemapPagesAsync(contentTypeName, cancellationToken);
+                results.AddRange(pages);
+            }
+            catch (CMS.DataEngine.DataClassNotFoundException ex)
+            {
+                _logger.LogWarning(ex,
+                    "[Sitemap] Skipping content type '{ContentType}' — class not found in database. " +
+                    "Register it in XbyK or remove it from SitemapContentTypes.SitemapPages.",
+                    contentTypeName);
+            }
+        }
 
-        return results.SelectMany(x => x).ToList();
+        return results;
     }
 
     private async Task<IEnumerable<SitemapPageNode>> QuerySitemapPagesAsync(
