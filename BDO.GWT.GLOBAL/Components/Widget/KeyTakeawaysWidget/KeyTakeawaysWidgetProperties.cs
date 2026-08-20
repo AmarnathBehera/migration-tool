@@ -1,4 +1,5 @@
 ﻿
+using BDO.GWT.Web.Widgets;
 using Kentico.Forms.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
 using Kentico.Xperience.Admin.Base.FormAnnotations;
@@ -7,7 +8,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BDO.GWT.GLOBAL.Components.Widget.KeyTakeawaysWidget;
 
-public class KeyTakeawaysWidgetProperties : IWidgetProperties
+public class KeyTakeawaysWidgetProperties : BaseWidgetProperties
 {
     [TextInputComponent( Label = "Title", Order = 0)]
     public string Title { get; set; }
