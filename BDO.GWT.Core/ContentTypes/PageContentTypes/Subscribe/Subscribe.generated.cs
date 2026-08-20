@@ -62,7 +62,7 @@ namespace BDO
 		/// <summary>
 		/// Information.
 		/// </summary>
-		public bool Information { get; set; }
+		public string Information { get; set; }
 
 
 		/// <summary>
