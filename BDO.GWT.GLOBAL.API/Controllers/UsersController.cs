@@ -42,15 +42,15 @@ public class UsersController : EntityControllerBase
     // <summary>
     // Returns a single user having the specified GUID.
     // </summary>
-    // <param name="userGUID">GUID of the user you want to retrieve.</param>
+    // <param name="userGuid">GUID of the user you want to retrieve.</param>
     // <param name="cancellationToken"></param>
     // <returns>Returns one user.</returns>
-    [HttpGet("Users/{userGUID:guid}")]
+    [HttpGet("Users/{userGuid:guid}")]
     [HasPermission(ApiMethodGroupName.Users, ApiPermission.Read)]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(UserOutput), MediaTypeNames.Application.Json)]
-    public async Task<ActionResult<UserOutput>> Get(Guid userGUID, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserOutput>> Get(Guid userGuid, CancellationToken cancellationToken)
     {
-        var user = await _userCrudService.GetUserAsync(userGUID, cancellationToken);
+        var user = await _userCrudService.GetUserAsync(userGuid, cancellationToken);
 
         return Ok(user);
     }
@@ -68,22 +68,22 @@ public class UsersController : EntityControllerBase
     {
         var user = await _userCrudService.CreateUserAsync(userInput, cancellationToken);
 
-        return CreatedAtAction(nameof(Get), new { memberFirmID, userGUID = user.General.GUID }, user);
+        return CreatedAtAction(nameof(Get), new { memberFirmID, userGuid = user.General.GUID }, user);
     }
 
     // <summary>
     // Updates a single user having the specified GUID.
     // </summary>
-    // <param name="userGUID">GUID of the user.</param>
+    // <param name="userGuid">GUID of the user.</param>
     // <param name="userInput">Updated user data.</param>
     // <param name="cancellationToken"></param>
     // <returns>Updated user.</returns>
-    [HttpPut("Users/{userGUID:guid}")]
+    [HttpPut("Users/{userGuid:guid}")]
     [HasPermission(ApiMethodGroupName.Users, ApiPermission.Manage)]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(UserOutput), MediaTypeNames.Application.Json)]
-    public async Task<ActionResult<UserOutput>> Put(Guid userGUID, [FromBody] UserInput userInput, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserOutput>> Put(Guid userGuid, [FromBody] UserInput userInput, CancellationToken cancellationToken)
     {
-        var user = await _userCrudService.UpdateUserAsync(userGUID, userInput, cancellationToken);
+        var user = await _userCrudService.UpdateUserAsync(userGuid, userInput, cancellationToken);
 
         return Ok(user);
     }
@@ -91,15 +91,15 @@ public class UsersController : EntityControllerBase
     // <summary>
     // Deletes a single user having the specified GUID.
     // </summary>
-    // <param name="userGUID">GUID of the user.</param>
+    // <param name="userGuid">GUID of the user.</param>
     // <param name="cancellationToken"></param>
     // <returns>204 No Content.</returns>
-    [HttpDelete("Users/{userGUID:guid}")]
+    [HttpDelete("Users/{userGuid:guid}")]
     [HasPermission(ApiMethodGroupName.Users, ApiPermission.Manage)]
     [SwaggerResponse(StatusCodes.Status204NoContent, null, typeof(void))]
-    public async Task<IActionResult> Delete(Guid userGUID, CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete(Guid userGuid, CancellationToken cancellationToken)
     {
-        await _userCrudService.DeleteUserAsync(userGUID, cancellationToken);
+        await _userCrudService.DeleteUserAsync(userGuid, cancellationToken);
 
         return NoContent();
     }
