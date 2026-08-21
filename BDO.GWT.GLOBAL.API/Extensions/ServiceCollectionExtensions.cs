@@ -60,5 +60,6 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ILicenseKeysCrudService, LicenseKeysCrudService>();
         serviceCollection.AddScoped<IScheduledTaskCrudService, ScheduledTaskCrudService>();
         serviceCollection.AddScoped<IContentCategoryService, ContentCategoryService>();
+        serviceCollection.AddScoped<IEventLogCrudService, EventLogCrudService>();
     }
 }
