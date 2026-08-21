@@ -58,7 +58,7 @@ if (-not (Test-Path -LiteralPath $SwaggerFilePath -PathType Leaf)) {
 }
 
 try {
-	$null = Get-Content -LiteralPath $SwaggerFilePath -Raw | ConvertFrom-Json
+	$SwaggerDocument = Get-Content -LiteralPath $SwaggerFilePath -Raw | ConvertFrom-Json
 }
 catch {
 	throw ('The file {0} does not contain valid JSON: {1}' -f $SwaggerFilePath, $_.Exception.Message)
@@ -84,11 +84,16 @@ if (-not $PSCmdlet.ShouldProcess($ExistingApi.Id, ('Import OpenAPI definition fr
 	return
 }
 
+# Import-AzApiManagementApi takes the display name from info.title, so it must match the existing API's name to avoid a name collision with another API in the same APIM service.
+$SwaggerDocument.info.title = $ExistingApi.Name
+$PatchedSwaggerFilePath = Join-Path ([System.IO.Path]::GetTempPath()) ('{0}.json' -f [Guid]::NewGuid())
+$SwaggerDocument | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $PatchedSwaggerFilePath -Encoding utf8
+
 $ImportParameters = @{
 	Context             = $ApimContext
 	ApiId               = $ApiId
 	SpecificationFormat = 'OpenApiJson'
-	SpecificationPath   = (Resolve-Path -LiteralPath $SwaggerFilePath).Path
+	SpecificationPath   = $PatchedSwaggerFilePath
 	Path                = $ExistingApi.Path
 	ApiRevision         = $ExistingApi.ApiRevision
 	ApiVersion          = $ExistingApi.ApiVersion
@@ -98,7 +103,13 @@ $ImportParameters = @{
 	ErrorAction         = 'Stop'
 }
 
-$ImportedApi = Import-AzApiManagementApi @ImportParameters
+try {
+	$ImportedApi = Import-AzApiManagementApi @ImportParameters
+}
+finally {
+	Remove-Item -LiteralPath $PatchedSwaggerFilePath -ErrorAction SilentlyContinue
+}
+
 Write-Information ('Imported OpenAPI definition into API {0}.' -f $ImportedApi.ApiId)
 
 $FinalOperations = @(Get-AzApiManagementOperation -Context $ApimContext -ApiId $ApiId -ErrorAction Stop)
