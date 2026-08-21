@@ -16,8 +16,8 @@ public class GlobalSiteController : ControllerBase
     }
 
     [HttpPost("SynchronizeGlobalDeals")]
-    public async Task SynchronizeGlobalDeals([FromQuery] bool forceUpdate, CancellationToken cancellationToken)
+    public async Task SynchronizeGlobalDeals([FromQuery] bool forceUpdate)
     {
-        await _globalDealsSynchronizer.SynchronizeGlobalDealsAsync(forceUpdate, cancellationToken);
+        await _globalDealsSynchronizer.SynchronizeGlobalDealsAsync(forceUpdate, CancellationToken.None);
     }
 }

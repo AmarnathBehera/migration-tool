@@ -157,7 +157,7 @@ public class GlobalSiteDealsService : IGlobalSiteDealsService
 
                 dealsWithChannel.AddRange(channelDeals.Select(d => (Deal: d, ChannelGuid: channel.General.GUID)));
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 _logger.LogError(ex, "Failed to retrieve deals for channel {ChannelName} ({ChannelGuid})",
                     channel.General.CodeName, channel.General.GUID);
@@ -215,7 +215,7 @@ public class GlobalSiteDealsService : IGlobalSiteDealsService
                     Permanently = true,
                 });
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 _logger.LogError(ex, "Failed to delete remote deal for source page {Guid}", remoteDeal.OriginalPageGUID);
             }
@@ -248,7 +248,7 @@ public class GlobalSiteDealsService : IGlobalSiteDealsService
                     throw new InvalidOperationException($"Failed to publish remote deal {entry.Deal.SystemFields?.WebPageItemGUID}.");
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 _logger.LogError(ex, "Failed to update remote deal for source page {Guid}", entry.Deal.SystemFields?.WebPageItemGUID);
             }
@@ -284,7 +284,7 @@ public class GlobalSiteDealsService : IGlobalSiteDealsService
                     throw new InvalidOperationException($"Failed to publish new remote deal (source {entry.Deal.SystemFields?.WebPageItemGUID}).");
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 _logger.LogError(ex, "Failed to create remote deal for source page {Guid}", entry.Deal.SystemFields?.WebPageItemGUID);
             }
