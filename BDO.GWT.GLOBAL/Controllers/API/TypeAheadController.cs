@@ -23,8 +23,8 @@ namespace GWTXbyKWeb.Controllers.API
             _typeAheadSearchService = typeAheadSearchService;
         }
 
-        [HttpGet("suggestions")]
-        public async Task<IEnumerable<TypeAheadSearchResultDto>> GetSuggestions([FromQuery] string searchText, CancellationToken cancellationToken)
+        [HttpGet]
+        public async Task<IEnumerable<TypeAheadSearchResultDto>> Get([FromQuery] string searchText, CancellationToken cancellationToken)
         {
             var results = await _typeAheadSearchService.GetSuggestions(searchText, cancellationToken);
 

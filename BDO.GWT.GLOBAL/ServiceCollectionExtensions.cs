@@ -153,7 +153,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IDateTimeProvider, DateTimeProvider>();
         serviceCollection.AddScoped<IContentPageCardHelper<Insight>, ContentPageCardHelper<Insight>>();
         serviceCollection.AddScoped<IPageUrlService, PageUrlService>();
-        
+        serviceCollection.AddScoped<ITypeAheadSearchService, TypeAheadSearchService>();
+
     }
 
 }
