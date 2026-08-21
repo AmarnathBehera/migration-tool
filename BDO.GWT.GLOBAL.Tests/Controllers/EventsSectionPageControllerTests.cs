@@ -1,11 +1,13 @@
 using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.LiveSite.Filters;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Web.Core.LiveSite.Controllers.API;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Microsoft.AspNetCore.Routing;
 
 namespace BDO.GWT.GLOBAL.Tests.Controllers
 {
@@ -22,9 +24,12 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             {
                 ControllerContext = new ControllerContext
                 {
-                    HttpContext = new DefaultHttpContext()
+                    HttpContext = new DefaultHttpContext(),
+                    RouteData = new RouteData()
                 }
             };
+
+            _controller.RouteData.Values[CultureInjectorAttribute.RouteParameter] = "en-gb";
         }
 
         [TearDown]
@@ -40,27 +45,36 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             };
 
             _serviceMock
-                .Setup(s => s.GetFilteredItemsAsync(It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+                .Setup(s => s.GetFilteredItemsAsync(
+                    It.IsAny<CardsQuery>(),
+                    "en-gb",
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expected);
 
-            var result = await _controller.Items(new CardsQuery { Filters = new Dictionary<string, string>() }, CancellationToken.None);
+            var result = await _controller.Items(
+                new CardsQuery { Filters = new Dictionary<string, string>() },
+                CancellationToken.None);
 
             Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
             var ok = (OkObjectResult)result.Result!;
             Assert.That(ok.Value, Is.SameAs(expected));
         }
 
-
         [Test]
         public async Task Items_AddsShowOngoingEventsFilter()
         {
             CardsQuery? captured = null;
             _serviceMock
-                .Setup(s => s.GetFilteredItemsAsync(It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
-                .Callback<CardsQuery, CancellationToken>((q, _) => captured = q)
+                .Setup(s => s.GetFilteredItemsAsync(
+                    It.IsAny<CardsQuery>(),
+                    "en-gb",
+                    It.IsAny<CancellationToken>()))
+                .Callback<CardsQuery,string, CancellationToken>((q,_, _) => captured = q)
                 .ReturnsAsync(new PaginationDto<EventsWebinarsCardDto>());
 
-            await _controller.Items(new CardsQuery { Filters = new Dictionary<string, string>() }, CancellationToken.None);
+            await _controller.Items(
+                new CardsQuery { Filters = new Dictionary<string, string>() },
+                CancellationToken.None);
 
             Assert.That(captured, Is.Not.Null);
             Assert.Multiple(() =>
@@ -77,23 +91,30 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             var token = cts.Token;
 
             _serviceMock
-                .Setup(s => s.GetFilteredItemsAsync(It.IsAny<CardsQuery>(), token))
+                .Setup(s => s.GetFilteredItemsAsync(It.IsAny<CardsQuery>(),"en-gb", token))
                 .ReturnsAsync(new PaginationDto<EventsWebinarsCardDto>());
 
-            await _controller.Items(new CardsQuery { Filters = new Dictionary<string, string>() }, token);
+            await _controller.Items(
+                new CardsQuery { Filters = new Dictionary<string, string>() },
+                token);
 
-            _serviceMock.Verify(s => s.GetFilteredItemsAsync(It.IsAny<CardsQuery>(), token), Times.Once);
+            _serviceMock.Verify(s => s.GetFilteredItemsAsync(It.IsAny<CardsQuery>(), "en-gb", token), Times.Once);
         }
 
         [Test]
         public void Items_PropagatesException_FromService()
         {
             _serviceMock
-                .Setup(s => s.GetFilteredItemsAsync(It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+                .Setup(s => s.GetFilteredItemsAsync(
+                    It.IsAny<CardsQuery>(),
+                    "en-gb",
+                    It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new InvalidOperationException("boom"));
 
             Assert.ThrowsAsync<InvalidOperationException>(() =>
-                _controller.Items(new CardsQuery { Filters = new Dictionary<string, string>() }, CancellationToken.None));
+                _controller.Items(
+                    new CardsQuery { Filters = new Dictionary<string, string>() },
+                    CancellationToken.None));
         }
     }
 }
