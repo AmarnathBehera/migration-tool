@@ -1,5 +1,6 @@
 ﻿namespace BDO.GWT.Core
 {
+    using BDO.GWT.Common.Core.Services;
     using BDO.GWT.Core;
     using BDO.GWT.Core.Helpers;
     using BDO.GWT.Core.LiveSite.Services;
@@ -10,9 +11,14 @@
     using BDO.GWT.Core.Services.Header;
     using BDO.GWT.Core.Services.Widget;
     using BDO.GWT.Core.ValueObjects;
+    using BDO.GWT.Domain.Core.Helpers;
+    using BDO.GWT.Domain.Core.Services;
+    using BDO.GWT.GLOBAL.Services;
     using BDO.GWT.Web.Core.LiveSite.Services;
     using BDO.GWT.Web.Core.Services;
     using BDO.GWT.Web.Services;
+    using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
+    using BDO.GWT.Xperience.Core.LiveSite.Services;
     using BDO.GWT.Xperience.Core.Services;
     using CMS.ContentEngine;
     using CMS.Helpers;
@@ -93,6 +99,7 @@
             serviceCollection.AddScoped<IInsightPageService, InsightPageService>();
             serviceCollection.AddScoped<IInsightCardService, InsightCardService>();
             serviceCollection.AddScoped<IInsightCarouselService, InsightCarouselService>();
+            serviceCollection.AddScoped<IInsightCarouselStateStore, InsightCarouselStateStore>();
             serviceCollection.AddScoped<IEditorsPickStateStore, EditorsPickStateStore>();
 
             serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
@@ -128,6 +135,24 @@
             serviceCollection.AddScoped<ISitemapService, SitemapService>();
             serviceCollection.AddScoped<ILanguageProvider, LanguageProvider>();
             serviceCollection.AddScoped<IPageNodeProvider, PageNodeProvider>();
+            serviceCollection.AddScoped<ISubscribePageService, SubscribePageService>();
+            serviceCollection.AddScoped<IContactPageService, ContactPageService>();
+            serviceCollection.AddScoped<ISubscribeFormService, SubscribeFormService>();
+            serviceCollection.AddScoped<ISubscribeConfirmPageService, SubscribeConfirmPageService>();
+            serviceCollection.AddScoped<ISubscribeRemovePageService, SubscribeRemovePageService>();
+            serviceCollection.AddScoped<INewsletterSubscriptionService, NewsletterSubscriptionService>();
+            serviceCollection.AddScoped<IMarketingContactManagementService, MarketingContactManagementService>();
+            serviceCollection.AddScoped<ICookieConsentService, CookieConsentService>();
+            serviceCollection.AddScoped<IPageUrlService, PageUrlService>();
+            serviceCollection.AddScoped<ISiteContext, SiteContext>();
+            serviceCollection.AddScoped<IVisitorContext, VisitorContext>();
+            serviceCollection.AddScoped<IHashSaltProvider, HashSaltProvider>();
+            serviceCollection.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
+            serviceCollection.AddScoped<ICultureService, CultureService>();
+            serviceCollection.AddScoped<IChannelAccessService, ChannelAccessService>();
+            serviceCollection.AddScoped<IDateTimeProvider, DateTimeProvider>();
+            serviceCollection.AddScoped<IRelatedContentCardService, RelatedContentCardService>();
+            serviceCollection.AddScoped<IRelatedContentCarouselService, RelatedContentCarouselService>();
 
             return serviceCollection;
         }

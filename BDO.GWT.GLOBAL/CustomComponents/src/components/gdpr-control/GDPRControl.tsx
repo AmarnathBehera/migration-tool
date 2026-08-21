@@ -1,13 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button, InputBase } from "@kentico/xperience-admin-components";
 import { useFormComponentCommandProvider, FormComponentProps } from "@kentico/xperience-admin-base";
-
-type GdprCommand = 'FetchTextData' | 'FetchXmlData' | 'Delete';
-
-interface GdprCommandResult {
-    success: boolean;
-    message: string;
-}
+import type { GdprCommand, GdprCommandResult } from "@model/gdprControl";
 
 const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
@@ -24,6 +18,14 @@ export const GDPRControl = (props: FormComponentProps) => {
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [copied, setCopied] = useState(false);
+
+    const successTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+    const copyTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+    useEffect(() => () => {
+        clearTimeout(successTimer.current);
+        clearTimeout(copyTimer.current);
+    }, []);
 
     const { executeCommand } = useFormComponentCommandProvider();
 
@@ -60,7 +62,7 @@ export const GDPRControl = (props: FormComponentProps) => {
             setResults("");
             setFetchedEmail("");
             setSuccessMessage(result.message);
-            setTimeout(() => setSuccessMessage(""), 3000);
+            successTimer.current = setTimeout(() => setSuccessMessage(""), 3000);
         } else {
             setResults(result.message);
             setFetchedEmail(emailAddress.trim());
@@ -84,7 +86,7 @@ export const GDPRControl = (props: FormComponentProps) => {
         try {
             await navigator.clipboard.writeText(results);
             setCopied(true);
-            setTimeout(() => setCopied(false), 3000);
+            copyTimer.current = setTimeout(() => setCopied(false), 3000);
         } catch {
             setErrorMessage("Failed to copy to clipboard. Please copy the results manually.");
         }

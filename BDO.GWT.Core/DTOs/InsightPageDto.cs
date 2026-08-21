@@ -1,4 +1,5 @@
-﻿using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
+﻿using System.Diagnostics.CodeAnalysis;
+using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
 using BDO.GWT.Core.DTOs.SchemaMarkups;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.DTOs.Pages;
@@ -28,8 +29,10 @@ public class InsightPageDto : ContentPageDto
 
     public bool? ShowPeopleInline { get; set; }
 
+    [SetsRequiredMembers]
     public InsightPageDto(ContentPageDto contentPageDto) : base(contentPageDto)
     {
+        SchemaMarkup = new ArticleSchemaMarkupDto();
     }
 }
 

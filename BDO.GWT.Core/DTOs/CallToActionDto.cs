@@ -9,6 +9,9 @@ public class CallToActionDto
 
     public string ButtonUrl { get; set; } = null!;
 
+    public string? Position { get; set; } = "left";
+
+
 
 }
 

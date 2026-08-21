@@ -2,6 +2,7 @@
   <Project Path="BDO.GWT.Common/BDO.GWT.Common.csproj" Id="ef097f8d-b2e0-4e60-9d35-592af4b14621" />
   <Project Path="BDO.GWT.Core.Tests/BDO.GWT.Core.Tests.csproj" />
   <Project Path="BDO.GWT.Core/BDO.GWT.Core.csproj" />
+  <Project Path="BDO.GWT.CustomReportingModule/BDO.GWT.CustomReportingModule.csproj" Id="eb6dbc94-affa-4e9c-b0d8-2bd433305880" />
   <Project Path="BDO.GWT.GLOBAL.API.Tests/BDO.GWT.GLOBAL.API.Tests.csproj" Id="54a32d67-1f7e-45f4-b538-5621e3dd8bdd" />
   <Project Path="BDO.GWT.GLOBAL.API/BDO.GWT.GLOBAL.API.csproj" Id="4a2ae184-6013-4d62-adb6-b4bb404040a1" />
   <Project Path="BDO.GWT.GLOBAL.Sync/BDO.GWT.GLOBAL.Sync.csproj" Id="78f397be-bbb4-4878-901a-9d5b4d29cbbe" />

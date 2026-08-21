@@ -18,7 +18,7 @@ using IFormItemCollectionProvider = Kentico.Xperience.Admin.Base.Forms.Internal.
     parentType: typeof(RedirectApplicationPage),
     slug: "bulk-import",
     uiPageType: typeof(RedirectBulkImport),
-    name: "Bulk import",
+    name: "Bulk Import",
     templateName: TemplateNames.EDIT,
     order: UIPageOrder.NoOrder)]
 
