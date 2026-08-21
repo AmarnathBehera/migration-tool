@@ -115,5 +115,5 @@
   <ClassShortName>BDORemoteDeal</ClassShortName>
   <ClassTableName>BDO_RemoteDeal</ClassTableName>
   <ClassType>Content</ClassType>
-  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
 </cms.contenttype>
