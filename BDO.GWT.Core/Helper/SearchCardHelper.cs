@@ -7,6 +7,7 @@ using BDO.GWT.Core.Utilities;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Helpers;
 using BDO.GWT.Web.Core.Services;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,14 +49,17 @@ namespace BDO.GWT.Core.Helpers
         private readonly IEventWebinarCardsService _eventWebinarCardsService;
         private readonly IPageUrlService _pageUrlService;
         private readonly ITypeMapper _typeMapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public SearchCardHelper(IContentPageCardHelper<Insight> insightCardHelper, ICultureContext cultureContext, IEventWebinarCardsService eventWebinarCardsService, IPageUrlService pageUrlService, ITypeMapper typeMapper)
+        public SearchCardHelper(IContentPageCardHelper<Insight> insightCardHelper, ICultureContext cultureContext, IEventWebinarCardsService eventWebinarCardsService, 
+                IPageUrlService pageUrlService, ITypeMapper typeMapper, IHttpContextAccessor httpContextAccessor)
         {
             _insightCardHelper = insightCardHelper; 
             _cultureContext = cultureContext;
             _eventWebinarCardsService = eventWebinarCardsService;
             _pageUrlService = pageUrlService;
             _typeMapper = typeMapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<SearchCardDto[]> GetSearchCardDtos(IEnumerable<SearchDocument> searchDocuments, CancellationToken cancellationToken)
@@ -74,46 +78,74 @@ namespace BDO.GWT.Core.Helpers
             //var searchCardType = SearchCardType.Generic;
             //}
 
-            if(searchDocument.ClassName == "BDO.Insight")
+            //if(searchDocument.ClassName == "BDO.Insight")
+            //{
+            //    return SearchCardType.Insight;
+            //}
+            //else if (searchDocument.ClassName == "BDO.Event" || searchDocument.ClassName == "BDO.Webinar")
+            //{
+            //    return SearchCardType.EventsAndWebinars;
+            //}
+            //else
+            //{
+            var className = searchDocument.ClassName;   // breakpoint here: inspect actual class name
+
+            if (className == "BDO.Insight")
             {
                 return SearchCardType.Insight;
             }
-            else if (searchDocument.ClassName == "BDO.Event" || searchDocument.ClassName == "BDO.Webinar")
-            {
-                return SearchCardType.EventsAndWebinars;
-            }
-            else
-            {
-                return SearchCardType.Generic;
-            }
+
+            return SearchCardType.Generic;
+
+            
+            //}
         }
         
         private async Task<IEnumerable<SearchCardDto>> MapSearchCardDtosAsync(SearchCardType searchCardType, IEnumerable<SearchDocument> searchDocuments, CancellationToken cancellationToken)
         {
-            return searchCardType switch
+            switch (searchCardType)
             {
-                SearchCardType.Insight => WrapCards(await MapInsightCardsAsync(searchDocuments, cancellationToken), SearchCardType.Insight),
-                SearchCardType.EventsAndWebinars => WrapCards(await MapEventAndWebinarCardsAsync(searchDocuments, cancellationToken), SearchCardType.EventsAndWebinars),
-                SearchCardType.Generic => WrapCards(await MapGenericCardsAsync(searchDocuments.ToList(), cancellationToken), SearchCardType.Generic),
-                _ => throw new ArgumentOutOfRangeException(nameof(searchCardType), searchCardType, null),
-            };
+                case SearchCardType.Insight:
+                    var insightCards = await MapInsightCardsAsync(searchDocuments, cancellationToken);
+                    return WrapCards(insightCards, SearchCardType.Insight);
+
+                case SearchCardType.Generic:
+                    var genericCards = await MapGenericCardsAsync(searchDocuments.ToList(), cancellationToken);
+                    var wrappedGeneric = WrapCards(genericCards, SearchCardType.Generic);
+                    return wrappedGeneric;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(searchCardType), searchCardType, null);
+            }
         }
 
-        private async Task<IEnumerable<InsightSearchCardDto>> MapInsightCardsAsync(IEnumerable<SearchDocument> documents, CancellationToken cancellationToken)
+        private async Task<IEnumerable<InsightCardDto>> MapInsightCardsAsync(IEnumerable<SearchDocument> documents, CancellationToken cancellationToken)
         {
-            var insights = documents.Select(x => new InsightSearchCardDto
+            var documentList = documents.ToList();
+
+            var relativeUrlByNodeId = await _pageUrlService.GetPageRelativeUrlByNodeIdAsync(
+                documentList.Select(x => x.NodeId), _cultureContext.CurrentLanguageTag, cancellationToken);
+
+            var cards = new List<InsightCardDto>();
+
+            foreach (var document in documentList)
             {
-                NodeId = x.NodeId,
-                InsightImage = x.InsightImage ?? throw new InvalidOperationException($"{nameof(SearchDocument.InsightImage)} is null for {nameof(Insight)} with NodeID: {x.NodeId}"),
-                InsightImageAltText = x.InsightImageAltText ?? throw new InvalidOperationException($"{nameof(SearchDocument.InsightImageAltText)} is null for {nameof(Insight)} with NodeID: {x.NodeId}"),
-                MetadataTitle = x.MetadataTitle,
-                //PublishFrom = x.PublishFrom,
-                MetadataDescription = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(x.MetadataDescription),
-            }).ToList();
+                // breakpoint here
+                var card = new InsightCardDto
+                {
+                    Title = document.MetadataTitle,
+                    Description = HtmlHelper.ExtractTextFromHtml(document.MetadataDescription) ?? string.Empty,
+                    ImageURL = GetAbsoluteAssetUrl(document.InsightImage),
+                    ImageAltText = document.InsightImageAltText ?? string.Empty,
+                    ReadMoreLink = relativeUrlByNodeId.TryGetValue(document.NodeId, out var url)
+                        ? url.ToHtmlCompatibleString()
+                        : string.Empty,
+                };
 
-            //return await _insightCardHelper.GetContentPageCardListAsync(insights, _cultureContext.CurrentLanguageTag, _ => false, cancellationToken);
+                cards.Add(card);
+            }
 
-            return insights;
+            return cards;
         }
 
         private async Task<IEnumerable<EventsWebinarsCardDto>> MapEventAndWebinarCardsAsync(IEnumerable<SearchDocument> documents, CancellationToken cancellationToken)
@@ -123,14 +155,31 @@ namespace BDO.GWT.Core.Helpers
                 NodeId = x.NodeId,
                 MetadataTitle = x.MetadataTitle,
                 //EventType = x.EventType ?? new List<int>(),
-                EventDateFrom = x.EventDateFrom ?? throw new InvalidOperationException($"{nameof(SearchDocument.EventDateFrom)} is null for {nameof(Event)} with NodeID: {x.NodeId}"),
-                EventDateTo = x.EventDateTo ?? throw new InvalidOperationException($"{nameof(SearchDocument.EventDateTo)} is null for {nameof(Event)} with NodeID: {x.NodeId}"),
-                EventLocationCity = x.EventLocationCity,
-                EventLocationTitle = x.EventLocationTitle,
-                MetadataDescription = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(x.MetadataDescription),
-            }).Cast<IEventOrWebinar>().ToList();
+                //EventDateFrom = x.EventDateFrom ?? throw new InvalidOperationException($"{nameof(SearchDocument.EventDateFrom)} is null for {nameof(Event)} with NodeID: {x.NodeId}"),
+                //EventDateTo = x.EventDateTo ?? throw new InvalidOperationException($"{nameof(SearchDocument.EventDateTo)} is null for {nameof(Event)} with NodeID: {x.NodeId}"),
+                //EventLocationCity = x.EventLocationCity,
+                //EventLocationTitle = x.EventLocationTitle,
+                MetadataDescription = HtmlHelper.ExtractTextFromHtml(x.MetadataDescription),
+            }).ToList();
 
-            return await _eventWebinarCardsService.GetEventWebinarCardDtosAsync(eventsAndWebinars, _ => false, cancellationToken);
+            var eventWebinarCards =  new List<EventsWebinarsCardDto>();
+
+            foreach(var eventOrWebinar in eventsAndWebinars)
+            {
+                var card = new EventsWebinarsCardDto
+                {
+                    Title = eventOrWebinar.MetadataTitle,
+                    Description = eventOrWebinar.MetadataDescription,
+                    //Type = eventOrWebinar.EventType,
+                    //DateTime = eventOrWebinar.EventDateFrom ?? throw new InvalidOperationException($"{nameof(SearchDocument.EventDateFrom)} is null for {nameof(Event)} with NodeID: {eventOrWebinar.NodeId}"),
+                    //DateTimeTo = eventOrWebinar.EventDateTo,
+                    //Location = eventOrWebinar.EventLocationTitle,
+                };
+                eventWebinarCards.Add(card);
+            }
+
+            //return await _eventWebinarCardsService.GetEventWebinarCardDtosAsync(eventsAndWebinars, _ => false, cancellationToken);
+            return eventWebinarCards;
         }
 
         private async Task<IEnumerable<GenericCardDto>> MapGenericCardsAsync(ICollection<SearchDocument> documents, CancellationToken cancellationToken)
@@ -154,6 +203,40 @@ namespace BDO.GWT.Core.Helpers
                 CardType = searchCardType.ToString(),
                 Data = card,
             });
+        }
+        private string? GetAbsoluteAssetUrl(string? url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return null;
+            }
+
+            // Already absolute URL
+            if (Uri.TryCreate(url, UriKind.Absolute, out _))
+            {
+                return url;
+            }
+
+            var request = _httpContextAccessor.HttpContext?.Request;
+
+            if (request is null)
+            {
+                return url.Replace("~/", "/");
+            }
+
+            var relativeUrl = GetRelativeUrl(url);
+
+            return $"{request.Scheme}://{request.Host}{relativeUrl}";
+        }
+
+        private string GetRelativeUrl(string url)
+        {
+            if (url.StartsWith("~/"))
+            {
+                return url.Substring(1);
+            }
+
+            return url;
         }
     }
 }

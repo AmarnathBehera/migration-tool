@@ -25,10 +25,10 @@ namespace BDO.GWT.Core.Mappers
                 .ForMember(
                     d => d.PublishTo,
                     o => o.MapFrom(s =>
-                    s.PublishFrom.HasValue &&
-                    s.PublishFrom.Value > DateTimeOffset.MinValue
-                                ? s.PublishFrom.Value.UtcDateTime
-                                : (DateTime?)null))
+                    s.PublishTo.HasValue &&
+                    s.PublishTo.Value > DateTimeOffset.MinValue
+                        ? s.PublishTo.Value.UtcDateTime
+                        : (DateTime?)null))
                 .ForMember(d => d.ClassName,
                     o => o.MapFrom(s => s.ClassName))
                 .ForMember(d => d.DocumentID,
@@ -39,6 +39,10 @@ namespace BDO.GWT.Core.Mappers
                     o => o.MapFrom(s => s.Content))
                 .ForMember(d => d.MetadataTitle,
                     o => o.MapFrom(s => s.MetadataTitle))
+                .ForMember(d => d.Image,
+                    o => o.MapFrom(s => s.InsightImage))
+                .ForMember(d => d.ImageAltText,
+                    o => o.MapFrom(s => s.InsightImageAltText))
                 .ForMember(d => d.SortDate,
                     o => o.MapFrom(s => s.SortDate))
                 .ForMember(d => d.EventDateFrom,
@@ -87,6 +91,10 @@ namespace BDO.GWT.Core.Mappers
                     o => o.MapFrom(s => s.Content))
                 .ForMember(d => d.MetadataTitle,
                     o => o.MapFrom(s => s.MetadataTitle))
+                 .ForMember(d => d.InsightImage,
+                    o => o.MapFrom(s => s.Image == null ? null : s.Image))
+                .ForMember(d => d.InsightImageAltText,
+                    o => o.MapFrom(s => s.ImageAltText ?? string.Empty))
                 .ForMember(d => d.SortDate,
                     o => o.MapFrom(s => s.SortDate))
                 .ForMember(d => d.EventDateFrom,

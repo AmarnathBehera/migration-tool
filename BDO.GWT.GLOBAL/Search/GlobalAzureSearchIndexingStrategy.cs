@@ -72,7 +72,7 @@ public class GlobalAzureSearchIndexingStrategy : BaseAzureSearchIndexingStrategy
         if (string.Equals(indexedPage.ContentTypeName, Insight.CONTENT_TYPE_NAME, StringComparison.OrdinalIgnoreCase))
         {
             var page = await GetPage<Insight>(
-                indexedPage.ItemGuid, indexedPage.WebsiteChannelName, indexedPage.LanguageName, Insight.CONTENT_TYPE_NAME);
+                indexedPage.ItemGuid, indexedPage.WebsiteChannelName, indexedPage.LanguageName, Insight.CONTENT_TYPE_NAME, linkedItemsDepth: 2);
 
             if (page is null)
             {
@@ -84,6 +84,7 @@ public class GlobalAzureSearchIndexingStrategy : BaseAzureSearchIndexingStrategy
             // Populate the Content field with the first non-null InsightContent from the linked items for insight pages.
             // If there are no linked InsightContent items, set Content to an empty string.
             var insightContent = page.InsightContent?.FirstOrDefault();
+            
             result.Content = insightContent?.InsightContent ?? string.Empty;
             result.Image = insightContent?.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset.Url ?? string.Empty;
             result.ImageAltText = insightContent?.ImageFileAltText ?? string.Empty;
@@ -217,13 +218,13 @@ public class GlobalAzureSearchIndexingStrategy : BaseAzureSearchIndexingStrategy
     /// <summary>
     /// Retrieves a strongly typed web page item by its GUID on the given channel and language.
     /// </summary>
-    private async Task<T?> GetPage<T>(Guid id, string channelName, string languageName, string contentTypeName)
+    private async Task<T?> GetPage<T>(Guid id, string channelName, string languageName, string contentTypeName, int linkedItemsDepth = 1)
         where T : IWebPageFieldsSource, new()
     {
         var query = new ContentItemQueryBuilder()
             .ForContentType(contentTypeName,
                 config => config
-                    .WithLinkedItems(1)
+                    .WithLinkedItems(linkedItemsDepth)
                     .ForWebsite(channelName)
                     .Where(where => where.WhereEquals(nameof(WebPageFields.WebPageItemGUID), id))
                     .TopN(1))

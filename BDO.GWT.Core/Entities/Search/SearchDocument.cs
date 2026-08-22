@@ -37,7 +37,7 @@ namespace BDO.GWT.Core.Entities.Search
 
         public List<int>? InsightContentType { get; set; }
 
-        public Link? InsightImage { get; set; }
+        public string? InsightImage { get; set; }
 
         public string? InsightImageAltText { get; set; }
 

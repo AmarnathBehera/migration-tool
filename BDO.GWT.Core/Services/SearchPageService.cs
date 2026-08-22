@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace BDO.GWT.Core.Services
 {
@@ -258,4 +259,19 @@ namespace BDO.GWT.Core.Services
             return PageTypeGroupKeyByPageType.TryGetValue(_typeMapper.GetTypeFromPageClassNameInvariant(className ?? string.Empty), out var pageTypeGroupKey) ? pageTypeGroupKey : null;
         }
     }
+
+    //public class SearchDocument          // <-- BDO.GWT.Core.Services.SearchDocument
+    //{
+    //    public string NodeId { get; set; } = null!;
+    //    public string LanguageTag { get; set; } = null!;
+    //    public string ClassName { get; set; } = null!;
+    //    public string SortDate { get; set; } = null!;
+    //    public int Count { get; set; }
+
+    //    [JsonPropertyName("cardType")]
+    //    public string CardType { get; set; }
+
+    //    [JsonPropertyName("data")]
+    //    public object? DataObject { get; protected set; }
+    //}
 }
