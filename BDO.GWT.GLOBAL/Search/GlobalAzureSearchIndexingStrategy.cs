@@ -1,15 +1,13 @@
+using BDO;
+using CMS.ContentEngine;
+using CMS.DataEngine.Query;
+using CMS.Websites;
+using Kentico.Content.Web.Mvc;
+using Kentico.Xperience.AzureSearch.Indexing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
-using BDO;
-
-using CMS.ContentEngine;
-using CMS.Websites;
-
-using Kentico.Content.Web.Mvc;
-using Kentico.Xperience.AzureSearch.Indexing;
 
 namespace BDO.GWT.GLOBAL.Search;
 
@@ -110,6 +108,30 @@ public class GlobalAzureSearchIndexingStrategy : BaseAzureSearchIndexingStrategy
             {
                 return null;
             }
+
+            result.EventType = page.EventType.FirstOrDefault()?.Name ?? string.Empty;
+
+            //storing event from and to date in UTC format in the index, which is important for accurate filtering and
+            //sorting of search results based on event dates.
+            DateTime eventFromDate = DateTime.SpecifyKind(page.EventDateFrom, DateTimeKind.Utc);
+            DateTimeOffset eventFromDateOffset = new DateTimeOffset(eventFromDate);
+            result.EventDateFrom = eventFromDateOffset;
+
+            DateTime eventToDate = DateTime.SpecifyKind(page.EventDateTo, DateTimeKind.Utc);
+            DateTimeOffset eventToDateOffset = new DateTimeOffset(eventToDate);
+
+            result.EventDateTo = eventToDateOffset;
+            result.EventLocationTitle = page.EventLocationTitle ?? string.Empty;
+            result.EventLocationCity = page.EventLocationCity ?? string.Empty;
+            result.EventLocationState = page.EventLocationState ?? string.Empty;
+            result.EventLocationCountry = page.EventLocationCountry ?? string.Empty;
+            result.EventContactName = page.EventContactName ?? string.Empty;
+            result.EventLocationZip = page.EventLocationZip ?? string.Empty;
+            result.EventContactEmail = page.EventContactEmail ?? string.Empty;
+            result.EventContactPhone = page.EventContactPhone ?? string.Empty;
+            result.EventIsPrivate = page.EventIsPrivate;
+            result.EventLocationAddress1 = page.EventLocationAddress1 ?? string.Empty;
+            result.EventLocationAddress2 = page.EventLocationAddress2 ?? string.Empty;
 
             MapCommonMetadataFields(result, indexedPage, page);
         }

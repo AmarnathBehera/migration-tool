@@ -82,10 +82,7 @@ namespace BDO.GWT.Core.Helpers
             //{
             //    return SearchCardType.Insight;
             //}
-            //else if (searchDocument.ClassName == "BDO.Event" || searchDocument.ClassName == "BDO.Webinar")
-            //{
-            //    return SearchCardType.EventsAndWebinars;
-            //}
+            //
             //else
             //{
             var className = searchDocument.ClassName;   // breakpoint here: inspect actual class name
@@ -94,11 +91,12 @@ namespace BDO.GWT.Core.Helpers
             {
                 return SearchCardType.Insight;
             }
-
-            return SearchCardType.Generic;
-
+            else if (searchDocument.ClassName == "BDO.Event" || searchDocument.ClassName == "BDO.Webinar")
+            {
+                return SearchCardType.EventsAndWebinars;
+            }
+                return SearchCardType.Generic;
             
-            //}
         }
         
         private async Task<IEnumerable<SearchCardDto>> MapSearchCardDtosAsync(SearchCardType searchCardType, IEnumerable<SearchDocument> searchDocuments, CancellationToken cancellationToken)
@@ -154,11 +152,11 @@ namespace BDO.GWT.Core.Helpers
             {
                 NodeId = x.NodeId,
                 MetadataTitle = x.MetadataTitle,
-                //EventType = x.EventType ?? new List<int>(),
-                //EventDateFrom = x.EventDateFrom ?? throw new InvalidOperationException($"{nameof(SearchDocument.EventDateFrom)} is null for {nameof(Event)} with NodeID: {x.NodeId}"),
-                //EventDateTo = x.EventDateTo ?? throw new InvalidOperationException($"{nameof(SearchDocument.EventDateTo)} is null for {nameof(Event)} with NodeID: {x.NodeId}"),
-                //EventLocationCity = x.EventLocationCity,
-                //EventLocationTitle = x.EventLocationTitle,
+                EventType = x.EventType ?? x.EventType,
+                EventDateFrom = x.EventDateFrom ?? throw new InvalidOperationException($"{nameof(SearchDocument.EventDateFrom)} is null for {nameof(Event)} with NodeID: {x.NodeId}"),
+                EventDateTo = x.EventDateTo ?? throw new InvalidOperationException($"{nameof(SearchDocument.EventDateTo)} is null for {nameof(Event)} with NodeID: {x.NodeId}"),
+                EventLocationCity = x.EventLocationCity,
+                EventLocationTitle = x.EventLocationTitle,
                 MetadataDescription = HtmlHelper.ExtractTextFromHtml(x.MetadataDescription),
             }).ToList();
 

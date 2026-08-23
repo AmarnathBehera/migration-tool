@@ -45,10 +45,19 @@ namespace BDO.GWT.Core.Mappers
                     o => o.MapFrom(s => s.InsightImageAltText))
                 .ForMember(d => d.SortDate,
                     o => o.MapFrom(s => s.SortDate))
-                .ForMember(d => d.EventDateFrom,
-                    o => o.MapFrom(s => s.EventDateFrom))
+               .ForMember(
+                    d => d.EventDateFrom,
+                    o => o.MapFrom(s =>
+                    s.EventDateFrom.HasValue &&
+                    s.EventDateFrom.Value > DateTimeOffset.MinValue
+                        ? s.EventDateFrom.Value
+                        : (DateTime?)null))
                 .ForMember(d => d.EventDateTo,
-                    o => o.MapFrom(s => s.EventDateTo))
+                    o => o.MapFrom(s =>
+                         s.EventDateTo.HasValue &&
+                         s.EventDateTo.Value > DateTimeOffset.MinValue
+                            ? s.EventDateTo.Value
+                            : (DateTime?)null))
                 .ForMember(d => d.EventLocationTitle,
                     o => o.MapFrom(s => s.EventLocationTitle))
                 .ForMember(d => d.EventLocationCity,
@@ -97,10 +106,19 @@ namespace BDO.GWT.Core.Mappers
                     o => o.MapFrom(s => s.ImageAltText ?? string.Empty))
                 .ForMember(d => d.SortDate,
                     o => o.MapFrom(s => s.SortDate))
-                .ForMember(d => d.EventDateFrom,
-                    o => o.MapFrom(s => s.EventDateFrom))
+               .ForMember(
+                  d => d.EventDateFrom,
+                  o => o.MapFrom(s =>
+                  s.EventDateFrom.HasValue &&
+                  s.EventDateFrom.Value > DateTimeOffset.MinValue
+                  ? s.EventDateFrom.Value.UtcDateTime
+                   : (DateTime?)null))
                 .ForMember(d => d.EventDateTo,
-                    o => o.MapFrom(s => s.EventDateTo))
+                    o => o.MapFrom(s =>
+                         s.EventDateTo.HasValue &&
+                         s.EventDateTo.Value > DateTimeOffset.MinValue
+                         ? s.EventDateTo.Value.UtcDateTime
+                            : (DateTime?)null))
                 .ForMember(d => d.EventLocationTitle,
                     o => o.MapFrom(s => s.EventLocationTitle))
                 .ForMember(d => d.EventLocationCity,
