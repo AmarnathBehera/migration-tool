@@ -54,7 +54,10 @@ namespace BDO.GWT.Core.Tests.Services
                 .ReturnsAsync(true);
 
             _eventWebinarCardsServiceMock
-                .Setup(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.CreateFiltersAsync(
+                    It.IsAny<HashSet<string>>(),
+                    It.IsAny<string?>(),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
 
             _service = new SectionEventsService(
@@ -221,7 +224,10 @@ namespace BDO.GWT.Core.Tests.Services
             {
                 Assert.That(result.CardsGrid.Filters, Is.Null);
                 _eventWebinarCardsServiceMock.Verify(
-                    x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()),
+                    x => x.CreateFiltersAsync(
+                        It.IsAny<HashSet<string>>(),
+                        It.IsAny<string?>(),
+                        It.IsAny<CancellationToken>()),
                     Times.Never);
             });
         }
@@ -237,7 +243,10 @@ namespace BDO.GWT.Core.Tests.Services
 
             HashSet<string>? captured = null;
             _eventWebinarCardsServiceMock
-                .Setup(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.CreateFiltersAsync(
+                    It.IsAny<HashSet<string>>(),
+                    It.IsAny<string?>(),
+                    It.IsAny<CancellationToken>()))
                 .Callback<HashSet<string>, string?, CancellationToken>((f, _, _) => captured = f)
                 .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
 
@@ -258,7 +267,10 @@ namespace BDO.GWT.Core.Tests.Services
 
             HashSet<string>? captured = null;
             _eventWebinarCardsServiceMock
-                .Setup(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.CreateFiltersAsync(
+                    It.IsAny<HashSet<string>>(),
+                    It.IsAny<string?>(),
+                    It.IsAny<CancellationToken>()))
                 .Callback<HashSet<string>, string?, CancellationToken>((f, _, _) => captured = f)
                 .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
 
@@ -282,7 +294,10 @@ namespace BDO.GWT.Core.Tests.Services
 
             HashSet<string>? captured = null;
             _eventWebinarCardsServiceMock
-                .Setup(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.CreateFiltersAsync(
+                    It.IsAny<HashSet<string>>(),
+                    It.IsAny<string?>(),
+                    It.IsAny<CancellationToken>()))
                 .Callback<HashSet<string>, string?, CancellationToken>((f, _, _) => captured = f)
                 .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
 
@@ -317,7 +332,10 @@ namespace BDO.GWT.Core.Tests.Services
                 .ReturnsAsync(new List<SectionEvents>());
 
             Assert.ThrowsAsync<MissingSectionPageException>(() =>
-                _service.GetFilteredItemsAsync(new CardsQuery { Filters = new Dictionary<string, string>() }, CancellationToken.None));
+                _service.GetFilteredItemsAsync(
+                    new CardsQuery { Filters = new Dictionary<string, string>() },
+                    "en-gb",
+                    CancellationToken.None));
         }
 
         [Test]
@@ -343,9 +361,11 @@ namespace BDO.GWT.Core.Tests.Services
                 TotalCount = 0,
             };
 
+            // SectionEventsService.GetFilteredItemsAsync passes language from _cultureContext internally
             _eventWebinarCardsServiceMock
                 .Setup(x => x.GetFilteredItemsAsync(
                     It.IsAny<CardsQuery>(),
+                    It.IsAny<string>(),       // language — passed internally from cultureContext
                     It.IsAny<Action<ContentItemQueryBuilder>?>(),
                     It.IsAny<Func<IEventOrWebinar, bool>>(),
                     true,
@@ -354,7 +374,7 @@ namespace BDO.GWT.Core.Tests.Services
                 .ReturnsAsync(expected);
 
             var query = new CardsQuery { Filters = new Dictionary<string, string>() };
-            var result = await _service.GetFilteredItemsAsync(query, CancellationToken.None);
+            var result = await _service.GetFilteredItemsAsync(query, "en-gb", CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -383,6 +403,7 @@ namespace BDO.GWT.Core.Tests.Services
             _eventWebinarCardsServiceMock
                 .Setup(x => x.GetFilteredItemsAsync(
                     It.IsAny<CardsQuery>(),
+                    It.IsAny<string>(),
                     It.IsAny<Action<ContentItemQueryBuilder>?>(),
                     It.IsAny<Func<IEventOrWebinar, bool>>(),
                     false,
@@ -396,7 +417,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             var query = new CardsQuery { Filters = null! };
 
-            await _service.GetFilteredItemsAsync(query, CancellationToken.None);
+            await _service.GetFilteredItemsAsync(query, "en-gb", CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -425,6 +446,7 @@ namespace BDO.GWT.Core.Tests.Services
             _eventWebinarCardsServiceMock
                 .Setup(x => x.GetFilteredItemsAsync(
                     It.IsAny<CardsQuery>(),
+                    It.IsAny<string>(),
                     It.IsAny<Action<ContentItemQueryBuilder>?>(),
                     It.IsAny<Func<IEventOrWebinar, bool>>(),
                     true,
@@ -444,7 +466,7 @@ namespace BDO.GWT.Core.Tests.Services
                 },
             };
 
-            await _service.GetFilteredItemsAsync(query, CancellationToken.None);
+            await _service.GetFilteredItemsAsync(query, "en-gb", CancellationToken.None);
 
             Assert.That(query.Filters[FilterParameterName.ShowAllPastEvents], Is.EqualTo(bool.TrueString));
         }
@@ -473,12 +495,14 @@ namespace BDO.GWT.Core.Tests.Services
             _eventWebinarCardsServiceMock
                 .Setup(x => x.GetFilteredItemsAsync(
                     It.IsAny<CardsQuery>(),
+                    It.IsAny<string>(),
                     It.IsAny<Action<ContentItemQueryBuilder>?>(),
                     It.IsAny<Func<IEventOrWebinar, bool>>(),
                     true,
                     false,
                     It.IsAny<CancellationToken>()))
-                .Callback<CardsQuery, Action<ContentItemQueryBuilder>?, Func<IEventOrWebinar, bool>, bool, bool, CancellationToken>((_, _, p, _, _, _) => capturedPredicate = p)
+                .Callback<CardsQuery, string, Action<ContentItemQueryBuilder>?, Func<IEventOrWebinar, bool>, bool, bool, CancellationToken>(
+                    (_, _, _, p, _, _, _) => capturedPredicate = p)
                 .ReturnsAsync(new PaginationDto<EventsWebinarsCardDto>
                 {
                     Data = Array.Empty<EventsWebinarsCardDto>(),
@@ -486,7 +510,7 @@ namespace BDO.GWT.Core.Tests.Services
                 });
 
             var query = new CardsQuery { Filters = new Dictionary<string, string>() };
-            await _service.GetFilteredItemsAsync(query, CancellationToken.None);
+            await _service.GetFilteredItemsAsync(query, "en-gb", CancellationToken.None);
 
             var featured = new Mock<IEventOrWebinar>();
             featured.SetupGet(x => x.SystemFields).Returns(new WebPageFields { WebPageItemID = 101 });
@@ -543,6 +567,7 @@ namespace BDO.GWT.Core.Tests.Services
             _eventWebinarCardsServiceMock
                 .Setup(x => x.GetFilteredItemsAsync(
                     It.IsAny<CardsQuery>(),
+                    It.IsAny<string>(),
                     It.IsAny<Action<ContentItemQueryBuilder>?>(),
                     It.IsAny<Func<IEventOrWebinar, bool>>(),
                     true,
@@ -555,10 +580,11 @@ namespace BDO.GWT.Core.Tests.Services
                 });
 
             var query = new CardsQuery { Filters = new Dictionary<string, string>() };
-            await _service.GetFilteredItemsAsync(query, token);
+            await _service.GetFilteredItemsAsync(query, "en-gb", token);
 
             _eventWebinarCardsServiceMock.Verify(x => x.GetFilteredItemsAsync(
                 It.IsAny<CardsQuery>(),
+                It.IsAny<string>(),
                 It.IsAny<Action<ContentItemQueryBuilder>?>(),
                 It.IsAny<Func<IEventOrWebinar, bool>>(),
                 true,

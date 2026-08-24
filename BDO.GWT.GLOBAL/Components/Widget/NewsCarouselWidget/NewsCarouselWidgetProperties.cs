@@ -1,4 +1,5 @@
 ﻿using BDO.GWT.Core.Constants;
+using BDO.GWT.Web.Widgets;
 using CMS.ContentEngine;
 using Kentico.Forms.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace BDO.GWT.GLOBAL.Widgets;
 
-public class NewsCarouselWidgetProperties : IWidgetProperties
+public class NewsCarouselWidgetProperties : BaseWidgetProperties
 {
     [TextInputComponent(Label = "Title", ExplanationText = "Title that will be shown over news carousel widget.", Order = 0)]
     public string Title { get; set; }
@@ -66,11 +67,7 @@ public class NewsCarouselWidgetProperties : IWidgetProperties
     [DropDownComponent(Label = "Bottom margin", Order = 11, Options = "0px;None\r\n20px\r\n40px\r\n60px\r\n80px")]
     public string BottomMargin { get; set; } = "0px";
 
-    [TextInputComponent( Order = 12, ExplanationText = "ID should be unique from any other ID on the page. If the ID contains multiple words, words must be joined with a '-' (e.g. three-word-id). No other special characters and no spaces.'", Label = "Widget ID")]
-    [RegularExpression(
-       @"^[a-z0-9'-]*$",
-       ErrorMessage = "Characters are not allowed.")]
-    public string WidgetID { get; set; }
+
 }
 public static class NewsCarouselFilters
 {

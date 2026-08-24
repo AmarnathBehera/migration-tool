@@ -1,4 +1,5 @@
 ﻿using BDO.GWT.Core.Constants;
+using BDO.GWT.Web.Widgets;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.EventsWebinarsSliderWidget;
 using CMS.ContentEngine;
 using Kentico.Forms.Web.Mvc;
@@ -15,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace BDO.GWT.GLOBAL.Components.Widget.InsightCarouselWidget;
 
-public class InsightCarouselWidgetProperties : IWidgetProperties
+public class InsightCarouselWidgetProperties : BaseWidgetProperties
 {
     private const string MarginOptions = "0px;None\r\n20px\r\n40px\r\n60px\r\n80px";
 
@@ -59,12 +60,6 @@ public class InsightCarouselWidgetProperties : IWidgetProperties
 
     [DropDownComponent(Label = "Bottom margin", Order = 11, Options = MarginOptions)]
     public string BottomMargin { get; set; } = "0px";
-
-    [TextInputComponent(Order = 12, ExplanationText = "ID should be unique from any other ID on the page. If the ID contains multiple words, words must be joined with a '-' (e.g. three-word-id). No other special characters and no spaces.'", Label = "Widget ID")]
-    [RegularExpression(
-      @"^[a-z0-9'-]*$",
-      ErrorMessage = "Characters are not allowed.")]
-    public string WidgetID { get; set; }
 }
 
 public static class InsightCarouselWidgetFilter

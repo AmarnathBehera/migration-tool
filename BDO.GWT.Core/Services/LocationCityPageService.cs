@@ -93,7 +93,7 @@ public class LocationCityPageService : ILocationCityPageService
     private async Task<IEnumerable<LocationOffice>> RetrieveOfficesAsync(LocationCity page, CancellationToken cancellationToken)
     {
         var offices = (await _contentService.GetPagesAsync<LocationOffice>(
-           new RetrievePagesParameters { },
+           new RetrievePagesParameters { LinkedItemsMaxLevel = 2 },
            query => query
                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
                .Where(w => w.WhereEquals("WebPageItemParentID", page.SystemFields.WebPageItemID)),
