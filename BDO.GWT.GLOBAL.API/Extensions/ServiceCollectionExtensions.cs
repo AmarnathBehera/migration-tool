@@ -1,11 +1,11 @@
 ﻿using BDO.GWT.Core.Services;
 using BDO.GWT.GLOBAL.API.ApiClients;
+using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Helpers;
 using BDO.GWT.GLOBAL.API.Middleware;
 using BDO.GWT.GLOBAL.API.Options;
 using BDO.GWT.GLOBAL.API.Services;
 using CMS.MacroEngine;
-using CMS.Websites;
 
 namespace BDO.GWT.GLOBAL.API.Extensions;
 
@@ -59,5 +59,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IUserApiPermissionsCrudService, UserApiPermissionsCrudService>();
         serviceCollection.AddScoped<ILicenseKeysCrudService, LicenseKeysCrudService>();
         serviceCollection.AddScoped<IScheduledTaskCrudService, ScheduledTaskCrudService>();
+        serviceCollection.AddScoped<IPageAttachmentService, PageAttachmentService>();
+        serviceCollection.AddScoped<IPageAttachmentCrudService, PageAttachmentCrudService>();
     }
 }

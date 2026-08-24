@@ -123,13 +123,13 @@ namespace BDO.GWT.GLOBAL.Tests.Services
                     WebPageItemParentID = 100
                 });
             _pageContextMock
-                .Setup(p => p.GetAnyPageByWebPageItemId(100, It.IsAny<CancellationToken>()))
+                .Setup(p => p.GetAnyPageByWebPageItemId(100, It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new SectionMicrosites
                 {
                     SystemFields = CreateWebPageFields(100, "Section microsite", 0)
                 });
             _pageContextMock
-                .Setup(p => p.GetPageTitleByWebPageItemId(200, It.IsAny<CancellationToken>()))
+                .Setup(p => p.GetPageTitleByWebPageItemId(200, It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync("Current page");
             _pageUrlRetrieverMock
                 .Setup(r => r.Retrieve(100, "en", false, It.IsAny<CancellationToken>()))
@@ -143,7 +143,7 @@ namespace BDO.GWT.GLOBAL.Tests.Services
             Assert.That(result.Links, Is.Not.Null);
             Assert.That(result.Links!.Select(link => link.Title), Is.EqualTo(HomePlusCurrentPageTitles));
             _pageContextMock.Verify(
-                p => p.GetPageTitleByWebPageItemId(100, It.IsAny<CancellationToken>()),
+                p => p.GetPageTitleByWebPageItemId(100, It.IsAny<string>(), It.IsAny<CancellationToken>()),
                 Times.Never
             );
         }
@@ -164,13 +164,13 @@ namespace BDO.GWT.GLOBAL.Tests.Services
                     WebPageItemParentID = 100
                 });
             _pageContextMock
-                .Setup(p => p.GetAnyPageByWebPageItemId(100, It.IsAny<CancellationToken>()))
+                .Setup(p => p.GetAnyPageByWebPageItemId(100, It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new MicrositeMasterPage
                 {
                     SystemFields = CreateWebPageFields(100, "Ancestor page", 0)
                 });
             _pageContextMock
-                .Setup(p => p.GetPageTitleByWebPageItemId(200, It.IsAny<CancellationToken>()))
+                .Setup(p => p.GetPageTitleByWebPageItemId(200, It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync("Current page");
             _pageUrlRetrieverMock
                 .Setup(r => r.Retrieve(100, "en", false, It.IsAny<CancellationToken>()))
@@ -184,7 +184,7 @@ namespace BDO.GWT.GLOBAL.Tests.Services
             Assert.That(result.Links, Is.Not.Null);
             Assert.That(result.Links!.Select(link => link.Title), Is.EqualTo(HomePlusCurrentPageTitles));
             _pageContextMock.Verify(
-                p => p.GetPageTitleByWebPageItemId(100, It.IsAny<CancellationToken>()),
+                p => p.GetPageTitleByWebPageItemId(100, It.IsAny<string>(), It.IsAny<CancellationToken>()),
                 Times.Never
             );
         }

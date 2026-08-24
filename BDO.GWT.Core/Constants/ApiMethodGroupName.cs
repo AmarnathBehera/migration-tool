@@ -31,4 +31,5 @@ public static class ApiMethodGroupName
     public const string Footer = "Footer";
     public const string ChannelSettings = "ChannelSettings";
     public const string GlobalSettings = "GlobalSettings";
+    public const string LicenseKeys = "LicenseKeys";
 }

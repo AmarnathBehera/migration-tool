@@ -10,7 +10,7 @@
       <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
         <properties />
       </schema>
-      <field column="Unsubscribemessages" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6e932b1a-39d7-46d6-935d-8aca2a5fa0c1" visible="true">
+      <field allowempty="true" column="Unsubscribemessages" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6e932b1a-39d7-46d6-935d-8aca2a5fa0c1" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Unsubscribe messages</fieldcaption>

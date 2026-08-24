@@ -32,7 +32,6 @@ public class GlobalSettingsController : EntityControllerBase
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Returns a list of global settings.</returns>
     [HttpGet]
-    [HasPermission(ApiMethodGroupName.GlobalSettings, ApiPermission.Read)]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(GlobalSettingOutput[]), MediaTypeNames.Application.Json)]
     public async Task<ActionResult<GlobalSettingOutput[]>> GetGlobalSettings([FromQuery] SettingsQuery query, CancellationToken cancellationToken)
     {
@@ -48,7 +47,6 @@ public class GlobalSettingsController : EntityControllerBase
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Returns one global setting.</returns>
     [HttpGet("{codeName}")]
-    [HasPermission(ApiMethodGroupName.GlobalSettings, ApiPermission.Read)]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(GlobalSettingOutput), MediaTypeNames.Application.Json)]
     public async Task<ActionResult<GlobalSettingOutput>> GetGlobalSetting(string codeName, CancellationToken cancellationToken)
     {

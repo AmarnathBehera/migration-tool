@@ -48,7 +48,6 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// </summary>
 
         [HttpGet]
-        [HasPermission(ApiMethodGroupName.Footer, ApiPermission.Read)]
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(FooterDto), MediaTypeNames.Application.Json)]        
         public async Task<ActionResult<FooterDto>> Get(CancellationToken cancellationToken)
         {
