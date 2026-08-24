@@ -161,19 +161,21 @@ public class PageAttachmentCrudServiceTests
         SetupAttachments(pageGuid, "ch", "en-gb", new[] { attachment });
 
         var result = await _service.GetAttachmentAsync(1, pageGuid, attachGuid, "en-gb");
-
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.GUID, Is.EqualTo(attachGuid));
-        Assert.That(result.Name, Is.EqualTo(string.Empty));
-        Assert.That(result.Extension, Is.EqualTo(string.Empty));
-        Assert.That(result.MimeType, Is.EqualTo("application/octet-stream"));
-        Assert.That(result.Size, Is.EqualTo(0));
-        Assert.That(result.ImageWidth, Is.Null);
-        Assert.That(result.ImageHeight, Is.Null);
-        Assert.That(result.Title, Is.Null);
-        Assert.That(result.Description, Is.Null);
-        Assert.That(result.LastModified, Is.Null);
-        Assert.That(result.Order, Is.EqualTo(0));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.GUID, Is.EqualTo(attachGuid));
+            Assert.That(result.Name, Is.EqualTo(string.Empty));
+            Assert.That(result.Extension, Is.EqualTo(string.Empty));
+            Assert.That(result.MimeType, Is.EqualTo("application/octet-stream"));
+            Assert.That(result.Size, Is.EqualTo(0));
+            Assert.That(result.ImageWidth, Is.Null);
+            Assert.That(result.ImageHeight, Is.Null);
+            Assert.That(result.Title, Is.Null);
+            Assert.That(result.Description, Is.Null);
+            Assert.That(result.LastModified, Is.Null);
+            Assert.That(result.Order, Is.EqualTo(0));
+        });
     }
 
     [Test]
@@ -205,9 +207,11 @@ public class PageAttachmentCrudServiceTests
         SetupAttachments(pageGuid, "ch", "en-gb", new[] { attachment });
 
         var result = await _service.GetAttachmentAsync(1, pageGuid, attachGuid, "en-gb");
-
-        Assert.That(result!.ImageWidth, Is.EqualTo(1920));
-        Assert.That(result.ImageHeight, Is.EqualTo(1080));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.ImageWidth, Is.EqualTo(1920));
+            Assert.That(result.ImageHeight, Is.EqualTo(1080));
+        });
     }
 
     [Test]
@@ -228,10 +232,12 @@ public class PageAttachmentCrudServiceTests
         SetupAttachments(pageGuid, "ch", "en-gb", attachments);
 
         var result = await _service.GetAttachmentAsync(1, pageGuid, targetGuid, "en-gb");
-
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.GUID, Is.EqualTo(targetGuid));
-        Assert.That(result.Name, Is.EqualTo("target.pdf"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.GUID, Is.EqualTo(targetGuid));
+            Assert.That(result.Name, Is.EqualTo("target.pdf"));
+        });
     }
 
     // ── GetAttachmentsAsync ─────────────────────────────────────────────────────
@@ -251,10 +257,12 @@ public class PageAttachmentCrudServiceTests
         });
 
         var result = (await _service.GetAttachmentsAsync(3, pageGuid, "en-gb")).ToList();
-
-        Assert.That(result, Has.Count.EqualTo(2));
-        Assert.That(result[0].GUID, Is.EqualTo(guid1));
-        Assert.That(result[1].GUID, Is.EqualTo(guid2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Count.EqualTo(2));
+            Assert.That(result[0].GUID, Is.EqualTo(guid1));
+            Assert.That(result[1].GUID, Is.EqualTo(guid2));
+        });
     }
 
     [Test]
@@ -302,10 +310,13 @@ public class PageAttachmentCrudServiceTests
 
         var result = (await _service.GetAttachmentsAsync(1, pageGuid, "en-gb")).ToList();
 
-        Assert.That(result, Has.Count.EqualTo(2));
-        Assert.That(result[0].Name, Is.EqualTo(string.Empty));
-        Assert.That(result[0].MimeType, Is.EqualTo("application/octet-stream"));
-        Assert.That(result[1].Name, Is.EqualTo(string.Empty));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Count.EqualTo(2));
+            Assert.That(result[0].Name, Is.EqualTo(string.Empty));
+            Assert.That(result[0].MimeType, Is.EqualTo("application/octet-stream"));
+            Assert.That(result[1].Name, Is.EqualTo(string.Empty));
+        });
     }
 
     // ── MimeType mapping ────────────────────────────────────────────────────────
