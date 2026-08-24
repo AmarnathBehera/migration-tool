@@ -30,6 +30,62 @@ public class AttachmentsControllerTests
     }
 
     [Test]
+    public async Task GetAllAttachments_ReturnsOkWithResults()
+    {
+        var pageGuid = Guid.NewGuid();
+        var expected = new[]
+        {
+            new PageAttachmentOutput { GUID = Guid.NewGuid(), Name = "a.pdf" },
+            new PageAttachmentOutput { GUID = Guid.NewGuid(), Name = "b.png" }
+        };
+
+        _attachmentServiceMock
+            .Setup(x => x.GetAttachmentsAsync(42, pageGuid, "en-gb", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expected);
+
+        var result = await _controller.Get(1, pageGuid, "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.InstanceOf<OkObjectResult>());
+        var okResult = (OkObjectResult)result;
+        Assert.That(okResult.Value, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public async Task GetAllAttachments_ForwardsChannelIdPageGuidAndCulture()
+    {
+        var pageGuid = Guid.NewGuid();
+
+        _attachmentServiceMock
+            .Setup(x => x.GetAttachmentsAsync(
+                It.IsAny<int>(), It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<PageAttachmentOutput>());
+
+        await _controller.Get(999, pageGuid, "fr-fr", CancellationToken.None);
+
+        _attachmentServiceMock.Verify(
+            x => x.GetAttachmentsAsync(42, pageGuid, "fr-fr", It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task GetAllAttachments_PassesCancellationToken()
+    {
+        var pageGuid = Guid.NewGuid();
+        using var cts = new CancellationTokenSource();
+
+        _attachmentServiceMock
+            .Setup(x => x.GetAttachmentsAsync(
+                It.IsAny<int>(), It.IsAny<Guid>(), It.IsAny<string>(), cts.Token))
+            .ReturnsAsync(Array.Empty<PageAttachmentOutput>());
+
+        await _controller.Get(1, pageGuid, "en-gb", cts.Token);
+
+        _attachmentServiceMock.Verify(
+            x => x.GetAttachmentsAsync(42, pageGuid, "en-gb", cts.Token),
+            Times.Once);
+    }
+
+    [Test]
     public async Task Get_WhenAttachmentFound_ReturnsOkWithResult()
     {
         var pageGuid = Guid.NewGuid();
