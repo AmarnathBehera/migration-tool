@@ -18,6 +18,25 @@ namespace BDO.GWT.GLOBAL.API.Controllers
             this.attachmentService = attachmentService;
         }
 
+        [HttpGet]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status200OK, null, typeof(IEnumerable<PageAttachmentOutput>), MediaTypeNames.Application.Json)]
+        public async Task<IActionResult> Get(
+            int memberFirmID,
+            Guid pageGUID,
+            [FromQuery][Required] string culture,
+            CancellationToken cancellationToken)
+        {
+            int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
+
+            var result =
+                await attachmentService.GetAttachmentsAsync(
+                    channelId,
+                    pageGUID,
+                    culture,
+                    cancellationToken);
+
+            return Ok(result);
+        }
 
         [HttpGet("{attachmentGUID:guid}")]
         [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageAttachmentOutput), MediaTypeNames.Application.Json)]
