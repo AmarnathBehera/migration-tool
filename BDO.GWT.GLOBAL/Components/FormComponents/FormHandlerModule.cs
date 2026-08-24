@@ -1,6 +1,7 @@
 ﻿using BDO.GWT.Common;
 using BDO.GWT.Core;
 using BDO.GWT.GLOBAL.Services;
+using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents;
 using CMS;
 using CMS.Core;
@@ -10,9 +11,11 @@ using CMS.EmailLibrary;
 using CMS.OnlineForms;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
+using Kentico.Xperience.Admin.Base;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using System.Threading;
@@ -54,6 +57,7 @@ public partial class FormHandlerModule : Module
             BizFormInfo formInfo = e.Item.BizFormInfo;
             if (formInfo == null)
                 return;
+            await CheckFormSubmissionAsync(formDataItem, formInfo).ConfigureAwait(false);
 
             switch (formInfo.FormName?.ToLowerInvariant())
             {
@@ -79,8 +83,24 @@ public partial class FormHandlerModule : Module
             _logger.LogError(ex, "Failed to handle form item insert event.");
         }
     }
+    private async Task CheckFormSubmissionAsync(BizFormItem formDataItem, BizFormInfo formInfo)
+    {
+        try
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var formSubmissionSubscriptionsService = scope.ServiceProvider
+                .GetRequiredService<IFormSubmissionSubscriptionsService>();
 
-    private async Task SendEmailAsync(BizFormItem formDataItem)
+            await formSubmissionSubscriptionsService
+                .InvokeRegisteredEndpointsAsync(formDataItem,  formInfo, CancellationToken.None)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogError(ex, "Failed to invoke registered form submission endpoints for form {FormName}.", formInfo.FormName);
+        }
+    }
+   private async Task SendEmailAsync(BizFormItem formDataItem)
     {
         try
         {

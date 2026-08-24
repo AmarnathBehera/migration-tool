@@ -153,6 +153,7 @@
             serviceCollection.AddScoped<IDateTimeProvider, DateTimeProvider>();
             serviceCollection.AddScoped<IRelatedContentCardService, RelatedContentCardService>();
             serviceCollection.AddScoped<IRelatedContentCarouselService, RelatedContentCarouselService>();
+            serviceCollection.AddScoped<IFormSubmissionSubscriptionsService, FormSubmissionSubscriptionsService>();
 
             return serviceCollection;
         }
