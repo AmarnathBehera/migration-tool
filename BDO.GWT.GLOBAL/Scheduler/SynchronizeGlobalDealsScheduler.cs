@@ -62,29 +62,141 @@ public class SynchronizeGlobalDealsScheduler : IScheduledTask
         httpClient.DefaultRequestHeaders.Add(API_KEY_HEADER, syncApiKey);
 
         var requestUrl = $"{syncApiUrl.TrimEnd('/')}/GlobalSite/SynchronizeGlobalDeals?forceUpdate={forceUpdate}";
+        var maskedApiKey = MaskSecret(syncApiKey);
+        var machineName = Environment.MachineName;
+        var startedUtc = DateTime.UtcNow;
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
         try
         {
             var response = await httpClient.PostAsync(requestUrl, null, cancellationToken);
+            stopwatch.Stop();
 
             if (response.IsSuccessStatusCode)
             {
-                return new ScheduledTaskExecutionResult($"Successfully created remote deal pages ({(int)response.StatusCode})");
+                return new ScheduledTaskExecutionResult($"Successfully created remote deal pages ({(int)response.StatusCode}) in {stopwatch.ElapsedMilliseconds} ms.");
             }
 
             var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+            var traceId = TryExtractTraceId(responseBody);
+            var responseHeaders = FormatHeaders(response.Headers);
+            var contentHeaders = FormatHeaders(response.Content.Headers);
+            var wwwAuthenticate = response.Headers.WwwAuthenticate.Count > 0
+                ? string.Join("; ", response.Headers.WwwAuthenticate)
+                : "(none)";
+
+            var details =
+                $"SynchronizeGlobalDeals API call failed.{Environment.NewLine}" +
+                $"  Status       : {(int)response.StatusCode} {response.StatusCode} ({response.ReasonPhrase}){Environment.NewLine}" +
+                $"  Request URL  : POST {requestUrl}{Environment.NewLine}" +
+                $"  ForceUpdate  : {forceUpdate}{Environment.NewLine}" +
+                $"  API Key Hdr  : {API_KEY_HEADER}={maskedApiKey} (length={syncApiKey.Length}){Environment.NewLine}" +
+                $"  Elapsed      : {stopwatch.ElapsedMilliseconds} ms{Environment.NewLine}" +
+                $"  Started (UTC): {startedUtc:O}{Environment.NewLine}" +
+                $"  Machine      : {machineName}{Environment.NewLine}" +
+                $"  TraceId      : {traceId ?? "(not present)"}{Environment.NewLine}" +
+                $"  WWW-Auth     : {wwwAuthenticate}{Environment.NewLine}" +
+                $"  Resp Headers : {responseHeaders}{Environment.NewLine}" +
+                $"  Cont Headers : {contentHeaders}{Environment.NewLine}" +
+                $"  Response Body: {responseBody}";
 
             _logger.LogError(
-                "SynchronizeGlobalDeals API call failed with status {StatusCode}: {Body}",
-                response.StatusCode, responseBody);
+                "SynchronizeGlobalDeals API call failed. Status={StatusCode} ({StatusName}) Reason={Reason}, Url={Url}, ForceUpdate={ForceUpdate}, ApiKeyHeader={ApiKeyHeader}={ApiKeyMasked}, ElapsedMs={ElapsedMs}, StartedUtc={StartedUtc:O}, Machine={Machine}, TraceId={TraceId}, WwwAuthenticate={WwwAuthenticate}, ResponseHeaders={ResponseHeaders}, ContentHeaders={ContentHeaders}, Body={Body}",
+                (int)response.StatusCode, response.StatusCode, response.ReasonPhrase, requestUrl, forceUpdate,
+                API_KEY_HEADER, maskedApiKey, stopwatch.ElapsedMilliseconds, startedUtc, machineName,
+                traceId, wwwAuthenticate, responseHeaders, contentHeaders, responseBody);
 
-            return new ScheduledTaskExecutionResult($"SynchronizeGlobalDeals API call failed ({(int)response.StatusCode}): {responseBody}");
+            return new ScheduledTaskExecutionResult(details);
+        }
+        catch (OperationCanceledException ex) when (cancellationToken.IsCancellationRequested)
+        {
+            stopwatch.Stop();
+            _logger.LogWarning(ex,
+                "SynchronizeGlobalDeals API call was canceled. Url={Url}, ForceUpdate={ForceUpdate}, ElapsedMs={ElapsedMs}, Machine={Machine}",
+                requestUrl, forceUpdate, stopwatch.ElapsedMilliseconds, machineName);
+            return new ScheduledTaskExecutionResult($"SynchronizeGlobalDeals API call was canceled after {stopwatch.ElapsedMilliseconds} ms. Url={requestUrl}");
+        }
+        catch (TaskCanceledException ex)
+        {
+            stopwatch.Stop();
+            _logger.LogError(ex,
+                "SynchronizeGlobalDeals API call timed out. Url={Url}, ForceUpdate={ForceUpdate}, Timeout={Timeout}, ElapsedMs={ElapsedMs}, Machine={Machine}",
+                requestUrl, forceUpdate, httpClient.Timeout, stopwatch.ElapsedMilliseconds, machineName);
+            return new ScheduledTaskExecutionResult($"SynchronizeGlobalDeals API call timed out after {stopwatch.ElapsedMilliseconds} ms (Timeout={httpClient.Timeout}). Url={requestUrl}. Error: {ex.Message}");
+        }
+        catch (HttpRequestException ex)
+        {
+            stopwatch.Stop();
+            _logger.LogError(ex,
+                "SynchronizeGlobalDeals API HTTP request failed. Url={Url}, ForceUpdate={ForceUpdate}, StatusCode={StatusCode}, ElapsedMs={ElapsedMs}, Machine={Machine}",
+                requestUrl, forceUpdate, ex.StatusCode, stopwatch.ElapsedMilliseconds, machineName);
+            return new ScheduledTaskExecutionResult($"SynchronizeGlobalDeals API HTTP request failed. Url={requestUrl}, StatusCode={ex.StatusCode}, ElapsedMs={stopwatch.ElapsedMilliseconds}. Error: {ex.Message}{(ex.InnerException != null ? $" | Inner: {ex.InnerException.Message}" : string.Empty)}");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to call SynchronizeGlobalDeals API");
-            return new ScheduledTaskExecutionResult($"Failed to call SynchronizeGlobalDeals API: {ex.Message}");
+            stopwatch.Stop();
+            _logger.LogError(ex,
+                "Failed to call SynchronizeGlobalDeals API. Url={Url}, ForceUpdate={ForceUpdate}, ElapsedMs={ElapsedMs}, Machine={Machine}",
+                requestUrl, forceUpdate, stopwatch.ElapsedMilliseconds, machineName);
+            return new ScheduledTaskExecutionResult($"Failed to call SynchronizeGlobalDeals API. Url={requestUrl}, ElapsedMs={stopwatch.ElapsedMilliseconds}. {ex.GetType().Name}: {ex.Message}{(ex.InnerException != null ? $" | Inner ({ex.InnerException.GetType().Name}): {ex.InnerException.Message}" : string.Empty)}");
         }
+    }
+
+    private static string MaskSecret(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return "(empty)";
+        }
+
+        if (value.Length <= 4)
+        {
+            return new string('*', value.Length);
+        }
+
+        return $"{value[..2]}***{value[^2..]}";
+    }
+
+    private static string FormatHeaders(System.Net.Http.Headers.HttpHeaders headers)
+    {
+        var parts = new System.Collections.Generic.List<string>();
+        foreach (var header in headers)
+        {
+            var name = header.Key;
+            // Avoid dumping sensitive headers.
+            var value = name.Equals("Authorization", StringComparison.OrdinalIgnoreCase) ||
+                        name.Equals(API_KEY_HEADER, StringComparison.OrdinalIgnoreCase) ||
+                        name.Equals("Set-Cookie", StringComparison.OrdinalIgnoreCase)
+                ? "(hidden)"
+                : string.Join(",", header.Value);
+            parts.Add($"{name}={value}");
+        }
+        return parts.Count == 0 ? "(none)" : string.Join("; ", parts);
+    }
+
+    private static string? TryExtractTraceId(string? body)
+    {
+        if (string.IsNullOrWhiteSpace(body))
+        {
+            return null;
+        }
+
+        try
+        {
+            using var doc = JsonDocument.Parse(body);
+            if (doc.RootElement.ValueKind == JsonValueKind.Object &&
+                doc.RootElement.TryGetProperty("traceId", out var traceId) &&
+                traceId.ValueKind == JsonValueKind.String)
+            {
+                return traceId.GetString();
+            }
+        }
+        catch (JsonException)
+        {
+            // Body is not JSON; ignore.
+        }
+
+        return null;
     }
 
     private static bool ParseForceUpdate(string? taskData)

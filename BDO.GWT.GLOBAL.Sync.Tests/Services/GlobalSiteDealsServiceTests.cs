@@ -152,17 +152,219 @@ public class GlobalSiteDealsServiceTests
             _loggerMock.Object));
     }
 
-    #pragma warning disable CA1873 // Moq Verify expression, not a real log call
-        private void VerifyLog(LogLevel level, Times times) =>
-            _loggerMock.Verify(
-                l => l.Log(
-                    level,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception?>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                times);
-    #pragma warning restore CA1873
+    [Test]
+    public async Task SynchronizeChannelGlobalDealsAsync_WhenSourceChannelsEmpty_DoesNotAskForAdminUser()
+    {
+        var globalChannel = CreateChannel(Guid.NewGuid(), "global");
+
+        await _service.SynchronizeChannelGlobalDealsAsync(
+            globalChannel,
+            Array.Empty<ChannelOutput>(),
+            forceUpdate: false,
+            CancellationToken.None);
+
+        _userInfoProviderMock.Verify(p => p.Get(It.IsAny<string>()), Times.Never);
+    }
+
+    [Test]
+    public async Task SynchronizeChannelGlobalDealsAsync_WhenSourceChannelsEmpty_DoesNotLogError()
+    {
+        var globalChannel = CreateChannel(Guid.NewGuid(), "global");
+
+        await _service.SynchronizeChannelGlobalDealsAsync(
+            globalChannel,
+            Array.Empty<ChannelOutput>(),
+            forceUpdate: false,
+            CancellationToken.None);
+
+        VerifyLog(LogLevel.Error, Times.Never());
+    }
+
+    [Test]
+    public async Task SynchronizeChannelGlobalDealsAsync_WhenAdminUserNotFound_LooksUpAdministratorUserByName()
+    {
+        var globalChannel = CreateChannel(Guid.NewGuid(), "global");
+        var sourceChannel = CreateChannel(Guid.NewGuid(), "source");
+
+        _userInfoProviderMock
+            .Setup(p => p.Get(It.IsAny<string>()))
+            .Returns((UserInfo)null!);
+
+        await _service.SynchronizeChannelGlobalDealsAsync(
+            globalChannel,
+            new[] { sourceChannel },
+            forceUpdate: false,
+            CancellationToken.None);
+
+        _userInfoProviderMock.Verify(p => p.Get("administrator"), Times.Once);
+        _userInfoProviderMock.Verify(p => p.Get(It.IsNotIn("administrator")), Times.Never);
+    }
+
+    [Test]
+    public async Task SynchronizeChannelGlobalDealsAsync_WhenAdminUserNotFound_DoesNotLogInformation()
+    {
+        var globalChannel = CreateChannel(Guid.NewGuid(), "global");
+        var sourceChannel = CreateChannel(Guid.NewGuid(), "source");
+
+        _userInfoProviderMock
+            .Setup(p => p.Get(It.IsAny<string>()))
+            .Returns((UserInfo)null!);
+
+        await _service.SynchronizeChannelGlobalDealsAsync(
+            globalChannel,
+            new[] { sourceChannel },
+            forceUpdate: false,
+            CancellationToken.None);
+
+        VerifyLog(LogLevel.Information, Times.Never());
+    }
+
+    [Test]
+    public async Task SynchronizeChannelGlobalDealsAsync_WhenAdminUserNotFound_WithMultipleSourceChannels_StillReturnsEarly()
+    {
+        var globalChannel = CreateChannel(Guid.NewGuid(), "global");
+        var source1 = CreateChannel(Guid.NewGuid(), "source-1");
+        var source2 = CreateChannel(Guid.NewGuid(), "source-2");
+        var source3 = CreateChannel(Guid.NewGuid(), "source-3");
+
+        _userInfoProviderMock
+            .Setup(p => p.Get(It.IsAny<string>()))
+            .Returns((UserInfo)null!);
+
+        await _service.SynchronizeChannelGlobalDealsAsync(
+            globalChannel,
+            new[] { source1, source2, source3 },
+            forceUpdate: true,
+            CancellationToken.None);
+
+        _userInfoProviderMock.Verify(p => p.Get("administrator"), Times.Once);
+        _webPageManagerFactoryMock.Verify(
+            f => f.Create(It.IsAny<int>(), It.IsAny<int>()),
+            Times.Never);
+        _contentQueryExecutorMock.VerifyNoOtherCalls();
+    }
+
+    [Test]
+    public async Task SynchronizeChannelGlobalDealsAsync_WhenAdminUserNotFound_DoesNotCreateWebPageManager()
+    {
+        var globalChannel = CreateChannel(Guid.NewGuid(), "global");
+        var sourceChannel = CreateChannel(Guid.NewGuid(), "source");
+
+        _userInfoProviderMock
+            .Setup(p => p.Get(It.IsAny<string>()))
+            .Returns((UserInfo)null!);
+
+        await _service.SynchronizeChannelGlobalDealsAsync(
+            globalChannel,
+            new[] { sourceChannel },
+            forceUpdate: false,
+            CancellationToken.None);
+
+        _webPageManagerFactoryMock.VerifyNoOtherCalls();
+    }
+
+    [Test]
+    public async Task SynchronizeChannelGlobalDealsAsync_WhenAdminUserNotFound_DoesNotExecuteContentQueries()
+    {
+        var globalChannel = CreateChannel(Guid.NewGuid(), "global");
+        var sourceChannel = CreateChannel(Guid.NewGuid(), "source");
+
+        _userInfoProviderMock
+            .Setup(p => p.Get(It.IsAny<string>()))
+            .Returns((UserInfo)null!);
+
+        await _service.SynchronizeChannelGlobalDealsAsync(
+            globalChannel,
+            new[] { sourceChannel },
+            forceUpdate: false,
+            CancellationToken.None);
+
+        _contentQueryExecutorMock.VerifyNoOtherCalls();
+    }
+
+    [Test]
+    public async Task SynchronizeChannelGlobalDealsAsync_WhenSourceChannelsEmpty_WithCancelledToken_ReturnsEarlyWithoutThrowing()
+    {
+        var globalChannel = CreateChannel(Guid.NewGuid(), "global");
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        Assert.DoesNotThrowAsync(async () =>
+            await _service.SynchronizeChannelGlobalDealsAsync(
+                globalChannel,
+                Array.Empty<ChannelOutput>(),
+                forceUpdate: false,
+                cts.Token));
+    }
+
+    [Test]
+    public async Task SynchronizeChannelGlobalDealsAsync_WhenAdminUserNotFound_WithCancelledToken_ReturnsEarlyWithoutThrowing()
+    {
+        var globalChannel = CreateChannel(Guid.NewGuid(), "global");
+        var sourceChannel = CreateChannel(Guid.NewGuid(), "source");
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        _userInfoProviderMock
+            .Setup(p => p.Get(It.IsAny<string>()))
+            .Returns((UserInfo)null!);
+
+        Assert.DoesNotThrowAsync(async () =>
+            await _service.SynchronizeChannelGlobalDealsAsync(
+                globalChannel,
+                new[] { sourceChannel },
+                forceUpdate: false,
+                cts.Token));
+
+        await Task.CompletedTask;
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task SynchronizeChannelGlobalDealsAsync_WhenSourceChannelsEmpty_ForBothForceUpdateFlags_LogsInformation(bool forceUpdate)
+    {
+        var globalChannel = CreateChannel(Guid.NewGuid(), "global");
+
+        await _service.SynchronizeChannelGlobalDealsAsync(
+            globalChannel,
+            Array.Empty<ChannelOutput>(),
+            forceUpdate: forceUpdate,
+            CancellationToken.None);
+
+        VerifyLog(LogLevel.Information, Times.Once());
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task SynchronizeChannelGlobalDealsAsync_WhenAdminUserNotFound_ForBothForceUpdateFlags_LogsError(bool forceUpdate)
+    {
+        var globalChannel = CreateChannel(Guid.NewGuid(), "global");
+        var sourceChannel = CreateChannel(Guid.NewGuid(), "source");
+
+        _userInfoProviderMock
+            .Setup(p => p.Get(It.IsAny<string>()))
+            .Returns((UserInfo)null!);
+
+        await _service.SynchronizeChannelGlobalDealsAsync(
+            globalChannel,
+            new[] { sourceChannel },
+            forceUpdate: forceUpdate,
+            CancellationToken.None);
+
+        VerifyLog(LogLevel.Error, Times.Once());
+    }
+
+#pragma warning disable CA1873 // Moq Verify expression, not a real log call
+    private void VerifyLog(LogLevel level, Times times) =>
+        _loggerMock.Verify(
+            l => l.Log(
+                level,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception?>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            times);
+#pragma warning restore CA1873
 
     private static ChannelOutput CreateChannel(Guid guid, string codeName) => new()
     {

@@ -267,7 +267,7 @@ public class SynchronizeGlobalDealsSchedulerTests
 
         var result = await _scheduler.Execute(task, CancellationToken.None);
 
-        Assert.That(GetResultMessage(result), Does.Contain("Failed to call SynchronizeGlobalDeals API"));
+        Assert.That(GetResultMessage(result), Does.Contain("SynchronizeGlobalDeals API HTTP request failed"));
         Assert.That(GetResultMessage(result), Does.Contain("Connection refused"));
     }
 
