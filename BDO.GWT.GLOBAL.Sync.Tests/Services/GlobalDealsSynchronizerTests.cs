@@ -132,6 +132,56 @@ public class GlobalDealsSynchronizerTests
         _scopeFactoryMock.Verify(f => f.CreateScope(), Times.Once);
     }
 
+    [Test]
+    public async Task SynchronizeGlobalDealsAsync_ForwardsForceUpdateFalse()
+    {
+        var globalChannel = CreateChannel(GlobalSiteGuid, "global");
+        var sourceChannels = new List<ChannelOutput> { CreateChannel(Guid.NewGuid(), "channel-a") };
+
+        _channelDirectoryMock
+            .Setup(c => c.GetChannelAsync(GlobalSiteGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(globalChannel);
+        _channelDirectoryMock
+            .Setup(c => c.GetAllChannelsExceptAsync(GlobalSiteGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(sourceChannels);
+
+        await _synchronizer.SynchronizeGlobalDealsAsync(forceUpdate: false, CancellationToken.None);
+
+        _globalSiteDealsMock.Verify(
+            s => s.SynchronizeChannelGlobalDealsAsync(
+                globalChannel, sourceChannels, false, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task SynchronizeGlobalDealsAsync_PropagatesCancellationToken()
+    {
+        using var cts = new CancellationTokenSource();
+        var token = cts.Token;
+
+        _channelDirectoryMock
+            .Setup(c => c.GetChannelAsync(GlobalSiteGuid, token))
+            .ReturnsAsync((ChannelOutput?)null);
+
+        await _synchronizer.SynchronizeGlobalDealsAsync(false, token);
+
+        _channelDirectoryMock.Verify(c => c.GetChannelAsync(GlobalSiteGuid, token), Times.Once);
+    }
+
+    [Test]
+    public void SynchronizeGlobalDealsAsync_WhenChannelDirectoryThrows_PropagatesException()
+    {
+        var expected = new InvalidOperationException("boom");
+        _channelDirectoryMock
+            .Setup(c => c.GetChannelAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(expected);
+
+        var actual = Assert.ThrowsAsync<InvalidOperationException>(
+            () => _synchronizer.SynchronizeGlobalDealsAsync(false, CancellationToken.None));
+
+        Assert.That(actual, Is.SameAs(expected));
+    }
+
     private static ChannelOutput CreateChannel(Guid guid, string codeName) => new()
     {
         General = new SiteGeneralOutput

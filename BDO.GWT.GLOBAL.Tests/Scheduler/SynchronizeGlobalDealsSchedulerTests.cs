@@ -1,3 +1,4 @@
+using BDO.GWT.GLOBAL.Scheduler;
 using CMS.Scheduler;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -68,7 +69,7 @@ public class SynchronizeGlobalDealsSchedulerTests
             .GetProperty("Result", BindingFlags.Instance | BindingFlags.NonPublic)
             ?.GetValue(result) ?? string.Empty;
 
-    private static ScheduledTaskConfigurationInfo CreateTaskInfo(string? data = null)
+    private static TestScheduledTaskConfigurationInfo CreateTaskInfo(string? data = null)
         => new TestScheduledTaskConfigurationInfo { Data = data };
 
     private sealed class TestScheduledTaskConfigurationInfo : ScheduledTaskConfigurationInfo

@@ -1,4 +1,5 @@
-﻿using CMS.Scheduler;
+﻿#nullable enable
+using CMS.Scheduler;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -7,7 +8,9 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-[assembly: RegisterScheduledTask(identifier: "BDO.SynchronizeGlobalDealsScheduler", typeof(SynchronizeGlobalDealsScheduler))]
+[assembly: RegisterScheduledTask(identifier: "BDO.SynchronizeGlobalDealsScheduler", typeof(BDO.GWT.GLOBAL.Scheduler.SynchronizeGlobalDealsScheduler))]
+
+namespace BDO.GWT.GLOBAL.Scheduler;
 
 public class SynchronizeGlobalDealsScheduler : IScheduledTask
 {
@@ -15,6 +18,11 @@ public class SynchronizeGlobalDealsScheduler : IScheduledTask
     private const string SYNC_API_URL_SETTING = "BDO.SyncApiUrl";
     private const string SYNC_API_KEY_SETTING = "BDO.SyncApiKey";
     private const string API_KEY_HEADER = "X-API-Key";
+
+    private static readonly JsonSerializerOptions TaskOptionsJsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
@@ -88,8 +96,7 @@ public class SynchronizeGlobalDealsScheduler : IScheduledTask
 
         try
         {
-            var options = JsonSerializer.Deserialize<TaskOptions>(
-                taskData, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var options = JsonSerializer.Deserialize<TaskOptions>(taskData, TaskOptionsJsonOptions);
 
             return options?.ForceUpdate ?? false;
         }
@@ -99,8 +106,5 @@ public class SynchronizeGlobalDealsScheduler : IScheduledTask
         }
     }
 
-    private sealed class TaskOptions
-    {
-        public bool ForceUpdate { get; set; }
-    }
+    private sealed record TaskOptions(bool ForceUpdate);
 }
