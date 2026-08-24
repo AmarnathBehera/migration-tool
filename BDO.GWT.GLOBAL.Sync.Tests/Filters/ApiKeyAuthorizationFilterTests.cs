@@ -48,8 +48,11 @@ public class ApiKeyAuthorizationFilterTests
 
         await _filter.OnAuthorizationAsync(context);
 
-        Assert.That(context.Result, Is.InstanceOf<StatusCodeResult>());
-        Assert.That(((StatusCodeResult)context.Result!).StatusCode, Is.EqualTo(StatusCodes.Status403Forbidden));
+        Assert.Multiple(() =>
+        {
+            Assert.That(context.Result, Is.InstanceOf<StatusCodeResult>());
+            Assert.That(((StatusCodeResult)context.Result!).StatusCode, Is.EqualTo(StatusCodes.Status403Forbidden));
+        });
     }
 
     [Test]
@@ -69,8 +72,11 @@ public class ApiKeyAuthorizationFilterTests
 
         await _filter.OnAuthorizationAsync(context);
 
-        Assert.That(context.Result, Is.InstanceOf<StatusCodeResult>());
-        Assert.That(((StatusCodeResult)context.Result!).StatusCode, Is.EqualTo(StatusCodes.Status403Forbidden));
+        Assert.Multiple(() =>
+        {
+            Assert.That(context.Result, Is.InstanceOf<StatusCodeResult>());
+            Assert.That(((StatusCodeResult)context.Result!).StatusCode, Is.EqualTo(StatusCodes.Status403Forbidden));
+        });
     }
 
     [Test]

@@ -2,7 +2,6 @@ using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
 using BDO.GWT.GLOBAL.Services;
 using Kentico.Web.Mvc;
-using Microsoft.OpenApi;
 
 namespace BDO.GWT.GLOBAL.Sync;
 
