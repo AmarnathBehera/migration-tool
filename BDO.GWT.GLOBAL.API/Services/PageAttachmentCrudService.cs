@@ -24,7 +24,10 @@ namespace BDO.GWT.GLOBAL.API.Services
             CancellationToken cancellationToken = default)
         {
             var channelName = await channelInfoService.GetChannelNameAsync(channelId, cancellationToken);
-
+            if (channelName is null)
+            {
+                return null;
+            }
             var attachments =
                 await pageAttachmentService.GetPageAttachmentsAsync(
                     pageGuid,
@@ -47,8 +50,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             CancellationToken cancellationToken = default)
         {
             var channelName = await channelInfoService.GetChannelNameAsync(channelId, cancellationToken);
-
-
+            ArgumentNullException.ThrowIfNull(channelName);
             var attachments =
                 await pageAttachmentService.GetPageAttachmentsAsync(
                     pageGuid,

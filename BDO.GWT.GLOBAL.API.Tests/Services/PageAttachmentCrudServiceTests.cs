@@ -105,17 +105,19 @@ public class PageAttachmentCrudServiceTests
         SetupAttachments(pageGuid, "testchannel", "en-gb", new[] { attachment });
 
         var result = await _service.GetAttachmentAsync(1, pageGuid, attachGuid, "en-gb");
-
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.GUID, Is.EqualTo(attachGuid));
-        Assert.That(result.Name, Is.EqualTo("report.pdf"));
-        Assert.That(result.Extension, Is.EqualTo(".pdf"));
-        Assert.That(result.MimeType, Is.EqualTo("application/pdf"));
-        Assert.That(result.Size, Is.EqualTo(2048));
-        Assert.That(result.Order, Is.EqualTo(0));
-        Assert.That(result.Title, Is.EqualTo("report.pdf"));
-        Assert.That(result.Description, Is.EqualTo("report.pdf"));
-        Assert.That(result.LastModified, Is.EqualTo(lastModified));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.GUID, Is.EqualTo(attachGuid));
+            Assert.That(result.Name, Is.EqualTo("report.pdf"));
+            Assert.That(result.Extension, Is.EqualTo(".pdf"));
+            Assert.That(result.MimeType, Is.EqualTo("application/pdf"));
+            Assert.That(result.Size, Is.EqualTo(2048));
+            Assert.That(result.Order, Is.EqualTo(0));
+            Assert.That(result.Title, Is.EqualTo("report.pdf"));
+            Assert.That(result.Description, Is.EqualTo("report.pdf"));
+            Assert.That(result.LastModified, Is.EqualTo(lastModified));
+        });
     }
 
     [Test]
