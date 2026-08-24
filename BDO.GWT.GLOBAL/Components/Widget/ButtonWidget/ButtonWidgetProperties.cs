@@ -22,7 +22,7 @@ public class ButtonWidgetProperties : IWidgetProperties
     [DropDownComponent(Label = "Link targe", Order = 2, Options = "_self;Same tab\n_blank;New tab")]
     public string Target { get; set; } = "_self";
 
-    [RadioGroupComponent(Label = "Button type", Order = 3, Options = "primary;Primary\\r\\nsecondary;Secondary\\r\\ntertiary;Tertiary\"")]
+    [RadioGroupComponent(Label = "Button type", Order = 3, Options = "primary;Primary\r\nsecondary;Secondary\r\ntertiary;Tertiary")]
     public string Type { get; set; } = "primary";
 
     [RadioGroupComponent(Label = "Light / dark theme", Order = 4, Options = "light;Light theme\r\ndark;Dark theme")]
