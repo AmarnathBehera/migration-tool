@@ -70,8 +70,11 @@ public class EditorsPickControllerTests
         var result = await _controller.Items(query, CancellationToken.None);
 
         var okResult = result.Result as OkObjectResult;
-        Assert.That(okResult, Is.Not.Null);
-        Assert.That(okResult!.Value, Is.EqualTo(expected));
+        Assert.Multiple(() =>
+        {
+            Assert.That(okResult, Is.Not.Null);
+            Assert.That(okResult!.Value, Is.EqualTo(expected));
+        });
     }
 
     [Test]
@@ -117,9 +120,12 @@ public class EditorsPickControllerTests
 
         await _controller.Items(query, CancellationToken.None);
 
-        Assert.That(capturedQuery, Is.Not.Null);
-        Assert.That(capturedQuery!.Filters, Contains.Key(FilterParameterName.ContentType));
-        Assert.That(capturedQuery.Filters[FilterParameterName.ContentType], Is.EqualTo("Article"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedQuery, Is.Not.Null);
+            Assert.That(capturedQuery!.Filters, Contains.Key(FilterParameterName.ContentType));
+            Assert.That(capturedQuery.Filters[FilterParameterName.ContentType], Is.EqualTo("Article"));
+        });
     }
 
     [Test]
@@ -144,10 +150,14 @@ public class EditorsPickControllerTests
 
         await _controller.Items(query, CancellationToken.None);
 
-        Assert.That(capturedQuery!.Filters, Contains.Key(FilterParameterName.ContentType));
-        Assert.That(capturedQuery.Filters, Contains.Key(FilterParameterName.BusinessLine));
-        Assert.That(capturedQuery.Filters[FilterParameterName.ContentType], Is.EqualTo("Article"));
-        Assert.That(capturedQuery.Filters[FilterParameterName.BusinessLine], Is.EqualTo("Tax"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedQuery, Is.Not.Null);
+            Assert.That(capturedQuery!.Filters, Contains.Key(FilterParameterName.ContentType));
+            Assert.That(capturedQuery.Filters, Contains.Key(FilterParameterName.BusinessLine));
+            Assert.That(capturedQuery.Filters[FilterParameterName.ContentType], Is.EqualTo("Article"));
+            Assert.That(capturedQuery.Filters[FilterParameterName.BusinessLine], Is.EqualTo("Tax"));
+        });
     }
 
     [Test]
@@ -175,10 +185,13 @@ public class EditorsPickControllerTests
 
         await _controller.Items(query, CancellationToken.None);
 
-        Assert.That(capturedQuery!.Filters, Does.Not.ContainKey("unknownParam"));
-        Assert.That(capturedQuery.Filters, Does.Not.ContainKey("selectedGuids"));
-        Assert.That(capturedQuery.Filters, Does.Not.ContainKey("featuredGuids"));
-        Assert.That(capturedQuery.Filters, Does.Not.ContainKey("currentPageGuid"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedQuery!.Filters, Does.Not.ContainKey("unknownParam"));
+            Assert.That(capturedQuery.Filters, Does.Not.ContainKey("selectedGuids"));
+            Assert.That(capturedQuery.Filters, Does.Not.ContainKey("featuredGuids"));
+            Assert.That(capturedQuery.Filters, Does.Not.ContainKey("currentPageGuid"));
+        });
     }
 
     [Test]
@@ -228,9 +241,12 @@ public class EditorsPickControllerTests
 
         await _controller.Items(query, CancellationToken.None);
 
-        Assert.That(capturedQuery!.SelectedGuids, Contains.Item(guid1));
-        Assert.That(capturedQuery.SelectedGuids, Contains.Item(guid2));
-        Assert.That(capturedQuery.SelectedGuids!.Count, Is.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedQuery!.SelectedGuids, Contains.Item(guid1));
+            Assert.That(capturedQuery.SelectedGuids, Contains.Item(guid2));
+            Assert.That(capturedQuery.SelectedGuids!, Has.Count.EqualTo(2));
+        });
     }
 
     [Test]
@@ -289,8 +305,11 @@ public class EditorsPickControllerTests
 
         await _controller.Items(query, CancellationToken.None);
 
-        Assert.That(capturedQuery!.SelectedGuids, Is.Empty);
-        Assert.That(capturedQuery.FeaturedGuids, Is.Empty);
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedQuery!.SelectedGuids, Is.Empty);
+            Assert.That(capturedQuery.FeaturedGuids, Is.Empty);
+        });
     }
 
     // -------------------------------------------------------------------------
@@ -325,13 +344,16 @@ public class EditorsPickControllerTests
 
         await _controller.Items(query, CancellationToken.None);
 
-        Assert.That(capturedQuery, Is.Not.Null);
-        Assert.That(capturedQuery!.CurrentPageGuid, Is.EqualTo(guid));
-        Assert.That(capturedQuery.PageType, Is.EqualTo(nameof(Insight)));
-        Assert.That(capturedQuery.SelectedGuids, Contains.Item(selectedGuid));
-        Assert.That(capturedQuery.FeaturedGuids, Contains.Item(featuredGuid));
-        Assert.That(capturedQuery.CurrentPage, Is.EqualTo(2));
-        Assert.That(capturedQuery.PageSize, Is.EqualTo(5));
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedQuery, Is.Not.Null);
+            Assert.That(capturedQuery!.CurrentPageGuid, Is.EqualTo(guid));
+            Assert.That(capturedQuery.PageType, Is.EqualTo(nameof(Insight)));
+            Assert.That(capturedQuery.SelectedGuids, Contains.Item(selectedGuid));
+            Assert.That(capturedQuery.FeaturedGuids, Contains.Item(featuredGuid));
+            Assert.That(capturedQuery.CurrentPage, Is.EqualTo(2));
+            Assert.That(capturedQuery.PageSize, Is.EqualTo(5));
+        });
     }
 
     // -------------------------------------------------------------------------
