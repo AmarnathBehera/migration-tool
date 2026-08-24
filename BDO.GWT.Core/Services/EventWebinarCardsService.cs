@@ -32,7 +32,7 @@ public interface IEventWebinarCardsService
 
     Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(
         CardsQuery cardsQuery,
-        string language,
+        string lang,
         Action<ContentItemQueryBuilder>? decorateQuery,
         Func<IEventOrWebinar, bool> isFeatured,
         bool showPastPages,

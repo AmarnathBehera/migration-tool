@@ -190,7 +190,7 @@ public class EventsWebinarsSliderService : IEventsWebinarsSliderService
 
         var paginationDto = await _eventWebinarCardsService.GetFilteredItemsAsync(
             query,
-            null,
+            null!,
             decorateQuery,
             item => featuredPageIds.Contains(item.SystemFields.WebPageItemID),
             showPastPages: false,
