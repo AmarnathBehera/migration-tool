@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.resource>
+  <ResourceDisplayName>Reporting Application</ResourceDisplayName>
+  <ResourceGUID>bdd1c3fd-8fb1-451c-b386-9b05228a7569</ResourceGUID>
+  <ResourceIsInDevelopment>False</ResourceIsInDevelopment>
+  <ResourceName>ReportingApplication</ResourceName>
+</cms.resource>

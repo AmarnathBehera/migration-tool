@@ -409,6 +409,16 @@ stages:
               $(publishOutput)
             displayName: "Publish API solution"
 
+          - task: CopyFiles@2
+            displayName: "Copy APIM update script to API package output"
+            inputs:
+              SourceFolder: "$(selfSourcesDirectory)/_deploy/scripts/API"
+              Contents: |
+                Update-ApimApiFromSwagger.ps1
+                swagger.json
+              TargetFolder: "$(publishOutput)/Deploy/APIM"
+              OverWrite: true
+
           - task: ArchiveFiles@2
             displayName: "Create API deployment package"
             inputs:
