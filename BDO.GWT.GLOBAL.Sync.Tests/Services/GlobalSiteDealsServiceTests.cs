@@ -45,6 +45,101 @@ public class GlobalSiteDealsServiceTests
 
         _webPageManagerFactoryMock.VerifyNoOtherCalls();
         _contentQueryExecutorMock.VerifyNoOtherCalls();
+        _userInfoProviderMock.VerifyNoOtherCalls();
+    }
+
+    [Test]
+    public async Task SynchronizeChannelGlobalDealsAsync_WhenSourceChannelsEmpty_LogsInformation()
+    {
+        var globalChannel = CreateChannel(Guid.NewGuid(), "global");
+
+        await _service.SynchronizeChannelGlobalDealsAsync(
+            globalChannel,
+            Array.Empty<ChannelOutput>(),
+            forceUpdate: false,
+            CancellationToken.None);
+
+        VerifyLog(LogLevel.Information, Times.Once());
+    }
+
+    [Test]
+    public async Task SynchronizeChannelGlobalDealsAsync_WhenAdminUserNotFound_ReturnsWithoutCreatingManager()
+    {
+        var globalChannel = CreateChannel(Guid.NewGuid(), "global");
+        var sourceChannel = CreateChannel(Guid.NewGuid(), "source");
+
+        _userInfoProviderMock
+            .Setup(p => p.Get(It.IsAny<string>()))
+            .Returns((UserInfo?)null);
+
+        await _service.SynchronizeChannelGlobalDealsAsync(
+            globalChannel,
+            new[] { sourceChannel },
+            forceUpdate: false,
+            CancellationToken.None);
+
+        _userInfoProviderMock.Verify(p => p.Get("administrator"), Times.Once);
+        _webPageManagerFactoryMock.Verify(
+            f => f.Create(It.IsAny<int>(), It.IsAny<int>()),
+            Times.Never);
+        _contentQueryExecutorMock.VerifyNoOtherCalls();
+    }
+
+    [Test]
+    public async Task SynchronizeChannelGlobalDealsAsync_WhenAdminUserNotFound_LogsError()
+    {
+        var globalChannel = CreateChannel(Guid.NewGuid(), "global");
+        var sourceChannel = CreateChannel(Guid.NewGuid(), "source");
+
+        _userInfoProviderMock
+            .Setup(p => p.Get(It.IsAny<string>()))
+            .Returns((UserInfo?)null);
+
+        await _service.SynchronizeChannelGlobalDealsAsync(
+            globalChannel,
+            new[] { sourceChannel },
+            forceUpdate: false,
+            CancellationToken.None);
+
+        VerifyLog(LogLevel.Error, Times.Once());
+    }
+
+    [Test]
+    public async Task SynchronizeChannelGlobalDealsAsync_WhenCancellationRequested_StillHandlesEmptySourceChannels()
+    {
+        var globalChannel = CreateChannel(Guid.NewGuid(), "global");
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        await _service.SynchronizeChannelGlobalDealsAsync(
+            globalChannel,
+            Array.Empty<ChannelOutput>(),
+            forceUpdate: false,
+            cts.Token);
+
+        _webPageManagerFactoryMock.VerifyNoOtherCalls();
+        _userInfoProviderMock.VerifyNoOtherCalls();
+    }
+
+    [Test]
+    public async Task SynchronizeChannelGlobalDealsAsync_WithForceUpdateTrue_AndEmptySources_StillReturnsEarly()
+    {
+        var globalChannel = CreateChannel(Guid.NewGuid(), "global");
+
+        await _service.SynchronizeChannelGlobalDealsAsync(
+            globalChannel,
+            Array.Empty<ChannelOutput>(),
+            forceUpdate: true,
+            CancellationToken.None);
+
+        _webPageManagerFactoryMock.VerifyNoOtherCalls();
+        _userInfoProviderMock.VerifyNoOtherCalls();
+    }
+
+    [Test]
+    public void Service_ImplementsIGlobalSiteDealsService()
+    {
+        Assert.That(_service, Is.InstanceOf<IGlobalSiteDealsService>());
     }
 
     [Test]
@@ -56,6 +151,16 @@ public class GlobalSiteDealsServiceTests
             _userInfoProviderMock.Object,
             _loggerMock.Object));
     }
+
+    private void VerifyLog(LogLevel level, Times times) =>
+        _loggerMock.Verify(
+            l => l.Log(
+                level,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception?>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            times);
 
     private static ChannelOutput CreateChannel(Guid guid, string codeName) => new()
     {

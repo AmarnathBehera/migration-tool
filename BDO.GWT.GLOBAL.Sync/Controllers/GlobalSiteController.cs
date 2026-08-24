@@ -1,10 +1,11 @@
-﻿using BDO.GWT.GLOBAL.Sync.Services;
+﻿using BDO.GWT.GLOBAL.Sync.Attributes;
+using BDO.GWT.GLOBAL.Sync.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BDO.GWT.GLOBAL.Sync.Controllers;
 
 [ApiController]
-//[AuthorizeApiKey]
+[AuthorizeApiKey]
 [Route("GlobalSite")]
 public class GlobalSiteController : ControllerBase
 {
