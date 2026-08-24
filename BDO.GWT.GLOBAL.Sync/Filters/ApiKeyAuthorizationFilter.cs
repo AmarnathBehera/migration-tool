@@ -32,7 +32,7 @@ public class ApiKeyAuthorizationFilter : IAsyncAuthorizationFilter
 
         return Task.CompletedTask;
     }
-    public class HeaderName
+    public static class HeaderName
     {
         public const string ApiKey = "X-API-Key";
     }

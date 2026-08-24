@@ -70,7 +70,7 @@ public class GlobalSiteDealsServiceTests
 
         _userInfoProviderMock
             .Setup(p => p.Get(It.IsAny<string>()))
-            .Returns((UserInfo?)null);
+            .Returns((UserInfo)null!);
 
         await _service.SynchronizeChannelGlobalDealsAsync(
             globalChannel,
@@ -93,7 +93,7 @@ public class GlobalSiteDealsServiceTests
 
         _userInfoProviderMock
             .Setup(p => p.Get(It.IsAny<string>()))
-            .Returns((UserInfo?)null);
+            .Returns((UserInfo)null!);
 
         await _service.SynchronizeChannelGlobalDealsAsync(
             globalChannel,
@@ -152,15 +152,17 @@ public class GlobalSiteDealsServiceTests
             _loggerMock.Object));
     }
 
-    private void VerifyLog(LogLevel level, Times times) =>
-        _loggerMock.Verify(
-            l => l.Log(
-                level,
-                It.IsAny<EventId>(),
-                It.IsAny<It.IsAnyType>(),
-                It.IsAny<Exception?>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            times);
+    #pragma warning disable CA1873 // Moq Verify expression, not a real log call
+        private void VerifyLog(LogLevel level, Times times) =>
+            _loggerMock.Verify(
+                l => l.Log(
+                    level,
+                    It.IsAny<EventId>(),
+                    It.IsAny<It.IsAnyType>(),
+                    It.IsAny<Exception?>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                times);
+    #pragma warning restore CA1873
 
     private static ChannelOutput CreateChannel(Guid guid, string codeName) => new()
     {
