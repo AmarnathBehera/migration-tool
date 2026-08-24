@@ -8,10 +8,8 @@ trigger:
     include:
       - "*"
   paths:
-    include:
-      - _deploy/scripts/API/swagger.json
     exclude:
-      - _deploy/**
+      - _deploy/pipelines/**
       - .octopus/**
 
 variables:
