@@ -207,7 +207,7 @@ public class MicrositeHeaderService : IMicrositeHeaderService
             if (masterPages.TryGetValue(parentId, out var masterPage) && masterPage != null)
                 return masterPage;
 
-            var ancestor = await _pageContext.GetAnyPageByWebPageItemId(parentId, cancellationToken);
+            var ancestor = await _pageContext.GetAnyPageByWebPageItemId(parentId, ctx.WebPage.LanguageName, cancellationToken);
             parentId = ancestor?.SystemFields.WebPageItemParentID ?? 0;
         }
 

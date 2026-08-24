@@ -31,7 +31,6 @@ public class ChannelController : EntityControllerBase
     /// <param name = "cancellationToken" ></param >
     /// <returns > Returns a list of channels.</returns>
     [HttpGet]
-    [HasPermission(ApiMethodGroupName.Channel, ApiPermission.Read)]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(IEnumerable<ChannelOutput>), MediaTypeNames.Application.Json)]
     public async Task<ActionResult<IEnumerable<ChannelOutput>>> GetChannelsAsync([FromQuery] ChannelsQuery query, CancellationToken cancellationToken)
     {
@@ -47,7 +46,6 @@ public class ChannelController : EntityControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns>Returns one channel.</returns>
     [HttpGet("{channelGuid:guid}")]
-    [HasPermission(ApiMethodGroupName.Channel, ApiPermission.Read)]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(ChannelOutput), MediaTypeNames.Application.Json)]
     public async Task<ActionResult<ChannelOutput>> GetChannelAsync(Guid channelGuid, CancellationToken cancellationToken)
     {

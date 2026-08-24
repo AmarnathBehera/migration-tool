@@ -28,6 +28,14 @@
           <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This input field is required.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
       </field>
       <schema guid="6bf9af2e-ee19-461b-a071-2b6541b36653" name="6bf9af2e-ee19-461b-a071-2b6541b36653">
         <properties />
@@ -124,43 +132,6 @@
         </properties>
         <settings>
           <controlname>Kentico.Administration.Checkbox</controlname>
-        </settings>
-      </field>
-      <field allowempty="true" column="Sharingbuttons" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="b020bfba-5fa0-4706-99a7-0c94d524520f" visible="true">
-        <properties>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Sharing buttons</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-          <includeintranslation>True</includeintranslation>
-        </properties>
-        <settings>
-          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
-        </settings>
-      </field>
-      <field allowempty="true" column="ShowInsightPrintButton" columnprecision="0" columntype="boolean" enabled="true" guid="c3f9ce6b-7349-4e9b-8b54-6896db27c9f6" visible="true">
-        <properties>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Show print button</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-        </properties>
-        <settings>
-          <controlname>Kentico.Administration.Checkbox</controlname>
-        </settings>
-      </field>
-      <field allowempty="true" column="DownloadInsightButtonAttachment" columnprecision="0" columntype="contentitemreference" enabled="true" guid="2cb2a1a2-8206-433a-a283-73711ec9ee72" visible="true">
-        <properties>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Download button attachment</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-        </properties>
-        <settings>
-          <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
-          </AllowedContentItemTypeIdentifiers>
-          <controlname>Kentico.Administration.ContentItemSelector</controlname>
-          <MaximumItems>1</MaximumItems>
-          <MinimumItems>1</MinimumItems>
-          <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
       <field allowempty="true" column="Layoutwithoutsidebar" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="c55ac0e7-8cc8-4be9-a344-988dcc48912d" visible="true">

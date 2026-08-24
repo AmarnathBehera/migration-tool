@@ -24,7 +24,7 @@
           <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
         </settings>
       </field>
-      <field column="FormType" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="39eb734f-261b-4039-9107-28af7cccae06" visible="true">
+      <field allowempty="true" column="FormType" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="39eb734f-261b-4039-9107-28af7cccae06" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Form type</fieldcaption>
@@ -41,28 +41,6 @@ embedCode;Embed code
           </Options>
           <OptionsValueSeparator>;</OptionsValueSeparator>
         </settings>
-      </field>
-      <field allowempty="true" column="Form" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="5f364379-9b99-4510-acf2-722be7089fef" visible="true">
-        <properties>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Form</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-          <includeintranslation>True</includeintranslation>
-        </properties>
-        <settings>
-          <controlname>BDO.SQLDropdown</controlname>
-          <Script>select * from cms_form</Script>
-        </settings>
-        <visibilityconditiondata>
-          <VisibilityConditionConfiguration>
-            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
-            <Properties>
-              <PropertyName>FormType</PropertyName>
-              <Value>form</Value>
-              <CaseSensitive>true</CaseSensitive>
-            </Properties>
-          </VisibilityConditionConfiguration>
-        </visibilityconditiondata>
       </field>
       <field allowempty="true" column="EmbedCode" columnprecision="0" columnsize="1000" columntype="text" enabled="true" guid="f0b90f30-5129-4469-940b-a4a14ad7dfe1" visible="true">
         <properties>
@@ -99,17 +77,18 @@ embedCode;Embed code
           <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
         </settings>
       </field>
-      <field allowempty="true" column="Information" columnprecision="0" columntype="boolean" enabled="true" guid="5a177be9-9bed-4e7f-aaf2-1f7f5121e49f" visible="true">
+      <field allowempty="true" column="Information" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="5a177be9-9bed-4e7f-aaf2-1f7f5121e49f" visible="true">
         <properties>
           <explanationtext>
-            <![CDATA[All field labels can be changed in <b>'BDO Site localization'</b> module with key prefix <b>'BDO.LiveSite.SubscribeForm.'</b>.]]>
+            <![CDATA[All field labels can be changed in 'BDO Site localization'  module with key prefix 'BDO.LiveSite.SubscribeForm'.]]>
           </explanationtext>
-          <explanationtextashtml>False</explanationtextashtml>
+          <explanationtextashtml>True</explanationtextashtml>
           <fieldcaption>Information</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <fielddescriptionashtml>True</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
-          <controlname>Kentico.Administration.Checkbox</controlname>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
         </settings>
         <visibilityconditiondata>
           <VisibilityConditionConfiguration>
@@ -185,7 +164,7 @@ embedCode;Embed code
       <field allowempty="true" column="IsJobTitleRequired" columnprecision="0" columntype="boolean" enabled="true" guid="40a6eb40-f138-4888-a341-d9df8b012403" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Job Title Required</fieldcaption>
+          <fieldcaption>Is job title field required</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
         </properties>
         <settings>
@@ -253,9 +232,9 @@ embedCode;Embed code
         </settings>
         <visibilityconditiondata>
           <VisibilityConditionConfiguration>
-            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Identifier>Kentico.Administration.ContainsString</Identifier>
             <Properties>
-              <PropertyName>Form</PropertyName>
+              <PropertyName>FormType</PropertyName>
               <Value>form</Value>
               <CaseSensitive>true</CaseSensitive>
             </Properties>

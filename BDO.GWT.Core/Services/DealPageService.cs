@@ -73,17 +73,23 @@ public class DealPageService(
             ? sidebarService.GetDealSidebarDtoAsync(dealPage, cancellationToken)
             : null;
 
+        
+
 
         var hero = await heroService.GetHeroDtoAsync(heroData, cancellationToken);
         var sidebar = sidebarTask is null ? null : await sidebarTask;
 
         int displayCount = int.TryParse(dealPage.DisplayedContacts,out var parse) ? parse: 0 ;
 
-        if (dealPage.ShowSidebar)
+        if (dealPage.ShowSidebar && sidebar is not null)
         {
-            sidebar?.Contacts = sidebar.Contacts.Take(displayCount).ToArray();
+            sidebar.Contacts = sidebar.Contacts.Take(displayCount).ToArray();
+            foreach (var contact in sidebar.Contacts.Where(c => c.Image?.Url is not null))
+            {
+                contact.Image!.Url = contact.Image.Url!.TrimStart('~');
+            }
         }
-        
+
 
 
         return new DealDto

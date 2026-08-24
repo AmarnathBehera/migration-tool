@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Reporting Report</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ReportingReportID" columntype="integer" enabled="true" guid="1ed32352-a97c-4817-81c1-46718ed092df" isPK="true" />
+      <field column="ReportingReportDisplayName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="04a8d7bc-ee8c-49ee-b4f4-59370a9fb24f" />
+      <field column="ReportingReportCodeName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="a42ba1bf-bb2f-4367-81a6-0a2b3ca1a055" />
+      <field column="ReportingReportChannelSettingsID" columnprecision="0" columntype="integer" enabled="true" guid="c165cd33-6cb9-418e-9f74-898da1c626c0" refobjtype="bdo.reportingchannelsetting" reftype="Required">
+        <properties>
+          <defaultvalue>0</defaultvalue>
+        </properties>
+      </field>
+      <field column="ReportingReportQuery" columnprecision="0" columntype="longtext" enabled="true" guid="a70eda69-3384-407e-b394-33d7bb5d2da0" />
+      <field column="ReportingReportGUID" columnprecision="0" columntype="guid" enabled="true" guid="0dfadc2b-7b93-452e-bc3f-0bdc425fb23c" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>5c861584-e3db-4556-81d3-3b12fa9a5e4e</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.ReportingReport</ClassName>
+  <ClassResourceID>
+    <CodeName>ReportingApplication</CodeName>
+    <GUID>bdd1c3fd-8fb1-451c-b386-9b05228a7569</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_ReportingReport</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

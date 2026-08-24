@@ -29,12 +29,18 @@ public class InsightCarouselService : IInsightCarouselService
     private readonly IFilteringHelper _filteringHelper;
     private readonly IInsightCardService _insightCardService;
     private readonly IContentService _contentService;
+    private readonly IInsightCarouselStateStore _stateStore;
 
-    public InsightCarouselService(IFilteringHelper filteringHelper, IInsightCardService insightCardService, IContentService contentService)
+    public InsightCarouselService(
+        IFilteringHelper filteringHelper,
+        IInsightCardService insightCardService,
+        IContentService contentService,
+        IInsightCarouselStateStore stateStore)
     {
         _filteringHelper = filteringHelper;
         _insightCardService = insightCardService;
         _contentService = contentService;
+        _stateStore = stateStore;
     }
 
     public async Task<InsightCarouselDto> GetInsightCarouselAsync<T>(T currentPage, InsightCarouselData data, CancellationToken cancellationToken)
@@ -48,6 +54,9 @@ public class InsightCarouselService : IInsightCarouselService
           : null;
 
         var featuredSet = data.FeaturedInsightNodeGuids?.ToHashSet() ?? new HashSet<ContentItemReference>();
+        var stateGuid = Guid.NewGuid();
+
+        _stateStore.Save(stateGuid, featuredSet);
 
         var dto = new InsightCarouselDto
         {
@@ -71,6 +80,7 @@ public class InsightCarouselService : IInsightCarouselService
             WidgetID = data.WidgetID,
             CurrentPageGuid = currentPage.SystemFields.ContentItemGUID,
             PageType = currentPage.GetType().Name,
+            StateGUID = stateGuid,
         };
 
         return dto;
@@ -90,11 +100,17 @@ public class InsightCarouselService : IInsightCarouselService
 
     public async Task<ICollection<ContentPageCardDto>> GetAPIFilteredItemsAsync(CardsQuery query, CancellationToken cancellationToken)
     {
-        // Safe null handling for CurrentPageGuid
+        var featuredGuids = new HashSet<ContentItemReference>();
+
+        if (query.State.HasValue)
+        {
+            _stateStore.TryGet(query.State.Value, out featuredGuids);
+        }
+
         return await BuildAndExecuteQueryAsync(
             query.CurrentPageGuid?.ToString() ?? string.Empty,
             query.PageType ?? string.Empty,
-            new HashSet<ContentItemReference>(),
+            featuredGuids,
             query,
             cancellationToken);
     }

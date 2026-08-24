@@ -13,8 +13,8 @@ namespace BDO.GWT.Core.Services
         bool IsInPreviewMode { get; }
         bool IsInPageBuilderMode { get; }
         Task<BaseWebPage> GetCurrentPageBasePropertiesAsync(CancellationToken cancellationToken = default);
-        Task<IWebPageFieldsSource> GetAnyPageByWebPageItemId(int webPageItemId, CancellationToken cancellationToken);
-        Task<string?> GetPageTitleByWebPageItemId(int webPageItemId, CancellationToken cancellationToken);
+        Task<IWebPageFieldsSource> GetAnyPageByWebPageItemId(int webPageItemId, string languageName, CancellationToken cancellationToken);
+        Task<string?> GetPageTitleByWebPageItemId(int webPageItemId, string languageName, CancellationToken cancellationToken);
     }
 
 }
