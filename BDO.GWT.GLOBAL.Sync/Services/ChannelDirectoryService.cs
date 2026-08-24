@@ -22,12 +22,10 @@ public interface IChannelDirectoryService
 public class ChannelDirectoryService : IChannelDirectoryService
 {
     private readonly IInfoProvider<ChannelInfo> _channelProvider;
-    private readonly IInfoProvider<ContentLanguageInfo> _languageProvider;
 
-    public ChannelDirectoryService(IInfoProvider<ChannelInfo> channelProvider, IInfoProvider<ContentLanguageInfo> languageProvider)
+    public ChannelDirectoryService(IInfoProvider<ChannelInfo> channelProvider)
     {
         _channelProvider = channelProvider;
-        _languageProvider = languageProvider;
     }
 
     public async Task<ChannelOutput?> GetChannelAsync(Guid channelGuid, CancellationToken cancellationToken)
@@ -37,7 +35,7 @@ public class ChannelDirectoryService : IChannelDirectoryService
             .GetDataContainerResultAsync(cancellationToken: cancellationToken);
 
         var result = channels.FirstOrDefault();
-        return result is null ? null : await ToChannelOutputAsync(result, _languageProvider, cancellationToken);
+        return result is null ? null : ToChannelOutput(result);
     }
 
     public async Task<List<ChannelOutput>> GetAllChannelsExceptAsync(Guid excludeGuid, CancellationToken cancellationToken)
@@ -49,7 +47,7 @@ public class ChannelDirectoryService : IChannelDirectoryService
         var results = new List<ChannelOutput>();
         foreach (var channel in channels)
         {
-            results.Add(await ToChannelOutputAsync(channel, _languageProvider, cancellationToken));
+            results.Add(ToChannelOutput(channel));
         }
 
         return results;
@@ -70,21 +68,9 @@ public class ChannelDirectoryService : IChannelDirectoryService
                 nameof(WebsiteChannelInfo.WebsiteChannelDomain),
                 nameof(WebsiteChannelInfo.WebsiteChannelPrimaryContentLanguageID));
 
-    private static async Task<ChannelOutput> ToChannelOutputAsync(
-        IDataContainer channel,
-        IInfoProvider<ContentLanguageInfo> languageProvider,
-        CancellationToken cancellationToken)
+    private static ChannelOutput ToChannelOutput(IDataContainer channel)
     {
         string domain = channel.GetValue(nameof(WebsiteChannelInfo.WebsiteChannelDomain))?.ToString() ?? string.Empty;
-        int primaryLanguageId = ValidationHelper.GetInteger(
-            channel.GetValue(nameof(WebsiteChannelInfo.WebsiteChannelPrimaryContentLanguageID)), 0);
-
-        var language = primaryLanguageId > 0
-            ? (await languageProvider.Get()
-                .WhereEquals(nameof(ContentLanguageInfo.ContentLanguageID), primaryLanguageId)
-                .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
-                .FirstOrDefault()
-            : null;
 
         var general = new SiteGeneralOutput
         {

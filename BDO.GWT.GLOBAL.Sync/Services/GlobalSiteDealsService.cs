@@ -118,7 +118,7 @@ public class GlobalSiteDealsService : IGlobalSiteDealsService
             .InLanguage(GLOBAL_CULTURE);
 
         var sectionDeals = await _contentQueryExecutor.GetMappedResult<SectionDeals>(
-            builder, new ContentQueryExecutionOptions { ForPreview = true });
+            builder, new ContentQueryExecutionOptions { ForPreview = true }, cancellationToken: cancellationToken);
 
         return sectionDeals.FirstOrDefault();
     }
@@ -131,7 +131,7 @@ public class GlobalSiteDealsService : IGlobalSiteDealsService
             .InLanguage(GLOBAL_CULTURE);
 
         var remoteDeals = await _contentQueryExecutor.GetMappedResult<RemoteDeal>(
-            builder, new ContentQueryExecutionOptions { ForPreview = true });
+            builder, new ContentQueryExecutionOptions { ForPreview = true }, cancellationToken: cancellationToken);
 
         return remoteDeals.ToList();
     }
@@ -153,7 +153,7 @@ public class GlobalSiteDealsService : IGlobalSiteDealsService
             try
             {
                 var channelDeals = await _contentQueryExecutor.GetMappedResult<Deal>(
-                    builder, new ContentQueryExecutionOptions { ForPreview = true });
+                    builder, new ContentQueryExecutionOptions { ForPreview = true }, cancellationToken: cancellationToken);
 
                 dealsWithChannel.AddRange(channelDeals.Select(d => (Deal: d, ChannelGuid: channel.General.GUID)));
             }
@@ -213,7 +213,7 @@ public class GlobalSiteDealsService : IGlobalSiteDealsService
                     remoteDeal.SystemFields.WebPageItemID, GLOBAL_CULTURE)
                 {
                     Permanently = true,
-                });
+                }, cancellationToken);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
@@ -362,7 +362,7 @@ public class GlobalSiteDealsService : IGlobalSiteDealsService
     private async Task<Dictionary<string, ContentItemReference>> GetGlobalDealCardReferencesByCodeNameAsync<T>(
         string contentType,
         ChannelOutput globalChannel,
-        IReadOnlyCollection<string> codeNames,
+        List<string> codeNames,
         Func<T, string> codeNameSelector,
         CancellationToken cancellationToken)
         where T : class, IWebPageFieldsSource
@@ -377,11 +377,11 @@ public class GlobalSiteDealsService : IGlobalSiteDealsService
         var builder = new ContentItemQueryBuilder()
             .ForContentType(contentType, q => q
                 .ForWebsite(globalChannel.General.CodeName)
-                .Where(w => w.WhereIn(DEAL_CARD_CODE_NAME_FIELD, codeNames.ToList())))
+                .Where(w => w.WhereIn(DEAL_CARD_CODE_NAME_FIELD, codeNames)))
             .InLanguage(GLOBAL_CULTURE);
 
         var items = await _contentQueryExecutor.GetMappedResult<T>(
-            builder, new ContentQueryExecutionOptions { ForPreview = true });
+            builder, new ContentQueryExecutionOptions { ForPreview = true }, cancellationToken: cancellationToken);
 
         foreach (var group in items.GroupBy(codeNameSelector, StringComparer.OrdinalIgnoreCase))
         {
