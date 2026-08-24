@@ -70,31 +70,17 @@ namespace BDO.GWT.Core.Helpers
         }
 
         private SearchCardType GetCardType(SearchDocument searchDocument)
-        {
-            //var pageType = _typeMapper.GetTypeFromPageClassNameInvariant(searchDocument.ClassName);
-
-            //if (!SearchCardTypeByPageType.TryGetValue(pageType, out var searchCardType))
-            //{
-            //var searchCardType = SearchCardType.Generic;
-            //}
-
-            //if(searchDocument.ClassName == "BDO.Insight")
-            //{
-            //    return SearchCardType.Insight;
-            //}
-            //
-            //else
-            //{
+        {          
             var className = searchDocument.ClassName;   // breakpoint here: inspect actual class name
 
             if (className == "BDO.Insight")
             {
                 return SearchCardType.Insight;
             }
-            else if (searchDocument.ClassName == "BDO.Event" || searchDocument.ClassName == "BDO.Webinar")
-            {
-                return SearchCardType.EventsAndWebinars;
-            }
+            //else if (searchDocument.ClassName == "BDO.Event" || searchDocument.ClassName == "BDO.Webinar")
+            //{
+            //    return SearchCardType.EventsAndWebinars;
+            //}
                 return SearchCardType.Generic;
             
         }
@@ -111,6 +97,7 @@ namespace BDO.GWT.Core.Helpers
                     var genericCards = await MapGenericCardsAsync(searchDocuments.ToList(), cancellationToken);
                     var wrappedGeneric = WrapCards(genericCards, SearchCardType.Generic);
                     return wrappedGeneric;
+                
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(searchCardType), searchCardType, null);
