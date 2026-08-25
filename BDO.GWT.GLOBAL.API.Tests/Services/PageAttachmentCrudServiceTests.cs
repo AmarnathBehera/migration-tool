@@ -1,5 +1,4 @@
 using BDO.GWT.GLOBAL.API.Data;
-using BDO.GWT.GLOBAL.API.Helpers;
 using BDO.GWT.GLOBAL.API.Services;
 using CMS.ContentEngine;
 using Moq;
@@ -12,17 +11,17 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services;
 public class PageAttachmentCrudServiceTests
 {
     private Mock<IPageAttachmentService> _pageAttachmentServiceMock = null!;
-    private Mock<IChannelInfoService> _channelInfoServiceMock = null!;
+    private Mock<IPageChannelResolver> _pageChannelResolverMock = null!;
     private PageAttachmentCrudService _service = null!;
 
     [SetUp]
     public void Setup()
     {
         _pageAttachmentServiceMock = new Mock<IPageAttachmentService>();
-        _channelInfoServiceMock = new Mock<IChannelInfoService>();
+        _pageChannelResolverMock = new Mock<IPageChannelResolver>();
         _service = new PageAttachmentCrudService(
             _pageAttachmentServiceMock.Object,
-            _channelInfoServiceMock.Object);
+            _pageChannelResolverMock.Object);
     }
 
     private static BDO.ContentAttachment CreateAttachment(Guid guid, ContentItemAsset? asset = null)
@@ -77,8 +76,8 @@ public class PageAttachmentCrudServiceTests
     }
 
     private void SetupChannel(int channelId, string channelName) =>
-        _channelInfoServiceMock
-            .Setup(x => x.GetChannelNameAsync(channelId, It.IsAny<CancellationToken>()))
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(channelName);
 
     private void SetupAttachments(
@@ -189,7 +188,7 @@ public class PageAttachmentCrudServiceTests
 
         await _service.GetAttachmentAsync(7, pageGuid, attachGuid, "fr-fr");
 
-        _channelInfoServiceMock.Verify(x => x.GetChannelNameAsync(7, It.IsAny<CancellationToken>()), Times.Once);
+        _pageChannelResolverMock.Verify(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()), Times.Once);
         _pageAttachmentServiceMock.Verify(
             x => x.GetPageAttachmentsAsync(pageGuid, "channel7", "fr-fr", It.IsAny<CancellationToken>()),
             Times.Once);
@@ -288,7 +287,7 @@ public class PageAttachmentCrudServiceTests
 
         await _service.GetAttachmentsAsync(5, pageGuid, "de-de");
 
-        _channelInfoServiceMock.Verify(x => x.GetChannelNameAsync(5, It.IsAny<CancellationToken>()), Times.Once);
+        _pageChannelResolverMock.Verify(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()), Times.Once);
         _pageAttachmentServiceMock.Verify(
             x => x.GetPageAttachmentsAsync(pageGuid, "ch5", "de-de", It.IsAny<CancellationToken>()),
             Times.Once);
@@ -326,8 +325,8 @@ public class PageAttachmentCrudServiceTests
         var attachmentGuid = Guid.NewGuid();
         var expected = (Data: new byte[] { 1, 2, 3 }, ContentType: "application/pdf", FileName: "file.pdf");
 
-        _channelInfoServiceMock
-            .Setup(x => x.GetChannelNameAsync(9, It.IsAny<CancellationToken>()))
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()))
             .ReturnsAsync("ch9");
 
         _pageAttachmentServiceMock
@@ -348,8 +347,8 @@ public class PageAttachmentCrudServiceTests
         var pageGuid = Guid.NewGuid();
         var attachmentGuid = Guid.NewGuid();
 
-        _channelInfoServiceMock
-            .Setup(x => x.GetChannelNameAsync(9, It.IsAny<CancellationToken>()))
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()))
             .ReturnsAsync((string?)null);
 
         var result = await _service.GetAttachmentBinaryAsync(9, pageGuid, attachmentGuid, "en-gb", CancellationToken.None);
