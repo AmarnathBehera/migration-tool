@@ -77,11 +77,11 @@ namespace BDO.GWT.Core.Helpers
             {
                 return SearchCardType.Insight;
             }
-            //else if (searchDocument.ClassName == "BDO.Event" || searchDocument.ClassName == "BDO.Webinar")
-            //{
-            //    return SearchCardType.EventsAndWebinars;
-            //}
-                return SearchCardType.Generic;
+            else if (searchDocument.ClassName == "BDO.Event" || searchDocument.ClassName == "BDO.Webinar")
+            {
+                return SearchCardType.EventsAndWebinars;
+            }
+            return SearchCardType.Generic;
             
         }
         
@@ -91,32 +91,37 @@ namespace BDO.GWT.Core.Helpers
             {
                 case SearchCardType.Insight:
                     var insightCards = await MapInsightCardsAsync(searchDocuments, cancellationToken);
-                    return WrapCards(insightCards, SearchCardType.Insight);
+                    var wrappedInsight = WrapCards(insightCards, SearchCardType.Insight);
+                    return wrappedInsight;
 
                 case SearchCardType.Generic:
                     var genericCards = await MapGenericCardsAsync(searchDocuments.ToList(), cancellationToken);
                     var wrappedGeneric = WrapCards(genericCards, SearchCardType.Generic);
                     return wrappedGeneric;
                 
+                case SearchCardType.EventsAndWebinars:
+                    var eventWebinarCards = await MapEventAndWebinarCardsAsync(searchDocuments, cancellationToken);
+                    var wrappedEventWebinar = WrapCards(eventWebinarCards, SearchCardType.EventsAndWebinars);
+                    return wrappedEventWebinar;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(searchCardType), searchCardType, null);
             }
         }
 
-        private async Task<IEnumerable<InsightCardDto>> MapInsightCardsAsync(IEnumerable<SearchDocument> documents, CancellationToken cancellationToken)
+        private async Task<IEnumerable<InsightSearchCardDto>> MapInsightCardsAsync(IEnumerable<SearchDocument> documents, CancellationToken cancellationToken)
         {
             var documentList = documents.ToList();
 
             var relativeUrlByNodeId = await _pageUrlService.GetPageRelativeUrlByNodeIdAsync(
                 documentList.Select(x => x.NodeId), _cultureContext.CurrentLanguageTag, cancellationToken);
 
-            var cards = new List<InsightCardDto>();
+            var cards = new List<InsightSearchCardDto>();
 
             foreach (var document in documentList)
             {
                 // breakpoint here
-                var card = new InsightCardDto
+                var card = new InsightSearchCardDto
                 {
                     Title = document.MetadataTitle,
                     Description = HtmlHelper.ExtractTextFromHtml(document.MetadataDescription) ?? string.Empty,
@@ -133,45 +138,43 @@ namespace BDO.GWT.Core.Helpers
             return cards;
         }
 
-        private async Task<IEnumerable<EventsWebinarsCardDto>> MapEventAndWebinarCardsAsync(IEnumerable<SearchDocument> documents, CancellationToken cancellationToken)
+        private async Task<IEnumerable<EventWebinarSearchCard>> MapEventAndWebinarCardsAsync(IEnumerable<SearchDocument> documents, CancellationToken cancellationToken)
         {
-            var eventsAndWebinars = documents.Select(x => new EventsWebinarsSearchCardDto
-            {
-                NodeId = x.NodeId,
-                MetadataTitle = x.MetadataTitle,
-                EventType = x.EventType ?? x.EventType,
-                EventDateFrom = x.EventDateFrom ?? throw new InvalidOperationException($"{nameof(SearchDocument.EventDateFrom)} is null for {nameof(Event)} with NodeID: {x.NodeId}"),
-                EventDateTo = x.EventDateTo ?? throw new InvalidOperationException($"{nameof(SearchDocument.EventDateTo)} is null for {nameof(Event)} with NodeID: {x.NodeId}"),
-                EventLocationCity = x.EventLocationCity,
-                EventLocationTitle = x.EventLocationTitle,
-                MetadataDescription = HtmlHelper.ExtractTextFromHtml(x.MetadataDescription),
-            }).ToList();
+            var documentList = documents.ToList();
 
-            var eventWebinarCards =  new List<EventsWebinarsCardDto>();
+            var relativeUrlByNodeId = await _pageUrlService.GetPageRelativeUrlByNodeIdAsync(
+                documentList.Select(x => x.NodeId), _cultureContext.CurrentLanguageTag, cancellationToken);
 
-            foreach(var eventOrWebinar in eventsAndWebinars)
+            var cards = new List<EventWebinarSearchCard>(documentList.Count);
+
+            foreach (var document in documentList)
             {
-                var card = new EventsWebinarsCardDto
+                // breakpoint here: check EventDateFrom / EventDateTo / EventType are actually populated
+                var card = new EventWebinarSearchCard
                 {
-                    Title = eventOrWebinar.MetadataTitle,
-                    Description = eventOrWebinar.MetadataDescription,
-                    //Type = eventOrWebinar.EventType,
-                    //DateTime = eventOrWebinar.EventDateFrom ?? throw new InvalidOperationException($"{nameof(SearchDocument.EventDateFrom)} is null for {nameof(Event)} with NodeID: {eventOrWebinar.NodeId}"),
-                    //DateTimeTo = eventOrWebinar.EventDateTo,
-                    //Location = eventOrWebinar.EventLocationTitle,
+                    NodeId             = document.NodeId,
+                    EventTitle         = document.MetadataTitle,
+                    EventDescription   = HtmlHelper.ExtractTextFromHtml(document.MetadataDescription) ?? string.Empty,
+                    EventType          = document.EventType,
+                    EventDateFrom      = document.EventDateFrom,
+                    EventDateTo        = document.EventDateTo,
+                    EventLocationTitle = document.EventLocationTitle,
+                    EventLocationCity  = document.EventLocationCity,
+                    // add whatever link member EventWebinarSearchCard exposes:
+                    ReadMoreLink = relativeUrlByNodeId.TryGetValue(document.NodeId, out var url) ? url.ToHtmlCompatibleString() : string.Empty,
                 };
-                eventWebinarCards.Add(card);
+
+                cards.Add(card);
             }
 
-            //return await _eventWebinarCardsService.GetEventWebinarCardDtosAsync(eventsAndWebinars, _ => false, cancellationToken);
-            return eventWebinarCards;
+            return cards;
         }
 
-        private async Task<IEnumerable<GenericCardDto>> MapGenericCardsAsync(ICollection<SearchDocument> documents, CancellationToken cancellationToken)
+        private async Task<IEnumerable<GenericSearchCardDto>> MapGenericCardsAsync(ICollection<SearchDocument> documents, CancellationToken cancellationToken)
         {
             var relativeUrlByNodeId = await _pageUrlService.GetPageRelativeUrlByNodeIdAsync(documents.Select(x => x.NodeId), _cultureContext.CurrentLanguageTag, cancellationToken);
 
-            var cards = documents.Select(x => new GenericCardDto
+            var cards = documents.Select(x => new GenericSearchCardDto
             {
                 Title = x.MetadataTitle,
                 Description = HtmlHelper.ExtractTextFromHtml(x.MetadataDescription) ?? "",
@@ -181,11 +184,20 @@ namespace BDO.GWT.Core.Helpers
             return cards;
         }
 
+        private static readonly Dictionary<SearchCardType, string> CardTypeNames = new()
+        {
+            [SearchCardType.Insight]           = "Insight",
+            [SearchCardType.EventsAndWebinars] = "EventsWebinars", // match the filter name
+            [SearchCardType.Generic]           = "Generic",
+        };
+
         private static IEnumerable<SearchCardDto<TCard>> WrapCards<TCard>(IEnumerable<TCard> cards, SearchCardType searchCardType)
         {
+            var cardTypeName = CardTypeNames[searchCardType];
+
             return cards.Select(card => new SearchCardDto<TCard>
             {
-                CardType = searchCardType.ToString(),
+                CardType = cardTypeName,
                 Data = card,
             });
         }

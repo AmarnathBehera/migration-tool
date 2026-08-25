@@ -4,7 +4,7 @@ using System.Text;
 
 namespace BDO.GWT.Core.DTOs.Cards
 {
-    public class GenericCardDto
+    public class GenericSearchCardDto
     {
         public string Title { get; set; } = null!;
 
