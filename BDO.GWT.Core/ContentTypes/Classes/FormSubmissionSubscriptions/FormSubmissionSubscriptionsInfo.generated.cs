@@ -159,6 +159,39 @@ namespace BDO
 
 
         /// <summary>
+        /// Scheme.
+        /// </summary>
+        [DatabaseField]
+        public virtual string Scheme
+        {
+            get => ValidationHelper.GetString(GetValue(nameof(Scheme)), "Basic");
+            set => SetValue(nameof(Scheme), value, String.Empty);
+        }
+
+
+        /// <summary>
+        /// Username.
+        /// </summary>
+        [DatabaseField]
+        public virtual string Username
+        {
+            get => ValidationHelper.GetString(GetValue(nameof(Username)), String.Empty);
+            set => SetValue(nameof(Username), value, String.Empty);
+        }
+
+
+        /// <summary>
+        /// Encrypted password.
+        /// </summary>
+        [DatabaseField]
+        public virtual string EncryptedPassword
+        {
+            get => ValidationHelper.GetString(GetValue(nameof(EncryptedPassword)), String.Empty);
+            set => SetValue(nameof(EncryptedPassword), value, String.Empty);
+        }
+
+
+        /// <summary>
         /// Deletes the object using appropriate provider.
         /// </summary>
         protected override void DeleteObject()

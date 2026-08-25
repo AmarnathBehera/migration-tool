@@ -1,6 +1,8 @@
 ﻿using BDO.GWT.Common;
 using BDO.GWT.Core;
+using BDO.GWT.Domain.Core.Entities;
 using BDO.GWT.GLOBAL.Services;
+using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents;
 using CMS;
 using CMS.Core;
@@ -10,10 +12,13 @@ using CMS.EmailLibrary;
 using CMS.OnlineForms;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
+using Kentico.Xperience.Admin.Base;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,6 +60,9 @@ public partial class FormHandlerModule : Module
             if (formInfo == null)
                 return;
 
+            var formEntry = MapToFormEntry(formDataItem, formInfo);
+            await CheckFormSubmissionAsync(formDataItem, formEntry).ConfigureAwait(false);
+
             switch (formInfo.FormName?.ToLowerInvariant())
             {
                 case "bdo_contactuswithsaveurl":
@@ -79,8 +87,24 @@ public partial class FormHandlerModule : Module
             _logger.LogError(ex, "Failed to handle form item insert event.");
         }
     }
+    private async Task CheckFormSubmissionAsync(BizFormItem formDataItem, FormEntry formEntry)
+    {
+        try
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var formSubmissionSubscriptionsService = scope.ServiceProvider
+                .GetRequiredService<IFormSubmissionSubscriptionsService>();
 
-    private async Task SendEmailAsync(BizFormItem formDataItem)
+            await formSubmissionSubscriptionsService
+                .InvokeRegisteredEndpointsAsync(formDataItem, formEntry, CancellationToken.None)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogError(ex, "Failed to invoke registered form submission endpoints.");
+        }
+    }
+   private async Task SendEmailAsync(BizFormItem formDataItem)
     {
         try
         {
@@ -209,6 +233,47 @@ public partial class FormHandlerModule : Module
             return null;
         }
     }
+
+    private static FormEntry MapToFormEntry(BizFormItem formItem, BizFormInfo formInfo)
+    {
+#nullable enable
+        IEnumerable<KeyValuePair<string, object?>> EnumerateColumns()
+        {
+            foreach (var column in formItem.ColumnNames)
+                yield return new KeyValuePair<string, object?>(column, formItem.GetValue(column));
+        }
+
+        return BuildFormEntry(formItem.ItemID, formInfo.FormID, formInfo.FormName, EnumerateColumns());
+#nullable restore
+    }
+
+    /// <summary>
+    /// Pure, testable projection of raw form data into a <see cref="FormEntry"/>.
+    /// Kept internal (rather than private) so unit tests can exercise it without
+    /// standing up Kentico's DataClass / IoC pipeline.
+    /// </summary>
+#nullable enable
+    internal static FormEntry BuildFormEntry(
+        int itemId,
+        int formId,
+        string? formName,
+        IEnumerable<KeyValuePair<string, object?>> columns)
+    {
+        var entry = new FormEntry
+        {
+            ID = itemId,
+            FormID = formId,
+            FormCodeName = formName ?? string.Empty,
+        };
+
+        foreach (var kvp in columns)
+        {
+            entry[kvp.Key] = kvp.Value is not null ? $"{{{kvp.Value}}}" : null;
+        }
+
+        return entry;
+    }
+#nullable restore
 
     private string GetReferrerUrl()
         => _httpContextAccessor?.HttpContext?.Request.Headers.Referer.ToString()

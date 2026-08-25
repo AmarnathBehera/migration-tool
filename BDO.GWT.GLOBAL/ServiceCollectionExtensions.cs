@@ -4,6 +4,7 @@ using BDO.GWT.Core.Services.Header;
 using BDO.GWT.CustomReportingModule.ReportingApp;
 using BDO.GWT.GLOBAL.Components.FormComponents.CustomDropdown;
 using BDO.GWT.GLOBAL.Services;
+using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using GWTXbyKWeb.Components.Services.SEOOptions;
@@ -46,6 +47,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddSingleton<ISqlBrowserResultProvider, SqlBrowserResultProvider>();
         serviceCollection.AddSingleton<ISqlBrowserExporter, SqlBrowserExporter>();
         serviceCollection.AddSingleton<ISqlQueryValidator, SqlQueryValidator>();
+        serviceCollection.AddSingleton<IFormSubmissionSubscriptionsService, FormSubmissionSubscriptionsService>();
 
     }
 
