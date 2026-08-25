@@ -16,6 +16,6 @@ namespace BDO.GWT.Core.DTOs.Cards
 
         public string? ImageAltText { get; set; }
 
-        public string ReadMoreLink { get; set; } = null!;
+        public LinkItemDto ReadMoreLink { get; set; } = null!;
     }
 }

@@ -1,4 +1,5 @@
-﻿using BDO.GWT.Core.DTOs;
+﻿using BDO.GWT.Core.Constants;
+using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.Entities.Search;
 using BDO.GWT.Core.Extensions;
@@ -127,9 +128,11 @@ namespace BDO.GWT.Core.Helpers
                     Description = HtmlHelper.ExtractTextFromHtml(document.MetadataDescription) ?? string.Empty,
                     ImageURL = GetAbsoluteAssetUrl(document.InsightImage),
                     ImageAltText = document.InsightImageAltText ?? string.Empty,
-                    ReadMoreLink = relativeUrlByNodeId.TryGetValue(document.NodeId, out var url)
-                        ? url.ToHtmlCompatibleString()
-                        : string.Empty,
+                    ReadMoreLink = new LinkItemDto
+                    {
+                        Title = ResourceStringKey.LiveSite.ReadMore,
+                        URL = relativeUrlByNodeId.TryGetValue(document.NodeId, out var url) ? url.ToHtmlCompatibleString() : string.Empty,
+                    },
                 };
 
                 cards.Add(card);
@@ -150,18 +153,26 @@ namespace BDO.GWT.Core.Helpers
             foreach (var document in documentList)
             {
                 // breakpoint here: check EventDateFrom / EventDateTo / EventType are actually populated
+                var title = FirstNotEmpty(document.MetadataTitle, document.Title, document.Content) ?? string.Empty;
+                var dateTime = document.EventDateFrom ?? document.SortDate ?? document.CreatedWhen;
+                var dateTimeTo = document.EventDateFrom.HasValue && document.EventDateTo.HasValue && document.EventDateFrom.Value.Date != document.EventDateTo.Value.Date
+                    ? document.EventDateTo
+                    : null;
+                var location = FirstNotEmpty(document.EventLocationCity, document.EventLocationTitle) ?? string.Empty;
+
                 var card = new EventWebinarSearchCard
                 {
-                    NodeId             = document.NodeId,
-                    EventTitle         = document.MetadataTitle,
-                    EventDescription   = HtmlHelper.ExtractTextFromHtml(document.MetadataDescription) ?? string.Empty,
-                    EventType          = document.EventType,
-                    EventDateFrom      = document.EventDateFrom,
-                    EventDateTo        = document.EventDateTo,
-                    EventLocationTitle = document.EventLocationTitle,
-                    EventLocationCity  = document.EventLocationCity,
-                    // add whatever link member EventWebinarSearchCard exposes:
-                    ReadMoreLink = relativeUrlByNodeId.TryGetValue(document.NodeId, out var url) ? url.ToHtmlCompatibleString() : string.Empty,
+                    Title = title,
+                    Description = HtmlHelper.ExtractTextFromHtml(document.MetadataDescription) ?? string.Empty,
+                    Type = document.EventType,
+                    DateTime = dateTime,
+                    DateTimeTo = dateTimeTo,
+                    Location = location,
+                    Link = new LinkItemDto
+                    {
+                        Title = ResourceStringKey.LiveSite.ReadMore,
+                        URL = relativeUrlByNodeId.TryGetValue(document.NodeId, out var url) ? url.ToHtmlCompatibleString() : string.Empty,
+                    },
                 };
 
                 cards.Add(card);
@@ -187,7 +198,7 @@ namespace BDO.GWT.Core.Helpers
         private static readonly Dictionary<SearchCardType, string> CardTypeNames = new()
         {
             [SearchCardType.Insight]           = "Insight",
-            [SearchCardType.EventsAndWebinars] = "EventsWebinars", // match the filter name
+            [SearchCardType.EventsAndWebinars] = "EventsAndWebinars",
             [SearchCardType.Generic]           = "Generic",
         };
 
@@ -234,6 +245,11 @@ namespace BDO.GWT.Core.Helpers
             }
 
             return url;
+        }
+
+        private static string? FirstNotEmpty(params string?[] values)
+        {
+            return values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
         }
     }
 }

@@ -71,9 +71,9 @@ namespace BDO.GWT.Core.Mappers
 
             CreateMap<AzureSearchDocument, SearchDocument>()
                 .ForMember(d => d.Title,
-                    o => o.MapFrom(s => s.DocumentPageTitle))
+                    o => o.MapFrom(s => FirstNotEmpty(s.DocumentPageTitle, s.MetadataTitle, s.DocumentName)))
                 .ForMember(d => d.MetadataDescription,
-                    o => o.MapFrom(s => s.MetadataDescription))
+                    o => o.MapFrom(s => FirstNotEmpty(s.MetadataDescription, s.DocumentPageDescription, s.DescriptionBody, s.Content)))
                 .ForMember(d => d.NodeAliasPath,
                     o => o.MapFrom(s => s.Url))
                 .ForMember(
@@ -95,17 +95,19 @@ namespace BDO.GWT.Core.Mappers
                 .ForMember(d => d.DocumentId,
                     o => o.MapFrom(s => s.DocumentID ?? 0))
                 .ForMember(d => d.NodeId,
-                    o => o.MapFrom(s => s.NodeID ?? 0))
+                    o => o.MapFrom(s => s.DocumentNodeID ?? s.NodeID ?? 0))
                 .ForMember(d => d.Content,
                     o => o.MapFrom(s => s.Content))
                 .ForMember(d => d.MetadataTitle,
-                    o => o.MapFrom(s => s.MetadataTitle))
+                    o => o.MapFrom(s => FirstNotEmpty(s.MetadataTitle, s.DocumentPageTitle, s.DocumentName)))
                  .ForMember(d => d.InsightImage,
                     o => o.MapFrom(s => s.Image == null ? null : s.Image))
                 .ForMember(d => d.InsightImageAltText,
                     o => o.MapFrom(s => s.ImageAltText ?? string.Empty))
                 .ForMember(d => d.SortDate,
                     o => o.MapFrom(s => s.SortDate))
+                .ForMember(d => d.CreatedWhen,
+                    o => o.MapFrom(s => s.DocumentCreatedWhen.HasValue ? s.DocumentCreatedWhen.Value.UtcDateTime : DateTime.MinValue))
                .ForMember(
                   d => d.EventDateFrom,
                   o => o.MapFrom(s =>
@@ -129,6 +131,11 @@ namespace BDO.GWT.Core.Mappers
                     o => o.MapFrom(s => s.EventType))
                 .ForMember(d => d.LanguageTag,
                     o => o.MapFrom(s => s.SysCulture));
+        }
+
+        private static string? FirstNotEmpty(params string?[] values)
+        {
+            return values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
         }
 
     }

@@ -97,7 +97,7 @@ namespace BDO.GWT.Core.Services
         },
             [ServicesPageGroupKey] = new[]
             {
-            typeof(BusinessLine), typeof(ServiceArea), typeof(Service), typeof(SubService),
+            typeof(BusinessLine), typeof(ServiceArea), typeof(Service), typeof(Sub_Service),
         },
             [BlogsPageGroupKey] = new[]
             {
