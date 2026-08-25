@@ -19,31 +19,21 @@ public class CareerCategoryPageService : ICareerCategoryPageService
 {
     private readonly IHeroService _heroService;
     private readonly IContentService _contentRetriever;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
-    public CareerCategoryPageService(IHeroService heroService, IContentService contentService, IWebsiteChannelContext websiteChannelContext)
+    public CareerCategoryPageService(IHeroService heroService, IContentService contentService)
     {
         _heroService = heroService;
         _contentRetriever = contentService;
-        _websiteChannelContext = websiteChannelContext;
 
     }
 
     public async Task<CareerCategoryDto> GetCareerCategoryDtoAsync(CancellationToken cancellationToken)
     {
-        var pages = await _contentRetriever.GetPagesAsync<CareerCategory>(
-            new RetrievePagesParameters
+        var careercategorypage = await _contentRetriever.RetrieveCurrentPageAsync<CareerContent>(
+            new RetrieveCurrentPageParameters()
             {
-                LinkedItemsMaxLevel = 5
-            },
-            query =>
-            {
-                query.Where(w =>
-                    w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
-            },
-            RetrievalCacheSettings.CacheDisabled,
-            cancellationToken);
 
-        var careercategorypage = pages?.FirstOrDefault();
+                LinkedItemsMaxLevel = 3
+            }, cancellationToken);
 
         if (careercategorypage == null)
         {

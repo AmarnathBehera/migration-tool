@@ -19,6 +19,7 @@
     using BDO.GWT.Web.Services;
     using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
     using BDO.GWT.Xperience.Core.LiveSite.Services;
+    using BDO.GWT.Common.Helpers;
     using BDO.GWT.Xperience.Core.Services;
     using CMS.ContentEngine;
     using CMS.Helpers;
@@ -100,7 +101,6 @@
             serviceCollection.AddScoped<IInsightCardService, InsightCardService>();
             serviceCollection.AddScoped<IInsightCarouselService, InsightCarouselService>();
             serviceCollection.AddScoped<IInsightCarouselStateStore, InsightCarouselStateStore>();
-            serviceCollection.AddScoped<IEditorsPickStateStore, EditorsPickStateStore>();
 
             serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
             serviceCollection.AddScoped<IEventWebinarPageService, EventWebinarPageService>();
@@ -153,6 +153,7 @@
             serviceCollection.AddScoped<IDateTimeProvider, DateTimeProvider>();
             serviceCollection.AddScoped<IRelatedContentCardService, RelatedContentCardService>();
             serviceCollection.AddScoped<IRelatedContentCarouselService, RelatedContentCarouselService>();
+            serviceCollection.AddSingleton<ISecretsEncryptionHelper, SecretsEncryptionHelper>();
 
             return serviceCollection;
         }

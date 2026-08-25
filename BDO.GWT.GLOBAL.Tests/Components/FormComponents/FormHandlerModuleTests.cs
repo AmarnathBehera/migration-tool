@@ -1,8 +1,12 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using BDO.GWT.Core;
+using BDO.GWT.Domain.Core.Entities;
+using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents;
 using CMS.DataEngine;
 using CMS.EmailLibrary;
+using CMS.OnlineForms;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Http;
@@ -442,6 +446,145 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             var url = InvokePrivate<string>(_module, "GetReferrerUrl");
 
             Assert.That(url, Is.EqualTo("https://example.com/"));
+        }
+
+        // ??? MapToFormEntry ??????????????????????????????????????????????????????
+
+        [Test]
+        public void MapToFormEntry_MapsFormItemIdAndFormId()
+        {
+            var result = FormHandlerModule.BuildFormEntry(
+                itemId: 99,
+                formId: 7,
+                formName: "test_form",
+                columns: Array.Empty<KeyValuePair<string, object?>>());
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.ID, Is.EqualTo(99));
+                Assert.That(result.FormID, Is.EqualTo(7));
+                Assert.That(result.FormCodeName, Is.EqualTo("test_form"));
+            });
+        }
+
+        [Test]
+        public void MapToFormEntry_NullFormName_UsesEmptyString()
+        {
+            var result = FormHandlerModule.BuildFormEntry(
+                itemId: 1,
+                formId: 1,
+                formName: null,
+                columns: Array.Empty<KeyValuePair<string, object?>>());
+
+            Assert.That(result.FormCodeName, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void MapToFormEntry_ColumnWithNullValue_StoresNullInEntry()
+        {
+            var result = FormHandlerModule.BuildFormEntry(
+                itemId: 1,
+                formId: 1,
+                formName: "form",
+                columns: new[] { new KeyValuePair<string, object?>("Field1", null) });
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.ContainsKey("Field1"), Is.True);
+                Assert.That(result["Field1"], Is.Null);
+            });
+        }
+
+        [Test]
+        public void MapToFormEntry_ColumnWithNonNullValue_WrapsValueInBraces()
+        {
+            var result = FormHandlerModule.BuildFormEntry(
+                itemId: 1,
+                formId: 1,
+                formName: "form",
+                columns: new[] { new KeyValuePair<string, object?>("Email", "user@example.com") });
+
+            Assert.That(result["Email"], Is.EqualTo("{user@example.com}"));
+        }
+
+        // ??? CheckFormSubmissionAsync ????????????????????????????????????????????
+
+        [Test]
+        public async Task CheckFormSubmissionAsync_InvokesRegisteredEndpoints()
+        {
+            var subscriptionServiceMock = new Mock<IFormSubmissionSubscriptionsService>();
+            subscriptionServiceMock
+                .Setup(s => s.InvokeRegisteredEndpointsAsync(
+                    It.IsAny<BizFormItem>(),
+                    It.IsAny<FormEntry>(),
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var scope = CreateScope(subscriptionServiceMock.Object);
+            _scopeFactory.Setup(f => f.CreateScope()).Returns(scope);
+
+            var formItem = (BizFormItem)RuntimeHelpers.GetUninitializedObject(typeof(BizFormItem));
+            var formEntry = new FormEntry();
+
+            var mi = typeof(FormHandlerModule).GetMethod("CheckFormSubmissionAsync", PrivateInstance);
+            Assert.That(mi, Is.Not.Null);
+            await (Task)mi!.Invoke(_module, [formItem, formEntry])!;
+
+            subscriptionServiceMock.Verify(s => s.InvokeRegisteredEndpointsAsync(
+                formItem, formEntry, CancellationToken.None), Times.Once);
+        }
+
+        [Test]
+        public async Task CheckFormSubmissionAsync_WhenServiceThrows_DoesNotPropagate()
+        {
+            var subscriptionServiceMock = new Mock<IFormSubmissionSubscriptionsService>();
+            subscriptionServiceMock
+                .Setup(s => s.InvokeRegisteredEndpointsAsync(
+                    It.IsAny<BizFormItem>(),
+                    It.IsAny<FormEntry>(),
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("Boom"));
+
+            var scope = CreateScope(subscriptionServiceMock.Object);
+            _scopeFactory.Setup(f => f.CreateScope()).Returns(scope);
+
+            var formItem = (BizFormItem)RuntimeHelpers.GetUninitializedObject(typeof(BizFormItem));
+            var formEntry = new FormEntry();
+
+            var mi = typeof(FormHandlerModule).GetMethod("CheckFormSubmissionAsync", PrivateInstance);
+            Assert.That(mi, Is.Not.Null);
+
+            // Exception must be swallowed — method does not rethrow.
+            Assert.DoesNotThrowAsync(async () =>
+                await (Task)mi!.Invoke(_module, [formItem, formEntry])!);
+        }
+
+        // ??? Helpers (additional) ????????????????????????????????????????????????
+
+        private static IServiceScope CreateScope(IFormSubmissionSubscriptionsService service)
+        {
+            var services = new ServiceCollection();
+            services.AddSingleton(service);
+            var sp = services.BuildServiceProvider();
+            var scopeMock = new Mock<IServiceScope>();
+            scopeMock.SetupGet(s => s.ServiceProvider).Returns(sp);
+            return scopeMock.Object;
+        }
+
+        /// <summary>
+        /// The MapToFormEntry helpers previously created uninitialized <see cref="BizFormInfo"/>/
+        /// <see cref="BizFormItem"/> instances, but their setters go through Kentico's DataClass
+        /// which requires the CMS IoC container. The tests now target the pure
+        /// <c>FormHandlerModule.BuildFormEntry</c> helper instead.
+        /// </summary>
+
+        private static T InvokeStaticPrivate<T>(string method, params object?[] args)
+        {
+            var mi = typeof(FormHandlerModule).GetMethod(
+                method,
+                BindingFlags.Static | BindingFlags.NonPublic);
+            Assert.That(mi, Is.Not.Null, $"Private static method '{method}' not found.");
+            return (T)mi!.Invoke(null, args)!;
         }
 
         private static void SetPrivateField(object target, string name, object value)
