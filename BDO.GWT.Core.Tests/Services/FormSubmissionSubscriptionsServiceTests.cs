@@ -630,11 +630,15 @@ public class FormSubmissionSubscriptionsServiceTests
         return mock.Object;
     }
 
+    // CA1873 flags ILogger.Log calls whose arguments may be expensive to evaluate,
+    // recommending an IsEnabled guard. The Log(...) invocations below are NOT real
+    // log calls — they are Moq expression trees used only to match invocations
+    // against the mock, so the analyzer's guidance does not apply here.
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Usage", "CA1873:Avoid potentially expensive logging",
+        Justification = "Expressions are Moq Verify matchers, not actual log calls.")]
     private void VerifyLoggedAtLeastOnce(LogLevel level, bool withException = false)
     {
-        // CA1873: gate the mock expression on IsEnabled so it's not evaluated when disabled.
-        _loggerMock.Setup(l => l.IsEnabled(level)).Returns(true);
-
         if (withException)
         {
             _loggerMock.Verify(
