@@ -86,7 +86,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
             }
 
             Response.Headers["Content-Disposition"] = "inline";
-            return File(result.Value.Data, MediaTypeNames.Application.Octet, result.Value.FileName);
+            return File(result.Value.Data, MediaTypeNames.Application.Octet);
         }
     }
 }
