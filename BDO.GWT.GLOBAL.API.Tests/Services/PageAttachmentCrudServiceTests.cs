@@ -319,6 +319,47 @@ public class PageAttachmentCrudServiceTests
         });
     }
 
+    [Test]
+    public async Task GetAttachmentBinaryAsync_ForwardsArgumentsToPageAttachmentService()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+        var expected = (Data: new byte[] { 1, 2, 3 }, ContentType: "application/pdf", FileName: "file.pdf");
+
+        _channelInfoServiceMock
+            .Setup(x => x.GetChannelNameAsync(9, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("ch9");
+
+        _pageAttachmentServiceMock
+            .Setup(x => x.GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch9", "en-gb", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expected);
+
+        var result = await _service.GetAttachmentBinaryAsync(9, pageGuid, attachmentGuid, "en-gb", CancellationToken.None);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Value, Is.EqualTo(expected));
+        });
+    }
+
+    [Test]
+    public async Task GetAttachmentBinaryAsync_WhenChannelNameIsNull_ReturnsNull()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+
+        _channelInfoServiceMock
+            .Setup(x => x.GetChannelNameAsync(9, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        var result = await _service.GetAttachmentBinaryAsync(9, pageGuid, attachmentGuid, "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+        _pageAttachmentServiceMock.Verify(
+            x => x.GetPageAttachmentBinaryAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
     // ── MimeType mapping ────────────────────────────────────────────────────────
 
     [TestCase(".png", "image/png")]

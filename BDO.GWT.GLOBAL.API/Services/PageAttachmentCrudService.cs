@@ -61,6 +61,27 @@ namespace BDO.GWT.GLOBAL.API.Services
             return attachments.Select(Map);
         }
 
+        public async Task<(byte[] Data, string ContentType, string FileName)?> GetAttachmentBinaryAsync(
+            int channelId,
+            Guid pageGuid,
+            Guid attachmentGuid,
+            string culture,
+            CancellationToken cancellationToken = default)
+        {
+            var channelName = await channelInfoService.GetChannelNameAsync(channelId, cancellationToken);
+            if (channelName is null)
+            {
+                return null;
+            }
+
+            return await pageAttachmentService.GetPageAttachmentBinaryAsync(
+                pageGuid,
+                attachmentGuid,
+                channelName,
+                culture,
+                cancellationToken);
+        }
+
 
         private static PageAttachmentOutput Map(ContentAttachment attachment)
         {

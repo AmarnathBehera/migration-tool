@@ -1,15 +1,31 @@
 ﻿using BDO.GWT.Core;
+using BDO.GWT.GLOBAL.API.Options;
 using CMS.Websites;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.Options;
+using System.Net.Mime;
 
 namespace BDO.GWT.GLOBAL.API.Data
 {
     public class PageAttachmentService : IPageAttachmentService
     {
-        private readonly IContentService _contentService;
+        private static readonly FileExtensionContentTypeProvider ContentTypeProvider = new();
 
-        public PageAttachmentService(IContentService contentService)
+        private readonly IContentService _contentService;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly PageAttachmentOptions _pageAttachmentOptions;
+
+        public PageAttachmentService(
+            IContentService contentService,
+            IHttpClientFactory httpClientFactory,
+            IHttpContextAccessor httpContextAccessor,
+            IOptions<PageAttachmentOptions> pageAttachmentOptions)
         {
             _contentService = contentService;
+            _httpClientFactory = httpClientFactory;
+            _httpContextAccessor = httpContextAccessor;
+            _pageAttachmentOptions = pageAttachmentOptions.Value;
         }
 
         public async Task<IEnumerable<ContentAttachment>> GetPageAttachmentsAsync(
@@ -31,6 +47,73 @@ namespace BDO.GWT.GLOBAL.API.Data
             return pages
                 .SelectMany(GetAttachmentsFromPage)
                 .ToList();
+        }
+
+        public async Task<(byte[] Data, string ContentType, string FileName)?> GetPageAttachmentBinaryAsync(
+            Guid pageGuid,
+            Guid attachmentGuid,
+            string channelName,
+            string culture,
+            CancellationToken cancellationToken = default)
+        {
+            var attachments = await GetPageAttachmentsAsync(pageGuid, channelName, culture, cancellationToken);
+            var attachment = attachments.FirstOrDefault(x => x.SystemFields.ContentItemGUID == attachmentGuid);
+            var asset = attachment?.ContentAttachmentAsset;
+
+            if (asset?.Url is null)
+            {
+                return null;
+            }
+
+            var normalizedPath = NormalizePath(asset.Url);
+            var assetUri = BuildAssetUri(normalizedPath);
+            if (assetUri is null)
+            {
+                return null;
+            }
+
+            var response = await _httpClientFactory.CreateClient().GetAsync(assetUri, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            var data = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+            var contentType = response.Content.Headers.ContentType?.MediaType
+                ?? GetMimeType(asset.Metadata.Extension ?? string.Empty);
+            var fileName = asset.Metadata.Name ?? "attachment";
+
+            return (data, contentType, fileName);
+        }
+
+        private static string NormalizePath(string assetUrl)
+        {
+            var normalizedPath = assetUrl.Trim().TrimStart('~');
+            return normalizedPath.StartsWith('/') ? normalizedPath : $"/{normalizedPath}";
+        }
+
+        private static string GetMimeType(string extension)
+        {
+            if (ContentTypeProvider.TryGetContentType($"file{extension}", out var contentType))
+            {
+                return contentType;
+            }
+
+            return MediaTypeNames.Application.Octet;
+        }
+
+        private Uri? BuildAssetUri(string normalizedPath)
+        {
+            if (!string.IsNullOrWhiteSpace(_pageAttachmentOptions.LiveSiteBaseUrl)
+                && Uri.TryCreate(_pageAttachmentOptions.LiveSiteBaseUrl, UriKind.Absolute, out var liveSiteBaseUri))
+            {
+                return new Uri(liveSiteBaseUri, normalizedPath);
+            }
+
+            var request = _httpContextAccessor.HttpContext?.Request;
+            return request is null
+                ? null
+                : new Uri($"{request.Scheme}://{request.Host}{normalizedPath}");
         }
 
         private static IEnumerable<ContentAttachment> GetAttachmentsFromPage(IWebPageFieldsSource page)

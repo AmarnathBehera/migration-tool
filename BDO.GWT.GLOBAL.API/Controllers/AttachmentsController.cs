@@ -61,5 +61,32 @@ namespace BDO.GWT.GLOBAL.API.Controllers
                 ? NotFound()
                 : Ok(result);
         }
+
+        [HttpGet("{attachmentGUID:guid}/binary")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status200OK, null, typeof(byte[]), MediaTypeNames.Application.Octet)]
+        public async Task<IActionResult> GetBinary(
+            int memberFirmID,
+            Guid pageGUID,
+            Guid attachmentGUID,
+            [FromQuery][Required] string culture,
+            CancellationToken cancellationToken)
+        {
+            int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
+
+            var result = await attachmentService.GetAttachmentBinaryAsync(
+                channelId,
+                pageGUID,
+                attachmentGUID,
+                culture,
+                cancellationToken);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            Response.Headers["Content-Disposition"] = "inline";
+            return File(result.Value.Data, MediaTypeNames.Application.Octet, result.Value.FileName);
+        }
     }
 }

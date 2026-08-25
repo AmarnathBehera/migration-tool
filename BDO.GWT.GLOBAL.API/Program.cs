@@ -26,6 +26,7 @@ public static class Program
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
             });
+        builder.Services.AddHttpContextAccessor();
         builder.Services.AddKentico();
         builder.Services.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
         builder.Services.AddContentServices();

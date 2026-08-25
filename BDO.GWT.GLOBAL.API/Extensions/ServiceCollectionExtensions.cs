@@ -33,6 +33,9 @@ public static class ServiceCollectionExtensions
             .BindConfiguration("MasterDataApi")
             .ValidateDataAnnotations();
 
+        serviceCollection.AddOptions<PageAttachmentOptions>()
+            .BindConfiguration("PageAttachment");
+
         serviceCollection.AddScoped<IMemberFirmService, MemberFirmService>();
         serviceCollection.AddScoped<IMasterDataApiClient, MasterDataApiClient>();
         serviceCollection.AddScoped<IValidationState, ValidationState>();
