@@ -572,8 +572,10 @@ public class GlobalSiteDealsServiceTests
             _ => industries,
             i => i.CodeName);
 
-        Assert.That(result, Is.EquivalentTo(new[] { "Valid" }));
+        Assert.That(result, Is.EquivalentTo(ExpectedValidOnly));
     }
+
+    private static readonly string[] ExpectedValidOnly = new[] { "Valid" };
 
     [Test]
     public void CollectDistinctCodeNames_TrimsAndDeduplicatesIgnoringCase()

@@ -5,7 +5,7 @@ using Kentico.Web.Mvc;
 
 namespace BDO.GWT.GLOBAL.Sync;
 
-public class Program
+public static class Program
 {
     public static void Main(string[] args)
     {

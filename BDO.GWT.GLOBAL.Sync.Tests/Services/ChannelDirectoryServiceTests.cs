@@ -139,8 +139,8 @@ public class ChannelDirectoryServiceTests
     public void ToChannelOutput_WhenIdAndGuidAreNull_FallsBackToDefaults()
     {
         var container = new Mock<IDataContainer>();
-        container.Setup(c => c.GetValue(nameof(WebsiteChannelInfo.WebsiteChannelID))).Returns((object?)null);
-        container.Setup(c => c.GetValue(nameof(ChannelInfo.ChannelGUID))).Returns((object?)null);
+        container.Setup(c => c.GetValue(nameof(WebsiteChannelInfo.WebsiteChannelID))).Returns((object)null!);
+        container.Setup(c => c.GetValue(nameof(ChannelInfo.ChannelGUID))).Returns((object)null!);
         container.Setup(c => c.GetValue(nameof(ChannelInfo.ChannelDisplayName))).Returns("A");
         container.Setup(c => c.GetValue(nameof(ChannelInfo.ChannelName))).Returns("a");
         container.Setup(c => c.GetValue(nameof(WebsiteChannelInfo.WebsiteChannelDomain))).Returns("d");
