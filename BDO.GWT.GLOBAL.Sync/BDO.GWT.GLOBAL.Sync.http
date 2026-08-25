@@ -1,6 +1,0 @@
-@BDO.GWT.GLOBAL.Sync_HostAddress = http://localhost:5145
-
-GET {{BDO.GWT.GLOBAL.Sync_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
