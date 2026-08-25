@@ -3,6 +3,7 @@ using BDO.GWT.GLOBAL.API.Bases;
 using BDO.GWT.GLOBAL.API.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Net.Http.Headers;
 using System.Net.Mime;
 
 namespace BDO.GWT.GLOBAL.API.Controllers
@@ -85,7 +86,8 @@ namespace BDO.GWT.GLOBAL.API.Controllers
                 return NotFound();
             }
 
-            Response.Headers["Content-Disposition"] = "inline";
+            Response.GetTypedHeaders().ContentDisposition = new ContentDispositionHeaderValue("inline");
+
             return File(result.Value.Data, MediaTypeNames.Application.Octet);
         }
     }
