@@ -33,7 +33,6 @@ namespace BDO.GWT.GLOBAL.Tests.Services
         {
             _filteringHelperMock = new Mock<IFilteringHelper>();
             _eventWebinarCardsServiceMock = new Mock<IEventWebinarCardsService>();
-         
             _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
             _contentQueryExecutorMock = new Mock<IContentQueryExecutor>();
 
@@ -109,6 +108,7 @@ namespace BDO.GWT.GLOBAL.Tests.Services
             _eventWebinarCardsServiceMock
                 .Setup(x => x.GetFilteredItemsAsync(
                     It.IsAny<CardsQuery>(),
+                    It.IsAny<string>(),
                     It.IsAny<Action<ContentItemQueryBuilder>?>(),
                     It.IsAny<Func<IEventOrWebinar, bool>>(),
                     false,
@@ -161,6 +161,7 @@ namespace BDO.GWT.GLOBAL.Tests.Services
             _eventWebinarCardsServiceMock
                 .Setup(x => x.GetFilteredItemsAsync(
                     It.IsAny<CardsQuery>(),
+                    It.IsAny<string>(),
                     It.IsAny<Action<ContentItemQueryBuilder>?>(),
                     It.IsAny<Func<IEventOrWebinar, bool>>(),
                     false,
@@ -175,13 +176,13 @@ namespace BDO.GWT.GLOBAL.Tests.Services
                 cancellationToken);
 
             // Assert
-            // Assert
             Assert.Multiple(() =>
             {
                 Assert.That(result.Filters, Is.Null);
                 Assert.That(result.FilteringTooltipEnabled, Is.False);
             });
-                _eventWebinarCardsServiceMock.Verify(
+
+            _eventWebinarCardsServiceMock.Verify(
                 x => x.CreateFiltersAsync(
                     It.IsAny<HashSet<string>>(),
                     It.IsAny<string?>(),
@@ -213,6 +214,7 @@ namespace BDO.GWT.GLOBAL.Tests.Services
             _eventWebinarCardsServiceMock
                 .Setup(x => x.GetFilteredItemsAsync(
                     It.IsAny<CardsQuery>(),
+                    It.IsAny<string>(),
                     It.IsAny<Action<ContentItemQueryBuilder>?>(),
                     It.IsAny<Func<IEventOrWebinar, bool>>(),
                     false,
@@ -251,13 +253,14 @@ namespace BDO.GWT.GLOBAL.Tests.Services
             _eventWebinarCardsServiceMock
                 .Setup(x => x.GetFilteredItemsAsync(
                     It.IsAny<CardsQuery>(),
+                    It.IsAny<string>(),
                     It.IsAny<Action<ContentItemQueryBuilder>?>(),
                     It.IsAny<Func<IEventOrWebinar, bool>>(),
                     false,
                     true,
                     cancellationToken))
-                .Callback<CardsQuery, Action<ContentItemQueryBuilder>?, Func<IEventOrWebinar, bool>, bool, bool, CancellationToken>(
-                    (q, _, _, _, _, _) => capturedQuery = q)
+                .Callback<CardsQuery, string, Action<ContentItemQueryBuilder>?, Func<IEventOrWebinar, bool>, bool, bool, CancellationToken>(
+                    (q, _, _, _, _, _, _) => capturedQuery = q)
                 .ReturnsAsync(CreatePaginationDto(cards));
 
             // Act
@@ -291,13 +294,14 @@ namespace BDO.GWT.GLOBAL.Tests.Services
             _eventWebinarCardsServiceMock
                 .Setup(x => x.GetFilteredItemsAsync(
                     It.IsAny<CardsQuery>(),
+                    It.IsAny<string>(),
                     It.IsAny<Action<ContentItemQueryBuilder>?>(),
                     It.IsAny<Func<IEventOrWebinar, bool>>(),
                     false,
                     true,
                     cancellationToken))
-                .Callback<CardsQuery, Action<ContentItemQueryBuilder>?, Func<IEventOrWebinar, bool>, bool, bool, CancellationToken>(
-                    (q, decorateQuery, _, _, _, _) =>
+                .Callback<CardsQuery, string, Action<ContentItemQueryBuilder>?, Func<IEventOrWebinar, bool>, bool, bool, CancellationToken>(
+                    (q, _, decorateQuery, _, _, _, _) =>
                     {
                         capturedQuery = q;
                         capturedDecorateQuery = decorateQuery;
@@ -335,13 +339,14 @@ namespace BDO.GWT.GLOBAL.Tests.Services
             _eventWebinarCardsServiceMock
                 .Setup(x => x.GetFilteredItemsAsync(
                     It.IsAny<CardsQuery>(),
+                    It.IsAny<string>(),
                     It.IsAny<Action<ContentItemQueryBuilder>?>(),
                     It.IsAny<Func<IEventOrWebinar, bool>>(),
                     false,
                     true,
                     cancellationToken))
-                .Callback<CardsQuery, Action<ContentItemQueryBuilder>?, Func<IEventOrWebinar, bool>, bool, bool, CancellationToken>(
-                    (q, _, _, _, _, _) => capturedQuery = q)
+                .Callback<CardsQuery, string, Action<ContentItemQueryBuilder>?, Func<IEventOrWebinar, bool>, bool, bool, CancellationToken>(
+                    (q, _, _, _, _, _, _) => capturedQuery = q)
                 .ReturnsAsync(CreatePaginationDto());
 
             // Act
