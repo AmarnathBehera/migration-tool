@@ -488,8 +488,11 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
                 formName: "form",
                 columns: new[] { new KeyValuePair<string, object?>("Field1", null) });
 
-            Assert.That(result.ContainsKey("Field1"), Is.True);
-            Assert.That(result["Field1"], Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.ContainsKey("Field1"), Is.True);
+                Assert.That(result["Field1"], Is.Null);
+            });
         }
 
         [Test]

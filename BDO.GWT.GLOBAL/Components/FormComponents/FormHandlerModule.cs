@@ -101,7 +101,7 @@ public partial class FormHandlerModule : Module
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            _logger.LogError(ex, "Failed to invoke registered form submission endpoints for form {FormName}.");
+            _logger.LogError(ex, "Failed to invoke registered form submission endpoints.");
         }
     }
    private async Task SendEmailAsync(BizFormItem formDataItem)
@@ -236,6 +236,7 @@ public partial class FormHandlerModule : Module
 
     private static FormEntry MapToFormEntry(BizFormItem formItem, BizFormInfo formInfo)
     {
+#nullable enable
         IEnumerable<KeyValuePair<string, object?>> EnumerateColumns()
         {
             foreach (var column in formItem.ColumnNames)
@@ -243,6 +244,7 @@ public partial class FormHandlerModule : Module
         }
 
         return BuildFormEntry(formItem.ItemID, formInfo.FormID, formInfo.FormName, EnumerateColumns());
+#nullable restore
     }
 
     /// <summary>
@@ -250,6 +252,7 @@ public partial class FormHandlerModule : Module
     /// Kept internal (rather than private) so unit tests can exercise it without
     /// standing up Kentico's DataClass / IoC pipeline.
     /// </summary>
+#nullable enable
     internal static FormEntry BuildFormEntry(
         int itemId,
         int formId,
@@ -270,6 +273,7 @@ public partial class FormHandlerModule : Module
 
         return entry;
     }
+#nullable restore
 
     private string GetReferrerUrl()
         => _httpContextAccessor?.HttpContext?.Request.Headers.Referer.ToString()

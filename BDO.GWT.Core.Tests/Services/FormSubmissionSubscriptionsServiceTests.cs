@@ -20,6 +20,9 @@ public class FormSubmissionSubscriptionsServiceTests
 {
     private const BindingFlags PrivateInstance = BindingFlags.Instance | BindingFlags.NonPublic;
 
+    // CA1861: avoid allocating a new array on each call site of CreateSubscription.
+    private static readonly string[] SingleEmptyFormName = [""];
+
     private Mock<ILogger<FormSubmissionSubscriptionsService>> _loggerMock = null!;
     private Mock<IHttpClientFactory> _httpClientFactoryMock = null!;
     private Mock<IInfoProvider<FormSubmissionSubscriptionsInfo>> _subscriptionProviderMock = null!;
@@ -154,7 +157,7 @@ public class FormSubmissionSubscriptionsServiceTests
     [Test]
     public async Task InvokeRegisteredEndpointsAsync_SubscriptionWithEmptyEndpoint_IsSkipped()
     {
-        var subscription = CreateSubscription(endpoint: "", method: "POST", formNames: new[] { "" });
+        var subscription = CreateSubscription(endpoint: "", method: "POST", formNames: SingleEmptyFormName);
         SetupSubscriptions(subscription);
         _httpClientFactoryMock.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(new HttpClient());
 
@@ -168,7 +171,7 @@ public class FormSubmissionSubscriptionsServiceTests
     [Test]
     public async Task InvokeRegisteredEndpointsAsync_SubscriptionWithEmptyMethod_IsSkipped()
     {
-        var subscription = CreateSubscription(endpoint: "https://example.com/api", method: "", formNames: new[] { "" });
+        var subscription = CreateSubscription(endpoint: "https://example.com/api", method: "", formNames: SingleEmptyFormName);
         SetupSubscriptions(subscription);
         _httpClientFactoryMock.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(new HttpClient());
 
@@ -181,7 +184,7 @@ public class FormSubmissionSubscriptionsServiceTests
     [Test]
     public async Task InvokeRegisteredEndpointsAsync_InvalidUri_LogsWarningAndSkips()
     {
-        var subscription = CreateSubscription(endpoint: "not-a-valid-uri", method: "POST", formNames: new[] { "" });
+        var subscription = CreateSubscription(endpoint: "not-a-valid-uri", method: "POST", formNames: SingleEmptyFormName);
         SetupSubscriptions(subscription);
         _httpClientFactoryMock.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(new HttpClient());
 
@@ -197,7 +200,7 @@ public class FormSubmissionSubscriptionsServiceTests
         var subscription = CreateSubscription(
             endpoint: "https://example.com/api",
             method: "INVALID METHOD!",
-            formNames: new[] { "" });
+            formNames: SingleEmptyFormName);
         SetupSubscriptions(subscription);
         _httpClientFactoryMock.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(new HttpClient());
 
@@ -213,7 +216,7 @@ public class FormSubmissionSubscriptionsServiceTests
         var subscription = CreateSubscription(
             endpoint: "https://example.com/api",
             method: "GET",
-            formNames: new[] { "" },
+            formNames: SingleEmptyFormName,
             requestBodyFormat: "{\"data\":\"test\"}");
         SetupSubscriptions(subscription);
 
@@ -232,7 +235,7 @@ public class FormSubmissionSubscriptionsServiceTests
         var subscription = CreateSubscription(
             endpoint: "https://example.com/api",
             method: "POST",
-            formNames: new[] { "" },
+            formNames: SingleEmptyFormName,
             requestBodyFormat: "{\"data\":\"test\"}",
             requestContentType: "application/json");
         SetupSubscriptions(subscription);
@@ -252,7 +255,7 @@ public class FormSubmissionSubscriptionsServiceTests
         var subscription = CreateSubscription(
             endpoint: "https://example.com/api",
             method: "POST",
-            formNames: new[] { "" },
+            formNames: SingleEmptyFormName,
             requestBodyFormat: "{\"data\":\"test\"}",
             requestContentType: "");
         SetupSubscriptions(subscription);
@@ -272,7 +275,7 @@ public class FormSubmissionSubscriptionsServiceTests
         var subscription = CreateSubscription(
             endpoint: "https://example.com/api",
             method: "POST",
-            formNames: new[] { "" });
+            formNames: SingleEmptyFormName);
         SetupSubscriptions(subscription);
 
         var handler = CreateMockHandler(new HttpResponseMessage(HttpStatusCode.InternalServerError)
@@ -293,7 +296,7 @@ public class FormSubmissionSubscriptionsServiceTests
         var subscription = CreateSubscription(
             endpoint: "https://example.com/api",
             method: "POST",
-            formNames: new[] { "" });
+            formNames: SingleEmptyFormName);
         SetupSubscriptions(subscription);
 
         var handler = CreateThrowingHandler(new HttpRequestException("Connection refused"));
@@ -313,7 +316,7 @@ public class FormSubmissionSubscriptionsServiceTests
         var subscription = CreateSubscription(
             endpoint: "https://example.com/api",
             method: "POST",
-            formNames: new[] { "" });
+            formNames: SingleEmptyFormName);
         SetupSubscriptions(subscription);
 
         var handler = CreateThrowingHandler(new OperationCanceledException());
@@ -331,7 +334,7 @@ public class FormSubmissionSubscriptionsServiceTests
         var subscription = CreateSubscription(
             endpoint: "https://example.com/api",
             method: "POST",
-            formNames: new[] { "" },
+            formNames: SingleEmptyFormName,
             useAuthorization: true,
             scheme: AuthenticationScheme.Basic,
             username: "user",
@@ -350,10 +353,13 @@ public class FormSubmissionSubscriptionsServiceTests
         await _service.InvokeRegisteredEndpointsAsync(formItem, new FormEntry(), CancellationToken.None);
 
         Assert.That(captured?.Headers.Authorization, Is.Not.Null);
-        Assert.That(captured!.Headers.Authorization!.Scheme, Is.EqualTo("Basic"));
         var decoded = System.Text.Encoding.UTF8.GetString(
-            Convert.FromBase64String(captured.Headers.Authorization.Parameter!));
-        Assert.That(decoded, Is.EqualTo("user:secret"));
+            Convert.FromBase64String(captured!.Headers.Authorization!.Parameter!));
+        Assert.Multiple(() =>
+        {
+            Assert.That(captured!.Headers.Authorization!.Scheme, Is.EqualTo("Basic"));
+            Assert.That(decoded, Is.EqualTo("user:secret"));
+        });
     }
 
     [Test]
@@ -362,7 +368,7 @@ public class FormSubmissionSubscriptionsServiceTests
         var subscription = CreateSubscription(
             endpoint: "https://example.com/api",
             method: "POST",
-            formNames: new[] { "" },
+            formNames: SingleEmptyFormName,
             useAuthorization: true,
             scheme: AuthenticationScheme.Basic,
             username: "user",
@@ -388,7 +394,7 @@ public class FormSubmissionSubscriptionsServiceTests
         var subscription = CreateSubscription(
             endpoint: "https://example.com/api",
             method: "POST",
-            formNames: new[] { "" },
+            formNames: SingleEmptyFormName,
             useAuthorization: true,
             scheme: AuthenticationScheme.Basic,
             username: "user",
@@ -424,7 +430,7 @@ public class FormSubmissionSubscriptionsServiceTests
         var subscription = CreateSubscription(
             endpoint: "https://example.com/api",
             method: "POST",
-            formNames: new[] { "" },
+            formNames: SingleEmptyFormName,
             useAuthorization: true,
             scheme: "Bearer"); // Not implemented ? NotImplementedException
         SetupSubscriptions(subscription);
@@ -534,7 +540,7 @@ public class FormSubmissionSubscriptionsServiceTests
     /// Creates a <see cref="FormSubmissionSubscriptionsInfo"/> using its DataRow constructor so the
     /// Kentico CMS IoC container / DB pipeline is never invoked during unit tests.
     /// </summary>
-    private static FormSubmissionSubscriptionsInfo CreateSubscription(
+    private static TestFormSubmissionSubscriptionsInfo CreateSubscription(
         string endpoint = "https://example.com",
         string method = "POST",
         IEnumerable<string>? formNames = null,
@@ -626,6 +632,9 @@ public class FormSubmissionSubscriptionsServiceTests
 
     private void VerifyLoggedAtLeastOnce(LogLevel level, bool withException = false)
     {
+        // CA1873: gate the mock expression on IsEnabled so it's not evaluated when disabled.
+        _loggerMock.Setup(l => l.IsEnabled(level)).Returns(true);
+
         if (withException)
         {
             _loggerMock.Verify(
@@ -657,3 +666,4 @@ public class FormSubmissionSubscriptionsServiceTests
         return (T)mi!.Invoke(target, args)!;
     }
 }
+

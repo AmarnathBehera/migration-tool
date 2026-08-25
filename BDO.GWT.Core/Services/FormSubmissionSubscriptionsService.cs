@@ -40,16 +40,7 @@ public class FormSubmissionSubscriptionsService : IFormSubmissionSubscriptionsSe
         if (formItem == null)
             return;
 
-        string formCodeName;
-        try
-        {
-            formCodeName = formItem.BizFormInfo?.FormName ?? string.Empty;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Could not resolve BizFormInfo for the submitted form item; continuing with an empty form code name.");
-            formCodeName = string.Empty;
-        }
+        string formCodeName = ResolveFormCodeName(formItem);
 
         var subscriptions = _subscriptionProvider
             .Get()
@@ -67,108 +58,168 @@ public class FormSubmissionSubscriptionsService : IFormSubmissionSubscriptionsSe
 
         foreach (var subscription in subscriptions)
         {
-            if (string.IsNullOrWhiteSpace(subscription.Endpoint) || string.IsNullOrWhiteSpace(subscription.Method))
-                continue;
+            await ProcessSubscriptionAsync(subscription, formEntry, formCodeName, httpClient, cancellationToken).ConfigureAwait(false);
+        }
+    }
 
-            if (!Uri.TryCreate(subscription.Endpoint, UriKind.Absolute, out var endpointUri))
-            {
-                _logger.LogWarning(
-                    "Skipping subscription '{Codename}': endpoint '{Endpoint}' is not a valid absolute URI.",
-                    subscription.Codename, subscription.Endpoint);
-                continue;
-            }
+    private string ResolveFormCodeName(BizFormItem formItem)
+    {
+        try
+        {
+            return formItem.BizFormInfo?.FormName ?? string.Empty;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Could not resolve BizFormInfo for the submitted form item; continuing with an empty form code name.");
+            return string.Empty;
+        }
+    }
 
-            HttpMethod method;
+    private async Task ProcessSubscriptionAsync(
+        FormSubmissionSubscriptionsInfo subscription,
+        FormEntry formEntry,
+        string formCodeName,
+        HttpClient httpClient,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(subscription.Endpoint) || string.IsNullOrWhiteSpace(subscription.Method))
+            return;
+
+        if (!Uri.TryCreate(subscription.Endpoint, UriKind.Absolute, out var endpointUri))
+        {
+            _logger.LogWarning(
+                "Skipping subscription '{Codename}': endpoint '{Endpoint}' is not a valid absolute URI.",
+                subscription.Codename, subscription.Endpoint);
+            return;
+        }
+
+        if (!TryParseHttpMethod(subscription, out var method))
+        {
+            return;
+        }
+
+        try
+        {
+            using var request = BuildRequest(subscription, formEntry, endpointUri, method);
+            ApplyAuthorization(subscription, request);
+
+            using var requestCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            requestCts.CancelAfter(EndpointTimeout);
+
+            HttpResponseMessage? response = null;
             try
             {
-                method = HttpMethod.Parse(subscription.Method);
+                response = await httpClient.SendAsync(request, requestCts.Token).ConfigureAwait(false);
+                LogNonSuccessResponse(subscription, response, formCodeName);
             }
-            catch (FormatException)
+            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
             {
-                _logger.LogWarning(
-                    "Skipping subscription '{Codename}': '{Method}' is not a valid HTTP method.",
-                    subscription.Codename, subscription.Method);
-                continue;
+                _logger.LogError(
+                    "Request to endpoint '{Endpoint}' timed out after {Timeout}s for subscription '{Codename}' during '{FormCodeName}' form submission.",
+                    subscription.Endpoint, EndpointTimeout.TotalSeconds, subscription.Codename, formCodeName);
             }
-
-            try
+            finally
             {
-                var request = new HttpRequestMessage
-                {
-                    RequestUri = endpointUri,
-                    Method = method,
-                };
-
-                bool methodSupportsBody = method != HttpMethod.Get
-                    && method != HttpMethod.Head
-                    && method != HttpMethod.Delete
-                    && method != HttpMethod.Options
-                    && method != HttpMethod.Trace;
-
-                if (methodSupportsBody && !string.IsNullOrWhiteSpace(subscription.Requestbodyformat))
-                {
-                    var formattedBody = FormatRequestBody(formEntry, subscription.Requestbodyformat);
-
-                    request.Content = string.IsNullOrEmpty(subscription.Requestcontenttype)
-                        ? new StringContent(formattedBody, Encoding.UTF8)
-                        : new StringContent(formattedBody, Encoding.UTF8, subscription.Requestcontenttype);
-                }
-                else if (!methodSupportsBody && !string.IsNullOrWhiteSpace(subscription.Requestbodyformat))
-                {
-                    _logger.LogWarning(
-                        "Subscription '{Codename}' has a request body format configured but uses method '{Method}' which does not support a body. The body will be ignored.",
-                        subscription.Codename, subscription.Method);
-                }
-
-                if (subscription.Useauthorization)
-                {
-                    var authorization = ConstructAuthorizationHeader(subscription);
-                    if (authorization is null)
-                    {
-                        _logger.LogWarning(
-                            "Subscription '{Codename}' has authorization enabled but no valid authorization could be constructed. The request will be sent without an Authorization header.",
-                            subscription.Codename);
-                    }
-                    else
-                    {
-                        request.Headers.TryAddWithoutValidation("Authorization", authorization);
-                    }
-                }
-
-                using var requestCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                requestCts.CancelAfter(EndpointTimeout);
-
-                HttpResponseMessage response;
-                try
-                {
-                    response = await httpClient.SendAsync(request, requestCts.Token).ConfigureAwait(false);
-                }
-                catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
-                {
-                    _logger.LogError(
-                        "Request to endpoint '{Endpoint}' timed out after {Timeout}s for subscription '{Codename}' during '{FormCodeName}' form submission.",
-                        subscription.Endpoint, EndpointTimeout.TotalSeconds, subscription.Codename, formCodeName);
-                    continue;
-                }
-
-                // Log once with full context and move on — do NOT also call
-                // EnsureSuccessStatusCode(), which would throw and be logged
-                // a second time (with less detail) by the catch block below.
-                if (!response.IsSuccessStatusCode)
-                {
-                    _logger.LogError(
-                        "Endpoint '{Endpoint}' returned {StatusCode} ({ReasonPhrase}) for subscription '{Codename}' during '{FormCodeName}' form submission. Method used: {Method}. Authorization required: {Useauthorization}.",
-                        subscription.Endpoint, (int)response.StatusCode, response.ReasonPhrase,
-                        subscription.Codename, formCodeName, subscription.Method, subscription.Useauthorization);
-                }
-            }
-            catch (Exception ex) when (ex is not OperationCanceledException)
-            {
-                _logger.LogError(ex,
-                    "Failed to send request to endpoint '{Endpoint}' during '{FormCodeName}' form submission (subscription: '{Codename}').",
-                    subscription.Endpoint, formCodeName, subscription.Codename);
+                response?.Dispose();
             }
         }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogError(ex,
+                "Failed to send request to endpoint '{Endpoint}' during '{FormCodeName}' form submission (subscription: '{Codename}').",
+                subscription.Endpoint, formCodeName, subscription.Codename);
+        }
+    }
+
+    private bool TryParseHttpMethod(FormSubmissionSubscriptionsInfo subscription, out HttpMethod method)
+    {
+        try
+        {
+            method = HttpMethod.Parse(subscription.Method);
+            return true;
+        }
+        catch (FormatException)
+        {
+            _logger.LogWarning(
+                "Skipping subscription '{Codename}': '{Method}' is not a valid HTTP method.",
+                subscription.Codename, subscription.Method);
+            method = HttpMethod.Get;
+            return false;
+        }
+    }
+
+    private HttpRequestMessage BuildRequest(
+        FormSubmissionSubscriptionsInfo subscription,
+        FormEntry formEntry,
+        Uri endpointUri,
+        HttpMethod method)
+    {
+        var request = new HttpRequestMessage
+        {
+            RequestUri = endpointUri,
+            Method = method,
+        };
+
+        bool methodSupportsBody = MethodSupportsBody(method);
+        bool hasBodyFormat = !string.IsNullOrWhiteSpace(subscription.Requestbodyformat);
+
+        if (methodSupportsBody && hasBodyFormat)
+        {
+            var formattedBody = FormatRequestBody(formEntry, subscription.Requestbodyformat);
+
+            request.Content = string.IsNullOrEmpty(subscription.Requestcontenttype)
+                ? new StringContent(formattedBody, Encoding.UTF8)
+                : new StringContent(formattedBody, Encoding.UTF8, subscription.Requestcontenttype);
+        }
+        else if (!methodSupportsBody && hasBodyFormat)
+        {
+            _logger.LogWarning(
+                "Subscription '{Codename}' has a request body format configured but uses method '{Method}' which does not support a body. The body will be ignored.",
+                subscription.Codename, subscription.Method);
+        }
+
+        return request;
+    }
+
+    private static bool MethodSupportsBody(HttpMethod method)
+        => method != HttpMethod.Get
+           && method != HttpMethod.Head
+           && method != HttpMethod.Delete
+           && method != HttpMethod.Options
+           && method != HttpMethod.Trace;
+
+    private void ApplyAuthorization(FormSubmissionSubscriptionsInfo subscription, HttpRequestMessage request)
+    {
+        if (!subscription.Useauthorization)
+            return;
+
+        var authorization = ConstructAuthorizationHeader(subscription);
+        if (authorization is null)
+        {
+            _logger.LogWarning(
+                "Subscription '{Codename}' has authorization enabled but no valid authorization could be constructed. The request will be sent without an Authorization header.",
+                subscription.Codename);
+            return;
+        }
+
+        request.Headers.TryAddWithoutValidation("Authorization", authorization);
+    }
+
+    private void LogNonSuccessResponse(
+        FormSubmissionSubscriptionsInfo subscription,
+        HttpResponseMessage response,
+        string formCodeName)
+    {
+        // Log once with full context and move on — do NOT also call
+        // EnsureSuccessStatusCode(), which would throw and be logged
+        // a second time (with less detail) by the outer catch block.
+        if (response.IsSuccessStatusCode)
+            return;
+
+        _logger.LogError(
+            "Endpoint '{Endpoint}' returned {StatusCode} ({ReasonPhrase}) for subscription '{Codename}' during '{FormCodeName}' form submission. Method used: {Method}. Authorization required: {Useauthorization}.",
+            subscription.Endpoint, (int)response.StatusCode, response.ReasonPhrase,
+            subscription.Codename, formCodeName, subscription.Method, subscription.Useauthorization);
     }
 
     // Safely resolves the configured form code names for a subscription.

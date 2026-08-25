@@ -8,6 +8,6 @@ namespace BDO.GWT.Common.Options
         /// 32 bytes secret key.
         /// </summary>
         [Required]
-        public string SecretKey { get; set; }
+        public required string SecretKey { get; set; }
     }
 }
