@@ -210,7 +210,7 @@ namespace BDO.GWT.GLOBAL.Tests.Services
                 .Setup(x => x.GetHeroDtoAsync(
                     It.Is<HeroData>(h =>
                         h.CallToActionButtonUrl != null &&
-                        h.CallToActionButtonUrl.Path == "/careers/apply"),
+                        h.CallToActionButtonUrl.Path == "careers/apply"),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new HeroDto())
                 .Verifiable();
