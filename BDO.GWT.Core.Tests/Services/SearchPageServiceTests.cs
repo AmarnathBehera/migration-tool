@@ -345,7 +345,7 @@ namespace BDO.GWT.Core.Tests.Services
             var dto = await _service.GetSearchResultsAsync(
                 new SearchResultQuery { SearchText = "x" }, CancellationToken.None);
 
-            Assert.That(dto.Filters.Options, Has.Length.EqualTo(8),
+            Assert.That(dto.Filters.Options, Has.Length.EqualTo(9),
                 "One option is expected per key in PageTypesByPageGroupKey.");
         }
 
