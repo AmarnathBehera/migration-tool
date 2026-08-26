@@ -86,9 +86,9 @@ namespace BDO.GWT.GLOBAL.API.Controllers
                 return NotFound();
             }
 
-            Response.GetTypedHeaders().ContentDisposition = new ContentDispositionHeaderValue("inline");
+            Response.GetTypedHeaders().ContentDisposition = new ContentDispositionHeaderValue("attachment");
 
-            return File(result.Value.Data, MediaTypeNames.Application.Octet);
+            return File(result.Value.Data, MediaTypeNames.Application.Octet, result.Value.FileName);
         }
     }
 }

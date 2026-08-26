@@ -1,31 +1,31 @@
 ﻿using BDO.GWT.Core;
-using BDO.GWT.GLOBAL.API.Options;
 using CMS.Websites;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.Options;
 using System.Net.Mime;
 
 namespace BDO.GWT.GLOBAL.API.Data
 {
     public class PageAttachmentService : IPageAttachmentService
     {
+        private const string DevelopmentLiveSiteBaseUrl = "http://localhost:12393";
         private static readonly FileExtensionContentTypeProvider ContentTypeProvider = new();
 
         private readonly IContentService _contentService;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly PageAttachmentOptions _pageAttachmentOptions;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
         public PageAttachmentService(
             IContentService contentService,
             IHttpClientFactory httpClientFactory,
             IHttpContextAccessor httpContextAccessor,
-            IOptions<PageAttachmentOptions> pageAttachmentOptions)
+            IWebHostEnvironment hostEnvironment)
         {
             _contentService = contentService;
             _httpClientFactory = httpClientFactory;
             _httpContextAccessor = httpContextAccessor;
-            _pageAttachmentOptions = pageAttachmentOptions.Value;
+            _hostEnvironment = hostEnvironment;
         }
 
         public async Task<IEnumerable<ContentAttachment>> GetPageAttachmentsAsync(
@@ -65,8 +65,7 @@ namespace BDO.GWT.GLOBAL.API.Data
                 return null;
             }
 
-            var normalizedPath = NormalizePath(asset.Url);
-            var assetUri = BuildAssetUri(normalizedPath);
+            var assetUri = BuildAssetUri(asset.Url);
             if (assetUri is null)
             {
                 return null;
@@ -102,12 +101,18 @@ namespace BDO.GWT.GLOBAL.API.Data
             return MediaTypeNames.Application.Octet;
         }
 
-        private Uri? BuildAssetUri(string normalizedPath)
+        private Uri? BuildAssetUri(string assetUrl)
         {
-            if (!string.IsNullOrWhiteSpace(_pageAttachmentOptions.LiveSiteBaseUrl)
-                && Uri.TryCreate(_pageAttachmentOptions.LiveSiteBaseUrl, UriKind.Absolute, out var liveSiteBaseUri))
+            if (Uri.TryCreate(assetUrl.Trim(), UriKind.Absolute, out var absoluteAssetUri))
             {
-                return new Uri(liveSiteBaseUri, normalizedPath);
+                return absoluteAssetUri;
+            }
+
+            var normalizedPath = NormalizePath(assetUrl);
+
+            if (_hostEnvironment.IsDevelopment())
+            {
+                return new Uri(new Uri(DevelopmentLiveSiteBaseUrl), normalizedPath);
             }
 
             var request = _httpContextAccessor.HttpContext?.Request;

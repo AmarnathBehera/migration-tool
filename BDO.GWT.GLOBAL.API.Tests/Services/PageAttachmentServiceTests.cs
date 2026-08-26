@@ -1,16 +1,15 @@
 using BDO.GWT.Core;
 using BDO.GWT.GLOBAL.API.Data;
-using BDO.GWT.GLOBAL.API.Options;
 using CMS.ContentEngine;
 using CMS.Websites;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
 using System.Net;
 using System.Net.Mime;
-using System.Runtime.CompilerServices;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace BDO.GWT.GLOBAL.API.Tests.Services;
 
@@ -21,7 +20,7 @@ public class PageAttachmentServiceTests
     private Mock<IHttpClientFactory> _httpClientFactoryMock = null!;
     private Mock<HttpMessageHandler> _httpMessageHandlerMock = null!;
     private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
-    private Mock<IOptions<PageAttachmentOptions>> _optionsMock = null!;
+    private Mock<IWebHostEnvironment> _hostEnvironmentMock = null!;
 
     [SetUp]
     public void Setup()
@@ -36,16 +35,15 @@ public class PageAttachmentServiceTests
             .Returns(httpClient);
 
         _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
-        _optionsMock = new Mock<IOptions<PageAttachmentOptions>>();
-        _optionsMock.Setup(o => o.Value).Returns(new PageAttachmentOptions());
+        _hostEnvironmentMock = new Mock<IWebHostEnvironment>();
+        _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
+    }
 
-        }
-
-        private PageAttachmentService CreateSut() => new(
-            _contentServiceMock.Object,
-            _httpClientFactoryMock.Object,
-            _httpContextAccessorMock.Object,
-            _optionsMock.Object);
+    private PageAttachmentService CreateSut() => new(
+        _contentServiceMock.Object,
+        _httpClientFactoryMock.Object,
+        _httpContextAccessorMock.Object,
+        _hostEnvironmentMock.Object);
 
     // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -122,8 +120,8 @@ public class PageAttachmentServiceTests
             .ReturnsAsync(new HttpResponseMessage(statusCode) { Content = content });
     }
 
-    private void SetupLiveSiteBaseUrl(string url) =>
-        _optionsMock.Setup(o => o.Value).Returns(new PageAttachmentOptions { LiveSiteBaseUrl = url });
+    private void SetupIsDevelopment(bool isDevelopment) =>
+        _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns(isDevelopment ? "Development" : "Production");
 
     // ── GetPageAttachmentsAsync ────────────────────────────────────────────────
 
@@ -234,6 +232,37 @@ public class PageAttachmentServiceTests
     }
 
     [Test]
+    public async Task GetPageAttachmentBinaryAsync_WhenAssetUrlIsAbsolute_UsesAbsoluteUrl()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+        var expectedBytes = new byte[] { 1, 2, 3 };
+        var absoluteUrl = "https://media.example.com/media/file.pdf";
+        var asset = CreateAsset(absoluteUrl, "file.pdf", ".pdf");
+        var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
+        SetupContentService(pageGuid, [page]);
+        SetupIsDevelopment(true);
+
+        var content = new ByteArrayContent(expectedBytes);
+        content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
+
+        _httpMessageHandlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(request =>
+                    request.Method == HttpMethod.Get
+                    && request.RequestUri == new Uri(absoluteUrl)),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK) { Content = content });
+
+        var result = await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb");
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Value.Data, Is.EqualTo(expectedBytes));
+    }
+
+    [Test]
     public async Task GetPageAttachmentBinaryAsync_WhenNoLiveSiteBaseUrlAndNoHttpContext_ReturnsNull()
     {
         var pageGuid = Guid.NewGuid();
@@ -242,8 +271,7 @@ public class PageAttachmentServiceTests
         var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
         SetupContentService(pageGuid, [page]);
 
-        // No LiveSiteBaseUrl and no HttpContext
-        _optionsMock.Setup(o => o.Value).Returns(new PageAttachmentOptions { LiveSiteBaseUrl = null });
+        SetupIsDevelopment(false);
         _httpContextAccessorMock.Setup(x => x.HttpContext).Returns((HttpContext?)null);
 
         var result = await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb");
@@ -259,7 +287,7 @@ public class PageAttachmentServiceTests
         var asset = CreateAsset("/media/file.pdf", "file.pdf", ".pdf");
         var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
         SetupContentService(pageGuid, [page]);
-        SetupLiveSiteBaseUrl("https://example.com");
+        SetupIsDevelopment(true);
         SetupHttpResponse(HttpStatusCode.NotFound);
 
         var result = await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb");
@@ -276,7 +304,7 @@ public class PageAttachmentServiceTests
         var asset = CreateAsset("/media/file.pdf", "file.pdf", ".pdf");
         var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
         SetupContentService(pageGuid, [page]);
-        SetupLiveSiteBaseUrl("https://example.com");
+        SetupIsDevelopment(true);
         SetupHttpResponse(HttpStatusCode.OK, expectedBytes, "application/pdf");
 
         var result = await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb");
@@ -299,7 +327,7 @@ public class PageAttachmentServiceTests
         var asset = CreateAsset("/media/file.pdf", "file.pdf", ".pdf");
         var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
         SetupContentService(pageGuid, [page]);
-        SetupLiveSiteBaseUrl("https://example.com");
+        SetupIsDevelopment(true);
         // No media type on the response — service must fall back to extension-based MIME
         SetupHttpResponse(HttpStatusCode.OK, expectedBytes, mediaType: null);
 
@@ -317,7 +345,7 @@ public class PageAttachmentServiceTests
         var asset = CreateAsset("/media/file.xyz", "file.xyz", ".xyz");
         var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
         SetupContentService(pageGuid, [page]);
-        SetupLiveSiteBaseUrl("https://example.com");
+        SetupIsDevelopment(true);
         SetupHttpResponse(HttpStatusCode.OK, [1, 2], mediaType: null);
 
         var result = await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb");
@@ -335,8 +363,7 @@ public class PageAttachmentServiceTests
         var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
         SetupContentService(pageGuid, [page]);
 
-        // No LiveSiteBaseUrl — should fall back to HttpContext request
-        _optionsMock.Setup(o => o.Value).Returns(new PageAttachmentOptions { LiveSiteBaseUrl = null });
+        SetupIsDevelopment(false);
 
         var mockRequest = new Mock<HttpRequest>();
         mockRequest.Setup(r => r.Scheme).Returns("https");
