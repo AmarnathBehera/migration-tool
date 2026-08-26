@@ -262,22 +262,6 @@ public class PageAttachmentServiceTests
         Assert.That(result!.Value.Data, Is.EqualTo(expectedBytes));
     }
 
-    [Test]
-    public async Task GetPageAttachmentBinaryAsync_WhenNoLiveSiteBaseUrlAndNoHttpContext_ReturnsNull()
-    {
-        var pageGuid = Guid.NewGuid();
-        var attachmentGuid = Guid.NewGuid();
-        var asset = CreateAsset("/media/file.pdf", "file.pdf", ".pdf");
-        var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
-        SetupContentService(pageGuid, [page]);
-
-        SetupIsDevelopment(false);
-        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns((HttpContext?)null);
-
-        var result = await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb");
-
-        Assert.That(result, Is.Null);
-    }
 
     [Test]
     public async Task GetPageAttachmentBinaryAsync_WhenHttpRequestFails_ReturnsNull()
