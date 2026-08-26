@@ -14,9 +14,13 @@ namespace GWTXbyKWeb.Controllers
         {
             _searchPageService = searchPageService;
         }
-        public async Task<IActionResult> Index([FromQuery] string? searchText, CancellationToken cancellationToken)
+        public async Task<IActionResult> Index([FromQuery] string searchText, CancellationToken cancellationToken)
         {
-            var dto = await _searchPageService.GetSearchPageDtoAsync(searchText ?? "", cancellationToken);
+            if (string.IsNullOrEmpty(searchText))
+            {
+                searchText = string.Empty;
+            }
+            var dto = await _searchPageService.GetSearchPageDtoAsync(searchText, cancellationToken);
             return View(dto);
         }
     }

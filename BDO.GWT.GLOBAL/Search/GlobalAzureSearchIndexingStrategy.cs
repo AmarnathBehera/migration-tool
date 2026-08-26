@@ -27,12 +27,14 @@ namespace BDO.GWT.GLOBAL.Search;
 /// </summary>
 public class GlobalAzureSearchIndexingStrategy : BaseAzureSearchIndexingStrategy<GlobalSearchModel>
 {
-    [Obsolete]
+    [Obsolete("This field is retained for backward compatibility with Azure Kentico Search indexing. " +
+        "Use the constructor that accepts the complete dependency set instead.")]
     private readonly IWebPageQueryResultMapper webPageMapper;
     private readonly IContentQueryExecutor queryExecutor;
     private readonly IWebPageUrlRetriever urlRetriever;
 
-    [Obsolete]
+    [Obsolete("This constructor is retained for backward compatibility with Azure Kentico Search indexing. " +
+        "Use the constructor that accepts the complete dependency set instead.")]
     public GlobalAzureSearchIndexingStrategy(
         IWebPageQueryResultMapper webPageMapper,
         IContentQueryExecutor queryExecutor,

@@ -20,11 +20,11 @@ namespace BDO.GWT.Core.Tests.Helpers
         private const string EVENT_CLASS_NAME = "BDO.Event";
         private const string WEBINAR_CLASS_NAME = "BDO.Webinar";
 
-        private Mock<IContentPageCardHelper<Insight>> _insightCardHelperMock = null!;
+        //private Mock<IContentPageCardHelper<Insight>> _insightCardHelperMock = null!;
         private Mock<ICultureContext> _cultureContextMock = null!;
-        private Mock<IEventWebinarCardsService> _eventWebinarCardsServiceMock = null!;
+        //private Mock<IEventWebinarCardsService> _eventWebinarCardsServiceMock = null!;
         private Mock<IPageUrlService> _pageUrlServiceMock = null!;
-        private Mock<ITypeMapper> _typeMapperMock = null!;
+        //private Mock<ITypeMapper> _typeMapperMock = null!;
         private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
         private SearchCardHelper _helper = null!;
 
@@ -32,11 +32,11 @@ namespace BDO.GWT.Core.Tests.Helpers
         [SetUp]
         public void Setup()
         {
-            _insightCardHelperMock = new Mock<IContentPageCardHelper<Insight>>();
+            //_insightCardHelperMock = new Mock<IContentPageCardHelper<Insight>>();
             _cultureContextMock = new Mock<ICultureContext>();
-            _eventWebinarCardsServiceMock = new Mock<IEventWebinarCardsService>();
+            //_eventWebinarCardsServiceMock = new Mock<IEventWebinarCardsService>();
             _pageUrlServiceMock = new Mock<IPageUrlService>();
-            _typeMapperMock = new Mock<ITypeMapper>();
+            //_typeMapperMock = new Mock<ITypeMapper>();
             _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
 
             _cultureContextMock.SetupGet(x => x.CurrentLanguageTag).Returns(LANGUAGE_TAG);
@@ -44,11 +44,8 @@ namespace BDO.GWT.Core.Tests.Helpers
             SetupUrls();
 
             _helper = new SearchCardHelper(
-                _insightCardHelperMock.Object,
                 _cultureContextMock.Object,
-                _eventWebinarCardsServiceMock.Object,
                 _pageUrlServiceMock.Object,
-                _typeMapperMock.Object,
                 _httpContextAccessorMock.Object);
         }
 
@@ -101,9 +98,9 @@ namespace BDO.GWT.Core.Tests.Helpers
 
             _pageUrlServiceMock.Verify(x => x.GetPageRelativeUrlByNodeIdAsync(
                 It.IsAny<IEnumerable<int>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
-            _insightCardHelperMock.VerifyNoOtherCalls();
-            _eventWebinarCardsServiceMock.VerifyNoOtherCalls();
-            _typeMapperMock.VerifyNoOtherCalls();
+            //_insightCardHelperMock.VerifyNoOtherCalls();
+            //_eventWebinarCardsServiceMock.VerifyNoOtherCalls();
+            //_typeMapperMock.VerifyNoOtherCalls();
         }
 
         #endregion
@@ -202,8 +199,8 @@ namespace BDO.GWT.Core.Tests.Helpers
         {
             await _helper.GetSearchCardDtos([Document(1, "BDO.Person")], CancellationToken.None);
 
-            _insightCardHelperMock.VerifyNoOtherCalls();
-            _eventWebinarCardsServiceMock.VerifyNoOtherCalls();
+            //_insightCardHelperMock.VerifyNoOtherCalls();
+            //_eventWebinarCardsServiceMock.VerifyNoOtherCalls();
         }
 
 

@@ -115,25 +115,20 @@ namespace BDO.GWT.Core.Services
             {
             typeof(Event), typeof(Webinar),
         },
-        //    [DealsPageGroupKey] = new[]
-        //    {
-        //    typeof(Deal), typeof(RemoteDeal),
-        //},
+            [DealsPageGroupKey] = new[]
+            {
+            typeof(Deal), typeof(RemoteDeal),
+        },
         };
 
         private static readonly Dictionary<Type, string> PageTypeGroupKeyByPageType = PageTypesByPageGroupKey.InvertKeyAndListValueDictionary();
 
         #endregion
 
-        private readonly ICultureContext _cultureContext = cultureContext;
-        private readonly IContentService _contentService = contentService;
-        private readonly IUrlHelperFactory _urlHelperFactory = urlHelperFactory;
-        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
-        private readonly IWebsiteChannelContext _websiteChannelContext = websiteChannelContext;
-        private readonly IWebPageUrlResolver _urlResolver = urlResolver;
+        private readonly ICultureContext _cultureContext = cultureContext;               
         private readonly ISearchService _searchService = searchService;
         private readonly ITypeMapper _typeMapper = typeMapper;
-        private readonly IDateTimeProviderSearch _dateTimeProvider = dateTimeProvider;
+        
         private readonly ISearchCardHelper _searchCardHelper = searchCardHelper;
         public async Task<SearchResultDto> GetSearchResultsAsync(SearchResultQuery query, CancellationToken cancellationToken)
         {
@@ -165,9 +160,7 @@ namespace BDO.GWT.Core.Services
 
             var currentLanguageTag = _cultureContext.CurrentLanguageTag;
             LanguageTag languageTag = LanguageTag.Parse(currentLanguageTag);
-            //var nodeIds = response.Documents.Select(x => x.NodeId).ToList();
-            //var urlByPageNodeId = await _urlResolver.GetPageRelativeUrlByNodeIdAsync(response.Documents.Select(x => x.NodeId), languageTag, cancellationToken);
-
+            
             var existingDocuments = response.Documents.ToList();
 
             var totalItems = (int)response.Count!;
@@ -224,17 +217,20 @@ namespace BDO.GWT.Core.Services
                 (pageGroupKey, facetGroup) => (PageGroupKey: pageGroupKey, FacetGroup: facetGroup.DefaultIfEmpty())
             );
 
-            var searchFilterDtos = joinedData.Select(x =>
+            var searchFilterDtos = new SearchFacetOptionDto[pageGroupKeys.Count];
+            var index = 0;
+
+            foreach (var (pageGroupKey, facetGroup) in joinedData)
             {
-                var dto = new SearchFacetOptionDto
+                searchFilterDtos[index] = new SearchFacetOptionDto
                 {
-                    Label = ResourceStringByPageTypeGroupKey[x.PageGroupKey],
-                    Value = x.PageGroupKey,
-                    Count = x.FacetGroup.Sum(y => y?.Sum(z => z.Count) ?? 0),
+                    Label = ResourceStringByPageTypeGroupKey[pageGroupKey],
+                    Value = pageGroupKey,
+                    Count = SumFacetCounts(facetGroup),
                 };
 
-                return dto;
-            }).ToArray();
+                index++;
+            }
 
             var filterItemDto = FilterDtoUtility.CreateFilterItemDto(FilterItemType.Select, FilterByFilterName, ResourceStringKey.LiveSite.FilterBy, null, searchFilterDtos);
 
@@ -258,20 +254,26 @@ namespace BDO.GWT.Core.Services
         {
             return PageTypeGroupKeyByPageType.TryGetValue(_typeMapper.GetTypeFromPageClassNameInvariant(className ?? string.Empty), out var pageTypeGroupKey) ? pageTypeGroupKey : null;
         }
+
+        private static long SumFacetCounts(IEnumerable<IGrouping<string?, SearchFacet>?> facetGroups)
+        {
+            long total = 0;
+
+            foreach (var group in facetGroups)
+            {
+                if (group is null)
+                {
+                    continue;
+                }
+
+                foreach (var facet in group)
+                {
+                    total += facet.Count ?? 0;
+                }
+            }
+
+            return total;
+        }
     }
-
-    //public class SearchDocument          // <-- BDO.GWT.Core.Services.SearchDocument
-    //{
-    //    public string NodeId { get; set; } = null!;
-    //    public string LanguageTag { get; set; } = null!;
-    //    public string ClassName { get; set; } = null!;
-    //    public string SortDate { get; set; } = null!;
-    //    public int Count { get; set; }
-
-    //    [JsonPropertyName("cardType")]
-    //    public string CardType { get; set; }
-
-    //    [JsonPropertyName("data")]
-    //    public object? DataObject { get; protected set; }
-    //}
+        
 }

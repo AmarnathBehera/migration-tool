@@ -43,6 +43,12 @@ namespace BDO.GWT.Core.Tests.Services
         private Mock<ISearchCardHelper> _searchCardHelperMock = null!;
         private SearchPageService _service = null!;
 
+        private static readonly string[] ExpectedSortOptions =
+        {
+               "topResults",
+               "mostRecent"
+        };
+
 
         [SetUp]
         public void Setup()
@@ -445,9 +451,9 @@ namespace BDO.GWT.Core.Tests.Services
 
             Assert.Multiple(() =>
             {
-                Assert.That(dto.SortBy.Options, Has.Length.EqualTo(2));
+                Assert.That(dto.SortBy.Options, Has.Length.EqualTo(ExpectedSortOptions.Length));
                 Assert.That(dto.SortBy.Options.Select(x => x.Value),
-                    Is.EqualTo(new[] { "topResults", "mostRecent" }));
+                    Is.EqualTo(ExpectedSortOptions));
             });
         }
               

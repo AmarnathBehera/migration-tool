@@ -275,7 +275,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             Assert.Multiple(() =>
             {
-                Assert.That(response.Documents.Count(), Is.EqualTo(3));
+                Assert.That(response.Documents.Count, Is.EqualTo(3));
                 Assert.That(response.Count, Is.EqualTo(3));
             });
         }
