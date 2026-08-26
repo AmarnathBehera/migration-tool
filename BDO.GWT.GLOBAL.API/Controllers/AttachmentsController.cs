@@ -88,7 +88,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
 
             Response.GetTypedHeaders().ContentDisposition = new ContentDispositionHeaderValue("attachment");
 
-            return File(result.Value.Data, MediaTypeNames.Application.Octet, result.Value.FileName);
+            return File(result.Value.Data, MediaTypeNames.Application.Octet);
         }
     }
 }
