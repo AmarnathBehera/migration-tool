@@ -5,10 +5,6 @@ using CMS.Websites.Internal;
 
 namespace BDO.GWT.GLOBAL.API.Data
 {
-    public interface IPageChannelResolver
-    {
-        Task<string?> GetChannelNameByPageGuidAsync(Guid pageGuid, CancellationToken cancellationToken = default);
-    }
 
     public sealed class PageChannelResolver(
         IInfoProvider<ChannelInfo> channelInfoProvider,
