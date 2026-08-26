@@ -1,12 +1,18 @@
 using BDO.GWT.Common.Core.Exceptions;
+using BDO.GWT.Core;
+using BDO.GWT.Core.Services;
 using BDO.GWT.GLOBAL.API.Constants;
 using BDO.GWT.GLOBAL.API.Extensions;
+using BDO.GWT.GLOBAL.Services;
 using Kentico.Web.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.Identity.Web;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
+using System.Security.Claims;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace BDO.GWT.GLOBAL.API;
 public static class Program
@@ -15,12 +21,64 @@ public static class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddControllersWithViews();
+        builder.Services.AddControllersWithViews()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+            });
         builder.Services.AddKentico();
+        builder.Services.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
+        builder.Services.AddContentServices();
         builder.Services.AddApi();
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+            .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+
+        var azureAdSection = builder.Configuration.GetSection("AzureAd");
+        var azureAdClientId = azureAdSection["ClientId"];
+        var azureAdAudience = azureAdSection["Audience"];
+
+        builder.Services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, jwtBearerOptions =>
+        {
+            // Accept both v1 (aud = App ID URI) and v2 (aud = client id) access tokens.
+            var validAudiences = new[]
+            {
+                azureAdAudience,
+                azureAdClientId,
+                $"api://{azureAdClientId}",
+            }.Where(audience => !string.IsNullOrWhiteSpace(audience)).Distinct().ToArray();
+
+            jwtBearerOptions.TokenValidationParameters.ValidAudiences = validAudiences;
+
+            jwtBearerOptions.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    var environment = context.HttpContext.RequestServices.GetRequiredService<IHostEnvironment>();
+
+                    var hasBearerToken = context.Request.Headers.Authorization
+                        .Any(value => value is not null && value.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase));
+
+                    // Dev convenience: skip validation until a bearer token is supplied via Swagger.
+                    if (environment.IsDevelopment() && !hasBearerToken)
+                    {
+                        context.Principal = new ClaimsPrincipal(new ClaimsIdentity(authenticationType: "SwaggerNoAuth"));
+                        context.Success();
+                    }
+
+                    return Task.CompletedTask;
+                },
+                OnAuthenticationFailed = context =>
+                {
+                    context.HttpContext.RequestServices
+                        .GetRequiredService<ILoggerFactory>()
+                        .CreateLogger("JwtBearerAuthentication")
+                        .LogWarning(context.Exception, "JWT authentication failed for {RequestPath}.", context.Request.Path);
+
+                    return Task.CompletedTask;
+                },
+            };
+        });
 
         builder.Services.AddSwaggerGen(c =>
         {
@@ -61,6 +119,8 @@ public static class Program
 
         if (app.Environment.IsDevelopment())
         {
+            Microsoft.IdentityModel.Logging.IdentityModelEventSource.ShowPII = true;
+
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
@@ -107,9 +167,9 @@ public static class Program
 
         app.UseAuthentication();
 
-        app.UseAuthorization();
-
         app.UseMiddleware<Middleware.MemberFirmMiddleware>();
+
+        app.UseAuthorization();
 
         app.MapControllers();
 

@@ -48,6 +48,15 @@ namespace BDO.GWT.Core.Services
         public async Task<InsightPageDto> GetInsightPageDtoAsync(Insight? page, CancellationToken cancellationToken)
         {
             var insightPage = await _contentRetriever.RetrieveCurrentPage<Insight>(new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
+            if (insightPage is null)
+            {
+                return new InsightPageDto(new ContentPageDto())
+                {
+                    SchemaMarkup = new ArticleSchemaMarkupDto()
+                };
+            }
+
+            
             var contentPageDto = await GetContentPageDtoAsync(insightPage, cancellationToken);
             var sys = insightPage.SystemFields;
            
@@ -195,6 +204,7 @@ namespace BDO.GWT.Core.Services
                     Description = callToActionDescription,
                     ButtonTitle = callToActionButtonText,
                     ButtonUrl = callToActionButtonLink,
+                    Position = CallToActionPosition ?? "left"
                 },
                 Position = CallToActionPosition ?? "left"
             };
@@ -228,34 +238,42 @@ namespace BDO.GWT.Core.Services
                     .ContentAttachmentAsset
                     .Url,
                 SocialMediaButtons = page.ShowSocialMediaButtons ? await _socialMediaButtonsService.GetSocialMediaButtonsDto(page, page.PageTitle, cancellationToken) : null,
-                ShowCopyLinkButton = settingInfo?.DisableCopyLinkButton == true
+                ShowCopyLinkButton = settingInfo?.DisableCopyLinkButton != true
             };
 
-            if (sidebarDto.SocialMediaButtons is not null)
-            {
-                sidebarDto.SocialMediaButtons.ShowCopyLinkButton = null;
-            }
+            
 
             return sidebarDto;
         }
         public async Task<SidebarExternalPersonDto[]> GetSidebarExternalPeopleDtosAsync(IEnumerable<ExternalPerson> externalPeopleNodeGuids, CancellationToken cancellationToken)
         {
-            var guids = externalPeopleNodeGuids.Select(x => x.SystemFields.ContentItemGUID).ToList();
-            
+            var guids = (externalPeopleNodeGuids ?? Enumerable.Empty<ExternalPerson>())
+                .Select(x => x.SystemFields?.ContentItemGUID ?? Guid.Empty)
+                .Where(x => x != Guid.Empty)
+                .Distinct()
+                .ToList();
+
+            if (guids.Count == 0)
+            {
+                return Array.Empty<SidebarExternalPersonDto>();
+            }
+
             var externalPeople = await _contentService.GetPagesAsync<ExternalPerson>(
-                new RetrievePagesParameters { },
+                new RetrievePagesParameters { LinkedItemsMaxLevel = 2 },
                 query => query.Where(w => w.WhereIn("ContentItemGUID", guids)),
                 RetrievalCacheSettings.CacheDisabled,
                 cancellationToken
             );
-            
-            var dtos = await Task.WhenAll(externalPeople.Select(async externalPerson => new SidebarExternalPersonDto
+
+            var safeExternalPeople = externalPeople ?? Enumerable.Empty<ExternalPerson>();
+
+            var dtos = await Task.WhenAll(safeExternalPeople.Select(async externalPerson => new SidebarExternalPersonDto
             {
-                Image = PageHelper.GetImageDto(externalPerson.ImageFile.FirstOrDefault()?.ContentAttachmentAsset?.Url, externalPerson.ImageFileAltText),
+                Image = PageHelper.GetImageDto(externalPerson.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset?.Url, externalPerson.ImageFileAltText),
                 FullName = await GetDisplayNameAsync(externalPerson),
                 JobTitle = externalPerson.JobTitle,
                 Url = externalPerson.Url,
-            }));
+            })).ConfigureAwait(false);
 
             return dtos;
         }
@@ -273,20 +291,26 @@ namespace BDO.GWT.Core.Services
             {
                 throw new MissingSectionPageException($"Could not lookup {nameof(Insight)}");
             }
-
+            var firstPublished = contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen ?? DateTime.MinValue;
+            var lastPublished = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen ?? DateTime.MinValue;
+ 
             var sidebarDto = await GetSidebarDtoAsync(contentPage, cancellationToken);
             sidebarDto.ShowCopyLinkButton = await GetShowCopyLinkOptionFromSectionPageAsync(contentPage, sidebarDto.ShowCopyLinkButton, cancellationToken);
             sidebarDto.TypeName = contentPage.ContentType.FirstOrDefault()?.Name;
-            sidebarDto.PublishDate = contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen == DateTime.MinValue ? null : contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen;
-            sidebarDto.UpdatedDate = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen == DateTime.MinValue ? null : contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen;
+            sidebarDto.PublishDate = Normalize(firstPublished) is null ? null : firstPublished;
+            sidebarDto.UpdatedDate = Normalize(lastPublished) is null || Normalize(firstPublished) == Normalize(lastPublished) ? null : lastPublished;
             sidebarDto.RelevantContactPeopleTitle = ResourceStringKey.LiveSite.Insights.Authors;
             
             sidebarDto.RelevantContactPeople = await GetContentPageAuthorDtos(contentPage);
 
-            sidebarDto.RelatedExternalPeople = await GetSidebarExternalPeopleDtosAsync(contentPage.RelatedExternalPeople, cancellationToken);
+            sidebarDto.RelatedExternalPeople = await GetSidebarExternalPeopleDtosAsync(contentPage.RelatedExternalPeople ?? Enumerable.Empty<ExternalPerson>(), cancellationToken);
 
             return sidebarDto;
         }
+        static DateTime? Normalize(DateTime dt) =>
+    dt == DateTime.MinValue
+        ? null
+        : (DateTime?)new DateTime(dt.Ticks - (dt.Ticks % TimeSpan.TicksPerSecond), DateTimeKind.Utc);
         private async Task<SidebarPersonDto[]> GetContentPageAuthorDtos(Insight contentPage)
         {
            
@@ -349,53 +373,74 @@ namespace BDO.GWT.Core.Services
         }
 
         private async Task<SectionInsightsPage?> FindSectionInsightsPageFromHierarchyAsync(int startingParentId, CancellationToken cancellationToken)
+
         {
+
             // Try the direct parent first
+
             if (startingParentId <= 0)
+
             {
+
                 return null;
+
             }
 
             var section = await GetSectionInsightsPageByIdAsync(startingParentId, cancellationToken);
+
             if (section is not null)
+
             {
+
                 return section;
+
             }
 
             // Try one level up via InsightGroup
+
             var group = (await _contentService.GetPagesAsync<InsightGroup>(
+
                 new RetrievePagesParameters { },
+
                 query => query.Where(w => w.WhereEquals(nameof(WebPageFields.WebPageItemID), startingParentId)),
+
                 RetrievalCacheSettings.CacheDisabled,
+
                 cancellationToken)).FirstOrDefault();
 
             var groupParentId = group?.SystemFields.WebPageItemParentID ?? 0;
-            if (groupParentId <= 0)
-            {
-                return null;
-            }
+
 
             section = await GetSectionInsightsPageByIdAsync(groupParentId, cancellationToken);
+
             if (section is not null)
+
             {
+
                 return section;
+
             }
 
             // Try one more level up via InsightCategory
+
             var category = (await _contentService.GetPagesAsync<InsightCategory>(
+
                 new RetrievePagesParameters { },
-                query => query.Where(w => w.WhereEquals(nameof(WebPageFields.WebPageItemID), groupParentId)),
+
+                query => query.Where(w => w.WhereEquals(nameof(WebPageFields.WebPageItemID), startingParentId)),
+
                 RetrievalCacheSettings.CacheDisabled,
+
                 cancellationToken)).FirstOrDefault();
 
             var categoryParentId = category?.SystemFields.WebPageItemParentID ?? 0;
-            if (categoryParentId <= 0)
-            {
-                return null;
-            }
+
 
             return await GetSectionInsightsPageByIdAsync(categoryParentId, cancellationToken);
+
         }
+
+
 
         private async Task<SectionInsightsPage?> GetSectionInsightsPageByIdAsync(int webPageItemId, CancellationToken cancellationToken)
         {
@@ -413,7 +458,7 @@ namespace BDO.GWT.Core.Services
             var websiteChannel = await _websiteChannelInfoProvider.GetAsync(_websiteChannelContext.WebsiteChannelID, cancellationToken);
             var presentationUrl = websiteChannel?.WebsiteChannelDomain;
             var authorNames = new List<string>();
-            if (insights.RelevantContactPerson.Any())
+            if (insights.RelevantContactPerson?.Any() == true)
             {
                 var relevantContactIds = insights.RelevantContactPerson
                     .Select(p => ((IContentItemFieldsSource)p).SystemFields.ContentItemID)
@@ -422,7 +467,7 @@ namespace BDO.GWT.Core.Services
                 authorNames.AddRange(contactNames);
             }
 
-            if (insights.RelatedExternalPeople.Any())
+            if (insights.RelatedExternalPeople?.Any() == true)
             {
                 var guids = insights.RelatedExternalPeople
                .Select(x => x.SystemFields.ContentItemGUID).ToList();
@@ -545,6 +590,12 @@ namespace BDO.GWT.Core.Services
                 return null;
             }
 
+            var firmName = insight.InsightContent.FirstOrDefault()?.SharingSourceFirm;
+
+            // Only return InsightSource for copied/syndicated insights
+            // that have a source firm — same logic as KX13's OriginalSiteGuid check
+            if (string.IsNullOrWhiteSpace(firmName))
+                return null;
             return new InsightSourceDto
             {
                 Link = insight.MetadataCanonical,

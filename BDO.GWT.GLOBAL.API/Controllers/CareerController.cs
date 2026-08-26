@@ -15,7 +15,6 @@ namespace BDO.GWT.GLOBAL.API.Controllers
     /// <summary>
     /// Provides methods to read and manage careers.
     /// </summary>
-    [AllowAnonymous]
     [ApiController]
     [Route("memberFirms/{memberFirmID:int}/Careers")]
     public class CareerController : EntityControllerBase
@@ -36,7 +35,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>Returns one career page.</returns>
         [HttpGet("{pageGUID:guid}")]
-        //[HasPermission(ApiMethodGroupName.Careers, ApiPermission.Read)]
+        [HasPermission(ApiMethodGroupName.Careers, ApiPermission.Read)]
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(PageOutput<CareerPageContent>), MediaTypeNames.Application.Json)]
         public async Task<ActionResult<PageOutput<CareerPageContent>>> Get(int memberFirmID, Guid pageGUID, [FromQuery][Required] string culture, CancellationToken cancellationToken)
         {
@@ -55,7 +54,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>Returns a list of career pages.</returns>
         [HttpGet]
-        //[HasPermission(ApiMethodGroupName.Careers, ApiPermission.Read)]
+        [HasPermission(ApiMethodGroupName.Careers, ApiPermission.Read)]
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(IEnumerable<PageOutput<CareerPageContent>>), MediaTypeNames.Application.Json)]
         public async Task<ActionResult<IEnumerable<PageOutput<CareerPageContent>>>> Get(int memberFirmID, string? culture, bool? onlyPublished, CancellationToken cancellationToken)
         {
@@ -77,7 +76,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>Newly created Career page.</returns>
         [HttpPost]
-        //[HasPermission(ApiMethodGroupName.Careers, ApiPermission.Manage)]
+        [HasPermission(ApiMethodGroupName.Careers, ApiPermission.Manage)]
         [SwaggerResponse(StatusCodes.Status201Created, null, typeof(PageOutput<CareerPageContent>), MediaTypeNames.Application.Json)]
         public async Task<ActionResult<PageOutput<CareerPageContent>>> Post(int memberFirmID, [FromQuery][Required] int nodeParentID, [FromQuery][Required] string culture, [FromBody] CareerPageContent request, CancellationToken cancellationToken)
         {
@@ -98,7 +97,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>New career page in another culture.</returns>
         [HttpPost("{pageGUID:guid}/CreateNewCultureVersion")]
-        //[HasPermission(ApiMethodGroupName.Careers, ApiPermission.Manage)]
+        [HasPermission(ApiMethodGroupName.Careers, ApiPermission.Manage)]
         [SwaggerResponse(StatusCodes.Status201Created, null, typeof(PageOutput<CareerPageContent>), MediaTypeNames.Application.Json)]
         public async Task<ActionResult<PageOutput<CareerPageContent>>> CreateNewCultureVersion(int memberFirmID, Guid pageGUID, [FromQuery][Required] string fromCulture, [FromQuery][Required] string toCulture, [FromBody] CareerPageContent request, CancellationToken cancellationToken)
         {

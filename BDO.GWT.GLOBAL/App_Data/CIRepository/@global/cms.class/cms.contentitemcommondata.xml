@@ -873,6 +873,14 @@ tertiary;Tertiary
           <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This input field is required.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
         <visibilityconditiondata>
           <VisibilityConditionConfiguration>
             <Identifier>Kentico.Administration.NotEqualsString</Identifier>

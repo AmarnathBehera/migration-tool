@@ -2,6 +2,8 @@ import '@styles/index.css';
 import { BDOSQLDropdown } from '@components/custom-dropdown/CustomDropdown';
 import { GDPRControl } from '~/components/gdpr-control/GDPRControl';
 import { FieldGroupSeparator } from '@components/field-group-separator/FieldGroupSeparator';
+import { CsvFileUpload } from '@components/csv-file-upload/CsvFileUpload';
+import { ApiPermissionsControl } from '@components/api-permissions/ApiPermissionsControl';
 
 if (typeof document !== 'undefined') {
     const cssHref = '/Admin/adminresources/bdo.custom.components/entry.css';
@@ -19,4 +21,11 @@ export {
     GDPRControl,
     GDPRControl as GDPRControlFormComponent,
     FieldGroupSeparator as FieldGroupSeparatorFormComponent,
+    CsvFileUpload,
+    CsvFileUpload as CsvFileUploadFormComponent,
+    ApiPermissionsControl,
+    ApiPermissionsControl as ApiPermissionsControlFormComponent,
 };
+export { EditQueryTemplate as EditQuery, EditQueryTemplate } from '@components/custom-reporting/EditQuery';
+export { EditQueryTemplate as default } from '@components/custom-reporting/EditQuery';
+export * from '@components/custom-reporting/EditQueryTemplate';

@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Thank You/Conversion Page</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="9b8b6f43-b6d5-42bc-9351-8501dbfab466" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="d648c4df-cf47-4b65-afc4-7b05b62f5e44" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="e49e1fe8-2017-432e-9165-7aa0e9ee58dd" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>df55a00f-7d8c-40ac-945c-2628fd44c833</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-bullseye</ClassIconClass>
+  <ClassName>BDO.ThankYouConversionPage</ClassName>
+  <ClassShortName>BDOThankYouConversionPage</ClassShortName>
+  <ClassTableName>BDO_ThankYouConversionPage</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>

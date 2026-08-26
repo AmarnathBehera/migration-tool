@@ -1,14 +1,4 @@
-﻿using BDO.GWT.Common.Core.Extensions;
-using BDO.GWT.Core;
-using BDO.GWT.Core.Services;
-using BDO.GWT.Core.ValueObjects;
-using BDO.GWT.Domain.Core.Entities;
-using BDO.GWT.GLOBAL.API.Services;
-using CMS.ContentEngine;
-using CMS.DataEngine;
-using CMS.Websites.Routing;
-using Kentico.Content.Web.Mvc;
-using System.Globalization;
+﻿using BDO.GWT.Core.Services;
 
 namespace BDO.GWT.GLOBAL.API.Middleware;
 
@@ -17,6 +7,8 @@ namespace BDO.GWT.GLOBAL.API.Middleware;
 /// </summary>
 public class MemberFirmMiddleware : IMiddleware
 {
+    internal const string UserIdentifierItemKey = "UserIdentifier";
+
     private readonly IGlobalLocationCustomTableDataService _globalLocationCustomTableDataService;
 
     /// <summary>
@@ -36,13 +28,13 @@ public class MemberFirmMiddleware : IMiddleware
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        //if (context.User.Identity is not { IsAuthenticated: true })
-        //{
-        //    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-        //    await context.Response.CompleteAsync();
+        if (context.User.Identity is not { IsAuthenticated: true })
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            await context.Response.CompleteAsync();
 
-        //    return;
-        //}
+            return;
+        }
 
         if (!context.Request.Path.StartsWithSegments("/memberFirms", StringComparison.InvariantCultureIgnoreCase))
         {
@@ -74,10 +66,10 @@ public class MemberFirmMiddleware : IMiddleware
         }
         var globalLocationCustomTableData = await _globalLocationCustomTableDataService.GetLocationsAsync(memberFirmID);
 
-        if (globalLocationCustomTableData != null)
+        if (globalLocationCustomTableData != null && globalLocationCustomTableData.ChannelId != 0)
         {
 
-            context.Items["ChannelId"] = globalLocationCustomTableData.ChannelId == 0 ? 1 : globalLocationCustomTableData.ChannelId;
+            context.Items["ChannelId"] = globalLocationCustomTableData.ChannelId;
         }
         else
         {

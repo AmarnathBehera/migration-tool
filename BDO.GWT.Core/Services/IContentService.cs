@@ -123,6 +123,11 @@
             IEnumerable<Guid> guids,
             string[] contentTypes);
 
+        Task<IEnumerable<T>> GetPagesByGuidsAsync<T>(
+            IEnumerable<Guid> guids,
+            CancellationToken cancellationToken = default)
+            where T : class, IWebPageFieldsSource;
+
        public string? EnsureAbsoluteUrl(string? url);
         
     }

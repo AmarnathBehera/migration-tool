@@ -18,18 +18,17 @@ namespace BDO.GWT.GLOBAL.API.Services;
 public interface IPersonCrudService
 {
     Task<ActionResult<IEnumerable<PageOutput<PersonPageContent>>>> GetPersonPagesAsync(int channelId, string? culture, bool? onlyPublished, CancellationToken cancellationToken);
-    Task<ActionResult<PageOutput<PersonPageContent>>> GetPersonPageAsync(int channelId, Guid pageGUID, string? culture, CancellationToken cancellationToken);
-    Task<ActionResult<PageOutput<PersonPageContent>>> CreatePageAsync(int channelId, int nodeParentID, string? culture, PersonPageContent request, CancellationToken cancellationToken);
-    Task<ActionResult<PageOutput<PersonPageContent>>> CreatePageCultureVersionAsync(int channelId, Guid pageGUID, string? fromCulture, string? toCulture, PersonPageContent request, CancellationToken cancellationToken);
-    Task<ActionResult<PageOutput<PersonPageContent>>> UpdatePageAsync(int channelId, Guid pageGUID, string? culture, PersonPageContent request, CancellationToken cancellationToken);
-    Task DeletePageAsync(int channelId, Guid pageGUID, string? culture, bool deleteAllCultures, CancellationToken cancellationToken);
+    Task<ActionResult<PageOutput<PersonPageContent>>> GetPersonPageAsync(int channelId, Guid WebPageItemGuid, string? culture, CancellationToken cancellationToken);
+    Task<ActionResult<PageOutput<PersonPageContent>>> CreatePageAsync(int channelId, int WebPageParentID, string? culture, PersonPageContent request, CancellationToken cancellationToken);
+    Task<ActionResult<PageOutput<PersonPageContent>>> CreatePageCultureVersionAsync(int channelId, Guid WebPageItemGuid, string? fromCulture, string? toCulture, PersonPageContent request, CancellationToken cancellationToken);
+    Task<ActionResult<PageOutput<PersonPageContent>>> UpdatePageAsync(int channelId, Guid WebPageItemGuid, string? culture, PersonPageContent request, CancellationToken cancellationToken);
+    Task DeletePageAsync(int channelId, Guid WebPageItemGuid, string? culture, bool deleteAllCultures, CancellationToken cancellationToken);
 }
 
 public class PersonCrudService : IPersonCrudService
 {
     private readonly IContentService _contentRetriever;
     private readonly IValidationState _validationState;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly ICultureService _cultureService;
     private readonly IPageContentValidator _pageContentValidator;
     private readonly IInfoProvider<ChannelInfo> _channelInfoProvider;
@@ -56,11 +55,10 @@ public class PersonCrudService : IPersonCrudService
 
         _contentRetriever = contentRetriever;
         _validationState = validationState;
-        _websiteChannelContext = websiteChannelContext;
         _cultureService = cultureService;
         _pageContentValidator = pageContentValidator;
         _channelInfoProvider = channelInfoProvider;
-        _webPageManager = webPageManagerFactory.Create(_websiteChannelContext.WebsiteChannelID == 0 ? 1 : _websiteChannelContext.WebsiteChannelID, user.UserID);
+        _webPageManager = webPageManagerFactory.Create(websiteChannelContext.WebsiteChannelID == 0 ? 1 : websiteChannelContext.WebsiteChannelID, user.UserID);
         _mappingHelper = mappingHelper;
     }
 
@@ -68,7 +66,7 @@ public class PersonCrudService : IPersonCrudService
     {
         try
         {
-            var currentCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+            var currentCulture = await _mappingHelper.ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
 
             if (string.IsNullOrEmpty(currentCulture.Locale))
             {
@@ -113,11 +111,11 @@ public class PersonCrudService : IPersonCrudService
         }
     }
 
-    public async Task<ActionResult<PageOutput<PersonPageContent>>> GetPersonPageAsync(int channelId, Guid pageGUID, string? culture, CancellationToken cancellationToken)
+    public async Task<ActionResult<PageOutput<PersonPageContent>>> GetPersonPageAsync(int channelId, Guid WebPageItemGuid, string? culture, CancellationToken cancellationToken)
     {
         try
         {
-            var currentCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+            var currentCulture = await _mappingHelper.ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
 
             if (string.IsNullOrEmpty(currentCulture.Locale))
             {
@@ -139,7 +137,7 @@ public class PersonCrudService : IPersonCrudService
             };
 
             var result = await _contentRetriever.GetPagesAsync<Person>(_retrieveCurrentPage,
-                query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
+                query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, WebPageItemGuid)),
                 RetrievalCacheSettings.CacheDisabled,
                 cancellationToken);
 
@@ -166,7 +164,7 @@ public class PersonCrudService : IPersonCrudService
         }
     }
 
-    public async Task<ActionResult<PageOutput<PersonPageContent>>> CreatePageAsync(int channelId, int nodeParentID, string? culture, PersonPageContent request, CancellationToken cancellationToken)
+    public async Task<ActionResult<PageOutput<PersonPageContent>>> CreatePageAsync(int channelId, int WebPageParentID, string? culture, PersonPageContent request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -175,7 +173,7 @@ public class PersonCrudService : IPersonCrudService
 
         try
         {
-            var currentCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+            var currentCulture = await _mappingHelper.ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
 
             if (string.IsNullOrEmpty(currentCulture.Locale))
             {
@@ -197,11 +195,11 @@ public class PersonCrudService : IPersonCrudService
             };
 
             var parentPage = await _contentRetriever.GetPagesAsync<SectionPeoplePage>(_retrieveCurrentPage, query => query
-                .Where(w => w.WhereEquals("WebPageItemID", nodeParentID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
+                .Where(w => w.WhereEquals("WebPageItemID", WebPageParentID)), RetrievalCacheSettings.CacheDisabled, cancellationToken);
 
             if (parentPage == null)
             {
-                _validationState.AddUnprocessableEntityError(nameof(nodeParentID), ErrorMessage.ParentWithNodeIdNotFound(nodeParentID));
+                _validationState.AddUnprocessableEntityError(nameof(WebPageParentID), ErrorMessage.ParentWithNodeIdNotFound(WebPageParentID));
                 throw new UnprocessableEntityException();
             }
 
@@ -218,7 +216,7 @@ public class PersonCrudService : IPersonCrudService
             var contentItemParameters = new ContentItemParameters(PERSON_CONTENT_TYPE, itemData);
             var createPageParameters = new CreateWebPageParameters(pageDisplayName, currentCulture.Locale, contentItemParameters)
             {
-                ParentWebPageItemID = nodeParentID
+                ParentWebPageItemID = WebPageParentID
             };
 
             // Creates the page in the database
@@ -267,7 +265,7 @@ public class PersonCrudService : IPersonCrudService
         }
     }
 
-    public async Task<ActionResult<PageOutput<PersonPageContent>>> CreatePageCultureVersionAsync(int channelId, Guid pageGUID, string? fromCulture, string? toCulture, PersonPageContent request, CancellationToken cancellationToken)
+    public async Task<ActionResult<PageOutput<PersonPageContent>>> CreatePageCultureVersionAsync(int channelId, Guid WebPageItemGuid, string? fromCulture, string? toCulture, PersonPageContent request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -276,14 +274,14 @@ public class PersonCrudService : IPersonCrudService
 
         try
         {
-            var fromLangCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, fromCulture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+            var fromLangCulture = await _mappingHelper.ValidateAndNormalizeSiteCultureAsync(channelId, fromCulture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
 
             if (string.IsNullOrEmpty(fromLangCulture.Language))
             {
                 throw new NotFoundException("Invalid from culture specified");
             }
 
-            var toLangCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, toCulture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+            var toLangCulture = await _mappingHelper.ValidateAndNormalizeSiteCultureAsync(channelId, toCulture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
 
             if (string.IsNullOrEmpty(toLangCulture.Language))
             {
@@ -310,7 +308,7 @@ public class PersonCrudService : IPersonCrudService
 
             // Get existing page
             var result = await _contentRetriever.GetPagesAsync<Person>(_retrieveCurrentPage,
-                query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
+                query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, WebPageItemGuid)),
                 RetrievalCacheSettings.CacheDisabled,
                 cancellationToken);
 
@@ -363,7 +361,7 @@ public class PersonCrudService : IPersonCrudService
             };
 
             var variantResult = await _contentRetriever.GetPagesAsync<Person>(_retrieveNewVariant,
-                query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
+                query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, WebPageItemGuid)),
                 RetrievalCacheSettings.CacheDisabled,
                 cancellationToken);
 
@@ -384,7 +382,7 @@ public class PersonCrudService : IPersonCrudService
         }
     }
 
-    public async Task<ActionResult<PageOutput<PersonPageContent>>> UpdatePageAsync(int channelId, Guid pageGUID, string? culture, PersonPageContent request, CancellationToken cancellationToken)
+    public async Task<ActionResult<PageOutput<PersonPageContent>>> UpdatePageAsync(int channelId, Guid WebPageItemGuid, string? culture, PersonPageContent request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -393,7 +391,7 @@ public class PersonCrudService : IPersonCrudService
 
         try
         {
-            var currentCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Locale, cancellationToken) ?? defaultCulture;
+            var currentCulture = await _mappingHelper.ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Locale, cancellationToken) ?? defaultCulture;
 
             if (string.IsNullOrEmpty(currentCulture.Locale))
             {
@@ -420,7 +418,7 @@ public class PersonCrudService : IPersonCrudService
 
             // Get existing page
             var result = await _contentRetriever.GetPagesAsync<Person>(_retrieveCurrentPage,
-                query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
+                query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, WebPageItemGuid)),
                 RetrievalCacheSettings.CacheDisabled,
                 cancellationToken);
 
@@ -455,7 +453,7 @@ public class PersonCrudService : IPersonCrudService
 
             // Retrieve the updated page and return it
             var updatedResult = await _contentRetriever.GetPagesAsync<Person>(_retrieveCurrentPage,
-                query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
+                query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, WebPageItemGuid)),
                 RetrievalCacheSettings.CacheDisabled,
                 cancellationToken);
 
@@ -476,9 +474,9 @@ public class PersonCrudService : IPersonCrudService
         }
     }
 
-    public async Task DeletePageAsync(int channelId, Guid pageGUID, string? culture, bool deleteAllCultures, CancellationToken cancellationToken)
+    public async Task DeletePageAsync(int channelId, Guid WebPageItemGuid, string? culture, bool deleteAllCultures, CancellationToken cancellationToken)
     {
-        var currentCulture = await ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Locale, cancellationToken) ?? defaultCulture;
+        var currentCulture = await _mappingHelper.ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Locale, cancellationToken) ?? defaultCulture;
 
         if (string.IsNullOrEmpty(currentCulture.Locale))
         {
@@ -509,7 +507,7 @@ public class PersonCrudService : IPersonCrudService
 
                 // Get existing page for this culture
                 var result = await _contentRetriever.GetPagesAsync<Person>(_retrieveCurrentPage,
-                    query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
+                    query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, WebPageItemGuid)),
                     RetrievalCacheSettings.CacheDisabled,
                     cancellationToken);
 
@@ -538,7 +536,7 @@ public class PersonCrudService : IPersonCrudService
 
             // Get existing page
             var result = await _contentRetriever.GetPagesAsync<Person>(_retrieveCurrentPage,
-                query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, pageGUID)),
+                query => query.Where(w => w.WhereEquals(WEB_PAGE_GUID, WebPageItemGuid)),
                 RetrievalCacheSettings.CacheDisabled,
                 cancellationToken);
 
@@ -710,34 +708,4 @@ public class PersonCrudService : IPersonCrudService
         };
     }
 
-    private async Task<LanguageTag?> ValidateAndNormalizeSiteCultureAsync(int channelId, string languageTagString, CancellationToken cancellationToken)
-    {
-        var languageTag = ValidateAndNormalizeCultureAsync(languageTagString);
-
-        if (languageTag == null)
-        {
-            return null;
-        }
-
-        var siteCultures = (await _cultureService.GetSiteCulturesLanguageCodeAsync(channelId, cancellationToken)).ToHashSet();
-
-        if (!siteCultures.Contains(languageTag))
-        {
-            _validationState.AddError("culture", ErrorMessage.DocumentCultureNotAllowedOnSite(languageTag, _websiteChannelContext.WebsiteChannelName, siteCultures));
-        }
-
-        return languageTag;
-    }
-
-    private LanguageTag? ValidateAndNormalizeCultureAsync(string languageTagString)
-    {
-        if (LanguageTag.TryParse(languageTagString, out var languageTag))
-        {
-            return languageTag;
-        }
-
-        _validationState.AddError("culture", ErrorMessage.IncorrectLanguageTagFormat(languageTagString));
-
-        return null;
-    }
-}
+   }

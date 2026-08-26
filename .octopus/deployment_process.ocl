@@ -41,12 +41,12 @@ step "deploy-cms-app-service" {
                   },
                   {
                     "name": "AzureAd__ClientId",
-                    "value": "#{appsettings.azureAdClientId}",
+                    "value": "#{appsettings.cmsAppClientId}",
                     "slotSetting": false
                   },
                     {
                     "name": "AzureAd__ClientSecret",
-                    "value": "#{appsettings.azureAdClientSecret}",
+                    "value": "#{appsettings.cmsAppClientSecret}",
                     "slotSetting": false
                   },
                   {
@@ -160,12 +160,12 @@ step "deploy-mvc-app-service" {
                   },
                   {
                     "name": "AzureAd__ClientId",
-                    "value": "#{appsettings.azureAdClientId}",
+                    "value": "#{appsettings.cmsAppClientId}",
                     "slotSetting": false
                   },
                     {
                     "name": "AzureAd__ClientSecret",
-                    "value": "#{appsettings.azureAdClientSecret}",
+                    "value": "#{appsettings.cmsAppClientSecret}",
                     "slotSetting": false
                   },
                   {
@@ -284,12 +284,17 @@ step "deploy-api-app-service" {
                   },
                   {
                     "name": "AzureAd__ClientId",
-                    "value": "#{appsettings.azureAdClientId}",
+                    "value": "#{appsettings.apiAppClientId}",
                     "slotSetting": false
                   },
                   {
                     "name": "AzureAd__ClientSecret",
-                    "value": "#{appsettings.azureAdClientSecret}",
+                    "value": "#{appsettings.apiAppClientSecret}",
+                    "slotSetting": false
+                  },
+                                    {
+                    "name": "AzureAd__Audience",
+                    "value": "#{appsettings.apiAppAudience}",
                     "slotSetting": false
                   },
                   {
@@ -314,6 +319,33 @@ step "deploy-api-app-service" {
             Octopus.Action.Package.DownloadOnTentacle = "False"
             Octopus.Action.Package.FeedId = "octopus-server-built-in"
             Octopus.Action.Package.PackageId = "GWT.XbyK.API.Deploy"
+            OctopusUseBundledTooling = "False"
+        }
+        worker_pool_variable = "deploy.octopus.workerPool"
+
+        packages {
+            acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = "GWT.XbyK.API.Deploy"
+            properties = {
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
+step "update-apim-api-from-swagger" {
+    name = "Update APIM API from Swagger"
+
+    action {
+        action_type = "Octopus.AzurePowerShell"
+        properties = {
+            Octopus.Action.Azure.AccountId = "#{octopus.azure.account}"
+            Octopus.Action.Package.DownloadOnTentacle = "False"
+            Octopus.Action.Package.FeedId = "octopus-server-built-in"
+            Octopus.Action.Package.PackageId = "GWT.XbyK.API.Deploy"
+            Octopus.Action.Script.ScriptFileName = "Deploy/APIM/Update-ApimApiFromSwagger.ps1"
+            Octopus.Action.Script.ScriptSource = "Package"
             OctopusUseBundledTooling = "False"
         }
         worker_pool_variable = "deploy.octopus.workerPool"

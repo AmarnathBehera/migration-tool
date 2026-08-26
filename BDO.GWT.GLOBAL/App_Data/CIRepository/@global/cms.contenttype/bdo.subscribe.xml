@@ -10,6 +10,308 @@
       <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
         <properties />
       </schema>
+      <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
+        <properties />
+      </schema>
+      <field allowempty="true" column="Formoptions" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="95bc2916-1369-4bc8-8c01-634ed2138758" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Form options</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="FormType" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="39eb734f-261b-4039-9107-28af7cccae06" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Form type</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.DropDownSelector</controlname>
+          <Options>
+<![CDATA[
+form;Premade form
+embedCode;Embed code
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+      </field>
+      <field allowempty="true" column="EmbedCode" columnprecision="0" columnsize="1000" columntype="text" enabled="true" guid="f0b90f30-5129-4469-940b-a4a14ad7dfe1" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Embed Code</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextArea</controlname>
+          <CopyButtonVisible>False</CopyButtonVisible>
+          <MaxRowsNumber>5</MaxRowsNumber>
+          <MinRowsNumber>3</MinRowsNumber>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>embedCode</Value>
+              <CaseSensitive>true</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="Formfieldsettings" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="0f2b2c0f-6d62-43f4-bc86-daaaa2f97330" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Form field settings</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="Information" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="5a177be9-9bed-4e7f-aaf2-1f7f5121e49f" visible="true">
+        <properties>
+          <explanationtext>
+            <![CDATA[All field labels can be changed in 'BDO Site localization'  module with key prefix 'BDO.LiveSite.SubscribeForm'.]]>
+          </explanationtext>
+          <explanationtextashtml>True</explanationtextashtml>
+          <fieldcaption>Information</fieldcaption>
+          <fielddescriptionashtml>True</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>form</Value>
+              <CaseSensitive>true</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="ShowCompanyField" columnprecision="0" columntype="boolean" enabled="true" guid="40abad33-9976-4a8a-a8e5-04b7eeecd605" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show company field</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>form</Value>
+              <CaseSensitive>true</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="IsCompanyRequired" columnprecision="0" columntype="boolean" enabled="true" guid="68c16995-2292-4db5-b164-67bf9d227437" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Is company field required</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>form</Value>
+              <CaseSensitive>true</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="ShowJobTitleField" columnprecision="0" columntype="boolean" enabled="true" guid="0d278cd7-ce7d-400f-8ee0-82932f2d56ef" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show Job Title Field</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>form</Value>
+              <CaseSensitive>true</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="IsJobTitleRequired" columnprecision="0" columntype="boolean" enabled="true" guid="40a6eb40-f138-4888-a341-d9df8b012403" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Is job title field required</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>form</Value>
+              <CaseSensitive>true</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="ShowCountryField" columnprecision="0" columntype="boolean" enabled="true" guid="7ed7fcc0-5498-427c-8309-f975f7ba377c" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show Country Field</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>form</Value>
+              <CaseSensitive>true</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="IsCountryRequired" columnprecision="0" columntype="boolean" enabled="true" guid="96de6366-d3f1-404d-afda-d974797d4875" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Is Country Required</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>form</Value>
+              <CaseSensitive>true</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="AddConsentToForm" columnprecision="0" columntype="boolean" enabled="true" guid="1501a98b-e80a-435a-921d-83ce7e0f1f23" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Add Consent To Form</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.ContainsString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>form</Value>
+              <CaseSensitive>true</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="RecaptchaUseV3" columnprecision="0" columntype="boolean" enabled="true" guid="3503c535-4f82-43ed-8df0-29d8db8a5459" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Use V3</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>form</Value>
+              <CaseSensitive>true</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="RecaptchaScoreTreshhold" columnprecision="27" columnsize="28" columntype="decimal" enabled="true" guid="baf39fe7-bd1a-4e1b-8fe6-e20206456d68" visible="true">
+        <properties>
+          <defaultvalue>0.5</defaultvalue>
+          <explanationtext>Enter a decimal or whole number (e.g. 0.3)</explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Score Threshold</fieldcaption>
+          <fielddescription>A decimal number between 0 and 1</fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.DecimalNumberInput</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>form</Value>
+              <CaseSensitive>true</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="RedirectPageOnFormSubmission" columnprecision="0" columntype="webpages" enabled="true" guid="16300ee2-a10e-4a6a-8d15-c7a93a407a7a" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Redirect to page on form submission</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.WebPageSelector</controlname>
+          <MaximumPages>1</MaximumPages>
+          <Sortable>False</Sortable>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>form</Value>
+              <CaseSensitive>true</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
       <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
         <properties />
       </schema>

@@ -18,7 +18,7 @@ public interface ISectionEventsService
 {
     Task<SectionEventsDto> GetEventsSectionDtoAsync(SectionEvents page, CancellationToken cancellationToken);
 
-    Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(CardsQuery query, CancellationToken cancellationToken);
+    Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(CardsQuery query, string language, CancellationToken cancellationToken);
 }
 
 public class SectionEventsService : ISectionEventsService
@@ -140,7 +140,7 @@ public class SectionEventsService : ISectionEventsService
         };
     }
 
-    public async Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(CardsQuery query, CancellationToken cancellationToken)
+    public async Task<PaginationDto<EventsWebinarsCardDto>> GetFilteredItemsAsync(CardsQuery query, string language, CancellationToken cancellationToken)
     {
         var result = await RetrieveSectionEventsPageAsync(cancellationToken);
         var featuredPageIds = result.FeaturedPageIds;
@@ -151,6 +151,7 @@ public class SectionEventsService : ISectionEventsService
 
         return await _eventWebinarCardsService.GetFilteredItemsAsync(
             query,
+            language,
             null,
             eventOrWebinar => featuredPageIds.Contains(eventOrWebinar.SystemFields.WebPageItemID),
             showPastEvents,

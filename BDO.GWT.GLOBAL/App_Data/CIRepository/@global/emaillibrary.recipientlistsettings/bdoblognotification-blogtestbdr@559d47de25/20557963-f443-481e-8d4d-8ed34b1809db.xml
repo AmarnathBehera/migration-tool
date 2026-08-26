@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<emaillibrary.recipientlistsettings>
+  <RecipientListSettingsAfterConfirmationPage>7144880a-b654-4908-9a7b-7127007567bb</RecipientListSettingsAfterConfirmationPage>
+  <RecipientListSettingsAfterUnsubscriptionPage>655581ca-6ebd-4884-8281-0936c79d118e</RecipientListSettingsAfterUnsubscriptionPage>
+  <RecipientListSettingsGUID>20557963-f443-481e-8d4d-8ed34b1809db</RecipientListSettingsGUID>
+  <RecipientListSettingsRecipientListID>
+    <CodeName>BDOBlogNotification-BlogTestBDR</CodeName>
+    <GUID>f0307842-9da3-4e79-84f0-77450206b89f</GUID>
+    <ObjectType>om.recipientlist</ObjectType>
+  </RecipientListSettingsRecipientListID>
+  <RecipientListSettingsSendSubscriptionConfirmationEmail>False</RecipientListSettingsSendSubscriptionConfirmationEmail>
+  <RecipientListSettingsSendUnsubscriptionConfirmationEmail>False</RecipientListSettingsSendUnsubscriptionConfirmationEmail>
+</emaillibrary.recipientlistsettings>

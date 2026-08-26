@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Email</ClassContentTypeType>
+  <ClassDisplayName>Newsletter</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="d647c8ec-997b-43d2-b872-8284cc91a8e8" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="814b355d-c0a6-4cc3-b457-199ace55dd4c" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="0d05d162-b929-45dc-8d3e-4d8c44f32223" isunique="true" system="true" />
+      <field allowempty="true" column="EmailSenderID" columntype="integer" enabled="true" guid="fa09c64a-86a4-48ac-9820-9b23dcd3e272" refobjtype="emaillibrary.emailchannelsender" reftype="NotRequired" system="true" />
+      <field allowempty="true" column="EmailTemplateID" columntype="integer" enabled="true" guid="d4f04684-7ed3-4c49-bb90-49cfa8e1331b" refobjtype="emaillibrary.emailtemplate" reftype="NotRequired" system="true" />
+      <field allowempty="true" column="EmailPlainText" columntype="longtext" enabled="true" guid="8755e317-e45c-428e-a419-940575121184" system="true" />
+      <field allowempty="true" column="EmailSubject" columnsize="450" columntype="text" enabled="true" guid="e8136c81-5cc7-4910-a392-f8c87b13b44e" visible="true">
+        <properties>
+          <fieldcaption>{$digitalmarketing.emails.edit.subject$}</fieldcaption>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues />
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+      <field allowempty="true" column="EmailPreviewText" columntype="longtext" enabled="true" guid="9ca0a56a-ae65-4ff8-9440-66c6221a2a2e" visible="true">
+        <properties>
+          <fieldcaption>{$digitalmarketing.emails.edit.previewtext$}</fieldcaption>
+          <fielddescription>
+            <![CDATA[{$digitalmarketing.emails.edit.previewtext.tooltip$}]]>
+          </fielddescription>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextArea</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>806e18cd-6fac-4358-bb81-871412a4ffc2</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-newspaper</ClassIconClass>
+  <ClassName>BDO.Newsletter</ClassName>
+  <ClassTableName>BDO_Newsletter</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

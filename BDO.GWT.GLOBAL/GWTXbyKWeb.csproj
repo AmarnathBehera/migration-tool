@@ -9,6 +9,7 @@
   <ItemGroup>
     <EmbeddedResource Include="wwwroot\PageBuilder\Admin\**" />
   </ItemGroup>
+ 
   <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Admin" />
     <PackageReference Include="kentico.xperience.azurestorage" />
@@ -21,6 +22,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BDO.GWT.Core\BDO.GWT.Core.csproj" />
+    <ProjectReference Include="..\BDO.GWT.CustomReportingModule\BDO.GWT.CustomReportingModule.csproj" />
     <ProjectReference Include="..\Kentico.Xperience.AzureSearch\Kentico.Xperience.AzureSearch.csproj" />
     <ProjectReference Include="..\xperience-community-redirects-main\src\XperienceCommunity.Redirects.csproj" />
   </ItemGroup>

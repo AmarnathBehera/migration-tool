@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Subscribe - Confirm</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="036e218a-5bc6-4bb2-b8d8-53343c647761" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="7fd0326a-3963-4192-b8b5-3cce2e5a391f" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="34ac88a9-c4fb-4c44-919e-6a24db9a5118" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <field allowempty="true" column="Subscribemessages" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="d32f2a8e-abcc-43c0-88ef-0085cdb5968b" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Subscribe messages</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
+      <field column="SuccessfulSubscribeMessage" columnprecision="0" columntype="longtext" enabled="true" guid="818dac56-8877-4ff3-9789-9098a79801e1" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Successful approval text</fieldcaption>
+          <fielddescription>
+            <![CDATA[Text to be displayed when a subscription was successfully approved.]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.RichTextEditor</controlname>
+        </settings>
+      </field>
+      <field column="UnsuccessfulSubscribeMessage" columnprecision="0" columntype="longtext" enabled="true" guid="218e37ad-eb28-449e-af2f-d811e271544f" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Unsuccessful approval text</fieldcaption>
+          <fielddescription>
+            <![CDATA[Text to be displayed when a subscription was not approved. (malformed URL, newsletter doesn't exist anymore) ]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.RichTextEditor</controlname>
+        </settings>
+      </field>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>1d59794e-3c8e-49a6-9635-e716ef8d6040</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-message</ClassIconClass>
+  <ClassName>BDO.SubscribeConfirm</ClassName>
+  <ClassShortName>BDOSubscribeConfirm</ClassShortName>
+  <ClassTableName>BDO_SubscribeConfirm</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>
