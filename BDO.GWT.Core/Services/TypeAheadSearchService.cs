@@ -26,10 +26,10 @@ namespace BDO.GWT.Core.Services
     public class TypeAheadSearchService : ITypeAheadSearchService
     {
         private readonly ICultureContext _cultureContext;
-        private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly IDateTimeProviderSearch _dateTimeProvider;
         private readonly IPageUrlService _pageUrlService;
         private readonly ISearchService _searchService;
-        public TypeAheadSearchService(ICultureContext cultureContext, IDateTimeProvider dateTimeProvider, IPageUrlService pageUrlService, ISearchService searchService)
+        public TypeAheadSearchService(ICultureContext cultureContext, IDateTimeProviderSearch dateTimeProvider, IPageUrlService pageUrlService, ISearchService searchService)
         {
             _cultureContext = cultureContext;
             _dateTimeProvider = dateTimeProvider;

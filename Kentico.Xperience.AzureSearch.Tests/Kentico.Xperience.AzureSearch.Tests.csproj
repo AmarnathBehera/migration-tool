@@ -9,15 +9,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoFixture" />
-    <PackageReference Include="coverlet.collector" />
-    <PackageReference Include="FluentAssertions" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="NSubstitute" />
-    <PackageReference Include="NUnit" />
-    <PackageReference Include="NUnit.Analyzers" />
-    <PackageReference Include="NUnit3TestAdapter" />
-  </ItemGroup>
+  <PackageReference Include="AutoFixture" Version="4.18.1" />
+  <PackageReference Include="coverlet.collector" Version="6.0.4" />
+  <PackageReference Include="FluentAssertions" Version="6.12.2" />
+  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
+  <PackageReference Include="NSubstitute" Version="5.3.0" />
+  <PackageReference Include="NUnit" Version="4.3.2" />
+  <PackageReference Include="NUnit.Analyzers" Version="4.7.0" />
+  <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
+</ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Kentico.Xperience.AzureSearch\Kentico.Xperience.AzureSearch.csproj" />

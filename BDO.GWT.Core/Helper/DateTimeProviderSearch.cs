@@ -4,12 +4,12 @@ using System.Text;
 
 namespace BDO.GWT.Core.Helpers
 {
-    public interface IDateTimeProvider
+    public interface IDateTimeProviderSearch
     {
         DateTime Now { get; }
     }
 
-    public class DateTimeProvider : IDateTimeProvider
+    public class DateTimeProviderSearch : IDateTimeProviderSearch
     {
         public DateTime Now => DateTime.Now;
     }

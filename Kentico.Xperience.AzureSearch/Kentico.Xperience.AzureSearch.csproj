@@ -55,8 +55,8 @@
       
 
 	<ItemGroup>
-		<PackageReference Include="Azure.Search.Documents" />
-		<PackageReference Include="Kentico.Xperience.Admin" />
-		<PackageReference Include="Kentico.Xperience.WebApp" />
-	</ItemGroup>
+    <PackageReference Include="Azure.Search.Documents" Version="12.0.0" />
+    <PackageReference Include="Kentico.Xperience.Admin" Version="31.2.3" />
+    <PackageReference Include="Kentico.Xperience.WebApp" Version="31.2.3" />
+</ItemGroup>
 </Project>

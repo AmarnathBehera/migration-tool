@@ -10,7 +10,7 @@ namespace BDO.GWT.Core.Extensions
 {
     public static class SearchQueryExtensions
     {
-        public static void OnlyPublishedPages(this ISearchQuery<BDO.GWT.Core.Entities.Search.SearchDocument> query, IDateTimeProvider dateTimeProvider)
+        public static void OnlyPublishedPages(this ISearchQuery<BDO.GWT.Core.Entities.Search.SearchDocument> query, IDateTimeProviderSearch dateTimeProvider)
         {
             query.Where(x => x.PublishTo == null || x.PublishTo >= dateTimeProvider.Now);
             query.Where(x => x.PublishFrom == null || x.PublishFrom <= dateTimeProvider.Now);

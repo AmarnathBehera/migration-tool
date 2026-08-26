@@ -13,6 +13,7 @@ using BDO.GWT.Core.Mappers;
 using CMS.Core;
 using GWTXbyKWeb.Components.Services.SEOOptions;
 using Microsoft.Extensions.DependencyInjection;
+using BDO.GWT.Common.Core.Services;
 
 
 namespace BDO.GWT.Common;
@@ -54,18 +55,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddSingleton<IFormSubmissionSubscriptionsService, FormSubmissionSubscriptionsService>();
 
         serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
-        serviceCollection.AddSingleton<IEditorsPickStateStore, EditorsPickStateStore>();
-        serviceCollection.AddScoped<ISearchService, SearchService>();
-        serviceCollection.AddScoped<ISearchQueryHelper, SearchQueryHelper>();
-        serviceCollection.AddScoped<ISearchClientBuilder, SearchClientBuilder>();
-        serviceCollection.AddScoped<ISearchPageService, SearchPageService>(); // add this line
-        serviceCollection.AddScoped<ITypeMapper, TypeMapper>();
-        serviceCollection.AddScoped<IKenticoTypeMapper, KenticoTypeMapper>();
-        serviceCollection.AddScoped<ISearchCardHelper, SearchCardHelper>();
         serviceCollection.AddScoped<IDateTimeProvider, DateTimeProvider>();
-        serviceCollection.AddScoped<IContentPageCardHelper<Insight>, ContentPageCardHelper<Insight>>();
-        serviceCollection.AddScoped<IPageUrlService, PageUrlService>();
-        serviceCollection.AddScoped<ITypeAheadSearchService, TypeAheadSearchService>();
+        
 
     }
 

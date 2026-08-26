@@ -39,7 +39,7 @@ namespace BDO.GWT.Core.Tests.Services
         private Mock<IWebPageUrlResolver> _urlResolverMock = null!;
         private Mock<ITypeMapper> _typeMapperMock = null!;
         private Mock<ISearchService> _searchServiceMock = null!;
-        private Mock<IDateTimeProvider> _dateTimeProviderMock = null!;
+        private Mock<IDateTimeProviderSearch> _dateTimeProviderMock = null!;
         private Mock<ISearchCardHelper> _searchCardHelperMock = null!;
         private SearchPageService _service = null!;
 
@@ -55,7 +55,7 @@ namespace BDO.GWT.Core.Tests.Services
             _urlResolverMock = new Mock<IWebPageUrlResolver>();
             _typeMapperMock = new Mock<ITypeMapper>();
             _searchServiceMock = new Mock<ISearchService>();
-            _dateTimeProviderMock = new Mock<IDateTimeProvider>();
+            _dateTimeProviderMock = new Mock<IDateTimeProviderSearch>();
             _searchCardHelperMock = new Mock<ISearchCardHelper>();
 
             _cultureContextMock.SetupGet(x => x.CurrentLanguageTag).Returns(LANGUAGE_TAG);

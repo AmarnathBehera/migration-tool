@@ -39,7 +39,7 @@ namespace BDO.GWT.Core.Services
         IWebPageUrlResolver urlResolver,
         ITypeMapper typeMapper,
         ISearchService searchService,
-        IDateTimeProvider dateTimeProvider,
+        IDateTimeProviderSearch dateTimeProvider,
         ISearchCardHelper searchCardHelper
 
             ) : ISearchPageService
@@ -133,7 +133,7 @@ namespace BDO.GWT.Core.Services
         private readonly IWebPageUrlResolver _urlResolver = urlResolver;
         private readonly ISearchService _searchService = searchService;
         private readonly ITypeMapper _typeMapper = typeMapper;
-        private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
+        private readonly IDateTimeProviderSearch _dateTimeProvider = dateTimeProvider;
         private readonly ISearchCardHelper _searchCardHelper = searchCardHelper;
         public async Task<SearchResultDto> GetSearchResultsAsync(SearchResultQuery query, CancellationToken cancellationToken)
         {

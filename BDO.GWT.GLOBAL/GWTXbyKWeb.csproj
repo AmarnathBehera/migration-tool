@@ -10,16 +10,16 @@
     <EmbeddedResource Include="wwwroot\PageBuilder\Admin\**" />
   </ItemGroup>
  
-  <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.Admin" />
-    <PackageReference Include="kentico.xperience.azurestorage" />
-    <PackageReference Include="kentico.xperience.imageprocessing" />
-    <PackageReference Include="Kentico.Xperience.SendGrid" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" />
-    <PackageReference Include="Microsoft.Identity.Web" VersionOverride="4.3.0" />
-    <PackageReference Include="XperienceCommunity.Localization" />
-  </ItemGroup>
+ <ItemGroup>
+<PackageReference Include="Kentico.Xperience.Admin" Version="31.2.3" />
+<PackageReference Include="kentico.xperience.azurestorage" Version="31.2.3" />
+<PackageReference Include="kentico.xperience.imageprocessing" Version="31.2.3" />
+<PackageReference Include="Kentico.Xperience.SendGrid" Version="31.2.3" />
+<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="3.1.0" />
+<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.0" />
+<PackageReference Include="Microsoft.Identity.Web" Version="4.3.0" />
+<PackageReference Include="XperienceCommunity.Localization" Version="2.0.1" />
+</ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BDO.GWT.Core\BDO.GWT.Core.csproj" />
     <ProjectReference Include="..\BDO.GWT.CustomReportingModule\BDO.GWT.CustomReportingModule.csproj" />

@@ -1,9 +1,12 @@
 ﻿namespace BDO.GWT.Core
 {
+    using BDO.GWT.AzureCognitiveSearch.Services;
     using BDO.GWT.Common.Core.Services;
+    using BDO.GWT.Common.Helpers;
     using BDO.GWT.Core;
     using BDO.GWT.Core.Helpers;
     using BDO.GWT.Core.LiveSite.Services;
+    using BDO.GWT.Core.Mappers;
     using BDO.GWT.Core.Retrievers;
     using BDO.GWT.Core.services;
     using BDO.GWT.Core.Services;
@@ -19,7 +22,6 @@
     using BDO.GWT.Web.Services;
     using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
     using BDO.GWT.Xperience.Core.LiveSite.Services;
-    using BDO.GWT.Common.Helpers;
     using BDO.GWT.Xperience.Core.Services;
     using CMS.ContentEngine;
     using CMS.Helpers;
@@ -64,7 +66,7 @@
             serviceCollection.AddScoped<IAuthoredContentService, AuthoredContentService>();
             serviceCollection.AddScoped<ISidebarService, SidebarService>();
             serviceCollection.AddScoped<ISocialMediaButtonsService, SocialMediaButtonsService>();
-            serviceCollection.AddScoped<IExternalPeopleHelper, ExternalPeopleHelper>();
+            serviceCollection.AddScoped<IExternalPeopleHelper, ExternalPeopleHelper>(); 
             serviceCollection.AddScoped<IFilteringHelper, FilteringHelper>();
             serviceCollection.AddScoped<ISettingService, SettingService>();
             serviceCollection.AddScoped<ISectionEventsService, SectionEventsService>();
@@ -129,8 +131,8 @@
             serviceCollection.AddScoped<IEventRegistrationFormPageService, EventRegistrationFormPageService>();
             serviceCollection.AddScoped<IDealCardsService, DealCardsService>();
             serviceCollection.AddScoped<ITimeZoneService, TimeZoneService>();
-            serviceCollection.AddScoped<ICookieBannerService, CookieBannerService>();
-
+            serviceCollection.AddScoped<ICookieBannerService, CookieBannerService>();        
+            serviceCollection.AddScoped<IDateTimeProviderSearch, DateTimeProviderSearch>();
             serviceCollection.AddScoped<ISitemapPageService, SitemapPageService>();
             serviceCollection.AddScoped<ISitemapService, SitemapService>();
             serviceCollection.AddScoped<ILanguageProvider, LanguageProvider>();
@@ -150,11 +152,21 @@
             serviceCollection.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
             serviceCollection.AddScoped<ICultureService, CultureService>();
             serviceCollection.AddScoped<IChannelAccessService, ChannelAccessService>();
-            serviceCollection.AddScoped<IDateTimeProvider, DateTimeProvider>();
+            serviceCollection.AddScoped<IDateTimeProviderSearch, DateTimeProviderSearch>();
             serviceCollection.AddScoped<IRelatedContentCardService, RelatedContentCardService>();
             serviceCollection.AddScoped<IRelatedContentCarouselService, RelatedContentCarouselService>();
             serviceCollection.AddSingleton<ISecretsEncryptionHelper, SecretsEncryptionHelper>();
-
+            serviceCollection.AddScoped<ISearchService, SearchService>();
+            serviceCollection.AddScoped<ISearchQueryHelper, SearchQueryHelper>();
+            serviceCollection.AddScoped<ISearchClientBuilder, SearchClientBuilder>();
+            serviceCollection.AddScoped<ISearchPageService, SearchPageService>();
+            serviceCollection.AddScoped<ITypeMapper, TypeMapper>();
+            serviceCollection.AddScoped<IKenticoTypeMapper, KenticoTypeMapper>();
+            serviceCollection.AddScoped<ISearchCardHelper, SearchCardHelper>();          
+            serviceCollection.AddScoped<IContentPageCardHelper<Insight>, ContentPageCardHelper<Insight>>();
+            serviceCollection.AddScoped<IPageUrlService, PageUrlService>();
+            serviceCollection.AddScoped<ITypeAheadSearchService, TypeAheadSearchService>();
+            //serviceCollection.AddScoped<IDateTimeProviderSearch, DateTimeProviderSearch>();
             return serviceCollection;
         }
     }
