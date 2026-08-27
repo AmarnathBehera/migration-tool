@@ -24,4 +24,15 @@ public static class PaginationHelper
             .Skip((paginationQuery.CurrentPage.Value - 1) * paginationQuery.PageSize.Value)
             .Take(paginationQuery.PageSize.Value);
     }
+
+    public static int CalculateTotalPages(int totalItems, int pageSize)
+    {
+        return (int)Math.Ceiling((double)totalItems / pageSize);
+    }
+
+    public static int CalculateSkip(int currentPage, int pageSize)
+    {
+        return (currentPage - 1) * pageSize;
+
+    }
 }

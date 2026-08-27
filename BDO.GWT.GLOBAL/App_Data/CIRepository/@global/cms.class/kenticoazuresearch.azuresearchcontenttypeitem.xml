@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>AzureSearch Type Item</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="AzureSearchContentTypeItemId" columntype="integer" enabled="true" guid="75e5285a-d8e3-4bb5-86e3-12f8fbe6a843" isPK="true" />
+      <field column="AzureSearchContentTypeItemContentTypeName" columnprecision="0" columnsize="100" columntype="text" enabled="true" guid="c98416cc-8504-44ed-8a1b-c202268df994" visible="true" />
+      <field column="AzureSearchContentTypeItemIncludedPathItemId" columnprecision="0" columntype="integer" enabled="true" guid="3c811177-e575-4091-bf23-48246742dfef" refobjtype="kenticoazuresearch.azuresearchincludedpathitem" reftype="Required" visible="true" />
+      <field column="AzureSearchContentTypeItemGuid" columnprecision="0" columntype="guid" enabled="true" guid="4b50a295-c650-4f6d-876d-f8e7fe56fdeb" visible="true" />
+      <field column="AzureSearchContentTypeItemIndexItemId" columnprecision="0" columntype="integer" enabled="true" guid="6fa5bcd7-82b0-4260-af74-17b0ce832b0f" refobjtype="kenticoazuresearch.azuresearchindexitem" reftype="Required" visible="true" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>a15230b3-e6cd-496e-939a-170b48de57db</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>KenticoAzureSearch.AzureSearchContentTypeItem</ClassName>
+  <ClassResourceID>
+    <CodeName>CMS.Integration.AzureSearch</CodeName>
+    <GUID>202b58b7-8d7e-4ef3-9c73-239ec4e31aa7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>KenticoAzureSearch_AzureSearchContentTypeItem</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>
