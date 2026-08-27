@@ -45,20 +45,16 @@ namespace BDO.GWT.Core.Helpers
 
         private static readonly Dictionary<Type, SearchCardType> SearchCardTypeByPageType = PageTypesBySearchCardType.InvertKeyAndListValueDictionary();
 
-        //private readonly IContentPageCardHelper<Insight> _insightCardHelper;
-        private readonly ICultureContext _cultureContext;
-        //private readonly IEventWebinarCardsService _eventWebinarCardsService;
-        private readonly IPageUrlService _pageUrlService;
-        //private readonly ITypeMapper _typeMapper;
+      
+        private readonly ICultureContext _cultureContext;        
+        private readonly IPageUrlService _pageUrlService;        
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public SearchCardHelper(ICultureContext cultureContext, IPageUrlService pageUrlService,IHttpContextAccessor httpContextAccessor)
         {
-            //_insightCardHelper = insightCardHelper; 
-            _cultureContext = cultureContext;
-           // _eventWebinarCardsService = eventWebinarCardsService;
+            
+            _cultureContext = cultureContext;           
             _pageUrlService = pageUrlService;
-            //_typeMapper = typeMapper;
             _httpContextAccessor = httpContextAccessor;
         }
 

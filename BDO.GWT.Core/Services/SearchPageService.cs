@@ -32,14 +32,14 @@ namespace BDO.GWT.Core.Services
     }
     public class SearchPageService(
         ICultureContext cultureContext,
-        IContentService contentService,
-        IUrlHelperFactory urlHelperFactory,
-        IHttpContextAccessor httpContextAccessor,
-        IWebsiteChannelContext websiteChannelContext,
-        IWebPageUrlResolver urlResolver,
+        //IContentService contentService,
+        //IUrlHelperFactory urlHelperFactory,
+        //IHttpContextAccessor httpContextAccessor,
+        //IWebsiteChannelContext websiteChannelContext,
+        //IWebPageUrlResolver urlResolver,
         ITypeMapper typeMapper,
         ISearchService searchService,
-        IDateTimeProviderSearch dateTimeProvider,
+        //IDateTimeProviderSearch dateTimeProvider,
         ISearchCardHelper searchCardHelper
 
             ) : ISearchPageService
