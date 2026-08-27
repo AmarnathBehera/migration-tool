@@ -181,29 +181,31 @@ public class WhereConditionParser
     private static RelationalWhereCondition ParseRelationalBinaryExpression(BinaryExpression binaryExpression)
     {
         string? propertyName;
-
         QueryOperator queryOperator;
 
         var propertyValue = QueryExpressionHelper.GetPropertyValue(binaryExpression.Right);
 
-        if (binaryExpression.Left is MemberExpression memberExpression && memberExpression.Member.DeclaringType == typeof(LanguageTag) && memberExpression.Member.Name == nameof(LanguageTag.Language) && memberExpression.Expression is not null)
+        if (binaryExpression.Left is MemberExpression memberExpression
+            && memberExpression.Member.DeclaringType == typeof(LanguageTag)
+            && memberExpression.Member.Name == nameof(LanguageTag.Language)
+            && memberExpression.Expression is not null)
         {
-            propertyName = QueryExpressionHelper.GetPropertyName(memberExpression.Expression);
+            // Filter on the whole SearchDocument.LanguageTag property (mapped to the index
+            // "LanguageName" field), NOT the nested "Language" member (which SearchDocument
+            // does not expose and cannot be mapped).
+            propertyName = QueryExpressionHelper.GetPropertyName(memberExpression.Expression); // "LanguageTag"
 
-            queryOperator = QueryOperator.Like;
-
-            propertyValue = $"{propertyValue}-%";
+            // Azure Search has no LIKE — use equality against the indexed culture value.
+            queryOperator = QueryOperator.Equal;
+            // propertyValue stays the plain culture string (no "-%" wildcard)
         }
         else
         {
             propertyName = QueryExpressionHelper.GetPropertyName(binaryExpression);
-
             queryOperator = QueryExpressionHelper.GetQueryOperator(binaryExpression);
         }
 
-        var queryCondition = new RelationalWhereCondition(propertyName, queryOperator, propertyValue);
-
-        return queryCondition;
+        return new RelationalWhereCondition(propertyName, queryOperator, propertyValue);
     }
 
     private static NotWhereCondition ParseUnaryExpression(UnaryExpression unaryExpression)

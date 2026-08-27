@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Azure Search Reusable Content Type Item</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="AzureSearchReusableContentTypeItemId" columntype="integer" enabled="true" guid="89b25bc4-fc09-4229-abd8-740d15bc2c8a" isPK="true" />
+      <field column="AzureSearchReusableContentTypeItemContentTypeName" columnprecision="0" columnsize="100" columntype="text" enabled="true" guid="d4ed9e57-de52-4e60-8f64-264e794b239a" visible="true" />
+      <field column="AzureSearchReusableContentTypeItemGuid" columnprecision="0" columntype="guid" enabled="true" guid="def48167-5635-4a22-8b82-2915a8497ef8" visible="true" />
+      <field column="AzureSearchReusableContentTypeItemIndexItemId" columnprecision="0" columntype="integer" enabled="true" guid="0d9b6591-f7c6-4892-9298-c7347d346241" refobjtype="kenticoazuresearch.azuresearchindexitem" reftype="Required" visible="true" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>7eb3c525-30d7-45d9-80c0-de3f14fcda1a</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>
+    <![CDATA[KenticoAzureSearch.AzureSearchReusableContentTypeItem]]>
+  </ClassName>
+  <ClassResourceID>
+    <CodeName>CMS.Integration.AzureSearch</CodeName>
+    <GUID>202b58b7-8d7e-4ef3-9c73-239ec4e31aa7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>
+    <![CDATA[KenticoAzureSearch_AzureSearchReusableContentTypeItem]]>
+  </ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

@@ -1,3 +1,4 @@
+using BDO.GWT.Core.ValueObjects;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 using System.Threading;
@@ -33,6 +34,36 @@ namespace BDO.GWT.Core
         {
             var homePage = await _homePageService.GetHomePageUrl(cancellationToken);
             return homePage ?? string.Empty;
+        }
+
+        public async Task<IDictionary<int, RelativeLink>> GetPageRelativeUrlByNodeIdAsync(IEnumerable<int> nodeIds, LanguageTag languageTag, CancellationToken cancellationToken)
+        {
+            var linkByNodeId = new Dictionary<int, RelativeLink>();
+
+            // Materialize once to avoid multiple enumeration.
+            var distinctIds = nodeIds.Distinct();
+
+            foreach (var webPageItemId in distinctIds)
+            {
+                var webPageUrl = await _pageUrlRetriever.Retrieve(
+                    webPageItemId,
+                    languageTag.Locale,
+                    cancellationToken: cancellationToken);
+
+                var relativePath = webPageUrl?.RelativePath;
+
+                if (string.IsNullOrEmpty(relativePath))
+                {
+                    continue;
+                }
+
+                if (Link.Parse(relativePath) is RelativeLink relativeLink)
+                {
+                    linkByNodeId[webPageItemId] = relativeLink;
+                }
+            }
+
+            return linkByNodeId;
         }
     }
 }
