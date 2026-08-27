@@ -29,9 +29,8 @@ public class EditorsPickDto : ICardsCarouselDto<EditorsPickCardDto>, IFilterable
 
     public string? WidgetID { get; set; }
 
-    public Guid StateGUID { get; set; }
-
-    public string? FeaturedGuids { get; set; }
-
-    public string? SelectedGuids { get; set; }
+    public Guid? CurrentPageGuid { get; set; }
+    public string? PageType { get; set; }
+    public List<Guid> SelectedGuids { get; set; } = new();
+    public List<Guid> FeaturedGuids { get; set; } = new();
 }

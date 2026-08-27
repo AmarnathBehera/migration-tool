@@ -1,0 +1,18 @@
+﻿namespace BDO.GWT.GLOBAL.API.Data
+{
+    public interface IPageAttachmentCrudService
+    {
+        Task<PageAttachmentOutput?> GetAttachmentAsync(
+            int channelId,
+            Guid pageGuid,
+            Guid attachmentGuid,
+            string culture,
+            CancellationToken cancellationToken = default);
+
+        Task<IEnumerable<PageAttachmentOutput>> GetAttachmentsAsync(
+            int channelId,
+            Guid pageGuid,
+            string culture,
+            CancellationToken cancellationToken = default);
+    }
+}

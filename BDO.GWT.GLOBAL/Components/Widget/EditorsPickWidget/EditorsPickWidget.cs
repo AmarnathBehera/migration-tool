@@ -1,8 +1,8 @@
 ﻿using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Services;
-using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.EditorsPickWidget;
+using CMS.ContentEngine;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
@@ -19,7 +19,6 @@ public class EditorsPickWidget : ViewComponent
     private readonly IContentRetriever _contentRetriever;
     private readonly IContentService _contentService;
 
-
     public EditorsPickWidget(
         IEditorsPickService editorsPickService,
         IContentRetriever contentRetriever,
@@ -33,8 +32,8 @@ public class EditorsPickWidget : ViewComponent
     public async Task<IViewComponentResult> InvokeAsync(ComponentViewModel<EditorsPickWidgetProperties> model)
     {
         var currentPage = await _contentService.RetrieveCurrentPageAsync<IWebPageFieldsSource>(
-             new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 2 },
-             HttpContext.RequestAborted);
+            new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 2 },
+            HttpContext.RequestAborted);
 
         if (currentPage is null)
         {
@@ -43,13 +42,13 @@ public class EditorsPickWidget : ViewComponent
                 FilteringTooltipEnabled = false,
                 Items = []
             });
-
         }
-        var backgroundimageurl = model.Properties.BackgroundImages?.Any() == true
-         ? await _contentRetriever.RetrieveContentByGuids<ContentAttachment>(
-             model.Properties.BackgroundImages.Select(i => i.Identifier).ToList(),
-             new RetrieveContentParameters { LinkedItemsMaxLevel = 1 })
-         : Enumerable.Empty<ContentAttachment>();
+
+        var backgroundImageUrl = model.Properties.BackgroundImages?.Any() == true
+            ? await _contentRetriever.RetrieveContentByGuids<ContentAttachment>(
+                model.Properties.BackgroundImages.Select(i => i.Identifier).ToList(),
+                new RetrieveContentParameters { LinkedItemsMaxLevel = 1 })
+            : Enumerable.Empty<ContentAttachment>();
 
         var data = new EditorsPickData
         {
@@ -59,8 +58,10 @@ public class EditorsPickWidget : ViewComponent
             Filters = model.Properties.Filters?.ToHashSet() ?? new HashSet<string>(),
             EditorsPickGuids = model.Properties.Pages ?? [],
             FeaturedPageGuids = model.Properties.FeaturedPages ?? [],
-            BackgroundImageUrl = backgroundimageurl.FirstOrDefault()?.ContentAttachmentAsset.Url,
-            BackgroundImageAltText = string.IsNullOrEmpty(model.Properties.BackgroundImageAltText) ? null : model.Properties.BackgroundImageAltText,
+            BackgroundImageUrl = backgroundImageUrl.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+            BackgroundImageAltText = string.IsNullOrEmpty(model.Properties.BackgroundImageAltText)
+                ? null
+                : model.Properties.BackgroundImageAltText,
             SeeAllLinkText = model.Properties.SeeAllLinkText,
             SeeAllLinkUrl = model.Properties.SeeAllLinkURL,
             SeeAllLinkURLTarget = model.Properties.SeeAllLinkURLTarget,

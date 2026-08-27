@@ -404,6 +404,33 @@ step "deploy-api-app-service" {
     }
 }
 
+step "update-apim-api-from-swagger" {
+    name = "Update APIM API from Swagger"
+
+    action {
+        action_type = "Octopus.AzurePowerShell"
+        properties = {
+            Octopus.Action.Azure.AccountId = "#{octopus.azure.account}"
+            Octopus.Action.Package.DownloadOnTentacle = "False"
+            Octopus.Action.Package.FeedId = "octopus-server-built-in"
+            Octopus.Action.Package.PackageId = "GWT.XbyK.API.Deploy"
+            Octopus.Action.Script.ScriptFileName = "Deploy/APIM/Update-ApimApiFromSwagger.ps1"
+            Octopus.Action.Script.ScriptSource = "Package"
+            OctopusUseBundledTooling = "False"
+        }
+        worker_pool_variable = "deploy.octopus.workerPool"
+
+        packages {
+            acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = "GWT.XbyK.API.Deploy"
+            properties = {
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
 step "restore-kentico-ci-database" {
     name = "Restore Kentico CI Database"
 
