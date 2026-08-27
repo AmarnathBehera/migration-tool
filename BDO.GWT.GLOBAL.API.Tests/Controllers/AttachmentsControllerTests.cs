@@ -199,6 +199,45 @@ public class AttachmentsControllerTests
     }
 
     [Test]
+    public async Task Post_WhenAttachmentCreated_ReturnsOkWithResult()
+    {
+        var pageGuid = Guid.NewGuid();
+        var file = new FormFile(new MemoryStream([1, 2, 3]), 0, 3, "file", "sample.pdf");
+        var expected = new PageAttachmentOutput { GUID = Guid.NewGuid(), Name = "sample.pdf" };
+
+        _attachmentServiceMock
+            .Setup(x => x.CreateAttachmentAsync(42, pageGuid, "en-gb", file, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expected);
+
+        var request = new AttachmentsController.CreateAttachmentRequest { Culture = "en-gb", File = file };
+        var result = await _controller.Post(1, pageGuid, request, CancellationToken.None);
+
+        Assert.That(result, Is.InstanceOf<OkObjectResult>());
+        var okResult = (OkObjectResult)result;
+        Assert.That(okResult.Value, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public async Task Post_ForwardsArgumentsToService()
+    {
+        var pageGuid = Guid.NewGuid();
+        var file = new FormFile(new MemoryStream([9, 8, 7]), 0, 3, "file", "sample.pdf");
+        using var cts = new CancellationTokenSource();
+
+        _attachmentServiceMock
+            .Setup(x => x.CreateAttachmentAsync(
+                It.IsAny<int>(), It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<IFormFile>(), cts.Token))
+            .ReturnsAsync(new PageAttachmentOutput());
+
+        var request = new AttachmentsController.CreateAttachmentRequest { Culture = "fr-fr", File = file };
+        await _controller.Post(999, pageGuid, request, cts.Token);
+
+        _attachmentServiceMock.Verify(
+            x => x.CreateAttachmentAsync(42, pageGuid, "fr-fr", file, cts.Token),
+            Times.Once);
+    }
+
+    [Test]
     public async Task GetBinary_WhenAttachmentExists_ReturnsFileContentResult()
     {
         var pageGuid = Guid.NewGuid();

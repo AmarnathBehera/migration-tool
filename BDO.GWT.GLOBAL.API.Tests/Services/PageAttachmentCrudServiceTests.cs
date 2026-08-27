@@ -1,6 +1,9 @@
+using BDO.GWT.Core;
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Services;
 using CMS.ContentEngine;
+using CMS.Membership;
+using CMS.Websites;
 using Moq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -12,6 +15,10 @@ public class PageAttachmentCrudServiceTests
 {
     private Mock<IPageAttachmentService> _pageAttachmentServiceMock = null!;
     private Mock<IPageChannelResolver> _pageChannelResolverMock = null!;
+    private Mock<IContentService> _contentServiceMock = null!;
+    private Mock<IWebPageManagerFactory> _webPageManagerFactoryMock = null!;
+    private Mock<IContentItemManagerFactory> _contentItemManagerFactoryMock = null!;
+    private Mock<IUserInfoProvider> _userInfoProviderMock = null!;
     private PageAttachmentCrudService _service = null!;
 
     [SetUp]
@@ -19,9 +26,18 @@ public class PageAttachmentCrudServiceTests
     {
         _pageAttachmentServiceMock = new Mock<IPageAttachmentService>();
         _pageChannelResolverMock = new Mock<IPageChannelResolver>();
+        _contentServiceMock = new Mock<IContentService>();
+        _webPageManagerFactoryMock = new Mock<IWebPageManagerFactory>();
+        _contentItemManagerFactoryMock = new Mock<IContentItemManagerFactory>();
+        _userInfoProviderMock = new Mock<IUserInfoProvider>();
+
         _service = new PageAttachmentCrudService(
             _pageAttachmentServiceMock.Object,
-            _pageChannelResolverMock.Object);
+            _pageChannelResolverMock.Object,
+            _contentServiceMock.Object,
+            _webPageManagerFactoryMock.Object,
+            _contentItemManagerFactoryMock.Object,
+            _userInfoProviderMock.Object);
     }
 
     private static BDO.ContentAttachment CreateAttachment(Guid guid, ContentItemAsset? asset = null)
