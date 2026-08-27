@@ -44,6 +44,7 @@ public class InsightCarouselWidgetProperties : BaseWidgetProperties
 
     [TextInputComponent(Label = "Background image alt text", Order = 6)]
     [VisibleIfNotEmpty(nameof(BackgroundImages))]
+    [RequiredValidationRule]
     public string BackgroundImageAltText { get; set; } = string.Empty;
 
     [TextInputComponent(Label = "See all link text", Order = 7)]

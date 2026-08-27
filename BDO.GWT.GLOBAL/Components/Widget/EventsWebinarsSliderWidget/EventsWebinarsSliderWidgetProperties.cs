@@ -44,10 +44,12 @@ public class EventsWebinarsSliderWidgetProperties : BaseWidgetProperties
         Order = 4)]
     public IEnumerable<ContentItemReference> FeaturedEventsAndWebinars { get; set; } = new List<ContentItemReference>();
 
-    [ContentItemSelectorComponent(ContentAttachment.CONTENT_TYPE_NAME, Label = "Background image", Order = 5)]
+    [ContentItemSelectorComponent(ContentAttachment.CONTENT_TYPE_NAME, Label = "Background image", Order = 5, MaximumItems = 1)]
     public IEnumerable<ContentItemReference> BackgroundImages { get; set; }
 
     [TextInputComponent(Label = "Background image alt text", Order = 6)]
+    [VisibleIfNotEmpty(nameof(BackgroundImages))]
+    [RequiredValidationRule]
     public string BackgroundImageAltText { get; set; } = "";
 
     [TextInputComponent(Label = "See all link text", Order = 7)]

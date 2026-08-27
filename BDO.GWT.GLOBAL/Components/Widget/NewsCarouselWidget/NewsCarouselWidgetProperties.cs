@@ -50,6 +50,7 @@ public class NewsCarouselWidgetProperties : BaseWidgetProperties
 
     [TextInputComponent(Label = "Background image alt text", Order = 6)]
     [VisibleIfNotEmpty(nameof(BackgroundImages))]
+    [RequiredValidationRule]
     public string BackgroundImageAltText { get; set; } = "";
 
     [TextInputComponent(Label = "See all link text", Order = 7)]
