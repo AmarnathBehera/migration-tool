@@ -73,7 +73,42 @@ step "deploy-cms-app-service" {
                     "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
                     "value": "#{appsettings.appInsightsCMSConnectionString}",
                     "slotSetting": false
-                  }  
+                  },
+                  {
+                    "name": "CMSAzureSearch__SearchServiceEnabled",
+                    "value": "true",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureSearch__SearchServiceEndPoint",
+                    "value": "#{appsettings.CMSAzureSearchSearchServiceEndPoint}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureSearch__SearchServiceAdminApiKey",
+                    "value": "#{appsettings.CMSAzureSearchSearchServiceAdminApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureSearch__SearchServiceQueryApiKey",
+                    "value": "#{appsettings.CMSAzureSearchSearchServiceQueryApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureCognitiveSearch__ServiceUrl",
+                    "value": "#{appsettings.AzureCognitiveSearchServiceUrl}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureCognitiveSearch__QueryKey",
+                    "value": "#{appsettings.AzureCognitiveSearchQueryKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureCognitiveSearch__IndexSuffix",
+                    "value": "",
+                    "slotSetting": false
+                  }
                 ]
                 EOT
             Octopus.Action.Azure.ConnectionStrings = <<-EOT
@@ -181,6 +216,41 @@ step "deploy-mvc-app-service" {
                   {
                     "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
                     "value": "#{appsettings.appInsightsMVCConnectionString}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureSearch__SearchServiceEnabled",
+                    "value": "true",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureSearch__SearchServiceEndPoint",
+                    "value": "#{appsettings.CMSAzureSearchSearchServiceEndPoint}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureSearch__SearchServiceAdminApiKey",
+                    "value": "#{appsettings.CMSAzureSearchSearchServiceAdminApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureSearch__SearchServiceQueryApiKey",
+                    "value": "#{appsettings.CMSAzureSearchSearchServiceQueryApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureCognitiveSearch__ServiceUrl",
+                    "value": "#{appsettings.AzureCognitiveSearchServiceUrl}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureCognitiveSearch__QueryKey",
+                    "value": "#{appsettings.AzureCognitiveSearchQueryKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureCognitiveSearch__IndexSuffix",
+                    "value": "",
                     "slotSetting": false
                   }
                 ]
