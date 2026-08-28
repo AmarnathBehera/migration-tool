@@ -231,6 +231,45 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
         }
 
         [PageCommand]
+        public Task<ICommandResponse<SavedQuery?>> UpdateQuery(SavedQuery query)
+        {
+            if (query.ID <= 0 || string.IsNullOrWhiteSpace(query.Text))
+            {
+                return Task.FromResult(
+                    ResponseFrom<SavedQuery?>(null)
+                        .AddErrorMessage("Invalid query ID or empty query text"));
+            }
+
+            var savedQuery = savedQueryProvider.Get()
+                .TopN(1)
+                .WhereEquals(nameof(ReportingReportInfo.ReportingReportID), query.ID)
+                .WhereEquals(nameof(ReportingReportInfo.ReportingReportChannelSettingsID), ReportingChannelSettingId)
+                .FirstOrDefault();
+
+            if (savedQuery is null)
+            {
+                return Task.FromResult(
+                    ResponseFrom<SavedQuery?>(null)
+                        .AddErrorMessage($"Query {query.ID} not found"));
+            }
+
+            savedQuery.ReportingReportQuery = query.Text;
+            if (!string.IsNullOrWhiteSpace(query.Name))
+            {
+                savedQuery.ReportingReportDisplayName = query.Name;
+                savedQuery.ReportingReportCodeName = GenerateQueryCodeName(query.Name);
+            }
+            savedQuery.Update();
+
+            query.Name = savedQuery.ReportingReportDisplayName;
+            query.Text = savedQuery.ReportingReportQuery;
+
+            return Task.FromResult(
+                ResponseFrom<SavedQuery?>(query)
+                    .AddSuccessMessage("Query updated!"));
+        }
+
+        [PageCommand]
         public Task<ICommandResponse<SavedQuery?>> SaveQuery(SavedQuery query)
         {
             if (string.IsNullOrWhiteSpace(query.Name) ||

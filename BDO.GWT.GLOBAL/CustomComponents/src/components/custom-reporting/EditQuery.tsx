@@ -195,6 +195,25 @@ export const EditQuery = (props: EditQueryClientProperties) => {
             }
         });
 
+    const { execute: updateQuery } =
+        usePageCommand<SavedQuery, SavedQuery>('UpdateQuery', {
+            after: updatedQuery => {
+                if (!updatedQuery) {
+                    return;
+                }
+
+                setSavedQueries(currentQueries =>
+                    currentQueries.map(query => {
+                        if (query.id !== updatedQuery.id) {
+                            return query;
+                        }
+
+                        return updatedQuery;
+                    })
+                );
+            }
+        });
+
     const { execute: deleteQuery } =
         usePageCommand<number, number>('DeleteQuery', {
             after: async id => {
@@ -228,6 +247,18 @@ export const EditQuery = (props: EditQueryClientProperties) => {
         renameQuery({
             ...query,
             name
+        });
+    };
+
+    const updateSavedQueryClick = async (query: SavedQuery) => {
+        if (!queryText || queryText.length <= 0) {
+            alert('Please enter a query in the editor');
+            return;
+        }
+
+        updateQuery({
+            ...query,
+            text: queryText
         });
     };
 
@@ -378,6 +409,25 @@ export const EditQuery = (props: EditQueryClientProperties) => {
                         icon: 'xp-doc-copy',
                         tooltip: 'Copy query to editor',
                         onClick: () => transferClick(q.text)
+                    },
+                    {
+                        label: 'Edit',
+                        icon: 'xp-edit',
+                        tooltip: 'Edit query text',
+                        onClick: () => {
+                            // Load the query text into the editor
+                            setQueryText(q.text);
+                            if (textAreaRef.current) {
+                                textAreaRef.current.textContent = q.text;
+                            }
+                            notify('Query loaded into editor. Edit and use "Update" button to save changes.');
+                        }
+                    },
+                    {
+                        label: 'Update',
+                        icon: 'xp-check',
+                        tooltip: 'Save current editor text to this query',
+                        onClick: () => updateSavedQueryClick(q)
                     },
                     {
                         label: 'Rename',
