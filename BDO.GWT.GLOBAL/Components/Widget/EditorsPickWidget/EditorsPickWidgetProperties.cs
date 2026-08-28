@@ -49,11 +49,12 @@ public class EditorsPickWidgetProperties : BaseWidgetProperties
     [ContentItemSelectorComponent(contentTypeNames: [BlogPost.CONTENT_TYPE_NAME, Event.CONTENT_TYPE_NAME, MicrositePage.CONTENT_TYPE_NAME, NewsArticle.CONTENT_TYPE_NAME, Webinar.CONTENT_TYPE_NAME,Insight.CONTENT_TYPE_NAME],Label = "Featured pages", ExplanationText = "Only pages from Blog Posts, Events, Insights, Microsites, News Articles and Webinars will be showcased.", Order = 5)]
     public IEnumerable<ContentItemReference> FeaturedPages { get; set; } = Enumerable.Empty<ContentItemReference>();
 
-    [ContentItemSelectorComponent(contentTypeName:ContentAttachment.CONTENT_TYPE_NAME, Label = "Background image", Order = 6)]
+    [ContentItemSelectorComponent(contentTypeName:ContentAttachment.CONTENT_TYPE_NAME, Label = "Background image", Order = 6,MaximumItems =1)]
     public IEnumerable<ContentItemReference> BackgroundImages { get; set; } = Enumerable.Empty<ContentItemReference>();
 
     [TextInputComponent( Label = "Background image alt text", Order = 7)]
     [VisibleIfNotEmpty(nameof(BackgroundImages))]
+    [RequiredValidationRule]
     public string BackgroundImageAltText { get; set; } = "";
 
     [TextInputComponent( Label = "See all link text", Order = 8)]
