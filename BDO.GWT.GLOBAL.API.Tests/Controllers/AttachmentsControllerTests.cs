@@ -197,4 +197,43 @@ public class AttachmentsControllerTests
                 It.IsAny<string>(), It.IsAny<CancellationToken>()),
             Times.Once);
     }
+
+    [Test]
+    public async Task GetBinary_WhenAttachmentExists_ReturnsFileContentResult()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+        var data = new byte[] { 1, 2, 3 };
+
+        _attachmentServiceMock
+            .Setup(x => x.GetAttachmentBinaryAsync(42, pageGuid, attachmentGuid, "en-gb", It.IsAny<CancellationToken>()))
+            .ReturnsAsync((data, "application/pdf", "file.pdf"));
+
+        var result = await _controller.GetBinary(1, pageGuid, attachmentGuid, "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.InstanceOf<FileContentResult>());
+        var fileResult = (FileContentResult)result;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(fileResult.FileContents, Is.EqualTo(data));
+            Assert.That(fileResult.ContentType, Is.EqualTo("application/octet-stream"));
+            Assert.That(fileResult.FileDownloadName, Is.EqualTo(string.Empty));
+        });
+    }
+
+    [Test]
+    public async Task GetBinary_WhenAttachmentNotFound_ReturnsNotFound()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+
+        _attachmentServiceMock
+            .Setup(x => x.GetAttachmentBinaryAsync(42, pageGuid, attachmentGuid, "en-gb", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(((byte[] Data, string ContentType, string FileName)?)null);
+
+        var result = await _controller.GetBinary(1, pageGuid, attachmentGuid, "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.InstanceOf<NotFoundResult>());
+    }
 }

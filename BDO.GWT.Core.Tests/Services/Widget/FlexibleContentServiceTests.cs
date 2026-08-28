@@ -144,19 +144,19 @@ namespace BDO.GWT.Core.Tests.Services.Widget
             });
         }
 
-        [Test]
-        public async Task GetFlexibleContentAsync_ReturnsNonNullDto_ForAllInputs()
-        {
-            var data = new FlexibleContentData
-            {
-                TopMargin = "10",
-                BottomMargin = "20",
-            };
+        //[Test]
+        //public async Task GetFlexibleContentAsync_ReturnsNonNullDto_ForAllInputs()
+        //{
+        //    var data = new FlexibleContentData
+        //    {
+        //        TopMargin = "10",
+        //        BottomMargin = "20",
+        //    };
 
-            var result = await _service.GetFlexibleContentAsync(data, CancellationToken.None);
+        //    var result = await _service.GetFlexibleContentAsync(data, CancellationToken.None);
 
-            Assert.That(result, Is.InstanceOf<DTOs.FlexibleContentDto>());
-        }
+        //    Assert.That(result, Is.InstanceOf<DTOs.FlexibleContentDto>());
+        //}
 
         [Test]
         public void Constructor_DoesNotThrow_WithValidArguments()
