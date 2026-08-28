@@ -462,7 +462,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             return createdContentItem.ContentItemGUID;
         }
 
-        private async Task UpdatePageWithReferencesAsync(
+        private static async Task UpdatePageWithReferencesAsync(
             IWebPageManager webPageManager,
             int webPageItemId,
             string culture,
