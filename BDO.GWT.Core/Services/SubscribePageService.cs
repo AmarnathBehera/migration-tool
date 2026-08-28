@@ -7,6 +7,7 @@ using BDO.GWT.Web.Core.Services;
 using CMS.ContactManagement;
 using CMS.ContentEngine;
 using CMS.DataEngine;
+using CMS.Globalization;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
@@ -25,17 +26,17 @@ public class SubscribePageService : ISubscribePageService
     private readonly IContentRetriever _contentRetriever;
     private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly IInfoProvider<WebsiteCaptchaSettingsInfo> _captchaSettingsProvider;
-
+    private readonly IInfoProvider<CountryInfo> _countryProvider;
     private readonly IInfoProvider<ContactGroupInfo> _recipientListInfoProvider;
 
-    public SubscribePageService(IInfoProvider<ContactGroupInfo> recipientListInfoProvider,IWebsiteChannelContext websiteChannelContext, IHeroService heroService,IContentRetriever contentRetriever, IInfoProvider<WebsiteCaptchaSettingsInfo> captchaSettingsProvider)
+    public SubscribePageService(IInfoProvider<CountryInfo> countryProvider,IInfoProvider<ContactGroupInfo> recipientListInfoProvider,IWebsiteChannelContext websiteChannelContext, IHeroService heroService,IContentRetriever contentRetriever, IInfoProvider<WebsiteCaptchaSettingsInfo> captchaSettingsProvider)
     {
         _heroService = heroService;
         _contentRetriever = contentRetriever;
         _websiteChannelContext = websiteChannelContext;
         _captchaSettingsProvider = captchaSettingsProvider;
         _recipientListInfoProvider = recipientListInfoProvider;
-
+        _countryProvider = countryProvider;
     }
 
     public async Task<SubscribeDto> GetSubscribeDtoAsync(Subscribe? subscribePage, CancellationToken cancellationToken)
@@ -103,7 +104,7 @@ public class SubscribePageService : ISubscribePageService
             EndpointRoute = $"newsletter/subscribe/{subscribePage.SystemFields.WebPageItemGUID}",
             RedirectUrl = redirectLink ?? string.Empty,
             Newsletters = await GetAllSiteNewsletterOptionDtos(),
-            // Countries = await GetAllCountriesOptionDtos(cancellationToken),
+            Countries = await GetAllCountriesOptionDtosAsync(cancellationToken),
             ShowCompanyField = subscribePage.ShowCompanyField,
             IsCompanyRequired = subscribePage.IsCompanyRequired,
             ShowJobTitleField = subscribePage.ShowJobTitleField,
@@ -116,8 +117,18 @@ public class SubscribePageService : ISubscribePageService
 
     return dto;
 }
+    public async Task<BDO.GWT.Core.DTOs.OptionDto[]> GetAllCountriesOptionDtosAsync(CancellationToken cancellationToken)
+    {
+        var countries = await _countryProvider.Get()
+                                              .OrderBy(nameof(CountryInfo.CountryDisplayName))
+                                              .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
 
-
+        return countries.Select(c => new BDO.GWT.Core.DTOs.OptionDto
+        {
+            Value = c.CountryGUID.ToString(),
+            Label = c.CountryDisplayName
+        }).ToArray();
+    }
 
     private Task<BDO.GWT.Core.DTOs.OptionDto[]> GetAllSiteNewsletterOptionDtos()
     {

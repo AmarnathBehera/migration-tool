@@ -65,7 +65,7 @@ public class SubscribeFormService : ISubscribeFormService
         {
             case { ShowCompanyField: true, IsCompanyRequired: true } when string.IsNullOrWhiteSpace(newsletterSubscriptionFormData.Company):
             case { ShowJobTitleField: true, IsJobTitleRequired: true } when string.IsNullOrWhiteSpace(newsletterSubscriptionFormData.JobTitle):
-            case { ShowCountryField: true, IsCountryRequired: true } when newsletterSubscriptionFormData.CountryGuid is null:
+            case { ShowCountryField: true, IsCountryRequired: true } when !newsletterSubscriptionFormData.CountryGuid.HasValue || newsletterSubscriptionFormData.CountryGuid.Value == Guid.Empty:
                 return false;
 
             default:

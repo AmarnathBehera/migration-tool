@@ -1,7 +1,6 @@
 ﻿using BDO;
 using BDO.GWT.Core;
 using BDO.GWT.Core.Data.Queries;
-using BDO.GWT.Domain.Core.Helpers;
 using BDO.GWT.Domain.Core.Services;
 using BDO.GWT.Web.Core.Data;
 using BDO.GWT.Web.Core.Data.Queries;
@@ -11,11 +10,9 @@ using CMS.EmailEngine;
 using CMS.EmailLibrary;
 using CMS.EmailMarketing;
 using CMS.FormEngine;
-using CMS.MacroEngine;
-using CMS.OnlineForms;
+using CMS.Globalization;
 using CMS.Websites;
 using CMS.Websites.Routing;
-using Kentico.Content.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,12 +33,14 @@ public class NewsletterSubscriptionService(
     IMarketingContactManagementService marketingContactManagementService,
     IInfoProvider<ContactGroupInfo> recipientListInfoProvider,
     IInfoProvider<ContactGroupMemberInfo> contactGroupMemberInfoProvider,
-    IInfoProvider<EmailSubscriptionConfirmationInfo> emailSubscriptionConfirmationInfoProvider) : INewsletterSubscriptionService
+    IInfoProvider<EmailSubscriptionConfirmationInfo> emailSubscriptionConfirmationInfoProvider,
+    IInfoProvider<CountryInfo> countryInfoProvider) : INewsletterSubscriptionService
 {
     private readonly IMarketingContactManagementService _marketingContactManagementService = marketingContactManagementService;
     private readonly IInfoProvider<ContactGroupInfo> _recipientListInfoProvider = recipientListInfoProvider;
     private readonly IInfoProvider<ContactGroupMemberInfo> _contactGroupMemberInfoProvider = contactGroupMemberInfoProvider;
     private readonly IInfoProvider<EmailSubscriptionConfirmationInfo> _emailSubscriptionConfirmationInfoProvider = emailSubscriptionConfirmationInfoProvider;
+    private readonly IInfoProvider<CountryInfo> _countryInfoProvider = countryInfoProvider;
     private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
     private const string EmailKey = "Email";
 
@@ -201,17 +200,32 @@ public class NewsletterSubscriptionService(
     {
         contact.ContactFirstName = data.FirstName;
         contact.ContactLastName = data.LastName;
-
         if (!string.IsNullOrWhiteSpace(data.Company))
         {
             contact.ContactCompanyName = data.Company;
         }
-
+        if (!string.IsNullOrWhiteSpace(data.Consent))
+        {
+            contact.ContactNotes = data.Consent;
+        }
         if (!string.IsNullOrWhiteSpace(data.JobTitle))
         {
             contact.ContactJobTitle = data.JobTitle;
         }
+        if (data.CountryGuid.HasValue && data.CountryGuid.Value != Guid.Empty)
+        {
+            var country = (await _countryInfoProvider.Get()
+                .WhereEquals(nameof(CountryInfo.CountryGUID), data.CountryGuid.Value)
+                .Columns(nameof(CountryInfo.CountryID))
+                .TopN(1)
+                .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
+                .FirstOrDefault();
 
+            if (country is not null)
+            {
+                contact.ContactCountryID = country.CountryID;
+            }
+        }
         await _marketingContactManagementService.UpdateMarketingContactAsync(contact, cancellationToken);
     }
 
