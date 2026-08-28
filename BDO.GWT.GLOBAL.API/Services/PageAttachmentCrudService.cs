@@ -1,19 +1,18 @@
-﻿using BDO.GWT.GLOBAL.API.Data;
-using BDO.GWT.GLOBAL.API.Helpers;
+using BDO.GWT.GLOBAL.API.Data;
 
 namespace BDO.GWT.GLOBAL.API.Services
 {
     public class PageAttachmentCrudService : IPageAttachmentCrudService
     {
         private readonly IPageAttachmentService pageAttachmentService;
-        private readonly IChannelInfoService channelInfoService;
+        private readonly IPageChannelResolver pageChannelResolver;
 
         public PageAttachmentCrudService(
             IPageAttachmentService pageAttachmentService,
-            IChannelInfoService channelInfoService)
+            IPageChannelResolver pageChannelResolver)
         {
             this.pageAttachmentService = pageAttachmentService;
-            this.channelInfoService = channelInfoService;
+            this.pageChannelResolver = pageChannelResolver;
         }
 
         public async Task<PageAttachmentOutput?> GetAttachmentAsync(
@@ -23,7 +22,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             string culture,
             CancellationToken cancellationToken = default)
         {
-            var channelName = await channelInfoService.GetChannelNameAsync(channelId, cancellationToken);
+            var channelName = await pageChannelResolver.GetChannelNameByPageGuidAsync(pageGuid, cancellationToken);
             if (channelName is null)
             {
                 return null;
@@ -49,7 +48,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             string culture,
             CancellationToken cancellationToken = default)
         {
-            var channelName = await channelInfoService.GetChannelNameAsync(channelId, cancellationToken);
+            var channelName = await pageChannelResolver.GetChannelNameByPageGuidAsync(pageGuid, cancellationToken);
             ArgumentNullException.ThrowIfNull(channelName);
             var attachments =
                 await pageAttachmentService.GetPageAttachmentsAsync(
@@ -59,6 +58,27 @@ namespace BDO.GWT.GLOBAL.API.Services
                     cancellationToken);
 
             return attachments.Select(Map);
+        }
+
+        public async Task<(byte[] Data, string ContentType, string FileName)?> GetAttachmentBinaryAsync(
+            int channelId,
+            Guid pageGuid,
+            Guid attachmentGuid,
+            string culture,
+            CancellationToken cancellationToken = default)
+        {
+            var channelName = await pageChannelResolver.GetChannelNameByPageGuidAsync(pageGuid, cancellationToken);
+            if (channelName is null)
+            {
+                return null;
+            }
+
+            return await pageAttachmentService.GetPageAttachmentBinaryAsync(
+                pageGuid,
+                attachmentGuid,
+                channelName,
+                culture,
+                cancellationToken);
         }
 
 

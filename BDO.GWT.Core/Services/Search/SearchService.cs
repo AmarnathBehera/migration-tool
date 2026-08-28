@@ -8,6 +8,8 @@ using BDO.GWT.Core.Extensions;
 using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.Retrievers.Search;
 using BDO.GWT.Xperience.Core.Services;
+using CMS.Core;
+using CMS.EventLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,13 +33,16 @@ namespace BDO.GWT.AzureCognitiveSearch.Services
         private readonly ISearchClientBuilder _searchClientBuilder;
         private readonly ISearchQueryHelper _searchQueryHelper;
         private readonly ISiteContext _siteContext;
+        private readonly IEventLogService eventLogService;
 
-        public SearchService(IMapper mapper, ISearchClientBuilder searchClientBuilder, ISearchQueryHelper searchQueryHelper, ISiteContext siteContext)
+        public SearchService(IMapper mapper, ISearchClientBuilder searchClientBuilder, 
+            ISearchQueryHelper searchQueryHelper, ISiteContext siteContext, IEventLogService eventLogService)
         {
             _mapper = mapper;
             _searchClientBuilder = searchClientBuilder;
             _searchQueryHelper = searchQueryHelper;
             _siteContext = siteContext;
+            this.eventLogService = eventLogService;
         }
 
         public async Task<SearchResponse<TEntity>> SearchAsync<TEntity>(string searchText, Action<SearchQuery<TEntity>>? decorateQuery = null, CancellationToken cancellationToken = default)
@@ -49,13 +54,34 @@ namespace BDO.GWT.AzureCognitiveSearch.Services
 
             var client = _searchClientBuilder.CreateSearchClient(_siteContext.CurrentSiteName);
 
-            var searchOptions = _searchQueryHelper.MapSearchQueryToSearchOptions(query);
+            try
+            {
+                var searchOptions = _searchQueryHelper.MapSearchQueryToSearchOptions(query);
 
-            var response = await client.SearchAsync<AzureSearchDocument>(searchText, searchOptions, cancellationToken);
+                eventLogService.LogInformation("SearchService", "SearchAsync",
+                    $"Executing search. Index: '{client.IndexName}', SearchText: '{searchText}', Filter: '{searchOptions.Filter}', QueryType: '{searchOptions.QueryType}'");
 
-            var mappedResponse = await MapSearchResponseAsync<TEntity>(response);
+                var response = await client.SearchAsync<AzureSearchDocument>(searchText, searchOptions, cancellationToken);
 
-            return mappedResponse;
+                var mappedResponse = await MapSearchResponseAsync<TEntity>(response);
+
+               eventLogService.LogInformation("SearchService", "SearchAsync",
+                    $"Search completed. Index: '{client.IndexName}', ResultCount: {mappedResponse.Count}, DocumentsReturned: {mappedResponse.Documents?.Count ?? 0}");
+
+                return mappedResponse;
+            }
+            catch (OperationCanceledException)
+            {
+                // Do not wrap or log as an error: cancellation is expected behavior
+                // (e.g., client navigated away / request aborted), not a failure.
+                throw;
+            }
+            catch (Exception ex)
+            {
+                eventLogService.LogError("SearchService", "SearchAsync",
+                    $"Error executing search query. Index: '{client.IndexName}', SearchText: '{searchText}', Error: {ex.Message}");
+                throw;
+            }
         }
 
         public async Task<SuggestSearchResponse<TEntity>> SuggestAsync<TEntity>(string searchText, string suggesterName, Action<SuggestSearchQuery<TEntity>>? decorateQuery = null, CancellationToken cancellationToken = default)
@@ -67,13 +93,21 @@ namespace BDO.GWT.AzureCognitiveSearch.Services
 
             var client = _searchClientBuilder.CreateSearchClient(_siteContext.CurrentSiteName);
 
-            var suggestOptions = _searchQueryHelper.MapSuggestSearchQueryToSuggestSearchOptions(query);
+           
+                var suggestOptions = _searchQueryHelper.MapSuggestSearchQueryToSuggestSearchOptions(query);
 
-            var response = await client.SuggestAsync<AzureSearchDocument>(searchText, suggesterName, suggestOptions, cancellationToken);
+                eventLogService.LogInformation("SearchService", "SuggestAsync",
+                    $"Executing suggest. Index: '{client.IndexName}', SearchText: '{searchText}', Suggester: '{suggesterName}', Filter: '{suggestOptions.Filter}'");
 
-            var mappedResponse = MapSuggestResponse<TEntity>(response);
+                var response = await client.SuggestAsync<AzureSearchDocument>(searchText, suggesterName, suggestOptions, cancellationToken);
 
-            return mappedResponse;
+                var mappedResponse = MapSuggestResponse<TEntity>(response);
+
+                eventLogService.LogInformation("SearchService", "SuggestAsync",
+                    $"Suggest completed. Index: '{client.IndexName}', ResultCount: {mappedResponse.Results?.Count ?? 0}");
+
+                return mappedResponse;
+            
         }
 
         private async Task<SearchResponse<TEntity>> MapSearchResponseAsync<TEntity>(Response<SearchResults<AzureSearchDocument>> response)
@@ -93,16 +127,16 @@ namespace BDO.GWT.AzureCognitiveSearch.Services
             await foreach (var searchResult in response.Value.GetResultsAsync())
             {
                 try
-                {                
+                {
                     var mappedDocument = _mapper.Map<TEntity>(searchResult.Document);
                     mappedDocuments.Add(mappedDocument);
                 }
                 catch (Exception ex)
                 {
-                    // Handle the exception (e.g., log it, rethrow it, etc.)
-                    throw new Exception($"Error mapping search result for document with key '{searchResult.Document}': {ex.Message}", ex);
+                    eventLogService.LogError("SearchService", "MapSearchResponseAsync",
+                        $"Error mapping search result document. Error: {ex.Message}");
+                    // Skip this document instead of failing the whole response
                 }
-                
             }
 
             var suggestSearchResponse = new SearchResponse<TEntity>

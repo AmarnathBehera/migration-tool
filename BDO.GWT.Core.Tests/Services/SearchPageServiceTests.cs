@@ -9,7 +9,7 @@ using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Utilities;
 using BDO.GWT.Web.Core.Helpers;
 using BDO.GWT.Web.Core.Services;
-
+using CMS.Core;
 using CMS.Websites.Routing;
 
 using Microsoft.AspNetCore.Http;
@@ -31,16 +31,11 @@ namespace BDO.GWT.Core.Tests.Services
         private const string INSIGHTS_GROUP_KEY = "Insights";
         private const int DEFAULT_PAGE_SIZE = 12;
 
-        private Mock<ICultureContext> _cultureContextMock = null!;
-        //private Mock<IContentService> _contentServiceMock = null!;
-        //private Mock<IUrlHelperFactory> _urlHelperFactoryMock = null!;
-        //private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
-        //private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
-        //private Mock<IWebPageUrlResolver> _urlResolverMock = null!;
+        private Mock<ICultureContext> _cultureContextMock = null!;        
         private Mock<ITypeMapper> _typeMapperMock = null!;
-        private Mock<ISearchService> _searchServiceMock = null!;
-        //private Mock<IDateTimeProviderSearch> _dateTimeProviderMock = null!;
+        private Mock<ISearchService> _searchServiceMock = null!;       
         private Mock<ISearchCardHelper> _searchCardHelperMock = null!;
+        private Mock<IEventLogService> _eventLogServiceMock = null!;
         private SearchPageService _service = null!;
 
         private static readonly string[] ExpectedSortOptions =
@@ -53,17 +48,11 @@ namespace BDO.GWT.Core.Tests.Services
         [SetUp]
         public void Setup()
         {
-            _cultureContextMock = new Mock<ICultureContext>();
-            //_contentServiceMock = new Mock<IContentService>();
-            //_urlHelperFactoryMock = new Mock<IUrlHelperFactory>();
-            //_httpContextAccessorMock = new Mock<IHttpContextAccessor>();
-            //_websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
-            //_urlResolverMock = new Mock<IWebPageUrlResolver>();
+            _cultureContextMock = new Mock<ICultureContext>();       
             _typeMapperMock = new Mock<ITypeMapper>();
-            _searchServiceMock = new Mock<ISearchService>();
-            //_dateTimeProviderMock = new Mock<IDateTimeProviderSearch>();
+            _searchServiceMock = new Mock<ISearchService>();           
             _searchCardHelperMock = new Mock<ISearchCardHelper>();
-
+            _eventLogServiceMock = new Mock<IEventLogService>();
             _cultureContextMock.SetupGet(x => x.CurrentLanguageTag).Returns(LANGUAGE_TAG);
 
             _typeMapperMock
@@ -87,16 +76,11 @@ namespace BDO.GWT.Core.Tests.Services
             SetupSearchResponse();
 
             _service = new SearchPageService(
-                _cultureContextMock.Object,
-                //_contentServiceMock.Object,
-                //_urlHelperFactoryMock.Object,
-                //_httpContextAccessorMock.Object,
-                //_websiteChannelContextMock.Object,
-                //_urlResolverMock.Object,
+                _cultureContextMock.Object,                
                 _typeMapperMock.Object,
-                _searchServiceMock.Object,
-                //_dateTimeProviderMock.Object,
-                _searchCardHelperMock.Object);
+                _searchServiceMock.Object,               
+                _searchCardHelperMock.Object,
+                _eventLogServiceMock.Object);
         }
 
 

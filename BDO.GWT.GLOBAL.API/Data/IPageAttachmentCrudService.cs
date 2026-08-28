@@ -14,5 +14,12 @@
             Guid pageGuid,
             string culture,
             CancellationToken cancellationToken = default);
+
+        Task<(byte[] Data, string ContentType, string FileName)?> GetAttachmentBinaryAsync(
+            int channelId,
+            Guid pageGuid,
+            Guid attachmentGuid,
+            string culture,
+            CancellationToken cancellationToken = default);
     }
 }

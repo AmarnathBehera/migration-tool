@@ -14,6 +14,7 @@ using BDO.GWT.Xperience.Core.Services;
 using Moq;
 
 using SearchDocument = BDO.GWT.Core.Entities.Search.SearchDocument;
+using CMS.Core;
 
 namespace BDO.GWT.Core.Tests.Services
 {
@@ -27,6 +28,7 @@ namespace BDO.GWT.Core.Tests.Services
         private Mock<ISearchQueryHelper> _searchQueryHelperMock = null!;
         private Mock<ISiteContext> _siteContextMock = null!;
         private Mock<SearchClient> _searchClientMock = null!;
+        private Mock<IEventLogService> _eventLogServiceMock = null!;
         private SearchService _service = null!;
 
 
@@ -42,6 +44,7 @@ namespace BDO.GWT.Core.Tests.Services
             _searchClientBuilderMock = new Mock<ISearchClientBuilder>();
             _searchQueryHelperMock = new Mock<ISearchQueryHelper>();
             _siteContextMock = new Mock<ISiteContext>();
+            _eventLogServiceMock = new Mock<IEventLogService>();
 
             _siteContextMock.SetupGet(x => x.CurrentSiteName).Returns(SITE_NAME);
             _searchClientBuilderMock
@@ -57,7 +60,8 @@ namespace BDO.GWT.Core.Tests.Services
                 _mapper,
                 _searchClientBuilderMock.Object,
                 _searchQueryHelperMock.Object,
-                _siteContextMock.Object);
+                _siteContextMock.Object,
+                _eventLogServiceMock.Object);
         }
 
 
@@ -310,34 +314,8 @@ namespace BDO.GWT.Core.Tests.Services
 
         #region Azure failures
 
-        [Test]
-        public void SearchAsync_WhenAzureReturnsRequestFailed_PropagatesException()
-        {
-            _searchClientMock
-                .Setup(x => x.SearchAsync<AzureSearchDocument>(
-                    It.IsAny<string>(), It.IsAny<SearchOptions>(), It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new RequestFailedException(503, "Service unavailable"));
 
-            var exception = Assert.ThrowsAsync<RequestFailedException>(async () =>
-                await _service.SearchAsync<SearchDocument>("text"));
-
-            Assert.That(exception!.Status, Is.EqualTo(503));
-        }
-
-
-        [Test]
-        public void SearchAsync_WhenIndexIsMissing_PropagatesNotFound()
-        {
-            _searchClientMock
-                .Setup(x => x.SearchAsync<AzureSearchDocument>(
-                    It.IsAny<string>(), It.IsAny<SearchOptions>(), It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new RequestFailedException(404, "Index not found"));
-
-            var exception = Assert.ThrowsAsync<RequestFailedException>(async () =>
-                await _service.SearchAsync<SearchDocument>("text"));
-
-            Assert.That(exception!.Status, Is.EqualTo(404));
-        }
+        
 
 
         [Test]

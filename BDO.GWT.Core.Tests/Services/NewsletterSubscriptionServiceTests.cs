@@ -7,6 +7,7 @@ using BDO.GWT.Xperience.Core.LiveSite.Services;
 using CMS.ContactManagement;
 using CMS.DataEngine;
 using CMS.EmailMarketing;
+using CMS.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
@@ -20,6 +21,7 @@ public class NewsletterSubscriptionServiceTests
     private Mock<IInfoProvider<ContactGroupInfo>> _recipientListInfoProviderMock = null!;
     private Mock<IInfoProvider<ContactGroupMemberInfo>> _contactGroupMemberInfoProviderMock = null!;
     private Mock<IInfoProvider<EmailSubscriptionConfirmationInfo>> _emailSubscriptionConfirmationInfoProviderMock = null!;
+    private Mock<IInfoProvider<CountryInfo>> _countryInfoProviderMock = null!;
     private NewsletterSubscriptionService _service = null!;
 
     [SetUp]
@@ -31,13 +33,15 @@ public class NewsletterSubscriptionServiceTests
         _recipientListInfoProviderMock = new Mock<IInfoProvider<ContactGroupInfo>>();
         _contactGroupMemberInfoProviderMock = new Mock<IInfoProvider<ContactGroupMemberInfo>>();
         _emailSubscriptionConfirmationInfoProviderMock = new Mock<IInfoProvider<EmailSubscriptionConfirmationInfo>>();
+        _countryInfoProviderMock = new Mock<IInfoProvider<CountryInfo>>();
 
         _service = new NewsletterSubscriptionService(
             _serviceScopeFactoryMock.Object,
             _marketingContactManagementServiceMock.Object,
             _recipientListInfoProviderMock.Object,
             _contactGroupMemberInfoProviderMock.Object,
-            _emailSubscriptionConfirmationInfoProviderMock.Object);
+            _emailSubscriptionConfirmationInfoProviderMock.Object,
+            _countryInfoProviderMock.Object);
     }
 
     // --- Helpers -----------------------------------------------------------------
