@@ -88,17 +88,17 @@ public class HeaderService : IHeaderService
 
         var websiteDisplayName = _websiteCulturesService.GetDisplayName(_websiteChannel);
 
-        var megaMenu = await BuildMegaMenuAsync(cancellationToken);
-
-        //var logoImageUrl = await _currentWebsiteHelper.GetCurrentWebsiteLogoImageUrlAsync(cancellationToken);
+        var megaMenu = await BuildMegaMenuAsync(cancellationToken);              
 
         var logoPageLink = await GetLogoPageLinkAsync(cancellationToken);
 
-        //var searchPage = await _searchPageRetriever.RetrievePageAsync(query =>
-        //{
-        //    query.IncludeUrlPath();
-
-        //}, cancellationToken);
+        //getting the search page
+        var searchPage = (await _contentRetriever.RetrievePages<Search>(
+           new RetrievePagesParameters { PathMatch = PathMatch.Children(navRootPath, 1) },
+           query => query.OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
+           RetrievalCacheSettings.CacheDisabled,
+           cancellationToken
+       ))?.FirstOrDefault();
 
         var headerDto = new HeaderDto
         {
@@ -108,7 +108,7 @@ public class HeaderService : IHeaderService
             SiteName = websiteDisplayName,
             LogoURL = logoPageLink ?? string.Empty,
             LogoImageURL = "https://cdn.bdo.global/images/bdo_logo/1.0.0/bdo_logo_color.png",
-            SearchPageURL = string.Empty,//searchPage != null ? searchPage.UrlPath.ToHtmlCompatibleString() : string.Empty,
+            SearchPageURL = searchPage != null ? _urlResolver.GetRelativePath(searchPage) : string.Empty,
             MegaMenuItems = megaMenu,
         };
 

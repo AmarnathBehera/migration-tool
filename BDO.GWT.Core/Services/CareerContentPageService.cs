@@ -19,33 +19,24 @@ public class CareerContentPageService : ICareerContentPageService
 {
     private readonly IHeroService _heroService;
     private readonly IContentService _contentRetriever;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
-    public CareerContentPageService(IHeroService heroService, IContentService contentService, IWebsiteChannelContext websiteChannelContext)
+
+    public CareerContentPageService(IHeroService heroService, IContentService contentService)
     {
         _heroService = heroService;
         _contentRetriever = contentService;
-        _websiteChannelContext = websiteChannelContext;
 
     }
 
     public async Task<CareerDto> GetCareerContentDtoAsync(CancellationToken cancellationToken)
     {
-        var pages = await _contentRetriever.GetPagesAsync<CareerContent>(
-            new RetrievePagesParameters
+        var careercontentpage = await _contentRetriever.RetrieveCurrentPageAsync<CareerContent>(
+            new RetrieveCurrentPageParameters()
             {
+
                 LinkedItemsMaxLevel = 5
-            },
-            query =>
-            {
-                query.Where(w =>
-                    w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
-            },
-            RetrievalCacheSettings.CacheDisabled,
-            cancellationToken);
+            }, cancellationToken);
 
-        var careercategorypage = pages?.FirstOrDefault();
-
-        if (careercategorypage == null)
+        if (careercontentpage == null)
         {
             return new CareerDto();
         }
@@ -55,16 +46,16 @@ public class CareerContentPageService : ICareerContentPageService
         {
             Hero = await _heroService.GetHeroDtoAsync(new HeroData
             {
-                Layout = careercategorypage.HeroLayout,
-                Title = careercategorypage.HeroTitle,
-                Description = careercategorypage.HeroDescription,
-                BackgroundImage = careercategorypage.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string bgUrl ? Link.Parse(bgUrl) : null,
-                BackgroundImageAltText = careercategorypage.HeroBackgroundImageAltText,
-                MobileBackgroundImage = careercategorypage.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string mobileUrl ? Link.Parse(mobileUrl) : null,
-                MobileBackgroundImageAltText = careercategorypage.HeroBackgroundImage_MobileAltText,
-                CallToActionButtonType = careercategorypage.HeroCallToActionButtonType,
-                CallToActionButtonText = careercategorypage.HeroCallToActionButtonText,
-                CallToActionButtonUrl = careercategorypage.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath is string ctaPath ? Link.Parse(ctaPath) : null,
+                Layout = careercontentpage.HeroLayout,
+                Title = careercontentpage.HeroTitle,
+                Description = careercontentpage.HeroDescription,
+                BackgroundImage = careercontentpage.HeroBackgroundImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string bgUrl ? Link.Parse(bgUrl) : null,
+                BackgroundImageAltText = careercontentpage.HeroBackgroundImageAltText,
+                MobileBackgroundImage = careercontentpage.HeroBackgroundImage_Mobile?.FirstOrDefault()?.ContentAttachmentAsset?.Url is string mobileUrl ? Link.Parse(mobileUrl) : null,
+                MobileBackgroundImageAltText = careercontentpage.HeroBackgroundImage_MobileAltText,
+                CallToActionButtonType = careercontentpage.HeroCallToActionButtonType,
+                CallToActionButtonText = careercontentpage.HeroCallToActionButtonText,
+                CallToActionButtonUrl = careercontentpage.HeroCallToActionButtonUrl?.FirstOrDefault()?.SystemFields?.WebPageUrlPath is string ctaPath ? Link.Parse(ctaPath) : null,
             }, cancellationToken),
         };
 
