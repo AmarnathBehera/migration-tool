@@ -87,11 +87,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             IFormFile file,
             CancellationToken cancellationToken = default)
         {
-            ArgumentNullException.ThrowIfNull(file);
-            if (file.Length <= 0)
-            {
-                throw new ArgumentException("File cannot be empty.", nameof(file));
-            }
+            ValidateFile(file);
 
             var channelName = await pageChannelResolver.GetChannelNameByPageGuidAsync(pageGuid, cancellationToken);
             ArgumentNullException.ThrowIfNull(channelName);
@@ -125,21 +121,9 @@ namespace BDO.GWT.GLOBAL.API.Services
 
             if (duplicateAttachment is not null)
             {
-                return new PageAttachmentOutput
-                {
-                    GUID = duplicateAttachment.SystemFields.ContentItemGUID,
-                    Name = duplicateAttachment.ContentAttachmentAsset?.Metadata.Name ?? fileName,
-                    Extension = duplicateAttachment.ContentAttachmentAsset?.Metadata.Extension ?? string.Empty,
-                    Size = (int)(duplicateAttachment.ContentAttachmentAsset?.Metadata.Size ?? 0),
-                    MimeType = GetMimeType(duplicateAttachment.ContentAttachmentAsset?.Metadata.Extension ?? string.Empty),
-                    ImageWidth = duplicateAttachment.ContentAttachmentAsset?.Metadata.Width,
-                    ImageHeight = duplicateAttachment.ContentAttachmentAsset?.Metadata.Height,
-                    Title = duplicateAttachment.ContentAttachmentAsset?.Metadata.Name,
-                    Description = duplicateAttachment.ContentAttachmentAsset?.Metadata.Name,
-                    LastModified = duplicateAttachment.ContentAttachmentAsset?.Metadata.LastModified,
-                    Order = 0,
-                    Message = "Image already available on this page"
-                };
+                var output = Map(duplicateAttachment);
+                output.Message = "Image already available on this page";
+                return output;
             }
 
             // Find the first empty attachment field
@@ -155,47 +139,12 @@ namespace BDO.GWT.GLOBAL.API.Services
             if (emptyAttachmentProperty is null)
             {
                 attachmentPlacementMessage = "No available image field to add the attachment. The attachment has been created in the content hub but could not be placed on the page.";
-                // We'll return this message along with the created attachment info
             }
 
             var extension = System.IO.Path.GetExtension(file.FileName ?? string.Empty);
             var user = userInfoProvider.Get("administrator");
 
-            var assetSource = new ContentItemAssetStreamSource(ct => Task.FromResult<Stream>(file.OpenReadStream()));
-            var assetMetadata = new ContentItemAssetMetadataWithSource(
-                assetSource,
-                fileName,
-                extension,
-                file.Length,
-                DateTime.UtcNow);
-
-            var createItemData = new ContentItemData(new Dictionary<string, object>
-            {
-                { nameof(BDO.ContentAttachment.ContentAttachmentAsset), assetMetadata },
-                { "sys_parentItemGUID", pageGuid }
-            });
-
-            CreateContentItemParameters attachmentParameters = new(
-                                                                ContentAttachment.CONTENT_TYPE_NAME,
-                                                                fileName,
-                                                                fileName,
-                                                                culture,
-                                                                "KenticoDefault")
-            {
-                VersionStatus = VersionStatus.Published
-            };
-            var createParameters = attachmentParameters;
-
-            var contentItemManager = contentItemManagerFactory.Create(user.UserID);
-            int createdContentItemId = await contentItemManager.Create(createParameters, createItemData, cancellationToken);
-
-            // Get the actual GUID of the created content item
-            var createdContentItem = await contentItemInfoService.GetByIdAsync(createdContentItemId, cancellationToken);
-            if (createdContentItem is null)
-            {
-                throw new InvalidOperationException("Failed to retrieve the created attachment content item.");
-            }
-            var attachmentGuid = createdContentItem.ContentItemGUID;
+            var attachmentGuid = await CreateAttachmentContentItemAsync(file, pageGuid, culture, user.UserID, cancellationToken);
 
             // Only update the page if we found an empty attachment field
             if (emptyAttachmentProperty is not null)
@@ -214,17 +163,14 @@ namespace BDO.GWT.GLOBAL.API.Services
                 });
 
                 var webPageManager = webPageManagerFactory.Create(channelId, user.UserID);
-                await webPageManager.TryCreateDraft(page.SystemFields.WebPageItemID, culture, cancellationToken);
-
-                if (!await webPageManager.TryUpdateDraft(page.SystemFields.WebPageItemID, culture, new UpdateDraftData(updateData), cancellationToken))
-                {
-                    throw new InvalidOperationException("Failed to update page with the new attachment.");
-                }
-
-                if (!await webPageManager.TryPublish(page.SystemFields.WebPageItemID, culture, cancellationToken))
-                {
-                    throw new InvalidOperationException("Failed to publish page after adding attachment.");
-                }
+                await UpdatePageWithReferencesAsync(
+                    webPageManager,
+                    page.SystemFields.WebPageItemID,
+                    culture,
+                    updateData,
+                    "Failed to update page with the new attachment.",
+                    "Failed to publish page after adding attachment.",
+                    cancellationToken);
             }
 
             var savedAttachment = (await pageAttachmentService.GetPageAttachmentsAsync(pageGuid, channelName, culture, cancellationToken))
@@ -284,11 +230,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             IFormFile file,
             CancellationToken cancellationToken = default)
         {
-            ArgumentNullException.ThrowIfNull(file);
-            if (file.Length <= 0)
-            {
-                throw new ArgumentException("File cannot be empty.", nameof(file));
-            }
+            ValidateFile(file);
 
             var channelName = await pageChannelResolver.GetChannelNameByPageGuidAsync(pageGuid, cancellationToken);
             if (channelName is null)
@@ -305,58 +247,17 @@ namespace BDO.GWT.GLOBAL.API.Services
             }
 
             // Find the attachment property that contains the existing attachment GUID
-            var targetProperty = page.GetType()
-                .GetProperties()
-                .Where(x => typeof(IEnumerable<BDO.ContentAttachment>).IsAssignableFrom(x.PropertyType))
-                .FirstOrDefault(prop =>
-                    (prop.GetValue(page) as IEnumerable<BDO.ContentAttachment>)
-                        ?.Any(a => a.SystemFields.ContentItemGUID == attachmentGuid) == true);
-
+            var targetProperty = FindAttachmentPropertyContaining(page, attachmentGuid);
             if (targetProperty is null)
             {
                 // Attachment not found on this page
                 return null;
             }
 
-            var fileName = System.IO.Path.GetFileName(file.FileName ?? "attachment");
-            var extension = System.IO.Path.GetExtension(file.FileName ?? string.Empty);
             var user = userInfoProvider.Get("administrator");
 
             // Create new attachment in content hub
-            var assetSource = new ContentItemAssetStreamSource(ct => Task.FromResult<Stream>(file.OpenReadStream()));
-            var assetMetadata = new ContentItemAssetMetadataWithSource(
-                assetSource,
-                fileName,
-                extension,
-                file.Length,
-                DateTime.UtcNow);
-
-            var createItemData = new ContentItemData(new Dictionary<string, object>
-            {
-                { nameof(BDO.ContentAttachment.ContentAttachmentAsset), assetMetadata },
-                { "sys_parentItemGUID", pageGuid }
-            });
-
-            CreateContentItemParameters attachmentParameters = new(
-                ContentAttachment.CONTENT_TYPE_NAME,
-                fileName,
-                fileName,
-                culture,
-                "KenticoDefault")
-            {
-                VersionStatus = VersionStatus.Published
-            };
-
-            var contentItemManager = contentItemManagerFactory.Create(user.UserID);
-            int createdContentItemId = await contentItemManager.Create(attachmentParameters, createItemData, cancellationToken);
-
-            // Get the actual GUID of the created content item
-            var createdContentItem = await contentItemInfoService.GetByIdAsync(createdContentItemId, cancellationToken);
-            if (createdContentItem is null)
-            {
-                throw new InvalidOperationException("Failed to retrieve the created attachment content item.");
-            }
-            var newAttachmentGuid = createdContentItem.ContentItemGUID;
+            var newAttachmentGuid = await CreateAttachmentContentItemAsync(file, pageGuid, culture, user.UserID, cancellationToken);
 
             // Get current attachments in the field and replace the old GUID with new GUID
             var fieldAttachments = targetProperty.GetValue(page) as IEnumerable<BDO.ContentAttachment>
@@ -378,17 +279,14 @@ namespace BDO.GWT.GLOBAL.API.Services
 
             // Update the page with the new attachment reference
             var webPageManager = webPageManagerFactory.Create(channelId, user.UserID);
-            await webPageManager.TryCreateDraft(page.SystemFields.WebPageItemID, culture, cancellationToken);
-
-            if (!await webPageManager.TryUpdateDraft(page.SystemFields.WebPageItemID, culture, new UpdateDraftData(updateData), cancellationToken))
-            {
-                throw new InvalidOperationException("Failed to update page with the new attachment reference.");
-            }
-
-            if (!await webPageManager.TryPublish(page.SystemFields.WebPageItemID, culture, cancellationToken))
-            {
-                throw new InvalidOperationException("Failed to publish page after updating attachment reference.");
-            }
+            await UpdatePageWithReferencesAsync(
+                webPageManager,
+                page.SystemFields.WebPageItemID,
+                culture,
+                updateData,
+                "Failed to update page with the new attachment reference.",
+                "Failed to publish page after updating attachment reference.",
+                cancellationToken);
 
             // Retrieve and return the new attachment
             var updatedAttachments = await pageAttachmentService.GetPageAttachmentsAsync(
@@ -425,13 +323,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             }
 
             // Find the attachment property that contains the attachment GUID
-            var targetProperty = page.GetType()
-                                 .GetProperties()
-                                 .Where(x => typeof(IEnumerable<BDO.ContentAttachment>).IsAssignableFrom(x.PropertyType))
-                                 .FirstOrDefault(prop =>
-                                     (prop.GetValue(page) as IEnumerable<BDO.ContentAttachment>)
-                                         ?.Any(a => a.SystemFields.ContentItemGUID == attachmentGuid) == true);
-
+            var targetProperty = FindAttachmentPropertyContaining(page, attachmentGuid);
             if (targetProperty is null)
             {
                 // Attachment not found on this page
@@ -456,17 +348,14 @@ namespace BDO.GWT.GLOBAL.API.Services
 
             // Update the page to remove the attachment reference
             var webPageManager = webPageManagerFactory.Create(channelId, user.UserID);
-            await webPageManager.TryCreateDraft(page.SystemFields.WebPageItemID, culture, cancellationToken);
-
-            if (!await webPageManager.TryUpdateDraft(page.SystemFields.WebPageItemID, culture, new UpdateDraftData(updateData), cancellationToken))
-            {
-                throw new InvalidOperationException("Failed to update page to remove attachment reference.");
-            }
-
-            if (!await webPageManager.TryPublish(page.SystemFields.WebPageItemID, culture, cancellationToken))
-            {
-                throw new InvalidOperationException("Failed to publish page after removing attachment reference.");
-            }
+            await UpdatePageWithReferencesAsync(
+                webPageManager,
+                page.SystemFields.WebPageItemID,
+                culture,
+                updateData,
+                "Failed to update page to remove attachment reference.",
+                "Failed to publish page after removing attachment reference.",
+                cancellationToken);
 
             return true;
         }
@@ -491,6 +380,7 @@ namespace BDO.GWT.GLOBAL.API.Services
                 LastModified = asset?.Metadata.LastModified
             };
         }
+
         private static string GetMimeType(string extension)
         {
             return extension?.ToLowerInvariant() switch
@@ -503,6 +393,95 @@ namespace BDO.GWT.GLOBAL.API.Services
                 ".pdf" => "application/pdf",
                 _ => "application/octet-stream"
             };
+        }
+
+        private static void ValidateFile(IFormFile file)
+        {
+            ArgumentNullException.ThrowIfNull(file);
+            if (file.Length <= 0)
+            {
+                throw new ArgumentException("File cannot be empty.", nameof(file));
+            }
+        }
+
+        private static System.Reflection.PropertyInfo? FindAttachmentPropertyContaining(
+            IWebPageFieldsSource page,
+            Guid attachmentGuid)
+        {
+            return page.GetType()
+                .GetProperties()
+                .Where(x => typeof(IEnumerable<BDO.ContentAttachment>).IsAssignableFrom(x.PropertyType))
+                .FirstOrDefault(prop =>
+                    (prop.GetValue(page) as IEnumerable<BDO.ContentAttachment>)
+                        ?.Any(a => a.SystemFields.ContentItemGUID == attachmentGuid) == true);
+        }
+
+        private async Task<Guid> CreateAttachmentContentItemAsync(
+            IFormFile file,
+            Guid pageGuid,
+            string culture,
+            int userId,
+            CancellationToken cancellationToken)
+        {
+            var fileName = System.IO.Path.GetFileName(file.FileName ?? "attachment");
+            var extension = System.IO.Path.GetExtension(file.FileName ?? string.Empty);
+
+            var assetSource = new ContentItemAssetStreamSource(ct => Task.FromResult<Stream>(file.OpenReadStream()));
+            var assetMetadata = new ContentItemAssetMetadataWithSource(
+                assetSource,
+                fileName,
+                extension,
+                file.Length,
+                DateTime.UtcNow);
+
+            var createItemData = new ContentItemData(new Dictionary<string, object>
+            {
+                { nameof(BDO.ContentAttachment.ContentAttachmentAsset), assetMetadata },
+                { "sys_parentItemGUID", pageGuid }
+            });
+
+            var attachmentParameters = new CreateContentItemParameters(
+                ContentAttachment.CONTENT_TYPE_NAME,
+                fileName,
+                fileName,
+                culture,
+                "KenticoDefault")
+            {
+                VersionStatus = VersionStatus.Published
+            };
+
+            var contentItemManager = contentItemManagerFactory.Create(userId);
+            int createdContentItemId = await contentItemManager.Create(attachmentParameters, createItemData, cancellationToken);
+
+            var createdContentItem = await contentItemInfoService.GetByIdAsync(createdContentItemId, cancellationToken);
+            if (createdContentItem is null)
+            {
+                throw new InvalidOperationException("Failed to retrieve the created attachment content item.");
+            }
+
+            return createdContentItem.ContentItemGUID;
+        }
+
+        private async Task UpdatePageWithReferencesAsync(
+            IWebPageManager webPageManager,
+            int webPageItemId,
+            string culture,
+            ContentItemData updateData,
+            string updateErrorMessage,
+            string publishErrorMessage,
+            CancellationToken cancellationToken)
+        {
+            await webPageManager.TryCreateDraft(webPageItemId, culture, cancellationToken);
+
+            if (!await webPageManager.TryUpdateDraft(webPageItemId, culture, new UpdateDraftData(updateData), cancellationToken))
+            {
+                throw new InvalidOperationException(updateErrorMessage);
+            }
+
+            if (!await webPageManager.TryPublish(webPageItemId, culture, cancellationToken))
+            {
+                throw new InvalidOperationException(publishErrorMessage);
+            }
         }
     }
 }
