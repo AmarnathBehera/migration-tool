@@ -56,7 +56,7 @@ variable "appsettings.syncRegions" {
 }
 
 variable "appsettings.syncGlobalSiteGuid" {
-    value "" {}
+    value "CDD133DB-1319-42C7-B3BD-9A1CF2DBA942" {}
 }
 
 variable "appsettings.reactAppService" {
