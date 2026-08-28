@@ -24,6 +24,14 @@ namespace BDO.GWT.GLOBAL.API.Data
             IFormFile file,
             CancellationToken cancellationToken = default);
 
+        Task<PageAttachmentOutput?> UpdateAttachmentAsync(
+            int channelId,
+            Guid pageGuid,
+            Guid attachmentGuid,
+            string culture,
+            IFormFile file,
+            CancellationToken cancellationToken = default);
+
         Task<(byte[] Data, string ContentType, string FileName)?> GetAttachmentBinaryAsync(
             int channelId,
             Guid pageGuid,

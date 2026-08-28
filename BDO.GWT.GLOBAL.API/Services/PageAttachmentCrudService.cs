@@ -277,6 +277,141 @@ namespace BDO.GWT.GLOBAL.API.Services
                 cancellationToken);
         }
 
+        public async Task<PageAttachmentOutput?> UpdateAttachmentAsync(
+            int channelId,
+            Guid pageGuid,
+            Guid attachmentGuid,
+            string culture,
+            IFormFile file,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(file);
+            if (file.Length <= 0)
+            {
+                throw new ArgumentException("File cannot be empty.", nameof(file));
+            }
+
+            var channelName = await pageChannelResolver.GetChannelNameByPageGuidAsync(pageGuid, cancellationToken);
+            if (channelName is null)
+            {
+                return null;
+            }
+
+            // Get the page to find which field contains the attachment
+            var page = (await contentService.GetItemsByGUIDForAPIAsync(new List<Guid> { pageGuid }, channelName, culture))
+                ?.FirstOrDefault();
+            if (page is null)
+            {
+                return null;
+            }
+
+            // Find the attachment property that contains the existing attachment GUID
+            var allAttachmentProperties = page.GetType().GetProperties()
+                .Where(x => typeof(IEnumerable<BDO.ContentAttachment>).IsAssignableFrom(x.PropertyType))
+                .ToList();
+
+            System.Reflection.PropertyInfo? targetProperty = null;
+            foreach (var prop in allAttachmentProperties)
+            {
+                var attachments = prop.GetValue(page) as IEnumerable<BDO.ContentAttachment>;
+                if (attachments?.Any(a => a.SystemFields.ContentItemGUID == attachmentGuid) == true)
+                {
+                    targetProperty = prop;
+                    break;
+                }
+            }
+
+            if (targetProperty is null)
+            {
+                // Attachment not found on this page
+                return null;
+            }
+
+            var fileName = System.IO.Path.GetFileName(file.FileName ?? "attachment");
+            var extension = System.IO.Path.GetExtension(file.FileName ?? string.Empty);
+            var user = userInfoProvider.Get("administrator");
+
+            // Create new attachment in content hub
+            var assetSource = new ContentItemAssetStreamSource(ct => Task.FromResult<Stream>(file.OpenReadStream()));
+            var assetMetadata = new ContentItemAssetMetadataWithSource(
+                assetSource,
+                fileName,
+                extension,
+                file.Length,
+                DateTime.UtcNow);
+
+            var createItemData = new ContentItemData(new Dictionary<string, object>
+            {
+                { nameof(BDO.ContentAttachment.ContentAttachmentAsset), assetMetadata },
+                { "sys_parentItemGUID", pageGuid }
+            });
+
+            CreateContentItemParameters attachmentParameters = new(
+                ContentAttachment.CONTENT_TYPE_NAME,
+                fileName,
+                fileName,
+                culture,
+                "KenticoDefault")
+            {
+                VersionStatus = VersionStatus.Published
+            };
+
+            var contentItemManager = contentItemManagerFactory.Create(user.UserID);
+            int createdContentItemId = await contentItemManager.Create(attachmentParameters, createItemData, cancellationToken);
+
+            // Get the actual GUID of the created content item
+            var createdContentItem = await contentItemInfoProvider.GetAsync(createdContentItemId, cancellationToken);
+            if (createdContentItem is null)
+            {
+                throw new InvalidOperationException("Failed to retrieve the created attachment content item.");
+            }
+            var newAttachmentGuid = createdContentItem.ContentItemGUID;
+
+            // Get current attachments in the field and replace the old GUID with new GUID
+            var fieldAttachments = targetProperty.GetValue(page) as IEnumerable<BDO.ContentAttachment>
+                ?? Enumerable.Empty<BDO.ContentAttachment>();
+
+            var references = fieldAttachments
+                .Select(x => new ContentItemReference
+                {
+                    Identifier = x.SystemFields.ContentItemGUID == attachmentGuid
+                        ? newAttachmentGuid  // Replace old with new
+                        : x.SystemFields.ContentItemGUID
+                })
+                .ToList();
+
+            var updateData = new ContentItemData(new Dictionary<string, object>
+            {
+                { targetProperty.Name, references }
+            });
+
+            // Update the page with the new attachment reference
+            var webPageManager = webPageManagerFactory.Create(channelId, user.UserID);
+            await webPageManager.TryCreateDraft(page.SystemFields.WebPageItemID, culture, cancellationToken);
+
+            if (!await webPageManager.TryUpdateDraft(page.SystemFields.WebPageItemID, culture, new UpdateDraftData(updateData), cancellationToken))
+            {
+                throw new InvalidOperationException("Failed to update page with the new attachment reference.");
+            }
+
+            if (!await webPageManager.TryPublish(page.SystemFields.WebPageItemID, culture, cancellationToken))
+            {
+                throw new InvalidOperationException("Failed to publish page after updating attachment reference.");
+            }
+
+            // Retrieve and return the new attachment
+            var updatedAttachments = await pageAttachmentService.GetPageAttachmentsAsync(
+                pageGuid,
+                channelName,
+                culture,
+                cancellationToken);
+
+            var newAttachment = updatedAttachments.FirstOrDefault(
+                x => x.SystemFields.ContentItemGUID == newAttachmentGuid);
+
+            return newAttachment is null ? null : Map(newAttachment);
+        }
+
 
         private static PageAttachmentOutput Map(BDO.ContentAttachment attachment)
         {

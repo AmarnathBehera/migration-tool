@@ -51,7 +51,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         public async Task<IActionResult> Post(
        [FromRoute] int memberFirmID,
        [FromRoute] Guid pageGUID,
-       [FromForm] CreateAttachmentRequest request,
+       [FromForm] AttachmentRequest request,
        CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
@@ -123,13 +123,34 @@ namespace BDO.GWT.GLOBAL.API.Controllers
 
             return File(result.Value.Data, MediaTypeNames.Application.Octet);
         }
-        public class CreateAttachmentRequest
-        {
-            [Required]
-            public string Culture { get; set; }
 
-            [Required]
-            public IFormFile File { get; set; }
+        [HttpPut("{attachmentGUID:guid}")]
+        [Consumes("multipart/form-data")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation(Summary = "Updates an existing attachment for a page")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status200OK, "Attachment updated", typeof(PageAttachmentOutput), MediaTypeNames.Application.Json)]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid request")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status404NotFound, "Attachment or page not found")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error")]
+        public async Task<IActionResult> Put(
+            [FromRoute] int memberFirmID,
+            [FromRoute] Guid pageGUID,
+            [FromRoute] Guid attachmentGUID,
+            [FromForm] AttachmentRequest request,
+            CancellationToken cancellationToken)
+        {
+            int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
+
+            var result = await attachmentService.UpdateAttachmentAsync(
+                channelId,
+                pageGUID,
+                attachmentGUID,
+                request.Culture,
+                request.File,
+                cancellationToken);
+
+            return result == null
+                ? NotFound()
+                : Ok(result);
         }
     }
 }
