@@ -2,7 +2,6 @@ using BDO.GWT.Core;
 using BDO.GWT.GLOBAL.API.Data;
 using CMS.ContentEngine;
 using CMS.ContentEngine.Internal;
-using CMS.DataEngine;
 using CMS.Membership;
 using CMS.Websites;
 
@@ -16,7 +15,7 @@ namespace BDO.GWT.GLOBAL.API.Services
         private readonly IWebPageManagerFactory webPageManagerFactory;
         private readonly IContentItemManagerFactory contentItemManagerFactory;
         private readonly IUserInfoProvider userInfoProvider;
-        private readonly IInfoProvider<ContentItemInfo> contentItemInfoProvider;
+        private readonly IContentItemInfoService contentItemInfoService;
 
         public PageAttachmentCrudService(
             IPageAttachmentService pageAttachmentService,
@@ -25,7 +24,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             IWebPageManagerFactory webPageManagerFactory,
             IContentItemManagerFactory contentItemManagerFactory,
             IUserInfoProvider userInfoProvider,
-            IInfoProvider<ContentItemInfo> contentItemInfoProvider)
+            IContentItemInfoService contentItemInfoService)
         {
             this.pageAttachmentService = pageAttachmentService;
             this.pageChannelResolver = pageChannelResolver;
@@ -33,7 +32,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             this.webPageManagerFactory = webPageManagerFactory;
             this.contentItemManagerFactory = contentItemManagerFactory;
             this.userInfoProvider = userInfoProvider;
-            this.contentItemInfoProvider = contentItemInfoProvider;
+            this.contentItemInfoService = contentItemInfoService;
         }
 
         public async Task<PageAttachmentOutput?> GetAttachmentAsync(
@@ -191,7 +190,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             int createdContentItemId = await contentItemManager.Create(createParameters, createItemData, cancellationToken);
 
             // Get the actual GUID of the created content item
-            var createdContentItem = await contentItemInfoProvider.GetAsync(createdContentItemId, cancellationToken);
+            var createdContentItem = await contentItemInfoService.GetByIdAsync(createdContentItemId, cancellationToken);
             if (createdContentItem is null)
             {
                 throw new InvalidOperationException("Failed to retrieve the created attachment content item.");
@@ -352,7 +351,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             int createdContentItemId = await contentItemManager.Create(attachmentParameters, createItemData, cancellationToken);
 
             // Get the actual GUID of the created content item
-            var createdContentItem = await contentItemInfoProvider.GetAsync(createdContentItemId, cancellationToken);
+            var createdContentItem = await contentItemInfoService.GetByIdAsync(createdContentItemId, cancellationToken);
             if (createdContentItem is null)
             {
                 throw new InvalidOperationException("Failed to retrieve the created attachment content item.");
