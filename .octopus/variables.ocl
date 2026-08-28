@@ -48,7 +48,7 @@ variable "appsettings.syncApiKey" {
 }
 
 variable "appsettings.syncApiUrl" {
-    value "bdo-web-gwt-xbyk-syn-#{environment.abbreviation}-eur-we.azurewebsites.net" {}
+    value "https://bdo-web-gwt-xbyk-syn-#{environment.abbreviation}-eur-we.azurewebsites.net" {}
 }
 
 variable "appsettings.syncRegions" {
