@@ -103,6 +103,7 @@ public class NewsletterSubscriptionService(
             }
 
             var baseUnsubscribeUrl = await ResolveSubscribeRemoveRelativeUrlAsync(subscribePageGuid, cancellationToken) ?? "/Subscribe/Remove";
+            var baseConfirmsubscribeUrl = await ResolveSubscribeConfirmRelativeUrlAsync(subscribePageGuid, cancellationToken) ?? "/Subscribe/Remove";
             var unsubscribeUrl = QueryHelpers.AddQueryString(baseUnsubscribeUrl, new Dictionary<string, string?>
             {
                 ["email"] = newsletterSubscriptionData.Email,
@@ -117,7 +118,8 @@ public class NewsletterSubscriptionService(
             var rawBody =
                 $"<p><strong>Hello</strong> {safeFirstName}</p>" +
                 $"<p><strong>you have been subscribed to:</strong> {safeRecipientList}</p>" +
-                $"<p><a href='{safeUnsubscribeUrl}'>Unsubscribe</a></p>";
+                $"<p><a href='{safeUnsubscribeUrl}'>Unsubscribe</a></p>"+
+                $"<p><a href='{baseConfirmsubscribeUrl}'>Subscribe Confirm</a></p>";
 
             var email = new EmailMessage
             {
@@ -227,6 +229,42 @@ public class NewsletterSubscriptionService(
             }
         }
         await _marketingContactManagementService.UpdateMarketingContactAsync(contact, cancellationToken);
+    }
+    private async Task<string?> ResolveSubscribeConfirmRelativeUrlAsync(Guid? subscribePageGuid, CancellationToken cancellationToken)
+    {
+        if (!subscribePageGuid.HasValue || subscribePageGuid.Value == Guid.Empty)
+        {
+            return null;
+        }
+
+        using var scope = _scopeFactory.CreateScope();
+        var contentService = scope.ServiceProvider.GetRequiredService<IContentService>();
+        var urlRetriever = scope.ServiceProvider.GetRequiredService<IWebPageUrlRetriever>();
+        var languageRetriever = scope.ServiceProvider.GetRequiredService<IPreferredLanguageRetriever>();
+
+        var subscribePage = (await contentService.GetPagesByGuidsAsync<Subscribe>([subscribePageGuid.Value], cancellationToken))
+            .FirstOrDefault();
+
+        if (subscribePage?.SystemFields is null)
+        {
+            return null;
+        }
+
+        var subscribeRemovePage = (await contentService.GetContentType<SubscribeConfirm>(cancellationToken))
+            .FirstOrDefault(p => p.SystemFields?.WebPageItemParentID == subscribePage.SystemFields.WebPageItemID);
+
+        if (subscribeRemovePage?.SystemFields is null)
+        {
+            return null;
+        }
+
+        var languageName = languageRetriever.Get();
+        var url = await urlRetriever.Retrieve(
+            subscribeRemovePage,
+            languageName,
+            cancellationToken);
+
+        return url.AbsoluteUrl;
     }
 
     private async Task<string?> ResolveSubscribeRemoveRelativeUrlAsync(Guid? subscribePageGuid, CancellationToken cancellationToken)

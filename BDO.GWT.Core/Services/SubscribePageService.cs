@@ -120,6 +120,7 @@ public class SubscribePageService : ISubscribePageService
     public async Task<BDO.GWT.Core.DTOs.OptionDto[]> GetAllCountriesOptionDtosAsync(CancellationToken cancellationToken)
     {
         var countries = await _countryProvider.Get()
+                                              .Columns(nameof(CountryInfo.CountryGUID), nameof(CountryInfo.CountryDisplayName))
                                               .OrderBy(nameof(CountryInfo.CountryDisplayName))
                                               .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
 
