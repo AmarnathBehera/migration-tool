@@ -214,8 +214,12 @@ public class AttachmentsControllerTests
 
         Assert.That(result, Is.InstanceOf<CreatedAtActionResult>());
         var createdResult = (CreatedAtActionResult)result;
-        Assert.That(createdResult.Value, Is.EqualTo(expected));
-        Assert.That(createdResult.ActionName, Is.EqualTo(nameof(AttachmentsController.Get)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(createdResult.Value, Is.EqualTo(expected));
+            Assert.That(createdResult.ActionName, Is.EqualTo(nameof(AttachmentsController.Get)));
+        });
+
     }
 
     [Test]

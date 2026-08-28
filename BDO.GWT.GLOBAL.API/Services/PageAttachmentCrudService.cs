@@ -109,7 +109,7 @@ namespace BDO.GWT.GLOBAL.API.Services
                 .Where(x => typeof(IEnumerable<BDO.ContentAttachment>).IsAssignableFrom(x.PropertyType))
                 .ToList();
 
-            if (!allAttachmentProperties.Any())
+            if (allAttachmentProperties.Count == 0)
             {
                 throw new InvalidOperationException($"Page '{pageGuid}' does not contain any attachment-capable fields.");
             }
@@ -150,7 +150,7 @@ namespace BDO.GWT.GLOBAL.API.Services
                 return value == null || !value.Any();
             });
 
-            string attachmentPlacementMessage = null;
+            string? attachmentPlacementMessage = null;
 
             // If no empty field found, prepare message but continue with creation
             if (emptyAttachmentProperty is null)
@@ -306,20 +306,12 @@ namespace BDO.GWT.GLOBAL.API.Services
             }
 
             // Find the attachment property that contains the existing attachment GUID
-            var allAttachmentProperties = page.GetType().GetProperties()
+            var targetProperty = page.GetType()
+                .GetProperties()
                 .Where(x => typeof(IEnumerable<BDO.ContentAttachment>).IsAssignableFrom(x.PropertyType))
-                .ToList();
-
-            System.Reflection.PropertyInfo? targetProperty = null;
-            foreach (var prop in allAttachmentProperties)
-            {
-                var attachments = prop.GetValue(page) as IEnumerable<BDO.ContentAttachment>;
-                if (attachments?.Any(a => a.SystemFields.ContentItemGUID == attachmentGuid) == true)
-                {
-                    targetProperty = prop;
-                    break;
-                }
-            }
+                .FirstOrDefault(prop =>
+                    (prop.GetValue(page) as IEnumerable<BDO.ContentAttachment>)
+                        ?.Any(a => a.SystemFields.ContentItemGUID == attachmentGuid) == true);
 
             if (targetProperty is null)
             {
@@ -434,20 +426,12 @@ namespace BDO.GWT.GLOBAL.API.Services
             }
 
             // Find the attachment property that contains the attachment GUID
-            var allAttachmentProperties = page.GetType().GetProperties()
-                .Where(x => typeof(IEnumerable<BDO.ContentAttachment>).IsAssignableFrom(x.PropertyType))
-                .ToList();
-
-            System.Reflection.PropertyInfo? targetProperty = null;
-            foreach (var prop in allAttachmentProperties)
-            {
-                var attachments = prop.GetValue(page) as IEnumerable<BDO.ContentAttachment>;
-                if (attachments?.Any(a => a.SystemFields.ContentItemGUID == attachmentGuid) == true)
-                {
-                    targetProperty = prop;
-                    break;
-                }
-            }
+            var targetProperty = page.GetType()
+                                 .GetProperties()
+                                 .Where(x => typeof(IEnumerable<BDO.ContentAttachment>).IsAssignableFrom(x.PropertyType))
+                                 .FirstOrDefault(prop =>
+                                     (prop.GetValue(page) as IEnumerable<BDO.ContentAttachment>)
+                                         ?.Any(a => a.SystemFields.ContentItemGUID == attachmentGuid) == true);
 
             if (targetProperty is null)
             {

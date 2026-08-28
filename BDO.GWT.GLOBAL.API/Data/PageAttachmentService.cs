@@ -1,6 +1,5 @@
 ﻿using BDO.GWT.Core;
 using CMS.Websites;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Net.Mime;
 
@@ -8,7 +7,6 @@ namespace BDO.GWT.GLOBAL.API.Data
 {
     public class PageAttachmentService : IPageAttachmentService
     {
-        private const string DevelopmentLiveSiteBaseUrl = "http://localhost:12393";
         private static readonly FileExtensionContentTypeProvider ContentTypeProvider = new();
 
         private readonly IContentService _contentService;
@@ -109,11 +107,6 @@ namespace BDO.GWT.GLOBAL.API.Data
             }
 
             var normalizedPath = NormalizePath(assetUrl);
-
-            if (_hostEnvironment.IsDevelopment())
-            {
-                return new Uri(new Uri(DevelopmentLiveSiteBaseUrl), normalizedPath);
-            }
 
             var request = _httpContextAccessor.HttpContext?.Request;
             return request is null
