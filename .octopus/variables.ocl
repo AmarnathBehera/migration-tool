@@ -123,11 +123,11 @@ variable "appsettings.CMSAzureSearchSearchServiceEndPoint" {
 }
 
 variable "appsettings.CMSAzureSearchSearchServiceAdminApiKey" {
-    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ais-gwt-xbyk-dev-eur-we-primaryKey)" {}
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ais-gwt-xbyk-#{environment.abbreviation}-eur-we-primaryKey)" {}
 }
 
 variable "appsettings.CMSAzureSearchSearchServiceQueryApiKey" {
-    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ais-gwt-xbyk-dev-eur-we-queryKey)" {}
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ais-gwt-xbyk-#{environment.abbreviation}-eur-we-queryKey)" {}
 }
 
 variable "appsettings.AzureCognitiveSearchServiceUrl" {
@@ -135,7 +135,7 @@ variable "appsettings.AzureCognitiveSearchServiceUrl" {
 }
 
 variable "appsettings.AzureCognitiveSearchQueryKey" {
-    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ais-gwt-xbyk-dev-eur-we-queryKey)" {}
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ais-gwt-xbyk-#{environment.abbreviation}-eur-we-queryKey)" {}
 }
 
 variable "appsettings.RedirectDomain" {
