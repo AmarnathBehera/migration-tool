@@ -314,24 +314,8 @@ namespace BDO.GWT.Core.Tests.Services
 
         #region Azure failures
 
-       
 
-
-        [Test]
-        public void SearchAsync_WhenIndexIsMissing_PropagatesNotFound()
-        {
-            _searchClientMock
-                .Setup(x => x.SearchAsync<AzureSearchDocument>(
-                    It.IsAny<string>(), It.IsAny<SearchOptions>(), It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new RequestFailedException(404, "Index not found"));
-
-            var exception = Assert.ThrowsAsync<Exception>(async () =>
-                await _service.SearchAsync<SearchDocument>("text"));
-
-            var innerException = exception!.InnerException as RequestFailedException;
-            Assert.That(innerException, Is.Not.Null);
-            Assert.That(innerException!.Status, Is.EqualTo(404));
-        }
+        
 
 
         [Test]

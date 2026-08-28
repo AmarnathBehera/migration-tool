@@ -65,8 +65,8 @@ namespace BDO.GWT.AzureCognitiveSearch.Services
 
                 var mappedResponse = await MapSearchResponseAsync<TEntity>(response);
 
-                eventLogService.LogInformation("SearchService", "SearchAsync",
-                    $"Search completed. Index: '{client.IndexName}', ResultCount: {mappedResponse.Count}, DocumentsReturned: {mappedResponse.Documents?.Count() ?? 0}");
+               eventLogService.LogInformation("SearchService", "SearchAsync",
+                    $"Search completed. Index: '{client.IndexName}', ResultCount: {mappedResponse.Count}, DocumentsReturned: {mappedResponse.Documents?.Count ?? 0}");
 
                 return mappedResponse;
             }
@@ -80,7 +80,7 @@ namespace BDO.GWT.AzureCognitiveSearch.Services
             {
                 eventLogService.LogError("SearchService", "SearchAsync",
                     $"Error executing search query. Index: '{client.IndexName}', SearchText: '{searchText}', Error: {ex.Message}");
-                throw new Exception($"Error executing search query: {ex.Message}", ex);
+                throw;
             }
         }
 
@@ -93,8 +93,7 @@ namespace BDO.GWT.AzureCognitiveSearch.Services
 
             var client = _searchClientBuilder.CreateSearchClient(_siteContext.CurrentSiteName);
 
-            try
-            {
+           
                 var suggestOptions = _searchQueryHelper.MapSuggestSearchQueryToSuggestSearchOptions(query);
 
                 eventLogService.LogInformation("SearchService", "SuggestAsync",
@@ -105,16 +104,10 @@ namespace BDO.GWT.AzureCognitiveSearch.Services
                 var mappedResponse = MapSuggestResponse<TEntity>(response);
 
                 eventLogService.LogInformation("SearchService", "SuggestAsync",
-                    $"Suggest completed. Index: '{client.IndexName}', ResultCount: {mappedResponse.Results?.Count() ?? 0}");
+                    $"Suggest completed. Index: '{client.IndexName}', ResultCount: {mappedResponse.Results?.Count ?? 0}");
 
                 return mappedResponse;
-            }
-            catch (Exception ex)
-            {
-                eventLogService.LogError("SearchService", "SuggestAsync",
-                    $"Error executing suggest query. Index: '{client.IndexName}', SearchText: '{searchText}', Suggester: '{suggesterName}', Error: {ex.Message}");
-                throw new Exception($"Error executing suggest query: {ex.Message}", ex);
-            }
+            
         }
 
         private async Task<SearchResponse<TEntity>> MapSearchResponseAsync<TEntity>(Response<SearchResults<AzureSearchDocument>> response)
