@@ -21,6 +21,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text.Json.Serialization;
+using CMS.Core;
 
 namespace BDO.GWT.Core.Services
 {
@@ -40,7 +41,8 @@ namespace BDO.GWT.Core.Services
         ITypeMapper typeMapper,
         ISearchService searchService,
         //IDateTimeProviderSearch dateTimeProvider,
-        ISearchCardHelper searchCardHelper
+        ISearchCardHelper searchCardHelper,
+        IEventLogService eventLogService
 
             ) : ISearchPageService
     {
@@ -159,8 +161,10 @@ namespace BDO.GWT.Core.Services
             }, cancellationToken);
 
             var currentLanguageTag = _cultureContext.CurrentLanguageTag;
-            LanguageTag languageTag = LanguageTag.Parse(currentLanguageTag);
-            
+            // TEMP DEBUG - remove after diagnosis
+            eventLogService.LogInformation("SearchPageService", "GetSearchResultsAsync",
+                $"CurrentLanguageTag (query side): '{currentLanguageTag}'");
+
             var existingDocuments = response.Documents.ToList();
 
             var totalItems = (int)response.Count!;
