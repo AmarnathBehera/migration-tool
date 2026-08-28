@@ -2,6 +2,8 @@ using BDO.GWT.Core;
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Services;
 using CMS.ContentEngine;
+using CMS.ContentEngine.Internal;
+using CMS.DataEngine;
 using CMS.Membership;
 using CMS.Websites;
 using Moq;
@@ -19,6 +21,7 @@ public class PageAttachmentCrudServiceTests
     private Mock<IWebPageManagerFactory> _webPageManagerFactoryMock = null!;
     private Mock<IContentItemManagerFactory> _contentItemManagerFactoryMock = null!;
     private Mock<IUserInfoProvider> _userInfoProviderMock = null!;
+    private Mock<IInfoProvider<ContentItemInfo>> _contentItemInfoProviderMock = null!;
     private PageAttachmentCrudService _service = null!;
 
     [SetUp]
@@ -30,6 +33,7 @@ public class PageAttachmentCrudServiceTests
         _webPageManagerFactoryMock = new Mock<IWebPageManagerFactory>();
         _contentItemManagerFactoryMock = new Mock<IContentItemManagerFactory>();
         _userInfoProviderMock = new Mock<IUserInfoProvider>();
+        _contentItemInfoProviderMock = new Mock<IInfoProvider<ContentItemInfo>>();
 
         _service = new PageAttachmentCrudService(
             _pageAttachmentServiceMock.Object,
@@ -37,7 +41,8 @@ public class PageAttachmentCrudServiceTests
             _contentServiceMock.Object,
             _webPageManagerFactoryMock.Object,
             _contentItemManagerFactoryMock.Object,
-            _userInfoProviderMock.Object);
+            _userInfoProviderMock.Object,
+            _contentItemInfoProviderMock.Object);
     }
 
     private static BDO.ContentAttachment CreateAttachment(Guid guid, ContentItemAsset? asset = null)

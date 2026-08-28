@@ -1,6 +1,8 @@
 using BDO.GWT.Core;
 using BDO.GWT.GLOBAL.API.Data;
 using CMS.ContentEngine;
+using CMS.ContentEngine.Internal;
+using CMS.DataEngine;
 using CMS.Membership;
 using CMS.Websites;
 
@@ -14,6 +16,7 @@ namespace BDO.GWT.GLOBAL.API.Services
         private readonly IWebPageManagerFactory webPageManagerFactory;
         private readonly IContentItemManagerFactory contentItemManagerFactory;
         private readonly IUserInfoProvider userInfoProvider;
+        private readonly IInfoProvider<ContentItemInfo> contentItemInfoProvider;
 
         public PageAttachmentCrudService(
             IPageAttachmentService pageAttachmentService,
@@ -21,7 +24,8 @@ namespace BDO.GWT.GLOBAL.API.Services
             IContentService contentService,
             IWebPageManagerFactory webPageManagerFactory,
             IContentItemManagerFactory contentItemManagerFactory,
-            IUserInfoProvider userInfoProvider)
+            IUserInfoProvider userInfoProvider,
+            IInfoProvider<ContentItemInfo> contentItemInfoProvider)
         {
             this.pageAttachmentService = pageAttachmentService;
             this.pageChannelResolver = pageChannelResolver;
@@ -29,6 +33,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             this.webPageManagerFactory = webPageManagerFactory;
             this.contentItemManagerFactory = contentItemManagerFactory;
             this.userInfoProvider = userInfoProvider;
+            this.contentItemInfoProvider = contentItemInfoProvider;
         }
 
         public async Task<PageAttachmentOutput?> GetAttachmentAsync(
@@ -155,10 +160,9 @@ namespace BDO.GWT.GLOBAL.API.Services
             }
 
             var extension = System.IO.Path.GetExtension(file.FileName ?? string.Empty);
-            var attachmentGuid = Guid.NewGuid();
             var user = userInfoProvider.Get("administrator");
 
-           var assetSource = new ContentItemAssetStreamSource(ct => Task.FromResult<Stream>(file.OpenReadStream()));
+            var assetSource = new ContentItemAssetStreamSource(ct => Task.FromResult<Stream>(file.OpenReadStream()));
             var assetMetadata = new ContentItemAssetMetadataWithSource(
                 assetSource,
                 fileName,
@@ -184,7 +188,15 @@ namespace BDO.GWT.GLOBAL.API.Services
             var createParameters = attachmentParameters;
 
             var contentItemManager = contentItemManagerFactory.Create(user.UserID);
-            await contentItemManager.Create(createParameters, createItemData, cancellationToken);
+            int createdContentItemId = await contentItemManager.Create(createParameters, createItemData, cancellationToken);
+
+            // Get the actual GUID of the created content item
+            var createdContentItem = await contentItemInfoProvider.GetAsync(createdContentItemId, cancellationToken);
+            if (createdContentItem is null)
+            {
+                throw new InvalidOperationException("Failed to retrieve the created attachment content item.");
+            }
+            var attachmentGuid = createdContentItem.ContentItemGUID;
 
             // Only update the page if we found an empty attachment field
             if (emptyAttachmentProperty is not null)

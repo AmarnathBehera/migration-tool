@@ -43,6 +43,11 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         }
         [HttpPost]
         [Consumes("multipart/form-data")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation(Summary = "Creates a new attachment for a page")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status201Created, "Attachment created", typeof(PageAttachmentOutput), MediaTypeNames.Application.Json)]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid request")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status404NotFound, "Page not found")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error")]
         public async Task<IActionResult> Post(
        [FromRoute] int memberFirmID,
        [FromRoute] Guid pageGUID,
@@ -58,7 +63,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
                 request.File,
                 cancellationToken);
 
-            return Ok(result);
+            return CreatedAtAction(nameof(Get), new { memberFirmID, pageGUID, attachmentGUID = result.GUID }, result);
         }
 
         [HttpGet("{attachmentGUID:guid}")]

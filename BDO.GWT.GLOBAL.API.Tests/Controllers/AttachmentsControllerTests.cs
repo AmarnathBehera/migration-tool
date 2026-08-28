@@ -199,7 +199,7 @@ public class AttachmentsControllerTests
     }
 
     [Test]
-    public async Task Post_WhenAttachmentCreated_ReturnsOkWithResult()
+    public async Task Post_WhenAttachmentCreated_ReturnsCreatedAtAction()
     {
         var pageGuid = Guid.NewGuid();
         var file = new FormFile(new MemoryStream([1, 2, 3]), 0, 3, "file", "sample.pdf");
@@ -212,9 +212,10 @@ public class AttachmentsControllerTests
         var request = new AttachmentsController.CreateAttachmentRequest { Culture = "en-gb", File = file };
         var result = await _controller.Post(1, pageGuid, request, CancellationToken.None);
 
-        Assert.That(result, Is.InstanceOf<OkObjectResult>());
-        var okResult = (OkObjectResult)result;
-        Assert.That(okResult.Value, Is.EqualTo(expected));
+        Assert.That(result, Is.InstanceOf<CreatedAtActionResult>());
+        var createdResult = (CreatedAtActionResult)result;
+        Assert.That(createdResult.Value, Is.EqualTo(expected));
+        Assert.That(createdResult.ActionName, Is.EqualTo(nameof(AttachmentsController.Get)));
     }
 
     [Test]
