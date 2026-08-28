@@ -61,10 +61,7 @@ public class MarketingContactManagementService : IMarketingContactManagementServ
 
     public Task UpdateMarketingContactAsync(ContactInfo contact, CancellationToken cancellationToken)
     {
-        if (contact is null)
-        {
-            throw new ArgumentNullException(nameof(contact));
-        }
+        ArgumentNullException.ThrowIfNull(contact);
 
         // Ensure we only update the exact record identified by ContactID.
         // A ContactID of 0 would cause Kentico to INSERT and potentially match/merge
