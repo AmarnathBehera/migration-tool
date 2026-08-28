@@ -63,9 +63,8 @@ public class InsightCardService : IInsightCardService
             new RetrievePagesParameters
             {
                 LinkedItemsMaxLevel = 4,
-
-                PathMatch = PathMatch.Children(parentPath)
-
+                PathMatch = PathMatch.Children(parentPath),
+                LanguageName = language
             },
             query =>
             {

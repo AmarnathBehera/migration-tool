@@ -18,10 +18,12 @@ public class QuoteCardWidgetProperties : BaseWidgetProperties
     [ContentItemSelectorComponent(ContentAttachment.CONTENT_TYPE_NAME,
     Label = "Image",
     Order = 2,
-    ExplanationText = "Recommended size depends on usage but a 3:2 aspect ratio works well for most instances.")]
+    ExplanationText = "Recommended size depends on usage but a 3:2 aspect ratio works well for most instances.",MaximumItems =1)]
     public IEnumerable<ContentItemReference> Image { get; set; } = new List<ContentItemReference>();
   
     [TextInputComponent(Label = "Image alt text", Order = 3)]
+    [RequiredValidationRule]
+    [VisibleIfNotEmpty(nameof(Image))]
     public string ImageAltText { get; set; }
 
     [RichTextEditorComponent(Order = 4, Label = "Quote text", ExplanationText = "Recommended quote text length is under 100 words.")]
