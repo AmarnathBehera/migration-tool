@@ -412,6 +412,82 @@ namespace BDO.GWT.GLOBAL.API.Services
             return newAttachment is null ? null : Map(newAttachment);
         }
 
+        public async Task<bool> DeleteAttachmentAsync(
+            int channelId,
+            Guid pageGuid,
+            Guid attachmentGuid,
+            string culture,
+            CancellationToken cancellationToken = default)
+        {
+            var channelName = await pageChannelResolver.GetChannelNameByPageGuidAsync(pageGuid, cancellationToken);
+            if (channelName is null)
+            {
+                return false;
+            }
+
+            // Get the page to find which field contains the attachment
+            var page = (await contentService.GetItemsByGUIDForAPIAsync(new List<Guid> { pageGuid }, channelName, culture))
+                ?.FirstOrDefault();
+            if (page is null)
+            {
+                return false;
+            }
+
+            // Find the attachment property that contains the attachment GUID
+            var allAttachmentProperties = page.GetType().GetProperties()
+                .Where(x => typeof(IEnumerable<BDO.ContentAttachment>).IsAssignableFrom(x.PropertyType))
+                .ToList();
+
+            System.Reflection.PropertyInfo? targetProperty = null;
+            foreach (var prop in allAttachmentProperties)
+            {
+                var attachments = prop.GetValue(page) as IEnumerable<BDO.ContentAttachment>;
+                if (attachments?.Any(a => a.SystemFields.ContentItemGUID == attachmentGuid) == true)
+                {
+                    targetProperty = prop;
+                    break;
+                }
+            }
+
+            if (targetProperty is null)
+            {
+                // Attachment not found on this page
+                return false;
+            }
+
+            var user = userInfoProvider.Get("administrator");
+
+            // Get current attachments in the field and remove the one to delete
+            var fieldAttachments = targetProperty.GetValue(page) as IEnumerable<BDO.ContentAttachment>
+                ?? Enumerable.Empty<BDO.ContentAttachment>();
+
+            var references = fieldAttachments
+                .Where(x => x.SystemFields.ContentItemGUID != attachmentGuid) // Exclude the one to delete
+                .Select(x => new ContentItemReference { Identifier = x.SystemFields.ContentItemGUID })
+                .ToList();
+
+            var updateData = new ContentItemData(new Dictionary<string, object>
+            {
+                { targetProperty.Name, references }
+            });
+
+            // Update the page to remove the attachment reference
+            var webPageManager = webPageManagerFactory.Create(channelId, user.UserID);
+            await webPageManager.TryCreateDraft(page.SystemFields.WebPageItemID, culture, cancellationToken);
+
+            if (!await webPageManager.TryUpdateDraft(page.SystemFields.WebPageItemID, culture, new UpdateDraftData(updateData), cancellationToken))
+            {
+                throw new InvalidOperationException("Failed to update page to remove attachment reference.");
+            }
+
+            if (!await webPageManager.TryPublish(page.SystemFields.WebPageItemID, culture, cancellationToken))
+            {
+                throw new InvalidOperationException("Failed to publish page after removing attachment reference.");
+            }
+
+            return true;
+        }
+
 
         private static PageAttachmentOutput Map(BDO.ContentAttachment attachment)
         {

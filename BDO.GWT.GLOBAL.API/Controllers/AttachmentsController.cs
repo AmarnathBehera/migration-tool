@@ -152,5 +152,38 @@ namespace BDO.GWT.GLOBAL.API.Controllers
                 ? NotFound()
                 : Ok(result);
         }
+
+        /// <summary>
+        /// Deletes an attachment from a page.
+        /// </summary>
+        /// <param name="memberFirmID">ID of the member firm.</param>
+        /// <param name="pageGUID">Page GUID containing the attachment.</param>
+        /// <param name="attachmentGUID">GUID of the attachment to delete.</param>
+        /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>204 No Content if successful, 404 if attachment or page not found.</returns>
+        [HttpDelete("{attachmentGUID:guid}")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation(Summary = "Deletes an attachment from a page")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status204NoContent, "Attachment deleted")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status404NotFound, "Attachment or page not found")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error")]
+        public async Task<IActionResult> Delete(
+            [FromRoute] int memberFirmID,
+            [FromRoute] Guid pageGUID,
+            [FromRoute] Guid attachmentGUID,
+            [FromQuery][Required] string culture,
+            CancellationToken cancellationToken)
+        {
+            int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
+
+            var deleted = await attachmentService.DeleteAttachmentAsync(
+                channelId,
+                pageGUID,
+                attachmentGUID,
+                culture,
+                cancellationToken);
+
+            return deleted ? NoContent() : NotFound();
+        }
     }
 }

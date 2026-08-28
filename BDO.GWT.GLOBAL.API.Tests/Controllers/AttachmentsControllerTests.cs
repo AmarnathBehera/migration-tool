@@ -334,4 +334,53 @@ public class AttachmentsControllerTests
             x => x.UpdateAttachmentAsync(42, pageGuid, attachmentGuid, "fr-fr", file, cts.Token),
             Times.Once);
     }
+
+    [Test]
+    public async Task Delete_WhenAttachmentExists_ReturnsNoContent()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+
+        _attachmentServiceMock
+            .Setup(x => x.DeleteAttachmentAsync(42, pageGuid, attachmentGuid, "en-gb", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        var result = await _controller.Delete(1, pageGuid, attachmentGuid, "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.InstanceOf<NoContentResult>());
+    }
+
+    [Test]
+    public async Task Delete_WhenAttachmentNotFound_ReturnsNotFound()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+
+        _attachmentServiceMock
+            .Setup(x => x.DeleteAttachmentAsync(42, pageGuid, attachmentGuid, "en-gb", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
+        var result = await _controller.Delete(1, pageGuid, attachmentGuid, "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.InstanceOf<NotFoundResult>());
+    }
+
+    [Test]
+    public async Task Delete_ForwardsArgumentsToService()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+        using var cts = new CancellationTokenSource();
+
+        _attachmentServiceMock
+            .Setup(x => x.DeleteAttachmentAsync(
+                It.IsAny<int>(), It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>(), cts.Token))
+            .ReturnsAsync(true);
+
+        await _controller.Delete(999, pageGuid, attachmentGuid, "fr-fr", cts.Token);
+
+        _attachmentServiceMock.Verify(
+            x => x.DeleteAttachmentAsync(42, pageGuid, attachmentGuid, "fr-fr", cts.Token),
+            Times.Once);
+    }
 }

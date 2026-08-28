@@ -38,5 +38,12 @@ namespace BDO.GWT.GLOBAL.API.Data
             Guid attachmentGuid,
             string culture,
             CancellationToken cancellationToken = default);
+
+        Task<bool> DeleteAttachmentAsync(
+            int channelId,
+            Guid pageGuid,
+            Guid attachmentGuid,
+            string culture,
+            CancellationToken cancellationToken = default);
     }
 }
