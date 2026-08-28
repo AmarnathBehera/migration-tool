@@ -25,9 +25,11 @@ namespace BDO.GWT.Controllers.API
         [HttpGet("{pageGuid:Guid}/[action]")]
         public async Task<ActionResult<PaginationDto<ContentPageCardDto>>> Get([FromRoute] Guid pageGuid, [FromQuery] CardsQuery query, CancellationToken cancellationToken)
         {
+            var language = RouteData.Values[CultureInjectorAttribute.RouteParameter]?.ToString();
+
             query.Filters = RequestQueryUtility.ExtractFilterQueryParameters(Request.Query);
 
-            var result = await _insightCardListingPageService.GetContentPaginationResultAsync(pageGuid, query, cancellationToken);
+            var result = await _insightCardListingPageService.GetContentPaginationResultAsync(pageGuid, query, cancellationToken, language);
 
             return Ok(result);
         }

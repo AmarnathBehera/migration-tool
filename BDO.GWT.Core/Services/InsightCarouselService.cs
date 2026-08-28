@@ -21,7 +21,7 @@ public interface IInsightCarouselService
     Task<ICollection<ContentPageCardDto>> GetFilteredItemsAsync<T>(T currentPage, HashSet<ContentItemReference> featuredGuids, CardsQuery query, CancellationToken cancellationToken)
         where T : IWebPageFieldsSource;
 
-    Task<ICollection<ContentPageCardDto>> GetAPIFilteredItemsAsync(CardsQuery query, CancellationToken cancellationToken);
+    Task<ICollection<ContentPageCardDto>> GetAPIFilteredItemsAsync(CardsQuery query, string? language, CancellationToken cancellationToken);
 }
 
 public class InsightCarouselService : IInsightCarouselService
@@ -94,11 +94,12 @@ public class InsightCarouselService : IInsightCarouselService
             currentPage.GetType().Name,
             featuredGuids,
             query,
+            null,
             cancellationToken);
     }
 
 
-    public async Task<ICollection<ContentPageCardDto>> GetAPIFilteredItemsAsync(CardsQuery query, CancellationToken cancellationToken)
+    public async Task<ICollection<ContentPageCardDto>> GetAPIFilteredItemsAsync(CardsQuery query, string? language, CancellationToken cancellationToken)
     {
         var featuredGuids = new HashSet<ContentItemReference>();
 
@@ -112,6 +113,7 @@ public class InsightCarouselService : IInsightCarouselService
             query.PageType ?? string.Empty,
             featuredGuids,
             query,
+            language,
             cancellationToken);
     }
 
@@ -120,6 +122,7 @@ public class InsightCarouselService : IInsightCarouselService
         string pageTypeName,
         HashSet<ContentItemReference> featuredGuids,
         CardsQuery query,
+        string? language,
         CancellationToken cancellationToken)
     {
         var whereExpressions = new List<Action<WhereParameters>>();
@@ -189,7 +192,7 @@ public class InsightCarouselService : IInsightCarouselService
         var paginationDto = await _insightCardService.GetFilteredItemsAsync(
             query,
             "/",
-            _contentService.GetCurrentLanguage(),
+            string.IsNullOrWhiteSpace(language) ? _contentService.GetCurrentLanguage() : language,
             decorateQuery,
             item => featuredGuids.Any(r => r.Identifier == item.SystemFields.ContentItemGUID),
             cancellationToken);

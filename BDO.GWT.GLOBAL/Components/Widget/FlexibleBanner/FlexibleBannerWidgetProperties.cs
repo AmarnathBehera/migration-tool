@@ -19,6 +19,8 @@ public class FlexibleBannerWidgetProperties : BaseWidgetProperties
     public IEnumerable<ContentItemReference> BackgroundImage { get; set; }
 
     [TextInputComponent(Label = "Background image alt text", Order = 3)]
+    [VisibleIfNotEmpty(nameof(BackgroundImage))]
+    [RequiredValidationRule]
     public string BackgroundImageAltText { get; set; }
 
     [RadioGroupComponent(Label = "Light / Dark theme", Order = 4, Options = "light;Light theme\r\ndark;Dark theme")]
@@ -27,6 +29,7 @@ public class FlexibleBannerWidgetProperties : BaseWidgetProperties
     [RadioGroupComponent(Label = "Button side", Order = 5, Options = "left;Left\r\nright;Right")]
     //[VisibleIfEqualTo(nameof(Layout), new[] {"col-2" , "col-2-shadowed"})]
     //[VisibleIfEqualTo(nameof(Layout), "col-2-shadowed")]
+    [VisibleIfNotEqualTo(nameof(Layout), "col-1")]
     public string ButtonSide { get; set; } = "right";
 
     #region Primary button

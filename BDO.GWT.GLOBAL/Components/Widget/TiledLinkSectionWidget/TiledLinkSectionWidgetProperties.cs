@@ -21,11 +21,13 @@ public class TiledLinkSectionWidgetProperties : BaseWidgetProperties
     public string? Description { get; set; }
 
 
-    [ContentItemSelectorComponent(ContentAttachment.CONTENT_TYPE_NAME, Label = "Background Image", Order = 2)]
+    [ContentItemSelectorComponent(ContentAttachment.CONTENT_TYPE_NAME, Label = "Background Image", Order = 2, MaximumItems = 1)]
     public IEnumerable<ContentItemReference> BackgroundImages { get; set; } = new List<ContentItemReference>();
 
 
     [TextInputComponent(Label = "Background image alt text", Order = 3)]
+    [VisibleIfNotEmpty(nameof(BackgroundImages))]
+    [RequiredValidationRule]
     public string BackgroundImageAltText { get; set; } = "";
 
     [DropDownComponent(Label = "Tile page type", Order = 4, Options = "Industry;Industry\r\nService;Service")]
