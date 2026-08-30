@@ -6,6 +6,14 @@ namespace BDO.GWT.GLOBAL.API.Data;
 public interface IMediaFileCrudService
 {
     /// <summary>
+    /// Gets all media files in the specified Content Hub workspace.
+    /// </summary>
+    /// <param name="workspaceName">The name of the content hub workspace.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>A list of all media file outputs in the workspace.</returns>
+    Task<IEnumerable<MediaFileOutput>> GetMediaFilesAsync(string workspaceName, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Gets a single media file by workspace name and attachment GUID.
     /// </summary>
     /// <param name="workspaceName">The name of the content hub workspace.</param>

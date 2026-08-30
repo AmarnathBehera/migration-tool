@@ -21,6 +21,25 @@ public class MediaFileController : EntityControllerBase
     }
 
     /// <summary>
+    /// Returns all media files in the specified Content Hub workspace.
+    /// </summary>
+    /// <param name="memberFirmID">The ID of the member firm.</param>
+    /// <param name="workspaceName">The name of the Content Hub workspace.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Returns a list of all media files in the workspace.</returns>
+    [HttpGet]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns all media files in the workspace.", typeof(IEnumerable<MediaFileOutput>), MediaTypeNames.Application.Json)]
+    public async Task<ActionResult<IEnumerable<MediaFileOutput>>> GetMediaFilesAsync(
+        int memberFirmID,
+        string workspaceName,
+        CancellationToken cancellationToken)
+    {
+        var mediaFiles = await _mediaFileCrudService.GetMediaFilesAsync(workspaceName, cancellationToken);
+
+        return Ok(mediaFiles);
+    }
+
+    /// <summary>
     /// Returns a single media file for a page having the specified media file GUID.
     /// </summary>
     /// <param name="memberFirmID">The ID of the member firm.</param>

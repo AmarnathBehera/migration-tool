@@ -22,6 +22,35 @@ public class MediaFileCrudService : IMediaFileCrudService
     }
 
     /// <inheritdoc/>
+    public async Task<IEnumerable<MediaFileOutput>> GetMediaFilesAsync(string workspaceName, CancellationToken cancellationToken)
+    {
+        var results = new List<MediaFileOutput>();
+
+        // Collect from BDO.ContentAttachment (primary content type for images)
+        var contentAttachments = await GetAllMediaFilesFromContentTypeAsync<ContentAttachment>(
+            ContentAttachment.CONTENT_TYPE_NAME,
+            item => item.ContentAttachmentAsset,
+            cancellationToken);
+        results.AddRange(contentAttachments);
+
+        // Collect from Legacy.MediaFile
+        var legacyMediaFiles = await GetAllMediaFilesFromContentTypeAsync<MediaFile>(
+            MediaFile.CONTENT_TYPE_NAME,
+            item => item.LegacyMediaFileAsset,
+            cancellationToken);
+        results.AddRange(legacyMediaFiles);
+
+        // Collect from MigratedMediaFile
+        var migratedMediaFiles = await GetAllMediaFilesFromContentTypeAsync<MigratedMediaFile>(
+            MigratedMediaFile.CONTENT_TYPE_NAME,
+            item => item.MediaFile,
+            cancellationToken);
+        results.AddRange(migratedMediaFiles);
+
+        return results;
+    }
+
+    /// <inheritdoc/>
     public async Task<MediaFileOutput?> GetMediaFileAsync(string workspaceName, Guid attachmentGuid, CancellationToken cancellationToken)
     {
         // Try to get from BDO.ContentAttachment content type first (primary content type for images)
@@ -56,6 +85,49 @@ public class MediaFileCrudService : IMediaFileCrudService
             cancellationToken);
 
         return migratedResult;
+    }
+
+    private async Task<IEnumerable<MediaFileOutput>> GetAllMediaFilesFromContentTypeAsync<T>(
+        string contentTypeName,
+        Func<T, ContentItemAsset?> assetSelector,
+        CancellationToken cancellationToken)
+        where T : class, IContentItemFieldsSource
+    {
+        var query = new ContentItemQueryBuilder()
+            .ForContentType(contentTypeName);
+
+        var results = await _contentQueryExecutor.GetMappedResult<T>(query, cancellationToken: cancellationToken);
+
+        var outputs = new List<MediaFileOutput>();
+        foreach (var item in results)
+        {
+            var asset = assetSelector(item);
+            if (asset == null)
+            {
+                continue;
+            }
+
+            var assetUrl = asset.Url ?? string.Empty;
+            var fileName = GetFileNameFromUrl(assetUrl);
+            var extension = System.IO.Path.GetExtension(fileName);
+
+            if (!_contentTypeProvider.TryGetContentType(fileName, out var mimeType))
+            {
+                mimeType = GetMimeTypeFromExtension(extension);
+            }
+
+            outputs.Add(new MediaFileOutput
+            {
+                Id = item.SystemFields.ContentItemID,
+                Path = fileName,
+                MimeType = mimeType ?? "application/octet-stream",
+                Extension = extension,
+                Guid = item.SystemFields.ContentItemGUID,
+                Link = $"~/getmedia/{item.SystemFields.ContentItemGUID}/{fileName}"
+            });
+        }
+
+        return outputs;
     }
 
     private async Task<MediaFileOutput?> GetMediaFileFromContentTypeAsync<T>(
