@@ -1,5 +1,6 @@
 ﻿using BDO.GWT.Core.Services;
 using BDO.GWT.GLOBAL.API.ApiClients;
+using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Helpers;
 using BDO.GWT.GLOBAL.API.Middleware;
 using BDO.GWT.GLOBAL.API.Options;
@@ -59,5 +60,6 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IUserApiPermissionsCrudService, UserApiPermissionsCrudService>();
         serviceCollection.AddScoped<ILicenseKeysCrudService, LicenseKeysCrudService>();
         serviceCollection.AddScoped<IScheduledTaskCrudService, ScheduledTaskCrudService>();
+        serviceCollection.AddScoped<IMediaFileCrudService, MediaFileCrudService>();
     }
 }
