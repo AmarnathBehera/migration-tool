@@ -1,6 +1,8 @@
 using BDO.GWT.GLOBAL.API.Bases;
 using BDO.GWT.GLOBAL.API.Data;
+using BDO.GWT.GLOBAL.API.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Mime;
 
@@ -64,5 +66,102 @@ public class MediaFileController : EntityControllerBase
         }
 
         return Ok(mediaFile);
+    }
+
+    /// <summary>
+    /// Gets the binary content of a media file having the specified GUID.
+    /// </summary>
+    /// <param name="memberFirmID">The ID of the member firm.</param>
+    /// <param name="workspaceName">The name of the Content Hub workspace.</param>
+    /// <param name="attachmentGuid">The GUID of the media file attachment.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Returns the binary file content.</returns>
+    [HttpGet("{attachmentGuid:guid}/binary")]
+    [SwaggerOperation(Summary = "Gets media file binary content")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Media file binary content.", typeof(byte[]), MediaTypeNames.Application.Octet)]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Media file not found.")]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error.")]
+    public async Task<IActionResult> GetBinaryAsync(
+        int memberFirmID,
+        string workspaceName,
+        Guid attachmentGuid,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediaFileCrudService.DownloadMediaFileAsync(workspaceName, attachmentGuid, cancellationToken);
+
+        if (result is null)
+        {
+            return NotFound();
+        }
+
+        Response.GetTypedHeaders().ContentDisposition = new ContentDispositionHeaderValue("attachment");
+
+        return File(result.Stream, MediaTypeNames.Application.Octet);
+    }
+
+    /// <summary>
+    /// Creates a new media file in the specified Content Hub workspace.
+    /// </summary>
+    [HttpPost]
+    [Consumes("multipart/form-data")]
+    [SwaggerOperation(Summary = "Creates a new media file in the workspace")]
+    [SwaggerResponse(StatusCodes.Status201Created, "Media file created.", typeof(MediaFileOutput), MediaTypeNames.Application.Json)]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid request.")]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error.")]
+    public async Task<ActionResult<MediaFileOutput>> CreateMediaFileAsync(
+        [FromRoute] int memberFirmID,
+        [FromRoute] string workspaceName,
+        [FromForm] MediaFileInput input,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediaFileCrudService.CreateMediaFileAsync(workspaceName, input, cancellationToken);
+
+        return CreatedAtAction(
+            nameof(GetMediaFileAsync),
+            new { memberFirmID, workspaceName, attachmentGuid = result.Guid },
+            result);
+    }
+
+    /// <summary>
+    /// Updates an existing media file in the specified Content Hub workspace.
+    /// </summary>
+    [HttpPut("{attachmentGuid:guid}")]
+    [Consumes("multipart/form-data")]
+    [SwaggerOperation(Summary = "Updates an existing media file")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Media file updated.", typeof(MediaFileOutput), MediaTypeNames.Application.Json)]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid request.")]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Media file not found.")]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error.")]
+    public async Task<ActionResult<MediaFileOutput>> UpdateMediaFileAsync(
+        [FromRoute] int memberFirmID,
+        [FromRoute] string workspaceName,
+        [FromRoute] Guid attachmentGuid,
+        [FromForm] MediaFileInput input,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediaFileCrudService.UpdateMediaFileAsync(workspaceName, attachmentGuid, input, cancellationToken);
+
+        return result is null
+            ? NotFound()
+            : Ok(result);
+    }
+
+    /// <summary>
+    /// Deletes a media file from the specified Content Hub workspace.
+    /// </summary>
+    [HttpDelete("{attachmentGuid:guid}")]
+    [SwaggerOperation(Summary = "Deletes a media file from the workspace")]
+    [SwaggerResponse(StatusCodes.Status204NoContent, "Media file deleted.")]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Media file not found.")]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error.")]
+    public async Task<IActionResult> DeleteMediaFileAsync(
+        [FromRoute] int memberFirmID,
+        [FromRoute] string workspaceName,
+        [FromRoute] Guid attachmentGuid,
+        CancellationToken cancellationToken)
+    {
+        var deleted = await _mediaFileCrudService.DeleteMediaFileAsync(workspaceName, attachmentGuid, cancellationToken);
+
+        return deleted ? NoContent() : NotFound();
     }
 }
