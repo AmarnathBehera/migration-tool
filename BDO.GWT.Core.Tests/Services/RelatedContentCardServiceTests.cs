@@ -773,6 +773,28 @@ public class RelatedContentCardServiceTests
     }
 
     [Test]
+    public async Task GetFilteredItemsAsync_InsightCard_MapsComingSoon()
+    {
+        var insight = CreateInsight(Guid.NewGuid(), new InsightOptions { ComingSoon = true });
+        SetupInsightRetrieval(new[] { insight });
+
+        var result = await _sut.GetFilteredItemsAsync(BasicQuery(nameof(Insight)), "/", "en-gb", null, _ => false, CancellationToken.None);
+
+        Assert.That(result.Data.Single().isComingSoon, Is.True);
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_BlogPostCard_IsComingSoonAlwaysFalse()
+    {
+        var blogPost = CreateBlogPost(Guid.NewGuid());
+        SetupRetrieval<BlogPost>(new[] { blogPost });
+
+        var result = await _sut.GetFilteredItemsAsync(BasicQuery(nameof(BlogPost)), "/", "en-gb", null, _ => false, CancellationToken.None);
+
+        Assert.That(result.Data.Single().isComingSoon, Is.False);
+    }
+
+    [Test]
     public async Task GetFilteredItemsAsync_InsightCard_MapsContentTypeAndDateAndDescription()
     {
         var publishDate = DateTime.UtcNow.AddDays(-2);
@@ -1163,6 +1185,7 @@ public class RelatedContentCardServiceTests
         public IEnumerable<ServiceArea>? ServiceAreas { get; init; }
         public IEnumerable<IndustryCategory>? IndustryCategories { get; init; }
         public string? Description { get; init; }
+        public bool ComingSoon { get; init; }
     }
 
     private static Insight CreateInsight(Guid guid, InsightOptions? options = null)
@@ -1177,6 +1200,7 @@ public class RelatedContentCardServiceTests
         SetProperty(insight, nameof(Insight.MetadataBusinessLine), options.BusinessLines ?? Enumerable.Empty<BusinessLine>());
         SetProperty(insight, nameof(Insight.MetadataServiceAreas), options.ServiceAreas ?? Enumerable.Empty<ServiceArea>());
         SetProperty(insight, nameof(Insight.MetadataIndustryCategories), options.IndustryCategories ?? Enumerable.Empty<IndustryCategory>());
+        SetProperty(insight, nameof(Insight.ComingSoon), options.ComingSoon);
 
         var insightContentProp = typeof(Insight).GetProperty(nameof(Insight.InsightContent));
         var elementType = insightContentProp?.PropertyType.GetGenericArguments().FirstOrDefault();
