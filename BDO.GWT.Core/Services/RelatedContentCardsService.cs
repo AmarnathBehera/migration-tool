@@ -259,16 +259,16 @@ public class RelatedContentCardService : IRelatedContentCardService
 
         var card = page switch
         {
-            Insight i => BuildCard(i, isFeatured,
+            Insight i => BuildCard(i, isFeatured, new CardContent(
                 i.InsightContent.FirstOrDefault()?.ImageFile.FirstOrDefault()?.ContentAttachmentAsset?.Url,
                 i.InsightContent.FirstOrDefault()?.ImageFileAltText,
-                i.ContentType?.FirstOrDefault()?.Name, i.MetadataTitle, i.MetadataDescription, i.ComingSoon),
+                i.ContentType?.FirstOrDefault()?.Name, i.MetadataTitle, i.MetadataDescription, i.ComingSoon)),
 
-            BlogPost b     => BuildCard(b, isFeatured, Teaser(b.MetadataTeaserImage), b.MetadataTeaserImageAltText, b.ContentType?.FirstOrDefault()?.Name, b.MetadataTitle, b.MetadataDescription),
-            NewsArticle n  => BuildCard(n, isFeatured, Teaser(n.MetadataTeaserImage), n.MetadataTeaserImageAltText, n.ContentType?.FirstOrDefault()?.Name, n.MetadataTitle, n.MetadataDescription),
-            Event e        => BuildCard(e, isFeatured, Teaser(e.MetadataTeaserImage), e.MetadataTeaserImageAltText, e.ContentType?.FirstOrDefault()?.Name, e.MetadataTitle, e.MetadataDescription),
-            Webinar w      => BuildCard(w, isFeatured, Teaser(w.MetadataTeaserImage), w.MetadataTeaserImageAltText, w.ContentType?.FirstOrDefault()?.Name, w.MetadataTitle, w.MetadataDescription),
-            MicrositePage m => BuildCard(m, isFeatured, Teaser(m.MetadataTeaserImage), m.MetadataTeaserImageAltText, m.MicrositeContentType?.FirstOrDefault()?.Name, m.MetadataTitle, m.MetadataDescription),
+            BlogPost b     => BuildCard(b, isFeatured, new CardContent(Teaser(b.MetadataTeaserImage), b.MetadataTeaserImageAltText, b.ContentType?.FirstOrDefault()?.Name, b.MetadataTitle, b.MetadataDescription)),
+            NewsArticle n  => BuildCard(n, isFeatured, new CardContent(Teaser(n.MetadataTeaserImage), n.MetadataTeaserImageAltText, n.ContentType?.FirstOrDefault()?.Name, n.MetadataTitle, n.MetadataDescription)),
+            Event e        => BuildCard(e, isFeatured, new CardContent(Teaser(e.MetadataTeaserImage), e.MetadataTeaserImageAltText, e.ContentType?.FirstOrDefault()?.Name, e.MetadataTitle, e.MetadataDescription)),
+            Webinar w      => BuildCard(w, isFeatured, new CardContent(Teaser(w.MetadataTeaserImage), w.MetadataTeaserImageAltText, w.ContentType?.FirstOrDefault()?.Name, w.MetadataTitle, w.MetadataDescription)),
+            MicrositePage m => BuildCard(m, isFeatured, new CardContent(Teaser(m.MetadataTeaserImage), m.MetadataTeaserImageAltText, m.MicrositeContentType?.FirstOrDefault()?.Name, m.MetadataTitle, m.MetadataDescription)),
 
             _ => null
         };
@@ -276,28 +276,22 @@ public class RelatedContentCardService : IRelatedContentCardService
         return Task.FromResult(card!);
     }
 
-    
     private ContentPageCardDto BuildCard(
         IWebPageFieldsSource page,
         Func<IWebPageFieldsSource, bool> isFeatured,
-        string? imageUrl,
-        string? imageAltText,
-        string? type,
-        string? title,
-        string? description,
-        bool isComingSoon = false) =>
+        CardContent content) =>
         new ContentPageCardDto
         {
             IsFeatured = isFeatured(page),
-            ImageURL = GetAbsoluteAssetUrl(imageUrl),
-            isComingSoon = isComingSoon,
-            ImageAltText = imageAltText,
-            Type = type,
-            Title = title,
+            ImageURL = GetAbsoluteAssetUrl(content.ImageUrl),
+            isComingSoon = content.IsComingSoon,
+            ImageAltText = content.ImageAltText,
+            Type = content.Type,
+            Title = content.Title ?? string.Empty,
             Date = page.SystemFields.ContentItemCommonDataLastPublishedWhen
                    ?? page.SystemFields.ContentItemCommonDataFirstPublishedWhen,
             UpdatedOnDate = null,
-            Description = HtmlHelper.ExtractTextFromHtml(description),
+            Description = HtmlHelper.ExtractTextFromHtml(content.Description),
             ReadMoreLink = new LinkItemDto
             {
                 Title = ResourceStringKey.LiveSite.ReadMore,
@@ -305,7 +299,11 @@ public class RelatedContentCardService : IRelatedContentCardService
             }
         };
 
-
-
-    
+    private readonly record struct CardContent(
+        string? ImageUrl,
+        string? ImageAltText,
+        string? Type,
+        string? Title,
+        string? Description,
+        bool IsComingSoon = false);
 }
