@@ -74,42 +74,42 @@ public class RelatedContentCardService : IRelatedContentCardService
             IEnumerable<IWebPageFieldsSource> pages = pageType switch
             {
                 nameof(Insight) => await _contentRetriever.RetrievePages<Insight, Insight>(
-                    new RetrievePagesParameters { LinkedItemsMaxLevel = 4, PathMatch = PathMatch.Children(parentPath) },
+                    new RetrievePagesParameters { LinkedItemsMaxLevel = 4, PathMatch = PathMatch.Children(parentPath), LanguageName= language },
                     query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
                     RetrievalCacheSettings.CacheDisabled,
                     (_, page) => Task.FromResult(page),
                     cancellationToken),
 
                 nameof(BlogPost) => await _contentRetriever.RetrievePages<BlogPost, BlogPost>(
-                    new RetrievePagesParameters { LinkedItemsMaxLevel = 4, PathMatch = PathMatch.Children(parentPath) },
+                    new RetrievePagesParameters { LinkedItemsMaxLevel = 4, PathMatch = PathMatch.Children(parentPath), LanguageName= language },
                     query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
                     RetrievalCacheSettings.CacheDisabled,
                     (_, page) => Task.FromResult(page),
                     cancellationToken),
 
                 nameof(NewsArticle) => await _contentRetriever.RetrievePages<NewsArticle, NewsArticle>(
-                    new RetrievePagesParameters { LinkedItemsMaxLevel = 4, PathMatch = PathMatch.Children(parentPath) },
+                    new RetrievePagesParameters { LinkedItemsMaxLevel = 4, PathMatch = PathMatch.Children(parentPath), LanguageName= language },
                     query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
                     RetrievalCacheSettings.CacheDisabled,
                     (_, page) => Task.FromResult(page),
                     cancellationToken),
 
                 nameof(Event) => await _contentRetriever.RetrievePages<Event, Event>(
-                    new RetrievePagesParameters { LinkedItemsMaxLevel = 4, PathMatch = PathMatch.Children(parentPath) },
+                    new RetrievePagesParameters { LinkedItemsMaxLevel = 4, PathMatch = PathMatch.Children(parentPath), LanguageName= language },
                     query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
                     RetrievalCacheSettings.CacheDisabled,
                     (_, page) => Task.FromResult(page),
                     cancellationToken),
 
                 nameof(Webinar) => await _contentRetriever.RetrievePages<Webinar, Webinar>(
-                    new RetrievePagesParameters { LinkedItemsMaxLevel = 4, PathMatch = PathMatch.Children(parentPath) },
+                    new RetrievePagesParameters { LinkedItemsMaxLevel = 4, PathMatch = PathMatch.Children(parentPath), LanguageName= language },
                     query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
                     RetrievalCacheSettings.CacheDisabled,
                     (_, page) => Task.FromResult(page),
                     cancellationToken),
 
                 nameof(MicrositePage) => await _contentRetriever.RetrievePages<MicrositePage, MicrositePage>(
-                    new RetrievePagesParameters { LinkedItemsMaxLevel = 4, PathMatch = PathMatch.Children(parentPath) },
+                    new RetrievePagesParameters { LinkedItemsMaxLevel = 4, PathMatch = PathMatch.Children(parentPath), LanguageName = language },
                     query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
                     RetrievalCacheSettings.CacheDisabled,
                     (_, page) => Task.FromResult(page),
@@ -144,12 +144,14 @@ public class RelatedContentCardService : IRelatedContentCardService
             .Take(pageSize)
             .ToArray();
 
-        var itemDtos = await Task.WhenAll(
-            paginated.Select(page => GetContentPageCardDtoAsync(page, isFeatured)));
+        var itemDtos = (await Task.WhenAll(
+     paginated.Select(page => GetContentPageCardDtoAsync(page, isFeatured))))
+     .Where(card => card is not null)
+     .ToArray();
 
         return new PaginationDto<ContentPageCardDto>
         {
-            Data = itemDtos,
+            Data = itemDtos!,
             TotalCount = ordered.Length
         };
     }
@@ -285,10 +287,10 @@ public class RelatedContentCardService : IRelatedContentCardService
             Event e => BuildEventCard(e, isFeatured),
             Webinar w => BuildWebinarCard(w, isFeatured),
             MicrositePage m => BuildMicrositePageCard(m, isFeatured),
-            _ => throw new InvalidOperationException($"Unhandled page type: {page.GetType().Name}")
+            _ => null
         };
 
-        return Task.FromResult(card);
+        return Task.FromResult(card!);
     }
 
     private ContentPageCardDto BuildInsightCard(Insight page, Func<IWebPageFieldsSource, bool> isFeatured)
