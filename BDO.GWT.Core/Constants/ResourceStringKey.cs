@@ -111,5 +111,32 @@ public static class ResourceStringKey
 
             public const string RelevantContactPeople = CareersPrefix + "RelevantContactPeople";
         }
+
+        public static class SearchPage
+        {
+            private const string SearchPagePrefix = LiveSitePrefix + "SearchPage.";
+
+            public const string Deals = SearchPagePrefix + "Deals";
+
+            public const string Industries = SearchPagePrefix + "Industries";
+
+            public const string Insights = SearchPagePrefix + "Insights";
+
+            public const string Services = SearchPagePrefix + "Services";
+
+            public const string People = SearchPagePrefix + "People";
+
+            public const string Blogs = SearchPagePrefix + "Blogs";
+
+            public const string News = SearchPagePrefix + "News";
+
+            public const string Specialties = SearchPagePrefix + "Specialties";
+
+            public const string EventsWebinars = SearchPagePrefix + "EventsWebinars";
+
+            public const string TopResults = SearchPagePrefix + "TopResults";
+
+            public const string MostRecent = SearchPagePrefix + "MostRecent";
+        }
     }
 }

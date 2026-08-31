@@ -121,7 +121,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             var query = new CardsQuery { PageType = "UnknownType", CurrentPage = null, PageSize = null };
 
-            await _service.GetAPIFilteredItemsAsync(query, CancellationToken.None);
+            await _service.GetAPIFilteredItemsAsync(query,"fr-fr", CancellationToken.None);
             Assert.Multiple(() =>
             {
                 Assert.That(captured, Is.Not.Null);
@@ -144,7 +144,7 @@ namespace BDO.GWT.Core.Tests.Services
                     return true;
                 });
 
-            await _service.GetAPIFilteredItemsAsync(query, CancellationToken.None);
+            await _service.GetAPIFilteredItemsAsync(query,"en-gb", CancellationToken.None);
 
             _stateStoreMock.Verify(x => x.TryGet(stateGuid, out It.Ref<HashSet<ContentItemReference>>.IsAny), Times.Once);
         }

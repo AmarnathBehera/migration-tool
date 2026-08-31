@@ -3,6 +3,7 @@ using BDO.GWT.Core.Services;
 using BDO.GWT.Web.Core.Services;
 using CMS.ContactManagement;
 using CMS.DataEngine;
+using CMS.Globalization;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
@@ -17,6 +18,7 @@ public class SubscribePageServiceTests
     private Mock<IHeroService> _heroServiceMock = null!;
     private Mock<IContentRetriever> _contentRetrieverMock = null!;
     private Mock<IInfoProvider<WebsiteCaptchaSettingsInfo>> _captchaSettingsProviderMock = null!;
+    private Mock<IInfoProvider<CountryInfo>> _countryInfoProviderMock = null!;
     private SubscribePageService _service = null!;
 
     [SetUp]
@@ -27,8 +29,10 @@ public class SubscribePageServiceTests
         _heroServiceMock = new Mock<IHeroService>();
         _contentRetrieverMock = new Mock<IContentRetriever>();
         _captchaSettingsProviderMock = new Mock<IInfoProvider<WebsiteCaptchaSettingsInfo>>();
+        _countryInfoProviderMock = new Mock<IInfoProvider<CountryInfo>>();
 
         _service = new SubscribePageService(
+            _countryInfoProviderMock.Object,
             _recipientListInfoProviderMock.Object,
             _websiteChannelContextMock.Object,
             _heroServiceMock.Object,
