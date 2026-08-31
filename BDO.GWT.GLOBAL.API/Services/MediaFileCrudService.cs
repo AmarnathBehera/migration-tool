@@ -398,7 +398,8 @@ public class MediaFileCrudService : IMediaFileCrudService
         Func<ContentItemAssetMetadataWithSource, Task<T>> action,
         CancellationToken cancellationToken)
     {
-        var fileName = file.FileName;
+        // Sanitize user-supplied filename: take only the base file name to prevent path traversal
+        var fileName = System.IO.Path.GetFileName(file.FileName ?? string.Empty);
         var extension = GetSafeExtension(fileName);
 
         var tempPath = System.IO.Path.GetTempFileName();
