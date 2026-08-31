@@ -293,6 +293,9 @@ public class MediaFileCrudService : IMediaFileCrudService
         };
     }
 
+    // Explicit cross-platform set: null byte, forward/back slashes, and common injection chars
+    private static readonly char[] UnsafeExtensionChars = ['\0', '/', '\\', '|', '<', '>', ':', '"', '?', '*'];
+
     private static string GetSafeExtension(string fileName)
     {
         var extension = System.IO.Path.GetExtension(fileName ?? string.Empty);
@@ -302,9 +305,7 @@ public class MediaFileCrudService : IMediaFileCrudService
             return string.Empty;
         }
 
-        if (extension.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) >= 0
-            || extension.Contains(System.IO.Path.DirectorySeparatorChar)
-            || extension.Contains(System.IO.Path.AltDirectorySeparatorChar))
+        if (extension.IndexOfAny(UnsafeExtensionChars) >= 0)
         {
             return string.Empty;
         }
