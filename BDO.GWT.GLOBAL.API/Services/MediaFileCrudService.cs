@@ -5,6 +5,7 @@ using CMS.ContentEngine.Internal;
 using CMS.DataEngine;
 using CMS.Membership;
 using Microsoft.AspNetCore.StaticFiles;
+using System.Buffers;
 using System.Net.Mime;
 
 namespace BDO.GWT.GLOBAL.API.Services;
@@ -294,7 +295,8 @@ public class MediaFileCrudService : IMediaFileCrudService
     }
 
     // Explicit cross-platform set: null byte, forward/back slashes, and common injection chars
-    private static readonly char[] UnsafeExtensionChars = ['\0', '/', '\\', '|', '<', '>', ':', '"', '?', '*'];
+    private static readonly SearchValues<char> UnsafeExtensionChars =
+        SearchValues.Create(['\0', '/', '\\', '|', '<', '>', ':', '"', '?', '*']);
 
     private static string GetSafeExtension(string fileName)
     {
@@ -305,7 +307,7 @@ public class MediaFileCrudService : IMediaFileCrudService
             return string.Empty;
         }
 
-        if (extension.IndexOfAny(UnsafeExtensionChars) >= 0)
+        if (extension.AsSpan().IndexOfAny(UnsafeExtensionChars) >= 0)
         {
             return string.Empty;
         }
@@ -400,6 +402,12 @@ public class MediaFileCrudService : IMediaFileCrudService
         var extension = GetSafeExtension(fileName);
 
         var tempPath = System.IO.Path.GetTempFileName();
+        var expectedTempDir = System.IO.Path.GetTempPath();
+        if (!tempPath.StartsWith(expectedTempDir, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Temporary file path is outside the expected temp directory.");
+        }
+
         try
         {
             await using (var fs = System.IO.File.Create(tempPath))
