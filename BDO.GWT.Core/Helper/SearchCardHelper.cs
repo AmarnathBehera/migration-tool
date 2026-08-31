@@ -21,7 +21,7 @@ namespace BDO.GWT.Core.Helpers
     public interface ISearchCardHelper
     {
         Task<SearchCardDto[]> GetSearchCardDtos(IEnumerable<SearchDocument> searchDocuments,string currentLanguage, CancellationToken cancellationToken);
-        //void GetSearchCardDtos(IEnumerable<SearchDocument> enumerable,string currentLanguage, CancellationToken cancellationToken);
+        
     }
 
     public enum SearchCardType
