@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.resource>
+  <ResourceDisplayName>BDO Integrations</ResourceDisplayName>
+  <ResourceGUID>cab4dd77-7704-4867-bcff-37351ca47e1e</ResourceGUID>
+  <ResourceIsInDevelopment>False</ResourceIsInDevelopment>
+  <ResourceName>BDOIntegrations</ResourceName>
+</cms.resource>

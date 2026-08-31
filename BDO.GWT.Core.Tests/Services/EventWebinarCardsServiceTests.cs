@@ -51,10 +51,10 @@ namespace BDO.GWT.Core.Tests.Services
                 _contentServiceMock.Object,
                 _channelContextMock.Object,
                 _urlRetrieverMock.Object,
-                _timeZoneServiceMock.Object
-                );
+                _timeZoneServiceMock.Object);
         }
 
+        // ── Interface / constructor checks ──────────────────────────────────
 
         [Test]
         public void Service_ImplementsInterface()
@@ -140,7 +140,9 @@ namespace BDO.GWT.Core.Tests.Services
         {
             var result = await _service.GetEventWebinarCardDtosAsync(
                 new List<IEventOrWebinar>(),
+                "en",
                 _ => false,
+                
                 CancellationToken.None);
 
             Assert.That(result, Is.Empty);
@@ -159,7 +161,9 @@ namespace BDO.GWT.Core.Tests.Services
 
             var result = await _service.GetEventWebinarCardDtosAsync(
                 new List<IEventOrWebinar> { item.Object },
+                "en-gb",
                 _ => false,
+                
                 CancellationToken.None);
 
             Assert.That(result, Is.Empty);
@@ -168,8 +172,6 @@ namespace BDO.GWT.Core.Tests.Services
         [Test]
         public async Task GetEventWebinarCardDtosAsync_MapsCoreFields_WhenUrlIsResolved()
         {
-            _contentServiceMock.Setup(x => x.GetCurrentLanguage()).Returns("en");
-
             var guid = Guid.NewGuid();
             var item = new Mock<IEventOrWebinar>();
             item.SetupGet(x => x.SystemFields).Returns(new WebPageFields { WebPageItemGUID = guid });
@@ -186,7 +188,9 @@ namespace BDO.GWT.Core.Tests.Services
 
             var result = await _service.GetEventWebinarCardDtosAsync(
                 new List<IEventOrWebinar> { item.Object },
-                e => e.SystemFields.WebPageItemGUID == guid,
+                "en",
+                e => e.SystemFields.WebPageItemGUID == guid
+                ,
                 CancellationToken.None);
 
             Assert.That(result, Has.Length.EqualTo(1));
@@ -206,8 +210,6 @@ namespace BDO.GWT.Core.Tests.Services
         [Test]
         public async Task GetEventWebinarCardDtosAsync_SetsNullDateToLocationAndDescription_WhenNotProvided()
         {
-            _contentServiceMock.Setup(x => x.GetCurrentLanguage()).Returns("en");
-
             var guid = Guid.NewGuid();
             var sameDay = new DateTime(2026, 01, 01, 10, 00, 00, DateTimeKind.Utc);
 
@@ -226,7 +228,9 @@ namespace BDO.GWT.Core.Tests.Services
 
             var result = await _service.GetEventWebinarCardDtosAsync(
                 new List<IEventOrWebinar> { item.Object },
+                "en",
                 _ => false,
+                
                 CancellationToken.None);
 
             Assert.That(result, Has.Length.EqualTo(1));
@@ -240,10 +244,9 @@ namespace BDO.GWT.Core.Tests.Services
         }
 
         [Test]
-        public async Task GetEventWebinarCardDtosAsync_UsesCurrentLanguage_ForUrlRetrieval()
+        public async Task GetEventWebinarCardDtosAsync_UsesPassedLanguage_ForUrlRetrieval()
         {
-            _contentServiceMock.Setup(x => x.GetCurrentLanguage()).Returns("fr");
-
+            // Language now comes from the caller, not from GetCurrentLanguage()
             var guid = Guid.NewGuid();
             var item = new Mock<IEventOrWebinar>();
             item.SetupGet(x => x.SystemFields).Returns(new WebPageFields { WebPageItemGUID = guid });
@@ -258,17 +261,19 @@ namespace BDO.GWT.Core.Tests.Services
 
             await _service.GetEventWebinarCardDtosAsync(
                 new List<IEventOrWebinar> { item.Object },
+                "fr",
                 _ => false,
+                
                 CancellationToken.None);
 
+            // Verify the passed language "fr" was used — NOT GetCurrentLanguage()
             _urlRetrieverMock.Verify(x => x.Retrieve(item.Object, "fr", It.IsAny<CancellationToken>()), Times.Once);
+            _contentServiceMock.Verify(x => x.GetCurrentLanguage(), Times.Never);
         }
 
         [Test]
         public async Task GetEventWebinarCardDtosAsync_ReturnsOnlyItems_WithResolvedUrls_WhenMixedResults()
         {
-            _contentServiceMock.Setup(x => x.GetCurrentLanguage()).Returns("en");
-
             var guidOk = Guid.NewGuid();
             var guidFail = Guid.NewGuid();
 
@@ -296,7 +301,9 @@ namespace BDO.GWT.Core.Tests.Services
 
             var result = await _service.GetEventWebinarCardDtosAsync(
                 new List<IEventOrWebinar> { okItem.Object, failedItem.Object },
+                "en",
                 _ => false,
+                
                 CancellationToken.None);
 
             Assert.That(result, Has.Length.EqualTo(1));
@@ -306,8 +313,6 @@ namespace BDO.GWT.Core.Tests.Services
         [Test]
         public async Task GetEventWebinarCardDtosAsync_PassesCancellationToken_ToUrlRetriever()
         {
-            _contentServiceMock.Setup(x => x.GetCurrentLanguage()).Returns("en");
-
             using var cts = new CancellationTokenSource();
             var token = cts.Token;
 
@@ -324,7 +329,9 @@ namespace BDO.GWT.Core.Tests.Services
 
             await _service.GetEventWebinarCardDtosAsync(
                 new List<IEventOrWebinar> { item.Object },
+                "en",
                 _ => false,
+                
                 token);
 
             _urlRetrieverMock.Verify(x => x.Retrieve(item.Object, "en", token), Times.Once);

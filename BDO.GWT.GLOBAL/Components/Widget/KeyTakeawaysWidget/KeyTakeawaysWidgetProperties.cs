@@ -1,4 +1,5 @@
 ﻿
+using BDO.GWT.Web.Widgets;
 using Kentico.Forms.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
 using Kentico.Xperience.Admin.Base.FormAnnotations;
@@ -7,7 +8,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BDO.GWT.GLOBAL.Components.Widget.KeyTakeawaysWidget;
 
-public class KeyTakeawaysWidgetProperties : IWidgetProperties
+public class KeyTakeawaysWidgetProperties : BaseWidgetProperties
 {
     [TextInputComponent( Label = "Title", Order = 0)]
     public string Title { get; set; }
@@ -32,9 +33,4 @@ public class KeyTakeawaysWidgetProperties : IWidgetProperties
     [DropDownComponent( Label = "Bottom margin", Order = 6,Options = "0px;None\r\n20px\r\n40px\r\n60px\r\n80px")]
     public string BottomMargin { get; set; } = "0px";
 
-    [TextInputComponent(Order = 999, ExplanationText = "ID should be unique from any other ID on the page. If the ID contains multiple words, words must be joined with a '-' (e.g. three-word-id). No other special characters and no spaces.'", Label = "Widget ID")]
-    [RegularExpression(
-        @"^[a-z0-9'-]*$",
-        ErrorMessage = "Characters are not allowed.")]
-    public string WidgetID { get; set; }
 }

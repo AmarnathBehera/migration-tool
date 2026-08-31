@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace BDO.GWT.Web.Core.Data;
 
@@ -19,6 +20,7 @@ public class NewsletterSubscriptionData
     public string? Consent { get; set; }
 
     public Guid? CountryGuid { get; set; }
+
 
     public IEnumerable<Guid> NewsletterGuids { get; set; } = Enumerable.Empty<Guid>();
 }

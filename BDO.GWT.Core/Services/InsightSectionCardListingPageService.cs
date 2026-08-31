@@ -18,7 +18,7 @@ public interface IInsightSectionCardListingPageService
 {
     Task<InsightCardListingDto> GetContentSectionDtoAsync(SectionInsightsPage insightPage, CancellationToken cancellationToken);
 
-    Task<PaginationDto<ContentPageCardDto>> GetContentPaginationResultAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken);
+    Task<PaginationDto<ContentPageCardDto>> GetContentPaginationResultAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken, string? language = null);
 }
 
 public class InsightSectionCardListingPageService : IInsightSectionCardListingPageService
@@ -62,7 +62,8 @@ public class InsightSectionCardListingPageService : IInsightSectionCardListingPa
     public async Task<PaginationDto<ContentPageCardDto>> GetContentPaginationResultAsync(
         Guid pageGuid,
         CardsQuery cardsQuery,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        string? language = null)
     {
         var treePath = await GetTreePathAsync<SectionInsightsPage>(pageGuid, cancellationToken)
             ?? await GetTreePathAsync<InsightGroup>(pageGuid, cancellationToken)
@@ -82,8 +83,8 @@ public class InsightSectionCardListingPageService : IInsightSectionCardListingPa
         return await _insightCardService.GetFilteredItemsAsync(
             cardsQuery,
             treePath,
-            _contentService.GetCurrentLanguage(),
-             decorateQuery,
+            string.IsNullOrWhiteSpace(language) ? _contentService.GetCurrentLanguage() : language,
+            decorateQuery,
             contentPage => featuredContentPageIds.Contains(contentPage.SystemFields.WebPageItemID),
             cancellationToken);
     }

@@ -302,3 +302,4 @@ BDO.GWT.GLOBAL/App_Data/CIRepository/*
 
 # Ignore this github folder used for CoPilot instructions
 .github/*
+/Kentico.Xperience.AzureSearch/Admin/Client/dist

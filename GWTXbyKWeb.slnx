@@ -5,7 +5,11 @@
   <Project Path="BDO.GWT.CustomReportingModule/BDO.GWT.CustomReportingModule.csproj" Id="eb6dbc94-affa-4e9c-b0d8-2bd433305880" />
   <Project Path="BDO.GWT.GLOBAL.API.Tests/BDO.GWT.GLOBAL.API.Tests.csproj" Id="54a32d67-1f7e-45f4-b538-5621e3dd8bdd" />
   <Project Path="BDO.GWT.GLOBAL.API/BDO.GWT.GLOBAL.API.csproj" Id="4a2ae184-6013-4d62-adb6-b4bb404040a1" />
+  <Project Path="BDO.GWT.GLOBAL.Sync.Tests/BDO.GWT.GLOBAL.Sync.Tests.csproj" Id="d5540f0e-dff1-44a0-a1a3-d00bb91946ef" />
+  <Project Path="BDO.GWT.GLOBAL.Sync/BDO.GWT.GLOBAL.Sync.csproj" Id="78f397be-bbb4-4878-901a-9d5b4d29cbbe" />
   <Project Path="BDO.GWT.GLOBAL.Tests/BDO.GWT.GLOBAL.Tests.csproj" />
   <Project Path="BDO.GWT.GLOBAL/GWTXbyKWeb.csproj" />
+  <Project Path="Kentico.Xperience.AzureSearch.Tests/Kentico.Xperience.AzureSearch.Tests.csproj" Id="0b74caf7-be15-4171-8013-3bf494cd6b9d" />
+  <Project Path="Kentico.Xperience.AzureSearch/Kentico.Xperience.AzureSearch.csproj" Id="ef097f8d-b2e0-4e60-9d35-592af4b14453" />
   <Project Path="xperience-community-redirects-main/src/XperienceCommunity.Redirects.csproj" />
 </Solution>

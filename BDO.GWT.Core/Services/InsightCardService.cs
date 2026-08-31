@@ -63,9 +63,8 @@ public class InsightCardService : IInsightCardService
             new RetrievePagesParameters
             {
                 LinkedItemsMaxLevel = 4,
-
-                PathMatch = PathMatch.Children(parentPath)
-
+                PathMatch = PathMatch.Children(parentPath),
+                LanguageName = language
             },
             query =>
             {
@@ -241,10 +240,10 @@ public class InsightCardService : IInsightCardService
             ImageAltText = page.InsightContent.FirstOrDefault()?.ImageFileAltText,
        
             Type = page.ContentType?.FirstOrDefault()?.Name,
-            Title = page.MetadataTitle,
+            Title = page.InsightContent.FirstOrDefault()?.Title ?? page.MetadataTitle,
             Date = page.SystemFields.ContentItemCommonDataLastPublishedWhen ?? page.SystemFields.ContentItemCommonDataFirstPublishedWhen,
             UpdatedOnDate = null,
-            Description = HtmlHelper.ExtractTextFromHtml(page.MetadataDescription),
+            Description = HtmlHelper.ExtractTextFromHtml(page.InsightContent.FirstOrDefault()?.Description ?? page.MetadataDescription),
             ReadMoreLink = new LinkItemDto
             {
                 Title = ResourceStringKey.LiveSite.ReadMore,

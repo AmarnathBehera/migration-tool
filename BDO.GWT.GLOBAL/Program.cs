@@ -1,10 +1,14 @@
-﻿using BDO;
+﻿using AngleSharp;
+using AutoMapper;
+using BDO;
 using BDO.GWT.Common;
 using BDO.GWT.Common.Options;
 using BDO.GWT.Core;
 using BDO.GWT.Core.Constants;
+using BDO.GWT.Core.Mappers;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Domain.Services;
+using BDO.GWT.GLOBAL.Search;
 using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
@@ -36,6 +40,7 @@ using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using XperienceCommunity.MultiChoiceFormControl.Admin.Helpers.Components.MultiChoice;
 using XperienceCommunity.Redirects;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddKentico(features =>
@@ -89,6 +94,23 @@ builder.Services.AddScoped<ISiteConfigurationService, SiteConfigurationService>(
 builder.Services.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllersWithViews();
+
+// Register Kentico Azure AI Search with our custom indexing strategy.
+// The strategy name ("GlobalSearchStrategy") is selected per-index in the Xperience admin UI.
+builder.Services.AddKenticoAzureSearch(searchBuilder =>
+{
+    searchBuilder.RegisterStrategy<GlobalAzureSearchIndexingStrategy, GlobalSearchModel>("GlobalSearchStrategy");
+}, builder.Configuration);
+
+// Register AutoMapper so IMapper can be resolved for SearchService / SearchQueryHelper.
+// Scan the assemblies that contain your AutoMapper Profile classes and the search types.
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddMaps(
+        typeof(BDO.GWT.Core.Helpers.SearchQueryHelper).Assembly,        // BDO.GWT.Core
+        typeof(BDO.GWT.AzureCognitiveSearch.Services.SearchService).Assembly);
+    cfg.AddProfile<SearchDocumentProfile>();
+});
 builder.Services.AddXperienceCommunityRedirects();
 builder.Services.AddXperienceCommunityLocalization();
 builder.Services.AddAdminExternalAuthenticationProvider(
@@ -127,6 +149,9 @@ if (builder.Environment.IsDevelopment())
         options.AuthenticationOptions.Mode = AdminAuthenticationMode.MaintainForms;
     });
 }
+
+builder.Services.AddOptions<BDO.GWT.Core.Extensions.AzureCognitiveSearchOptions>()
+    .BindConfiguration("AzureCognitiveSearch");   // section name in appsettings.json
 
 // Add Application Insights telemetry
 builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
@@ -181,6 +206,8 @@ if (!builder.Environment.IsDevelopment() && builder.Configuration.GetSection("Ad
     // Adds the URL rewriting middleware to the request pipeline using the configured RewriteOptions
     app.UseRewriter(rewriteOptions);
 }
+
+
 
 app.UseKentico();
 app.UseMiddleware<RedirectMiddleware>();

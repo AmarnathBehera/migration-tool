@@ -36,7 +36,7 @@ stages:
               projectKey: "bdo_GWT.XbyK.Web"
               projectName: "GWT.XbyK.Web"
               extraProperties: |
-                sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**,**/*.bacpac,**/TestResults/**,/BDO.GWT.GLOBAL/App_Data/**
+                sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**,**/*.bacpac,**/TestResults/**,/BDO.GWT.GLOBAL/App_Data/**,BDO.GWT.GLOBAL/wwwroot/**
                 sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/**/coverage.opencover.xml
 
           - task: DotNetCoreCLI@2

@@ -292,7 +292,7 @@ where T : class
         public async Task<IEnumerable<IWebPageFieldsSource>> GetItemsByGUIDAsync(List<Guid> webPageItemGuidsfirst)
         {
             return await _contentRetriever.RetrieveAllPagesByGuids<IWebPageFieldsSource>(webPageItemGuidsfirst);
-        }           
+        }
 
         public async Task<IEnumerable<IWebPageFieldsSource>> GetItemsByGUIDForAPIAsync(List<Guid> webPageItemGuidsfirst, string? channelName, string? cultureName)
         {
@@ -302,13 +302,14 @@ where T : class
                 // e.g., ChannelName = channelName, CultureName = cultureName
                 ChannelName = channelName,
                 LanguageName = cultureName,
-                IsForPreview = false
-                
+                IsForPreview = false,
+                LinkedItemsMaxLevel = 1
+
             };
-            
+
             return await _contentRetriever.RetrieveAllPagesByGuids<IWebPageFieldsSource>(
-                webPageItemGuidsfirst, 
-                parameters, 
+                webPageItemGuidsfirst,
+                parameters,
                 CancellationToken.None);
         }
 
@@ -317,7 +318,7 @@ where T : class
             return await _contentRetriever.RetrievePages<T>(cancellationToken);
         }
 
-        public async Task<IEnumerable<T>> GetContentTypeForAPI<T>( string? channelName = null, string? cultureName = null, CancellationToken cancellationToken = default) where T : class, IWebPageFieldsSource
+        public async Task<IEnumerable<T>> GetContentTypeForAPI<T>(string? channelName = null, string? cultureName = null, CancellationToken cancellationToken = default) where T : class, IWebPageFieldsSource
         {
             var parameters = new RetrievePagesParameters
             {
@@ -328,7 +329,7 @@ where T : class
                 IsForPreview = false
 
             };
-            return await _contentRetriever.RetrievePages<T>(parameters,cancellationToken);
+            return await _contentRetriever.RetrievePages<T>(parameters, cancellationToken);
         }
         public async Task<IEnumerable<TPage>> GetChildPagesByParentGuidAsync<TPage>(
        int parentGuid,
@@ -570,7 +571,7 @@ where T : class
             return url;
         }
 
-      
+
     }
 }
 
