@@ -402,6 +402,10 @@ public class MediaFileCrudService : IMediaFileCrudService
         // Sanitize user-supplied filename: take only the base file name to prevent path traversal
         var fileName = System.IO.Path.GetFileName(file.FileName ?? string.Empty);
         var extension = GetSafeExtension(fileName);
+        // Derive display name without extension using string trimming — avoids Path API on user data
+        var nameWithoutExtension = extension.Length > 0 && fileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase)
+            ? fileName[..^extension.Length]
+            : fileName;
 
         var tempPath = System.IO.Path.GetTempFileName();
         var expectedTempDir = System.IO.Path.GetTempPath();
@@ -420,7 +424,7 @@ public class MediaFileCrudService : IMediaFileCrudService
             var assetSource = new ContentItemAssetFileSource(tempPath, canMove: true);
             var assetMetadata = new ContentItemAssetMetadataWithSource(
                 assetSource,
-                System.IO.Path.GetFileNameWithoutExtension(fileName),
+                nameWithoutExtension,
                 extension,
                 file.Length,
                 DateTime.UtcNow);
