@@ -16,16 +16,24 @@ namespace BDO.GWT.Web.Controllers.API
     public class SearchController : Controller
     {
         private readonly ISearchPageService _searchPageService;
-
-        public SearchController(ISearchPageService searchService)
+        private readonly ICultureContext _cultureContext;
+        public SearchController(ISearchPageService searchService, ICultureContext cultureContext)
         {
             _searchPageService = searchService;
+            _cultureContext = cultureContext;
         }
 
         [HttpGet]
-        public async Task<SearchResultDto> Get([FromQuery] SearchResultQuery query, CancellationToken cancellationToken)
+        public async Task<SearchResultDto> Get([FromQuery] SearchResultQuery query,  CancellationToken cancellationToken)
         {
-            var results = await _searchPageService.GetSearchResultsAsync(query, cancellationToken);
+            var currentLanguage = RouteData.Values[CultureInjectorAttribute.RouteParameter]?.ToString();
+           
+            if (string.IsNullOrEmpty(currentLanguage))
+            {
+                currentLanguage = _cultureContext.CurrentLanguageTag;
+            }
+           
+            var results = await _searchPageService.GetSearchResultsAsync(query, currentLanguage, cancellationToken);
 
             return results;
         }
