@@ -14,8 +14,10 @@ namespace BDO.GWT.GLOBAL.API.Services;
 /// </summary>
 public class MediaFileCrudService : IMediaFileCrudService
 {
-    private const string DevelopmentLiveSiteBaseUrl = "http://localhost:12393";
+    private const string DevelopmentLiveSiteHost = "localhost";
+    private const int DevelopmentLiveSitePort = 12393;
 
+    private static readonly Uri DevelopmentLiveSiteBaseUri = new UriBuilder(Uri.UriSchemeHttp, DevelopmentLiveSiteHost, DevelopmentLiveSitePort).Uri;
     private static readonly FileExtensionContentTypeProvider _contentTypeProvider = new();
 
     private const string FallbackLanguageName = "en-US";
@@ -70,7 +72,7 @@ public class MediaFileCrudService : IMediaFileCrudService
     /// <inheritdoc/>
     public async Task<FileStreamData?> DownloadMediaFileAsync(string workspaceName, Guid attachmentGuid, CancellationToken cancellationToken)
     {
-        var target = await GetMediaFileTargetAsync(workspaceName, attachmentGuid, cancellationToken);
+        var target = await GetMediaFileTargetAsync(attachmentGuid, cancellationToken);
 
         if (target?.Asset.Url is null)
         {
@@ -102,7 +104,7 @@ public class MediaFileCrudService : IMediaFileCrudService
         };
     }
 
-    private async Task<MediaFileTarget?> GetMediaFileTargetAsync(string workspaceName, Guid attachmentGuid, CancellationToken cancellationToken)
+    private async Task<MediaFileTarget?> GetMediaFileTargetAsync(Guid attachmentGuid, CancellationToken cancellationToken)
     {
         return await GetMediaFileTargetFromContentTypeAsync<ContentAttachment>(
             ContentAttachment.CONTENT_TYPE_NAME,
@@ -150,7 +152,7 @@ public class MediaFileCrudService : IMediaFileCrudService
 
         if (_hostEnvironment.IsDevelopment())
         {
-            return new Uri(new Uri(DevelopmentLiveSiteBaseUrl), normalizedPath);
+            return new Uri(DevelopmentLiveSiteBaseUri, normalizedPath);
         }
 
         var request = _httpContextAccessor.HttpContext?.Request;
@@ -195,24 +197,7 @@ public class MediaFileCrudService : IMediaFileCrudService
                 continue;
             }
 
-            var assetUrl = asset.Url ?? string.Empty;
-            var fileName = GetFileNameFromUrl(assetUrl);
-            var extension = System.IO.Path.GetExtension(fileName);
-
-            if (!_contentTypeProvider.TryGetContentType(fileName, out var mimeType))
-            {
-                mimeType = GetMimeTypeFromExtension(extension);
-            }
-
-            outputs.Add(new MediaFileOutput
-            {
-                Id = item.SystemFields.ContentItemID,
-                Path = fileName,
-                MimeType = mimeType ?? "application/octet-stream",
-                Extension = extension,
-                Guid = item.SystemFields.ContentItemGUID,
-                Link = $"~/getmedia/{item.SystemFields.ContentItemGUID}/{fileName}"
-            });
+            outputs.Add(MapToMediaFileOutput(item, asset));
         }
 
         return outputs;
@@ -246,26 +231,7 @@ public class MediaFileCrudService : IMediaFileCrudService
             return null;
         }
 
-        // Extract file information from the asset URL
-        var assetUrl = asset.Url ?? string.Empty;
-        var fileName = GetFileNameFromUrl(assetUrl);
-        var extension = System.IO.Path.GetExtension(fileName);
-
-        // Get MIME type from extension
-        if (!_contentTypeProvider.TryGetContentType(fileName, out var mimeType))
-        {
-            mimeType = GetMimeTypeFromExtension(extension);
-        }
-
-        return new MediaFileOutput
-        {
-            Id = item.SystemFields.ContentItemID,
-            Path = fileName,
-            MimeType = mimeType ?? "application/octet-stream",
-            Extension = extension,
-            Guid = item.SystemFields.ContentItemGUID,
-            Link = $"~/getmedia/{item.SystemFields.ContentItemGUID}/{fileName}"
-        };
+        return MapToMediaFileOutput(item, asset);
     }
 
     private static string GetFileNameFromUrl(string url)
@@ -305,36 +271,60 @@ public class MediaFileCrudService : IMediaFileCrudService
         };
     }
 
+    private static MediaFileOutput MapToMediaFileOutput(IContentItemFieldsSource item, ContentItemAsset asset)
+    {
+        var assetUrl = asset.Url ?? string.Empty;
+        var fileName = GetFileNameFromUrl(assetUrl);
+        var extension = System.IO.Path.GetExtension(fileName);
+
+        if (!_contentTypeProvider.TryGetContentType(fileName, out var mimeType))
+        {
+            mimeType = GetMimeTypeFromExtension(extension);
+        }
+
+        return new MediaFileOutput
+        {
+            Id = item.SystemFields.ContentItemID,
+            Path = fileName,
+            MimeType = mimeType ?? "application/octet-stream",
+            Extension = extension,
+            Guid = item.SystemFields.ContentItemGUID,
+            Link = $"~/getmedia/{item.SystemFields.ContentItemGUID}/{fileName}"
+        };
+    }
+
+    private static string GetSafeExtension(string fileName)
+    {
+        var extension = System.IO.Path.GetExtension(fileName ?? string.Empty);
+
+        if (string.IsNullOrWhiteSpace(extension))
+        {
+            return string.Empty;
+        }
+
+        if (extension.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) >= 0
+            || extension.Contains(System.IO.Path.DirectorySeparatorChar)
+            || extension.Contains(System.IO.Path.AltDirectorySeparatorChar))
+        {
+            return string.Empty;
+        }
+
+        return extension;
+    }
+
     /// <inheritdoc/>
     public async Task<MediaFileOutput> CreateMediaFileAsync(string workspaceName, MediaFileInput input, CancellationToken cancellationToken)
     {
         var fileName = input.File.FileName;
-        var extension = System.IO.Path.GetExtension(fileName);
         var displayName = input.DisplayName ?? System.IO.Path.GetFileNameWithoutExtension(fileName);
 
-        var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid() + extension);
-        try
+        var languageName = await GetDefaultLanguageNameAsync(cancellationToken);
+        var user = await _userInfoProvider.GetAsync("administrator", cancellationToken);
+        var manager = _contentItemManagerFactory.Create(user.UserID);
+
+        var newItemId = await WithUploadedAssetMetadataAsync(input.File, async assetMetadata =>
         {
-            await using (var fs = System.IO.File.Create(tempPath))
-            {
-                await input.File.CopyToAsync(fs, cancellationToken);
-            }
-
-            var assetSource = new ContentItemAssetFileSource(tempPath, canMove: true);
-            var assetMetadata = new ContentItemAssetMetadataWithSource(
-                assetSource,
-                System.IO.Path.GetFileNameWithoutExtension(fileName),
-                extension,
-                input.File.Length,
-                DateTime.UtcNow);
-
-            var itemData = new ContentItemData(new Dictionary<string, object>
-            {
-                [nameof(ContentAttachment.ContentAttachmentAsset)] = assetMetadata
-            });
-
-            var languageName = await GetDefaultLanguageNameAsync(cancellationToken);
-
+            var itemData = CreateContentItemData(assetMetadata);
             var createParameters = new CreateContentItemParameters(
                 ContentAttachment.CONTENT_TYPE_NAME,
                 null,
@@ -342,81 +332,42 @@ public class MediaFileCrudService : IMediaFileCrudService
                 languageName,
                 workspaceName);
 
-            var user = await _userInfoProvider.GetAsync("administrator", cancellationToken);
-            var manager = _contentItemManagerFactory.Create(user.UserID);
+            return await manager.Create(createParameters, itemData, cancellationToken);
+        }, cancellationToken);
 
-            var newItemId = await manager.Create(createParameters, itemData, cancellationToken);
-            await manager.TryPublish(newItemId, languageName, cancellationToken);
+        await manager.TryPublish(newItemId, languageName, cancellationToken);
 
-            var created = await GetMediaFileByIdAsync(newItemId, cancellationToken);
-            return created!;
-        }
-        finally
-        {
-            if (System.IO.File.Exists(tempPath))
-            {
-                System.IO.File.Delete(tempPath);
-            }
-        }
+        var created = await GetMediaFileByIdAsync(newItemId, cancellationToken);
+        return created!;
     }
 
     /// <inheritdoc/>
     public async Task<MediaFileOutput?> UpdateMediaFileAsync(string workspaceName, Guid attachmentGuid, MediaFileInput input, CancellationToken cancellationToken)
     {
-        var target = await GetMediaFileTargetAsync(workspaceName, attachmentGuid, cancellationToken);
+        var target = await GetMediaFileTargetAsync(attachmentGuid, cancellationToken);
         if (target is null)
         {
             return null;
         }
 
-        var fileName = input.File.FileName;
-        var extension = System.IO.Path.GetExtension(fileName);
+        var languageName = await GetDefaultLanguageNameAsync(cancellationToken);
+        var user = await _userInfoProvider.GetAsync("administrator", cancellationToken);
+        var manager = _contentItemManagerFactory.Create(user.UserID);
 
-        var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid() + extension);
-        try
-        {
-            await using (var fs = System.IO.File.Create(tempPath))
-            {
-                await input.File.CopyToAsync(fs, cancellationToken);
-            }
+        var itemData = await WithUploadedAssetMetadataAsync(input.File, assetMetadata =>
+            Task.FromResult(CreateContentItemData(assetMetadata)), cancellationToken);
 
-            var assetSource = new ContentItemAssetFileSource(tempPath, canMove: true);
-            var assetMetadata = new ContentItemAssetMetadataWithSource(
-                assetSource,
-                System.IO.Path.GetFileNameWithoutExtension(fileName),
-                extension,
-                input.File.Length,
-                DateTime.UtcNow);
+        await manager.TryCreateDraft(target.ContentItemId, languageName, cancellationToken);
+        await manager.TryUpdateDraft(target.ContentItemId, languageName, itemData, cancellationToken);
+        await manager.TryPublish(target.ContentItemId, languageName, cancellationToken);
 
-            var itemData = new ContentItemData(new Dictionary<string, object>
-            {
-                [nameof(ContentAttachment.ContentAttachmentAsset)] = assetMetadata
-            });
-
-            var languageName = await GetDefaultLanguageNameAsync(cancellationToken);
-
-            var user = await _userInfoProvider.GetAsync("administrator", cancellationToken);
-            var manager = _contentItemManagerFactory.Create(user.UserID);
-
-            await manager.TryCreateDraft(target.ContentItemId, languageName, cancellationToken);
-            await manager.TryUpdateDraft(target.ContentItemId, languageName, itemData, cancellationToken);
-            await manager.TryPublish(target.ContentItemId, languageName, cancellationToken);
-
-            return await GetMediaFileAsync(workspaceName, attachmentGuid, cancellationToken);
-        }
-        finally
-        {
-            if (System.IO.File.Exists(tempPath))
-            {
-                System.IO.File.Delete(tempPath);
-            }
-        }
+        return await GetMediaFileAsync(workspaceName, attachmentGuid, cancellationToken);
     }
 
     /// <inheritdoc/>
     public async Task<bool> DeleteMediaFileAsync(string workspaceName, Guid attachmentGuid, CancellationToken cancellationToken)
     {
-        var target = await GetMediaFileTargetAsync(workspaceName, attachmentGuid, cancellationToken);
+        var target = await GetMediaFileTargetAsync(attachmentGuid, cancellationToken);
         if (target is null)
         {
             return false;
@@ -427,8 +378,51 @@ public class MediaFileCrudService : IMediaFileCrudService
         var user = await _userInfoProvider.GetAsync("administrator", cancellationToken);
         var manager = _contentItemManagerFactory.Create(user.UserID);
 
-        await manager.Delete(target.ContentItemId, languageName, cancellationToken);
+        await manager.Delete(new DeleteContentItemParameters(target.ContentItemId, languageName), cancellationToken);
         return true;
+    }
+
+    private static ContentItemData CreateContentItemData(ContentItemAssetMetadataWithSource assetMetadata)
+    {
+        return new ContentItemData(new Dictionary<string, object>
+        {
+            [nameof(ContentAttachment.ContentAttachmentAsset)] = assetMetadata
+        });
+    }
+
+    private static async Task<T> WithUploadedAssetMetadataAsync<T>(
+        IFormFile file,
+        Func<ContentItemAssetMetadataWithSource, Task<T>> action,
+        CancellationToken cancellationToken)
+    {
+        var fileName = file.FileName;
+        var extension = GetSafeExtension(fileName);
+
+        var tempPath = System.IO.Path.GetTempFileName();
+        try
+        {
+            await using (var fs = System.IO.File.Create(tempPath))
+            {
+                await file.CopyToAsync(fs, cancellationToken);
+            }
+
+            var assetSource = new ContentItemAssetFileSource(tempPath, canMove: true);
+            var assetMetadata = new ContentItemAssetMetadataWithSource(
+                assetSource,
+                System.IO.Path.GetFileNameWithoutExtension(fileName),
+                extension,
+                file.Length,
+                DateTime.UtcNow);
+
+            return await action(assetMetadata);
+        }
+        finally
+        {
+            if (System.IO.File.Exists(tempPath))
+            {
+                System.IO.File.Delete(tempPath);
+            }
+        }
     }
 
     private async Task<string> GetDefaultLanguageNameAsync(CancellationToken cancellationToken)
@@ -463,24 +457,7 @@ public class MediaFileCrudService : IMediaFileCrudService
             return null;
         }
 
-        var assetUrl = asset.Url ?? string.Empty;
-        var fileName = GetFileNameFromUrl(assetUrl);
-        var extension = System.IO.Path.GetExtension(fileName);
-
-        if (!_contentTypeProvider.TryGetContentType(fileName, out var mimeType))
-        {
-            mimeType = GetMimeTypeFromExtension(extension);
-        }
-
-        return new MediaFileOutput
-        {
-            Id = item.SystemFields.ContentItemID,
-            Path = fileName,
-            MimeType = mimeType ?? "application/octet-stream",
-            Extension = extension,
-            Guid = item.SystemFields.ContentItemGUID,
-            Link = $"~/getmedia/{item.SystemFields.ContentItemGUID}/{fileName}"
-        };
+        return MapToMediaFileOutput(item, asset);
     }
 }
 
