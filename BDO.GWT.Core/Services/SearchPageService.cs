@@ -121,7 +121,7 @@ namespace BDO.GWT.Core.Services
 
         #endregion
 
-        private readonly ICultureContext _cultureContext = cultureContext;               
+        //private readonly ICultureContext _cultureContext = cultureContext;               
         private readonly ISearchService _searchService = searchService;
         private readonly ITypeMapper _typeMapper = typeMapper;
         
