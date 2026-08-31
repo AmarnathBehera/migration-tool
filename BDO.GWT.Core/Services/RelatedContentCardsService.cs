@@ -285,7 +285,7 @@ public class RelatedContentCardService : IRelatedContentCardService
             Event e => BuildEventCard(e, isFeatured),
             Webinar w => BuildWebinarCard(w, isFeatured),
             MicrositePage m => BuildMicrositePageCard(m, isFeatured),
-            _ => BuildFallbackCard(page, isFeatured)
+            _ => throw new InvalidOperationException($"Unhandled page type: {page.GetType().Name}")
         };
 
         return Task.FromResult(card);
@@ -340,42 +340,22 @@ public class RelatedContentCardService : IRelatedContentCardService
         };
     }
 
-    // follow the same pattern for NewsArticle, Event, Webinar, MicrositePage
-    // adjust image/alt text fields to match each type's actual properties
-    private ContentPageCardDto BuildNewsArticleCard(NewsArticle page, Func<IWebPageFieldsSource, bool> isFeatured) =>
-        BuildGenericCard(page, isFeatured, page.MetadataTitle, page.MetadataDescription, page.ContentType?.FirstOrDefault()?.Name);
-
-    private ContentPageCardDto BuildEventCard(Event page, Func<IWebPageFieldsSource, bool> isFeatured) =>
-        BuildGenericCard(page, isFeatured, page.MetadataTitle, page.MetadataDescription, page.ContentType?.FirstOrDefault()?.Name);
-
-    private ContentPageCardDto BuildWebinarCard(Webinar page, Func<IWebPageFieldsSource, bool> isFeatured) =>
-        BuildGenericCard(page, isFeatured, page.MetadataTitle, page.MetadataDescription, page.ContentType?.FirstOrDefault()?.Name);
-
-    private ContentPageCardDto BuildMicrositePageCard(MicrositePage page, Func<IWebPageFieldsSource, bool> isFeatured) =>
-        BuildGenericCard(page, isFeatured, page.MetadataTitle, page.MetadataDescription, null);
-
-    private ContentPageCardDto BuildFallbackCard(IWebPageFieldsSource page, Func<IWebPageFieldsSource, bool> isFeatured) =>
-        BuildGenericCard(page, isFeatured, null, null, null);
-
-    private ContentPageCardDto BuildGenericCard(
-        IWebPageFieldsSource page,
-        Func<IWebPageFieldsSource, bool> isFeatured,
-        string? title,
-        string? description,
-        string? type)
+    private ContentPageCardDto BuildNewsArticleCard(NewsArticle page, Func<IWebPageFieldsSource, bool> isFeatured)
     {
+        var imageUrl = page.MetadataTeaserImage.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+
         return new ContentPageCardDto
         {
             IsFeatured = isFeatured(page),
-            ImageURL = null,
+            ImageURL = GetAbsoluteAssetUrl(imageUrl),
             isComingSoon = false,
-            ImageAltText = null,
-            Type = type,
-            Title = title ?? string.Empty,
+            ImageAltText = page.MetadataTeaserImageAltText,
+            Type = page.ContentType?.FirstOrDefault()?.Name,
+            Title = page.MetadataTitle,
             Date = page.SystemFields.ContentItemCommonDataLastPublishedWhen
                    ?? page.SystemFields.ContentItemCommonDataFirstPublishedWhen,
             UpdatedOnDate = null,
-            Description = HtmlHelper.ExtractTextFromHtml(description),
+            Description = HtmlHelper.ExtractTextFromHtml(page.MetadataDescription),
             ReadMoreLink = new LinkItemDto
             {
                 Title = ResourceStringKey.LiveSite.ReadMore,
@@ -383,4 +363,80 @@ public class RelatedContentCardService : IRelatedContentCardService
             }
         };
     }
+
+    private ContentPageCardDto BuildEventCard(Event page, Func<IWebPageFieldsSource, bool> isFeatured)
+    {
+        var imageUrl = page.MetadataTeaserImage.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+
+        return new ContentPageCardDto
+        {
+            IsFeatured = isFeatured(page),
+            ImageURL = GetAbsoluteAssetUrl(imageUrl),
+            isComingSoon = false,
+            ImageAltText = page.MetadataTeaserImageAltText,
+            Type = page.ContentType?.FirstOrDefault()?.Name,
+            Title = page.MetadataTitle,
+            Date = page.SystemFields.ContentItemCommonDataLastPublishedWhen
+                   ?? page.SystemFields.ContentItemCommonDataFirstPublishedWhen,
+            UpdatedOnDate = null,
+            Description = HtmlHelper.ExtractTextFromHtml(page.MetadataDescription),
+            ReadMoreLink = new LinkItemDto
+            {
+                Title = ResourceStringKey.LiveSite.ReadMore,
+                URL = _webPageUrlResolver.GetAbsoluteUrl(page)
+            }
+        };
+    }
+
+    private ContentPageCardDto BuildWebinarCard(Webinar page, Func<IWebPageFieldsSource, bool> isFeatured)
+    {
+        var imageUrl = page.MetadataTeaserImage.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+
+        return new ContentPageCardDto
+        {
+            IsFeatured = isFeatured(page),
+            ImageURL = GetAbsoluteAssetUrl(imageUrl),
+            isComingSoon = false,
+            ImageAltText = page.MetadataTeaserImageAltText,
+            Type = page.ContentType?.FirstOrDefault()?.Name,
+            Title = page.MetadataTitle,
+            Date = page.SystemFields.ContentItemCommonDataLastPublishedWhen
+                   ?? page.SystemFields.ContentItemCommonDataFirstPublishedWhen,
+            UpdatedOnDate = null,
+            Description = HtmlHelper.ExtractTextFromHtml(page.MetadataDescription),
+            ReadMoreLink = new LinkItemDto
+            {
+                Title = ResourceStringKey.LiveSite.ReadMore,
+                URL = _webPageUrlResolver.GetAbsoluteUrl(page)
+            }
+        };
+    }
+
+    private ContentPageCardDto BuildMicrositePageCard(MicrositePage page, Func<IWebPageFieldsSource, bool> isFeatured)
+    {
+        var imageUrl = page.MetadataTeaserImage.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+
+        return new ContentPageCardDto
+        {
+            IsFeatured = isFeatured(page),
+            ImageURL = GetAbsoluteAssetUrl(imageUrl),
+            isComingSoon = false,
+            ImageAltText = page.MetadataTeaserImageAltText,
+            Type = page.MicrositeContentType?.FirstOrDefault()?.Name,
+            Title = page.MetadataTitle,
+            Date = page.SystemFields.ContentItemCommonDataLastPublishedWhen
+                   ?? page.SystemFields.ContentItemCommonDataFirstPublishedWhen,
+            UpdatedOnDate = null,
+            Description = HtmlHelper.ExtractTextFromHtml(page.MetadataDescription),
+            ReadMoreLink = new LinkItemDto
+            {
+                Title = ResourceStringKey.LiveSite.ReadMore,
+                URL = _webPageUrlResolver.GetAbsoluteUrl(page)
+            }
+        };
+    }
+
+    
+
+    
 }
