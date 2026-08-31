@@ -137,13 +137,7 @@
             serviceCollection.AddScoped<ISitemapService, SitemapService>();
             serviceCollection.AddScoped<ILanguageProvider, LanguageProvider>();
             serviceCollection.AddScoped<IPageNodeProvider, PageNodeProvider>();
-            serviceCollection.AddScoped<ISubscribePageService, SubscribePageService>();
             serviceCollection.AddScoped<IContactPageService, ContactPageService>();
-            serviceCollection.AddScoped<ISubscribeFormService, SubscribeFormService>();
-            serviceCollection.AddScoped<ISubscribeConfirmPageService, SubscribeConfirmPageService>();
-            serviceCollection.AddScoped<ISubscribeRemovePageService, SubscribeRemovePageService>();
-            serviceCollection.AddScoped<INewsletterSubscriptionService, NewsletterSubscriptionService>();
-            serviceCollection.AddScoped<IMarketingContactManagementService, MarketingContactManagementService>();
             serviceCollection.AddScoped<ICookieConsentService, CookieConsentService>();
             serviceCollection.AddScoped<IPageUrlService, PageUrlService>();
             serviceCollection.AddScoped<ISiteContext, SiteContext>();
@@ -166,7 +160,16 @@
             serviceCollection.AddScoped<IContentPageCardHelper<Insight>, ContentPageCardHelper<Insight>>();
             serviceCollection.AddScoped<IPageUrlService, PageUrlService>();
             serviceCollection.AddScoped<ITypeAheadSearchService, TypeAheadSearchService>();
-            //serviceCollection.AddScoped<IDateTimeProviderSearch, DateTimeProviderSearch>();
+
+            
+            serviceCollection.AddAutoMapper(cfg =>
+            {
+                cfg.AddMaps(
+                    typeof(BDO.GWT.Core.Helpers.SearchQueryHelper).Assembly,       
+                    typeof(BDO.GWT.AzureCognitiveSearch.Services.SearchService).Assembly);
+                cfg.AddProfile<SearchDocumentProfile>();
+            });
+
             return serviceCollection;
         }
     }
