@@ -1685,6 +1685,35 @@ after;After
           </ValidationRuleConfiguration>
         </validationrulesdata>
       </field>
+      <schema guid="6539cfc9-05fd-49d4-a289-7b6fbd91d8ac" name="Descriptiontext">
+        <properties>
+          <fieldcaption>Description text</fieldcaption>
+        </properties>
+      </schema>
+      <field allowempty="true" column="DescriptionTitleforGlobal" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="324a44b9-b808-49b6-89d0-01efff6fbbd3" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>6539cfc9-05fd-49d4-a289-7b6fbd91d8ac</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="DescriptionBodyforGlobal" columnprecision="0" columntype="longtext" enabled="true" guid="9555902d-a845-48ff-af4a-f004ee3931d3" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Body content</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+          <kxp_schema_identifier>6539cfc9-05fd-49d4-a289-7b6fbd91d8ac</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.RichTextEditor</controlname>
+        </settings>
+      </field>
     </form>
   </ClassFormDefinition>
   <ClassGUID>a6581fb3-892a-45b4-981a-012ce4b50b43</ClassGUID>

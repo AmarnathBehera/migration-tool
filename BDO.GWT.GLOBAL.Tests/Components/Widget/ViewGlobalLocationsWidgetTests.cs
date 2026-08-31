@@ -1,11 +1,13 @@
-﻿using BDO.GWT.Web.Core.LiveSite.Data;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ViewGlobalLocations;
+﻿using BDO.GWT.Core.Data;
+using BDO.GWT.Core.Services.Widget;
+using BDO.GWT.GLOBAL.Widgets;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Moq;
 
 namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 {
@@ -13,11 +15,13 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
     {
         private ViewGlobalLocationsWidget _widget;
         private DefaultHttpContext _httpContext;
+        private Mock<IViewGlobalLocationsService> _mockViewGlobalLocationsService;
 
         [SetUp]
         public void SetUp()
         {
-            _widget = new ViewGlobalLocationsWidget();
+            _mockViewGlobalLocationsService = new Mock<IViewGlobalLocationsService>();
+            _widget = new ViewGlobalLocationsWidget(_mockViewGlobalLocationsService.Object);
 
             _httpContext = new DefaultHttpContext();
             _httpContext.RequestAborted = CancellationToken.None;

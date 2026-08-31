@@ -395,3 +395,11 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 
 [assembly: RegisterWebPageRoute(BusinessStrategy.CONTENT_TYPE_NAME, typeof(BusinessStrategyController), ActionName = nameof(BusinessStrategyController.Index))]
 [assembly: RegisterWebPageRoute(SectionBusinessStrategies.CONTENT_TYPE_NAME, typeof(SectionBusinessStrategiesController), ActionName = nameof(SectionBusinessStrategiesController.Index))]
+
+[assembly: RegisterPageTemplate(
+    identifier: GlobalLocations.CONTENT_TYPE_NAME,
+    name: "Global Locations Content Type Template",
+    customViewName: "~/Views/GlobalLocations/Index.cshtml",
+    ContentTypeNames = new[] { "BDO.GlobalLocations" },
+    IconClass = "xp-market")]
+[assembly: RegisterWebPageRoute(GlobalLocations.CONTENT_TYPE_NAME, typeof(GlobalLocationsController), ActionName = nameof(GlobalLocationsController.Index))]

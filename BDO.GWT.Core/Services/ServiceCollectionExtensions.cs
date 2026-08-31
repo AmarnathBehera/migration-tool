@@ -101,6 +101,7 @@
             serviceCollection.AddScoped<IInsightCardService, InsightCardService>();
             serviceCollection.AddScoped<IInsightCarouselService, InsightCarouselService>();
             serviceCollection.AddScoped<IInsightCarouselStateStore, InsightCarouselStateStore>();
+            serviceCollection.AddScoped<IViewGlobalLocationsService, ViewGlobalLocationsService>();
 
             serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
             serviceCollection.AddScoped<IEventWebinarPageService, EventWebinarPageService>();
@@ -130,6 +131,7 @@
             serviceCollection.AddScoped<IDealCardsService, DealCardsService>();
             serviceCollection.AddScoped<ITimeZoneService, TimeZoneService>();
             serviceCollection.AddScoped<ICookieBannerService, CookieBannerService>();
+            serviceCollection.AddScoped<IGlobalLocationsPageService, GlobalLocationsPageService>();
 
             serviceCollection.AddScoped<ISitemapPageService, SitemapPageService>();
             serviceCollection.AddScoped<ISitemapService, SitemapService>();

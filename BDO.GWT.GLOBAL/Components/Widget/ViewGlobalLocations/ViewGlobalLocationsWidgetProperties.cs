@@ -1,12 +1,8 @@
-﻿using BDO.GWT.Web.Widgets;
-using Kentico.Components.Web.Mvc.FormComponents;
+﻿using Kentico.Components.Web.Mvc.FormComponents;
 using Kentico.Forms.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
-using Kentico.Xperience.Admin.Base.FormAnnotations;
 
-
-namespace BDO;
-
+namespace BDO.GWT.GLOBAL.Widgets;
 public class ViewGlobalLocationsWidgetProperties : IWidgetProperties
 {
     [EditingComponent(TextInputComponent.IDENTIFIER, Order = 0, Label = "Title")]
