@@ -49,7 +49,7 @@ public class MediaFileController : EntityControllerBase
     /// <param name="attachmentGuid">The GUID of the media file attachment.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Returns the media file information.</returns>
-    [HttpGet("{attachmentGuid:guid}")]
+    [HttpGet("{attachmentGuid:guid}", Name = "GetMediaFileByAttachmentGuid")]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns the media file information.", typeof(MediaFileOutput), MediaTypeNames.Application.Json)]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Media file not found.")]
     public async Task<ActionResult<MediaFileOutput>> GetMediaFileAsync(
@@ -94,17 +94,20 @@ public class MediaFileController : EntityControllerBase
             return NotFound();
         }
 
-        Response.GetTypedHeaders().ContentDisposition = new ContentDispositionHeaderValue("attachment");
+        Response.GetTypedHeaders().ContentDisposition = new ContentDispositionHeaderValue("attachment")
+        {
+            FileNameStar = result.FileName
+        };
 
-        return File(result.Stream, MediaTypeNames.Application.Octet);
+        return File(result.Stream, result.ContentType, result.FileName);
     }
 
     /// <summary>
-    /// Creates a new media file in the specified Content Hub workspace.
+    /// Creates a new attachment in the specified Content Hub workspace.
     /// </summary>
     [HttpPost]
     [Consumes("multipart/form-data")]
-    [SwaggerOperation(Summary = "Creates a new media file in the workspace")]
+    [SwaggerOperation(Summary = "Creates a new attachment in the workspace")]
     [SwaggerResponse(StatusCodes.Status201Created, "Media file created.", typeof(MediaFileOutput), MediaTypeNames.Application.Json)]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid request.")]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error.")]
@@ -116,18 +119,18 @@ public class MediaFileController : EntityControllerBase
     {
         var result = await _mediaFileCrudService.CreateMediaFileAsync(workspaceName, input, cancellationToken);
 
-        return CreatedAtAction(
-            nameof(GetMediaFileAsync),
+        return CreatedAtRoute(
+            "GetMediaFileByAttachmentGuid",
             new { memberFirmID, workspaceName, attachmentGuid = result.Guid },
             result);
     }
 
     /// <summary>
-    /// Updates an existing media file in the specified Content Hub workspace.
+    /// Updates an existing attachment in the specified Content Hub workspace.
     /// </summary>
     [HttpPut("{attachmentGuid:guid}")]
     [Consumes("multipart/form-data")]
-    [SwaggerOperation(Summary = "Updates an existing media file")]
+    [SwaggerOperation(Summary = "Updates an existing attachment")]
     [SwaggerResponse(StatusCodes.Status200OK, "Media file updated.", typeof(MediaFileOutput), MediaTypeNames.Application.Json)]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid request.")]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Media file not found.")]
@@ -147,10 +150,10 @@ public class MediaFileController : EntityControllerBase
     }
 
     /// <summary>
-    /// Deletes a media file from the specified Content Hub workspace.
+    /// Deletes an attachment file from the specified Content Hub workspace.
     /// </summary>
     [HttpDelete("{attachmentGuid:guid}")]
-    [SwaggerOperation(Summary = "Deletes a media file from the workspace")]
+    [SwaggerOperation(Summary = "Deletes an attachment file from the workspace")]
     [SwaggerResponse(StatusCodes.Status204NoContent, "Media file deleted.")]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Media file not found.")]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error.")]

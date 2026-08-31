@@ -18,7 +18,7 @@ public class MediaFileCrudService : IMediaFileCrudService
 
     private static readonly FileExtensionContentTypeProvider _contentTypeProvider = new();
 
-    private const string DefaultLanguageName = "en";
+    private const string FallbackLanguageName = "en-US";
 
     private readonly IContentQueryExecutor _contentQueryExecutor;
     private readonly IHttpClientFactory _httpClientFactory;
@@ -26,6 +26,9 @@ public class MediaFileCrudService : IMediaFileCrudService
     private readonly IWebHostEnvironment _hostEnvironment;
     private readonly IContentItemManagerFactory _contentItemManagerFactory;
     private readonly IUserInfoProvider _userInfoProvider;
+    private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageInfoProvider;
+
+    private sealed record MediaFileTarget(int ContentItemId, ContentItemAsset Asset);
 
     public MediaFileCrudService(
         IContentQueryExecutor contentQueryExecutor,
@@ -33,7 +36,8 @@ public class MediaFileCrudService : IMediaFileCrudService
         IHttpContextAccessor httpContextAccessor,
         IWebHostEnvironment hostEnvironment,
         IContentItemManagerFactory contentItemManagerFactory,
-        IUserInfoProvider userInfoProvider)
+        IUserInfoProvider userInfoProvider,
+        IInfoProvider<ContentLanguageInfo> contentLanguageInfoProvider)
     {
         _contentQueryExecutor = contentQueryExecutor;
         _httpClientFactory = httpClientFactory;
@@ -41,85 +45,39 @@ public class MediaFileCrudService : IMediaFileCrudService
         _hostEnvironment = hostEnvironment;
         _contentItemManagerFactory = contentItemManagerFactory;
         _userInfoProvider = userInfoProvider;
+        _contentLanguageInfoProvider = contentLanguageInfoProvider;
     }
 
     /// <inheritdoc/>
     public async Task<IEnumerable<MediaFileOutput>> GetMediaFilesAsync(string workspaceName, CancellationToken cancellationToken)
     {
-        var results = new List<MediaFileOutput>();
-
-        // Collect from BDO.ContentAttachment (primary content type for images)
-        var contentAttachments = await GetAllMediaFilesFromContentTypeAsync<ContentAttachment>(
+        return await GetAllMediaFilesFromContentTypeAsync<ContentAttachment>(
             ContentAttachment.CONTENT_TYPE_NAME,
             item => item.ContentAttachmentAsset,
             cancellationToken);
-        results.AddRange(contentAttachments);
-
-        // Collect from Legacy.MediaFile
-        var legacyMediaFiles = await GetAllMediaFilesFromContentTypeAsync<MediaFile>(
-            MediaFile.CONTENT_TYPE_NAME,
-            item => item.LegacyMediaFileAsset,
-            cancellationToken);
-        results.AddRange(legacyMediaFiles);
-
-        // Collect from MigratedMediaFile
-        var migratedMediaFiles = await GetAllMediaFilesFromContentTypeAsync<MigratedMediaFile>(
-            MigratedMediaFile.CONTENT_TYPE_NAME,
-            item => item.MediaFile,
-            cancellationToken);
-        results.AddRange(migratedMediaFiles);
-
-        return results;
     }
 
     /// <inheritdoc/>
     public async Task<MediaFileOutput?> GetMediaFileAsync(string workspaceName, Guid attachmentGuid, CancellationToken cancellationToken)
     {
-        // Try to get from BDO.ContentAttachment content type first (primary content type for images)
-        var contentAttachmentResult = await GetMediaFileFromContentTypeAsync<ContentAttachment>(
+        return await GetMediaFileFromContentTypeAsync<ContentAttachment>(
             ContentAttachment.CONTENT_TYPE_NAME,
             attachmentGuid,
             item => item.ContentAttachmentAsset,
             cancellationToken);
-
-        if (contentAttachmentResult != null)
-        {
-            return contentAttachmentResult;
-        }
-
-        // Try Legacy.MediaFile content type
-        var mediaFileResult = await GetMediaFileFromContentTypeAsync<MediaFile>(
-            MediaFile.CONTENT_TYPE_NAME,
-            attachmentGuid,
-            item => item.LegacyMediaFileAsset,
-            cancellationToken);
-
-        if (mediaFileResult != null)
-        {
-            return mediaFileResult;
-        }
-
-        // Try MigratedMediaFile content type
-        var migratedResult = await GetMediaFileFromContentTypeAsync<MigratedMediaFile>(
-            MigratedMediaFile.CONTENT_TYPE_NAME,
-            attachmentGuid,
-            item => item.MediaFile,
-            cancellationToken);
-
-        return migratedResult;
     }
 
     /// <inheritdoc/>
     public async Task<FileStreamData?> DownloadMediaFileAsync(string workspaceName, Guid attachmentGuid, CancellationToken cancellationToken)
     {
-        var asset = await GetAssetByGuidAsync(workspaceName, attachmentGuid, cancellationToken);
+        var target = await GetMediaFileTargetAsync(workspaceName, attachmentGuid, cancellationToken);
 
-        if (asset?.Url is null)
+        if (target?.Asset.Url is null)
         {
             return null;
         }
 
-        var assetUri = BuildAssetUri(asset.Url);
+        var assetUri = BuildAssetUri(target.Asset.Url);
         if (assetUri is null)
         {
             return null;
@@ -133,8 +91,8 @@ public class MediaFileCrudService : IMediaFileCrudService
 
         var data = await response.Content.ReadAsByteArrayAsync(cancellationToken);
         var contentType = response.Content.Headers.ContentType?.MediaType
-            ?? GetMimeType(asset.Metadata?.Extension ?? string.Empty);
-        var fileName = asset.Metadata?.Name ?? "attachment";
+            ?? GetMimeType(target.Asset.Metadata?.Extension ?? string.Empty);
+        var fileName = target.Asset.Metadata?.Name ?? "attachment";
 
         return new FileStreamData
         {
@@ -144,26 +102,16 @@ public class MediaFileCrudService : IMediaFileCrudService
         };
     }
 
-    private async Task<ContentItemAsset?> GetAssetByGuidAsync(string workspaceName, Guid attachmentGuid, CancellationToken cancellationToken)
+    private async Task<MediaFileTarget?> GetMediaFileTargetAsync(string workspaceName, Guid attachmentGuid, CancellationToken cancellationToken)
     {
-        var asset = await GetAssetFromContentTypeAsync<ContentAttachment>(
-            ContentAttachment.CONTENT_TYPE_NAME, attachmentGuid,
-            item => item.ContentAttachmentAsset, cancellationToken);
-
-        if (asset is not null) return asset;
-
-        asset = await GetAssetFromContentTypeAsync<MediaFile>(
-            MediaFile.CONTENT_TYPE_NAME, attachmentGuid,
-            item => item.LegacyMediaFileAsset, cancellationToken);
-
-        if (asset is not null) return asset;
-
-        return await GetAssetFromContentTypeAsync<MigratedMediaFile>(
-            MigratedMediaFile.CONTENT_TYPE_NAME, attachmentGuid,
-            item => item.MediaFile, cancellationToken);
+        return await GetMediaFileTargetFromContentTypeAsync<ContentAttachment>(
+            ContentAttachment.CONTENT_TYPE_NAME,
+            attachmentGuid,
+            item => item.ContentAttachmentAsset,
+            cancellationToken);
     }
 
-    private async Task<ContentItemAsset?> GetAssetFromContentTypeAsync<T>(
+    private async Task<MediaFileTarget?> GetMediaFileTargetFromContentTypeAsync<T>(
         string contentTypeName,
         Guid attachmentGuid,
         Func<T, ContentItemAsset?> assetSelector,
@@ -179,7 +127,16 @@ public class MediaFileCrudService : IMediaFileCrudService
 
         var results = await _contentQueryExecutor.GetMappedResult<T>(query, cancellationToken: cancellationToken);
         var item = results.FirstOrDefault();
-        return item is null ? null : assetSelector(item);
+
+        if (item is null)
+        {
+            return null;
+        }
+
+        var asset = assetSelector(item);
+        return asset is null
+            ? null
+            : new MediaFileTarget(item.SystemFields.ContentItemID, asset);
     }
 
     private Uri? BuildAssetUri(string assetUrl)
@@ -376,18 +333,20 @@ public class MediaFileCrudService : IMediaFileCrudService
                 [nameof(ContentAttachment.ContentAttachmentAsset)] = assetMetadata
             });
 
+            var languageName = await GetDefaultLanguageNameAsync(cancellationToken);
+
             var createParameters = new CreateContentItemParameters(
                 ContentAttachment.CONTENT_TYPE_NAME,
                 null,
                 displayName,
-                DefaultLanguageName,
+                languageName,
                 workspaceName);
 
             var user = await _userInfoProvider.GetAsync("administrator", cancellationToken);
             var manager = _contentItemManagerFactory.Create(user.UserID);
 
             var newItemId = await manager.Create(createParameters, itemData, cancellationToken);
-            await manager.TryPublish(newItemId, DefaultLanguageName, cancellationToken);
+            await manager.TryPublish(newItemId, languageName, cancellationToken);
 
             var created = await GetMediaFileByIdAsync(newItemId, cancellationToken);
             return created!;
@@ -404,8 +363,8 @@ public class MediaFileCrudService : IMediaFileCrudService
     /// <inheritdoc/>
     public async Task<MediaFileOutput?> UpdateMediaFileAsync(string workspaceName, Guid attachmentGuid, MediaFileInput input, CancellationToken cancellationToken)
     {
-        var existing = await GetMediaFileAsync(workspaceName, attachmentGuid, cancellationToken);
-        if (existing is null)
+        var target = await GetMediaFileTargetAsync(workspaceName, attachmentGuid, cancellationToken);
+        if (target is null)
         {
             return null;
         }
@@ -434,14 +393,16 @@ public class MediaFileCrudService : IMediaFileCrudService
                 [nameof(ContentAttachment.ContentAttachmentAsset)] = assetMetadata
             });
 
+            var languageName = await GetDefaultLanguageNameAsync(cancellationToken);
+
             var user = await _userInfoProvider.GetAsync("administrator", cancellationToken);
             var manager = _contentItemManagerFactory.Create(user.UserID);
 
-            await manager.TryCreateDraft(existing.Id, DefaultLanguageName, cancellationToken);
-            await manager.TryUpdateDraft(existing.Id, DefaultLanguageName, itemData, cancellationToken);
-            await manager.TryPublish(existing.Id, DefaultLanguageName, cancellationToken);
+            await manager.TryCreateDraft(target.ContentItemId, languageName, cancellationToken);
+            await manager.TryUpdateDraft(target.ContentItemId, languageName, itemData, cancellationToken);
+            await manager.TryPublish(target.ContentItemId, languageName, cancellationToken);
 
-            return await GetMediaFileByIdAsync(existing.Id, cancellationToken);
+            return await GetMediaFileAsync(workspaceName, attachmentGuid, cancellationToken);
         }
         finally
         {
@@ -455,17 +416,29 @@ public class MediaFileCrudService : IMediaFileCrudService
     /// <inheritdoc/>
     public async Task<bool> DeleteMediaFileAsync(string workspaceName, Guid attachmentGuid, CancellationToken cancellationToken)
     {
-        var existing = await GetMediaFileAsync(workspaceName, attachmentGuid, cancellationToken);
-        if (existing is null)
+        var target = await GetMediaFileTargetAsync(workspaceName, attachmentGuid, cancellationToken);
+        if (target is null)
         {
             return false;
         }
 
+        var languageName = await GetDefaultLanguageNameAsync(cancellationToken);
+
         var user = await _userInfoProvider.GetAsync("administrator", cancellationToken);
         var manager = _contentItemManagerFactory.Create(user.UserID);
 
-        await manager.Delete(existing.Id, DefaultLanguageName, cancellationToken);
+        await manager.Delete(target.ContentItemId, languageName, cancellationToken);
         return true;
+    }
+
+    private async Task<string> GetDefaultLanguageNameAsync(CancellationToken cancellationToken)
+    {
+        var language = await _contentLanguageInfoProvider.Get()
+            .Columns(nameof(ContentLanguageInfo.ContentLanguageName))
+            .TopN(1)
+            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
+
+        return language.FirstOrDefault()?.ContentLanguageName ?? FallbackLanguageName;
     }
 
     private async Task<MediaFileOutput?> GetMediaFileByIdAsync(int contentItemId, CancellationToken cancellationToken)
