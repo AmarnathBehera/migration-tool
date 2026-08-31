@@ -318,7 +318,8 @@ public class MediaFileCrudService : IMediaFileCrudService
     /// <inheritdoc/>
     public async Task<MediaFileOutput> CreateMediaFileAsync(string workspaceName, MediaFileInput input, CancellationToken cancellationToken)
     {
-        var fileName = input.File.FileName;
+        // Sanitize user-supplied filename: take only the base file name to prevent path traversal
+        var fileName = System.IO.Path.GetFileName(input.File.FileName ?? string.Empty);
         var displayName = input.DisplayName ?? System.IO.Path.GetFileNameWithoutExtension(fileName);
 
         var languageName = await GetDefaultLanguageNameAsync(cancellationToken);
