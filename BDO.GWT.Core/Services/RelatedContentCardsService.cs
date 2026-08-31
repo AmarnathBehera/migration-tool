@@ -74,42 +74,42 @@ public class RelatedContentCardService : IRelatedContentCardService
             IEnumerable<IWebPageFieldsSource> pages = pageType switch
             {
                 nameof(Insight) => await _contentRetriever.RetrievePages<Insight, Insight>(
-                    new RetrievePagesParameters { LinkedItemsMaxLevel = 4, PathMatch = PathMatch.Children(parentPath), LanguageName= language },
+                    new RetrievePagesParameters { LinkedItemsMaxLevel = 2, PathMatch = PathMatch.Children(parentPath), LanguageName= language },
                     query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
                     RetrievalCacheSettings.CacheDisabled,
                     (_, page) => Task.FromResult(page),
                     cancellationToken),
 
                 nameof(BlogPost) => await _contentRetriever.RetrievePages<BlogPost, BlogPost>(
-                    new RetrievePagesParameters { LinkedItemsMaxLevel = 4, PathMatch = PathMatch.Children(parentPath), LanguageName= language },
+                    new RetrievePagesParameters { LinkedItemsMaxLevel = 2, PathMatch = PathMatch.Children(parentPath), LanguageName= language },
                     query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
                     RetrievalCacheSettings.CacheDisabled,
                     (_, page) => Task.FromResult(page),
                     cancellationToken),
 
                 nameof(NewsArticle) => await _contentRetriever.RetrievePages<NewsArticle, NewsArticle>(
-                    new RetrievePagesParameters { LinkedItemsMaxLevel = 4, PathMatch = PathMatch.Children(parentPath), LanguageName= language },
+                    new RetrievePagesParameters { LinkedItemsMaxLevel = 2, PathMatch = PathMatch.Children(parentPath), LanguageName= language },
                     query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
                     RetrievalCacheSettings.CacheDisabled,
                     (_, page) => Task.FromResult(page),
                     cancellationToken),
 
                 nameof(Event) => await _contentRetriever.RetrievePages<Event, Event>(
-                    new RetrievePagesParameters { LinkedItemsMaxLevel = 4, PathMatch = PathMatch.Children(parentPath), LanguageName= language },
+                    new RetrievePagesParameters { LinkedItemsMaxLevel = 2, PathMatch = PathMatch.Children(parentPath), LanguageName= language },
                     query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
                     RetrievalCacheSettings.CacheDisabled,
                     (_, page) => Task.FromResult(page),
                     cancellationToken),
 
                 nameof(Webinar) => await _contentRetriever.RetrievePages<Webinar, Webinar>(
-                    new RetrievePagesParameters { LinkedItemsMaxLevel = 4, PathMatch = PathMatch.Children(parentPath), LanguageName= language },
+                    new RetrievePagesParameters { LinkedItemsMaxLevel = 2, PathMatch = PathMatch.Children(parentPath), LanguageName= language },
                     query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
                     RetrievalCacheSettings.CacheDisabled,
                     (_, page) => Task.FromResult(page),
                     cancellationToken),
 
                 nameof(MicrositePage) => await _contentRetriever.RetrievePages<MicrositePage, MicrositePage>(
-                    new RetrievePagesParameters { LinkedItemsMaxLevel = 4, PathMatch = PathMatch.Children(parentPath), LanguageName = language },
+                    new RetrievePagesParameters { LinkedItemsMaxLevel = 2, PathMatch = PathMatch.Children(parentPath), LanguageName = language },
                     query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
                     RetrievalCacheSettings.CacheDisabled,
                     (_, page) => Task.FromResult(page),
