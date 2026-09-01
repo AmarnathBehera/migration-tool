@@ -1,5 +1,6 @@
 ﻿using BDO;
 using BDO.GWT.Core.Services;
+using CMS.Core;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
@@ -18,19 +19,25 @@ namespace BDO.GWT.GLOBAL.Controllers
         private readonly IErrorService _errorService;
         private readonly IWebPageDataContextInitializer _webPageDataContextInitializer;
         private readonly IWebsiteChannelContext _websiteChannelContext;
+        private readonly IEventLogService _eventLogService;
 
         public ErrorController(
             IErrorService errorService,
             IWebPageDataContextInitializer webPageDataContextInitializer,
-            IWebsiteChannelContext websiteChannelContext)
+            IWebsiteChannelContext websiteChannelContext,
+            IEventLogService eventLogService)
         {
             _errorService = errorService;
             _webPageDataContextInitializer = webPageDataContextInitializer;
             _websiteChannelContext = websiteChannelContext;
+            _eventLogService = eventLogService;
         }
 
         public async Task<IActionResult> Index(int code, CancellationToken cancellationToken)
         {
+            // Log the exception to the CMS event log (only for server errors)
+            LogExceptionToCms(code);
+
             var statusCodeReExecuteFeature = HttpContext.Features.Get<IStatusCodeReExecuteFeature>();
 
             var languageName = TryExtractLanguageFromUrl(statusCodeReExecuteFeature)
@@ -60,6 +67,21 @@ namespace BDO.GWT.GLOBAL.Controllers
             });
 
             return View(statusCodePage);
+        }
+
+        private void LogExceptionToCms(int code)
+        {
+            // Retrieve the original exception captured by UseExceptionHandler
+            var exceptionFeature = HttpContext.Features.Get<IExceptionHandlerFeature>();
+
+            if (exceptionFeature?.Error is Exception exception)
+            {
+                _eventLogService.LogException(
+                    source: nameof(ErrorController),
+                    eventCode: code.ToString(),
+                    ex: exception,
+                    additionalMessage: $"An unhandled exception occurred at path: {exceptionFeature.Path}");
+            }
         }
 
         private static string? TryExtractLanguageFromUrl(IStatusCodeReExecuteFeature? feature)
