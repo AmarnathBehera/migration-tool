@@ -189,7 +189,7 @@ public class MediaFileController : EntityControllerBase
             return false;
         }
 
-        var safeFileName = System.IO.Path.GetFileName(input.File.FileName ?? string.Empty);
+        var safeFileName = GetSafeFileName(input.File.FileName);
         if (string.IsNullOrWhiteSpace(safeFileName))
         {
             return false;
@@ -207,5 +207,12 @@ public class MediaFileController : EntityControllerBase
         input.DisplayName = input.DisplayName?.Trim();
 
         return true;
+    }
+
+    private static string GetSafeFileName(string? fileName)
+    {
+        var value = fileName ?? string.Empty;
+        var separatorIndex = value.LastIndexOfAny(['/', '\\']);
+        return separatorIndex >= 0 ? value[(separatorIndex + 1)..] : value;
     }
 }

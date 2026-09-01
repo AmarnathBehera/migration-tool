@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace BDO.GWT.GLOBAL.API.Tests.Services;
 
@@ -286,6 +287,58 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
+    public void GetSafeFileName_WhenPathContainsSeparators_ReturnsTerminalFileName()
+    {
+        var result = (string)InvokePrivateStatic("GetSafeFileName", "folder\\nested/image.png");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo("image.png"));
+        });
+    }
+
+    [Test]
+    public void CreateSafeTempUploadPath_ReturnsPathInExpectedTempDirectory()
+    {
+        var result = (string)InvokePrivateStatic("CreateSafeTempUploadPath");
+        var expectedRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "App_Data", "Uploads", "Temp"));
+        var fullPath = Path.GetFullPath(result);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(fullPath, Does.StartWith(expectedRoot + Path.DirectorySeparatorChar));
+            Assert.That(Path.GetExtension(fullPath), Is.EqualTo(".tmp"));
+        });
+    }
+
+    [Test]
+    public async Task WithUploadedAssetMetadataAsync_WhenFileIsProcessed_DeletesTemporaryFile()
+    {
+        var tempDirectory = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "App_Data", "Uploads", "Temp"));
+        Directory.CreateDirectory(tempDirectory);
+        var before = Directory.GetFiles(tempDirectory).OrderBy(x => x).ToArray();
+
+        var bytes = Encoding.UTF8.GetBytes("file-content");
+        await using var stream = new MemoryStream(bytes, writable: false);
+        IFormFile file = new FormFile(stream, 0, bytes.Length, "File", "folder\\sample.jpg");
+
+        var result = await InvokePrivateStaticAsync<bool>(
+            "WithUploadedAssetMetadataAsync",
+            [typeof(bool)],
+            file,
+            new Func<ContentItemAssetMetadataWithSource, Task<bool>>(_ => Task.FromResult(true)),
+            CancellationToken.None);
+
+        var after = Directory.GetFiles(tempDirectory).OrderBy(x => x).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.True);
+            Assert.That(after, Is.EquivalentTo(before));
+        });
+    }
+
+    [Test]
     public void BuildAssetUri_WhenAbsoluteUrl_ReturnsAbsoluteUri()
     {
         var service = CreateSut();
@@ -374,6 +427,14 @@ public class MediaFileCrudServiceTests
     {
         var method = typeof(MediaFileCrudService).GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic)!;
         return method.Invoke(null, args)!;
+    }
+
+    private static async Task<T> InvokePrivateStaticAsync<T>(string methodName, Type[] genericTypes, params object[] args)
+    {
+        var method = typeof(MediaFileCrudService).GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic)!;
+        var genericMethod = method.MakeGenericMethod(genericTypes);
+        var task = (Task<T>)genericMethod.Invoke(null, args)!;
+        return await task;
     }
 
     private static object? InvokePrivateInstance(MediaFileCrudService instance, string methodName, params object[] args)

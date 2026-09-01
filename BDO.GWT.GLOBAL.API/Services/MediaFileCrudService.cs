@@ -299,6 +299,13 @@ public class MediaFileCrudService : IMediaFileCrudService
     private static readonly SearchValues<char> InvalidFileNameChars =
         SearchValues.Create(System.IO.Path.GetInvalidFileNameChars());
 
+    private static string GetSafeFileName(string? fileName)
+    {
+        var value = fileName ?? string.Empty;
+        var separatorIndex = value.LastIndexOfAny(['/', '\\']);
+        return separatorIndex >= 0 ? value[(separatorIndex + 1)..] : value;
+    }
+
     private static string GetSafeExtension(string fileName)
     {
         var extension = System.IO.Path.GetExtension(fileName ?? string.Empty);
@@ -320,7 +327,7 @@ public class MediaFileCrudService : IMediaFileCrudService
     public async Task<MediaFileOutput> CreateMediaFileAsync(string workspaceName, MediaFileInput input, CancellationToken cancellationToken)
     {
         // Sanitize user-supplied filename: take only the base file name to prevent path traversal
-        var fileName = System.IO.Path.GetFileName(input.File.FileName ?? string.Empty);
+        var fileName = GetSafeFileName(input.File.FileName);
         var displayName = input.DisplayName ?? System.IO.Path.GetFileNameWithoutExtension(fileName);
 
         var languageName = await GetDefaultLanguageNameAsync(cancellationToken);
@@ -427,7 +434,7 @@ public class MediaFileCrudService : IMediaFileCrudService
         ArgumentNullException.ThrowIfNull(file);
 
         // Sanitize user-supplied filename: take only the base file name to prevent path traversal
-        var fileName = System.IO.Path.GetFileName(file.FileName ?? string.Empty);
+        var fileName = GetSafeFileName(file.FileName);
         var extension = GetSafeExtension(fileName);
         // Derive display name without extension using string trimming — avoids Path API on user data
         var nameWithoutExtension = extension.Length > 0 && fileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase)
