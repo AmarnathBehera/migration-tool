@@ -231,6 +231,14 @@ public class MediaFileCrudServiceTests
     [TestCase(".jpeg", "image/jpeg")]
     [TestCase(".webp", "image/webp")]
     [TestCase(".pdf", "application/pdf")]
+    [TestCase(".gif", "image/gif")]
+    [TestCase(".svg", "image/svg+xml")]
+    [TestCase(".doc", "application/msword")]
+    [TestCase(".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")]
+    [TestCase(".xls", "application/vnd.ms-excel")]
+    [TestCase(".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
+    [TestCase(".mp4", "video/mp4")]
+    [TestCase(".mp3", "audio/mpeg")]
     [TestCase(".unknown", "application/octet-stream")]
     public void GetMimeTypeFromExtension_ReturnsExpectedValue(string extension, string expected)
     {
@@ -446,6 +454,286 @@ public class MediaFileCrudServiceTests
         Assert.Multiple(() =>
         {
             Assert.That(result, Is.EqualTo("application/octet-stream"));
+        });
+    }
+
+    [Test]
+    public void GetMimeType_WhenKnownExtension_ReturnsExpectedContentType()
+    {
+        var result = (string)InvokePrivateStatic("GetMimeType", ".png");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo("image/png"));
+        });
+    }
+
+    [Test]
+    public void GetSafeFileName_WhenNull_ReturnsEmpty()
+    {
+        var result = (string)InvokePrivateStatic("GetSafeFileName", new object?[] { null });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo(string.Empty));
+        });
+    }
+
+    [Test]
+    public void GetSafeFileName_WhenOnlyBackslashes_ReturnsFileName()
+    {
+        var result = (string)InvokePrivateStatic("GetSafeFileName", "folder\\subfolder\\file.txt");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo("file.txt"));
+        });
+    }
+
+    [Test]
+    public void GetSafeFileName_WhenOnlyForwardSlashes_ReturnsFileName()
+    {
+        var result = (string)InvokePrivateStatic("GetSafeFileName", "folder/subfolder/file.txt");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo("file.txt"));
+        });
+    }
+
+    [Test]
+    public void GetSafeFileName_WhenNoSeparators_ReturnsOriginal()
+    {
+        var result = (string)InvokePrivateStatic("GetSafeFileName", "simple.jpg");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo("simple.jpg"));
+        });
+    }
+
+    [Test]
+    public void GetSafeExtension_WhenNullFileName_ReturnsEmpty()
+    {
+        var result = (string)InvokePrivateStatic("GetSafeExtension", new object?[] { null });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo(string.Empty));
+        });
+    }
+
+    [Test]
+    public void GetSafeExtension_WhenWhitespaceOnly_ReturnsEmpty()
+    {
+        var result = (string)InvokePrivateStatic("GetSafeExtension", "   ");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo(string.Empty));
+        });
+    }
+
+    [Test]
+    public void GetSafeExtension_WhenContainsBackslash_ReturnsEmpty()
+    {
+        var result = (string)InvokePrivateStatic("GetSafeExtension", "photo.jp\\g");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo(string.Empty));
+        });
+    }
+
+    [Test]
+    public void GetSafeExtension_WhenContainsNullChar_ReturnsEmpty()
+    {
+        var result = (string)InvokePrivateStatic("GetSafeExtension", "photo.jp\0g");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo(string.Empty));
+        });
+    }
+
+    [Test]
+    public void GetFileNameFromUrl_WhenUrlHasPathButNoQuery_ReturnsFileName()
+    {
+        var result = (string)InvokePrivateStatic("GetFileNameFromUrl", "/path/to/document.pdf");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo("document.pdf"));
+        });
+    }
+
+    [Test]
+    public void GetFileNameFromUrl_WhenUrlIsNull_ReturnsEmpty()
+    {
+        var result = (string)InvokePrivateStatic("GetFileNameFromUrl", (string)null!);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo(string.Empty));
+        });
+    }
+
+    [Test]
+    public void BuildAssetUri_WhenDevelopmentEnvironment_ReturnsLocalhostUri()
+    {
+        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
+        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Development");
+
+        var service = CreateSut(hostEnvironment: hostEnvironmentMock.Object);
+
+        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "~/getmedia/img.jpg");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Host, Is.EqualTo("localhost"));
+            Assert.That(result.Port, Is.EqualTo(12393));
+            Assert.That(result.AbsolutePath, Is.EqualTo("/getmedia/img.jpg"));
+        });
+    }
+
+    [Test]
+    public void BuildAssetUri_WhenProductionWithPort_IncludesPort()
+    {
+        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
+        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
+
+        var httpContext = new DefaultHttpContext();
+        httpContext.Request.Scheme = "https";
+        httpContext.Request.Host = new HostString("example.com", 8443);
+
+        var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+        httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
+
+        var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
+
+        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "/getmedia/img.jpg");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Port, Is.EqualTo(8443));
+        });
+    }
+
+    [Test]
+    public void MapToMediaFileOutput_WhenKnownMimeType_ReturnsCorrectMimeType()
+    {
+        var attachmentGuid = Guid.NewGuid();
+        var itemMock = new Mock<IContentItemFieldsSource>();
+        itemMock.SetupGet(x => x.SystemFields).Returns(new ContentItemFields
+        {
+            ContentItemID = 456,
+            ContentItemGUID = attachmentGuid
+        });
+
+        var asset = CreateAsset("photo.png", ".png", 256, "/assets/photo.png");
+
+        var output = (MediaFileOutput)InvokePrivateStatic("MapToMediaFileOutput", itemMock.Object, asset);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(output.Id, Is.EqualTo(456));
+            Assert.That(output.Guid, Is.EqualTo(attachmentGuid));
+            Assert.That(output.Path, Is.EqualTo("photo.png"));
+            Assert.That(output.Extension, Is.EqualTo(".png"));
+            Assert.That(output.MimeType, Is.EqualTo("image/png"));
+            Assert.That(output.Link, Is.EqualTo($"~/getmedia/{attachmentGuid}/photo.png"));
+        });
+    }
+
+    [Test]
+    public void MapToMediaFileOutput_WhenUrlIsNull_HandlesGracefully()
+    {
+        var attachmentGuid = Guid.NewGuid();
+        var itemMock = new Mock<IContentItemFieldsSource>();
+        itemMock.SetupGet(x => x.SystemFields).Returns(new ContentItemFields
+        {
+            ContentItemID = 789,
+            ContentItemGUID = attachmentGuid
+        });
+
+        var asset = new ContentItemAsset { Url = null };
+
+        var output = (MediaFileOutput)InvokePrivateStatic("MapToMediaFileOutput", itemMock.Object, asset);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(output.Id, Is.EqualTo(789));
+            Assert.That(output.Path, Is.EqualTo(string.Empty));
+            Assert.That(output.MimeType, Is.EqualTo("application/octet-stream"));
+        });
+    }
+
+    [Test]
+    public async Task WithUploadedAssetMetadataAsync_WhenFileHasNoExtension_ProcessesCorrectly()
+    {
+        var bytes = Encoding.UTF8.GetBytes("content");
+        await using var stream = new MemoryStream(bytes, writable: false);
+        IFormFile file = new FormFile(stream, 0, bytes.Length, "File", "noextension");
+
+        ContentItemAssetMetadataWithSource? capturedMetadata = null;
+        var result = await InvokePrivateStaticAsync<bool>(
+            "WithUploadedAssetMetadataAsync",
+            [typeof(bool)],
+            file,
+            new Func<ContentItemAssetMetadataWithSource, Task<bool>>(metadata =>
+            {
+                capturedMetadata = metadata;
+                return Task.FromResult(true);
+            }),
+            CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.True);
+            Assert.That(capturedMetadata, Is.Not.Null);
+            Assert.That(capturedMetadata!.Extension, Is.EqualTo(string.Empty));
+            Assert.That(capturedMetadata.Name, Is.EqualTo("noextension"));
+        });
+    }
+
+    [Test]
+    public void WithUploadedAssetMetadataAsync_WhenFileIsNull_ThrowsArgumentNullException()
+    {
+        Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await InvokePrivateStaticAsync<bool>(
+                "WithUploadedAssetMetadataAsync",
+                [typeof(bool)],
+                null!,
+                new Func<ContentItemAssetMetadataWithSource, Task<bool>>(_ => Task.FromResult(true)),
+                CancellationToken.None));
+    }
+
+    [Test]
+    public async Task WithUploadedAssetMetadataAsync_WhenExtensionMatchesFileName_TrimsExtensionFromName()
+    {
+        var bytes = Encoding.UTF8.GetBytes("content");
+        await using var stream = new MemoryStream(bytes, writable: false);
+        IFormFile file = new FormFile(stream, 0, bytes.Length, "File", "document.PDF");
+
+        ContentItemAssetMetadataWithSource? capturedMetadata = null;
+        await InvokePrivateStaticAsync<bool>(
+            "WithUploadedAssetMetadataAsync",
+            [typeof(bool)],
+            file,
+            new Func<ContentItemAssetMetadataWithSource, Task<bool>>(metadata =>
+            {
+                capturedMetadata = metadata;
+                return Task.FromResult(true);
+            }),
+            CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedMetadata, Is.Not.Null);
+            Assert.That(capturedMetadata!.Name, Is.EqualTo("document"));
+            Assert.That(capturedMetadata.Extension, Is.EqualTo(".PDF"));
         });
     }
 
