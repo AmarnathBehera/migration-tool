@@ -58,6 +58,7 @@ export const EditQuery = (props: EditQueryClientProperties) => {
     const [savedQueries, setSavedQueries] = useState(props.savedQueries);
     const [queryResult, setQueryResult] = useState<SqlBrowserQueryResult>();
     const [isRunningQuery, setIsRunningQuery] = useState(false);
+    const [editingQuery, setEditingQuery] = useState<SavedQuery | null>(null);
 
     const { execute: runSql } =
         usePageCommand<SqlBrowserQueryResult, string>('RunSql', {
@@ -192,6 +193,12 @@ export const EditQuery = (props: EditQueryClientProperties) => {
                         return updatedQuery;
                     })
                 );
+
+                setEditingQuery(currentQuery =>
+                    currentQuery?.id === updatedQuery.id
+                        ? updatedQuery
+                        : currentQuery
+                );
             }
         });
 
@@ -211,6 +218,10 @@ export const EditQuery = (props: EditQueryClientProperties) => {
                         return updatedQuery;
                     })
                 );
+
+                setEditingQuery(updatedQuery);
+                setQueryText(updatedQuery.text);
+                notify('Query updated successfully.');
             }
         });
 
@@ -229,6 +240,9 @@ export const EditQuery = (props: EditQueryClientProperties) => {
                 });
 
                 setSavedQueries(newQueries);
+                setEditingQuery(currentQuery =>
+                    currentQuery?.id === id ? null : currentQuery
+                );
 
                 await executeCommand<boolean, SavedQuery[]>(
                     'UpdateSavedOrder',
@@ -250,14 +264,18 @@ export const EditQuery = (props: EditQueryClientProperties) => {
         });
     };
 
-    const updateSavedQueryClick = async (query: SavedQuery) => {
+    const updateSavedQueryClick = async () => {
+        if (!editingQuery) {
+            return;
+        }
+
         if (!queryText || queryText.length <= 0) {
             alert('Please enter a query in the editor');
             return;
         }
 
         updateQuery({
-            ...query,
+            ...editingQuery,
             text: queryText
         });
     };
@@ -290,6 +308,7 @@ export const EditQuery = (props: EditQueryClientProperties) => {
         }
 
         setQueryText('');
+        setEditingQuery(null);
         textAreaRef.current.textContent = '';
     };
 
@@ -404,30 +423,19 @@ export const EditQuery = (props: EditQueryClientProperties) => {
                             runSql(q.text);
                         }
                     },
-                    {
-                        label: 'Copy',
-                        icon: 'xp-doc-copy',
-                        tooltip: 'Copy query to editor',
-                        onClick: () => transferClick(q.text)
-                    },
+                    
                     {
                         label: 'Edit',
                         icon: 'xp-edit',
                         tooltip: 'Edit query text',
                         onClick: () => {
-                            // Load the query text into the editor
+                            setEditingQuery(q);
                             setQueryText(q.text);
                             if (textAreaRef.current) {
                                 textAreaRef.current.textContent = q.text;
                             }
-                            notify('Query loaded into editor. Edit and use "Update" button to save changes.');
+                            notify('Query loaded into editor. Edit and use the Update button to save changes.');
                         }
-                    },
-                    {
-                        label: 'Update',
-                        icon: 'xp-check',
-                        tooltip: 'Save current editor text to this query',
-                        onClick: () => updateSavedQueryClick(q)
                     },
                     {
                         label: 'Rename',
@@ -541,6 +549,16 @@ export const EditQuery = (props: EditQueryClientProperties) => {
                 onClick={saveClick}
                 icon="xp-doc-plus"
             />
+
+            {editingQuery && (
+                <Button
+                    label="Update"
+                    color={ButtonColor.Secondary}
+                    size={ButtonSize.S}
+                    onClick={updateSavedQueryClick}
+                    icon="xp-check"
+                />
+            )}
 
             <Button
                 label="Copy"

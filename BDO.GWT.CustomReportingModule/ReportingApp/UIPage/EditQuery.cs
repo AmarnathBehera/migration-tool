@@ -41,58 +41,16 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
         [PageCommand]
         public Task<ICommandResponse<SqlBrowserQueryResult>> RunSql(string query)
         {
-            if (string.IsNullOrWhiteSpace(query))
+            if (!SqlQueryValidator.Validate(query, out var errorMessage))
             {
+                var errorResult = new SqlBrowserQueryResult
+                {
+                    ErrorMessage = errorMessage ?? "Invalid SQL statement."
+                };
+
                 return Task.FromResult(
-                    ResponseFrom(new SqlBrowserQueryResult
-                    {
-                        ErrorMessage = "No query entered."
-                    })
-                        .AddErrorMessage("No query entered."));
-            }
-
-            // Only allow SELECT queries (skip leading comments/whitespace and inspect first token)
-            static string? GetFirstTokenSkippingComments(string sql)
-            {
-                if (string.IsNullOrWhiteSpace(sql))
-                {
-                    return null;
-                }
-
-                int index = 0;
-
-                while (index < sql.Length)
-                {
-                    SkipWhitespace(sql, ref index);
-
-                    if (index >= sql.Length)
-                    {
-                        return null;
-                    }
-
-                    if (SkipLineComment(sql, ref index) || SkipBlockComment(sql, ref index))
-                    {
-                        continue;
-                    }
-
-                    string? token = ReadToken(sql, ref index);
-                    if (!string.IsNullOrEmpty(token))
-                    {
-                        return token;
-                    }
-
-                    index++;
-                }
-
-                return null;
-            }
-
-            var firstToken = GetFirstTokenSkippingComments(query)?.ToUpperInvariant();
-            if (firstToken is null || !(firstToken == "SELECT" || firstToken == "WITH"))
-            {
-                // Return an empty result with an error message
-                var errorResult = new SqlBrowserQueryResult { ErrorMessage = "Only SELECT queries (optionally with CTEs) are allowed." };
-                return Task.FromResult(ResponseFrom(errorResult).AddErrorMessage("Only SELECT queries (optionally with CTEs) are allowed."));
+                    ResponseFrom(errorResult)
+                        .AddErrorMessage(errorResult.ErrorMessage));
             }
 
             sqlBrowserResultProvider.SetQuery(query);
@@ -173,6 +131,7 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
                 ? null
                 : sql.Substring(start, index - start);
         }
+
         [PageCommand]
         public Task<ICommandResponse<SavedQuery?>> RenameQuery(SavedQuery query)
         {

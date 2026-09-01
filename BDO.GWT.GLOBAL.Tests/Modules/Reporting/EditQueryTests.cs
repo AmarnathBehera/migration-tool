@@ -392,7 +392,7 @@ public partial class EditQueryTests
     }
 
     [Test]
-    public void RunSql_Allows_Select_With_Leading_Comments()
+    public void RunSql_Allows_Supported_Select_With_Leading_Comments()
     {
         var sqlProvider = new FakeSqlProvider();
 
@@ -406,7 +406,7 @@ public partial class EditQueryTests
         var method = _type.GetMethod("RunSql")!;
 
         var sql =
-            "-- this is a comment\n/* block */\n   SELECT 1";
+            "-- this is a comment\n/* block */\n   SELECT * FROM CMS_User";
 
         InvokeTaskResult(instance, method, sql);
 
@@ -414,7 +414,7 @@ public partial class EditQueryTests
     }
 
     [Test]
-    public void RunSql_Allows_With_Cte_Query()
+    public void RunSql_Disallows_With_Cte_Query()
     {
         var sqlProvider = new FakeSqlProvider();
 
@@ -436,7 +436,7 @@ SELECT * FROM Data";
 
         InvokeTaskResult(instance, method, sql);
 
-        Assert.That(sqlProvider.Query, Is.EqualTo(sql));
+        Assert.That(sqlProvider.Query, Is.Null);
     }
 
     [Test]
