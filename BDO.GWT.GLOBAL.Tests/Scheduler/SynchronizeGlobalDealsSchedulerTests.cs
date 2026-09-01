@@ -45,8 +45,8 @@ public class SynchronizeGlobalDealsSchedulerTests
 
     private void SetupConfig(string? url, string? apiKey)
     {
-        _configurationMock.Setup(c => c["BDO.SyncApiUrl"]).Returns(url);
-        _configurationMock.Setup(c => c["BDO.SyncApiKey"]).Returns(apiKey);
+        _configurationMock.Setup(c => c["BDOSyncApiUrl"]).Returns(url);
+        _configurationMock.Setup(c => c["BDOSyncApiKey"]).Returns(apiKey);
     }
 
     private void SetupHttpResponse(HttpStatusCode statusCode, string content = "")
@@ -93,7 +93,7 @@ public class SynchronizeGlobalDealsSchedulerTests
 
         var result = await _scheduler.Execute(task, CancellationToken.None);
 
-        Assert.That(GetResultMessage(result), Does.Contain("BDO.SyncApiUrl"));
+        Assert.That(GetResultMessage(result), Does.Contain("BDOSyncApiUrl"));
 
     }
 
@@ -105,7 +105,7 @@ public class SynchronizeGlobalDealsSchedulerTests
 
         var result = await _scheduler.Execute(task, CancellationToken.None);
 
-        Assert.That(GetResultMessage(result), Does.Contain("BDO.SyncApiUrl"));
+        Assert.That(GetResultMessage(result), Does.Contain("BDOSyncApiUrl"));
     }
 
     [Test]
@@ -133,7 +133,7 @@ public class SynchronizeGlobalDealsSchedulerTests
 
         var result = await _scheduler.Execute(task, CancellationToken.None);
 
-        Assert.That(GetResultMessage(result), Does.Contain("BDO.SyncApiKey"));
+        Assert.That(GetResultMessage(result), Does.Contain("BDOSyncApiKey"));
     }
 
     [Test]
@@ -144,7 +144,7 @@ public class SynchronizeGlobalDealsSchedulerTests
 
         var result = await _scheduler.Execute(task, CancellationToken.None);
 
-        Assert.That(GetResultMessage(result), Does.Contain("BDO.SyncApiKey"));
+        Assert.That(GetResultMessage(result), Does.Contain("BDOSyncApiKey"));
     }
 
     [Test]

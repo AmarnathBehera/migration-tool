@@ -63,6 +63,8 @@ variables:
     value: "BDO.GWT.GLOBAL/GWTXbyKWeb.csproj"
   - name: apiProjectFilePath
     value: "BDO.GWT.GLOBAL.API/BDO.GWT.GLOBAL.API.csproj"
+  - name: syncProjectFilePath
+    value: "BDO.GWT.GLOBAL.Sync/BDO.GWT.GLOBAL.Sync.csproj"
 
   # Octopus Deploy variables
   - name: octopusSpaceName
@@ -79,8 +81,8 @@ variables:
     value: "GWT.XbyK.React.Deploy"
   - name: ciAppPackageId
     value: "GWT.XbyK.CI.Deploy"
-  # - name: synAppPackageId
-  #   value: "GWT.XbyK.Sync.Deploy"
+  - name: syncAppPackageId
+    value: "GWT.XbyK.Sync.Deploy"
   - name: apiAppPackageId
     value: "GWT.XbyK.API.Deploy"
 
@@ -434,6 +436,49 @@ stages:
               targetPath: "$(octopusPackageOutput)"
               artifact: drop-api
 
+      - job: BuildSyncApp
+        displayName: "Build and package XbyK Sync App"
+        pool:
+          vmImage: "ubuntu-latest"
+        variables:
+          selfSourcesDirectory: "$(Build.SourcesDirectory)"
+        steps:
+          - checkout: self
+
+          - task: UseDotNet@2
+            displayName: "Use .NET $(dotnetVersion)"
+            inputs:
+              packageType: "sdk"
+              version: "$(dotnetVersion)"
+              installationPath: $(Agent.ToolsDirectory)/dotnet
+
+          - task: NuGetAuthenticate@1
+            displayName: "Authenticate NuGet"
+
+          - script: dotnet restore $(selfSourcesDirectory)/$(syncProjectFilePath)
+            displayName: "Restore NuGet packages"
+
+          - script: >
+              dotnet publish $(selfSourcesDirectory)/$(syncProjectFilePath)
+              --configuration $(buildConfiguration) --no-restore --output
+              $(publishOutput)
+            displayName: "Publish Sync project"
+
+          - task: ArchiveFiles@2
+            displayName: "Create Sync deployment package"
+            inputs:
+              rootFolderOrFile: "$(publishOutput)"
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: "$(octopusPackageOutput)/$(syncAppPackageId).$(Build.BuildNumber).zip"
+              replaceExistingArchive: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish Sync package artifact"
+            inputs:
+              targetPath: "$(octopusPackageOutput)"
+              artifact: drop-sync
+
       - job: BuildReactApp
         displayName: "Build and package XbyK React SSR App"
         steps:
@@ -532,6 +577,9 @@ stages:
           - download: current
             displayName: "Download API package artifact"
             artifact: drop-api
+          - download: current
+            displayName: "Download Sync package artifact"
+            artifact: drop-sync
 
           - task: OctopusPush@7
             displayName: Push Packages to Octopus
@@ -544,6 +592,7 @@ stages:
                 $(Pipeline.Workspace)/drop-react/*.zip
                 $(Pipeline.Workspace)/drop-ci/*.zip
                 $(Pipeline.Workspace)/drop-api/*.zip
+                $(Pipeline.Workspace)/drop-sync/*.zip
               Replace: "true"
 
           - task: OctopusBuildInformation@7
@@ -557,6 +606,7 @@ stages:
                 $(reactAppPackageId)
                 $(ciAppPackageId)
                 $(apiAppPackageId)
+                $(syncAppPackageId)
               PackageVersion: "$(Build.BuildNumber)"
               Replace: OverwriteExisting
 
