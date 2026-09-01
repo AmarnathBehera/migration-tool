@@ -35,6 +35,16 @@ step "deploy-cms-app-service" {
                     "slotSetting": false
                   },  
                   {
+                    "name": "BDOSyncApiKey",
+                    "value": "#{appsettings.syncApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "BDOSyncApiUrl",
+                    "value": "#{appsettings.syncApiUrl}",
+                    "slotSetting": false
+                  },
+                  {
                     "name": "AzureAd__TenantId",
                     "value": "#{appsettings.azureAdTenantId}",
                     "slotSetting": false
@@ -176,6 +186,16 @@ step "deploy-mvc-app-service" {
                   {
                     "name": "CMSHashStringSalt",
                     "value": "#{appsettings.CMSHashStringSalt}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "BDOSyncApiKey",
+                    "value": "#{appsettings.syncApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "BDOSyncApiUrl",
+                    "value": "#{appsettings.syncApiUrl}",
                     "slotSetting": false
                   },
                   {
@@ -402,6 +422,75 @@ step "deploy-api-app-service" {
             }
         }
     }
+}
+
+step "deploy-sync-app-service" {
+  name = "Deploy Sync App Service"
+  properties = {
+    Octopus.Action.TargetRoles = "xbyk-sync-webapp"
+  }
+  start_trigger = "StartWithPrevious"
+
+  action {
+    action_type = "Octopus.AzureAppService"
+    properties = {
+      Octopus.Action.Azure.AppSettings = <<-EOT
+        [
+          {
+          "name": "ASPNETCORE_ENVIRONMENT",
+          "value": "#{appsettings.aspNetCoreEnvironment}",
+          "slotSetting": false
+          },
+          {
+          "name": "SyncApiKey",
+          "value": "#{appsettings.syncApiKey}",
+          "slotSetting": false
+          },
+          {
+          "name": "Regions__Name",
+          "value": "",
+          "slotSetting": false
+          },
+          {
+          "name": "Regions__SyncServerUrl",
+          "value": "",
+          "slotSetting": false
+          },
+          {
+          "name": "GlobalSiteGUID",
+          "value": "#{appsettings.syncGlobalSiteGuid}",
+          "slotSetting": false
+          }
+        ]
+        EOT
+      Octopus.Action.Azure.ConnectionStrings = <<-EOT
+        [
+           {
+            "name": "CMSConnectionString",
+            "value": "#{appsettings.CMSConnectionString}",
+            "type": "SQLAzure",
+            "slotSetting": false
+           }
+        ]
+        EOT
+      Octopus.Action.Azure.DeploymentType = "Package"
+      Octopus.Action.EnabledFeatures = "Octopus.Features.ConfigurationVariables,Octopus.Features.JsonConfigurationVariables,Octopus.Features.ConfigurationTransforms,Octopus.Features.SubstituteInFiles"
+      Octopus.Action.Package.DownloadOnTentacle = "False"
+      Octopus.Action.Package.FeedId = "octopus-server-built-in"
+      Octopus.Action.Package.PackageId = "GWT.XbyK.Sync.Deploy"
+      OctopusUseBundledTooling = "False"
+    }
+    worker_pool_variable = "deploy.octopus.workerPool"
+
+    packages {
+      acquisition_location = "Server"
+      feed = "octopus-server-built-in"
+      package_id = "GWT.XbyK.Sync.Deploy"
+      properties = {
+        SelectionMode = "immediate"
+      }
+    }
+  }
 }
 
 step "update-apim-api-from-swagger" {

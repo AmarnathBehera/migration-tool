@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using BDO.GWT.Web.Widgets;
 using Kentico.Components.Web.Mvc.FormComponents;
 using Kentico.Forms.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
@@ -9,9 +10,9 @@ using Microsoft.Extensions.Options;
 
 namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ButtonWidget;
 
-public class ButtonWidgetProperties : IWidgetProperties
+public class ButtonWidgetProperties : BaseWidgetProperties
 {
-    [TextInputComponent(Label = "Button text", ExplanationText = "Button text", Order = 0)]
+    [TextInputComponent(Label = "Button text", Order = 0)]
     public string? Text { get; set; }
 
     [TextInputComponent(Label = "Button link", Order = 1)]
@@ -19,7 +20,7 @@ public class ButtonWidgetProperties : IWidgetProperties
     [ExcludeFromAiraTranslation]
     public string? Link { get; set; }
 
-    [DropDownComponent(Label = "Link targe", Order = 2, Options = "_self;Same tab\n_blank;New tab")]
+    [DropDownComponent(Label = "Link target", Order = 2, Options = "_self;Same tab\n_blank;New tab")]
     public string Target { get; set; } = "_self";
 
     [RadioGroupComponent(Label = "Button type", Order = 3, Options = "primary;Primary\r\nsecondary;Secondary\r\ntertiary;Tertiary")]
