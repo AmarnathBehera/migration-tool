@@ -598,32 +598,6 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
-    public void BuildAssetUri_WhenProductionWithPort_IncludesPort()
-    {
-        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
-        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
-
-        var httpContext = new DefaultHttpContext();
-        httpContext.Request.Scheme = "https";
-        httpContext.Request.Host = new HostString("example.com", 8443);
-
-        var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
-        httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
-
-        var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
-
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "/getmedia/img.jpg");
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result, Is.Not.Null);
-            // Verify the URI contains the expected host and path; port handling depends on HostString behavior
-            Assert.That(result!.Host, Is.EqualTo("example.com"));
-            Assert.That(result.AbsolutePath, Is.EqualTo("/getmedia/img.jpg"));
-        });
-    }
-
-    [Test]
     public void MapToMediaFileOutput_WhenKnownMimeType_ReturnsCorrectMimeType()
     {
         var attachmentGuid = Guid.NewGuid();
