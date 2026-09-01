@@ -84,7 +84,7 @@ namespace BDO.GWT.GLOBAL.Controllers
             }
         }
 
-        private static string TryExtractLanguageFromUrl(IStatusCodeReExecuteFeature? feature)
+        private static string TryExtractLanguageFromUrl(IStatusCodeReExecuteFeature feature)
         {
             if (feature is null) return null;
 
