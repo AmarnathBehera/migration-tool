@@ -13,6 +13,7 @@ public static class Program
 
         builder.Services.AddControllersWithViews();
         builder.Services.AddKentico();
+        builder.Services.AddKenticoAzureSearch(builder.Configuration);
         builder.Services.AddContentServices();
         builder.Services.AddApiService(builder.Configuration);
         builder.Services.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
