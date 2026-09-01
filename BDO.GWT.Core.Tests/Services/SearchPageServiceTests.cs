@@ -75,8 +75,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             SetupSearchResponse();
 
-            _service = new SearchPageService(
-                _cultureContextMock.Object,                
+            _service = new SearchPageService(                              
                 _typeMapperMock.Object,
                 _searchServiceMock.Object,               
                 _searchCardHelperMock.Object,
