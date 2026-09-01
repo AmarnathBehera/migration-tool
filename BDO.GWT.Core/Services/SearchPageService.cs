@@ -31,8 +31,7 @@ namespace BDO.GWT.Core.Services
 
         Task<SearchPageDto> GetSearchPageDtoAsync(string searchText,string currentLanguage, CancellationToken cancellationToken);
     }
-    public class SearchPageService(
-        ICultureContext cultureContext,        
+    public class SearchPageService(           
         ITypeMapper typeMapper,
         ISearchService searchService,   
         ISearchCardHelper searchCardHelper,
@@ -121,7 +120,7 @@ namespace BDO.GWT.Core.Services
 
         #endregion
 
-        //private readonly ICultureContext _cultureContext = cultureContext;               
+                    
         private readonly ISearchService _searchService = searchService;
         private readonly ITypeMapper _typeMapper = typeMapper;
         
