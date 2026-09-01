@@ -35,12 +35,12 @@ step "deploy-cms-app-service" {
                     "slotSetting": false
                   },  
                   {
-                    "name": "BDO.SyncApiKey",
+                    "name": "BDOSyncApiKey",
                     "value": "#{appsettings.syncApiKey}",
                     "slotSetting": false
                   },
                   {
-                    "name": "BDO.SyncApiUrl",
+                    "name": "BDOSyncApiUrl",
                     "value": "#{appsettings.syncApiUrl}",
                     "slotSetting": false
                   },
@@ -189,12 +189,12 @@ step "deploy-mvc-app-service" {
                     "slotSetting": false
                   },
                   {
-                    "name": "BDO.SyncApiKey",
+                    "name": "BDOSyncApiKey",
                     "value": "#{appsettings.syncApiKey}",
                     "slotSetting": false
                   },
                   {
-                    "name": "BDO.SyncApiUrl",
+                    "name": "BDOSyncApiUrl",
                     "value": "#{appsettings.syncApiUrl}",
                     "slotSetting": false
                   },
