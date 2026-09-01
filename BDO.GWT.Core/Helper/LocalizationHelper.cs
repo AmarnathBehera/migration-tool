@@ -11,18 +11,15 @@ public interface ILocalizationHelper
 }
 
 public class LocalizationHelper : ILocalizationHelper
-{
-    private readonly ICultureContext _cultureContext;
+{ 
     private readonly IInfoProvider<LocalizationKeyInfo> _localizationKeyProvider;
     private readonly IInfoProvider<XperienceCommunity.Localization.LocalizationTranslationItemInfo> _localizationTranslationProvider;
     private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageProvider;
-    public LocalizationHelper(
-        ICultureContext cultureContext,
+    public LocalizationHelper( 
         IInfoProvider<LocalizationKeyInfo> localizationKeyProvider,
         IInfoProvider<XperienceCommunity.Localization.LocalizationTranslationItemInfo> localizationTranslationProvider,
         IInfoProvider<ContentLanguageInfo> contentLanguageProvider)
-    {
-        _cultureContext = cultureContext;
+    { 
         _localizationKeyProvider = localizationKeyProvider;
         _localizationTranslationProvider = localizationTranslationProvider;
         _contentLanguageProvider = contentLanguageProvider;
