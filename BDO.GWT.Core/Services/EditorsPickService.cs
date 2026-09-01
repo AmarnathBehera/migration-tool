@@ -21,22 +21,23 @@ public interface IEditorsPickService
         HashSet<ContentItemReference> selectedGuids,
         CardsQuery query,
         CancellationToken cancellationToken);
+
+    Task<ICollection<EditorsPickCardDto>> GetAPIFilteredItemsAsync(
+        EditorsPickCardsQuery query,
+        CancellationToken cancellationToken);
 }
 
 public class EditorsPickService : IEditorsPickService
 {
     private readonly IFilteringHelper _filteringHelper;
     private readonly IEditorsPickCardService _editorsPickCardService;
-    private readonly IEditorsPickStateStore _stateStore;
 
     public EditorsPickService(
         IFilteringHelper filteringHelper,
-        IEditorsPickCardService editorsPickCardService,
-        IEditorsPickStateStore stateStore)
+        IEditorsPickCardService editorsPickCardService)
     {
         _filteringHelper = filteringHelper;
         _editorsPickCardService = editorsPickCardService;
-        _stateStore = stateStore;
     }
 
     public async Task<EditorsPickDto> GetEditorsPickAsync<T>(
@@ -64,10 +65,6 @@ public class EditorsPickService : IEditorsPickService
             new CardsQuery(),
             cancellationToken);
 
-        var stateGuid = Guid.NewGuid();
-
-        _stateStore.Save(stateGuid, featuredGuids, selectedGuids);
-
         return new EditorsPickDto
         {
             Title = data.Title,
@@ -90,9 +87,15 @@ public class EditorsPickService : IEditorsPickService
             TopMargin = data.TopMargin ?? string.Empty,
             BottomMargin = data.BottomMargin ?? string.Empty,
             WidgetID = data.WidgetID,
-            StateGUID = stateGuid,
-            FeaturedGuids = string.Join(",", featuredGuids.Select(x => x.Identifier)),
-            SelectedGuids = string.Join(",", selectedGuids.Select(x => x.Identifier)),
+            CurrentPageGuid = currentPage.SystemFields.ContentItemGUID,
+            PageType = currentPage.GetType().Name,
+
+            SelectedGuids = selectedGuids
+                .Select(x => x.Identifier)
+                .ToList(),
+            FeaturedGuids = featuredGuids
+                .Select(x => x.Identifier)
+                .ToList(),
         };
     }
 
@@ -106,7 +109,6 @@ public class EditorsPickService : IEditorsPickService
         featuredGuids ??= new HashSet<ContentItemReference>();
         selectedGuids ??= new HashSet<ContentItemReference>();
 
-
         var selectedPageGuids = selectedGuids
             .Select(x => x.Identifier)
             .ToHashSet();
@@ -115,11 +117,40 @@ public class EditorsPickService : IEditorsPickService
             .Select(x => x.Identifier)
             .ToHashSet();
 
+        // Include featured in the retrieval set
         selectedPageGuids.UnionWith(featuredPageGuids);
+
         var paginationDto = await _editorsPickCardService.GetFilteredItemsAsync(
             query,
             selectedPageGuids,
             page => featuredPageGuids.Contains(page.SystemFields.ContentItemGUID),
+            cancellationToken);
+
+        return paginationDto.Data;
+    }
+
+    public async Task<ICollection<EditorsPickCardDto>> GetAPIFilteredItemsAsync(
+        EditorsPickCardsQuery query,
+        CancellationToken cancellationToken)
+    {
+        var selectedGuids = query.SelectedGuids?.ToHashSet() ?? new HashSet<Guid>();
+        var featuredGuids = query.FeaturedGuids?.ToHashSet() ?? new HashSet<Guid>();
+
+        // Include featured in retrieval set — same as SSR path
+        var allGuids = selectedGuids.ToHashSet();
+        allGuids.UnionWith(featuredGuids);
+
+        var cardsQuery = new CardsQuery
+        {
+            Filters = query.Filters,
+            CurrentPage = query.CurrentPage ?? 1,
+            PageSize = query.PageSize ?? 10
+        };
+
+        var paginationDto = await _editorsPickCardService.GetFilteredItemsAsync(
+            cardsQuery,
+            allGuids,
+            page => featuredGuids.Contains(page.SystemFields.ContentItemGUID),
             cancellationToken);
 
         return paginationDto.Data;

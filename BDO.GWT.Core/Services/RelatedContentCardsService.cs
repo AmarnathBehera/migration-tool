@@ -6,7 +6,6 @@ using BDO.GWT.Core.Utilities;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Http;
-using ReverseMarkdown.Converters;
 
 namespace BDO.GWT.Core.Services;
 
@@ -22,7 +21,7 @@ public interface IRelatedContentCardService
         string parentPath,
         string language,
         Action<RetrievePagesQueryParameters>? decorateQuery,
-        Func<IWebPageFieldsSource, bool> isFeatured,  // fixed
+        Func<IWebPageFieldsSource, bool> isFeatured,
         CancellationToken cancellationToken);
 }
 
@@ -60,7 +59,7 @@ public class RelatedContentCardService : IRelatedContentCardService
         string parentPath,
         string language,
         Action<RetrievePagesQueryParameters>? decorateQuery,
-        Func<IWebPageFieldsSource, bool> isFeatured,  // fixed
+        Func<IWebPageFieldsSource, bool> isFeatured,
         CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(parentPath))
@@ -69,52 +68,30 @@ public class RelatedContentCardService : IRelatedContentCardService
         var selectedTypes = cardsQuery.SelectedPageTypes ?? new List<string>();
         var allPages = new List<IWebPageFieldsSource>();
 
+        async Task<IEnumerable<IWebPageFieldsSource>> RetrieveAsync<T>()
+            where T : class, IWebPageFieldsSource =>
+            await _contentRetriever.RetrievePages<T, T>(
+                new RetrievePagesParameters
+                {
+                    LinkedItemsMaxLevel = 2,
+                    PathMatch = PathMatch.Children(parentPath),
+                    LanguageName = language
+                },
+                query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
+                RetrievalCacheSettings.CacheDisabled,
+                (_, page) => Task.FromResult(page),
+                cancellationToken);
+
         foreach (var pageType in selectedTypes)
         {
             IEnumerable<IWebPageFieldsSource> pages = pageType switch
             {
-                nameof(Insight) => await _contentRetriever.RetrievePages<Insight, Insight>(
-                    new RetrievePagesParameters { LinkedItemsMaxLevel = 2, PathMatch = PathMatch.Children(parentPath) },
-                    query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
-                    RetrievalCacheSettings.CacheDisabled,
-                    (_, page) => Task.FromResult(page),
-                    cancellationToken),
-
-                nameof(BlogPost) => await _contentRetriever.RetrievePages<BlogPost, BlogPost>(
-                    new RetrievePagesParameters { LinkedItemsMaxLevel = 2, PathMatch = PathMatch.Children(parentPath) },
-                    query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
-                    RetrievalCacheSettings.CacheDisabled,
-                    (_, page) => Task.FromResult(page),
-                    cancellationToken),
-
-                nameof(NewsArticle) => await _contentRetriever.RetrievePages<NewsArticle, NewsArticle>(
-                    new RetrievePagesParameters { LinkedItemsMaxLevel = 2, PathMatch = PathMatch.Children(parentPath) },
-                    query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
-                    RetrievalCacheSettings.CacheDisabled,
-                    (_, page) => Task.FromResult(page),
-                    cancellationToken),
-
-                nameof(Event) => await _contentRetriever.RetrievePages<Event, Event>(
-                    new RetrievePagesParameters { LinkedItemsMaxLevel = 2, PathMatch = PathMatch.Children(parentPath) },
-                    query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
-                    RetrievalCacheSettings.CacheDisabled,
-                    (_, page) => Task.FromResult(page),
-                    cancellationToken),
-
-                nameof(Webinar) => await _contentRetriever.RetrievePages<Webinar, Webinar>(
-                    new RetrievePagesParameters { LinkedItemsMaxLevel = 2, PathMatch = PathMatch.Children(parentPath) },
-                    query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
-                    RetrievalCacheSettings.CacheDisabled,
-                    (_, page) => Task.FromResult(page),
-                    cancellationToken),
-
-                nameof(MicrositePage) => await _contentRetriever.RetrievePages<MicrositePage, MicrositePage>(
-                    new RetrievePagesParameters { LinkedItemsMaxLevel = 2, PathMatch = PathMatch.Children(parentPath) },
-                    query => { ApplyCommonFilter(query); decorateQuery?.Invoke(query); },
-                    RetrievalCacheSettings.CacheDisabled,
-                    (_, page) => Task.FromResult(page),
-                    cancellationToken),
-
+                nameof(Insight)       => await RetrieveAsync<Insight>(),
+                nameof(BlogPost)      => await RetrieveAsync<BlogPost>(),
+                nameof(NewsArticle)   => await RetrieveAsync<NewsArticle>(),
+                nameof(Event)         => await RetrieveAsync<Event>(),
+                nameof(Webinar)       => await RetrieveAsync<Webinar>(),
+                nameof(MicrositePage) => await RetrieveAsync<MicrositePage>(),
                 _ => Array.Empty<IWebPageFieldsSource>()
             };
 
@@ -128,7 +105,6 @@ public class RelatedContentCardService : IRelatedContentCardService
             .Where(page => filters.All(f => f(page)))
             .ToArray();
 
-        // explicit cast fixes the async LINQ overload conflict
         var ordered = ((IEnumerable<IWebPageFieldsSource>)filtered)
             .OrderByDescending(x => isFeatured(x))
             .ThenByDescending(x =>
@@ -144,12 +120,14 @@ public class RelatedContentCardService : IRelatedContentCardService
             .Take(pageSize)
             .ToArray();
 
-        var itemDtos = await Task.WhenAll(
-            paginated.Select(page => GetContentPageCardDtoAsync(page, isFeatured)));
+        var itemDtos = (await Task.WhenAll(
+            paginated.Select(page => GetContentPageCardDtoAsync(page, isFeatured))))
+            .Where(card => card is not null)
+            .ToArray();
 
         return new PaginationDto<ContentPageCardDto>
         {
-            Data = itemDtos,
+            Data = itemDtos!,
             TotalCount = ordered.Length
         };
     }
@@ -272,115 +250,60 @@ public class RelatedContentCardService : IRelatedContentCardService
         return UrlPathSeparator + url;
     }
 
-    // fixed: IWebPageFieldsSource + type switch for card mapping
     private Task<ContentPageCardDto> GetContentPageCardDtoAsync(
         IWebPageFieldsSource page,
         Func<IWebPageFieldsSource, bool> isFeatured)
     {
+        static string? Teaser(IEnumerable<ContentAttachment>? img) =>
+            img?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+
         var card = page switch
         {
-            Insight i => BuildInsightCard(i, isFeatured),
-            BlogPost b => BuildBlogPostCard(b, isFeatured),
-            NewsArticle n => BuildNewsArticleCard(n, isFeatured),
-            Event e => BuildEventCard(e, isFeatured),
-            Webinar w => BuildWebinarCard(w, isFeatured),
-            MicrositePage m => BuildMicrositePageCard(m, isFeatured),
-            _ => BuildFallbackCard(page, isFeatured)
+            Insight i => BuildCard(i, isFeatured, new CardContent(
+                i.InsightContent.FirstOrDefault()?.ImageFile.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+                i.InsightContent.FirstOrDefault()?.ImageFileAltText,
+                i.ContentType?.FirstOrDefault()?.Name, i.MetadataTitle, i.MetadataDescription, i.ComingSoon)),
+
+            BlogPost b     => BuildCard(b, isFeatured, new CardContent(Teaser(b.MetadataTeaserImage), b.MetadataTeaserImageAltText, b.ContentType?.FirstOrDefault()?.Name, b.MetadataTitle, b.MetadataDescription)),
+            NewsArticle n  => BuildCard(n, isFeatured, new CardContent(Teaser(n.MetadataTeaserImage), n.MetadataTeaserImageAltText, n.ContentType?.FirstOrDefault()?.Name, n.MetadataTitle, n.MetadataDescription)),
+            Event e        => BuildCard(e, isFeatured, new CardContent(Teaser(e.MetadataTeaserImage), e.MetadataTeaserImageAltText, e.ContentType?.FirstOrDefault()?.Name, e.MetadataTitle, e.MetadataDescription)),
+            Webinar w      => BuildCard(w, isFeatured, new CardContent(Teaser(w.MetadataTeaserImage), w.MetadataTeaserImageAltText, w.ContentType?.FirstOrDefault()?.Name, w.MetadataTitle, w.MetadataDescription)),
+            MicrositePage m => BuildCard(m, isFeatured, new CardContent(Teaser(m.MetadataTeaserImage), m.MetadataTeaserImageAltText, m.MicrositeContentType?.FirstOrDefault()?.Name, m.MetadataTitle, m.MetadataDescription)),
+
+            _ => null
         };
 
-        return Task.FromResult(card);
+        return Task.FromResult(card!);
     }
 
-    private ContentPageCardDto BuildInsightCard(Insight page, Func<IWebPageFieldsSource, bool> isFeatured)
-    {
-        var imageUrl = page.InsightContent.FirstOrDefault()?.ImageFile
-            .FirstOrDefault()?.ContentAttachmentAsset?.Url;
-
-        return new ContentPageCardDto
-        {
-            IsFeatured = isFeatured(page),
-            ImageURL = GetAbsoluteAssetUrl(imageUrl),
-            isComingSoon = page.ComingSoon,
-            ImageAltText = page.InsightContent.FirstOrDefault()?.ImageFileAltText,
-            Type = page.ContentType?.FirstOrDefault()?.Name,
-            Title = page.MetadataTitle,
-            Date = page.SystemFields.ContentItemCommonDataLastPublishedWhen
-                   ?? page.SystemFields.ContentItemCommonDataFirstPublishedWhen,
-            UpdatedOnDate = null,
-            Description = HtmlHelper.ExtractTextFromHtml(page.MetadataDescription),
-            ReadMoreLink = new LinkItemDto
-            {
-                Title = ResourceStringKey.LiveSite.ReadMore,
-                URL = _webPageUrlResolver.GetAbsoluteUrl(page)
-            }
-        };
-    }
-
-    private ContentPageCardDto BuildBlogPostCard(BlogPost page, Func<IWebPageFieldsSource, bool> isFeatured)
-    {
-        var imageUrl = page.MetadataTeaserImage.FirstOrDefault()?.ContentAttachmentAsset?.Url;
-
-        return new ContentPageCardDto
-        {
-            IsFeatured = isFeatured(page),
-            ImageURL = GetAbsoluteAssetUrl(imageUrl),
-            isComingSoon = false,
-            ImageAltText = page.MetadataTeaserImageAltText,
-            Type = page.ContentType?.FirstOrDefault()?.Name,
-            Title = page.MetadataTitle,
-            Date = page.SystemFields.ContentItemCommonDataLastPublishedWhen
-                   ?? page.SystemFields.ContentItemCommonDataFirstPublishedWhen,
-            UpdatedOnDate = null,
-            Description = HtmlHelper.ExtractTextFromHtml(page.MetadataDescription),
-            ReadMoreLink = new LinkItemDto
-            {
-                Title = ResourceStringKey.LiveSite.ReadMore,
-                URL = _webPageUrlResolver.GetAbsoluteUrl(page)
-            }
-        };
-    }
-
-    // follow the same pattern for NewsArticle, Event, Webinar, MicrositePage
-    // adjust image/alt text fields to match each type's actual properties
-    private ContentPageCardDto BuildNewsArticleCard(NewsArticle page, Func<IWebPageFieldsSource, bool> isFeatured) =>
-        BuildGenericCard(page, isFeatured, page.MetadataTitle, page.MetadataDescription, page.ContentType?.FirstOrDefault()?.Name);
-
-    private ContentPageCardDto BuildEventCard(Event page, Func<IWebPageFieldsSource, bool> isFeatured) =>
-        BuildGenericCard(page, isFeatured, page.MetadataTitle, page.MetadataDescription, page.ContentType?.FirstOrDefault()?.Name);
-
-    private ContentPageCardDto BuildWebinarCard(Webinar page, Func<IWebPageFieldsSource, bool> isFeatured) =>
-        BuildGenericCard(page, isFeatured, page.MetadataTitle, page.MetadataDescription, page.ContentType?.FirstOrDefault()?.Name);
-
-    private ContentPageCardDto BuildMicrositePageCard(MicrositePage page, Func<IWebPageFieldsSource, bool> isFeatured) =>
-        BuildGenericCard(page, isFeatured, page.MetadataTitle, page.MetadataDescription, null);
-
-    private ContentPageCardDto BuildFallbackCard(IWebPageFieldsSource page, Func<IWebPageFieldsSource, bool> isFeatured) =>
-        BuildGenericCard(page, isFeatured, null, null, null);
-
-    private ContentPageCardDto BuildGenericCard(
+    private ContentPageCardDto BuildCard(
         IWebPageFieldsSource page,
         Func<IWebPageFieldsSource, bool> isFeatured,
-        string? title,
-        string? description,
-        string? type)
-    {
-        return new ContentPageCardDto
+        CardContent content) =>
+        new ContentPageCardDto
         {
             IsFeatured = isFeatured(page),
-            ImageURL = null,
-            isComingSoon = false,
-            ImageAltText = null,
-            Type = type,
-            Title = title ?? string.Empty,
+            ImageURL = GetAbsoluteAssetUrl(content.ImageUrl),
+            isComingSoon = content.IsComingSoon,
+            ImageAltText = content.ImageAltText,
+            Type = content.Type,
+            Title = content.Title ?? string.Empty,
             Date = page.SystemFields.ContentItemCommonDataLastPublishedWhen
                    ?? page.SystemFields.ContentItemCommonDataFirstPublishedWhen,
             UpdatedOnDate = null,
-            Description = HtmlHelper.ExtractTextFromHtml(description),
+            Description = HtmlHelper.ExtractTextFromHtml(content.Description),
             ReadMoreLink = new LinkItemDto
             {
                 Title = ResourceStringKey.LiveSite.ReadMore,
                 URL = _webPageUrlResolver.GetAbsoluteUrl(page)
             }
         };
-    }
+
+    private readonly record struct CardContent(
+        string? ImageUrl,
+        string? ImageAltText,
+        string? Type,
+        string? Title,
+        string? Description,
+        bool IsComingSoon = false);
 }

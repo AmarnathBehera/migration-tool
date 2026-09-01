@@ -5,6 +5,7 @@ using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Web.Core.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Moq;
 
 namespace BDO.GWT.GLOBAL.Tests.Controllers.API;
@@ -22,7 +23,8 @@ public class InsightsControllerTests
         {
             ControllerContext = new ControllerContext
             {
-                HttpContext = new DefaultHttpContext()
+                HttpContext = new DefaultHttpContext(),
+                RouteData = new RouteData()
             }
         };
     }
@@ -45,7 +47,7 @@ public class InsightsControllerTests
         };
 
         _serviceMock
-            .Setup(x => x.GetContentPaginationResultAsync(pageGuid, It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetContentPaginationResultAsync(pageGuid, It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>(), It.IsAny<string?>()))
             .ReturnsAsync(expected);
 
         var result = await _controller.Get(pageGuid, query, CancellationToken.None);
@@ -72,7 +74,7 @@ public class InsightsControllerTests
         _controller.ControllerContext.HttpContext.Request.Query = queryCollection;
 
         _serviceMock
-            .Setup(x => x.GetContentPaginationResultAsync(pageGuid, It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetContentPaginationResultAsync(pageGuid, It.IsAny<CardsQuery>(), It.IsAny<CancellationToken>(), It.IsAny<string?>()))
             .ReturnsAsync(new PaginationDto<ContentPageCardDto> { Data = Array.Empty<ContentPageCardDto>(), TotalCount = 0 });
 
         await _controller.Get(pageGuid, query, CancellationToken.None);
@@ -81,7 +83,8 @@ public class InsightsControllerTests
             x => x.GetContentPaginationResultAsync(
                 pageGuid,
                 It.Is<CardsQuery>(q => q.Filters.Count > 0),
-                It.IsAny<CancellationToken>()),
+                It.IsAny<CancellationToken>(),
+                It.IsAny<string?>()),
             Times.Once);
     }
 }

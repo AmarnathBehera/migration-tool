@@ -193,6 +193,7 @@ public class HomePageService : IHomePageService
 
 
         var trendingTopicPagesResult = await _contentRetriever.GetChildPagesByParentGuidAsync<TrendingTopic>(
+            
         trendingTopicPage.SystemFields.WebPageItemID,
         cancellationToken);
         
@@ -208,7 +209,7 @@ public class HomePageService : IHomePageService
           {
                 Title = x?.Title,
                 ReadMoreLink = x?.CTANodeGuid?.FirstOrDefault()?.SystemFields?.WebPageUrlPath,
-                ImageURL = x?.ImageUrl.FirstOrDefault()?.ContentAttachmentAsset.Url,
+                ImageURL = x?.ImageUrl.FirstOrDefault()?.ContentAttachmentAsset.Url.TrimStart('~'),
                 ImageAltText = x?.ImageAltText,
                 Items = x?.FeaturedItems?.Select(item => item switch
                     {

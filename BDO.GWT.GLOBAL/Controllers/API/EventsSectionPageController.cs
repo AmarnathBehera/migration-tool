@@ -26,8 +26,10 @@ public class EventsSectionPageController : ControllerBase
         query.Filters = RequestQueryUtility.ExtractFilterQueryParameters(Request.Query);
 
         query.Filters.Add(FilterParameterName.ShowOngoingEvents, bool.TrueString);
-         
-        var items = await _eventsSectionPageService.GetFilteredItemsAsync(query, cancellationToken);
+
+        var language = RouteData.Values[CultureInjectorAttribute.RouteParameter]?.ToString();
+
+        var items = await _eventsSectionPageService.GetFilteredItemsAsync(query, language, cancellationToken);
 
         return Ok(items);
     }

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace BDO.GWT.Web.Widgets.ImageWithTextWidget;
 
-public class ImageWithTextWidgetProperties : IWidgetProperties
+public class ImageWithTextWidgetProperties : BaseWidgetProperties
 {
     [TextInputComponent(Label = "Title", Order = 0)]
     [RequiredValidationRule]
@@ -50,10 +50,12 @@ public class ImageWithTextWidgetProperties : IWidgetProperties
 
     [ContentItemSelectorComponent(ContentAttachment.CONTENT_TYPE_NAME, Label = "Image", Order = 10, MaximumItems = 1)]
     [VisibleIfEqualTo(nameof(MediaType), "image")]
+    [RequiredValidationRule]
     public IEnumerable<ContentItemReference> ImageURL { get; set; }   
 
     [TextInputComponent(Label = "Image alt text", Order = 11)]
     [VisibleIfEqualTo(nameof(MediaType), "image")]
+    [RequiredValidationRule]
     public string ImageAltText { get; set; } = "";
 
     [RadioGroupComponent(Label = "Image / video side", Order = 12, Options = "left;Left\r\nright;Right")]
@@ -80,9 +82,8 @@ public class ImageWithTextWidgetProperties : IWidgetProperties
     [DropDownComponent(Label = "Bottom margin", Order = 17, Options = "0px;None\r\n20px\r\n40px\r\n60px\r\n80px")]
     public string BottomMargin { get; set; } = "0px";
 
-    [TextInputComponent(Label = "Widget ID", Order = 18, ExplanationText = "ID should be unique from any other ID on the page. If the ID contains multiple words, words must be joined with a '-' (e.g. three-word-id). No other special characters and no spaces.'")]
 
-    public string WidgetID { get; set; }
+
 }
 
 public enum UrlSourceType

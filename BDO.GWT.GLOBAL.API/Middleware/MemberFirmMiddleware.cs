@@ -66,10 +66,10 @@ public class MemberFirmMiddleware : IMiddleware
         }
         var globalLocationCustomTableData = await _globalLocationCustomTableDataService.GetLocationsAsync(memberFirmID);
 
-        if (globalLocationCustomTableData != null)
+        if (globalLocationCustomTableData != null && globalLocationCustomTableData.ChannelId != 0)
         {
 
-            context.Items["ChannelId"] = globalLocationCustomTableData.ChannelId == 0 ? 1 : globalLocationCustomTableData.ChannelId;
+            context.Items["ChannelId"] = globalLocationCustomTableData.ChannelId;
         }
         else
         {

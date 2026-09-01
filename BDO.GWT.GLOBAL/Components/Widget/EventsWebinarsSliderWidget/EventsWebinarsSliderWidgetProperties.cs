@@ -1,4 +1,5 @@
 ﻿using BDO.GWT.Core.Constants;
+using BDO.GWT.Web.Widgets;
 using CMS.ContentEngine;
 using Kentico.Forms.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
@@ -14,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.EventsWebinarsSliderWidget;
 
-public class EventsWebinarsSliderWidgetProperties : IWidgetProperties
+public class EventsWebinarsSliderWidgetProperties : BaseWidgetProperties
 {
     [TextInputComponent(Label = "Title", ExplanationText = "Title that will be shown over the widget.", Order = 0)]
     public string Title { get; set; }
@@ -43,10 +44,12 @@ public class EventsWebinarsSliderWidgetProperties : IWidgetProperties
         Order = 4)]
     public IEnumerable<ContentItemReference> FeaturedEventsAndWebinars { get; set; } = new List<ContentItemReference>();
 
-    [ContentItemSelectorComponent(ContentAttachment.CONTENT_TYPE_NAME, Label = "Background image", Order = 5)]
+    [ContentItemSelectorComponent(ContentAttachment.CONTENT_TYPE_NAME, Label = "Background image", Order = 5, MaximumItems = 1)]
     public IEnumerable<ContentItemReference> BackgroundImages { get; set; }
 
     [TextInputComponent(Label = "Background image alt text", Order = 6)]
+    [VisibleIfNotEmpty(nameof(BackgroundImages))]
+    [RequiredValidationRule]
     public string BackgroundImageAltText { get; set; } = "";
 
     [TextInputComponent(Label = "See all link text", Order = 7)]
@@ -64,14 +67,7 @@ public class EventsWebinarsSliderWidgetProperties : IWidgetProperties
     [DropDownComponent(Label = "Bottom margin", Options = "0px;None\r\n20px\r\n40px\r\n60px\r\n80px", Order = 11)]
     public string BottomMargin { get; set; } = null!;
 
-    [TextInputComponent(
-        Order = 12,
-        ExplanationText = "ID should be unique from any other ID on the page. If the ID contains multiple words, words must be joined with a '-' (e.g. three-word-id). No other special characters and no spaces.'",
-        Label = "Widget ID")]
-    [RegularExpression(
-        @"^[a-z0-9'-]*$",
-        ErrorMessage = "Characters are not allowed.")]
-    public string WidgetID { get; set; }
+
 }
 
 public static class EventWebinarFilters
