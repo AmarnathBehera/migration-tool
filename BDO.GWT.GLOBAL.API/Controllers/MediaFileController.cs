@@ -116,13 +116,12 @@ public class MediaFileController : EntityControllerBase
         [FromForm] MediaFileInput input,
         CancellationToken cancellationToken)
     {
-        var sanitizedInput = CreateSanitizedInput(input);
-        if (sanitizedInput is null)
+        if (!TrySanitizeInput(input))
         {
             return BadRequest("Invalid file name.");
         }
 
-        var result = await _mediaFileCrudService.CreateMediaFileAsync(workspaceName, sanitizedInput, cancellationToken);
+        var result = await _mediaFileCrudService.CreateMediaFileAsync(workspaceName, input, cancellationToken);
 
         return CreatedAtRoute(
             "GetMediaFileByAttachmentGuid",
@@ -147,13 +146,12 @@ public class MediaFileController : EntityControllerBase
         [FromForm] MediaFileInput input,
         CancellationToken cancellationToken)
     {
-        var sanitizedInput = CreateSanitizedInput(input);
-        if (sanitizedInput is null)
+        if (!TrySanitizeInput(input))
         {
             return BadRequest("Invalid file name.");
         }
 
-        var result = await _mediaFileCrudService.UpdateMediaFileAsync(workspaceName, attachmentGuid, sanitizedInput, cancellationToken);
+        var result = await _mediaFileCrudService.UpdateMediaFileAsync(workspaceName, attachmentGuid, input, cancellationToken);
 
         return result is null
             ? NotFound()
@@ -179,30 +177,25 @@ public class MediaFileController : EntityControllerBase
         return deleted ? NoContent() : NotFound();
     }
 
-    private static MediaFileInput? CreateSanitizedInput(MediaFileInput input)
+    private static bool TrySanitizeInput(MediaFileInput input)
     {
         if (input?.File is null)
         {
-            return null;
+            return false;
         }
 
         var safeFileName = System.IO.Path.GetFileName(input.File.FileName ?? string.Empty);
         if (string.IsNullOrWhiteSpace(safeFileName))
         {
-            return null;
+            return false;
         }
 
-        var safeFile = new FormFile(input.File.OpenReadStream(), 0, input.File.Length, input.File.Name, safeFileName)
+        input.File = new FormFile(input.File.OpenReadStream(), 0, input.File.Length, input.File.Name, safeFileName)
         {
-            Headers = input.File.Headers,
-            ContentType = input.File.ContentType,
-            ContentDisposition = input.File.ContentDisposition
+            Headers = input.File.Headers ?? new HeaderDictionary()
         };
+        input.DisplayName = input.DisplayName?.Trim();
 
-        return new MediaFileInput
-        {
-            File = safeFile,
-            DisplayName = input.DisplayName?.Trim()
-        };
+        return true;
     }
 }
