@@ -14,7 +14,7 @@ namespace BDO.GWT.Web.Core.API.Controllers;
 /// Provides methods to read and manage channels.
 /// </summary>
 [ApiController]
-[Route("memberFirms/{memberFirmID:int}/Channels")]
+[Route("Channels")]
 public class ChannelController : EntityControllerBase
 {
     private readonly IChannelCrudService _channelCrudService;

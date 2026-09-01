@@ -236,12 +236,6 @@ public class ContentCategoryService : IContentCategoryService
         }
     }
 
-    /// <summary>
-    /// Resolves the URL for the Insights search page.
-    /// Prefers the real "BDO.Search" page (now that the content type exists in the CMS);
-    /// falls back to a domain-based "/{culture}/search" URL if no Search page is found
-    /// for the given channel/culture, so behavior degrades gracefully instead of breaking.
-    /// </summary>
     private async Task<string?> GetInsightSearchUrlAsync(int channelId, string channelName, string culture, CancellationToken cancellationToken)
     {
         var pageUrl = await GetInsightSearchUrlByPageAsync(channelName, culture, cancellationToken);
@@ -290,8 +284,6 @@ public class ContentCategoryService : IContentCategoryService
             return null;
         }
 
-        // Confirm WebsiteChannelDomain already includes the scheme (https://...).
-        // If it turns out to be schemeless (e.g. "www.bdo.com"), prefix it here.
         var normalizedDomain = domain.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
             || domain.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
                 ? domain

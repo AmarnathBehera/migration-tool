@@ -1,9 +1,8 @@
-﻿using BDO.GWT.Domain.Core.Constants;
+﻿using BDO.GWT.Domain.Core.Enums;
+using BDO.GWT.GLOBAL.API.Attributes;
 using BDO.GWT.GLOBAL.API.Bases;
 using BDO.GWT.GLOBAL.API.Data;
-using BDO.GWT.GLOBAL.API.Filters;
 using BDO.GWT.GLOBAL.API.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Mime;
@@ -15,8 +14,8 @@ namespace BDO.GWT.GLOBAL.API.Controllers;
 /// </summary>
 /// 
 [ApiController]
-//[AuthorizeUserPrivilegeLevel(UserPrivilegeLevel.GlobalAdministrator)]
-[Route("memberFirms/{memberFirmID:int}/LicenseKeys")]
+[AuthorizeUserPrivilegeLevel(UserPrivilegeLevel.GlobalAdministrator)]
+[Route("/LicenseKeys")]
 public class LicenseKeysController : EntityControllerBase
 {
     private readonly ILicenseKeysCrudService _licenseKeysCrudService;
