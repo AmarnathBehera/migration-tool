@@ -123,6 +123,17 @@ public class PageAttachmentServiceTests
     private void SetupIsDevelopment(bool isDevelopment) =>
         _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns(isDevelopment ? "Development" : "Production");
 
+    private void SetupHttpContext(string scheme = "https", string host = "localhost")
+    {
+        var mockRequest = new Mock<HttpRequest>();
+        mockRequest.Setup(r => r.Scheme).Returns(scheme);
+        mockRequest.Setup(r => r.Host).Returns(new HostString(host));
+
+        var mockHttpContext = new Mock<HttpContext>();
+        mockHttpContext.Setup(c => c.Request).Returns(mockRequest.Object);
+        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(mockHttpContext.Object);
+    }
+
     // ── GetPageAttachmentsAsync ────────────────────────────────────────────────
 
     [Test]
@@ -272,6 +283,7 @@ public class PageAttachmentServiceTests
         var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
         SetupContentService(pageGuid, [page]);
         SetupIsDevelopment(true);
+        SetupHttpContext();
         SetupHttpResponse(HttpStatusCode.NotFound);
 
         var result = await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb");
@@ -289,6 +301,7 @@ public class PageAttachmentServiceTests
         var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
         SetupContentService(pageGuid, [page]);
         SetupIsDevelopment(true);
+        SetupHttpContext();
         SetupHttpResponse(HttpStatusCode.OK, expectedBytes, "application/pdf");
 
         var result = await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb");
@@ -312,6 +325,7 @@ public class PageAttachmentServiceTests
         var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
         SetupContentService(pageGuid, [page]);
         SetupIsDevelopment(true);
+        SetupHttpContext();
         // No media type on the response — service must fall back to extension-based MIME
         SetupHttpResponse(HttpStatusCode.OK, expectedBytes, mediaType: null);
 
@@ -330,6 +344,7 @@ public class PageAttachmentServiceTests
         var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
         SetupContentService(pageGuid, [page]);
         SetupIsDevelopment(true);
+        SetupHttpContext();
         SetupHttpResponse(HttpStatusCode.OK, [1, 2], mediaType: null);
 
         var result = await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb");
