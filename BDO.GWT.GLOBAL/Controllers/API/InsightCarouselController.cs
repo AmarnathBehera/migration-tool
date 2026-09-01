@@ -23,8 +23,10 @@ public class InsightCarouselController : ControllerBase
     [HttpGet("[action]")]
     public async Task<ActionResult<IEnumerable<ContentPageCardDto>>> Items([FromQuery] CardsQuery query, CancellationToken cancellationToken)
     {
+        var language = RouteData.Values[CultureInjectorAttribute.RouteParameter]?.ToString();
+
         query.Filters = RequestQueryUtility.ExtractFilterQueryParameters(Request.Query);
-        var items = await _insightCarouselService.GetAPIFilteredItemsAsync(query, cancellationToken);
+        var items = await _insightCarouselService.GetAPIFilteredItemsAsync(query, language, cancellationToken);
 
             return Ok(items);
         

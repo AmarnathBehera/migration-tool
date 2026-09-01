@@ -1,12 +1,19 @@
-﻿using BDO.GWT.Common.Options;
+﻿using BDO.GWT.AzureCognitiveSearch.Services;
+using BDO.GWT.Common.Core.Services;
+using BDO.GWT.Common.Options;
+using BDO.GWT.Core.Mappers;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Services.Header;
 using BDO.GWT.CustomReportingModule.ReportingApp;
+using BDO.GWT.Domain.Core.Services;
 using BDO.GWT.GLOBAL.Components.FormComponents.CustomDropdown;
 using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
+using BDO.GWT.Xperience.Core.LiveSite.Services;
+using BDO.GWT.Xperience.Core.Services;
+using CMS.Core;
 using GWTXbyKWeb.Components.Services.SEOOptions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -48,6 +55,17 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddSingleton<ISqlBrowserExporter, SqlBrowserExporter>();
         serviceCollection.AddSingleton<ISqlQueryValidator, SqlQueryValidator>();
         serviceCollection.AddSingleton<IFormSubmissionSubscriptionsService, FormSubmissionSubscriptionsService>();
+
+        serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
+        serviceCollection.AddScoped<IDateTimeProvider, DateTimeProvider>();
+
+        serviceCollection.AddScoped<ISubscribePageService, SubscribePageService>();
+        serviceCollection.AddScoped<IMarketingContactManagementService, MarketingContactManagementService>();
+        serviceCollection.AddScoped<ISubscribeFormService, SubscribeFormService>();
+        serviceCollection.AddScoped<ISubscribeConfirmPageService, SubscribeConfirmPageService>();
+        serviceCollection.AddScoped<ISubscribeRemovePageService, SubscribeRemovePageService>();
+        serviceCollection.AddScoped<INewsletterSubscriptionService, NewsletterSubscriptionService>();
+
 
     }
 

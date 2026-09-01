@@ -50,10 +50,12 @@ public class ImageWithTextWidgetProperties : BaseWidgetProperties
 
     [ContentItemSelectorComponent(ContentAttachment.CONTENT_TYPE_NAME, Label = "Image", Order = 10, MaximumItems = 1)]
     [VisibleIfEqualTo(nameof(MediaType), "image")]
+    [RequiredValidationRule]
     public IEnumerable<ContentItemReference> ImageURL { get; set; }   
 
     [TextInputComponent(Label = "Image alt text", Order = 11)]
     [VisibleIfEqualTo(nameof(MediaType), "image")]
+    [RequiredValidationRule]
     public string ImageAltText { get; set; } = "";
 
     [RadioGroupComponent(Label = "Image / video side", Order = 12, Options = "left;Left\r\nright;Right")]

@@ -18,7 +18,7 @@ public interface IInsightCategoryCardListingPageService
 {
     Task<InsightCardListingDto> GetInsightPageDtoAsync(InsightCategory insightPage, CancellationToken cancellationToken);
 
-    Task<PaginationDto<ContentPageCardDto>> GetContentPaginationResultAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken);
+    Task<PaginationDto<ContentPageCardDto>> GetContentPaginationResultAsync(Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken, string? language = null);
 }
 
 public class InsightCategoryCardListingPageService : IInsightCategoryCardListingPageService
@@ -61,7 +61,8 @@ public class InsightCategoryCardListingPageService : IInsightCategoryCardListing
     public async Task<PaginationDto<ContentPageCardDto>> GetContentPaginationResultAsync(
      Guid pageGuid,
      CardsQuery cardsQuery,
-     CancellationToken cancellationToken)
+     CancellationToken cancellationToken,
+     string? language = null)
     {
         var page = (await _contentRetriever.RetrievePages<InsightCategory, InsightCategory>(
             new RetrievePagesParameters(),
@@ -85,7 +86,7 @@ public class InsightCategoryCardListingPageService : IInsightCategoryCardListing
         return await _insightCardService.GetFilteredItemsAsync(
             cardsQuery,
             treePath,
-           _contentService.GetCurrentLanguage(),
+            string.IsNullOrWhiteSpace(language) ? _contentService.GetCurrentLanguage() : language,
             decorateQuery,
             contentPage => featuredContentPageIds.Contains(contentPage.SystemFields.WebPageItemID),
             cancellationToken);

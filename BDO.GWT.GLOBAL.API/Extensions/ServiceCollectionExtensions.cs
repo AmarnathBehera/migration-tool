@@ -60,6 +60,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ILicenseKeysCrudService, LicenseKeysCrudService>();
         serviceCollection.AddScoped<IScheduledTaskCrudService, ScheduledTaskCrudService>();
         serviceCollection.AddScoped<IPageAttachmentService, PageAttachmentService>();
+        serviceCollection.AddScoped<IPageChannelResolver, PageChannelResolver>();
+        serviceCollection.AddScoped<IContentItemInfoService, ContentItemInfoService>();
         serviceCollection.AddScoped<IPageAttachmentCrudService, PageAttachmentCrudService>();
     }
 }
