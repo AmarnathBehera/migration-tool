@@ -1,6 +1,11 @@
+using BDO.GWT.Core;
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Services;
 using CMS.ContentEngine;
+using CMS.ContentEngine.Internal;
+using CMS.Membership;
+using CMS.Websites;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -12,6 +17,11 @@ public class PageAttachmentCrudServiceTests
 {
     private Mock<IPageAttachmentService> _pageAttachmentServiceMock = null!;
     private Mock<IPageChannelResolver> _pageChannelResolverMock = null!;
+    private Mock<IContentService> _contentServiceMock = null!;
+    private Mock<IWebPageManagerFactory> _webPageManagerFactoryMock = null!;
+    private Mock<IContentItemManagerFactory> _contentItemManagerFactoryMock = null!;
+    private Mock<IUserInfoProvider> _userInfoProviderMock = null!;
+    private Mock<IContentItemInfoService> _contentItemInfoServiceMock = null!;
     private PageAttachmentCrudService _service = null!;
 
     [SetUp]
@@ -19,9 +29,20 @@ public class PageAttachmentCrudServiceTests
     {
         _pageAttachmentServiceMock = new Mock<IPageAttachmentService>();
         _pageChannelResolverMock = new Mock<IPageChannelResolver>();
+        _contentServiceMock = new Mock<IContentService>();
+        _webPageManagerFactoryMock = new Mock<IWebPageManagerFactory>();
+        _contentItemManagerFactoryMock = new Mock<IContentItemManagerFactory>();
+        _userInfoProviderMock = new Mock<IUserInfoProvider>();
+        _contentItemInfoServiceMock = new Mock<IContentItemInfoService>();
+
         _service = new PageAttachmentCrudService(
             _pageAttachmentServiceMock.Object,
-            _pageChannelResolverMock.Object);
+            _pageChannelResolverMock.Object,
+            _contentServiceMock.Object,
+            _webPageManagerFactoryMock.Object,
+            _contentItemManagerFactoryMock.Object,
+            _userInfoProviderMock.Object,
+            _contentItemInfoServiceMock.Object);
     }
 
     private static BDO.ContentAttachment CreateAttachment(Guid guid, ContentItemAsset? asset = null)
@@ -386,5 +407,756 @@ public class PageAttachmentCrudServiceTests
         var result = await _service.GetAttachmentAsync(1, pageGuid, attachGuid, "en-gb");
 
         Assert.That(result!.MimeType, Is.EqualTo(expectedMimeType));
+    }
+
+    // ── CreateAttachmentAsync ────────────────────────────────────────────────
+
+    [Test]
+    public void CreateAttachmentAsync_WhenFileIsNull_ThrowsArgumentNullException()
+    {
+        Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await _service.CreateAttachmentAsync(1, Guid.NewGuid(), "en-gb", null!, CancellationToken.None));
+    }
+
+    [Test]
+    public void CreateAttachmentAsync_WhenFileIsEmpty_ThrowsArgumentException()
+    {
+        var emptyFile = new Mock<IFormFile>();
+        emptyFile.Setup(f => f.Length).Returns(0);
+
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () =>
+            await _service.CreateAttachmentAsync(1, Guid.NewGuid(), "en-gb", emptyFile.Object, CancellationToken.None));
+
+        Assert.That(ex!.ParamName, Is.EqualTo("file"));
+    }
+
+    [Test]
+    public void CreateAttachmentAsync_WhenChannelNameIsNull_ThrowsArgumentNullException()
+    {
+        var file = CreateMockFormFile("test.pdf", 100);
+
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await _service.CreateAttachmentAsync(1, Guid.NewGuid(), "en-gb", file, CancellationToken.None));
+    }
+
+    [Test]
+    public void CreateAttachmentAsync_WhenPageNotFound_ThrowsInvalidOperationException()
+    {
+        var pageGuid = Guid.NewGuid();
+        var file = CreateMockFormFile("test.pdf", 100);
+
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("testchannel");
+
+        _contentServiceMock
+            .Setup(x => x.GetItemsByGUIDForAPIAsync(It.IsAny<List<Guid>>(), "testchannel", "en-gb"))
+            .Returns(Task.FromResult<IEnumerable<IWebPageFieldsSource>>(null!));
+
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await _service.CreateAttachmentAsync(1, pageGuid, "en-gb", file, CancellationToken.None));
+
+        Assert.That(ex!.Message, Does.Contain(pageGuid.ToString()));
+    }
+
+    [Test]
+    public async Task CreateAttachmentAsync_WhenDuplicateAttachmentExists_ReturnsDuplicateWithMessage()
+    {
+        var pageGuid = Guid.NewGuid();
+        var existingGuid = Guid.NewGuid();
+        var file = CreateMockFormFile("existing.pdf", 500);
+
+        var existingAsset = CreateAsset("existing.pdf", ".pdf", 500);
+        var existingAttachment = CreateAttachment(existingGuid, existingAsset);
+
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("testchannel");
+
+        var mockPage = CreateMockPage(pageGuid, new[] { existingAttachment });
+        _contentServiceMock
+            .Setup(x => x.GetItemsByGUIDForAPIAsync(It.IsAny<List<Guid>>(), "testchannel", "en-gb"))
+            .ReturnsAsync(new[] { mockPage });
+
+        var result = await _service.CreateAttachmentAsync(1, pageGuid, "en-gb", file, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.GUID, Is.EqualTo(existingGuid));
+            Assert.That(result.Message, Is.EqualTo("Image already available on this page"));
+        });
+    }
+
+    [Test]
+    public async Task CreateAttachmentAsync_WhenEmptyFieldExists_CreatesAttachmentAndUpdatesPage()
+    {
+        var pageGuid = Guid.NewGuid();
+        var newAttachmentGuid = Guid.NewGuid();
+        var webPageItemId = 42;
+        var file = CreateMockFormFile("newfile.pdf", 1024);
+
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("testchannel");
+
+        // Page with empty attachments list (empty field available)
+        var mockPage = CreateMockPage(pageGuid, Array.Empty<BDO.ContentAttachment>(), webPageItemId);
+        _contentServiceMock
+            .Setup(x => x.GetItemsByGUIDForAPIAsync(It.IsAny<List<Guid>>(), "testchannel", "en-gb"))
+            .ReturnsAsync(new[] { mockPage });
+
+        var mockUser = new Mock<UserInfo>();
+        mockUser.Setup(u => u.UserID).Returns(1);
+        _userInfoProviderMock.Setup(x => x.Get("administrator")).Returns(mockUser.Object);
+
+        var mockContentItemManager = new Mock<IContentItemManager>();
+        mockContentItemManager
+            .Setup(x => x.Create(It.IsAny<CreateContentItemParameters>(), It.IsAny<ContentItemData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(123);
+        _contentItemManagerFactoryMock
+            .Setup(x => x.Create(1))
+            .Returns(mockContentItemManager.Object);
+
+        var mockContentItemInfo = new Mock<ContentItemInfo>();
+        mockContentItemInfo.Setup(x => x.ContentItemGUID).Returns(newAttachmentGuid);
+        _contentItemInfoServiceMock
+            .Setup(x => x.GetByIdAsync(123, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(mockContentItemInfo.Object);
+
+        var mockWebPageManager = new Mock<IWebPageManager>();
+        mockWebPageManager.Setup(x => x.TryCreateDraft(webPageItemId, "en-gb", It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        mockWebPageManager.Setup(x => x.TryUpdateDraft(webPageItemId, "en-gb", It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        mockWebPageManager.Setup(x => x.TryPublish(webPageItemId, "en-gb", It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _webPageManagerFactoryMock.Setup(x => x.Create(1, 1)).Returns(mockWebPageManager.Object);
+
+        // Setup the saved attachment retrieval
+        var savedAsset = CreateAsset("newfile.pdf", ".pdf", 1024);
+        var savedAttachment = CreateAttachment(newAttachmentGuid, savedAsset);
+        _pageAttachmentServiceMock
+            .Setup(x => x.GetPageAttachmentsAsync(pageGuid, "testchannel", "en-gb", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { savedAttachment });
+
+        var result = await _service.CreateAttachmentAsync(1, pageGuid, "en-gb", file, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.GUID, Is.EqualTo(newAttachmentGuid));
+            Assert.That(result.Message, Is.Null);
+        });
+
+        mockContentItemManager.Verify(x => x.Create(It.IsAny<CreateContentItemParameters>(), It.IsAny<ContentItemData>(), It.IsAny<CancellationToken>()), Times.Once);
+        mockWebPageManager.Verify(x => x.TryCreateDraft(webPageItemId, "en-gb", It.IsAny<CancellationToken>()), Times.Once);
+        mockWebPageManager.Verify(x => x.TryUpdateDraft(webPageItemId, "en-gb", It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()), Times.Once);
+        mockWebPageManager.Verify(x => x.TryPublish(webPageItemId, "en-gb", It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Test]
+    public async Task CreateAttachmentAsync_WhenNoEmptyFieldExists_CreatesAttachmentWithMessage()
+    {
+        var pageGuid = Guid.NewGuid();
+        var existingGuid = Guid.NewGuid();
+        var newAttachmentGuid = Guid.NewGuid();
+        var file = CreateMockFormFile("different.pdf", 2048); // Different filename
+
+        // Page with existing attachment (no empty slots)
+        var existingAsset = CreateAsset("existing.pdf", ".pdf", 500);
+        var existingAttachment = CreateAttachment(existingGuid, existingAsset);
+
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("testchannel");
+
+        var mockPage = CreateMockPage(pageGuid, new[] { existingAttachment });
+        _contentServiceMock
+            .Setup(x => x.GetItemsByGUIDForAPIAsync(It.IsAny<List<Guid>>(), "testchannel", "en-gb"))
+            .ReturnsAsync(new[] { mockPage });
+
+        var mockUser = new Mock<UserInfo>();
+        mockUser.Setup(u => u.UserID).Returns(1);
+        _userInfoProviderMock.Setup(x => x.Get("administrator")).Returns(mockUser.Object);
+
+        var mockContentItemManager = new Mock<IContentItemManager>();
+        mockContentItemManager
+            .Setup(x => x.Create(It.IsAny<CreateContentItemParameters>(), It.IsAny<ContentItemData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(456);
+        _contentItemManagerFactoryMock
+            .Setup(x => x.Create(1))
+            .Returns(mockContentItemManager.Object);
+
+        var mockContentItemInfo = new Mock<ContentItemInfo>();
+        mockContentItemInfo.Setup(x => x.ContentItemGUID).Returns(newAttachmentGuid);
+        _contentItemInfoServiceMock
+            .Setup(x => x.GetByIdAsync(456, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(mockContentItemInfo.Object);
+
+        // The new attachment won't be on the page since there's no empty field
+        _pageAttachmentServiceMock
+            .Setup(x => x.GetPageAttachmentsAsync(pageGuid, "testchannel", "en-gb", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { existingAttachment }); // Only existing, no new one
+
+        var result = await _service.CreateAttachmentAsync(1, pageGuid, "en-gb", file, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.GUID, Is.EqualTo(newAttachmentGuid));
+            Assert.That(result.Name, Is.EqualTo("different.pdf"));
+            Assert.That(result.Message, Is.EqualTo("No available image field to add the attachment. The attachment has been created in the content hub but could not be placed on the page."));
+        });
+
+        // WebPageManager should NOT be called since no empty field exists
+        _webPageManagerFactoryMock.Verify(x => x.Create(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+    }
+
+    [Test]
+    public async Task CreateAttachmentAsync_WhenSavedAttachmentIsNull_ReturnsFallbackOutput()
+    {
+        var pageGuid = Guid.NewGuid();
+        var newAttachmentGuid = Guid.NewGuid();
+        var webPageItemId = 42;
+        var file = CreateMockFormFile("newfile.pdf", 1024);
+
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("testchannel");
+
+        // Page with empty attachments list (empty field available)
+        var mockPage = CreateMockPage(pageGuid, Array.Empty<BDO.ContentAttachment>(), webPageItemId);
+        _contentServiceMock
+            .Setup(x => x.GetItemsByGUIDForAPIAsync(It.IsAny<List<Guid>>(), "testchannel", "en-gb"))
+            .ReturnsAsync(new[] { mockPage });
+
+        var mockUser = new Mock<UserInfo>();
+        mockUser.Setup(u => u.UserID).Returns(1);
+        _userInfoProviderMock.Setup(x => x.Get("administrator")).Returns(mockUser.Object);
+
+        var mockContentItemManager = new Mock<IContentItemManager>();
+        mockContentItemManager
+            .Setup(x => x.Create(It.IsAny<CreateContentItemParameters>(), It.IsAny<ContentItemData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(123);
+        _contentItemManagerFactoryMock
+            .Setup(x => x.Create(1))
+            .Returns(mockContentItemManager.Object);
+
+        var mockContentItemInfo = new Mock<ContentItemInfo>();
+        mockContentItemInfo.Setup(x => x.ContentItemGUID).Returns(newAttachmentGuid);
+        _contentItemInfoServiceMock
+            .Setup(x => x.GetByIdAsync(123, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(mockContentItemInfo.Object);
+
+        var mockWebPageManager = new Mock<IWebPageManager>();
+        mockWebPageManager.Setup(x => x.TryCreateDraft(webPageItemId, "en-gb", It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        mockWebPageManager.Setup(x => x.TryUpdateDraft(webPageItemId, "en-gb", It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        mockWebPageManager.Setup(x => x.TryPublish(webPageItemId, "en-gb", It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _webPageManagerFactoryMock.Setup(x => x.Create(1, 1)).Returns(mockWebPageManager.Object);
+
+        // The attachment is NOT found when retrieving (returns empty) - triggers fallback
+        _pageAttachmentServiceMock
+            .Setup(x => x.GetPageAttachmentsAsync(pageGuid, "testchannel", "en-gb", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<BDO.ContentAttachment>());
+
+        var result = await _service.CreateAttachmentAsync(1, pageGuid, "en-gb", file, CancellationToken.None);
+
+        // Should return the fallback output with constructed values
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.GUID, Is.EqualTo(newAttachmentGuid));
+            Assert.That(result.Name, Is.EqualTo("newfile.pdf"));
+            Assert.That(result.Extension, Is.EqualTo(".pdf"));
+            Assert.That(result.MimeType, Is.EqualTo("application/pdf"));
+            Assert.That(result.Size, Is.EqualTo(1024));
+            Assert.That(result.Message, Is.Null);
+        });
+    }
+
+    [Test]
+    public void CreateAttachmentAsync_WhenContentItemInfoServiceReturnsNull_ThrowsInvalidOperationException()
+    {
+        var pageGuid = Guid.NewGuid();
+        var file = CreateMockFormFile("test.pdf", 100);
+
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("testchannel");
+
+        var mockPage = CreateMockPage(pageGuid, Array.Empty<BDO.ContentAttachment>());
+        _contentServiceMock
+            .Setup(x => x.GetItemsByGUIDForAPIAsync(It.IsAny<List<Guid>>(), "testchannel", "en-gb"))
+            .ReturnsAsync(new[] { mockPage });
+
+        var mockUser = new Mock<UserInfo>();
+        mockUser.Setup(u => u.UserID).Returns(1);
+        _userInfoProviderMock.Setup(x => x.Get("administrator")).Returns(mockUser.Object);
+
+        var mockContentItemManager = new Mock<IContentItemManager>();
+        mockContentItemManager
+            .Setup(x => x.Create(It.IsAny<CreateContentItemParameters>(), It.IsAny<ContentItemData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(789);
+        _contentItemManagerFactoryMock.Setup(x => x.Create(1)).Returns(mockContentItemManager.Object);
+
+        // ContentItemInfoService returns null - simulating failure
+        _contentItemInfoServiceMock
+            .Setup(x => x.GetByIdAsync(789, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((ContentItemInfo?)null);
+
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await _service.CreateAttachmentAsync(1, pageGuid, "en-gb", file, CancellationToken.None));
+
+        Assert.That(ex!.Message, Does.Contain("Failed to retrieve the created attachment content item"));
+    }
+
+    [Test]
+    public void CreateAttachmentAsync_WhenUpdateDraftFails_ThrowsInvalidOperationException()
+    {
+        var pageGuid = Guid.NewGuid();
+        var newAttachmentGuid = Guid.NewGuid();
+        var webPageItemId = 42;
+        var file = CreateMockFormFile("newfile.pdf", 1024);
+
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("testchannel");
+
+        var mockPage = CreateMockPage(pageGuid, Array.Empty<BDO.ContentAttachment>(), webPageItemId);
+        _contentServiceMock
+            .Setup(x => x.GetItemsByGUIDForAPIAsync(It.IsAny<List<Guid>>(), "testchannel", "en-gb"))
+            .ReturnsAsync(new[] { mockPage });
+
+        var mockUser = new Mock<UserInfo>();
+        mockUser.Setup(u => u.UserID).Returns(1);
+        _userInfoProviderMock.Setup(x => x.Get("administrator")).Returns(mockUser.Object);
+
+        var mockContentItemManager = new Mock<IContentItemManager>();
+        mockContentItemManager
+            .Setup(x => x.Create(It.IsAny<CreateContentItemParameters>(), It.IsAny<ContentItemData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(123);
+        _contentItemManagerFactoryMock.Setup(x => x.Create(1)).Returns(mockContentItemManager.Object);
+
+        var mockContentItemInfo = new Mock<ContentItemInfo>();
+        mockContentItemInfo.Setup(x => x.ContentItemGUID).Returns(newAttachmentGuid);
+        _contentItemInfoServiceMock
+            .Setup(x => x.GetByIdAsync(123, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(mockContentItemInfo.Object);
+
+        var mockWebPageManager = new Mock<IWebPageManager>();
+        mockWebPageManager.Setup(x => x.TryCreateDraft(webPageItemId, "en-gb", It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        mockWebPageManager.Setup(x => x.TryUpdateDraft(webPageItemId, "en-gb", It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>())).ReturnsAsync(false); // Failure
+        _webPageManagerFactoryMock.Setup(x => x.Create(1, 1)).Returns(mockWebPageManager.Object);
+
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await _service.CreateAttachmentAsync(1, pageGuid, "en-gb", file, CancellationToken.None));
+
+        Assert.That(ex!.Message, Does.Contain("Failed to update page with the new attachment"));
+    }
+
+    [Test]
+    public void CreateAttachmentAsync_WhenPublishFails_ThrowsInvalidOperationException()
+    {
+        var pageGuid = Guid.NewGuid();
+        var newAttachmentGuid = Guid.NewGuid();
+        var webPageItemId = 42;
+        var file = CreateMockFormFile("newfile.pdf", 1024);
+
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("testchannel");
+
+        var mockPage = CreateMockPage(pageGuid, Array.Empty<BDO.ContentAttachment>(), webPageItemId);
+        _contentServiceMock
+            .Setup(x => x.GetItemsByGUIDForAPIAsync(It.IsAny<List<Guid>>(), "testchannel", "en-gb"))
+            .ReturnsAsync(new[] { mockPage });
+
+        var mockUser = new Mock<UserInfo>();
+        mockUser.Setup(u => u.UserID).Returns(1);
+        _userInfoProviderMock.Setup(x => x.Get("administrator")).Returns(mockUser.Object);
+
+        var mockContentItemManager = new Mock<IContentItemManager>();
+        mockContentItemManager
+            .Setup(x => x.Create(It.IsAny<CreateContentItemParameters>(), It.IsAny<ContentItemData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(123);
+        _contentItemManagerFactoryMock.Setup(x => x.Create(1)).Returns(mockContentItemManager.Object);
+
+        var mockContentItemInfo = new Mock<ContentItemInfo>();
+        mockContentItemInfo.Setup(x => x.ContentItemGUID).Returns(newAttachmentGuid);
+        _contentItemInfoServiceMock
+            .Setup(x => x.GetByIdAsync(123, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(mockContentItemInfo.Object);
+
+        var mockWebPageManager = new Mock<IWebPageManager>();
+        mockWebPageManager.Setup(x => x.TryCreateDraft(webPageItemId, "en-gb", It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        mockWebPageManager.Setup(x => x.TryUpdateDraft(webPageItemId, "en-gb", It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        mockWebPageManager.Setup(x => x.TryPublish(webPageItemId, "en-gb", It.IsAny<CancellationToken>())).ReturnsAsync(false); // Failure
+        _webPageManagerFactoryMock.Setup(x => x.Create(1, 1)).Returns(mockWebPageManager.Object);
+
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await _service.CreateAttachmentAsync(1, pageGuid, "en-gb", file, CancellationToken.None));
+
+        Assert.That(ex!.Message, Does.Contain("Failed to publish page after adding attachment"));
+    }
+
+    [Test]
+    public void CreateAttachmentAsync_WhenPageHasNoAttachmentFields_ThrowsInvalidOperationException()
+    {
+        var pageGuid = Guid.NewGuid();
+        var file = CreateMockFormFile("test.pdf", 100);
+
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("testchannel");
+
+        // Use a page type without attachment properties
+        var mockPage = new TestPageWithoutAttachments();
+        typeof(TestPageWithoutAttachments)
+            .GetProperty("SystemFields")!
+            .SetValue(mockPage, new WebPageFields { WebPageItemID = 1 });
+
+        _contentServiceMock
+            .Setup(x => x.GetItemsByGUIDForAPIAsync(It.IsAny<List<Guid>>(), "testchannel", "en-gb"))
+            .ReturnsAsync(new IWebPageFieldsSource[] { mockPage });
+
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await _service.CreateAttachmentAsync(1, pageGuid, "en-gb", file, CancellationToken.None));
+
+        Assert.That(ex!.Message, Does.Contain("does not contain any attachment-capable fields"));
+    }
+
+    // NOTE: The following CreateAttachmentAsync failure tests were removed because
+    // IInfoProvider<T>.GetAsync and IInfoProvider<T>.Get are extension methods that cannot
+    // be mocked with Moq. Testing these failure scenarios would require integration tests or
+    // introducing a wrapper interface around the Kentico IInfoProvider<T>.
+    // Removed tests:
+    // - CreateAttachmentAsync_WhenContentItemCreationFails_ThrowsInvalidOperationException
+    // - CreateAttachmentAsync_WhenUpdateDraftFails_ThrowsInvalidOperationException
+    // - CreateAttachmentAsync_WhenPublishFails_ThrowsInvalidOperationException
+
+    // ── UpdateAttachmentAsync ────────────────────────────────────────────────
+
+    [Test]
+    public void UpdateAttachmentAsync_WhenFileIsNull_ThrowsArgumentNullException()
+    {
+        Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await _service.UpdateAttachmentAsync(1, Guid.NewGuid(), Guid.NewGuid(), "en-gb", null!, CancellationToken.None));
+    }
+
+    [Test]
+    public void UpdateAttachmentAsync_WhenFileIsEmpty_ThrowsArgumentException()
+    {
+        var emptyFile = new Mock<IFormFile>();
+        emptyFile.Setup(f => f.Length).Returns(0);
+
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () =>
+            await _service.UpdateAttachmentAsync(1, Guid.NewGuid(), Guid.NewGuid(), "en-gb", emptyFile.Object, CancellationToken.None));
+
+        Assert.That(ex!.ParamName, Is.EqualTo("file"));
+    }
+
+    [Test]
+    public async Task UpdateAttachmentAsync_WhenChannelNameIsNull_ReturnsNull()
+    {
+        var file = CreateMockFormFile("test.pdf", 100);
+
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        var result = await _service.UpdateAttachmentAsync(1, Guid.NewGuid(), Guid.NewGuid(), "en-gb", file, CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task UpdateAttachmentAsync_WhenPageNotFound_ReturnsNull()
+    {
+        var pageGuid = Guid.NewGuid();
+        var file = CreateMockFormFile("test.pdf", 100);
+
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("testchannel");
+
+        _contentServiceMock
+            .Setup(x => x.GetItemsByGUIDForAPIAsync(It.IsAny<List<Guid>>(), "testchannel", "en-gb"))
+            .Returns(Task.FromResult<IEnumerable<IWebPageFieldsSource>>(null!));
+
+        var result = await _service.UpdateAttachmentAsync(1, pageGuid, Guid.NewGuid(), "en-gb", file, CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task UpdateAttachmentAsync_WhenAttachmentNotFoundOnPage_ReturnsNull()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+        var differentGuid = Guid.NewGuid();
+        var file = CreateMockFormFile("test.pdf", 100);
+
+        var existingAttachment = CreateAttachment(differentGuid, CreateAsset("other.pdf", ".pdf", 200));
+
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("testchannel");
+
+        var mockPage = CreateMockPage(pageGuid, new[] { existingAttachment });
+        _contentServiceMock
+            .Setup(x => x.GetItemsByGUIDForAPIAsync(It.IsAny<List<Guid>>(), "testchannel", "en-gb"))
+            .ReturnsAsync(new[] { mockPage });
+
+        var result = await _service.UpdateAttachmentAsync(1, pageGuid, attachmentGuid, "en-gb", file, CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+    }
+
+    // NOTE: The following UpdateAttachmentAsync tests were removed because
+    // IInfoProvider<T>.Get is an extension method that cannot be mocked with Moq.
+    // Testing these scenarios would require integration tests or introducing a
+    // wrapper interface around the Kentico IInfoProvider<T>.
+    // Removed tests:
+    // - UpdateAttachmentAsync_WhenSuccessful_CreatesNewAttachmentAndReplacesReference
+    // - UpdateAttachmentAsync_WhenContentItemCreationFails_ThrowsInvalidOperationException
+    // - UpdateAttachmentAsync_WhenUpdateDraftFails_ThrowsInvalidOperationException
+    // - UpdateAttachmentAsync_WhenPublishFails_ThrowsInvalidOperationException
+
+    // ── DeleteAttachmentAsync ────────────────────────────────────────────────
+
+    [Test]
+    public async Task DeleteAttachmentAsync_WhenChannelNameIsNull_ReturnsFalse()
+    {
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        var result = await _service.DeleteAttachmentAsync(1, Guid.NewGuid(), Guid.NewGuid(), "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public async Task DeleteAttachmentAsync_WhenPageNotFound_ReturnsFalse()
+    {
+        var pageGuid = Guid.NewGuid();
+
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("testchannel");
+
+        _contentServiceMock
+            .Setup(x => x.GetItemsByGUIDForAPIAsync(It.IsAny<List<Guid>>(), "testchannel", "en-gb"))
+            .Returns(Task.FromResult<IEnumerable<IWebPageFieldsSource>>(null!));
+
+        var result = await _service.DeleteAttachmentAsync(1, pageGuid, Guid.NewGuid(), "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public async Task DeleteAttachmentAsync_WhenAttachmentNotFoundOnPage_ReturnsFalse()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+        var differentGuid = Guid.NewGuid();
+
+        var existingAttachment = CreateAttachment(differentGuid, CreateAsset("other.pdf", ".pdf", 200));
+
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("testchannel");
+
+        var mockPage = CreateMockPage(pageGuid, new[] { existingAttachment });
+        _contentServiceMock
+            .Setup(x => x.GetItemsByGUIDForAPIAsync(It.IsAny<List<Guid>>(), "testchannel", "en-gb"))
+            .ReturnsAsync(new[] { mockPage });
+
+        var result = await _service.DeleteAttachmentAsync(1, pageGuid, attachmentGuid, "en-gb", CancellationToken.None);
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public async Task DeleteAttachmentAsync_WhenAttachmentFound_CallsWebPageManagerToRemoveReference()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+        var webPageItemId = 42;
+
+        var existingAttachment = CreateAttachment(attachmentGuid, CreateAsset("test.pdf", ".pdf", 200));
+
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("testchannel");
+
+        var mockPage = CreateMockPage(pageGuid, new[] { existingAttachment }, webPageItemId);
+        _contentServiceMock
+            .Setup(x => x.GetItemsByGUIDForAPIAsync(It.IsAny<List<Guid>>(), "testchannel", "en-gb"))
+            .ReturnsAsync(new[] { mockPage });
+
+        var mockUser = new Mock<UserInfo>();
+        mockUser.Setup(u => u.UserID).Returns(1);
+        _userInfoProviderMock.Setup(x => x.Get("administrator")).Returns(mockUser.Object);
+
+        var mockWebPageManager = new Mock<IWebPageManager>();
+        mockWebPageManager
+            .Setup(x => x.TryCreateDraft(webPageItemId, "en-gb", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        mockWebPageManager
+            .Setup(x => x.TryUpdateDraft(webPageItemId, "en-gb", It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        mockWebPageManager
+            .Setup(x => x.TryPublish(webPageItemId, "en-gb", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        _webPageManagerFactoryMock
+            .Setup(x => x.Create(1, 1))
+            .Returns(mockWebPageManager.Object);
+
+        var result = await _service.DeleteAttachmentAsync(1, pageGuid, attachmentGuid, "en-gb", CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.True);
+            mockWebPageManager.Verify(x => x.TryCreateDraft(webPageItemId, "en-gb", It.IsAny<CancellationToken>()), Times.Once);
+            mockWebPageManager.Verify(x => x.TryUpdateDraft(webPageItemId, "en-gb", It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()), Times.Once);
+            mockWebPageManager.Verify(x => x.TryPublish(webPageItemId, "en-gb", It.IsAny<CancellationToken>()), Times.Once);
+        });
+    }
+
+    [Test]
+    public void DeleteAttachmentAsync_WhenUpdateDraftFails_ThrowsInvalidOperationException()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+        var webPageItemId = 42;
+
+        var existingAttachment = CreateAttachment(attachmentGuid, CreateAsset("test.pdf", ".pdf", 200));
+
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("testchannel");
+
+        var mockPage = CreateMockPage(pageGuid, new[] { existingAttachment }, webPageItemId);
+        _contentServiceMock
+            .Setup(x => x.GetItemsByGUIDForAPIAsync(It.IsAny<List<Guid>>(), "testchannel", "en-gb"))
+            .ReturnsAsync(new[] { mockPage });
+
+        var mockUser = new Mock<UserInfo>();
+        mockUser.Setup(u => u.UserID).Returns(1);
+        _userInfoProviderMock.Setup(x => x.Get("administrator")).Returns(mockUser.Object);
+
+        var mockWebPageManager = new Mock<IWebPageManager>();
+        mockWebPageManager
+            .Setup(x => x.TryCreateDraft(webPageItemId, "en-gb", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        mockWebPageManager
+            .Setup(x => x.TryUpdateDraft(webPageItemId, "en-gb", It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false); // Simulate failure
+
+        _webPageManagerFactoryMock
+            .Setup(x => x.Create(1, 1))
+            .Returns(mockWebPageManager.Object);
+
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await _service.DeleteAttachmentAsync(1, pageGuid, attachmentGuid, "en-gb", CancellationToken.None));
+
+        Assert.That(ex!.Message, Does.Contain("Failed to update page to remove attachment reference"));
+    }
+
+    [Test]
+    public void DeleteAttachmentAsync_WhenPublishFails_ThrowsInvalidOperationException()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+        var webPageItemId = 42;
+
+        var existingAttachment = CreateAttachment(attachmentGuid, CreateAsset("test.pdf", ".pdf", 200));
+
+        _pageChannelResolverMock
+            .Setup(x => x.GetChannelNameByPageGuidAsync(pageGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("testchannel");
+
+        var mockPage = CreateMockPage(pageGuid, new[] { existingAttachment }, webPageItemId);
+        _contentServiceMock
+            .Setup(x => x.GetItemsByGUIDForAPIAsync(It.IsAny<List<Guid>>(), "testchannel", "en-gb"))
+            .ReturnsAsync(new[] { mockPage });
+
+        var mockUser = new Mock<UserInfo>();
+        mockUser.Setup(u => u.UserID).Returns(1);
+        _userInfoProviderMock.Setup(x => x.Get("administrator")).Returns(mockUser.Object);
+
+        var mockWebPageManager = new Mock<IWebPageManager>();
+        mockWebPageManager
+            .Setup(x => x.TryCreateDraft(webPageItemId, "en-gb", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        mockWebPageManager
+            .Setup(x => x.TryUpdateDraft(webPageItemId, "en-gb", It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        mockWebPageManager
+            .Setup(x => x.TryPublish(webPageItemId, "en-gb", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false); // Simulate failure
+
+        _webPageManagerFactoryMock
+            .Setup(x => x.Create(1, 1))
+            .Returns(mockWebPageManager.Object);
+
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await _service.DeleteAttachmentAsync(1, pageGuid, attachmentGuid, "en-gb", CancellationToken.None));
+
+        Assert.That(ex!.Message, Does.Contain("Failed to publish page after removing attachment reference"));
+    }
+
+    // ── Helper Methods ───────────────────────────────────────────────────────
+
+    private static IFormFile CreateMockFormFile(string fileName, long length)
+    {
+        var fileMock = new Mock<IFormFile>();
+        fileMock.Setup(f => f.FileName).Returns(fileName);
+        fileMock.Setup(f => f.Length).Returns(length);
+        fileMock.Setup(f => f.OpenReadStream()).Returns(new MemoryStream(new byte[length]));
+        return fileMock.Object;
+    }
+
+    private static TestPageWithAttachments CreateMockPage(Guid pageGuid, IEnumerable<BDO.ContentAttachment> attachments, int webPageItemId = 1)
+    {
+        var page = new TestPageWithAttachments
+        {
+            Attachments = attachments.ToList()
+        };
+
+        // Set SystemFields using reflection
+        var systemFields = new WebPageFields
+        {
+            WebPageItemID = webPageItemId
+        };
+        typeof(WebPageFields).GetProperty("ContentItemGUID")!.SetValue(systemFields, pageGuid);
+
+        typeof(TestPageWithAttachments)
+            .GetProperty("SystemFields")!
+            .SetValue(page, systemFields);
+
+        return page;
+    }
+
+    /// <summary>
+    /// Test page class that implements IWebPageFieldsSource with attachment properties
+    /// </summary>
+    private class TestPageWithAttachments : IWebPageFieldsSource
+    {
+        public WebPageFields SystemFields { get; set; } = new();
+
+        public IEnumerable<BDO.ContentAttachment> Attachments { get; set; } = new List<BDO.ContentAttachment>();
+    }
+
+    /// <summary>
+    /// Test page class that implements IWebPageFieldsSource WITHOUT attachment properties
+    /// Used to test the "no attachment-capable fields" error case
+    /// </summary>
+    private class TestPageWithoutAttachments : IWebPageFieldsSource
+    {
+        public WebPageFields SystemFields { get; set; } = new();
+
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
     }
 }
