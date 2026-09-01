@@ -339,6 +339,32 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
+    public void MapToMediaFileOutput_WhenMimeTypeIsUnknown_UsesFallbackMimeAndMapsFields()
+    {
+        var attachmentGuid = Guid.NewGuid();
+        var itemMock = new Mock<IContentItemFieldsSource>();
+        itemMock.SetupGet(x => x.SystemFields).Returns(new ContentItemFields
+        {
+            ContentItemID = 123,
+            ContentItemGUID = attachmentGuid
+        });
+
+        var asset = CreateAsset("mystery.weird", ".weird", 128, "/assets/mystery.weird");
+
+        var output = (MediaFileOutput)InvokePrivateStatic("MapToMediaFileOutput", itemMock.Object, asset);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(output.Id, Is.EqualTo(123));
+            Assert.That(output.Guid, Is.EqualTo(attachmentGuid));
+            Assert.That(output.Path, Is.EqualTo("mystery.weird"));
+            Assert.That(output.Extension, Is.EqualTo(".weird"));
+            Assert.That(output.MimeType, Is.EqualTo("application/octet-stream"));
+            Assert.That(output.Link, Is.EqualTo($"~/getmedia/{attachmentGuid}/mystery.weird"));
+        });
+    }
+
+    [Test]
     public void BuildAssetUri_WhenAbsoluteUrl_ReturnsAbsoluteUri()
     {
         var service = CreateSut();
@@ -378,7 +404,7 @@ public class MediaFileCrudServiceTests
         var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
         httpContextAccessorMock.Setup(x => x.HttpContext).Returns((HttpContext?)null);
 
-        var service = CreateSut(httpContextAccessorMock.Object, hostEnvironmentMock.Object);
+        var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
 
         var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "~/getmedia/img.jpg");
 
@@ -401,7 +427,7 @@ public class MediaFileCrudServiceTests
         var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
         httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var service = CreateSut(httpContextAccessorMock.Object, hostEnvironmentMock.Object);
+        var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
 
         var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "getmedia/img.jpg");
 
@@ -421,6 +447,36 @@ public class MediaFileCrudServiceTests
         {
             Assert.That(result, Is.EqualTo("application/octet-stream"));
         });
+    }
+
+    private static ContentItemAsset CreateAsset(string name, string extension, long size, string url)
+    {
+        var asset = new ContentItemAsset { Url = url };
+        var metadata = (ContentItemAssetMetadata)RuntimeHelpers.GetUninitializedObject(typeof(ContentItemAssetMetadata));
+
+        SetMetadataProperty(metadata, "Name", name);
+        SetMetadataProperty(metadata, "Extension", extension);
+        SetMetadataProperty(metadata, "Size", size);
+
+        typeof(ContentItemAsset)
+            .GetProperty("Metadata")!
+            .SetValue(asset, metadata);
+
+        return asset;
+    }
+
+    private static void SetMetadataProperty(object target, string propertyName, object? value)
+    {
+        var type = target.GetType();
+        PropertyInfo? property = null;
+
+        while (type != null && property == null)
+        {
+            property = type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            type = type.BaseType;
+        }
+
+        property!.SetValue(target, value);
     }
 
     private static object InvokePrivateStatic(string methodName, params object[] args)
@@ -444,17 +500,20 @@ public class MediaFileCrudServiceTests
     }
 
     private static MediaFileCrudService CreateSut(
+        IContentQueryExecutor? queryExecutor = null,
+        IHttpClientFactory? httpClientFactory = null,
         IHttpContextAccessor? httpContextAccessor = null,
         IWebHostEnvironment? hostEnvironment = null,
         IInfoProvider<ContentLanguageInfo>? languageInfoProvider = null)
     {
         return new MediaFileCrudService(
-            Mock.Of<IContentQueryExecutor>(),
-            Mock.Of<IHttpClientFactory>(),
+            queryExecutor ?? Mock.Of<IContentQueryExecutor>(),
+            httpClientFactory ?? Mock.Of<IHttpClientFactory>(),
             httpContextAccessor ?? Mock.Of<IHttpContextAccessor>(),
             hostEnvironment ?? Mock.Of<IWebHostEnvironment>(),
             Mock.Of<IContentItemManagerFactory>(),
             Mock.Of<CMS.Membership.IUserInfoProvider>(),
             languageInfoProvider ?? Mock.Of<IInfoProvider<ContentLanguageInfo>>());
     }
+
 }
