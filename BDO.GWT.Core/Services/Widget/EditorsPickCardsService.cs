@@ -199,7 +199,7 @@ public class EditorsPickCardService : IEditorsPickCardService
                     ?? page.SystemFields.ContentItemName
                     ?? string.Empty,
                 Description = NormalizeDescription(GetStringProperty(page, "MetadataDescription")),
-                ImageURL = GetImageUrl(page),
+                ImageURL = GetImageUrl(page)?.TrimStart('~'),
                 ImageAltText = GetStringProperty(page, "MetadataTeaserImageAltText")
                     ?? GetStringProperty(page, "ImageFileAltText"),
                 Date = GetPublishDateUtc(page),
