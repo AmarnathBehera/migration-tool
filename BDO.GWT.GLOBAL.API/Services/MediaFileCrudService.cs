@@ -1,7 +1,5 @@
-using BDO;
 using BDO.GWT.GLOBAL.API.Data;
 using CMS.ContentEngine;
-using CMS.ContentEngine.Internal;
 using CMS.DataEngine;
 using CMS.Membership;
 using Microsoft.AspNetCore.StaticFiles;
@@ -51,7 +49,6 @@ public class MediaFileCrudService : IMediaFileCrudService
         _contentLanguageInfoProvider = contentLanguageInfoProvider;
     }
 
-    /// <inheritdoc/>
     public async Task<IEnumerable<MediaFileOutput>> GetMediaFilesAsync(string workspaceName, CancellationToken cancellationToken)
     {
         return await GetAllMediaFilesFromContentTypeAsync<ContentAttachment>(
@@ -60,7 +57,7 @@ public class MediaFileCrudService : IMediaFileCrudService
             cancellationToken);
     }
 
-    /// <inheritdoc/>
+
     public async Task<MediaFileOutput?> GetMediaFileAsync(string workspaceName, Guid attachmentGuid, CancellationToken cancellationToken)
     {
         return await GetMediaFileFromContentTypeAsync<ContentAttachment>(
@@ -70,7 +67,6 @@ public class MediaFileCrudService : IMediaFileCrudService
             cancellationToken);
     }
 
-    /// <inheritdoc/>
     public async Task<FileStreamData?> DownloadMediaFileAsync(string workspaceName, Guid attachmentGuid, CancellationToken cancellationToken)
     {
         var target = await GetMediaFileTargetAsync(attachmentGuid, cancellationToken);
@@ -315,7 +311,7 @@ public class MediaFileCrudService : IMediaFileCrudService
         return extension;
     }
 
-    /// <inheritdoc/>
+
     public async Task<MediaFileOutput> CreateMediaFileAsync(string workspaceName, MediaFileInput input, CancellationToken cancellationToken)
     {
         // Sanitize user-supplied filename: take only the base file name to prevent path traversal
@@ -345,7 +341,7 @@ public class MediaFileCrudService : IMediaFileCrudService
         return created!;
     }
 
-    /// <inheritdoc/>
+
     public async Task<MediaFileOutput?> UpdateMediaFileAsync(string workspaceName, Guid attachmentGuid, MediaFileInput input, CancellationToken cancellationToken)
     {
         var target = await GetMediaFileTargetAsync(attachmentGuid, cancellationToken);
@@ -368,7 +364,7 @@ public class MediaFileCrudService : IMediaFileCrudService
         return await GetMediaFileAsync(workspaceName, attachmentGuid, cancellationToken);
     }
 
-    /// <inheritdoc/>
+
     public async Task<bool> DeleteMediaFileAsync(string workspaceName, Guid attachmentGuid, CancellationToken cancellationToken)
     {
         var target = await GetMediaFileTargetAsync(attachmentGuid, cancellationToken);
@@ -394,11 +390,31 @@ public class MediaFileCrudService : IMediaFileCrudService
         });
     }
 
+    private static string CreateSafeTempUploadPath()
+    {
+        var tempDirectory = System.IO.Path.Combine(AppContext.BaseDirectory, "App_Data", "Uploads", "Temp");
+        System.IO.Directory.CreateDirectory(tempDirectory);
+
+        var rootPath = System.IO.Path.GetFullPath(tempDirectory);
+        var tempFileName = $"upload-{Guid.NewGuid():N}.tmp";
+        var candidatePath = System.IO.Path.Combine(rootPath, tempFileName);
+        var fullPath = System.IO.Path.GetFullPath(candidatePath);
+
+        if (!fullPath.StartsWith(rootPath + System.IO.Path.DirectorySeparatorChar, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Invalid temporary file path.");
+        }
+
+        return fullPath;
+    }
+
     private static async Task<T> WithUploadedAssetMetadataAsync<T>(
         IFormFile file,
         Func<ContentItemAssetMetadataWithSource, Task<T>> action,
         CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(file);
+
         // Sanitize user-supplied filename: take only the base file name to prevent path traversal
         var fileName = System.IO.Path.GetFileName(file.FileName ?? string.Empty);
         var extension = GetSafeExtension(fileName);
@@ -407,12 +423,7 @@ public class MediaFileCrudService : IMediaFileCrudService
             ? fileName[..^extension.Length]
             : fileName;
 
-        var tempPath = System.IO.Path.GetTempFileName();
-        var expectedTempDir = System.IO.Path.GetTempPath();
-        if (!tempPath.StartsWith(expectedTempDir, StringComparison.Ordinal))
-        {
-            throw new InvalidOperationException("Temporary file path is outside the expected temp directory.");
-        }
+        var tempPath = CreateSafeTempUploadPath();
 
         try
         {
