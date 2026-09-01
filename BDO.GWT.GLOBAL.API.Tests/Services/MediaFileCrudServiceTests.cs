@@ -172,7 +172,7 @@ public class MediaFileCrudServiceTests
         var service = (MediaFileCrudService)RuntimeHelpers.GetUninitializedObject(typeof(MediaFileCrudService));
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await service.DeleteMediaFileAsync("Demo", Guid.NewGuid(), CancellationToken.None));
+            await service.DeleteMediaFileAsync(Guid.NewGuid(), CancellationToken.None));
 
         Assert.Multiple(() =>
         {

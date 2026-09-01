@@ -248,12 +248,66 @@ public class MediaFileControllerTests
     }
 
     [Test]
+    public async Task CreateMediaFileAsync_WhenFileNameIsInvalid_ReturnsBadRequest()
+    {
+        var input = new MediaFileInput
+        {
+            File = new FormFile(new MemoryStream([7, 8]), 0, 2, "File", string.Empty)
+        };
+
+        var result = await _controller.CreateMediaFileAsync(100, "Demo", input, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<BadRequestObjectResult>());
+        });
+
+        _mediaFileCrudServiceMock.VerifyNoOtherCalls();
+    }
+
+    [Test]
+    public async Task UpdateMediaFileAsync_WhenFileNameContainsPath_SanitizesBeforeServiceCall()
+    {
+        var attachmentGuid = Guid.NewGuid();
+        var input = new MediaFileInput
+        {
+            File = new FormFile(new MemoryStream([1, 2, 3]), 0, 3, "File", "folder\\replace.png"),
+            DisplayName = " Replacement "
+        };
+
+        var expected = new MediaFileOutput { Id = 21, Guid = attachmentGuid, Path = "replace.png", MimeType = "image/png", Extension = ".png", Link = "~/getmedia/replace.png" };
+
+        _mediaFileCrudServiceMock
+            .Setup(x => x.UpdateMediaFileAsync(
+                "Demo",
+                attachmentGuid,
+                It.Is<MediaFileInput>(m => m.File.FileName == "replace.png" && m.DisplayName == "Replacement"),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expected);
+
+        var result = await _controller.UpdateMediaFileAsync(100, "Demo", attachmentGuid, input, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
+            var okResult = (OkObjectResult)result.Result!;
+            Assert.That(okResult.Value, Is.EqualTo(expected));
+        });
+
+        _mediaFileCrudServiceMock.Verify(x => x.UpdateMediaFileAsync(
+            "Demo",
+            attachmentGuid,
+            It.Is<MediaFileInput>(m => m.File.FileName == "replace.png" && m.DisplayName == "Replacement"),
+            CancellationToken.None), Times.Once);
+    }
+
+    [Test]
     public async Task DeleteMediaFileAsync_WhenDeleted_ReturnsNoContent()
     {
         var attachmentGuid = Guid.NewGuid();
 
         _mediaFileCrudServiceMock
-            .Setup(x => x.DeleteMediaFileAsync("Demo", attachmentGuid, It.IsAny<CancellationToken>()))
+            .Setup(x => x.DeleteMediaFileAsync(attachmentGuid, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
         var result = await _controller.DeleteMediaFileAsync(100, "Demo", attachmentGuid, CancellationToken.None);
@@ -263,7 +317,7 @@ public class MediaFileControllerTests
             Assert.That(result, Is.InstanceOf<NoContentResult>());
         });
 
-        _mediaFileCrudServiceMock.Verify(x => x.DeleteMediaFileAsync("Demo", attachmentGuid, CancellationToken.None), Times.Once);
+        _mediaFileCrudServiceMock.Verify(x => x.DeleteMediaFileAsync(attachmentGuid, CancellationToken.None), Times.Once);
     }
 
     [Test]
@@ -272,7 +326,7 @@ public class MediaFileControllerTests
         var attachmentGuid = Guid.NewGuid();
 
         _mediaFileCrudServiceMock
-            .Setup(x => x.DeleteMediaFileAsync("Demo", attachmentGuid, It.IsAny<CancellationToken>()))
+            .Setup(x => x.DeleteMediaFileAsync(attachmentGuid, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
         var result = await _controller.DeleteMediaFileAsync(100, "Demo", attachmentGuid, CancellationToken.None);
@@ -282,6 +336,6 @@ public class MediaFileControllerTests
             Assert.That(result, Is.InstanceOf<NotFoundResult>());
         });
 
-        _mediaFileCrudServiceMock.Verify(x => x.DeleteMediaFileAsync("Demo", attachmentGuid, CancellationToken.None), Times.Once);
+        _mediaFileCrudServiceMock.Verify(x => x.DeleteMediaFileAsync(attachmentGuid, CancellationToken.None), Times.Once);
     }
 }

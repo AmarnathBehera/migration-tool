@@ -16,7 +16,6 @@ public class MediaFileCrudService : IMediaFileCrudService
     private const string DevelopmentLiveSiteHost = "localhost";
     private const int DevelopmentLiveSitePort = 12393;
 
-    private static readonly Uri DevelopmentLiveSiteBaseUri = new UriBuilder(Uri.UriSchemeHttp, DevelopmentLiveSiteHost, DevelopmentLiveSitePort).Uri;
     private static readonly FileExtensionContentTypeProvider _contentTypeProvider = new();
 
     private const string FallbackLanguageName = "en-US";
@@ -149,13 +148,16 @@ public class MediaFileCrudService : IMediaFileCrudService
 
         if (_hostEnvironment.IsDevelopment())
         {
-            return new Uri(DevelopmentLiveSiteBaseUri, normalizedPath);
+            return new UriBuilder(Uri.UriSchemeHttp, DevelopmentLiveSiteHost, DevelopmentLiveSitePort, normalizedPath).Uri;
         }
 
         var request = _httpContextAccessor.HttpContext?.Request;
-        return request is null
-            ? null
-            : new Uri($"{request.Scheme}://{request.Host}{normalizedPath}");
+        if (request is null)
+        {
+            return null;
+        }
+
+        return new UriBuilder(request.Scheme, request.Host.Host, request.Host.Port ?? -1, normalizedPath).Uri;
     }
 
     private static string NormalizePath(string assetUrl)
@@ -294,6 +296,9 @@ public class MediaFileCrudService : IMediaFileCrudService
     private static readonly SearchValues<char> UnsafeExtensionChars =
         SearchValues.Create(['\0', '/', '\\', '|', '<', '>', ':', '"', '?', '*']);
 
+    private static readonly SearchValues<char> InvalidFileNameChars =
+        SearchValues.Create(System.IO.Path.GetInvalidFileNameChars());
+
     private static string GetSafeExtension(string fileName)
     {
         var extension = System.IO.Path.GetExtension(fileName ?? string.Empty);
@@ -365,7 +370,7 @@ public class MediaFileCrudService : IMediaFileCrudService
     }
 
 
-    public async Task<bool> DeleteMediaFileAsync(string workspaceName, Guid attachmentGuid, CancellationToken cancellationToken)
+    public async Task<bool> DeleteMediaFileAsync(Guid attachmentGuid, CancellationToken cancellationToken)
     {
         var target = await GetMediaFileTargetAsync(attachmentGuid, cancellationToken);
         if (target is null)
@@ -396,7 +401,13 @@ public class MediaFileCrudService : IMediaFileCrudService
         System.IO.Directory.CreateDirectory(tempDirectory);
 
         var rootPath = System.IO.Path.GetFullPath(tempDirectory);
-        var tempFileName = $"upload-{Guid.NewGuid():N}.tmp";
+        var randomFileName = System.IO.Path.GetRandomFileName();
+        if (randomFileName.AsSpan().IndexOfAny(InvalidFileNameChars) >= 0)
+        {
+            throw new InvalidOperationException("Invalid temporary file name.");
+        }
+
+        var tempFileName = System.IO.Path.ChangeExtension(randomFileName, ".tmp");
         var candidatePath = System.IO.Path.Combine(rootPath, tempFileName);
         var fullPath = System.IO.Path.GetFullPath(candidatePath);
 

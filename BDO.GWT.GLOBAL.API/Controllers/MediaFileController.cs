@@ -1,8 +1,10 @@
 using BDO.GWT.GLOBAL.API.Bases;
 using BDO.GWT.GLOBAL.API.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Buffers;
 using System.Net.Mime;
 
 namespace BDO.GWT.Web.Core.API.Controllers;
@@ -14,6 +16,9 @@ namespace BDO.GWT.Web.Core.API.Controllers;
 [Route("memberFirms/{memberFirmID:int}/workspaces/{workspaceName}/mediafiles")]
 public class MediaFileController : EntityControllerBase
 {
+    private static readonly SearchValues<char> UnsafeFileNameChars =
+        SearchValues.Create(['\0', '/', '\\', '|', '<', '>', ':', '"', '?', '*']);
+
     private readonly IMediaFileCrudService _mediaFileCrudService;
 
     public MediaFileController(IMediaFileCrudService mediaFileCrudService)
@@ -172,7 +177,7 @@ public class MediaFileController : EntityControllerBase
         [FromRoute] Guid attachmentGuid,
         CancellationToken cancellationToken)
     {
-        var deleted = await _mediaFileCrudService.DeleteMediaFileAsync(workspaceName, attachmentGuid, cancellationToken);
+        var deleted = await _mediaFileCrudService.DeleteMediaFileAsync(attachmentGuid, cancellationToken);
 
         return deleted ? NoContent() : NotFound();
     }
@@ -186,6 +191,11 @@ public class MediaFileController : EntityControllerBase
 
         var safeFileName = System.IO.Path.GetFileName(input.File.FileName ?? string.Empty);
         if (string.IsNullOrWhiteSpace(safeFileName))
+        {
+            return false;
+        }
+
+        if (safeFileName.AsSpan().IndexOfAny(UnsafeFileNameChars) >= 0)
         {
             return false;
         }

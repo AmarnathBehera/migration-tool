@@ -55,10 +55,9 @@ public interface IMediaFileCrudService
     /// <summary>
     /// Deletes a media file content item by GUID.
     /// </summary>
-    /// <param name="workspaceName">The name of the content hub workspace.</param>
     /// <param name="attachmentGuid">The GUID of the media file to delete.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>True if deleted, false if not found.</returns>
-    Task<bool> DeleteMediaFileAsync(string workspaceName, Guid attachmentGuid, CancellationToken cancellationToken);
+    Task<bool> DeleteMediaFileAsync(Guid attachmentGuid, CancellationToken cancellationToken);
 }
 
