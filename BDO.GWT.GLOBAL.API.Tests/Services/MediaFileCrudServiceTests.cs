@@ -743,7 +743,7 @@ public class MediaFileCrudServiceTests
         property!.SetValue(target, value);
     }
 
-    private static object InvokePrivateStatic(string methodName, params object[] args)
+    private static object InvokePrivateStatic(string methodName, params object?[] args)
     {
         var method = typeof(MediaFileCrudService).GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic)!;
         return method.Invoke(null, args)!;
