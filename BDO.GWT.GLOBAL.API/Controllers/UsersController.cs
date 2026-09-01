@@ -1,4 +1,6 @@
 ﻿using BDO.GWT.Domain.Core.Constants;
+using BDO.GWT.Domain.Core.Enums;
+using BDO.GWT.GLOBAL.API.Attributes;
 using BDO.GWT.GLOBAL.API.Bases;
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Filters;
@@ -13,15 +15,17 @@ namespace BDO.GWT.GLOBAL.API.Controllers;
 // <summary>
 // Provides methods to read and manage users.
 // </summary>
-[ApiController]
-[Route("memberFirms/{memberFirmID:int}/Users")]
+[AuthorizeUserPrivilegeLevel(UserPrivilegeLevel.GlobalAdministrator)]
+
 public class UsersController : EntityControllerBase
 {
     private readonly IUserCrudService _userCrudService;
+    private readonly IUserApiPermissionsCrudService _userApiPermissionsCrudService;
 
-    public UsersController(IUserCrudService userCrudService)
+    public UsersController(IUserCrudService userCrudService, IUserApiPermissionsCrudService userApiPermissionsCrudService)
     {
         _userCrudService = userCrudService;
+        _userApiPermissionsCrudService = userApiPermissionsCrudService;
     }
     // <summary>
     // Returns all users.
@@ -96,6 +100,38 @@ public class UsersController : EntityControllerBase
     {
         await _userCrudService.DeleteUserAsync(userGuid, cancellationToken);
 
-        return NoContent();
+        return NoContent(); 
     }
-}
+     // <summary>
+     // Returns user API permissions by endpoint group name.
+     // </summary>
+     // <param name="memberFirmID">ID of the member firm (website channel) for which the permissions should be retrieved.</param>
+     // <param name="userGuid">GUID of the user for which the permissions should be retrieved.</param>
+     // <param name="cancellationToken">Cancellation token.</param>
+     // <returns>User API permissions by API endpoint group name.</returns>
+     [HttpGet("Users/{userGuid:guid}/ApiPermissions")]
+     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(IDictionary<string, ApiEndpointGroupPermissions>), MediaTypeNames.Application.Json)]
+     public async Task<ActionResult<IDictionary<string, ApiEndpointGroupPermissions>>> GetApiPermissions(int memberFirmID, Guid userGuid, CancellationToken cancellationToken)
+     {
+            var userApiPermissionsByEndpointGroupName = await _userApiPermissionsCrudService.GetUserApiPermissionsByEndpointGroupNameAsync(memberFirmID, userGuid, cancellationToken);
+
+            return Ok(userApiPermissionsByEndpointGroupName);
+        }
+
+      // <summary>
+      // Sets user API permissions by endpoint group name.
+      // </summary>
+      // <param name="memberFirmID">ID of the member firm (website channel) for which the permissions should be set.</param>
+      // <param name="userGuid">GUID of the user for which the permissions should be set.</param>
+      // <param name="userApiPermissionsByEndpointGroupNameInput">User API permissions by API endpoint group name.</param>
+      // <param name="cancellationToken">Cancellation token.</param>
+      // <returns>Updated user API permissions by API endpoint group name.</returns>
+       [HttpPut("Users/{userGuid:guid}/ApiPermissions")]
+      [SwaggerResponse(StatusCodes.Status200OK, null, typeof(IDictionary<string, ApiEndpointGroupPermissions>), MediaTypeNames.Application.Json)]
+      public async Task<ActionResult<IDictionary<string, ApiEndpointGroupPermissions>>> SetApiPermissions(int memberFirmID, Guid userGuid, [FromBody] IDictionary<string, ApiEndpointGroupPermissions> userApiPermissionsByEndpointGroupNameInput, CancellationToken cancellationToken)
+       {
+            var userApiPermissionsByEndpointGroupName = await _userApiPermissionsCrudService.SetUserApiPermissionsByEndpointGroupNameAsync(memberFirmID, userGuid, userApiPermissionsByEndpointGroupNameInput, cancellationToken);
+
+            return Ok(userApiPermissionsByEndpointGroupName);
+        }
+    }
