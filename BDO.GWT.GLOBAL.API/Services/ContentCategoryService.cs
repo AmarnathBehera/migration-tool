@@ -16,7 +16,7 @@ namespace BDO.GWT.GLOBAL.API.Services;
 
 public interface IContentCategoryService
 {
-    
+
     Task<ActionResult<IEnumerable<ContentCategoryDto>>> GetContentCategoriesAsync(int channelId, string culture, CancellationToken cancellationToken);
 
     Task<ActionResult<ContentDto>> GetContentAsync(int channelId, string culture, int? insightCount, int? whatsNewCount, ContentCategoryFilter[] categoryFilters, CancellationToken cancellationToken);
@@ -53,7 +53,7 @@ public class ContentCategoryService : IContentCategoryService
         _webPageUrlRetriever = webPageUrlRetriever;
     }
 
-   
+
     public async Task<ActionResult<IEnumerable<ContentCategoryDto>>> GetContentCategoriesAsync(int channelId, string culture, CancellationToken cancellationToken)
     {
         try
@@ -151,7 +151,7 @@ public class ContentCategoryService : IContentCategoryService
         };
     }
 
-   
+
     public async Task<ActionResult<ContentDto>> GetContentAsync(
         int channelId, string culture, int? insightCount, int? whatsNewCount,
         ContentCategoryFilter[] categoryFilters, CancellationToken cancellationToken)
@@ -236,8 +236,50 @@ public class ContentCategoryService : IContentCategoryService
         }
     }
 
-    
+    /// <summary>
+    /// Resolves the URL for the Insights search page.
+    /// Prefers the real "BDO.Search" page (now that the content type exists in the CMS);
+    /// falls back to a domain-based "/{culture}/search" URL if no Search page is found
+    /// for the given channel/culture, so behavior degrades gracefully instead of breaking.
+    /// </summary>
     private async Task<string?> GetInsightSearchUrlAsync(int channelId, string channelName, string culture, CancellationToken cancellationToken)
+    {
+        var pageUrl = await GetInsightSearchUrlByPageAsync(channelName, culture, cancellationToken);
+        if (!string.IsNullOrWhiteSpace(pageUrl))
+        {
+            return pageUrl;
+        }
+
+        return await GetInsightSearchUrlByDomainAsync(channelId, culture, cancellationToken);
+    }
+
+    private async Task<string?> GetInsightSearchUrlByPageAsync(string channelName, string culture, CancellationToken cancellationToken)
+    {
+        var builder = new ContentItemQueryBuilder()
+            .ForContentType(Search.CONTENT_TYPE_NAME, config => config
+                .ForWebsite(channelName)
+                .Columns("WebPageItemID"))
+            .InLanguage(culture)
+            .Parameters(q => q.TopN(1));
+
+        var searchPages = await _contentQueryExecutor.GetResult(builder, row => new
+        {
+            WebPageItemID = row.GetValue<int>("WebPageItemID"),
+        }, cancellationToken: cancellationToken);
+
+        var searchPage = searchPages.FirstOrDefault();
+
+        if (searchPage is null)
+        {
+            return null;
+        }
+
+        var url = await _webPageUrlRetriever.Retrieve(searchPage.WebPageItemID, culture, cancellationToken: cancellationToken);
+
+        return url?.AbsoluteUrl;
+    }
+
+    private async Task<string?> GetInsightSearchUrlByDomainAsync(int channelId, string culture, CancellationToken cancellationToken)
     {
         var websiteChannel = await _websiteChannelInfoProvider.GetAsync(channelId, cancellationToken);
 
@@ -257,40 +299,6 @@ public class ContentCategoryService : IContentCategoryService
 
         return $"{normalizedDomain.TrimEnd('/')}/{culture}/search";
     }
-
-    // ------------------------------------------------------------
-    // OPTION B — COMMENTED OUT. Uncomment once a "Search" content type
-    // exists in the CMS, replace "BDO.Search" with its real
-    // CONTENT_TYPE_NAME constant, and delete/replace the call to
-    // GetInsightSearchUrlAsync above with GetInsightSearchUrlByPageAsync.
-    // ------------------------------------------------------------
-
-    //private async Task<string?> GetInsightSearchUrlByPageAsync(string channelName, string culture, CancellationToken cancellationToken)
-    //{
-    //    var builder = new ContentItemQueryBuilder()
-    //        .ForContentType("BDO.Search", config => config   // TODO: replace with Search.CONTENT_TYPE_NAME
-    //            .ForWebsite(channelName)
-    //            .Columns("WebPageItemID"))
-    //        .InLanguage(culture)
-    //        .Parameters(q => q.TopN(1));
-
-    //    var searchPages = await _contentQueryExecutor.GetResult(builder, row => new
-    //    {
-    //        WebPageItemID = row.GetValue<int>("WebPageItemID"),
-    //    }, cancellationToken: cancellationToken);
-
-    //    var searchPage = searchPages.FirstOrDefault();
-
-    //    if (searchPage is null)
-    //    {
-    //        return null;
-    //    }
-
-    //    var url = await _webPageUrlRetriever.Retrieve(searchPage.WebPageItemID, culture, cancellationToken: cancellationToken);
-
-    //    return url?.AbsoluteUrl;
-    //}
-
 
     private void ValidateContentCategoryFilters(ContentCategoryFilter[] filters)
     {

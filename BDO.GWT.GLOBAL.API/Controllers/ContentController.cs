@@ -26,13 +26,11 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         [HttpGet("categories", Name = "GetContentCategories")]
         [HasPermission(ApiMethodGroupName.Content, ApiPermission.Read)]
         [SwaggerResponse(StatusCodes.Status200OK, null, typeof(IEnumerable<ContentCategoryDto>), MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<IEnumerable<ContentCategoryDto>>> GetContentCategories(int memberFirmId,string? culture, CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<ContentCategoryDto>>> GetContentCategories(int memberFirmId, string? culture, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
 
-            var dtos = await _contentService.GetContentCategoriesAsync(channelId,culture, cancellationToken);
-
-            return Ok(dtos);
+            return await _contentService.GetContentCategoriesAsync(channelId, culture, cancellationToken);
         }
 
         [HttpPost(Name = "GetContentFromCategories")]
@@ -41,9 +39,8 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         public async Task<ActionResult<ContentDto>> GetContentFromCategories([FromRoute] int memberFirmId, [FromRoute] string culture, [FromQuery] int countInsights, [FromQuery] int countWhatsNew, [FromBody] ContentCategoryFilter[] categoryFilters, CancellationToken cancellationToken)
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-            var dto = await _contentService.GetContentAsync(channelId, culture, countInsights, countWhatsNew, categoryFilters, cancellationToken);
 
-            return Ok(dto);
+            return await _contentService.GetContentAsync(channelId, culture, countInsights, countWhatsNew, categoryFilters, cancellationToken);
         }
     }
 }
