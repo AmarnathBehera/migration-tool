@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace BDO.GWT.GLOBAL.Controllers
 {
     [Route("Error/{code:int}")]
-    public class ErrorController : Controller
+    public partial class ErrorController : Controller
     {
         private readonly IErrorService _errorService;
         private readonly IWebPageDataContextInitializer _webPageDataContextInitializer;
@@ -84,7 +84,7 @@ namespace BDO.GWT.GLOBAL.Controllers
             }
         }
 
-        private static string? TryExtractLanguageFromUrl(IStatusCodeReExecuteFeature? feature)
+        private static string TryExtractLanguageFromUrl(IStatusCodeReExecuteFeature? feature)
         {
             if (feature is null) return null;
 
@@ -97,7 +97,10 @@ namespace BDO.GWT.GLOBAL.Controllers
 
         private static bool IsLanguageTag(string segment)
         {
-            return Regex.IsMatch(segment, @"^[a-z]{2}(-[a-zA-Z]{2,4})?$");
+            return MyRegex().IsMatch(segment);
         }
+
+        [GeneratedRegex(@"^[a-z]{2}(-[a-zA-Z]{2,4})?$")]
+        private static partial Regex MyRegex();
     }
 }
