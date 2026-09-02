@@ -47,7 +47,7 @@ namespace BDO.GWT.GLOBAL.Controllers
                 statusCodeReExecuteFeature,
                 languageName,
                 _websiteChannelContext.WebsiteChannelName,
-                cancellationToken);
+                CancellationToken.None);
 
             if (statusCodePage is null)
             {
