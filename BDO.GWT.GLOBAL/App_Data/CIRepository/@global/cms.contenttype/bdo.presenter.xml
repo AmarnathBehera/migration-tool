@@ -49,5 +49,5 @@
   <ClassShortName>BDOPresenter</ClassShortName>
   <ClassTableName>BDO_Presenter</ClassTableName>
   <ClassType>Content</ClassType>
-  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
 </cms.contenttype>
