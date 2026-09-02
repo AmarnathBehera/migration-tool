@@ -106,19 +106,20 @@ public class CareersPageServiceTests
         string title = "Software Engineer",
         string? reference = "REF-001",
         DateTime? publishDate = null) => new Career
+    {
+        MetadataTitle = title,
+        MetadataTeaserImageAltText = "Career Image Alt",
+        CareerReference = reference,
+        SystemFields = new WebPageFields
         {
-            MetadataTitle = title,
-            MetadataTeaserImageAltText = "Career Image Alt",
-            CareerReference = reference,
-            SystemFields = new WebPageFields
-            {
-                WebPageItemID = webPageItemId,
-                WebPageItemGUID = Guid.NewGuid(),
-                WebPageItemName = title,
-                WebPageUrlPath = "/careers/" + webPageItemId,
-                WebPageItemTreePath = "/careers/" + webPageItemId,
-            },
-        };
+            WebPageItemID = webPageItemId,
+            WebPageItemGUID = Guid.NewGuid(),
+            WebPageItemName = title,
+            WebPageUrlPath = "/careers/" + webPageItemId,
+            WebPageItemTreePath = "/careers/" + webPageItemId,
+            ContentItemCommonDataFirstPublishedWhen = publishDate,
+        },
+    };
 
     private void SetupCurrentPage(Careers? page) =>
         _contentServiceMock
