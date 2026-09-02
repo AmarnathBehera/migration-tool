@@ -110,7 +110,6 @@ public class CareersPageServiceTests
             MetadataTitle = title,
             MetadataTeaserImageAltText = "Career Image Alt",
             CareerReference = reference,
-            DocumentPublishFrom = publishDate ?? new DateTime(2024, 1, 1),
             SystemFields = new WebPageFields
             {
                 WebPageItemID = webPageItemId,

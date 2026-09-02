@@ -29,6 +29,7 @@ public class CareerDetailPageServiceTests
     private Mock<ISocialMediaButtonsService> _socialMediaButtonsServiceMock = null!;
     private Mock<ISettingService> _settingServiceMock = null!;
     private Mock<IContentService> _contentServiceMock = null!;
+    private Mock<ISidebarService> _sidebarServiceMock = null!;
     private CareerDetailPageService _service = null!;
 
     [SetUp]
@@ -39,6 +40,7 @@ public class CareerDetailPageServiceTests
         _socialMediaButtonsServiceMock = new Mock<ISocialMediaButtonsService>();
         _settingServiceMock = new Mock<ISettingService>();
         _contentServiceMock = new Mock<IContentService>();
+        _sidebarServiceMock = new Mock<ISidebarService>();
 
         _heroServiceMock
             .Setup(x => x.GetHeroDtoAsync(It.IsAny<HeroData>(), It.IsAny<CancellationToken>()))
@@ -48,12 +50,17 @@ public class CareerDetailPageServiceTests
             .Setup(x => x.GetPrintorShareInfo())
             .ReturnsAsync((IEnumerable<PrintorShareInfo>?)null);
 
+        _sidebarServiceMock
+            .Setup(x => x.GetContentPageAuthorDtosGen(It.IsAny<List<Guid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<SidebarPersonDto>());
+
         _service = new CareerDetailPageService(
             _heroServiceMock.Object,
             _cultureContextMock.Object,
             _socialMediaButtonsServiceMock.Object,
             _settingServiceMock.Object,
-            _contentServiceMock.Object);
+            _contentServiceMock.Object,
+            _sidebarServiceMock.Object);
     }
 
     private static Career CreateCareer(
@@ -67,7 +74,6 @@ public class CareerDetailPageServiceTests
             MetadataDescription = "Career description",
             CareerReference = "REF-001",
             CareerApplyForm = "apply-form",
-            DocumentPublishFrom = new DateTime(2024, 4, 1),
             ShowSidebar = showSidebar,
             ShowPrintButton = showPrintButton,
             ShowSocialMediaButtons = showSocialButtons,
@@ -254,7 +260,7 @@ public class CareerDetailPageServiceTests
 
         var result = await _service.GetCareerPageDtoAsync(CancellationToken.None);
 
-        Assert.That(result.Sidebar!.PublishDate, Is.EqualTo(career.DocumentPublishFrom));
+        Assert.That(result.Sidebar!.PublishDate, Is.EqualTo(career.SystemFields.ContentItemCommonDataFirstPublishedWhen));
     }
 
     [Test]

@@ -161,7 +161,7 @@ public class CareersPageService : ICareersPageService
         }
 
         var filteredArray = filtered
-            .OrderByDescending(c => c.DocumentPublishFrom)
+            .OrderByDescending(c => c.SystemFields.ContentItemCommonDataFirstPublishedWhen)
             .ToArray();
 
         var totalCount = filteredArray.Length;
@@ -193,7 +193,7 @@ public class CareersPageService : ICareersPageService
         .Select(loc => loc.MetadataTitle ?? string.Empty)
         .ToArray()
         ?? Array.Empty<string>(),
-                PublishDate = c.DocumentPublishFrom,
+                PublishDate = c.SystemFields.ContentItemCommonDataFirstPublishedWhen,
                 ApplyURL = absolutepageurl,
                 JobTitleURL = careersPage.MetadataTitle is not null && c.CareerJobTitle is not null
                     ? $"{careerspageurl}?careerJobTitle={c.CareerJobTitle.FirstOrDefault()?.Name}"
