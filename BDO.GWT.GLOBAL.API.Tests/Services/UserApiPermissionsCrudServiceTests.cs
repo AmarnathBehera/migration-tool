@@ -299,6 +299,24 @@ public class UserApiPermissionsCrudServiceTests
         apiProviderMock.Verify(x => x.Delete(It.IsAny<Api_permissionsInfo>()), Times.Never);
     }
 
+    [Test]
+    public async Task DeduplicateAndCleanUpAsync_WithDuplicateGroups_DeletesLowerIdsAndKeepsHighest()
+    {
+        var service = CreateServiceWithMockedDependencies(out _, out var apiProviderMock);
+
+        var keep = CreatePermission(ApiMethodGroupName.Users, 20, read: true, manage: true);
+        var duplicate1 = CreatePermission(ApiMethodGroupName.Users, 10, read: false, manage: true);
+        var duplicate2 = CreatePermission(ApiMethodGroupName.Users, 5, read: false, manage: false);
+
+        var result = await InvokeDeduplicateAndCleanUpAsync(service, [keep, duplicate1, duplicate2]);
+
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[ApiMethodGroupName.Users].Api_permissionsID, Is.EqualTo(20));
+
+        apiProviderMock.Verify(x => x.DeleteAsync(It.Is<Api_permissionsInfo>(p => p.Api_permissionsID == 10), It.IsAny<CancellationToken>()), Times.Once);
+        apiProviderMock.Verify(x => x.DeleteAsync(It.Is<Api_permissionsInfo>(p => p.Api_permissionsID == 5), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
     #endregion
 
     #region ApiEndpointGroupPermissions DTO

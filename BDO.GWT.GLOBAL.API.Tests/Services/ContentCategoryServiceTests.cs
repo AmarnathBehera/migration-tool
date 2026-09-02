@@ -1,5 +1,6 @@
 using BDO.GWT.Common.Core.Exceptions;
 using BDO.GWT.Core;
+using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.GLOBAL.API.DTOs;
 using BDO.GWT.GLOBAL.API.Helpers;
@@ -19,7 +20,7 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services;
 [TestFixture]
 public class ContentCategoryServiceTests
 {
-    private static readonly int[] ServiceAreaSubCategoryIds = [1, 2, 3];
+    private static readonly int[] ExpectedBusinessIssueIds = [8, 9];
 
     private static ContentCategoryService CreateServiceWithoutConstructor() =>
         (ContentCategoryService)RuntimeHelpers.GetUninitializedObject(typeof(ContentCategoryService));
@@ -121,8 +122,11 @@ public class ContentCategoryServiceTests
 
         var result = await harness.Build().GetContentCategoriesAsync(5, "en-GB", CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<UnprocessableEntityObjectResult>());
-        Assert.That(((UnprocessableEntityObjectResult)result.Result!).Value, Is.SameAs(errors));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<UnprocessableEntityObjectResult>());
+            Assert.That(((UnprocessableEntityObjectResult)result.Result!).Value, Is.SameAs(errors));
+        });
     }
 
     [Test]
@@ -135,8 +139,11 @@ public class ContentCategoryServiceTests
 
         var result = await harness.Build().GetContentCategoriesAsync(5, "en-GB", CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
-        Assert.That(((NotFoundObjectResult)result.Result!).Value, Is.EqualTo("Invalid culture specified"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+            Assert.That(((NotFoundObjectResult)result.Result!).Value, Is.EqualTo("Invalid culture specified"));
+        });
     }
 
     [Test]
@@ -149,8 +156,11 @@ public class ContentCategoryServiceTests
 
         var result = await harness.Build().GetContentAsync(5, "en-GB", null, null, [], CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
-        Assert.That(((NotFoundObjectResult)result.Result!).Value, Is.EqualTo("Invalid culture specified"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+            Assert.That(((NotFoundObjectResult)result.Result!).Value, Is.EqualTo("Invalid culture specified"));
+        });
     }
 
     [Test]
@@ -221,10 +231,105 @@ public class ContentCategoryServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(map["BusinessIssue"], Is.EqualTo(new[] { 8, 9 }));
+            Assert.That(map["BusinessIssue"], Is.EqualTo(ExpectedBusinessIssueIds));
             Assert.That(map["BusinessLine"], Is.Empty);
             Assert.That(map["ServiceArea"], Is.Empty);
             Assert.That(map["Industry"], Is.Empty);
+        });
+    }
+
+    [Test]
+    public void BuildSubCategoryIdsByCategoryCode_WithRepeatedCategory_UsesLastValue()
+    {
+        var method = typeof(ContentCategoryService).GetMethod("BuildSubCategoryIdsByCategoryCode", BindingFlags.Static | BindingFlags.NonPublic)!;
+
+        var map = (Dictionary<string, int[]>)method.Invoke(null, [new[]
+        {
+            new ContentCategoryFilter { CategoryCode = "Industry", SubCategoryIds = [1] },
+            new ContentCategoryFilter { CategoryCode = "Industry", SubCategoryIds = [2, 3] }
+        }])!;
+
+        Assert.That(map["Industry"], Is.EqualTo(new[] { 2, 3 }));
+    }
+
+    [Test]
+    public void BuildSubCategoryIdsByCategoryCode_IgnoresEntriesWithNullSubCategoryIds()
+    {
+        var method = typeof(ContentCategoryService).GetMethod("BuildSubCategoryIdsByCategoryCode", BindingFlags.Static | BindingFlags.NonPublic)!;
+
+        var map = (Dictionary<string, int[]>)method.Invoke(null, [new[]
+        {
+            new ContentCategoryFilter { CategoryCode = "ServiceArea", SubCategoryIds = null }
+        }])!;
+
+        Assert.That(map["ServiceArea"], Is.Empty);
+    }
+
+    [Test]
+    public void BuildSubCategoryIdsByCategoryCode_AlwaysContainsAllValidCodes()
+    {
+        var method = typeof(ContentCategoryService).GetMethod("BuildSubCategoryIdsByCategoryCode", BindingFlags.Static | BindingFlags.NonPublic)!;
+
+        var map = (Dictionary<string, int[]>)method.Invoke(null, [Array.Empty<ContentCategoryFilter>()])!;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(map.ContainsKey("BusinessIssue"), Is.True);
+            Assert.That(map.ContainsKey("BusinessLine"), Is.True);
+            Assert.That(map.ContainsKey("ServiceArea"), Is.True);
+            Assert.That(map.ContainsKey("Industry"), Is.True);
+        });
+    }
+
+    [Test]
+    public void InsightProjection_ToDto_MapsExpectedValues()
+    {
+        var projectionType = typeof(ContentCategoryService)
+            .GetNestedType("InsightProjection", BindingFlags.NonPublic)!;
+
+        var projection = projectionType
+            .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Single(c => c.GetParameters().Length == 11)
+            .Invoke([
+                Guid.NewGuid(), "BlogPost", "Title", "Summary", "https://img", new DateTime(2025, 1, 15), "/url",
+                new[] { 1 }, new[] { 2 }, new[] { 3 }, new[] { 4 }
+            ]);
+
+        var dto = (InsightContentDto)projectionType.GetMethod("ToDto")!.Invoke(projection, null)!;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.PageType, Is.EqualTo("BlogPost"));
+            Assert.That(dto.TitleFull, Is.EqualTo("Title"));
+            Assert.That(dto.SummaryFull, Is.EqualTo("Summary"));
+            Assert.That(dto.ImageUrlFull, Is.EqualTo("https://img"));
+            Assert.That(dto.URL, Is.EqualTo("/url"));
+            Assert.That(dto.DisplayDate, Is.EqualTo("15 January 2025"));
+        });
+    }
+
+    [Test]
+    public void InsightProjection_ToDto_UsesFallbacksForNullImageAndDefaultDate()
+    {
+        var projectionType = typeof(ContentCategoryService)
+            .GetNestedType("InsightProjection", BindingFlags.NonPublic)!;
+
+        var projection = projectionType
+            .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Single(c => c.GetParameters().Length == 11)
+            .Invoke([
+                Guid.NewGuid(), "Insight", "Title", "Summary", null, default(DateTime), string.Empty,
+                Array.Empty<int>(), Array.Empty<int>(), Array.Empty<int>(), Array.Empty<int>()
+            ]);
+
+        var dto = (InsightContentDto)projectionType.GetMethod("ToDto")!.Invoke(projection, null)!;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.ImageUrlFull, Is.EqualTo(string.Empty));
+            Assert.That(dto.ImageUrlTwoThirds, Is.EqualTo(string.Empty));
+            Assert.That(dto.ImageUrlOneThird, Is.EqualTo(string.Empty));
+            Assert.That(dto.DisplayDate, Is.EqualTo(string.Empty));
         });
     }
 
@@ -261,13 +366,13 @@ public class ContentCategoryServiceTests
         var filter = new ContentCategoryFilter
         {
             CategoryCode = "ServiceArea",
-            SubCategoryIds = ServiceAreaSubCategoryIds
+            SubCategoryIds = new[] { 1, 2, 3 }
         };
 
         Assert.Multiple(() =>
         {
             Assert.That(filter.CategoryCode, Is.EqualTo("ServiceArea"));
-            Assert.That(filter.SubCategoryIds, Is.EqualTo(ServiceAreaSubCategoryIds));
+            Assert.That(filter.SubCategoryIds, Is.EqualTo(new[] { 1, 2, 3 }));
         });
     }
 
@@ -351,7 +456,7 @@ public class ContentCategoryServiceTests
     private sealed class ContentCategoryHarness
     {
         public Mock<IContentQueryExecutor> ContentQueryExecutor { get; } = new();
-        public Mock<BDO.GWT.Core.IContentService> ContentService { get; } = new();
+        public Mock<IContentService> ContentService { get; } = new();
         public Mock<IMappingHelper> MappingHelper { get; } = new();
         public Mock<IInfoProvider<ChannelInfo>> ChannelInfoProvider { get; } = new();
         public Mock<IValidationState> ValidationState { get; } = new();

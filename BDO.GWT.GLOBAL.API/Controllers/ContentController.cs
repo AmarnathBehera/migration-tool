@@ -30,7 +30,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         {
             int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
 
-            return await _contentService.GetContentCategoriesAsync(channelId, culture, cancellationToken);
+            return await _contentService.GetContentCategoriesAsync(channelId, culture ?? string.Empty, cancellationToken);
         }
 
         [HttpPost(Name = "GetContentFromCategories")]

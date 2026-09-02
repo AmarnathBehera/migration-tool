@@ -70,11 +70,8 @@ public class UsersControllerTests
         var result = await _controller.Get(null, CancellationToken.None);
 
         var okResult = result.Result as OkObjectResult;
-        Assert.Multiple(() =>
-        {
-            Assert.That(okResult, Is.Not.Null);
-            Assert.That((IEnumerable<UserOutput>)okResult!.Value!, Has.Exactly(2).Items);
-        });
+        Assert.That(okResult, Is.Not.Null);
+        Assert.That((IEnumerable<UserOutput>)okResult!.Value!, Has.Exactly(2).Items);
     }
 
     [Test]
@@ -87,11 +84,8 @@ public class UsersControllerTests
         var result = await _controller.Get("nomatch", CancellationToken.None);
 
         var okResult = result.Result as OkObjectResult;
-        Assert.Multiple(() =>
-        {
-            Assert.That(okResult, Is.Not.Null);
-            Assert.That((IEnumerable<UserOutput>)okResult!.Value!, Is.Empty);
-        });
+        Assert.That(okResult, Is.Not.Null);
+        Assert.That((IEnumerable<UserOutput>)okResult!.Value!, Is.Empty);
     }
 
     [TestCase("jdoe")]
@@ -421,6 +415,99 @@ public class UsersControllerTests
 
         Assert.ThrowsAsync<UnauthorizedAccessException>(async () =>
             await _controller.Delete(userGuid, CancellationToken.None));
+    }
+
+    #endregion
+
+    #region API permissions
+
+    [Test]
+    public async Task GetApiPermissions_ReturnsOk_AndUsesChannelIdFromHttpContext()
+    {
+        var userGuid = Guid.NewGuid();
+        var expected = new Dictionary<string, ApiEndpointGroupPermissions>
+        {
+            ["Users"] = new() { Read = true, Manage = false }
+        };
+        _controller.HttpContext.Items["ChannelId"] = 42;
+
+        _userApiPermissionsCrudServiceMock
+            .Setup(x => x.GetUserApiPermissionsByEndpointGroupNameAsync(42, userGuid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expected);
+
+        var result = await _controller.GetApiPermissions(1, userGuid, CancellationToken.None);
+
+        var okResult = result.Result as OkObjectResult;
+        Assert.That(okResult, Is.Not.Null);
+        Assert.That(okResult!.Value, Is.EqualTo(expected));
+        _userApiPermissionsCrudServiceMock.Verify(
+            x => x.GetUserApiPermissionsByEndpointGroupNameAsync(42, userGuid, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task GetApiPermissions_ForwardsCancellationToken()
+    {
+        using var cts = new CancellationTokenSource();
+        var userGuid = Guid.NewGuid();
+        _controller.HttpContext.Items["ChannelId"] = 9;
+
+        _userApiPermissionsCrudServiceMock
+            .Setup(x => x.GetUserApiPermissionsByEndpointGroupNameAsync(9, userGuid, cts.Token))
+            .ReturnsAsync(new Dictionary<string, ApiEndpointGroupPermissions>());
+
+        await _controller.GetApiPermissions(1, userGuid, cts.Token);
+
+        _userApiPermissionsCrudServiceMock.Verify(
+            x => x.GetUserApiPermissionsByEndpointGroupNameAsync(9, userGuid, cts.Token),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task SetApiPermissions_ReturnsOk_AndForwardsInput()
+    {
+        var userGuid = Guid.NewGuid();
+        var input = new Dictionary<string, ApiEndpointGroupPermissions>
+        {
+            ["Content"] = new() { Read = true, Manage = true }
+        };
+        var expected = new Dictionary<string, ApiEndpointGroupPermissions>
+        {
+            ["Content"] = new() { Read = true, Manage = true }
+        };
+        _controller.HttpContext.Items["ChannelId"] = 17;
+
+        _userApiPermissionsCrudServiceMock
+            .Setup(x => x.SetUserApiPermissionsByEndpointGroupNameAsync(17, userGuid, input, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expected);
+
+        var result = await _controller.SetApiPermissions(1, userGuid, input, CancellationToken.None);
+
+        var okResult = result.Result as OkObjectResult;
+        Assert.That(okResult, Is.Not.Null);
+        Assert.That(okResult!.Value, Is.EqualTo(expected));
+        _userApiPermissionsCrudServiceMock.Verify(
+            x => x.SetUserApiPermissionsByEndpointGroupNameAsync(17, userGuid, input, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task SetApiPermissions_ForwardsCancellationToken()
+    {
+        using var cts = new CancellationTokenSource();
+        var userGuid = Guid.NewGuid();
+        var input = new Dictionary<string, ApiEndpointGroupPermissions>();
+        _controller.HttpContext.Items["ChannelId"] = 17;
+
+        _userApiPermissionsCrudServiceMock
+            .Setup(x => x.SetUserApiPermissionsByEndpointGroupNameAsync(17, userGuid, input, cts.Token))
+            .ReturnsAsync(new Dictionary<string, ApiEndpointGroupPermissions>());
+
+        await _controller.SetApiPermissions(1, userGuid, input, cts.Token);
+
+        _userApiPermissionsCrudServiceMock.Verify(
+            x => x.SetUserApiPermissionsByEndpointGroupNameAsync(17, userGuid, input, cts.Token),
+            Times.Once);
     }
 
     #endregion

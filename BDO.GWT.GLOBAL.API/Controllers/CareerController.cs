@@ -111,7 +111,7 @@ namespace BDO.GWT.GLOBAL.API.Controllers
         /// Updates a single career page having the specified page GUID.
         /// </summary>
         /// <param name="memberFirmID">ID of the member firm in which the page should be modified.</param>
-        /// <param name="pageGUID">Page GUID of the career page.</param>
+        /// <param name="pageGuid">Page GUID of the career page.</param>
         /// <param name="culture">Language tag in the form of RFC 5646 (e.g. "en-US").</param>
         /// <param name="request">Updated career page data.</param>
         /// <param name="cancellationToken"></param>

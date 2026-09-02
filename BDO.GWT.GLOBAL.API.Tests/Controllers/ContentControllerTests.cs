@@ -54,11 +54,8 @@ public class ContentControllerTests
 
         var result = await _controller.GetContentCategories(1, "en-GB", CancellationToken.None);
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Result, Is.Null);
-            Assert.That(result.Value, Is.SameAs(expected));
-        });
+        Assert.That(result.Result, Is.Null);
+        Assert.That(result.Value, Is.SameAs(expected));
 
         _contentServiceMock.Verify(
             x => x.GetContentCategoriesAsync(ChannelId, "en-GB", It.IsAny<CancellationToken>()),
@@ -75,7 +72,7 @@ public class ContentControllerTests
         await _controller.GetContentCategories(1, null, CancellationToken.None);
 
         _contentServiceMock.Verify(
-            x => x.GetContentCategoriesAsync(ChannelId, null!, It.IsAny<CancellationToken>()),
+            x => x.GetContentCategoriesAsync(ChannelId, string.Empty, It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -99,11 +96,8 @@ public class ContentControllerTests
 
         var result = await _controller.GetContentFromCategories(1, "en-GB", 5, 3, filters, CancellationToken.None);
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Result, Is.Null);
-            Assert.That(result.Value, Is.SameAs(expected));
-        });
+        Assert.That(result.Result, Is.Null);
+        Assert.That(result.Value, Is.SameAs(expected));
 
         _contentServiceMock.Verify(
             x => x.GetContentAsync(ChannelId, "en-GB", 5, 3, filters, It.IsAny<CancellationToken>()),

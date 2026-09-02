@@ -173,7 +173,7 @@ public class UserApiPermissionsCrudService : IUserApiPermissionsCrudService
         return existingPermissions.Where(x => !string.IsNullOrEmpty(x.MethodGroup));
     }
 
-    private static IDictionary<string, Api_permissionsInfo> DeduplicateByGroupName(IEnumerable<Api_permissionsInfo> permissions)
+    private static Dictionary<string, Api_permissionsInfo> DeduplicateByGroupName(IEnumerable<Api_permissionsInfo> permissions)
     {
         return permissions
             .GroupBy(x => x.MethodGroup)

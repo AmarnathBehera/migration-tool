@@ -1,7 +1,9 @@
+using System.Collections;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using CMS.DataEngine;
 using CMS.Websites;
+using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
 using Moq;
 using XperienceCommunity.Redirects.UIPages;
@@ -189,6 +191,27 @@ public class RedirectEditTests
     // ── ProcessFormData (behavioural) ─────────────────────────────────────────
 
     [Test]
+    public async Task EditPage_ProcessFormData_WhenDuplicateSourceUrl_ReturnsValidationFailure()
+    {
+        var page = MakePage();
+        var provider = new Mock<IInfoProvider<RedirectInfoX>>();
+        var query = QueryReturning([CreateRedirectInfo()]);
+
+        provider.Setup(x => x.Get()).Returns(query.Object);
+        SetField(page, "_redirectInfoProvider", provider.Object);
+        page.ObjectID = 7;
+
+        var model = new RedirectEditModel { SourceUrl = "/Source" };
+
+        var response = (ICommandResponse)await (Task<ICommandResponse>)typeof(RedirectEdit)
+            .GetMethod("ProcessFormData", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .Invoke(page, new object[] { model, new List<IFormItem>() })!;
+
+        Assert.That(response.Messages.Any(m => m.Message.Contains("already exists", StringComparison.OrdinalIgnoreCase)), Is.True);
+        query.Verify(x => x.WhereNotEquals(nameof(RedirectInfoX.RedirectID), 7), Times.Once);
+    }
+
+    [Test]
     public async Task EditPage_ProcessFormData_MapsModelOntoLoadedInfo()
     {
         KenticoContainerSetup.Reset();
@@ -223,6 +246,31 @@ public class RedirectEditTests
     }
 
     // ── helpers ─────────────────────────────────────────────────────────────
+
+    private static Mock<ObjectQuery<RedirectInfoX>> QueryReturning(IEnumerable<RedirectInfoX> rows)
+    {
+        var data = rows.ToArray();
+        var query = new Mock<ObjectQuery<RedirectInfoX>>();
+
+        query.Setup(x => x.WhereEquals(It.IsAny<string>(), It.IsAny<object>()))
+            .Returns(query.Object);
+        query.Setup(x => x.WhereNotEquals(It.IsAny<string>(), It.IsAny<object>()))
+            .Returns(query.Object);
+        query.Setup(x => x.TopN(It.IsAny<int>()))
+            .Returns(query.Object);
+
+        query.As<IEnumerable<RedirectInfoX>>()
+            .Setup(x => x.GetEnumerator())
+            .Returns(() => ((IEnumerable<RedirectInfoX>)data).GetEnumerator());
+        query.As<IEnumerable>()
+            .Setup(x => x.GetEnumerator())
+            .Returns(() => data.GetEnumerator());
+
+        return query;
+    }
+
+    private static RedirectInfoX CreateRedirectInfo() =>
+        (RedirectInfoX)RuntimeHelpers.GetUninitializedObject(typeof(RedirectInfoX));
 
     private static RedirectEdit MakePage() =>
         (RedirectEdit)RuntimeHelpers.GetUninitializedObject(typeof(RedirectEdit));
