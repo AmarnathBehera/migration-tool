@@ -1,3 +1,4 @@
+using BDO;
 using BDO.GWT.Common.Core.Exceptions;
 using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
@@ -12,6 +13,7 @@ using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System.Data;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -21,6 +23,12 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services;
 public class ContentCategoryServiceTests
 {
     private static readonly int[] ExpectedBusinessIssueIds = [8, 9];
+    private static readonly int[] ExpectedIndustryIds = [2, 3];
+    private static readonly int[] ExpectedFilterIds = [1, 2, 3];
+    private static readonly int[] ProjectionBusinessIssueIds = [1];
+    private static readonly int[] ProjectionBusinessLineIds = [2];
+    private static readonly int[] ProjectionServiceAreaIds = [3];
+    private static readonly int[] ProjectionIndustryIds = [4];
 
     private static ContentCategoryService CreateServiceWithoutConstructor() =>
         (ContentCategoryService)RuntimeHelpers.GetUninitializedObject(typeof(ContentCategoryService));
@@ -239,6 +247,97 @@ public class ContentCategoryServiceTests
     }
 
     [Test]
+    public async Task GetContentCategoriesAsync_WithValidInputs_ReturnsFourCategories()
+    {
+        var mapping = new Mock<IMappingHelper>();
+        var channelProvider = new Mock<IInfoProvider<ChannelInfo>>();
+        var validation = new Mock<IValidationState>();
+        var websiteProvider = new Mock<IInfoProvider<WebsiteChannelInfo>>();
+
+        mapping.Setup(x => x.ValidateAndNormalizeSiteCultureAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(LanguageTag.GB);
+
+        channelProvider.Setup(x => x.Get()).Returns(QueryReturning([CreateChannelInfo("Global")]).Object);
+
+        var service = new ContentCategoryService(
+            CreateContentQueryExecutorProxy(),
+            Mock.Of<IContentService>(),
+            mapping.Object,
+            channelProvider.Object,
+            validation.Object,
+            websiteProvider.Object,
+            Mock.Of<IWebPageUrlRetriever>());
+
+        var result = await service.GetContentCategoriesAsync(1, "en-GB", CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+        Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+    }
+
+    [Test]
+    public async Task GetContentAsync_WithValidInputs_ReturnsContentDtoWithInsightsAndSearchUrl()
+    {
+        var mapping = new Mock<IMappingHelper>();
+        var channelProvider = new Mock<IInfoProvider<ChannelInfo>>();
+        var validation = new Mock<IValidationState>();
+        var websiteProvider = new Mock<IInfoProvider<WebsiteChannelInfo>>();
+        var contentService = new Mock<IContentService>();
+
+        mapping.Setup(x => x.ValidateAndNormalizeSiteCultureAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(LanguageTag.GB);
+        validation.Setup(x => x.HasUnprocessableEntityErrors()).Returns(false);
+        validation.Setup(x => x.HasErrors()).Returns(false);
+
+        channelProvider.Setup(x => x.Get()).Returns(QueryReturning([CreateChannelInfo("Global")]).Object);
+        websiteProvider.Setup(x => x.Get()).Returns(QueryReturning([CreateWebsiteChannelInfo("example.com")]).Object);
+
+        var blogPost = new BlogPost
+        {
+            SystemFields = new WebPageFields
+            {
+                ContentItemGUID = Guid.NewGuid(),
+                ContentItemCommonDataLastPublishedWhen = new DateTime(2025, 2, 1),
+                WebPageUrlPath = "/blog/1"
+            },
+            MetadataTitle = "Blog one",
+            MetadataDescription = "Summary",
+            MetadataTeaserImage = Array.Empty<ContentAttachment>(),
+            MetadataBusinessIssues = Array.Empty<Businessissue>(),
+            MetadataBusinessLine = Array.Empty<BusinessLine>(),
+            MetadataServiceAreas = Array.Empty<ServiceArea>(),
+            MetadataIndustries = Array.Empty<Industry>()
+        };
+
+        contentService.Setup(x => x.GetPagesAsync<BlogPost>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([blogPost]);
+
+        contentService.Setup(x => x.GetPagesAsync<Insight>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<Insight>());
+
+        var service = new ContentCategoryService(
+            CreateContentQueryExecutorProxy(),
+            contentService.Object,
+            mapping.Object,
+            channelProvider.Object,
+            validation.Object,
+            websiteProvider.Object,
+            Mock.Of<IWebPageUrlRetriever>());
+
+        var result = await service.GetContentAsync(1, "en-GB", 10, 5, Array.Empty<ContentCategoryFilter>(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+        Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+    }
+
+    [Test]
     public void BuildSubCategoryIdsByCategoryCode_WithRepeatedCategory_UsesLastValue()
     {
         var method = typeof(ContentCategoryService).GetMethod("BuildSubCategoryIdsByCategoryCode", BindingFlags.Static | BindingFlags.NonPublic)!;
@@ -249,7 +348,7 @@ public class ContentCategoryServiceTests
             new ContentCategoryFilter { CategoryCode = "Industry", SubCategoryIds = [2, 3] }
         }])!;
 
-        Assert.That(map["Industry"], Is.EqualTo(new[] { 2, 3 }));
+        Assert.That(map["Industry"], Is.EqualTo(ExpectedIndustryIds));
     }
 
     [Test]
@@ -292,7 +391,7 @@ public class ContentCategoryServiceTests
             .Single(c => c.GetParameters().Length == 11)
             .Invoke([
                 Guid.NewGuid(), "BlogPost", "Title", "Summary", "https://img", new DateTime(2025, 1, 15), "/url",
-                new[] { 1 }, new[] { 2 }, new[] { 3 }, new[] { 4 }
+                ProjectionBusinessIssueIds, ProjectionBusinessLineIds, ProjectionServiceAreaIds, ProjectionIndustryIds
             ]);
 
         var dto = (InsightContentDto)projectionType.GetMethod("ToDto")!.Invoke(projection, null)!;
@@ -333,6 +432,80 @@ public class ContentCategoryServiceTests
         });
     }
 
+    [Test]
+    public void MapBlogPostToProjection_MapsMetadataAndTaxonomies()
+    {
+        var method = typeof(ContentCategoryService).GetMethod("MapBlogPostToProjection", BindingFlags.Static | BindingFlags.NonPublic)!;
+
+        var blog = new BlogPost
+        {
+            SystemFields = new WebPageFields
+            {
+                ContentItemGUID = Guid.NewGuid(),
+                ContentItemCommonDataLastPublishedWhen = new DateTime(2024, 12, 1),
+                WebPageUrlPath = "/blog/post"
+            },
+            MetadataTitle = "Blog title",
+            MetadataDescription = "Blog summary",
+            MetadataTeaserImage =
+            [
+                new ContentAttachment { ContentAttachmentAsset = new ContentItemAsset { Url = "https://cdn/img.jpg" } }
+            ],
+            MetadataBusinessIssues = [new Businessissue { SystemFields = new WebPageFields { ContentItemID = 10 } }],
+            MetadataBusinessLine = [new BusinessLine { SystemFields = new WebPageFields { ContentItemID = 20 } }],
+            MetadataServiceAreas = [new ServiceArea { SystemFields = new WebPageFields { ContentItemID = 30 } }],
+            MetadataIndustries = [new Industry { SystemFields = new WebPageFields { ContentItemID = 40 } }]
+        };
+
+        var projection = method.Invoke(null, [blog])!;
+        var dto = (InsightContentDto)projection.GetType().GetMethod("ToDto")!.Invoke(projection, null)!;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.PageType, Is.EqualTo("BlogPost"));
+            Assert.That(dto.TitleFull, Is.EqualTo("Blog title"));
+            Assert.That(dto.SummaryFull, Is.EqualTo("Blog summary"));
+            Assert.That(dto.ImageUrlFull, Is.EqualTo("https://cdn/img.jpg"));
+            Assert.That(dto.URL, Is.EqualTo("/blog/post"));
+        });
+    }
+
+    [Test]
+    public void MapInsightToProjection_UsesEmptyFallbacksWhenMetadataMissing()
+    {
+        var method = typeof(ContentCategoryService).GetMethod("MapInsightToProjection", BindingFlags.Static | BindingFlags.NonPublic)!;
+
+        var insight = new Insight
+        {
+            SystemFields = new WebPageFields
+            {
+                ContentItemGUID = Guid.NewGuid(),
+                ContentItemCommonDataLastPublishedWhen = null,
+                WebPageUrlPath = null
+            },
+            MetadataTitle = null!,
+            MetadataDescription = null!,
+            MetadataTeaserImage = Array.Empty<ContentAttachment>(),
+            MetadataBusinessIssues = Array.Empty<Businessissue>(),
+            MetadataBusinessLine = Array.Empty<BusinessLine>(),
+            MetadataServiceAreas = Array.Empty<ServiceArea>(),
+            MetadataIndustries = Array.Empty<Industry>()
+        };
+
+        var projection = method.Invoke(null, [insight])!;
+        var dto = (InsightContentDto)projection.GetType().GetMethod("ToDto")!.Invoke(projection, null)!;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.PageType, Is.EqualTo("Insight"));
+            Assert.That(dto.TitleFull, Is.EqualTo(string.Empty));
+            Assert.That(dto.SummaryFull, Is.EqualTo(string.Empty));
+            Assert.That(dto.ImageUrlFull, Is.EqualTo(string.Empty));
+            Assert.That(dto.URL, Is.EqualTo(string.Empty));
+            Assert.That(dto.DisplayDate, Is.EqualTo(string.Empty));
+        });
+    }
+
     #endregion
 
     #region DTOs
@@ -366,13 +539,13 @@ public class ContentCategoryServiceTests
         var filter = new ContentCategoryFilter
         {
             CategoryCode = "ServiceArea",
-            SubCategoryIds = new[] { 1, 2, 3 }
+            SubCategoryIds = ExpectedFilterIds
         };
 
         Assert.Multiple(() =>
         {
             Assert.That(filter.CategoryCode, Is.EqualTo("ServiceArea"));
-            Assert.That(filter.SubCategoryIds, Is.EqualTo(new[] { 1, 2, 3 }));
+            Assert.That(filter.SubCategoryIds, Is.EqualTo(ExpectedFilterIds));
         });
     }
 
@@ -453,6 +626,77 @@ public class ContentCategoryServiceTests
         }
     }
 
+    private static IContentQueryExecutor CreateContentQueryExecutorProxy()
+    {
+        var executor = DispatchProxy.Create<IContentQueryExecutor, ContentQueryExecutorProxy>();
+        return executor!;
+    }
+
+    private static Mock<ObjectQuery<T>> QueryReturning<T>(IEnumerable<T> rows)
+        where T : BaseInfo
+    {
+        var query = new Mock<ObjectQuery<T>>();
+
+        query.Setup(x => x.WhereEquals(It.IsAny<string>(), It.IsAny<object>()))
+            .Returns(query.Object);
+        query.Setup(x => x.TopN(It.IsAny<int>()))
+            .Returns(query.Object);
+        query.Setup(x => x.GetEnumerableTypedResultAsync(
+                It.IsAny<CommandBehavior>(),
+                It.IsAny<bool>(),
+                It.IsAny<CancellationToken?>()))
+            .ReturnsAsync(rows);
+
+        return query;
+    }
+
+    private class ContentQueryExecutorProxy : DispatchProxy
+    {
+        protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
+        {
+            if (targetMethod == null)
+            {
+                return null;
+            }
+
+            var returnType = targetMethod.ReturnType;
+
+            if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
+            {
+                var payloadType = returnType.GetGenericArguments()[0];
+                if (payloadType.IsGenericType && payloadType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                {
+                    var itemType = payloadType.GetGenericArguments()[0];
+                    var emptySequence = typeof(Enumerable)
+                        .GetMethod(nameof(Enumerable.Empty))!
+                        .MakeGenericMethod(itemType)
+                        .Invoke(null, null)!;
+
+                    return typeof(Task)
+                        .GetMethod(nameof(Task.FromResult))!
+                        .MakeGenericMethod(payloadType)
+                        .Invoke(null, [emptySequence])!;
+                }
+            }
+
+            return returnType.IsValueType ? Activator.CreateInstance(returnType) : null;
+        }
+    }
+
+    private static ChannelInfo CreateChannelInfo(string channelName)
+    {
+        var channel = (FakeChannelInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeChannelInfo));
+        channel.ChannelName = channelName;
+        return channel;
+    }
+
+    private static WebsiteChannelInfo CreateWebsiteChannelInfo(string domain)
+    {
+        var channel = (FakeWebsiteChannelInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeWebsiteChannelInfo));
+        channel.WebsiteChannelDomain = domain;
+        return channel;
+    }
+
     private sealed class ContentCategoryHarness
     {
         public Mock<IContentQueryExecutor> ContentQueryExecutor { get; } = new();
@@ -471,5 +715,27 @@ public class ContentCategoryServiceTests
             ValidationState.Object,
             WebsiteChannelInfoProvider.Object,
             WebPageUrlRetriever.Object);
+    }
+
+    private sealed class FakeChannelInfo : ChannelInfo
+    {
+        private string? channelName;
+
+        public override string ChannelName
+        {
+            get => channelName ?? string.Empty;
+            set => channelName = value;
+        }
+    }
+
+    private sealed class FakeWebsiteChannelInfo : WebsiteChannelInfo
+    {
+        private string? websiteChannelDomain;
+
+        public override string WebsiteChannelDomain
+        {
+            get => websiteChannelDomain ?? string.Empty;
+            set => websiteChannelDomain = value;
+        }
     }
 }

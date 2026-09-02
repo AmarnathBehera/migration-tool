@@ -4,6 +4,7 @@ using BDO.GWT.GLOBAL.API.Services;
 using CMS.DataEngine;
 using CMS.Membership;
 using Moq;
+using System.Data;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -317,6 +318,57 @@ public class UserApiPermissionsCrudServiceTests
         apiProviderMock.Verify(x => x.DeleteAsync(It.Is<Api_permissionsInfo>(p => p.Api_permissionsID == 5), It.IsAny<CancellationToken>()), Times.Once);
     }
 
+    [Test]
+    public async Task GetUserApiPermissionsAsync_WithNoRows_ReturnsAllKnownGroupsDefaultingToFalse()
+    {
+        var service = CreateServiceWithMockedDependencies(out _, out var apiProviderMock);
+        apiProviderMock.Setup(x => x.Get()).Returns(QueryReturning<Api_permissionsInfo>([]).Object);
+
+        var result = await InvokeGetUserApiPermissionsAsync(service, 42, 1001);
+
+        var groupNames = (string[])typeof(UserApiPermissionsCrudService)
+            .GetField("ApiMethodGroupNames", BindingFlags.Static | BindingFlags.NonPublic)!
+            .GetValue(null)!;
+
+        Assert.That(result.Keys, Is.SupersetOf(groupNames));
+        Assert.That(result.Values.All(v => v.Read == false && v.Manage == false), Is.True);
+    }
+
+    [Test]
+    public async Task GetUserApiPermissionsAsync_WithRows_UsesHighestIdPerGroup()
+    {
+        var service = CreateServiceWithMockedDependencies(out _, out var apiProviderMock);
+        var rows = new Api_permissionsInfo[]
+        {
+            CreatePermission(ApiMethodGroupName.Users, 3, read: false, manage: false),
+            CreatePermission(ApiMethodGroupName.Users, 9, read: true, manage: false),
+            CreatePermission(ApiMethodGroupName.Content, 5, read: true, manage: true),
+        };
+
+        apiProviderMock.Setup(x => x.Get()).Returns(QueryReturning(rows).Object);
+
+        var result = await InvokeGetUserApiPermissionsAsync(service, 7, 222);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result[ApiMethodGroupName.Users].Read, Is.True);
+            Assert.That(result[ApiMethodGroupName.Users].Manage, Is.False);
+            Assert.That(result[ApiMethodGroupName.Content].Read, Is.True);
+            Assert.That(result[ApiMethodGroupName.Content].Manage, Is.True);
+        });
+    }
+
+    [Test]
+    public async Task SetUserApiPermissionsAsync_WithNoRequestAndNoExisting_CompletesWithoutThrowing()
+    {
+        var service = CreateServiceWithMockedDependencies(out _, out var apiProviderMock);
+        apiProviderMock.Setup(x => x.Get()).Returns(QueryReturning<Api_permissionsInfo>([]).Object);
+
+        await InvokeSetUserApiPermissionsAsync(service, 5, 111, new Dictionary<string, ApiEndpointGroupPermissions>());
+
+        apiProviderMock.Verify(x => x.Get(), Times.Once);
+    }
+
     #endregion
 
     #region ApiEndpointGroupPermissions DTO
@@ -349,6 +401,47 @@ public class UserApiPermissionsCrudServiceTests
     }
 
     #endregion
+
+    private static async Task<IDictionary<string, ApiEndpointGroupPermissions>> InvokeGetUserApiPermissionsAsync(
+        UserApiPermissionsCrudService service, int websiteChannelId, int userId)
+    {
+        var method = typeof(UserApiPermissionsCrudService)
+            .GetMethod("GetUserApiPermissionsAsync", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var task = (Task<IDictionary<string, ApiEndpointGroupPermissions>>)method.Invoke(service, [websiteChannelId, userId, CancellationToken.None])!;
+        return await task;
+    }
+
+    private static async Task InvokeSetUserApiPermissionsAsync(
+        UserApiPermissionsCrudService service,
+        int websiteChannelId,
+        int userId,
+        IDictionary<string, ApiEndpointGroupPermissions> request)
+    {
+        var method = typeof(UserApiPermissionsCrudService)
+            .GetMethod("SetUserApiPermissionsAsync", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var task = (Task)method.Invoke(service, [websiteChannelId, userId, request, CancellationToken.None])!;
+        await task;
+    }
+
+    private static Mock<ObjectQuery<T>> QueryReturning<T>(IEnumerable<T> rows)
+        where T : BaseInfo
+    {
+        var query = new Mock<ObjectQuery<T>>();
+
+        query.Setup(x => x.WhereEquals(It.IsAny<string>(), It.IsAny<object>()))
+            .Returns(query.Object);
+        query.Setup(x => x.WhereNotEquals(It.IsAny<string>(), It.IsAny<object>()))
+            .Returns(query.Object);
+        query.Setup(x => x.TopN(It.IsAny<int>()))
+            .Returns(query.Object);
+        query.Setup(x => x.GetEnumerableTypedResultAsync(
+                It.IsAny<CommandBehavior>(),
+                It.IsAny<bool>(),
+                It.IsAny<CancellationToken?>()))
+            .ReturnsAsync(rows);
+
+        return query;
+    }
 
     private sealed class FakeApiPermissionsInfo : Api_permissionsInfo
     {
