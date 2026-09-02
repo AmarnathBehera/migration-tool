@@ -65,7 +65,7 @@ public class ContentCategoryService : IContentCategoryService
                 throw new NotFoundException("Invalid culture specified");
             }
 
-            var channel = await _channelInfoProvider.GetAsync(channelId, cancellationToken);
+            var channel = await GetChannelAsync(channelId);
             if (string.IsNullOrEmpty(channel?.ChannelName))
             {
                 throw new NotFoundException("Channel not found");
@@ -165,7 +165,7 @@ public class ContentCategoryService : IContentCategoryService
                 throw new NotFoundException("Invalid culture specified");
             }
 
-            var channel = await _channelInfoProvider.GetAsync(channelId, cancellationToken);
+            var channel = await GetChannelAsync(channelId);
             if (string.IsNullOrEmpty(channel?.ChannelName))
             {
                 throw new NotFoundException("Channel not found");
@@ -275,7 +275,7 @@ public class ContentCategoryService : IContentCategoryService
 
     private async Task<string?> GetInsightSearchUrlByDomainAsync(int channelId, string culture, CancellationToken cancellationToken)
     {
-        var websiteChannel = await _websiteChannelInfoProvider.GetAsync(channelId, cancellationToken);
+        var websiteChannel = await GetWebsiteChannelAsync(channelId);
 
         var domain = websiteChannel?.WebsiteChannelDomain;
 
@@ -312,6 +312,18 @@ public class ContentCategoryService : IContentCategoryService
         {
             throw new UnprocessableEntityException();
         }
+    }
+
+    private Task<ChannelInfo?> GetChannelAsync(int channelId)
+    {
+        var provider = _channelInfoProvider as IInfoByIdProvider<ChannelInfo>;
+        return Task.FromResult(provider?.Get(channelId));
+    }
+
+    private Task<WebsiteChannelInfo?> GetWebsiteChannelAsync(int channelId)
+    {
+        var provider = _websiteChannelInfoProvider as IInfoByIdProvider<WebsiteChannelInfo>;
+        return Task.FromResult(provider?.Get(channelId));
     }
 
     private static Dictionary<string, int[]> BuildSubCategoryIdsByCategoryCode(IEnumerable<ContentCategoryFilter> categoryFilters)

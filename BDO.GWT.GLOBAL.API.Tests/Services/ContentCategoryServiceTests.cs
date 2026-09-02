@@ -256,11 +256,46 @@ public class ContentCategoryServiceTests
 
         mapping.Setup(x => x.ValidateAndNormalizeSiteCultureAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(LanguageTag.GB);
+        channelProvider.As<IInfoByIdProvider<ChannelInfo>>()
+            .Setup(x => x.Get(1))
+            .Returns(CreateChannelInfo("Global"));
 
-        channelProvider.Setup(x => x.Get()).Returns(QueryReturning([CreateChannelInfo("Global")]).Object);
+        var contentExecutor = CreateContentQueryExecutorProxy((method, args) =>
+        {
+            if (method.Name == "GetMappedResult")
+            {
+                var issue = new Businessissue
+                {
+                    SystemFields = new WebPageFields { ContentItemID = 11 },
+                    Name = "Operations"
+                };
+
+                return Task.FromResult<IEnumerable<Businessissue>>([issue]);
+            }
+
+            if (method.Name == "GetResult")
+            {
+                var selector = args![1]!;
+                var row = new Mock<IContentQueryDataContainer>();
+                row.Setup(x => x.GetValue<int>(It.IsAny<string>())).Returns(21);
+                row.Setup(x => x.GetValue<string>(It.IsAny<string>())).Returns("Category item");
+
+                var projected = selector.GetType().GetMethod("Invoke")!.Invoke(selector, [row.Object])!;
+                var payloadType = method.ReturnType.GetGenericArguments()[0];
+                var array = Array.CreateInstance(projected.GetType(), 1);
+                array.SetValue(projected, 0);
+
+                return typeof(Task)
+                    .GetMethod(nameof(Task.FromResult))!
+                    .MakeGenericMethod(payloadType)
+                    .Invoke(null, [array])!;
+            }
+
+            return GetDefaultReturnValue(method.ReturnType);
+        });
 
         var service = new ContentCategoryService(
-            CreateContentQueryExecutorProxy(),
+            contentExecutor,
             Mock.Of<IContentService>(),
             mapping.Object,
             channelProvider.Object,
@@ -282,14 +317,19 @@ public class ContentCategoryServiceTests
         var validation = new Mock<IValidationState>();
         var websiteProvider = new Mock<IInfoProvider<WebsiteChannelInfo>>();
         var contentService = new Mock<IContentService>();
+        var webPageUrlRetriever = new Mock<IWebPageUrlRetriever>();
 
         mapping.Setup(x => x.ValidateAndNormalizeSiteCultureAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(LanguageTag.GB);
         validation.Setup(x => x.HasUnprocessableEntityErrors()).Returns(false);
         validation.Setup(x => x.HasErrors()).Returns(false);
 
-        channelProvider.Setup(x => x.Get()).Returns(QueryReturning([CreateChannelInfo("Global")]).Object);
-        websiteProvider.Setup(x => x.Get()).Returns(QueryReturning([CreateWebsiteChannelInfo("example.com")]).Object);
+        channelProvider.As<IInfoByIdProvider<ChannelInfo>>()
+            .Setup(x => x.Get(1))
+            .Returns(CreateChannelInfo("Global"));
+        websiteProvider.As<IInfoByIdProvider<WebsiteChannelInfo>>()
+            .Setup(x => x.Get(1))
+            .Returns(CreateWebsiteChannelInfo("example.com"));
 
         var blogPost = new BlogPost
         {
@@ -301,6 +341,23 @@ public class ContentCategoryServiceTests
             },
             MetadataTitle = "Blog one",
             MetadataDescription = "Summary",
+            MetadataTeaserImage = Array.Empty<ContentAttachment>(),
+            MetadataBusinessIssues = Array.Empty<Businessissue>(),
+            MetadataBusinessLine = Array.Empty<BusinessLine>(),
+            MetadataServiceAreas = Array.Empty<ServiceArea>(),
+            MetadataIndustries = Array.Empty<Industry>()
+        };
+
+        var insight = new Insight
+        {
+            SystemFields = new WebPageFields
+            {
+                ContentItemGUID = Guid.NewGuid(),
+                ContentItemCommonDataLastPublishedWhen = new DateTime(2025, 2, 2),
+                WebPageUrlPath = "/insight/1"
+            },
+            MetadataTitle = "Insight one",
+            MetadataDescription = "Insight summary",
             MetadataTeaserImage = Array.Empty<ContentAttachment>(),
             MetadataBusinessIssues = Array.Empty<Businessissue>(),
             MetadataBusinessLine = Array.Empty<BusinessLine>(),
@@ -320,21 +377,172 @@ public class ContentCategoryServiceTests
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Array.Empty<Insight>());
+            .ReturnsAsync([insight]);
+
+        webPageUrlRetriever
+            .Setup(x => x.Retrieve(500, "en-gb", It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new WebPageUrl("~/search", "https://example.com/en-gb/search"));
+
+        var contentExecutor = CreateContentQueryExecutorProxy((method, args) =>
+        {
+            if (method.Name == "GetResult")
+            {
+                var selector = args![1]!;
+                var row = new Mock<IContentQueryDataContainer>();
+                row.Setup(x => x.GetValue<int>(It.IsAny<string>()))
+                    .Returns((string key) => key == "WebPageItemID" ? 500 : 21);
+                row.Setup(x => x.GetValue<string>(It.IsAny<string>())).Returns("Search");
+
+                var projected = selector.GetType().GetMethod("Invoke")!.Invoke(selector, [row.Object])!;
+                var payloadType = method.ReturnType.GetGenericArguments()[0];
+                var array = Array.CreateInstance(projected.GetType(), 1);
+                array.SetValue(projected, 0);
+
+                return typeof(Task)
+                    .GetMethod(nameof(Task.FromResult))!
+                    .MakeGenericMethod(payloadType)
+                    .Invoke(null, [array])!;
+            }
+
+            return GetDefaultReturnValue(method.ReturnType);
+        });
 
         var service = new ContentCategoryService(
-            CreateContentQueryExecutorProxy(),
+            contentExecutor,
             contentService.Object,
             mapping.Object,
             channelProvider.Object,
             validation.Object,
             websiteProvider.Object,
+            webPageUrlRetriever.Object);
+
+        var result = await service.GetContentAsync(1, "en-gb", 10, 5, Array.Empty<ContentCategoryFilter>(), CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.Null);
+            Assert.That(result.Value, Is.Not.Null);
+            Assert.That(result.Value!.InsightsSearchURL, Is.EqualTo("https://example.com/en-GB/search"));
+            Assert.That(result.Value.Insights, Has.Count.EqualTo(2));
+        });
+    }
+
+    [Test]
+    public async Task GetInsightSearchUrlByDomainAsync_WhenDomainWithoutScheme_ReturnsNormalizedUrl()
+    {
+        var websiteProvider = new Mock<IInfoProvider<WebsiteChannelInfo>>();
+        websiteProvider.As<IInfoByIdProvider<WebsiteChannelInfo>>()
+            .Setup(x => x.Get(1))
+            .Returns(CreateWebsiteChannelInfo("example.com/"));
+
+        var service = new ContentCategoryService(
+            Mock.Of<IContentQueryExecutor>(),
+            Mock.Of<IContentService>(),
+            Mock.Of<IMappingHelper>(),
+            Mock.Of<IInfoProvider<ChannelInfo>>(),
+            Mock.Of<IValidationState>(),
+            websiteProvider.Object,
             Mock.Of<IWebPageUrlRetriever>());
 
-        var result = await service.GetContentAsync(1, "en-GB", 10, 5, Array.Empty<ContentCategoryFilter>(), CancellationToken.None);
+        var method = typeof(ContentCategoryService).GetMethod("GetInsightSearchUrlByDomainAsync", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var task = (Task<string?>)method.Invoke(service, [1, "en-gb", CancellationToken.None])!;
+        var result = await task;
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.That(result, Is.EqualTo("https://example.com/en-gb/search"));
+    }
+
+    [Test]
+    public async Task GetInsightSearchUrlByDomainAsync_WhenDomainHasHttpScheme_KeepsSchemeAndTrimsSlash()
+    {
+        var websiteProvider = new Mock<IInfoProvider<WebsiteChannelInfo>>();
+        websiteProvider.As<IInfoByIdProvider<WebsiteChannelInfo>>()
+            .Setup(x => x.Get(1))
+            .Returns(CreateWebsiteChannelInfo("http://example.com/"));
+
+        var service = new ContentCategoryService(
+            Mock.Of<IContentQueryExecutor>(),
+            Mock.Of<IContentService>(),
+            Mock.Of<IMappingHelper>(),
+            Mock.Of<IInfoProvider<ChannelInfo>>(),
+            Mock.Of<IValidationState>(),
+            websiteProvider.Object,
+            Mock.Of<IWebPageUrlRetriever>());
+
+        var method = typeof(ContentCategoryService).GetMethod("GetInsightSearchUrlByDomainAsync", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var task = (Task<string?>)method.Invoke(service, [1, "fr-fr", CancellationToken.None])!;
+        var result = await task;
+
+        Assert.That(result, Is.EqualTo("http://example.com/fr-fr/search"));
+    }
+
+    [Test]
+    public void GetBusinessIssueCategoryDtoAsync_WithoutContentModelMapper_ThrowsExpectedException()
+    {
+        var service = new ContentCategoryService(
+            CreateContentQueryExecutorProxy(),
+            Mock.Of<IContentService>(),
+            Mock.Of<IMappingHelper>(),
+            Mock.Of<IInfoProvider<ChannelInfo>>(),
+            Mock.Of<IValidationState>(),
+            Mock.Of<IInfoProvider<WebsiteChannelInfo>>(),
+            Mock.Of<IWebPageUrlRetriever>());
+
+        var method = typeof(ContentCategoryService).GetMethod("GetBusinessIssueCategoryDtoAsync", BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await (Task<ContentCategoryDto>)method.Invoke(service, ["Global", LanguageTag.GB, CancellationToken.None])!);
+
+        Assert.That(ex!.Message, Does.Contain("automatic mapping"));
+    }
+
+    [Test]
+    public async Task GetContentCategoryDtoAsync_MapsRowsToSubCategories()
+    {
+        var executor = CreateContentQueryExecutorProxy((method, args) =>
+        {
+            if (method.Name == "GetResult")
+            {
+                var selector = args![1]!;
+                var row = new Mock<IContentQueryDataContainer>();
+                row.Setup(x => x.GetValue<int>("ContentItemID")).Returns(88);
+                row.Setup(x => x.GetValue<string>("MetadataTitle")).Returns("Tax");
+
+                var projected = selector.GetType().GetMethod("Invoke")!.Invoke(selector, [row.Object])!;
+                var payloadType = method.ReturnType.GetGenericArguments()[0];
+                var array = Array.CreateInstance(projected.GetType(), 1);
+                array.SetValue(projected, 0);
+
+                return typeof(Task)
+                    .GetMethod(nameof(Task.FromResult))!
+                    .MakeGenericMethod(payloadType)
+                    .Invoke(null, [array])!;
+            }
+
+            return GetDefaultReturnValue(method.ReturnType);
+        });
+
+        var service = new ContentCategoryService(
+            executor,
+            Mock.Of<IContentService>(),
+            Mock.Of<IMappingHelper>(),
+            Mock.Of<IInfoProvider<ChannelInfo>>(),
+            Mock.Of<IValidationState>(),
+            Mock.Of<IInfoProvider<WebsiteChannelInfo>>(),
+            Mock.Of<IWebPageUrlRetriever>());
+
+        var method = typeof(ContentCategoryService).GetMethod("GetContentCategoryDtoAsync", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var task = (Task<ContentCategoryDto>)method.Invoke(
+            service,
+            ["Industry", "Industry", Industry.CONTENT_TYPE_NAME, "Global", LanguageTag.GB, CancellationToken.None])!;
+        var dto = await task;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.Name, Is.EqualTo("Industry"));
+            Assert.That(dto.Code, Is.EqualTo("Industry"));
+            Assert.That(dto.SubCategories.Single().Id, Is.EqualTo(88));
+            Assert.That(dto.SubCategories.Single().Name, Is.EqualTo("Tax"));
+        });
     }
 
     [Test]
@@ -626,9 +834,10 @@ public class ContentCategoryServiceTests
         }
     }
 
-    private static IContentQueryExecutor CreateContentQueryExecutorProxy()
+    private static IContentQueryExecutor CreateContentQueryExecutorProxy(Func<MethodInfo, object?[]?, object?>? onInvoke = null)
     {
         var executor = DispatchProxy.Create<IContentQueryExecutor, ContentQueryExecutorProxy>();
+        ContentQueryExecutorProxy.GetProxy(executor!).OnInvoke = onInvoke;
         return executor!;
     }
 
@@ -652,6 +861,8 @@ public class ContentCategoryServiceTests
 
     private class ContentQueryExecutorProxy : DispatchProxy
     {
+        public Func<MethodInfo, object?[]?, object?>? OnInvoke { get; set; }
+
         protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
         {
             if (targetMethod == null)
@@ -659,28 +870,45 @@ public class ContentCategoryServiceTests
                 return null;
             }
 
-            var returnType = targetMethod.ReturnType;
+            return OnInvoke?.Invoke(targetMethod, args) ?? GetDefaultReturnValue(targetMethod.ReturnType);
+        }
 
-            if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
+        public static ContentQueryExecutorProxy GetProxy(IContentQueryExecutor proxy) =>
+            (ContentQueryExecutorProxy)(object)proxy;
+    }
+
+    private static object? GetDefaultReturnValue(Type returnType)
+    {
+        if (returnType == typeof(Task))
+        {
+            return Task.CompletedTask;
+        }
+
+        if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
+        {
+            var payloadType = returnType.GetGenericArguments()[0];
+            if (payloadType.IsGenericType && payloadType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
             {
-                var payloadType = returnType.GetGenericArguments()[0];
-                if (payloadType.IsGenericType && payloadType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                {
-                    var itemType = payloadType.GetGenericArguments()[0];
-                    var emptySequence = typeof(Enumerable)
-                        .GetMethod(nameof(Enumerable.Empty))!
-                        .MakeGenericMethod(itemType)
-                        .Invoke(null, null)!;
+                var itemType = payloadType.GetGenericArguments()[0];
+                var emptySequence = typeof(Enumerable)
+                    .GetMethod(nameof(Enumerable.Empty))!
+                    .MakeGenericMethod(itemType)
+                    .Invoke(null, null)!;
 
-                    return typeof(Task)
-                        .GetMethod(nameof(Task.FromResult))!
-                        .MakeGenericMethod(payloadType)
-                        .Invoke(null, [emptySequence])!;
-                }
+                return typeof(Task)
+                    .GetMethod(nameof(Task.FromResult))!
+                    .MakeGenericMethod(payloadType)
+                    .Invoke(null, [emptySequence])!;
             }
 
-            return returnType.IsValueType ? Activator.CreateInstance(returnType) : null;
+            var defaultValue = payloadType.IsValueType ? Activator.CreateInstance(payloadType) : null;
+            return typeof(Task)
+                .GetMethod(nameof(Task.FromResult))!
+                .MakeGenericMethod(payloadType)
+                .Invoke(null, [defaultValue])!;
         }
+
+        return returnType.IsValueType ? Activator.CreateInstance(returnType) : null;
     }
 
     private static ChannelInfo CreateChannelInfo(string channelName)
