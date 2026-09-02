@@ -154,7 +154,7 @@ builder.Services.AddOptions<BDO.GWT.Core.Extensions.AzureCognitiveSearchOptions>
     .BindConfiguration("AzureCognitiveSearch");   // section name in appsettings.json
 
 // Add Application Insights telemetry
-//builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
+builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
 // Loads the administration redirect domain (AdminRedirectOptions) from a configuration file section
 builder.Services.Configure<AdminRedirectOptions>(builder.Configuration.GetSection("AdminRedirectOptions"));
