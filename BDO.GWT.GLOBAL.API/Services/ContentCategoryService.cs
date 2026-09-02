@@ -244,7 +244,7 @@ public class ContentCategoryService : IContentCategoryService
             return pageUrl;
         }
 
-        return await GetInsightSearchUrlByDomainAsync(channelId, culture, cancellationToken);
+        return await GetInsightSearchUrlByDomainAsync(channelId, culture);
     }
 
     private async Task<string?> GetInsightSearchUrlByPageAsync(string channelName, string culture, CancellationToken cancellationToken)
@@ -273,7 +273,7 @@ public class ContentCategoryService : IContentCategoryService
         return url?.AbsoluteUrl;
     }
 
-    private async Task<string?> GetInsightSearchUrlByDomainAsync(int channelId, string culture, CancellationToken cancellationToken)
+    private async Task<string?> GetInsightSearchUrlByDomainAsync(int channelId, string culture)
     {
         var websiteChannel = await GetWebsiteChannelAsync(channelId);
 

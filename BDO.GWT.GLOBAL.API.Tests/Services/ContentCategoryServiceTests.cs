@@ -305,8 +305,11 @@ public class ContentCategoryServiceTests
 
         var result = await service.GetContentCategoriesAsync(1, "en-GB", CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
     }
 
     [Test]
@@ -445,7 +448,7 @@ public class ContentCategoryServiceTests
             Mock.Of<IWebPageUrlRetriever>());
 
         var method = typeof(ContentCategoryService).GetMethod("GetInsightSearchUrlByDomainAsync", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        var task = (Task<string?>)method.Invoke(service, [1, "en-gb", CancellationToken.None])!;
+        var task = (Task<string?>)method.Invoke(service, [1, "en-gb"])!;
         var result = await task;
 
         Assert.That(result, Is.EqualTo("https://example.com/en-gb/search"));
@@ -469,7 +472,7 @@ public class ContentCategoryServiceTests
             Mock.Of<IWebPageUrlRetriever>());
 
         var method = typeof(ContentCategoryService).GetMethod("GetInsightSearchUrlByDomainAsync", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        var task = (Task<string?>)method.Invoke(service, [1, "fr-fr", CancellationToken.None])!;
+        var task = (Task<string?>)method.Invoke(service, [1, "fr-fr"])!;
         var result = await task;
 
         Assert.That(result, Is.EqualTo("http://example.com/fr-fr/search"));
@@ -911,14 +914,14 @@ public class ContentCategoryServiceTests
         return returnType.IsValueType ? Activator.CreateInstance(returnType) : null;
     }
 
-    private static ChannelInfo CreateChannelInfo(string channelName)
+    private static FakeChannelInfo CreateChannelInfo(string channelName)
     {
         var channel = (FakeChannelInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeChannelInfo));
         channel.ChannelName = channelName;
         return channel;
     }
 
-    private static WebsiteChannelInfo CreateWebsiteChannelInfo(string domain)
+    private static FakeWebsiteChannelInfo CreateWebsiteChannelInfo(string domain)
     {
         var channel = (FakeWebsiteChannelInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeWebsiteChannelInfo));
         channel.WebsiteChannelDomain = domain;

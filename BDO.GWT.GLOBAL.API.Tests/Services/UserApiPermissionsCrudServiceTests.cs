@@ -330,8 +330,11 @@ public class UserApiPermissionsCrudServiceTests
             .GetField("ApiMethodGroupNames", BindingFlags.Static | BindingFlags.NonPublic)!
             .GetValue(null)!;
 
-        Assert.That(result.Keys, Is.SupersetOf(groupNames));
-        Assert.That(result.Values.All(v => v.Read == false && v.Manage == false), Is.True);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Keys, Is.SupersetOf(groupNames));
+            Assert.That(result.Values.All(v => v.Read == false && v.Manage == false), Is.True);
+        });
     }
 
     [Test]
