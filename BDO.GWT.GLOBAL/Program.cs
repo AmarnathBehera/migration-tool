@@ -177,6 +177,17 @@ app.UseStaticFiles();
 app.UseCookiePolicy();
 
 app.UseAuthentication();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error/500");
+    app.UseHsts();  
+}
+
+
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
+
+
 if (!builder.Environment.IsDevelopment() && builder.Configuration.GetSection("AdminRedirectOptions")?.GetSection("RedirectDomain")?.Value.Trim() != string.Empty)
 {
     // Configures the URL rewriting options

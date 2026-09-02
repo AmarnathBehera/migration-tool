@@ -63,6 +63,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IPageChannelResolver, PageChannelResolver>();
         serviceCollection.AddScoped<IContentItemInfoService, ContentItemInfoService>();
         serviceCollection.AddScoped<IPageAttachmentCrudService, PageAttachmentCrudService>();
+        serviceCollection.AddScoped<IMediaFileCrudService, MediaFileCrudService>();
         serviceCollection.AddScoped<IContentCategoryService, ContentCategoryService>();
         serviceCollection.AddScoped<IEventLogCrudService, EventLogCrudService>();
     }

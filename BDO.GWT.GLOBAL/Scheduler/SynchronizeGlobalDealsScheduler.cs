@@ -15,8 +15,8 @@ namespace BDO.GWT.GLOBAL.Scheduler;
 public class SynchronizeGlobalDealsScheduler : IScheduledTask
 {
     // Matches the keys actually present in appsettings.json.
-    private const string SYNC_API_URL_SETTING = "BDO.SyncApiUrl";
-    private const string SYNC_API_KEY_SETTING = "BDO.SyncApiKey";
+    private const string SYNC_API_URL_SETTING = "BDOSyncApiUrl";
+    private const string SYNC_API_KEY_SETTING = "BDOSyncApiKey";
     private const string API_KEY_HEADER = "X-API-Key";
 
     private static readonly JsonSerializerOptions TaskOptionsJsonOptions = new()
