@@ -55,13 +55,25 @@ public class HeaderService : IHeaderService
 
     public async Task<HeaderDto?> GetAsync(IContentService contentservice, CancellationToken cancellationToken)
     {
+        // The header (menus, contact, etc.) is language-specific, so the current
+        // culture MUST be part of the cache key. Without it, the first language to
+        // populate the cache is served to every other language on the channel.
+        var languageName = _preferredLanguageRetriever.Get();
         var cacheSettings = new CacheSettings(
             cacheMinutes: 10,
             cacheItemNameParts:
             [
                 nameof(HeaderService),
-                _websiteChannel.WebsiteChannelName
-            ]);
+                _websiteChannel.WebsiteChannelName,
+                languageName // language part – header varies by culture
+            ])
+        {
+            GetCacheDependency = () => CacheHelper.GetCacheDependency(new[]
+            {
+                $"webpageitem|bychannel|{_websiteChannel.WebsiteChannelName}"
+                // optionally narrow to the navigation content types
+            })
+        };
 
         var header = await _cache.LoadAsync(
             async _ => await BuildStaticHeaderAsync(cancellationToken),
