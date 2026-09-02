@@ -154,7 +154,7 @@ builder.Services.AddOptions<BDO.GWT.Core.Extensions.AzureCognitiveSearchOptions>
     .BindConfiguration("AzureCognitiveSearch");   // section name in appsettings.json
 
 // Add Application Insights telemetry
-builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
+//builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
 // Loads the administration redirect domain (AdminRedirectOptions) from a configuration file section
 builder.Services.Configure<AdminRedirectOptions>(builder.Configuration.GetSection("AdminRedirectOptions"));
@@ -178,14 +178,14 @@ app.UseCookiePolicy();
 
 app.UseAuthentication();
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error/500");
-    app.UseHsts();  
-}
+//if (!app.Environment.IsDevelopment())
+//{
+//    app.UseExceptionHandler("/Error/500");
+//    app.UseHsts();  
+//}
 
 
-app.UseStatusCodePagesWithReExecute("/Error/{0}");
+//app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
 
 if (!builder.Environment.IsDevelopment() && builder.Configuration.GetSection("AdminRedirectOptions")?.GetSection("RedirectDomain")?.Value.Trim() != string.Empty)
