@@ -25,6 +25,7 @@ public class HeaderService : IHeaderService
     private readonly ILocalizedUrlsBuilder _localizedUrlsBuilder;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IProgressiveCache _cache;
+    private readonly IPreferredLanguageRetriever _preferredLanguageRetriever;
     private readonly IWebPageUrlResolver _urlResolver;
     private readonly string navRootPath = "/";
 
@@ -37,6 +38,7 @@ public class HeaderService : IHeaderService
         ILocalizedUrlsBuilder localizedUrlsBuilder,
         IHttpContextAccessor httpContextAccessor,
         IProgressiveCache cache,
+        IPreferredLanguageRetriever preferredLanguageRetriever,
         IWebPageUrlResolver urlResolver)
     {
         _contentService = contentService;
@@ -47,6 +49,7 @@ public class HeaderService : IHeaderService
         _localizedUrlsBuilder = localizedUrlsBuilder;
         _httpContextAccessor = httpContextAccessor;
         _cache = cache;
+        _preferredLanguageRetriever = preferredLanguageRetriever;
         _urlResolver = urlResolver;
     }
 
