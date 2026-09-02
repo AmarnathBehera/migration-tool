@@ -4,6 +4,7 @@
     using BDO.GWT.Common.Core.Services;
     using BDO.GWT.Common.Helpers;
     using BDO.GWT.Core;
+    using BDO.GWT.Core.Helper;
     using BDO.GWT.Core.Helpers;
     using BDO.GWT.Core.LiveSite.Services;
     using BDO.GWT.Core.Mappers;
@@ -161,8 +162,9 @@
             serviceCollection.AddScoped<IContentPageCardHelper<Insight>, ContentPageCardHelper<Insight>>();
             serviceCollection.AddScoped<IPageUrlService, PageUrlService>();
             serviceCollection.AddScoped<ITypeAheadSearchService, TypeAheadSearchService>();
+            serviceCollection.AddScoped<ILocalizationHelper, LocalizationHelper>();
 
-            
+
             serviceCollection.AddAutoMapper(cfg =>
             {
                 cfg.AddMaps(
