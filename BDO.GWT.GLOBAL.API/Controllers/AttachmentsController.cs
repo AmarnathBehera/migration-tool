@@ -41,30 +41,6 @@ namespace BDO.GWT.GLOBAL.API.Controllers
 
             return Ok(result);
         }
-        [HttpPost]
-        [Consumes("multipart/form-data")]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation(Summary = "Creates a new attachment for a page")]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status201Created, "Attachment created", typeof(PageAttachmentOutput), MediaTypeNames.Application.Json)]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid request")]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status404NotFound, "Page not found")]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error")]
-        public async Task<IActionResult> Post(
-       [FromRoute] int memberFirmID,
-       [FromRoute] Guid pageGUID,
-       [FromForm] AttachmentRequest request,
-       CancellationToken cancellationToken)
-        {
-            int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
-
-            var result = await attachmentService.CreateAttachmentAsync(
-                channelId,
-                pageGUID,
-                request.Culture,
-                request.File,
-                cancellationToken);
-
-            return CreatedAtAction(nameof(Get), new { memberFirmID, pageGUID, attachmentGUID = result.GUID }, result);
-        }
 
         [HttpGet("{attachmentGUID:guid}")]
         [Swashbuckle.AspNetCore.Annotations.SwaggerOperation(Summary = "Gets a specific attachment by GUID")]
@@ -91,6 +67,31 @@ namespace BDO.GWT.GLOBAL.API.Controllers
             return result == null
                 ? NotFound()
                 : Ok(result);
+        }
+
+        [HttpPost]
+        [Consumes("multipart/form-data")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation(Summary = "Creates a new attachment for a page")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status201Created, "Attachment created", typeof(PageAttachmentOutput), MediaTypeNames.Application.Json)]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid request")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status404NotFound, "Page not found")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error")]
+        public async Task<IActionResult> Post(
+       [FromRoute] int memberFirmID,
+       [FromRoute] Guid pageGUID,
+       [FromForm] AttachmentRequest request,
+       CancellationToken cancellationToken)
+        {
+            int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
+
+            var result = await attachmentService.CreateAttachmentAsync(
+                channelId,
+                pageGUID,
+                request.Culture,
+                request.File,
+                cancellationToken);
+
+            return CreatedAtAction(nameof(Get), new { memberFirmID, pageGUID, attachmentGUID = result.GUID }, result);
         }
 
         [HttpGet("{attachmentGUID:guid}/binary")]

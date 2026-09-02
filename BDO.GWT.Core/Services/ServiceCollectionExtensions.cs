@@ -89,7 +89,8 @@
             serviceCollection.AddScoped<IRssPageService, RssPageService>();
             serviceCollection.AddScoped<IBusinessStrategyService, BusinessStrategyService>();
             serviceCollection.AddScoped<ISectionBusinessStrategiesService, SectionBusinessStrategiesService>();
-
+            serviceCollection.AddScoped<IStatusCodePageService, StatusCodePageService>();
+            serviceCollection.AddScoped<IErrorService, ErrorService>();
             //Widget Service
             serviceCollection.AddScoped<INewsCarouselService, NewsCarouselService>();
             serviceCollection.AddScoped<IKeyContactsService, KeyContactsService>();
