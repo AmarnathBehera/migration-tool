@@ -70,8 +70,11 @@ public class UsersControllerTests
         var result = await _controller.Get(null, CancellationToken.None);
 
         var okResult = result.Result as OkObjectResult;
-        Assert.That(okResult, Is.Not.Null);
-        Assert.That((IEnumerable<UserOutput>)okResult!.Value!, Has.Exactly(2).Items);
+        Assert.Multiple(() =>
+        {
+            Assert.That(okResult, Is.Not.Null);
+            Assert.That((IEnumerable<UserOutput>)okResult!.Value!, Has.Exactly(2).Items);
+        });
     }
 
     [Test]
@@ -84,8 +87,11 @@ public class UsersControllerTests
         var result = await _controller.Get("nomatch", CancellationToken.None);
 
         var okResult = result.Result as OkObjectResult;
-        Assert.That(okResult, Is.Not.Null);
-        Assert.That((IEnumerable<UserOutput>)okResult!.Value!, Is.Empty);
+        Assert.Multiple(() =>
+        {
+            Assert.That(okResult, Is.Not.Null);
+            Assert.That((IEnumerable<UserOutput>)okResult!.Value!, Is.Empty);
+        });
     }
 
     [TestCase("jdoe")]

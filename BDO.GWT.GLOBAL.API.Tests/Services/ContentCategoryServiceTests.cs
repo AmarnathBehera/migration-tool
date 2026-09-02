@@ -1,7 +1,17 @@
+using BDO.GWT.Common.Core.Exceptions;
+using BDO.GWT.Core;
+using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.GLOBAL.API.DTOs;
+using BDO.GWT.GLOBAL.API.Helpers;
 using BDO.GWT.GLOBAL.API.Services;
+using CMS.ContentEngine;
+using CMS.DataEngine;
+using CMS.Websites;
+using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace BDO.GWT.GLOBAL.API.Tests.Services;
@@ -9,6 +19,8 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services;
 [TestFixture]
 public class ContentCategoryServiceTests
 {
+    private static readonly int[] ServiceAreaSubCategoryIds = [1, 2, 3];
+
     private static ContentCategoryService CreateServiceWithoutConstructor() =>
         (ContentCategoryService)RuntimeHelpers.GetUninitializedObject(typeof(ContentCategoryService));
 
@@ -94,6 +106,130 @@ public class ContentCategoryServiceTests
         Assert.That(objectResult!.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
     }
 
+    #region Service branch coverage
+
+    [Test]
+    public async Task GetContentCategoriesAsync_WhenCultureValidationThrowsUnprocessableEntity_Returns422()
+    {
+        var harness = new ContentCategoryHarness();
+        var errors = new Dictionary<string, string> { ["culture"] = "invalid" };
+
+        harness.MappingHelper
+            .Setup(x => x.ValidateAndNormalizeSiteCultureAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new UnprocessableEntityException());
+        harness.ValidationState.Setup(x => x.GetErrors()).Returns(errors);
+
+        var result = await harness.Build().GetContentCategoriesAsync(5, "en-GB", CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<UnprocessableEntityObjectResult>());
+        Assert.That(((UnprocessableEntityObjectResult)result.Result!).Value, Is.SameAs(errors));
+    }
+
+    [Test]
+    public async Task GetContentCategoriesAsync_WhenCultureLocaleIsEmpty_ReturnsNotFound()
+    {
+        var harness = new ContentCategoryHarness();
+        harness.MappingHelper
+            .Setup(x => x.ValidateAndNormalizeSiteCultureAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new LanguageTag("en", "GB", string.Empty));
+
+        var result = await harness.Build().GetContentCategoriesAsync(5, "en-GB", CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+        Assert.That(((NotFoundObjectResult)result.Result!).Value, Is.EqualTo("Invalid culture specified"));
+    }
+
+    [Test]
+    public async Task GetContentAsync_WhenCultureLocaleIsEmpty_ReturnsNotFound()
+    {
+        var harness = new ContentCategoryHarness();
+        harness.MappingHelper
+            .Setup(x => x.ValidateAndNormalizeSiteCultureAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new LanguageTag("en", "GB", string.Empty));
+
+        var result = await harness.Build().GetContentAsync(5, "en-GB", null, null, [], CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+        Assert.That(((NotFoundObjectResult)result.Result!).Value, Is.EqualTo("Invalid culture specified"));
+    }
+
+    [Test]
+    public void ValidateContentCategoryFilters_WhenInvalidCategoryCode_ThrowsAndRegistersValidationError()
+    {
+        var harness = new ContentCategoryHarness();
+        harness.ValidationState.Setup(x => x.HasUnprocessableEntityErrors()).Returns(true);
+
+        var service = harness.Build();
+        var ex = Assert.ThrowsAsync<UnprocessableEntityException>(async () =>
+            await InvokePrivateAsync<Task>(
+                service,
+                "ValidateContentCategoryFilters",
+                [new[] { new ContentCategoryFilter { CategoryCode = "Invalid", SubCategoryIds = [1] } }]));
+
+        Assert.That(ex, Is.Not.Null);
+        harness.ValidationState.Verify(
+            x => x.AddUnprocessableEntityError(nameof(ContentCategoryFilter.CategoryCode), It.Is<string>(m => m.Contains("Not valid category code"))),
+            Times.Once);
+    }
+
+    [Test]
+    public void ValidateContentCategoryFilters_WhenSubcategoriesMissing_ThrowsAndRegistersValidationError()
+    {
+        var harness = new ContentCategoryHarness();
+        harness.ValidationState.Setup(x => x.HasUnprocessableEntityErrors()).Returns(true);
+
+        var service = harness.Build();
+
+        Assert.ThrowsAsync<UnprocessableEntityException>(async () =>
+            await InvokePrivateAsync<Task>(
+                service,
+                "ValidateContentCategoryFilters",
+                [new[] { new ContentCategoryFilter { CategoryCode = "Industry", SubCategoryIds = [] } }]));
+
+        harness.ValidationState.Verify(
+            x => x.AddUnprocessableEntityError(nameof(ContentCategoryFilter.SubCategoryIds), It.Is<string>(m => m.Contains("empty"))),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task ValidateContentCategoryFilters_WhenValidFilters_DoesNotAddErrors()
+    {
+        var harness = new ContentCategoryHarness();
+        harness.ValidationState.Setup(x => x.HasUnprocessableEntityErrors()).Returns(false);
+        harness.ValidationState.Setup(x => x.HasErrors()).Returns(false);
+
+        var service = harness.Build();
+
+        await InvokePrivateAsync<Task>(
+            service,
+            "ValidateContentCategoryFilters",
+            [new[] { new ContentCategoryFilter { CategoryCode = "Industry", SubCategoryIds = [1, 2] } }]);
+
+        harness.ValidationState.Verify(x => x.AddUnprocessableEntityError(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Test]
+    public async Task BuildSubCategoryIdsByCategoryCode_FillsMissingCodesWithEmptyArrays()
+    {
+        var method = typeof(ContentCategoryService).GetMethod("BuildSubCategoryIdsByCategoryCode", BindingFlags.Static | BindingFlags.NonPublic)!;
+
+        var map = (Dictionary<string, int[]>)method.Invoke(null, [new[]
+        {
+            new ContentCategoryFilter { CategoryCode = "BusinessIssue", SubCategoryIds = [8, 9] },
+            new ContentCategoryFilter { CategoryCode = null, SubCategoryIds = [99] }
+        }])!;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(map["BusinessIssue"], Is.EqualTo(new[] { 8, 9 }));
+            Assert.That(map["BusinessLine"], Is.Empty);
+            Assert.That(map["ServiceArea"], Is.Empty);
+            Assert.That(map["Industry"], Is.Empty);
+        });
+    }
+
+    #endregion
+
     #region DTOs
 
     [Test]
@@ -125,13 +261,13 @@ public class ContentCategoryServiceTests
         var filter = new ContentCategoryFilter
         {
             CategoryCode = "ServiceArea",
-            SubCategoryIds = new[] { 1, 2, 3 }
+            SubCategoryIds = ServiceAreaSubCategoryIds
         };
 
         Assert.Multiple(() =>
         {
             Assert.That(filter.CategoryCode, Is.EqualTo("ServiceArea"));
-            Assert.That(filter.SubCategoryIds, Is.EqualTo(new[] { 1, 2, 3 }));
+            Assert.That(filter.SubCategoryIds, Is.EqualTo(ServiceAreaSubCategoryIds));
         });
     }
 
@@ -190,4 +326,45 @@ public class ContentCategoryServiceTests
     }
 
     #endregion
+
+    private static async Task<T> InvokePrivateAsync<T>(object instance, string methodName, object[] args)
+    {
+        var method = instance.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+        try
+        {
+            var result = method.Invoke(instance, args);
+
+            if (result is Task task)
+            {
+                await task;
+            }
+
+            return result is T typed ? typed : default!;
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException is not null)
+        {
+            throw ex.InnerException;
+        }
+    }
+
+    private sealed class ContentCategoryHarness
+    {
+        public Mock<IContentQueryExecutor> ContentQueryExecutor { get; } = new();
+        public Mock<BDO.GWT.Core.IContentService> ContentService { get; } = new();
+        public Mock<IMappingHelper> MappingHelper { get; } = new();
+        public Mock<IInfoProvider<ChannelInfo>> ChannelInfoProvider { get; } = new();
+        public Mock<IValidationState> ValidationState { get; } = new();
+        public Mock<IInfoProvider<WebsiteChannelInfo>> WebsiteChannelInfoProvider { get; } = new();
+        public Mock<IWebPageUrlRetriever> WebPageUrlRetriever { get; } = new();
+
+        public ContentCategoryService Build() => new(
+            ContentQueryExecutor.Object,
+            ContentService.Object,
+            MappingHelper.Object,
+            ChannelInfoProvider.Object,
+            ValidationState.Object,
+            WebsiteChannelInfoProvider.Object,
+            WebPageUrlRetriever.Object);
+    }
 }

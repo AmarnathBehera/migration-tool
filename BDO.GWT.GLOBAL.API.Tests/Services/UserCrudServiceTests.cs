@@ -469,7 +469,7 @@ public class UserCrudServiceTests
     public async Task GetUsersAsync_WithoutFilter_DoesNotCallWhereContains_AndReturnsMappedUsers()
     {
         var harness = new Harness();
-        var userQuery = QueryReturning(new[] { CreateUser(1, Guid.NewGuid(), "jdoe", true, true) });
+        var userQuery = QueryReturning<UserInfo>(new UserInfo[] { CreateUser(1, Guid.NewGuid(), "jdoe", true, true) });
         harness.Users.Setup(x => x.Get()).Returns(userQuery.Object);
         harness.SetupEmptyMapping();
 
@@ -492,7 +492,7 @@ public class UserCrudServiceTests
     public async Task GetUsersAsync_WithUserNameFilter_CallsWhereContains()
     {
         var harness = new Harness();
-        var userQuery = QueryReturning(new[] { CreateUser(1, Guid.NewGuid(), "jdoe", true, true) });
+        var userQuery = QueryReturning<UserInfo>(new UserInfo[] { CreateUser(1, Guid.NewGuid(), "jdoe", true, true) });
         harness.Users.Setup(x => x.Get()).Returns(userQuery.Object);
         harness.SetupEmptyMapping();
 
@@ -515,7 +515,7 @@ public class UserCrudServiceTests
 
         var harness = new Harness();
         harness.Users.Setup(x => x.Get())
-            .Returns(QueryReturning(new[] { CreateUser(1, userGuid, "jdoe", true, true) }).Object);
+            .Returns(QueryReturning<UserInfo>(new UserInfo[] { CreateUser(1, userGuid, "jdoe", true, true) }).Object);
 
         harness.SetupMapping(
             roles: new[] { CreateRole(10, roleGuid, "Editor") },
@@ -562,7 +562,7 @@ public class UserCrudServiceTests
         var userGuid = Guid.NewGuid();
         var harness = new Harness();
         harness.Users.Setup(x => x.Get())
-            .Returns(QueryReturning(new[] { CreateUser(1, userGuid, "jdoe", true, true) }).Object);
+            .Returns(QueryReturning<UserInfo>(new UserInfo[] { CreateUser(1, userGuid, "jdoe", true, true) }).Object);
         harness.SetupEmptyMapping();
 
         var service = harness.Build();
@@ -616,7 +616,7 @@ public class UserCrudServiceTests
         var harness = new Harness();
         harness.Http.Setup(x => x.HttpContext).Returns(AuthenticatedContext("admin"));
         harness.Users.Setup(x => x.Get())
-            .Returns(QueryReturning(new[] { CreateUser(1, Guid.NewGuid(), "admin", enabled: false, adminAccess: true) }).Object);
+            .Returns(QueryReturning<UserInfo>(new UserInfo[] { CreateUser(1, Guid.NewGuid(), "admin", enabled: false, adminAccess: true) }).Object);
 
         var service = harness.Build();
 
@@ -630,7 +630,7 @@ public class UserCrudServiceTests
         var harness = new Harness();
         harness.Http.Setup(x => x.HttpContext).Returns(AuthenticatedContext("admin"));
         harness.Users.Setup(x => x.Get())
-            .Returns(QueryReturning(new[] { CreateUser(1, Guid.NewGuid(), "admin", enabled: true, adminAccess: false) }).Object);
+            .Returns(QueryReturning<UserInfo>(new UserInfo[] { CreateUser(1, Guid.NewGuid(), "admin", enabled: true, adminAccess: false) }).Object);
 
         var service = harness.Build();
 
@@ -656,13 +656,91 @@ public class UserCrudServiceTests
         var harness = new Harness();
         harness.Http.Setup(x => x.HttpContext).Returns(AuthenticatedContext("admin"));
         harness.Users.SetupSequence(x => x.Get())
-            .Returns(QueryReturning(new[] { CreateUser(1, Guid.NewGuid(), "admin", true, true) }).Object)
+            .Returns(QueryReturning<UserInfo>(new UserInfo[] { CreateUser(1, Guid.NewGuid(), "admin", true, true) }).Object)
             .Returns(QueryReturning(Array.Empty<UserInfo>()).Object);
 
         var service = harness.Build();
 
         Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await service.DeleteUserAsync(Guid.NewGuid(), CancellationToken.None));
+    }
+
+    #endregion
+
+    #region Role synchronization
+
+    [Test]
+    public async Task SyncUserRolesAsync_WhenRequestedRolesDiffer_DeletesAndAddsLinks()
+    {
+        var keepRoleGuid = Guid.NewGuid();
+        var addRoleGuid = Guid.NewGuid();
+
+        var harness = new Harness();
+        var roleQuery = QueryReturning<RoleInfo>(new RoleInfo[]
+        {
+            CreateRole(2, keepRoleGuid, "Keep"),
+            CreateRole(3, addRoleGuid, "Add")
+        });
+        roleQuery.Setup(x => x.WhereIn(It.IsAny<string>(), It.IsAny<ICollection<Guid>>()))
+            .Returns(roleQuery.Object);
+
+        var userRoleQuery = QueryReturning<UserRoleInfo>(new UserRoleInfo[]
+        {
+            CreateUserRole(42, 1),
+            CreateUserRole(42, 2)
+        });
+
+        harness.Roles.Setup(x => x.Get()).Returns(roleQuery.Object);
+        harness.UserRoles.Setup(x => x.Get()).Returns(userRoleQuery.Object);
+        harness.UserRoles.Setup(x => x.DeleteAsync(It.IsAny<UserRoleInfo>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+        harness.UserRoles.Setup(x => x.SetAsync(It.IsAny<UserRoleInfo>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        var service = harness.Build();
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await InvokeSyncUserRolesAsync(
+                service,
+                42,
+                new[] { new RoleSummaryInput { GUID = keepRoleGuid }, new RoleSummaryInput { GUID = addRoleGuid } },
+                CancellationToken.None));
+
+        harness.UserRoles.Verify(
+            x => x.DeleteAsync(It.Is<UserRoleInfo>(l => l.UserID == 42 && l.RoleID == 1), It.IsAny<CancellationToken>()),
+            Times.Once);
+        harness.UserRoles.Verify(x => x.SetAsync(It.IsAny<UserRoleInfo>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Test]
+    public async Task SyncUserRolesAsync_WhenRequestedRolesMatchExisting_DoesNotMutateLinks()
+    {
+        var sameRoleGuid = Guid.NewGuid();
+
+        var harness = new Harness();
+        var roleQuery = QueryReturning<RoleInfo>(new RoleInfo[] { CreateRole(2, sameRoleGuid, "Same") });
+        roleQuery.Setup(x => x.WhereIn(It.IsAny<string>(), It.IsAny<ICollection<Guid>>()))
+            .Returns(roleQuery.Object);
+
+        var userRoleQuery = QueryReturning<UserRoleInfo>(new UserRoleInfo[] { CreateUserRole(55, 2) });
+
+        harness.Roles.Setup(x => x.Get()).Returns(roleQuery.Object);
+        harness.UserRoles.Setup(x => x.Get()).Returns(userRoleQuery.Object);
+        harness.UserRoles.Setup(x => x.DeleteAsync(It.IsAny<UserRoleInfo>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+        harness.UserRoles.Setup(x => x.SetAsync(It.IsAny<UserRoleInfo>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        var service = harness.Build();
+
+        await InvokeSyncUserRolesAsync(
+            service,
+            55,
+            new[] { new RoleSummaryInput { GUID = sameRoleGuid } },
+            CancellationToken.None);
+
+        harness.UserRoles.Verify(x => x.DeleteAsync(It.IsAny<UserRoleInfo>(), It.IsAny<CancellationToken>()), Times.Never);
+        harness.UserRoles.Verify(x => x.SetAsync(It.IsAny<UserRoleInfo>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     #endregion
@@ -726,7 +804,15 @@ public class UserCrudServiceTests
             .Returns(query.Object);
         query.Setup(x => x.WhereEquals(It.IsAny<string>(), It.IsAny<object>()))
             .Returns(query.Object);
+        query.Setup(x => x.WhereNotEquals(It.IsAny<string>(), It.IsAny<object>()))
+            .Returns(query.Object);
+        query.Setup(x => x.WhereIn(It.IsAny<string>(), It.IsAny<ICollection<int>>()))
+            .Returns(query.Object);
+        query.Setup(x => x.WhereIn(It.IsAny<string>(), It.IsAny<ICollection<Guid>>()))
+            .Returns(query.Object);
         query.Setup(x => x.Columns(It.IsAny<string[]>()))
+            .Returns(query.Object);
+        query.Setup(x => x.TopN(It.IsAny<int>()))
             .Returns(query.Object);
         query.Setup(x => x.GetEnumerableTypedResultAsync(
                 It.IsAny<CommandBehavior>(),
@@ -735,6 +821,17 @@ public class UserCrudServiceTests
             .ReturnsAsync(rows);
 
         return query;
+    }
+
+    private static async Task InvokeSyncUserRolesAsync(
+        UserCrudService service,
+        int userId,
+        IEnumerable<RoleSummaryInput> requestedRoles,
+        CancellationToken cancellationToken)
+    {
+        var method = typeof(UserCrudService).GetMethod("SyncUserRolesAsync", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var task = (Task)method.Invoke(service, new object[] { userId, requestedRoles, cancellationToken })!;
+        await task;
     }
 
     private static DefaultHttpContext AuthenticatedContext(string? userName)
@@ -746,7 +843,7 @@ public class UserCrudServiceTests
         return new DefaultHttpContext { User = new ClaimsPrincipal(identity) };
     }
 
-    private static UserInfo CreateUser(int id, Guid guid, string userName, bool enabled, bool adminAccess)
+    private static FakeUserInfo CreateUser(int id, Guid guid, string userName, bool enabled, bool adminAccess)
     {
         var user = (FakeUserInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeUserInfo));
         user.UserID = id;
@@ -757,7 +854,7 @@ public class UserCrudServiceTests
         return user;
     }
 
-    private static RoleInfo CreateRole(int id, Guid guid, string displayName)
+    private static FakeRoleInfo CreateRole(int id, Guid guid, string displayName)
     {
         var role = (FakeRoleInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeRoleInfo));
         role.RoleID = id;
@@ -766,7 +863,7 @@ public class UserCrudServiceTests
         return role;
     }
 
-    private static UserRoleInfo CreateUserRole(int userId, int roleId)
+    private static FakeUserRoleInfo CreateUserRole(int userId, int roleId)
     {
         var link = (FakeUserRoleInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeUserRoleInfo));
         link.UserID = userId;
@@ -774,7 +871,7 @@ public class UserCrudServiceTests
         return link;
     }
 
-    private static WebPageAclRoleInfo CreateAclRole(int roleId, int aclId)
+    private static FakeWebPageAclRoleInfo CreateAclRole(int roleId, int aclId)
     {
         var aclRole = (FakeWebPageAclRoleInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeWebPageAclRoleInfo));
         aclRole.WebPageAclRoleRoleID = roleId;
@@ -782,7 +879,7 @@ public class UserCrudServiceTests
         return aclRole;
     }
 
-    private static WebPageAclInfo CreateAcl(int aclId, int websiteChannelId)
+    private static FakeWebPageAclInfo CreateAcl(int aclId, int websiteChannelId)
     {
         var acl = (FakeWebPageAclInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeWebPageAclInfo));
         acl.WebPageAclID = aclId;
@@ -790,7 +887,7 @@ public class UserCrudServiceTests
         return acl;
     }
 
-    private static WebsiteChannelInfo CreateWebsiteChannel(int websiteChannelId, int channelId)
+    private static FakeWebsiteChannelInfo CreateWebsiteChannel(int websiteChannelId, int channelId)
     {
         var wc = (FakeWebsiteChannelInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeWebsiteChannelInfo));
         wc.WebsiteChannelID = websiteChannelId;
@@ -798,7 +895,7 @@ public class UserCrudServiceTests
         return wc;
     }
 
-    private static ChannelInfo CreateChannel(int id, Guid guid, string displayName)
+    private static FakeChannelInfo CreateChannel(int id, Guid guid, string displayName)
     {
         var channel = (FakeChannelInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeChannelInfo));
         channel.ChannelID = id;
