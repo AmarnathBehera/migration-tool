@@ -98,10 +98,6 @@ namespace BDO.GWT.Core.Tests.Services
                 .SetupGet(x => x.HttpContext)
                 .Returns(new DefaultHttpContext());
 
-            _preferredLanguageRetrieverMock
-                .Setup(x => x.Get())
-                .Returns("en");
-
             _localizedUrlsBuilderMock
                 .Setup(x => x.BuildAsync(It.IsAny<HttpContext>()))
                 .ReturnsAsync(new List<LocalizedUrl>
