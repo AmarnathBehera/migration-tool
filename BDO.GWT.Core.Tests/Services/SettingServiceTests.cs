@@ -43,4 +43,80 @@ public class SettingServiceTests
     {
         Assert.That(_service, Is.Not.Null);
     }
+
+    // --- Helpers -----------------------------------------------------------------
+
+    private static Mock<ObjectQuery<T>> BuildQuery<T>(IEnumerable<T> results)
+        where T : BaseInfo
+    {
+        var queryMock = new Mock<ObjectQuery<T>>();
+
+        queryMock.Setup(q => q.WhereEquals(It.IsAny<string>(), It.IsAny<object>()))
+            .Returns(queryMock.Object);
+        queryMock.Setup(q => q.TopN(It.IsAny<int>()))
+            .Returns(queryMock.Object);
+        queryMock.Setup(q => q.GetEnumerableTypedResultAsync(
+                It.IsAny<System.Data.CommandBehavior>(),
+                It.IsAny<bool>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(results.ToList());
+
+        return queryMock;
+    }
+
+    private void SetupChannelSettingsQuery(IEnumerable<WebChannelSettingsInfo> results) =>
+        _channelMock.Setup(p => p.Get()).Returns(BuildQuery(results).Object);
+
+    // --- GetPrintorShareInfo / GetFilteringInfo / GetUsePersonPageTitleInfo -------
+
+    [Test]
+    public async Task GetPrintorShareInfo_ReturnsNull_WhenNoChannelSettingFound()
+    {
+        SetupChannelSettingsQuery([]);
+
+        var result = await _service.GetPrintorShareInfo();
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task GetFilteringInfo_ReturnsNull_WhenNoChannelSettingFound()
+    {
+        SetupChannelSettingsQuery([]);
+
+        var result = await _service.GetFilteringInfo();
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task GetUsePersonPageTitleInfo_ReturnsNull_WhenNoChannelSettingFound()
+    {
+        SetupChannelSettingsQuery([]);
+
+        var result = await _service.GetUsePersonPageTitleInfo();
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task GetPrintorShareInfo_UsesCurrentChannelIdFromContentService()
+    {
+        SetupChannelSettingsQuery([]);
+
+        await _service.GetPrintorShareInfo();
+
+        _contentMock.Verify(x => x.GetCurrentChannelID(), Times.Once);
+        _channelMock.Verify(p => p.Get(), Times.Once);
+    }
+
+    [Test]
+    public void GetPrintorShareInfo_PropagatesException_FromChannelProvider()
+    {
+        _channelMock.Setup(p => p.Get())
+            .Throws(new InvalidOperationException("db error"));
+
+        Assert.ThrowsAsync<InvalidOperationException>(() => _service.GetPrintorShareInfo());
+    }
+
 }

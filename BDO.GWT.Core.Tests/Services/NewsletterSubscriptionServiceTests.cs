@@ -318,4 +318,30 @@ public class NewsletterSubscriptionServiceTests
 
         _recipientListInfoProviderMock.Verify(p => p.Get(), Times.Never);
     }
+
+    [Test]
+    public async Task UnsubscribeFromNewsletterAsync_ReturnsFalse_WhenNewsletterGuidIsEmpty_EvenWithValidEmail()
+    {
+        var query = BuildRemoveQuery(email: "user@example.com", newsletterGuid: Guid.Empty);
+
+        var result = await _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.False);
+            _recipientListInfoProviderMock.Verify(p => p.Get(), Times.Never);
+        });
+    }
+
+    [Test]
+    public void UnsubscribeFromNewsletterAsync_PropagatesException_FromRecipientListProvider()
+    {
+        var query = BuildRemoveQuery();
+        _recipientListInfoProviderMock
+            .Setup(p => p.Get())
+            .Throws(new InvalidOperationException("db error"));
+
+        Assert.ThrowsAsync<InvalidOperationException>(
+            () => _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None));
+    }
 }

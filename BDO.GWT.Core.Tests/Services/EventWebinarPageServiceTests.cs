@@ -510,11 +510,141 @@ namespace BDO.GWT.Core.Tests.Services
             });
         }
 
-        [Test]
-        public void PresenterDto_Link_IsNullable()
+        #endregion
+
+        #region EventnWebinarSetting via full iCal generation (mocked empty settings)
+
+        /// <summary>
+        /// Mocks the snippet + global settings providers to return empty result sets so that
+        /// <c>EventnWebinarSetting()</c> resolves to its default values ("0", false) without
+        /// requiring the Kentico IoC container. This lets the full iCal generation path run.
+        /// </summary>
+        private void SetupEmptySettingsProviders()
         {
-            var dto = new PresenterDto { Name = "John", Title = "Manager" };
-            Assert.That(dto.Link, Is.Null);
+            _webChannelSnippetInfoProviderMock
+                .Setup(p => p.Get())
+                .Returns(BuildEmptyQuery<WebChannelSnippetInfo>().Object);
+
+            _globalSettingsKeyInfoProviderMock
+                .Setup(p => p.Get())
+                .Returns(BuildEmptyQuery<GlobalsettingskeyInfo>().Object);
+        }
+
+        private static Mock<ObjectQuery<T>> BuildEmptyQuery<T>()
+            where T : BaseInfo
+        {
+            var queryMock = new Mock<ObjectQuery<T>>();
+            queryMock.Setup(q => q.TopN(It.IsAny<int>())).Returns(queryMock.Object);
+            queryMock.As<IEnumerable<T>>()
+                .Setup(x => x.GetEnumerator())
+                .Returns(() => Enumerable.Empty<T>().GetEnumerator());
+            return queryMock;
+        }
+
+        [Test]
+        public async Task GenerateOutlookEventCardContent_ReturnsICalString_WhenPageFound()
+        {
+            SetupEmptySettingsProviders();
+
+            var page = BuildEvent(e =>
+            {
+                e.EventLocationTitle = "HQ";
+                e.EventLocationCity = "Toronto";
+                e.EventLocationAddress1 = "123 Main St";
+                e.CustomBodyText = "<p>Join us</p>";
+            });
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<Event>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[] { page });
+
+            var result = await _service.GenerateOutlookEventCardContent(
+                page.SystemFields.ContentItemGUID, null, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result, Does.Contain("BEGIN:VCALENDAR"));
+                Assert.That(result, Does.Contain("BEGIN:VEVENT"));
+                Assert.That(result, Does.Contain("SUMMARY:Test Event"));
+            });
+        }
+
+        [Test]
+        public async Task GenerateOutlookWebinarCardContent_ReturnsICalString_WhenPageFound()
+        {
+            SetupEmptySettingsProviders();
+
+            var page = BuildWebinar(w =>
+            {
+                w.EventLocationTitle = "Online";
+                w.CustomBodyText = "<p>Webinar body</p>";
+            });
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<Webinar>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[] { page });
+
+            var result = await _service.GenerateOutlookWebinarCardContent(
+                page.SystemFields.ContentItemGUID, null, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result, Does.Contain("BEGIN:VCALENDAR"));
+                Assert.That(result, Does.Contain("SUMMARY:Test Webinar"));
+            });
+        }
+
+        [Test]
+        public async Task GenerateOutlookEventCardContent_ProducesICal_WithoutCustomBodyText()
+        {
+            SetupEmptySettingsProviders();
+
+            var page = BuildEvent(e => e.CustomBodyText = null!);
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<Event>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[] { page });
+
+            var result = await _service.GenerateOutlookEventCardContent(
+                page.SystemFields.ContentItemGUID, null, CancellationToken.None);
+
+            Assert.That(result, Does.Contain("BEGIN:VEVENT"));
+        }
+
+        [Test]
+        public void GenerateOutlookEventCardContent_ThrowsOperationCanceled_WhenTokenCancelled()
+        {
+            SetupEmptySettingsProviders();
+
+            var page = BuildEvent();
+
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<Event>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[] { page });
+
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            Assert.ThrowsAsync<OperationCanceledException>(
+                () => _service.GenerateOutlookEventCardContent(page.SystemFields.ContentItemGUID, null, cts.Token));
         }
 
         #endregion
