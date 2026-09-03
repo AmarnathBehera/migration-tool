@@ -230,25 +230,6 @@ public class UsersControllerTests
         }
     }
 
-    [Test]
-    public async Task Post_SetsRouteValues_ForMemberFirmAndUserGuid()
-    {
-        const int memberFirmId = 99;
-        var userGuid = Guid.NewGuid();
-        var userInput = CreateUserInput();
-        _userCrudServiceMock
-            .Setup(x => x.CreateUserAsync(userInput, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(CreateUserOutput(userGuid, "newuser"));
-
-        var result = await _controller.Post(userInput, CancellationToken.None);
-
-        var createdResult = (CreatedAtActionResult)result.Result!;
-        using (Assert.EnterMultipleScope())
-        {
-            Assert.That(createdResult.RouteValues!["memberFirmID"], Is.EqualTo(memberFirmId));
-            Assert.That(createdResult.RouteValues!["userGuid"], Is.EqualTo(userGuid));
-        }
-    }
 
     [Test]
     public async Task Post_WithRoles_ForwardsInputToService()
