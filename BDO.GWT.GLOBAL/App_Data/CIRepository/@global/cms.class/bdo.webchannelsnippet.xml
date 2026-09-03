@@ -35,16 +35,9 @@
       <field allowempty="true" column="ScriptinTopofBodyInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="2b5ffc8d-4ab8-4336-a975-31ea181ea868" />
       <field allowempty="true" column="ScriptexecutedwhencookiesareacceptedInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="6dce8a8f-331e-438e-8efd-36ee0a09d7b6" />
       <field allowempty="true" column="MarketoMunchkinCodeInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="c181f540-9a92-4597-b77e-3e865c4b8924" />
-      <field allowempty="true" column="SitekeyreCAPTCHAv2" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="9588fb16-6af8-4c75-9d65-4c5a1afd41e5" />
-      <field allowempty="true" column="SitekeyreCAPTCHAv3" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="dca3c57a-856c-4484-a3b8-7996e652c8ba" />
-      <field allowempty="true" column="SecretkeyreCAPTCHAv2" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="8be8e932-4079-4c36-862b-f8499f46772b" />
-      <field allowempty="true" column="SecretkeyreCAPTCHAv3" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="c5189e89-840c-446d-a650-774d54e52695" />
-      <field allowempty="true" column="ScorethresholdreCAPTCHAv3" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="66c1943a-b67e-467f-9a45-7116f1b950f3" />
-      <field allowempty="true" column="ScorethresholdreCAPTCHAv3Ineritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="e3de9cd6-5f27-4792-b25e-8b3127e65524" />
       <field allowempty="true" column="SecretkeyreCAPTCHAv3Inheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="eaa4ce31-2ed8-4715-9304-5e4101790258" />
       <field allowempty="true" column="SecretkeyreCAPTCHAv2Inheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="4535fe8c-b610-4b4f-bd98-1caf3259f76a" />
       <field allowempty="true" column="SitekeyreCAPTCHAv3Inheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="73d6429f-2e6c-4cf6-a92b-5d68778f193c" />
-      <field allowempty="true" column="SitekeyreCAPTCHAv2Inheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="d54ed48c-1ba4-4eb2-a562-b8a951ea8a5f" />
     </form>
   </ClassFormDefinition>
   <ClassGUID>b8d0d5cb-4b0a-48fa-a8a4-54dc06ee7bfa</ClassGUID>

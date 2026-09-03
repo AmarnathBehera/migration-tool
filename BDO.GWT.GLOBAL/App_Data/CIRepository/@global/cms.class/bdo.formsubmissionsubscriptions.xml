@@ -19,11 +19,7 @@
         </properties>
       </field>
       <field allowempty="true" column="Username" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="2508d73b-80eb-4bb6-bcca-f39f881dfbf1" />
-      <field allowempty="true" column="EncryptedPassword" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="81ebca66-d85e-49ba-8d4d-ce4d380b8fba">
-        <properties>
-          <defaultvalue>Encrypted Password</defaultvalue>
-        </properties>
-      </field>
+      <field allowempty="true" column="EncryptedPassword" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="81ebca66-d85e-49ba-8d4d-ce4d380b8fba" />
     </form>
   </ClassFormDefinition>
   <ClassGUID>af2e45df-3907-49de-b692-82bbcc496cfc</ClassGUID>
