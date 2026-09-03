@@ -358,7 +358,7 @@ public class UserCrudServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(output.Channels, Is.Empty);
+           
             Assert.That(output.Roles, Is.Empty);
         });
     }
@@ -418,18 +418,7 @@ public class UserCrudServiceTests
         });
     }
 
-    [Test]
-    public void ChannelSummaryOutput_StoresValues()
-    {
-        var guid = Guid.NewGuid();
-        var summary = new ChannelSummaryOutput { GUID = guid, DisplayName = "Main Channel" };
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(summary.GUID, Is.EqualTo(guid));
-            Assert.That(summary.DisplayName, Is.EqualTo("Main Channel"));
-        });
-    }
+    
 
     [Test]
     public void RoleSummaryOutput_StoresValues()
@@ -450,13 +439,12 @@ public class UserCrudServiceTests
         var output = new UserOutput
         {
             General = new UserGeneralOutput { UserName = "jdoe" },
-            Channels = [new ChannelSummaryOutput { GUID = Guid.NewGuid(), DisplayName = "Channel A" }],
             Roles = [new RoleSummaryOutput { GUID = Guid.NewGuid(), DisplayName = "Editor" }]
         };
 
         Assert.Multiple(() =>
         {
-            Assert.That(output.Channels, Has.Length.EqualTo(1));
+           
             Assert.That(output.Roles, Has.Length.EqualTo(1));
         });
     }
@@ -482,7 +470,7 @@ public class UserCrudServiceTests
             Assert.That(result, Has.Count.EqualTo(1));
             Assert.That(result[0].General.UserName, Is.EqualTo("jdoe"));
             Assert.That(result[0].Roles, Is.Empty);
-            Assert.That(result[0].Channels, Is.Empty);
+            
         });
 
         userQuery.Verify(x => x.WhereContains(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
@@ -535,9 +523,7 @@ public class UserCrudServiceTests
             Assert.That(result[0].Roles, Has.Length.EqualTo(1));
             Assert.That(result[0].Roles[0].GUID, Is.EqualTo(roleGuid));
             Assert.That(result[0].Roles[0].DisplayName, Is.EqualTo("Editor"));
-            Assert.That(result[0].Channels, Has.Length.EqualTo(1));
-            Assert.That(result[0].Channels[0].GUID, Is.EqualTo(channelGuid));
-            Assert.That(result[0].Channels[0].DisplayName, Is.EqualTo("Global"));
+            
         });
     }
 

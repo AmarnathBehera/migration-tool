@@ -343,19 +343,8 @@ public class UserCrudService : IUserCrudService
             .Select(r => new RoleSummaryOutput { GUID = r.RoleGUID, DisplayName = r.RoleDisplayName })
             .ToArray();
 
-        var channels = roleIds
-            .SelectMany(id => ctx.WebPageAclIdsByRoleId[id])
-            .Distinct()
-            .Select(aclId => ctx.WebsiteChannelIdByAclId.TryGetValue(aclId, out var wcId) ? wcId : (int?)null)
-            .Where(wcId => wcId.HasValue)
-            .Select(wcId => ctx.ChannelIdByWebsiteChannelId.TryGetValue(wcId!.Value, out var chId) ? chId : (int?)null)
-            .Where(chId => chId.HasValue)
-            .Distinct()
-            .Select(chId => ctx.ChannelsById.TryGetValue(chId!.Value, out var ch) ? ch : null)
-            .Where(ch => ch is not null)
-            .Select(ch => new ChannelSummaryOutput { GUID = ch!.ChannelGUID, DisplayName = ch.ChannelDisplayName })
-            .ToArray();
+       
 
-        return new UserOutput { General = general, Roles = roles, Channels = channels };
+        return new UserOutput { General = general, Roles = roles};
     }
 }
