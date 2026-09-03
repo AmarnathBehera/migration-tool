@@ -27,19 +27,5 @@
         <ObjectType>cms.contenttype</ObjectType>
       </AllowedChildContentTypeChildID>
     </Binding>
-    <Binding id="cms.contenttype_BDO.InsightSubscriptionConfirmationPage">
-      <AllowedChildContentTypeChildID>
-        <CodeName>BDO.InsightSubscriptionConfirmationPage</CodeName>
-        <GUID>a9fdbc9e-bae2-476c-97e6-9b89da7de0af</GUID>
-        <ObjectType>cms.contenttype</ObjectType>
-      </AllowedChildContentTypeChildID>
-    </Binding>
-    <Binding id="cms.contenttype_BDO.Insightunsubscriptionpage">
-      <AllowedChildContentTypeChildID>
-        <CodeName>BDO.Insightunsubscriptionpage</CodeName>
-        <GUID>276ddf6c-90ce-4263-bc61-475fdf0c7325</GUID>
-        <ObjectType>cms.contenttype</ObjectType>
-      </AllowedChildContentTypeChildID>
-    </Binding>
   </Bindings>
 </cms.allowedchildcontenttype>
