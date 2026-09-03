@@ -220,6 +220,18 @@
       <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
         <properties />
       </schema>
+      <field column="tst" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="2182c68f-b642-4302-a7ed-0ee91cb160a5" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>tst</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Link</controlname>
+          <OpenInNewTab>True</OpenInNewTab>
+        </settings>
+      </field>
     </form>
   </ClassFormDefinition>
   <ClassGUID>e30b9d00-dae6-4bff-b137-9d8f3653e727</ClassGUID>

@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentworkflowstep>
+  <ContentWorkflowStepDisplayName>Final</ContentWorkflowStepDisplayName>
+  <ContentWorkflowStepGUID>50b7ba6a-3cf1-4228-be10-d9c323f86b88</ContentWorkflowStepGUID>
+  <ContentWorkflowStepIconClass />
+  <ContentWorkflowStepIsNotificationEnabled>False</ContentWorkflowStepIsNotificationEnabled>
+  <ContentWorkflowStepName>Final-xk82acex</ContentWorkflowStepName>
+  <ContentWorkflowStepOrder>100</ContentWorkflowStepOrder>
+  <ContentWorkflowStepType>4</ContentWorkflowStepType>
+  <ContentWorkflowStepWorkflowID>
+    <CodeName>AdditionalApprovalStep</CodeName>
+    <GUID>9f10643a-fd7a-46f5-aec1-f2c75ea58d13</GUID>
+    <ObjectType>cms.contentworkflow</ObjectType>
+  </ContentWorkflowStepWorkflowID>
+</cms.contentworkflowstep>

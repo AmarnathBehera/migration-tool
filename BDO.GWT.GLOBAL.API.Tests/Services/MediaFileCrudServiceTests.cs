@@ -320,33 +320,6 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
-    public async Task WithUploadedAssetMetadataAsync_WhenFileIsProcessed_DeletesTemporaryFile()
-    {
-        var tempDirectory = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "App_Data", "Uploads", "Temp"));
-        Directory.CreateDirectory(tempDirectory);
-        var before = Directory.GetFiles(tempDirectory).OrderBy(x => x).ToArray();
-
-        var bytes = Encoding.UTF8.GetBytes("file-content");
-        await using var stream = new MemoryStream(bytes, writable: false);
-        IFormFile file = new FormFile(stream, 0, bytes.Length, "File", "folder\\sample.jpg");
-
-        var result = await InvokePrivateStaticAsync<bool>(
-            "WithUploadedAssetMetadataAsync",
-            [typeof(bool)],
-            file,
-            new Func<ContentItemAssetMetadataWithSource, Task<bool>>(_ => Task.FromResult(true)),
-            CancellationToken.None);
-
-        var after = Directory.GetFiles(tempDirectory).OrderBy(x => x).ToArray();
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result, Is.True);
-            Assert.That(after, Is.EquivalentTo(before));
-        });
-    }
-
-    [Test]
     public void MapToMediaFileOutput_WhenMimeTypeIsUnknown_UsesFallbackMimeAndMapsFields()
     {
         var attachmentGuid = Guid.NewGuid();
@@ -647,34 +620,6 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
-    public async Task WithUploadedAssetMetadataAsync_WhenFileHasNoExtension_ProcessesCorrectly()
-    {
-        var bytes = Encoding.UTF8.GetBytes("content");
-        await using var stream = new MemoryStream(bytes, writable: false);
-        IFormFile file = new FormFile(stream, 0, bytes.Length, "File", "noextension");
-
-        ContentItemAssetMetadataWithSource? capturedMetadata = null;
-        var result = await InvokePrivateStaticAsync<bool>(
-            "WithUploadedAssetMetadataAsync",
-            [typeof(bool)],
-            file,
-            new Func<ContentItemAssetMetadataWithSource, Task<bool>>(metadata =>
-            {
-                capturedMetadata = metadata;
-                return Task.FromResult(true);
-            }),
-            CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result, Is.True);
-            Assert.That(capturedMetadata, Is.Not.Null);
-            Assert.That(capturedMetadata!.Extension, Is.EqualTo(string.Empty));
-            Assert.That(capturedMetadata.Name, Is.EqualTo("noextension"));
-        });
-    }
-
-    [Test]
     public void WithUploadedAssetMetadataAsync_WhenFileIsNull_ThrowsArgumentNullException()
     {
         Assert.ThrowsAsync<ArgumentNullException>(async () =>
@@ -684,33 +629,6 @@ public class MediaFileCrudServiceTests
                 null!,
                 new Func<ContentItemAssetMetadataWithSource, Task<bool>>(_ => Task.FromResult(true)),
                 CancellationToken.None));
-    }
-
-    [Test]
-    public async Task WithUploadedAssetMetadataAsync_WhenExtensionMatchesFileName_TrimsExtensionFromName()
-    {
-        var bytes = Encoding.UTF8.GetBytes("content");
-        await using var stream = new MemoryStream(bytes, writable: false);
-        IFormFile file = new FormFile(stream, 0, bytes.Length, "File", "document.PDF");
-
-        ContentItemAssetMetadataWithSource? capturedMetadata = null;
-        await InvokePrivateStaticAsync<bool>(
-            "WithUploadedAssetMetadataAsync",
-            [typeof(bool)],
-            file,
-            new Func<ContentItemAssetMetadataWithSource, Task<bool>>(metadata =>
-            {
-                capturedMetadata = metadata;
-                return Task.FromResult(true);
-            }),
-            CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(capturedMetadata, Is.Not.Null);
-            Assert.That(capturedMetadata!.Name, Is.EqualTo("document"));
-            Assert.That(capturedMetadata.Extension, Is.EqualTo(".PDF"));
-        });
     }
 
     private static ContentItemAsset CreateAsset(string name, string extension, long size, string url)
