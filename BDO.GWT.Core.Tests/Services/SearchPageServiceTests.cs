@@ -65,8 +65,8 @@ namespace BDO.GWT.Core.Tests.Services
                     : className == EVENT_CLASS_NAME ? typeof(Event) : typeof(object));
 
             _searchCardHelperMock
-                .Setup(x => x.GetSearchCardDtos(It.IsAny<IEnumerable<SearchDocument>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((IEnumerable<SearchDocument> docs, CancellationToken _) =>
+                .Setup(x => x.GetSearchCardDtos(It.IsAny<IEnumerable<SearchDocument>>(), LANGUAGE_TAG, It.IsAny<CancellationToken>()))
+                .ReturnsAsync((IEnumerable<SearchDocument> docs, string _, CancellationToken _) =>
                     docs.Select(d => new SearchCardDto<GenericSearchCardDto>
                     {
                         CardType = "Generic",
@@ -75,8 +75,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             SetupSearchResponse();
 
-            _service = new SearchPageService(
-                _cultureContextMock.Object,                
+            _service = new SearchPageService(                              
                 _typeMapperMock.Object,
                 _searchServiceMock.Object,               
                 _searchCardHelperMock.Object,
@@ -131,7 +130,7 @@ namespace BDO.GWT.Core.Tests.Services
         [Test]
         public async Task GetSearchResultsAsync_WithNullSearchText_UsesEmptyString()
         {
-            await _service.GetSearchResultsAsync(new SearchResultQuery { SearchText = null }, CancellationToken.None);
+            await _service.GetSearchResultsAsync(new SearchResultQuery { SearchText = null }, LANGUAGE_TAG, CancellationToken.None);
 
             _searchServiceMock.Verify(x => x.SearchAsync<SearchDocument>(
                 string.Empty,
@@ -143,7 +142,7 @@ namespace BDO.GWT.Core.Tests.Services
         [Test]
         public async Task GetSearchResultsAsync_PassesSearchTextThrough()
         {
-            await _service.GetSearchResultsAsync(new SearchResultQuery { SearchText = "audit" }, CancellationToken.None);
+            await _service.GetSearchResultsAsync(new SearchResultQuery { SearchText = "audit" }, LANGUAGE_TAG, CancellationToken.None);
 
             _searchServiceMock.Verify(x => x.SearchAsync<SearchDocument>(
                 "audit",
@@ -157,19 +156,19 @@ namespace BDO.GWT.Core.Tests.Services
         {
             using var cts = new CancellationTokenSource();
 
-            await _service.GetSearchResultsAsync(new SearchResultQuery { SearchText = "x" }, cts.Token);
+            await _service.GetSearchResultsAsync(new SearchResultQuery { SearchText = "x" }, LANGUAGE_TAG, cts.Token);
 
             _searchServiceMock.Verify(x => x.SearchAsync<SearchDocument>(
                 It.IsAny<string>(), It.IsAny<Action<SearchQuery<SearchDocument>>?>(), cts.Token), Times.AtLeastOnce);
             _searchCardHelperMock.Verify(x => x.GetSearchCardDtos(
-                It.IsAny<IEnumerable<SearchDocument>>(), cts.Token), Times.Once);
+                It.IsAny<IEnumerable<SearchDocument>>(), LANGUAGE_TAG, cts.Token), Times.Once);
         }
 
 
         [Test]
         public async Task GetSearchResultsAsync_QueriesSearchServiceTwice_ForResultsAndFilters()
         {
-            await _service.GetSearchResultsAsync(new SearchResultQuery { SearchText = "x" }, CancellationToken.None);
+            await _service.GetSearchResultsAsync(new SearchResultQuery { SearchText = "x" }, LANGUAGE_TAG, CancellationToken.None);
 
             _searchServiceMock.Verify(x => x.SearchAsync<SearchDocument>(
                 It.IsAny<string>(),
@@ -187,7 +186,7 @@ namespace BDO.GWT.Core.Tests.Services
             SetupSearchResponse(Response([Document(1, INSIGHT_CLASS_NAME)], count: 25));
 
             var dto = await _service.GetSearchResultsAsync(
-                new SearchResultQuery { SearchText = "x", PageSize = null }, CancellationToken.None);
+                new SearchResultQuery { SearchText = "x", PageSize = null }, LANGUAGE_TAG, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -203,7 +202,7 @@ namespace BDO.GWT.Core.Tests.Services
             SetupSearchResponse(Response([Document(1, INSIGHT_CLASS_NAME)], count: 25));
 
             var dto = await _service.GetSearchResultsAsync(
-                new SearchResultQuery { SearchText = "x", PageSize = 10 }, CancellationToken.None);
+                new SearchResultQuery { SearchText = "x", PageSize = 10 }, LANGUAGE_TAG, CancellationToken.None);
 
             Assert.That(dto.TotalPages, Is.EqualTo(PaginationHelper.CalculateTotalPages(25, 10)));
         }
@@ -218,6 +217,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             var dto = await _service.GetSearchResultsAsync(
                 new SearchResultQuery { SearchText = "x", CurrentPage = currentPage, PageSize = 10 },
+                LANGUAGE_TAG,
                 CancellationToken.None);
 
             Assert.That(dto, Is.Not.Null);
@@ -230,7 +230,7 @@ namespace BDO.GWT.Core.Tests.Services
             SetupSearchResponse(Response([], count: 0));
 
             var dto = await _service.GetSearchResultsAsync(
-                new SearchResultQuery { SearchText = "no matches" }, CancellationToken.None);
+                new SearchResultQuery { SearchText = "no matches" }, LANGUAGE_TAG, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -248,7 +248,7 @@ namespace BDO.GWT.Core.Tests.Services
         public async Task GetSearchResultsAsync_WithMostRecentSort_BuildsQueryWithoutError()
         {
             var dto = await _service.GetSearchResultsAsync(
-                new SearchResultQuery { SearchText = "x", SortBy = MOST_RECENT }, CancellationToken.None);
+                new SearchResultQuery { SearchText = "x", SortBy = MOST_RECENT }, LANGUAGE_TAG, CancellationToken.None);
 
             Assert.That(dto, Is.Not.Null);
         }   
@@ -260,7 +260,7 @@ namespace BDO.GWT.Core.Tests.Services
             _typeMapperMock.Invocations.Clear();
 
             await _service.GetSearchResultsAsync(
-                new SearchResultQuery { SearchText = "x", FilterBy = "NotAGroupKey" }, CancellationToken.None);
+                new SearchResultQuery { SearchText = "x", FilterBy = "NotAGroupKey" }, LANGUAGE_TAG, CancellationToken.None);
 
             _typeMapperMock.Verify(x => x.GetClassNameFromPageType(It.IsAny<Type>()), Times.Never);
         }
@@ -273,7 +273,7 @@ namespace BDO.GWT.Core.Tests.Services
             _typeMapperMock.Invocations.Clear();
 
             await _service.GetSearchResultsAsync(
-                new SearchResultQuery { SearchText = "x", FilterBy = filterBy }, CancellationToken.None);
+                new SearchResultQuery { SearchText = "x", FilterBy = filterBy }, LANGUAGE_TAG, CancellationToken.None);
 
             _typeMapperMock.Verify(x => x.GetClassNameFromPageType(It.IsAny<Type>()), Times.Never);
         }
@@ -288,10 +288,10 @@ namespace BDO.GWT.Core.Tests.Services
             var documents = new[] { Document(1, INSIGHT_CLASS_NAME), Document(2, EVENT_CLASS_NAME) };
             SetupSearchResponse(Response(documents, count: 2));
 
-            await _service.GetSearchResultsAsync(new SearchResultQuery { SearchText = "x" }, CancellationToken.None);
+            await _service.GetSearchResultsAsync(new SearchResultQuery { SearchText = "x" }, LANGUAGE_TAG, CancellationToken.None);
 
             _searchCardHelperMock.Verify(x => x.GetSearchCardDtos(
-                It.Is<IEnumerable<SearchDocument>>(d => d.Count() == 2), It.IsAny<CancellationToken>()), Times.Once);
+                It.Is<IEnumerable<SearchDocument>>(d => d.Count() == 2), LANGUAGE_TAG, It.IsAny<CancellationToken>()), Times.Once);
         }
 
 
@@ -301,7 +301,7 @@ namespace BDO.GWT.Core.Tests.Services
             SetupSearchResponse(Response([Document(1, INSIGHT_CLASS_NAME), Document(2, INSIGHT_CLASS_NAME)], count: 2));
 
             var dto = await _service.GetSearchResultsAsync(
-                new SearchResultQuery { SearchText = "x" }, CancellationToken.None);
+                new SearchResultQuery { SearchText = "x" }, LANGUAGE_TAG, CancellationToken.None);
 
             Assert.That(dto.Data, Has.Length.EqualTo(2));
         }
@@ -316,7 +316,7 @@ namespace BDO.GWT.Core.Tests.Services
                 .ThrowsAsync(new InvalidOperationException("Azure down"));
 
             Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await _service.GetSearchResultsAsync(new SearchResultQuery { SearchText = "x" }, CancellationToken.None));
+                await _service.GetSearchResultsAsync(new SearchResultQuery { SearchText = "x" }, LANGUAGE_TAG, CancellationToken.None));
         }
 
         #endregion
@@ -327,7 +327,7 @@ namespace BDO.GWT.Core.Tests.Services
         public async Task GetSearchResultsAsync_ReturnsFilterOptionForEveryPageGroupKey()
         {
             var dto = await _service.GetSearchResultsAsync(
-                new SearchResultQuery { SearchText = "x" }, CancellationToken.None);
+                new SearchResultQuery { SearchText = "x" }, LANGUAGE_TAG, CancellationToken.None);
 
             Assert.That(dto.Filters.Options, Has.Length.EqualTo(9),
                 "One option is expected per key in PageTypesByPageGroupKey.");
@@ -338,7 +338,7 @@ namespace BDO.GWT.Core.Tests.Services
         public async Task GetSearchResultsAsync_WithNoFacets_ReturnsZeroCountForEveryFilter()
         {
             var dto = await _service.GetSearchResultsAsync(
-                new SearchResultQuery { SearchText = "x" }, CancellationToken.None);
+                new SearchResultQuery { SearchText = "x" }, LANGUAGE_TAG, CancellationToken.None);
 
             Assert.That(dto.Filters.Options.Select(x => x.Count), Is.All.Zero);
         }
@@ -360,7 +360,7 @@ namespace BDO.GWT.Core.Tests.Services
                 }));
 
             var dto = await _service.GetSearchResultsAsync(
-                new SearchResultQuery { SearchText = "x" }, CancellationToken.None);
+                new SearchResultQuery { SearchText = "x" }, LANGUAGE_TAG, CancellationToken.None);
 
             var insights = dto.Filters.Options.Single(x => x.Value == INSIGHTS_GROUP_KEY);
 
@@ -376,7 +376,7 @@ namespace BDO.GWT.Core.Tests.Services
                 facets: new Dictionary<string, IEnumerable<SearchFacet>>()));
 
             Assert.ThrowsAsync<KeyNotFoundException>(async () =>
-                await _service.GetSearchResultsAsync(new SearchResultQuery { SearchText = "x" }, CancellationToken.None));
+                await _service.GetSearchResultsAsync(new SearchResultQuery { SearchText = "x" }, LANGUAGE_TAG, CancellationToken.None));
         }
 
         #endregion
@@ -386,7 +386,7 @@ namespace BDO.GWT.Core.Tests.Services
         [Test]
         public async Task GetSearchPageDtoAsync_SetsInitialSearchText()
         {
-            var dto = await _service.GetSearchPageDtoAsync("audit services", CancellationToken.None);
+            var dto = await _service.GetSearchPageDtoAsync("audit services", LANGUAGE_TAG, CancellationToken.None);
 
             Assert.That(dto.InitialSearchText, Is.EqualTo("audit services"));
         }
@@ -395,7 +395,7 @@ namespace BDO.GWT.Core.Tests.Services
         [Test]
         public async Task GetSearchPageDtoAsync_WithEmptySearchText_StillReturnsDto()
         {
-            var dto = await _service.GetSearchPageDtoAsync(string.Empty, CancellationToken.None);
+            var dto = await _service.GetSearchPageDtoAsync(string.Empty, LANGUAGE_TAG, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -409,7 +409,7 @@ namespace BDO.GWT.Core.Tests.Services
         [Test]
         public async Task GetSearchPageDtoAsync_QueriesSearchServiceOnce_ForFiltersOnly()
         {
-            await _service.GetSearchPageDtoAsync("x", CancellationToken.None);
+            await _service.GetSearchPageDtoAsync("x", LANGUAGE_TAG, CancellationToken.None);
 
             _searchServiceMock.Verify(x => x.SearchAsync<SearchDocument>(
                 It.IsAny<string>(),
@@ -421,17 +421,17 @@ namespace BDO.GWT.Core.Tests.Services
         [Test]
         public async Task GetSearchPageDtoAsync_DoesNotBuildCards()
         {
-            await _service.GetSearchPageDtoAsync("x", CancellationToken.None);
+            await _service.GetSearchPageDtoAsync("x", LANGUAGE_TAG, CancellationToken.None);
 
             _searchCardHelperMock.Verify(x => x.GetSearchCardDtos(
-                It.IsAny<IEnumerable<SearchDocument>>(), It.IsAny<CancellationToken>()), Times.Never);
+                It.IsAny<IEnumerable<SearchDocument>>(), LANGUAGE_TAG, It.IsAny<CancellationToken>()), Times.Never);
         }
 
 
         [Test]
         public async Task GetSearchPageDtoAsync_SortByFilter_HasTopResultsAndMostRecentOptions()
         {
-            var dto = await _service.GetSearchPageDtoAsync("x", CancellationToken.None);
+            var dto = await _service.GetSearchPageDtoAsync("x", LANGUAGE_TAG, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -448,7 +448,7 @@ namespace BDO.GWT.Core.Tests.Services
         {
             using var cts = new CancellationTokenSource();
 
-            await _service.GetSearchPageDtoAsync("x", cts.Token);
+            await _service.GetSearchPageDtoAsync("x", LANGUAGE_TAG, cts.Token);
 
             _searchServiceMock.Verify(x => x.SearchAsync<SearchDocument>(
                 It.IsAny<string>(), It.IsAny<Action<SearchQuery<SearchDocument>>?>(), cts.Token), Times.Once);

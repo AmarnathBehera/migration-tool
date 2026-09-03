@@ -43,8 +43,8 @@
 
 @if (this.Model.PersonDto.ParentEnableForm && this.Model.PersonDto.EnableForm)
 {
-    <div class="section-container section-container--md">
-        <div class="ktc-default-section">
+    <div class="section-container section-container--md py-20">
+        <div class="ktc-default-section text-center">
             @await FormBuilder.GetFormBuilderWidget(Html, "bdo_contactpeoplewithemail")
         </div>
     </div>
@@ -57,3 +57,5 @@
             AllowedWidgets = widgetsList
         })
 </div>
+
+ 

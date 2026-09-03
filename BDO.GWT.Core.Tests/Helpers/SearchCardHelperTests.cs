@@ -85,7 +85,7 @@ namespace BDO.GWT.Core.Tests.Helpers
         [Test]
         public async Task GetSearchCardDtos_WithEmptyDocuments_ReturnsEmptyArray()
         {
-            var result = await _helper.GetSearchCardDtos([], CancellationToken.None);
+            var result = await _helper.GetSearchCardDtos([], LANGUAGE_TAG, CancellationToken.None);
 
             Assert.That(result, Is.Empty);
         }
@@ -94,13 +94,11 @@ namespace BDO.GWT.Core.Tests.Helpers
         [Test]
         public async Task GetSearchCardDtos_WithEmptyDocuments_DoesNotCallAnyDependency()
         {
-            await _helper.GetSearchCardDtos([], CancellationToken.None);
+            await _helper.GetSearchCardDtos([], LANGUAGE_TAG, CancellationToken.None);
 
             _pageUrlServiceMock.Verify(x => x.GetPageRelativeUrlByNodeIdAsync(
                 It.IsAny<IEnumerable<int>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
-            //_insightCardHelperMock.VerifyNoOtherCalls();
-            //_eventWebinarCardsServiceMock.VerifyNoOtherCalls();
-            //_typeMapperMock.VerifyNoOtherCalls();
+          
         }
 
         #endregion
@@ -110,7 +108,7 @@ namespace BDO.GWT.Core.Tests.Helpers
         [Test]
         public async Task GetSearchCardDtos_WithInsightDocument_ReturnsInsightCard()
         {
-            var result = await _helper.GetSearchCardDtos([Document(1, INSIGHT_CLASS_NAME)], CancellationToken.None);
+            var result = await _helper.GetSearchCardDtos([Document(1, INSIGHT_CLASS_NAME)], LANGUAGE_TAG, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -125,7 +123,7 @@ namespace BDO.GWT.Core.Tests.Helpers
         [TestCase(WEBINAR_CLASS_NAME)]
         public async Task GetSearchCardDtos_WithEventOrWebinarDocument_ReturnsEventsAndWebinarsCard(string className)
         {
-            var result = await _helper.GetSearchCardDtos([Document(1, className)], CancellationToken.None);
+            var result = await _helper.GetSearchCardDtos([Document(1, className)], LANGUAGE_TAG, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -141,7 +139,7 @@ namespace BDO.GWT.Core.Tests.Helpers
         [TestCase("bdo.insight")]
         public async Task GetSearchCardDtos_WithUnmappedClassName_ReturnsGenericCard(string className)
         {
-            var result = await _helper.GetSearchCardDtos([Document(1, className)], CancellationToken.None);
+            var result = await _helper.GetSearchCardDtos([Document(1, className)], LANGUAGE_TAG, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -166,7 +164,7 @@ namespace BDO.GWT.Core.Tests.Helpers
                 Document(5, "BDO.Person")
             ];
 
-            var result = await _helper.GetSearchCardDtos(documents, CancellationToken.None);
+            var result = await _helper.GetSearchCardDtos(documents, LANGUAGE_TAG, CancellationToken.None);
 
             Assert.That(result.Select(x => x.CardType), Is.EqualTo(new[]
             {
@@ -185,7 +183,7 @@ namespace BDO.GWT.Core.Tests.Helpers
                 Document(3, EVENT_CLASS_NAME)
             ];
 
-            var result = await _helper.GetSearchCardDtos(documents, CancellationToken.None);
+            var result = await _helper.GetSearchCardDtos(documents, LANGUAGE_TAG, CancellationToken.None);
 
             Assert.That(result, Has.Length.EqualTo(documents.Length));
         }
@@ -197,17 +195,16 @@ namespace BDO.GWT.Core.Tests.Helpers
         [Test]
         public async Task GetSearchCardDtos_WithGenericDocumentsOnly_DoesNotCallInsightOrEventHelpers()
         {
-            await _helper.GetSearchCardDtos([Document(1, "BDO.Person")], CancellationToken.None);
+            await _helper.GetSearchCardDtos([Document(1, "BDO.Person")], LANGUAGE_TAG, CancellationToken.None);
 
-            //_insightCardHelperMock.VerifyNoOtherCalls();
-            //_eventWebinarCardsServiceMock.VerifyNoOtherCalls();
+            
         }
 
 
         [Test]
         public async Task GetSearchCardDtos_ResolvesUrlsUsingCurrentLanguageTag()
         {
-            await _helper.GetSearchCardDtos([Document(1, INSIGHT_CLASS_NAME)], CancellationToken.None);
+            await _helper.GetSearchCardDtos([Document(1, INSIGHT_CLASS_NAME)], LANGUAGE_TAG, CancellationToken.None);
 
             _pageUrlServiceMock.Verify(x => x.GetPageRelativeUrlByNodeIdAsync(
                 It.IsAny<IEnumerable<int>>(), LANGUAGE_TAG, It.IsAny<CancellationToken>()), Times.Once);
@@ -219,7 +216,7 @@ namespace BDO.GWT.Core.Tests.Helpers
         {
             using var cts = new CancellationTokenSource();
 
-            await _helper.GetSearchCardDtos([Document(1, INSIGHT_CLASS_NAME)], cts.Token);
+            await _helper.GetSearchCardDtos([Document(1, INSIGHT_CLASS_NAME)], LANGUAGE_TAG, cts.Token);
 
             _pageUrlServiceMock.Verify(x => x.GetPageRelativeUrlByNodeIdAsync(
                 It.IsAny<IEnumerable<int>>(), It.IsAny<string>(), cts.Token), Times.Once);
@@ -236,7 +233,7 @@ namespace BDO.GWT.Core.Tests.Helpers
                 Document(3, EVENT_CLASS_NAME)
             ];
 
-            await _helper.GetSearchCardDtos(documents, CancellationToken.None);
+            await _helper.GetSearchCardDtos(documents, LANGUAGE_TAG, CancellationToken.None);
 
             _pageUrlServiceMock.Verify(x => x.GetPageRelativeUrlByNodeIdAsync(
                 It.IsAny<IEnumerable<int>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
@@ -252,7 +249,7 @@ namespace BDO.GWT.Core.Tests.Helpers
             var document = Document(1, INSIGHT_CLASS_NAME, "Insight title");
             document.MetadataDescription = "<p>Plain <strong>text</strong></p>";
 
-            var result = await _helper.GetSearchCardDtos([document], CancellationToken.None);
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
             var card = (InsightSearchCardDto)result[0].DataObject!;
 
             Assert.Multiple(() =>
@@ -272,24 +269,12 @@ namespace BDO.GWT.Core.Tests.Helpers
                     It.IsAny<IEnumerable<int>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new Dictionary<int, RelativeLink>());
 
-            var result = await _helper.GetSearchCardDtos([Document(1, INSIGHT_CLASS_NAME)], CancellationToken.None);
+            var result = await _helper.GetSearchCardDtos([Document(1, INSIGHT_CLASS_NAME)], LANGUAGE_TAG, CancellationToken.None);
             var card = (InsightSearchCardDto)result[0].DataObject!;
 
             Assert.That(card.ReadMoreLink.URL, Is.Empty);
         }
-
-
-        [Test]
-        public void GetSearchCardDtos_ForGeneric_WithMissingUrl_Throws()
-        {
-            _pageUrlServiceMock
-                .Setup(x => x.GetPageRelativeUrlByNodeIdAsync(
-                    It.IsAny<IEnumerable<int>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new Dictionary<int, RelativeLink>());
-
-            Assert.ThrowsAsync<KeyNotFoundException>(async () =>
-                await _helper.GetSearchCardDtos([Document(1, "BDO.Person")], CancellationToken.None));
-        }
+      
 
 
         [Test]
@@ -299,7 +284,7 @@ namespace BDO.GWT.Core.Tests.Helpers
             document.MetadataTitle = string.Empty;
             document.Title = "Fallback title";
 
-            var result = await _helper.GetSearchCardDtos([document], CancellationToken.None);
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
             var card = (EventWebinarSearchCard)result[0].DataObject!;
 
             Assert.That(card.Title, Is.EqualTo("Fallback title"));
@@ -313,7 +298,7 @@ namespace BDO.GWT.Core.Tests.Helpers
             document.EventDateFrom = new DateTime(2025, 6, 1, 9, 0, 0);
             document.EventDateTo = new DateTime(2025, 6, 1, 17, 0, 0);
 
-            var result = await _helper.GetSearchCardDtos([document], CancellationToken.None);
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
             var card = (EventWebinarSearchCard)result[0].DataObject!;
 
             Assert.Multiple(() =>
@@ -331,7 +316,7 @@ namespace BDO.GWT.Core.Tests.Helpers
             document.EventDateFrom = new DateTime(2025, 6, 1);
             document.EventDateTo = new DateTime(2025, 6, 3);
 
-            var result = await _helper.GetSearchCardDtos([document], CancellationToken.None);
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
             var card = (EventWebinarSearchCard)result[0].DataObject!;
 
             Assert.That(card.DateTimeTo, Is.EqualTo(document.EventDateTo));
@@ -345,7 +330,7 @@ namespace BDO.GWT.Core.Tests.Helpers
             document.EventDateFrom = null;
             document.SortDate = new DateTime(2025, 3, 3);
 
-            var result = await _helper.GetSearchCardDtos([document], CancellationToken.None);
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
             var card = (EventWebinarSearchCard)result[0].DataObject!;
 
             Assert.That(card.DateTime, Is.EqualTo(new DateTime(2025, 3, 3)));
@@ -359,7 +344,7 @@ namespace BDO.GWT.Core.Tests.Helpers
             document.EventLocationCity = "London";
             document.EventLocationTitle = "BDO Office";
 
-            var result = await _helper.GetSearchCardDtos([document], CancellationToken.None);
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
             var card = (EventWebinarSearchCard)result[0].DataObject!;
 
             Assert.That(card.Location, Is.EqualTo("London"));
@@ -375,7 +360,7 @@ namespace BDO.GWT.Core.Tests.Helpers
             var document = Document(1, INSIGHT_CLASS_NAME);
             document.InsightImage = null;
 
-            var result = await _helper.GetSearchCardDtos([document], CancellationToken.None);
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
             var card = (InsightSearchCardDto)result[0].DataObject!;
 
             Assert.That(card.ImageURL, Is.Null);
@@ -388,7 +373,7 @@ namespace BDO.GWT.Core.Tests.Helpers
             var document = Document(1, INSIGHT_CLASS_NAME);
             document.InsightImage = "https://cdn.bdo.com/image.png";
 
-            var result = await _helper.GetSearchCardDtos([document], CancellationToken.None);
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
             var card = (InsightSearchCardDto)result[0].DataObject!;
 
             Assert.That(card.ImageURL, Is.EqualTo("https://cdn.bdo.com/image.png"));
@@ -403,7 +388,7 @@ namespace BDO.GWT.Core.Tests.Helpers
             var document = Document(1, INSIGHT_CLASS_NAME);
             document.InsightImage = "~/media/image.png";
 
-            var result = await _helper.GetSearchCardDtos([document], CancellationToken.None);
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
             var card = (InsightSearchCardDto)result[0].DataObject!;
 
             Assert.That(card.ImageURL, Is.EqualTo("/media/image.png"));
@@ -421,7 +406,7 @@ namespace BDO.GWT.Core.Tests.Helpers
             var document = Document(1, INSIGHT_CLASS_NAME);
             document.InsightImage = "~/media/image.png";
 
-            var result = await _helper.GetSearchCardDtos([document], CancellationToken.None);
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
             var card = (InsightSearchCardDto)result[0].DataObject!;
 
             Assert.That(card.ImageURL, Is.EqualTo("https://www.bdo.com/media/image.png"));

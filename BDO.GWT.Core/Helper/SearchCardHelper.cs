@@ -20,7 +20,8 @@ namespace BDO.GWT.Core.Helpers
 {
     public interface ISearchCardHelper
     {
-        Task<SearchCardDto[]> GetSearchCardDtos(IEnumerable<SearchDocument> searchDocuments, CancellationToken cancellationToken);
+        Task<SearchCardDto[]> GetSearchCardDtos(IEnumerable<SearchDocument> searchDocuments,string currentLanguage, CancellationToken cancellationToken);
+        
     }
 
     public enum SearchCardType
@@ -49,17 +50,21 @@ namespace BDO.GWT.Core.Helpers
         private readonly ICultureContext _cultureContext;        
         private readonly IPageUrlService _pageUrlService;        
         private readonly IHttpContextAccessor _httpContextAccessor;
-
+        private string _currentLanguage;
         public SearchCardHelper(ICultureContext cultureContext, IPageUrlService pageUrlService,IHttpContextAccessor httpContextAccessor)
         {
             
             _cultureContext = cultureContext;           
             _pageUrlService = pageUrlService;
             _httpContextAccessor = httpContextAccessor;
+            _currentLanguage = _cultureContext.CurrentLanguageTag;
         }
 
-        public async Task<SearchCardDto[]> GetSearchCardDtos(IEnumerable<SearchDocument> searchDocuments, CancellationToken cancellationToken)
+        public async Task<SearchCardDto[]> GetSearchCardDtos(IEnumerable<SearchDocument> searchDocuments, string currentLanguage, CancellationToken cancellationToken)
         {
+            //setting the current language for the search card helper to use when mapping the search documents to card DTOs
+            //this language is passed from the search controller and is the language of the search results page
+            _currentLanguage = currentLanguage;
             var cardsDtos = await EnumerableHelper.TransformGroupedElementsMaintainingOrderAsync(searchDocuments, GetCardType, (cardType, document) => MapSearchCardDtosAsync(cardType, document, cancellationToken));
 
             return cardsDtos;
@@ -110,7 +115,7 @@ namespace BDO.GWT.Core.Helpers
             var documentList = documents.ToList();
 
             var relativeUrlByNodeId = await _pageUrlService.GetPageRelativeUrlByNodeIdAsync(
-                documentList.Select(x => x.NodeId), _cultureContext.CurrentLanguageTag, cancellationToken);
+                documentList.Select(x => x.NodeId), _currentLanguage, cancellationToken);
 
             var cards = new List<InsightSearchCardDto>();
 
@@ -141,7 +146,7 @@ namespace BDO.GWT.Core.Helpers
             var documentList = documents.ToList();
 
             var relativeUrlByNodeId = await _pageUrlService.GetPageRelativeUrlByNodeIdAsync(
-                documentList.Select(x => x.NodeId), _cultureContext.CurrentLanguageTag, cancellationToken);
+                documentList.Select(x => x.NodeId), _currentLanguage, cancellationToken);
 
             var cards = new List<EventWebinarSearchCard>(documentList.Count);
 
@@ -178,13 +183,14 @@ namespace BDO.GWT.Core.Helpers
 
         private async Task<IEnumerable<GenericSearchCardDto>> MapGenericCardsAsync(ICollection<SearchDocument> documents, CancellationToken cancellationToken)
         {
-            var relativeUrlByNodeId = await _pageUrlService.GetPageRelativeUrlByNodeIdAsync(documents.Select(x => x.NodeId), _cultureContext.CurrentLanguageTag, cancellationToken);
+            var relativeUrlByNodeId = await _pageUrlService.GetPageRelativeUrlByNodeIdAsync(documents.Select(x => x.NodeId), _currentLanguage, cancellationToken);
 
             var cards = documents.Select(x => new GenericSearchCardDto
             {
                 Title = x.MetadataTitle,
                 Description = HtmlHelper.ExtractTextFromHtml(x.MetadataDescription) ?? "",
-                ReadMoreLink = relativeUrlByNodeId[x.NodeId].ToHtmlCompatibleString(),
+                //ReadMoreLink = relativeUrlByNodeId[x.NodeId].ToHtmlCompatibleString(),
+                ReadMoreLink = GetAbsoluteAssetUrl(x.NodeAliasPath) ?? relativeUrlByNodeId[x.NodeId].ToHtmlCompatibleString(),
             });
 
             return cards;
