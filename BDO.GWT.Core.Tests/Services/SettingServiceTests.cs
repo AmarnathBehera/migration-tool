@@ -6,6 +6,7 @@ namespace BDO.GWT.Core.Tests.Services;
 
 public class SettingServiceTests
 {
+    private Mock<IInfoProvider<GlobalLocationInfo>> _globalMock = null!;
     private Mock<IInfoProvider<PrintorShareInfo>> _printMock = null!;
     private Mock<IInfoProvider<FilteringInfo>> _filterMock = null!;
     private Mock<IInfoProvider<OurPeopleInfo>> _peopleMock = null!;
@@ -27,6 +28,7 @@ public class SettingServiceTests
     [SetUp]
     public void Setup()
     {
+        _globalMock = new Mock<IInfoProvider<GlobalLocationInfo>>();
         _printMock = new Mock<IInfoProvider<PrintorShareInfo>>();
         _filterMock = new Mock<IInfoProvider<FilteringInfo>>();
         _peopleMock = new Mock<IInfoProvider<OurPeopleInfo>>();
@@ -37,6 +39,7 @@ public class SettingServiceTests
             .Returns(1);
 
         _service = new SettingService(
+            _globalMock.Object,
             _printMock.Object,
             _filterMock.Object,
             _peopleMock.Object,

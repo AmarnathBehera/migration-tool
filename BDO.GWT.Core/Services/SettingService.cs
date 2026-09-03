@@ -7,10 +7,12 @@ public interface ISettingService
     Task<IEnumerable<PrintorShareInfo>?> GetPrintorShareInfo();
     Task<IEnumerable<FilteringInfo>?> GetFilteringInfo();
     Task<IEnumerable<OurPeopleInfo>?> GetUsePersonPageTitleInfo();
+    Task<GlobalLocationInfo?> GetGlobalSettingAsync();
 }
 
 public class SettingService : ISettingService
 {
+    public readonly IInfoProvider<GlobalLocationInfo> _GlobalLocationInfoProvider;
     public readonly IInfoProvider<PrintorShareInfo> _PrintorShareinfoProvider;
     public readonly IInfoProvider<FilteringInfo> _FilteringinfoProvider;
     public readonly IInfoProvider<OurPeopleInfo> _ourpeopleinfoProvider;
@@ -18,12 +20,14 @@ public class SettingService : ISettingService
     private readonly IContentService _contentService;
     
     public SettingService(
+        IInfoProvider<GlobalLocationInfo> GlobalLocationInfoProvider,
         IInfoProvider<PrintorShareInfo> PrintorShareinfoProvider,
         IInfoProvider<FilteringInfo> FilteringinfoProvider,
         IInfoProvider<OurPeopleInfo> ourpeopleinfoProvider,
         IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider,
         IContentService contentService)
     {
+        _GlobalLocationInfoProvider = GlobalLocationInfoProvider;
         _PrintorShareinfoProvider = PrintorShareinfoProvider;
         _FilteringinfoProvider = FilteringinfoProvider;
         _ourpeopleinfoProvider = ourpeopleinfoProvider;
@@ -31,11 +35,20 @@ public class SettingService : ISettingService
         _contentService = contentService;
     }
 
+    public async Task<GlobalLocationInfo?> GetGlobalSettingAsync()
+    {
+        var currentChannelSettings = await _GlobalLocationInfoProvider
+            .Get()
+            .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), _contentService.GetCurrentChannelID())
+            .TopN(1)
+            .GetEnumerableTypedResultAsync();
+
+        return currentChannelSettings?.FirstOrDefault();
+    }
     private async Task<WebChannelSettingsInfo?> GetCurrentChannelSettingAsync()
     {
         var currentChannelSettings = await _webChannelSettingsInfoProvider
             .Get()
-            .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), _contentService.GetCurrentChannelID())
             .TopN(1)
             .GetEnumerableTypedResultAsync();
 

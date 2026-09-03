@@ -1,6 +1,7 @@
 ﻿using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.Helper;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.DTOs;
 using CMS.Core;
@@ -11,19 +12,21 @@ namespace BDO.GWT.Core.Services.Widget;
 public interface IViewGlobalLocationsService
 {
     Task<ViewGlobalLocationsDto> GetGlobalLocationsBannerAsync(ViewGlobalLocationsData data, CancellationToken cancellationToken);
-
-   // Task<string> GetTranslationAsync(int siteId, LanguageTag languageTag, string key, CancellationToken cancellationToken);
 }
 
 public class ViewGlobalLocationsService : IViewGlobalLocationsService
 {
     private readonly IContentService _contentService;
     private readonly IWebPageUrlResolver _webPageUrlResolver;
+    private readonly ICultureContext _cultureContext;
+    private readonly ILocalizationHelper _localizationHelper;
 
-    public ViewGlobalLocationsService(IContentService contentService, IWebPageUrlResolver webPageUrlResolver)
+    public ViewGlobalLocationsService(IContentService contentService, IWebPageUrlResolver webPageUrlResolver, ILocalizationHelper localizationHelper, ICultureContext cultureContext)
     {
         _contentService = contentService;
         _webPageUrlResolver = webPageUrlResolver;
+        _localizationHelper = localizationHelper;
+        _cultureContext = cultureContext;
     }
 
     public async Task<ViewGlobalLocationsDto> GetGlobalLocationsBannerAsync(ViewGlobalLocationsData data, CancellationToken cancellationToken)
@@ -47,12 +50,9 @@ public class ViewGlobalLocationsService : IViewGlobalLocationsService
             globalLocationsURL = relativeLink;
         }
 
-        //var buttonTitle = await GetTranslationAsync(_siteContext.CurrentSiteID, _pageContext.CurrentPage.LanguageTag, ResourceStringKey.LiveSite.ViewGlobalLocations.Button, cancellationToken);
-        //var descriptionText = await GetTranslationAsync(_siteContext.CurrentSiteID, _pageContext.CurrentPage.LanguageTag, ResourceStringKey.LiveSite.ViewGlobalLocations.Description, cancellationToken);
-        //var titleText = await GetTranslationAsync(_siteContext.CurrentSiteID, _pageContext.CurrentPage.LanguageTag, ResourceStringKey.LiveSite.ViewGlobalLocations.Title, cancellationToken);
-        var buttonTitle = ResourceStringKey.LiveSite.ViewGlobalLocations.Button;
-        var descriptionText = ResourceStringKey.LiveSite.ViewGlobalLocations.Description;
-        var titleText = ResourceStringKey.LiveSite.ViewGlobalLocations.Title;
+        var buttonTitle = await _localizationHelper.GetTranslationAsync(_cultureContext.CurrentLanguageTag,ResourceStringKey.LiveSite.ViewGlobalLocations.Button, cancellationToken);
+        var descriptionText = await _localizationHelper.GetTranslationAsync(_cultureContext.CurrentLanguageTag, ResourceStringKey.LiveSite.ViewGlobalLocations.Description, cancellationToken);
+        var titleText = await _localizationHelper.GetTranslationAsync(_cultureContext.CurrentLanguageTag, ResourceStringKey.LiveSite.ViewGlobalLocations.Title, cancellationToken);
 
         var dto = new ViewGlobalLocationsDto
         {
@@ -83,16 +83,4 @@ public class ViewGlobalLocationsService : IViewGlobalLocationsService
         // return (string?)setting?.Value;
         return "";
     }
-
-    //public async Task<string> GetTranslationAsync(int siteId, LanguageTag languageTag, string key, CancellationToken cancellationToken)
-    //{
-    //    if (languageTag.Language == Language.English)
-    //    {
-    //        return await _localizationService.GetGlobalTranslationAsync(languageTag, key, cancellationToken) ?? key;
-    //    }
-    //    else
-    //    {
-    //        return await _localizationService.GetTranslation(key, languageTag, siteId, cancellationToken) ?? key;
-    //    }
-    //}
 }

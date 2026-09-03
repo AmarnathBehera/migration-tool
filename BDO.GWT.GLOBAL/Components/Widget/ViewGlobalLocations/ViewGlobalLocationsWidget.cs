@@ -18,25 +18,6 @@ public class ViewGlobalLocationsWidget : ViewComponent
     {
         var cancellationToken = HttpContext.RequestAborted;
 
-        var data1 = new ViewGlobalLocationsData
-        {
-            Title = model.Properties.Title,
-            Description = model.Properties.Description,
-            Theme = model.Properties.Theme,
-            Layout = model.Properties.Layout,
-            TopMargin = model.Properties.TopMargin,
-            BottomMargin = model.Properties.BottomMargin,
-            WidgetID=model.Properties.WidgetID,
-            Button = new ButtonDto
-            {
-                Title = model.Properties.ButtonText,
-                URL = model.Properties.ButtonUrl,
-                Target = model.Properties.ButtonLinkTarget,
-                Type = "secondary",
-            },
-            BackgroundImage= "~/images/globalviewimage.jpg"
-        };
-
         var data = new ViewGlobalLocationsData
         {
             Title = model.Properties.Title,
