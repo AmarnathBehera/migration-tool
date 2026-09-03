@@ -219,7 +219,7 @@ public class UsersControllerTests
             .Setup(x => x.CreateUserAsync(userInput, It.IsAny<CancellationToken>()))
             .ReturnsAsync(expected);
 
-        var result = await _controller.Post(1, userInput, CancellationToken.None);
+        var result = await _controller.Post(userInput, CancellationToken.None);
 
         var createdResult = result.Result as CreatedAtActionResult;
         Assert.That(createdResult, Is.Not.Null);
@@ -240,7 +240,7 @@ public class UsersControllerTests
             .Setup(x => x.CreateUserAsync(userInput, It.IsAny<CancellationToken>()))
             .ReturnsAsync(CreateUserOutput(userGuid, "newuser"));
 
-        var result = await _controller.Post(memberFirmId, userInput, CancellationToken.None);
+        var result = await _controller.Post(userInput, CancellationToken.None);
 
         var createdResult = (CreatedAtActionResult)result.Result!;
         using (Assert.EnterMultipleScope())
@@ -259,7 +259,7 @@ public class UsersControllerTests
             .Setup(x => x.CreateUserAsync(It.Is<UserInput>(i => i.Roles.Length == 1 && i.Roles[0].GUID == roleGuid), It.IsAny<CancellationToken>()))
             .ReturnsAsync(CreateUserOutput(userName: "newuser"));
 
-        await _controller.Post(1, userInput, CancellationToken.None);
+        await _controller.Post(userInput, CancellationToken.None);
 
         _userCrudServiceMock.Verify(
             x => x.CreateUserAsync(It.Is<UserInput>(i => i.Roles.Length == 1 && i.Roles[0].GUID == roleGuid), It.IsAny<CancellationToken>()),
@@ -275,7 +275,7 @@ public class UsersControllerTests
             .Setup(x => x.CreateUserAsync(userInput, cts.Token))
             .ReturnsAsync(CreateUserOutput(userName: "newuser"));
 
-        await _controller.Post(1, userInput, cts.Token);
+        await _controller.Post(userInput, cts.Token);
 
         _userCrudServiceMock.Verify(x => x.CreateUserAsync(userInput, cts.Token), Times.Once);
     }
@@ -289,7 +289,7 @@ public class UsersControllerTests
             .ThrowsAsync(new InvalidOperationException("duplicate"));
 
         Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await _controller.Post(1, userInput, CancellationToken.None));
+            await _controller.Post(userInput, CancellationToken.None));
     }
 
     [Test]
@@ -301,7 +301,7 @@ public class UsersControllerTests
             .ThrowsAsync(new UnauthorizedAccessException("no access"));
 
         Assert.ThrowsAsync<UnauthorizedAccessException>(async () =>
-            await _controller.Post(1, userInput, CancellationToken.None));
+            await _controller.Post(userInput, CancellationToken.None));
     }
 
     #endregion

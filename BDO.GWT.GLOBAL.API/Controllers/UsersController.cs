@@ -65,11 +65,11 @@ public class UsersController : EntityControllerBase
     // <returns>Newly created user.</returns>
     [HttpPost("Users")]
     [SwaggerResponse(StatusCodes.Status201Created, null, typeof(UserOutput), MediaTypeNames.Application.Json)]
-    public async Task<ActionResult<UserOutput>> Post(int memberFirmID, [FromBody] UserInput userInput, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserOutput>> Post([FromBody] UserInput userInput, CancellationToken cancellationToken)
     {
         var user = await _userCrudService.CreateUserAsync(userInput, cancellationToken);
 
-        return CreatedAtAction(nameof(Get), new { memberFirmID, userGuid = user.General.GUID }, user);
+        return CreatedAtAction(nameof(Get), new { userGuid = user.General.GUID }, user);
     }
 
     // <summary>
