@@ -87,88 +87,97 @@ public class SettingService : ISettingService
             return snippet;
         }
 
-        return new WebChannelSnippetInfo
-        {
-            WebChannelSnippetID = snippet.WebChannelSnippetID,
-            WebChannelSnippetWebChannelSettingsID = snippet.WebChannelSnippetWebChannelSettingsID,
-            WebSettingsGUID = snippet.WebSettingsGUID,
+        return ApplyMerge(new WebChannelSnippetInfo(), snippet, global);
+    }
 
-            // Script fields
-            ScriptHeadKeyValue = Pick(snippet.ScriptHeadInheritfromglobalsettings, global.ScriptHeadKeyValue, snippet.ScriptHeadKeyValue),
-            ScriptsTopofPageHeadKeyValue = Pick(snippet.ScriptsTopofPageInheritfromglobalsetting, global.ScriptsTopofPageHeadKeyValue, snippet.ScriptsTopofPageHeadKeyValue),
-            ScriptinbottomofBodyKeyValue = Pick(snippet.ScriptinbottomofBodyInheritFromGlobal, global.ScriptinbottomofBodyKeyValue, snippet.ScriptinbottomofBodyKeyValue),
-            ScriptinTopofBodyKeyValue = Pick(snippet.ScriptinTopofBodyInheritfromglobal, global.ScriptinTopofBodyKeyValue, snippet.ScriptinTopofBodyKeyValue),
-            ScriptexecutedwhencookiesareacceptedKeyValue = Pick(snippet.ScriptexecutedwhencookiesareacceptedInheritfromglobal, global.ScriptexecutedwhencookiesareacceptedKeyValue, snippet.ScriptexecutedwhencookiesareacceptedKeyValue),
-            MarketoMunchkinCodeKeyValue = Pick(snippet.MarketoMunchkinCodeInheritfromglobal, global.MarketoMunchkinCodeKeyValue, snippet.MarketoMunchkinCodeKeyValue),
+    /// <summary>
+    /// Projects the per-field inherit-from-global resolution onto <paramref name="target"/>.
+    /// Extracted so it can be unit-tested with lightweight overridden test doubles that do
+    /// not touch the Kentico IoC container.
+    /// </summary>
+    internal static WebChannelSnippetInfo ApplyMerge(WebChannelSnippetInfo target, WebChannelSnippetInfo snippet, GlobalsettingskeyInfo global)
+    {
+        target.WebChannelSnippetID = snippet.WebChannelSnippetID;
+        target.WebChannelSnippetWebChannelSettingsID = snippet.WebChannelSnippetWebChannelSettingsID;
+        target.WebSettingsGUID = snippet.WebSettingsGUID;
 
-            // Email
-            FromEmail = Pick(snippet.FromEmailInheritfromglobal, global.FromEmail, snippet.FromEmail),
-            DisplayName = snippet.DisplayName,
+        // Script fields
+        target.ScriptHeadKeyValue = Pick(snippet.ScriptHeadInheritfromglobalsettings, global.ScriptHeadKeyValue, snippet.ScriptHeadKeyValue);
+        target.ScriptsTopofPageHeadKeyValue = Pick(snippet.ScriptsTopofPageInheritfromglobalsetting, global.ScriptsTopofPageHeadKeyValue, snippet.ScriptsTopofPageHeadKeyValue);
+        target.ScriptinbottomofBodyKeyValue = Pick(snippet.ScriptinbottomofBodyInheritFromGlobal, global.ScriptinbottomofBodyKeyValue, snippet.ScriptinbottomofBodyKeyValue);
+        target.ScriptinTopofBodyKeyValue = Pick(snippet.ScriptinTopofBodyInheritfromglobal, global.ScriptinTopofBodyKeyValue, snippet.ScriptinTopofBodyKeyValue);
+        target.ScriptexecutedwhencookiesareacceptedKeyValue = Pick(snippet.ScriptexecutedwhencookiesareacceptedInheritfromglobal, global.ScriptexecutedwhencookiesareacceptedKeyValue, snippet.ScriptexecutedwhencookiesareacceptedKeyValue);
+        target.MarketoMunchkinCodeKeyValue = Pick(snippet.MarketoMunchkinCodeInheritfromglobal, global.MarketoMunchkinCodeKeyValue, snippet.MarketoMunchkinCodeKeyValue);
 
-            // Calendar
-            Minutestotriggercalendarreminder = Pick(snippet.MinutestotriggercalendarreminderInheritfromglobal, global.Minutestotriggercalendarreminder, snippet.Minutestotriggercalendarreminder),
+        // Email
+        target.FromEmail = Pick(snippet.FromEmailInheritfromglobal, global.FromEmail, snippet.FromEmail);
+        target.DisplayName = snippet.DisplayName;
 
-            // Sidebar / location
-            Displaylocationtitleinasidebar = Pick(snippet.DisplaylocationtitleinasidebarInheritfromglobal, global.Displaylocationtitleinasidebar, snippet.Displaylocationtitleinasidebar),
+        // Calendar
+        target.Minutestotriggercalendarreminder = Pick(snippet.MinutestotriggercalendarreminderInheritfromglobal, global.Minutestotriggercalendarreminder, snippet.Minutestotriggercalendarreminder);
 
-            // Character dictionary
-            NonASCIItoASCIIcharacterdictionary = Pick(snippet.NonASCIItoASCIIcharacterdictionaryInheritfromglobal, global.NonASCIItoASCIIcharacterdictionary, snippet.NonASCIItoASCIIcharacterdictionary),
+        // Sidebar / location
+        target.Displaylocationtitleinasidebar = Pick(snippet.DisplaylocationtitleinasidebarInheritfromglobal, global.Displaylocationtitleinasidebar, snippet.Displaylocationtitleinasidebar);
 
-            // External link warning
-            Enableexternallinkwarning = Pick(snippet.EnableexternallinkwarningInheritfromlocal, global.Enableexternallinkwarning, snippet.Enableexternallinkwarning),
+        // Character dictionary
+        target.NonASCIItoASCIIcharacterdictionary = Pick(snippet.NonASCIItoASCIIcharacterdictionaryInheritfromglobal, global.NonASCIItoASCIIcharacterdictionary, snippet.NonASCIItoASCIIcharacterdictionary);
 
-            // SEO
-            SeoSettingsRobots = Pick(snippet.SeoSettingsRobotsInheritfromglobal, global.SeoSettingsRobots, snippet.SeoSettingsRobots),
-            SeoSettingsSecurity = Pick(snippet.SeoSettingsSecurityInheritfromGlobal, global.SeoSettingsSecurity, snippet.SeoSettingsSecurity),
+        // External link warning
+        target.Enableexternallinkwarning = Pick(snippet.EnableexternallinkwarningInheritfromlocal, global.Enableexternallinkwarning, snippet.Enableexternallinkwarning);
 
-            // Print / share
-            DisableDownload = Pick(snippet.DisableDownloadInheritfromglobal, global.DisableDownload, snippet.DisableDownload),
-            DisablePrint = Pick(snippet.DisablePrintInheritfromglobal, global.DisablePrint, snippet.DisablePrint),
-            DisableFacebook = Pick(snippet.DisableFacebookInheritfromglobal, global.DisableFacebook, snippet.DisableFacebook),
-            DisableTwitter = Pick(snippet.DisableTwitterInheritfromglobal, global.DisableTwitter, snippet.DisableTwitter),
-            DisableLinkedIn = Pick(snippet.DisableLinkedInInheritfromglobal, global.DisableLinkedIn, snippet.DisableLinkedIn),
-            DisableEmail = Pick(snippet.DisableEmailInheritfromglobal, global.DisableEmail, snippet.DisableEmail),
-            DisableCopyLinkButton = Pick(snippet.DisableCopyLinkButtonInheritfromglobal, global.DisableCopyLinkButton, snippet.DisableCopyLinkButton),
+        // SEO
+        target.SeoSettingsRobots = Pick(snippet.SeoSettingsRobotsInheritfromglobal, global.SeoSettingsRobots, snippet.SeoSettingsRobots);
+        target.SeoSettingsSecurity = Pick(snippet.SeoSettingsSecurityInheritfromGlobal, global.SeoSettingsSecurity, snippet.SeoSettingsSecurity);
 
-            // Filtering
-            Showtooltip = Pick(snippet.ShowtooltipInheritfromglobal, global.Showtooltip, snippet.Showtooltip),
+        // Print / share
+        target.DisableDownload = Pick(snippet.DisableDownloadInheritfromglobal, global.DisableDownload, snippet.DisableDownload);
+        target.DisablePrint = Pick(snippet.DisablePrintInheritfromglobal, global.DisablePrint, snippet.DisablePrint);
+        target.DisableFacebook = Pick(snippet.DisableFacebookInheritfromglobal, global.DisableFacebook, snippet.DisableFacebook);
+        target.DisableTwitter = Pick(snippet.DisableTwitterInheritfromglobal, global.DisableTwitter, snippet.DisableTwitter);
+        target.DisableLinkedIn = Pick(snippet.DisableLinkedInInheritfromglobal, global.DisableLinkedIn, snippet.DisableLinkedIn);
+        target.DisableEmail = Pick(snippet.DisableEmailInheritfromglobal, global.DisableEmail, snippet.DisableEmail);
+        target.DisableCopyLinkButton = Pick(snippet.DisableCopyLinkButtonInheritfromglobal, global.DisableCopyLinkButton, snippet.DisableCopyLinkButton);
 
-            // People
-            DisplayEmailinvCard = Pick(snippet.DisplayEmailinvCardInheritfromglobal, global.DisplayEmailinvCard, snippet.DisplayEmailinvCard),
-            UsePageTitleToDisplayPersonName = Pick(snippet.UsePageTitleToDisplayPersonNameInheritfromglobal, global.UsePageTitleToDisplayPersonName, snippet.UsePageTitleToDisplayPersonName),
+        // Filtering
+        target.Showtooltip = Pick(snippet.ShowtooltipInheritfromglobal, global.Showtooltip, snippet.Showtooltip);
 
-            // Cookiebot
-            EnableCookiebot = Pick(snippet.EnableCookiebotInheritfromglobal, global.EnableCookiebot, snippet.EnableCookiebot),
-            CookieID = Pick(snippet.CookieIDInheritfromglobal, global.CookieID, snippet.CookieID),
-            CustomCookiebotScript = Pick(snippet.CustomCookiebotScriptInheritfromglobal, global.CustomCookiebotScript, snippet.CustomCookiebotScript),
+        // People
+        target.DisplayEmailinvCard = Pick(snippet.DisplayEmailinvCardInheritfromglobal, global.DisplayEmailinvCard, snippet.DisplayEmailinvCard);
+        target.UsePageTitleToDisplayPersonName = Pick(snippet.UsePageTitleToDisplayPersonNameInheritfromglobal, global.UsePageTitleToDisplayPersonName, snippet.UsePageTitleToDisplayPersonName);
 
-            // Preserve inherit flags as-is (informational)
-            ScriptHeadInheritfromglobalsettings = snippet.ScriptHeadInheritfromglobalsettings,
-            ScriptsTopofPageInheritfromglobalsetting = snippet.ScriptsTopofPageInheritfromglobalsetting,
-            ScriptinbottomofBodyInheritFromGlobal = snippet.ScriptinbottomofBodyInheritFromGlobal,
-            ScriptinTopofBodyInheritfromglobal = snippet.ScriptinTopofBodyInheritfromglobal,
-            ScriptexecutedwhencookiesareacceptedInheritfromglobal = snippet.ScriptexecutedwhencookiesareacceptedInheritfromglobal,
-            MarketoMunchkinCodeInheritfromglobal = snippet.MarketoMunchkinCodeInheritfromglobal,
-            FromEmailInheritfromglobal = snippet.FromEmailInheritfromglobal,
-            MinutestotriggercalendarreminderInheritfromglobal = snippet.MinutestotriggercalendarreminderInheritfromglobal,
-            DisplaylocationtitleinasidebarInheritfromglobal = snippet.DisplaylocationtitleinasidebarInheritfromglobal,
-            NonASCIItoASCIIcharacterdictionaryInheritfromglobal = snippet.NonASCIItoASCIIcharacterdictionaryInheritfromglobal,
-            EnableexternallinkwarningInheritfromlocal = snippet.EnableexternallinkwarningInheritfromlocal,
-            SeoSettingsRobotsInheritfromglobal = snippet.SeoSettingsRobotsInheritfromglobal,
-            SeoSettingsSecurityInheritfromGlobal = snippet.SeoSettingsSecurityInheritfromGlobal,
-            DisableDownloadInheritfromglobal = snippet.DisableDownloadInheritfromglobal,
-            DisablePrintInheritfromglobal = snippet.DisablePrintInheritfromglobal,
-            DisableFacebookInheritfromglobal = snippet.DisableFacebookInheritfromglobal,
-            DisableTwitterInheritfromglobal = snippet.DisableTwitterInheritfromglobal,
-            DisableLinkedInInheritfromglobal = snippet.DisableLinkedInInheritfromglobal,
-            DisableEmailInheritfromglobal = snippet.DisableEmailInheritfromglobal,
-            DisableCopyLinkButtonInheritfromglobal = snippet.DisableCopyLinkButtonInheritfromglobal,
-            ShowtooltipInheritfromglobal = snippet.ShowtooltipInheritfromglobal,
-            DisplayEmailinvCardInheritfromglobal = snippet.DisplayEmailinvCardInheritfromglobal,
-            UsePageTitleToDisplayPersonNameInheritfromglobal = snippet.UsePageTitleToDisplayPersonNameInheritfromglobal,
-            EnableCookiebotInheritfromglobal = snippet.EnableCookiebotInheritfromglobal,
-            CookieIDInheritfromglobal = snippet.CookieIDInheritfromglobal,
-            CustomCookiebotScriptInheritfromglobal = snippet.CustomCookiebotScriptInheritfromglobal,
-        };
+        // Cookiebot
+        target.EnableCookiebot = Pick(snippet.EnableCookiebotInheritfromglobal, global.EnableCookiebot, snippet.EnableCookiebot);
+        target.CookieID = Pick(snippet.CookieIDInheritfromglobal, global.CookieID, snippet.CookieID);
+        target.CustomCookiebotScript = Pick(snippet.CustomCookiebotScriptInheritfromglobal, global.CustomCookiebotScript, snippet.CustomCookiebotScript);
+
+        // Preserve inherit flags as-is (informational)
+        target.ScriptHeadInheritfromglobalsettings = snippet.ScriptHeadInheritfromglobalsettings;
+        target.ScriptsTopofPageInheritfromglobalsetting = snippet.ScriptsTopofPageInheritfromglobalsetting;
+        target.ScriptinbottomofBodyInheritFromGlobal = snippet.ScriptinbottomofBodyInheritFromGlobal;
+        target.ScriptinTopofBodyInheritfromglobal = snippet.ScriptinTopofBodyInheritfromglobal;
+        target.ScriptexecutedwhencookiesareacceptedInheritfromglobal = snippet.ScriptexecutedwhencookiesareacceptedInheritfromglobal;
+        target.MarketoMunchkinCodeInheritfromglobal = snippet.MarketoMunchkinCodeInheritfromglobal;
+        target.FromEmailInheritfromglobal = snippet.FromEmailInheritfromglobal;
+        target.MinutestotriggercalendarreminderInheritfromglobal = snippet.MinutestotriggercalendarreminderInheritfromglobal;
+        target.DisplaylocationtitleinasidebarInheritfromglobal = snippet.DisplaylocationtitleinasidebarInheritfromglobal;
+        target.NonASCIItoASCIIcharacterdictionaryInheritfromglobal = snippet.NonASCIItoASCIIcharacterdictionaryInheritfromglobal;
+        target.EnableexternallinkwarningInheritfromlocal = snippet.EnableexternallinkwarningInheritfromlocal;
+        target.SeoSettingsRobotsInheritfromglobal = snippet.SeoSettingsRobotsInheritfromglobal;
+        target.SeoSettingsSecurityInheritfromGlobal = snippet.SeoSettingsSecurityInheritfromGlobal;
+        target.DisableDownloadInheritfromglobal = snippet.DisableDownloadInheritfromglobal;
+        target.DisablePrintInheritfromglobal = snippet.DisablePrintInheritfromglobal;
+        target.DisableFacebookInheritfromglobal = snippet.DisableFacebookInheritfromglobal;
+        target.DisableTwitterInheritfromglobal = snippet.DisableTwitterInheritfromglobal;
+        target.DisableLinkedInInheritfromglobal = snippet.DisableLinkedInInheritfromglobal;
+        target.DisableEmailInheritfromglobal = snippet.DisableEmailInheritfromglobal;
+        target.DisableCopyLinkButtonInheritfromglobal = snippet.DisableCopyLinkButtonInheritfromglobal;
+        target.ShowtooltipInheritfromglobal = snippet.ShowtooltipInheritfromglobal;
+        target.DisplayEmailinvCardInheritfromglobal = snippet.DisplayEmailinvCardInheritfromglobal;
+        target.UsePageTitleToDisplayPersonNameInheritfromglobal = snippet.UsePageTitleToDisplayPersonNameInheritfromglobal;
+        target.EnableCookiebotInheritfromglobal = snippet.EnableCookiebotInheritfromglobal;
+        target.CookieIDInheritfromglobal = snippet.CookieIDInheritfromglobal;
+        target.CustomCookiebotScriptInheritfromglobal = snippet.CustomCookiebotScriptInheritfromglobal;
+
+        return target;
     }
 }
