@@ -191,6 +191,17 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
                     return;
                 }
 
+                // Validate SQL syntax by attempting to parse/compile the query without executing it
+                var syntaxError = ValidateSqlSyntax(query);
+                if (!string.IsNullOrEmpty(syntaxError))
+                {
+                    _result = new DataSet();
+                    errorMessage = syntaxError;
+                    eventLogService.LogWarning(nameof(SqlBrowserResultProvider), nameof(EnsureResult),
+                        $"SQL syntax validation failed:{Environment.NewLine}{query}{Environment.NewLine}Error: {syntaxError}");
+                    return;
+                }
+
                 _result = ConnectionHelper.ExecuteQuery(query, null, QueryTypeEnum.SQLQuery);
                 eventLogService.LogInformation(nameof(SqlBrowserResultProvider), nameof(EnsureResult),
                     $"User executed query:{Environment.NewLine}{query}");
@@ -203,8 +214,33 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
             }
         }
 
+        /// <summary>
+        /// Validates SQL syntax by using SET NOEXEC ON to compile without executing.
+        /// Returns null if syntax is valid, or the error message if invalid.
+        /// </summary>
+        private static string? ValidateSqlSyntax(string sqlQuery)
+        {
+            try
+            {
+                // Use SET NOEXEC ON to validate syntax without executing the query
+                // This compiles the query and catches syntax errors without returning data
+                var validationSql = $@"
+SET NOEXEC ON;
+{sqlQuery}
+SET NOEXEC OFF;";
 
-        private bool ResultsAreEmpty() => _result is null || _result.Tables.Count == 0;
+                ConnectionHelper.ExecuteQuery(validationSql, null, QueryTypeEnum.SQLQuery);
+                return null; // Syntax is valid
+            }
+            catch (Exception ex)
+            {
+                // Extract meaningful error message from the exception
+                return $"SQL syntax error: {ex.Message}";
+            }
+        }
+
+
+        private bool ResultsAreEmpty() => _result is null || _result.Tables.Count == 0 || _result.Tables[0].Columns.Count == 0;
     }
 
 }

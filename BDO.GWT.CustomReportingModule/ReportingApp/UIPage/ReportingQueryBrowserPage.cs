@@ -2,17 +2,9 @@
 using CMS.Membership;
 using Kentico.Xperience.Admin.Base;
 
+// Register Results and View record under the Queries page
 [assembly: UIPage(
-    parentType: typeof(ReportingReportListingPage),
-    slug: "query-browser",
-    uiPageType: typeof(ReportingQueryBrowserPage),
-    name: "Query Browser",
-    templateName: TemplateNames.SECTION_LAYOUT,
-    order: 10)]
-
-// Register Results and View record under the Query Browser application window
-[assembly: UIPage(
-    parentType: typeof(ReportingQueryBrowserPage),
+    parentType: typeof(EditQuery),
     slug: "results",
     uiPageType: typeof(ResultListing),
     name: "Results",
