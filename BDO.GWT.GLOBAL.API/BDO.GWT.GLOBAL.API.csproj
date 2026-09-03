@@ -10,8 +10,6 @@
 
   <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Admin" Version="31.7.0" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
-    <PackageReference Include="Microsoft.Data.SqlClient.Extensions.Azure" Version="7.0.2" />
     <PackageReference Include="Microsoft.Identity.Web" Version="4.11.0" />
 	<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
 	<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.6.2" />
