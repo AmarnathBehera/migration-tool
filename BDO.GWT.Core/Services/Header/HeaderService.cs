@@ -13,7 +13,6 @@ public interface IHeaderService
 {
     Task<HeaderDto?> GetAsync(IContentService contentservice, CancellationToken cancellationToken);
     Task<IEnumerable<CultureDto>> GetCultureDtosAsync(CancellationToken cancellationToken);
-
 }
 
 public class HeaderService : IHeaderService
@@ -29,6 +28,7 @@ public class HeaderService : IHeaderService
     private readonly IPreferredLanguageRetriever _preferredLanguageRetriever;
     private readonly IWebPageUrlResolver _urlResolver;
     private readonly string navRootPath = "/";
+
     public HeaderService(
         IContentService contentService,
         IContentRetriever contentRetriever,
@@ -52,13 +52,13 @@ public class HeaderService : IHeaderService
         _preferredLanguageRetriever = preferredLanguageRetriever;
         _urlResolver = urlResolver;
     }
+
     public async Task<HeaderDto?> GetAsync(IContentService contentservice, CancellationToken cancellationToken)
     {
         // The header (menus, contact, etc.) is language-specific, so the current
         // culture MUST be part of the cache key. Without it, the first language to
         // populate the cache is served to every other language on the channel.
         var languageName = _preferredLanguageRetriever.Get();
-
         var cacheSettings = new CacheSettings(
             cacheMinutes: 10,
             cacheItemNameParts:
@@ -75,44 +75,44 @@ public class HeaderService : IHeaderService
             })
         };
 
-        return await _cache.LoadAsync(
-            async _ => await BuildHeaderAsync(cancellationToken),
+        var header = await _cache.LoadAsync(
+            async _ => await BuildStaticHeaderAsync(cancellationToken),
             cacheSettings);
+
+        if (header is null)
+        {
+            return null;
+        }
+
+        header.Cultures = await GetCultureDtosAsync(cancellationToken);
+        return header;
     }
 
-    private async Task<HeaderDto?> BuildHeaderAsync(CancellationToken cancellationToken)
+    private async Task<HeaderDto?> BuildStaticHeaderAsync(CancellationToken cancellationToken)
     {
         var topMenu = await BuildTopMenuAsync(cancellationToken);
-
-        var cultures = await GetCultureDtosAsync(cancellationToken);
-
         var websiteDisplayName = _websiteCulturesService.GetDisplayName(_websiteChannel);
-
-        var megaMenu = await BuildMegaMenuAsync(cancellationToken);              
-
+        var megaMenu = await BuildMegaMenuAsync(cancellationToken);
         var logoPageLink = await GetLogoPageLinkAsync(cancellationToken);
 
-        //getting the search page
         var searchPage = (await _contentRetriever.RetrievePages<Search>(
-           new RetrievePagesParameters { PathMatch = PathMatch.Children(navRootPath, 1) },
-           query => query.OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
-           RetrievalCacheSettings.CacheDisabled,
-           cancellationToken
-       ))?.FirstOrDefault();
+            new RetrievePagesParameters { PathMatch = PathMatch.Children(navRootPath, 1) },
+            query => query.OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken
+        ))?.FirstOrDefault();
 
-        var headerDto = new HeaderDto
+        return new HeaderDto
         {
             MenuItems = topMenu.TopMenu,
-            Cultures = cultures,
             Contact = topMenu.Contact,
             SiteName = websiteDisplayName,
             LogoURL = logoPageLink ?? string.Empty,
             LogoImageURL = "https://cdn.bdo.global/images/bdo_logo/1.0.0/bdo_logo_color.png",
             SearchPageURL = searchPage != null ? _urlResolver.GetRelativePath(searchPage) : string.Empty,
-            MegaMenuItems = megaMenu,
+            MegaMenuItems = megaMenu
+            // Cultures intentionally NOT set here
         };
-
-        return headerDto;
     }
 
     protected virtual async Task<string> GetLogoPageLinkAsync(CancellationToken cancellationToken)
@@ -140,7 +140,7 @@ public class HeaderService : IHeaderService
     }
 
     private async Task<(IEnumerable<LinkItemDto> TopMenu, LinkItemDto? Contact)> BuildTopMenuAsync(CancellationToken cancellationToken)
-    {        
+    {
         var pages = (await _contentRetriever.RetrievePages<Navigation>(
             new RetrievePagesParameters
             {
@@ -170,14 +170,13 @@ public class HeaderService : IHeaderService
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken
         ))?.FirstOrDefault();
-       
-            var linkItemDto = new LinkItemDto
-            {
-                Title = contactPage?.MetadataTitle ?? string.Empty,
-                URL = contactPage?.GetUrl()?.RelativePath ?? string.Empty
-            };
-            return (topMenuItems, linkItemDto);
-             
+
+        var linkItemDto = new LinkItemDto
+        {
+            Title = contactPage?.MetadataTitle ?? string.Empty,
+            URL = contactPage?.GetUrl()?.RelativePath ?? string.Empty
+        };
+        return (topMenuItems, linkItemDto);
     }
 
     private List<LinkItemDto> MapTopMenuLinks(IEnumerable<Navigation> pages)
@@ -194,7 +193,7 @@ public class HeaderService : IHeaderService
     }
 
     protected virtual async Task<IEnumerable<FirstLevelMenuItemDto>> BuildMegaMenuAsync(CancellationToken cancellationToken = default)
-    {       
+    {
         var firstLevelItems = (await _contentRetriever.RetrievePages<NavigationFirstLevelItem>(
             new RetrievePagesParameters
             {
@@ -216,9 +215,7 @@ public class HeaderService : IHeaderService
         foreach (var first in firstLevelItems.Where(f => f != null))
         {
             var secondLevelDtos = await BuildSecondLevelAsync(first.SystemFields?.WebPageItemID ?? 0, cancellationToken);
-
             var featuredDtos = await BuildFeaturedLevelAsync(first.SystemFields?.WebPageItemID ?? 0, cancellationToken);
-
             var targetPage = first.TargetURL?
                 .OfType<IWebPageFieldsSource>()
                 .FirstOrDefault();
@@ -325,260 +322,3 @@ public class HeaderService : IHeaderService
         return featuredDtos;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,6 +1,5 @@
 ﻿using BDO.GWT.Core;
 using CMS.Websites;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Net.Mime;
 
@@ -8,7 +7,8 @@ namespace BDO.GWT.GLOBAL.API.Data
 {
     public class PageAttachmentService : IPageAttachmentService
     {
-        private const string DevelopmentLiveSiteBaseUrl = "http://localhost:12393";
+        private const string DevelopmentLiveSiteHost = "localhost";
+        private const int DevelopmentLiveSitePort = 12393;
         private static readonly FileExtensionContentTypeProvider ContentTypeProvider = new();
 
         private readonly IContentService _contentService;
@@ -112,13 +112,16 @@ namespace BDO.GWT.GLOBAL.API.Data
 
             if (_hostEnvironment.IsDevelopment())
             {
-                return new Uri(new Uri(DevelopmentLiveSiteBaseUrl), normalizedPath);
+                return new UriBuilder(Uri.UriSchemeHttp, DevelopmentLiveSiteHost, DevelopmentLiveSitePort, normalizedPath).Uri;
             }
 
             var request = _httpContextAccessor.HttpContext?.Request;
-            return request is null
-                ? null
-                : new Uri($"{request.Scheme}://{request.Host}{normalizedPath}");
+            if (request is null)
+            {
+                return null;
+            }
+
+            return new UriBuilder(request.Scheme, request.Host.Host, request.Host.Port ?? -1, normalizedPath).Uri;
         }
 
         private static IEnumerable<ContentAttachment> GetAttachmentsFromPage(IWebPageFieldsSource page)

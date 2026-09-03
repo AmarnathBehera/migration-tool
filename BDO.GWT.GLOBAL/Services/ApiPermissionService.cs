@@ -34,7 +34,7 @@ public sealed class ApiPermissionService : IApiPermissionService
         new() { Id = 10, DisplayName = ApiMethodGroupName.ServiceAreas },
         new() { Id = 11, DisplayName = ApiMethodGroupName.EventSections },
         new() { Id = 12, DisplayName = ApiMethodGroupName.Content },
-        new() { Id = 13, DisplayName = ApiMethodGroupName.CareerJobOpportunities },
+        new() { Id = 13, DisplayName = "Careers" },
         new() { Id = 14, DisplayName = ApiMethodGroupName.Forms },
         new() { Id = 15, DisplayName = ApiMethodGroupName.PageAttachments },
         new() { Id = 16, DisplayName = ApiMethodGroupName.LocationOffices },

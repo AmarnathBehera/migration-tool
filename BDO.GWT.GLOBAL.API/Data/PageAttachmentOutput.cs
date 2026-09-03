@@ -23,5 +23,7 @@
         public string? Description { get; set; }
 
         public DateTime? LastModified { get; set; }
+
+        public string? Message { get; set; }
     }
 }

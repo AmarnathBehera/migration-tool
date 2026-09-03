@@ -27,20 +27,13 @@ namespace BDO.GWT.Core.Services
 {
     public interface ISearchPageService
     {
-        Task<SearchResultDto> GetSearchResultsAsync(SearchResultQuery query, CancellationToken cancellationToken);
+        Task<SearchResultDto> GetSearchResultsAsync(SearchResultQuery query,string currentLanguage, CancellationToken cancellationToken);
 
-        Task<SearchPageDto> GetSearchPageDtoAsync(string searchText, CancellationToken cancellationToken);
+        Task<SearchPageDto> GetSearchPageDtoAsync(string searchText,string currentLanguage, CancellationToken cancellationToken);
     }
-    public class SearchPageService(
-        ICultureContext cultureContext,
-        //IContentService contentService,
-        //IUrlHelperFactory urlHelperFactory,
-        //IHttpContextAccessor httpContextAccessor,
-        //IWebsiteChannelContext websiteChannelContext,
-        //IWebPageUrlResolver urlResolver,
+    public class SearchPageService(           
         ITypeMapper typeMapper,
-        ISearchService searchService,
-        //IDateTimeProviderSearch dateTimeProvider,
+        ISearchService searchService,   
         ISearchCardHelper searchCardHelper,
         IEventLogService eventLogService
 
@@ -127,23 +120,24 @@ namespace BDO.GWT.Core.Services
 
         #endregion
 
-        private readonly ICultureContext _cultureContext = cultureContext;               
+                    
         private readonly ISearchService _searchService = searchService;
         private readonly ITypeMapper _typeMapper = typeMapper;
         
         private readonly ISearchCardHelper _searchCardHelper = searchCardHelper;
-        public async Task<SearchResultDto> GetSearchResultsAsync(SearchResultQuery query, CancellationToken cancellationToken)
+        public async Task<SearchResultDto> GetSearchResultsAsync(SearchResultQuery query, string currentLanguage, CancellationToken cancellationToken)
         {
             var searchText = query.SearchText ?? string.Empty;
             var currentPage = query.CurrentPage ?? 1;
             var pageSize = query.PageSize ?? 12;
 
+           
             var response = await _searchService.SearchAsync<SearchDocument>(searchText, q =>
             {
                 q.IncludeTotalCount();
 
                 //q.OnlyPublishedPages(_dateTimeProvider);
-                q.Where(x => x.LanguageTag == _cultureContext.CurrentLanguageTag);
+                q.Where(x => x.LanguageTag == currentLanguage);
 
                 if (query.SortBy == MostRecentOptionValue)
                 {
@@ -160,7 +154,7 @@ namespace BDO.GWT.Core.Services
                 q.Take(pageSize);
             }, cancellationToken);
 
-            var currentLanguageTag = _cultureContext.CurrentLanguageTag;
+            var currentLanguageTag = currentLanguage;
             // TEMP DEBUG - remove after diagnosis
             eventLogService.LogInformation("SearchPageService", "GetSearchResultsAsync",
                 $"CurrentLanguageTag (query side): '{currentLanguageTag}'");
@@ -170,8 +164,8 @@ namespace BDO.GWT.Core.Services
             var totalItems = (int)response.Count!;
             var totalPages = PaginationHelper.CalculateTotalPages(totalItems, pageSize);
 
-            var cards = await _searchCardHelper.GetSearchCardDtos(existingDocuments, cancellationToken);
-            var filters = await GetFiltersAsync(searchText, cancellationToken);
+            var cards = await _searchCardHelper.GetSearchCardDtos(existingDocuments, currentLanguage, cancellationToken);
+            var filters = await GetFiltersAsync(searchText, currentLanguage, cancellationToken);
 
             var dto = new SearchResultDto
             {
@@ -184,12 +178,12 @@ namespace BDO.GWT.Core.Services
             return dto;
         }
 
-        public async Task<SearchPageDto> GetSearchPageDtoAsync(string searchText, CancellationToken cancellationToken)
+        public async Task<SearchPageDto> GetSearchPageDtoAsync(string searchText,string currentLanguage, CancellationToken cancellationToken)
         {
             var dto = new SearchPageDto
             {
                 InitialSearchText = searchText,
-                Filters = await GetFiltersAsync(searchText, cancellationToken),
+                Filters = await GetFiltersAsync(searchText, currentLanguage, cancellationToken),
                 SortBy = GetSortByFilter(),
             };
 
@@ -198,13 +192,13 @@ namespace BDO.GWT.Core.Services
             return dto;
         }
 
-        private async Task<FilterItemDto<SearchFacetOptionDto>> GetFiltersAsync(string searchText, CancellationToken cancellationToken)
+        private async Task<FilterItemDto<SearchFacetOptionDto>> GetFiltersAsync(string searchText, string currentLanguage, CancellationToken cancellationToken)
         {
             var searchResponse = await _searchService.SearchAsync<SearchDocument>(searchText, q =>
             {
                 q.IncludeFacet(x => x.ClassName, 100);
                 //q.OnlyPublishedPages(_dateTimeProvider);
-                q.Where(x => x.LanguageTag == _cultureContext.CurrentLanguageTag);
+                q.Where(x => x.LanguageTag == currentLanguage);
                 q.Take(0);
             }, cancellationToken);
 
