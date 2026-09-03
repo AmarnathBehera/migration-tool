@@ -24,7 +24,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
                 _siteProviderMock.Object);
         }
 
-        private static Mock<ObjectQuery<T>> CreateMockQuery<T>(IEnumerable<T> items)
+        private static Mock<ObjectQuery<T>> CreateMockQuery<T>(List<T> items)
             where T : BaseInfo
         {
             var mockQuery = new Mock<ObjectQuery<T>>();
