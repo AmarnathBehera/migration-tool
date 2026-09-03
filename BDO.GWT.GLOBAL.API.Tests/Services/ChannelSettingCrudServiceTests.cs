@@ -1,6 +1,8 @@
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Queries;
 using BDO.GWT.GLOBAL.API.Services;
+using CMS.DataEngine;
+using Moq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -132,6 +134,61 @@ public class ChannelSettingCrudServiceTests
         Assert.ThrowsAsync<NullReferenceException>(async () =>
             await service.GetChannelSetting("BDO.WebChannelSnippet", CancellationToken.None));
     }
+
+    // --- Guard branches reachable without provider access ------------------------
+
+    [TestCase("Email")]
+    [TestCase("SEO Settings")]
+    [TestCase("Filtering")]
+    public async Task GetChannelSettings_ReturnsEmpty_WhenDisplayNameIsNotIncludeCustomScripts(string displayName)
+    {
+        // A non-"Include Custom Scripts" DisplayName short-circuits before touching the
+        // provider, so a mocked (never-configured) provider is sufficient.
+        var providerMock = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
+        var service = new ChannelSettingCrudService(providerMock.Object);
+        var query = new SettingsQuery { DisplayName = displayName };
+
+        var result = await service.GetChannelSettings(query, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Empty);
+            providerMock.Verify(p => p.Get(), Times.Never);
+        });
+    }
+
+    [TestCase("BDO.Email")]
+    [TestCase("BDO.Cookiebot")]
+    [TestCase("")]
+    public async Task GetChannelSetting_ReturnsNull_WhenCodeNameIsNotWebChannelSnippet(string codeName)
+    {
+        var providerMock = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
+        var service = new ChannelSettingCrudService(providerMock.Object);
+
+        var result = await service.GetChannelSetting(codeName, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Null);
+            providerMock.Verify(p => p.Get(), Times.Never);
+        });
+    }
+
+    [Test]
+    public async Task GetChannelSetting_IsCaseSensitive_ForWebChannelSnippetCodeName()
+    {
+        // The comparison uses StringComparison.Ordinal, so a differently-cased value
+        // must not match and must return null without querying the provider.
+        var providerMock = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
+        var service = new ChannelSettingCrudService(providerMock.Object);
+
+        var result = await service.GetChannelSetting("bdo.webchannelsnippet", CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+    }
+
+
 
     [Test]
     public void ChannelSettingCrudService_Interface_HasExpectedMethods()
