@@ -13,12 +13,5 @@
         <ObjectType>cms.contenttype</ObjectType>
       </AllowedChildContentTypeChildID>
     </Binding>
-    <Binding id="cms.contenttype_BDO.RemoteDeal">
-      <AllowedChildContentTypeChildID>
-        <CodeName>BDO.RemoteDeal</CodeName>
-        <GUID>1977d31f-d844-4267-aeb3-ed0e2465b30d</GUID>
-        <ObjectType>cms.contenttype</ObjectType>
-      </AllowedChildContentTypeChildID>
-    </Binding>
   </Bindings>
 </cms.allowedchildcontenttype>

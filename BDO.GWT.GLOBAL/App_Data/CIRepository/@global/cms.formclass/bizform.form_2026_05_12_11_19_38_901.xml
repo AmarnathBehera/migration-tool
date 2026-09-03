@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.formclass>
+  <ClassContactMapping>
+    <form>
+      <field column="ContactFirstName" enabled="true" guid="2f112665-82de-41bc-a64a-e10e002b0100" mappedtofield="firstname" visible="true" />
+      <field column="ContactLastName" enabled="true" guid="75d85ac8-5b81-44f7-9f0b-f223f4424766" mappedtofield="lastname" visible="true" />
+    </form>
+  </ClassContactMapping>
+  <ClassDisplayName>Form (2026-05-12_11:19)</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="Form_2026_05_12_11_19_38_901ID" columntype="integer" enabled="true" guid="57456f40-78fb-463e-8128-70b3889b4216" isPK="true" />
+      <field column="FormInserted" columnprecision="7" columntype="datetime" enabled="true" guid="efc48448-5947-484f-9262-b57cbb9cea58" system="true">
+        <properties>
+          <fieldcaption>Form inserted</fieldcaption>
+        </properties>
+      </field>
+      <field column="FormUpdated" columnprecision="7" columntype="datetime" enabled="true" guid="c1f80dc8-18fd-485a-a687-09384eda710f" system="true">
+        <properties>
+          <fieldcaption>Form updated</fieldcaption>
+        </properties>
+      </field>
+      <field allowempty="true" column="FirstName" columnsize="500" columntype="text" enabled="true" guid="4b278c17-2c72-4c15-afe3-70a44cd9383e" visible="true">
+        <properties>
+          <fieldcaption>First name</fieldcaption>
+          <smart>False</smart>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.TextInput</componentidentifier>
+        </settings>
+        <validationrulesdata>
+          <FormValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.MaximumStringLengthFormValidationRule</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>Maximum allowed length of the input text is 100.</ErrorMessage>
+              <MaximumLength>100</MaximumLength>
+            </RuleValues>
+          </FormValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+      <field allowempty="true" column="LastName" columnsize="500" columntype="text" enabled="true" guid="1d1d67e5-e5a0-40a5-b5f5-33fe15acfd49" visible="true">
+        <properties>
+          <fieldcaption>Last name</fieldcaption>
+          <smart>False</smart>
+        </properties>
+        <settings>
+          <componentidentifier>Kentico.TextInput</componentidentifier>
+        </settings>
+        <validationrulesdata>
+          <FormValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.MaximumStringLengthFormValidationRule</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>Maximum allowed length of the input text is 100.</ErrorMessage>
+              <MaximumLength>100</MaximumLength>
+            </RuleValues>
+          </FormValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>28ba312a-a072-4f21-96ed-a913136fae6d</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BizForm.Form_2026_05_12_11_19_38_901</ClassName>
+  <ClassTableName>Form_Form_2026_05_12_11_19_38_901</ClassTableName>
+  <ClassType>Form</ClassType>
+  <ClassXmlSchema>
+<![CDATA[
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Form_Form_2026_05_12_11_19_38_901">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Form_2026_05_12_11_19_38_901ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" type="xs:int" />
+              <xs:element name="FormInserted" type="xs:dateTime" />
+              <xs:element name="FormUpdated" type="xs:dateTime" />
+              <xs:element name="FirstName" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="500" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="LastName" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="500" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//Form_Form_2026_05_12_11_19_38_901" />
+      <xs:field xpath="Form_2026_05_12_11_19_38_901ID" />
+    </xs:unique>
+  </xs:element>
+</xs:schema>
+]]>
+  </ClassXmlSchema>
+</cms.formclass>
