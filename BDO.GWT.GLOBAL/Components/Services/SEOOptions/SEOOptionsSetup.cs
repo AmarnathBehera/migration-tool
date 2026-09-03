@@ -7,13 +7,14 @@ using System.Linq;
 namespace GWTXbyKWeb.Components.Services.SEOOptions;
 public class SEOOptionsSetup : IConfigureOptions<SEOOptions>
 {
-    private readonly IInfoProvider<SEOSettingsInfo> seoSettingsInfoProvider;
+    private readonly IInfoProvider<WebChannelSnippetInfo> webChannelSnippetInfoProvider;
     private readonly IWebsiteChannelContext websiteChannelContext;
     private readonly IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider;
+    private readonly IInfoProvider<GlobalsettingskeyInfo> _provider;
 
-    public SEOOptionsSetup(IInfoProvider<SEOSettingsInfo> seoSettingsInfoProvider, IWebsiteChannelContext websiteChannelContext, IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider)
+    public SEOOptionsSetup(IInfoProvider<GlobalsettingskeyInfo> provider,IInfoProvider<WebChannelSnippetInfo> webChannelSnippetInfoProvider, IWebsiteChannelContext websiteChannelContext, IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider)
     {
-        this.seoSettingsInfoProvider = seoSettingsInfoProvider;
+        this.webChannelSnippetInfoProvider = webChannelSnippetInfoProvider;
         this.websiteChannelContext = websiteChannelContext;
         this.webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
     }
@@ -27,11 +28,27 @@ public class SEOOptionsSetup : IConfigureOptions<SEOOptions>
             .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), currentChannelID)
             .FirstOrDefault();
 
-        var seoSettings = seoSettingsInfoProvider.Get()
-            .WhereEquals(nameof(SEOSettingsInfo.SeoSettingsWebChannelSettingID), channelSettings?.WebChannelSettingsID ?? 0)
+        var seoSettings = webChannelSnippetInfoProvider.Get()
+            .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID), channelSettings?.WebChannelSettingsID ?? 0)
             .FirstOrDefault();
-
-        options.RobotsText = seoSettings?.SeoSettingsRobots ?? string.Empty;
-        options.SecurityText = seoSettings?.SeoSettingsSecurity ?? string.Empty;
+        if(seoSettings.SeoSettingsRobotsInheritfromglobal)
+        {
+            var globalSettings = _provider.Get().FirstOrDefault();
+            options.RobotsText = globalSettings?.SeoSettingsRobots ?? string.Empty;
+        }
+        else
+        {
+            options.RobotsText = seoSettings?.SeoSettingsRobots ?? string.Empty;
+        }
+        if(seoSettings.SeoSettingsSecurityInheritfromGlobal)
+        {
+            var globalSettings = _provider.Get().FirstOrDefault();
+            options.SecurityText = globalSettings?.SeoSettingsRobots ?? string.Empty;
+        }
+        else
+        {
+            options.SecurityText = seoSettings?.SeoSettingsSecurity ?? string.Empty;
+        }
+       
     }
 }

@@ -20,6 +20,7 @@ using Kentico.Content.Web.Mvc.Routing;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace BDO.GWT.Web.Core.Services;
 
@@ -35,9 +36,10 @@ public interface IEventWebinarPageService
 
 public partial class EventWebinarPageService : IEventWebinarPageService
 {
+    private readonly IInfoProvider<GlobalsettingskeyInfo> _provider;
+    private readonly IInfoProvider<WebChannelSnippetInfo> _siteProvider;
     private readonly IWebsiteChannelContext _websiteChannelContext;
-    private readonly IInfoProvider<EventsWebinarsInfo> _eventInfoProvider;
-    private readonly IInfoProvider<GlobalEventsnWebinarsInfo> _globalEventInfoProvider;
+    private readonly IInfoProvider<WebChannelSettingsInfo> _webChannelSettingsInfoProvider;
     private readonly IPreferredLanguageRetriever _preferredLanguageRetriever;
     private readonly IContentService _contentRetriever;
     private readonly IWebPageUrlRetriever _pageUrlRetriever;
@@ -47,16 +49,18 @@ public partial class EventWebinarPageService : IEventWebinarPageService
         IContentService contentRetriever,
         IWebsiteChannelContext websiteChannelContext,
         IWebPageUrlRetriever pageUrlRetriever,
-        IInfoProvider<EventsWebinarsInfo> eventInfoProvider,
-        IInfoProvider<GlobalEventsnWebinarsInfo> globalEventInfoProvider,
+        IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider,
+        IInfoProvider<GlobalsettingskeyInfo> provider,
+        IInfoProvider<WebChannelSnippetInfo> siteProvider,     
         IPreferredLanguageRetriever preferredLanguageRetriever,
         ISocialMediaButtonsService socialMediaButtonsService)
     {
         _contentRetriever = contentRetriever;
         _websiteChannelContext = websiteChannelContext;
         _pageUrlRetriever = pageUrlRetriever;
-        _eventInfoProvider = eventInfoProvider;
-        _globalEventInfoProvider = globalEventInfoProvider;
+        _provider = provider;
+        _siteProvider = siteProvider;
+        _webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
         _preferredLanguageRetriever = preferredLanguageRetriever;
         _socialMediaButtonsService = socialMediaButtonsService;
     }
@@ -640,34 +644,34 @@ public partial class EventWebinarPageService : IEventWebinarPageService
 
     private (string MinutesToTrigger, bool DisplayLocationInSidebar) EventnWebinarSetting()
     {
-        int currentWebsiteID = _websiteChannelContext.WebsiteChannelID;
+        var channelSetting = _siteProvider.Get().TopN(1).FirstOrDefault();
+        GlobalsettingskeyInfo? globalSetting = null;
 
-        var currentChannelSettings = _eventInfoProvider
-            .Get()
-            .WhereEquals(nameof(EventsWebinarsInfo.EventnWebinarWebChannelSettingID), currentWebsiteID)
-            .TopN(1)
-            .FirstOrDefault();
-
-        bool inheritFromGlobal = currentChannelSettings == null
-            || ValidationHelper.GetBoolean(currentChannelSettings.GetValue("InheritFromGlobal"), false);
-
-        if (!inheritFromGlobal)
+        int minutesToTrigger;
+        if (channelSetting == null || channelSetting.MinutestotriggercalendarreminderInheritfromglobal)
         {
-            return (
-                currentChannelSettings!.Minutestotriggercalendarreminder.ToString(),
-                currentChannelSettings.Displaylocationtitleinasidebar
-            );
+            globalSetting ??= _provider.Get().TopN(1).FirstOrDefault();
+            minutesToTrigger = globalSetting?.Minutestotriggercalendarreminder ?? 0;
+        }
+        else
+        {
+            minutesToTrigger = channelSetting.Minutestotriggercalendarreminder;
         }
 
-        var globalValue = _globalEventInfoProvider
-            .Get()
-            .TopN(1)
-            .GetEnumerableTypedResult()
-            .FirstOrDefault();
+        bool displayLocationInSidebar;
+        if (channelSetting == null || channelSetting.DisplaylocationtitleinasidebarInheritfromglobal)
+        {
+            globalSetting ??= _provider.Get().TopN(1).FirstOrDefault();
+            displayLocationInSidebar = globalSetting?.Displaylocationtitleinasidebar ?? false;
+        }
+        else
+        {
+            displayLocationInSidebar = channelSetting.Displaylocationtitleinasidebar;
+        }
 
         return (
-            globalValue?.Minutestotriggercalendarreminder.ToString() ?? string.Empty,
-            globalValue?.Displaylocationtitleinasidebar ?? false
+            minutesToTrigger.ToString(CultureInfo.InvariantCulture),
+            displayLocationInSidebar
         );
     }
 }

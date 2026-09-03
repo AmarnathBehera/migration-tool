@@ -5,6 +5,7 @@ using BDO.GWT.Xperience.Core.Services;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Websites;
+using CMS.Websites.Routing;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -29,8 +30,10 @@ public sealed record SiteConfigurationProviders(
     IInfoProvider<XperienceCommunity.Localization.LocalizationTranslationItemInfo> LocalizationTranslation,
     IInfoProvider<ContentLanguageInfo> ContentLanguage,
     IInfoProvider<WebChannelSettingsInfo> WebChannelSettings,
-    IInfoProvider<GeneralSettingInfo> GeneralSetting,
-    IInfoProvider<WebsiteChannelInfo> WebsiteChannel);
+    IInfoProvider<WebsiteChannelInfo> WebsiteChannel,
+    IInfoProvider<GlobalsettingskeyInfo> provider,
+    IWebsiteChannelContext websiteChannelContext,
+    IInfoProvider<WebChannelSnippetInfo> webChannelSnippetInfoProvider);
 
 public class SiteConfigurationService : ISiteConfigurationService
 {
@@ -49,7 +52,10 @@ public class SiteConfigurationService : ISiteConfigurationService
     private readonly ICachingService _cachingService;
     private readonly ISiteContext _siteContext;
     private readonly SiteConfigurationProviders _providers;
-
+    private readonly IInfoProvider<WebChannelSnippetInfo> _webChannelSnippetInfoProvider;
+    private readonly IWebsiteChannelContext _websiteChannelContext;
+    private readonly IInfoProvider<WebChannelSettingsInfo> _webChannelSettingsInfoProvider;
+    private readonly IInfoProvider<GlobalsettingskeyInfo> _provider;
     public SiteConfigurationService(
         ICachingService cachingService,
         IContentQueryExecutor executor,
@@ -125,15 +131,23 @@ public class SiteConfigurationService : ISiteConfigurationService
         {
             return settings;
         }
-
-        var generalSetting = _providers.GeneralSetting.Get()
-            .WhereEquals(nameof(GeneralSettingInfo.GeneralSettingsWebChannelSettingID), webChannelSettings.WebChannelSettingsID)
-            .TopN(1)
+       
+        var generalSetting = _webChannelSnippetInfoProvider.Get()
+            .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID), webChannelSettings?.WebChannelSettingsID ?? 0)
             .FirstOrDefault();
 
         if (generalSetting != null)
         {
-            settings.ExternalLinkWarningEnabled = generalSetting.Enableexternallinkwarning;
+            if (generalSetting.EnableexternallinkwarningInheritfromlocal)
+            {
+                var GlobalgeneralSetting = _provider.Get().FirstOrDefault();
+                settings.ExternalLinkWarningEnabled = GlobalgeneralSetting.Enableexternallinkwarning;
+
+            }
+            else
+            {
+                settings.ExternalLinkWarningEnabled = generalSetting.Enableexternallinkwarning;
+            }
         }
 
         return settings;

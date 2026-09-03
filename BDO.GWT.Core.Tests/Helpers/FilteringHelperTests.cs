@@ -29,7 +29,7 @@ public class FilteringHelperTests
     {
         _settingServiceMock
             .Setup(x => x.GetFilteringInfo())
-            .ReturnsAsync((IEnumerable<FilteringInfo>?)null);
+            .ReturnsAsync((IEnumerable<WebChannelSnippetInfo>?)null);
 
         var result = await _filteringHelper.IsFilteringTooltipEnabledAsync(true, CancellationToken.None);
 
@@ -41,7 +41,7 @@ public class FilteringHelperTests
     {
         _settingServiceMock
             .Setup(x => x.GetFilteringInfo())
-            .ReturnsAsync(new List<FilteringInfo>());
+            .ReturnsAsync(new List<WebChannelSnippetInfo>());
 
         var result = await _filteringHelper.IsFilteringTooltipEnabledAsync(true, CancellationToken.None);
 
@@ -53,7 +53,7 @@ public class FilteringHelperTests
     {
         _settingServiceMock
             .Setup(x => x.GetFilteringInfo())
-            .ReturnsAsync((IEnumerable<FilteringInfo>?)null);
+            .ReturnsAsync((IEnumerable<WebChannelSnippetInfo>?)null);
 
         await _filteringHelper.IsFilteringTooltipEnabledAsync(true, CancellationToken.None);
 
