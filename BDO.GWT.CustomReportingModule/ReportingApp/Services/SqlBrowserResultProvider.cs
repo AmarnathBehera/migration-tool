@@ -218,7 +218,7 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
         /// Validates SQL syntax by using SET NOEXEC ON to compile without executing.
         /// Returns null if syntax is valid, or the error message if invalid.
         /// </summary>
-        private string? ValidateSqlSyntax(string sqlQuery)
+        private static string? ValidateSqlSyntax(string sqlQuery)
         {
             try
             {

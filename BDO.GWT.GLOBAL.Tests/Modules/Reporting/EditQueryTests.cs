@@ -725,6 +725,146 @@ SELECT * FROM Data";
             Assert.That(result, Is.Not.Null);
         });
     }
+
+    [Test]
+    public void ConfigureTemplateProperties_Sets_Default_Query_And_ChannelId_Before_LoadingSavedQueries()
+    {
+        var providerMock = new Mock<IInfoProvider<ReportingReportInfo>>();
+        providerMock.Setup(p => p.Get()).Throws(new InvalidOperationException("boom"));
+
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            Mock.Of<ISqlBrowserResultProvider>(),
+            Mock.Of<ISqlBrowserExporter>(),
+            providerMock.Object)!;
+
+        _type.GetProperty(nameof(EditQuery.ReportingChannelSettingId))!
+            .SetValue(instance, 42);
+
+        var method = _type.GetMethod(nameof(EditQuery.ConfigureTemplateProperties))!;
+        var properties = new EditSqlTemplateClientProperties();
+
+        Assert.Throws<InvalidOperationException>(() =>
+            InvokeTaskResult(instance, method, properties));
+
+        Assert.That(properties.Query, Does.Contain("No query has been configured."));
+        Assert.That(properties.Query, Does.Contain("Use ChannelID = 42"));
+    }
+
+    [Test]
+    public void RenameQuery_Returns_Error_When_Query_Is_Not_Found()
+    {
+        var providerMock = new Mock<IInfoProvider<ReportingReportInfo>>();
+        var queryMock = new Mock<ObjectQuery<ReportingReportInfo>>();
+        IQueryable<ReportingReportInfo> emptyQuery = new EnumerableQuery<ReportingReportInfo>(Array.Empty<ReportingReportInfo>());
+
+        queryMock.Setup(q => q.TopN(It.IsAny<int>())).Returns(queryMock.Object);
+        queryMock.Setup(q => q.WhereEquals(It.IsAny<string>(), It.IsAny<object>())).Returns(queryMock.Object);
+        queryMock.As<IQueryable<ReportingReportInfo>>().SetupGet(q => q.Provider).Returns(emptyQuery.Provider);
+        queryMock.As<IQueryable<ReportingReportInfo>>().SetupGet(q => q.Expression).Returns(emptyQuery.Expression);
+        queryMock.As<IQueryable<ReportingReportInfo>>().SetupGet(q => q.ElementType).Returns(emptyQuery.ElementType);
+        queryMock.As<IEnumerable<ReportingReportInfo>>().Setup(q => q.GetEnumerator()).Returns(emptyQuery.GetEnumerator());
+        providerMock.Setup(p => p.Get()).Returns(queryMock.Object);
+
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            Mock.Of<ISqlBrowserResultProvider>(),
+            Mock.Of<ISqlBrowserExporter>(),
+            providerMock.Object)!;
+
+        var method = _type.GetMethod("RenameQuery")!;
+        var model = new SavedQuery { ID = 99, Name = "Updated" };
+
+        var response = InvokeTaskResult(instance, method, model);
+        var value = GetResponseValue(response!);
+
+        Assert.That(value, Is.Null);
+        providerMock.Verify(p => p.Get(), Times.Once);
+    }
+
+    [Test]
+    public void DeleteQuery_Returns_Error_When_Query_Is_Not_Found()
+    {
+        var providerMock = new Mock<IInfoProvider<ReportingReportInfo>>();
+        var queryMock = new Mock<ObjectQuery<ReportingReportInfo>>();
+        IQueryable<ReportingReportInfo> emptyQuery = new EnumerableQuery<ReportingReportInfo>(Array.Empty<ReportingReportInfo>());
+
+        queryMock.Setup(q => q.TopN(It.IsAny<int>())).Returns(queryMock.Object);
+        queryMock.Setup(q => q.WhereEquals(It.IsAny<string>(), It.IsAny<object>())).Returns(queryMock.Object);
+        queryMock.As<IQueryable<ReportingReportInfo>>().SetupGet(q => q.Provider).Returns(emptyQuery.Provider);
+        queryMock.As<IQueryable<ReportingReportInfo>>().SetupGet(q => q.Expression).Returns(emptyQuery.Expression);
+        queryMock.As<IQueryable<ReportingReportInfo>>().SetupGet(q => q.ElementType).Returns(emptyQuery.ElementType);
+        queryMock.As<IEnumerable<ReportingReportInfo>>().Setup(q => q.GetEnumerator()).Returns(emptyQuery.GetEnumerator());
+        providerMock.Setup(p => p.Get()).Returns(queryMock.Object);
+
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            Mock.Of<ISqlBrowserResultProvider>(),
+            Mock.Of<ISqlBrowserExporter>(),
+            providerMock.Object)!;
+
+        var method = _type.GetMethod("DeleteQuery")!;
+
+        var response = InvokeTaskResult(instance, method, 99);
+        var value = GetResponseValue(response!);
+
+        Assert.That(value, Is.Null);
+        providerMock.Verify(p => p.Get(), Times.Once);
+    }
+
+    [Test]
+    public void UpdateQuery_Returns_Error_When_Input_Is_Invalid()
+    {
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            Mock.Of<ISqlBrowserResultProvider>(),
+            Mock.Of<ISqlBrowserExporter>(),
+            Mock.Of<IInfoProvider<ReportingReportInfo>>())!;
+
+        var method = _type.GetMethod("UpdateQuery")!;
+        var model = new SavedQuery { ID = 0, Text = "SELECT 1" };
+
+        var response = InvokeTaskResult(instance, method, model);
+        var value = GetResponseValue(response!);
+
+        Assert.That(value, Is.Null);
+    }
+
+    [Test]
+    public void UpdateQuery_Returns_Error_When_Query_Is_Not_Found()
+    {
+        var providerMock = new Mock<IInfoProvider<ReportingReportInfo>>();
+        var queryMock = new Mock<ObjectQuery<ReportingReportInfo>>();
+        IQueryable<ReportingReportInfo> emptyQuery = new EnumerableQuery<ReportingReportInfo>(Array.Empty<ReportingReportInfo>());
+
+        queryMock.Setup(q => q.TopN(It.IsAny<int>())).Returns(queryMock.Object);
+        queryMock.Setup(q => q.WhereEquals(It.IsAny<string>(), It.IsAny<object>())).Returns(queryMock.Object);
+        queryMock.As<IQueryable<ReportingReportInfo>>().SetupGet(q => q.Provider).Returns(emptyQuery.Provider);
+        queryMock.As<IQueryable<ReportingReportInfo>>().SetupGet(q => q.Expression).Returns(emptyQuery.Expression);
+        queryMock.As<IQueryable<ReportingReportInfo>>().SetupGet(q => q.ElementType).Returns(emptyQuery.ElementType);
+        queryMock.As<IEnumerable<ReportingReportInfo>>().Setup(q => q.GetEnumerator()).Returns(emptyQuery.GetEnumerator());
+        providerMock.Setup(p => p.Get()).Returns(queryMock.Object);
+
+        var instance = Activator.CreateInstance(
+            _type,
+            Mock.Of<IEventLogService>(),
+            Mock.Of<ISqlBrowserResultProvider>(),
+            Mock.Of<ISqlBrowserExporter>(),
+            providerMock.Object)!;
+
+        var method = _type.GetMethod("UpdateQuery")!;
+        var model = new SavedQuery { ID = 99, Name = "Updated", Text = "SELECT 1" };
+
+        var response = InvokeTaskResult(instance, method, model);
+        var value = GetResponseValue(response!);
+
+        Assert.That(value, Is.Null);
+        providerMock.Verify(p => p.Get(), Times.Once);
+    }
     [Test]
     public void RenameQuery_Method_Exists()
     {
