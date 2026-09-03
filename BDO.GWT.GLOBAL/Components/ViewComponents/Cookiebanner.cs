@@ -13,21 +13,15 @@ public class Cookiebanner : ViewComponent
     private readonly ICookieBannerService _cookiebannerService;
     private readonly IInfoProvider<GlobalsettingskeyInfo> _provider;
     private readonly IInfoProvider<WebChannelSnippetInfo> _siteProvider;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
-    private readonly IInfoProvider<WebChannelSettingsInfo> _webChannelSettingsInfoProvider;
 
     public Cookiebanner(
         ICookieBannerService cookiebannerService,
-        IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider,
-        IWebsiteChannelContext websiteChannelContext,
         IInfoProvider<GlobalsettingskeyInfo> provider,
         IInfoProvider<WebChannelSnippetInfo> siteProvider)
     {
         _cookiebannerService = cookiebannerService;
         _provider = provider;
         _siteProvider = siteProvider;
-        _websiteChannelContext = websiteChannelContext;
-        _webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
     }
 
     public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken)

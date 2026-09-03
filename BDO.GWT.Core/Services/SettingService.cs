@@ -14,7 +14,6 @@ public class SettingService : ISettingService
 {
     private readonly IInfoProvider<GlobalsettingskeyInfo> _provider;
     private readonly IInfoProvider<WebChannelSnippetInfo> _siteProvider;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly IInfoProvider<WebChannelSettingsInfo> _webChannelSettingsInfoProvider;
     private readonly IContentService _contentService;
 
@@ -27,7 +26,6 @@ public class SettingService : ISettingService
     {
         _provider = provider;
         _siteProvider = siteProvider;
-        _websiteChannelContext = websiteChannelContext;
         _webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
         _contentService = contentService;
     }
@@ -79,6 +77,9 @@ public class SettingService : ISettingService
         return new[] { Merge(snippet, global) };
     }
 
+    private static T Pick<T>(bool inheritFromGlobal, T globalValue, T snippetValue) =>
+        inheritFromGlobal ? globalValue : snippetValue;
+
     private static WebChannelSnippetInfo Merge(WebChannelSnippetInfo snippet, GlobalsettingskeyInfo? global)
     {
         if (global == null)
@@ -93,53 +94,53 @@ public class SettingService : ISettingService
             WebSettingsGUID = snippet.WebSettingsGUID,
 
             // Script fields
-            ScriptHeadKeyValue = snippet.ScriptHeadInheritfromglobalsettings ? global.ScriptHeadKeyValue : snippet.ScriptHeadKeyValue,
-            ScriptsTopofPageHeadKeyValue = snippet.ScriptsTopofPageInheritfromglobalsetting ? global.ScriptsTopofPageHeadKeyValue : snippet.ScriptsTopofPageHeadKeyValue,
-            ScriptinbottomofBodyKeyValue = snippet.ScriptinbottomofBodyInheritFromGlobal ? global.ScriptinbottomofBodyKeyValue : snippet.ScriptinbottomofBodyKeyValue,
-            ScriptinTopofBodyKeyValue = snippet.ScriptinTopofBodyInheritfromglobal ? global.ScriptinTopofBodyKeyValue : snippet.ScriptinTopofBodyKeyValue,
-            ScriptexecutedwhencookiesareacceptedKeyValue = snippet.ScriptexecutedwhencookiesareacceptedInheritfromglobal ? global.ScriptexecutedwhencookiesareacceptedKeyValue : snippet.ScriptexecutedwhencookiesareacceptedKeyValue,
-            MarketoMunchkinCodeKeyValue = snippet.MarketoMunchkinCodeInheritfromglobal ? global.MarketoMunchkinCodeKeyValue : snippet.MarketoMunchkinCodeKeyValue,
+            ScriptHeadKeyValue = Pick(snippet.ScriptHeadInheritfromglobalsettings, global.ScriptHeadKeyValue, snippet.ScriptHeadKeyValue),
+            ScriptsTopofPageHeadKeyValue = Pick(snippet.ScriptsTopofPageInheritfromglobalsetting, global.ScriptsTopofPageHeadKeyValue, snippet.ScriptsTopofPageHeadKeyValue),
+            ScriptinbottomofBodyKeyValue = Pick(snippet.ScriptinbottomofBodyInheritFromGlobal, global.ScriptinbottomofBodyKeyValue, snippet.ScriptinbottomofBodyKeyValue),
+            ScriptinTopofBodyKeyValue = Pick(snippet.ScriptinTopofBodyInheritfromglobal, global.ScriptinTopofBodyKeyValue, snippet.ScriptinTopofBodyKeyValue),
+            ScriptexecutedwhencookiesareacceptedKeyValue = Pick(snippet.ScriptexecutedwhencookiesareacceptedInheritfromglobal, global.ScriptexecutedwhencookiesareacceptedKeyValue, snippet.ScriptexecutedwhencookiesareacceptedKeyValue),
+            MarketoMunchkinCodeKeyValue = Pick(snippet.MarketoMunchkinCodeInheritfromglobal, global.MarketoMunchkinCodeKeyValue, snippet.MarketoMunchkinCodeKeyValue),
 
             // Email
-            FromEmail = snippet.FromEmailInheritfromglobal ? global.FromEmail : snippet.FromEmail,
+            FromEmail = Pick(snippet.FromEmailInheritfromglobal, global.FromEmail, snippet.FromEmail),
             DisplayName = snippet.DisplayName,
 
             // Calendar
-            Minutestotriggercalendarreminder = snippet.MinutestotriggercalendarreminderInheritfromglobal ? global.Minutestotriggercalendarreminder : snippet.Minutestotriggercalendarreminder,
+            Minutestotriggercalendarreminder = Pick(snippet.MinutestotriggercalendarreminderInheritfromglobal, global.Minutestotriggercalendarreminder, snippet.Minutestotriggercalendarreminder),
 
             // Sidebar / location
-            Displaylocationtitleinasidebar = snippet.DisplaylocationtitleinasidebarInheritfromglobal ? global.Displaylocationtitleinasidebar : snippet.Displaylocationtitleinasidebar,
+            Displaylocationtitleinasidebar = Pick(snippet.DisplaylocationtitleinasidebarInheritfromglobal, global.Displaylocationtitleinasidebar, snippet.Displaylocationtitleinasidebar),
 
             // Character dictionary
-            NonASCIItoASCIIcharacterdictionary = snippet.NonASCIItoASCIIcharacterdictionaryInheritfromglobal ? global.NonASCIItoASCIIcharacterdictionary : snippet.NonASCIItoASCIIcharacterdictionary,
+            NonASCIItoASCIIcharacterdictionary = Pick(snippet.NonASCIItoASCIIcharacterdictionaryInheritfromglobal, global.NonASCIItoASCIIcharacterdictionary, snippet.NonASCIItoASCIIcharacterdictionary),
 
             // External link warning
-            Enableexternallinkwarning = snippet.EnableexternallinkwarningInheritfromlocal ? global.Enableexternallinkwarning : snippet.Enableexternallinkwarning,
+            Enableexternallinkwarning = Pick(snippet.EnableexternallinkwarningInheritfromlocal, global.Enableexternallinkwarning, snippet.Enableexternallinkwarning),
 
             // SEO
-            SeoSettingsRobots = snippet.SeoSettingsRobotsInheritfromglobal ? global.SeoSettingsRobots : snippet.SeoSettingsRobots,
-            SeoSettingsSecurity = snippet.SeoSettingsSecurityInheritfromGlobal ? global.SeoSettingsSecurity : snippet.SeoSettingsSecurity,
+            SeoSettingsRobots = Pick(snippet.SeoSettingsRobotsInheritfromglobal, global.SeoSettingsRobots, snippet.SeoSettingsRobots),
+            SeoSettingsSecurity = Pick(snippet.SeoSettingsSecurityInheritfromGlobal, global.SeoSettingsSecurity, snippet.SeoSettingsSecurity),
 
             // Print / share
-            DisableDownload = snippet.DisableDownloadInheritfromglobal ? global.DisableDownload : snippet.DisableDownload,
-            DisablePrint = snippet.DisablePrintInheritfromglobal ? global.DisablePrint : snippet.DisablePrint,
-            DisableFacebook = snippet.DisableFacebookInheritfromglobal ? global.DisableFacebook : snippet.DisableFacebook,
-            DisableTwitter = snippet.DisableTwitterInheritfromglobal ? global.DisableTwitter : snippet.DisableTwitter,
-            DisableLinkedIn = snippet.DisableLinkedInInheritfromglobal ? global.DisableLinkedIn : snippet.DisableLinkedIn,
-            DisableEmail = snippet.DisableEmailInheritfromglobal ? global.DisableEmail : snippet.DisableEmail,
-            DisableCopyLinkButton = snippet.DisableCopyLinkButtonInheritfromglobal ? global.DisableCopyLinkButton : snippet.DisableCopyLinkButton,
+            DisableDownload = Pick(snippet.DisableDownloadInheritfromglobal, global.DisableDownload, snippet.DisableDownload),
+            DisablePrint = Pick(snippet.DisablePrintInheritfromglobal, global.DisablePrint, snippet.DisablePrint),
+            DisableFacebook = Pick(snippet.DisableFacebookInheritfromglobal, global.DisableFacebook, snippet.DisableFacebook),
+            DisableTwitter = Pick(snippet.DisableTwitterInheritfromglobal, global.DisableTwitter, snippet.DisableTwitter),
+            DisableLinkedIn = Pick(snippet.DisableLinkedInInheritfromglobal, global.DisableLinkedIn, snippet.DisableLinkedIn),
+            DisableEmail = Pick(snippet.DisableEmailInheritfromglobal, global.DisableEmail, snippet.DisableEmail),
+            DisableCopyLinkButton = Pick(snippet.DisableCopyLinkButtonInheritfromglobal, global.DisableCopyLinkButton, snippet.DisableCopyLinkButton),
 
             // Filtering
-            Showtooltip = snippet.ShowtooltipInheritfromglobal ? global.Showtooltip : snippet.Showtooltip,
+            Showtooltip = Pick(snippet.ShowtooltipInheritfromglobal, global.Showtooltip, snippet.Showtooltip),
 
             // People
-            DisplayEmailinvCard = snippet.DisplayEmailinvCardInheritfromglobal ? global.DisplayEmailinvCard : snippet.DisplayEmailinvCard,
-            UsePageTitleToDisplayPersonName = snippet.UsePageTitleToDisplayPersonNameInheritfromglobal ? global.UsePageTitleToDisplayPersonName : snippet.UsePageTitleToDisplayPersonName,
+            DisplayEmailinvCard = Pick(snippet.DisplayEmailinvCardInheritfromglobal, global.DisplayEmailinvCard, snippet.DisplayEmailinvCard),
+            UsePageTitleToDisplayPersonName = Pick(snippet.UsePageTitleToDisplayPersonNameInheritfromglobal, global.UsePageTitleToDisplayPersonName, snippet.UsePageTitleToDisplayPersonName),
 
             // Cookiebot
-            EnableCookiebot = snippet.EnableCookiebotInheritfromglobal ? global.EnableCookiebot : snippet.EnableCookiebot,
-            CookieID = snippet.CookieIDInheritfromglobal ? global.CookieID : snippet.CookieID,
-            CustomCookiebotScript = snippet.CustomCookiebotScriptInheritfromglobal ? global.CustomCookiebotScript : snippet.CustomCookiebotScript,
+            EnableCookiebot = Pick(snippet.EnableCookiebotInheritfromglobal, global.EnableCookiebot, snippet.EnableCookiebot),
+            CookieID = Pick(snippet.CookieIDInheritfromglobal, global.CookieID, snippet.CookieID),
+            CustomCookiebotScript = Pick(snippet.CustomCookiebotScriptInheritfromglobal, global.CustomCookiebotScript, snippet.CustomCookiebotScript),
 
             // Preserve inherit flags as-is (informational)
             ScriptHeadInheritfromglobalsettings = snippet.ScriptHeadInheritfromglobalsettings,

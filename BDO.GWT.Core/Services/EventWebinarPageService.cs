@@ -38,8 +38,6 @@ public partial class EventWebinarPageService : IEventWebinarPageService
 {
     private readonly IInfoProvider<GlobalsettingskeyInfo> _provider;
     private readonly IInfoProvider<WebChannelSnippetInfo> _siteProvider;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
-    private readonly IInfoProvider<WebChannelSettingsInfo> _webChannelSettingsInfoProvider;
     private readonly IPreferredLanguageRetriever _preferredLanguageRetriever;
     private readonly IContentService _contentRetriever;
     private readonly IWebPageUrlRetriever _pageUrlRetriever;
@@ -47,20 +45,16 @@ public partial class EventWebinarPageService : IEventWebinarPageService
 
     public EventWebinarPageService(
         IContentService contentRetriever,
-        IWebsiteChannelContext websiteChannelContext,
         IWebPageUrlRetriever pageUrlRetriever,
-        IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider,
         IInfoProvider<GlobalsettingskeyInfo> provider,
-        IInfoProvider<WebChannelSnippetInfo> siteProvider,     
+        IInfoProvider<WebChannelSnippetInfo> siteProvider,
         IPreferredLanguageRetriever preferredLanguageRetriever,
         ISocialMediaButtonsService socialMediaButtonsService)
     {
         _contentRetriever = contentRetriever;
-        _websiteChannelContext = websiteChannelContext;
         _pageUrlRetriever = pageUrlRetriever;
         _provider = provider;
         _siteProvider = siteProvider;
-        _webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
         _preferredLanguageRetriever = preferredLanguageRetriever;
         _socialMediaButtonsService = socialMediaButtonsService;
     }
@@ -650,7 +644,7 @@ public partial class EventWebinarPageService : IEventWebinarPageService
         int minutesToTrigger;
         if (channelSetting == null || channelSetting.MinutestotriggercalendarreminderInheritfromglobal)
         {
-            globalSetting ??= _provider.Get().TopN(1).FirstOrDefault();
+            globalSetting = _provider.Get().TopN(1).FirstOrDefault();
             minutesToTrigger = globalSetting?.Minutestotriggercalendarreminder ?? 0;
         }
         else

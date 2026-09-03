@@ -18,9 +18,7 @@ namespace BDO.GWT.Core.Tests.Services
     public class EventWebinarPageServiceTests
     {
         private Mock<IContentService> _contentServiceMock = null!;
-        private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
         private Mock<IWebPageUrlRetriever> _pageUrlRetrieverMock = null!;
-        private Mock<IInfoProvider<WebChannelSettingsInfo>> _webChannelSettingsInfoProviderMock = null!;
         private Mock<IInfoProvider<GlobalsettingskeyInfo>> _globalSettingsKeyInfoProviderMock = null!;
         private Mock<IInfoProvider<WebChannelSnippetInfo>> _webChannelSnippetInfoProviderMock = null!;
         private Mock<IPreferredLanguageRetriever> _preferredLanguageRetrieverMock = null!;
@@ -31,17 +29,11 @@ namespace BDO.GWT.Core.Tests.Services
         public void Setup()
         {
             _contentServiceMock = new Mock<IContentService>();
-            _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
             _pageUrlRetrieverMock = new Mock<IWebPageUrlRetriever>();
-            _webChannelSettingsInfoProviderMock = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
             _globalSettingsKeyInfoProviderMock = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
             _webChannelSnippetInfoProviderMock = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
             _preferredLanguageRetrieverMock = new Mock<IPreferredLanguageRetriever>();
             _socialMediaButtonsServiceMock = new Mock<ISocialMediaButtonsService>();
-
-            _websiteChannelContextMock
-                .Setup(x => x.WebsiteChannelID)
-                .Returns(1);
 
             // EventnWebinarSetting() calls _eventInfoProvider.Get().WhereEquals(...).TopN(1).FirstOrDefault()
             // ObjectQuery<T> is a concrete Kentico class that cannot be Moq-mocked as an interface.
@@ -71,9 +63,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             _service = new EventWebinarPageService(
                 _contentServiceMock.Object,
-                _websiteChannelContextMock.Object,
                 _pageUrlRetrieverMock.Object,
-                _webChannelSettingsInfoProviderMock.Object,
                 _globalSettingsKeyInfoProviderMock.Object,
                 _webChannelSnippetInfoProviderMock.Object,
                 _preferredLanguageRetrieverMock.Object,
@@ -184,9 +174,7 @@ namespace BDO.GWT.Core.Tests.Services
             Assert.Multiple(() =>
             {
                 Assert.That(parameters, Has.Member(typeof(IContentService)));
-                Assert.That(parameters, Has.Member(typeof(IWebsiteChannelContext)));
                 Assert.That(parameters, Has.Member(typeof(IWebPageUrlRetriever)));
-                Assert.That(parameters, Has.Member(typeof(IInfoProvider<WebChannelSettingsInfo>)));
                 Assert.That(parameters, Has.Member(typeof(IInfoProvider<GlobalsettingskeyInfo>)));
                 Assert.That(parameters, Has.Member(typeof(IInfoProvider<WebChannelSnippetInfo>)));
                 Assert.That(parameters, Has.Member(typeof(IPreferredLanguageRetriever)));

@@ -52,10 +52,6 @@ public class SiteConfigurationService : ISiteConfigurationService
     private readonly ICachingService _cachingService;
     private readonly ISiteContext _siteContext;
     private readonly SiteConfigurationProviders _providers;
-    private readonly IInfoProvider<WebChannelSnippetInfo> _webChannelSnippetInfoProvider;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
-    private readonly IInfoProvider<WebChannelSettingsInfo> _webChannelSettingsInfoProvider;
-    private readonly IInfoProvider<GlobalsettingskeyInfo> _provider;
     public SiteConfigurationService(
         ICachingService cachingService,
         IContentQueryExecutor executor,
@@ -132,17 +128,16 @@ public class SiteConfigurationService : ISiteConfigurationService
             return settings;
         }
        
-        var generalSetting = _webChannelSnippetInfoProvider.Get()
-            .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID), webChannelSettings?.WebChannelSettingsID ?? 0)
+        var generalSetting = _providers.webChannelSnippetInfoProvider.Get()
+            .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID), webChannelSettings.WebChannelSettingsID)
             .FirstOrDefault();
 
         if (generalSetting != null)
         {
             if (generalSetting.EnableexternallinkwarningInheritfromlocal)
             {
-                var GlobalgeneralSetting = _provider.Get().FirstOrDefault();
-                settings.ExternalLinkWarningEnabled = GlobalgeneralSetting.Enableexternallinkwarning;
-
+                var globalGeneralSetting = _providers.provider.Get().FirstOrDefault();
+                settings.ExternalLinkWarningEnabled = globalGeneralSetting?.Enableexternallinkwarning ?? false;
             }
             else
             {

@@ -9,8 +9,6 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 {
     public class CookiebotTests
     {
-        private Mock<IInfoProvider<WebChannelSettingsInfo>> _webChannelSettingsInfoProviderMock;
-        private Mock<IWebsiteChannelContext> _websiteChannelContextMock;
         private Mock<IInfoProvider<GlobalsettingskeyInfo>> _providerMock;
         private Mock<IInfoProvider<WebChannelSnippetInfo>> _siteProviderMock;
         private Cookiebot _component;
@@ -18,14 +16,10 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
         [SetUp]
         public void Setup()
         {
-            _webChannelSettingsInfoProviderMock = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
-            _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
             _providerMock = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
             _siteProviderMock = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
 
             _component = new Cookiebot(
-                _webChannelSettingsInfoProviderMock.Object,
-                _websiteChannelContextMock.Object,
                 _providerMock.Object,
                 _siteProviderMock.Object);
         }

@@ -14,19 +14,13 @@ public class Cookiebot : ViewComponent
 {
     private readonly IInfoProvider<GlobalsettingskeyInfo> _provider;
     private readonly IInfoProvider<WebChannelSnippetInfo> _siteProvider;
-    private readonly IWebsiteChannelContext _websiteChannelContext;
-    private readonly IInfoProvider<WebChannelSettingsInfo> _webChannelSettingsInfoProvider;
 
     public Cookiebot(
-        IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider,
-        IWebsiteChannelContext websiteChannelContext,
         IInfoProvider<GlobalsettingskeyInfo> provider,
         IInfoProvider<WebChannelSnippetInfo> siteProvider)
     {
         _provider = provider;
         _siteProvider = siteProvider;
-        _websiteChannelContext = websiteChannelContext;
-        _webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
     }
 
     public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken)
