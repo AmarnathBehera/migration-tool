@@ -29,7 +29,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
                 _siteProviderMock.Object);
         }
 
-        private static Mock<ObjectQuery<T>> BuildQuery<T>(IEnumerable<T> items)
+        private static Mock<ObjectQuery<T>> BuildQuery<T>(List<T> items)
             where T : BaseInfo
         {
             var mockQuery = new Mock<ObjectQuery<T>>();
@@ -58,8 +58,11 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
             var result = await _component.InvokeAsync(CancellationToken.None) as ViewViewComponentResult;
 
             Assert.That(result, Is.Not.Null);
-            Assert.That(result!.ViewName, Is.EqualTo("~/Views/Shared/Components/Cookiebanner/Default.cshtml"));
-            Assert.That(result.ViewData?.Model, Is.SameAs(dto));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result!.ViewName, Is.EqualTo("~/Views/Shared/Components/Cookiebanner/Default.cshtml"));
+                Assert.That(result.ViewData?.Model, Is.SameAs(dto));
+            });
         }
 
         [Test]
