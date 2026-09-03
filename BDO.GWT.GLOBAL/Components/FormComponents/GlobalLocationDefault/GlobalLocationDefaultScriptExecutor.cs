@@ -1,3 +1,4 @@
+using BDO.GWT.Core.Services;
 using CMS.DataEngine;
 using System;
 using System.Threading.Tasks;
@@ -6,16 +7,29 @@ namespace BDO.GWT.GLOBAL.Components.FormComponents.GlobalLocationDefault
 {
     public class GlobalLocationDefaultScriptExecutor
     {
-        public Task<String> ExecuteAsync(string sql)
+        public readonly ISettingService _settingService;
+
+        public GlobalLocationDefaultScriptExecutor(ISettingService settingService)
         {
-            if (string.IsNullOrWhiteSpace(sql))
-                return Task.FromResult(string.Empty);
+            _settingService = settingService;
+        }
+        public async Task<String> ExecuteAsync(string settingName)
+        {
+            if (string.IsNullOrWhiteSpace(settingName))
+                return string.Empty;
 
-            var ds = ConnectionHelper.ExecuteQuery(sql, null, QueryTypeEnum.SQLQuery);
+            var globalLocationInfo = await _settingService.GetGlobalSettingAsync();
+            string results = " ";
+            if (settingName == "Title")
+            {
+                results = globalLocationInfo?.GlobalLocationsTitle ?? string.Empty;
+            }
+            else if (settingName == "Description")
+            {
+                results = globalLocationInfo?.GlobalLocationsDescription ?? string.Empty;
+            }
 
-            var results = "fghjk";
-
-            return Task.FromResult<string>(results);
+            return results;
         }
     }
 }
