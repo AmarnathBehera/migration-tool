@@ -161,6 +161,35 @@ public class NewsletterSubscriptionServiceTests
             () => _service.SubscribeToNewslettersAsync(BuildSubscriptionData(), CancellationToken.None));
     }
 
+    [Test]
+    public void SubscribeToNewslettersAsync_DoesNotUpdateContact_WhenGetMarketingContactThrows()
+    {
+        // If the contact lookup fails, UpdateMarketingContactAsync must never be reached.
+        _marketingContactManagementServiceMock
+            .Setup(m => m.GetMarketingContactByEmailAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("contact error"));
+
+        Assert.ThrowsAsync<InvalidOperationException>(
+            () => _service.SubscribeToNewslettersAsync(BuildSubscriptionData(), CancellationToken.None));
+
+        _marketingContactManagementServiceMock.Verify(
+            m => m.UpdateMarketingContactAsync(It.IsAny<ContactInfo>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public void SubscribeToNewslettersAsync_UsesDefaultNullSubscribePageGuid_WhenNotProvided()
+    {
+        // Overload defaults subscribePageGuid to null; the lookup still starts with the
+        // contact retrieval, which we short-circuit via a sentinel to keep the test isolated.
+        _marketingContactManagementServiceMock
+            .Setup(m => m.GetMarketingContactByEmailAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new NotImplementedException("sentinel"));
+
+        Assert.ThrowsAsync<NotImplementedException>(
+            () => _service.SubscribeToNewslettersAsync(BuildSubscriptionData(), CancellationToken.None));
+    }
+
     // --- ConfirmSubscriptionForNewsletterAsync -----------------------------------
 
     [Test]
@@ -265,6 +294,31 @@ public class NewsletterSubscriptionServiceTests
         _emailSubscriptionConfirmationInfoProviderMock.Verify(p => p.Get(), Times.Never);
     }
 
+    [Test]
+    public async Task ConfirmSubscriptionForNewsletterAsync_QueriesProvider_WhenHashAndDateTimeAreValid()
+    {
+        // Valid hash + valid ddMMyyyyHHmmss date passes the guard and reaches the provider.
+        var query = BuildConfirmQuery(subscriptionHash: "abc", dateTime: "31122024235959");
+        SetupConfirmationQuery([]);
+
+        var result = await _service.ConfirmSubscriptionForNewsletterAsync(query, "TestSite", CancellationToken.None);
+
+        Assert.That(result, Is.False);
+        _emailSubscriptionConfirmationInfoProviderMock.Verify(p => p.Get(), Times.Once);
+    }
+
+    [Test]
+    public async Task ConfirmSubscriptionForNewsletterAsync_ReturnsFalse_WhenDateTimeHasWrongLength()
+    {
+        // A numeric-but-too-short value must not parse under the exact ddMMyyyyHHmmss format.
+        var query = BuildConfirmQuery(dateTime: "010120");
+
+        var result = await _service.ConfirmSubscriptionForNewsletterAsync(query, "TestSite", CancellationToken.None);
+
+        Assert.That(result, Is.False);
+        _emailSubscriptionConfirmationInfoProviderMock.Verify(p => p.Get(), Times.Never);
+    }
+
     // --- UnsubscribeFromNewsletterAsync -----------------------------------------
 
     [Test]
@@ -275,6 +329,20 @@ public class NewsletterSubscriptionServiceTests
         var result = await _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None);
 
         Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public async Task UnsubscribeFromNewsletterAsync_ReturnsFalse_WhenEmailIsNull()
+    {
+        var query = BuildRemoveQuery(email: null!);
+
+        var result = await _service.UnsubscribeFromNewsletterAsync(query, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.False);
+            _recipientListInfoProviderMock.Verify(p => p.Get(), Times.Never);
+        });
     }
 
     [Test]

@@ -119,4 +119,51 @@ public class SettingServiceTests
         Assert.ThrowsAsync<InvalidOperationException>(() => _service.GetPrintorShareInfo());
     }
 
+    // --- Snippet lookup + Merge (documented limitation) --------------------------
+    //
+    // The snippet-found path and the Merge(...) projection cannot be exercised as unit
+    // tests. The service resolves query results via Kentico's GetEnumerableTypedResultAsync,
+    // which is an EXTENSION method (not virtual) on ObjectQuery<T>; Moq cannot intercept it,
+    // so a mocked query cannot be made to yield a populated list. As a result the mocked
+    // channel-settings chain always resolves to "no channel setting", and execution returns
+    // before reaching the snippet lookup or Merge.
+    //
+    // Additionally, Merge builds a `new WebChannelSnippetInfo { ... }`, whose DatabaseField
+    // setters route through AbstractInfoBase.SetValue -> the CMS IoC container, which is not
+    // initialized in unit tests. These paths therefore require Kentico integration tests.
+
+    /// <summary>
+    /// Verifies the pure Merge behaviour that IS reachable in isolation: when there is no
+    /// global settings row, Merge returns the channel snippet unchanged (its early
+    /// `if (global == null) return snippet;` branch), without constructing a merged object.
+    /// Info subclasses provide plain backing storage so no CMS infrastructure is touched.
+    /// </summary>
+    [Test]
+    public void Merge_ReturnsSnippetUnchanged_WhenGlobalIsNull()
+    {
+        var snippet = new TestWebChannelSnippetInfo
+        {
+            WebChannelSnippetID = 42,
+            WebChannelSnippetWebChannelSettingsID = 5,
+            FromEmail = "channel@example.com",
+        };
+
+        var merge = typeof(SettingService).GetMethod(
+            "Merge",
+            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+
+        Assert.That(merge, Is.Not.Null, "Private static Merge(WebChannelSnippetInfo, GlobalsettingskeyInfo?) not found.");
+
+        var result = merge!.Invoke(null, [snippet, null]);
+
+        Assert.That(result, Is.SameAs(snippet));
+    }
+
+    private sealed class TestWebChannelSnippetInfo : WebChannelSnippetInfo
+    {
+        public override int WebChannelSnippetID { get; set; }
+        public override int WebChannelSnippetWebChannelSettingsID { get; set; }
+        public override string FromEmail { get; set; } = string.Empty;
+    }
+
 }
