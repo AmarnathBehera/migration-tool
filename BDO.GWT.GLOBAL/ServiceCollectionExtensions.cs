@@ -7,6 +7,7 @@ using BDO.GWT.Core.Services.Header;
 using BDO.GWT.CustomReportingModule.ReportingApp;
 using BDO.GWT.Domain.Core.Services;
 using BDO.GWT.GLOBAL.Components.FormComponents.CustomDropdown;
+using BDO.GWT.GLOBAL.Components.FormComponents.FetchGlobalSettingFieldData;
 using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Web.Services;
@@ -40,6 +41,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.ConfigureOptions<SEOOptionsSetup>();
         serviceCollection.AddScoped<IPageBuilderSectionService, PageBuilderSectionService>();
         serviceCollection.AddTransient<DropdownScriptExecutor>();
+        serviceCollection.AddTransient<IFetchGlobalSettingFieldDataProvider, FetchGlobalSettingFieldDataProvider>();
 
         serviceCollection.AddScoped<IChannelAccessService, ChannelAccessService>();
         serviceCollection.AddScoped<IMicrositeMasterPageService, MicrositeMasterPageService>();

@@ -3,6 +3,7 @@ using BDO.GWT.Common.Options;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Services.Header;
 using BDO.GWT.GLOBAL.Components.FormComponents.CustomDropdown;
+using BDO.GWT.GLOBAL.Components.FormComponents.FetchGlobalSettingFieldData;
 using BDO.GWT.GLOBAL.Services;
 using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Web.Core.Services;
@@ -102,6 +103,21 @@ public class ServiceCollectionExtensionsTests
         Assert.Multiple(() =>
         {
             Assert.That(descriptor!.ImplementationType, Is.EqualTo(typeof(DropdownScriptExecutor)));
+            Assert.That(descriptor.Lifetime, Is.EqualTo(ServiceLifetime.Transient));
+        });
+    }
+
+    [Test]
+    public void AddXperience_RegistersFetchGlobalSettingFieldDataProviderAsTransient()
+    {
+        _services.AddXperience();
+
+        var descriptor = _services.FirstOrDefault(sd => sd.ServiceType == typeof(IFetchGlobalSettingFieldDataProvider));
+
+        Assert.That(descriptor, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(descriptor!.ImplementationType, Is.EqualTo(typeof(FetchGlobalSettingFieldDataProvider)));
             Assert.That(descriptor.Lifetime, Is.EqualTo(ServiceLifetime.Transient));
         });
     }
