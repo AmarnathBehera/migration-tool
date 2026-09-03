@@ -142,17 +142,11 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
                         .AddErrorMessage("Received empty parameter"));
             }
 
-            var savedQuery = savedQueryProvider.Get()
-                .TopN(1)
-                .WhereEquals(nameof(ReportingReportInfo.ReportingReportID), query.ID)
-                .WhereEquals(nameof(ReportingReportInfo.ReportingReportChannelSettingsID), ReportingChannelSettingId)
-                .FirstOrDefault();
+            var savedQuery = GetSavedQuery(query.ID);
 
             if (savedQuery is null)
             {
-                return Task.FromResult(
-                    ResponseFrom<SavedQuery?>(null)
-                        .AddErrorMessage($"Query {query.ID} not found"));
+                return QueryNotFoundResponse(query.ID);
             }
 
             savedQuery.ReportingReportDisplayName = query.Name;
@@ -199,17 +193,11 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
                         .AddErrorMessage("Invalid query ID or empty query text"));
             }
 
-            var savedQuery = savedQueryProvider.Get()
-                .TopN(1)
-                .WhereEquals(nameof(ReportingReportInfo.ReportingReportID), query.ID)
-                .WhereEquals(nameof(ReportingReportInfo.ReportingReportChannelSettingsID), ReportingChannelSettingId)
-                .FirstOrDefault();
+            var savedQuery = GetSavedQuery(query.ID);
 
             if (savedQuery is null)
             {
-                return Task.FromResult(
-                    ResponseFrom<SavedQuery?>(null)
-                        .AddErrorMessage($"Query {query.ID} not found"));
+                return QueryNotFoundResponse(query.ID);
             }
 
             savedQuery.ReportingReportQuery = query.Text;
@@ -309,6 +297,18 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
 
             return ResponseFrom(true);
         }
+
+        private ReportingReportInfo? GetSavedQuery(int id) =>
+            savedQueryProvider.Get()
+                .TopN(1)
+                .WhereEquals(nameof(ReportingReportInfo.ReportingReportID), id)
+                .WhereEquals(nameof(ReportingReportInfo.ReportingReportChannelSettingsID), ReportingChannelSettingId)
+                .FirstOrDefault();
+
+        private Task<ICommandResponse<SavedQuery?>> QueryNotFoundResponse(int id) =>
+            Task.FromResult(
+                ResponseFrom<SavedQuery?>(null)
+                    .AddErrorMessage($"Query {id} not found"));
 
         [GeneratedRegex("[^a-zA-Z0-9_.-]")]
         private static partial Regex CodeNameSanitizer();
