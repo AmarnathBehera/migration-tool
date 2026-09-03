@@ -20,8 +20,9 @@ namespace BDO.GWT.Core.Tests.Services
         private Mock<IContentService> _contentServiceMock = null!;
         private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
         private Mock<IWebPageUrlRetriever> _pageUrlRetrieverMock = null!;
-        private Mock<IInfoProvider<EventsWebinarsInfo>> _eventInfoProviderMock = null!;
-        private Mock<IInfoProvider<GlobalEventsnWebinarsInfo>> _globalEventInfoProviderMock = null!;
+        private Mock<IInfoProvider<WebChannelSettingsInfo>> _webChannelSettingsInfoProviderMock = null!;
+        private Mock<IInfoProvider<GlobalsettingskeyInfo>> _globalSettingsKeyInfoProviderMock = null!;
+        private Mock<IInfoProvider<WebChannelSnippetInfo>> _webChannelSnippetInfoProviderMock = null!;
         private Mock<IPreferredLanguageRetriever> _preferredLanguageRetrieverMock = null!;
         private Mock<ISocialMediaButtonsService> _socialMediaButtonsServiceMock = null!;
         private EventWebinarPageService _service = null!;
@@ -32,8 +33,9 @@ namespace BDO.GWT.Core.Tests.Services
             _contentServiceMock = new Mock<IContentService>();
             _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
             _pageUrlRetrieverMock = new Mock<IWebPageUrlRetriever>();
-            _eventInfoProviderMock = new Mock<IInfoProvider<EventsWebinarsInfo>>();
-            _globalEventInfoProviderMock = new Mock<IInfoProvider<GlobalEventsnWebinarsInfo>>();
+            _webChannelSettingsInfoProviderMock = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
+            _globalSettingsKeyInfoProviderMock = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
+            _webChannelSnippetInfoProviderMock = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
             _preferredLanguageRetrieverMock = new Mock<IPreferredLanguageRetriever>();
             _socialMediaButtonsServiceMock = new Mock<ISocialMediaButtonsService>();
 
@@ -71,8 +73,9 @@ namespace BDO.GWT.Core.Tests.Services
                 _contentServiceMock.Object,
                 _websiteChannelContextMock.Object,
                 _pageUrlRetrieverMock.Object,
-                _eventInfoProviderMock.Object,
-                _globalEventInfoProviderMock.Object,
+                _webChannelSettingsInfoProviderMock.Object,
+                _globalSettingsKeyInfoProviderMock.Object,
+                _webChannelSnippetInfoProviderMock.Object,
                 _preferredLanguageRetrieverMock.Object,
                 _socialMediaButtonsServiceMock.Object);
         }
@@ -183,8 +186,9 @@ namespace BDO.GWT.Core.Tests.Services
                 Assert.That(parameters, Has.Member(typeof(IContentService)));
                 Assert.That(parameters, Has.Member(typeof(IWebsiteChannelContext)));
                 Assert.That(parameters, Has.Member(typeof(IWebPageUrlRetriever)));
-                Assert.That(parameters, Has.Member(typeof(IInfoProvider<EventsWebinarsInfo>)));
-                Assert.That(parameters, Has.Member(typeof(IInfoProvider<GlobalEventsnWebinarsInfo>)));
+                Assert.That(parameters, Has.Member(typeof(IInfoProvider<WebChannelSettingsInfo>)));
+                Assert.That(parameters, Has.Member(typeof(IInfoProvider<GlobalsettingskeyInfo>)));
+                Assert.That(parameters, Has.Member(typeof(IInfoProvider<WebChannelSnippetInfo>)));
                 Assert.That(parameters, Has.Member(typeof(IPreferredLanguageRetriever)));
                 Assert.That(parameters, Has.Member(typeof(ISocialMediaButtonsService)));
             });

@@ -14,6 +14,7 @@ public class SEOOptionsSetup : IConfigureOptions<SEOOptions>
 
     public SEOOptionsSetup(IInfoProvider<GlobalsettingskeyInfo> provider,IInfoProvider<WebChannelSnippetInfo> webChannelSnippetInfoProvider, IWebsiteChannelContext websiteChannelContext, IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider)
     {
+        this._provider = provider;
         this.webChannelSnippetInfoProvider = webChannelSnippetInfoProvider;
         this.websiteChannelContext = websiteChannelContext;
         this.webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
@@ -31,7 +32,7 @@ public class SEOOptionsSetup : IConfigureOptions<SEOOptions>
         var seoSettings = webChannelSnippetInfoProvider.Get()
             .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID), channelSettings?.WebChannelSettingsID ?? 0)
             .FirstOrDefault();
-        if(seoSettings.SeoSettingsRobotsInheritfromglobal)
+        if(seoSettings?.SeoSettingsRobotsInheritfromglobal ?? true)
         {
             var globalSettings = _provider.Get().FirstOrDefault();
             options.RobotsText = globalSettings?.SeoSettingsRobots ?? string.Empty;
@@ -40,7 +41,7 @@ public class SEOOptionsSetup : IConfigureOptions<SEOOptions>
         {
             options.RobotsText = seoSettings?.SeoSettingsRobots ?? string.Empty;
         }
-        if(seoSettings.SeoSettingsSecurityInheritfromGlobal)
+        if(seoSettings?.SeoSettingsSecurityInheritfromGlobal ?? true)
         {
             var globalSettings = _provider.Get().FirstOrDefault();
             options.SecurityText = globalSettings?.SeoSettingsRobots ?? string.Empty;

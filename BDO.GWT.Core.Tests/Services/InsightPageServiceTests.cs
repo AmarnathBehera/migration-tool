@@ -54,11 +54,11 @@ public class InsightPageServiceTests
 
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
-            .ReturnsAsync(default(IEnumerable<PrintorShareInfo>)!);
+            .ReturnsAsync(default(IEnumerable<WebChannelSnippetInfo>)!);
 
         _settingServiceMock
             .Setup(x => x.GetUsePersonPageTitleInfo())
-            .ReturnsAsync(default(IEnumerable<OurPeopleInfo>)!);
+            .ReturnsAsync(default(IEnumerable<WebChannelSnippetInfo>)!);
 
         _contentServiceMock
             .Setup(x => x.GetCurrentSiteLogoImageUrlAsync())
@@ -509,7 +509,7 @@ public class InsightPageServiceTests
 
     private void SetupUsePersonPageTitleSetting(bool usePageTitle)
     {
-        var setting = new TestOurPeopleInfo
+        var setting = new WebChannelSnippetInfo
         {
             UsePageTitleToDisplayPersonName = usePageTitle
         };
@@ -517,18 +517,6 @@ public class InsightPageServiceTests
         _settingServiceMock
             .Setup(x => x.GetUsePersonPageTitleInfo())
             .ReturnsAsync(new[] { setting });
-    }
-
-    private sealed class TestOurPeopleInfo : OurPeopleInfo
-    {
-        public override bool UsePageTitleToDisplayPersonName { get; set; }
-    }
-
-    private sealed class TestPrintorShareInfo : PrintorShareInfo
-    {
-        public override bool DisableDownload { get; set; }
-        public override bool DisablePrint { get; set; }
-        public override bool DisableCopyLinkButton { get; set; }
     }
 
     private void SetupCopyLinkSection(
