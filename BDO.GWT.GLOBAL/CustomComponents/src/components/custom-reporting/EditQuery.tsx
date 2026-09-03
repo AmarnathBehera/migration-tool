@@ -291,12 +291,6 @@ export const EditQuery = (props: EditQueryClientProperties) => {
         deleteQuery(id);
     };
 
-        setQueryText(text);
-        textAreaRef.current.textContent = text;
-
-        notify('Query copied to editor');
-    };
-
     const clearClick = () => {
         if (!textAreaRef.current) {
             return;
