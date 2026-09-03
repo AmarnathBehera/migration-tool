@@ -14,7 +14,7 @@ namespace BDO.GWT.Web.Core.API.Controllers;
 /// Provides methods to read and manage channels.
 /// </summary>
 [ApiController]
-[Route("memberFirms/{memberFirmID:int}/Channels")]
+[Route("Channels")]
 public class ChannelController : EntityControllerBase
 {
     private readonly IChannelCrudService _channelCrudService;
@@ -42,14 +42,14 @@ public class ChannelController : EntityControllerBase
     /// <summary>
     /// Returns a single channel having the specified GUID.
     /// </summary>
-    /// <param name="channelGUID">GUID of the channel you want to retrieve.</param>
+    /// <param name="channelGuid">GUID of the channel you want to retrieve.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>Returns one channel.</returns>
-    [HttpGet("{channelGUID:guid}")]
+    [HttpGet("{channelGuid:guid}")]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(ChannelOutput), MediaTypeNames.Application.Json)]
-    public async Task<ActionResult<ChannelOutput>> GetChannelAsync(Guid channelGUID, CancellationToken cancellationToken)
+    public async Task<ActionResult<ChannelOutput>> GetChannelAsync(Guid channelGuid, CancellationToken cancellationToken)
     {
-        var channel = await _channelCrudService.GetEntityAsync(channelGUID, cancellationToken);
+        var channel = await _channelCrudService.GetEntityAsync(channelGuid, cancellationToken);
 
         return Ok(channel);
     }
