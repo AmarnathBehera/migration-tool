@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using BDO;
 using BDO.GWT.Core;
 using BDO.GWT.Domain.Core.Entities;
 using BDO.GWT.Web.Core.LiveSite.Services;
@@ -192,13 +193,15 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             var websiteChannelContext = new Mock<IWebsiteChannelContext>();
             websiteChannelContext.SetupGet(x => x.WebsiteChannelID).Returns(-1);
 
-            var emailInfoProvider = new Mock<IInfoProvider<EmailInfo>>();
             var channelSettingsProvider = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
+            var snippetProvider = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
+            var globalSettingsProvider = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
 
             var services = new ServiceCollection();
             services.AddSingleton(websiteChannelContext.Object);
-            services.AddSingleton(emailInfoProvider.Object);
             services.AddSingleton(channelSettingsProvider.Object);
+            services.AddSingleton(snippetProvider.Object);
+            services.AddSingleton(globalSettingsProvider.Object);
 
             var serviceProvider = services.BuildServiceProvider();
             var scope = new Mock<IServiceScope>();
@@ -216,13 +219,15 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             var websiteChannelContext = new Mock<IWebsiteChannelContext>();
             websiteChannelContext.SetupGet(x => x.WebsiteChannelID).Returns(0);
 
-            var emailInfoProvider = new Mock<IInfoProvider<EmailInfo>>();
             var channelSettingsProvider = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
+            var snippetProvider = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
+            var globalSettingsProvider = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
 
             var services = new ServiceCollection();
             services.AddSingleton(websiteChannelContext.Object);
-            services.AddSingleton(emailInfoProvider.Object);
             services.AddSingleton(channelSettingsProvider.Object);
+            services.AddSingleton(snippetProvider.Object);
+            services.AddSingleton(globalSettingsProvider.Object);
 
             var serviceProvider = services.BuildServiceProvider();
             var scope = new Mock<IServiceScope>();
@@ -327,13 +332,15 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             var websiteChannelContext = new Mock<IWebsiteChannelContext>();
             websiteChannelContext.SetupGet(x => x.WebsiteChannelID).Returns(42);
 
-            var emailInfoProvider = new Mock<IInfoProvider<EmailInfo>>();
             var channelSettingsProvider = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
+            var snippetProvider = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
+            var globalSettingsProvider = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
 
             var services = new ServiceCollection();
             services.AddSingleton(websiteChannelContext.Object);
-            services.AddSingleton(emailInfoProvider.Object);
             services.AddSingleton(channelSettingsProvider.Object);
+            services.AddSingleton(snippetProvider.Object);
+            services.AddSingleton(globalSettingsProvider.Object);
 
             var sp = services.BuildServiceProvider();
             var scope = new Mock<IServiceScope>();

@@ -1,6 +1,7 @@
 ﻿using BDO.GWT.Core.DTOs.Cookieboot;
 using BDO.GWT.Web.Core.LiveSite.Components.ViewComponents;
 using CMS.DataEngine;
+using CMS.Websites.Routing;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Moq;
 
@@ -8,29 +9,49 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 {
     public class CookiebotTests
     {
-        private Mock<IInfoProvider<CookiebotInfo>> _providerMock;
+        private Mock<IInfoProvider<WebChannelSettingsInfo>> _webChannelSettingsInfoProviderMock;
+        private Mock<IWebsiteChannelContext> _websiteChannelContextMock;
+        private Mock<IInfoProvider<GlobalsettingskeyInfo>> _providerMock;
+        private Mock<IInfoProvider<WebChannelSnippetInfo>> _siteProviderMock;
         private Cookiebot _component;
 
         [SetUp]
         public void Setup()
         {
-            _providerMock = new Mock<IInfoProvider<CookiebotInfo>>();
-            _component = new Cookiebot(_providerMock.Object);
+            _webChannelSettingsInfoProviderMock = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
+            _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
+            _providerMock = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
+            _siteProviderMock = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
+
+            _component = new Cookiebot(
+                _webChannelSettingsInfoProviderMock.Object,
+                _websiteChannelContextMock.Object,
+                _providerMock.Object,
+                _siteProviderMock.Object);
         }
-        [Test]
-        public async Task InvokeAsync_ReturnsDefaultDto_WhenNoData()
+
+        private static Mock<ObjectQuery<T>> CreateMockQuery<T>(IEnumerable<T> items)
+            where T : BaseInfo
         {
-            var mockQuery = new Mock<ObjectQuery<CookiebotInfo>>();
+            var mockQuery = new Mock<ObjectQuery<T>>();
 
             mockQuery.Setup(x => x.TopN(It.IsAny<int>()))
                      .Returns(mockQuery.Object);
 
-            mockQuery.As<IEnumerable<CookiebotInfo>>()
+            mockQuery.As<IEnumerable<T>>()
                      .Setup(x => x.GetEnumerator())
-                     .Returns(new List<CookiebotInfo>().GetEnumerator());
+                     .Returns(() => items.GetEnumerator());
 
-            _providerMock.Setup(x => x.Get())
-                         .Returns(mockQuery.Object);
+            return mockQuery;
+        }
+
+        [Test]
+        public async Task InvokeAsync_ReturnsDefaultDto_WhenNoData()
+        {
+            var snippetQuery = CreateMockQuery(new List<WebChannelSnippetInfo>());
+
+            _siteProviderMock.Setup(x => x.Get())
+                             .Returns(snippetQuery.Object);
 
             var result = await _component.InvokeAsync(CancellationToken.None) as ViewViewComponentResult;
 

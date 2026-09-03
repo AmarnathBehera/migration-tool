@@ -118,7 +118,7 @@ public class ChannelSettingCrudServiceTests
     public void GetChannelSettings_WithDisplayNameFilter_WhenDependenciesUnavailable_Throws()
     {
         var service = (ChannelSettingCrudService)RuntimeHelpers.GetUninitializedObject(typeof(ChannelSettingCrudService));
-        var query = new SettingsQuery { DisplayName = "Email" };
+        var query = new SettingsQuery { DisplayName = "Include Custom Scripts" };
 
         Assert.ThrowsAsync<NullReferenceException>(async () =>
             await service.GetChannelSettings(query, CancellationToken.None));
@@ -130,7 +130,7 @@ public class ChannelSettingCrudServiceTests
         var service = (ChannelSettingCrudService)RuntimeHelpers.GetUninitializedObject(typeof(ChannelSettingCrudService));
 
         Assert.ThrowsAsync<NullReferenceException>(async () =>
-            await service.GetChannelSetting("BDO.Email", CancellationToken.None));
+            await service.GetChannelSetting("BDO.WebChannelSnippet", CancellationToken.None));
     }
 
     [Test]

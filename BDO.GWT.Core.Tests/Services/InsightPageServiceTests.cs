@@ -509,14 +509,24 @@ public class InsightPageServiceTests
 
     private void SetupUsePersonPageTitleSetting(bool usePageTitle)
     {
-        var setting = new WebChannelSnippetInfo
+        // WebChannelSnippetInfo derives from Kentico's AbstractInfo; setting the
+        // UsePageTitleToDisplayPersonName property directly routes through SetValue ->
+        // DataClass -> the CMS IoC container, which is not initialized in unit tests.
+        // Overriding the virtual property in a test subclass provides plain backing
+        // storage so no CMS infrastructure is touched.
+        var setting = new TestWebChannelSnippetInfo
         {
             UsePageTitleToDisplayPersonName = usePageTitle
         };
 
         _settingServiceMock
             .Setup(x => x.GetUsePersonPageTitleInfo())
-            .ReturnsAsync(new[] { setting });
+            .ReturnsAsync(new WebChannelSnippetInfo[] { setting });
+    }
+
+    private sealed class TestWebChannelSnippetInfo : WebChannelSnippetInfo
+    {
+        public override bool UsePageTitleToDisplayPersonName { get; set; }
     }
 
     private void SetupCopyLinkSection(
