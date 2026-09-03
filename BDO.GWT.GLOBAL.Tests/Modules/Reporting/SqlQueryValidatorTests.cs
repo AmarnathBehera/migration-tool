@@ -78,15 +78,28 @@ public class SqlQueryValidatorTests
     }
 
     [Test]
-    public void ValidateSqlStatement_WithValidDeclareStatement_ReturnsSuccess()
+    public void ValidateSqlStatement_WithValidTopSelectQuery_ReturnsSuccess()
+    {
+        var service = new SqlQueryValidator();
+        var result = service.ValidateSqlStatement("SELECT TOP 2 * FROM Users");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.ErrorMessage, Is.Null);
+        });
+    }
+
+    [Test]
+    public void ValidateSqlStatement_WithDeclareStatement_ReturnsFailure()
     {
         var service = new SqlQueryValidator();
         var result = service.ValidateSqlStatement("DECLARE @id INT SELECT @id");
 
         Assert.Multiple(() =>
         {
-            Assert.That(result.IsValid, Is.True);
-            Assert.That(result.ErrorMessage, Is.Null);
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(result.ErrorMessage, Is.EqualTo("Query must match the supported SELECT pattern."));
         });
     }
 
@@ -202,7 +215,20 @@ public class SqlQueryValidatorTests
     }
 
     [Test]
-    public void ValidateSqlStatement_WithComplexJoin_ReturnsSuccess()
+    public void ValidateSqlStatement_WithTableAlias_ReturnsFailure()
+    {
+        var service = new SqlQueryValidator();
+        var result = service.ValidateSqlStatement("SELECT TOP 2 * FROM CMS_User dgd");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(result.ErrorMessage, Is.EqualTo("Query must match the supported SELECT pattern."));
+        });
+    }
+
+    [Test]
+    public void ValidateSqlStatement_WithComplexJoin_ReturnsFailure()
     {
         var service = new SqlQueryValidator();
         var sql = @"
@@ -213,6 +239,10 @@ public class SqlQueryValidatorTests
 
         var result = service.ValidateSqlStatement(sql);
 
-        Assert.That(result.IsValid, Is.True);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(result.ErrorMessage, Is.EqualTo("Query must match the supported SELECT pattern."));
+        });
     }
 }

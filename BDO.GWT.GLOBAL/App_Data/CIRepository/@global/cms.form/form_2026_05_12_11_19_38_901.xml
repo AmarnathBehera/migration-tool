@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.form>
+  <FormBuilderLayout>
+<![CDATA[
+{
+  "editableAreas": [
+    {
+      "identifier": "DefaultFormBuilderArea",
+      "sections": [
+        {
+          "identifier": "00000000-0000-0000-0000-000000000000",
+          "type": "Kentico.DefaultSection",
+          "zones": [
+            {
+              "identifier": "0d81216a-84e6-41a9-bd66-e27d41d42370",
+              "formComponents": [
+                {
+                  "identifier": "4b278c17-2c72-4c15-afe3-70a44cd9383e"
+                }
+              ]
+            }
+          ],
+          "properties": null
+        },
+        {
+          "identifier": "ad650e53-12ae-4bbd-9f40-c81cbb76b88f",
+          "type": "Kentico.DefaultSection",
+          "zones": [
+            {
+              "identifier": "ffc68f39-c76a-4b93-a7ef-11b28e1385cd",
+              "formComponents": [
+                {
+                  "identifier": "1d1d67e5-e5a0-40a5-b5f5-33fe15acfd49"
+                }
+              ]
+            }
+          ],
+          "properties": null
+        }
+      ]
+    }
+  ]
+}
+]]>
+  </FormBuilderLayout>
+  <FormClassID>
+    <CodeName>BizForm.Form_2026_05_12_11_19_38_901</CodeName>
+    <GUID>28ba312a-a072-4f21-96ed-a913136fae6d</GUID>
+    <ObjectType>cms.formclass</ObjectType>
+  </FormClassID>
+  <FormDisplayName>Form (2026-05-12_11:19)</FormDisplayName>
+  <FormGUID>fbebcf18-c62a-462e-aefe-0d9f80e79607</FormGUID>
+  <FormItems>0</FormItems>
+  <FormLogActivity>True</FormLogActivity>
+  <FormName>Form_2026_05_12_11_19_38_901</FormName>
+</cms.form>

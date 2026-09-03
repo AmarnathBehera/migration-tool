@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<emaillibrary.emailtemplate>
+  <EmailTemplateCode>
+<![CDATA[
+<html>
+<head>
+<style type="text/css">
+
+</style>
+	</head>
+<body>
+<p>{$ BDO.KIT.BlogNotificationSalutation $} {% Recipient.FirstName |(identity)GlobalAdministrator|(hash)0a576af52d00bccc2b3d18b9c947840e54dd8c3c94b7737d966e1a2ff39e246f%}&nbsp;{% Recipient.LastName |(identity)GlobalAdministrator|(hash)820e10e95d65f7ff20233d90f85355ea5124b3e1bfe4617980be8e982dbdd162%}</p>
+
+<p>&nbsp;</p>
+
+<p>{$ BDO.KIT.BlogNotificationIntro $}</p>
+
+<p>$$linktoblog$$</p>
+
+<p>&nbsp;</p>
+
+<p>{$ BDO.KIT.BlogNotificationClosing $},&nbsp;{% Newsletter.NewsletterSenderName |(identity)GlobalAdministrator|(hash)b560365292c1d6bfe49cea98e3264dacad168a06c1910d82debfaf11a314458d%}</p>
+
+<p>&nbsp;</p>
+
+<p><a href="{% EmailFeed.UnsubscribeFromEmailFeedUrl |(identity)GlobalAdministrator|(hash)386e27c1d60048a78a939f85badda70ba1e9bbd8761f44aa684bd6a646bce917%}" title="Unsubscribe">{$BDO.KIT.BlogNotificationUnsubscribeLink$}</a>&nbsp;{$BDO.KIT.BlogNotificationUnsubscribePost$}</p>
+</body>
+</html>
+]]>
+  </EmailTemplateCode>
+  <EmailTemplateDisplayName>BDO Blog Notification - Blog Test BDR</EmailTemplateDisplayName>
+  <EmailTemplateGuid>30eebfae-5a86-49f6-b4ff-f306bef018bf</EmailTemplateGuid>
+  <EmailTemplateName>BDOBlogNotification-BlogTestBDR</EmailTemplateName>
+</emaillibrary.emailtemplate>
