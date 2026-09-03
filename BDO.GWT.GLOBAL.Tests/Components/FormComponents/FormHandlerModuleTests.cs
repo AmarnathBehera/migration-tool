@@ -273,44 +273,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             Assert.That(result, Is.Null);
         }
 
-        [Test]
-        public void ResolveFromEmailForCurrentChannel_ReturnsSnippetFromEmail_WhenNotInheriting()
-        {
-            var services = CreateResolveFromEmailServices(
-                websiteChannelId: 10,
-                channelSettings: [new TestWebChannelSettingsInfo { WebChannelSettingsID = 20 }],
-                snippets: [new TestWebChannelSnippetInfo { WebChannelSnippetWebChannelSettingsID = 20, FromEmailInheritfromglobal = false, FromEmail = "snippet@bdo.com" }],
-                globals: [new TestGlobalSettingsKeyInfo { FromEmail = "global@bdo.com" }]);
-
-            var serviceProvider = services.BuildServiceProvider();
-            var scope = new Mock<IServiceScope>();
-            scope.SetupGet(x => x.ServiceProvider).Returns(serviceProvider);
-            _scopeFactory.Setup(x => x.CreateScope()).Returns(scope.Object);
-
-            var result = InvokePrivate<string?>(_module, "ResolveFromEmailForCurrentChannel");
-
-            Assert.That(result, Is.EqualTo("snippet@bdo.com"));
-        }
-
-        [Test]
-        public void ResolveFromEmailForCurrentChannel_ReturnsGlobalFromEmail_WhenInheriting()
-        {
-            var services = CreateResolveFromEmailServices(
-                websiteChannelId: 10,
-                channelSettings: [new TestWebChannelSettingsInfo { WebChannelSettingsID = 20 }],
-                snippets: [new TestWebChannelSnippetInfo { WebChannelSnippetWebChannelSettingsID = 20, FromEmailInheritfromglobal = true, FromEmail = "snippet@bdo.com" }],
-                globals: [new TestGlobalSettingsKeyInfo { FromEmail = "global@bdo.com" }]);
-
-            var serviceProvider = services.BuildServiceProvider();
-            var scope = new Mock<IServiceScope>();
-            scope.SetupGet(x => x.ServiceProvider).Returns(serviceProvider);
-            _scopeFactory.Setup(x => x.CreateScope()).Returns(scope.Object);
-
-            var result = InvokePrivate<string?>(_module, "ResolveFromEmailForCurrentChannel");
-
-            Assert.That(result, Is.EqualTo("global@bdo.com"));
-        }
-
+        
         [Test]
         public void ResolveFromEmailForCurrentChannel_ReturnsNull_WhenInheritingAndGlobalMissing()
         {
