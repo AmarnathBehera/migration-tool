@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<cms.contentlanguage>
-  <ContentLanguageCultureFormat>es-ES</ContentLanguageCultureFormat>
-  <ContentLanguageDisplayName>Spainsh</ContentLanguageDisplayName>
-  <ContentLanguageFlagIconName>xp-flag-spain</ContentLanguageFlagIconName>
-  <ContentLanguageGUID>ee380e62-f7ff-416a-88c1-646fe247d5f3</ContentLanguageGUID>
-  <ContentLanguageIsDefault>False</ContentLanguageIsDefault>
-  <ContentLanguageName>es-es</ContentLanguageName>
-</cms.contentlanguage>
