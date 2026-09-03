@@ -104,6 +104,8 @@ public static class ResourceStringKey
             public const string SortLastNameZtoA = PeoplePrefix + "SortLastNameZtoA";
 
             public const string SortNodeOrder = PeoplePrefix + "SortNodeOrder";
+
+            public const string contactForm = PeoplePrefix + "ContactForm";
         }
         public static class Careers
         {

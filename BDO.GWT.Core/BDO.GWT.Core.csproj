@@ -11,8 +11,9 @@
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="16.1.1" />
 		<PackageReference Include="Ical.Net" Version="5.2.2" />
-		<PackageReference Include="Kentico.Xperience.Admin" Version="31.2.3" />
+		<PackageReference Include="Kentico.Xperience.Admin" Version="31.7.0" />
 		<PackageReference Include="System.ServiceModel.Syndication" Version="10.0.9" />
+		<PackageReference Include="XperienceCommunity.Localization" Version="2.0.1" />
 		<PackageReference Include="XperienceCommunity.MultiChoiceFormControl" Version="1.0.0" />
 		<ProjectReference Include="..\BDO.GWT.Common\BDO.GWT.Common.csproj" />
 		<ProjectReference Include="..\Kentico.Xperience.AzureSearch\Kentico.Xperience.AzureSearch.csproj" />

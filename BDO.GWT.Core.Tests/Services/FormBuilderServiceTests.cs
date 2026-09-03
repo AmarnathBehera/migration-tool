@@ -1,3 +1,4 @@
+using BDO.GWT.Core.Helper;
 using BDO.GWT.Core.Services;
 using CMS.DataEngine;
 using Kentico.Forms.Web.Mvc.Widgets;
@@ -11,11 +12,15 @@ namespace BDO.GWT.Core.Tests.Services;
 public class FormBuilderServiceTests
 {
     private FormBuilderService _service = null!;
+    private Mock<ILocalizationHelper> _localizationHelperMock = null!;
+    private Mock<ICultureContext> _cultureContextMock = null!;
 
     [SetUp]
     public void Setup()
     {
-        _service = new FormBuilderService();
+        _localizationHelperMock = new Mock<ILocalizationHelper>();
+        _cultureContextMock = new Mock<ICultureContext>();
+        _service = new FormBuilderService(_localizationHelperMock.Object, _cultureContextMock.Object);
     }
 
     // ?? Interface contract ???????????????????????????????????????????????

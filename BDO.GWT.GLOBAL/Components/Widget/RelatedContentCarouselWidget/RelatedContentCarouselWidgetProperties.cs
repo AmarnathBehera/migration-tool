@@ -18,12 +18,12 @@ namespace BDO.GWT.Core.Components.Widgets.RelatedContentCarouselWidget;
 
 public class RelatedContentCarouselWidgetProperties : BaseWidgetProperties
 {
-    private static readonly (string ParameterName, bool IsDefault)[] RelatedContentFilters =
+    private static readonly (string ParameterName, string AdminDisplayName, bool IsDefault)[] RelatedContentFilters =
     [
-        (FilterParameterName.ContentType, true),
-        (FilterParameterName.BusinessLine, true),
-        (FilterParameterName.ServiceArea, false),
-        (FilterParameterName.IndustryCategory, true),
+        (FilterParameterName.ContentType,"Content Type", true),
+        (FilterParameterName.BusinessLine, "Business Line", true),
+        (FilterParameterName.ServiceArea, "Service Area", false),
+        (FilterParameterName.IndustryCategory, "Industry Category", true),
     ];
 
     private static readonly (string ParameterName, string AdminDisplayName, bool IsDefault)[] AvailablePageTypes =
@@ -88,7 +88,7 @@ public class RelatedContentCarouselWidgetProperties : BaseWidgetProperties
             RelatedContentFilters.Select(x => new ObjectSelectorListItem<string>
             {
                 Value = x.ParameterName,
-                Text = x.ParameterName,
+                Text = x.AdminDisplayName,
                 IsValid = true
             }).ToArray();
 
@@ -131,7 +131,7 @@ public class RelatedContentCarouselWidgetProperties : BaseWidgetProperties
             AvailablePageTypes.Select(x => new ObjectSelectorListItem<string>
             {
                 Value = x.ParameterName,
-                Text = x.ParameterName,
+                Text = x.AdminDisplayName,
                 IsValid = true
             }).ToArray();
 
