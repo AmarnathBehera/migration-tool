@@ -36,7 +36,7 @@ public class SEOOptionsSetupTests
 
     // --- Helpers -----------------------------------------------------------------
 
-    private static Mock<ObjectQuery<T>> BuildEmptyQuery<T>()
+    private static Mock<ObjectQuery<T>> BuildQuery<T>(IEnumerable<T> items)
         where T : BaseInfo
     {
         var queryMock = new Mock<ObjectQuery<T>>();
@@ -47,7 +47,7 @@ public class SEOOptionsSetupTests
             .Returns(queryMock.Object);
         queryMock.As<IEnumerable<T>>()
             .Setup(x => x.GetEnumerator())
-            .Returns(() => Enumerable.Empty<T>().GetEnumerator());
+            .Returns(() => items.GetEnumerator());
 
         return queryMock;
     }
@@ -55,11 +55,11 @@ public class SEOOptionsSetupTests
     private void SetupAllProvidersEmpty()
     {
         _channelSettingsProviderMock.Setup(p => p.Get())
-            .Returns(BuildEmptyQuery<WebChannelSettingsInfo>().Object);
+            .Returns(BuildQuery<WebChannelSettingsInfo>(new WebChannelSettingsInfo[0]).Object);
         _snippetProviderMock.Setup(p => p.Get())
-            .Returns(BuildEmptyQuery<WebChannelSnippetInfo>().Object);
+            .Returns(BuildQuery<WebChannelSnippetInfo>(new WebChannelSnippetInfo[0]).Object);
         _globalProviderMock.Setup(p => p.Get())
-            .Returns(BuildEmptyQuery<GlobalsettingskeyInfo>().Object);
+            .Returns(BuildQuery<GlobalsettingskeyInfo>(new GlobalsettingskeyInfo[0]).Object);
     }
 
     // --- Tests -------------------------------------------------------------------
@@ -84,8 +84,6 @@ public class SEOOptionsSetupTests
     [Test]
     public void Configure_SetsEmptyRobotsAndSecurity_WhenNoSettingsExist()
     {
-        // No channel setting, no snippet, no global ? both inherit branches (?? true)
-        // resolve against an empty global provider, yielding empty strings.
         SetupAllProvidersEmpty();
         var options = new GWTXbyKWeb.Components.Services.SEOOptions.SEOOptions
         {
@@ -120,6 +118,74 @@ public class SEOOptionsSetupTests
     }
 
     [Test]
+    public void Configure_UsesSnippetValues_WhenBothInheritFlagsAreFalse()
+    {
+        var channel = new TestWebChannelSettingsInfo { WebChannelSettingsID = 11, WebChannelSettingsChannelID = 1 };
+        var snippet = new TestWebChannelSnippetInfo
+        {
+            WebChannelSnippetWebChannelSettingsID = 11,
+            SeoSettingsRobotsInheritfromglobal = false,
+            SeoSettingsRobots = "robots-local",
+            SeoSettingsSecurityInheritfromGlobal = false,
+            SeoSettingsSecurity = "security-local"
+        };
+
+        _channelSettingsProviderMock.Setup(p => p.Get())
+            .Returns(BuildQuery<WebChannelSettingsInfo>(new[] { channel }).Object);
+        _snippetProviderMock.Setup(p => p.Get())
+            .Returns(BuildQuery<WebChannelSnippetInfo>(new[] { snippet }).Object);
+
+        var options = new GWTXbyKWeb.Components.Services.SEOOptions.SEOOptions();
+
+        _setup.Configure(options);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(options.RobotsText, Is.EqualTo("robots-local"));
+            Assert.That(options.SecurityText, Is.EqualTo("security-local"));
+            _globalProviderMock.Verify(p => p.Get(), Times.Never);
+        });
+    }
+
+    [Test]
+    public void Configure_UsesGlobalValues_WhenBothInheritFlagsAreTrue()
+    {
+        var channel = new TestWebChannelSettingsInfo { WebChannelSettingsID = 11, WebChannelSettingsChannelID = 1 };
+        var snippet = new TestWebChannelSnippetInfo
+        {
+            WebChannelSnippetWebChannelSettingsID = 11,
+            SeoSettingsRobotsInheritfromglobal = true,
+            SeoSettingsSecurityInheritfromGlobal = true,
+            SeoSettingsRobots = "robots-local",
+            SeoSettingsSecurity = "security-local"
+        };
+        var global = new TestGlobalSettingsInfo
+        {
+            SeoSettingsRobots = "robots-global",
+            SeoSettingsSecurity = "security-global"
+        };
+
+        _channelSettingsProviderMock.Setup(p => p.Get())
+            .Returns(BuildQuery<WebChannelSettingsInfo>(new[] { channel }).Object);
+        _snippetProviderMock.Setup(p => p.Get())
+            .Returns(BuildQuery<WebChannelSnippetInfo>(new[] { snippet }).Object);
+        _globalProviderMock.Setup(p => p.Get())
+            .Returns(BuildQuery<GlobalsettingskeyInfo>(new[] { global }).Object);
+
+        var options = new GWTXbyKWeb.Components.Services.SEOOptions.SEOOptions();
+
+        _setup.Configure(options);
+
+        // NOTE: service currently maps SecurityText from global.SeoSettingsRobots when inheriting.
+        Assert.Multiple(() =>
+        {
+            Assert.That(options.RobotsText, Is.EqualTo("robots-global"));
+            Assert.That(options.SecurityText, Is.EqualTo("robots-global"));
+            _globalProviderMock.Verify(p => p.Get(), Times.Exactly(2));
+        });
+    }
+
+    [Test]
     public void Configure_PropagatesException_FromChannelSettingsProvider()
     {
         _channelSettingsProviderMock.Setup(p => p.Get())
@@ -127,5 +193,26 @@ public class SEOOptionsSetupTests
         var options = new GWTXbyKWeb.Components.Services.SEOOptions.SEOOptions();
 
         Assert.Throws<InvalidOperationException>(() => _setup.Configure(options));
+    }
+
+    private sealed class TestWebChannelSettingsInfo : WebChannelSettingsInfo
+    {
+        public override int WebChannelSettingsID { get; set; }
+        public override int WebChannelSettingsChannelID { get; set; }
+    }
+
+    private sealed class TestWebChannelSnippetInfo : WebChannelSnippetInfo
+    {
+        public override int WebChannelSnippetWebChannelSettingsID { get; set; }
+        public override bool SeoSettingsRobotsInheritfromglobal { get; set; }
+        public override string SeoSettingsRobots { get; set; } = string.Empty;
+        public override bool SeoSettingsSecurityInheritfromGlobal { get; set; }
+        public override string SeoSettingsSecurity { get; set; } = string.Empty;
+    }
+
+    private sealed class TestGlobalSettingsInfo : GlobalsettingskeyInfo
+    {
+        public override string SeoSettingsRobots { get; set; } = string.Empty;
+        public override string SeoSettingsSecurity { get; set; } = string.Empty;
     }
 }

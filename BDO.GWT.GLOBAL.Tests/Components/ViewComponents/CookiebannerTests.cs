@@ -46,7 +46,6 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
         [Test]
         public async Task InvokeAsync_ReturnsBannerView_WhenNoChannelSetting()
         {
-            // channelSetting == null ? enableCookiebot false ? banner view is rendered.
             _siteProviderMock.Setup(x => x.Get())
                              .Returns(BuildQuery(new List<WebChannelSnippetInfo>()).Object);
 
@@ -63,6 +62,74 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
                 Assert.That(result!.ViewName, Is.EqualTo("~/Views/Shared/Components/Cookiebanner/Default.cshtml"));
                 Assert.That(result.ViewData?.Model, Is.SameAs(dto));
             });
+        }
+
+        [Test]
+        public async Task InvokeAsync_ReturnsEmptyContent_WhenCookiebotEnabledOnSnippet()
+        {
+            var snippet = new TestWebChannelSnippetInfo
+            {
+                EnableCookiebotInheritfromglobal = false,
+                EnableCookiebot = true
+            };
+
+            _siteProviderMock.Setup(x => x.Get())
+                .Returns(BuildQuery(new List<WebChannelSnippetInfo> { snippet }).Object);
+
+            var result = await _component.InvokeAsync(CancellationToken.None);
+
+            Assert.That(result, Is.InstanceOf<ContentViewComponentResult>());
+            var content = (ContentViewComponentResult)result;
+            Assert.That(content.Content, Is.EqualTo(string.Empty));
+            _cookieBannerServiceMock.Verify(x => x.GetAsync(It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Test]
+        public async Task InvokeAsync_ReturnsEmptyContent_WhenCookiebotInheritedFromGlobalAndEnabled()
+        {
+            var snippet = new TestWebChannelSnippetInfo
+            {
+                EnableCookiebotInheritfromglobal = true,
+                EnableCookiebot = false
+            };
+            var global = new TestGlobalSettingsInfo
+            {
+                EnableCookiebot = true
+            };
+
+            _siteProviderMock.Setup(x => x.Get())
+                .Returns(BuildQuery(new List<WebChannelSnippetInfo> { snippet }).Object);
+            _providerMock.Setup(x => x.Get())
+                .Returns(BuildQuery(new List<GlobalsettingskeyInfo> { global }).Object);
+
+            var result = await _component.InvokeAsync(CancellationToken.None);
+
+            Assert.That(result, Is.InstanceOf<ContentViewComponentResult>());
+            _cookieBannerServiceMock.Verify(x => x.GetAsync(It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Test]
+        public async Task InvokeAsync_ReturnsBannerView_WhenInheritingAndGlobalMissing()
+        {
+            var snippet = new TestWebChannelSnippetInfo
+            {
+                EnableCookiebotInheritfromglobal = true,
+                EnableCookiebot = true
+            };
+
+            _siteProviderMock.Setup(x => x.Get())
+                .Returns(BuildQuery(new List<WebChannelSnippetInfo> { snippet }).Object);
+            _providerMock.Setup(x => x.Get())
+                .Returns(BuildQuery(new List<GlobalsettingskeyInfo>()).Object);
+
+            _cookieBannerServiceMock
+                .Setup(x => x.GetAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new CookieBannerDto());
+
+            var result = await _component.InvokeAsync(CancellationToken.None);
+
+            Assert.That(result, Is.InstanceOf<ViewViewComponentResult>());
+            _cookieBannerServiceMock.Verify(x => x.GetAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
@@ -105,6 +172,17 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 
             Assert.ThrowsAsync<InvalidOperationException>(
                 () => _component.InvokeAsync(CancellationToken.None));
+        }
+
+        private sealed class TestWebChannelSnippetInfo : WebChannelSnippetInfo
+        {
+            public override bool EnableCookiebotInheritfromglobal { get; set; }
+            public override bool EnableCookiebot { get; set; }
+        }
+
+        private sealed class TestGlobalSettingsInfo : GlobalsettingskeyInfo
+        {
+            public override bool EnableCookiebot { get; set; }
         }
     }
 }
