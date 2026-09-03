@@ -35,7 +35,7 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
         {
             Assert.That(
                 ReportingReportListingPage.IDENTIFIER,
-                Is.EqualTo("DancingGoat.Reporting"));
+                Is.EqualTo("BDO.Reporting"));
         }
 
         [Test]
