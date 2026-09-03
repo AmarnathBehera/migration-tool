@@ -1,6 +1,7 @@
 ﻿using BDO;
 using BDO.GWT.Controllers;
 using BDO.GWT.Core.LiveSite.Controllers;
+using BDO.GWT.GLOBAL.Controllers;
 using BDO.GWT.Web.Controllers;
 using BDO.GWT.Web.Core.Controllers;
 using BDO.GWT.Web.Core.LiveSite.Controllers;
@@ -393,6 +394,8 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 [assembly: RegisterWebPageRoute(Rss.CONTENT_TYPE_NAME, typeof(RssController))]
 [assembly: RegisterWebPageRoute(LegalPage.CONTENT_TYPE_NAME, typeof(LegalPageController))]
 
+
 [assembly: RegisterWebPageRoute(BusinessStrategy.CONTENT_TYPE_NAME, typeof(BusinessStrategyController), ActionName = nameof(BusinessStrategyController.Index))]
 [assembly: RegisterWebPageRoute(SectionBusinessStrategies.CONTENT_TYPE_NAME, typeof(SectionBusinessStrategiesController), ActionName = nameof(SectionBusinessStrategiesController.Index))]
 [assembly: RegisterWebPageRoute(Search.CONTENT_TYPE_NAME, typeof(SearchController), ActionName = nameof(SearchController.Index))]
+[assembly: RegisterWebPageRoute(StatusCode.CONTENT_TYPE_NAME, typeof(ErrorController))]
