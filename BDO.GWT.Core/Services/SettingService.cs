@@ -8,6 +8,7 @@ public interface ISettingService
     Task<IEnumerable<WebChannelSnippetInfo>?> GetPrintorShareInfo();
     Task<IEnumerable<WebChannelSnippetInfo>?> GetFilteringInfo();
     Task<IEnumerable<WebChannelSnippetInfo>?> GetUsePersonPageTitleInfo();
+    Task<GlobalsettingskeyInfo?> GetGlobalSettingAsync();
 }
 
 public class SettingService : ISettingService
@@ -36,6 +37,15 @@ public class SettingService : ISettingService
 
     public Task<IEnumerable<WebChannelSnippetInfo>?> GetUsePersonPageTitleInfo() => GetMergedSnippetAsync();
 
+    public async Task<GlobalsettingskeyInfo?> GetGlobalSettingAsync()
+    {
+        var currentChannelSettings = await _provider
+            .Get()
+            .TopN(1)
+            .GetEnumerableTypedResultAsync();
+
+        return currentChannelSettings?.FirstOrDefault();
+    }
     private async Task<WebChannelSettingsInfo?> GetCurrentChannelSettingAsync()
     {
         var currentChannelSettings = await _webChannelSettingsInfoProvider
