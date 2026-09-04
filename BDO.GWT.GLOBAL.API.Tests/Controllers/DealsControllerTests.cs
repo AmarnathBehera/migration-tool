@@ -107,6 +107,38 @@ public class DealsControllerTests
     }
 
     [Test]
+    public async Task CreateNewCultureVersion_ForwardsArguments_AndReturnsCreatedAtAction()
+    {
+        var pageGuid = Guid.NewGuid();
+        var request = new DealPageContent { MetadataTitle = "Localized deal" };
+        var expected = new PageOutput<DealPageContent>
+        {
+            General = new PageGeneralOutput { PageGuid = Guid.NewGuid() },
+            Content = request,
+        };
+
+        var serviceResult = new ActionResult<PageOutput<DealPageContent>>(expected);
+
+        _dealCrudServiceMock
+            .Setup(x => x.CreatePageCultureVersionAsync(42, pageGuid, "en-gb", "fr-fr", request, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(serviceResult);
+
+        var result = await _controller.CreateNewCultureVersion(960, pageGuid, "en-gb", "fr-fr", request, CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<CreatedAtActionResult>());
+        var createdResult = (CreatedAtActionResult)result.Result!;
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(createdResult.ActionName, Is.EqualTo("Get"));
+            Assert.That(createdResult.Value, Is.EqualTo(expected));
+        }
+
+        _dealCrudServiceMock.Verify(
+            x => x.CreatePageCultureVersionAsync(42, pageGuid, "en-gb", "fr-fr", request, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
     public async Task Put_ForwardsArguments_AndReturnsOk()
     {
         var pageGuid = Guid.NewGuid();

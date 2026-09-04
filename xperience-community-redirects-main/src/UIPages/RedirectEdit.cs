@@ -69,6 +69,14 @@ internal class RedirectEdit : ModelEditPage<RedirectEditModel>
 
     protected override async Task<ICommandResponse> ProcessFormData(RedirectEditModel model, ICollection<IFormItem> formItems)
     {
+        if (RedirectSourceUrlValidation.SourceUrlExists(_redirectInfoProvider, model.SourceUrl, ObjectID))
+        {
+            var response = ResponseFrom(new FormSubmissionResult(FormSubmissionStatus.ValidationFailure));
+            response.AddErrorMessage($"A redirect with the source URL '{model.SourceUrl}' already exists. The source URL must be unique.");
+
+            return response;
+        }
+
         var info = _redirectInfoProvider.Get(ObjectID);
 
         await model.MapToRedirectInfo(info, _webPageUrlRetriever);
