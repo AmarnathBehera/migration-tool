@@ -46,7 +46,7 @@ public static class ReactComponentType
     public const string InsightCarousel = "InsightCarousel";
     public const string InFocus = "InFocus";
     public const string BusinessStrategiesGrid = "BusinessStrategiesGrid";
-
+    public const string GlobalLocationsList = "GlobalLocationsList";
     public const string CareerDetails = "CareerDetails";
     public const string KeyTakeAways = "KeyTakeAwaysWidget";
     public const string BlogPostContent = "BlogPostContent";
@@ -118,6 +118,7 @@ public static class ReactComponentType
     public const string SubscribeFormGUID = "4772187b-22a3-4888-a7e9-54b3bd9cbd02";
     public const string AnimatedTileCarouselWidgetGUID = "abfdfcbf-6696-4de8-a409-d9d3ff31a17c";
     public const string SearchResultsGUID = "8405ba6d-77df-48ee-b4e5-99dc66789f8a";
+    public const string GlobalLocationsListGUID = "wefefcbf-6696-4de8-a409-d9d3ff31a10f";
 }
 
 

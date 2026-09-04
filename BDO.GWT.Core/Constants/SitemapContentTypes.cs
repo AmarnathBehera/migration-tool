@@ -22,6 +22,7 @@ namespace BDO.GWT.Core.Constants
         Locations.CONTENT_TYPE_NAME,
         LocationCity.CONTENT_TYPE_NAME,
         LocationOffice.CONTENT_TYPE_NAME,
+        GlobalLocations.CONTENT_TYPE_NAME,
         StatusCode.CONTENT_TYPE_NAME,
         SectionIndustries.CONTENT_TYPE_NAME,
         IndustryCategory.CONTENT_TYPE_NAME,
