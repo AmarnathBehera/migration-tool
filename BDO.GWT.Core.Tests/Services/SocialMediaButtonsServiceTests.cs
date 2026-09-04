@@ -38,7 +38,7 @@ public class SocialMediaButtonsServiceTests
         bool li = false,
         bool copy = false)
     {
-        // NOTE: We cannot use an object initializer (i.e. `new PrintorShareInfo { DisableEmail = ... }`)
+        // NOTE: We cannot use an object initializer (i.e. `new WebChannelSnippetInfo { DisableEmail = ... }`)
         // because the property setters call AbstractInfoBase.SetValue, which lazily resolves the
         // Kentico DataClass through the CMS IoC container. The container is not initialized in unit
         // tests, so any setter call throws ServiceResolutionException. Instead, use a test-only
@@ -53,7 +53,7 @@ public class SocialMediaButtonsServiceTests
         };
     }
 
-    private sealed class TestPrintorShareInfo : PrintorShareInfo
+    private sealed class TestPrintorShareInfo : WebChannelSnippetInfo
     {
         public override bool DisableEmail { get; set; }
         public override bool DisableFacebook { get; set; }
@@ -162,7 +162,7 @@ public class SocialMediaButtonsServiceTests
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
-            .ReturnsAsync((IEnumerable<PrintorShareInfo>?)null);
+            .ReturnsAsync((IEnumerable<WebChannelSnippetInfo>?)null);
 
         var page = new Mock<IWebPageFieldsSource>();
 

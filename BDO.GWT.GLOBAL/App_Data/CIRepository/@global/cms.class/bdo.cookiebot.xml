@@ -6,7 +6,7 @@
       <field column="CookiebotID" columntype="integer" enabled="true" guid="cf532231-40f3-41ef-80b2-e08d4635dc45" isPK="true" />
       <field column="EnableCookiebot" columnprecision="0" columntype="boolean" enabled="true" guid="b2b4d059-6e29-4a92-8106-256e5e489bf8" />
       <field column="CookieID" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="2ac54063-1ed6-47ac-b986-6967d0f81063" />
-      <field column="CustomCookiebotScript" columnprecision="0" columntype="longtext" enabled="true" guid="c5ec9283-3719-485e-9f61-ace645b985a1" />
+      <field allowempty="true" column="CustomCookiebotScript" columnprecision="0" columntype="longtext" enabled="true" guid="c5ec9283-3719-485e-9f61-ace645b985a1" />
     </form>
   </ClassFormDefinition>
   <ClassGUID>e884d8e0-a6d1-4029-81c4-d0c0863b0759</ClassGUID>

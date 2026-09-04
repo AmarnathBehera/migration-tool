@@ -14,106 +14,42 @@ public interface IGlobalSettingCrudService
 public class GlobalSettingCrudService : IGlobalSettingCrudService
 {
     private readonly IInfoProvider<GlobalsettingskeyInfo> _customScriptinfoProvider;
-    private readonly IInfoProvider<CookiebotInfo> _cookiebotinfoProvider;
-    private readonly IInfoProvider<GlobalEventsnWebinarsInfo> _globalEventsnWebinarinfoProvider;
 
-    public GlobalSettingCrudService(
-        IInfoProvider<GlobalsettingskeyInfo> customScriptinfoProvider,
-        IInfoProvider<CookiebotInfo> cookiebotinfoProvider,
-        IInfoProvider<GlobalEventsnWebinarsInfo> globalEventsnWebinarinfoProvider)
+    public GlobalSettingCrudService(IInfoProvider<GlobalsettingskeyInfo> customScriptinfoProvider)
     {
         _customScriptinfoProvider = customScriptinfoProvider;
-        _cookiebotinfoProvider = cookiebotinfoProvider;
-        _globalEventsnWebinarinfoProvider = globalEventsnWebinarinfoProvider;
     }
 
-    public async Task<GlobalSettingOutput[]> GetGlobalSettings(SettingsQuery settingsQuery, CancellationToken cancellationToken)
+    public Task<GlobalSettingOutput[]> GetGlobalSettings(SettingsQuery settingsQuery, CancellationToken cancellationToken)
     {
-        var queryGlobalsettingskeyInfo = _customScriptinfoProvider.Get();
-        var queryCookiebotInfo = _cookiebotinfoProvider.Get();
-        var queryGlobalEventsnWebinarinfo = _globalEventsnWebinarinfoProvider.Get();
+        var globalSettings = _customScriptinfoProvider.Get().GetEnumerableTypedResult();
 
-        if (settingsQuery.DisplayName is not null)
+        if (settingsQuery.DisplayName is not null &&
+            settingsQuery.DisplayName is not ("Include Custom Scripts" or "Cookiebot" or "Events & Webinar"))
         {
-            if (settingsQuery.DisplayName == "Include Custom Scripts")
-            {
-                var globalSettings = queryGlobalsettingskeyInfo.GetEnumerableTypedResult();
-                return globalSettings.Select(ToGlobalSettingOutput).ToArray();
-            }
-            else if (settingsQuery.DisplayName == "Cookiebot")
-            {
-                var cookiebots = queryCookiebotInfo.GetEnumerableTypedResult();
-                return cookiebots.Select(ToGlobalSettingOutput).ToArray();
-            }
-            else if (settingsQuery.DisplayName == "Events & Webinar")
-            {
-                var globalEventsnWebinars = queryGlobalEventsnWebinarinfo.GetEnumerableTypedResult();
-                return globalEventsnWebinars.Select(ToGlobalSettingOutput).ToArray();
-            }
-            else
-            {
-                return System.Array.Empty<GlobalSettingOutput>();
-            }
+            return Task.FromResult(System.Array.Empty<GlobalSettingOutput>());
         }
 
-        var allGlobalSettings = queryGlobalsettingskeyInfo.GetEnumerableTypedResult();
-        var allCookiebots = queryCookiebotInfo.GetEnumerableTypedResult();
-        var allGlobalEventsnWebinars = queryGlobalEventsnWebinarinfo.GetEnumerableTypedResult();
-
-        var outputs = allGlobalSettings.Select(ToGlobalSettingOutput)
-            .Concat(allCookiebots.Select(ToGlobalSettingOutput))
-            .Concat(allGlobalEventsnWebinars.Select(ToGlobalSettingOutput))
-            .ToArray();
-
-        return outputs;
+        return Task.FromResult(globalSettings.Select(ToGlobalSettingOutput).ToArray());
     }
-    public async Task<GlobalSettingOutput?> GetGlobalSetting(string settingCodeName, CancellationToken cancellationToken)
+
+    public Task<GlobalSettingOutput?> GetGlobalSetting(string settingCodeName, CancellationToken cancellationToken)
     {
-        if (settingCodeName == "BDO.Globalsettingskey")
+        if (settingCodeName is "BDO.Globalsettingskey" or "BDO.Cookiebot" or "BDO.GlobalEventsnWebinars")
         {
             var globalSettings = _customScriptinfoProvider.Get().GetEnumerableTypedResult();
-            return globalSettings.Select(ToGlobalSettingOutput).FirstOrDefault();
-        }
-        else if (settingCodeName == "BDO.Cookiebot")
-        {
-            var cookiebots = _cookiebotinfoProvider.Get().GetEnumerableTypedResult();
-            return cookiebots.Select(ToGlobalSettingOutput).FirstOrDefault();
-        }
-        else if (settingCodeName == "BDO.GlobalEventsnWebinars")
-        {
-            var globalEventsnWebinars = _globalEventsnWebinarinfoProvider.Get().GetEnumerableTypedResult();
-            return globalEventsnWebinars.Select(ToGlobalSettingOutput).FirstOrDefault();
+            return Task.FromResult(globalSettings.Select(ToGlobalSettingOutput).FirstOrDefault());
         }
 
-        return null;
+        return Task.FromResult<GlobalSettingOutput?>(null);
     }
 
     private static GlobalSettingOutput ToGlobalSettingOutput(GlobalsettingskeyInfo setting)
     {
         return new GlobalSettingOutput
         {
-            CodeName = setting.ClassName,
+            CodeName = GlobalsettingskeyInfo.OBJECT_TYPE,
             DisplayName = "Include Custom Scripts",
-            Value = ToFieldDictionary(setting)
-        };
-    }
-
-    private static GlobalSettingOutput ToGlobalSettingOutput(CookiebotInfo setting)
-    {
-        return new GlobalSettingOutput
-        {
-            CodeName = setting.ClassName,
-            DisplayName = "Cookiebot",
-            Value = ToFieldDictionary(setting)
-        };
-    }
-
-    private static GlobalSettingOutput ToGlobalSettingOutput(GlobalEventsnWebinarsInfo setting)
-    {
-        return new GlobalSettingOutput
-        {
-            CodeName = setting.ClassName,
-            DisplayName = "Events & Webinar",
             Value = ToFieldDictionary(setting)
         };
     }

@@ -36,7 +36,7 @@ public class SidebarServiceTests
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
-            .ReturnsAsync((IEnumerable<PrintorShareInfo>?)null);
+            .ReturnsAsync((IEnumerable<WebChannelSnippetInfo>?)null);
 
         var page = new NewsArticle();
 
@@ -50,7 +50,7 @@ public class SidebarServiceTests
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
-            .ReturnsAsync(new List<PrintorShareInfo>());
+            .ReturnsAsync(new List<WebChannelSnippetInfo>());
 
         var page = new NewsArticle();
 
@@ -64,7 +64,7 @@ public class SidebarServiceTests
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
-            .ReturnsAsync((IEnumerable<PrintorShareInfo>?)null);
+            .ReturnsAsync((IEnumerable<WebChannelSnippetInfo>?)null);
 
         var page = new NewsArticle { ShowPrintButton = true };
 
@@ -78,7 +78,7 @@ public class SidebarServiceTests
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
-            .ReturnsAsync((IEnumerable<PrintorShareInfo>?)null);
+            .ReturnsAsync((IEnumerable<WebChannelSnippetInfo>?)null);
 
         var page = new NewsArticle();
 
@@ -92,7 +92,7 @@ public class SidebarServiceTests
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
-            .ReturnsAsync((IEnumerable<PrintorShareInfo>?)null);
+            .ReturnsAsync((IEnumerable<WebChannelSnippetInfo>?)null);
 
         var page = new NewsArticle { ShowSocialMediaButtons = false };
 
@@ -106,7 +106,7 @@ public class SidebarServiceTests
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
-            .ReturnsAsync((IEnumerable<PrintorShareInfo>?)null);
+            .ReturnsAsync((IEnumerable<WebChannelSnippetInfo>?)null);
 
         var expectedDto = new SocialMediaButtonsDto { ShowCopyLinkButton = true };
         _socialMediaButtonsServiceMock
@@ -129,7 +129,7 @@ public class SidebarServiceTests
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
-            .ReturnsAsync((IEnumerable<PrintorShareInfo>?)null);
+            .ReturnsAsync((IEnumerable<WebChannelSnippetInfo>?)null);
 
         _socialMediaButtonsServiceMock
             .Setup(x => x.GetSocialMediaButtonsDto(It.IsAny<IWebPageFieldsSource>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -148,7 +148,7 @@ public class SidebarServiceTests
     {
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
-            .ReturnsAsync((IEnumerable<PrintorShareInfo>?)null);
+            .ReturnsAsync((IEnumerable<WebChannelSnippetInfo>?)null);
 
         var page = new NewsArticle { ShowSocialMediaButtons = false };
 
@@ -163,7 +163,7 @@ public class SidebarServiceTests
     //{
     //    _settingServiceMock
     //        .Setup(x => x.GetPrintorShareInfo())
-    //        .ReturnsAsync(new List<PrintorShareInfo> { new PrintorShareInfo { DisablePrint = true } });
+    //        .ReturnsAsync(new List<WebChannelSnippetInfo> { new WebChannelSnippetInfo { DisablePrint = true } });
 
     //    var page = new NewsArticle { ShowPrintButton = true };
 
@@ -177,7 +177,7 @@ public class SidebarServiceTests
     //{
     //    _settingServiceMock
     //        .Setup(x => x.GetPrintorShareInfo())
-    //        .ReturnsAsync(new List<PrintorShareInfo> { new PrintorShareInfo { DisableCopyLinkButton = true } });
+    //        .ReturnsAsync(new List<WebChannelSnippetInfo> { new WebChannelSnippetInfo { DisableCopyLinkButton = true } });
 
     //    var page = new NewsArticle();
 
@@ -191,7 +191,7 @@ public class SidebarServiceTests
     //{
     //    _settingServiceMock
     //        .Setup(x => x.GetPrintorShareInfo())
-    //        .ReturnsAsync(new List<PrintorShareInfo> { new PrintorShareInfo { DisableCopyLinkButton = false } });
+    //        .ReturnsAsync(new List<WebChannelSnippetInfo> { new WebChannelSnippetInfo { DisableCopyLinkButton = false } });
 
     //    var page = new NewsArticle();
 

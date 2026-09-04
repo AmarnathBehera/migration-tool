@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using BDO;
 using BDO.GWT.Core;
 using BDO.GWT.Domain.Core.Entities;
 using BDO.GWT.Web.Core.LiveSite.Services;
@@ -142,11 +143,8 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
         [Test]
         public void Module_IsNamedCustomFormHandlers()
         {
-            // The base Module stores its name; we can verify it via the Name property.
             Assert.That(_module.Name, Is.EqualTo("CustomFormHandlers"));
         }
-
-        // ??? GetReferrerUrl – additional cases ????????????????????????????????????
 
         [Test]
         public void GetReferrerUrl_ReturnsRefererHeader_WithTrailingSlash()
@@ -172,8 +170,6 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             Assert.That(url, Is.EqualTo("https://example.com/en-gb/search?q=tax"));
         }
 
-        // ??? GetCurrentPersonSafelyAsync – additional cases ???????????????????????
-
         [Test]
         public async Task GetCurrentPersonSafelyAsync_ReturnsNull_WhenHttpContextAccessorFieldIsNull()
         {
@@ -192,13 +188,15 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             var websiteChannelContext = new Mock<IWebsiteChannelContext>();
             websiteChannelContext.SetupGet(x => x.WebsiteChannelID).Returns(-1);
 
-            var emailInfoProvider = new Mock<IInfoProvider<EmailInfo>>();
             var channelSettingsProvider = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
+            var snippetProvider = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
+            var globalSettingsProvider = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
 
             var services = new ServiceCollection();
             services.AddSingleton(websiteChannelContext.Object);
-            services.AddSingleton(emailInfoProvider.Object);
             services.AddSingleton(channelSettingsProvider.Object);
+            services.AddSingleton(snippetProvider.Object);
+            services.AddSingleton(globalSettingsProvider.Object);
 
             var serviceProvider = services.BuildServiceProvider();
             var scope = new Mock<IServiceScope>();
@@ -216,13 +214,15 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             var websiteChannelContext = new Mock<IWebsiteChannelContext>();
             websiteChannelContext.SetupGet(x => x.WebsiteChannelID).Returns(0);
 
-            var emailInfoProvider = new Mock<IInfoProvider<EmailInfo>>();
             var channelSettingsProvider = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
+            var snippetProvider = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
+            var globalSettingsProvider = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
 
             var services = new ServiceCollection();
             services.AddSingleton(websiteChannelContext.Object);
-            services.AddSingleton(emailInfoProvider.Object);
             services.AddSingleton(channelSettingsProvider.Object);
+            services.AddSingleton(snippetProvider.Object);
+            services.AddSingleton(globalSettingsProvider.Object);
 
             var serviceProvider = services.BuildServiceProvider();
             var scope = new Mock<IServiceScope>();
@@ -233,6 +233,64 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             var fromEmail = InvokePrivate<string?>(_module, "ResolveFromEmailForCurrentChannel");
 
             Assert.That(fromEmail, Is.Null);
+        }
+
+        [Test]
+        public void ResolveFromEmailForCurrentChannel_ReturnsNull_WhenChannelSettingsMissing()
+        {
+            var services = CreateResolveFromEmailServices(
+                websiteChannelId: 10,
+                channelSettings: [],
+                snippets: [],
+                globals: []);
+
+            var serviceProvider = services.BuildServiceProvider();
+            var scope = new Mock<IServiceScope>();
+            scope.SetupGet(x => x.ServiceProvider).Returns(serviceProvider);
+            _scopeFactory.Setup(x => x.CreateScope()).Returns(scope.Object);
+
+            var result = InvokePrivate<string?>(_module, "ResolveFromEmailForCurrentChannel");
+
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public void ResolveFromEmailForCurrentChannel_ReturnsNull_WhenSnippetMissing()
+        {
+            var services = CreateResolveFromEmailServices(
+                websiteChannelId: 10,
+                channelSettings: [new TestWebChannelSettingsInfo { WebChannelSettingsID = 20 }],
+                snippets: [],
+                globals: []);
+
+            var serviceProvider = services.BuildServiceProvider();
+            var scope = new Mock<IServiceScope>();
+            scope.SetupGet(x => x.ServiceProvider).Returns(serviceProvider);
+            _scopeFactory.Setup(x => x.CreateScope()).Returns(scope.Object);
+
+            var result = InvokePrivate<string?>(_module, "ResolveFromEmailForCurrentChannel");
+
+            Assert.That(result, Is.Null);
+        }
+
+        
+        [Test]
+        public void ResolveFromEmailForCurrentChannel_ReturnsNull_WhenInheritingAndGlobalMissing()
+        {
+            var services = CreateResolveFromEmailServices(
+                websiteChannelId: 10,
+                channelSettings: [new TestWebChannelSettingsInfo { WebChannelSettingsID = 20 }],
+                snippets: [new TestWebChannelSnippetInfo { WebChannelSnippetWebChannelSettingsID = 20, FromEmailInheritfromglobal = true, FromEmail = "snippet@bdo.com" }],
+                globals: []);
+
+            var serviceProvider = services.BuildServiceProvider();
+            var scope = new Mock<IServiceScope>();
+            scope.SetupGet(x => x.ServiceProvider).Returns(serviceProvider);
+            _scopeFactory.Setup(x => x.CreateScope()).Returns(scope.Object);
+
+            var result = InvokePrivate<string?>(_module, "ResolveFromEmailForCurrentChannel");
+
+            Assert.That(result, Is.Null);
         }
 
         // ??? SendEmailAsync – guarded early-exit paths ????????????????????????????
@@ -327,13 +385,15 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             var websiteChannelContext = new Mock<IWebsiteChannelContext>();
             websiteChannelContext.SetupGet(x => x.WebsiteChannelID).Returns(42);
 
-            var emailInfoProvider = new Mock<IInfoProvider<EmailInfo>>();
             var channelSettingsProvider = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
+            var snippetProvider = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
+            var globalSettingsProvider = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
 
             var services = new ServiceCollection();
             services.AddSingleton(websiteChannelContext.Object);
-            services.AddSingleton(emailInfoProvider.Object);
             services.AddSingleton(channelSettingsProvider.Object);
+            services.AddSingleton(snippetProvider.Object);
+            services.AddSingleton(globalSettingsProvider.Object);
 
             var sp = services.BuildServiceProvider();
             var scope = new Mock<IServiceScope>();
@@ -559,8 +619,6 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
                 await (Task)mi!.Invoke(_module, [formItem, formEntry])!);
         }
 
-        // ??? Helpers (additional) ????????????????????????????????????????????????
-
         private static IServiceScope CreateScope(IFormSubmissionSubscriptionsService service)
         {
             var services = new ServiceCollection();
@@ -571,12 +629,67 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
             return scopeMock.Object;
         }
 
-        /// <summary>
-        /// The MapToFormEntry helpers previously created uninitialized <see cref="BizFormInfo"/>/
-        /// <see cref="BizFormItem"/> instances, but their setters go through Kentico's DataClass
-        /// which requires the CMS IoC container. The tests now target the pure
-        /// <c>FormHandlerModule.BuildFormEntry</c> helper instead.
-        /// </summary>
+        private static ServiceCollection CreateResolveFromEmailServices(
+            int websiteChannelId,
+            IEnumerable<WebChannelSettingsInfo> channelSettings,
+            IEnumerable<WebChannelSnippetInfo> snippets,
+            IEnumerable<GlobalsettingskeyInfo> globals)
+        {
+            var websiteChannelContext = new Mock<IWebsiteChannelContext>();
+            websiteChannelContext.SetupGet(x => x.WebsiteChannelID).Returns(websiteChannelId);
+
+            var channelSettingsProvider = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
+            channelSettingsProvider.Setup(x => x.Get())
+                .Returns(BuildQuery(channelSettings));
+
+            var snippetProvider = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
+            snippetProvider.Setup(x => x.Get())
+                .Returns(BuildQuery(snippets));
+
+            var globalSettingsProvider = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
+            globalSettingsProvider.Setup(x => x.Get())
+                .Returns(BuildQuery(globals));
+
+            var services = new ServiceCollection();
+            services.AddSingleton(websiteChannelContext.Object);
+            services.AddSingleton(channelSettingsProvider.Object);
+            services.AddSingleton(snippetProvider.Object);
+            services.AddSingleton(globalSettingsProvider.Object);
+
+            return services;
+        }
+
+        private static ObjectQuery<T> BuildQuery<T>(IEnumerable<T> items)
+            where T : BaseInfo
+        {
+            var queryMock = new Mock<ObjectQuery<T>>();
+            queryMock.Setup(q => q.WhereEquals(It.IsAny<string>(), It.IsAny<object>()))
+                .Returns(queryMock.Object);
+            queryMock.Setup(q => q.TopN(It.IsAny<int>()))
+                .Returns(queryMock.Object);
+            queryMock.As<IEnumerable<T>>()
+                .Setup(x => x.GetEnumerator())
+                .Returns(() => items.GetEnumerator());
+
+            return queryMock.Object;
+        }
+
+        private sealed class TestWebChannelSettingsInfo : WebChannelSettingsInfo
+        {
+            public override int WebChannelSettingsID { get; set; }
+        }
+
+        private sealed class TestWebChannelSnippetInfo : WebChannelSnippetInfo
+        {
+            public override int WebChannelSnippetWebChannelSettingsID { get; set; }
+            public override bool FromEmailInheritfromglobal { get; set; }
+            public override string FromEmail { get; set; } = string.Empty;
+        }
+
+        private sealed class TestGlobalSettingsKeyInfo : GlobalsettingskeyInfo
+        {
+            public override string FromEmail { get; set; } = string.Empty;
+        }
 
         private static T InvokeStaticPrivate<T>(string method, params object?[] args)
         {
@@ -625,3 +738,4 @@ namespace BDO.GWT.GLOBAL.Tests.Components.FormComponents
 
     }
 }
+

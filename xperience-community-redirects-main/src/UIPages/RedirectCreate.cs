@@ -41,11 +41,24 @@ internal class RedirectCreate : ModelEditPage<RedirectEditModel>
 
     protected override async Task<ICommandResponse> ProcessFormData(RedirectEditModel model, ICollection<IFormItem> formItems)
     {
+        if (RedirectSourceUrlValidation.SourceUrlExists(_redirectInfoProvider, model.SourceUrl))
+        {
+            return CreateDuplicateSourceUrlResponse(model.SourceUrl);
+        }
+
         await CreateCodeSnippetInfo(model);
 
         var navigateResponse = await NavigateToEditPage(model, formItems);
 
         return navigateResponse;
+    }
+
+    private ICommandResponse CreateDuplicateSourceUrlResponse(string? sourceUrl)
+    {
+        var response = ResponseFrom(new FormSubmissionResult(FormSubmissionStatus.ValidationFailure));
+        response.AddErrorMessage($"A redirect with the source URL '{sourceUrl}' already exists. The source URL must be unique.");
+
+        return response;
     }
 
     private async Task<INavigateResponse> NavigateToEditPage(RedirectEditModel model, ICollection<IFormItem> formItems)
