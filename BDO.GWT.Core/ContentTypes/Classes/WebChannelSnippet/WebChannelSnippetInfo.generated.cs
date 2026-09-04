@@ -203,35 +203,453 @@ namespace BDO
 
 
         /// <summary>
-        /// Secretkeyre CAPTCH av 3 inheritfromglobal.
+        /// From email.
         /// </summary>
         [DatabaseField]
-        public virtual bool SecretkeyreCAPTCHAv3Inheritfromglobal
+        public virtual string FromEmail
         {
-            get => ValidationHelper.GetBoolean(GetValue(nameof(SecretkeyreCAPTCHAv3Inheritfromglobal)), false);
-            set => SetValue(nameof(SecretkeyreCAPTCHAv3Inheritfromglobal), value);
+            get => ValidationHelper.GetString(GetValue(nameof(FromEmail)), String.Empty);
+            set => SetValue(nameof(FromEmail), value, String.Empty);
         }
 
 
         /// <summary>
-        /// Secretkeyre CAPTCH av 2 inheritfromglobal.
+        /// From email inheritfromglobal.
         /// </summary>
         [DatabaseField]
-        public virtual bool SecretkeyreCAPTCHAv2Inheritfromglobal
+        public virtual bool FromEmailInheritfromglobal
         {
-            get => ValidationHelper.GetBoolean(GetValue(nameof(SecretkeyreCAPTCHAv2Inheritfromglobal)), false);
-            set => SetValue(nameof(SecretkeyreCAPTCHAv2Inheritfromglobal), value);
+            get => ValidationHelper.GetBoolean(GetValue(nameof(FromEmailInheritfromglobal)), false);
+            set => SetValue(nameof(FromEmailInheritfromglobal), value);
         }
 
 
         /// <summary>
-        /// Sitekeyre CAPTCH av 3 inheritfromglobal.
+        /// Display name.
         /// </summary>
         [DatabaseField]
-        public virtual bool SitekeyreCAPTCHAv3Inheritfromglobal
+        public virtual string DisplayName
         {
-            get => ValidationHelper.GetBoolean(GetValue(nameof(SitekeyreCAPTCHAv3Inheritfromglobal)), false);
-            set => SetValue(nameof(SitekeyreCAPTCHAv3Inheritfromglobal), value);
+            get => ValidationHelper.GetString(GetValue(nameof(DisplayName)), "Email");
+            set => SetValue(nameof(DisplayName), value, String.Empty);
+        }
+
+
+        /// <summary>
+        /// Minutestotriggercalendarreminder inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool MinutestotriggercalendarreminderInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(MinutestotriggercalendarreminderInheritfromglobal)), false);
+            set => SetValue(nameof(MinutestotriggercalendarreminderInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Minutestotriggercalendarreminder.
+        /// </summary>
+        [DatabaseField]
+        public virtual int Minutestotriggercalendarreminder
+        {
+            get => ValidationHelper.GetInteger(GetValue(nameof(Minutestotriggercalendarreminder)), 0);
+            set => SetValue(nameof(Minutestotriggercalendarreminder), value, 0);
+        }
+
+
+        /// <summary>
+        /// Displaylocationtitleinasidebar inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool DisplaylocationtitleinasidebarInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(DisplaylocationtitleinasidebarInheritfromglobal)), false);
+            set => SetValue(nameof(DisplaylocationtitleinasidebarInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Displaylocationtitleinasidebar.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool Displaylocationtitleinasidebar
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(Displaylocationtitleinasidebar)), false);
+            set => SetValue(nameof(Displaylocationtitleinasidebar), value);
+        }
+
+
+        /// <summary>
+        /// Non ASCI ito ASCI icharacterdictionary inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool NonASCIItoASCIIcharacterdictionaryInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(NonASCIItoASCIIcharacterdictionaryInheritfromglobal)), false);
+            set => SetValue(nameof(NonASCIItoASCIIcharacterdictionaryInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Non ASCI ito ASCI icharacterdictionary.
+        /// </summary>
+        [DatabaseField]
+        public virtual string NonASCIItoASCIIcharacterdictionary
+        {
+            get => ValidationHelper.GetString(GetValue(nameof(NonASCIItoASCIIcharacterdictionary)), String.Empty);
+            set => SetValue(nameof(NonASCIItoASCIIcharacterdictionary), value, String.Empty);
+        }
+
+
+        /// <summary>
+        /// Enableexternallinkwarning inheritfromlocal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool EnableexternallinkwarningInheritfromlocal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(EnableexternallinkwarningInheritfromlocal)), false);
+            set => SetValue(nameof(EnableexternallinkwarningInheritfromlocal), value);
+        }
+
+
+        /// <summary>
+        /// Enableexternallinkwarning.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool Enableexternallinkwarning
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(Enableexternallinkwarning)), false);
+            set => SetValue(nameof(Enableexternallinkwarning), value);
+        }
+
+
+        /// <summary>
+        /// Seo settings robots inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool SeoSettingsRobotsInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(SeoSettingsRobotsInheritfromglobal)), false);
+            set => SetValue(nameof(SeoSettingsRobotsInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Seo settings robots.
+        /// </summary>
+        [DatabaseField]
+        public virtual string SeoSettingsRobots
+        {
+            get => ValidationHelper.GetString(GetValue(nameof(SeoSettingsRobots)), String.Empty);
+            set => SetValue(nameof(SeoSettingsRobots), value, String.Empty);
+        }
+
+
+        /// <summary>
+        /// Seo settings security inheritfrom global.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool SeoSettingsSecurityInheritfromGlobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(SeoSettingsSecurityInheritfromGlobal)), false);
+            set => SetValue(nameof(SeoSettingsSecurityInheritfromGlobal), value);
+        }
+
+
+        /// <summary>
+        /// Seo settings security.
+        /// </summary>
+        [DatabaseField]
+        public virtual string SeoSettingsSecurity
+        {
+            get => ValidationHelper.GetString(GetValue(nameof(SeoSettingsSecurity)), String.Empty);
+            set => SetValue(nameof(SeoSettingsSecurity), value, String.Empty);
+        }
+
+
+        /// <summary>
+        /// Disable download inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool DisableDownloadInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(DisableDownloadInheritfromglobal)), false);
+            set => SetValue(nameof(DisableDownloadInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Disable download.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool DisableDownload
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(DisableDownload)), false);
+            set => SetValue(nameof(DisableDownload), value);
+        }
+
+
+        /// <summary>
+        /// Disable print inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool DisablePrintInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(DisablePrintInheritfromglobal)), false);
+            set => SetValue(nameof(DisablePrintInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Disable print.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool DisablePrint
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(DisablePrint)), false);
+            set => SetValue(nameof(DisablePrint), value);
+        }
+
+
+        /// <summary>
+        /// Disable facebook inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool DisableFacebookInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(DisableFacebookInheritfromglobal)), false);
+            set => SetValue(nameof(DisableFacebookInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Disable facebook.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool DisableFacebook
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(DisableFacebook)), false);
+            set => SetValue(nameof(DisableFacebook), value);
+        }
+
+
+        /// <summary>
+        /// Disable twitter inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool DisableTwitterInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(DisableTwitterInheritfromglobal)), false);
+            set => SetValue(nameof(DisableTwitterInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Disable twitter.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool DisableTwitter
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(DisableTwitter)), false);
+            set => SetValue(nameof(DisableTwitter), value);
+        }
+
+
+        /// <summary>
+        /// Disable linked in inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool DisableLinkedInInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(DisableLinkedInInheritfromglobal)), false);
+            set => SetValue(nameof(DisableLinkedInInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Disable linked in.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool DisableLinkedIn
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(DisableLinkedIn)), false);
+            set => SetValue(nameof(DisableLinkedIn), value);
+        }
+
+
+        /// <summary>
+        /// Disable email inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool DisableEmailInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(DisableEmailInheritfromglobal)), false);
+            set => SetValue(nameof(DisableEmailInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Disable email.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool DisableEmail
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(DisableEmail)), false);
+            set => SetValue(nameof(DisableEmail), value);
+        }
+
+
+        /// <summary>
+        /// Disable copy link button inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool DisableCopyLinkButtonInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(DisableCopyLinkButtonInheritfromglobal)), false);
+            set => SetValue(nameof(DisableCopyLinkButtonInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Disable copy link button.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool DisableCopyLinkButton
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(DisableCopyLinkButton)), false);
+            set => SetValue(nameof(DisableCopyLinkButton), value);
+        }
+
+
+        /// <summary>
+        /// Showtooltip inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool ShowtooltipInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(ShowtooltipInheritfromglobal)), false);
+            set => SetValue(nameof(ShowtooltipInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Showtooltip.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool Showtooltip
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(Showtooltip)), false);
+            set => SetValue(nameof(Showtooltip), value);
+        }
+
+
+        /// <summary>
+        /// Display emailinv card inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool DisplayEmailinvCardInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(DisplayEmailinvCardInheritfromglobal)), false);
+            set => SetValue(nameof(DisplayEmailinvCardInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Display emailinv card.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool DisplayEmailinvCard
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(DisplayEmailinvCard)), false);
+            set => SetValue(nameof(DisplayEmailinvCard), value);
+        }
+
+
+        /// <summary>
+        /// Use page title to display person name inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool UsePageTitleToDisplayPersonNameInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(UsePageTitleToDisplayPersonNameInheritfromglobal)), false);
+            set => SetValue(nameof(UsePageTitleToDisplayPersonNameInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Use page title to display person name.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool UsePageTitleToDisplayPersonName
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(UsePageTitleToDisplayPersonName)), false);
+            set => SetValue(nameof(UsePageTitleToDisplayPersonName), value);
+        }
+
+
+        /// <summary>
+        /// Enable cookiebot inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool EnableCookiebotInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(EnableCookiebotInheritfromglobal)), false);
+            set => SetValue(nameof(EnableCookiebotInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Enable cookiebot.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool EnableCookiebot
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(EnableCookiebot)), false);
+            set => SetValue(nameof(EnableCookiebot), value);
+        }
+
+
+        /// <summary>
+        /// Cookie ID inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool CookieIDInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(CookieIDInheritfromglobal)), false);
+            set => SetValue(nameof(CookieIDInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Cookie ID.
+        /// </summary>
+        [DatabaseField]
+        public virtual string CookieID
+        {
+            get => ValidationHelper.GetString(GetValue(nameof(CookieID)), String.Empty);
+            set => SetValue(nameof(CookieID), value, String.Empty);
+        }
+
+
+        /// <summary>
+        /// Custom cookiebot script inheritfromglobal.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool CustomCookiebotScriptInheritfromglobal
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(CustomCookiebotScriptInheritfromglobal)), false);
+            set => SetValue(nameof(CustomCookiebotScriptInheritfromglobal), value);
+        }
+
+
+        /// <summary>
+        /// Custom cookiebot script.
+        /// </summary>
+        [DatabaseField]
+        public virtual string CustomCookiebotScript
+        {
+            get => ValidationHelper.GetString(GetValue(nameof(CustomCookiebotScript)), String.Empty);
+            set => SetValue(nameof(CustomCookiebotScript), value);
         }
 
 

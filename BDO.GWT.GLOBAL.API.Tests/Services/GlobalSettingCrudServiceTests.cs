@@ -1,6 +1,8 @@
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Queries;
 using BDO.GWT.GLOBAL.API.Services;
+using CMS.DataEngine;
+using Moq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -102,6 +104,30 @@ public class GlobalSettingCrudServiceTests
         Assert.ThrowsAsync<NullReferenceException>(async () =>
             await service.GetGlobalSetting("BDO.Cookiebot", CancellationToken.None));
     }
+
+    // --- Guard branch reachable without provider access --------------------------
+
+    [TestCase("BDO.WebChannelSnippet")]
+    [TestCase("BDO.Email")]
+    [TestCase("")]
+    [TestCase("bdo.globalsettingskey")]
+    public async Task GetGlobalSetting_ReturnsNull_WhenCodeNameIsNotAKnownGlobalSetting(string codeName)
+    {
+        // Unknown / differently-cased code names short-circuit before touching the
+        // provider (the match uses an exact 'is' pattern), so a mocked provider suffices.
+        var providerMock = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
+        var service = new GlobalSettingCrudService(providerMock.Object);
+
+        var result = await service.GetGlobalSetting(codeName, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Null);
+            providerMock.Verify(p => p.Get(), Times.Never);
+        });
+    }
+
+
 
     [Test]
     public void GlobalSettingCrudService_Interface_HasExpectedMethods()

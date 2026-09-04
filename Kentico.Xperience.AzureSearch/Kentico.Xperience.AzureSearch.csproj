@@ -27,16 +27,12 @@
 		<!-- Requires that npm run build or npm run build:dev was executed _before_ the .NET build -->
 	</ItemGroup>
 
-	<Target Name="NpmInstall" BeforeTargets="NpmBuildClient"
-        Inputs="Admin\Client\package.json;Admin\Client\package-lock.json"
-        Outputs="Admin\Client\node_modules\.install-stamp">
+	<Target Name="NpmInstall" BeforeTargets="NpmBuildClient" Inputs="Admin\Client\package.json;Admin\Client\package-lock.json" Outputs="Admin\Client\node_modules\.install-stamp">
     <Exec Command="npm ci --no-audit --no-fund" WorkingDirectory="$(MSBuildProjectDirectory)\Admin\Client" />
     <Touch Files="Admin\Client\node_modules\.install-stamp" AlwaysCreate="true" />
 </Target>
 
-<Target Name="NpmBuildClient" BeforeTargets="BeforeBuild"
-        Inputs="@(NpmClientSourceFiles)"
-        Outputs="Admin\Client\dist\entry.js">
+<Target Name="NpmBuildClient" BeforeTargets="BeforeBuild" Inputs="@(NpmClientSourceFiles)" Outputs="Admin\Client\dist\entry.js">
     <ItemGroup>
         <NpmClientSourceFiles Include="Admin\Client\src\**\*.*;Admin\Client\webpack.config.js;Admin\Client\package.json" />
     </ItemGroup>
@@ -58,5 +54,7 @@
     <PackageReference Include="Azure.Search.Documents" Version="12.0.0" />
     <PackageReference Include="Kentico.Xperience.Admin" Version="31.7.0" />
     <PackageReference Include="Kentico.Xperience.WebApp" Version="31.7.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
+    <PackageReference Include="Microsoft.Data.SqlClient.Extensions.Azure" Version="7.0.2" />
 </ItemGroup>
 </Project>

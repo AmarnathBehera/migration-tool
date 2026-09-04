@@ -32,7 +32,6 @@ public partial class FormHandlerModule : Module
     private IHttpContextAccessor _httpContextAccessor;
     private ILogger<FormHandlerModule> _logger;
     private IServiceScopeFactory _scopeFactory;
-    private const string EmailKey = "Email";
     public FormHandlerModule() : base("CustomFormHandlers")
     {
     }
@@ -176,7 +175,8 @@ public partial class FormHandlerModule : Module
         using var scope = _scopeFactory.CreateScope();
         var websiteChannelContext = scope.ServiceProvider.GetRequiredService<IWebsiteChannelContext>();
         var webChannelSettingsInfoProvider = scope.ServiceProvider.GetRequiredService<IInfoProvider<WebChannelSettingsInfo>>();
-        var emailInfoProvider = scope.ServiceProvider.GetRequiredService<IInfoProvider<EmailInfo>>();
+        var webChannelSnippetInfoProvider = scope.ServiceProvider.GetRequiredService<IInfoProvider<WebChannelSnippetInfo>>();
+        var globalSettingsInfoProvider = scope.ServiceProvider.GetRequiredService<IInfoProvider<GlobalsettingskeyInfo>>();
 
         int currentWebsiteID = websiteChannelContext.WebsiteChannelID;
         if (currentWebsiteID <= 0)
@@ -197,12 +197,26 @@ public partial class FormHandlerModule : Module
             return null;
         }
 
-        return emailInfoProvider.Get()
-            .WhereEquals(nameof(EmailInfo.DisplayName), EmailKey)
-            .WhereEquals(nameof(EmailInfo.EmailSettingsWebChannelSettingID), currentChannelSettings.WebChannelSettingsID)
+        var channelSnippet = webChannelSnippetInfoProvider
+            .Get()
+            .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID), currentChannelSettings.WebChannelSettingsID)
             .TopN(1)
             .GetEnumerableTypedResult()
-            .FirstOrDefault()?.FromEmail;
+            .FirstOrDefault();
+
+        // Use the channel-level value unless it is missing or configured to inherit from the global settings.
+        if (channelSnippet != null && !channelSnippet.FromEmailInheritfromglobal)
+        {
+            return channelSnippet.FromEmail;
+        }
+
+        var globalSettings = globalSettingsInfoProvider
+            .Get()
+            .TopN(1)
+            .GetEnumerableTypedResult()
+            .FirstOrDefault();
+
+        return globalSettings?.FromEmail;
     }
 
     private async Task<Person> GetCurrentPersonSafelyAsync()

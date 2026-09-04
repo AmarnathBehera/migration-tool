@@ -427,6 +427,71 @@ public class SqlBrowserResultProviderTests
             x => x.ValidateSqlStatement(query),
             Times.Once);
     }
+
+    [Test]
+    public void GetQueryResult_WhenValidatorReturnsInvalid_ReturnsValidationError()
+    {
+        var mockEventLog = new Mock<IEventLogService>();
+        var mockValidator = new Mock<ISqlQueryValidator>();
+
+        const string query = "SELECT * FROM Users";
+        const string errorMessage = "Query must match the supported SELECT pattern.";
+
+        mockValidator
+            .Setup(x => x.ValidateSqlStatement(query))
+            .Returns(new ValidationResult(errorMessage));
+
+        var service = new SqlBrowserResultProvider(
+            mockEventLog.Object,
+            mockValidator.Object);
+
+        service.SetQuery(query);
+
+        var result = service.GetQueryResult();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.ErrorMessage, Is.EqualTo(errorMessage));
+            Assert.That(result.Columns, Is.Empty);
+            Assert.That(result.Rows, Is.Empty);
+        });
+
+        mockValidator.Verify(
+            x => x.ValidateSqlStatement(query),
+            Times.Once);
+    }
+
+    [Test]
+    public void GetQueryResult_WhenValidatorReturnsNull_ReturnsSyntaxValidationError()
+    {
+        var mockEventLog = new Mock<IEventLogService>();
+        var mockValidator = new Mock<ISqlQueryValidator>();
+
+        const string query = "SELECT * FROM";
+
+        mockValidator
+            .Setup(x => x.ValidateSqlStatement(query))
+            .Returns((ValidationResult)null!);
+
+        var service = new SqlBrowserResultProvider(
+            mockEventLog.Object,
+            mockValidator.Object);
+
+        service.SetQuery(query);
+
+        var result = service.GetQueryResult();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.ErrorMessage, Does.StartWith("SQL syntax error:"));
+            Assert.That(result.Columns, Is.Empty);
+            Assert.That(result.Rows, Is.Empty);
+        });
+
+        mockValidator.Verify(
+            x => x.ValidateSqlStatement(query),
+            Times.Once);
+    }
     // ────── behavior: row text formatting ────────────────────────────────────────────────────────
 
     [Test]
