@@ -83,7 +83,7 @@
       <field allowempty="true" column="CookieIDInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="3683db6b-6263-44d8-a24a-c4157bfd9cf5" />
       <field allowempty="true" column="CookieID" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7fd26cc9-f564-4978-a181-f8be7a2649cf" />
       <field allowempty="true" column="CustomCookiebotScriptInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="01a0738d-bb74-44fe-a44a-853e2e7afcc0" />
-      <field column="CustomCookiebotScript" columnprecision="0" columntype="longtext" enabled="true" guid="c7e0fda2-945f-49e5-9932-2e85faeb556e" />
+      <field allowempty="true" column="CustomCookiebotScript" columnprecision="0" columntype="longtext" enabled="true" guid="c7e0fda2-945f-49e5-9932-2e85faeb556e" />
     </form>
   </ClassFormDefinition>
   <ClassGUID>b8d0d5cb-4b0a-48fa-a8a4-54dc06ee7bfa</ClassGUID>

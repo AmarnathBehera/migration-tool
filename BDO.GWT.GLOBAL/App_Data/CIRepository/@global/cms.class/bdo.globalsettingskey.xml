@@ -29,7 +29,11 @@
         </properties>
       </field>
       <field allowempty="true" column="FromEmail" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="4ec77ad8-c539-40d5-bcc2-ee7505497013" />
-      <field allowempty="true" column="DisplayName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="80577043-9d94-4c85-847b-6ab6883fc074" />
+      <field allowempty="true" column="DisplayName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="80577043-9d94-4c85-847b-6ab6883fc074">
+        <properties>
+          <defaultvalue>Email</defaultvalue>
+        </properties>
+      </field>
       <field allowempty="true" column="NonASCIItoASCIIcharacterdictionary" columnprecision="0" columntype="longtext" enabled="true" guid="3038bbf1-a60e-48a8-95c3-6ca3b1603244" />
       <field allowempty="true" column="Enableexternallinkwarning" columnprecision="0" columntype="boolean" enabled="true" guid="1d67878f-7388-4a1d-9260-ebd878ec891f" />
       <field allowempty="true" column="SeoSettingsRobots" columnprecision="0" columnsize="2000" columntype="text" enabled="true" guid="d7df973f-a4bf-4a42-8211-96226eb14e2a" />
