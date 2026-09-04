@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.resource>
+  <ResourceDescription>SQL browser module</ResourceDescription>
+  <ResourceDisplayName>Xperience Community- SQL browser</ResourceDisplayName>
+  <ResourceGUID>72810bcb-5749-4e55-9fe6-ca67cf72c774</ResourceGUID>
+  <ResourceIsInDevelopment>False</ResourceIsInDevelopment>
+  <ResourceName>Community.SqlBrowser</ResourceName>
+</cms.resource>

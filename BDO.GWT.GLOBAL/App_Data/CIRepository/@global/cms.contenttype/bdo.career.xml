@@ -36,26 +36,6 @@
           <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
         </settings>
       </field>
-      <field column="DocumentPublishFrom" columnprecision="7" columntype="datetime" enabled="true" guid="783c8177-02ca-4285-a2ef-c4ed1ca2b86b" visible="true">
-        <properties>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Publish date</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-        </properties>
-        <settings>
-          <controlname>Kentico.Administration.DateTimeInput</controlname>
-        </settings>
-      </field>
-      <field allowempty="true" column="DocumentPublishTo" columnprecision="7" columntype="datetime" enabled="true" guid="348fe8c1-ddf8-4eab-b434-c255e50e5171" visible="true">
-        <properties>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Publish to</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-        </properties>
-        <settings>
-          <controlname>Kentico.Administration.DateTimeInput</controlname>
-        </settings>
-      </field>
       <field allowempty="true" column="CareerContactPeopleID" columnprecision="0" columntype="contentitemreference" enabled="true" guid="5bc7f055-3fd7-45ed-878b-ba451a9a4f1f" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
@@ -81,7 +61,7 @@
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["f3c1aa73-5245-4566-ae9c-ac80c54a6ce2"]]]>
+            <![CDATA[["f3c1aa73-5245-4566-ae9c-ac80c54a6ce2","f868347c-a9e1-459c-aa63-06b98c5fb82e"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>

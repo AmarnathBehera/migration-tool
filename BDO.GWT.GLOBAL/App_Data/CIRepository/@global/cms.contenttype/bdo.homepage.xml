@@ -29,7 +29,7 @@
   </ClassFormDefinition>
   <ClassGUID>31f6383b-697e-4d8f-acec-be459fe4ad01</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
-  <ClassIconClass>icon-doc-o</ClassIconClass>
+  <ClassIconClass>xp-doc</ClassIconClass>
   <ClassName>BDO.HomePage</ClassName>
   <ClassShortName>BDOHomePageXguvkpe0</ClassShortName>
   <ClassTableName>BDO_HomePage</ClassTableName>
