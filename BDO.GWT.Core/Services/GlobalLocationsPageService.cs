@@ -53,14 +53,25 @@ public class GlobalLocationsPageService : IGlobalLocationsPageService
         };
 
         var globalLocationInfo = await _settingService.GetGlobalSettingAsync();
+        string title = globalLocationInfo?.GlobalLocationsTitle ?? string.Empty;
+        string description = globalLocationInfo?.GlobalLocationsDescription ?? string.Empty;
+
+        if (string.IsNullOrEmpty(globalLocationInfo?.GlobalLocationsTitle))
+        {
+            title = globalLocationInfo?.GlobalLocationsTitle ?? string.Empty;
+        }
+        if (string.IsNullOrEmpty(globalLocationInfo?.GlobalLocationsDescription))
+        {
+            description = globalLocationInfo?.GlobalLocationsDescription ?? string.Empty;
+        }
         return new GlobalLocationsDto
         {
 
             Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
             MainGrid = new GlobalLocationsGridDto
             {
-                Title = globalLocationInfo?.GlobalLocationsTitle ?? string.Empty,
-                Description = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(globalLocationInfo?.GlobalLocationsDescription ?? string.Empty),
+                Title = title,
+                Description = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(description),
                 Locations = await GetGlobalLocationsDtoAsync(cancellationToken),
             }
         };
