@@ -1,4 +1,6 @@
-﻿using BDO.GWT.GLOBAL.API.Bases;
+﻿using BDO.GWT.Domain.Core.Enums;
+using BDO.GWT.GLOBAL.API.Attributes;
+using BDO.GWT.GLOBAL.API.Bases;
 using BDO.GWT.GLOBAL.API.DTOs;
 using BDO.GWT.GLOBAL.API.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -12,8 +14,8 @@ namespace BDO.GWT.GLOBAL.API.Controllers;
 /// Provides methods to read and manage scheduled tasks.
 /// </summary>
 [ApiController]
-//[AuthorizeUserPrivilegeLevel(UserPrivilegeLevel.GlobalAdministrator)]
-[Route("memberFirms/{memberFirmID:int}/ScheduledTasks")]
+[AuthorizeUserPrivilegeLevel(UserPrivilegeLevel.GlobalAdministrator)]
+[Route("ScheduledTasks")]
 public class ScheduledTasksController : EntityControllerBase
 {
     private readonly IScheduledTaskCrudService _scheduledTaskCrudService;

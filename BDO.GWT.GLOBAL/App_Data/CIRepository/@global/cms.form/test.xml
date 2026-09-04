@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.form>
+  <FormBuilderLayout>
+<![CDATA[
+{
+  "editableAreas": [
+    {
+      "identifier": "DefaultFormBuilderArea",
+      "sections": [
+        {
+          "identifier": "00000000-0000-0000-0000-000000000000",
+          "type": "Kentico.DefaultSection",
+          "zones": [
+            {
+              "identifier": "62d963c4-34c2-45ac-8e3d-608073dbde1a",
+              "formComponents": [
+                {
+                  "identifier": "a352e7a1-f651-486b-a2ab-d58b586e67ad"
+                }
+              ]
+            }
+          ],
+          "properties": null
+        },
+        {
+          "identifier": "3b030ea6-2136-43c5-a892-2c0f263be1cf",
+          "type": "Kentico.DefaultSection",
+          "zones": [
+            {
+              "identifier": "1b122829-bd6a-4a5d-93cb-15b1800e2cd0",
+              "formComponents": [
+                {
+                  "identifier": "f03754bc-7348-45ff-9c06-7befcfa45f7a"
+                }
+              ]
+            }
+          ],
+          "properties": null
+        }
+      ]
+    }
+  ]
+}
+]]>
+  </FormBuilderLayout>
+  <FormClassID>
+    <CodeName>BizForm.test</CodeName>
+    <GUID>c4ddf94c-c43f-4bd7-b2eb-499765ddedec</GUID>
+    <ObjectType>cms.formclass</ObjectType>
+  </FormClassID>
+  <FormDisplayName>test</FormDisplayName>
+  <FormGUID>7a4148fe-0659-4dd7-be27-6d5531cf7b73</FormGUID>
+  <FormItems>0</FormItems>
+  <FormLogActivity>True</FormLogActivity>
+  <FormName>test</FormName>
+</cms.form>

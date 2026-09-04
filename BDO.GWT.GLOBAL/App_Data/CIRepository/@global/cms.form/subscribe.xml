@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.form>
+  <FormBuilderLayout>
+<![CDATA[
+{
+  "editableAreas": [
+    {
+      "identifier": "DefaultFormBuilderArea",
+      "sections": [
+        {
+          "identifier": "00000000-0000-0000-0000-000000000000",
+          "type": "Kentico.DefaultSection",
+          "zones": [
+            {
+              "identifier": "33f40ad3-7d67-4656-a622-055bde146150",
+              "formComponents": [
+                {
+                  "identifier": "97663e37-aac5-45a9-bf86-fe525b9def88"
+                }
+              ]
+            }
+          ],
+          "properties": null
+        },
+        {
+          "identifier": "a092e342-ae3e-4431-9d58-2e6ca75d5a71",
+          "type": "Kentico.DefaultSection",
+          "zones": [
+            {
+              "identifier": "874664ee-dd91-4aa6-b6f5-06eb3a714bc7",
+              "formComponents": [
+                {
+                  "identifier": "f568f00d-5a39-4e7f-814b-bf7b075eb54a"
+                }
+              ]
+            }
+          ],
+          "properties": null
+        },
+        {
+          "identifier": "20d6c6a8-bdff-479b-9cef-30b10b273caa",
+          "type": "Kentico.DefaultSection",
+          "zones": [
+            {
+              "identifier": "67931605-8563-4f08-ba06-af92487e61dd",
+              "formComponents": [
+                {
+                  "identifier": "15da46a5-b0cc-41ea-a383-8e04d29d2f25"
+                }
+              ]
+            }
+          ],
+          "properties": null
+        },
+        {
+          "identifier": "f00fb387-878b-4279-bfd6-60471acabd29",
+          "type": "Kentico.DefaultSection",
+          "zones": [
+            {
+              "identifier": "23780508-93be-45d5-a979-4e1172a27306",
+              "formComponents": [
+                {
+                  "identifier": "099e7966-64e4-4ee8-a03a-4eca12abe008"
+                },
+                {
+                  "identifier": "dc4f0f4a-20f5-443e-8858-3e527ab54128"
+                }
+              ]
+            }
+          ],
+          "properties": null
+        }
+      ]
+    }
+  ]
+}
+]]>
+  </FormBuilderLayout>
+  <FormClassID>
+    <CodeName>BizForm.Subscribe</CodeName>
+    <GUID>eae49fa5-fbc0-4de3-abf1-401387cd093d</GUID>
+    <ObjectType>cms.formclass</ObjectType>
+  </FormClassID>
+  <FormDisplayName>Subscribe</FormDisplayName>
+  <FormGUID>8d5fb041-4d3e-4c0d-af22-d2ca7c1d39b1</FormGUID>
+  <FormItems>0</FormItems>
+  <FormLogActivity>True</FormLogActivity>
+  <FormName>Subscribe</FormName>
+</cms.form>

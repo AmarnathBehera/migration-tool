@@ -122,6 +122,22 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
         }
 
         [Test]
+        public async Task OpenEditQuery_WithChannelId_UsesParameterizedEditQueryPath()
+        {
+            _sut.ReportingChannelSettingId = 5;
+
+            _pageLinkGenerator
+                .Setup(x => x.GetPath<EditQuery>(It.IsAny<PageParameterValues>()))
+                .Returns("/editquery/5");
+
+            await _sut.OpenEditQuery();
+
+            _pageLinkGenerator.Verify(
+                x => x.GetPath<EditQuery>(It.IsAny<PageParameterValues>()),
+                Times.Once);
+        }
+
+        [Test]
         public async Task OpenEditQuery_ReturnsNavigationResponse()
         {
             var result = await _sut.OpenEditQuery();

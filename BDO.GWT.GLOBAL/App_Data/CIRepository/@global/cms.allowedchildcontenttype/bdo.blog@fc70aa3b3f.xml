@@ -27,12 +27,5 @@
         <ObjectType>cms.contenttype</ObjectType>
       </AllowedChildContentTypeChildID>
     </Binding>
-    <Binding id="cms.contenttype_BDO.Rss">
-      <AllowedChildContentTypeChildID>
-        <CodeName>BDO.Rss</CodeName>
-        <GUID>22064a96-e307-425f-be14-88c1dd367c07</GUID>
-        <ObjectType>cms.contenttype</ObjectType>
-      </AllowedChildContentTypeChildID>
-    </Binding>
   </Bindings>
 </cms.allowedchildcontenttype>

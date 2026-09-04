@@ -13,12 +13,5 @@
         <ObjectType>cms.contenttype</ObjectType>
       </AllowedChildContentTypeChildID>
     </Binding>
-    <Binding id="cms.contenttype_BDO.InFocusFolder">
-      <AllowedChildContentTypeChildID>
-        <CodeName>BDO.InFocusFolder</CodeName>
-        <GUID>ac1e408b-4818-40ac-848f-9cdc87912a42</GUID>
-        <ObjectType>cms.contenttype</ObjectType>
-      </AllowedChildContentTypeChildID>
-    </Binding>
   </Bindings>
 </cms.allowedchildcontenttype>
