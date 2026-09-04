@@ -38,18 +38,18 @@
 //        {
 //            _settingServiceMock
 //                .Setup(x => x.GetUsePersonPageTitleInfo())
-//                .ReturnsAsync((IEnumerable<OurPeopleInfo>?)null);
+//                .ReturnsAsync((IEnumerable<WebChannelSnippetInfo>?)null);
 //        }
 //        else
 //        {
 //            var info = new TestOurPeopleInfo(value.Value);
 //            _settingServiceMock
 //                .Setup(x => x.GetUsePersonPageTitleInfo())
-//                .ReturnsAsync(new List<OurPeopleInfo> { info });
+//                .ReturnsAsync(new List<WebChannelSnippetInfo> { info });
 //        }
 //    }
 
-//    private sealed class TestOurPeopleInfo : OurPeopleInfo
+//    private sealed class TestOurPeopleInfo : WebChannelSnippetInfo
 //    {
 //        private readonly bool _usePageTitle;
 
