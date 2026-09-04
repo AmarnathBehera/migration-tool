@@ -1699,8 +1699,7 @@ after;After
           <kxp_schema_identifier>6539cfc9-05fd-49d4-a289-7b6fbd91d8ac</kxp_schema_identifier>
         </properties>
         <settings>
-          <controlname>BDO.FetchGlobalSettingFieldData</controlname>
-          <FieldName>GlobalLocationsTitle</FieldName>
+          <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
       <field allowempty="true" column="DescriptionBodyforGlobal" columnprecision="0" columntype="longtext" enabled="true" guid="9555902d-a845-48ff-af4a-f004ee3931d3" visible="true">
@@ -1713,8 +1712,10 @@ after;After
           <kxp_schema_identifier>6539cfc9-05fd-49d4-a289-7b6fbd91d8ac</kxp_schema_identifier>
         </properties>
         <settings>
-          <controlname>BDO.FetchGlobalSettingFieldData</controlname>
-          <FieldName>GlobalLocationsDescription</FieldName>
+          <controlname>Kentico.Administration.TextArea</controlname>
+          <CopyButtonVisible>False</CopyButtonVisible>
+          <MaxRowsNumber>5</MaxRowsNumber>
+          <MinRowsNumber>3</MinRowsNumber>
         </settings>
       </field>
     </form>
