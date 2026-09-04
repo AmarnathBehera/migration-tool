@@ -67,6 +67,42 @@ public class SettingServiceTests
     private void SetupChannelSettingsQuery(IEnumerable<WebChannelSettingsInfo> results) =>
         _channelMock.Setup(p => p.Get()).Returns(BuildQuery(results).Object);
 
+    private void SetupGlobalSettingsQuery(IEnumerable<GlobalsettingskeyInfo> results) =>
+        _globalMock.Setup(p => p.Get()).Returns(BuildQuery(results).Object);
+
+    // --- GetGlobalSettingAsync ---------------------------------------------------
+
+    [Test]
+    public async Task GetGlobalSettingAsync_ReturnsNull_WhenNoGlobalSettingFound()
+    {
+        SetupGlobalSettingsQuery([]);
+
+        var result = await _service.GetGlobalSettingAsync();
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task GetGlobalSettingAsync_UsesTopNOne_FromGlobalProvider()
+    {
+        var queryMock = BuildQuery(Array.Empty<GlobalsettingskeyInfo>());
+        _globalMock.Setup(p => p.Get()).Returns(queryMock.Object);
+
+        await _service.GetGlobalSettingAsync();
+
+        _globalMock.Verify(p => p.Get(), Times.Once);
+        queryMock.Verify(q => q.TopN(1), Times.Once);
+    }
+
+    [Test]
+    public void GetGlobalSettingAsync_PropagatesException_FromGlobalProvider()
+    {
+        _globalMock.Setup(p => p.Get())
+            .Throws(new InvalidOperationException("db error"));
+
+        Assert.ThrowsAsync<InvalidOperationException>(() => _service.GetGlobalSettingAsync());
+    }
+
 
 
     // --- GetPrintorShareInfo / GetFilteringInfo / GetUsePersonPageTitleInfo -------
