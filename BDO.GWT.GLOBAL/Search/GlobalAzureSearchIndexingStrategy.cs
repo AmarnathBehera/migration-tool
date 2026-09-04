@@ -122,14 +122,14 @@ public class GlobalAzureSearchIndexingStrategy : BaseAzureSearchIndexingStrategy
                 return null;
             }
 
-            result.PersonDirectDialNumber = personPage?.PersonDirectDialNumber ?? string.Empty;
-            result.PersonEmail = personPage?.PersonEmail ?? string.Empty;
-            result.PersonFirstName = personPage?.PersonFirstName ?? string.Empty;
-            result.PersonLastName = personPage?.PersonLastName ?? string.Empty;
-            result.PersonJobTitle = personPage?.PersonJobTitle ?? string.Empty;
-            result.PersonMobilePhone = personPage?.PersonMobilePhone ?? string.Empty;
-            result.PersonPhone = personPage?.PersonPhone ?? string.Empty;
-            result.PersonSurnamePrefixes = personPage?.PersonSurnamePrefixes ?? string.Empty;
+            result.PersonDirectDialNumber = personPage.PersonDirectDialNumber ?? string.Empty;
+            result.PersonEmail = personPage.PersonEmail ?? string.Empty;
+            result.PersonFirstName = personPage.PersonFirstName ?? string.Empty;
+            result.PersonLastName = personPage.PersonLastName ?? string.Empty;
+            result.PersonJobTitle = personPage.PersonJobTitle ?? string.Empty;
+            result.PersonMobilePhone = personPage.PersonMobilePhone ?? string.Empty;
+            result.PersonPhone = personPage.PersonPhone ?? string.Empty;
+            result.PersonSurnamePrefixes = personPage.PersonSurnamePrefixes ?? string.Empty;
             
             MapCommonMetadataFields(result, indexedPage, personPage);
         }
@@ -147,7 +147,7 @@ public class GlobalAzureSearchIndexingStrategy : BaseAzureSearchIndexingStrategy
                 return null;
             }
 
-            result.DealContent = dealPage?.DealContent ?? string.Empty;            
+            result.DealContent = dealPage.DealContent ?? string.Empty;            
 
 
             MapCommonMetadataFields(result, indexedPage, dealPage);
