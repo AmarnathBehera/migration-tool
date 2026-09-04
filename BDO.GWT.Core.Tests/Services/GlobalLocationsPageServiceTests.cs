@@ -12,6 +12,8 @@ public class GlobalLocationsPageServiceTests
 {
     private Mock<IGlobalLocationCustomTableDataService> _globalLocationCustomTableDataServiceMock;
     private Mock<IHeroService> _heroServiceMock;
+    private Mock<ISettingService> _settingServiceMock;
+
     private GlobalLocationsPageService _service;
 
     [SetUp]
@@ -19,6 +21,7 @@ public class GlobalLocationsPageServiceTests
     {
         _globalLocationCustomTableDataServiceMock = new Mock<IGlobalLocationCustomTableDataService>();
         _heroServiceMock = new Mock<IHeroService>();
+        _settingServiceMock = new Mock<ISettingService>();
 
         _heroServiceMock
             .Setup(s => s.GetHeroDtoAsync(It.IsAny<HeroData>(), It.IsAny<CancellationToken>()))
@@ -30,7 +33,8 @@ public class GlobalLocationsPageServiceTests
 
         _service = new GlobalLocationsPageService(
             _globalLocationCustomTableDataServiceMock.Object,
-            _heroServiceMock.Object);
+            _heroServiceMock.Object,
+            _settingServiceMock.Object);
     }
 
     private static BDO.GlobalLocations CreatePage(
