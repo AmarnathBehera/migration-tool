@@ -79,6 +79,16 @@ public static class ResourceStringKey
 
             public const string Year = FiltersPrefix + "Year";
         }
+        public static class ViewGlobalLocations
+        {
+            private const string ViewGlobalLocationsPrefix = LiveSitePrefix + "ViewGlobalLocations.";
+
+            public const string Button = ViewGlobalLocationsPrefix + "Button";
+
+            public const string Description = ViewGlobalLocationsPrefix + "Description";
+
+            public const string Title = ViewGlobalLocationsPrefix + "Title";
+        }
         public static class Insights
         {
             private const string InsightsPrefix = LiveSitePrefix + "Insights.";

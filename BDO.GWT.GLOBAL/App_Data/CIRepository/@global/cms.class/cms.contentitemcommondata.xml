@@ -1336,12 +1336,21 @@ MicrositePage;Microsite Page
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Location address</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
           <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>8412bdf1-4ba5-4fc9-8d9b-7cf930b5c243</kxp_schema_identifier>
         </properties>
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This input field is required.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
       </field>
       <field allowempty="true" column="EventLocationAddress2" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="61dd9cee-294a-4685-b8d4-642eddd33bd6" visible="true">
         <properties>
@@ -1360,12 +1369,21 @@ MicrositePage;Microsite Page
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>City</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
           <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>8412bdf1-4ba5-4fc9-8d9b-7cf930b5c243</kxp_schema_identifier>
         </properties>
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This input field is required.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
       </field>
       <field allowempty="true" column="EventLocationState" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="4cd910c0-b981-4230-8079-cbad7dd9cb6a" visible="true">
         <properties>
@@ -1427,12 +1445,21 @@ after;After
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Country</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
           <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>8412bdf1-4ba5-4fc9-8d9b-7cf930b5c243</kxp_schema_identifier>
         </properties>
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This input field is required.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
       </field>
       <field allowempty="true" column="ShowEventLocation" columnprecision="0" columntype="boolean" enabled="true" guid="b2c2a34d-e8e3-442f-a2ef-a7d55642bf76" visible="true">
         <properties>
@@ -1691,6 +1718,9 @@ after;After
       </schema>
       <field allowempty="true" column="DescriptionTitleforGlobal" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="324a44b9-b808-49b6-89d0-01efff6fbbd3" visible="true">
         <properties>
+          <explanationtext>
+            <![CDATA[If this field is left blank, its value will automatically be taken from the Global Settings.]]>
+          </explanationtext>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Title</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
@@ -1699,12 +1729,14 @@ after;After
           <kxp_schema_identifier>6539cfc9-05fd-49d4-a289-7b6fbd91d8ac</kxp_schema_identifier>
         </properties>
         <settings>
-          <controlname>BDO.FetchGlobalSettingFieldData</controlname>
-          <FieldName>GlobalLocationsTitle</FieldName>
+          <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
       <field allowempty="true" column="DescriptionBodyforGlobal" columnprecision="0" columntype="longtext" enabled="true" guid="9555902d-a845-48ff-af4a-f004ee3931d3" visible="true">
         <properties>
+          <explanationtext>
+            <![CDATA[If this field is left blank, its value will automatically be taken from the Global Settings.]]>
+          </explanationtext>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Body content</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
@@ -1713,8 +1745,10 @@ after;After
           <kxp_schema_identifier>6539cfc9-05fd-49d4-a289-7b6fbd91d8ac</kxp_schema_identifier>
         </properties>
         <settings>
-          <controlname>BDO.FetchGlobalSettingFieldData</controlname>
-          <FieldName>GlobalLocationsDescription</FieldName>
+          <controlname>Kentico.Administration.TextArea</controlname>
+          <CopyButtonVisible>False</CopyButtonVisible>
+          <MaxRowsNumber>5</MaxRowsNumber>
+          <MinRowsNumber>3</MinRowsNumber>
         </settings>
       </field>
     </form>
