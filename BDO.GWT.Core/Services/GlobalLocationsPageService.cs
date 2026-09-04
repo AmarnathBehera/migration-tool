@@ -53,17 +53,12 @@ public class GlobalLocationsPageService : IGlobalLocationsPageService
         };
 
         var globalLocationInfo = await _settingService.GetGlobalSettingAsync();
-        string title = globalLocationInfo?.GlobalLocationsTitle ?? string.Empty;
-        string description = globalLocationInfo?.GlobalLocationsDescription ?? string.Empty;
-
-        if (string.IsNullOrEmpty(globalLocationInfo?.GlobalLocationsTitle))
-        {
-            title = globalLocationInfo?.GlobalLocationsTitle ?? string.Empty;
-        }
-        if (string.IsNullOrEmpty(globalLocationInfo?.GlobalLocationsDescription))
-        {
-            description = globalLocationInfo?.GlobalLocationsDescription ?? string.Empty;
-        }
+        var title = string.IsNullOrWhiteSpace(globalLocations.DescriptionTitleforGlobal)
+            ? globalLocationInfo?.GlobalLocationsTitle ?? string.Empty
+            : globalLocations.DescriptionTitleforGlobal;
+        var description = string.IsNullOrWhiteSpace(globalLocations.DescriptionBodyforGlobal)
+            ? globalLocationInfo?.GlobalLocationsDescription ?? string.Empty
+            : globalLocations.DescriptionBodyforGlobal;
         return new GlobalLocationsDto
         {
 
