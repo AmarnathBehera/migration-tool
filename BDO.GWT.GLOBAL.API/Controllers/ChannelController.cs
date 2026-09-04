@@ -1,9 +1,6 @@
-﻿using BDO.GWT.Domain.Core.Constants;
-using BDO.GWT.GLOBAL.API.Bases;
+﻿using BDO.GWT.GLOBAL.API.Bases;
 using BDO.GWT.GLOBAL.API.Data;
-using BDO.GWT.GLOBAL.API.Filters;
 using BDO.GWT.GLOBAL.API.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Mime;
@@ -52,5 +49,54 @@ public class ChannelController : EntityControllerBase
         var channel = await _channelCrudService.GetEntityAsync(channelGuid, cancellationToken);
 
         return Ok(channel);
+    }
+
+    /// <summary>
+    /// Creates a new channel.
+    /// </summary>
+    /// <param name="request">Input data of the new channel.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Newly created channel.</returns>
+    [HttpPost]
+    [SwaggerResponse(StatusCodes.Status201Created, null, typeof(ChannelOutput), MediaTypeNames.Application.Json)]
+    public async Task<ActionResult<ChannelOutput>> PostChannelAsync([FromRoute] int memberFirmID, [FromBody] ChannelInput request, CancellationToken cancellationToken)
+    {
+        var channel = await _channelCrudService.CreateEntityAsync(request, cancellationToken);
+
+        return CreatedAtAction(nameof(GetChannelAsync), new { memberFirmID, channelGuid = channel.General.GUID }, channel);
+    }
+
+    //            return CreatedAtAction(nameof(Get), new { memberFirmID, pageGUID, attachmentGUID = result.GUID }, result);
+
+
+    /// <summary>
+    /// Updates a single channel having the specified GUID.
+    /// </summary>
+    /// <param name="channelGuid">GUID of the channel.</param>
+    /// <param name="request">Updated channel data.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Updated channel.</returns>
+    [HttpPut("{channelGuid:guid}")]
+    [SwaggerResponse(StatusCodes.Status200OK, null, typeof(ChannelOutput), MediaTypeNames.Application.Json)]
+    public async Task<ActionResult<ChannelOutput>> PutChannelAsync(Guid channelGuid, [FromBody] ChannelInput request, CancellationToken cancellationToken)
+    {
+        var channel = await _channelCrudService.UpdateEntityAsync(channelGuid, request, cancellationToken);
+
+        return Ok(channel);
+    }
+
+    /// <summary>
+    /// Deletes a single channel having the specified GUID.
+    /// </summary>
+    /// <param name="channelGuid">GUID of the channel.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>204 No Content.</returns>
+    [HttpDelete("{channelGuid:guid}")]
+    [SwaggerResponse(StatusCodes.Status204NoContent, null, typeof(void))]
+    public async Task<IActionResult> DeleteChannelAsync(Guid channelGuid, CancellationToken cancellationToken)
+    {
+        await _channelCrudService.DeleteEntityAsync(channelGuid, cancellationToken);
+
+        return NoContent();
     }
 }
