@@ -224,7 +224,7 @@ public class PeopleCardsServiceTests
 
         _settingServiceMock
             .Setup(s => s.GetUsePersonPageTitleInfo())
-            .ReturnsAsync((IEnumerable<OurPeopleInfo>?)null);
+            .ReturnsAsync((IEnumerable<WebChannelSnippetInfo>?)null);
 
         var result = await _service.GetFallbackMetadataDescription(person);
 
@@ -244,7 +244,7 @@ public class PeopleCardsServiceTests
 
         _settingServiceMock
             .Setup(s => s.GetUsePersonPageTitleInfo())
-            .ReturnsAsync(Enumerable.Empty<OurPeopleInfo>());
+            .ReturnsAsync(Enumerable.Empty<WebChannelSnippetInfo>());
 
         var result = await _service.GetFallbackMetadataDescription(person);
 

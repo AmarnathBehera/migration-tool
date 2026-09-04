@@ -34,7 +34,7 @@ internal class RedirectEditModel
     /// </summary>
     public async Task MapToRedirectInfo(RedirectInfo info, IWebPageUrlRetriever webPageUrlRetriever)
     {
-        info.RedirectSourceUrl = SourceUrl?.ToLower();
+        info.RedirectSourceUrl = SourceUrl?.ToLowerInvariant();
         info.RedirectTargetPageURL = string.Empty;
 
         var targetPage = TargetWebPageItem.FirstOrDefault();

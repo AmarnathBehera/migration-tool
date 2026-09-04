@@ -15,7 +15,7 @@
     {
         ComponentIdentifiers.Widgets.RichText,
         ComponentIdentifiers.Widgets.InsightCarousel,
-       // ComponentIdentifiers.Widgets.InsightAnimationCard,
+        ComponentIdentifiers.Widgets.InsightAnimationCard,
         ComponentIdentifiers.Widgets.FlexibleBanner,
         ComponentIdentifiers.Widgets.Button,
         ComponentIdentifiers.Widgets.QuoteCard,
@@ -27,9 +27,11 @@
 }
 
 
-@await Html.Kentico().EditableAreaAsync(
-"mainContent",
-        new EditableAreaOptions
-        {
-            AllowedWidgets = widgetsList
-        })
+<div class="py-20">
+    @await Html.Kentico().EditableAreaAsync(
+    "mainContent",
+            new EditableAreaOptions
+            {
+                AllowedWidgets = widgetsList
+            })
+</div>

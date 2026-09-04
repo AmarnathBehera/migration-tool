@@ -17,7 +17,7 @@ namespace BDO.GWT.Core.Tests.Services;
 public class CareerDetailPageServiceTests
 {
 
-    private sealed class TestPrintorShareInfo : PrintorShareInfo
+    private sealed class TestPrintorShareInfo : WebChannelSnippetInfo
     {
         public override bool DisablePrint { get; set; }
         public override bool DisableDownload { get; set; }
@@ -46,7 +46,7 @@ public class CareerDetailPageServiceTests
 
         _settingServiceMock
             .Setup(x => x.GetPrintorShareInfo())
-            .ReturnsAsync((IEnumerable<PrintorShareInfo>?)null);
+            .ReturnsAsync((IEnumerable<WebChannelSnippetInfo>?)null);
 
         _service = new CareerDetailPageService(
             _heroServiceMock.Object,

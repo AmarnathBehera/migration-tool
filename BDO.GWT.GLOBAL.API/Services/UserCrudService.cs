@@ -5,7 +5,6 @@ using CMS.DataEngine;
 using CMS.Membership;
 using CMS.Websites;
 using CMS.Websites.Internal;
-using System.Security.Claims;
 
 namespace BDO.GWT.GLOBAL.API.Services;
 
@@ -58,14 +57,10 @@ public class UserCrudService : IUserCrudService
         var query = _userInfoProvider.Get();
 
         if (!string.IsNullOrEmpty(userName))
-        {
             query = query.WhereContains(nameof(UserInfo.UserName), userName);
-        }
 
         var users = await query.GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
-
         var context = await BuildContextAsync(cancellationToken);
-
         return users.Select(u => ToUserOutput(u, context));
     }
 
@@ -77,12 +72,9 @@ public class UserCrudService : IUserCrudService
             .FirstOrDefault();
 
         if (user is null)
-        {
             return null;
-        }
 
         var context = await BuildContextAsync(cancellationToken);
-
         return ToUserOutput(user, context);
     }
 
@@ -90,6 +82,8 @@ public class UserCrudService : IUserCrudService
 
     public async Task<UserOutput> CreateUserAsync(UserInput userInput, CancellationToken cancellationToken)
     {
+        var caller = await GetAndValidateCallerAsync(cancellationToken);
+
         await ValidateUserInputAsync(null, userInput, cancellationToken);
 
         var user = new UserInfo
@@ -101,15 +95,18 @@ public class UserCrudService : IUserCrudService
             UserEnabled = userInput.General.Enabled,
             UserIsExternal = userInput.General.IsExternalUser,
             UserPreferredLanguage = userInput.General.PreferredLanguage,
-            //UserAdministrationAccess = true
+            UserAdministrationAccess = true
         };
 
-        await _userInfoProvider.SetAsync(user, cancellationToken);
+        using (var actionContext = new CMSActionContext(caller))
+        {
+            actionContext.UseGlobalAdminContext = true;
+            _userInfoProvider.Set(user);
+             await SyncUserRolesAsync(user.UserID, userInput.Roles, cancellationToken);
+        }
 
-        await SyncUserRolesAsync(user.UserID, userInput.Roles, cancellationToken);
 
         var context = await BuildContextAsync(cancellationToken);
-
         return ToUserOutput(user, context);
     }
 
@@ -117,6 +114,8 @@ public class UserCrudService : IUserCrudService
 
     public async Task<UserOutput> UpdateUserAsync(Guid userGUID, UserInput userInput, CancellationToken cancellationToken)
     {
+        var caller = await GetAndValidateCallerAsync(cancellationToken);
+
         var user = await GetValidatedUserAsync(userGUID, cancellationToken);
 
         await ValidateUserInputAsync(user.UserID, userInput, cancellationToken);
@@ -129,17 +128,15 @@ public class UserCrudService : IUserCrudService
         user.UserIsExternal = userInput.General.IsExternalUser;
         user.UserPreferredLanguage = userInput.General.PreferredLanguage;
 
-        var contextUser = await GetContextUserAsync(cancellationToken);
-
-        using (new CMSActionContext(contextUser))
+        using (var actionContext = new CMSActionContext(caller))
         {
-            await _userInfoProvider.SetAsync(user, cancellationToken);
-
-            await SyncUserRolesAsync(user.UserID, userInput.Roles, cancellationToken);
+            actionContext.UseGlobalAdminContext = true;
+            _userInfoProvider.Set(user);
+        await SyncUserRolesAsync(user.UserID, userInput.Roles, cancellationToken);
         }
 
-        var context = await BuildContextAsync(cancellationToken);
 
+        var context = await BuildContextAsync(cancellationToken);
         return ToUserOutput(user, context);
     }
 
@@ -147,38 +144,52 @@ public class UserCrudService : IUserCrudService
 
     public async Task DeleteUserAsync(Guid userGUID, CancellationToken cancellationToken)
     {
+        var caller = await GetAndValidateCallerAsync(cancellationToken);
+
         var user = await GetValidatedUserAsync(userGUID, cancellationToken);
 
-        var contextUser = await GetContextUserAsync(cancellationToken);
-
-        using (new CMSActionContext(contextUser))
+        using (var actionContext = new CMSActionContext(caller))
         {
-            await _userInfoProvider.DeleteAsync(user, cancellationToken);
+            actionContext.UseGlobalAdminContext = true;
+            _userInfoProvider.Delete(user);
         }
     }
 
-    // ---------- CALLER CONTEXT ----------
+    // ---------- CALLER VALIDATION ----------
 
-    private async Task<UserInfo> GetContextUserAsync(CancellationToken cancellationToken)
+    /// <summary>
+    /// Resolves the authenticated HTTP caller to a Kentico UserInfo and verifies
+    /// they are enabled and have administration access. Throws UnauthorizedAccessException
+    /// on any failure so the controller returns 401 rather than 500.
+    /// </summary>
+    private async Task<UserInfo> GetAndValidateCallerAsync(CancellationToken cancellationToken)
     {
         var httpContext = _httpContextAccessor.HttpContext
-            ?? throw new InvalidOperationException("No HTTP context available.");
+            ?? throw new UnauthorizedAccessException("HTTP context was not available.");
 
-        var callerIdentifier = httpContext.User.FindFirst(ClaimTypes.Email)?.Value
-            ?? throw new InvalidOperationException("Caller identity claim not found.");
+        if (httpContext.User?.Identity?.IsAuthenticated != true)
+            throw new UnauthorizedAccessException("User is not authenticated.");
 
-        var callerUser = (await _userInfoProvider.Get()
-            .WhereEquals(nameof(UserInfo.UserName), callerIdentifier)
+        var username = httpContext.User.Identity?.Name;
+
+        if (string.IsNullOrWhiteSpace(username))
+            throw new UnauthorizedAccessException("Authenticated username was not found in the request.");
+
+        var caller = (await _userInfoProvider.Get()
+            .WhereEquals(nameof(UserInfo.UserName), username)
             .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
             .FirstOrDefault();
 
-        if (callerUser is null || !callerUser.UserAdministrationAccess)
-        {
-            throw new InvalidOperationException(
-                $"Caller '{callerIdentifier}' was not found in Kentico or lacks administration access.");
-        }
+        if (caller is null)
+            throw new UnauthorizedAccessException($"Xperience user '{username}' was not found.");
 
-        return callerUser;
+        if (!caller.UserEnabled)
+            throw new UnauthorizedAccessException($"Xperience user '{caller.UserName}' is disabled.");
+
+        if (!caller.UserAdministrationAccess)
+            throw new UnauthorizedAccessException($"Xperience user '{caller.UserName}' does not have administration access.");
+
+        return caller;
     }
 
     // ---------- VALIDATION HELPERS ----------
@@ -190,35 +201,22 @@ public class UserCrudService : IUserCrudService
             .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
             .FirstOrDefault();
 
-        if (user is null)
-        {
-            throw new InvalidOperationException($"Cannot find user with GUID '{userGUID}'.");
-        }
-
-        return user;
+        return user ?? throw new InvalidOperationException($"Cannot find user with GUID '{userGUID}'.");
     }
 
     private async Task ValidateUserInputAsync(int? existingUserId, UserInput userInput, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(userInput.General.UserName))
-        {
             throw new InvalidOperationException("User name is required.");
-        }
 
         var userNameQuery = _userInfoProvider.Get()
             .WhereEquals(nameof(UserInfo.UserName), userInput.General.UserName);
 
         if (existingUserId.HasValue)
-        {
             userNameQuery = userNameQuery.WhereNotEquals(nameof(UserInfo.UserID), existingUserId.Value);
-        }
 
-        var userNameExists = (await userNameQuery.GetEnumerableTypedResultAsync(cancellationToken: cancellationToken)).Any();
-
-        if (userNameExists)
-        {
+        if ((await userNameQuery.GetEnumerableTypedResultAsync(cancellationToken: cancellationToken)).Any())
             throw new InvalidOperationException($"User name '{userInput.General.UserName}' already exists.");
-        }
 
         if (!string.IsNullOrEmpty(userInput.General.Email))
         {
@@ -226,16 +224,10 @@ public class UserCrudService : IUserCrudService
                 .WhereEquals(nameof(UserInfo.Email), userInput.General.Email);
 
             if (existingUserId.HasValue)
-            {
                 emailQuery = emailQuery.WhereNotEquals(nameof(UserInfo.UserID), existingUserId.Value);
-            }
 
-            var emailExists = (await emailQuery.GetEnumerableTypedResultAsync(cancellationToken: cancellationToken)).Any();
-
-            if (emailExists)
-            {
+            if ((await emailQuery.GetEnumerableTypedResultAsync(cancellationToken: cancellationToken)).Any())
                 throw new InvalidOperationException($"Email '{userInput.General.Email}' already exists.");
-            }
         }
 
         var roleGuids = userInput.Roles.Select(r => r.GUID).ToArray();
@@ -252,9 +244,7 @@ public class UserCrudService : IUserCrudService
             var invalidRoleGuids = roleGuids.Where(g => !existingRoleGuids.Contains(g)).ToArray();
 
             if (invalidRoleGuids.Length > 0)
-            {
                 throw new InvalidOperationException($"Roles not found: {string.Join(", ", invalidRoleGuids)}.");
-            }
         }
     }
 
@@ -277,14 +267,10 @@ public class UserCrudService : IUserCrudService
         var existingRoleIds = existingLinks.Select(l => l.RoleID).ToHashSet();
 
         foreach (var link in existingLinks.Where(l => !requestedRoleIds.Contains(l.RoleID)))
-        {
             await _userRoleInfoProvider.DeleteAsync(link, cancellationToken);
-        }
 
         foreach (var roleId in requestedRoleIds.Where(id => !existingRoleIds.Contains(id)))
-        {
             await _userRoleInfoProvider.SetAsync(new UserRoleInfo { UserID = userId, RoleID = roleId }, cancellationToken);
-        }
     }
 
     // ---------- MAPPING ----------
@@ -302,40 +288,34 @@ public class UserCrudService : IUserCrudService
         var roles = await _roleInfoProvider.Get()
             .Columns(nameof(RoleInfo.RoleID), nameof(RoleInfo.RoleGUID), nameof(RoleInfo.RoleDisplayName))
             .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
-        var rolesById = roles.ToDictionary(r => r.RoleID, r => r);
 
         var userRoles = await _userRoleInfoProvider.Get()
             .Columns(nameof(UserRoleInfo.UserID), nameof(UserRoleInfo.RoleID))
             .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
-        var roleIdsByUserId = userRoles.ToLookup(l => l.UserID, l => l.RoleID);
 
         var aclRoles = await _webPageAclRoleInfoProvider.Get()
             .Columns(nameof(WebPageAclRoleInfo.WebPageAclRoleRoleID), nameof(WebPageAclRoleInfo.WebPageAclRoleWebPageAclID))
             .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
-        var webPageAclIdsByRoleId = aclRoles.ToLookup(a => a.WebPageAclRoleRoleID, a => a.WebPageAclRoleWebPageAclID);
 
         var acls = await _webPageAclInfoProvider.Get()
             .Columns(nameof(WebPageAclInfo.WebPageAclID), nameof(WebPageAclInfo.WebPageAclWebsiteChannelID))
             .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
-        var websiteChannelIdByAclId = acls.ToDictionary(a => a.WebPageAclID, a => a.WebPageAclWebsiteChannelID);
 
         var websiteChannels = await _websiteChannelInfoProvider.Get()
             .Columns(nameof(WebsiteChannelInfo.WebsiteChannelID), nameof(WebsiteChannelInfo.WebsiteChannelChannelID))
             .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
-        var channelIdByWebsiteChannelId = websiteChannels.ToDictionary(w => w.WebsiteChannelID, w => w.WebsiteChannelChannelID);
 
         var channels = await _channelInfoProvider.Get()
             .Columns(nameof(ChannelInfo.ChannelID), nameof(ChannelInfo.ChannelGUID), nameof(ChannelInfo.ChannelDisplayName))
             .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
-        var channelsById = channels.ToDictionary(c => c.ChannelID, c => c);
 
         return new MappingContext(
-            rolesById,
-            roleIdsByUserId,
-            webPageAclIdsByRoleId,
-            websiteChannelIdByAclId,
-            channelIdByWebsiteChannelId,
-            channelsById);
+            roles.ToDictionary(r => r.RoleID, r => r),
+            userRoles.ToLookup(l => l.UserID, l => l.RoleID),
+            aclRoles.ToLookup(a => a.WebPageAclRoleRoleID, a => a.WebPageAclRoleWebPageAclID),
+            acls.ToDictionary(a => a.WebPageAclID, a => a.WebPageAclWebsiteChannelID),
+            websiteChannels.ToDictionary(w => w.WebsiteChannelID, w => w.WebsiteChannelChannelID),
+            channels.ToDictionary(c => c.ChannelID, c => c));
     }
 
     private static UserOutput ToUserOutput(UserInfo user, MappingContext ctx)
@@ -359,28 +339,12 @@ public class UserCrudService : IUserCrudService
 
         var roles = roleIds
             .Where(ctx.RolesById.ContainsKey)
-            .Select(roleId => ctx.RolesById[roleId])
+            .Select(id => ctx.RolesById[id])
             .Select(r => new RoleSummaryOutput { GUID = r.RoleGUID, DisplayName = r.RoleDisplayName })
             .ToArray();
 
-        var channels = roleIds
-            .SelectMany(roleId => ctx.WebPageAclIdsByRoleId[roleId])
-            .Distinct()
-            .Select(aclId => ctx.WebsiteChannelIdByAclId.TryGetValue(aclId, out var wcId) ? wcId : (int?)null)
-            .Where(wcId => wcId.HasValue)
-            .Select(wcId => ctx.ChannelIdByWebsiteChannelId.TryGetValue(wcId!.Value, out var chId) ? chId : (int?)null)
-            .Where(chId => chId.HasValue)
-            .Distinct()
-            .Select(chId => ctx.ChannelsById.TryGetValue(chId!.Value, out var channel) ? channel : null)
-            .Where(channel => channel is not null)
-            .Select(channel => new ChannelSummaryOutput { GUID = channel!.ChannelGUID, DisplayName = channel.ChannelDisplayName })
-            .ToArray();
+       
 
-        return new UserOutput
-        {
-            General = general,
-            Roles = roles,
-            Channels = channels
-        };
+        return new UserOutput { General = general, Roles = roles};
     }
 }
