@@ -23,11 +23,13 @@ public class GlobalLocationsPageService : IGlobalLocationsPageService
 
     private readonly IGlobalLocationCustomTableDataService _globalLocationCustomTableDataService;
     private readonly IHeroService _heroService;
+    private readonly ISettingService _settingService;
 
-    public GlobalLocationsPageService(IGlobalLocationCustomTableDataService globalLocationCustomTableDataService, IHeroService heroService)
+    public GlobalLocationsPageService(IGlobalLocationCustomTableDataService globalLocationCustomTableDataService, IHeroService heroService, ISettingService settingService)
     {
         _globalLocationCustomTableDataService = globalLocationCustomTableDataService;
         _heroService = heroService;
+        _settingService = settingService;
     }
 
     public async Task<GlobalLocationsDto> GetGlobalLocationsPageDtoAsync(GlobalLocations globalLocations, CancellationToken cancellationToken = default)
@@ -50,14 +52,15 @@ public class GlobalLocationsPageService : IGlobalLocationsPageService
             CallToActionButtonUrl = ctaUrlPath != null ? Link.Parse(ctaUrlPath) : null,
         };
 
+        var globalLocationInfo = await _settingService.GetGlobalSettingAsync();
         return new GlobalLocationsDto
         {
 
             Hero = await _heroService.GetHeroDtoAsync(heroData, cancellationToken),
             MainGrid = new GlobalLocationsGridDto
             {
-                Title = globalLocations.DescriptionTitleforGlobal,
-                Description = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(globalLocations.DescriptionBodyforGlobal),
+                Title = globalLocationInfo?.GlobalLocationsTitle ?? string.Empty,
+                Description = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(globalLocationInfo?.GlobalLocationsDescription ?? string.Empty),
                 Locations = await GetGlobalLocationsDtoAsync(cancellationToken),
             }
         };

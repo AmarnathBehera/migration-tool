@@ -13,10 +13,10 @@ public interface IFetchGlobalSettingFieldDataProvider
 public class FetchGlobalSettingFieldDataProvider : IFetchGlobalSettingFieldDataProvider
 {
     // Maps the field name entered on the component to the Global Location setting field it should display.
-    private static readonly Dictionary<string, Func<GlobalLocationInfo, string>> FieldSelectors = new(StringComparer.OrdinalIgnoreCase)
+    private static readonly Dictionary<string, Func<GlobalsettingskeyInfo, string>> FieldSelectors = new(StringComparer.OrdinalIgnoreCase)
     {
-        [nameof(GlobalLocationInfo.GlobalLocationsTitle)] = info => info.GlobalLocationsTitle,
-        [nameof(GlobalLocationInfo.GlobalLocationsDescription)] = info => info.GlobalLocationsDescription,
+        [nameof(GlobalsettingskeyInfo.GlobalLocationsTitle)] = info => info.GlobalLocationsTitle,
+        [nameof(GlobalsettingskeyInfo.GlobalLocationsDescription)] = info => info.GlobalLocationsDescription,
     };
 
     private readonly ISettingService _settingService;

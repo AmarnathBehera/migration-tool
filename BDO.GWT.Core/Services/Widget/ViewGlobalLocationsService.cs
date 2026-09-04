@@ -6,6 +6,7 @@ using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.DTOs;
 using CMS.Core;
 using CMS.Websites;
+using Google.Protobuf.WellKnownTypes;
 using Kentico.Content.Web.Mvc;
 
 namespace BDO.GWT.Core.Services.Widget;
@@ -21,12 +22,15 @@ public class ViewGlobalLocationsService : IViewGlobalLocationsService
     private readonly ICultureContext _cultureContext;
     private readonly ILocalizationHelper _localizationHelper;
 
-    public ViewGlobalLocationsService(IContentService contentService, IWebPageUrlResolver webPageUrlResolver, ILocalizationHelper localizationHelper, ICultureContext cultureContext)
+    private readonly ISettingService _settingService;
+
+    public ViewGlobalLocationsService(IContentService contentService, IWebPageUrlResolver webPageUrlResolver, ILocalizationHelper localizationHelper, ICultureContext cultureContext, ISettingService settingService)
     {
         _contentService = contentService;
         _webPageUrlResolver = webPageUrlResolver;
         _localizationHelper = localizationHelper;
         _cultureContext = cultureContext;
+        _settingService = settingService;
     }
 
     public async Task<ViewGlobalLocationsDto> GetGlobalLocationsBannerAsync(ViewGlobalLocationsData data, CancellationToken cancellationToken)
@@ -58,7 +62,7 @@ public class ViewGlobalLocationsService : IViewGlobalLocationsService
         {
             Title = titleText,
             Description = descriptionText,
-            BackgroundImage = await GetGlobalLoctionsBackgroundImageAsync(cancellationToken),
+            BackgroundImage = await GetGlobalLocationsBackgroundImageAsync(cancellationToken),
             Theme = data.Theme,
             Layout = data.Layout,
             TopMargin = data.TopMargin,
@@ -75,12 +79,28 @@ public class ViewGlobalLocationsService : IViewGlobalLocationsService
 
         return dto;
     }
-
-    private async Task<string?> GetGlobalLoctionsBackgroundImageAsync(CancellationToken cancellationToken)
+    private async Task<string?> GetGlobalLocationsBackgroundImageAsync(CancellationToken cancellationToken)
     {
-        //var setting = await _settingsService.GetCurrentSiteSettingAsync(SettingName.BDO.ViewGlobalLocationsBackgroundImage, cancellationToken);
+        var globalLocationInfo = await _settingService.GetGlobalSettingAsync();
+        var setting = globalLocationInfo?.GlobalLocationsBackgroundImage.FirstOrDefault();
 
-        // return (string?)setting?.Value;
-        return "";
+        if (setting is null)
+        {
+            return "";
+        }
+
+        var attachments = await _contentService.GetItemsAsync<ContentAttachment>(
+            builder => builder.Parameters(p => p
+                .Where(w => w
+                    .WhereEquals("ContentItemGUID", setting.Identifier) 
+                    .And()
+                    .WhereNotNull("ContentAttachmentAsset"))),
+            cancellationToken);
+        if (attachments == null)
+        {
+            return "";
+        }
+        var attachment = attachments?.FirstOrDefault();      
+        return attachment?.ContentAttachmentAsset?.Url;
     }
 }

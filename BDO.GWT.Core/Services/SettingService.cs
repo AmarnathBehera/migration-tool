@@ -7,12 +7,12 @@ public interface ISettingService
     Task<IEnumerable<PrintorShareInfo>?> GetPrintorShareInfo();
     Task<IEnumerable<FilteringInfo>?> GetFilteringInfo();
     Task<IEnumerable<OurPeopleInfo>?> GetUsePersonPageTitleInfo();
-    Task<GlobalLocationInfo?> GetGlobalSettingAsync();
+    Task<GlobalsettingskeyInfo?> GetGlobalSettingAsync();
 }
 
 public class SettingService : ISettingService
 {
-    public readonly IInfoProvider<GlobalLocationInfo> _GlobalLocationInfoProvider;
+    public readonly IInfoProvider<GlobalsettingskeyInfo> _GlobalLocationInfoProvider;
     public readonly IInfoProvider<PrintorShareInfo> _PrintorShareinfoProvider;
     public readonly IInfoProvider<FilteringInfo> _FilteringinfoProvider;
     public readonly IInfoProvider<OurPeopleInfo> _ourpeopleinfoProvider;
@@ -20,7 +20,7 @@ public class SettingService : ISettingService
     private readonly IContentService _contentService;
     
     public SettingService(
-        IInfoProvider<GlobalLocationInfo> GlobalLocationInfoProvider,
+        IInfoProvider<GlobalsettingskeyInfo> GlobalLocationInfoProvider,
         IInfoProvider<PrintorShareInfo> PrintorShareinfoProvider,
         IInfoProvider<FilteringInfo> FilteringinfoProvider,
         IInfoProvider<OurPeopleInfo> ourpeopleinfoProvider,
@@ -35,11 +35,10 @@ public class SettingService : ISettingService
         _contentService = contentService;
     }
 
-    public async Task<GlobalLocationInfo?> GetGlobalSettingAsync()
+    public async Task<GlobalsettingskeyInfo?> GetGlobalSettingAsync()
     {
         var currentChannelSettings = await _GlobalLocationInfoProvider
             .Get()
-            .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), _contentService.GetCurrentChannelID())
             .TopN(1)
             .GetEnumerableTypedResultAsync();
 

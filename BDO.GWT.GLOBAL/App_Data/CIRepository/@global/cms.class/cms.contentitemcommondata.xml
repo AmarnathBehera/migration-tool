@@ -1165,7 +1165,6 @@ MicrositePage;Microsite Page
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <MaximumItems>1</MaximumItems>
-          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -1695,11 +1694,13 @@ after;After
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Title</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
           <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>6539cfc9-05fd-49d4-a289-7b6fbd91d8ac</kxp_schema_identifier>
         </properties>
         <settings>
-          <controlname>Kentico.Administration.TextInput</controlname>
+          <controlname>BDO.FetchGlobalSettingFieldData</controlname>
+          <FieldName>GlobalLocationsTitle</FieldName>
         </settings>
       </field>
       <field allowempty="true" column="DescriptionBodyforGlobal" columnprecision="0" columntype="longtext" enabled="true" guid="9555902d-a845-48ff-af4a-f004ee3931d3" visible="true">
@@ -1707,11 +1708,13 @@ after;After
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Body content</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
           <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>6539cfc9-05fd-49d4-a289-7b6fbd91d8ac</kxp_schema_identifier>
         </properties>
         <settings>
-          <controlname>Kentico.Administration.RichTextEditor</controlname>
+          <controlname>BDO.FetchGlobalSettingFieldData</controlname>
+          <FieldName>GlobalLocationsDescription</FieldName>
         </settings>
       </field>
     </form>
