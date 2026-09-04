@@ -96,11 +96,7 @@ public class ViewGlobalLocationsService : IViewGlobalLocationsService
                     .And()
                     .WhereNotNull("ContentAttachmentAsset"))),
             cancellationToken);
-        if (attachments == null)
-        {
-            return "";
-        }
-        var attachment = attachments?.FirstOrDefault();      
+        var attachment = attachments.Count > 0 ? attachments[0] : null;
         return attachment?.ContentAttachmentAsset?.Url;
     }
 }

@@ -67,12 +67,12 @@ public class GlobalLocationsPageService : IGlobalLocationsPageService
             {
                 Title = title,
                 Description = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(description),
-                Locations = await GetGlobalLocationsDtoAsync(cancellationToken),
+                Locations = await GetGlobalLocationsDtoAsync(),
             }
         };
     }
 
-    private async Task<List<GlobalLocationsRegionDto>> GetGlobalLocationsDtoAsync(CancellationToken cancellationToken = default)
+    private async Task<List<GlobalLocationsRegionDto>> GetGlobalLocationsDtoAsync()
     {
         var locations = await _globalLocationCustomTableDataService.GetAllGlobalLocationsAsync();
 

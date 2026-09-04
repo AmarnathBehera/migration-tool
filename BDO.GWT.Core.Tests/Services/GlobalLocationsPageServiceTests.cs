@@ -10,6 +10,9 @@ namespace BDO.GWT.Core.Tests.Services;
 
 public class GlobalLocationsPageServiceTests
 {
+    private static readonly string[] ExpectedRegions = { "AMERICAS", "EMEA", "ASIA PACIFIC" };
+    private static readonly string[] ExpectedAmericasTitles = { "Chicago", "Los Angeles", "New York" };
+
     private Mock<IGlobalLocationCustomTableDataService> _globalLocationCustomTableDataServiceMock;
     private Mock<IHeroService> _heroServiceMock;
     private Mock<ISettingService> _settingServiceMock;
@@ -130,7 +133,7 @@ public class GlobalLocationsPageServiceTests
         var result = await _service.GetGlobalLocationsPageDtoAsync(CreatePage(), CancellationToken.None);
 
         var regions = result.MainGrid.Locations.Select(l => l.Region).ToList();
-        Assert.That(regions, Is.EquivalentTo(new[] { "AMERICAS", "EMEA", "ASIA PACIFIC" }));
+        Assert.That(regions, Is.EquivalentTo(ExpectedRegions));
     }
 
     [Test]
@@ -179,7 +182,7 @@ public class GlobalLocationsPageServiceTests
             .Select(l => l.Title)
             .ToList();
 
-        Assert.That(titles, Is.EqualTo(new[] { "Chicago", "Los Angeles", "New York" }));
+        Assert.That(titles, Is.EqualTo(ExpectedAmericasTitles));
     }
 
     [Test]
