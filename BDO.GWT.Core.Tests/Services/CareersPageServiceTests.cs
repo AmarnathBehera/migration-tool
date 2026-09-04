@@ -1,4 +1,4 @@
-﻿using BDO.GWT.Common.Exceptions;
+using BDO.GWT.Common.Exceptions;
 using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
@@ -59,7 +59,7 @@ public class CareersPageServiceTests
 
         _settingServiceMock
             .Setup(s => s.GetFilteringInfo())
-            .ReturnsAsync((IEnumerable<FilteringInfo>?)null);
+            .ReturnsAsync((IEnumerable<WebChannelSnippetInfo>?)null);
 
         _service = new CareersPageService(
             _heroServiceMock.Object,
@@ -70,7 +70,7 @@ public class CareersPageServiceTests
             _settingServiceMock.Object);
     }
 
-    // ── Builders ────────────────────────────────────────────────────────────
+    // -- Builders ------------------------------------------------------------
 
     private static Careers CreateDefaultCareersPage(
         bool filteringEnabled = false,
@@ -146,7 +146,7 @@ public class CareersPageServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(pages!);
 
-    // ── GetCareersPageDtoAsync ──────────────────────────────────────────────
+    // -- GetCareersPageDtoAsync ----------------------------------------------
 
     [Test]
     public async Task GetCareersPageDtoAsync_WhenPageIsNull_ReturnsEmptyDto()
@@ -374,7 +374,7 @@ public class CareersPageServiceTests
 
         _settingServiceMock
             .Setup(s => s.GetFilteringInfo())
-            .ReturnsAsync((IEnumerable<FilteringInfo>?)null);
+            .ReturnsAsync((IEnumerable<WebChannelSnippetInfo>?)null);
 
         var result = await _service.GetCareersPageDtoAsync(CancellationToken.None);
 
@@ -391,7 +391,7 @@ public class CareersPageServiceTests
         Assert.That(result.CardsGrid.FilteringTooltipEnabled, Is.False);
     }
 
-    // ── GetCareerPaginationResultAsync ──────────────────────────────────────
+    // -- GetCareerPaginationResultAsync --------------------------------------
 
     [Test]
     public void GetCareerPaginationResultAsync_WhenCareersPageNotFound_ThrowsMissingSectionPageException()

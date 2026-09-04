@@ -11,7 +11,6 @@ public class WebChannelSettingsListingPage : ListingPage
 {
     private readonly IInfoProvider<ChannelInfo> channelInfoProvider;
     private readonly IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider;
-    private readonly IInfoProvider<SEOSettingsInfo> seoSettingsInfoProvider;
     private readonly IChannelAccessService channelAccessService;
 
     protected override string ObjectType => WebChannelSettingsInfo.OBJECT_TYPE;
@@ -19,12 +18,10 @@ public class WebChannelSettingsListingPage : ListingPage
     public WebChannelSettingsListingPage(
         IInfoProvider<ChannelInfo> channelInfoProvider,
         IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider,
-        IInfoProvider<SEOSettingsInfo> seoSettingsInfoProvider,
         IChannelAccessService channelAccessService)
     {
         this.channelInfoProvider = channelInfoProvider;
         this.webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
-        this.seoSettingsInfoProvider = seoSettingsInfoProvider;
         this.channelAccessService = channelAccessService;
         EnsureSettingsListData();
     }
@@ -64,7 +61,6 @@ public class WebChannelSettingsListingPage : ListingPage
     {
         var channels = channelInfoProvider.Get();
         var webChannelSettings = webChannelSettingsInfoProvider.Get().ToList();
-        var seoSettings = seoSettingsInfoProvider.Get().ToList();
 
         foreach (var channel in channels)
         {
@@ -75,7 +71,6 @@ public class WebChannelSettingsListingPage : ListingPage
             EnsureChannelSetting(currentChannelSettings, channel);
             var currentChannelSetting = currentChannelSettings.FirstOrDefault();
             EnsureChannelSettingDisplayName(channel, currentChannelSetting);
-            EnsureSeoSettings(currentChannelSetting, seoSettings);
         }
     }
 
@@ -103,20 +98,5 @@ public class WebChannelSettingsListingPage : ListingPage
         }
     }
 
-    private void EnsureSeoSettings(WebChannelSettingsInfo currentChannelSetting, IEnumerable<SEOSettingsInfo> seoSettings)
-    {
-        int? webChannelSettingsId = currentChannelSetting?.WebChannelSettingsID;
-        var currentSeoSettings = seoSettings
-            .Where(s => s.SeoSettingsWebChannelSettingID == webChannelSettingsId)
-            .ToList();
-
-        if (currentSeoSettings.Count() == 0 && webChannelSettingsId != null)
-        {
-            seoSettingsInfoProvider.Set(new SEOSettingsInfo
-            {
-                SeoSettingsWebChannelSettingID = (int)webChannelSettingsId,
-                SeoSettingsRobots = string.Empty,
-            });
-        }
+   
     }
-}

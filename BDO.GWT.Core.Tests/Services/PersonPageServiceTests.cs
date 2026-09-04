@@ -957,7 +957,7 @@ public class PersonPageServiceTests
 
         _settingServiceMock
             .Setup(x => x.GetUsePersonPageTitleInfo())
-            .ReturnsAsync((IEnumerable<OurPeopleInfo>?)null);
+            .ReturnsAsync((IEnumerable<WebChannelSnippetInfo>?)null);
 
         _webPageUrlResolverMock
             .Setup(x => x.GetAbsoluteUrl(person))
@@ -1007,7 +1007,7 @@ public class PersonPageServiceTests
 
         _settingServiceMock
             .Setup(x => x.GetUsePersonPageTitleInfo())
-            .ReturnsAsync(new OurPeopleInfo[] { new TestOurPeopleInfo(displayEmailInVCard: true) });
+            .ReturnsAsync(new WebChannelSnippetInfo[] { new TestOurPeopleInfo(displayEmailInVCard: true) });
 
         var result = await _service.GeneratePersonVCardAsync(personGuid, null, CancellationToken.None);
 
@@ -1034,7 +1034,7 @@ public class PersonPageServiceTests
 
         _settingServiceMock
             .Setup(x => x.GetUsePersonPageTitleInfo())
-            .ReturnsAsync((IEnumerable<OurPeopleInfo>?)null);
+            .ReturnsAsync((IEnumerable<WebChannelSnippetInfo>?)null);
 
         var before = DateTime.UtcNow.AddSeconds(-1);
 
@@ -1091,12 +1091,12 @@ public class PersonPageServiceTests
     }
 
     /// <summary>
-    /// Test double for <see cref="OurPeopleInfo"/> that overrides only the getter we need.
+    /// Test double for <see cref="WebChannelSnippetInfo"/> that overrides only the getter we need.
     /// The base setter triggers Kentico IoC resolution (not initialized in unit tests),
-    /// and Castle DynamicProxy can't subclass <see cref="OurPeopleInfo"/> directly due to
+    /// and Castle DynamicProxy can't subclass <see cref="WebChannelSnippetInfo"/> directly due to
     /// internal virtual members it can't override across assemblies.
     /// </summary>
-    private sealed class TestOurPeopleInfo : OurPeopleInfo
+    private sealed class TestOurPeopleInfo : WebChannelSnippetInfo
     {
         private readonly bool _displayEmailInVCard;
 

@@ -186,7 +186,7 @@ namespace BDO
         [DatabaseField]
         public virtual string EncryptedPassword
         {
-            get => ValidationHelper.GetString(GetValue(nameof(EncryptedPassword)), String.Empty);
+            get => ValidationHelper.GetString(GetValue(nameof(EncryptedPassword)), "Encrypted Password");
             set => SetValue(nameof(EncryptedPassword), value, String.Empty);
         }
 

@@ -12,28 +12,48 @@ namespace BDO.GWT.Web.Core.LiveSite.Components.ViewComponents;
 
 public class Cookiebot : ViewComponent
 {
-    private readonly IInfoProvider<CookiebotInfo> _provider;
-    public Cookiebot(IInfoProvider<CookiebotInfo> provider)
+    private readonly IInfoProvider<GlobalsettingskeyInfo> _provider;
+    private readonly IInfoProvider<WebChannelSnippetInfo> _siteProvider;
+
+    public Cookiebot(
+        IInfoProvider<GlobalsettingskeyInfo> provider,
+        IInfoProvider<WebChannelSnippetInfo> siteProvider)
     {
         _provider = provider;
-       
+        _siteProvider = siteProvider;
     }
 
     public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken)
     {
-
-        var data = _provider.Get().TopN(1).FirstOrDefault();
-
+        var data = _siteProvider.Get().TopN(1).FirstOrDefault();
         var cookiebotDto = new CookiebotDTO();
 
-        if (data != null)
+        if (data == null)
         {
-            cookiebotDto.EnableCookiebot = data.EnableCookiebot;
-            cookiebotDto.CookieID = data.CookieID;
-            cookiebotDto.CustomCookiebotScript = data.CustomCookiebotScript;
+            return View("~/Components/Views/Shared/Components/Cookiebot/Default.cshtml", cookiebotDto);
         }
-        return View("~/Components/Views/Shared/Components/Cookiebot/Default.cshtml",cookiebotDto);
+
+        // Only fetch global data once, and only if at least one field needs it
+        GlobalsettingskeyInfo globalData = null;
+        if (data.EnableCookiebotInheritfromglobal
+            || data.CookieIDInheritfromglobal
+            || data.CustomCookiebotScriptInheritfromglobal)
+        {
+            globalData = _provider.Get().TopN(1).FirstOrDefault();
+        }
+
+        cookiebotDto.EnableCookiebot = data.EnableCookiebotInheritfromglobal
+            ? globalData?.EnableCookiebot ?? false
+            : data.EnableCookiebot;
+
+        cookiebotDto.CookieID = data.CookieIDInheritfromglobal
+            ? globalData?.CookieID
+            : data.CookieID;
+
+        cookiebotDto.CustomCookiebotScript = data.CustomCookiebotScriptInheritfromglobal
+            ? globalData?.CustomCookiebotScript
+            : data.CustomCookiebotScript;
+
+        return View("~/Components/Views/Shared/Components/Cookiebot/Default.cshtml", cookiebotDto);
     }
-
-
 }
