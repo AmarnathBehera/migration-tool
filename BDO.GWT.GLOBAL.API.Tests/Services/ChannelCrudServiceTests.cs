@@ -6,6 +6,7 @@ using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Websites;
 using Moq;
+using System.Data;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -349,6 +350,155 @@ public class ChannelCrudServiceTests
         });
     }
 
+    [Test]
+    public async Task GetEntityAsync_ReturnsNull_WhenNoChannelFound()
+    {
+        var channelProvider = new Mock<IInfoProvider<ChannelInfo>>();
+        var websiteProvider = new Mock<IInfoProvider<WebsiteChannelInfo>>();
+        var languageProvider = new Mock<IInfoProvider<ContentLanguageInfo>>();
+
+        channelProvider.Setup(x => x.Get()).Returns(QueryReturningDataContainers<ChannelInfo>([]).Object);
+
+        var service = new ChannelCrudService(channelProvider.Object, websiteProvider.Object, languageProvider.Object);
+
+        var result = await service.GetEntityAsync(Guid.NewGuid(), CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task DeleteEntityAsync_DeletesWebsiteChannels_AndChannel()
+    {
+        var channelGuid = Guid.NewGuid();
+        var channel = CreateChannelInfo(7, channelGuid, "Channel", "channel");
+        var wc1 = CreateWebsiteChannel(7, "a.example.com", 4);
+        var wc2 = CreateWebsiteChannel(7, "b.example.com", 4);
+
+        var channelProvider = new Mock<IInfoProvider<ChannelInfo>>();
+        var websiteProvider = new Mock<IInfoProvider<WebsiteChannelInfo>>();
+        var languageProvider = new Mock<IInfoProvider<ContentLanguageInfo>>();
+
+        channelProvider.Setup(x => x.Get()).Returns(QueryReturning<ChannelInfo>(new ChannelInfo[] { channel }).Object);
+        websiteProvider.Setup(x => x.Get()).Returns(QueryReturning<WebsiteChannelInfo>(new WebsiteChannelInfo[] { wc1, wc2 }).Object);
+
+        var service = new ChannelCrudService(channelProvider.Object, websiteProvider.Object, languageProvider.Object);
+
+        await service.DeleteEntityAsync(channelGuid, CancellationToken.None);
+
+        websiteProvider.Verify(x => x.DeleteAsync(It.IsAny<WebsiteChannelInfo>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
+        channelProvider.Verify(x => x.DeleteAsync(It.IsAny<ChannelInfo>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Test]
+    public void DeleteEntityAsync_ThrowsValidationException_WhenGdprSettingsClassIsMissing()
+    {
+        var channelGuid = Guid.NewGuid();
+        var channel = CreateChannelInfo(9, channelGuid, "Channel", "channel");
+
+        var channelProvider = new Mock<IInfoProvider<ChannelInfo>>();
+        var websiteProvider = new Mock<IInfoProvider<WebsiteChannelInfo>>();
+        var languageProvider = new Mock<IInfoProvider<ContentLanguageInfo>>();
+
+        channelProvider.Setup(x => x.Get()).Returns(QueryReturning<ChannelInfo>(new ChannelInfo[] { channel }).Object);
+        websiteProvider.Setup(x => x.Get()).Returns(QueryReturning<WebsiteChannelInfo>(Array.Empty<WebsiteChannelInfo>()).Object);
+        channelProvider.Setup(x => x.Delete(It.IsAny<ChannelInfo>()))
+            .Throws(CreateMissingGdprSettingsException());
+        channelProvider.Setup(x => x.DeleteAsync(It.IsAny<ChannelInfo>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(CreateMissingGdprSettingsException());
+
+        var service = new ChannelCrudService(channelProvider.Object, websiteProvider.Object, languageProvider.Object);
+
+        var ex = Assert.ThrowsAsync<ValidationException>(async () =>
+            await service.DeleteEntityAsync(channelGuid, CancellationToken.None));
+
+        Assert.That(ex!.Message, Is.EqualTo("Channel delete failed because CMS class 'BDO.GDPRSettings' is not available in this environment."));
+    }
+
+    [Test]
+    public void CreateEntityAsync_ThrowsUnprocessable_WhenDomainAlreadyUsed()
+    {
+        var channelProvider = new Mock<IInfoProvider<ChannelInfo>>();
+        var websiteProvider = new Mock<IInfoProvider<WebsiteChannelInfo>>();
+        var languageProvider = new Mock<IInfoProvider<ContentLanguageInfo>>();
+
+        var language = CreateLanguageInfo(4, "en-GB", "English");
+        var conflict = CreateWebsiteChannel(99, "channel.example.com", 4);
+
+        languageProvider.Setup(x => x.Get()).Returns(QueryReturning<ContentLanguageInfo>(new ContentLanguageInfo[] { language }).Object);
+        websiteProvider.Setup(x => x.Get()).Returns(QueryReturning<WebsiteChannelInfo>(new WebsiteChannelInfo[] { conflict }).Object);
+
+        var service = new ChannelCrudService(channelProvider.Object, websiteProvider.Object, languageProvider.Object);
+
+        var ex = Assert.ThrowsAsync<UnprocessableEntityException>(async () =>
+            await service.CreateEntityAsync(BuildChannelInput(), CancellationToken.None));
+
+        Assert.That(ex!.Message, Is.EqualTo("Website channel domain 'channel.example.com' is already used by another channel."));
+    }
+
+    [Test]
+    public async Task UpdateEntityAsync_ReturnsUpdatedChannel_WhenDependenciesProvideData()
+    {
+        var channelGuid = Guid.NewGuid();
+        var channel = CreateChannelInfo(11, channelGuid, "Old", "old");
+        var language = CreateLanguageInfo(4, "en-GB", "English");
+        var sameChannel = CreateWebsiteChannel(11, "channel.example.com", 4);
+        var existingChannel = CreateWebsiteChannel(11, "channel.example.com", 4);
+        var updatedContainer = CreateDataContainer(11, channelGuid, "Channel", "channel", "channel.example.com", 4);
+
+        var channelProvider = new Mock<IInfoProvider<ChannelInfo>>();
+        var websiteProvider = new Mock<IInfoProvider<WebsiteChannelInfo>>();
+        var languageProvider = new Mock<IInfoProvider<ContentLanguageInfo>>();
+
+        channelProvider.SetupSequence(x => x.Get())
+            .Returns(QueryReturning<ChannelInfo>(new ChannelInfo[] { channel }).Object)
+            .Returns(QueryReturningDataContainers<ChannelInfo>(new[] { updatedContainer }).Object);
+
+        languageProvider.Setup(x => x.Get()).Returns(QueryReturning<ContentLanguageInfo>(new ContentLanguageInfo[] { language }).Object);
+
+        websiteProvider.SetupSequence(x => x.Get())
+            .Returns(QueryReturning<WebsiteChannelInfo>(new WebsiteChannelInfo[] { sameChannel }).Object)
+            .Returns(QueryReturning<WebsiteChannelInfo>(new WebsiteChannelInfo[] { existingChannel }).Object);
+
+        var service = new ChannelCrudService(channelProvider.Object, websiteProvider.Object, languageProvider.Object);
+
+        var result = await service.UpdateEntityAsync(channelGuid, BuildChannelInput(), CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.General.ID, Is.EqualTo(11));
+            Assert.That(result.General.GUID, Is.EqualTo(channelGuid));
+            Assert.That(result.General.DisplayName, Is.EqualTo("Channel"));
+            Assert.That(result.General.CodeName, Is.EqualTo("channel"));
+            Assert.That(result.General.WebsitedomainresentationURL, Is.EqualTo("channel.example.com"));
+            Assert.That(result.General.DefaultContentCulture, Is.EqualTo("en-GB"));
+        });
+    }
+
+    [Test]
+    public async Task GetEntitiesAsync_ReturnsMappedOutputs_WhenRowsExist()
+    {
+        var container = CreateDataContainer(33, Guid.NewGuid(), "Channel 33", "channel-33", "c33.example.com", 0);
+
+        var channelProvider = new Mock<IInfoProvider<ChannelInfo>>();
+        var websiteProvider = new Mock<IInfoProvider<WebsiteChannelInfo>>();
+        var languageProvider = new Mock<IInfoProvider<ContentLanguageInfo>>();
+
+        channelProvider.Setup(x => x.Get()).Returns(QueryReturningDataContainers<ChannelInfo>([container]).Object);
+        languageProvider.Setup(x => x.Get()).Returns(QueryReturning<ContentLanguageInfo>(Array.Empty<ContentLanguageInfo>()).Object);
+
+        var service = new ChannelCrudService(channelProvider.Object, websiteProvider.Object, languageProvider.Object);
+
+        var result = (await service.GetEntitiesAsync(new ChannelsQuery(), CancellationToken.None)).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result[0].General.ID, Is.EqualTo(33));
+            Assert.That(result[0].General.DisplayName, Is.EqualTo("Channel 33"));
+            Assert.That(result[0].General.CodeName, Is.EqualTo("channel-33"));
+        });
+    }
+
     private static string InvokeNormalizeWebsiteChannelDomain(string value)
     {
         var method = typeof(ChannelCrudService).GetMethod("NormalizeWebsiteChannelDomain", BindingFlags.NonPublic | BindingFlags.Static)
@@ -446,5 +596,132 @@ public class ChannelCrudServiceTests
 
         var task = (Task<int>)method.Invoke(service, [input, cancellationToken])!;
         return await task;
+    }
+
+    private static Mock<ObjectQuery<T>> QueryReturning<T>(IEnumerable<T> rows)
+        where T : BaseInfo
+    {
+        var query = new Mock<ObjectQuery<T>>();
+
+        query.Setup(x => x.WhereEquals(It.IsAny<string>(), It.IsAny<object>())).Returns(query.Object);
+        query.Setup(x => x.TopN(It.IsAny<int>())).Returns(query.Object);
+        query.Setup(x => x.Columns(It.IsAny<string[]>())).Returns(query.Object);
+        query.Setup(x => x.GetEnumerableTypedResultAsync(
+                It.IsAny<CommandBehavior>(),
+                It.IsAny<bool>(),
+                It.IsAny<CancellationToken?>()))
+            .ReturnsAsync(rows);
+
+        return query;
+    }
+
+    private static Mock<ObjectQuery<T>> QueryReturningDataContainers<T>(IEnumerable<IDataContainer> rows)
+        where T : BaseInfo
+    {
+        var query = new Mock<ObjectQuery<T>>();
+
+        query.Setup(x => x.WhereEquals(It.IsAny<string>(), It.IsAny<object>())).Returns(query.Object);
+        query.Setup(x => x.TopN(It.IsAny<int>())).Returns(query.Object);
+        query.Setup(x => x.Source(It.IsAny<Action<QuerySource>>())).Returns(query.Object);
+        query.Setup(x => x.Columns(It.IsAny<string[]>())).Returns(query.Object);
+        query.Setup(x => x.GetDataContainerResultAsync(
+                It.IsAny<CommandBehavior>(),
+                It.IsAny<bool>(),
+                It.IsAny<CancellationToken?>()))
+            .ReturnsAsync(rows);
+
+        return query;
+    }
+
+    private static IDataContainer CreateDataContainer(
+        int channelId,
+        Guid channelGuid,
+        string displayName,
+        string codeName,
+        string domain,
+        int primaryLanguageId)
+    {
+        var container = new Mock<IDataContainer>();
+        container.Setup(c => c.GetValue(nameof(ChannelInfo.ChannelID))).Returns(channelId);
+        container.Setup(c => c.GetValue(nameof(ChannelInfo.ChannelGUID))).Returns(channelGuid);
+        container.Setup(c => c.GetValue(nameof(ChannelInfo.ChannelDisplayName))).Returns(displayName);
+        container.Setup(c => c.GetValue(nameof(ChannelInfo.ChannelName))).Returns(codeName);
+        container.Setup(c => c.GetValue(nameof(WebsiteChannelInfo.WebsiteChannelDomain))).Returns(domain);
+        container.Setup(c => c.GetValue(nameof(WebsiteChannelInfo.WebsiteChannelPrimaryContentLanguageID))).Returns(primaryLanguageId);
+        return container.Object;
+    }
+
+    private static FakeChannelInfo CreateChannelInfo(int channelId, Guid channelGuid, string displayName, string codeName)
+    {
+        var channel = (FakeChannelInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeChannelInfo));
+        channel.ChannelID = channelId;
+        channel.ChannelGUID = channelGuid;
+        channel.ChannelDisplayName = displayName;
+        channel.ChannelName = codeName;
+        return channel;
+    }
+
+    private static FakeWebsiteChannelInfo CreateWebsiteChannel(int channelId, string domain, int primaryLanguageId)
+    {
+        var websiteChannel = (FakeWebsiteChannelInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeWebsiteChannelInfo));
+        websiteChannel.WebsiteChannelChannelID = channelId;
+        websiteChannel.WebsiteChannelDomain = domain;
+        websiteChannel.WebsiteChannelPrimaryContentLanguageID = primaryLanguageId;
+        return websiteChannel;
+    }
+
+    private static FakeContentLanguageInfo CreateLanguageInfo(int languageId, string code, string displayName)
+    {
+        var language = (FakeContentLanguageInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeContentLanguageInfo));
+        language.ContentLanguageID = languageId;
+        language.ContentLanguageGUID = Guid.NewGuid();
+        language.ContentLanguageName = code;
+        language.ContentLanguageDisplayName = displayName;
+        return language;
+    }
+
+    private static DataClassNotFoundException CreateMissingGdprSettingsException()
+    {
+        var ex = (DataClassNotFoundException)RuntimeHelpers.GetUninitializedObject(typeof(DataClassNotFoundException));
+        var messageField = typeof(Exception).GetField("_message", BindingFlags.Instance | BindingFlags.NonPublic);
+        messageField?.SetValue(ex, "Class with name 'BDO.GDPRSettings' doesn't exist.");
+        return ex;
+    }
+
+    private sealed class FakeChannelInfo : ChannelInfo
+    {
+        private int channelId;
+        private Guid channelGuid;
+        private string displayName = string.Empty;
+        private string codeName = string.Empty;
+
+        public override int ChannelID { get => channelId; set => channelId = value; }
+        public override Guid ChannelGUID { get => channelGuid; set => channelGuid = value; }
+        public override string ChannelDisplayName { get => displayName; set => displayName = value; }
+        public override string ChannelName { get => codeName; set => codeName = value; }
+    }
+
+    private sealed class FakeWebsiteChannelInfo : WebsiteChannelInfo
+    {
+        private int channelId;
+        private string domain = string.Empty;
+        private int primaryLanguageId;
+
+        public override int WebsiteChannelChannelID { get => channelId; set => channelId = value; }
+        public override string WebsiteChannelDomain { get => domain; set => domain = value; }
+        public override int WebsiteChannelPrimaryContentLanguageID { get => primaryLanguageId; set => primaryLanguageId = value; }
+    }
+
+    private sealed class FakeContentLanguageInfo : ContentLanguageInfo
+    {
+        private int languageId;
+        private Guid languageGuid;
+        private string languageName = string.Empty;
+        private string displayName = string.Empty;
+
+        public override int ContentLanguageID { get => languageId; set => languageId = value; }
+        public override Guid ContentLanguageGUID { get => languageGuid; set => languageGuid = value; }
+        public override string ContentLanguageName { get => languageName; set => languageName = value; }
+        public override string ContentLanguageDisplayName { get => displayName; set => displayName = value; }
     }
 }
