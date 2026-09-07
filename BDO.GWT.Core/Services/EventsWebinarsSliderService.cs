@@ -197,24 +197,6 @@ public class EventsWebinarsSliderService : IEventsWebinarsSliderService
             featuredGuids,
             cancellationToken);
         var featuredPageIds = result.FeaturedPageIds;
-
-        // TODO (perf / SQL timeout risk): confirm whether
-        // IEventWebinarCardsService.GetFilteredItemsAsync applies the
-        // `item => featuredPageIds.Contains(...)` predicate below as an
-        // in-memory Func<> AFTER materializing + paginating results from SQL,
-        // or pushes it down via Action<WhereParameters> before paging (the
-        // pattern used elsewhere in this codebase, e.g. RetrieveFeaturedPageIdsAsync's
-        // WhereIn call). If it's the former, on a 130-channel install this can
-        // force the query executor to pull a much larger candidate set than
-        // intended and is a strong candidate for the SQL command timeouts
-        // seen in EventsWebinarsSliderWidget. If confirmed, the fix belongs in
-        // GetFilteredItemsAsync's implementation (translate featuredPageIds
-        // into a SQL-side WHERE ... IN clause), not here.
-        //
-        // The `null!` below also isn't self-documenting — confirm what this
-        // positional argument represents and whether null is a valid,
-        // intentional value here, or replace with a named/optional parameter
-        // if the interface allows it.
         var paginationDto = await _eventWebinarCardsService.GetFilteredItemsAsync(
             query,
             null!,

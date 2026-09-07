@@ -163,18 +163,28 @@ public class NewsletterSubscriptionService(
         return true;
     }
 
-    public async Task<bool> UnsubscribeFromNewsletterAsync(SubscribeRemoveQuery subscribeRemoveQuery, CancellationToken cancellationToken)
+    public async Task<bool> UnsubscribeFromNewsletterAsync(
+        SubscribeRemoveQuery subscribeRemoveQuery,
+        CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(subscribeRemoveQuery.Email) ||
-            subscribeRemoveQuery.NewsletterGuid == Guid.Empty)     {
+        if (string.IsNullOrWhiteSpace(subscribeRemoveQuery.Email) ||
+            subscribeRemoveQuery.NewsletterGuid == Guid.Empty)
+        {
             return false;
         }
 
-        var recipientList = (await _recipientListInfoProvider.Get()
-            .WhereEquals(nameof(ContactGroupInfo.ContactGroupGUID), subscribeRemoveQuery.NewsletterGuid)
-            .WhereEquals(nameof(ContactGroupInfo.ContactGroupIsRecipientList), true)
-            .Columns(nameof(ContactGroupInfo.ContactGroupID))
-            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
+        var recipientList = (await _recipientListInfoProvider
+            .Get()
+            .WhereEquals(
+                nameof(ContactGroupInfo.ContactGroupGUID),
+                subscribeRemoveQuery.NewsletterGuid)
+            .WhereEquals(
+                nameof(ContactGroupInfo.ContactGroupIsRecipientList),
+                true)
+            .Columns(
+                nameof(ContactGroupInfo.ContactGroupID))
+            .GetEnumerableTypedResultAsync(
+                cancellationToken: cancellationToken))
             .FirstOrDefault();
 
         if (recipientList is null)
@@ -182,18 +192,38 @@ public class NewsletterSubscriptionService(
             return false;
         }
 
+        var contact = await _marketingContactManagementService
+            .GetMarketingContactByEmailAsync(
+                subscribeRemoveQuery.Email,
+                cancellationToken);
+
+        if (contact is null)
+        {
+            return false;
+        }
+
         var recipientListId = recipientList.ContactGroupID;
 
-        var contact = await _marketingContactManagementService.GetMarketingContactByEmailAsync(subscribeRemoveQuery.Email, cancellationToken);
+        // Find existing subscription confirmation
+        var confirmation = (await _emailSubscriptionConfirmationInfoProvider
+            .Get()
+            .WhereEquals(
+                nameof(EmailSubscriptionConfirmationInfo.EmailSubscriptionConfirmationContactID),
+                contact.ContactID)
+            .WhereEquals(
+                nameof(EmailSubscriptionConfirmationInfo.EmailSubscriptionConfirmationRecipientListID),
+                recipientListId)
+            .GetEnumerableTypedResultAsync(
+                cancellationToken: cancellationToken))
+            .FirstOrDefault();
 
-        _emailSubscriptionConfirmationInfoProvider.BulkDelete(new WhereCondition()
-            .WhereEquals(nameof(EmailSubscriptionConfirmationInfo.EmailSubscriptionConfirmationContactID), contact.ContactID)
-            .WhereEquals(nameof(EmailSubscriptionConfirmationInfo.EmailSubscriptionConfirmationRecipientListID), recipientListId));
+        // Mark subscription as unsubscribed
+        if (confirmation is not null)
+        {
+            confirmation.EmailSubscriptionConfirmationIsApproved = false;
+            confirmation.Update();
+        }
 
-        _contactGroupMemberInfoProvider.BulkDelete(new WhereCondition()
-            .WhereEquals(nameof(ContactGroupMemberInfo.ContactGroupMemberRelatedID), contact.ContactID)
-            .WhereEquals(nameof(ContactGroupMemberInfo.ContactGroupMemberType), ContactGroupMemberTypeEnum.Contact)
-            .WhereEquals(nameof(ContactGroupMemberInfo.ContactGroupMemberContactGroupID), recipientListId));
 
         return true;
     }
@@ -336,9 +366,6 @@ public class NewsletterSubscriptionService(
         {
             return null;
         }
-
-        // Per-field inheritance: when the snippet's inherit-from-global flag is set,
-        // use the value from GlobalsettingskeyInfo; otherwise use the channel snippet's own value.
         if (snippet.FromEmailInheritfromglobal)
         {
             var global = globalSettingsProvider.Get()
