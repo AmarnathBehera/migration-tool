@@ -60,6 +60,8 @@
 
             public const string RelatedContentCarousel = WidgetPrefix + "RelatedContentCarousel";
 
+            public const string TrendingTopicsCarousel = WidgetPrefix + "TrendingTopicsCarousel";
+
         }
 
         //sections
