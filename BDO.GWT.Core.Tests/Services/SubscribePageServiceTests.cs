@@ -11,6 +11,7 @@ using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Moq;
 using System.Data;
+using System.Linq;
 
 namespace BDO.GWT.Core.Tests.Services;
 
@@ -128,5 +129,78 @@ public class SubscribePageServiceTests
 
         Assert.ThrowsAsync<InvalidOperationException>(() => _service.GetSubscribeDtoAsync(page, CancellationToken.None));
         _captchaSettingsProviderMock.Verify(p => p.Get(), Times.Once);
+    }
+
+    [Test]
+    public async Task GetAllCountriesOptionDtosAsync_ReturnsOnlyDefaultOption_WhenNoCountries()
+    {
+        var queryMock = new Mock<ObjectQuery<CountryInfo>>();
+
+        _countryInfoProviderMock
+            .Setup(p => p.Get())
+            .Returns(queryMock.Object);
+
+        queryMock
+            .Setup(q => q.Columns(It.IsAny<string[]>()))
+            .Returns(queryMock.Object);
+        queryMock
+            .Setup(q => q.OrderBy(It.IsAny<string>()))
+            .Returns(queryMock.Object);
+        queryMock
+            .Setup(q => q.GetEnumerableTypedResultAsync(It.IsAny<CommandBehavior>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        var result = await _service.GetAllCountriesOptionDtosAsync(CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Length.EqualTo(1));
+            Assert.That(result[0].Value, Is.EqualTo(string.Empty));
+            Assert.That(result[0].Label, Is.EqualTo("Please select"));
+        });
+    }
+
+    [Test]
+    public async Task GetAllCountriesOptionDtosAsync_ReturnsDefaultThenMappedCountries()
+    {
+        var queryMock = new Mock<ObjectQuery<CountryInfo>>();
+
+        var country1 = new Mock<CountryInfo>();
+        var country1Guid = Guid.NewGuid();
+        country1.SetupGet(x => x.CountryGUID).Returns(country1Guid);
+        country1.SetupGet(x => x.CountryDisplayName).Returns("France");
+
+        var country2 = new Mock<CountryInfo>();
+        var country2Guid = Guid.NewGuid();
+        country2.SetupGet(x => x.CountryGUID).Returns(country2Guid);
+        country2.SetupGet(x => x.CountryDisplayName).Returns("Germany");
+
+        _countryInfoProviderMock
+            .Setup(p => p.Get())
+            .Returns(queryMock.Object);
+
+        queryMock
+            .Setup(q => q.Columns(It.IsAny<string[]>()))
+            .Returns(queryMock.Object);
+        queryMock
+            .Setup(q => q.OrderBy(It.IsAny<string>()))
+            .Returns(queryMock.Object);
+        queryMock
+            .Setup(q => q.GetEnumerableTypedResultAsync(It.IsAny<CommandBehavior>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([country1.Object, country2.Object]);
+
+        var result = await _service.GetAllCountriesOptionDtosAsync(CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Length.EqualTo(3));
+            Assert.That(result[0].Value, Is.EqualTo(string.Empty));
+            Assert.That(result[0].Label, Is.EqualTo("Please select"));
+
+            Assert.That(result[1].Value, Is.EqualTo(country1Guid.ToString()));
+            Assert.That(result[1].Label, Is.EqualTo("France"));
+            Assert.That(result[2].Value, Is.EqualTo(country2Guid.ToString()));
+            Assert.That(result[2].Label, Is.EqualTo("Germany"));
+        });
     }
 }
