@@ -133,7 +133,16 @@ public class ChannelCrudService : IChannelCrudService
         channelInfo.ChannelDisplayName = channelInput.General.DisplayName;
         channelInfo.ChannelName = channelInput.General.CodeName;
 
-        _channelInfoProvider.Set(channelInfo);
+        try
+        {
+            _channelInfoProvider.Set(channelInfo);
+        }
+        catch (DataClassNotFoundException ex)
+            when (string.Equals(ex.Message, "Class with name 'BDO.GDPRSettings' doesn't exist.", StringComparison.Ordinal))
+        {
+            throw new ValidationException(
+                "Channel update failed because CMS class 'BDO.GDPRSettings' is not available in this environment.");
+        }
 
         var websiteChannelInfo = (await _websiteChannelInfoProvider.Get()
             .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelChannelID), channelInfo.ChannelID)
@@ -172,7 +181,16 @@ public class ChannelCrudService : IChannelCrudService
             _websiteChannelInfoProvider.Delete(websiteChannel);
         }
 
-        _channelInfoProvider.Delete(channelInfo);
+        try
+        {
+            _channelInfoProvider.Delete(channelInfo);
+        }
+        catch (DataClassNotFoundException ex)
+            when (string.Equals(ex.Message, "Class with name 'BDO.GDPRSettings' doesn't exist.", StringComparison.Ordinal))
+        {
+            throw new ValidationException(
+                "Channel delete failed because CMS class 'BDO.GDPRSettings' is not available in this environment.");
+        }
     }
 
     private async Task<ChannelInfo> GetChannelInfoByGuidAsync(Guid entityGUID, CancellationToken cancellationToken)
