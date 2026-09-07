@@ -124,11 +124,22 @@ public class SubscribePageService : ISubscribePageService
                                               .OrderBy(nameof(CountryInfo.CountryDisplayName))
                                               .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
 
-        return countries.Select(c => new BDO.GWT.Core.DTOs.OptionDto
+        var options = new List<BDO.GWT.Core.DTOs.OptionDto>
+    {
+        new BDO.GWT.Core.DTOs.OptionDto
+        {
+            Value = string.Empty,
+            Label = "Please select"
+        }
+    };
+
+        options.AddRange(countries.Select(c => new BDO.GWT.Core.DTOs.OptionDto
         {
             Value = c.CountryGUID.ToString(),
             Label = c.CountryDisplayName
-        }).ToArray();
+        }));
+
+        return options.ToArray();
     }
 
     private Task<BDO.GWT.Core.DTOs.OptionDto[]> GetAllSiteNewsletterOptionDtos()

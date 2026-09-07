@@ -90,7 +90,7 @@ public class NewsletterSubscriptionService(
             {
                 EmailSubscriptionConfirmationContactID = contact.ContactID,
                 EmailSubscriptionConfirmationRecipientListID = recipientList.ContactGroupID,
-                EmailSubscriptionConfirmationIsApproved = false,
+                EmailSubscriptionConfirmationIsApproved = true,
                 EmailSubscriptionConfirmationDate = DateTime.Now,
             };
             confirmation.Insert();

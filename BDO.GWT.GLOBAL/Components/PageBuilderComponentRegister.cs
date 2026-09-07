@@ -43,7 +43,7 @@ using Kentico.PageBuilder.Web.Mvc;
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.Button, typeof(ButtonWidget), "Button", typeof(ButtonWidgetProperties), AllowCache = true, IconClass = "icon-button")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.LocalNavigation, typeof(LocalNavigationWidget), "Local Navigation Item", typeof(LocalNavigationWidgetProperties), AllowCache = true, IconClass = "icon-chain")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.KeyTakeaways, typeof(KeyTakeawaysWidget), "Key Takeaways", typeof(KeyTakeawaysWidgetProperties), AllowCache = true, IconClass = "icon-list-bullets")]
-[assembly: RegisterWidget(ComponentIdentifiers.Widgets.EventsWebinarsSlider, typeof(EventsWebinarsSliderWidget), "Events Webinar Slider Widget", typeof(EventsWebinarsSliderWidgetProperties), AllowCache = true, IconClass = "icon-carousel")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.EventsWebinarsSlider, typeof(EventsWebinarsSliderWidget), "Events & Webinars Slider", typeof(EventsWebinarsSliderWidgetProperties), AllowCache = true, IconClass = "icon-carousel")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.FaqWidget, typeof(FaqWidget), "FAQ Widget", typeof(FaqWidgetProperties), AllowCache = true, IconClass = "icon-bubbles")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.FlexibleBanner, typeof(FlexibleBannerWidget), "Flexible Banner", typeof(FlexibleBannerWidgetProperties), AllowCache = true, IconClass = "icon-ribbon")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.FlexibleContent, typeof(FlexibleContentWidget), "Flexible Content", typeof(FlexibleContentWidgetProperties), AllowCache = true, IconClass = "icon-newspaper")]

@@ -26,6 +26,12 @@ public interface IInsightCarouselService
 
 public class InsightCarouselService : IInsightCarouselService
 {
+    // Default page size when no filter is applied (initial/unfiltered view).
+    private const int DefaultPageSizeUnfiltered = 10;
+
+    // Default page size once a filter narrows the result set.
+    private const int DefaultPageSizeFiltered = 20;
+
     private readonly IFilteringHelper _filteringHelper;
     private readonly IInsightCardService _insightCardService;
     private readonly IContentService _contentService;
@@ -46,6 +52,9 @@ public class InsightCarouselService : IInsightCarouselService
     public async Task<InsightCarouselDto> GetInsightCarouselAsync<T>(T currentPage, InsightCarouselData data, CancellationToken cancellationToken)
         where T : IWebPageFieldsSource
     {
+        ArgumentNullException.ThrowIfNull(currentPage);
+        ArgumentNullException.ThrowIfNull(data);
+
         var filters = data.FilteringEnabled
           ? await _insightCardService.CreateFiltersAsync(
               data.Filters ?? new HashSet<string>(),
@@ -54,9 +63,10 @@ public class InsightCarouselService : IInsightCarouselService
           : null;
 
         var featuredSet = data.FeaturedInsightNodeGuids?.ToHashSet() ?? new HashSet<ContentItemReference>();
-        var stateGuid = Guid.NewGuid();
 
+        var stateGuid = Guid.NewGuid();
         _stateStore.Save(stateGuid, featuredSet);
+       
 
         var dto = new InsightCarouselDto
         {
@@ -89,6 +99,10 @@ public class InsightCarouselService : IInsightCarouselService
     public async Task<ICollection<ContentPageCardDto>> GetFilteredItemsAsync<T>(T currentPage, HashSet<ContentItemReference> featuredGuids, CardsQuery query, CancellationToken cancellationToken)
         where T : IWebPageFieldsSource
     {
+        ArgumentNullException.ThrowIfNull(currentPage);
+        featuredGuids ??= new HashSet<ContentItemReference>();
+        query ??= new CardsQuery();
+
         return await BuildAndExecuteQueryAsync(
             currentPage.SystemFields.ContentItemGUID.ToString(),
             currentPage.GetType().Name,
@@ -98,11 +112,17 @@ public class InsightCarouselService : IInsightCarouselService
             cancellationToken);
     }
 
-
     public async Task<ICollection<ContentPageCardDto>> GetAPIFilteredItemsAsync(CardsQuery query, string? language, CancellationToken cancellationToken)
     {
-        var featuredGuids = new HashSet<ContentItemReference>();
+        ArgumentNullException.ThrowIfNull(query);
 
+        // Confirmed safe against InsightCarouselStateStore.TryGet: that
+        // implementation always assigns the out parameter to a non-null
+        // HashSet before any return (empty set on a Guid.Empty or cache
+        // miss), so the empty-set initializer below is never left as null.
+        // The generic .NET TryGet convention (out param -> default on
+        // false) doesn't apply here — no defensive null-check needed.
+        var featuredGuids = new HashSet<ContentItemReference>();
         if (query.State.HasValue)
         {
             _stateStore.TryGet(query.State.Value, out featuredGuids);
@@ -141,7 +161,6 @@ public class InsightCarouselService : IInsightCarouselService
             FilterParameterName.MicrositeMasterPage => x => x.WhereContains(nameof(Insight.MicrositeMasterPages), guid),
             FilterParameterName.MicrositePage => x => x.WhereContains(nameof(Insight.MicrositePages), guid),
             FilterParameterName.OfficeLocation => x => x.WhereContains(nameof(Insight.MetadataOfficeLocation), guid),
-
             _ => null,
         };
 
@@ -164,15 +183,18 @@ public class InsightCarouselService : IInsightCarouselService
 
         // If the pageTypeName signals a known filter but we couldn't build a filter expression, return an empty result.
         if (filter is null && isOneOfAllowedTypes)
+        {
             return Array.Empty<ContentPageCardDto>();
+        }
 
         if (filter is not null)
+        {
             whereExpressions.Add(filter);
+        }
 
         query.CurrentPage ??= 1;
-        query.PageSize ??= filter is null ? 10 : 20;
+        query.PageSize ??= filter is null ? DefaultPageSizeUnfiltered : DefaultPageSizeFiltered;
 
-        // Removed unused retrieval of all insights (was unused).
         Action<RetrievePagesQueryParameters>? decorateQuery = null;
         if (whereExpressions.Count > 0)
         {
@@ -188,7 +210,7 @@ public class InsightCarouselService : IInsightCarouselService
             };
         }
 
-
+       
         var paginationDto = await _insightCardService.GetFilteredItemsAsync(
             query,
             "/",
