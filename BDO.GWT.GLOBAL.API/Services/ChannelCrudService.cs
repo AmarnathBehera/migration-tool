@@ -106,7 +106,7 @@ public class ChannelCrudService : IChannelCrudService
             ChannelName = channelInput.General.CodeName
         };
 
-        _channelInfoProvider.Set(channelInfo);
+        await _channelInfoProvider.SetAsync(channelInfo, cancellationToken);
 
         var websiteChannelInfo = new WebsiteChannelInfo
         {
@@ -135,7 +135,7 @@ public class ChannelCrudService : IChannelCrudService
 
         try
         {
-            await _channelInfoProvider.SetAsync(channelInfo);
+            await _channelInfoProvider.SetAsync(channelInfo, cancellationToken);
         }
         catch (DataClassNotFoundException ex)
             when (string.Equals(ex.Message, "Class with name 'BDO.GDPRSettings' doesn't exist.", StringComparison.Ordinal))
