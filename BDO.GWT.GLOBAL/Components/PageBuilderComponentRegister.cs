@@ -1,5 +1,4 @@
 ﻿using BDO;
-
 using BDO.GWT.Core.Components.Widgets.EditorsPickWidget;
 using BDO.GWT.Core.Components.Widgets.RelatedContentCarouselWidget;
 using BDO.GWT.GLOBAL.Components.Widget.InsightCarouselWidget;
@@ -26,7 +25,6 @@ using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.EventsWebinarsSliderWid
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ExternalNavigationWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.RelatedContentCarouselWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWidget;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ViewGlobalLocations;
 using BDO.GWT.Xperience.LiveSite.Components.Section;
 using Kentico.Forms.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
