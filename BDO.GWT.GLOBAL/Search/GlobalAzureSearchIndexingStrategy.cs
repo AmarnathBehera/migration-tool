@@ -78,6 +78,10 @@ public class GlobalAzureSearchIndexingStrategy : BaseAzureSearchIndexingStrategy
             {
                 return null;
             }
+            if (page.IsSearchExcluded)
+            {
+                return null;
+            }
 
             MapCommonMetadataFields(result, indexedPage, page);
 
@@ -98,8 +102,55 @@ public class GlobalAzureSearchIndexingStrategy : BaseAzureSearchIndexingStrategy
             {
                 return null;
             }
-
+            if (page.IsSearchExcluded)
+            {
+                return null;
+            }
             MapCommonMetadataFields(result, indexedPage, page);
+        }
+        else if (string.Equals(indexedPage.ContentTypeName, Person.CONTENT_TYPE_NAME, StringComparison.OrdinalIgnoreCase))
+        {
+            var personPage = await GetPage<Person>(
+                indexedPage.ItemGuid, indexedPage.WebsiteChannelName, indexedPage.LanguageName, Person.CONTENT_TYPE_NAME);
+
+            if (personPage is null)
+            {
+                return null;
+            }
+            if (personPage.IsSearchExcluded)
+            {
+                return null;
+            }
+
+            result.PersonDirectDialNumber = personPage.PersonDirectDialNumber ?? string.Empty;
+            result.PersonEmail = personPage.PersonEmail ?? string.Empty;
+            result.PersonFirstName = personPage.PersonFirstName ?? string.Empty;
+            result.PersonLastName = personPage.PersonLastName ?? string.Empty;
+            result.PersonJobTitle = personPage.PersonJobTitle ?? string.Empty;
+            result.PersonMobilePhone = personPage.PersonMobilePhone ?? string.Empty;
+            result.PersonPhone = personPage.PersonPhone ?? string.Empty;
+            result.PersonSurnamePrefixes = personPage.PersonSurnamePrefixes ?? string.Empty;
+            
+            MapCommonMetadataFields(result, indexedPage, personPage);
+        }
+        else if (string.Equals(indexedPage.ContentTypeName, Deal.CONTENT_TYPE_NAME, StringComparison.OrdinalIgnoreCase))
+        {
+            var dealPage = await GetPage<Deal>(
+                indexedPage.ItemGuid, indexedPage.WebsiteChannelName, indexedPage.LanguageName, Deal.CONTENT_TYPE_NAME);
+
+            if (dealPage is null)
+            {
+                return null;
+            }
+            if (dealPage.IsSearchExcluded)
+            {
+                return null;
+            }
+
+            result.DealContent = dealPage.DealContent ?? string.Empty;            
+
+
+            MapCommonMetadataFields(result, indexedPage, dealPage);
         }
         else if (string.Equals(indexedPage.ContentTypeName, Event.CONTENT_TYPE_NAME, StringComparison.OrdinalIgnoreCase))
         {
@@ -107,6 +158,50 @@ public class GlobalAzureSearchIndexingStrategy : BaseAzureSearchIndexingStrategy
                 indexedPage.ItemGuid, indexedPage.WebsiteChannelName, indexedPage.LanguageName, Event.CONTENT_TYPE_NAME);
 
             if (page is null)
+            {
+                return null;
+            }
+            if (page.IsSearchExcluded)
+            {
+                return null;
+            }
+            result.EventType = page.EventType.FirstOrDefault()?.Name ?? string.Empty;
+
+            //storing event from and to date in UTC format in the index, which is important for accurate filtering and
+            //sorting of search results based on event dates.
+            DateTime eventFromDate = DateTime.SpecifyKind(page.EventDateFrom, DateTimeKind.Utc);
+            DateTimeOffset eventFromDateOffset = new DateTimeOffset(eventFromDate);
+            result.EventDateFrom = eventFromDateOffset;
+
+            DateTime eventToDate = DateTime.SpecifyKind(page.EventDateTo, DateTimeKind.Utc);
+            DateTimeOffset eventToDateOffset = new DateTimeOffset(eventToDate);
+
+            result.EventDateTo = eventToDateOffset;
+            result.EventLocationTitle = page.EventLocationTitle ?? string.Empty;
+            result.EventLocationCity = page.EventLocationCity ?? string.Empty;
+            result.EventLocationState = page.EventLocationState ?? string.Empty;
+            result.EventLocationCountry = page.EventLocationCountry ?? string.Empty;
+            result.EventContactName = page.EventContactName ?? string.Empty;
+            result.EventLocationZip = page.EventLocationZip ?? string.Empty;
+            result.EventContactEmail = page.EventContactEmail ?? string.Empty;
+            result.EventContactPhone = page.EventContactPhone ?? string.Empty;
+            result.EventIsPrivate = page.EventIsPrivate;
+            result.EventLocationAddress1 = page.EventLocationAddress1 ?? string.Empty;
+            result.EventLocationAddress2 = page.EventLocationAddress2 ?? string.Empty;
+
+            MapCommonMetadataFields(result, indexedPage, page);
+        }
+        else if (string.Equals(indexedPage.ContentTypeName, Webinar.CONTENT_TYPE_NAME, StringComparison.OrdinalIgnoreCase))
+        {
+            var page = await GetPage<Webinar>(
+                indexedPage.ItemGuid, indexedPage.WebsiteChannelName, indexedPage.LanguageName, Webinar.CONTENT_TYPE_NAME);
+
+            if (page is null)
+            {
+                return null;
+            }
+
+            if (page.IsSearchExcluded)
             {
                 return null;
             }
@@ -139,25 +234,35 @@ public class GlobalAzureSearchIndexingStrategy : BaseAzureSearchIndexingStrategy
         }
         else
         {
-            // Generic fallback: index ANY web page whose content type implements IMetadata.
-            var page = await GetMetadataPageOrNull(indexedPage);
+            // Generic fallback: index ANY web page whose content type implements both IMetadata and ISearchAndSEO.
+            var metadataPage = await GetMetadataPageOrNull(indexedPage);
             var pageWebPageSource = await GetPageWebPageSourceOrNull(indexedPage);
 
-            if (page is null )
+            if (metadataPage is null)
             {
-                // Web page, but its content type does not implement IMetadata (or not found) - skip.
+                // Web page, but its content type does not implement both IMetadata and ISearchAndSEO (or not found) - skip.
                 return null;
             }
 
-            result.MetadataTitle              = page?.MetadataTitle ?? string.Empty;
-            result.MetadataDescription        = page?.MetadataDescription ?? string.Empty;
-            result.DocumentPageTitle          = page?.MetadataTitle ?? string.Empty;
-            result.MetadataTeaserImage        = page?.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url ?? string.Empty;
-            result.MetadataTeaserImageAltText = page?.MetadataTeaserImageAltText ?? string.Empty;
+            // Unwrap the (IMetadata, ISearchAndSEO) tuple returned by GetMetadataPageOrNull now that we
+            // know the page implements both interfaces.
+            var (metadata, searchAndSeo) = metadataPage.Value;
+
+            // Respect the page's "exclude from search" setting - skip indexing this page entirely if set.
+            if (searchAndSeo.IsSearchExcluded)
+            {
+                return null;
+            }
+
+            result.MetadataTitle              = metadata.MetadataTitle ?? string.Empty;
+            result.MetadataDescription        = metadata.MetadataDescription ?? string.Empty;
+            result.DocumentPageTitle          = metadata.MetadataTitle ?? string.Empty;
+            result.MetadataTeaserImage        = metadata.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url ?? string.Empty;
+            result.MetadataTeaserImageAltText = metadata.MetadataTeaserImageAltText ?? string.Empty;
 
             SetIndexedPageFields(result, indexedPage);
 
-            if(pageWebPageSource is not null)
+            if (pageWebPageSource is not null)
             {
                 result.PublishFrom =
                        pageWebPageSource?.SystemFields.ContentItemCommonDataLastPublishedWhen is DateTime from
@@ -261,9 +366,10 @@ public class GlobalAzureSearchIndexingStrategy : BaseAzureSearchIndexingStrategy
 
     /// <summary>
     /// Retrieves the changed web page as its concrete registered content-type model and returns it as
-    /// <see cref="IMetadata"/> when that content type has the Metadata reusable schema; otherwise null.
+    /// <see cref="IMetadata"/> and <see cref="ISearchAndSEO"/> when the content type implements both;
+    /// otherwise returns <c>null</c> so the page is skipped from indexing.
     /// </summary>
-    private async Task<IMetadata?> GetMetadataPageOrNull(IndexEventWebPageItemModel indexedPage)
+    private async Task<(IMetadata Metadata, ISearchAndSEO SearchAndSeo)?> GetMetadataPageOrNull(IndexEventWebPageItemModel indexedPage)
     {
         var query = new ContentItemQueryBuilder()
             .ForContentType(indexedPage.ContentTypeName,
@@ -276,7 +382,17 @@ public class GlobalAzureSearchIndexingStrategy : BaseAzureSearchIndexingStrategy
 
         var pages = await queryExecutor.GetMappedWebPageResult<IWebPageFieldsSource>(query);
 
-        return pages.FirstOrDefault() as IMetadata;
+        var page = pages.FirstOrDefault();
+
+        // Only treat the page as indexable metadata if its concrete content type implements BOTH
+        // IMetadata (title/description/teaser image) and ISearchAndSEO (search-exclusion flag).
+        // Pages missing either schema are not indexable through this generic fallback path.
+        if (page is IMetadata metadata && page is ISearchAndSEO searchAndSeo)
+        {
+            return (metadata, searchAndSeo);
+        }
+
+        return null;
     }
 
     private async Task<IWebPageFieldsSource?> GetPageWebPageSourceOrNull(IndexEventWebPageItemModel indexedPage)

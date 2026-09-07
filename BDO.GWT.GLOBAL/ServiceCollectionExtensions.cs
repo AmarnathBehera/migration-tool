@@ -12,8 +12,6 @@ using BDO.GWT.Web.Core.LiveSite.Services;
 using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using BDO.GWT.Xperience.Core.LiveSite.Services;
-using BDO.GWT.Xperience.Core.Services;
-using CMS.Core;
 using GWTXbyKWeb.Components.Services.SEOOptions;
 using Microsoft.Extensions.DependencyInjection;
 
