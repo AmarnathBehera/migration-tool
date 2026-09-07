@@ -1,7 +1,9 @@
+using BDO.GWT.Common.Core.Exceptions;
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Services;
 using CMS.Base;
 using CMS.ContentEngine;
+using CMS.DataEngine;
 using CMS.Websites;
 using Moq;
 using System.Reflection;
@@ -247,6 +249,106 @@ public class ChannelCrudServiceTests
         });
     }
 
+    [Test]
+    public void GetEntitiesAsync_WhenDependenciesUnavailable_Throws()
+    {
+        var service = (ChannelCrudService)RuntimeHelpers.GetUninitializedObject(typeof(ChannelCrudService));
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.GetEntitiesAsync(new ChannelsQuery(), CancellationToken.None));
+    }
+
+    [Test]
+    public void GetEntityAsync_WhenDependenciesUnavailable_Throws()
+    {
+        var service = (ChannelCrudService)RuntimeHelpers.GetUninitializedObject(typeof(ChannelCrudService));
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.GetEntityAsync(Guid.NewGuid(), CancellationToken.None));
+    }
+
+    [Test]
+    public void CreateEntityAsync_WhenDependenciesUnavailable_Throws()
+    {
+        var service = (ChannelCrudService)RuntimeHelpers.GetUninitializedObject(typeof(ChannelCrudService));
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.CreateEntityAsync(BuildChannelInput(), CancellationToken.None));
+    }
+
+    [Test]
+    public void UpdateEntityAsync_WhenDependenciesUnavailable_Throws()
+    {
+        var service = (ChannelCrudService)RuntimeHelpers.GetUninitializedObject(typeof(ChannelCrudService));
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.UpdateEntityAsync(Guid.NewGuid(), BuildChannelInput(), CancellationToken.None));
+    }
+
+    [Test]
+    public void DeleteEntityAsync_WhenDependenciesUnavailable_Throws()
+    {
+        var service = (ChannelCrudService)RuntimeHelpers.GetUninitializedObject(typeof(ChannelCrudService));
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.DeleteEntityAsync(Guid.NewGuid(), CancellationToken.None));
+    }
+
+    [Test]
+    public void ValidateDomainAvailabilityAsync_ThrowsUnprocessable_WhenDomainIsEmpty()
+    {
+        var service = CreateServiceWithUnusedProviders();
+
+        var ex = Assert.ThrowsAsync<UnprocessableEntityException>(async () =>
+            await InvokeValidateDomainAvailabilityAsync(service, "", null, CancellationToken.None));
+
+        Assert.That(ex!.Message, Is.EqualTo("Presentation URL is required."));
+    }
+
+    [Test]
+    public void ResolvePrimaryLanguageIdAsync_ThrowsUnprocessable_WhenNoDefaultCultureAndNoCultures()
+    {
+        var service = CreateServiceWithUnusedProviders();
+        var input = new ChannelInput
+        {
+            General = new ChannelGeneralInput
+            {
+                DisplayName = "A",
+                CodeName = "a",
+                PresentationURL = "https://a.example.com",
+                DefaultContentCulture = null
+            },
+            DomainAliases = new ChannelDomainAliasesInput { LiveSite = [] },
+            Cultures = []
+        };
+
+        var ex = Assert.ThrowsAsync<UnprocessableEntityException>(async () =>
+            await InvokeResolvePrimaryLanguageIdAsync(service, input, CancellationToken.None));
+
+        Assert.That(ex!.Message, Is.EqualTo("Default content culture is required."));
+    }
+
+    [Test]
+    public void ToChannelOutput_DefaultContentCulture_IsNull_WhenPrimaryLanguageIsMissingFromDictionary()
+    {
+        var container = CreateContainer(
+            channelId: 20,
+            channelGuid: Guid.NewGuid(),
+            displayName: "Channel 20",
+            codeName: "channel-20",
+            domain: "channel20.example.com",
+            primaryLanguageId: 9);
+
+        var result = InvokeToChannelOutput(container, new Dictionary<int, ContentLanguageInfo>(), new List<ContentLanguageInfo>());
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.General.DefaultContentCulture, Is.Null);
+            Assert.That(result.General.WebsitedomainresentationURL, Is.EqualTo("channel20.example.com"));
+            Assert.That(result.Cultures, Is.Empty);
+        });
+    }
+
     private static string InvokeNormalizeWebsiteChannelDomain(string value)
     {
         var method = typeof(ChannelCrudService).GetMethod("NormalizeWebsiteChannelDomain", BindingFlags.NonPublic | BindingFlags.Static)
@@ -291,5 +393,58 @@ public class ChannelCrudServiceTests
         container.Setup(c => c.GetValue(nameof(WebsiteChannelInfo.WebsiteChannelPrimaryContentLanguageID))).Returns(primaryLanguageId);
 
         return container.Object;
+    }
+
+    private static ChannelCrudService CreateServiceWithUnusedProviders()
+    {
+        var channelProvider = new Mock<IInfoProvider<ChannelInfo>>();
+        var websiteChannelProvider = new Mock<IInfoProvider<WebsiteChannelInfo>>();
+        var languageProvider = new Mock<IInfoProvider<ContentLanguageInfo>>();
+
+        return new ChannelCrudService(channelProvider.Object, websiteChannelProvider.Object, languageProvider.Object);
+    }
+
+    private static ChannelInput BuildChannelInput()
+    {
+        return new ChannelInput
+        {
+            General = new ChannelGeneralInput
+            {
+                DisplayName = "Channel",
+                CodeName = "channel",
+                PresentationURL = "https://channel.example.com",
+                DefaultContentCulture = "en-GB"
+            },
+            DomainAliases = new ChannelDomainAliasesInput
+            {
+                LiveSite = [new ChannelDomainAliasInput { PresentationURL = "https://channel.example.com" }]
+            },
+            Cultures = [new ChannelCultureInput { Code = "en-GB" }]
+        };
+    }
+
+    private static async Task InvokeValidateDomainAvailabilityAsync(
+        ChannelCrudService service,
+        string domain,
+        int? currentChannelId,
+        CancellationToken cancellationToken)
+    {
+        var method = typeof(ChannelCrudService).GetMethod("ValidateDomainAvailabilityAsync", BindingFlags.NonPublic | BindingFlags.Instance)
+            ?? throw new InvalidOperationException("ValidateDomainAvailabilityAsync method not found.");
+
+        var task = (Task)method.Invoke(service, [domain, currentChannelId, cancellationToken])!;
+        await task;
+    }
+
+    private static async Task<int> InvokeResolvePrimaryLanguageIdAsync(
+        ChannelCrudService service,
+        ChannelInput input,
+        CancellationToken cancellationToken)
+    {
+        var method = typeof(ChannelCrudService).GetMethod("ResolvePrimaryLanguageIdAsync", BindingFlags.NonPublic | BindingFlags.Instance)
+            ?? throw new InvalidOperationException("ResolvePrimaryLanguageIdAsync method not found.");
+
+        var task = (Task<int>)method.Invoke(service, [input, cancellationToken])!;
+        return await task;
     }
 }

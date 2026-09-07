@@ -115,7 +115,7 @@ public class ChannelCrudService : IChannelCrudService
             WebsiteChannelPrimaryContentLanguageID = primaryLanguageId
         };
 
-        _websiteChannelInfoProvider.Set(websiteChannelInfo);
+        await _websiteChannelInfoProvider.SetAsync(websiteChannelInfo);
 
         var output = await GetEntityAsync(channelInfo.ChannelGUID, cancellationToken);
 
@@ -135,7 +135,7 @@ public class ChannelCrudService : IChannelCrudService
 
         try
         {
-            _channelInfoProvider.Set(channelInfo);
+            await _channelInfoProvider.SetAsync(channelInfo);
         }
         catch (DataClassNotFoundException ex)
             when (string.Equals(ex.Message, "Class with name 'BDO.GDPRSettings' doesn't exist.", StringComparison.Ordinal))
@@ -161,7 +161,7 @@ public class ChannelCrudService : IChannelCrudService
         websiteChannelInfo.WebsiteChannelDomain = domain;
         websiteChannelInfo.WebsiteChannelPrimaryContentLanguageID = primaryLanguageId;
 
-        _websiteChannelInfoProvider.Set(websiteChannelInfo);
+        await _websiteChannelInfoProvider.SetAsync(websiteChannelInfo);
 
         var output = await GetEntityAsync(channelInfo.ChannelGUID, cancellationToken);
 
@@ -178,12 +178,12 @@ public class ChannelCrudService : IChannelCrudService
 
         foreach (var websiteChannel in websiteChannels)
         {
-            _websiteChannelInfoProvider.Delete(websiteChannel);
+            await _websiteChannelInfoProvider.DeleteAsync(websiteChannel);
         }
 
         try
         {
-            _channelInfoProvider.Delete(channelInfo);
+            await _channelInfoProvider.DeleteAsync(channelInfo);
         }
         catch (DataClassNotFoundException ex)
             when (string.Equals(ex.Message, "Class with name 'BDO.GDPRSettings' doesn't exist.", StringComparison.Ordinal))
