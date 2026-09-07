@@ -10,6 +10,7 @@ using CMS.EmailMarketing;
 using CMS.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using System.Reflection;
 
 namespace BDO.GWT.Core.Tests.Services;
 
@@ -370,12 +371,31 @@ public class NewsletterSubscriptionServiceTests
         _recipientListInfoProviderMock.Verify(p => p.Get(), Times.Once);
     }
 
+    [Test]
+    public async Task ResolveSubscribeConfirmRelativeUrlAsync_ReturnsNull_WhenGuidMissingOrEmpty()
+    {
+        var method = typeof(NewsletterSubscriptionService)
+            .GetMethod("ResolveSubscribeConfirmRelativeUrlAsync", BindingFlags.Instance | BindingFlags.NonPublic)!;
 
+        var missingGuidTask = (Task<string?>)method.Invoke(_service, [null, CancellationToken.None])!;
+        var emptyGuidTask = (Task<string?>)method.Invoke(_service, [Guid.Empty, CancellationToken.None])!;
 
+        Assert.That(await missingGuidTask, Is.Null);
+        Assert.That(await emptyGuidTask, Is.Null);
+    }
 
+    [Test]
+    public async Task ResolveSubscribeRemoveRelativeUrlAsync_ReturnsNull_WhenGuidMissingOrEmpty()
+    {
+        var method = typeof(NewsletterSubscriptionService)
+            .GetMethod("ResolveSubscribeRemoveRelativeUrlAsync", BindingFlags.Instance | BindingFlags.NonPublic)!;
 
+        var missingGuidTask = (Task<string?>)method.Invoke(_service, [null, CancellationToken.None])!;
+        var emptyGuidTask = (Task<string?>)method.Invoke(_service, [Guid.Empty, CancellationToken.None])!;
 
-
+        Assert.That(await missingGuidTask, Is.Null);
+        Assert.That(await emptyGuidTask, Is.Null);
+    }
 
     [Test]
     public async Task UnsubscribeFromNewsletterAsync_DoesNotCallRecipientListProvider_WhenValidationFails()
