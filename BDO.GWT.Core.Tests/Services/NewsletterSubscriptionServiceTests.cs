@@ -8,6 +8,9 @@ using CMS.ContactManagement;
 using CMS.DataEngine;
 using CMS.EmailMarketing;
 using CMS.Globalization;
+using CMS.Websites;
+using CMS.Websites.Routing;
+using Kentico.Content.Web.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System.Reflection;
@@ -110,6 +113,25 @@ public class NewsletterSubscriptionServiceTests
                 It.IsAny<bool>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(results.ToList());
+    }
+
+    private void SetupScopeServices(
+        IContentService contentService,
+        IWebPageUrlRetriever urlRetriever,
+        IPreferredLanguageRetriever languageRetriever)
+    {
+        var serviceProvider = new ServiceCollection()
+            .AddSingleton(contentService)
+            .AddSingleton(urlRetriever)
+            .AddSingleton(languageRetriever)
+            .BuildServiceProvider();
+
+        var scopeMock = new Mock<IServiceScope>();
+        scopeMock.SetupGet(s => s.ServiceProvider).Returns(serviceProvider);
+
+        _serviceScopeFactoryMock
+            .Setup(x => x.CreateScope())
+            .Returns(scopeMock.Object);
     }
 
     // --- SubscribeToNewslettersAsync ---------------------------------------------
@@ -320,6 +342,22 @@ public class NewsletterSubscriptionServiceTests
         _emailSubscriptionConfirmationInfoProviderMock.Verify(p => p.Get(), Times.Never);
     }
 
+    [Test]
+    public async Task ConfirmSubscriptionForNewsletterAsync_ReturnsTrue_WhenConfirmationExists()
+    {
+        var query = BuildConfirmQuery();
+        var confirmation = new Mock<EmailSubscriptionConfirmationInfo>();
+        SetupConfirmationQuery([confirmation.Object]);
+
+        var result = await _service.ConfirmSubscriptionForNewsletterAsync(query, "TestSite", CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.True);
+            confirmation.Verify(x => x.Update(), Times.Once);
+        });
+    }
+
     // --- UnsubscribeFromNewsletterAsync -----------------------------------------
 
     [Test]
@@ -380,8 +418,11 @@ public class NewsletterSubscriptionServiceTests
         var missingGuidTask = (Task<string?>)method.Invoke(_service, [null, CancellationToken.None])!;
         var emptyGuidTask = (Task<string?>)method.Invoke(_service, [Guid.Empty, CancellationToken.None])!;
 
-        Assert.That(await missingGuidTask, Is.Null);
-        Assert.That(await emptyGuidTask, Is.Null);
+        Assert.Multiple(async () =>
+        {
+            Assert.That(await missingGuidTask, Is.Null);
+            Assert.That(await emptyGuidTask, Is.Null);
+        });
     }
 
     [Test]
@@ -393,8 +434,161 @@ public class NewsletterSubscriptionServiceTests
         var missingGuidTask = (Task<string?>)method.Invoke(_service, [null, CancellationToken.None])!;
         var emptyGuidTask = (Task<string?>)method.Invoke(_service, [Guid.Empty, CancellationToken.None])!;
 
-        Assert.That(await missingGuidTask, Is.Null);
-        Assert.That(await emptyGuidTask, Is.Null);
+        Assert.Multiple(async () =>
+        {
+            Assert.That(await missingGuidTask, Is.Null);
+            Assert.That(await emptyGuidTask, Is.Null);
+        });
+    }
+
+    [Test]
+    public async Task ResolveSubscribeConfirmRelativeUrlAsync_ReturnsNull_WhenSubscribePageIsMissing()
+    {
+        var pageGuid = Guid.NewGuid();
+        var contentServiceMock = new Mock<IContentService>();
+        var urlRetrieverMock = new Mock<IWebPageUrlRetriever>();
+        var languageRetrieverMock = new Mock<IPreferredLanguageRetriever>();
+
+        contentServiceMock
+            .Setup(x => x.GetPagesByGuidsAsync<Subscribe>(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        SetupScopeServices(contentServiceMock.Object, urlRetrieverMock.Object, languageRetrieverMock.Object);
+
+        var method = typeof(NewsletterSubscriptionService)
+            .GetMethod("ResolveSubscribeConfirmRelativeUrlAsync", BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+        var result = await (Task<string?>)method.Invoke(_service, [pageGuid, CancellationToken.None])!;
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task ResolveSubscribeConfirmRelativeUrlAsync_ReturnsAbsoluteUrl_WhenConfirmPageExists()
+    {
+        var pageGuid = Guid.NewGuid();
+        var token = CancellationToken.None;
+        var contentServiceMock = new Mock<IContentService>();
+        var urlRetrieverMock = new Mock<IWebPageUrlRetriever>();
+        var languageRetrieverMock = new Mock<IPreferredLanguageRetriever>();
+
+        var subscribePage = new Subscribe
+        {
+            SystemFields = new WebPageFields { WebPageItemID = 101 },
+        };
+
+        var confirmPage = new SubscribeConfirm
+        {
+            SystemFields = new WebPageFields { WebPageItemParentID = 101, WebPageItemID = 202 },
+        };
+
+        contentServiceMock
+            .Setup(x => x.GetPagesByGuidsAsync<Subscribe>(It.IsAny<IEnumerable<Guid>>(), token))
+            .ReturnsAsync([subscribePage]);
+
+        contentServiceMock
+            .Setup(x => x.GetContentType<SubscribeConfirm>(token))
+            .ReturnsAsync([confirmPage]);
+
+        languageRetrieverMock.Setup(x => x.Get()).Returns("en-us");
+
+        urlRetrieverMock
+            .Setup(x => x.Retrieve(confirmPage, "en-us", token))
+            .ReturnsAsync(new WebPageUrl("~/confirm", "https://example.com/confirm"));
+
+        SetupScopeServices(contentServiceMock.Object, urlRetrieverMock.Object, languageRetrieverMock.Object);
+
+        var method = typeof(NewsletterSubscriptionService)
+            .GetMethod("ResolveSubscribeConfirmRelativeUrlAsync", BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+        var result = await (Task<string?>)method.Invoke(_service, [pageGuid, token])!;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo("https://example.com/confirm"));
+            contentServiceMock.Verify(x => x.GetContentType<SubscribeConfirm>(token), Times.Once);
+            urlRetrieverMock.Verify(x => x.Retrieve(confirmPage, "en-us", token), Times.Once);
+        });
+    }
+
+    [Test]
+    public async Task ResolveSubscribeRemoveRelativeUrlAsync_ReturnsNull_WhenSubscribeRemovePageIsMissing()
+    {
+        var pageGuid = Guid.NewGuid();
+        var token = CancellationToken.None;
+        var contentServiceMock = new Mock<IContentService>();
+        var urlRetrieverMock = new Mock<IWebPageUrlRetriever>();
+        var languageRetrieverMock = new Mock<IPreferredLanguageRetriever>();
+
+        var subscribePage = new Subscribe
+        {
+            SystemFields = new WebPageFields { WebPageItemID = 777 },
+        };
+
+        contentServiceMock
+            .Setup(x => x.GetPagesByGuidsAsync<Subscribe>(It.IsAny<IEnumerable<Guid>>(), token))
+            .ReturnsAsync([subscribePage]);
+
+        contentServiceMock
+            .Setup(x => x.GetContentType<SubscribeRemove>(token))
+            .ReturnsAsync([]);
+
+        SetupScopeServices(contentServiceMock.Object, urlRetrieverMock.Object, languageRetrieverMock.Object);
+
+        var method = typeof(NewsletterSubscriptionService)
+            .GetMethod("ResolveSubscribeRemoveRelativeUrlAsync", BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+        var result = await (Task<string?>)method.Invoke(_service, [pageGuid, token])!;
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task ResolveSubscribeRemoveRelativeUrlAsync_ReturnsAbsoluteUrl_WhenSubscribeRemovePageExists()
+    {
+        var pageGuid = Guid.NewGuid();
+        var token = CancellationToken.None;
+        var contentServiceMock = new Mock<IContentService>();
+        var urlRetrieverMock = new Mock<IWebPageUrlRetriever>();
+        var languageRetrieverMock = new Mock<IPreferredLanguageRetriever>();
+
+        var subscribePage = new Subscribe
+        {
+            SystemFields = new WebPageFields { WebPageItemID = 333 },
+        };
+
+        var removePage = new SubscribeRemove
+        {
+            SystemFields = new WebPageFields { WebPageItemParentID = 333, WebPageItemID = 444 },
+        };
+
+        contentServiceMock
+            .Setup(x => x.GetPagesByGuidsAsync<Subscribe>(It.IsAny<IEnumerable<Guid>>(), token))
+            .ReturnsAsync([subscribePage]);
+
+        contentServiceMock
+            .Setup(x => x.GetContentType<SubscribeRemove>(token))
+            .ReturnsAsync([removePage]);
+
+        languageRetrieverMock.Setup(x => x.Get()).Returns("fr-fr");
+
+        urlRetrieverMock
+            .Setup(x => x.Retrieve(removePage, "fr-fr", token))
+            .ReturnsAsync(new WebPageUrl("~/remove", "https://example.com/remove"));
+
+        SetupScopeServices(contentServiceMock.Object, urlRetrieverMock.Object, languageRetrieverMock.Object);
+
+        var method = typeof(NewsletterSubscriptionService)
+            .GetMethod("ResolveSubscribeRemoveRelativeUrlAsync", BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+        var result = await (Task<string?>)method.Invoke(_service, [pageGuid, token])!;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo("https://example.com/remove"));
+            contentServiceMock.Verify(x => x.GetContentType<SubscribeRemove>(token), Times.Once);
+            urlRetrieverMock.Verify(x => x.Retrieve(removePage, "fr-fr", token), Times.Once);
+        });
     }
 
     [Test]
