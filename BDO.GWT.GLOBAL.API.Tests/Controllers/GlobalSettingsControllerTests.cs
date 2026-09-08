@@ -106,7 +106,7 @@ public class GlobalSettingsControllerTests
 
         _globalSettingCrudServiceMock
             .Setup(x => x.GetGlobalSetting(codeName, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((GlobalSettingOutput?)null);
+            .ReturnsAsync((GlobalSettingOutput)null!);
 
         var result = await _controller.GetGlobalSetting(codeName, CancellationToken.None);
 
