@@ -15,91 +15,153 @@ namespace BDO.GWT.Core.LiveSite.Services;
 
 public interface IInsightCarouselService
 {
-    Task<InsightCarouselDto> GetInsightCarouselAsync<T>(T currentPage, InsightCarouselData data, CancellationToken cancellationToken)
+    Task<InsightCarouselDto> GetInsightCarouselAsync<T>(
+        T currentPage,
+        InsightCarouselData data,
+        CancellationToken cancellationToken)
         where T : IWebPageFieldsSource;
 
-    Task<ICollection<ContentPageCardDto>> GetFilteredItemsAsync<T>(T currentPage, HashSet<ContentItemReference> featuredGuids, CardsQuery query, CancellationToken cancellationToken)
+    Task<ICollection<ContentPageCardDto>> GetFilteredItemsAsync<T>(
+        T currentPage,
+        HashSet<ContentItemReference> featuredGuids,
+        CardsQuery query,
+        CancellationToken cancellationToken)
         where T : IWebPageFieldsSource;
 
-    Task<ICollection<ContentPageCardDto>> GetAPIFilteredItemsAsync(CardsQuery query, string? language, CancellationToken cancellationToken);
+    Task<ICollection<ContentPageCardDto>> GetAPIFilteredItemsAsync(
+        CardsQuery query,
+        string? language,
+        CancellationToken cancellationToken);
 }
 
 public class InsightCarouselService : IInsightCarouselService
 {
-    // Default page size when no filter is applied (initial/unfiltered view).
     private const int DefaultPageSizeUnfiltered = 10;
-
-    // Default page size once a filter narrows the result set.
     private const int DefaultPageSizeFiltered = 20;
 
     private readonly IFilteringHelper _filteringHelper;
     private readonly IInsightCardService _insightCardService;
     private readonly IContentService _contentService;
     private readonly IInsightCarouselStateStore _stateStore;
+    private readonly IContentRetriever _contentRetriever;
 
     public InsightCarouselService(
+        IContentRetriever contentRetriever,
         IFilteringHelper filteringHelper,
         IInsightCardService insightCardService,
         IContentService contentService,
         IInsightCarouselStateStore stateStore)
     {
+        _contentRetriever = contentRetriever;
         _filteringHelper = filteringHelper;
         _insightCardService = insightCardService;
         _contentService = contentService;
         _stateStore = stateStore;
     }
 
-    public async Task<InsightCarouselDto> GetInsightCarouselAsync<T>(T currentPage, InsightCarouselData data, CancellationToken cancellationToken)
+    public async Task<InsightCarouselDto> GetInsightCarouselAsync<T>(
+        T currentPage,
+        InsightCarouselData data,
+        CancellationToken cancellationToken)
         where T : IWebPageFieldsSource
     {
         ArgumentNullException.ThrowIfNull(currentPage);
         ArgumentNullException.ThrowIfNull(data);
 
         var filters = data.FilteringEnabled
-          ? await _insightCardService.CreateFiltersAsync(
-              data.Filters ?? new HashSet<string>(),
-              null,
-              cancellationToken)
-          : null;
+            ? await _insightCardService.CreateFiltersAsync(
+                data.Filters ?? new HashSet<string>(),
+                null,
+                cancellationToken)
+            : null;
 
-        var featuredSet = data.FeaturedInsightNodeGuids?.ToHashSet() ?? new HashSet<ContentItemReference>();
+        // The configured featured insight references.
+        var featuredGuids = data.FeaturedInsightNodeGuids?
+            .ToHashSet()
+            ?? new HashSet<ContentItemReference>();
+
+        // Retrieve the actual Insight pages.
+        var featuredInsights = (await _contentRetriever.RetrievePages<Insight>(
+            new RetrievePagesParameters
+            {
+                LinkedItemsMaxLevel = 2
+            },
+            query => query.OrderBy(
+                nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken
+        ))?.ToList() ?? new List<Insight>();
+
+        // Keep only references that have a corresponding Insight page.
+        var retrievedFeaturedGuids = featuredInsights
+            .Where(x => featuredGuids.Any(
+                r => r.Identifier == x.SystemFields.ContentItemGUID))
+            .Select(x => x.SystemFields.ContentItemGUID)
+            .ToHashSet();
+
+        // Convert back to ContentItemReference because the state/query
+        // pipeline expects ContentItemReference.
+        var featuredReferences = featuredGuids
+            .Where(x => retrievedFeaturedGuids.Contains(x.Identifier))
+            .ToHashSet();
 
         var stateGuid = Guid.NewGuid();
-        _stateStore.Save(stateGuid, featuredSet);
-       
+
+        _stateStore.Save(stateGuid, featuredReferences);
 
         var dto = new InsightCarouselDto
         {
             Title = data.Title,
             Description = data.Description,
             Filters = data.FilteringEnabled ? filters : null,
-            FilteringTooltipEnabled = await _filteringHelper.IsFilteringTooltipEnabledAsync(data.FilteringEnabled, cancellationToken),
-            Items = await GetFilteredItemsAsync(currentPage, featuredSet, new CardsQuery(), cancellationToken),
+
+            FilteringTooltipEnabled =
+                await _filteringHelper.IsFilteringTooltipEnabledAsync(
+                    data.FilteringEnabled,
+                    cancellationToken),
+
+            Items = await GetFilteredItemsAsync(
+                currentPage,
+                featuredReferences,
+                new CardsQuery(),
+                cancellationToken),
+
             BackgroundImageURL = data.BackgroundImageURL,
             BackgroundImageAltText = data.BackgroundImageAltText,
-            SeeAllLink = data is { SeeAllLinkText: not null, SeeAllLinkUrl: not null }
+
+            SeeAllLink = data is
+            {
+                SeeAllLinkText: not null,
+                SeeAllLinkUrl: not null
+            }
                 ? new LinkItemDto
                 {
                     Title = data.SeeAllLinkText,
                     URL = data.SeeAllLinkUrl,
-                    Target = data.SeeAllLinkURLTarget ?? "_self",
+                    Target = data.SeeAllLinkURLTarget ?? "_self"
                 }
                 : null,
+
             TopMargin = data.TopMargin,
             BottomMargin = data.BottomMargin,
             WidgetID = data.WidgetID,
             CurrentPageGuid = currentPage.SystemFields.ContentItemGUID,
             PageType = currentPage.GetType().Name,
-            StateGUID = stateGuid,
+            StateGUID = stateGuid
         };
 
         return dto;
     }
 
-    public async Task<ICollection<ContentPageCardDto>> GetFilteredItemsAsync<T>(T currentPage, HashSet<ContentItemReference> featuredGuids, CardsQuery query, CancellationToken cancellationToken)
+    public async Task<ICollection<ContentPageCardDto>> GetFilteredItemsAsync<T>(
+        T currentPage,
+        HashSet<ContentItemReference> featuredGuids,
+        CardsQuery query,
+        CancellationToken cancellationToken)
         where T : IWebPageFieldsSource
     {
         ArgumentNullException.ThrowIfNull(currentPage);
+
         featuredGuids ??= new HashSet<ContentItemReference>();
         query ??= new CardsQuery();
 
@@ -112,20 +174,20 @@ public class InsightCarouselService : IInsightCarouselService
             cancellationToken);
     }
 
-    public async Task<ICollection<ContentPageCardDto>> GetAPIFilteredItemsAsync(CardsQuery query, string? language, CancellationToken cancellationToken)
+    public async Task<ICollection<ContentPageCardDto>> GetAPIFilteredItemsAsync(
+        CardsQuery query,
+        string? language,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(query);
 
-        // Confirmed safe against InsightCarouselStateStore.TryGet: that
-        // implementation always assigns the out parameter to a non-null
-        // HashSet before any return (empty set on a Guid.Empty or cache
-        // miss), so the empty-set initializer below is never left as null.
-        // The generic .NET TryGet convention (out param -> default on
-        // false) doesn't apply here — no defensive null-check needed.
         var featuredGuids = new HashSet<ContentItemReference>();
+
         if (query.State.HasValue)
         {
-            _stateStore.TryGet(query.State.Value, out featuredGuids);
+            _stateStore.TryGet(
+                query.State.Value,
+                out featuredGuids);
         }
 
         return await BuildAndExecuteQueryAsync(
@@ -147,21 +209,42 @@ public class InsightCarouselService : IInsightCarouselService
     {
         var whereExpressions = new List<Action<WhereParameters>>();
 
-        // Map filter parameter names to the correct Insight fields
         Action<WhereParameters>? filter = pageTypeName switch
         {
-            FilterParameterName.ContentType => x => x.WhereContains(nameof(Insight.ContentType), guid),
-            FilterParameterName.BusinessLine => x => x.WhereContains(nameof(Insight.MetadataBusinessLine), guid),
-            FilterParameterName.BusinessIssue => x => x.WhereContains(nameof(Insight.MetadataBusinessIssues), guid),
-            FilterParameterName.ServiceArea => x => x.WhereContains(nameof(Insight.MetadataServiceAreas), guid),
-            FilterParameterName.Service => x => x.WhereContains(nameof(Insight.MetadataServices), guid),
-            FilterParameterName.IndustryCategory => x => x.WhereContains(nameof(Insight.MetadataIndustryCategories), guid),
-            FilterParameterName.Industry => x => x.WhereContains(nameof(Insight.MetadataIndustries), guid),
-            FilterParameterName.SpecialtyCategory => x => x.WhereContains(nameof(Insight.MetadataSpecialtiesCategories), guid),
-            FilterParameterName.MicrositeMasterPage => x => x.WhereContains(nameof(Insight.MicrositeMasterPages), guid),
-            FilterParameterName.MicrositePage => x => x.WhereContains(nameof(Insight.MicrositePages), guid),
-            FilterParameterName.OfficeLocation => x => x.WhereContains(nameof(Insight.MetadataOfficeLocation), guid),
-            _ => null,
+            FilterParameterName.ContentType =>
+                x => x.WhereContains(nameof(Insight.ContentType), guid),
+
+            FilterParameterName.BusinessLine =>
+                x => x.WhereContains(nameof(Insight.MetadataBusinessLine), guid),
+
+            FilterParameterName.BusinessIssue =>
+                x => x.WhereContains(nameof(Insight.MetadataBusinessIssues), guid),
+
+            FilterParameterName.ServiceArea =>
+                x => x.WhereContains(nameof(Insight.MetadataServiceAreas), guid),
+
+            FilterParameterName.Service =>
+                x => x.WhereContains(nameof(Insight.MetadataServices), guid),
+
+            FilterParameterName.IndustryCategory =>
+                x => x.WhereContains(nameof(Insight.MetadataIndustryCategories), guid),
+
+            FilterParameterName.Industry =>
+                x => x.WhereContains(nameof(Insight.MetadataIndustries), guid),
+
+            FilterParameterName.SpecialtyCategory =>
+                x => x.WhereContains(nameof(Insight.MetadataSpecialtiesCategories), guid),
+
+            FilterParameterName.MicrositeMasterPage =>
+                x => x.WhereContains(nameof(Insight.MicrositeMasterPages), guid),
+
+            FilterParameterName.MicrositePage =>
+                x => x.WhereContains(nameof(Insight.MicrositePages), guid),
+
+            FilterParameterName.OfficeLocation =>
+                x => x.WhereContains(nameof(Insight.MetadataOfficeLocation), guid),
+
+            _ => null
         };
 
         var allowedPageTypes = new HashSet<string>
@@ -179,9 +262,8 @@ public class InsightCarouselService : IInsightCarouselService
             FilterParameterName.OfficeLocation
         };
 
-        bool isOneOfAllowedTypes = allowedPageTypes.Contains(pageTypeName);
+        var isOneOfAllowedTypes = allowedPageTypes.Contains(pageTypeName);
 
-        // If the pageTypeName signals a known filter but we couldn't build a filter expression, return an empty result.
         if (filter is null && isOneOfAllowedTypes)
         {
             return Array.Empty<ContentPageCardDto>();
@@ -193,9 +275,14 @@ public class InsightCarouselService : IInsightCarouselService
         }
 
         query.CurrentPage ??= 1;
-        query.PageSize ??= filter is null ? DefaultPageSizeUnfiltered : DefaultPageSizeFiltered;
+
+        query.PageSize ??=
+            filter is null
+                ? DefaultPageSizeUnfiltered
+                : DefaultPageSizeFiltered;
 
         Action<RetrievePagesQueryParameters>? decorateQuery = null;
+
         if (whereExpressions.Count > 0)
         {
             decorateQuery = rp =>
@@ -210,15 +297,18 @@ public class InsightCarouselService : IInsightCarouselService
             };
         }
 
-       
         var paginationDto = await _insightCardService.GetFilteredItemsAsync(
             query,
             "/",
-            string.IsNullOrWhiteSpace(language) ? _contentService.GetCurrentLanguage() : language,
+            string.IsNullOrWhiteSpace(language)
+                ? _contentService.GetCurrentLanguage()
+                : language,
             decorateQuery,
-            item => featuredGuids.Any(r => r.Identifier == item.SystemFields.ContentItemGUID),
+            item => featuredGuids.Any(
+                r => r.Identifier == item.SystemFields.ContentItemGUID),
             cancellationToken);
 
-        return paginationDto?.Data ?? Array.Empty<ContentPageCardDto>();
+        return paginationDto?.Data
+            ?? Array.Empty<ContentPageCardDto>();
     }
 }

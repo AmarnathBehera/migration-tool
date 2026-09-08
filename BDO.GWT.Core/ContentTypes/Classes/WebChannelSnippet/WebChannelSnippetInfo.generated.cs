@@ -649,7 +649,29 @@ namespace BDO
         public virtual string CustomCookiebotScript
         {
             get => ValidationHelper.GetString(GetValue(nameof(CustomCookiebotScript)), String.Empty);
-            set => SetValue(nameof(CustomCookiebotScript), value);
+            set => SetValue(nameof(CustomCookiebotScript), value, String.Empty);
+        }
+
+
+        /// <summary>
+        /// Show advanced widgets.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool ShowAdvancedWidgets
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(ShowAdvancedWidgets)), false);
+            set => SetValue(nameof(ShowAdvancedWidgets), value);
+        }
+
+
+        /// <summary>
+        /// Show advanced widgets inheritfromglobalsettings.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool ShowAdvancedWidgetsInheritfromglobalsettings
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(ShowAdvancedWidgetsInheritfromglobalsettings)), false);
+            set => SetValue(nameof(ShowAdvancedWidgetsInheritfromglobalsettings), value);
         }
 
 

@@ -185,7 +185,7 @@ namespace BDO
         [DatabaseField]
         public virtual string DisplayName
         {
-            get => ValidationHelper.GetString(GetValue(nameof(DisplayName)), String.Empty);
+            get => ValidationHelper.GetString(GetValue(nameof(DisplayName)), "Email");
             set => SetValue(nameof(DisplayName), value, String.Empty);
         }
 
@@ -374,6 +374,17 @@ namespace BDO
         {
             get => global::CMS.DataEngine.Internal.JsonDataTypeConverter.ConvertToModels<global::CMS.ContentEngine.ContentItemReference>(GetValue(nameof(GlobalLocationsBackgroundImage), String.Empty));
             set => SetValue(nameof(GlobalLocationsBackgroundImage), global::CMS.DataEngine.Internal.JsonDataTypeConverter.ConvertToString<IEnumerable<global::CMS.ContentEngine.ContentItemReference>>(value, Enumerable.Empty<global::CMS.ContentEngine.ContentItemReference>(), null));
+        }
+
+
+        /// <summary>
+        /// Show advanced widgets.
+        /// </summary>
+        [DatabaseField]
+        public virtual bool ShowAdvancedWidgets
+        {
+            get => ValidationHelper.GetBoolean(GetValue(nameof(ShowAdvancedWidgets)), false);
+            set => SetValue(nameof(ShowAdvancedWidgets), value);
         }
 
 
