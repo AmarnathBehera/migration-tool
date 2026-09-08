@@ -87,7 +87,12 @@ public class SettingService : ISettingService
         var globals = await _provider.Get().TopN(1).GetEnumerableTypedResultAsync();
         var global = globals?.FirstOrDefault();
 
-        return new[] { Merge(snippet, global) };
+        return BuildMergedResult(snippet, global);
+    }
+
+    internal static IEnumerable<WebChannelSnippetInfo> BuildMergedResult(WebChannelSnippetInfo snippet, GlobalsettingskeyInfo? global)
+    {
+        return [Merge(snippet, global)];
     }
 
     private static T Pick<T>(bool inheritFromGlobal, T globalValue, T snippetValue) =>
