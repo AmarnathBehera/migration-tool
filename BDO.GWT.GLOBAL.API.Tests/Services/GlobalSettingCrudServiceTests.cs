@@ -205,4 +205,141 @@ public class GlobalSettingCrudServiceTests
 
         Assert.That(input.Value, Is.EqualTo(42));
     }
+
+    // --- GetTypeName private static method: exhaustive branch coverage -----------
+
+    private static string InvokeGetTypeName(string? cmsDataType, object? value)
+    {
+        var method = typeof(GlobalSettingCrudService).GetMethod(
+            "GetTypeName",
+            BindingFlags.NonPublic | BindingFlags.Static)!;
+        return (string)method.Invoke(null, new[] { cmsDataType, value })!;
+    }
+
+    [TestCase(FieldDataType.Boolean, "boolean")]
+    [TestCase(FieldDataType.Double, "double")]
+    [TestCase(FieldDataType.Integer, "int32")]
+    [TestCase(FieldDataType.LongInteger, "int64")]
+    [TestCase(FieldDataType.LongText, "string")]
+    [TestCase(FieldDataType.Text, "string")]
+    [TestCase(FieldDataType.DateTime, "datetime")]
+    [TestCase(FieldDataType.Guid, "guid")]
+    [TestCase("SomethingUnknown", "string")]
+    public void GetTypeName_WithCmsDataType_ReturnsExpected(string cmsDataType, string expected)
+    {
+        var result = InvokeGetTypeName(cmsDataType, null);
+
+        Assert.That(result, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void GetTypeName_NullDataType_NullValue_ReturnsString()
+    {
+        Assert.That(InvokeGetTypeName(null, null), Is.EqualTo("string"));
+    }
+
+    [Test]
+    public void GetTypeName_NullDataType_BoolValue_ReturnsBoolean()
+    {
+        Assert.That(InvokeGetTypeName(null, true), Is.EqualTo("boolean"));
+    }
+
+    [Test]
+    public void GetTypeName_NullDataType_IntValue_ReturnsInt32()
+    {
+        Assert.That(InvokeGetTypeName(null, 5), Is.EqualTo("int32"));
+    }
+
+    [Test]
+    public void GetTypeName_NullDataType_LongValue_ReturnsInt64()
+    {
+        Assert.That(InvokeGetTypeName(null, 5L), Is.EqualTo("int64"));
+    }
+
+    [Test]
+    public void GetTypeName_NullDataType_DoubleValue_ReturnsDouble()
+    {
+        Assert.That(InvokeGetTypeName(null, 3.14d), Is.EqualTo("double"));
+    }
+
+    [Test]
+    public void GetTypeName_NullDataType_DecimalValue_ReturnsDouble()
+    {
+        Assert.That(InvokeGetTypeName(null, 3.14m), Is.EqualTo("double"));
+    }
+
+    [Test]
+    public void GetTypeName_NullDataType_FloatValue_ReturnsDouble()
+    {
+        Assert.That(InvokeGetTypeName(null, 3.14f), Is.EqualTo("double"));
+    }
+
+    [Test]
+    public void GetTypeName_NullDataType_DateTimeValue_ReturnsDateTime()
+    {
+        Assert.That(InvokeGetTypeName(null, DateTime.UtcNow), Is.EqualTo("datetime"));
+    }
+
+    [Test]
+    public void GetTypeName_NullDataType_GuidValue_ReturnsGuid()
+    {
+        Assert.That(InvokeGetTypeName(null, Guid.NewGuid()), Is.EqualTo("guid"));
+    }
+
+    [Test]
+    public void GetTypeName_NullDataType_UnknownValue_ReturnsString()
+    {
+        Assert.That(InvokeGetTypeName(null, new object()), Is.EqualTo("string"));
+    }
+
+    [Test]
+    public void GetTypeName_NullDataType_StringValue_ReturnsString()
+    {
+        Assert.That(InvokeGetTypeName(null, "hello"), Is.EqualTo("string"));
+    }
+
+    // --- GetValidatedSettingAndColumn / provider-guard branches ------------------
+
+    [Test]
+    public void GetValidatedSettingAndColumn_WhenProviderReturnsNull_AddsErrorAndThrows()
+    {
+        var providerMock = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
+        var settingsCrudHelperMock = new Mock<ISettingsCrudHelper>();
+        var validationStateMock = new Mock<IValidationState>();
+        var service = new GlobalSettingCrudService(
+            providerMock.Object,
+            settingsCrudHelperMock.Object,
+            validationStateMock.Object);
+
+        // Unconfigured provider -> Get() returns null -> NRE bubbles up before validation.
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.SetGlobalSetting("any", new GlobalSettingInput { Value = "x" }, CancellationToken.None));
+    }
+
+    [Test]
+    public void Constructor_AssignsAllDependencies()
+    {
+        var providerMock = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
+        var settingsCrudHelperMock = new Mock<ISettingsCrudHelper>();
+        var validationStateMock = new Mock<IValidationState>();
+
+        var service = new GlobalSettingCrudService(
+            providerMock.Object,
+            settingsCrudHelperMock.Object,
+            validationStateMock.Object);
+
+        var providerField = typeof(GlobalSettingCrudService)
+            .GetField("_customScriptinfoProvider", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var helperField = typeof(GlobalSettingCrudService)
+            .GetField("_settingsCrudHelper", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var validationField = typeof(GlobalSettingCrudService)
+            .GetField("_validationState", BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(providerField.GetValue(service), Is.SameAs(providerMock.Object));
+            Assert.That(helperField.GetValue(service), Is.SameAs(settingsCrudHelperMock.Object));
+            Assert.That(validationField.GetValue(service), Is.SameAs(validationStateMock.Object));
+        });
+    }
 }

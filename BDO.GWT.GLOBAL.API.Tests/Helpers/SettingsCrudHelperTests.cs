@@ -38,8 +38,11 @@ public class SettingsCrudHelperTests
         Assert.Throws<ValidationException>(() =>
             _helper.ValidateAndNormalizeSettingInput(null, "MySetting", input));
 
-        Assert.That(_validationState.HasErrors(), Is.True);
-        Assert.That(_validationState.GetErrors().ContainsKey("codeName"), Is.True);
+        Assert.Multiple(() =>
+        {
+            Assert.That(_validationState.HasErrors(), Is.True);
+            Assert.That(_validationState.GetErrors().ContainsKey("codeName"), Is.True);
+        });
     }
 
     [Test]
@@ -51,8 +54,11 @@ public class SettingsCrudHelperTests
         Assert.DoesNotThrow(() =>
             _helper.ValidateAndNormalizeSettingInput(field, "MySetting", input));
 
-        Assert.That(_validationState.HasErrors(), Is.False);
-        Assert.That(input.Value, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(_validationState.HasErrors(), Is.False);
+            Assert.That(input.Value, Is.Null);
+        });
     }
 
     [TestCase(FieldDataType.Boolean, "true", true)]
@@ -69,8 +75,11 @@ public class SettingsCrudHelperTests
 
         _helper.ValidateAndNormalizeSettingInput(field, "MySetting", input);
 
-        Assert.That(_validationState.HasErrors(), Is.False);
-        Assert.That(input.Value, Is.EqualTo(expected));
+        Assert.Multiple(() =>
+        {
+            Assert.That(_validationState.HasErrors(), Is.False);
+            Assert.That(input.Value, Is.EqualTo(expected));
+        });
     }
 
     [Test]
@@ -81,9 +90,12 @@ public class SettingsCrudHelperTests
 
         _helper.ValidateAndNormalizeSettingInput(field, "MySetting", input);
 
-        Assert.That(_validationState.HasErrors(), Is.False);
-        Assert.That(input.Value, Is.InstanceOf<DateTime>());
-        Assert.That((DateTime)input.Value!, Is.EqualTo(new DateTime(2024, 1, 15, 10, 30, 0)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(_validationState.HasErrors(), Is.False);
+            Assert.That(input.Value, Is.InstanceOf<DateTime>());
+            Assert.That((DateTime)input.Value!, Is.EqualTo(new DateTime(2024, 1, 15, 10, 30, 0)));
+        });
     }
 
     [Test]
@@ -95,8 +107,11 @@ public class SettingsCrudHelperTests
 
         _helper.ValidateAndNormalizeSettingInput(field, "MySetting", input);
 
-        Assert.That(_validationState.HasErrors(), Is.False);
-        Assert.That(input.Value, Is.EqualTo(guid));
+        Assert.Multiple(() =>
+        {
+            Assert.That(_validationState.HasErrors(), Is.False);
+            Assert.That(input.Value, Is.EqualTo(guid));
+        });
     }
 
     [Test]
@@ -107,8 +122,11 @@ public class SettingsCrudHelperTests
 
         _helper.ValidateAndNormalizeSettingInput(field, "MySetting", input);
 
-        Assert.That(_validationState.HasErrors(), Is.False);
-        Assert.That(input.Value, Is.EqualTo("raw"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(_validationState.HasErrors(), Is.False);
+            Assert.That(input.Value, Is.EqualTo("raw"));
+        });
     }
 
     [TestCase(FieldDataType.Boolean, "not-a-bool", "Please enter an boolean value (true/false).")]
@@ -126,8 +144,11 @@ public class SettingsCrudHelperTests
             _helper.ValidateAndNormalizeSettingInput(field, "MySetting", input));
 
         var errors = _validationState.GetErrors();
-        Assert.That(errors.ContainsKey("value"), Is.True);
-        Assert.That(errors["value"], Is.EqualTo(expectedMessage));
+        Assert.Multiple(() =>
+        {
+            Assert.That(errors.ContainsKey("value"), Is.True);
+            Assert.That(errors["value"], Is.EqualTo(expectedMessage));
+        });
     }
 
     [Test]
@@ -138,8 +159,11 @@ public class SettingsCrudHelperTests
 
         _helper.ValidateAndNormalizeSettingInput(field, "MySetting", input);
 
-        Assert.That(_validationState.HasErrors(), Is.False);
-        Assert.That(input.Value, Is.EqualTo(123));
+        Assert.Multiple(() =>
+        {
+            Assert.That(_validationState.HasErrors(), Is.False);
+            Assert.That(input.Value, Is.EqualTo(123));
+        });
     }
 
     [Test]

@@ -20,6 +20,9 @@ public interface IGlobalSettingCrudService
 
 public class GlobalSettingCrudService : IGlobalSettingCrudService
 {
+    private const string StringTypeName = "string";
+    private const string DoubleTypeName = "double";
+
     private readonly IInfoProvider<GlobalsettingskeyInfo> _customScriptinfoProvider;
     private readonly ISettingsCrudHelper _settingsCrudHelper;
     private readonly IValidationState _validationState;
@@ -101,7 +104,7 @@ public class GlobalSettingCrudService : IGlobalSettingCrudService
         return (setting, columnName);
     }
 
-    private static GlobalSettingOutput[] ToGlobalSettingOutputs(IDataContainer container)
+    private static GlobalSettingOutput[] ToGlobalSettingOutputs(GlobalsettingskeyInfo container)
     {
         var formInfo = FormHelper.GetFormInfo(GlobalsettingskeyInfo.OBJECT_TYPE, true);
 
@@ -129,29 +132,29 @@ public class GlobalSettingCrudService : IGlobalSettingCrudService
             return cmsDataType switch
             {
                 FieldDataType.Boolean => "boolean",
-                FieldDataType.Double => "double",
+                FieldDataType.Double => DoubleTypeName,
                 FieldDataType.Integer => "int32",
                 FieldDataType.LongInteger => "int64",
-                FieldDataType.LongText => "string",
-                FieldDataType.Text => "string",
+                FieldDataType.LongText => StringTypeName,
+                FieldDataType.Text => StringTypeName,
                 FieldDataType.DateTime => "datetime",
                 FieldDataType.Guid => "guid",
-                _ => "string",
+                _ => StringTypeName,
             };
         }
 
         return value switch
         {
-            null => "string",
+            null => StringTypeName,
             bool => "boolean",
             int => "int32",
             long => "int64",
-            double => "double",
-            decimal => "double",
-            float => "double",
+            double => DoubleTypeName,
+            decimal => DoubleTypeName,
+            float => DoubleTypeName,
             DateTime => "datetime",
             Guid => "guid",
-            _ => "string"
+            _ => StringTypeName
         };
     }
 }
