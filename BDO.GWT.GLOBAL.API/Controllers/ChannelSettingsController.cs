@@ -2,10 +2,10 @@
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Queries;
 using BDO.GWT.GLOBAL.API.Services;
-using ChannelSettingInput = BDO.GWT.Web.Core.API.Data.ChannelSettingInput;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Mime;
+using ChannelSettingInput = BDO.GWT.Web.Core.API.Data.ChannelSettingInput;
 
 namespace BDO.GWT.GLOBAL.API.Controllers
 {
