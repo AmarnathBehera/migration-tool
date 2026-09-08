@@ -6,5 +6,7 @@ public class GlobalSettingOutput
 
     public required string DisplayName { get; set; }
 
+    public required string Type { get; set; }
+
     public object? Value { get; set; }
 }

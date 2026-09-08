@@ -36,6 +36,7 @@ public class GlobalSettingsControllerTests
             {
                 CodeName = "cookiebot",
                 DisplayName = "Cookiebot",
+                Type="string",
                 Value = "abc123"
             }
         };
@@ -79,6 +80,7 @@ public class GlobalSettingsControllerTests
         {
             CodeName = codeName,
             DisplayName = "Cookiebot",
+            Type= "string",
             Value = "abc123"
         };
 

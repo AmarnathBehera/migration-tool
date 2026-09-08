@@ -1,4 +1,5 @@
 using BDO.GWT.GLOBAL.API.Data;
+using BDO.GWT.GLOBAL.API.Helpers;
 using BDO.GWT.GLOBAL.API.Queries;
 using BDO.GWT.GLOBAL.API.Services;
 using CMS.DataEngine;
@@ -25,7 +26,8 @@ public class GlobalSettingCrudServiceTests
         var output = new GlobalSettingOutput
         {
             CodeName = "BDO.Cookiebot",
-            DisplayName = "Cookiebot"
+            DisplayName = "Cookiebot",
+            Type = "string"
         };
 
         Assert.Multiple(() =>
@@ -44,6 +46,7 @@ public class GlobalSettingCrudServiceTests
         {
             CodeName = "BDO.Test",
             DisplayName = "Test Setting",
+            Type = "string",
             Value = value
         };
 
@@ -116,7 +119,12 @@ public class GlobalSettingCrudServiceTests
         // Unknown / differently-cased code names short-circuit before touching the
         // provider (the match uses an exact 'is' pattern), so a mocked provider suffices.
         var providerMock = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
-        var service = new GlobalSettingCrudService(providerMock.Object);
+        var settingsCrudHelperMock = new Mock<ISettingsCrudHelper>();
+        var validationStateMock = new Mock<IValidationState>();
+        var service = new GlobalSettingCrudService(
+            providerMock.Object,
+            settingsCrudHelperMock.Object,
+            validationStateMock.Object);
 
         var result = await service.GetGlobalSetting(codeName, CancellationToken.None);
 
