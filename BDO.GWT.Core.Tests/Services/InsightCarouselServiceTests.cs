@@ -19,6 +19,7 @@ public class InsightCarouselServiceTests
     private Mock<IInsightCardService> _insightCardServiceMock = null!;
     private Mock<IContentService> _contentServiceMock = null!;
     private Mock<IInsightCarouselStateStore> _stateStoreMock = null!;
+    private Mock<IContentRetriever> _contentRetrieverMock = null!;
     private InsightCarouselService _service = null!;
 
     [SetUp]
@@ -28,6 +29,7 @@ public class InsightCarouselServiceTests
         _insightCardServiceMock = new Mock<IInsightCardService>();
         _contentServiceMock = new Mock<IContentService>();
         _stateStoreMock = new Mock<IInsightCarouselStateStore>();
+        _contentRetrieverMock = new Mock<IContentRetriever>();
 
         _filteringHelperMock
             .Setup(x => x.IsFilteringTooltipEnabledAsync(It.IsAny<bool>(), It.IsAny<CancellationToken>()))
@@ -52,6 +54,7 @@ public class InsightCarouselServiceTests
             });
 
         _service = new InsightCarouselService(
+            _contentRetrieverMock.Object,
             _filteringHelperMock.Object,
             _insightCardServiceMock.Object,
             _contentServiceMock.Object,
