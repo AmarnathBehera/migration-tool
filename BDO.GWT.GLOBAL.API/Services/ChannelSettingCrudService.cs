@@ -73,7 +73,7 @@ public class ChannelSettingCrudService : IChannelSettingCrudService
         var snippet = (await _webChannelSnippetInfoProvider
             .Get()
             .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID), webChannelSettingsId)
-            .GetEnumerableTypedResultAsync())
+            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
             .FirstOrDefault();
 
         if (snippet is null)
@@ -135,8 +135,7 @@ public class ChannelSettingCrudService : IChannelSettingCrudService
     private string RemoveInheritSuffix(string columnName)
     {
         var matchedSuffix = _inheritSuffixes
-            .Where(suffix => columnName.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
-            .FirstOrDefault();
+            .FirstOrDefault(suffix => columnName.EndsWith(suffix, StringComparison.OrdinalIgnoreCase));
 
         return matchedSuffix is null
             ? columnName
@@ -248,7 +247,7 @@ public class ChannelSettingCrudService : IChannelSettingCrudService
         }
     }
 
-    private static object ConvertBoolean(JsonElement element, bool currentValue)
+    private static bool ConvertBoolean(JsonElement element, bool currentValue)
     {
         if (element.ValueKind is JsonValueKind.True or JsonValueKind.False)
         {
@@ -264,7 +263,7 @@ public class ChannelSettingCrudService : IChannelSettingCrudService
         return currentValue;
     }
 
-    private static object ConvertInt32(JsonElement element, int currentValue)
+    private static int ConvertInt32(JsonElement element, int currentValue)
     {
         if (element.ValueKind == JsonValueKind.Number && element.TryGetInt32(out var parsedValue))
         {
@@ -280,7 +279,7 @@ public class ChannelSettingCrudService : IChannelSettingCrudService
         return currentValue;
     }
 
-    private static object ConvertInt64(JsonElement element, long currentValue)
+    private static long ConvertInt64(JsonElement element, long currentValue)
     {
         if (element.ValueKind == JsonValueKind.Number && element.TryGetInt64(out var parsedValue))
         {
@@ -296,7 +295,7 @@ public class ChannelSettingCrudService : IChannelSettingCrudService
         return currentValue;
     }
 
-    private static object ConvertDecimal(JsonElement element, decimal currentValue)
+    private static decimal ConvertDecimal(JsonElement element, decimal currentValue)
     {
         if (element.ValueKind == JsonValueKind.Number && element.TryGetDecimal(out var parsedValue))
         {
@@ -312,7 +311,7 @@ public class ChannelSettingCrudService : IChannelSettingCrudService
         return currentValue;
     }
 
-    private static object ConvertGuid(JsonElement element, Guid currentValue)
+    private static Guid ConvertGuid(JsonElement element, Guid currentValue)
     {
         var isParsed = Guid.TryParse(element.ToString(), out var parsedValue);
         if (isParsed)
@@ -336,7 +335,7 @@ public class ChannelSettingCrudService : IChannelSettingCrudService
         };
     }
 
-    private ChannelSettingOutput CreateChannelSettingOutput(string columnName, object? value, bool inheritFromGlobal)
+    private static ChannelSettingOutput CreateChannelSettingOutput(string columnName, object? value, bool inheritFromGlobal)
     {
         return new ChannelSettingOutput
         {

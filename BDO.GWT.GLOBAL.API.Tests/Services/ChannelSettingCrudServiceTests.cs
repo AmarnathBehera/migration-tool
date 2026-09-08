@@ -94,7 +94,7 @@ public class ChannelSettingCrudServiceTests
         Assert.Multiple(() =>
         {
             Assert.That(InvokeConvertJsonElement(ParseElement("null"), "x"), Is.Null);
-            Assert.That(InvokeConvertJsonElement(ParseElement("true"), null), Is.EqualTo(true));
+            Assert.That(InvokeConvertJsonElement(ParseElement("true"), null), Is.True);
             Assert.That(InvokeConvertJsonElement(ParseElement("\"txt\""), null), Is.EqualTo("txt"));
             Assert.That(InvokeConvertJsonElement(ParseElement("12"), null), Is.EqualTo(12L));
             Assert.That(InvokeConvertJsonElement(ParseElement("12.5"), null), Is.EqualTo(12.5m));
@@ -110,8 +110,8 @@ public class ChannelSettingCrudServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(InvokeConvertJsonElement(ParseElement("\"true\""), false), Is.EqualTo(true));
-            Assert.That(InvokeConvertJsonElement(ParseElement("\"abc\""), false), Is.EqualTo(false));
+            Assert.That(InvokeConvertJsonElement(ParseElement("\"true\""), false), Is.True);
+            Assert.That(InvokeConvertJsonElement(ParseElement("\"abc\""), false), Is.False);
             Assert.That(InvokeConvertJsonElement(ParseElement("\"5\""), 1), Is.EqualTo(5));
             Assert.That(InvokeConvertJsonElement(ParseElement("\"abc\""), 1), Is.EqualTo(1));
             Assert.That(InvokeConvertJsonElement(ParseElement("\"6\""), 1L), Is.EqualTo(6L));
