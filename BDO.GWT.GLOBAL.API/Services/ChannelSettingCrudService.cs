@@ -1,9 +1,8 @@
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Queries;
-using ChannelSettingInput = BDO.GWT.Web.Core.API.Data.ChannelSettingInput;
-using CMS.Base;
 using CMS.DataEngine;
 using System.Text.Json;
+using ChannelSettingInput = BDO.GWT.Web.Core.API.Data.ChannelSettingInput;
 
 namespace BDO.GWT.GLOBAL.API.Services;
 
@@ -71,10 +70,10 @@ public class ChannelSettingCrudService : IChannelSettingCrudService
 
     public async Task<ChannelSettingOutput?> UpdateChannelSetting(int webChannelSettingsId, string codeName, ChannelSettingInput request, CancellationToken cancellationToken)
     {
-        var snippet = _webChannelSnippetInfoProvider
+        var snippet = (await _webChannelSnippetInfoProvider
             .Get()
             .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID), webChannelSettingsId)
-            .GetEnumerableTypedResult()
+            .GetEnumerableTypedResultAsync())
             .FirstOrDefault();
 
         if (snippet is null)
@@ -135,18 +134,16 @@ public class ChannelSettingCrudService : IChannelSettingCrudService
 
     private string RemoveInheritSuffix(string columnName)
     {
-        foreach (var suffix in _inheritSuffixes)
-        {
-            if (columnName.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
-            {
-                return columnName[..^suffix.Length];
-            }
-        }
+        var matchedSuffix = _inheritSuffixes
+            .Where(suffix => columnName.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+            .FirstOrDefault();
 
-        return columnName;
+        return matchedSuffix is null
+            ? columnName
+            : columnName[..^matchedSuffix.Length];
     }
 
-    private string? ResolveColumnName(string codeName, IDataContainer setting)
+    private string? ResolveColumnName(string codeName, WebChannelSnippetInfo setting)
     {
         var normalizedCodeName = codeName.StartsWith("BDO_", StringComparison.OrdinalIgnoreCase)
             ? codeName[4..]
@@ -162,8 +159,7 @@ public class ChannelSettingCrudService : IChannelSettingCrudService
             && !_excludedColumns.Contains(columnName)
             && !IsInheritColumn(columnName));
     }
-
-    private string? ResolveInheritColumnName(string baseColumnName, IDataContainer setting)
+    private string? ResolveInheritColumnName(string baseColumnName, WebChannelSnippetInfo setting)
     {
         var normalizedBaseColumnName = NormalizeColumnNameForInheritMatch(baseColumnName);
 
@@ -174,11 +170,19 @@ public class ChannelSettingCrudService : IChannelSettingCrudService
                 return false;
             }
 
-            var inheritBaseName = NormalizeColumnNameForInheritMatch(RemoveInheritSuffix(columnName));
+            var inheritBaseName =
+                NormalizeColumnNameForInheritMatch(RemoveInheritSuffix(columnName));
 
-            return string.Equals(inheritBaseName, normalizedBaseColumnName, StringComparison.OrdinalIgnoreCase)
-                || normalizedBaseColumnName.StartsWith(inheritBaseName, StringComparison.OrdinalIgnoreCase)
-                || inheritBaseName.StartsWith(normalizedBaseColumnName, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(
+                       inheritBaseName,
+                       normalizedBaseColumnName,
+                       StringComparison.OrdinalIgnoreCase)
+                   || normalizedBaseColumnName.StartsWith(
+                       inheritBaseName,
+                       StringComparison.OrdinalIgnoreCase)
+                   || inheritBaseName.StartsWith(
+                       normalizedBaseColumnName,
+                       StringComparison.OrdinalIgnoreCase);
         });
     }
 
@@ -211,39 +215,116 @@ public class ChannelSettingCrudService : IChannelSettingCrudService
             return null;
         }
 
-        if (currentValue is bool)
+        if (TryConvertUsingCurrentType(element, currentValue, out var convertedValue))
         {
-            return element.ValueKind is JsonValueKind.True or JsonValueKind.False
-                ? element.GetBoolean()
-                : bool.TryParse(element.ToString(), out var boolValue) ? boolValue : currentValue;
+            return convertedValue;
         }
 
-        if (currentValue is int)
+        return ConvertByJsonValueKind(element);
+    }
+
+    private static bool TryConvertUsingCurrentType(JsonElement element, object? currentValue, out object? convertedValue)
+    {
+        switch (currentValue)
         {
-            return element.ValueKind == JsonValueKind.Number && element.TryGetInt32(out var intValue)
-                ? intValue
-                : int.TryParse(element.ToString(), out intValue) ? intValue : currentValue;
+            case bool boolCurrentValue:
+                convertedValue = ConvertBoolean(element, boolCurrentValue);
+                return true;
+            case int intCurrentValue:
+                convertedValue = ConvertInt32(element, intCurrentValue);
+                return true;
+            case long longCurrentValue:
+                convertedValue = ConvertInt64(element, longCurrentValue);
+                return true;
+            case decimal decimalCurrentValue:
+                convertedValue = ConvertDecimal(element, decimalCurrentValue);
+                return true;
+            case Guid guidCurrentValue:
+                convertedValue = ConvertGuid(element, guidCurrentValue);
+                return true;
+            default:
+                convertedValue = null;
+                return false;
+        }
+    }
+
+    private static object ConvertBoolean(JsonElement element, bool currentValue)
+    {
+        if (element.ValueKind is JsonValueKind.True or JsonValueKind.False)
+        {
+            return element.GetBoolean();
         }
 
-        if (currentValue is long)
+        var isParsed = bool.TryParse(element.ToString(), out var parsedValue);
+        if (isParsed)
         {
-            return element.ValueKind == JsonValueKind.Number && element.TryGetInt64(out var longValue)
-                ? longValue
-                : long.TryParse(element.ToString(), out longValue) ? longValue : currentValue;
+            return parsedValue;
         }
 
-        if (currentValue is decimal)
+        return currentValue;
+    }
+
+    private static object ConvertInt32(JsonElement element, int currentValue)
+    {
+        if (element.ValueKind == JsonValueKind.Number && element.TryGetInt32(out var parsedValue))
         {
-            return element.ValueKind == JsonValueKind.Number && element.TryGetDecimal(out var decimalValue)
-                ? decimalValue
-                : decimal.TryParse(element.ToString(), out decimalValue) ? decimalValue : currentValue;
+            return parsedValue;
         }
 
-        if (currentValue is Guid)
+        var isParsed = int.TryParse(element.ToString(), out parsedValue);
+        if (isParsed)
         {
-            return Guid.TryParse(element.ToString(), out var guidValue) ? guidValue : currentValue;
+            return parsedValue;
         }
 
+        return currentValue;
+    }
+
+    private static object ConvertInt64(JsonElement element, long currentValue)
+    {
+        if (element.ValueKind == JsonValueKind.Number && element.TryGetInt64(out var parsedValue))
+        {
+            return parsedValue;
+        }
+
+        var isParsed = long.TryParse(element.ToString(), out parsedValue);
+        if (isParsed)
+        {
+            return parsedValue;
+        }
+
+        return currentValue;
+    }
+
+    private static object ConvertDecimal(JsonElement element, decimal currentValue)
+    {
+        if (element.ValueKind == JsonValueKind.Number && element.TryGetDecimal(out var parsedValue))
+        {
+            return parsedValue;
+        }
+
+        var isParsed = decimal.TryParse(element.ToString(), out parsedValue);
+        if (isParsed)
+        {
+            return parsedValue;
+        }
+
+        return currentValue;
+    }
+
+    private static object ConvertGuid(JsonElement element, Guid currentValue)
+    {
+        var isParsed = Guid.TryParse(element.ToString(), out var parsedValue);
+        if (isParsed)
+        {
+            return parsedValue;
+        }
+
+        return currentValue;
+    }
+
+    private static object? ConvertByJsonValueKind(JsonElement element)
+    {
         return element.ValueKind switch
         {
             JsonValueKind.String => element.GetString(),
@@ -267,7 +348,7 @@ public class ChannelSettingCrudService : IChannelSettingCrudService
         };
     }
 
-    private string ResolveSettingType(object? value)
+    private static string ResolveSettingType(object? value)
     {
         if (value is null || value is DBNull || value is string)
         {
