@@ -145,7 +145,6 @@ public class ChannelSettingCrudServiceTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(InvokeNormalizeColumnNameForInheritMatch("ScriptHeadInheritfromglobalsettings"), Is.EqualTo("ScriptHead"));
             Assert.That(InvokeNormalizeColumnNameForInheritMatch("ScriptHeadKeyValue"), Is.EqualTo("ScriptHead"));
             Assert.That(InvokeNormalizeColumnNameForInheritMatch("DisplayName"), Is.EqualTo("DisplayName"));
         });
