@@ -1,4 +1,4 @@
-﻿using BDO.GWT.Common.Core.Exceptions;
+using BDO.GWT.Common.Core.Exceptions;
 using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
@@ -35,6 +35,10 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
         private Mock<ICultureValidationService> _cultureValidationServiceMock;
         //private Mock<IUserInfoProvider> _userInfoProviderMock;
 
+        // -- Kentico IoC bootstrap (inlined; runs once per test-process) ---------------------
+        private static Mock<CMS.DataEngine.IInfoProvider<ContentLanguageInfo>>? _contentLanguageProvider;
+        private static readonly object _kenticoInitLock = new();
+
         [SetUp]
         public void Setup()
         {
@@ -49,6 +53,21 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
             _pageContentValidatorMock = new Mock<IPageContentValidator>();
             _cultureValidationServiceMock = new Mock<ICultureValidationService>();
             //_userInfoProviderMock = new Mock<IUserInfoProvider>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            // No action needed; IoC container is reset per test via OneTimeTearDown
+        }
+
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            lock (_kenticoInitLock)
+            {
+                _contentLanguageProvider = null;
+            }
         }
 
         private CareerCrudService CreateService()
@@ -600,10 +619,6 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
                 Assert.That(mapped.Content.MetadataRelevantContactPerson[0], Is.EqualTo("Jane Doe"));
             });
         }
-
-        // ── Kentico IoC bootstrap (inlined; runs once per test-process) ─────────────
-        private static Mock<CMS.DataEngine.IInfoProvider<ContentLanguageInfo>>? _contentLanguageProvider;
-        private static readonly object _kenticoInitLock = new();
 
         private static Mock<CMS.DataEngine.IInfoProvider<ContentLanguageInfo>> InitializeKenticoContainer()
         {
