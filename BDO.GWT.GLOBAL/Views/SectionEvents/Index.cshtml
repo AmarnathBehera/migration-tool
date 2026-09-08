@@ -6,6 +6,7 @@
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
 
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
@@ -15,13 +16,23 @@
     Layout = "_Layout";
 
     var widgetsList = new[]
-    {
+        {
         ComponentIdentifiers.Widgets.Button,
         ComponentIdentifiers.Widgets.Form,
+        ComponentIdentifiers.Widgets.HTML,
         ComponentIdentifiers.Widgets.RichText,
-       // ComponentIdentifiers.Widgets.HTML,
-        ComponentIdentifiers.Widgets.AccordionWidget,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+        ComponentIdentifiers.Widgets.InsightAnimationCard,
+    };
 
+    var topWidgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.Button,
+        ComponentIdentifiers.Widgets.FlexibleBanner,
+        ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.HTML,
+        ComponentIdentifiers.Widgets.QuoteCard,
+        ComponentIdentifiers.Widgets.ImageWithText,
     };
 }
 
@@ -31,7 +42,8 @@
     ReactComponentType.HeroGUID,
     new { data = Model.Hero },
     Context.RequestAborted))
-@await Html.PartialAsync("_LocalNavigation")
+
+@await PageBuilderService.AddIdentifier("topArea").AddWidgets(topWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
 
 @(await ReactService.RenderComponentAsync(
     pageId,
@@ -40,9 +52,6 @@
     Model.CardsGrid,
     Context.RequestAborted))
 
-@await Html.Kentico().EditableAreaAsync(
-    "mainContent",
-    new EditableAreaOptions
-    {
-        AllowedWidgets = widgetsList
-    })
+@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+
+@PageBuilderService.GetPageBuilderScripts(Html)

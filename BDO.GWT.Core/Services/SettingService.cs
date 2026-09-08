@@ -8,6 +8,7 @@ public interface ISettingService
     Task<IEnumerable<WebChannelSnippetInfo>?> GetPrintorShareInfo();
     Task<IEnumerable<WebChannelSnippetInfo>?> GetFilteringInfo();
     Task<IEnumerable<WebChannelSnippetInfo>?> GetUsePersonPageTitleInfo();
+    Task<IEnumerable<WebChannelSnippetInfo>?> GetShowAdvancedWidgetsInfo();
     Task<GlobalsettingskeyInfo?> GetGlobalSettingAsync();
 }
 
@@ -36,6 +37,8 @@ public class SettingService : ISettingService
     public Task<IEnumerable<WebChannelSnippetInfo>?> GetFilteringInfo() => GetMergedSnippetAsync();
 
     public Task<IEnumerable<WebChannelSnippetInfo>?> GetUsePersonPageTitleInfo() => GetMergedSnippetAsync();
+
+    public Task<IEnumerable<WebChannelSnippetInfo>?> GetShowAdvancedWidgetsInfo() => GetMergedSnippetAsync();
 
     public async Task<GlobalsettingskeyInfo?> GetGlobalSettingAsync()
     {
@@ -84,7 +87,12 @@ public class SettingService : ISettingService
         var globals = await _provider.Get().TopN(1).GetEnumerableTypedResultAsync();
         var global = globals?.FirstOrDefault();
 
-        return new[] { Merge(snippet, global) };
+        return BuildMergedResult(snippet, global);
+    }
+
+    internal static IEnumerable<WebChannelSnippetInfo> BuildMergedResult(WebChannelSnippetInfo snippet, GlobalsettingskeyInfo? global)
+    {
+        return [Merge(snippet, global)];
     }
 
     private static T Pick<T>(bool inheritFromGlobal, T globalValue, T snippetValue) =>
@@ -110,6 +118,9 @@ public class SettingService : ISettingService
         target.WebChannelSnippetID = snippet.WebChannelSnippetID;
         target.WebChannelSnippetWebChannelSettingsID = snippet.WebChannelSnippetWebChannelSettingsID;
         target.WebSettingsGUID = snippet.WebSettingsGUID;
+
+        //Show Advanced Widgets
+        target.ShowAdvancedWidgets = Pick(snippet.ShowAdvancedWidgetsInheritfromglobalsettings, global.ShowAdvancedWidgets, snippet.ShowAdvancedWidgets);
 
         // Script fields
         target.ScriptHeadKeyValue = Pick(snippet.ScriptHeadInheritfromglobalsettings, global.ScriptHeadKeyValue, snippet.ScriptHeadKeyValue);

@@ -31,15 +31,17 @@ public interface ICareerDetailPageService
     private readonly ISocialMediaButtonsService _socialMediaButtonsService;
     private readonly ISettingService _settingsService;
     private readonly IContentService _contentService;
+    private readonly ISidebarService _sidebarService;
 
-    public CareerDetailPageService(IHeroService heroService, ICultureContext cultureContext, ISocialMediaButtonsService socialMediaButtonsService, ISettingService settingsService, IContentService contentService)
+    public CareerDetailPageService(IHeroService heroService, ICultureContext cultureContext, ISocialMediaButtonsService socialMediaButtonsService, ISettingService settingsService, IContentService contentService, ISidebarService sidebarService)
     {
         _heroService = heroService;
 
         _cultureContext = cultureContext;
         _socialMediaButtonsService = socialMediaButtonsService;
         _settingsService = settingsService;
-        _contentService = contentService;   
+        _contentService = contentService;
+        _sidebarService = sidebarService;
     }
 
 
@@ -116,32 +118,20 @@ public interface ICareerDetailPageService
 
         sidebarDto.ShowCopyLinkButton = await GetShowCopyLinkOptionFromSectionPageAsync(careerPage,sidebarDto.ShowCopyLinkButton,cancellationToken); 
 
-        sidebarDto.PublishDate = careerPage.DocumentPublishFrom; 
+        sidebarDto.PublishDate = careerPage.SystemFields.ContentItemCommonDataFirstPublishedWhen; 
 
         sidebarDto.RelevantContactPeopleTitle = ResourceStringKey.LiveSite.Careers.RelevantContactPeople;
 
+
+
+
+
         sidebarDto.RelevantContactPeople =
     careerPage.MetadataRelevantContactPerson?
-    .Select(i => new SidebarPersonDto
-    {
-        FullName = $"{i.PersonFirstName} {i.PersonLastName}".Trim(),
-
-        Image = new ImageDto
-        {
-            Url = i.MetadataTeaserImage?
-                .FirstOrDefault()?
-                .ContentAttachmentAsset?
-                .Url,
-
-            AltText = i.MetadataTeaserImageAltText
-        },
-
-        JobTitle = i.PersonJobTitle,
-
-        Url = i.GetUrl()?.RelativePath
-    })
-    .ToArray()
-    ?? Array.Empty<SidebarPersonDto>();
+    .Select(person => person.SystemFields.ContentItemGUID)
+    .ToList() is { Count: > 0 } relevantPersonGuids
+        ? await _sidebarService.GetContentPageAuthorDtosGen(relevantPersonGuids, cancellationToken)
+        : Array.Empty<SidebarPersonDto>();
 
 
         return sidebarDto;
