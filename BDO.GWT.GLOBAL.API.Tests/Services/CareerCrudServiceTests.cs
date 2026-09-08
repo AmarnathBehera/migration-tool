@@ -620,7 +620,9 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
                 CMS.Core.Service.Use<CMS.Core.ILocalizationService>(new Mock<CMS.Core.ILocalizationService>().Object);
                 CMS.Core.Service.Use<CMS.Core.IConversionService>(new Mock<CMS.Core.IConversionService>().Object);
                 CMS.Core.Service.Use<CMS.Core.IEventLogService>(new Mock<CMS.Core.IEventLogService>().Object);
+#pragma warning disable KXA0023 // Test fixture calls Service.InitializeContainer without inheriting from a managed test base class
                 CMS.Core.Service.InitializeContainer();
+#pragma warning restore KXA0023 // Test fixture calls Service.InitializeContainer without inheriting from a managed test base class
 
                 _contentLanguageProvider = contentLanguageProvider;
                 return contentLanguageProvider;
