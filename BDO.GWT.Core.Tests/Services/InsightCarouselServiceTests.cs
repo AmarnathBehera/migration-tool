@@ -309,4 +309,112 @@ public class InsightCarouselServiceTests
     {
         Assert.ThrowsAsync<ArgumentNullException>(() => _service.GetAPIFilteredItemsAsync(null!, "en-us", CancellationToken.None));
     }
+
+    [Test]
+    public async Task GetInsightCarouselAsync_UsesProvidedSeeAllLinkTarget_WhenSpecified()
+    {
+        var page = new DummyPage();
+        var data = new InsightCarouselData
+        {
+            FilteringEnabled = false,
+            SeeAllLinkText = "See all",
+            SeeAllLinkUrl = "/insights",
+            SeeAllLinkURLTarget = "_blank",
+        };
+
+        var dto = await _service.GetInsightCarouselAsync(page, data, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.SeeAllLink, Is.Not.Null);
+            Assert.That(dto.SeeAllLink!.Title, Is.EqualTo("See all"));
+            Assert.That(dto.SeeAllLink.URL, Is.EqualTo("/insights"));
+            Assert.That(dto.SeeAllLink.Target, Is.EqualTo("_blank"));
+        });
+    }
+
+    [Test]
+    public async Task GetInsightCarouselAsync_SeeAllLinkNull_WhenLinkTextMissing()
+    {
+        var page = new DummyPage();
+        var data = new InsightCarouselData
+        {
+            FilteringEnabled = false,
+            SeeAllLinkText = null,
+            SeeAllLinkUrl = "/insights",
+        };
+
+        var dto = await _service.GetInsightCarouselAsync(page, data, CancellationToken.None);
+
+        Assert.That(dto.SeeAllLink, Is.Null);
+    }
+
+    [Test]
+    public async Task GetInsightCarouselAsync_SavesFeaturedStateExactlyOnce()
+    {
+        var page = new DummyPage();
+        var data = new InsightCarouselData { FilteringEnabled = false };
+
+        await _service.GetInsightCarouselAsync(page, data, CancellationToken.None);
+
+        _stateStoreMock.Verify(
+            x => x.Save(It.IsAny<Guid>(), It.IsAny<HashSet<ContentItemReference>>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task GetAPIFilteredItemsAsync_WhenNoState_DoesNotQueryStateStore_AndReturnsData()
+    {
+        var card = new ContentPageCardDto { Title = "api-card" };
+
+        _insightCardServiceMock
+            .Setup(x => x.GetFilteredItemsAsync(
+                It.IsAny<CardsQuery>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>?>(),
+                It.IsAny<Func<Insight, bool>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PaginationDto<ContentPageCardDto>
+            {
+                Data = [card],
+                TotalCount = 1,
+            });
+
+        var result = await _service.GetAPIFilteredItemsAsync(
+            new CardsQuery { State = null, PageType = "unknown", CurrentPageGuid = Guid.NewGuid() },
+            "en-us",
+            CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result.Single().Title, Is.EqualTo("api-card"));
+        });
+
+        _stateStoreMock.Verify(
+            x => x.TryGet(It.IsAny<Guid>(), out It.Ref<HashSet<ContentItemReference>>.IsAny),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task GetAPIFilteredItemsAsync_WhenCardServiceReturnsNull_ReturnsEmpty()
+    {
+        _insightCardServiceMock
+            .Setup(x => x.GetFilteredItemsAsync(
+                It.IsAny<CardsQuery>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>?>(),
+                It.IsAny<Func<Insight, bool>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((PaginationDto<ContentPageCardDto>)null!);
+
+        var result = await _service.GetAPIFilteredItemsAsync(
+            new CardsQuery { State = null, PageType = "unknown" },
+            null,
+            CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+    }
 }
