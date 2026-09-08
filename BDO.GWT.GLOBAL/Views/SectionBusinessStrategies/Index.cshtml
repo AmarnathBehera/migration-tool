@@ -16,14 +16,14 @@
     Layout = "_Layout";
 
     var widgetsList = new[]
-    {
-        ComponentIdentifiers.Widgets.AccordionWidget,
+        {
+        ComponentIdentifiers.Widgets.Accordion,
         ComponentIdentifiers.Widgets.EditorsPick,
-        ComponentIdentifiers.Widgets.FaqWidget,
-        ComponentIdentifiers.Widgets.Imagewithtext,
+        ComponentIdentifiers.Widgets.Faq,
+        ComponentIdentifiers.Widgets.ImageWithText,
         ComponentIdentifiers.Widgets.InFocus,
         ComponentIdentifiers.Widgets.KeyContacts,
-        ComponentIdentifiers.Widgets.Globallocation,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
         ComponentIdentifiers.Widgets.TabAccordion,
     };
 }
@@ -37,30 +37,21 @@
         data = Model.Hero,
         },
         Context.RequestAborted))
+    }
+    @await Html.PartialAsync("_LocalNavigation")
 
+    @await PageBuilderService.AddIdentifier("TopSection").AddSections(new[] { ComponentIdentifiers.Sections.DefaultSection, ComponentIdentifiers.Sections.Container }).AddDefaultWidgets().AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
+
+@if (Model != null && pageId != 0)
+{
         @(await ReactService.RenderComponentAsync(
         pageId,
         ReactComponentType.BusinessStrategiesGrid,
         ReactComponentType.BusinessStrategiesGridGUID,
         Model,
         Context.RequestAborted))
-    }
+}
 
-@await Html.PartialAsync("_LocalNavigation") 
+@await PageBuilderService.AddIdentifier("BottomSection").AddDefaultWidgets().AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
 
-
-@await Html.Kentico().EditableAreaAsync(
-    "TopSection",
-    new EditableAreaOptions
-    {
-        AllowedWidgets = widgetsList,
-        AllowedSections = new[] { ComponentIdentifiers.Sections.DefaultSection, ComponentIdentifiers.Sections.Container }
-    })
-
-@await Html.Kentico().EditableAreaAsync(
-"BottomSection",
-new EditableAreaOptions
-{
-AllowedWidgets = widgetsList
-})
-
+@PageBuilderService.GetPageBuilderScripts(Html)

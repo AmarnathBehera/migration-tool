@@ -32,6 +32,7 @@ namespace BDO
             TouchCacheDependencies = true,
             DependsOn = new List<ObjectDependency>()
             {
+                new ObjectDependency("ChannelSnippetWebChannelSettingsID", "bdo.webchannelsettings", ObjectDependencyEnum.Required),
             },
         };
 
@@ -44,6 +45,17 @@ namespace BDO
         {
             get => ValidationHelper.GetInteger(GetValue(nameof(FormSubmissionSubscriptionsID)), 0);
             set => SetValue(nameof(FormSubmissionSubscriptionsID), value);
+        }
+
+
+        /// <summary>
+        /// Channel snippet web channel settings ID.
+        /// </summary>
+        [DatabaseField]
+        public virtual int ChannelSnippetWebChannelSettingsID
+        {
+            get => ValidationHelper.GetInteger(GetValue(nameof(ChannelSnippetWebChannelSettingsID)), 0);
+            set => SetValue(nameof(ChannelSnippetWebChannelSettingsID), value);
         }
 
 

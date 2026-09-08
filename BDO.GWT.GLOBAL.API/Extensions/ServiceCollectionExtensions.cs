@@ -66,5 +66,6 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IMediaFileCrudService, MediaFileCrudService>();
         serviceCollection.AddScoped<IContentCategoryService, ContentCategoryService>();
         serviceCollection.AddScoped<IEventLogCrudService, EventLogCrudService>();
+        serviceCollection.AddScoped<ISettingsCrudHelper, SettingsCrudHelper>();
     }
 }

@@ -1,171 +1,435 @@
-using BDO.GWT.Core.LiveSite.Services;
-using BDO.GWT.Core.DTOs;
+using BDO;
 using BDO.GWT.Core.Data.Queries;
-using BDO.GWT.Core.Services;
+using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
-using Kentico.Content.Web.Mvc;
+using BDO.GWT.Core.Helpers;
+using BDO.GWT.Core.LiveSite.Services;
+using BDO.GWT.Core.Services;
+using BDO.GWT.Web.Core.Data;
 using CMS.ContentEngine;
 using CMS.Websites;
-using BDO.GWT.Core.Helpers;
+using Kentico.Content.Web.Mvc;
 using Moq;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using BDO.GWT.Web.Core.Data;
 
-namespace BDO.GWT.Core.Tests.Services
+namespace BDO.GWT.Core.Tests.Services;
+
+public class InsightCarouselServiceTests
 {
-    public class InsightCarouselServiceTests
+    private Mock<IFilteringHelper> _filteringHelperMock = null!;
+    private Mock<IInsightCardService> _insightCardServiceMock = null!;
+    private Mock<IContentService> _contentServiceMock = null!;
+    private Mock<IInsightCarouselStateStore> _stateStoreMock = null!;
+    private Mock<IContentRetriever> _contentRetrieverMock = null!;
+    private InsightCarouselService _service = null!;
+
+    [SetUp]
+    public void Setup()
     {
-        private Mock<IFilteringHelper> _filteringHelperMock = null!;
-        private Mock<IInsightCardService> _insightCardServiceMock = null!;
-        private Mock<IContentService> _contentServiceMock = null!;
-        private Mock<IInsightCarouselStateStore> _stateStoreMock = null!;
-        private InsightCarouselService _service = null!;
+        _filteringHelperMock = new Mock<IFilteringHelper>();
+        _insightCardServiceMock = new Mock<IInsightCardService>();
+        _contentServiceMock = new Mock<IContentService>();
+        _stateStoreMock = new Mock<IInsightCarouselStateStore>();
+        _contentRetrieverMock = new Mock<IContentRetriever>();
 
-        [SetUp]
-        public void Setup()
-        {
-            _filteringHelperMock = new Mock<IFilteringHelper>();
-            _insightCardServiceMock = new Mock<IInsightCardService>();
-            _contentServiceMock = new Mock<IContentService>();
-            _stateStoreMock = new Mock<IInsightCarouselStateStore>();
+        _filteringHelperMock
+            .Setup(x => x.IsFilteringTooltipEnabledAsync(It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
 
-            _filteringHelperMock.Setup(x => x.IsFilteringTooltipEnabledAsync(It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(true);
+        _contentServiceMock
+            .Setup(x => x.GetCurrentLanguage())
+            .Returns("en-us");
 
-            _insightCardServiceMock
-                .Setup(x => x.GetFilteredItemsAsync(It.IsAny<CardsQuery>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Action<RetrievePagesQueryParameters>?>(), It.IsAny<Func<Insight, bool>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new PaginationDto<ContentPageCardDto> { Data = Array.Empty<ContentPageCardDto>(), TotalCount = 0 });
-
-            _service = new InsightCarouselService(
-                _filteringHelperMock.Object,
-                _insightCardServiceMock.Object,
-                _contentServiceMock.Object,
-                _stateStoreMock.Object);
-        }
-
-        private class DummyPage : IWebPageFieldsSource
-        {
-            public WebPageFields SystemFields { get; set; } = new WebPageFields { ContentItemGUID = Guid.NewGuid() };
-        }
-
-        private class ContentType : IWebPageFieldsSource
-        {
-            public WebPageFields SystemFields { get; set; } = new WebPageFields { ContentItemGUID = Guid.NewGuid() };
-        }
-
-        [Test]
-        public async Task GetInsightCarouselAsync_WhenFilteringEnabled_CallsCreateFilters_And_PopulatesDto()
-        {
-            var currentPage = new DummyPage();
-            var filters = new[] { new FilterItemDto<OptionDto> { Name = "businessLine", Options = Array.Empty<OptionDto>() } };
-
-            _insightCardServiceMock
-                .Setup(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(filters);
-
-            _insightCardServiceMock
-                .Setup(x => x.GetFilteredItemsAsync(It.IsAny<CardsQuery>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Action<RetrievePagesQueryParameters>?>(), It.IsAny<Func<Insight, bool>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new PaginationDto<ContentPageCardDto> { Data = new[] { new ContentPageCardDto { Title = "t1" } }, TotalCount = 1 });
-
-            var data = new InsightCarouselData
+        _insightCardServiceMock
+            .Setup(x => x.GetFilteredItemsAsync(
+                It.IsAny<CardsQuery>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>?>(),
+                It.IsAny<Func<Insight, bool>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PaginationDto<ContentPageCardDto>
             {
-                Title = "T",
-                Description = "D",
-                FilteringEnabled = true,
-                Filters = new HashSet<string> { "businessLine" },
-            };
-
-            var dto = await _service.GetInsightCarouselAsync(currentPage, data, CancellationToken.None);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(dto.Title, Is.EqualTo("T"));
-                Assert.That(dto.Filters, Is.Not.Null);
-                Assert.That(dto.Items!.Count(), Is.EqualTo(1));
-                Assert.That(dto.StateGUID, Is.Not.EqualTo(Guid.Empty));
-                _insightCardServiceMock.Verify(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()), Times.Once);
-                _stateStoreMock.Verify(x => x.Save(dto.StateGUID, It.IsAny<HashSet<ContentItemReference>>()), Times.Once);
+                Data = Array.Empty<ContentPageCardDto>(),
+                TotalCount = 0,
             });
-        }
 
-        [Test]
-        public async Task GetInsightCarouselAsync_WhenFilteringDisabled_DoesNotCallCreateFilters()
+        _service = new InsightCarouselService(
+            _contentRetrieverMock.Object,
+            _filteringHelperMock.Object,
+            _insightCardServiceMock.Object,
+            _contentServiceMock.Object,
+            _stateStoreMock.Object);
+    }
+
+    private sealed class DummyPage : IWebPageFieldsSource
+    {
+        public WebPageFields SystemFields { get; set; } = new() { ContentItemGUID = Guid.NewGuid() };
+    }
+
+    private sealed class businessLine : IWebPageFieldsSource
+    {
+        public WebPageFields SystemFields { get; set; } = new() { ContentItemGUID = Guid.NewGuid() };
+    }
+
+    [Test]
+    public void GetInsightCarouselAsync_Throws_WhenArgumentsAreNull()
+    {
+        var page = new DummyPage();
+        var data = new InsightCarouselData();
+
+        Assert.Multiple(() =>
         {
-            var currentPage = new DummyPage();
+            Assert.ThrowsAsync<ArgumentNullException>(() => _service.GetInsightCarouselAsync<DummyPage>(null!, data, CancellationToken.None));
+            Assert.ThrowsAsync<ArgumentNullException>(() => _service.GetInsightCarouselAsync(page, null!, CancellationToken.None));
+        });
+    }
 
-            var data = new InsightCarouselData
-            {
-                FilteringEnabled = false
-            };
+    [Test]
+    public async Task GetInsightCarouselAsync_FilteringEnabled_PopulatesDto_AndStoresState()
+    {
+        var page = new DummyPage();
+        var pageCard = new ContentPageCardDto { Title = "item-1" };
+        HashSet<ContentItemReference>? storedFeatured = null;
 
-            var dto = await _service.GetInsightCarouselAsync(currentPage, data, CancellationToken.None);
+        _stateStoreMock
+            .Setup(x => x.Save(It.IsAny<Guid>(), It.IsAny<HashSet<ContentItemReference>>()))
+            .Callback<Guid, HashSet<ContentItemReference>>((_, featured) => storedFeatured = featured);
 
-            Assert.That(dto.Filters, Is.Null);
-            _insightCardServiceMock.Verify(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()), Times.Never);
-        }
-
-        [Test]
-        public async Task GetAPIFilteredItemsAsync_WithUnknownPageType_PassesDefaultPageSize_ToCardsService()
-        {
-            CardsQuery? captured = null;
-
-            _insightCardServiceMock
-                .Setup(x => x.GetFilteredItemsAsync(It.IsAny<CardsQuery>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Action<RetrievePagesQueryParameters>?>(), It.IsAny<Func<Insight, bool>>(), It.IsAny<CancellationToken>()))
-                .Callback<CardsQuery, string, string, Action<RetrievePagesQueryParameters>?, Func<Insight, bool>, CancellationToken>((q, _, __, ___, ____, _____) => captured = q)
-                .ReturnsAsync(new PaginationDto<ContentPageCardDto> { Data = Array.Empty<ContentPageCardDto>(), TotalCount = 0 });
-
-            var query = new CardsQuery { PageType = "UnknownType", CurrentPage = null, PageSize = null };
-
-            await _service.GetAPIFilteredItemsAsync(query,"fr-fr", CancellationToken.None);
-            Assert.Multiple(() =>
-            {
-                Assert.That(captured, Is.Not.Null);
-                Assert.That(captured!.CurrentPage, Is.EqualTo(1));
-                Assert.That(captured.PageSize, Is.EqualTo(10));
-            });
-        }
-
-        [Test]
-        public async Task GetAPIFilteredItemsAsync_WithState_UsesStateStore()
-        {
-            var stateGuid = Guid.NewGuid();
-            var query = new CardsQuery { State = stateGuid };
-
-            _stateStoreMock
-                .Setup(x => x.TryGet(stateGuid, out It.Ref<HashSet<ContentItemReference>>.IsAny))
-                .Returns((Guid _, out HashSet<ContentItemReference> featured) =>
+        _insightCardServiceMock
+            .Setup(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([
+                new FilterItemDto<OptionDto>
                 {
-                    featured = new HashSet<ContentItemReference> { new() { Identifier = Guid.NewGuid() } };
-                    return true;
-                });
+                    Name = "businessLine",
+                    Options = [],
+                },
+            ]);
 
-            await _service.GetAPIFilteredItemsAsync(query,"en-gb", CancellationToken.None);
-
-            _stateStoreMock.Verify(x => x.TryGet(stateGuid, out It.Ref<HashSet<ContentItemReference>>.IsAny), Times.Once);
-        }
-
-        [Test]
-        public async Task GetFilteredItemsAsync_WithContentTypePageName_CallsCardsService()
-        {
-            var page = new ContentType();
-            CardsQuery? captured = null;
-
-            _insightCardServiceMock
-                .Setup(x => x.GetFilteredItemsAsync(It.IsAny<CardsQuery>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Action<RetrievePagesQueryParameters>?>(), It.IsAny<Func<Insight, bool>>(), It.IsAny<CancellationToken>()))
-                .Callback<CardsQuery, string, string, Action<RetrievePagesQueryParameters>?, Func<Insight, bool>, CancellationToken>((q, _, __, ___, ____, _____) => captured = q)
-                .ReturnsAsync(new PaginationDto<ContentPageCardDto> { Data = Array.Empty<ContentPageCardDto>(), TotalCount = 0 });
-
-            var result = await _service.GetFilteredItemsAsync(page, new HashSet<ContentItemReference>(), new CardsQuery(), CancellationToken.None);
-            Assert.Multiple(() =>
+        _insightCardServiceMock
+            .Setup(x => x.GetFilteredItemsAsync(
+                It.IsAny<CardsQuery>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>?>(),
+                It.IsAny<Func<Insight, bool>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PaginationDto<ContentPageCardDto>
             {
-                Assert.That(captured, Is.Not.Null);
-                Assert.That(result, Is.Not.Null);
+                Data = [pageCard],
+                TotalCount = 1,
             });
-        }
+
+        var featuredGuid = Guid.NewGuid();
+        var data = new InsightCarouselData
+        {
+            Title = "Title",
+            Description = "Description",
+            FilteringEnabled = true,
+            Filters = ["businessLine"],
+            FeaturedInsightNodeGuids = [new ContentItemReference { Identifier = featuredGuid }],
+            SeeAllLinkText = "See all",
+            SeeAllLinkUrl = "/insights",
+            SeeAllLinkURLTarget = null,
+        };
+
+        _contentRetrieverMock
+            .Setup(x => x.RetrievePages<Insight, Insight>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, Insight, Task<Insight>>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Insight>
+            {
+                new() { SystemFields = new WebPageFields { ContentItemGUID = featuredGuid } },
+            });
+
+        var dto = await _service.GetInsightCarouselAsync(page, data, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.Title, Is.EqualTo("Title"));
+            Assert.That(dto.Description, Is.EqualTo("Description"));
+            Assert.That(dto.Filters, Is.Not.Null);
+            Assert.That(dto.FilteringTooltipEnabled, Is.True);
+            Assert.That(dto.Items!.Single().Title, Is.EqualTo("item-1"));
+            Assert.That(dto.SeeAllLink, Is.Not.Null);
+            Assert.That(dto.SeeAllLink!.Target, Is.EqualTo("_self"));
+            Assert.That(dto.CurrentPageGuid, Is.EqualTo(page.SystemFields.ContentItemGUID));
+            Assert.That(dto.PageType, Is.EqualTo(nameof(DummyPage)));
+            Assert.That(dto.StateGUID, Is.Not.EqualTo(Guid.Empty));
+            Assert.That(storedFeatured, Is.Not.Null);
+            Assert.That(storedFeatured!.Any(x => x.Identifier == featuredGuid), Is.True);
+        });
+
+        _insightCardServiceMock.Verify(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Test]
+    public async Task GetInsightCarouselAsync_FilteringDisabled_DoesNotCreateFilters_AndKeepsSeeAllLinkNull()
+    {
+        var page = new DummyPage();
+
+        var dto = await _service.GetInsightCarouselAsync(page, new InsightCarouselData { FilteringEnabled = false }, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.Filters, Is.Null);
+            Assert.That(dto.SeeAllLink, Is.Null);
+        });
+
+        _insightCardServiceMock.Verify(x => x.CreateFiltersAsync(It.IsAny<HashSet<string>>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_KnownFilterType_UsesDecoratorAndFilteredDefaults()
+    {
+        var page = new businessLine();
+        var featuredGuid = Guid.NewGuid();
+
+        CardsQuery? capturedQuery = null;
+        Action<RetrievePagesQueryParameters>? capturedDecorator = null;
+        Func<Insight, bool>? capturedFeaturedPredicate = null;
+        string? capturedLanguage = null;
+
+        _insightCardServiceMock
+            .Setup(x => x.GetFilteredItemsAsync(
+                It.IsAny<CardsQuery>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>?>(),
+                It.IsAny<Func<Insight, bool>>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<CardsQuery, string, string, Action<RetrievePagesQueryParameters>?, Func<Insight, bool>, CancellationToken>((query, _, language, decorateQuery, featured, _) =>
+            {
+                capturedQuery = query;
+                capturedDecorator = decorateQuery;
+                capturedFeaturedPredicate = featured;
+                capturedLanguage = language;
+            })
+            .ReturnsAsync((PaginationDto<ContentPageCardDto>)null!);
+
+        var result = await _service.GetFilteredItemsAsync(
+            page,
+            [new ContentItemReference { Identifier = featuredGuid }],
+            new CardsQuery(),
+            CancellationToken.None);
+
+        var hit = capturedFeaturedPredicate!(new Insight { SystemFields = new WebPageFields { ContentItemGUID = featuredGuid } });
+        var miss = capturedFeaturedPredicate!(new Insight { SystemFields = new WebPageFields { ContentItemGUID = Guid.NewGuid() } });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedQuery, Is.Not.Null);
+            Assert.That(capturedQuery!.CurrentPage, Is.EqualTo(1));
+            Assert.That(capturedQuery.PageSize, Is.EqualTo(20));
+            Assert.That(capturedDecorator, Is.Not.Null);
+            Assert.That(capturedLanguage, Is.EqualTo("en-us"));
+            Assert.That(hit, Is.True);
+            Assert.That(miss, Is.False);
+            Assert.That(result, Is.Empty);
+        });
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_UnknownType_UsesUnfilteredDefaultsAndNoDecorator()
+    {
+        var page = new DummyPage();
+        CardsQuery? capturedQuery = null;
+        Action<RetrievePagesQueryParameters>? capturedDecorator = null;
+
+        _insightCardServiceMock
+            .Setup(x => x.GetFilteredItemsAsync(
+                It.IsAny<CardsQuery>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>?>(),
+                It.IsAny<Func<Insight, bool>>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<CardsQuery, string, string, Action<RetrievePagesQueryParameters>?, Func<Insight, bool>, CancellationToken>((query, _, _, decorateQuery, _, _) =>
+            {
+                capturedQuery = query;
+                capturedDecorator = decorateQuery;
+            })
+            .ReturnsAsync(new PaginationDto<ContentPageCardDto>
+            {
+                Data = [],
+                TotalCount = 0,
+            });
+
+        await _service.GetFilteredItemsAsync(page, null!, null!, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedQuery, Is.Not.Null);
+            Assert.That(capturedQuery!.CurrentPage, Is.EqualTo(1));
+            Assert.That(capturedQuery.PageSize, Is.EqualTo(10));
+            Assert.That(capturedDecorator, Is.Null);
+        });
+    }
+
+    [Test]
+    public async Task GetAPIFilteredItemsAsync_UsesStateStore_WhenStateIsProvided()
+    {
+        var state = Guid.NewGuid();
+        var featuredGuid = Guid.NewGuid();
+        Func<Insight, bool>? capturedFeaturedPredicate = null;
+
+        _stateStoreMock
+            .Setup(x => x.TryGet(state, out It.Ref<HashSet<ContentItemReference>>.IsAny))
+            .Returns((Guid _, out HashSet<ContentItemReference> featured) =>
+            {
+                featured = [new ContentItemReference { Identifier = featuredGuid }];
+                return true;
+            });
+
+        _insightCardServiceMock
+            .Setup(x => x.GetFilteredItemsAsync(
+                It.IsAny<CardsQuery>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>?>(),
+                It.IsAny<Func<Insight, bool>>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<CardsQuery, string, string, Action<RetrievePagesQueryParameters>?, Func<Insight, bool>, CancellationToken>((_, _, _, _, featured, _) =>
+            {
+                capturedFeaturedPredicate = featured;
+            })
+            .ReturnsAsync(new PaginationDto<ContentPageCardDto>
+            {
+                Data = [new ContentPageCardDto()],
+                TotalCount = 1,
+            });
+
+        await _service.GetAPIFilteredItemsAsync(
+            new CardsQuery
+            {
+                State = state,
+                PageType = nameof(businessLine),
+                CurrentPageGuid = Guid.NewGuid(),
+                CurrentPage = null,
+                PageSize = null,
+            },
+            "fr-fr",
+            CancellationToken.None);
+
+        var isFeatured = capturedFeaturedPredicate!(new Insight { SystemFields = new WebPageFields { ContentItemGUID = featuredGuid } });
+
+        Assert.That(isFeatured, Is.True);
+        _stateStoreMock.Verify(x => x.TryGet(state, out It.Ref<HashSet<ContentItemReference>>.IsAny), Times.Once);
+    }
+
+    [Test]
+    public async Task GetAPIFilteredItemsAsync_Throws_WhenQueryIsNull()
+    {
+        Assert.ThrowsAsync<ArgumentNullException>(() => _service.GetAPIFilteredItemsAsync(null!, "en-us", CancellationToken.None));
+    }
+
+    [Test]
+    public async Task GetInsightCarouselAsync_UsesProvidedSeeAllLinkTarget_WhenSpecified()
+    {
+        var page = new DummyPage();
+        var data = new InsightCarouselData
+        {
+            FilteringEnabled = false,
+            SeeAllLinkText = "See all",
+            SeeAllLinkUrl = "/insights",
+            SeeAllLinkURLTarget = "_blank",
+        };
+
+        var dto = await _service.GetInsightCarouselAsync(page, data, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.SeeAllLink, Is.Not.Null);
+            Assert.That(dto.SeeAllLink!.Title, Is.EqualTo("See all"));
+            Assert.That(dto.SeeAllLink.URL, Is.EqualTo("/insights"));
+            Assert.That(dto.SeeAllLink.Target, Is.EqualTo("_blank"));
+        });
+    }
+
+    [Test]
+    public async Task GetInsightCarouselAsync_SeeAllLinkNull_WhenLinkTextMissing()
+    {
+        var page = new DummyPage();
+        var data = new InsightCarouselData
+        {
+            FilteringEnabled = false,
+            SeeAllLinkText = null,
+            SeeAllLinkUrl = "/insights",
+        };
+
+        var dto = await _service.GetInsightCarouselAsync(page, data, CancellationToken.None);
+
+        Assert.That(dto.SeeAllLink, Is.Null);
+    }
+
+    [Test]
+    public async Task GetInsightCarouselAsync_SavesFeaturedStateExactlyOnce()
+    {
+        var page = new DummyPage();
+        var data = new InsightCarouselData { FilteringEnabled = false };
+
+        await _service.GetInsightCarouselAsync(page, data, CancellationToken.None);
+
+        _stateStoreMock.Verify(
+            x => x.Save(It.IsAny<Guid>(), It.IsAny<HashSet<ContentItemReference>>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task GetAPIFilteredItemsAsync_WhenNoState_DoesNotQueryStateStore_AndReturnsData()
+    {
+        var card = new ContentPageCardDto { Title = "api-card" };
+
+        _insightCardServiceMock
+            .Setup(x => x.GetFilteredItemsAsync(
+                It.IsAny<CardsQuery>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>?>(),
+                It.IsAny<Func<Insight, bool>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PaginationDto<ContentPageCardDto>
+            {
+                Data = [card],
+                TotalCount = 1,
+            });
+
+        var result = await _service.GetAPIFilteredItemsAsync(
+            new CardsQuery { State = null, PageType = "unknown", CurrentPageGuid = Guid.NewGuid() },
+            "en-us",
+            CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result.Single().Title, Is.EqualTo("api-card"));
+        });
+
+        _stateStoreMock.Verify(
+            x => x.TryGet(It.IsAny<Guid>(), out It.Ref<HashSet<ContentItemReference>>.IsAny),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task GetAPIFilteredItemsAsync_WhenCardServiceReturnsNull_ReturnsEmpty()
+    {
+        _insightCardServiceMock
+            .Setup(x => x.GetFilteredItemsAsync(
+                It.IsAny<CardsQuery>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>?>(),
+                It.IsAny<Func<Insight, bool>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((PaginationDto<ContentPageCardDto>)null!);
+
+        var result = await _service.GetAPIFilteredItemsAsync(
+            new CardsQuery { State = null, PageType = "unknown" },
+            null,
+            CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
     }
 }

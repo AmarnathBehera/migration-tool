@@ -599,7 +599,7 @@ namespace BDO.GWT.GLOBAL.API.Services
                     MetadataNoindex = career.MetadataNoindex,
                     IncludeInSitemap = career.IncludeInSitemap,
                     CareerContactPeopleID = career.CareerContactPeopleID?.Select(p => p.MetadataTitle).ToList() ?? new List<string>(),
-                    MetadataRelevantContactPerson = career.MetadataRelevantContactPerson?.Select(p => p.MetadataTitle).ToList() ?? new List<string>(),
+                    MetadataRelevantContactPerson = career.MetadataRelevantContactPerson?.Select(p => (p as IMetadata)?.MetadataTitle ?? string.Empty).ToList() ?? new List<string>(),
                     MetadataOfficeLocation = career.MetadataOfficeLocation?.Select(p => p.MetadataTitle).ToList() ?? new List<string>(),
                     CareerReference = career.CareerReference,
                     CareerJobTitle = career.CareerJobTitle?.FirstOrDefault()?.Name ?? string.Empty,

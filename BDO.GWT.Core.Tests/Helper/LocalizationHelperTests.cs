@@ -9,7 +9,7 @@ namespace BDO.GWT.Core.Tests.Helper;
 public class LocalizationHelperTests
 {
     private Mock<IInfoProvider<LocalizationKeyInfo>> _localizationKeyProviderMock = null!;
-    private Mock<IInfoProvider<LocalizationTranslationItemInfo>> _localizationTranslationProviderMock = null!;
+    private Mock<IInfoProvider<XperienceCommunity.Localization.LocalizationTranslationItemInfo>> _localizationTranslationProviderMock = null!;
     private Mock<IInfoProvider<ContentLanguageInfo>> _contentLanguageProviderMock = null!;
     private LocalizationHelper _service = null!;
 
@@ -17,7 +17,7 @@ public class LocalizationHelperTests
     public void Setup()
     {
         _localizationKeyProviderMock = new Mock<IInfoProvider<LocalizationKeyInfo>>();
-        _localizationTranslationProviderMock = new Mock<IInfoProvider<LocalizationTranslationItemInfo>>();
+        _localizationTranslationProviderMock = new Mock<IInfoProvider<XperienceCommunity.Localization.LocalizationTranslationItemInfo>>();
         _contentLanguageProviderMock = new Mock<IInfoProvider<ContentLanguageInfo>>();
 
         _service = new LocalizationHelper(

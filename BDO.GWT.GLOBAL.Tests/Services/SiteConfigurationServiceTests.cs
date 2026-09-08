@@ -20,7 +20,7 @@ public class SiteConfigurationServiceTests
     private Mock<ISiteContext> _siteContextMock = null!;
 
     private Mock<IInfoProvider<LocalizationKeyInfo>> _localizationKeyProviderMock = null!;
-    private Mock<IInfoProvider<LocalizationTranslationItemInfo>> _localizationTranslationProviderMock = null!;
+    private Mock<IInfoProvider<XperienceCommunity.Localization.LocalizationTranslationItemInfo>> _localizationTranslationProviderMock = null!;
     private Mock<IInfoProvider<ContentLanguageInfo>> _contentLanguageProviderMock = null!;
     private Mock<IInfoProvider<WebChannelSettingsInfo>> _webChannelSettingsProviderMock = null!;
     private Mock<IInfoProvider<WebsiteChannelInfo>> _websiteChannelProviderMock = null!;
@@ -39,7 +39,7 @@ public class SiteConfigurationServiceTests
         _siteContextMock = new Mock<ISiteContext>();
 
         _localizationKeyProviderMock = new Mock<IInfoProvider<LocalizationKeyInfo>>();
-        _localizationTranslationProviderMock = new Mock<IInfoProvider<LocalizationTranslationItemInfo>>();
+        _localizationTranslationProviderMock = new Mock<IInfoProvider<XperienceCommunity.Localization.LocalizationTranslationItemInfo>>();
         _contentLanguageProviderMock = new Mock<IInfoProvider<ContentLanguageInfo>>();
         _webChannelSettingsProviderMock = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
         _websiteChannelProviderMock = new Mock<IInfoProvider<WebsiteChannelInfo>>();
@@ -345,7 +345,7 @@ public class SiteConfigurationServiceTests
         _localizationKeyProviderMock.Setup(p => p.Get())
             .Returns(BuildAsyncQuery<LocalizationKeyInfo>([]).Object);
         _localizationTranslationProviderMock.Setup(p => p.Get())
-            .Returns(BuildAsyncQuery<LocalizationTranslationItemInfo>([]).Object);
+            .Returns(BuildAsyncQuery<XperienceCommunity.Localization.LocalizationTranslationItemInfo>([]).Object);
         _contentLanguageProviderMock.Setup(p => p.Get())
             .Returns(BuildAsyncQuery<ContentLanguageInfo>([]).Object);
 
@@ -362,7 +362,7 @@ public class SiteConfigurationServiceTests
         _localizationKeyProviderMock.Setup(p => p.Get())
             .Returns(BuildAsyncQuery<LocalizationKeyInfo>([]).Object);
         _localizationTranslationProviderMock.Setup(p => p.Get())
-            .Returns(BuildAsyncQuery<LocalizationTranslationItemInfo>([]).Object);
+            .Returns(BuildAsyncQuery<XperienceCommunity.Localization.LocalizationTranslationItemInfo>([]).Object);
         _contentLanguageProviderMock.Setup(p => p.Get())
             .Returns(BuildAsyncQuery<ContentLanguageInfo>([]).Object);
 

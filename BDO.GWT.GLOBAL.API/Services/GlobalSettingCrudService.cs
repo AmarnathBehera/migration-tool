@@ -1,62 +1,160 @@
-﻿using BDO.GWT.GLOBAL.API.Data;
+﻿using BDO.GWT.Common.Core.Exceptions;
+using BDO.GWT.GLOBAL.API.Data;
+using BDO.GWT.GLOBAL.API.Helpers;
 using BDO.GWT.GLOBAL.API.Queries;
+using BDO.GWT.GLOBAL.API.Services;
 using CMS.Base;
 using CMS.DataEngine;
+using CMS.FormEngine;
 
 namespace BDO.GWT.GLOBAL.API.Services;
 
 public interface IGlobalSettingCrudService
 {
     Task<GlobalSettingOutput[]> GetGlobalSettings(SettingsQuery settingsQuery, CancellationToken cancellationToken);
-    Task<GlobalSettingOutput?> GetGlobalSetting(string settingCodeName, CancellationToken cancellationToken);
+
+    Task<GlobalSettingOutput> GetGlobalSetting(string settingCodeName, CancellationToken cancellationToken);
+
+    Task<GlobalSettingOutput> SetGlobalSetting(string settingCodeName, GlobalSettingInput input, CancellationToken cancellationToken);
 }
 
 public class GlobalSettingCrudService : IGlobalSettingCrudService
 {
-    private readonly IInfoProvider<GlobalsettingskeyInfo> _customScriptinfoProvider;
+    private const string StringTypeName = "string";
+    private const string DoubleTypeName = "double";
 
-    public GlobalSettingCrudService(IInfoProvider<GlobalsettingskeyInfo> customScriptinfoProvider)
+    private readonly IInfoProvider<GlobalsettingskeyInfo> _customScriptinfoProvider;
+    private readonly ISettingsCrudHelper _settingsCrudHelper;
+    private readonly IValidationState _validationState;
+
+    public GlobalSettingCrudService(
+        IInfoProvider<GlobalsettingskeyInfo> customScriptinfoProvider,
+        ISettingsCrudHelper settingsCrudHelper,
+        IValidationState validationState)
     {
         _customScriptinfoProvider = customScriptinfoProvider;
+        _settingsCrudHelper = settingsCrudHelper;
+        _validationState = validationState;
     }
 
     public Task<GlobalSettingOutput[]> GetGlobalSettings(SettingsQuery settingsQuery, CancellationToken cancellationToken)
     {
-        var globalSettings = _customScriptinfoProvider.Get().GetEnumerableTypedResult();
+        var setting = _customScriptinfoProvider.Get().GetEnumerableTypedResult().FirstOrDefault();
 
-        if (settingsQuery.DisplayName is not null &&
-            settingsQuery.DisplayName is not ("Include Custom Scripts" or "Cookiebot" or "Events & Webinar"))
+        if (setting is null)
         {
-            return Task.FromResult(System.Array.Empty<GlobalSettingOutput>());
+            return Task.FromResult(Array.Empty<GlobalSettingOutput>());
         }
 
-        return Task.FromResult(globalSettings.Select(ToGlobalSettingOutput).ToArray());
-    }
+        var outputs = ToGlobalSettingOutputs(setting);
 
-    public Task<GlobalSettingOutput?> GetGlobalSetting(string settingCodeName, CancellationToken cancellationToken)
-    {
-        if (settingCodeName is "BDO.Globalsettingskey" or "BDO.Cookiebot" or "BDO.GlobalEventsnWebinars")
+        if (settingsQuery.DisplayName is not null)
         {
-            var globalSettings = _customScriptinfoProvider.Get().GetEnumerableTypedResult();
-            return Task.FromResult(globalSettings.Select(ToGlobalSettingOutput).FirstOrDefault());
+            outputs = outputs
+                .Where(o => string.Equals(o.DisplayName, settingsQuery.DisplayName, StringComparison.OrdinalIgnoreCase))
+                .ToArray();
         }
 
-        return Task.FromResult<GlobalSettingOutput?>(null);
+        return Task.FromResult(outputs);
     }
 
-    private static GlobalSettingOutput ToGlobalSettingOutput(GlobalsettingskeyInfo setting)
+    public Task<GlobalSettingOutput> GetGlobalSetting(string settingCodeName, CancellationToken cancellationToken)
     {
-        return new GlobalSettingOutput
+        var (setting, columnName) = GetValidatedSettingAndColumn(settingCodeName);
+
+        var output = ToGlobalSettingOutputs(setting)
+            .First(o => string.Equals(o.CodeName, columnName, StringComparison.OrdinalIgnoreCase));
+
+        return Task.FromResult(output);
+    }
+
+    public async Task<GlobalSettingOutput> SetGlobalSetting(string settingCodeName, GlobalSettingInput input, CancellationToken cancellationToken)
+    {
+        var (setting, columnName) = GetValidatedSettingAndColumn(settingCodeName);
+
+        var formInfo = FormHelper.GetFormInfo(GlobalsettingskeyInfo.OBJECT_TYPE, true);
+        var field = formInfo.GetFormField(columnName);
+
+        _settingsCrudHelper.ValidateAndNormalizeSettingInput(field, columnName, input);
+
+        setting.SetValue(columnName, input.Value);
+
+        await _customScriptinfoProvider.SetAsync(setting, cancellationToken);
+
+        var output = ToGlobalSettingOutputs(setting)
+            .First(o => string.Equals(o.CodeName, columnName, StringComparison.OrdinalIgnoreCase));
+
+        return output;
+    }
+
+    private (GlobalsettingskeyInfo Setting, string ColumnName) GetValidatedSettingAndColumn(string settingCodeName)
+    {
+        var setting = _customScriptinfoProvider.Get().GetEnumerableTypedResult().FirstOrDefault();
+
+        var columnName = setting?.ColumnNames
+            .FirstOrDefault(c => string.Equals(c, settingCodeName, StringComparison.OrdinalIgnoreCase));
+
+        if (setting is null || columnName is null)
         {
-            CodeName = GlobalsettingskeyInfo.OBJECT_TYPE,
-            DisplayName = "Include Custom Scripts",
-            Value = ToFieldDictionary(setting)
-        };
+            _validationState.AddError("codeName", $"Cannot find setting with code name '{settingCodeName}'.");
+
+            throw new NotFoundException();
+        }
+
+        return (setting, columnName);
     }
 
-    private static Dictionary<string, object> ToFieldDictionary(IDataContainer container)
+    private static GlobalSettingOutput[] ToGlobalSettingOutputs(GlobalsettingskeyInfo container)
     {
+        var formInfo = FormHelper.GetFormInfo(GlobalsettingskeyInfo.OBJECT_TYPE, true);
+
         return container.ColumnNames
-            .ToDictionary(columnName => columnName, columnName => container.GetValue(columnName));
+            .Select(columnName =>
+            {
+                var field = formInfo.GetFormField(columnName);
+                var value = container.GetValue(columnName);
+
+                return new GlobalSettingOutput
+                {
+                    CodeName = columnName,
+                    DisplayName = $"{{$globalsettingskey.{columnName.ToLowerInvariant()}$}}",
+                    Type = GetTypeName(field?.DataType, value),
+                    Value = value
+                };
+            })
+            .ToArray();
+    }
+
+    private static string GetTypeName(string? cmsDataType, object? value)
+    {
+        if (cmsDataType is not null)
+        {
+            return cmsDataType switch
+            {
+                FieldDataType.Boolean => "boolean",
+                FieldDataType.Double => DoubleTypeName,
+                FieldDataType.Integer => "int32",
+                FieldDataType.LongInteger => "int64",
+                FieldDataType.LongText => StringTypeName,
+                FieldDataType.Text => StringTypeName,
+                FieldDataType.DateTime => "datetime",
+                FieldDataType.Guid => "guid",
+                _ => StringTypeName,
+            };
+        }
+
+        return value switch
+        {
+            null => StringTypeName,
+            bool => "boolean",
+            int => "int32",
+            long => "int64",
+            double => DoubleTypeName,
+            decimal => DoubleTypeName,
+            float => DoubleTypeName,
+            DateTime => "datetime",
+            Guid => "guid",
+            _ => StringTypeName
+        };
     }
 }

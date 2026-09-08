@@ -1,4 +1,6 @@
 ﻿using BDO.GWT.Domain.Core.Constants;
+using BDO.GWT.Domain.Core.Enums;
+using BDO.GWT.GLOBAL.API.Attributes;
 using BDO.GWT.GLOBAL.API.Bases;
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Filters;
@@ -15,7 +17,8 @@ namespace BDO.GWT.Web.Core.API.Controllers;
 /// Provides methods to read and manage global settings.
 /// </summary>
 [ApiController]
-[Route("memberFirms/{memberFirmID:int}/GlobalSettings")]
+[AuthorizeUserPrivilegeLevel(UserPrivilegeLevel.GlobalAdministrator)]
+[Route("GlobalSettings")]
 public class GlobalSettingsController : EntityControllerBase
 {
     private readonly IGlobalSettingCrudService _globalSettingCrudService;
@@ -54,4 +57,21 @@ public class GlobalSettingsController : EntityControllerBase
 
         return Ok(globalSetting);
     }
+
+    /// <summary>
+    /// Updates a single global setting having the specified code name.
+    /// </summary>
+    /// <param name="codeName">Code name of the global setting.</param>
+    /// <param name="input">Updated global setting data.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Updated global setting.</returns>
+    [HttpPut("{codeName}")]
+    [SwaggerResponse(StatusCodes.Status200OK, null, typeof(GlobalSettingOutput), MediaTypeNames.Application.Json)]
+    public async Task<ActionResult<GlobalSettingOutput>> SetGlobalSetting(string codeName, [FromBody] GlobalSettingInput input, CancellationToken cancellationToken)
+    {
+        var globalSetting = await _globalSettingCrudService.SetGlobalSetting(codeName, input, cancellationToken);
+
+        return Ok(globalSetting);
+    }
+
 }
