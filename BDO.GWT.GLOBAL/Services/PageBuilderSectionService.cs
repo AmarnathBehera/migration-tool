@@ -25,13 +25,13 @@ public class PageBuilderSectionService : IPageBuilderSectionService
         [ComponentIdentifiers.Sections.FourColumns] = [
             ComponentIdentifiers.Widgets.Button,
             ComponentIdentifiers.Widgets.SocialMediaButtons,
-            //ComponentIdentifiers.Widgets.HTML,
+            ComponentIdentifiers.Widgets.HTML,
             ComponentIdentifiers.Widgets.RichText,
         ],
         [ComponentIdentifiers.Sections.FiveColumns] = [
             ComponentIdentifiers.Widgets.Button,
             ComponentIdentifiers.Widgets.SocialMediaButtons,
-            //ComponentIdentifiers.Widgets.HTML,
+            ComponentIdentifiers.Widgets.HTML,
             ComponentIdentifiers.Widgets.RichText,
         ],
     };

@@ -369,6 +369,7 @@ public class SettingServiceTests
         WebChannelSnippetWebChannelSettingsID = 5,
         WebSettingsGUID = Guid.NewGuid(),
         DisplayName = "Snippet display",
+        ShowAdvancedWidgets = false,
 
         ScriptHeadKeyValue = "s-head",
         ScriptsTopofPageHeadKeyValue = "s-toppage",
@@ -398,6 +399,7 @@ public class SettingServiceTests
         CustomCookiebotScript = "s-script",
 
         ScriptHeadInheritfromglobalsettings = inheritAll,
+        ShowAdvancedWidgetsInheritfromglobalsettings = inheritAll,
         ScriptsTopofPageInheritfromglobalsetting = inheritAll,
         ScriptinbottomofBodyInheritFromGlobal = inheritAll,
         ScriptinTopofBodyInheritfromglobal = inheritAll,
@@ -427,6 +429,7 @@ public class SettingServiceTests
 
     private static FullTestGlobalInfo BuildGlobal() => new()
     {
+        ShowAdvancedWidgets = true,
         ScriptHeadKeyValue = "g-head",
         ScriptsTopofPageHeadKeyValue = "g-toppage",
         ScriptinbottomofBodyKeyValue = "g-bottom",
@@ -465,6 +468,7 @@ public class SettingServiceTests
         public override int WebChannelSnippetWebChannelSettingsID { get; set; }
         public override Guid WebSettingsGUID { get; set; }
         public override string DisplayName { get; set; } = string.Empty;
+        public override bool ShowAdvancedWidgets { get; set; }
 
         public override string ScriptHeadKeyValue { get; set; } = string.Empty;
         public override string ScriptsTopofPageHeadKeyValue { get; set; } = string.Empty;
@@ -494,6 +498,7 @@ public class SettingServiceTests
         public override string CustomCookiebotScript { get; set; } = string.Empty;
 
         public override bool ScriptHeadInheritfromglobalsettings { get; set; }
+        public override bool ShowAdvancedWidgetsInheritfromglobalsettings { get; set; }
         public override bool ScriptsTopofPageInheritfromglobalsetting { get; set; }
         public override bool ScriptinbottomofBodyInheritFromGlobal { get; set; }
         public override bool ScriptinTopofBodyInheritfromglobal { get; set; }
@@ -527,6 +532,7 @@ public class SettingServiceTests
     /// </summary>
     private sealed class FullTestGlobalInfo : GlobalsettingskeyInfo
     {
+        public override bool ShowAdvancedWidgets { get; set; }
         public override string ScriptHeadKeyValue { get; set; } = string.Empty;
         public override string ScriptsTopofPageHeadKeyValue { get; set; } = string.Empty;
         public override string ScriptinbottomofBodyKeyValue { get; set; } = string.Empty;
