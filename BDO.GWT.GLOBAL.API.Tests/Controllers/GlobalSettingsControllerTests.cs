@@ -114,4 +114,48 @@ public class GlobalSettingsControllerTests
         var okResult = (OkObjectResult)result.Result!;
         Assert.That(okResult.Value, Is.Null);
     }
+
+    [Test]
+    public async Task SetGlobalSetting_ReturnsOk_WithUpdatedSetting()
+    {
+        const string codeName = "cookiebot";
+        var input = new GlobalSettingInput { Value = "new-value" };
+        var expected = new GlobalSettingOutput
+        {
+            CodeName = codeName,
+            DisplayName = "Cookiebot",
+            Type = "string",
+            Value = "new-value"
+        };
+
+        _globalSettingCrudServiceMock
+            .Setup(x => x.SetGlobalSetting(codeName, input, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expected);
+
+        var result = await _controller.SetGlobalSetting(codeName, input, CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
+        var okResult = (OkObjectResult)result.Result!;
+        Assert.That(okResult.Value, Is.EqualTo(expected));
+
+        _globalSettingCrudServiceMock.Verify(
+            x => x.SetGlobalSetting(codeName, input, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task SetGlobalSetting_PropagatesServiceException()
+    {
+        const string codeName = "cookiebot";
+        var input = new GlobalSettingInput { Value = "bad" };
+
+        _globalSettingCrudServiceMock
+            .Setup(x => x.SetGlobalSetting(codeName, input, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("boom"));
+
+        Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await _controller.SetGlobalSetting(codeName, input, CancellationToken.None));
+
+        await Task.CompletedTask;
+    }
 }

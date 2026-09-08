@@ -114,10 +114,9 @@ public class GlobalSettingCrudServiceTests
     [TestCase("BDO.Email")]
     [TestCase("")]
     [TestCase("bdo.globalsettingskey")]
-    public async Task GetGlobalSetting_ReturnsNull_WhenCodeNameIsNotAKnownGlobalSetting(string codeName)
+    public void GetGlobalSetting_Throws_WhenCodeNameIsNotAKnownGlobalSetting(string codeName)
     {
-        // Unknown / differently-cased code names short-circuit before touching the
-        // provider (the match uses an exact 'is' pattern), so a mocked provider suffices.
+        // With an unconfigured provider, resolving the setting fails before any match can occur.
         var providerMock = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
         var settingsCrudHelperMock = new Mock<ISettingsCrudHelper>();
         var validationStateMock = new Mock<IValidationState>();
@@ -126,13 +125,32 @@ public class GlobalSettingCrudServiceTests
             settingsCrudHelperMock.Object,
             validationStateMock.Object);
 
-        var result = await service.GetGlobalSetting(codeName, CancellationToken.None);
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.GetGlobalSetting(codeName, CancellationToken.None));
+    }
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(result, Is.Null);
-            providerMock.Verify(p => p.Get(), Times.Never);
-        });
+    [Test]
+    public void SetGlobalSetting_Throws_WhenProviderIsUnconfigured()
+    {
+        var providerMock = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
+        var settingsCrudHelperMock = new Mock<ISettingsCrudHelper>();
+        var validationStateMock = new Mock<IValidationState>();
+        var service = new GlobalSettingCrudService(
+            providerMock.Object,
+            settingsCrudHelperMock.Object,
+            validationStateMock.Object);
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.SetGlobalSetting("BDO.Cookiebot", new GlobalSettingInput { Value = "x" }, CancellationToken.None));
+    }
+
+    [Test]
+    public void SetGlobalSetting_WhenDependenciesUnavailable_Throws()
+    {
+        var service = (GlobalSettingCrudService)RuntimeHelpers.GetUninitializedObject(typeof(GlobalSettingCrudService));
+
+        Assert.ThrowsAsync<NullReferenceException>(async () =>
+            await service.SetGlobalSetting("BDO.Cookiebot", new GlobalSettingInput { Value = "x" }, CancellationToken.None));
     }
 
 
