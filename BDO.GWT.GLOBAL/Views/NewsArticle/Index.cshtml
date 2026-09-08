@@ -6,6 +6,7 @@
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
 
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
@@ -13,28 +14,21 @@
 }
 @{
     Layout = "_Layout";
+
     var widgetsList = new[]
-    {
-        ComponentIdentifiers.Widgets.AccordionWidget,
-        //ComponentIdentifiers.Widgets.DescriptionText,
-        //ComponentIdentifiers.Widgets.EditorsPick,
-        //ComponentIdentifiers.Widgets.FeaturedEvent,
-        //ComponentIdentifiers.Widgets.FeaturedBusinessSolutions,
-        //ComponentIdentifiers.Widgets.FlexibleContent,
-        ComponentIdentifiers.Widgets.Imagewithtext,
-         ComponentIdentifiers.Widgets.KeyContacts,
-        // ComponentIdentifiers.Widgets.KeyTakeaways,
-         ComponentIdentifiers.Widgets.RelatedContacts,
-        //ComponentIdentifiers.Widgets.PurposeIcon,
-        //ComponentIdentifiers.Widgets.SubscriptionButton,
-        //ComponentIdentifiers.Widgets.TwitterCarousel,
+        {
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.ImageWithText,
+        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.KeyTakeaways,
+        ComponentIdentifiers.Widgets.RelatedContacts,
     };
 }
+@await Html.PartialAsync("_Hero")
 
-
-@* @await Html.PartialAsync("~/Views/ContentPage/_Hero.cshtml") *@
-
- @await Html.PartialAsync("_LocalNavigation") 
+@await Html.PartialAsync("_LocalNavigation") 
 
 @(await ReactService.RenderComponentAsync(
         pageId,
@@ -42,12 +36,7 @@
         ReactComponentType.InsightDetailsGUID,
         new { data = Model },
         Context.RequestAborted))
-<div>
-    @await Html.Kentico().EditableAreaAsync(
-    "mainContent",
-        new EditableAreaOptions
-        {
-            AllowedWidgets = widgetsList
-        })
-</div>
 
+@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+
+@PageBuilderService.GetPageBuilderScripts(Html)

@@ -6,6 +6,7 @@
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
 
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
@@ -14,17 +15,29 @@
 @{
     Layout = "_Layout";
 
-    
+    var widgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.ImageWithText,
+        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.KeyTakeaways,
+        ComponentIdentifiers.Widgets.RelatedContacts,
+    };    
 }
 
-<div>
-    @(await ReactService.RenderComponentAsync(
+@await Html.PartialAsync("_Hero")
+
+@await Html.PartialAsync("_LocalNavigation")
+
+@(await ReactService.RenderComponentAsync(
         pageId,
         ReactComponentType.InsightDetails,
         ReactComponentType.InsightDetailsGUID,
         new { data = Model },
         Context.RequestAborted))
-</div>
 
+@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
 
-
+@PageBuilderService.GetPageBuilderScripts(Html)

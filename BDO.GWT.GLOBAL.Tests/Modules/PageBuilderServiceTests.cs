@@ -1,5 +1,5 @@
 using System.Reflection;
-using BDO.GWT.Domain.Services;
+using BDO.GWT.Core.Services;
 using BDO.GWT.Xperience.LiveSite.Services;
 using Moq;
 
@@ -14,13 +14,13 @@ namespace BDO.GWT.GLOBAL.Tests.Modules
         private static readonly string[] SingleA = ["a"];
         private static readonly string[] SingleS = ["s"];
 
-        private Mock<ISettingsService> _settingsService = null!;
+        private Mock<ISettingService> _settingsService = null!;
         private PageBuilderService _service = null!;
 
         [SetUp]
         public void Setup()
         {
-            _settingsService = new Mock<ISettingsService>();
+            _settingsService = new Mock<ISettingService>();
             _service = new PageBuilderService(_settingsService.Object);
         }
 
@@ -105,14 +105,14 @@ namespace BDO.GWT.GLOBAL.Tests.Modules
         }
 
         [Test]
-        public void AddDefaultWidgets_AddsTwoWidgets()
+        public void AddDefaultWidgets_AddsDefaultWidgets()
         {
             var returned = _service.AddDefaultWidgets();
 
             Assert.Multiple(() =>
             {
                 Assert.That(returned, Is.SameAs(_service));
-                Assert.That(GetPrivateList(_service, "_widgets"), Has.Count.EqualTo(4));
+                Assert.That(GetPrivateList(_service, "_widgets"), Has.Count.EqualTo(9));
             });
         }
 
