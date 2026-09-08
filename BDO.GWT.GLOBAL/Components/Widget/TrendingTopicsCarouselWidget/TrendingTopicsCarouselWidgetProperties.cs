@@ -23,8 +23,29 @@ public class TrendingTopicsCarouselWidgetProperties : BaseWidgetProperties
         Options = "Blog\r\nIndustry\r\nInsight\r\nMicrosite\r\nService\r\nSpecialty")]
     public string TrendingTopicsPageType { get; set; } = null!;
 
-    [ContentItemSelectorComponent(typeof(TrendingTopicsContentTypeFilter), Label = "Pages", Order = 3)]
+    [ContentItemSelectorComponent(contentTypeNames: [SectionBlogs.CONTENT_TYPE_NAME,Blog.CONTENT_TYPE_NAME,BlogPost.CONTENT_TYPE_NAME], Label = "Pages", Order = 3)]
+    [VisibleIfEqualTo(nameof(TrendingTopicsPageType), "Blog")]
     public IEnumerable<ContentItemReference> Pages { get; set; } = Enumerable.Empty<ContentItemReference>();
+
+    [ContentItemSelectorComponent(contentTypeNames: [SectionServices.CONTENT_TYPE_NAME, Service.CONTENT_TYPE_NAME, BusinessLine.CONTENT_TYPE_NAME, ServiceArea.CONTENT_TYPE_NAME, Sub_Service.CONTENT_TYPE_NAME], Order = 3, Label = "Pages")]
+    [VisibleIfEqualTo(nameof(TrendingTopicsPageType), "Service")]
+    public IEnumerable<ContentItemReference> ServicePages { get; set; } = new List<ContentItemReference>();
+
+    [ContentItemSelectorComponent(contentTypeNames: [SectionIndustries.CONTENT_TYPE_NAME, Industry.CONTENT_TYPE_NAME, IndustryCategory.CONTENT_TYPE_NAME, IndustryService.CONTENT_TYPE_NAME], Order = 3, Label = "Pages")]
+    [VisibleIfEqualTo(nameof(TrendingTopicsPageType), "Industry")]
+    public IEnumerable<ContentItemReference> IndustryPages { get; set; } = new List<ContentItemReference>();
+
+    [ContentItemSelectorComponent(contentTypeNames: [SectionMicrosites.CONTENT_TYPE_NAME, MicrositeMasterPage.CONTENT_TYPE_NAME, MicrositePage.CONTENT_TYPE_NAME], Order = 3, Label = "Pages")]
+    [VisibleIfEqualTo(nameof(TrendingTopicsPageType), "Microsite")]
+    public IEnumerable<ContentItemReference> MicrositePages { get; set; } = new List<ContentItemReference>();
+
+    [ContentItemSelectorComponent(contentTypeNames: [SectionSpecialties.CONTENT_TYPE_NAME, SpecialtiesArea.CONTENT_TYPE_NAME, SpecialtiesCategory.CONTENT_TYPE_NAME, SpecialtiesPage.CONTENT_TYPE_NAME], Order = 3, Label = "Pages")]
+    [VisibleIfEqualTo(nameof(TrendingTopicsPageType), "Specialty")]
+    public IEnumerable<ContentItemReference> SpecialtyPages { get; set; } = new List<ContentItemReference>();
+
+    [ContentItemSelectorComponent(contentTypeNames: [SectionInsightsPage.CONTENT_TYPE_NAME, Insight.CONTENT_TYPE_NAME, InsightCategory.CONTENT_TYPE_NAME], Order = 3, Label = "Pages")]
+    [VisibleIfEqualTo(nameof(TrendingTopicsPageType), "Insight")]
+    public IEnumerable<ContentItemReference> InsightPages { get; set; } = new List<ContentItemReference>();
 
     [DropDownComponent(Label = "Redirect to Target Page", Order = 4,
         Options = "_self;Same tab\r\n_blank;New tab")]
@@ -38,53 +59,4 @@ public class TrendingTopicsCarouselWidgetProperties : BaseWidgetProperties
         Options = "0px;None\r\n20px\r\n40px\r\n60px\r\n80px")]
     public string BottomMargin { get; set; } = "0px";
 
-
-#pragma warning disable CA1812
-    public class TrendingTopicsContentTypeFilter : IContentTypesFilter
-    {
-        // Maps dropdown value → CONTENT_TYPE_NAME
-        private static readonly Dictionary<string, string> _pageTypeMap = new()
-        {
-            { "Blog",      SectionBlogs.CONTENT_TYPE_NAME      },
-            { "Industry",  SectionIndustries.CONTENT_TYPE_NAME  },
-            { "Insight",   SectionInsightsPage.CONTENT_TYPE_NAME },
-            { "Microsite", SectionMicrosites.CONTENT_TYPE_NAME  },
-            { "Service",   SectionServices.CONTENT_TYPE_NAME    },
-            { "Specialty", SectionSpecialties.CONTENT_TYPE_NAME },
-        };
-
-        private readonly IFormFieldValueProvider _formFieldValueProvider;
-
-        public TrendingTopicsContentTypeFilter(IFormFieldValueProvider formFieldValueProvider)
-        {
-            _formFieldValueProvider = formFieldValueProvider;
-        }
-
-        public IEnumerable<Guid> AllowedContentTypeIdentifiers
-        {
-            get
-            {
-                // Read the sibling dropdown value at runtime
-                if (_formFieldValueProvider.TryGet<string>(nameof(TrendingTopicsPageType), out var pageType)
-                    && !string.IsNullOrEmpty(pageType)
-                    && _pageTypeMap.TryGetValue(pageType, out var contentTypeName))
-                {
-                    var dataClass = DataClassInfoProviderBase<DataClassInfoProvider>
-                        .GetDataClassInfo(contentTypeName);
-
-                    if (dataClass is not null)
-                    {
-                        return new[] { dataClass.ClassGUID };
-                    }
-                }
-
-                // Fallback: return all six if dropdown not yet set
-                return _pageTypeMap.Values
-                    .Select(name => DataClassInfoProviderBase<DataClassInfoProvider>.GetDataClassInfo(name))
-                    .Where(info => info is not null)
-                    .Select(info => info!.ClassGUID);
-            }
-        }
-    }
-#pragma warning restore CA1812
 }
