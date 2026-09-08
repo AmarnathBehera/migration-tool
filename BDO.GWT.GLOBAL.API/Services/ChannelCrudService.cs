@@ -1,4 +1,5 @@
-﻿using BDO.GWT.GLOBAL.API.Data;
+﻿using BDO.GWT.Common.Core.Exceptions;
+using BDO.GWT.GLOBAL.API.Data;
 using CMS.Base;
 using CMS.ContentEngine;
 using CMS.DataEngine;
@@ -16,18 +17,24 @@ public interface IChannelCrudService
 {
     Task<IEnumerable<ChannelOutput>> GetEntitiesAsync(ChannelsQuery entityQuery, CancellationToken cancellationToken);
     Task<ChannelOutput?> GetEntityAsync(Guid entityGUID, CancellationToken cancellationToken);
+    Task<ChannelOutput> CreateEntityAsync(ChannelInput channelInput, CancellationToken cancellationToken);
+    Task<ChannelOutput> UpdateEntityAsync(Guid entityGUID, ChannelInput channelInput, CancellationToken cancellationToken);
+    Task DeleteEntityAsync(Guid entityGUID, CancellationToken cancellationToken);
 }
 
 public class ChannelCrudService : IChannelCrudService
 {
     private readonly IInfoProvider<ChannelInfo> _channelInfoProvider;
+    private readonly IInfoProvider<WebsiteChannelInfo> _websiteChannelInfoProvider;
     private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageInfoProvider;
 
     public ChannelCrudService(
         IInfoProvider<ChannelInfo> channelInfoProvider,
+        IInfoProvider<WebsiteChannelInfo> websiteChannelInfoProvider,
         IInfoProvider<ContentLanguageInfo> contentLanguageInfoProvider)
     {
         _channelInfoProvider = channelInfoProvider;
+        _websiteChannelInfoProvider = websiteChannelInfoProvider;
         _contentLanguageInfoProvider = contentLanguageInfoProvider;
     }
 
@@ -84,6 +91,188 @@ public class ChannelCrudService : IChannelCrudService
         var languagesById = allCultures.ToDictionary(c => c.ContentLanguageID, c => c);
 
         return ToChannelOutput(result, languagesById, allCultures);
+    }
+
+    public async Task<ChannelOutput> CreateEntityAsync(ChannelInput channelInput, CancellationToken cancellationToken)
+    {
+        int primaryLanguageId = await ResolvePrimaryLanguageIdAsync(channelInput, cancellationToken);
+        var domain = ResolvePresentationUrl(channelInput);
+
+        await ValidateDomainAvailabilityAsync(domain, null, cancellationToken);
+
+        var channelInfo = new ChannelInfo
+        {
+            ChannelDisplayName = channelInput.General.DisplayName,
+            ChannelName = channelInput.General.CodeName
+        };
+
+        await _channelInfoProvider.SetAsync(channelInfo, cancellationToken);
+
+        var websiteChannelInfo = new WebsiteChannelInfo
+        {
+            WebsiteChannelChannelID = channelInfo.ChannelID,
+            WebsiteChannelDomain = domain,
+            WebsiteChannelPrimaryContentLanguageID = primaryLanguageId
+        };
+
+        await _websiteChannelInfoProvider.SetAsync(websiteChannelInfo, cancellationToken);
+
+        var output = await GetEntityAsync(channelInfo.ChannelGUID, cancellationToken);
+
+        return output ?? throw new UnprocessableEntityException("Failed to create channel.");
+    }
+
+    public async Task<ChannelOutput> UpdateEntityAsync(Guid entityGUID, ChannelInput channelInput, CancellationToken cancellationToken)
+    {
+        var channelInfo = await GetChannelInfoByGuidAsync(entityGUID, cancellationToken);
+        int primaryLanguageId = await ResolvePrimaryLanguageIdAsync(channelInput, cancellationToken);
+        var domain = ResolvePresentationUrl(channelInput);
+
+        await ValidateDomainAvailabilityAsync(domain, channelInfo.ChannelID, cancellationToken);
+
+        channelInfo.ChannelDisplayName = channelInput.General.DisplayName;
+        channelInfo.ChannelName = channelInput.General.CodeName;
+
+        try
+        {
+            await _channelInfoProvider.SetAsync(channelInfo, cancellationToken);
+        }
+        catch (DataClassNotFoundException ex)
+            when (string.Equals(ex.Message, "Class with name 'BDO.GDPRSettings' doesn't exist.", StringComparison.Ordinal))
+        {
+            throw new ValidationException(
+                "Channel update failed because CMS class 'BDO.GDPRSettings' is not available in this environment.");
+        }
+
+        var websiteChannelInfo = (await _websiteChannelInfoProvider.Get()
+            .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelChannelID), channelInfo.ChannelID)
+            .TopN(1)
+            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
+            .FirstOrDefault();
+
+        if (websiteChannelInfo is null)
+        {
+            websiteChannelInfo = new WebsiteChannelInfo
+            {
+                WebsiteChannelChannelID = channelInfo.ChannelID
+            };
+        }
+
+        websiteChannelInfo.WebsiteChannelDomain = domain;
+        websiteChannelInfo.WebsiteChannelPrimaryContentLanguageID = primaryLanguageId;
+
+        await _websiteChannelInfoProvider.SetAsync(websiteChannelInfo, cancellationToken);
+
+        var output = await GetEntityAsync(channelInfo.ChannelGUID, cancellationToken);
+
+        return output ?? throw new NotFoundException("Channel not found.");
+    }
+
+    public async Task DeleteEntityAsync(Guid entityGUID, CancellationToken cancellationToken)
+    {
+        var channelInfo = await GetChannelInfoByGuidAsync(entityGUID, cancellationToken);
+
+        var websiteChannels = await _websiteChannelInfoProvider.Get()
+            .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelChannelID), channelInfo.ChannelID)
+            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
+
+        foreach (var websiteChannel in websiteChannels)
+        {
+            await _websiteChannelInfoProvider.DeleteAsync(websiteChannel, cancellationToken);
+        }
+
+        try
+        {
+            await _channelInfoProvider.DeleteAsync(channelInfo, cancellationToken);
+        }
+        catch (DataClassNotFoundException ex)
+            when (string.Equals(ex.Message, "Class with name 'BDO.GDPRSettings' doesn't exist.", StringComparison.Ordinal))
+        {
+            throw new ValidationException(
+                "Channel delete failed because CMS class 'BDO.GDPRSettings' is not available in this environment.");
+        }
+    }
+
+    private async Task<ChannelInfo> GetChannelInfoByGuidAsync(Guid entityGUID, CancellationToken cancellationToken)
+    {
+        var channelInfo = (await _channelInfoProvider.Get()
+            .WhereEquals(nameof(ChannelInfo.ChannelGUID), entityGUID)
+            .TopN(1)
+            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
+            .FirstOrDefault();
+
+        return channelInfo ?? throw new NotFoundException("Channel not found.");
+    }
+
+    private async Task<int> ResolvePrimaryLanguageIdAsync(ChannelInput channelInput, CancellationToken cancellationToken)
+    {
+        var defaultCulture = channelInput.General.DefaultContentCulture;
+
+        if (string.IsNullOrWhiteSpace(defaultCulture))
+        {
+            defaultCulture = channelInput.Cultures.FirstOrDefault()?.Code;
+        }
+
+        if (string.IsNullOrWhiteSpace(defaultCulture))
+        {
+            throw new UnprocessableEntityException("Default content culture is required.");
+        }
+
+        var language = (await _contentLanguageInfoProvider.Get()
+            .WhereEquals(nameof(ContentLanguageInfo.ContentLanguageName), defaultCulture)
+            .TopN(1)
+            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
+            .FirstOrDefault();
+
+        return language?.ContentLanguageID ?? throw new UnprocessableEntityException($"Culture '{defaultCulture}' was not found.");
+    }
+
+    private static string ResolvePresentationUrl(ChannelInput channelInput)
+    {
+        var rawUrl = channelInput.DomainAliases.LiveSite.FirstOrDefault()?.PresentationURL
+            ?? channelInput.General.PresentationURL;
+
+        return NormalizeWebsiteChannelDomain(rawUrl);
+    }
+
+    private async Task ValidateDomainAvailabilityAsync(string domain, int? currentChannelId, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(domain))
+        {
+            throw new UnprocessableEntityException("Presentation URL is required.");
+        }
+
+        var conflictingChannels = await _websiteChannelInfoProvider.Get()
+            .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelDomain), domain)
+            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
+
+        var hasConflict = conflictingChannels.Any(channel => !currentChannelId.HasValue || channel.WebsiteChannelChannelID != currentChannelId.Value);
+
+        if (hasConflict)
+        {
+            throw new UnprocessableEntityException($"Website channel domain '{domain}' is already used by another channel.");
+        }
+    }
+
+    private static string NormalizeWebsiteChannelDomain(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return string.Empty;
+        }
+
+        var trimmed = value.Trim();
+
+        if (Uri.TryCreate(trimmed, UriKind.Absolute, out var absoluteUri))
+        {
+            return absoluteUri.IsDefaultPort
+                ? absoluteUri.Host
+                : $"{absoluteUri.Host}:{absoluteUri.Port}";
+        }
+
+        var withoutPath = trimmed.Split('/', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? trimmed;
+
+        return withoutPath;
     }
 
     private async Task<List<ContentLanguageInfo>> GetAllCulturesAsync(CancellationToken cancellationToken)
