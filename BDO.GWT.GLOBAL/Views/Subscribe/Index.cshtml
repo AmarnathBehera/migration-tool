@@ -1,15 +1,14 @@
 ﻿@using BDO
 @using BDO.GWT.Core.Constants
 @using BDO.GWT.Core.Services
-@using BDO.GWT.Domain.Core.Constants
-@using BDO.GWT.Web.Core.LiveSite.Services
-@using BDO.GWT.Xperience.LiveSite.Services
 @using Kentico.Content.Web.Mvc
 @using Microsoft.AspNetCore.Antiforgery
 @inject IAntiforgery Antiforgery
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
+
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
     var pageId = pageContext.WebPage.WebPageItemID;
@@ -21,7 +20,7 @@
         ComponentIdentifiers.Widgets.FlexibleBanner,
         ComponentIdentifiers.Widgets.Form,
         ComponentIdentifiers.Widgets.RichText,
-       // ComponentIdentifiers.Widgets.ViewGlobalLocations,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
     };
 }
 @(await ReactService.RenderComponentAsync(
@@ -47,23 +46,13 @@
                     ReactComponentType.SubscribeFormGUID,
                     Model.SubscribeFormDto,
                     Context.RequestAborted)) 
-        }
-        
+        }        
     </div>
     <div>
-        @await Html.Kentico().EditableAreaAsync(
-        "topArea", // Unique identifier
-                new EditableAreaOptions
-                {
-                    AllowedWidgets = widgetsList
-                })
-    </div>
-    <div>
+        @await PageBuilderService.AddIdentifier("topArea").AddWidgets(widgetsList).BuildEditableAreaAsync(Html,Context.RequestAborted))
     </div>
 </div>
-@await Html.Kentico().EditableAreaAsync(
-        "bottomArea", // Unique identifier
-                new EditableAreaOptions
-                {
-                    AllowedWidgets = widgetsList
-                })
+
+@await PageBuilderService.AddIdentifier("bottomArea").AddWidgets(widgetsList).BuildEditableAreaAsync(Html,Context.RequestAborted))
+
+@PageBuilderService.GetPageBuilderScripts(Html)

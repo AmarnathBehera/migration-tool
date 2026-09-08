@@ -23,16 +23,16 @@ public class PageBuilderSectionService : IPageBuilderSectionService
     private static readonly Dictionary<string, string[]> AllowedWidgetsBySection = new()
     {
         [ComponentIdentifiers.Sections.FourColumns] = [
-            //ComponentIdentifiers.Widgets.Button,
-            ComponentIdentifiers.Widgets.Imagewithtext,
+            ComponentIdentifiers.Widgets.Button,
+            ComponentIdentifiers.Widgets.SocialMediaButtons,
             //ComponentIdentifiers.Widgets.HTML,
-            //ComponentIdentifiers.Widgets.RichText,
+            ComponentIdentifiers.Widgets.RichText,
         ],
         [ComponentIdentifiers.Sections.FiveColumns] = [
-            //ComponentIdentifiers.Widgets.Button,
-            ComponentIdentifiers.Widgets.Imagewithtext,
+            ComponentIdentifiers.Widgets.Button,
+            ComponentIdentifiers.Widgets.SocialMediaButtons,
             //ComponentIdentifiers.Widgets.HTML,
-            //ComponentIdentifiers.Widgets.RichText,
+            ComponentIdentifiers.Widgets.RichText,
         ],
     };
 
