@@ -1,13 +1,12 @@
-using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Queries;
 using BDO.GWT.GLOBAL.API.Services;
-using ChannelSettingInput = BDO.GWT.Web.Core.API.Data.ChannelSettingInput;
 using CMS.DataEngine;
 using Moq;
 using System.Data;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using ChannelSettingInput = BDO.GWT.Web.Core.API.Data.ChannelSettingInput;
 
 namespace BDO.GWT.GLOBAL.API.Tests.Services;
 
@@ -144,8 +143,12 @@ public class ChannelSettingCrudServiceTests
     [Test]
     public void NormalizeColumnNameForInheritMatch_StripsKeyValue()
     {
-        Assert.That(InvokeNormalizeColumnNameForInheritMatch("ScriptHeadKeyValue"), Is.EqualTo("ScriptHead"));
-        Assert.That(InvokeNormalizeColumnNameForInheritMatch("DisplayName"), Is.EqualTo("DisplayName"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(InvokeNormalizeColumnNameForInheritMatch("ScriptHeadInheritfromglobalsettings"), Is.EqualTo("ScriptHead"));
+            Assert.That(InvokeNormalizeColumnNameForInheritMatch("ScriptHeadKeyValue"), Is.EqualTo("ScriptHead"));
+            Assert.That(InvokeNormalizeColumnNameForInheritMatch("DisplayName"), Is.EqualTo("DisplayName"));
+        });
     }
 
     [Test]
