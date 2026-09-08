@@ -137,7 +137,7 @@ public class PageBuilderService : IPageBuilderService
 
         if (setting != null)
         {
-            var ShowAdvancedWidgets = setting?.FirstOrDefault()?.ShowAdvancedWidgets ?? false;
+            var ShowAdvancedWidgets = setting.FirstOrDefault()?.ShowAdvancedWidgets ?? false;
 
             if (ShowAdvancedWidgets)
             {
