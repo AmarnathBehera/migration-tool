@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>SQL browser saved query</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="SqlBrowserSavedQueryId" columntype="integer" enabled="true" guid="c91f5191-a2ac-4166-a7bc-1128dd73d6c6" isPK="true" />
+      <field column="SqlBrowserSavedQueryGuid" columnprecision="0" columntype="guid" enabled="true" guid="d5e7f958-3ea6-4fa6-bb62-d38ebe38362d" visible="true" />
+      <field column="SqlBrowserSavedQueryName" columnprecision="0" columnsize="100" columntype="text" enabled="true" guid="86cede87-fa90-4ef7-8ce7-a041f1552634" visible="true" />
+      <field column="SqlBrowserSavedQueryText" columnprecision="0" columnsize="4000" columntype="text" enabled="true" guid="19ff116c-a395-4aa7-a1bb-67136eb1a42e" visible="true" />
+      <field column="SqlBrowserSavedQueryOrder" columnprecision="0" columntype="integer" enabled="true" guid="2b754e4e-2da7-433e-b790-2a2a52c6f90f" visible="true" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>38632901-640c-424f-bdbf-1b14d25d365b</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>SqlBrowser.SavedQuery</ClassName>
+  <ClassResourceID>
+    <CodeName>Community.SqlBrowser</CodeName>
+    <GUID>72810bcb-5749-4e55-9fe6-ca67cf72c774</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>SqlBrowser_SavedQuery</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

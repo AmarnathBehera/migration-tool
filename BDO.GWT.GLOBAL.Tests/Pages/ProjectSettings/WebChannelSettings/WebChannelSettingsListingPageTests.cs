@@ -39,7 +39,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
         {
             var ctor = typeof(WebChannelSettingsListingPage).GetConstructors().Single();
 
-            Assert.That(ctor.GetParameters(), Has.Length.EqualTo(4));
+            Assert.That(ctor.GetParameters(), Has.Length.EqualTo(3));
         }
 
         [Test]
@@ -52,8 +52,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
             {
                 Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(IInfoProvider<ChannelInfo>)));
                 Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(IInfoProvider<WebChannelSettingsInfo>)));
-                Assert.That(parameters[2].ParameterType, Is.EqualTo(typeof(IInfoProvider<SEOSettingsInfo>)));
-                Assert.That(parameters[3].ParameterType, Is.EqualTo(typeof(IChannelAccessService)));
+                Assert.That(parameters[2].ParameterType, Is.EqualTo(typeof(IChannelAccessService)));
             });
         }
 
@@ -155,25 +154,6 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.ProjectSettings.WebChannelSettings
                 Assert.That(parameters, Has.Length.EqualTo(2));
                 Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(ChannelInfo)));
                 Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(WebChannelSettingsInfo)));
-            });
-        }
-
-        [Test]
-        public void EnsureSeoSettings_MethodExistsWithExpectedParameters()
-        {
-            var method = typeof(WebChannelSettingsListingPage).GetMethod(
-                "EnsureSeoSettings",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-
-            Assert.That(method, Is.Not.Null);
-
-            var parameters = method!.GetParameters();
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(parameters, Has.Length.EqualTo(2));
-                Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(WebChannelSettingsInfo)));
-                Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(IEnumerable<SEOSettingsInfo>)));
             });
         }
     }

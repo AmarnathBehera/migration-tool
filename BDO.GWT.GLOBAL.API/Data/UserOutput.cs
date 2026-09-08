@@ -2,7 +2,6 @@
 public class UserOutput
 {
     public UserGeneralOutput General { get; set; } = null!;
-    public ChannelSummaryOutput[] Channels { get; set; } = Array.Empty<ChannelSummaryOutput>();
     public RoleSummaryOutput[] Roles { get; set; } = Array.Empty<RoleSummaryOutput>();
 }
 
@@ -19,12 +18,6 @@ public class UserGeneralOutput
     public DateTime? LastSignIn { get; set; }
     public int InvalidSignInAttempts { get; set; }
     public string? PreferredLanguage { get; set; }
-}
-
-public class ChannelSummaryOutput
-{
-    public Guid GUID { get; set; }
-    public string DisplayName { get; set; } = null!;
 }
 
 public class RoleSummaryOutput

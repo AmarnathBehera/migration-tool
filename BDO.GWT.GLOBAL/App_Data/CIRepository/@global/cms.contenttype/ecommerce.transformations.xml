@@ -20,7 +20,7 @@
   </ClassFormDefinition>
   <ClassGUID>7539c21d-cde0-4d71-ab9f-12de5ddec092</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
-  <ClassIconClass>icon-folder-o</ClassIconClass>
+  <ClassIconClass>xp-folder</ClassIconClass>
   <ClassName>Ecommerce.Transformations</ClassName>
   <ClassShortName>EcommerceTransformations0n3s75eb</ClassShortName>
   <ClassTableName>Ecommerce_Transformations</ClassTableName>

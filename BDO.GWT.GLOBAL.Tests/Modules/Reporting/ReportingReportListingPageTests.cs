@@ -1,5 +1,6 @@
 using BDO.GWT.CustomReportingModule.ReportingApp;
 using Kentico.Xperience.Admin.Base;
+using System.Reflection;
 
 namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
 {
@@ -34,7 +35,7 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
         {
             Assert.That(
                 ReportingReportListingPage.IDENTIFIER,
-                Is.EqualTo("DancingGoat.Reporting"));
+                Is.EqualTo("BDO.Reporting"));
         }
 
         [Test]
@@ -84,6 +85,25 @@ namespace BDO.GWT.GLOBAL.Tests.Modules.Reporting
                 .GetMethod(nameof(ReportingReportListingPage.ConfigurePage));
 
             Assert.That(method, Is.Not.Null);
+        }
+
+        [Test]
+        public void EditQuery_Is_Registered_Directly_Under_Channel_Edit_Section()
+        {
+            var uiPageAttribute = typeof(EditQuery).Assembly
+                .GetCustomAttributesData()
+                .FirstOrDefault(a =>
+                    a.AttributeType.Name == "UIPageAttribute" &&
+                    a.ConstructorArguments.Count >= 3 &&
+                    Equals(a.ConstructorArguments[2].Value, typeof(EditQuery)));
+
+            Assert.That(uiPageAttribute, Is.Not.Null);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(uiPageAttribute!.ConstructorArguments[0].Value, Is.EqualTo(typeof(ReportingApplicationChannelSettingsEditSection)));
+                Assert.That(uiPageAttribute.ConstructorArguments[1].Value?.ToString(), Is.EqualTo("queries"));
+            });
         }
     }
 }

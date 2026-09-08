@@ -1,5 +1,4 @@
 ﻿using BDO;
-
 using BDO.GWT.Core.Components.Widgets.EditorsPickWidget;
 using BDO.GWT.Core.Components.Widgets.RelatedContentCarouselWidget;
 using BDO.GWT.GLOBAL.Components.Widget.InsightCarouselWidget;
@@ -24,9 +23,9 @@ using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ButtonWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.EditorsPickWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.EventsWebinarsSliderWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ExternalNavigationWidget;
+using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.HtmlWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.RelatedContentCarouselWidget;
 using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWidget;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ViewGlobalLocations;
 using BDO.GWT.Xperience.LiveSite.Components.Section;
 using Kentico.Forms.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
@@ -57,6 +56,7 @@ using Kentico.PageBuilder.Web.Mvc;
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.InsightAnimationCard,typeof(InsightAnimationCardWidget),"Insight Animation Card Widget",typeof(InsightAnimationCardWidgetProperties),AllowCache = true, IconClass = "icon-carousel")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.Hero,typeof(HeroWidget),"Hero",typeof(HeroWidgetProperties),AllowCache = true,IconClass = "icon-l-img-3-cols-3")]
 [assembly: RegisterWidget(ComponentIdentifiers.Widgets.RelatedContentCarousel, typeof(RelatedContentCarouselWidget), "Related content carousel", typeof(RelatedContentCarouselWidgetProperties), AllowCache = true, IconClass = "icon-carousel")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.HTML,typeof(HtmlWidget),"HTML",typeof(HtmlWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
 
 
 // Sections

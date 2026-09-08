@@ -19,11 +19,42 @@
       <field allowempty="true" column="ScriptinbottomofBodyKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="7478522a-3449-497f-9dec-f427bffd06a5" />
       <field allowempty="true" column="ScriptinTopofBodyKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="388b8e6a-9e0a-444b-b16c-c5ee896c055e" />
       <field allowempty="true" column="ScriptsTopofPageHeadKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="27cb7f3b-9404-4096-9086-a0bc141937bc" />
-      <field allowempty="true" column="SitekeyreCAPTCHAv2" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="37fe23d1-1c67-4a31-8968-b0178c17eea0" />
-      <field allowempty="true" column="SecretkeyreCAPTCHAv2" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="fd52f274-34a2-4756-bad6-7c01fd687370" />
-      <field allowempty="true" column="SitekeyreCAPTCHAv3" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="1d1627ef-e1ab-4ef3-bedf-4b9948f468f7" />
-      <field allowempty="true" column="SecretkeyreCAPTCHAv3" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="f6217532-d8b9-494c-b798-ae2cfe7158cf" />
-      <field allowempty="true" column="ScorethresholdreCAPTCHAv3" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6cb3232e-f47c-4eed-a625-741d3a2cfdd8" />
+      <field allowempty="true" column="EnableCookiebot" columnprecision="0" columntype="boolean" enabled="true" guid="9e021882-d0e5-42bb-bcd3-a39ba14db6ec" />
+      <field allowempty="true" column="CookieID" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="a49858e0-6698-43ab-a100-4adf09614a77" />
+      <field allowempty="true" column="CustomCookiebotScript" columnprecision="0" columntype="longtext" enabled="true" guid="e13ec638-c1d6-4378-a0aa-a1ea1cf41606" />
+      <field allowempty="true" column="Minutestotriggercalendarreminder" columnprecision="0" columntype="integer" enabled="true" guid="6df73e3a-d309-4e4d-9ce0-50ec4d7aa59e" />
+      <field allowempty="true" column="Displaylocationtitleinasidebar" columnprecision="0" columntype="boolean" enabled="true" guid="0f373300-d4a3-44dd-a351-83a0cd70abdd">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+        </properties>
+      </field>
+      <field allowempty="true" column="FromEmail" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="4ec77ad8-c539-40d5-bcc2-ee7505497013" />
+      <field allowempty="true" column="DisplayName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="80577043-9d94-4c85-847b-6ab6883fc074">
+        <properties>
+          <defaultvalue>Email</defaultvalue>
+        </properties>
+      </field>
+      <field allowempty="true" column="NonASCIItoASCIIcharacterdictionary" columnprecision="0" columntype="longtext" enabled="true" guid="3038bbf1-a60e-48a8-95c3-6ca3b1603244" />
+      <field allowempty="true" column="Enableexternallinkwarning" columnprecision="0" columntype="boolean" enabled="true" guid="1d67878f-7388-4a1d-9260-ebd878ec891f" />
+      <field allowempty="true" column="SeoSettingsRobots" columnprecision="0" columnsize="2000" columntype="text" enabled="true" guid="d7df973f-a4bf-4a42-8211-96226eb14e2a" />
+      <field allowempty="true" column="SeoSettingsSecurity" columnprecision="0" columnsize="2000" columntype="text" enabled="true" guid="f1ef9546-3592-4207-b59b-4f30eb84d72b" />
+      <field allowempty="true" column="DisableDownload" columnprecision="0" columntype="boolean" enabled="true" guid="295ed499-913c-4329-b431-e72c4075c9e7" />
+      <field allowempty="true" column="DisablePrint" columnprecision="0" columntype="boolean" enabled="true" guid="75ae5a72-1b6b-43a8-9c2a-dae4d6d259bd">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+        </properties>
+      </field>
+      <field allowempty="true" column="DisableFacebook" columnprecision="0" columntype="boolean" enabled="true" guid="4e288bae-b2dc-4031-9e79-3af17deeea54" />
+      <field allowempty="true" column="DisableTwitter" columnprecision="0" columntype="boolean" enabled="true" guid="015fa937-6d30-4b71-9fe0-46e6d57055b7" />
+      <field allowempty="true" column="DisableLinkedIn" columnprecision="0" columntype="boolean" enabled="true" guid="440befbb-91dc-4797-986b-142052d29a49" />
+      <field allowempty="true" column="DisableEmail" columnprecision="0" columntype="boolean" enabled="true" guid="b1d23bee-4187-49a9-9169-1449c54e031a" />
+      <field allowempty="true" column="DisableCopyLinkButton" columnprecision="0" columntype="boolean" enabled="true" guid="51fc700c-fa11-41e4-a6af-2f5edc42abe6" />
+      <field allowempty="true" column="Showtooltip" columnprecision="0" columntype="boolean" enabled="true" guid="d29924b9-9885-4ef1-8cd0-9cc788befe95" />
+      <field allowempty="true" column="DisplayEmailinvCard" columnprecision="0" columntype="boolean" enabled="true" guid="42cc8e00-87e7-4b95-8c4c-1c7b265ff2fd" />
+      <field allowempty="true" column="UsePageTitleToDisplayPersonName" columnprecision="0" columntype="boolean" enabled="true" guid="45738742-ec41-4854-94a3-6eb4e3054e46" />
+      <field allowempty="true" column="GlobalLocationsTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="a3f22c22-84fb-4e23-b130-06e3bec628eb" />
+      <field allowempty="true" column="GlobalLocationsDescription" columnprecision="0" columntype="longtext" enabled="true" guid="78e3a79f-7c7c-496f-8cb0-c44f3550cd47" />
+      <field allowempty="true" column="GlobalLocationsBackgroundImage" columnprecision="0" columntype="contentitemreference" enabled="true" guid="0dbd9ed7-aa5b-40ae-9b1c-55ef1cafcc56" />
     </form>
   </ClassFormDefinition>
   <ClassGUID>f393a535-3751-4fe5-bd51-90482f775b9a</ClassGUID>

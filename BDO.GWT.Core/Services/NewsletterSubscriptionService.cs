@@ -309,14 +309,16 @@ public class NewsletterSubscriptionService(
         using var scope = _scopeFactory.CreateScope();
         var websiteChannelContext = scope.ServiceProvider.GetRequiredService<IWebsiteChannelContext>();
         var webChannelSettingsInfoProvider = scope.ServiceProvider.GetRequiredService<IInfoProvider<WebChannelSettingsInfo>>();
-        var emailInfoProvider = scope.ServiceProvider.GetRequiredService<IInfoProvider<EmailInfo>>();
+        var snippetInfoProvider = scope.ServiceProvider.GetRequiredService<IInfoProvider<WebChannelSnippetInfo>>();
+        var globalSettingsProvider = scope.ServiceProvider.GetRequiredService<IInfoProvider<GlobalsettingskeyInfo>>();
 
         int currentWebsiteID = websiteChannelContext.WebsiteChannelID;
-       
+
         var currentChannelSettings = webChannelSettingsInfoProvider
             .Get()
             .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), currentWebsiteID)
             .TopN(1)
+            .GetEnumerableTypedResult()
             .FirstOrDefault();
 
         if (currentChannelSettings is null)
@@ -324,11 +326,29 @@ public class NewsletterSubscriptionService(
             return null;
         }
 
-        return emailInfoProvider.Get()
-            .WhereEquals(nameof(EmailInfo.DisplayName), EmailKey)
-            .WhereEquals(nameof(EmailInfo.EmailSettingsWebChannelSettingID), currentChannelSettings.WebChannelSettingsID)
+        var snippet = snippetInfoProvider.Get()
+            .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID), currentChannelSettings.WebChannelSettingsID)
             .TopN(1)
             .GetEnumerableTypedResult()
-            .FirstOrDefault()?.FromEmail;
+            .FirstOrDefault();
+
+        if (snippet is null)
+        {
+            return null;
+        }
+
+        // Per-field inheritance: when the snippet's inherit-from-global flag is set,
+        // use the value from GlobalsettingskeyInfo; otherwise use the channel snippet's own value.
+        if (snippet.FromEmailInheritfromglobal)
+        {
+            var global = globalSettingsProvider.Get()
+                .TopN(1)
+                .GetEnumerableTypedResult()
+                .FirstOrDefault();
+
+            return global?.FromEmail;
+        }
+
+        return snippet.FromEmail;
     }
 }
