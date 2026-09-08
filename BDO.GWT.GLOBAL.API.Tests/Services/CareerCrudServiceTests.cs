@@ -51,6 +51,12 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
             //_userInfoProviderMock = new Mock<IUserInfoProvider>();
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            // No action needed; IoC container is reset per test via OneTimeTearDown
+        }
+
         private CareerCrudService CreateService()
         {
             // The real constructor resolves a Kentico UserInfo (an AbstractInfoBase), which
@@ -591,14 +597,28 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
 
             Assert.That(result.Value, Is.Not.Null);
             var mapped = result.Value!.Single();
-            Assert.That(mapped.Content!.MetadataRelevantContactPerson, Is.Not.Null);
-            Assert.That(mapped.Content.MetadataRelevantContactPerson, Has.Count.EqualTo(1));
-            Assert.That(mapped.Content.MetadataRelevantContactPerson[0], Is.EqualTo("Jane Doe"));
+
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(mapped.Content!.MetadataRelevantContactPerson, Is.Not.Null);
+                Assert.That(mapped.Content.MetadataRelevantContactPerson, Has.Count.EqualTo(1));
+                Assert.That(mapped.Content.MetadataRelevantContactPerson[0], Is.EqualTo("Jane Doe"));
+            });
         }
 
         // ── Kentico IoC bootstrap (inlined; runs once per test-process) ─────────────
         private static Mock<CMS.DataEngine.IInfoProvider<ContentLanguageInfo>>? _contentLanguageProvider;
         private static readonly object _kenticoInitLock = new();
+
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            lock (_kenticoInitLock)
+            {
+                _contentLanguageProvider = null;
+            }
+        }
 
         private static Mock<CMS.DataEngine.IInfoProvider<ContentLanguageInfo>> InitializeKenticoContainer()
         {
