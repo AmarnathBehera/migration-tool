@@ -194,6 +194,6 @@ public class ViewGlobalLocationsServiceTests
 
         var result = await _service.GetGlobalLocationsBannerAsync(data, CancellationToken.None);
 
-        Assert.That(result.BackgroundImage, Is.Empty);
+        Assert.That(result.BackgroundImage, Is.Null);
     }
 }

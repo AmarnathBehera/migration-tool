@@ -86,7 +86,7 @@ public class ViewGlobalLocationsService : IViewGlobalLocationsService
 
         if (setting is null)
         {
-            return "";
+            return null;
         }
 
         var attachments = await _contentService.GetItemsAsync<ContentAttachment>(

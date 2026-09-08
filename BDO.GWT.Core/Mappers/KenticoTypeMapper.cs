@@ -39,9 +39,32 @@ namespace BDO.GWT.Core.Mappers
         {
             // Scan all loaded assemblies for non-abstract, non-interface types that implement IWebPageFieldsSource
             // (i.e., generated Kentico Xperience page type classes).
-            var pageTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a => a.GetTypes())
-                .Where(t => typeof(IWebPageFieldsSource).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface);
+            // Some third-party assemblies (e.g. Azure.AI.OpenAI when version-mismatched) fail to load all
+            // of their types. Catch ReflectionTypeLoadException and use the types that did load so a single
+            // bad assembly cannot break the whole mapper's type initializer.
+            var pageTypes = new List<Type>();
+
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                Type[] types;
+
+                try
+                {
+                    types = assembly.GetTypes();
+                }
+                catch (System.Reflection.ReflectionTypeLoadException ex)
+                {
+                    types = ex.Types.Where(t => t is not null).ToArray()!;
+                }
+                catch (Exception)
+                {
+                    // Dynamic / unloadable assemblies - skip entirely.
+                    continue;
+                }
+
+                pageTypes.AddRange(types.Where(t =>
+                    typeof(IWebPageFieldsSource).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface));
+            }
 
             foreach (var pageType in pageTypes)
             {
@@ -93,30 +116,5 @@ namespace BDO.GWT.Core.Mappers
             return pageType;
         }
         
-    }
-
-     
-
-        //public class SearchDocumentProfile : Profile
-        //{
-        //    public SearchDocumentProfile()
-        //    {
-        //        CreateMap<SearchDocument, AzureSearchDocument>()
-        //            // Same-named properties (ClassName, Content, EventDateFrom, EventDateTo,
-        //            // EventIsPrivate, ...) are mapped automatically by convention.
-        //            // Map only the members whose names differ between the two types:
-        //            .ForMember(dest => dest.DocumentID, opt => opt.MapFrom(src => src.DocumentId))
-        //            .ForMember(dest => dest.DocumentNodeID, opt => opt.MapFrom(src => src.NodeId))
-        //            .ForMember(dest => dest.DocumentName, opt => opt.MapFrom(src => src.Title))
-        //            .ForMember(dest => dest.DocumentPageTitle, opt => opt.MapFrom(src => src.MetadataTitle))
-        //            .ForMember(dest => dest.DocumentPageDescription, opt => opt.MapFrom(src => src.MetadataDescription))
-        //            .ForMember(dest => dest.DocumentPublishFrom, opt => opt.MapFrom(src => src.PublishFrom))
-        //            .ForMember(dest => dest.DocumentPublishTo, opt => opt.MapFrom(src => src.PublishTo))
-        //            .ForMember(dest => dest.DocumentCreatedWhen, opt => opt.MapFrom(src => src.CreatedWhen));
-        //        // Add/adjust ForMember lines for every SearchDocument property that your
-        //        // queries reference (Where/OrderBy/Select/facets), e.g. ChannelName,
-        //        // LanguageTag, NodeAliasPath, EventType, EventLocationTitle, InsightContentType,
-        //        // SortDate, EventLocationCity — each mapped to its AzureSearchDocument counterpart.
-        //    }
-        //}
-    }
+    }            
+   }
