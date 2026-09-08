@@ -4,6 +4,7 @@ using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Utilities;
 using CMS.ContentEngine;
 using CMS.Websites;
+using Kentico.Content.Web.Mvc;
 using MailKit;
 
 namespace BDO.GWT.Core.Services;
@@ -15,18 +16,48 @@ public interface ITrendingTopicsCarouselService
 
 public class TrendingTopicsCarouselService : ITrendingTopicsCarouselService
 {
-    private readonly IContentService _contentService;
     private readonly ICultureContext _cultureContext;
     private readonly IWebPageUrlRetriever _webPageUrlRetriever;
+    private readonly IContentRetriever _contentRetriever;
 
+    private static readonly string[] TrendingTopicsContentTypes =
+[
+SectionBlogs.CONTENT_TYPE_NAME,
+Blog.CONTENT_TYPE_NAME,
+BlogPost.CONTENT_TYPE_NAME,
+SectionServices.CONTENT_TYPE_NAME,
+Service.CONTENT_TYPE_NAME,
+BusinessLine.CONTENT_TYPE_NAME,
+ServiceArea.CONTENT_TYPE_NAME,
+Sub_Service.CONTENT_TYPE_NAME,
+SectionIndustries.CONTENT_TYPE_NAME,
+Industry.CONTENT_TYPE_NAME,
+IndustryCategory.CONTENT_TYPE_NAME,
+IndustryService.CONTENT_TYPE_NAME,
+SectionMicrosites.CONTENT_TYPE_NAME,
+MicrositeMasterPage.CONTENT_TYPE_NAME,
+MicrositePage.CONTENT_TYPE_NAME,
+SectionSpecialties.CONTENT_TYPE_NAME,
+SpecialtiesArea.CONTENT_TYPE_NAME,
+SpecialtiesCategory.CONTENT_TYPE_NAME,
+SpecialtiesPage.CONTENT_TYPE_NAME,
+SectionInsightsPage.CONTENT_TYPE_NAME,
+Insight.CONTENT_TYPE_NAME,
+InsightCategory.CONTENT_TYPE_NAME];
+
+    private readonly Func<IEnumerable<string>, IEnumerable<Guid>, RetrieveContentOfContentTypesParameters, CancellationToken, Task<IEnumerable<IWebPageFieldsSource>>> _retrieveContentByGuidsAsync;
     public TrendingTopicsCarouselService(
-        IContentService contentService,
+        IContentRetriever contentRetriever,
         ICultureContext cultureContext,
         IWebPageUrlRetriever webPageUrlRetriever)
     {
-        _contentService = contentService;
+        _contentRetriever = contentRetriever;
         _cultureContext = cultureContext;
         _webPageUrlRetriever = webPageUrlRetriever;
+
+        _retrieveContentByGuidsAsync = (contentTypes, guids, parameters, ct) =>
+            _contentRetriever.RetrieveContentOfContentTypesByGuids<IWebPageFieldsSource>(
+                contentTypes, guids.ToList(), parameters, ct);
     }
 
     public async Task<TrendingTopicsCarouselDto> GetTrendingTopicsCarouselAsync(
@@ -62,7 +93,11 @@ public class TrendingTopicsCarouselService : ITrendingTopicsCarouselService
             return Array.Empty<TrendingTopicsCarouselItemDto>();
         }
 
-        var pages = await _contentService.GetItemsByGUIDAsync(guids);
+        var pages = await _retrieveContentByGuidsAsync(
+                TrendingTopicsContentTypes,
+                guids,
+                new RetrieveContentOfContentTypesParameters() { LinkedItemsMaxLevel = 2 },
+                cancellationToken);
 
         var itemDtos = new List<TrendingTopicsCarouselItemDto>();
 
