@@ -34,32 +34,31 @@
     Layout = "_MicrositeLayout";
 
     var widgetsList = new[]
-    {
-        ComponentIdentifiers.Widgets.ExternalNavigation,
-        ComponentIdentifiers.Widgets.Imagewithtext,
-        ComponentIdentifiers.Widgets.QuoteCard,
-        ComponentIdentifiers.Widgets.TiledLink,
-        ComponentIdentifiers.Widgets.RichText,
-        ComponentIdentifiers.Widgets.Globallocation,
-        ComponentIdentifiers.Widgets.AccordionWidget,
-        ComponentIdentifiers.Widgets.FaqWidget,
-        ComponentIdentifiers.Widgets.FlexibleBanner,
+        {
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.EditorsPick,
         ComponentIdentifiers.Widgets.FlexibleContent,
-        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.ImageWithText,
         ComponentIdentifiers.Widgets.InFocus,
-
+        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.KeyTakeaways,
+        ComponentIdentifiers.Widgets.RelatedContentCarousel,
+        ComponentIdentifiers.Widgets.RelatedContacts,
+        ComponentIdentifiers.Widgets.TabAccordion,
+        ComponentIdentifiers.Widgets.TiledLinkSection,
+        //ComponentIdentifiers.Widgets.TrendingTopicsCarousel,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
     };
 }
 
 @section Styles {
     @PageBuilderService.GetPageBuilderStyles(Html)
 }
-<div>
-    @await Html.Kentico().EditableAreaAsync(
-        "mainContent",
-        new EditableAreaOptions
-        {
-            AllowedWidgets = widgetsList
-        })
-</div>
+
+@await Html.PartialAsync("_Hero")
+
+@await Html.PartialAsync("_LocalNavigation")
+
+@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
+
 @PageBuilderService.GetPageBuilderScripts(Html)

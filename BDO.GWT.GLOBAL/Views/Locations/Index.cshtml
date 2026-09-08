@@ -5,6 +5,7 @@
 @model (BDO.GWT.Core.DTOs.Pages.LocationsDto LocationsDto, BDO.GWT.Core.DTOs.SchemaMarkups.OrganizationSchemaMarkupDto LocationsSchemaMarkupDto)
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
 
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
@@ -13,15 +14,17 @@
 @{
     Layout = "_Layout";
 
-
     var widgetsList = new[]
-    {
+        {
         ComponentIdentifiers.Widgets.Button,
-        //ComponentIdentifiers.Widgets.EditorsPick,
-        //ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.FlexibleContent,
         ComponentIdentifiers.Widgets.Form,
-        ComponentIdentifiers.Widgets.Globallocation,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
     };
+}
+@section SchemaMarkup {
+    @Html.Raw(this.Model.LocationsSchemaMarkupDto.ToSchemaMarkupJsString())
 }
 
  @if (Model.LocationsDto != null && pageId != 0)
@@ -52,9 +55,7 @@
         Context.RequestAborted))
 
     }
- @await Html.Kentico().EditableAreaAsync(
-    "mainContent", 
-        new EditableAreaOptions
-        {
-            AllowedWidgets = widgetsList
-        })
+
+@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+
+@PageBuilderService.GetPageBuilderScripts(Html)

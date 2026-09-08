@@ -6,6 +6,7 @@
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
 
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
@@ -13,25 +14,26 @@
 }
 @{
     Layout = "_Layout";
-
-
     var widgetsList = new[]
-    {
-         
-        ComponentIdentifiers.Widgets.Imagewithtext,
-        ComponentIdentifiers.Widgets.QuoteCard,
-        ComponentIdentifiers.Widgets.TiledLink,
-        ComponentIdentifiers.Widgets.RichText,
-        ComponentIdentifiers.Widgets.Globallocation,
-        ComponentIdentifiers.Widgets.AccordionWidget,
-        ComponentIdentifiers.Widgets.FaqWidget,
+       {
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.Faq,
+        ComponentIdentifiers.Widgets.ImageWithText,
+        ComponentIdentifiers.Widgets.InFocus,
         ComponentIdentifiers.Widgets.KeyContacts,
         ComponentIdentifiers.Widgets.RelatedContacts,
-        ComponentIdentifiers.Widgets.InFocus,
+        ComponentIdentifiers.Widgets.TiledLinkSection,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+    };
+
+    var advancedWidgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.TabAccordion,
     };
 }
-<div>
-    @(await ReactService.RenderComponentAsync(
+
+@(await ReactService.RenderComponentAsync(
     pageId,
     ReactComponentType.Hero,
     ReactComponentType.HeroGUID,
@@ -40,14 +42,8 @@
             data = Model.Hero,
         },
     Context.RequestAborted))
-</div>
-<div>
 @await Html.PartialAsync("_LocalNavigation")
 
- @await Html.Kentico().EditableAreaAsync(
- "mainContent", 
-  new EditableAreaOptions
-  {
-   AllowedWidgets = widgetsList
- })   
-</div>
+@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+
+@PageBuilderService.GetPageBuilderScripts(Html)
