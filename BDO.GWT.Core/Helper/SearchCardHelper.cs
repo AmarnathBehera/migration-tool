@@ -168,7 +168,7 @@ namespace BDO.GWT.Core.Helpers
                     DateTime = dateTime,
                     DateTimeTo = dateTimeTo,
                     Location = location,
-                    Link = new LinkItemDto
+                    ReadMoreLink = new LinkItemDto
                     {
                         Title = ResourceStringKey.LiveSite.ReadMore,
                         URL = relativeUrlByNodeId.TryGetValue(document.NodeId, out var url) ? url.ToHtmlCompatibleString() : string.Empty,
