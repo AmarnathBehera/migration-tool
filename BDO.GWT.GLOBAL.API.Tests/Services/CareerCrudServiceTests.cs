@@ -463,11 +463,90 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
         }
 
 
-        
-       
+
+
         #endregion
 
-        
+        #region Additional coverage
+
+        [Test]
+        public void GetCareerPagesAsync_ChannelNotFound_ThrowsNotFoundException()
+        {
+            SetupValidCulture();
+            _channelInfoServiceMock
+                .Setup(x => x.GetChannelNameAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((string?)null);
+
+            var service = CreateService();
+
+            Assert.ThrowsAsync<NotFoundException>(() =>
+                service.GetCareerPagesAsync(1, "en", true, CancellationToken.None));
+        }
+
+        [Test]
+        public void CreateCareerPageAsync_ValidationHasErrors_ThrowsFromValidationState()
+        {
+            SetupValidCulture();
+            _channelInfoServiceMock
+                .Setup(x => x.GetChannelNameAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync("TestChannel");
+
+            // Trigger the HasErrors branch of ThrowIfThereAreErrors (different from HasUnprocessableEntityErrors).
+            _validationStateMock.Setup(x => x.HasErrors()).Returns(true);
+            _validationStateMock.Setup(x => x.HasUnprocessableEntityErrors()).Returns(false);
+
+            var service = CreateService();
+
+            Assert.ThrowsAsync<ValidationException>(() =>
+                service.CreateCareerPageAsync(1, 1, "en", new CareerPageContent(), CancellationToken.None));
+        }
+
+        [Test]
+        public void GetCareerPageAsync_ChannelNotFound_ThrowsNotFoundException()
+        {
+            SetupValidCulture();
+            _channelInfoServiceMock
+                .Setup(x => x.GetChannelNameAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((string?)null);
+
+            var service = CreateService();
+
+            Assert.ThrowsAsync<NotFoundException>(() =>
+                service.GetCareerPageAsync(1, Guid.NewGuid(), "en", CancellationToken.None));
+        }
+
+        [Test]
+        public void CreateCareerPageCultureVersionAsync_ChannelNotFound_ThrowsNotFoundException()
+        {
+            SetupValidCulture();
+            _channelInfoServiceMock
+                .Setup(x => x.GetChannelNameAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((string?)null);
+
+            var service = CreateService();
+
+            Assert.ThrowsAsync<NotFoundException>(() =>
+                service.CreateCareerPageCultureVersionAsync(1, Guid.NewGuid(), "en", "fr", new CareerPageContent(), CancellationToken.None));
+        }
+
+        [Test]
+        public void CreateCareerPageCultureVersionAsync_ValidationErrors_ThrowsFromValidationState()
+        {
+            SetupValidCulture();
+            _channelInfoServiceMock
+                .Setup(x => x.GetChannelNameAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync("TestChannel");
+
+            _validationStateMock.Setup(x => x.HasErrors()).Returns(false);
+            _validationStateMock.Setup(x => x.HasUnprocessableEntityErrors()).Returns(true);
+
+            var service = CreateService();
+
+            Assert.ThrowsAsync<UnprocessableEntityException>(() =>
+                service.CreateCareerPageCultureVersionAsync(1, Guid.NewGuid(), "en", "fr", new CareerPageContent(), CancellationToken.None));
+        }
+
+        #endregion
     }
 
     /// <summary>
