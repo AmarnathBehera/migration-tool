@@ -546,6 +546,82 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
                 service.CreateCareerPageCultureVersionAsync(1, Guid.NewGuid(), "en", "fr", new CareerPageContent(), CancellationToken.None));
         }
 
+        [Test]
+        public async Task GetCareerPagesAsync_MapsMetadataRelevantContactPerson_WhenPresent()
+        {
+            // Bootstrap a minimal Kentico IoC container so the static ContentLanguageInfo.Provider.Get()
+            // call inside MapCareerToPageOutput resolves. Safe to call more than once; guarded by a flag.
+            var contentLanguageProvider = InitializeKenticoContainer();
+
+            var languageQuery = new Mock<CMS.DataEngine.ObjectQuery<ContentLanguageInfo>>();
+            languageQuery
+                .Setup(q => q.GetEnumerator())
+                .Returns(() => ((IEnumerable<ContentLanguageInfo>)Array.Empty<ContentLanguageInfo>()).GetEnumerator());
+            contentLanguageProvider.Reset();
+            contentLanguageProvider
+                .Setup(p => p.Get())
+                .Returns(languageQuery.Object);
+
+            SetupValidCulture();
+            _channelInfoServiceMock
+                .Setup(x => x.GetChannelNameAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync("TestChannel");
+
+            // Career itself implements both IWebPageFieldsSource and IMetadata, so it's a valid
+            // element for MetadataRelevantContactPerson and exercises the (p as IMetadata) cast
+            // on line 602 of CareerCrudServices.cs.
+            var relevantContact = new Career
+            {
+                MetadataTitle = "Jane Doe",
+                SystemFields = new WebPageFields { WebPageItemID = 200 }
+            };
+
+            var career = new Career
+            {
+                MetadataTitle = "Career title",
+                MetadataRelevantContactPerson = new[] { relevantContact },
+                SystemFields = new WebPageFields { WebPageItemID = 10 }
+            };
+
+            SetupGetCareerPages(new[] { career });
+
+            var service = CreateService();
+
+            var result = await service.GetCareerPagesAsync(1, "en", true, CancellationToken.None);
+
+            Assert.That(result.Value, Is.Not.Null);
+            var mapped = result.Value!.Single();
+            Assert.That(mapped.Content!.MetadataRelevantContactPerson, Is.Not.Null);
+            Assert.That(mapped.Content.MetadataRelevantContactPerson, Has.Count.EqualTo(1));
+            Assert.That(mapped.Content.MetadataRelevantContactPerson[0], Is.EqualTo("Jane Doe"));
+        }
+
+        // ── Kentico IoC bootstrap (inlined; runs once per test-process) ─────────────
+        private static Mock<CMS.DataEngine.IInfoProvider<ContentLanguageInfo>>? _contentLanguageProvider;
+        private static readonly object _kenticoInitLock = new();
+
+        private static Mock<CMS.DataEngine.IInfoProvider<ContentLanguageInfo>> InitializeKenticoContainer()
+        {
+            lock (_kenticoInitLock)
+            {
+                if (_contentLanguageProvider is not null)
+                {
+                    return _contentLanguageProvider;
+                }
+
+                var contentLanguageProvider = new Mock<CMS.DataEngine.IInfoProvider<ContentLanguageInfo>>();
+
+                CMS.Core.Service.Use<CMS.DataEngine.IInfoProvider<ContentLanguageInfo>>(contentLanguageProvider.Object);
+                CMS.Core.Service.Use<CMS.Core.ILocalizationService>(new Mock<CMS.Core.ILocalizationService>().Object);
+                CMS.Core.Service.Use<CMS.Core.IConversionService>(new Mock<CMS.Core.IConversionService>().Object);
+                CMS.Core.Service.Use<CMS.Core.IEventLogService>(new Mock<CMS.Core.IEventLogService>().Object);
+                CMS.Core.Service.InitializeContainer();
+
+                _contentLanguageProvider = contentLanguageProvider;
+                return contentLanguageProvider;
+            }
+        }
+
         #endregion
     }
 
