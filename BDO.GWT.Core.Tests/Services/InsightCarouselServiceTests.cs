@@ -132,6 +132,18 @@ public class InsightCarouselServiceTests
             SeeAllLinkURLTarget = null,
         };
 
+        _contentRetrieverMock
+            .Setup(x => x.RetrievePages<Insight, Insight>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, Insight, Task<Insight>>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Insight>
+            {
+                new() { SystemFields = new WebPageFields { ContentItemGUID = featuredGuid } },
+            });
+
         var dto = await _service.GetInsightCarouselAsync(page, data, CancellationToken.None);
 
         Assert.Multiple(() =>
