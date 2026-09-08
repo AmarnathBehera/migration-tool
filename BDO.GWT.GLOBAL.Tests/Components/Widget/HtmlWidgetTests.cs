@@ -259,8 +259,11 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var result = _widget.Invoke(BuildComponentViewModel(properties)) as ViewViewComponentResult;
             var model = result?.ViewData?.Model as HtmlDto;
 
-            Assert.That(model!.HtmlCode, Is.EqualTo(longContent));
-            Assert.That(model.HtmlCode.Length, Is.GreaterThan(5000));
+            Assert.Multiple(() =>
+            {
+                Assert.That(model!.HtmlCode, Is.EqualTo(longContent));
+                Assert.That(model.HtmlCode, Has.Length.GreaterThan(5000));
+            });
         }
 
         [Test]
