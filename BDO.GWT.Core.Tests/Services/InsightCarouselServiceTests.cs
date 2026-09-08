@@ -192,7 +192,7 @@ public class InsightCarouselServiceTests
                 capturedFeaturedPredicate = featured;
                 capturedLanguage = language;
             })
-            .ReturnsAsync((PaginationDto<ContentPageCardDto>?)null);
+            .ReturnsAsync((PaginationDto<ContentPageCardDto>)null!);
 
         var result = await _service.GetFilteredItemsAsync(
             page,
