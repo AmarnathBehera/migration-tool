@@ -1,13 +1,12 @@
 ﻿@using BDO
 @using BDO.GWT.Core.Constants
 @using BDO.GWT.Core.Services
-@using BDO.GWT.Xperience.LiveSite.Services
 @using Kentico.Content.Web.Mvc
 @model BDO.GWT.Core.DTOs.LegalPageDto
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
-
+@inject IPageBuilderService PageBuilderService
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
     var pageId = pageContext.WebPage.WebPageItemID;
@@ -16,19 +15,20 @@
     Layout = "_Layout";
 
     var widgetsList = new[]
-    {
-
-        ComponentIdentifiers.Widgets.Imagewithtext,
-        ComponentIdentifiers.Widgets.QuoteCard,
-        ComponentIdentifiers.Widgets.TiledLink,
+        {
+        ComponentIdentifiers.Widgets.Button,
+        ComponentIdentifiers.Widgets.FlexibleBanner,
+        ComponentIdentifiers.Widgets.Form,
         ComponentIdentifiers.Widgets.RichText,
-        ComponentIdentifiers.Widgets.Globallocation,
-        ComponentIdentifiers.Widgets.AccordionWidget,
-        ComponentIdentifiers.Widgets.FaqWidget
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+    };
+
+    var advancedWidgetList = new[]
+    {
+        ComponentIdentifiers.Widgets.Accordion,
     };
 }
-@* @await Html.PartialAsync("_Hero") *@
-
+ @await Html.PartialAsync("_Hero") 
 
 <div class="legal-wrapper">
     <div class="@("legal-wrapper-content" + (Model.Links.Count() > 1 ? "" : " legal-wrapper-content--full"))">
@@ -56,10 +56,7 @@
                         })
         </main>
     </div>
-    @await Html.Kentico().EditableAreaAsync(
-        "bottomArea",
-        new EditableAreaOptions
-        {
-            AllowedWidgets = widgetsList
-        })
+    @await PageBuilderService.AddIdentifier("bottomArea").AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetList).BuildEditableAreaAsync(Html, Context.RequestAborted))
 </div>
+
+@PageBuilderService.GetPageBuilderScripts(Html)

@@ -6,6 +6,7 @@
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
 
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
@@ -15,21 +16,31 @@
     Layout = "_Layout";
 
     var widgetsList = new[]
-    {
-        ComponentIdentifiers.Widgets.ExternalNavigation,
-        ComponentIdentifiers.Widgets.Imagewithtext,
-        ComponentIdentifiers.Widgets.QuoteCard,
-        ComponentIdentifiers.Widgets.TiledLink,
-        ComponentIdentifiers.Widgets.RichText,
-        ComponentIdentifiers.Widgets.Globallocation,
-        ComponentIdentifiers.Widgets.AccordionWidget,
-        ComponentIdentifiers.Widgets.FaqWidget,
+        {
+        ComponentIdentifiers.Widgets.Button,
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.EventsWebinarsSlider,
         ComponentIdentifiers.Widgets.FlexibleBanner,
-        ComponentIdentifiers.Widgets.FlexibleContent,
-        ComponentIdentifiers.Widgets.NewsCarousel,
+        ComponentIdentifiers.Widgets.Form,
+        ComponentIdentifiers.Widgets.InsightCarousel,
+        ComponentIdentifiers.Widgets.InsightAnimationCard,
         ComponentIdentifiers.Widgets.KeyContacts,
-        ComponentIdentifiers.Widgets.InFocus,
+        ComponentIdentifiers.Widgets.NewsCarousel,
+        ComponentIdentifiers.Widgets.QuoteCard,
+        ComponentIdentifiers.Widgets.RelatedContacts,
+        ComponentIdentifiers.Widgets.TiledLinkSection,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+    };
 
+    var advancedWidgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.Faq,
+        ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.InFocus,
+        ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.TabAccordion,
+        //ComponentIdentifiers.Widgets.TrendingTopicsCarousel,
     };
 }
 <div>
@@ -43,6 +54,8 @@
         },
         Context.RequestAborted))
 </div>
+@await Html.PartialAsync("_LocalNavigation")
+
 <div>
     @(await ReactService.RenderComponentAsync(
         pageId,
@@ -59,5 +72,7 @@
             AllowedWidgets = widgetsList
         })
 </div>
+@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
 
+@PageBuilderService.GetPageBuilderScripts(Html)
 

@@ -1,4 +1,4 @@
-﻿using BDO.GWT.Common.Core.Exceptions;
+using BDO.GWT.Common.Core.Exceptions;
 using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
@@ -35,6 +35,10 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
         private Mock<ICultureValidationService> _cultureValidationServiceMock;
         //private Mock<IUserInfoProvider> _userInfoProviderMock;
 
+        // -- Kentico IoC bootstrap (inlined; runs once per test-process) ---------------------
+        private static Mock<CMS.DataEngine.IInfoProvider<ContentLanguageInfo>>? _contentLanguageProvider;
+        private static readonly object _kenticoInitLock = new();
+
         [SetUp]
         public void Setup()
         {
@@ -49,6 +53,21 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
             _pageContentValidatorMock = new Mock<IPageContentValidator>();
             _cultureValidationServiceMock = new Mock<ICultureValidationService>();
             //_userInfoProviderMock = new Mock<IUserInfoProvider>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            // No action needed; IoC container is reset per test via OneTimeTearDown
+        }
+
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            lock (_kenticoInitLock)
+            {
+                _contentLanguageProvider = null;
+            }
         }
 
         private CareerCrudService CreateService()
@@ -463,11 +482,169 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
         }
 
 
-        
-       
+
+
         #endregion
 
-        
+        #region Additional coverage
+
+        [Test]
+        public void GetCareerPagesAsync_ChannelNotFound_ThrowsNotFoundException()
+        {
+            SetupValidCulture();
+            _channelInfoServiceMock
+                .Setup(x => x.GetChannelNameAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((string?)null);
+
+            var service = CreateService();
+
+            Assert.ThrowsAsync<NotFoundException>(() =>
+                service.GetCareerPagesAsync(1, "en", true, CancellationToken.None));
+        }
+
+        [Test]
+        public void CreateCareerPageAsync_ValidationHasErrors_ThrowsFromValidationState()
+        {
+            SetupValidCulture();
+            _channelInfoServiceMock
+                .Setup(x => x.GetChannelNameAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync("TestChannel");
+
+            // Trigger the HasErrors branch of ThrowIfThereAreErrors (different from HasUnprocessableEntityErrors).
+            _validationStateMock.Setup(x => x.HasErrors()).Returns(true);
+            _validationStateMock.Setup(x => x.HasUnprocessableEntityErrors()).Returns(false);
+
+            var service = CreateService();
+
+            Assert.ThrowsAsync<ValidationException>(() =>
+                service.CreateCareerPageAsync(1, 1, "en", new CareerPageContent(), CancellationToken.None));
+        }
+
+        [Test]
+        public void GetCareerPageAsync_ChannelNotFound_ThrowsNotFoundException()
+        {
+            SetupValidCulture();
+            _channelInfoServiceMock
+                .Setup(x => x.GetChannelNameAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((string?)null);
+
+            var service = CreateService();
+
+            Assert.ThrowsAsync<NotFoundException>(() =>
+                service.GetCareerPageAsync(1, Guid.NewGuid(), "en", CancellationToken.None));
+        }
+
+        [Test]
+        public void CreateCareerPageCultureVersionAsync_ChannelNotFound_ThrowsNotFoundException()
+        {
+            SetupValidCulture();
+            _channelInfoServiceMock
+                .Setup(x => x.GetChannelNameAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((string?)null);
+
+            var service = CreateService();
+
+            Assert.ThrowsAsync<NotFoundException>(() =>
+                service.CreateCareerPageCultureVersionAsync(1, Guid.NewGuid(), "en", "fr", new CareerPageContent(), CancellationToken.None));
+        }
+
+        [Test]
+        public void CreateCareerPageCultureVersionAsync_ValidationErrors_ThrowsFromValidationState()
+        {
+            SetupValidCulture();
+            _channelInfoServiceMock
+                .Setup(x => x.GetChannelNameAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync("TestChannel");
+
+            _validationStateMock.Setup(x => x.HasErrors()).Returns(false);
+            _validationStateMock.Setup(x => x.HasUnprocessableEntityErrors()).Returns(true);
+
+            var service = CreateService();
+
+            Assert.ThrowsAsync<UnprocessableEntityException>(() =>
+                service.CreateCareerPageCultureVersionAsync(1, Guid.NewGuid(), "en", "fr", new CareerPageContent(), CancellationToken.None));
+        }
+
+        [Test]
+        public async Task GetCareerPagesAsync_MapsMetadataRelevantContactPerson_WhenPresent()
+        {
+            // Bootstrap a minimal Kentico IoC container so the static ContentLanguageInfo.Provider.Get()
+            // call inside MapCareerToPageOutput resolves. Safe to call more than once; guarded by a flag.
+            var contentLanguageProvider = InitializeKenticoContainer();
+
+            var languageQuery = new Mock<CMS.DataEngine.ObjectQuery<ContentLanguageInfo>>();
+            languageQuery
+                .Setup(q => q.GetEnumerator())
+                .Returns(() => ((IEnumerable<ContentLanguageInfo>)Array.Empty<ContentLanguageInfo>()).GetEnumerator());
+            contentLanguageProvider.Reset();
+            contentLanguageProvider
+                .Setup(p => p.Get())
+                .Returns(languageQuery.Object);
+
+            SetupValidCulture();
+            _channelInfoServiceMock
+                .Setup(x => x.GetChannelNameAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync("TestChannel");
+
+            // Career itself implements both IWebPageFieldsSource and IMetadata, so it's a valid
+            // element for MetadataRelevantContactPerson and exercises the (p as IMetadata) cast
+            // on line 602 of CareerCrudServices.cs.
+            var relevantContact = new Career
+            {
+                MetadataTitle = "Jane Doe",
+                SystemFields = new WebPageFields { WebPageItemID = 200 }
+            };
+
+            var career = new Career
+            {
+                MetadataTitle = "Career title",
+                MetadataRelevantContactPerson = new[] { relevantContact },
+                SystemFields = new WebPageFields { WebPageItemID = 10 }
+            };
+
+            SetupGetCareerPages(new[] { career });
+
+            var service = CreateService();
+
+            var result = await service.GetCareerPagesAsync(1, "en", true, CancellationToken.None);
+
+            Assert.That(result.Value, Is.Not.Null);
+            var mapped = result.Value!.Single();
+
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(mapped.Content!.MetadataRelevantContactPerson, Is.Not.Null);
+                Assert.That(mapped.Content.MetadataRelevantContactPerson, Has.Count.EqualTo(1));
+                Assert.That(mapped.Content.MetadataRelevantContactPerson[0], Is.EqualTo("Jane Doe"));
+            });
+        }
+
+        private static Mock<CMS.DataEngine.IInfoProvider<ContentLanguageInfo>> InitializeKenticoContainer()
+        {
+            lock (_kenticoInitLock)
+            {
+                if (_contentLanguageProvider is not null)
+                {
+                    return _contentLanguageProvider;
+                }
+
+                var contentLanguageProvider = new Mock<CMS.DataEngine.IInfoProvider<ContentLanguageInfo>>();
+
+                CMS.Core.Service.Use<CMS.DataEngine.IInfoProvider<ContentLanguageInfo>>(contentLanguageProvider.Object);
+                CMS.Core.Service.Use<CMS.Core.ILocalizationService>(new Mock<CMS.Core.ILocalizationService>().Object);
+                CMS.Core.Service.Use<CMS.Core.IConversionService>(new Mock<CMS.Core.IConversionService>().Object);
+                CMS.Core.Service.Use<CMS.Core.IEventLogService>(new Mock<CMS.Core.IEventLogService>().Object);
+#pragma warning disable KXA0023 // Test fixture calls Service.InitializeContainer without inheriting from a managed test base class
+                CMS.Core.Service.InitializeContainer();
+#pragma warning restore KXA0023 // Test fixture calls Service.InitializeContainer without inheriting from a managed test base class
+
+                _contentLanguageProvider = contentLanguageProvider;
+                return contentLanguageProvider;
+            }
+        }
+
+        #endregion
     }
 
     /// <summary>

@@ -8,40 +8,30 @@
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
 
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
     var pageId = pageContext.WebPage.WebPageItemID;
 }
 
-
 @{
     var widgetsList = new[]
     {
-        ComponentIdentifiers.Widgets.AccordionWidget,
-        //ComponentIdentifiers.Widgets.BannerWithIcons,
-        //ComponentIdentifiers.Widgets.CommunityInvolvement,
-        //ComponentIdentifiers.Widgets.DescriptionText,
-
-        // widgets_not_there_yet:
-
-        // ComponentIdentifiers.Widgets.EditorsPick,
-        ComponentIdentifiers.Widgets.FaqWidget,
-        ComponentIdentifiers.Widgets.Imagewithtext,
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.Faq,
+        ComponentIdentifiers.Widgets.ImageWithText,
         ComponentIdentifiers.Widgets.InFocus,
         ComponentIdentifiers.Widgets.KeyContacts,
-        // ---------
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+    };
 
-
-        //ComponentIdentifiers.Widgets.PurposeIcon,
-        //ComponentIdentifiers.Widgets.TwitterCarousel,
-        ComponentIdentifiers.Widgets.Globallocation,
+    var advancedWidgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.TabAccordion,
     };
 }
-
-@* @section Styles {
-    @PageBuilderService.GetPageBuilderStyles(Html)
-} *@
 
 <div>
     @(await ReactService.RenderComponentAsync(
@@ -54,14 +44,9 @@
         },
         Context.RequestAborted))
 </div>
-@* 
-@await Html.PartialAsync("_LocalNavigation") *@
 
+@await Html.PartialAsync("_LocalNavigation")
 
-@await Html.Kentico().EditableAreaAsync(
-"mainContent", // Unique identifier
-                        new EditableAreaOptions
-                        {
+@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
 
-                            AllowedWidgets = widgetsList
-                        })
+@PageBuilderService.GetPageBuilderScripts(Html)

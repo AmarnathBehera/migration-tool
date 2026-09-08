@@ -6,6 +6,7 @@
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
 
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
@@ -15,15 +16,17 @@
     Layout = "_Layout";
 
     var widgetsList = new[]
+        {
+        ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.ImageWithText,
+        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.RelatedContacts,
+        ComponentIdentifiers.Widgets.InsightAnimationCard,
+    };
+
+    var advancedWidgetsList = new[]
     {
-        ComponentIdentifiers.Widgets.Imagewithtext,
-        ComponentIdentifiers.Widgets.QuoteCard,
-        ComponentIdentifiers.Widgets.TiledLink,
-        ComponentIdentifiers.Widgets.RichText,
-        ComponentIdentifiers.Widgets.Globallocation,
-        ComponentIdentifiers.Widgets.AccordionWidget,
-        ComponentIdentifiers.Widgets.FaqWidget,
-        ComponentIdentifiers.Widgets.KeyContacts
+        ComponentIdentifiers.Widgets.Accordion,
     };
 }
 
@@ -38,17 +41,15 @@
         Context.RequestAborted))
 
 
+@await Html.PartialAsync("_LocalNavigation")
+
     @(await ReactService.RenderComponentAsync(
         pageId,
         ReactComponentType.MultiLinksCardsGrid,
         ReactComponentType.MultiLinksCardsGridGUID,
         Model.MultiLinksCardsGrid,
         Context.RequestAborted))
-@await Html.PartialAsync("_LocalNavigation")
+  
+@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
 
-    @await Html.Kentico().EditableAreaAsync(
-        "mainContent",
-        new EditableAreaOptions
-        {
-            AllowedWidgets = widgetsList
-        })
+@PageBuilderService.GetPageBuilderScripts(Html)

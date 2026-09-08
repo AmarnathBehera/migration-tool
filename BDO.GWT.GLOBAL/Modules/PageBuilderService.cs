@@ -1,4 +1,4 @@
-﻿using BDO.GWT.Domain.Services;
+﻿using BDO.GWT.Core.Services;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using static BDO.ComponentIdentifiers;
 
 namespace BDO.GWT.Xperience.LiveSite.Services;
 
@@ -15,9 +16,9 @@ public class PageBuilderService : IPageBuilderService
 
     private readonly List<string> _widgets = [], _advancedWidgets = [], _sections = [], _advancedSections = [];
     private string _identifier = MainArea;
-    private readonly ISettingsService _settingsService;
+    private readonly ISettingService _settingsService;
 
-    public PageBuilderService(ISettingsService settingsService)
+    public PageBuilderService(ISettingService settingsService)
     {
         _settingsService = settingsService;
     }
@@ -26,10 +27,16 @@ public class PageBuilderService : IPageBuilderService
     {
         _widgets.AddRange(new[]
         {
-            ComponentIdentifiers.Widgets.Form,
-            ComponentIdentifiers.Widgets.Imagewithtext,
-            ComponentIdentifiers.Widgets.ExternalNavigation,
-            ComponentIdentifiers.Widgets.NewsCarousel
+            Widgets.Button,
+            Widgets.EventsWebinarsSlider,
+            Widgets.FlexibleBanner,
+            Widgets.Form,
+            //Widgets.HTML,
+            Widgets.InsightCarousel,
+            Widgets.NewsCarousel,
+            Widgets.QuoteCard,
+            Widgets.RichText,
+            Widgets.SocialMediaButtons,
         });
         return this;
     }
@@ -85,7 +92,14 @@ public class PageBuilderService : IPageBuilderService
         {
             options.AllowedSections =
             [
-                ComponentIdentifiers.Sections.Container
+                ComponentIdentifiers.Sections.DefaultSection,
+                ComponentIdentifiers.Sections.Container,
+                ComponentIdentifiers.Sections.TwoColumns,
+                ComponentIdentifiers.Sections.ThreeColumns,
+                ComponentIdentifiers.Sections.OneThirdTwoThird,
+                ComponentIdentifiers.Sections.TwoThirdOneThird,
+                ComponentIdentifiers.Sections.FourColumns,
+                ComponentIdentifiers.Sections.FiveColumns,
             ];
         }
 
@@ -119,15 +133,18 @@ public class PageBuilderService : IPageBuilderService
 
     private async Task<(List<string>, List<string>)> GetWidgetsAndSectionsListAsync(CancellationToken cancellationToken)
     {
-        //var setting = await _settingsService.GetCurrentWebsiteSettingAsync("",
-        //                                                                   cancellationToken);
+        var setting = await _settingsService.GetShowAdvancedWidgetsInfo();
 
-        //if (setting != null && (bool)setting.Value!)
-        //{
-        //    _widgets.AddRange(_advancedWidgets);
-        //    _sections.AddRange(_advancedSections);
-        //}
+        if (setting != null)
+        {
+            var ShowAdvancedWidgets = setting.FirstOrDefault()?.ShowAdvancedWidgets ?? false;
 
+            if (ShowAdvancedWidgets)
+            {
+                _widgets.AddRange(_advancedWidgets);
+                _sections.AddRange(_advancedSections);
+            }
+        }
         return (_widgets.Distinct().ToList(), _sections.Distinct().ToList());
     }
 }
