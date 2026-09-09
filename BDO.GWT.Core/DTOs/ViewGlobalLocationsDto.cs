@@ -1,4 +1,6 @@
-﻿namespace BDO.GWT.Web.Core.DTOs;
+﻿using BDO.GWT.Web.Core.DTOs;
+
+namespace BDO.GWT.Core.DTOs;
 
 public class ViewGlobalLocationsDto
 {

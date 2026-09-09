@@ -15,24 +15,24 @@
 @{
     Layout = "_Layout";
 
-
     var widgetsList = new[]
-    {
-        // ComponentIdentifiers.Widgets.EditorsPick,
-        // ComponentIdentifiers.Widgets.FlexibleContent,
-        ComponentIdentifiers.Widgets.Imagewithtext,
+        {
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.ImageWithText,
         ComponentIdentifiers.Widgets.KeyContacts,
         ComponentIdentifiers.Widgets.RelatedContacts,
-        ComponentIdentifiers.Widgets.TiledLink,
-        ComponentIdentifiers.Widgets.Globallocation,
-        ComponentIdentifiers.Widgets.RelatedContacts,
+        ComponentIdentifiers.Widgets.TiledLinkSection,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
     };
 
     var advancedWidgetsList = new[]
     {
-        ComponentIdentifiers.Widgets.Globallocation,
-        ComponentIdentifiers.Widgets.AccordionWidget
+        ComponentIdentifiers.Widgets.Accordion,
     };
+}
+@section SchemaMarkup {
+    @Html.Raw(this.Model.LocationCitySchemaMarkupDto.ToSchemaMarkupJsString())
 }
 
 @if (Model.LocationCityDto != null && pageId != 0)
@@ -54,4 +54,6 @@
         Context.RequestAborted))
     }
 
-@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
+@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+
+@PageBuilderService.GetPageBuilderScripts(Html)

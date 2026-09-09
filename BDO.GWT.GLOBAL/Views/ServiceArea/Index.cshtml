@@ -6,6 +6,7 @@
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
 
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
@@ -16,13 +17,24 @@
 
     var widgetsList = new[]
     {
-        ComponentIdentifiers.Widgets.Imagewithtext,
-        ComponentIdentifiers.Widgets.QuoteCard,
-        ComponentIdentifiers.Widgets.TiledLink,
-        ComponentIdentifiers.Widgets.RichText,
-        ComponentIdentifiers.Widgets.Globallocation,
-        ComponentIdentifiers.Widgets.AccordionWidget,
-        ComponentIdentifiers.Widgets.FaqWidget
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.Faq,
+        ComponentIdentifiers.Widgets.ImageWithText,
+        ComponentIdentifiers.Widgets.InFocus,
+        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.RelatedContentCarousel,
+        ComponentIdentifiers.Widgets.RelatedContacts,
+        ComponentIdentifiers.Widgets.TiledLinkSection,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+        ComponentIdentifiers.Widgets.InsightAnimationCard,
+    };
+
+    var advancedWidgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.TabAccordion,
+        //ComponentIdentifiers.Widgets.TrendingTopicsCarousel,
     };
 }
 
@@ -35,6 +47,7 @@
             data = Model.Hero,
         },
         Context.RequestAborted))
+
 @await Html.PartialAsync("_LocalNavigation")
 
 @{
@@ -49,7 +62,7 @@
                         ReactComponentType.ServiceContentGUID,
                         Model,
                         Context.RequestAborted))
-            @* @await PageBuilderService.AddIdentifier("topArea").AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html) *@
+            @await PageBuilderService.AddIdentifier("topArea").AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html,Context.RequestAborted))
         </main>
         @if (isSideBoxVisible)
         {
@@ -63,13 +76,6 @@
             </aside>
         }
     </div>
-    @*  @await PageBuilderService.AddIdentifier("bottomArea").AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html) *@
+    @await PageBuilderService.AddIdentifier("bottomArea").AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html,Context.RequestAborted))
 </div>
-<div>
-    @await Html.Kentico().EditableAreaAsync(
-        "mainContent",
-        new EditableAreaOptions
-        {
-            AllowedWidgets = widgetsList
-        })
-</div>
+@PageBuilderService.GetPageBuilderScripts(Html)

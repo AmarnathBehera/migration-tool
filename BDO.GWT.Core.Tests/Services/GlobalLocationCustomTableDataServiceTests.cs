@@ -108,6 +108,73 @@ namespace BDO.GWT.Core.Tests.Services
         }
 
         [Test]
+        public async Task GetAllGlobalLocationsAsync_WhenConnectionStringIsMissing_ReturnsEmptyList()
+        {
+            var configuration = BuildConfiguration(connectionString: null);
+            _service = new GlobalLocationCustomTableDataService(configuration, _eventLogServiceMock.Object);
+
+            // GetConnectionString(..) returns null; force-unwrap with '!' throws
+            // ArgumentNullException inside SqlConnection ctor, caught by the service.
+            var result = await _service.GetAllGlobalLocationsAsync();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result, Is.InstanceOf<List<BDO.GWT.Core.Entities.GlobalLocation>>());
+                Assert.That(result, Is.Empty);
+            });
+        }
+
+        [Test]
+        public async Task GetAllGlobalLocationsAsync_WhenConnectionStringIsMissing_LogsException()
+        {
+            var configuration = BuildConfiguration(connectionString: null);
+            _service = new GlobalLocationCustomTableDataService(configuration, _eventLogServiceMock.Object);
+
+            await _service.GetAllGlobalLocationsAsync();
+
+            // The service passes "GetLocationsAsync" as the event code even from
+            // GetAllGlobalLocationsAsync, so we verify against that value.
+            _eventLogServiceMock.Verify(
+                x => x.LogEvent(It.Is<EventLogData>(e =>
+                    e.Source == "GlobalLocationCustomTableDataService" &&
+                    e.EventCode == "GetLocationsAsync")),
+                Times.Once);
+        }
+
+        [Test]
+        public async Task GetAllGlobalLocationsAsync_WhenConnectionStringIsInvalid_DoesNotThrow()
+        {
+            var configuration = BuildConfiguration(
+                "Server=(invalid-host-does-not-exist);Database=DoesNotExist;User Id=sa;Password=invalid;Connect Timeout=1;TrustServerCertificate=True;");
+            _service = new GlobalLocationCustomTableDataService(configuration, _eventLogServiceMock.Object);
+
+            List<BDO.GWT.Core.Entities.GlobalLocation>? result = null;
+
+            Assert.DoesNotThrowAsync(async () =>
+                result = await _service.GetAllGlobalLocationsAsync());
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Empty);
+        }
+
+        [Test]
+        public async Task GetAllGlobalLocationsAsync_WhenConnectionStringIsInvalid_LogsException()
+        {
+            var configuration = BuildConfiguration(
+                "Server=(invalid-host-does-not-exist);Database=DoesNotExist;User Id=sa;Password=invalid;Connect Timeout=1;TrustServerCertificate=True;");
+            _service = new GlobalLocationCustomTableDataService(configuration, _eventLogServiceMock.Object);
+
+            await _service.GetAllGlobalLocationsAsync();
+
+            _eventLogServiceMock.Verify(
+                x => x.LogEvent(It.Is<EventLogData>(e =>
+                    e.Source == "GlobalLocationCustomTableDataService" &&
+                    e.EventCode == "GetLocationsAsync")),
+                Times.Once);
+        }
+
+        [Test]
         public void Constructor_AllowsNullConfiguration()
         {
             // Constructor does not null-check its dependencies.

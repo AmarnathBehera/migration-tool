@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<om.recipientlist>
-  <ContactGroupDisplayName>test</ContactGroupDisplayName>
-  <ContactGroupEnabled>True</ContactGroupEnabled>
-  <ContactGroupGUID>66e5f99d-a9a8-494c-aa66-ba6fa1743f83</ContactGroupGUID>
-  <ContactGroupIsRecipientList>True</ContactGroupIsRecipientList>
-  <ContactGroupName>Test</ContactGroupName>
-</om.recipientlist>

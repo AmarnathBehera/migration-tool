@@ -444,7 +444,7 @@ Advanced
   </ClassFormDefinition>
   <ClassGUID>a0c5bc6c-9409-4fe9-8430-697d961328a6</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
-  <ClassIconClass>xp-calendar-number</ClassIconClass>
+  <ClassIconClass>xp-calendar</ClassIconClass>
   <ClassName>BDO.Webinar</ClassName>
   <ClassShortName>BDOWebinar</ClassShortName>
   <ClassTableName>BDO_Webinar</ClassTableName>

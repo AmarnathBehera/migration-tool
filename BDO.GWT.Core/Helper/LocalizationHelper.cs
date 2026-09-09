@@ -30,27 +30,26 @@ public class LocalizationHelper : ILocalizationHelper
         {
             return key;
         }
-        var languageTask = _contentLanguageProvider
+
+        var language = (await _contentLanguageProvider
             .Get()
             .WhereEquals(nameof(ContentLanguageInfo.ContentLanguageCultureFormat), cultureCode)
             .TopN(1)
-            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
+            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
+            .FirstOrDefault();
 
-        var localizationKeyTask = _localizationKeyProvider
+        var localizationKey = (await _localizationKeyProvider
             .Get()
             .WhereEquals(nameof(LocalizationKeyInfo.LocalizationKeyItemName), key)
             .TopN(1)
-            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
-
-        await Task.WhenAll(languageTask, localizationKeyTask);
-
-        var language = languageTask.Result.FirstOrDefault();
-        var localizationKey = localizationKeyTask.Result.FirstOrDefault();
+            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
+            .FirstOrDefault();
 
         if (language is null || localizationKey is null)
         {
             return key;
         }
+
         var translation = (await _localizationTranslationProvider
             .Get()
             .WhereEquals(nameof(LocalizationTranslationItemInfo.LocalizationTranslationItemLocalizationKeyItemId), localizationKey.LocalizationKeyItemId)
