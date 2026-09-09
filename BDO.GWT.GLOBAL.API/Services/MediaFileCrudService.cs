@@ -328,28 +328,41 @@ public class MediaFileCrudService : IMediaFileCrudService
     {
         // Sanitize user-supplied filename: take only the base file name to prevent path traversal
         var fileName = GetSafeFileName(input.File.FileName);
+        var extension = GetSafeExtension(fileName);
         var displayName = input.DisplayName ?? System.IO.Path.GetFileNameWithoutExtension(fileName);
 
         var languageName = await GetDefaultLanguageNameAsync(cancellationToken);
         var user = await _userInfoProvider.GetAsync("administrator", cancellationToken);
         var manager = _contentItemManagerFactory.Create(user.UserID);
 
-        var newItemId = await WithUploadedAssetMetadataAsync(input.File, async assetMetadata =>
+        var assetSource = new ContentItemAssetStreamSource(ct => Task.FromResult<Stream>(input.File.OpenReadStream()));
+        var assetMetadata = new ContentItemAssetMetadataWithSource(
+            assetSource,
+            fileName,
+            extension,
+            input.File.Length,
+            DateTime.UtcNow);
+
+        var createItemData = new ContentItemData(new Dictionary<string, object>
         {
-            var itemData = CreateContentItemData(assetMetadata);
-            var createParameters = new CreateContentItemParameters(
-                ContentAttachment.CONTENT_TYPE_NAME,
-                null,
-                displayName,
-                languageName,
-                workspaceName);
+            { nameof(ContentAttachment.ContentAttachmentAsset), assetMetadata }
+        });
 
-            return await manager.Create(createParameters, itemData, cancellationToken);
-        }, cancellationToken);
+        var attachmentParameters = new CreateContentItemParameters(
+            ContentAttachment.CONTENT_TYPE_NAME,
+            fileName,
+            fileName,
+            languageName,
+            "KenticoDefault")
+        {
+            VersionStatus = VersionStatus.Published
+        };
 
-        await manager.TryPublish(newItemId, languageName, cancellationToken);
+        int createdContentItemId = await manager.Create(attachmentParameters, createItemData, cancellationToken);
 
-        var created = await GetMediaFileByIdAsync(newItemId, cancellationToken);
+        var createdContentItem = await manager.TryPublish(createdContentItemId, languageName, cancellationToken);
+
+        var created = await GetMediaFileByIdAsync(createdContentItemId, cancellationToken);
         return created!;
     }
 
@@ -362,12 +375,26 @@ public class MediaFileCrudService : IMediaFileCrudService
             return null;
         }
 
+        // Sanitize user-supplied filename: take only the base file name to prevent path traversal
+        var fileName = GetSafeFileName(input.File.FileName);
+        var extension = GetSafeExtension(fileName);
+
         var languageName = await GetDefaultLanguageNameAsync(cancellationToken);
         var user = await _userInfoProvider.GetAsync("administrator", cancellationToken);
         var manager = _contentItemManagerFactory.Create(user.UserID);
 
-        var itemData = await WithUploadedAssetMetadataAsync(input.File, assetMetadata =>
-            Task.FromResult(CreateContentItemData(assetMetadata)), cancellationToken);
+        var assetSource = new ContentItemAssetStreamSource(ct => Task.FromResult<Stream>(input.File.OpenReadStream()));
+        var assetMetadata = new ContentItemAssetMetadataWithSource(
+            assetSource,
+            fileName,
+            extension,
+            input.File.Length,
+            DateTime.UtcNow);
+
+        var itemData = new ContentItemData(new Dictionary<string, object>
+        {
+            { nameof(ContentAttachment.ContentAttachmentAsset), assetMetadata }
+        });
 
         await manager.TryCreateDraft(target.ContentItemId, languageName, cancellationToken);
         await manager.TryUpdateDraft(target.ContentItemId, languageName, itemData, cancellationToken);
@@ -453,7 +480,7 @@ public class MediaFileCrudService : IMediaFileCrudService
             var assetSource = new ContentItemAssetFileSource(tempPath, canMove: true);
             var assetMetadata = new ContentItemAssetMetadataWithSource(
                 assetSource,
-                nameWithoutExtension,
+                fileName,
                 extension,
                 file.Length,
                 DateTime.UtcNow);
