@@ -117,6 +117,11 @@ namespace BDO.GWT.GLOBAL.Controllers
         }
 
         private Task<HashSet<string>> GetValidLanguagesAsync(CancellationToken cancellationToken)
+    => GetOrCreateValidLanguagesTask(_languageProvider, cancellationToken);
+
+        private static Task<HashSet<string>> GetOrCreateValidLanguagesTask(
+            IInfoProvider<ContentLanguageInfo> languageProvider,
+            CancellationToken cancellationToken)
         {
             if (_validLanguagesTask is { } existing)
             {
@@ -125,13 +130,15 @@ namespace BDO.GWT.GLOBAL.Controllers
 
             lock (_validLanguagesLock)
             {
-                return _validLanguagesTask ??= LoadValidLanguagesAsync(cancellationToken);
+                return _validLanguagesTask ??= LoadValidLanguagesAsync(languageProvider, cancellationToken);
             }
         }
 
-        private async Task<HashSet<string>> LoadValidLanguagesAsync(CancellationToken cancellationToken)
+        private static async Task<HashSet<string>> LoadValidLanguagesAsync(
+            IInfoProvider<ContentLanguageInfo> languageProvider,
+            CancellationToken cancellationToken)
         {
-            var languages = await _languageProvider.Get()
+            var languages = await languageProvider.Get()
                 .Column(nameof(ContentLanguageInfo.ContentLanguageName))
                 .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
 
