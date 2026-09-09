@@ -128,7 +128,7 @@ namespace BDO.GWT.Core.Helpers
                     Description = HtmlHelper.ExtractTextFromHtml(document.MetadataDescription) ?? string.Empty,
                     ImageURL = GetAbsoluteAssetUrl(document.InsightImage),
                     ImageAltText = document.InsightImageAltText ?? string.Empty,
-                    PublishedFrom = document.PublishFrom.HasValue ? document.PublishFrom.Value.Date
+                    PublishFrom = document.PublishFrom.HasValue ? document.PublishFrom.Value.Date
                     : null,
                     ReadMoreLink = new LinkItemDto
                     {

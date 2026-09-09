@@ -12,7 +12,7 @@ namespace BDO.GWT.Core.DTOs.Cards
 
         public string Description { get; set; } = null!;
 
-        public DateTime? PublishedFrom { get; set; }
+        public DateTime? PublishFrom { get; set; }
 
         public DateTime? UpdatedDate { get; set; }
 

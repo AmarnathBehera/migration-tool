@@ -1,4 +1,6 @@
 ﻿using BDO;
+using BDO.GWT.Core.Constants;
+using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.Entities.Search;
 using BDO.GWT.Core.Helpers;
@@ -410,6 +412,84 @@ namespace BDO.GWT.Core.Tests.Helpers
             var card = (InsightSearchCardDto)result[0].DataObject!;
 
             Assert.That(card.ImageURL, Is.EqualTo("https://www.bdo.com/media/image.png"));
+        }
+
+        #endregion
+
+        #region Publish from date
+
+        [Test]
+        public async Task GetSearchCardDtos_ForInsight_WithPublishFromHavingTimeComponent_StripsTimeAndReturnsDateOnly()
+        {
+            var document = Document(1, INSIGHT_CLASS_NAME);
+            document.PublishFrom = new DateTimeOffset(2025, 6, 15, 14, 30, 45, TimeSpan.Zero);
+
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
+            var card = (InsightSearchCardDto)result[0].DataObject!;
+
+            Assert.That(card.PublishFrom, Is.EqualTo(new DateTime(2025, 6, 15)));
+        }
+
+
+        [Test]
+        public async Task GetSearchCardDtos_ForInsight_WithNullPublishFrom_LeavesPublishedFromNull()
+        {
+            var document = Document(1, INSIGHT_CLASS_NAME);
+            document.PublishFrom = null;
+
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
+            var card = (InsightSearchCardDto)result[0].DataObject!;
+
+            Assert.That(card.PublishFrom, Is.Null);
+        }
+
+
+        [Test]
+        public async Task GetSearchCardDtos_ForInsight_DoesNotPopulateUpdatedDate()
+        {
+            // UpdatedDate currently has no corresponding source field on SearchDocument
+            // and is not mapped in MapInsightCardsAsync, so it should remain null.
+            var document = Document(1, INSIGHT_CLASS_NAME);
+
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
+            var card = (InsightSearchCardDto)result[0].DataObject!;
+
+            Assert.That(card.UpdatedDate, Is.Null);
+        }
+
+        #endregion
+
+        #region Event and Webinar specific mappings
+
+        [Test]
+        public async Task GetSearchCardDtos_ForEventOrWebinar_MapsReadMoreLinkAsLinkItemDto()
+        {
+            var document = Document(1, EVENT_CLASS_NAME);
+
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
+            var card = (EventWebinarSearchCard)result[0].DataObject!;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(card.ReadMoreLink, Is.InstanceOf<LinkItemDto>());
+                Assert.That(card.ReadMoreLink.Title, Is.EqualTo(ResourceStringKey.LiveSite.ReadMore));
+                Assert.That(card.ReadMoreLink.URL, Is.EqualTo("/page-1"));
+            });
+        }
+
+
+        [Test]
+        public async Task GetSearchCardDtos_ForEventOrWebinar_WithMissingUrl_UsesEmptyReadMoreLinkUrl()
+        {
+            _pageUrlServiceMock
+                .Setup(x => x.GetPageRelativeUrlByNodeIdAsync(
+                    It.IsAny<IEnumerable<int>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new Dictionary<int, RelativeLink>());
+
+            var result = await _helper.GetSearchCardDtos([Document(1, WEBINAR_CLASS_NAME)], LANGUAGE_TAG, CancellationToken.None);
+            var card = (EventWebinarSearchCard)result[0].DataObject!;
+
+            Assert.That(card.ReadMoreLink.URL, Is.Empty);
         }
 
         #endregion
