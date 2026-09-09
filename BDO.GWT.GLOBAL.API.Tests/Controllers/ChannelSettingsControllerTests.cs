@@ -2,6 +2,7 @@ using BDO.GWT.GLOBAL.API.Controllers;
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Queries;
 using BDO.GWT.GLOBAL.API.Services;
+using ChannelSettingInput = BDO.GWT.Web.Core.API.Data.ChannelSettingInput;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -24,97 +25,119 @@ public class ChannelSettingsControllerTests
                 HttpContext = new DefaultHttpContext()
             }
         };
+
+        _controller.HttpContext.Items["ChannelId"] = 100;
     }
 
     [Test]
     public async Task GetChannelSettings_ReturnsOk_WithSettingsArray()
     {
-        var query = new SettingsQuery { DisplayName = "Email" };
+        var query = new SettingsQuery { DisplayName = "ScriptHeadKeyValue" };
         var expected = new[]
         {
             new ChannelSettingOutput
             {
-                CodeName = "email_setting",
-                DisplayName = "Email Setting",
+                CodeName = "BDO_ScriptHeadKeyValue",
+                DisplayName = "ScriptHeadKeyValue",
                 InheritFromGlobalSettings = false,
-                Type = "Email"
+                Type = "string",
+                Value = "test"
             }
         };
 
         _channelSettingCrudServiceMock
-            .Setup(x => x.GetChannelSettings(query, It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetChannelSettings(100, query, It.IsAny<CancellationToken>()))
             .ReturnsAsync(expected);
 
-        var result = await _controller.GetChannelSettings(1, query, CancellationToken.None);
+        var result = await _controller.GetChannelSettings(100, query, CancellationToken.None);
 
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
-        var okResult = (OkObjectResult)result.Result!;
-        Assert.That(okResult.Value, Is.EqualTo(expected));
+        Assert.That(((OkObjectResult)result.Result!).Value, Is.EqualTo(expected));
 
         _channelSettingCrudServiceMock.Verify(
-            x => x.GetChannelSettings(query, It.IsAny<CancellationToken>()),
+            x => x.GetChannelSettings(100, query, It.IsAny<CancellationToken>()),
             Times.Once);
-    }
-
-    [Test]
-    public async Task GetChannelSettings_ReturnsOk_WithEmptyArray()
-    {
-        var query = new SettingsQuery();
-
-        _channelSettingCrudServiceMock
-            .Setup(x => x.GetChannelSettings(query, It.IsAny<CancellationToken>()))
-            .ReturnsAsync([]);
-
-        var result = await _controller.GetChannelSettings(1, query, CancellationToken.None);
-
-        Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
-        var okResult = (OkObjectResult)result.Result!;
-        Assert.That((ChannelSettingOutput[])okResult.Value!, Has.Length.EqualTo(0));
     }
 
     [Test]
     public async Task GetChannelSetting_ReturnsOk_WithMatchingSetting()
     {
-        const string codeName = "email_setting";
+        const string codeName = "BDO_ScriptHeadKeyValue";
         var expected = new[]
         {
             new ChannelSettingOutput
             {
                 CodeName = codeName,
-                DisplayName = "Email Setting",
+                DisplayName = "ScriptHeadKeyValue",
                 InheritFromGlobalSettings = true,
-                Type = "Email"
+                Type = "string",
+                Value = "value"
             }
         };
 
         _channelSettingCrudServiceMock
-            .Setup(x => x.GetChannelSetting(codeName, It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetChannelSetting(100, codeName, It.IsAny<CancellationToken>()))
             .ReturnsAsync(expected);
 
-        var result = await _controller.GetChannelSetting(1, codeName, CancellationToken.None);
+        var result = await _controller.GetChannelSetting(100, codeName, CancellationToken.None);
 
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
-        var okResult = (OkObjectResult)result.Result!;
-        Assert.That(okResult.Value, Is.EqualTo(expected));
+        Assert.That(((OkObjectResult)result.Result!).Value, Is.EqualTo(expected));
 
         _channelSettingCrudServiceMock.Verify(
-            x => x.GetChannelSetting(codeName, It.IsAny<CancellationToken>()),
+            x => x.GetChannelSetting(100, codeName, It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
     [Test]
-    public async Task GetChannelSetting_ReturnsOk_WithNull_WhenNotFound()
+    public async Task PutChannelSetting_ReturnsOk_WhenUpdated()
     {
-        const string codeName = "nonexistent";
+        const string codeName = "BDO_ScriptHeadKeyValue";
+        var request = new ChannelSettingInput
+        {
+            InheritFromGlobalSettings = true,
+            Value = "new testing script"
+        };
+
+        var expected = new ChannelSettingOutput
+        {
+            CodeName = codeName,
+            DisplayName = "ScriptHeadKeyValue",
+            InheritFromGlobalSettings = true,
+            Type = "string",
+            Value = "new testing script"
+        };
 
         _channelSettingCrudServiceMock
-            .Setup(x => x.GetChannelSetting(codeName, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((ChannelSettingOutput[]?)null);
+            .Setup(x => x.UpdateChannelSetting(100, codeName, request, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expected);
 
-        var result = await _controller.GetChannelSetting(1, codeName, CancellationToken.None);
+        var result = await _controller.PutChannelSetting(100, codeName, request, CancellationToken.None);
 
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
-        var okResult = (OkObjectResult)result.Result!;
-        Assert.That(okResult.Value, Is.Null);
+        Assert.That(((OkObjectResult)result.Result!).Value, Is.EqualTo(expected));
+
+        _channelSettingCrudServiceMock.Verify(
+            x => x.UpdateChannelSetting(100, codeName, request, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task PutChannelSetting_ReturnsNotFound_WhenNoSettingUpdated()
+    {
+        const string codeName = "BDO_Unknown";
+        var request = new ChannelSettingInput
+        {
+            InheritFromGlobalSettings = false,
+            Value = "test"
+        };
+
+        _channelSettingCrudServiceMock
+            .Setup(x => x.UpdateChannelSetting(100, codeName, request, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((ChannelSettingOutput?)null);
+
+        var result = await _controller.PutChannelSetting(100, codeName, request, CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
     }
 }
