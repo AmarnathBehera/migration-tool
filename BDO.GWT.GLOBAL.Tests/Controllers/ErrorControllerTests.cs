@@ -241,9 +241,12 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
 
             await _controller.Index(500, CancellationToken.None);
 
-            Assert.That(captured, Is.Not.Null);
-            Assert.That(captured!.LanguageName, Is.EqualTo("fr-fr"));
-            Assert.That(captured.WebsiteChannelName, Is.EqualTo("TestChannel"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(captured, Is.Not.Null);
+                Assert.That(captured!.LanguageName, Is.EqualTo("fr-fr"));
+                Assert.That(captured.WebsiteChannelName, Is.EqualTo("TestChannel"));
+            });
         }
 
         private async Task<string?> CaptureLanguageAsync(int code)

@@ -29,7 +29,7 @@ namespace BDO.GWT.GLOBAL.Controllers
         private readonly IInfoProvider<ContentLanguageInfo> _languageProvider;
 
         // Cache of valid Kentico language names (case-insensitive). Populated lazily, once per app lifetime.
-        private static Task<HashSet<string>>? _validLanguagesTask;
+        private static Task<HashSet<string>> _validLanguagesTask;
         private static readonly object _validLanguagesLock = new();
 
         public ErrorController(
@@ -97,8 +97,8 @@ namespace BDO.GWT.GLOBAL.Controllers
             }
         }
 
-        private async Task<string?> TryExtractLanguageFromUrlAsync(
-            IStatusCodeReExecuteFeature? feature,
+        private async Task<string> TryExtractLanguageFromUrlAsync(
+            IStatusCodeReExecuteFeature feature,
             CancellationToken cancellationToken)
         {
             if (feature?.OriginalPath is not { Length: > 0 } path) return null;
