@@ -5,42 +5,38 @@
 
 @model BDO.GWT.Core.DTOs.Pages.CareerPageDto
 
-
-
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
 @inject IFormBuilderService FormBuilder
+@inject IPageBuilderService PageBuilderService
 
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
     var pageId = pageContext.WebPage.WebPageItemID;
 }
-
-
 @{
     var widgetsList = new[]
-    {
-        ComponentIdentifiers.Widgets.AccordionWidget,
-        //ComponentIdentifiers.Widgets.BannerWithIcons,
-        //ComponentIdentifiers.Widgets.CommunityInvolvement,
-        //ComponentIdentifiers.Widgets.DescriptionText,
-
-        // widgets_not_there_yet:
-
-        // ComponentIdentifiers.Widgets.EditorsPick,
-        ComponentIdentifiers.Widgets.FaqWidget,
-        ComponentIdentifiers.Widgets.Imagewithtext,
+        {
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.Faq,
+        ComponentIdentifiers.Widgets.Form,
+        ComponentIdentifiers.Widgets.EventsWebinarsSlider,
         ComponentIdentifiers.Widgets.FlexibleBanner,
-        ComponentIdentifiers.Widgets.QuoteCard,
-        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.ImageWithText,
         ComponentIdentifiers.Widgets.InFocus,
-        // ---------
-
-
-        //ComponentIdentifiers.Widgets.PurposeIcon,
-        //ComponentIdentifiers.Widgets.TwitterCarousel,
+        ComponentIdentifiers.Widgets.InsightCarousel,
+        ComponentIdentifiers.Widgets.InsightAnimationCard,
         ComponentIdentifiers.Widgets.NewsCarousel,
-        ComponentIdentifiers.Widgets.Globallocation,
+        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.QuoteCard,
+        ComponentIdentifiers.Widgets.RelatedContacts,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+    };
+
+    var advancedWidgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.TabAccordion,
     };
 }
 
@@ -59,10 +55,7 @@
         },
         Context.RequestAborted))
 </div>
-
-
-@* 
-@await Html.PartialAsync("_LocalNavigation") *@
+@await Html.PartialAsync("_LocalNavigation") 
 <section class="career-details-section">
     <article class="career-details-wrapper">
         <div class="@($"career-details-container{(Model.Sidebar != null ? "" : "--no-sidebar")}")">
@@ -99,15 +92,6 @@
     </article>
 </section>
 
+@await PageBuilderService.AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
 
-
-
-@await Html.Kentico().EditableAreaAsync(
-"mainContent", // Unique identifier
-                        new EditableAreaOptions
-                        {
-
-                            AllowedWidgets = widgetsList
-                        })
-
-
+@PageBuilderService.GetPageBuilderScripts(Html)

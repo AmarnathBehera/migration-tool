@@ -1480,24 +1480,42 @@ after;After
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Longitude</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
           <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>8412bdf1-4ba5-4fc9-8d9b-7cf930b5c243</kxp_schema_identifier>
         </properties>
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowEventLocation</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <field allowempty="true" column="EventLocationLatitude" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="9db3e1aa-e029-435d-8a8c-59fc38bd0380" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Latitude</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
           <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>8412bdf1-4ba5-4fc9-8d9b-7cf930b5c243</kxp_schema_identifier>
         </properties>
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ShowEventLocation</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <field allowempty="true" column="EventContactName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="9aeb89e9-a543-478d-b96f-4744bb998f0a" visible="true">
         <properties>

@@ -129,6 +129,6 @@
             where T : class, IWebPageFieldsSource;
 
        public string? EnsureAbsoluteUrl(string? url);
-        
+        Task<IWebPageFieldsSource?> GetCurrentPageAsync(Guid webPageItemGuid, CancellationToken cancellationToken = default);
     }
 }

@@ -12,23 +12,23 @@
 
             public const string ExternalNavigation = WidgetPrefix + "ExternalNavigation";
 
-            public const string Imagewithtext = WidgetPrefix + "ImageWithText";
+            public const string ImageWithText = WidgetPrefix + "ImageWithText";
 
             public const string InsightCarousel = WidgetPrefix + "InsightCarousel";
 
             public const string QuoteCard = WidgetPrefix + "QuoteCard";
 
-            public const string TiledLink = WidgetPrefix + "TiledLinkSection";
+            public const string TiledLinkSection = WidgetPrefix + "TiledLinkSection";
 
-            public const string Globallocation = WidgetPrefix + "ViewGlobalLocations";
+            public const string ViewGlobalLocations = WidgetPrefix + "ViewGlobalLocations";
 
             public const string SocialMediaButtons = WidgetPrefix + "SocialMediaButtons";
 
             public const string RichText = WidgetPrefix + "RichText";
 
-            public const string AccordionWidget = WidgetPrefix + "AccordionWidget";
+            public const string Accordion = WidgetPrefix + "AccordionWidget";
 
-            public const string FaqWidget = WidgetPrefix + "FaqWidget";
+            public const string Faq = WidgetPrefix + "FaqWidget";
 
             public const string EventsWebinarsSlider = WidgetPrefix + "EventWebinarSliderWidget";
 

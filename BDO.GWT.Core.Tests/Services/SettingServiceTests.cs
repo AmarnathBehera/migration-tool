@@ -197,6 +197,34 @@ public class SettingServiceTests
         Assert.That(result, Is.SameAs(snippet));
     }
 
+    // --- GetMergedSnippetAsync result wrapping -----------------------------------
+    //
+    // The snippet-found path inside GetMergedSnippetAsync cannot be reached through the public
+    // API: results are resolved via Kentico's GetEnumerableTypedResultAsync, an EXTENSION method
+    // (not virtual) on ObjectQuery<T> that Moq cannot intercept, so a mocked query always yields
+    // an empty sequence. The final `return new[] { Merge(snippet, global) };` line was therefore
+    // extracted into the internal BuildMergedResult helper (mirroring the ApplyMerge extraction)
+    // so the array-wrapping is exercised directly. A null global keeps Merge on its
+    // `global == null` branch, avoiding the CMS IoC container.
+
+    [Test]
+    public void BuildMergedResult_ReturnsSingleSnippet_WhenGlobalIsNull()
+    {
+        var snippet = new TestWebChannelSnippetInfo
+        {
+            WebChannelSnippetID = 42,
+            WebChannelSnippetWebChannelSettingsID = 7,
+            FromEmail = "channel@example.com",
+        };
+
+        var result = SettingService.BuildMergedResult(snippet, null);
+
+        Assert.That(result, Is.Not.Null);
+        var list = result.ToList();
+        Assert.That(list, Has.Count.EqualTo(1));
+        Assert.That(list[0], Is.SameAs(snippet));
+    }
+
     // --- Pick<T> (pure helper, no CMS infrastructure) ----------------------------
 
     private static object? InvokePick<T>(bool inheritFromGlobal, T globalValue, T snippetValue)
@@ -369,6 +397,7 @@ public class SettingServiceTests
         WebChannelSnippetWebChannelSettingsID = 5,
         WebSettingsGUID = Guid.NewGuid(),
         DisplayName = "Snippet display",
+        ShowAdvancedWidgets = false,
 
         ScriptHeadKeyValue = "s-head",
         ScriptsTopofPageHeadKeyValue = "s-toppage",
@@ -398,6 +427,7 @@ public class SettingServiceTests
         CustomCookiebotScript = "s-script",
 
         ScriptHeadInheritfromglobalsettings = inheritAll,
+        ShowAdvancedWidgetsInheritfromglobalsettings = inheritAll,
         ScriptsTopofPageInheritfromglobalsetting = inheritAll,
         ScriptinbottomofBodyInheritFromGlobal = inheritAll,
         ScriptinTopofBodyInheritfromglobal = inheritAll,
@@ -427,6 +457,7 @@ public class SettingServiceTests
 
     private static FullTestGlobalInfo BuildGlobal() => new()
     {
+        ShowAdvancedWidgets = true,
         ScriptHeadKeyValue = "g-head",
         ScriptsTopofPageHeadKeyValue = "g-toppage",
         ScriptinbottomofBodyKeyValue = "g-bottom",
@@ -465,6 +496,7 @@ public class SettingServiceTests
         public override int WebChannelSnippetWebChannelSettingsID { get; set; }
         public override Guid WebSettingsGUID { get; set; }
         public override string DisplayName { get; set; } = string.Empty;
+        public override bool ShowAdvancedWidgets { get; set; }
 
         public override string ScriptHeadKeyValue { get; set; } = string.Empty;
         public override string ScriptsTopofPageHeadKeyValue { get; set; } = string.Empty;
@@ -494,6 +526,7 @@ public class SettingServiceTests
         public override string CustomCookiebotScript { get; set; } = string.Empty;
 
         public override bool ScriptHeadInheritfromglobalsettings { get; set; }
+        public override bool ShowAdvancedWidgetsInheritfromglobalsettings { get; set; }
         public override bool ScriptsTopofPageInheritfromglobalsetting { get; set; }
         public override bool ScriptinbottomofBodyInheritFromGlobal { get; set; }
         public override bool ScriptinTopofBodyInheritfromglobal { get; set; }
@@ -527,6 +560,7 @@ public class SettingServiceTests
     /// </summary>
     private sealed class FullTestGlobalInfo : GlobalsettingskeyInfo
     {
+        public override bool ShowAdvancedWidgets { get; set; }
         public override string ScriptHeadKeyValue { get; set; } = string.Empty;
         public override string ScriptsTopofPageHeadKeyValue { get; set; } = string.Empty;
         public override string ScriptinbottomofBodyKeyValue { get; set; } = string.Empty;

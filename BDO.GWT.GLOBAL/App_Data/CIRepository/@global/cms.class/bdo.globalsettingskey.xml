@@ -55,6 +55,7 @@
       <field allowempty="true" column="GlobalLocationsTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="a3f22c22-84fb-4e23-b130-06e3bec628eb" />
       <field allowempty="true" column="GlobalLocationsDescription" columnprecision="0" columntype="longtext" enabled="true" guid="78e3a79f-7c7c-496f-8cb0-c44f3550cd47" />
       <field allowempty="true" column="GlobalLocationsBackgroundImage" columnprecision="0" columntype="contentitemreference" enabled="true" guid="0dbd9ed7-aa5b-40ae-9b1c-55ef1cafcc56" />
+      <field allowempty="true" column="ShowAdvancedWidgets" columnprecision="0" columntype="boolean" enabled="true" guid="edf408b5-f3a0-4019-b6b5-7c314268850b" />
     </form>
   </ClassFormDefinition>
   <ClassGUID>f393a535-3751-4fe5-bd51-90482f775b9a</ClassGUID>

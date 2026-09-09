@@ -17,26 +17,20 @@
 @{
     Layout = "_Layout";
 
-
     var widgetsList = new[]
+        {
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.ImageWithText,
+        ComponentIdentifiers.Widgets.TiledLinkSection,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+    };
+
+    var sectionsList = new[]
     {
-        
-        ComponentIdentifiers.Widgets.Imagewithtext,
-        ComponentIdentifiers.Widgets.QuoteCard,
-        ComponentIdentifiers.Widgets.TiledLink,
-        ComponentIdentifiers.Widgets.Globallocation,
-        ComponentIdentifiers.Widgets.LocalNavigation,
-        ComponentIdentifiers.Widgets.KeyTakeaways,
-        ComponentIdentifiers.Widgets.TabAccordion,
-        ComponentIdentifiers.Widgets.SocialMediaButtons,
-        ComponentIdentifiers.Widgets.EditorsPick,
-        ComponentIdentifiers.Widgets.InsightCarousel,
-        ComponentIdentifiers.Widgets.InsightAnimationCard,
+        ComponentIdentifiers.Sections.DefaultSection,
+        ComponentIdentifiers.Sections.Container
     };
 }
-
-
-
 
     @if (Model != null && pageId != 0)
     {
@@ -63,13 +57,7 @@
         },
         Context.RequestAborted))
     }
-
-    @PageBuilderService.GetPageBuilderStyles(Html)
-
-    @await Html.Kentico().EditableAreaAsync(
-        "mainContent",
-        new EditableAreaOptions
-        {
-            AllowedWidgets = widgetsList
-        })
+    @await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddSections(sectionsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
 </div>
+
+@PageBuilderService.GetPageBuilderScripts(Html)

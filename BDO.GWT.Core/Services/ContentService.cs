@@ -313,6 +313,22 @@ where T : class
                 CancellationToken.None);
         }
 
+        /// <summary>
+        /// Resolves the single current/context page by its WebPageItemGUID. Used by
+        /// widgets rendered on a page whose exact content type isn't known at compile
+        /// time. Still an untyped IWebPageFieldsSource lookup under the hood (single-GUID
+        /// UNION ALL across content types), so prefer a typed retrieval wherever the
+        /// calling widget/service already knows the concrete content type.
+        /// </summary>
+        public async Task<IWebPageFieldsSource?> GetCurrentPageAsync(Guid webPageItemGuid, CancellationToken cancellationToken = default)
+        {
+            var results = await _contentRetriever.RetrieveAllPagesByGuids<IWebPageFieldsSource>(
+                new List<Guid> { webPageItemGuid },
+                cancellationToken: cancellationToken);
+
+            return results.FirstOrDefault();
+        }
+
         public async Task<IEnumerable<T>> GetContentType<T>(CancellationToken cancellationToken = default) where T : class, IWebPageFieldsSource
         {
             return await _contentRetriever.RetrievePages<T>(cancellationToken);
@@ -574,5 +590,3 @@ where T : class
 
     }
 }
-
-

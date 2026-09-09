@@ -116,6 +116,14 @@ center;Center
           <controlname>Kentico.Administration.ContentItemAssetUploader</controlname>
           <IsFormatConversionEnabled>False</IsFormatConversionEnabled>
         </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This input field is required.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
       </field>
       <field column="DownloadButtonTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="91a75beb-be99-48d0-b5e8-ec9c82de4620" visible="true">
         <properties>
