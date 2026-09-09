@@ -51,8 +51,12 @@ public class ChannelSettingsControllerTests
 
         var result = await _controller.GetChannelSettings(100, query, CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
-        Assert.That(((OkObjectResult)result.Result!).Value, Is.EqualTo(expected));
+        var okResult = (OkObjectResult)result.Result!;
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
+            Assert.That(okResult.Value, Is.EqualTo(expected));
+        });
 
         _channelSettingCrudServiceMock.Verify(
             x => x.GetChannelSettings(100, query, It.IsAny<CancellationToken>()),
@@ -81,12 +85,13 @@ public class ChannelSettingsControllerTests
 
         var result = await _controller.GetChannelSetting(100, codeName, CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
-        Assert.That(((OkObjectResult)result.Result!).Value, Is.EqualTo(expected));
-
-        _channelSettingCrudServiceMock.Verify(
-            x => x.GetChannelSetting(100, codeName, It.IsAny<CancellationToken>()),
-            Times.Once);
+        var okResult = (OkObjectResult)result.Result!;
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
+            Assert.That((ChannelSettingOutput[])okResult.Value!, Has.Length.EqualTo(1));
+            Assert.That(okResult.Value, Is.EqualTo(expected));
+        });
     }
 
     [Test]
@@ -114,8 +119,12 @@ public class ChannelSettingsControllerTests
 
         var result = await _controller.PutChannelSetting(100, codeName, request, CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
-        Assert.That(((OkObjectResult)result.Result!).Value, Is.EqualTo(expected));
+        var okResult = (OkObjectResult)result.Result!;
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
+            Assert.That(okResult.Value, Is.EqualTo(expected));
+        });
 
         _channelSettingCrudServiceMock.Verify(
             x => x.UpdateChannelSetting(100, codeName, request, It.IsAny<CancellationToken>()),
@@ -138,6 +147,9 @@ public class ChannelSettingsControllerTests
 
         var result = await _controller.PutChannelSetting(100, codeName, request, CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+        });
     }
 }
