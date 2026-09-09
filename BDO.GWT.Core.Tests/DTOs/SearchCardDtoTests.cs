@@ -93,7 +93,7 @@ public class SearchCardDtoTests
                 Data = new EventWebinarSearchCard
                 {
                     Title = "E",
-                    ReadMoreLink = new LinkItemDto { Title = "Read more", URL = "/event-1" }
+                    Link = new LinkItemDto { Title = "Read more", URL = "/event-1" }
                 }
             },
             new SearchCardDto<GenericSearchCardDto> { CardType = "Generic", Data = new GenericSearchCardDto { Title = "G" } }
@@ -105,8 +105,8 @@ public class SearchCardDtoTests
                 Is.EqualTo(new[] { INSIGHT_CARD_TYPE, "EventsAndWebinars", "Generic" }));
 
             var eventCard = (EventWebinarSearchCard)cards[1].DataObject!;
-            Assert.That(eventCard.ReadMoreLink, Is.InstanceOf<LinkItemDto>());
-            Assert.That(eventCard.ReadMoreLink.URL, Is.EqualTo("/event-1"));
+            Assert.That(eventCard.Link, Is.InstanceOf<LinkItemDto>());
+            Assert.That(eventCard.Link.URL, Is.EqualTo("/event-1"));
         });
     }
 
