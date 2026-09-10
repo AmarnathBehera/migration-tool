@@ -519,7 +519,7 @@ public class EventWebinarCardsServiceTests
 
     #region Helpers
 
-    private Mock<IEventOrWebinar> CreateEventOrWebinarMock(
+    private static Mock<IEventOrWebinar> CreateEventOrWebinarMock(
         Guid guid,
         string title = "Event title",
         string description = "",

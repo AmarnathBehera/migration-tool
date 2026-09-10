@@ -39,7 +39,7 @@ namespace GWTXbyKWeb.Pages.BDOIntegrations
             if (savedInfoObject.ChannelSnippetWebChannelSettingsID != WebChannelSettingsId)
             {
                 savedInfoObject.ChannelSnippetWebChannelSettingsID = WebChannelSettingsId;
-                formSubmissionSubscriptionsInfoProvider.Set(savedInfoObject);
+                await formSubmissionSubscriptionsInfoProvider.SetAsync(savedInfoObject);
             }
 
             var result = new EditPageSuccessFormSubmissionResult()

@@ -73,7 +73,7 @@ namespace GWTXbyKWeb.Tests.Pages.BDOIntegrations
             Assert.Multiple(() =>
             {
                 Assert.That(savedInfo.ChannelSnippetWebChannelSettingsID, Is.EqualTo(15));
-                infoProviderMock.Verify(p => p.Set(savedInfo), Times.Once);
+                infoProviderMock.Verify(p => p.SetAsync(savedInfo, It.IsAny<CancellationToken>()), Times.Once);
             });
         }
 
@@ -84,10 +84,10 @@ namespace GWTXbyKWeb.Tests.Pages.BDOIntegrations
 
             await SubmitIgnoringAdminRuntimeAsync(savedInfo);
 
-            infoProviderMock.Verify(p => p.Set(It.IsAny<FormSubmissionSubscriptionsInfo>()), Times.Never);
+            infoProviderMock.Verify(p => p.SetAsync(It.IsAny<FormSubmissionSubscriptionsInfo>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
-        private static FormSubmissionSubscriptionsInfo CreateSavedInfo(int channelSettingsId) =>
+        private static StubFormSubmissionSubscriptionsInfo CreateSavedInfo(int channelSettingsId) =>
             new StubFormSubmissionSubscriptionsInfo
             {
                 ChannelSnippetWebChannelSettingsID = channelSettingsId,

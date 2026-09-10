@@ -100,10 +100,13 @@ namespace GWTXbyKWeb.Tests.Pages.BDOIntegrations
             // attribute is present, mirroring the pattern from
             // WebChannelSettingsListingPage / ChannelSettingsListingPage's Delete override.
             var method = typeof(BdoIntegrationListingPage).GetMethod(nameof(BdoIntegrationListingPage.Delete));
-            var attr = (PageCommandAttribute)Attribute.GetCustomAttribute(method, typeof(PageCommandAttribute));
+
+            Assert.That(method, Is.Not.Null);
+
+            var attr = (PageCommandAttribute?)Attribute.GetCustomAttribute(method!, typeof(PageCommandAttribute));
 
             Assert.That(attr, Is.Not.Null);
-            Assert.That(attr.Permission, Is.EqualTo(SystemPermissions.DELETE));
+            Assert.That(attr!.Permission, Is.EqualTo(SystemPermissions.DELETE));
         }
 
         private async Task ConfigurePageIgnoringAdminRuntimeAsync()

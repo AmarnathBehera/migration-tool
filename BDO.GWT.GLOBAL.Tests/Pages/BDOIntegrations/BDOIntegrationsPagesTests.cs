@@ -469,7 +469,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
             var mock = new Mock<IChannelAccessService>();
             mock.Setup(s => s.CanAccessAsync(It.IsAny<int>())).ReturnsAsync(canAccess);
             mock.Setup(s => s.GetAccessibleWebChannelSettingsIdsAsync())
-                .ReturnsAsync((ICollection<int>)null);
+                .ReturnsAsync(Array.Empty<int>());
             return mock.Object;
         }
 
