@@ -189,6 +189,11 @@ step "deploy-mvc-app-service" {
                     "slotSetting": false
                   },
                   {
+                    "name": "BDOAdminSiteUrl",
+                    "value": "#{appsettings.BDOAdminSiteUrl}",
+                    "slotSetting": false
+                  },
+                  {
                     "name": "BDOSyncApiKey",
                     "value": "#{appsettings.syncApiKey}",
                     "slotSetting": false
