@@ -1,106 +1,128 @@
-﻿using BDO;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 using GWTXbyKWeb.Pages.BDOIntegrations;
 using Kentico.Xperience.Admin.Base;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Reflection;
 
-namespace GWTXbyKWeb.Pages.BDOIntegrations
+namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
 {
-    public class BdoIntegrationsChannelListingPage : ListingPage
+    [TestFixture]
+    public class BdoIntegrationsChannelListingPageTests
     {
-        private readonly IInfoProvider<ChannelInfo> channelInfoProvider;
-        private readonly IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider;
-        private readonly IChannelAccessService channelAccessService;
+        private const BindingFlags InstanceNonPublic = BindingFlags.Instance | BindingFlags.NonPublic;
 
-        protected override string ObjectType => WebChannelSettingsInfo.OBJECT_TYPE;
-
-        public BdoIntegrationsChannelListingPage(
-            IInfoProvider<ChannelInfo> channelInfoProvider,
-            IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider,
-            IChannelAccessService channelAccessService)
+        [Test]
+        public void InheritsFromListingPage()
         {
-            this.channelInfoProvider = channelInfoProvider;
-            this.webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
-            this.channelAccessService = channelAccessService;
-            EnsureSettingsListData();
+            Assert.That(typeof(BdoIntegrationsChannelListingPage).BaseType, Is.EqualTo(typeof(ListingPage)));
         }
 
-        public override async Task ConfigurePage()
+        [Test]
+        public void ExposesExpectedConstructor()
         {
-            PageConfiguration.ColumnConfigurations
-                .AddColumn(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelDisplayName), "Channel");
-            PageConfiguration.AddEditRowAction<BdoIntegrationsChannelEditSection>();
-
-            var accessibleIds = await channelAccessService.GetAccessibleWebChannelSettingsIdsAsync();
-            if (accessibleIds != null)
+            var constructor = typeof(BdoIntegrationsChannelListingPage).GetConstructor(new[]
             {
-                var idList = accessibleIds.ToList();
-                PageConfiguration.QueryModifiers.Add(new QueryModifier((query, _) =>
-                {
-                    if (idList.Count != 0)
-                    {
-                        return query.WhereIn(
-                            nameof(WebChannelSettingsInfo.WebChannelSettingsID),
-                            idList);
-                    }
-                    else
-                    {
-                        return query.WhereEquals(
-                            nameof(WebChannelSettingsInfo.WebChannelSettingsID), 0);
-                    }
-                }));
-            }
+                typeof(IInfoProvider<ChannelInfo>),
+                typeof(IInfoProvider<WebChannelSettingsInfo>),
+                typeof(IChannelAccessService),
+            });
 
-            await base.ConfigurePage();
+            Assert.That(constructor, Is.Not.Null);
         }
 
-        // Same self-healing sync as WebChannelSettingsListingPage — kept here too so this
-        // module works even if a user hasn't visited Project Settings > Channel settings first.
-        private void EnsureSettingsListData()
+        [Test]
+        public void DeclaresExpectedInjectedDependencies()
         {
-            var channels = channelInfoProvider.Get();
-            var webChannelSettings = webChannelSettingsInfoProvider.Get().ToList();
+            var type = typeof(BdoIntegrationsChannelListingPage);
 
-            foreach (var channel in channels)
+            Assert.Multiple(() =>
             {
-                var currentChannelSettings = webChannelSettings
-                    .Where(s => s.WebChannelSettingsChannelID.Equals(channel.ChannelID))
-                    .ToList();
-
-                EnsureChannelSetting(currentChannelSettings, channel);
-                var currentChannelSetting = currentChannelSettings.FirstOrDefault();
-                EnsureChannelSettingDisplayName(channel, currentChannelSetting);
-            }
+                Assert.That(type.GetField("channelInfoProvider", InstanceNonPublic)?.FieldType, Is.EqualTo(typeof(IInfoProvider<ChannelInfo>)));
+                Assert.That(type.GetField("webChannelSettingsInfoProvider", InstanceNonPublic)?.FieldType, Is.EqualTo(typeof(IInfoProvider<WebChannelSettingsInfo>)));
+                Assert.That(type.GetField("channelAccessService", InstanceNonPublic)?.FieldType, Is.EqualTo(typeof(IChannelAccessService)));
+            });
         }
 
-        // Changed from private to protected so TestableBdoIntegrationsChannelListingPage
-        // can expose these for direct unit testing.
-        protected void EnsureChannelSetting(List<WebChannelSettingsInfo> currentChannelSettings, ChannelInfo channel)
+        [Test]
+        public void ObjectType_ReturnsWebChannelSettingsObjectType()
         {
-            if (currentChannelSettings.Count == 0)
-            {
-                var newSetting = new WebChannelSettingsInfo
-                {
-                    WebChannelSettingsChannelID = channel.ChannelID,
-                    WebChannelSettingsChannelDisplayName = channel.ChannelDisplayName,
-                };
-                webChannelSettingsInfoProvider.Set(newSetting);
-                currentChannelSettings.Add(newSetting);
-            }
+            // The constructor performs a database sync, so the instance is created without running it.
+            var page = BdoIntegrationsPageTestHelper.CreateUninitialized<BdoIntegrationsChannelListingPage>();
+
+            var objectType = typeof(BdoIntegrationsChannelListingPage)
+                .GetProperty("ObjectType", InstanceNonPublic)
+                ?.GetValue(page) as string;
+
+            Assert.That(objectType, Is.EqualTo(WebChannelSettingsInfo.OBJECT_TYPE));
         }
 
-        protected void EnsureChannelSettingDisplayName(ChannelInfo channel, WebChannelSettingsInfo currentChannelSetting)
+        [Test]
+        public void ConfigurePage_IsOverridden()
         {
-            if (currentChannelSetting != null &&
-                !channel.ChannelDisplayName.Equals(currentChannelSetting.WebChannelSettingsChannelDisplayName))
+            var method = typeof(BdoIntegrationsChannelListingPage).GetMethod(
+                nameof(BdoIntegrationsChannelListingPage.ConfigurePage),
+                BindingFlags.Instance | BindingFlags.Public);
+
+            Assert.That(method, Is.Not.Null);
+            Assert.That(method!.DeclaringType, Is.EqualTo(typeof(BdoIntegrationsChannelListingPage)));
+        }
+
+        [Test]
+        public void DeclaresSelfHealingHelperMethods()
+        {
+            var type = typeof(BdoIntegrationsChannelListingPage);
+
+            Assert.Multiple(() =>
             {
-                currentChannelSetting.WebChannelSettingsChannelDisplayName = channel.ChannelDisplayName;
-                webChannelSettingsInfoProvider.Set(currentChannelSetting);
-            }
+                Assert.That(type.GetMethod("EnsureSettingsListData", InstanceNonPublic), Is.Not.Null);
+                Assert.That(type.GetMethod("EnsureChannelSetting", InstanceNonPublic), Is.Not.Null);
+                Assert.That(type.GetMethod("EnsureChannelSettingDisplayName", InstanceNonPublic), Is.Not.Null);
+            });
+        }
+
+        [Test]
+        public void EnsureChannelSetting_HasExpectedSignature()
+        {
+            var method = typeof(BdoIntegrationsChannelListingPage).GetMethod("EnsureChannelSetting", InstanceNonPublic);
+
+            Assert.That(method, Is.Not.Null);
+
+            var parameters = method!.GetParameters();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(parameters, Has.Length.EqualTo(2));
+                Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(List<WebChannelSettingsInfo>)));
+                Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(ChannelInfo)));
+            });
+        }
+
+        [Test]
+        public void EnsureChannelSettingDisplayName_HasExpectedSignature()
+        {
+            var method = typeof(BdoIntegrationsChannelListingPage).GetMethod("EnsureChannelSettingDisplayName", InstanceNonPublic);
+
+            Assert.That(method, Is.Not.Null);
+
+            var parameters = method!.GetParameters();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(parameters, Has.Length.EqualTo(2));
+                Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(ChannelInfo)));
+                Assert.That(parameters[1].ParameterType, Is.EqualTo(typeof(WebChannelSettingsInfo)));
+            });
+        }
+
+        [Test]
+        public void ConfigurePage_ReturnsTask()
+        {
+            var method = typeof(BdoIntegrationsChannelListingPage).GetMethod(
+                nameof(BdoIntegrationsChannelListingPage.ConfigurePage),
+                BindingFlags.Instance | BindingFlags.Public);
+
+            Assert.That(method!.ReturnType, Is.EqualTo(typeof(Task)));
         }
     }
 }

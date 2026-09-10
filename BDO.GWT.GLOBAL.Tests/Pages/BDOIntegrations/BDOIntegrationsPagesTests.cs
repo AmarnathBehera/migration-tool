@@ -56,10 +56,9 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         [Test]
         public void BDOIntegrationsChannelListingPage_ObjectType_ReturnsWebChannelSettingsObjectType()
         {
-            var page = new TestableBdoIntegrationsChannelListingPage(
-                new Mock<IInfoProvider<CMS.ContentEngine.ChannelInfo>>().Object,
-                new Mock<IInfoProvider<WebChannelSettingsInfo>>().Object,
-                new Mock<IChannelAccessService>().Object);
+            // The constructor performs a self-healing data sync against the database, so the
+            // instance is created without running it. ObjectType does not depend on that state.
+            var page = BdoIntegrationsPageTestHelper.CreateUninitialized<TestableBdoIntegrationsChannelListingPage>();
 
             Assert.That(page.ExposedObjectType, Is.EqualTo(WebChannelSettingsInfo.OBJECT_TYPE));
         }
