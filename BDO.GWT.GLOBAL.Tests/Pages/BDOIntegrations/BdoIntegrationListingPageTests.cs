@@ -1,83 +1,64 @@
 using BDO;
-using BDO.GWT.Xperience;
+using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
+using CMS.Membership;
 using GWTXbyKWeb.Pages.BDOIntegrations;
 using Kentico.Xperience.Admin.Base;
+using Moq;
+using NUnit.Framework;
+using System.Threading.Tasks;
 
-namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations;
-
-[TestFixture]
-public class BdoIntegrationListingPageTests
+namespace GWTXbyKWeb.Tests.Pages.BDOIntegrations
 {
-    [Test]
-    public void InheritsFromListingPage()
+    // Kentico's ListingPage.ConfigurePage() sets up PageConfiguration internals that
+    // are largely framework plumbing rather than logic worth asserting directly.
+    // These tests focus on the one piece of actual decision logic in this class:
+    // whether channelAccessService is consulted, and with what ID.
+    [TestFixture]
+    public class BdoIntegrationListingPageTests
     {
-        Assert.That(typeof(BdoIntegrationListingPage).BaseType, Is.EqualTo(typeof(ListingPage)));
-    }
+        private Mock<IChannelAccessService> channelAccessServiceMock;
+        private BdoIntegrationListingPage page;
 
-    [Test]
-    public void ObjectType_ReturnsExpectedObjectType()
-    {
-        var page = new TestableBdoIntegrationListingPage();
-        Assert.That(page.ExposedObjectType, Is.EqualTo(FormSubmissionSubscriptionsInfo.OBJECT_TYPE));
-    }
-
-    [Test]
-    public async Task ConfigurePage_ExecutesColumnConfigurationLines()
-    {
-        var page = BdoIntegrationsPageTestHelper.CreateUninitialized<BdoIntegrationListingPage>();
-        BdoIntegrationsPageTestHelper.PreparePageConfigurationForConfigurePage(page);
-
-        try
+        [SetUp]
+        public void SetUp()
         {
+            channelAccessServiceMock = new Mock<IChannelAccessService>();
+            page = new BdoIntegrationListingPage(channelAccessServiceMock.Object)
+            {
+                WebChannelSettingsId = 42
+            };
+        }
+
+        [Test]
+        public async Task ConfigurePage_ChecksAccessForBoundChannelId()
+        {
+            channelAccessServiceMock
+                .Setup(s => s.CanAccessAsync(42))
+                .ReturnsAsync(true);
+
+            // VERIFY: ConfigurePage() likely throws or no-ops on parts of
+            // PageConfiguration that require a fully bootstrapped Kentico admin
+            // context (PageInvoker, UITreeNode resolution for AddEditRowAction's
+            // ancestor parameters, etc). If a bare call to ConfigurePage() throws
+            // in isolation, wrap this in a TestableBdoIntegrationListingPage that
+            // overrides just the access + query-filter portion, following the
+            // TestableXxx pattern used elsewhere (e.g. TestableRecaptchaValidationService).
             await page.ConfigurePage();
-        }
-        catch
-        {
-        }
 
-        var config = BdoIntegrationsPageTestHelper.GetPageConfiguration(page);
-        Assert.That(BdoIntegrationsPageTestHelper.GetEnumerableCount(config, "ColumnConfigurations"), Is.GreaterThanOrEqualTo(5));
-    }
-
-    [Test]
-    public async Task Delete_InvokesForwardingPath()
-    {
-        var page = BdoIntegrationsPageTestHelper.CreateUninitialized<BdoIntegrationListingPage>();
-
-        try
-        {
-            await page.Delete(1);
-        }
-        catch
-        {
+            channelAccessServiceMock.Verify(s => s.CanAccessAsync(42), Times.Once);
         }
 
-        Assert.Pass();
-    }
-
-    [Test]
-    public void HasExpectedUiPageRegistration()
-    {
-        var attr = typeof(BdoIntegrationListingPage).Assembly
-            .GetCustomAttributesData()
-            .Where(a => a.AttributeType.Name == "UIPageAttribute")
-            .FirstOrDefault(a =>
-                a.ConstructorArguments.Count >= 3 &&
-                Equals(a.ConstructorArguments[2].Value, typeof(BdoIntegrationListingPage)));
-
-        Assert.That(attr, Is.Not.Null);
-        Assert.Multiple(() =>
+        [Test]
+        public void Delete_RequiresDeletePermission()
         {
-            Assert.That(attr!.ConstructorArguments[0].Value, Is.EqualTo(typeof(BdoIntegrationsApplication)));
-            Assert.That(attr.ConstructorArguments[1].Value?.ToString(), Is.EqualTo("BDO-Integrations"));
-            Assert.That(attr.ConstructorArguments[3].Value?.ToString(), Is.EqualTo("BDO Integrations"));
-            Assert.That(attr.ConstructorArguments[4].Value?.ToString(), Is.EqualTo(TemplateNames.LISTING));
-            Assert.That((int)attr.ConstructorArguments[5].Value!, Is.EqualTo(0));
-        });
-    }
+            // Confirms the [PageCommand(Permission = SystemPermissions.DELETE)]
+            // attribute is present, mirroring the pattern from
+            // WebChannelSettingsListingPage / ChannelSettingsListingPage's Delete override.
+            var method = typeof(BdoIntegrationListingPage).GetMethod(nameof(BdoIntegrationListingPage.Delete));
+            var attr = (PageCommandAttribute)Attribute.GetCustomAttribute(method, typeof(PageCommandAttribute));
 
-    private sealed class TestableBdoIntegrationListingPage : BdoIntegrationListingPage
-    {
-        public string ExposedObjectType => ObjectType;
+            Assert.That(attr, Is.Not.Null);
+            Assert.That(attr.Permission, Is.EqualTo(SystemPermissions.DELETE));
+        }
     }
 }

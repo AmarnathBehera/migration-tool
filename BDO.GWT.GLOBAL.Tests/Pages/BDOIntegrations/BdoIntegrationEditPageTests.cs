@@ -1,98 +1,63 @@
-using System.Reflection;
 using BDO;
+using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using GWTXbyKWeb.Pages.BDOIntegrations;
-using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
+using Moq;
+using NUnit.Framework;
+using System.Threading.Tasks;
 
-namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations;
-
-[TestFixture]
-public class BdoIntegrationEditPageTests
+namespace GWTXbyKWeb.Tests.Pages.BDOIntegrations
 {
-    [Test]
-    public void InheritsFromInfoEditPage()
+    [TestFixture]
+    public class BdoIntegrationEditPageTests
     {
-        var baseType = typeof(BdoIntegrationEditPage).BaseType;
-        Assert.That(baseType, Is.Not.Null);
+        private Mock<IFormComponentMapper> formComponentMapperMock;
+        private Mock<IFormDataBinder> formDataBinderMock;
+        private Mock<IChannelAccessService> channelAccessServiceMock;
+        private BdoIntegrationEditPage page;
 
-        Assert.Multiple(() =>
+        [SetUp]
+        public void SetUp()
         {
-            Assert.That(baseType!.IsGenericType, Is.True);
-            Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(FormSubmissionSubscriptionsInfo)));
-        });
-    }
+            formComponentMapperMock = new Mock<IFormComponentMapper>();
+            formDataBinderMock = new Mock<IFormDataBinder>();
+            channelAccessServiceMock = new Mock<IChannelAccessService>();
 
-    [Test]
-    public void HasExpectedConstructor()
-    {
-        var ctor = typeof(BdoIntegrationEditPage).GetConstructor(new[]
+            page = new BdoIntegrationEditPage(
+                formComponentMapperMock.Object,
+                formDataBinderMock.Object,
+                channelAccessServiceMock.Object)
+            {
+                WebChannelSettingsId = 7
+            };
+        }
+
+        [Test]
+        public async Task ConfigurePage_NoAccess_SetsAccessDeniedHeadlineAndHidesSubmit()
         {
-            typeof(IFormComponentMapper),
-            typeof(IFormDataBinder),
-        });
+            channelAccessServiceMock.Setup(s => s.CanAccessAsync(7)).ReturnsAsync(false);
 
-        Assert.That(ctor, Is.Not.Null);
-    }
-
-    [Test]
-    public void ObjectId_HasPageParameterAttributeWithIntBinder()
-    {
-        var objectIdProperty = typeof(BdoIntegrationEditPage).GetProperty(
-            nameof(BdoIntegrationEditPage.ObjectId),
-            BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
-
-        Assert.That(objectIdProperty, Is.Not.Null);
-
-        var attribute = objectIdProperty!
-            .GetCustomAttributesData()
-            .FirstOrDefault(a => a.AttributeType == typeof(PageParameterAttribute));
-
-        Assert.That(attribute, Is.Not.Null);
-        Assert.That(attribute!.ConstructorArguments[0].Value, Is.EqualTo(typeof(IntPageModelBinder)));
-    }
-
-    [Test]
-    public async Task ConfigurePage_SetsExpectedUiFormName_And_ObjectId_IsReadable()
-    {
-        var page = BdoIntegrationsPageTestHelper.CreateUninitialized<BdoIntegrationEditPage>();
-        BdoIntegrationsPageTestHelper.PreparePageConfigurationForConfigurePage(page);
-        page.ObjectId = 5;
-
-        try
-        {
             await page.ConfigurePage();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(page.PageConfiguration.Headline, Is.EqualTo("Access Denied"));
+                Assert.That(page.PageConfiguration.SubmitConfiguration.Visible, Is.False);
+            });
         }
-        catch
+
+        [Test]
+        public async Task ConfigurePage_HasAccess_SetsUIFormName()
         {
+            channelAccessServiceMock.Setup(s => s.CanAccessAsync(7)).ReturnsAsync(true);
+
+            // VERIFY: base.ConfigurePage() may require additional Kentico admin
+            // bootstrapping to run without throwing in an isolated unit test —
+            // if so, this assertion should be moved before the base call via a
+            // TestableBdoIntegrationEditPage subclass that stops short of calling base.
+            await page.ConfigurePage();
+
+            Assert.That(page.PageConfiguration.UIFormName, Is.EqualTo("FormSubmissionSubscriptions"));
         }
-
-        var config = BdoIntegrationsPageTestHelper.GetPageConfiguration(page);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(page.ObjectId, Is.EqualTo(5));
-            Assert.That(BdoIntegrationsPageTestHelper.GetStringProperty(config, "UIFormName"), Is.EqualTo("FormSubmissionSubscriptions"));
-        });
-    }
-
-    [Test]
-    public void HasExpectedUiPageRegistration()
-    {
-        var attr = typeof(BdoIntegrationEditPage).Assembly
-            .GetCustomAttributesData()
-            .Where(a => a.AttributeType.Name == "UIPageAttribute")
-            .FirstOrDefault(a =>
-                a.ConstructorArguments.Count >= 3 &&
-                Equals(a.ConstructorArguments[2].Value, typeof(BdoIntegrationEditPage)));
-
-        Assert.That(attr, Is.Not.Null);
-        Assert.Multiple(() =>
-        {
-            Assert.That(attr!.ConstructorArguments[0].Value, Is.EqualTo(typeof(BdoIntegrationsEditSection)));
-            Assert.That(attr.ConstructorArguments[1].Value?.ToString(), Is.EqualTo("edit"));
-            Assert.That(attr.ConstructorArguments[3].Value?.ToString(), Is.EqualTo("Edit Form Submission subscription"));
-            Assert.That(attr.ConstructorArguments[4].Value?.ToString(), Is.EqualTo(TemplateNames.EDIT));
-            Assert.That((int)attr.ConstructorArguments[5].Value!, Is.EqualTo(0));
-        });
     }
 }

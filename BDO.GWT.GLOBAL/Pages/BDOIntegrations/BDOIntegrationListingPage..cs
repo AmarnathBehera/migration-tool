@@ -1,26 +1,32 @@
 ﻿using BDO;
-using BDO.GWT.Xperience;
+using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
+using CMS.DataEngine;
 using CMS.Membership;
 using GWTXbyKWeb.Pages.BDOIntegrations;
 using Kentico.Xperience.Admin.Base;
+using System.Linq;
 using System.Threading.Tasks;
-[assembly: UIPage(
-    parentType: typeof(BdoIntegrationsApplication),
-    slug: "BDO-Integrations",
-    uiPageType: typeof(BdoIntegrationListingPage),
-    name: "BDO Integrations",
-    templateName: TemplateNames.LISTING,
-    order: 0)]
 
 namespace GWTXbyKWeb.Pages.BDOIntegrations
 {
-
     public class BdoIntegrationListingPage : ListingPage
     {
+        private readonly IChannelAccessService channelAccessService;
+
+        [PageParameter(typeof(IntPageModelBinder))]
+        public int WebChannelSettingsId { get; set; }
+
         protected override string ObjectType => FormSubmissionSubscriptionsInfo.OBJECT_TYPE;
+
+        public BdoIntegrationListingPage(IChannelAccessService channelAccessService)
+        {
+            this.channelAccessService = channelAccessService;
+        }
 
         public override async Task ConfigurePage()
         {
+            bool canAccess = await channelAccessService.CanAccessAsync(WebChannelSettingsId);
+
             PageConfiguration.ColumnConfigurations
                         .AddColumn(nameof(FormSubmissionSubscriptionsInfo.Displayname), "Display name")
                         .AddColumn(nameof(FormSubmissionSubscriptionsInfo.Codename), "Code name")
@@ -28,22 +34,35 @@ namespace GWTXbyKWeb.Pages.BDOIntegrations
                         .AddColumn(nameof(FormSubmissionSubscriptionsInfo.Method), "Method")
                         .AddColumn(nameof(FormSubmissionSubscriptionsInfo.Endpoint), "Endpoint");
 
-            // Add a "New settings" button at the top. This will navigate the user to a "create" page.
-            // We will define it in the next section.
-            PageConfiguration.HeaderActions.AddLink<BdoIntegrationsCreatePage>("New setting");
+            if (canAccess)
+            {
+                var ancestorParams = new PageParameterValues
+                {
+                    { typeof(BdoIntegrationsChannelEditSection), WebChannelSettingsId }
+                };
 
-            // Add an "Edit" row action. This will navigate the user to a "edit" section for a specific instance of GlobalSettingsKeyInfo object.
-            // We will define it in the next section.
-            PageConfiguration.AddEditRowAction<BdoIntegrationsEditSection>();
+                PageConfiguration.HeaderActions.AddLink<BdoIntegrationsCreatePage>(
+                    "New setting",
+                    parameters: ancestorParams);
 
-            // Define a "Delete" action for the user with sufficient permissions to remove an existing setting.
-            PageConfiguration.TableActions
-                .AddDeleteAction(nameof(Delete));
+                PageConfiguration.AddEditRowAction<BdoIntegrationsEditSection>(
+                    parameters: ancestorParams);
+
+                PageConfiguration.TableActions.AddDeleteAction(nameof(Delete));
+            }
+
+            PageConfiguration.QueryModifiers.Add(new QueryModifier((query, _) =>
+            {
+                return canAccess
+                    ? query.WhereEquals(
+                        nameof(FormSubmissionSubscriptionsInfo.ChannelSnippetWebChannelSettingsID),
+                        WebChannelSettingsId)
+                    : query.WhereEquals(nameof(FormSubmissionSubscriptionsInfo.FormSubmissionSubscriptionsID), 0);
+            }));
 
             await base.ConfigurePage();
         }
 
-        // Ensure only a user with permissions to delete can perform the delete action.
         [PageCommand(Permission = SystemPermissions.DELETE)]
         public override Task<ICommandResponse<RowActionResult>> Delete(int id) => base.Delete(id);
     }

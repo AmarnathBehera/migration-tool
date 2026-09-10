@@ -1,33 +1,56 @@
 ﻿using BDO;
-using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.GlobalSettings;
+using CMS.DataEngine;
 using GWTXbyKWeb.Pages.BDOIntegrations;
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
-[assembly: UIPage(
-    parentType: typeof(BdoIntegrationListingPage),
-    slug: "create",
-    uiPageType: typeof(BdoIntegrationsCreatePage),
-    name: "Create Form Submission Integration",
-    templateName: TemplateNames.EDIT,
-    order: 20)]
 namespace GWTXbyKWeb.Pages.BDOIntegrations
 {
     public class BdoIntegrationsCreatePage : CreatePage<FormSubmissionSubscriptionsInfo, BdoIntegrationsEditSection>
     {
-        public BdoIntegrationsCreatePage(IFormComponentMapper formComponentMapper,
+        private readonly IInfoProvider<FormSubmissionSubscriptionsInfo> formSubmissionSubscriptionsInfoProvider;
+
+        [PageParameter(typeof(IntPageModelBinder))]
+        public int WebChannelSettingsId { get; set; }
+
+        public BdoIntegrationsCreatePage(
+            IFormComponentMapper formComponentMapper,
             IFormDataBinder formDataBinder,
-            IPageLinkGenerator pageLinkGenerator)
+            IPageLinkGenerator pageLinkGenerator,
+            IInfoProvider<FormSubmissionSubscriptionsInfo> formSubmissionSubscriptionsInfoProvider)
             : base(formComponentMapper, formDataBinder, pageLinkGenerator)
         {
+            this.formSubmissionSubscriptionsInfoProvider = formSubmissionSubscriptionsInfoProvider;
         }
 
         public override Task ConfigurePage()
         {
-            // Assign your 'GlobalSettingsKeyEdit' UI form code name to the page. The assignment is case-insensitive.
             PageConfiguration.UIFormName = "FormSubmissionSubscriptions";
             return base.ConfigurePage();
+        }
+
+        protected override async Task<ICommandResponse> GetSubmitSuccessResponse(
+            FormSubmissionSubscriptionsInfo savedInfoObject, ICollection<IFormItem> items)
+        {
+            // Record is already persisted at this point — stamp the channel FK and
+            // re-save, since we couldn't locate a pre-save hook to do this earlier.
+            if (savedInfoObject.ChannelSnippetWebChannelSettingsID != WebChannelSettingsId)
+            {
+                savedInfoObject.ChannelSnippetWebChannelSettingsID = WebChannelSettingsId;
+                formSubmissionSubscriptionsInfoProvider.Set(savedInfoObject);
+            }
+
+            var result = new EditPageSuccessFormSubmissionResult()
+            {
+                Items = await items.OnlyVisible().GetClientProperties(),
+                ObjectDisplayName = savedInfoObject.Displayname,
+                ObjectId = savedInfoObject.FormSubmissionSubscriptionsID,
+                RefetchAll = RefetchAll
+            };
+
+            return ResponseFrom(result).AddSuccessMessage(LocalizationService?.GetString("base.forms.saved"));
         }
     }
 }

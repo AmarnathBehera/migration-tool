@@ -1,13 +1,16 @@
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
 using BDO;
 using BDO.GWT.Xperience;
+using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
+using CMS.DataEngine;
 using CMS.Membership;
 using GWTXbyKWeb.Pages.BDOIntegrations;
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
 using Moq;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
+using ReflectionFieldInfo = System.Reflection.FieldInfo;
 
 namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
 {
@@ -45,6 +48,36 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         }
 
         [Test]
+        public void BDOIntegrationsChannelListingPage_InheritsFromListingPage()
+        {
+            Assert.That(typeof(BdoIntegrationsChannelListingPage).BaseType, Is.EqualTo(typeof(ListingPage)));
+        }
+
+        [Test]
+        public void BDOIntegrationsChannelListingPage_ObjectType_ReturnsWebChannelSettingsObjectType()
+        {
+            var page = new TestableBdoIntegrationsChannelListingPage(
+                new Mock<IInfoProvider<CMS.ContentEngine.ChannelInfo>>().Object,
+                new Mock<IInfoProvider<WebChannelSettingsInfo>>().Object,
+                new Mock<IChannelAccessService>().Object);
+
+            Assert.That(page.ExposedObjectType, Is.EqualTo(WebChannelSettingsInfo.OBJECT_TYPE));
+        }
+
+        [Test]
+        public void BDOIntegrationsChannelEditSection_InheritsFromEditSectionPage()
+        {
+            var baseType = typeof(BdoIntegrationsChannelEditSection).BaseType;
+
+            Assert.That(baseType, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(baseType!.IsGenericType, Is.True);
+                Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(WebChannelSettingsInfo)));
+            });
+        }
+
+        [Test]
         public void BDOIntegrationListingPage_InheritsFromListingPage()
         {
             Assert.That(typeof(BdoIntegrationListingPage).BaseType, Is.EqualTo(typeof(ListingPage)));
@@ -53,7 +86,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         [Test]
         public void BDOIntegrationListingPage_ObjectType_ReturnsFormSubmissionSubscriptionsObjectType()
         {
-            var page = new TestableBdoIntegrationListingPage();
+            var page = new TestableBdoIntegrationListingPage(new Mock<IChannelAccessService>().Object);
 
             Assert.That(page.ExposedObjectType, Is.EqualTo(FormSubmissionSubscriptionsInfo.OBJECT_TYPE));
         }
@@ -113,6 +146,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
                 typeof(IFormComponentMapper),
                 typeof(IFormDataBinder),
                 typeof(IPageLinkGenerator),
+                typeof(IInfoProvider<FormSubmissionSubscriptionsInfo>),
             });
 
             Assert.That(ctor, Is.Not.Null);
@@ -162,6 +196,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
             {
                 typeof(IFormComponentMapper),
                 typeof(IFormDataBinder),
+                typeof(IChannelAccessService),
             });
 
             Assert.That(ctor, Is.Not.Null);
@@ -185,6 +220,23 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         }
 
         [Test]
+        public void BDOIntegrationEditPage_WebChannelSettingsId_HasPageParameterAttributeWithIntModelBinder()
+        {
+            var property = typeof(BdoIntegrationEditPage).GetProperty(
+                nameof(BdoIntegrationEditPage.WebChannelSettingsId),
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+
+            Assert.That(property, Is.Not.Null);
+
+            var attributeData = property!
+                .GetCustomAttributesData()
+                .FirstOrDefault(a => a.AttributeType == typeof(PageParameterAttribute));
+
+            Assert.That(attributeData, Is.Not.Null);
+            Assert.That(attributeData!.ConstructorArguments[0].Value, Is.EqualTo(typeof(IntPageModelBinder)));
+        }
+
+        [Test]
         public void BDOIntegrationEditPage_ConfigurePage_IsOverridden()
         {
             var method = typeof(BdoIntegrationEditPage).GetMethod(
@@ -196,13 +248,37 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         }
 
         [Test]
+        public void Assembly_HasExpectedUiPageRegistration_ForBDOIntegrationsChannelListingPage()
+        {
+            AssertUiPageAttribute(
+                uiPageType: typeof(BdoIntegrationsChannelListingPage),
+                parentType: typeof(BdoIntegrationsApplication),
+                slug: "BDO-Integrations",
+                name: "BDO Integrations",
+                templateName: TemplateNames.LISTING,
+                order: 0);
+        }
+
+        [Test]
+        public void Assembly_HasExpectedUiPageRegistration_ForBDOIntegrationsChannelEditSection()
+        {
+            AssertUiPageAttribute(
+                uiPageType: typeof(BdoIntegrationsChannelEditSection),
+                parentType: typeof(BdoIntegrationsChannelListingPage),
+                slug: PageParameterConstants.PARAMETERIZED_SLUG,
+                name: "Edit",
+                templateName: TemplateNames.SECTION_LAYOUT,
+                order: 0);
+        }
+
+        [Test]
         public void Assembly_HasExpectedUiPageRegistration_ForBDOIntegrationListingPage()
         {
             AssertUiPageAttribute(
                 uiPageType: typeof(BdoIntegrationListingPage),
-                parentType: typeof(BdoIntegrationsApplication),
-                slug: "BDO-Integrations",
-                name: "BDO Integrations",
+                parentType: typeof(BdoIntegrationsChannelEditSection),
+                slug: "integrations",
+                name: "Integrations",
                 templateName: TemplateNames.LISTING,
                 order: 0);
         }
@@ -256,14 +332,12 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
 
             Assert.Multiple(() =>
             {
-                // Column keys (nameof(...))
                 Assert.That(literals, Does.Contain(nameof(FormSubmissionSubscriptionsInfo.Displayname)));
                 Assert.That(literals, Does.Contain(nameof(FormSubmissionSubscriptionsInfo.Codename)));
                 Assert.That(literals, Does.Contain(nameof(FormSubmissionSubscriptionsInfo.Form)));
                 Assert.That(literals, Does.Contain(nameof(FormSubmissionSubscriptionsInfo.Method)));
                 Assert.That(literals, Does.Contain(nameof(FormSubmissionSubscriptionsInfo.Endpoint)));
 
-                // Column titles + actions
                 Assert.That(literals, Does.Contain("Display name"));
                 Assert.That(literals, Does.Contain("Code name"));
                 Assert.That(literals, Does.Contain("Form"));
@@ -307,6 +381,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
         {
             var page = (BdoIntegrationListingPage)RuntimeHelpers.GetUninitializedObject(typeof(BdoIntegrationListingPage));
             PreparePageConfigurationForConfigurePage(page);
+            SetPrivateField(page, "channelAccessService", CreateChannelAccessServiceMock(canAccess: true));
 
             try
             {
@@ -367,6 +442,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
             var page = (BdoIntegrationEditPage)RuntimeHelpers.GetUninitializedObject(typeof(BdoIntegrationEditPage));
             PreparePageConfigurationForConfigurePage(page);
             page.ObjectId = 99;
+            SetPrivateField(page, "channelAccessService", CreateChannelAccessServiceMock(canAccess: true));
 
             try
             {
@@ -385,6 +461,36 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
                 Assert.That(page.ObjectId, Is.EqualTo(99));
                 Assert.That(uiFormName, Is.EqualTo("FormSubmissionSubscriptions"));
             });
+        }
+
+        // ---- Helpers ----
+
+        private static object CreateChannelAccessServiceMock(bool canAccess)
+        {
+            var mock = new Mock<IChannelAccessService>();
+            mock.Setup(s => s.CanAccessAsync(It.IsAny<int>())).ReturnsAsync(canAccess);
+            mock.Setup(s => s.GetAccessibleWebChannelSettingsIdsAsync())
+                .ReturnsAsync((ICollection<int>)null);
+            return mock.Object;
+        }
+
+        private static void SetPrivateField(object target, string fieldName, object value)
+        {
+            const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
+
+            for (var type = target.GetType(); type is not null; type = type.BaseType)
+            {
+                ReflectionFieldInfo? field = type.GetField(fieldName, flags);
+                if (field is not null)
+                {
+                    field.SetValue(target, value);
+                    return;
+                }
+            }
+
+            // VERIFY: if this silently does nothing, the field name doesn't match the
+            // real private field name in your current source — check the actual
+            // declaration and adjust fieldName above to match exactly.
         }
 
         private static void AssertUiPageAttribute(
@@ -463,7 +569,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
             throw new InvalidOperationException("PageConfiguration property was not found.");
         }
 
-        private static FieldInfo? FindMatchingField(Type type, string propertyName, Type fieldType)
+        private static ReflectionFieldInfo? FindMatchingField(Type type, string propertyName, Type fieldType)
         {
             const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
 
@@ -508,7 +614,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
             }
 
             var flags = BindingFlags.Instance | BindingFlags.NonPublic;
-            var backingField = target.GetType().GetField($"<{propertyName}>k__BackingField", flags)
+            ReflectionFieldInfo? backingField = target.GetType().GetField($"<{propertyName}>k__BackingField", flags)
                 ?? target.GetType().GetField(propertyName, flags)
                 ?? target.GetType().GetFields(flags)
                     .FirstOrDefault(f => f.FieldType == propertyType && f.Name.Contains(propertyName, StringComparison.OrdinalIgnoreCase));
@@ -601,6 +707,24 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
 
         private sealed class TestableBdoIntegrationListingPage : BdoIntegrationListingPage
         {
+            public TestableBdoIntegrationListingPage(IChannelAccessService channelAccessService)
+                : base(channelAccessService)
+            {
+            }
+
+            public string ExposedObjectType => ObjectType;
+        }
+
+        private sealed class TestableBdoIntegrationsChannelListingPage : BdoIntegrationsChannelListingPage
+        {
+            public TestableBdoIntegrationsChannelListingPage(
+                IInfoProvider<CMS.ContentEngine.ChannelInfo> channelInfoProvider,
+                IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider,
+                IChannelAccessService channelAccessService)
+                : base(channelInfoProvider, webChannelSettingsInfoProvider, channelAccessService)
+            {
+            }
+
             public string ExposedObjectType => ObjectType;
         }
     }

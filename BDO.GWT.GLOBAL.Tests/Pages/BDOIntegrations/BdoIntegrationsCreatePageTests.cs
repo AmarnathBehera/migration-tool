@@ -1,76 +1,91 @@
 using BDO;
+using CMS.DataEngine;
 using GWTXbyKWeb.Pages.BDOIntegrations;
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
+using Moq;
+using NUnit.Framework;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations;
-
-[TestFixture]
-public class BdoIntegrationsCreatePageTests
+namespace GWTXbyKWeb.Tests.Pages.BDOIntegrations
 {
-    [Test]
-    public void InheritsFromCreatePage()
+    // Exposes the protected GetSubmitSuccessResponse for direct testing,
+    // same pattern as TestableRecaptchaValidationService etc.
+    internal class TestableBdoIntegrationsCreatePage : BdoIntegrationsCreatePage
     {
-        var baseType = typeof(BdoIntegrationsCreatePage).BaseType;
-        Assert.That(baseType, Is.Not.Null);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(baseType!.IsGenericType, Is.True);
-            Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(FormSubmissionSubscriptionsInfo)));
-            Assert.That(baseType.GetGenericArguments()[1], Is.EqualTo(typeof(BdoIntegrationsEditSection)));
-        });
-    }
-
-    [Test]
-    public async Task ConfigurePage_SetsExpectedUiFormName()
-    {
-        var page = BdoIntegrationsPageTestHelper.CreateUninitialized<BdoIntegrationsCreatePage>();
-        BdoIntegrationsPageTestHelper.PreparePageConfigurationForConfigurePage(page);
-
-        try
-        {
-            await page.ConfigurePage();
-        }
-        catch
+        public TestableBdoIntegrationsCreatePage(
+            IFormComponentMapper formComponentMapper,
+            IFormDataBinder formDataBinder,
+            IPageLinkGenerator pageLinkGenerator,
+            IInfoProvider<FormSubmissionSubscriptionsInfo> infoProvider)
+            : base(formComponentMapper, formDataBinder, pageLinkGenerator, infoProvider)
         {
         }
 
-        var config = BdoIntegrationsPageTestHelper.GetPageConfiguration(page);
-        Assert.That(BdoIntegrationsPageTestHelper.GetStringProperty(config, "UIFormName"), Is.EqualTo("FormSubmissionSubscriptions"));
+        public Task<ICommandResponse> PublicGetSubmitSuccessResponse(
+            FormSubmissionSubscriptionsInfo savedInfoObject, ICollection<IFormItem> items)
+            => GetSubmitSuccessResponse(savedInfoObject, items);
     }
 
-    [Test]
-    public void HasExpectedConstructor()
+    [TestFixture]
+    public class BdoIntegrationsCreatePageTests
     {
-        var ctor = typeof(BdoIntegrationsCreatePage).GetConstructor(new[]
+        private Mock<IFormComponentMapper> formComponentMapperMock;
+        private Mock<IFormDataBinder> formDataBinderMock;
+        private Mock<IPageLinkGenerator> pageLinkGeneratorMock;
+        private Mock<IInfoProvider<FormSubmissionSubscriptionsInfo>> infoProviderMock;
+        private TestableBdoIntegrationsCreatePage page;
+
+        [SetUp]
+        public void SetUp()
         {
-            typeof(IFormComponentMapper),
-            typeof(IFormDataBinder),
-            typeof(IPageLinkGenerator),
-        });
+            formComponentMapperMock = new Mock<IFormComponentMapper>();
+            formDataBinderMock = new Mock<IFormDataBinder>();
+            pageLinkGeneratorMock = new Mock<IPageLinkGenerator>();
+            infoProviderMock = new Mock<IInfoProvider<FormSubmissionSubscriptionsInfo>>();
 
-        Assert.That(ctor, Is.Not.Null);
-    }
+            page = new TestableBdoIntegrationsCreatePage(
+                formComponentMapperMock.Object,
+                formDataBinderMock.Object,
+                pageLinkGeneratorMock.Object,
+                infoProviderMock.Object)
+            {
+                WebChannelSettingsId = 15
+            };
+        }
 
-    [Test]
-    public void HasExpectedUiPageRegistration()
-    {
-        var attr = typeof(BdoIntegrationsCreatePage).Assembly
-            .GetCustomAttributesData()
-            .Where(a => a.AttributeType.Name == "UIPageAttribute")
-            .FirstOrDefault(a =>
-                a.ConstructorArguments.Count >= 3 &&
-                Equals(a.ConstructorArguments[2].Value, typeof(BdoIntegrationsCreatePage)));
-
-        Assert.That(attr, Is.Not.Null);
-        Assert.Multiple(() =>
+        [Test]
+        public async Task GetSubmitSuccessResponse_FkNotSet_StampsChannelIdAndReSaves()
         {
-            Assert.That(attr!.ConstructorArguments[0].Value, Is.EqualTo(typeof(BdoIntegrationListingPage)));
-            Assert.That(attr.ConstructorArguments[1].Value?.ToString(), Is.EqualTo("create"));
-            Assert.That(attr.ConstructorArguments[3].Value?.ToString(), Is.EqualTo("Create Form Submission Integration"));
-            Assert.That(attr.ConstructorArguments[4].Value?.ToString(), Is.EqualTo(TemplateNames.EDIT));
-            Assert.That((int)attr.ConstructorArguments[5].Value!, Is.EqualTo(20));
-        });
+            var savedInfoMock = new Mock<FormSubmissionSubscriptionsInfo>();
+            savedInfoMock.SetupProperty(i => i.ChannelSnippetWebChannelSettingsID, 0);
+            savedInfoMock.SetupGet(i => i.FormSubmissionSubscriptionsID).Returns(101);
+            savedInfoMock.SetupGet(i => i.Displayname).Returns("Test Integration");
+            var savedInfo = savedInfoMock.Object;
+
+            var response = await page.PublicGetSubmitSuccessResponse(savedInfo, new List<IFormItem>());
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(savedInfo.ChannelSnippetWebChannelSettingsID, Is.EqualTo(15));
+                infoProviderMock.Verify(p => p.Set(savedInfo), Times.Once);
+                Assert.That(response, Is.Not.Null);
+            });
+        }
+
+        [Test]
+        public async Task GetSubmitSuccessResponse_FkAlreadyCorrect_DoesNotReSave()
+        {
+            var savedInfoMock = new Mock<FormSubmissionSubscriptionsInfo>();
+            savedInfoMock.SetupProperty(i => i.ChannelSnippetWebChannelSettingsID, 15);
+            savedInfoMock.SetupGet(i => i.FormSubmissionSubscriptionsID).Returns(102);
+            savedInfoMock.SetupGet(i => i.Displayname).Returns("Already Correct");
+            var savedInfo = savedInfoMock.Object;
+
+            await page.PublicGetSubmitSuccessResponse(savedInfo, new List<IFormItem>());
+
+            infoProviderMock.Verify(p => p.Set(It.IsAny<FormSubmissionSubscriptionsInfo>()), Times.Never);
+        }
     }
 }
