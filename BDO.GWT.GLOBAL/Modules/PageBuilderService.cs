@@ -31,7 +31,7 @@ public class PageBuilderService : IPageBuilderService
             Widgets.EventsWebinarsSlider,
             Widgets.FlexibleBanner,
             Widgets.Form,
-            //Widgets.HTML,
+            Widgets.HTML,
             Widgets.InsightCarousel,
             Widgets.NewsCarousel,
             Widgets.QuoteCard,
