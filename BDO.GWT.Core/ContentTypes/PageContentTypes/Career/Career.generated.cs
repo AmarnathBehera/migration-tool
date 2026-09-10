@@ -42,18 +42,6 @@ namespace BDO
 
 
 		/// <summary>
-		/// DocumentPublishFrom.
-		/// </summary>
-		public DateTime DocumentPublishFrom { get; set; }
-
-
-		/// <summary>
-		/// DocumentPublishTo.
-		/// </summary>
-		public DateTime DocumentPublishTo { get; set; }
-
-
-		/// <summary>
 		/// CareerContactPeopleID.
 		/// </summary>
 		public IEnumerable<Person> CareerContactPeopleID { get; set; }
@@ -62,7 +50,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataRelevantContactPerson.
 		/// </summary>
-		public IEnumerable<Person> MetadataRelevantContactPerson { get; set; }
+		public IEnumerable<IWebPageFieldsSource> MetadataRelevantContactPerson { get; set; }
 
 
 		/// <summary>

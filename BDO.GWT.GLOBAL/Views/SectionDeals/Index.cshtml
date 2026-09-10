@@ -1,11 +1,11 @@
-﻿@using BDO
-@using BDO.GWT.Core.Constants
+﻿@using BDO.GWT.Core.Constants
 @using BDO.GWT.Core.Services
 @using Kentico.Content.Web.Mvc
 @model BDO.GWT.Core.DTOs.Pages.SectionDealsDto
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
 
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
@@ -15,7 +15,7 @@
     Layout = "_Layout";
 }
 
-@await Html.PartialAsync("~/Views/Shared/_Hero.cshtml") 
+@await Html.PartialAsync("_Hero")
 <div>
     @if (Model != null && pageId != 0)
     {
@@ -23,7 +23,9 @@
             pageId,
             ReactComponentType.DealsCardsGrid,
             ReactComponentType.DealsCardsGridGUID,
+
             Model,
             Context.RequestAborted))
     }
+    @PageBuilderService.GetPageBuilderScripts(Html)
 </div>
