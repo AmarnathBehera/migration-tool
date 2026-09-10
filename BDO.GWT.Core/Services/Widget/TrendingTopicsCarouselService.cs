@@ -117,16 +117,16 @@ InsightCategory.CONTENT_TYPE_NAME];
 
             // Resolve URL via IWebPageUrlRetriever using WebPageItemGUID (replaces NodeID url lookup)
             var url = await _webPageUrlRetriever.Retrieve(
-                webPage.SystemFields.WebPageItemGUID,
+                webPage,
                 _cultureContext.CurrentLanguageTag,
                 cancellationToken: cancellationToken);
 
             itemDtos.Add(new TrendingTopicsCarouselItemDto
             {
-                Title = webPage.SystemFields.WebPageItemName,
+                Title = metadata.MetadataTitle,
                 Description = HtmlHelper.ExtractTextFromHtml(metadata.MetadataDescription),
-                ReadMoreLink = url.RelativePath,
-                ImageURL = metadata.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url,
+                ReadMoreLink = url.AbsoluteUrl,
+                ImageURL = metadata.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url.TrimStart('~'),
                 ImageAltText = metadata.MetadataTeaserImageAltText,
                 IsFeatured = false,
             });
