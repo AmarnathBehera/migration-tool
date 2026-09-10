@@ -1,0 +1,37 @@
+﻿@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Core.DTOs.Pages.GlobalLocationsDto
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
+
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+}
+
+@if (Model.Hero != null && pageId != 0)
+{
+    @(await ReactService.RenderComponentAsync(
+   pageId,
+   ReactComponentType.Hero,
+   ReactComponentType.HeroGUID,
+   new
+   {
+       data = Model.Hero,
+   },
+   Context.RequestAborted))
+
+    @(await ReactService.RenderComponentAsync(
+    pageId,
+    "GlobalLocationsList",
+    ReactComponentType.GlobalLocationsListGUID,
+    Model.MainGrid,
+    Context.RequestAborted))
+}

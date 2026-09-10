@@ -1,20 +1,14 @@
-﻿using BDO.GWT.Domain.Core.Constants;
-using BDO.GWT.GLOBAL.API.Bases;
+﻿using BDO.GWT.GLOBAL.API.Bases;
 using BDO.GWT.GLOBAL.API.Data;
-using BDO.GWT.GLOBAL.API.Filters;
 using BDO.GWT.GLOBAL.API.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Mime;
 
 namespace BDO.GWT.Web.Core.API.Controllers;
 
-/// <summary>
-/// Provides methods to read and manage channels.
-/// </summary>
 [ApiController]
-[Route("memberFirms/{memberFirmID:int}/Channels")]
+[Route("Channels")]
 public class ChannelController : EntityControllerBase
 {
     private readonly IChannelCrudService _channelCrudService;
@@ -24,12 +18,6 @@ public class ChannelController : EntityControllerBase
         _channelCrudService = channelCrudService;
     }
 
-    /// <summary>
-    /// Returns all channels.
-    /// </summary>
-    /// <param name = "query" > Query parameters.</param>
-    /// <param name = "cancellationToken" ></param >
-    /// <returns > Returns a list of channels.</returns>
     [HttpGet]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(IEnumerable<ChannelOutput>), MediaTypeNames.Application.Json)]
     public async Task<ActionResult<IEnumerable<ChannelOutput>>> GetChannelsAsync([FromQuery] ChannelsQuery query, CancellationToken cancellationToken)
@@ -39,18 +27,52 @@ public class ChannelController : EntityControllerBase
         return Ok(channels);
     }
 
-    /// <summary>
-    /// Returns a single channel having the specified GUID.
-    /// </summary>
-    /// <param name="channelGUID">GUID of the channel you want to retrieve.</param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>Returns one channel.</returns>
-    [HttpGet("{channelGUID:guid}")]
+
+    [HttpGet("{channelGuid:guid}", Name = "GetChannel")]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(ChannelOutput), MediaTypeNames.Application.Json)]
-    public async Task<ActionResult<ChannelOutput>> GetChannelAsync(Guid channelGUID, CancellationToken cancellationToken)
+    public async Task<ActionResult<ChannelOutput>> GetChannelAsync(Guid channelGuid, CancellationToken cancellationToken)
     {
-        var channel = await _channelCrudService.GetEntityAsync(channelGUID, cancellationToken);
+        var channel = await _channelCrudService.GetEntityAsync(channelGuid, cancellationToken);
 
         return Ok(channel);
+    }
+
+
+    [HttpPost]
+    [SwaggerResponse(StatusCodes.Status201Created, null, typeof(ChannelOutput), MediaTypeNames.Application.Json)]
+    public async Task<ActionResult<ChannelOutput>> PostChannelAsync(
+        [FromBody] ChannelInput request,
+        CancellationToken cancellationToken)
+    {
+        var channel = await _channelCrudService.CreateEntityAsync(request, cancellationToken);
+
+        if (channel.General.GUID == Guid.Empty)
+        {
+            return BadRequest("Channel GUID was not generated.");
+        }
+
+        return CreatedAtRoute(
+            "GetChannel",
+            new { channelGuid = channel.General.GUID },
+            channel);
+    }
+
+    [HttpPut("{channelGuid:guid}")]
+    [SwaggerResponse(StatusCodes.Status200OK, null, typeof(ChannelOutput), MediaTypeNames.Application.Json)]
+    public async Task<ActionResult<ChannelOutput>> PutChannelAsync(Guid channelGuid, [FromBody] ChannelInput request, CancellationToken cancellationToken)
+    {
+        var channel = await _channelCrudService.UpdateEntityAsync(channelGuid, request, cancellationToken);
+
+        return Ok(channel);
+    }
+
+
+    [HttpDelete("{channelGuid:guid}")]
+    [SwaggerResponse(StatusCodes.Status204NoContent, null, typeof(void))]
+    public async Task<IActionResult> DeleteChannelAsync(Guid channelGuid, CancellationToken cancellationToken)
+    {
+        await _channelCrudService.DeleteEntityAsync(channelGuid, cancellationToken);
+
+        return NoContent();
     }
 }

@@ -63,74 +63,7 @@ namespace BDO.GWT.CustomReportingModule.ReportingApp
             }
 
             return Task.FromResult(response.AddSuccessMessage("Query executed."));
-        }
-
-        private static void SkipWhitespace(string sql, ref int index)
-        {
-            while (index < sql.Length && char.IsWhiteSpace(sql[index]))
-            {
-                index++;
-            }
-        }
-
-        private static bool SkipLineComment(string sql, ref int index)
-        {
-            if (index + 1 >= sql.Length ||
-                sql[index] != '-' ||
-                sql[index + 1] != '-')
-            {
-                return false;
-            }
-
-            index += 2;
-
-            while (index < sql.Length && sql[index] != '\n')
-            {
-                index++;
-            }
-
-            return true;
-        }
-
-        private static bool SkipBlockComment(string sql, ref int index)
-        {
-            if (index + 1 >= sql.Length ||
-                sql[index] != '/' ||
-                sql[index + 1] != '*')
-            {
-                return false;
-            }
-
-            index += 2;
-
-            while (index + 1 < sql.Length &&
-                   !(sql[index] == '*' && sql[index + 1] == '/'))
-            {
-                index++;
-            }
-
-            if (index + 1 < sql.Length)
-            {
-                index += 2;
-            }
-
-            return true;
-        }
-
-        private static string? ReadToken(string sql, ref int index)
-        {
-            int start = index;
-
-            while (index < sql.Length &&
-                   (char.IsLetter(sql[index]) || sql[index] == '_'))
-            {
-                index++;
-            }
-
-            return start == index
-                ? null
-                : sql.Substring(start, index - start);
-        }
+        }  
 
         [PageCommand]
         public Task<ICommandResponse<SavedQuery?>> RenameQuery(SavedQuery query)
