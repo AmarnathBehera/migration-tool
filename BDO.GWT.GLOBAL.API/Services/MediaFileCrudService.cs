@@ -145,10 +145,17 @@ public class MediaFileCrudService : IMediaFileCrudService
         }
 
         var normalizedPath = NormalizePath(assetUrl);
+        var queryIndex = normalizedPath.IndexOf('?');
+        var path = queryIndex >= 0 ? normalizedPath[..queryIndex] : normalizedPath;
+        var query = queryIndex >= 0 ? normalizedPath[(queryIndex + 1)..] : string.Empty;
 
         if (_hostEnvironment.IsDevelopment())
         {
-            return new UriBuilder(Uri.UriSchemeHttp, DevelopmentLiveSiteHost, DevelopmentLiveSitePort, normalizedPath).Uri;
+            return new UriBuilder(Uri.UriSchemeHttp, DevelopmentLiveSiteHost, DevelopmentLiveSitePort)
+            {
+                Path = path,
+                Query = query
+            }.Uri;
         }
 
         var request = _httpContextAccessor.HttpContext?.Request;
@@ -157,7 +164,11 @@ public class MediaFileCrudService : IMediaFileCrudService
             return null;
         }
 
-        return new UriBuilder(request.Scheme, request.Host.Host, request.Host.Port ?? -1, normalizedPath).Uri;
+        return new UriBuilder(request.Scheme, request.Host.Host, request.Host.Port ?? -1)
+        {
+            Path = path,
+            Query = query
+        }.Uri;
     }
 
     private static string NormalizePath(string assetUrl)
