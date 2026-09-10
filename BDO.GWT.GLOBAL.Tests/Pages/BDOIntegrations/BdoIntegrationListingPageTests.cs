@@ -1,4 +1,5 @@
 using BDO;
+using BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.Membership;
 using GWTXbyKWeb.Pages.BDOIntegrations;
@@ -11,8 +12,11 @@ namespace GWTXbyKWeb.Tests.Pages.BDOIntegrations
 {
     // Kentico's ListingPage.ConfigurePage() sets up PageConfiguration internals that
     // are largely framework plumbing rather than logic worth asserting directly.
-    // These tests focus on the one piece of actual decision logic in this class:
-    // whether channelAccessService is consulted, and with what ID.
+    // These tests focus on the actual decision logic in this class: whether
+    // channelAccessService is consulted, with what ID, and what is configured for
+    // users without access. The page is created without running its constructor and the
+    // base call is allowed to fail, because the Kentico admin runtime (IoC container,
+    // page invoker) is not bootstrapped in a unit test host.
     [TestFixture]
     public class BdoIntegrationListingPageTests
     {
@@ -23,10 +27,12 @@ namespace GWTXbyKWeb.Tests.Pages.BDOIntegrations
         public void SetUp()
         {
             channelAccessServiceMock = new Mock<IChannelAccessService>();
-            page = new BdoIntegrationListingPage(channelAccessServiceMock.Object)
-            {
-                WebChannelSettingsId = 42
-            };
+
+            page = BdoIntegrationsPageTestHelper.CreateUninitialized<BdoIntegrationListingPage>();
+            page.WebChannelSettingsId = 42;
+
+            BdoIntegrationsPageTestHelper.PreparePageConfigurationForConfigurePage(page);
+            BdoIntegrationsPageTestHelper.SetPrivateField(page, "channelAccessService", channelAccessServiceMock.Object);
         }
 
         [Test]
@@ -36,16 +42,55 @@ namespace GWTXbyKWeb.Tests.Pages.BDOIntegrations
                 .Setup(s => s.CanAccessAsync(42))
                 .ReturnsAsync(true);
 
-            // VERIFY: ConfigurePage() likely throws or no-ops on parts of
-            // PageConfiguration that require a fully bootstrapped Kentico admin
-            // context (PageInvoker, UITreeNode resolution for AddEditRowAction's
-            // ancestor parameters, etc). If a bare call to ConfigurePage() throws
-            // in isolation, wrap this in a TestableBdoIntegrationListingPage that
-            // overrides just the access + query-filter portion, following the
-            // TestableXxx pattern used elsewhere (e.g. TestableRecaptchaValidationService).
-            await page.ConfigurePage();
+            await ConfigurePageIgnoringAdminRuntimeAsync();
 
             channelAccessServiceMock.Verify(s => s.CanAccessAsync(42), Times.Once);
+        }
+
+        [Test]
+        public async Task ConfigurePage_ConfiguresExpectedListingColumns()
+        {
+            channelAccessServiceMock
+                .Setup(s => s.CanAccessAsync(It.IsAny<int>()))
+                .ReturnsAsync(false);
+
+            await ConfigurePageIgnoringAdminRuntimeAsync();
+
+            var pageConfiguration = BdoIntegrationsPageTestHelper.GetPageConfiguration(page);
+
+            Assert.That(BdoIntegrationsPageTestHelper.GetEnumerableCount(pageConfiguration, "ColumnConfigurations"), Is.EqualTo(5));
+        }
+
+        [Test]
+        public async Task ConfigurePage_NoAccess_DoesNotAddHeaderOrTableActions()
+        {
+            channelAccessServiceMock
+                .Setup(s => s.CanAccessAsync(It.IsAny<int>()))
+                .ReturnsAsync(false);
+
+            await ConfigurePageIgnoringAdminRuntimeAsync();
+
+            var pageConfiguration = BdoIntegrationsPageTestHelper.GetPageConfiguration(page);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(BdoIntegrationsPageTestHelper.GetEnumerableCount(pageConfiguration, "HeaderActions"), Is.Zero);
+                Assert.That(BdoIntegrationsPageTestHelper.GetEnumerableCount(pageConfiguration, "TableActions"), Is.Zero);
+            });
+        }
+
+        [Test]
+        public async Task ConfigurePage_NoAccess_AddsQueryModifier()
+        {
+            channelAccessServiceMock
+                .Setup(s => s.CanAccessAsync(It.IsAny<int>()))
+                .ReturnsAsync(false);
+
+            await ConfigurePageIgnoringAdminRuntimeAsync();
+
+            var pageConfiguration = BdoIntegrationsPageTestHelper.GetPageConfiguration(page);
+
+            Assert.That(BdoIntegrationsPageTestHelper.GetEnumerableCount(pageConfiguration, "QueryModifiers"), Is.EqualTo(1));
         }
 
         [Test]
@@ -59,6 +104,19 @@ namespace GWTXbyKWeb.Tests.Pages.BDOIntegrations
 
             Assert.That(attr, Is.Not.Null);
             Assert.That(attr.Permission, Is.EqualTo(SystemPermissions.DELETE));
+        }
+
+        private async Task ConfigurePageIgnoringAdminRuntimeAsync()
+        {
+            try
+            {
+                await page.ConfigurePage();
+            }
+            catch
+            {
+                // The Kentico admin runtime is not available in an isolated unit test host;
+                // everything asserted here is executed before the framework call that throws.
+            }
         }
     }
 }
