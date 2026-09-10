@@ -405,7 +405,7 @@ public class PageAttachmentServiceTests
             System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(fullPath)!);
             await System.IO.File.WriteAllBytesAsync(fullPath, expected);
 
-            _hostEnvironmentMock.Setup(x => x.WebRootPath).Returns((string?)null);
+            _hostEnvironmentMock.Setup(x => x.WebRootPath).Returns(string.Empty);
             _hostEnvironmentMock.Setup(x => x.ContentRootPath).Returns(rootPath);
 
             var result = await InvokePrivateInstanceAsync<byte[]?>(
