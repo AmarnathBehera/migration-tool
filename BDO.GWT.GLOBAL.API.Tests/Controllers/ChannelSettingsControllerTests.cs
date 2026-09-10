@@ -89,7 +89,7 @@ public class ChannelSettingsControllerTests
         Assert.Multiple(() =>
         {
             Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
-            Assert.That((ChannelSettingOutput[])okResult.Value!, Has.Length.EqualTo(0));
+            Assert.That(okResult.Value, Is.EqualTo(expected));
         });
     }
 
@@ -146,11 +146,6 @@ public class ChannelSettingsControllerTests
 
         var result = await _controller.PutChannelSetting(100, codeName, request, CancellationToken.None);
 
-        var okResult = (OkObjectResult)result.Result!;
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
-            Assert.That(okResult.Value, Is.Null);
-        });
+        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
     }
 }
