@@ -416,7 +416,7 @@ namespace BDO.GWT.Core.Tests.Helpers
 
         #endregion
 
-        #region Publish from date
+        #region Date
 
         [Test]
         public async Task GetSearchCardDtos_ForInsight_WithPublishFromHavingTimeComponent_StripsTimeAndReturnsDateOnly()
@@ -427,12 +427,12 @@ namespace BDO.GWT.Core.Tests.Helpers
             var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
             var card = (InsightSearchCardDto)result[0].DataObject!;
 
-            Assert.That(card.PublishFrom, Is.EqualTo(new DateTime(2025, 6, 15)));
+            Assert.That(card.Date, Is.EqualTo(new DateTime(2025, 6, 15)));
         }
 
 
         [Test]
-        public async Task GetSearchCardDtos_ForInsight_WithNullPublishFrom_LeavesPublishedFromNull()
+        public async Task GetSearchCardDtos_ForInsight_WithNullPublishFrom_LeavesDateNull()
         {
             var document = Document(1, INSIGHT_CLASS_NAME);
             document.PublishFrom = null;
@@ -440,7 +440,7 @@ namespace BDO.GWT.Core.Tests.Helpers
             var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
             var card = (InsightSearchCardDto)result[0].DataObject!;
 
-            Assert.That(card.PublishFrom, Is.Null);
+            Assert.That(card.Date, Is.Null);
         }
 
 
