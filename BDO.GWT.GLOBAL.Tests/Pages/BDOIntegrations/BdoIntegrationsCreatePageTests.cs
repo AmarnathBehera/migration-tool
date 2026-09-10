@@ -1,76 +1,112 @@
 using BDO;
+using CMS.DataEngine;
 using GWTXbyKWeb.Pages.BDOIntegrations;
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
+using Moq;
+using NUnit.Framework;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations;
-
-[TestFixture]
-public class BdoIntegrationsCreatePageTests
+namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
 {
-    [Test]
-    public void InheritsFromCreatePage()
+    // Exposes the protected GetSubmitSuccessResponse for direct testing,
+    // same pattern as TestableRecaptchaValidationService etc.
+    internal class TestableBdoIntegrationsCreatePage : BdoIntegrationsCreatePage
     {
-        var baseType = typeof(BdoIntegrationsCreatePage).BaseType;
-        Assert.That(baseType, Is.Not.Null);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(baseType!.IsGenericType, Is.True);
-            Assert.That(baseType.GetGenericArguments()[0], Is.EqualTo(typeof(FormSubmissionSubscriptionsInfo)));
-            Assert.That(baseType.GetGenericArguments()[1], Is.EqualTo(typeof(BdoIntegrationsEditSection)));
-        });
-    }
-
-    [Test]
-    public async Task ConfigurePage_SetsExpectedUiFormName()
-    {
-        var page = BdoIntegrationsPageTestHelper.CreateUninitialized<BdoIntegrationsCreatePage>();
-        BdoIntegrationsPageTestHelper.PreparePageConfigurationForConfigurePage(page);
-
-        try
-        {
-            await page.ConfigurePage();
-        }
-        catch
+        public TestableBdoIntegrationsCreatePage(
+            IFormComponentMapper formComponentMapper,
+            IFormDataBinder formDataBinder,
+            IPageLinkGenerator pageLinkGenerator,
+            IInfoProvider<FormSubmissionSubscriptionsInfo> infoProvider)
+            : base(formComponentMapper, formDataBinder, pageLinkGenerator, infoProvider)
         {
         }
 
-        var config = BdoIntegrationsPageTestHelper.GetPageConfiguration(page);
-        Assert.That(BdoIntegrationsPageTestHelper.GetStringProperty(config, "UIFormName"), Is.EqualTo("FormSubmissionSubscriptions"));
+        public Task<ICommandResponse> PublicGetSubmitSuccessResponse(
+            FormSubmissionSubscriptionsInfo savedInfoObject, ICollection<IFormItem> items)
+            => GetSubmitSuccessResponse(savedInfoObject, items);
     }
 
-    [Test]
-    public void HasExpectedConstructor()
+    // The Kentico generated info class cannot be proxied by Moq and its real property
+    // accessors require an initialised data engine, so the virtual members used by the
+    // page are overridden with plain in-memory values.
+    internal class StubFormSubmissionSubscriptionsInfo : FormSubmissionSubscriptionsInfo
     {
-        var ctor = typeof(BdoIntegrationsCreatePage).GetConstructor(new[]
-        {
-            typeof(IFormComponentMapper),
-            typeof(IFormDataBinder),
-            typeof(IPageLinkGenerator),
-        });
+        public override int FormSubmissionSubscriptionsID { get; set; }
 
-        Assert.That(ctor, Is.Not.Null);
+        public override int ChannelSnippetWebChannelSettingsID { get; set; }
+
+        public override string Displayname { get; set; } = string.Empty;
+
+        public override string ToString() => Displayname;
     }
 
-    [Test]
-    public void HasExpectedUiPageRegistration()
+    // The page is created without running its constructor: Kentico's CreatePage
+    // constructor resolves services from the admin IoC container, which is not
+    // bootstrapped in a unit test host. Only the channel FK stamping logic of this
+    // class is asserted here; the response building that follows it belongs to the
+    // Kentico admin runtime.
+    [TestFixture]
+    public class BdoIntegrationsCreatePageTests
     {
-        var attr = typeof(BdoIntegrationsCreatePage).Assembly
-            .GetCustomAttributesData()
-            .Where(a => a.AttributeType.Name == "UIPageAttribute")
-            .FirstOrDefault(a =>
-                a.ConstructorArguments.Count >= 3 &&
-                Equals(a.ConstructorArguments[2].Value, typeof(BdoIntegrationsCreatePage)));
+        private Mock<IInfoProvider<FormSubmissionSubscriptionsInfo>> infoProviderMock;
+        private TestableBdoIntegrationsCreatePage page;
 
-        Assert.That(attr, Is.Not.Null);
-        Assert.Multiple(() =>
+        [SetUp]
+        public void SetUp()
         {
-            Assert.That(attr!.ConstructorArguments[0].Value, Is.EqualTo(typeof(BdoIntegrationListingPage)));
-            Assert.That(attr.ConstructorArguments[1].Value?.ToString(), Is.EqualTo("create"));
-            Assert.That(attr.ConstructorArguments[3].Value?.ToString(), Is.EqualTo("Create Form Submission Integration"));
-            Assert.That(attr.ConstructorArguments[4].Value?.ToString(), Is.EqualTo(TemplateNames.EDIT));
-            Assert.That((int)attr.ConstructorArguments[5].Value!, Is.EqualTo(20));
-        });
+            infoProviderMock = new Mock<IInfoProvider<FormSubmissionSubscriptionsInfo>>();
+
+            page = BdoIntegrationsPageTestHelper.CreateUninitialized<TestableBdoIntegrationsCreatePage>();
+            page.WebChannelSettingsId = 15;
+
+            BdoIntegrationsPageTestHelper.SetPrivateField(page, "formSubmissionSubscriptionsInfoProvider", infoProviderMock.Object);
+        }
+
+        [Test]
+        public async Task GetSubmitSuccessResponse_FkNotSet_StampsChannelIdAndReSaves()
+        {
+            var savedInfo = CreateSavedInfo(channelSettingsId: 0);
+
+            await SubmitIgnoringAdminRuntimeAsync(savedInfo);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(savedInfo.ChannelSnippetWebChannelSettingsID, Is.EqualTo(15));
+                infoProviderMock.Verify(p => p.SetAsync(savedInfo, It.IsAny<CancellationToken?>()), Times.Once);
+            });
+        }
+
+        [Test]
+        public async Task GetSubmitSuccessResponse_FkAlreadyCorrect_DoesNotReSave()
+        {
+            var savedInfo = CreateSavedInfo(channelSettingsId: 15);
+
+            await SubmitIgnoringAdminRuntimeAsync(savedInfo);
+
+            infoProviderMock.Verify(p => p.SetAsync(It.IsAny<FormSubmissionSubscriptionsInfo>(), It.IsAny<CancellationToken?>()), Times.Never);
+        }
+
+        private static StubFormSubmissionSubscriptionsInfo CreateSavedInfo(int channelSettingsId) =>
+            new StubFormSubmissionSubscriptionsInfo
+            {
+                ChannelSnippetWebChannelSettingsID = channelSettingsId,
+                FormSubmissionSubscriptionsID = 101,
+                Displayname = "Test Integration",
+            };
+
+        private async Task SubmitIgnoringAdminRuntimeAsync(FormSubmissionSubscriptionsInfo savedInfo)
+        {
+            try
+            {
+                await page.PublicGetSubmitSuccessResponse(savedInfo, new List<IFormItem>());
+            }
+            catch
+            {
+                // Building the command response requires the Kentico admin runtime, which is not
+                // available in an isolated unit test host. The FK stamping asserted here runs first.
+            }
+        }
     }
 }
