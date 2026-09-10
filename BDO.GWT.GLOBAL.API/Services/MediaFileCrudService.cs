@@ -139,12 +139,14 @@ public class MediaFileCrudService : IMediaFileCrudService
 
     private Uri? BuildAssetUri(string assetUrl)
     {
-        if (Uri.TryCreate(assetUrl.Trim(), UriKind.Absolute, out var absoluteUri))
+        var trimmedAssetUrl = assetUrl.Trim();
+        if (Uri.TryCreate(trimmedAssetUrl, UriKind.Absolute, out var absoluteUri)
+            && (absoluteUri.Scheme == Uri.UriSchemeHttp || absoluteUri.Scheme == Uri.UriSchemeHttps))
         {
             return absoluteUri;
         }
 
-        var normalizedPath = NormalizePath(assetUrl);
+        var normalizedPath = NormalizePath(trimmedAssetUrl);
         var queryIndex = normalizedPath.IndexOf('?');
         var path = queryIndex >= 0 ? normalizedPath[..queryIndex] : normalizedPath;
         var query = queryIndex >= 0 ? normalizedPath[(queryIndex + 1)..] : string.Empty;
