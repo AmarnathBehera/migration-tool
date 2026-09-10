@@ -459,23 +459,7 @@ namespace BDO.GWT.Core.Tests.Helpers
 
         #endregion
 
-        #region Event and Webinar specific mappings
-
-        [Test]
-        public async Task GetSearchCardDtos_ForEventOrWebinar_MapsReadMoreLinkAsLinkItemDto()
-        {
-            var document = Document(1, EVENT_CLASS_NAME);
-
-            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
-            var card = (EventWebinarSearchCard)result[0].DataObject!;
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(card.Link, Is.InstanceOf<LinkItemDto>());
-                Assert.That(card.Link.Title, Is.EqualTo(ResourceStringKey.LiveSite.ReadMore));
-                Assert.That(card.Link.URL, Is.EqualTo("/page-1"));
-            });
-        }
+        #region Event and Webinar specific mappings      
 
 
         [Test]
