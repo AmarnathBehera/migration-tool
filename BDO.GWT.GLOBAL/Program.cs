@@ -184,7 +184,7 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseWhen(
         context => !context.Request.Host.Host.StartsWith(
-            builder.Configuration["BDO.AdminSiteUrl"],
+            builder.Configuration["BDOAdminSiteUrl"],
             StringComparison.OrdinalIgnoreCase),
         branch =>
         {
@@ -196,7 +196,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseWhen(
     context => !context.Request.Host.Host.StartsWith(
-        builder.Configuration["BDO.AdminSiteUrl"],
+        builder.Configuration["BDOAdminSiteUrl"],
         StringComparison.OrdinalIgnoreCase),
     branch =>
     {

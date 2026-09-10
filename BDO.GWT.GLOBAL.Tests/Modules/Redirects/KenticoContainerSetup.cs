@@ -6,6 +6,7 @@ using CMS.Modules;
 using CMS.Websites;
 using CMS.Websites.Internal;
 using Moq;
+using System.Reflection;
 using CoreService = global::CMS.Core.Service;
 using RedirectInfoX = global::BDO.RedirectInfo;
 
@@ -57,8 +58,38 @@ public static class KenticoContainerSetup
         CoreService.Use<IConversionService>(new Mock<IConversionService>().Object);
         CoreService.Use<IEventLogService>(new Mock<IEventLogService>().Object);
         CoreService.Use<ISettingsService>(new Mock<ISettingsService>().Object);
+        CoreService.Use<IAppSettingsService>(new Mock<IAppSettingsService>().Object);
+
+        // Admin UI services that admin page base classes resolve during construction and
+        // while building their page configuration. They are internal to the Kentico admin
+        // assembly, so they are registered through reflection.
+        UseMockedAdminService("Kentico.Xperience.Admin.Base.IActionConfigurationGenerator");
+        UseMockedAdminService("Kentico.Xperience.Admin.Base.IPageParameterValueProvider");
+        UseMockedAdminService("Kentico.Xperience.Admin.Base.Forms.IFormDataValidator");
 
         CoreService.InitializeContainer();
+    }
+
+    private static void UseMockedAdminService(string typeName)
+    {
+        var serviceType = typeof(Kentico.Xperience.Admin.Base.ApplicationPage).Assembly.GetType(typeName);
+        if (serviceType is null)
+        {
+            return;
+        }
+
+        var mock = (Mock)Activator.CreateInstance(typeof(Mock<>).MakeGenericType(serviceType))!;
+
+        var useMethod = typeof(CoreService)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .First(m => m.Name == nameof(CoreService.Use)
+                && m.IsGenericMethodDefinition
+                && m.GetGenericArguments().Length == 1
+                && m.GetParameters().Length == 2
+                && m.GetParameters()[0].ParameterType == typeof(object))
+            .MakeGenericMethod(serviceType);
+
+        useMethod.Invoke(null, new object?[] { mock.Object, null });
     }
 
     /// <summary>Resets all shared provider mocks so a test starts from a clean slate.</summary>

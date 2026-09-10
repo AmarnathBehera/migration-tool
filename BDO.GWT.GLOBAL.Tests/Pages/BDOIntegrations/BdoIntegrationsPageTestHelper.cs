@@ -75,6 +75,23 @@ internal static class BdoIntegrationsPageTestHelper
         return property?.GetValue(target)?.ToString();
     }
 
+    public static void SetPrivateField(object target, string fieldName, object? value)
+    {
+        const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
+
+        for (var type = target.GetType(); type is not null; type = type.BaseType)
+        {
+            var field = type.GetField(fieldName, flags);
+            if (field is not null)
+            {
+                field.SetValue(target, value);
+                return;
+            }
+        }
+
+        throw new InvalidOperationException($"Field {fieldName} was not found.");
+    }
+
     private static FieldInfo? FindMatchingField(Type type, string propertyName, Type fieldType)
     {
         const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
