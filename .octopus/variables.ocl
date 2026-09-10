@@ -64,12 +64,12 @@ variable "appsettings.syncGlobalSiteGuid" {
 
     value "CDD133DB-1319-42C7-B3BD-9A1CF2DBA942" {
         description = ""
-        environment = ["Development"]
+        environment = ["development"]
     }
 
     value "4678b9ef-ab99-4d15-a92a-ddd42a9f0782" {
         description = ""
-        environment = ["Test"]
+        environment = ["test"]
     }
 
 }
