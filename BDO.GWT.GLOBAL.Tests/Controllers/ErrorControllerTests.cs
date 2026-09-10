@@ -1,6 +1,9 @@
 using BDO;
 using BDO.GWT.Core.Services;
+using BDO.GWT.GLOBAL.Controllers;
+using CMS.ContentEngine;
 using CMS.Core;
+using CMS.DataEngine;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
@@ -12,9 +15,9 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using BDO.GWT.GLOBAL.Controllers;
 
 namespace BDO.GWT.GLOBAL.Tests.Controllers
 {
@@ -24,6 +27,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
         private Mock<IWebPageDataContextInitializer> _webPageDataContextInitializerMock = null!;
         private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
         private Mock<IEventLogService> _eventLogServiceMock = null!;
+        private Mock<IInfoProvider<ContentLanguageInfo>> _languageProviderMock = null!;
         private ErrorController _controller = null!;
         private DefaultHttpContext _httpContext = null!;
 
@@ -34,10 +38,15 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             _webPageDataContextInitializerMock = new Mock<IWebPageDataContextInitializer>();
             _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
             _eventLogServiceMock = new Mock<IEventLogService>();
+            _languageProviderMock = new Mock<IInfoProvider<ContentLanguageInfo>>();
 
             _websiteChannelContextMock
                 .Setup(x => x.WebsiteChannelName)
                 .Returns("TestChannel");
+
+            // Pre-seed the static valid-languages cache so the tests don't need to mock
+            // the Kentico ObjectQuery fluent chain used by LoadValidLanguagesAsync.
+            SeedValidLanguages("en-gb", "fr-fr");
 
             _httpContext = new DefaultHttpContext();
 
@@ -45,7 +54,8 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 _errorServiceMock.Object,
                 _webPageDataContextInitializerMock.Object,
                 _websiteChannelContextMock.Object,
-                _eventLogServiceMock.Object)
+                _eventLogServiceMock.Object,
+                _languageProviderMock.Object)
             {
                 ControllerContext = new ControllerContext
                 {
@@ -58,6 +68,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
         public void TearDown()
         {
             _controller.Dispose();
+            ResetValidLanguagesCache();
         }
 
         [Test]
@@ -157,23 +168,11 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
         }
 
         [Test]
-        public async Task Index_ExtractsLanguageFromUrl_AndPassesToErrorService()
+        public async Task Index_ExtractsLanguageFromUrl_WhenLanguageIsConfigured()
         {
             SetReExecuteFeature("/fr-fr/introuvable");
 
-            string? capturedLanguage = null;
-
-            _errorServiceMock
-                .Setup(x => x.GetStatusCodePageAsync(
-                    It.IsAny<IStatusCodeReExecuteFeature>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<CancellationToken>()))
-                .Callback<IStatusCodeReExecuteFeature, string, string, CancellationToken>(
-                    (_, lang, _, _) => capturedLanguage = lang)
-                .ReturnsAsync((StatusCode?)null);
-
-            await _controller.Index(404, CancellationToken.None);
+            var capturedLanguage = await CaptureLanguageAsync(404);
 
             Assert.That(capturedLanguage, Is.EqualTo("fr-fr"));
         }
@@ -183,6 +182,75 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
         {
             SetReExecuteFeature("/broken-page");
 
+            var capturedLanguage = await CaptureLanguageAsync(404);
+
+            Assert.That(capturedLanguage, Is.EqualTo("en-gb"));
+        }
+
+        [Test]
+        public async Task Index_DefaultsToEnGb_WhenSegmentLooksLikeLanguageButIsNotConfigured()
+        {
+            // "ln" matches the shape regex but is NOT a real Kentico language.
+            // Previously this caused: InvalidOperationException "Language 'ln' does not exist."
+            SetReExecuteFeature("/ln/some-page");
+
+            var capturedLanguage = await CaptureLanguageAsync(404);
+
+            Assert.That(capturedLanguage, Is.EqualTo("en-gb"));
+        }
+
+        [Test]
+        public async Task Index_DefaultsToEnGb_WhenFirstSegmentIsNotLanguageShape()
+        {
+            SetReExecuteFeature("/products/details");
+
+            var capturedLanguage = await CaptureLanguageAsync(404);
+
+            Assert.That(capturedLanguage, Is.EqualTo("en-gb"));
+        }
+
+        [Test]
+        public async Task Index_DefaultsToEnGb_WhenOriginalPathIsEmpty()
+        {
+            SetReExecuteFeature(string.Empty);
+
+            var capturedLanguage = await CaptureLanguageAsync(404);
+
+            Assert.That(capturedLanguage, Is.EqualTo("en-gb"));
+        }
+
+        [Test]
+        public async Task Index_UsesResolvedLanguage_WhenInitializingWebPageDataContext()
+        {
+            SetReExecuteFeature("/fr-fr/broken");
+
+            var statusPage = CreateStatusCodePage();
+
+            _errorServiceMock
+                .Setup(x => x.GetStatusCodePageAsync(
+                    It.IsAny<IStatusCodeReExecuteFeature>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(statusPage);
+
+            RoutedWebPage? captured = null;
+            _webPageDataContextInitializerMock
+                .Setup(x => x.Initialize(It.IsAny<RoutedWebPage>()))
+                .Callback<RoutedWebPage>(p => captured = p);
+
+            await _controller.Index(500, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(captured, Is.Not.Null);
+                Assert.That(captured!.LanguageName, Is.EqualTo("fr-fr"));
+                Assert.That(captured.WebsiteChannelName, Is.EqualTo("TestChannel"));
+            });
+        }
+
+        private async Task<string?> CaptureLanguageAsync(int code)
+        {
             string? capturedLanguage = null;
 
             _errorServiceMock
@@ -195,9 +263,9 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                     (_, lang, _, _) => capturedLanguage = lang)
                 .ReturnsAsync((StatusCode?)null);
 
-            await _controller.Index(404, CancellationToken.None);
+            await _controller.Index(code, CancellationToken.None);
 
-            Assert.That(capturedLanguage, Is.EqualTo("en-gb"));
+            return capturedLanguage;
         }
 
         private void SetReExecuteFeature(string originalPath)
@@ -220,6 +288,28 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                     WebPageItemID = 42
                 }
             };
+        }
+
+        // Seeds the static valid-languages cache on ErrorController so tests don't need
+        // to mock the Kentico ObjectQuery<ContentLanguageInfo> fluent chain.
+        private static void SeedValidLanguages(params string[] languageNames)
+        {
+            var set = new HashSet<string>(languageNames, StringComparer.OrdinalIgnoreCase);
+            GetValidLanguagesField().SetValue(null, Task.FromResult(set));
+        }
+
+        private static void ResetValidLanguagesCache()
+        {
+            GetValidLanguagesField().SetValue(null, null);
+        }
+
+        private static System.Reflection.FieldInfo GetValidLanguagesField()
+        {
+            return typeof(ErrorController).GetField(
+                "_validLanguagesTask",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                ?? throw new InvalidOperationException(
+                    "Static field '_validLanguagesTask' was not found on ErrorController.");
         }
     }
 }
