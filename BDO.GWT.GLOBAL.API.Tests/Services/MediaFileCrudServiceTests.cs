@@ -377,6 +377,23 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
+    public void BuildAssetUri_WhenDevelopmentAndRelativePathHasQuery_PreservesQuery()
+    {
+        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
+        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Development");
+
+        var service = CreateSut(hostEnvironment: hostEnvironmentMock.Object);
+
+        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "~/getmedia/img.jpg?language=en-gb");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.AbsoluteUri, Is.EqualTo("http://localhost:12393/getmedia/img.jpg?language=en-gb"));
+        });
+    }
+
+    [Test]
     public void BuildAssetUri_WhenProductionAndNoHttpContext_ReturnsNull()
     {
         var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
@@ -416,6 +433,30 @@ public class MediaFileCrudServiceTests
         {
             Assert.That(result, Is.Not.Null);
             Assert.That(result!.AbsoluteUri, Is.EqualTo("https://example.com/getmedia/img.jpg"));
+        });
+    }
+
+    [Test]
+    public void BuildAssetUri_WhenProductionAndHttpContextPresentAndPathHasQuery_PreservesQuery()
+    {
+        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
+        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
+
+        var httpContext = new DefaultHttpContext();
+        httpContext.Request.Scheme = "https";
+        httpContext.Request.Host = new HostString("example.com");
+
+        var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+        httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
+
+        var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
+
+        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "getmedia/img.jpg?language=en-gb");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.AbsoluteUri, Is.EqualTo("https://example.com/getmedia/img.jpg?language=en-gb"));
         });
     }
 

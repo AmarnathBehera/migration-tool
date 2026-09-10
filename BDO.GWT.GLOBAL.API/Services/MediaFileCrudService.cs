@@ -371,7 +371,7 @@ public class MediaFileCrudService : IMediaFileCrudService
 
         int createdContentItemId = await manager.Create(attachmentParameters, createItemData, cancellationToken);
 
-        var createdContentItem = await manager.TryPublish(createdContentItemId, languageName, cancellationToken);
+        await manager.TryPublish(createdContentItemId, languageName, cancellationToken);
 
         var created = await GetMediaFileByIdAsync(createdContentItemId, cancellationToken);
         return created!;

@@ -5,7 +5,6 @@ using CMS.ContentEngine;
 using CMS.ContentEngine.Internal;
 using CMS.Membership;
 using CMS.Websites;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using System.Reflection;
@@ -43,8 +42,7 @@ public class PageAttachmentCrudServiceTests
             _webPageManagerFactoryMock.Object,
             _contentItemManagerFactoryMock.Object,
             _userInfoProviderMock.Object,
-            _contentItemInfoServiceMock.Object,
-            new Mock<IWebHostEnvironment>().Object);
+            _contentItemInfoServiceMock.Object);
     }
 
     private static BDO.ContentAttachment CreateAttachment(Guid guid, ContentItemAsset? asset = null)

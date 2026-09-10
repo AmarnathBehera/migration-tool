@@ -176,12 +176,12 @@ namespace BDO.GWT.GLOBAL.API.Data
             }
         }
 
-        private bool IsRelativeUrl(string url)
+        private static bool IsRelativeUrl(string url)
         {
             if (string.IsNullOrEmpty(url))
                 return false;
 
-            return url.StartsWith("/") || url.StartsWith("~") || !Uri.IsWellFormedUriString(url, UriKind.Absolute);
+            return url.StartsWith('/') || url.StartsWith('~') || !Uri.IsWellFormedUriString(url, UriKind.Absolute);
         }
 
         private async Task<byte[]?> TryReadFileFromDiskAsync(string assetUrl, CancellationToken cancellationToken = default)

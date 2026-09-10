@@ -15,9 +15,7 @@ namespace BDO.GWT.GLOBAL.API.Services
         private readonly IContentItemManagerFactory contentItemManagerFactory;
         private readonly IUserInfoProvider userInfoProvider;
         private readonly IContentItemInfoService contentItemInfoService;
-        private readonly IWebHostEnvironment _hostEnvironment;
-        private const string DevelopmentLiveSiteHost = "localhost";
-        private const int DevelopmentLiveSitePort = 12393;
+
         public PageAttachmentCrudService(
             IPageAttachmentService pageAttachmentService,
             IPageChannelResolver pageChannelResolver,
@@ -25,8 +23,7 @@ namespace BDO.GWT.GLOBAL.API.Services
             IWebPageManagerFactory webPageManagerFactory,
             IContentItemManagerFactory contentItemManagerFactory,
             IUserInfoProvider userInfoProvider,
-            IContentItemInfoService contentItemInfoService,
-            IWebHostEnvironment hostEnvironment)
+            IContentItemInfoService contentItemInfoService)
         {
             this.pageAttachmentService = pageAttachmentService;
             this.pageChannelResolver = pageChannelResolver;
@@ -35,7 +32,6 @@ namespace BDO.GWT.GLOBAL.API.Services
             this.contentItemManagerFactory = contentItemManagerFactory;
             this.userInfoProvider = userInfoProvider;
             this.contentItemInfoService = contentItemInfoService;
-            _hostEnvironment = hostEnvironment;
         }
 
         public async Task<PageAttachmentOutput?> GetAttachmentAsync(
