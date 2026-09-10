@@ -33,7 +33,6 @@ namespace GWTXbyKWeb.Pages.BDOIntegrations
         {
             PageConfiguration.ColumnConfigurations
                 .AddColumn(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelDisplayName), "Channel");
-            PageConfiguration.AddEditRowAction<BdoIntegrationsChannelEditSection>();
 
             var accessibleIds = await channelAccessService.GetAccessibleWebChannelSettingsIdsAsync();
             if (accessibleIds != null)
@@ -54,6 +53,8 @@ namespace GWTXbyKWeb.Pages.BDOIntegrations
                     }
                 }));
             }
+
+            PageConfiguration.AddEditRowAction<BdoIntegrationsChannelEditSection>();
 
             await base.ConfigurePage();
         }

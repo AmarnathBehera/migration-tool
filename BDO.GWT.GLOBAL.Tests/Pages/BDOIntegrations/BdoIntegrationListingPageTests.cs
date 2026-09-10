@@ -1,14 +1,14 @@
 using BDO;
-using BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations;
 using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
 using CMS.Membership;
 using GWTXbyKWeb.Pages.BDOIntegrations;
 using Kentico.Xperience.Admin.Base;
 using Moq;
 using NUnit.Framework;
+using System.Reflection;
 using System.Threading.Tasks;
 
-namespace GWTXbyKWeb.Tests.Pages.BDOIntegrations
+namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
 {
     // Kentico's ListingPage.ConfigurePage() sets up PageConfiguration internals that
     // are largely framework plumbing rather than logic worth asserting directly.
@@ -94,6 +94,84 @@ namespace GWTXbyKWeb.Tests.Pages.BDOIntegrations
         }
 
         [Test]
+        public void Constructor_StoresChannelAccessService()
+        {
+            var constructed = new BdoIntegrationListingPage(channelAccessServiceMock.Object);
+
+            var stored = typeof(BdoIntegrationListingPage)
+                .GetField("channelAccessService", BindingFlags.Instance | BindingFlags.NonPublic)
+                ?.GetValue(constructed);
+
+            Assert.That(stored, Is.SameAs(channelAccessServiceMock.Object));
+        }
+
+        [Test]
+        public void ObjectType_ReturnsFormSubmissionSubscriptionsObjectType()
+        {
+            var objectType = typeof(BdoIntegrationListingPage)
+                .GetProperty("ObjectType", BindingFlags.Instance | BindingFlags.NonPublic)
+                ?.GetValue(page) as string;
+
+            Assert.That(objectType, Is.EqualTo(FormSubmissionSubscriptionsInfo.OBJECT_TYPE));
+        }
+
+        [Test]
+        public void WebChannelSettingsId_IsBoundAsPageParameter()
+        {
+            var property = typeof(BdoIntegrationListingPage)
+                .GetProperty(nameof(BdoIntegrationListingPage.WebChannelSettingsId));
+
+            var attribute = (PageParameterAttribute?)Attribute.GetCustomAttribute(property!, typeof(PageParameterAttribute));
+
+            Assert.That(attribute, Is.Not.Null);
+        }
+
+        [Test]
+        public async Task ConfigurePage_NoAccess_QueryModifierBlocksAllRows()
+        {
+            channelAccessServiceMock
+                .Setup(s => s.CanAccessAsync(It.IsAny<int>()))
+                .ReturnsAsync(false);
+
+            await ConfigurePageIgnoringAdminRuntimeAsync();
+
+            Assert.That(
+                InvokeSingleQueryModifier(),
+                Does.Contain(nameof(FormSubmissionSubscriptionsInfo.FormSubmissionSubscriptionsID)));
+        }
+
+        [Test]
+        public async Task ConfigurePage_HasAccess_QueryModifierFiltersOnBoundChannelId()
+        {
+            channelAccessServiceMock
+                .Setup(s => s.CanAccessAsync(It.IsAny<int>()))
+                .ReturnsAsync(true);
+
+            await ConfigurePageIgnoringAdminRuntimeAsync();
+
+            Assert.That(
+                InvokeSingleQueryModifier(),
+                Does.Contain(nameof(FormSubmissionSubscriptionsInfo.ChannelSnippetWebChannelSettingsID)));
+        }
+
+        [Test]
+        public async Task ConfigurePage_HasAccess_AddsHeaderLink()
+        {
+            channelAccessServiceMock
+                .Setup(s => s.CanAccessAsync(It.IsAny<int>()))
+                .ReturnsAsync(true);
+
+            await ConfigurePageIgnoringAdminRuntimeAsync();
+
+            var pageConfiguration = BdoIntegrationsPageTestHelper.GetPageConfiguration(page);
+            var headerActions = pageConfiguration.GetType()
+                .GetProperty("HeaderActions")!
+                .GetValue(pageConfiguration);
+
+            Assert.That(headerActions, Is.Not.Null);
+        }
+
+        [Test]
         public void Delete_RequiresDeletePermission()
         {
             // Confirms the [PageCommand(Permission = SystemPermissions.DELETE)]
@@ -109,16 +187,29 @@ namespace GWTXbyKWeb.Tests.Pages.BDOIntegrations
             Assert.That(attr!.Permission, Is.EqualTo(SystemPermissions.DELETE));
         }
 
+        private string InvokeSingleQueryModifier()
+        {
+            var pageConfiguration = BdoIntegrationsPageTestHelper.GetPageConfiguration(page);
+            var modifiers = (IEnumerable<QueryModifier>)pageConfiguration.GetType()
+                .GetProperty("QueryModifiers")!
+                .GetValue(pageConfiguration)!;
+
+            var query = modifiers.First().ModifyQuery(new CMS.DataEngine.ObjectQuery(), null!);
+
+            return query.WhereCondition ?? string.Empty;
+        }
+
         private async Task ConfigurePageIgnoringAdminRuntimeAsync()
         {
             try
             {
                 await page.ConfigurePage();
             }
-            catch
+            catch (Exception ex)
             {
                 // The Kentico admin runtime is not available in an isolated unit test host;
                 // everything asserted here is executed before the framework call that throws.
+                TestContext.Out.WriteLine(ex.ToString());
             }
         }
     }

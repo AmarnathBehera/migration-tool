@@ -1,5 +1,4 @@
 using BDO;
-using BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations;
 using CMS.DataEngine;
 using GWTXbyKWeb.Pages.BDOIntegrations;
 using Kentico.Xperience.Admin.Base;
@@ -9,7 +8,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace GWTXbyKWeb.Tests.Pages.BDOIntegrations
+namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
 {
     // Exposes the protected GetSubmitSuccessResponse for direct testing,
     // same pattern as TestableRecaptchaValidationService etc.
@@ -39,6 +38,8 @@ namespace GWTXbyKWeb.Tests.Pages.BDOIntegrations
         public override int ChannelSnippetWebChannelSettingsID { get; set; }
 
         public override string Displayname { get; set; } = string.Empty;
+
+        public override string ToString() => Displayname;
     }
 
     // The page is created without running its constructor: Kentico's CreatePage
@@ -73,7 +74,7 @@ namespace GWTXbyKWeb.Tests.Pages.BDOIntegrations
             Assert.Multiple(() =>
             {
                 Assert.That(savedInfo.ChannelSnippetWebChannelSettingsID, Is.EqualTo(15));
-                infoProviderMock.Verify(p => p.SetAsync(savedInfo, It.IsAny<CancellationToken>()), Times.Once);
+                infoProviderMock.Verify(p => p.SetAsync(savedInfo, It.IsAny<CancellationToken?>()), Times.Once);
             });
         }
 
@@ -84,7 +85,7 @@ namespace GWTXbyKWeb.Tests.Pages.BDOIntegrations
 
             await SubmitIgnoringAdminRuntimeAsync(savedInfo);
 
-            infoProviderMock.Verify(p => p.SetAsync(It.IsAny<FormSubmissionSubscriptionsInfo>(), It.IsAny<CancellationToken>()), Times.Never);
+            infoProviderMock.Verify(p => p.SetAsync(It.IsAny<FormSubmissionSubscriptionsInfo>(), It.IsAny<CancellationToken?>()), Times.Never);
         }
 
         private static StubFormSubmissionSubscriptionsInfo CreateSavedInfo(int channelSettingsId) =>

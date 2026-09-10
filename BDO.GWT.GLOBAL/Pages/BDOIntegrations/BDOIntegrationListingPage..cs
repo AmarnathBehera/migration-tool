@@ -34,6 +34,15 @@ namespace GWTXbyKWeb.Pages.BDOIntegrations
                         .AddColumn(nameof(FormSubmissionSubscriptionsInfo.Method), "Method")
                         .AddColumn(nameof(FormSubmissionSubscriptionsInfo.Endpoint), "Endpoint");
 
+            PageConfiguration.QueryModifiers.Add(new QueryModifier((query, _) =>
+            {
+                return canAccess
+                    ? query.WhereEquals(
+                        nameof(FormSubmissionSubscriptionsInfo.ChannelSnippetWebChannelSettingsID),
+                        WebChannelSettingsId)
+                    : query.WhereEquals(nameof(FormSubmissionSubscriptionsInfo.FormSubmissionSubscriptionsID), 0);
+            }));
+
             if (canAccess)
             {
                 var ancestorParams = new PageParameterValues
@@ -50,15 +59,6 @@ namespace GWTXbyKWeb.Pages.BDOIntegrations
 
                 PageConfiguration.TableActions.AddDeleteAction(nameof(Delete));
             }
-
-            PageConfiguration.QueryModifiers.Add(new QueryModifier((query, _) =>
-            {
-                return canAccess
-                    ? query.WhereEquals(
-                        nameof(FormSubmissionSubscriptionsInfo.ChannelSnippetWebChannelSettingsID),
-                        WebChannelSettingsId)
-                    : query.WhereEquals(nameof(FormSubmissionSubscriptionsInfo.FormSubmissionSubscriptionsID), 0);
-            }));
 
             await base.ConfigurePage();
         }
