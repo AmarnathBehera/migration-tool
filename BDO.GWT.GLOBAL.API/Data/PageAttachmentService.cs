@@ -1,6 +1,7 @@
 ﻿using BDO.GWT.Core;
 using CMS.Websites;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.Logging;
 using System.Net.Mime;
 
 namespace BDO.GWT.GLOBAL.API.Data
@@ -15,17 +16,20 @@ namespace BDO.GWT.GLOBAL.API.Data
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebHostEnvironment _hostEnvironment;
+        private readonly ILogger<PageAttachmentService> _logger;
 
         public PageAttachmentService(
             IContentService contentService,
             IHttpClientFactory httpClientFactory,
             IHttpContextAccessor httpContextAccessor,
-            IWebHostEnvironment hostEnvironment)
+            IWebHostEnvironment hostEnvironment,
+            ILogger<PageAttachmentService> logger)
         {
             _contentService = contentService;
             _httpClientFactory = httpClientFactory;
             _httpContextAccessor = httpContextAccessor;
             _hostEnvironment = hostEnvironment;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<ContentAttachment>> GetPageAttachmentsAsync(
@@ -56,45 +60,78 @@ namespace BDO.GWT.GLOBAL.API.Data
             string culture,
             CancellationToken cancellationToken = default)
         {
-            var attachments = await GetPageAttachmentsAsync(pageGuid, channelName, culture, cancellationToken);
-            var attachment = attachments.FirstOrDefault(x => x.SystemFields.ContentItemGUID == attachmentGuid);
-            var asset = attachment?.ContentAttachmentAsset;
-
-            if (asset?.Url is null)
+            try
             {
-                return null;
-            }
+                var attachments = await GetPageAttachmentsAsync(pageGuid, channelName, culture, cancellationToken);
+                var attachment = attachments.FirstOrDefault(x => x.SystemFields.ContentItemGUID == attachmentGuid);
+                var asset = attachment?.ContentAttachmentAsset;
 
-            var assetUri = BuildAssetUri(asset.Url);
-            if (assetUri is null)
-            {
-                return null;
-            }
-
-            // For development, try to read from file system first for relative URLs
-            if (_hostEnvironment.IsDevelopment() && IsRelativeUrl(asset.Url))
-            {
-                var fileData = await TryReadFileFromDiskAsync(asset.Url, cancellationToken);
-                if (fileData is not null)
+                if (asset?.Url is null)
                 {
-                    var contentType = GetMimeType(asset.Metadata.Extension ?? string.Empty);
-                    var fileName = asset.Metadata.Name ?? "attachment";
-                    return (fileData, contentType, fileName);
+                    _logger.LogWarning(
+                        "Attachment binary request skipped because asset URL is missing. PageGuid: {PageGuid}, AttachmentGuid: {AttachmentGuid}, Channel: {Channel}, Culture: {Culture}",
+                        pageGuid,
+                        attachmentGuid,
+                        channelName,
+                        culture);
+                    return null;
                 }
-            }
 
-            var response = await _httpClientFactory.CreateClient().GetAsync(assetUri, cancellationToken);
-            if (!response.IsSuccessStatusCode)
+                var assetUri = BuildAssetUri(asset.Url);
+                if (assetUri is null)
+                {
+                    _logger.LogWarning(
+                        "Attachment binary request skipped because asset URI could not be built. PageGuid: {PageGuid}, AttachmentGuid: {AttachmentGuid}, AssetUrl: {AssetUrl}, Channel: {Channel}, Culture: {Culture}",
+                        pageGuid,
+                        attachmentGuid,
+                        asset.Url,
+                        channelName,
+                        culture);
+                    return null;
+                }
+
+                // For development, try to read from file system first for relative URLs
+                if (_hostEnvironment.IsDevelopment() && IsRelativeUrl(asset.Url))
+                {
+                    var fileData = await TryReadFileFromDiskAsync(asset.Url, cancellationToken);
+                    if (fileData is not null)
+                    {
+                        var contentType = GetMimeType(asset.Metadata.Extension ?? string.Empty);
+                        var fileName = asset.Metadata.Name ?? "attachment";
+                        return (fileData, contentType, fileName);
+                    }
+                }
+
+                var response = await _httpClientFactory.CreateClient().GetAsync(assetUri, cancellationToken);
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning(
+                        "Attachment binary request failed with HTTP status {StatusCode}. PageGuid: {PageGuid}, AttachmentGuid: {AttachmentGuid}, AssetUri: {AssetUri}",
+                        (int)response.StatusCode,
+                        pageGuid,
+                        attachmentGuid,
+                        assetUri);
+                    return null;
+                }
+
+                var data = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+                var httpContentType = response.Content.Headers.ContentType?.MediaType
+                    ?? GetMimeType(asset.Metadata.Extension ?? string.Empty);
+                var httpFileName = asset.Metadata.Name ?? "attachment";
+
+                return (data, httpContentType, httpFileName);
+            }
+            catch (Exception ex)
             {
+                _logger.LogError(
+                    ex,
+                    "Attachment binary request failed unexpectedly. PageGuid: {PageGuid}, AttachmentGuid: {AttachmentGuid}, Channel: {Channel}, Culture: {Culture}",
+                    pageGuid,
+                    attachmentGuid,
+                    channelName,
+                    culture);
                 return null;
             }
-
-            var data = await response.Content.ReadAsByteArrayAsync(cancellationToken);
-            var httpContentType = response.Content.Headers.ContentType?.MediaType
-                ?? GetMimeType(asset.Metadata.Extension ?? string.Empty);
-            var httpFileName = asset.Metadata.Name ?? "attachment";
-
-            return (data, httpContentType, httpFileName);
         }
 
         private static string NormalizePath(string assetUrl)
@@ -140,7 +177,10 @@ namespace BDO.GWT.GLOBAL.API.Data
             }
 
             // Outside development: use current request's host
-            if (request is null)
+            if (request is null
+                || string.IsNullOrWhiteSpace(request.Scheme)
+                || !request.Host.HasValue
+                || string.IsNullOrWhiteSpace(request.Host.Host))
             {
                 return null;
             }

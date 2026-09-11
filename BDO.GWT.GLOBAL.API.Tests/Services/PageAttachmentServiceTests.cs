@@ -4,6 +4,7 @@ using CMS.ContentEngine;
 using CMS.Websites;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
 using System.Net;
@@ -43,7 +44,8 @@ public class PageAttachmentServiceTests
         _contentServiceMock.Object,
         _httpClientFactoryMock.Object,
         _httpContextAccessorMock.Object,
-        _hostEnvironmentMock.Object);
+        _hostEnvironmentMock.Object,
+        Mock.Of<ILogger<PageAttachmentService>>());
 
     // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -477,5 +479,29 @@ public class PageAttachmentServiceTests
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result!.Value.Data, Is.EqualTo(new byte[] { 1, 2, 3 }));
+    }
+
+    [Test]
+    public async Task GetPageAttachmentBinaryAsync_WhenProductionHostIsMissing_ReturnsNull()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+        var asset = CreateAsset("~/media/file.pdf", "file.pdf", ".pdf");
+        var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
+        SetupContentService(pageGuid, [page]);
+
+        SetupIsDevelopment(false);
+
+        var mockRequest = new Mock<HttpRequest>();
+        mockRequest.Setup(r => r.Scheme).Returns("https");
+        mockRequest.Setup(r => r.Host).Returns(default(HostString));
+
+        var mockHttpContext = new Mock<HttpContext>();
+        mockHttpContext.Setup(c => c.Request).Returns(mockRequest.Object);
+        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(mockHttpContext.Object);
+
+        var result = await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb");
+
+        Assert.That(result, Is.Null);
     }
 }

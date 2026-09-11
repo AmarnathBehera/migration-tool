@@ -2,6 +2,7 @@
 using BDO.GWT.GLOBAL.API.Bases;
 using BDO.GWT.GLOBAL.API.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
@@ -12,11 +13,14 @@ namespace BDO.GWT.GLOBAL.API.Controllers
     public class AttachmentsController : EntityControllerBase
     {
         private readonly IPageAttachmentCrudService attachmentService;
+        private readonly ILogger<AttachmentsController> logger;
 
         public AttachmentsController(
-            IPageAttachmentCrudService attachmentService)
+            IPageAttachmentCrudService attachmentService,
+            ILogger<AttachmentsController> logger)
         {
             this.attachmentService = attachmentService;
+            this.logger = logger;
         }
 
         [HttpGet]
@@ -117,6 +121,13 @@ namespace BDO.GWT.GLOBAL.API.Controllers
 
             if (result == null)
             {
+                logger.LogWarning(
+                    "Attachment binary not found or unavailable. MemberFirmID: {MemberFirmID}, PageGUID: {PageGUID}, AttachmentGUID: {AttachmentGUID}, Culture: {Culture}, ChannelId: {ChannelId}",
+                    memberFirmID,
+                    pageGUID,
+                    attachmentGUID,
+                    culture,
+                    channelId);
                 return NotFound();
             }
 

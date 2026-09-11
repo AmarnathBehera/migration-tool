@@ -413,6 +413,29 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
+    public void BuildAssetUri_WhenProductionAndHostIsMissing_ReturnsNull()
+    {
+        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
+        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
+
+        var httpContext = new DefaultHttpContext();
+        httpContext.Request.Scheme = "https";
+        httpContext.Request.Host = default;
+
+        var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+        httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
+
+        var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
+
+        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "~/getmedia/img.jpg");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Null);
+        });
+    }
+
+    [Test]
     public void BuildAssetUri_WhenProductionAndHttpContextPresent_UsesRequestSchemeAndHost()
     {
         var hostEnvironmentMock = new Mock<IWebHostEnvironment>();

@@ -161,7 +161,10 @@ public class MediaFileCrudService : IMediaFileCrudService
         }
 
         var request = _httpContextAccessor.HttpContext?.Request;
-        if (request is null)
+        if (request is null
+            || string.IsNullOrWhiteSpace(request.Scheme)
+            || !request.Host.HasValue
+            || string.IsNullOrWhiteSpace(request.Host.Host))
         {
             return null;
         }
