@@ -35,7 +35,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
     public class BdoIntegrationsChannelListingPageTests
     {
         private const BindingFlags InstanceNonPublic = BindingFlags.Instance | BindingFlags.NonPublic;
-
+        private static readonly int[] AccessibleChannelIds = { 1, 2 };
         private Mock<IInfoProvider<ChannelInfo>> channelInfoProviderMock;
         private Mock<IInfoProvider<WebChannelSettingsInfo>> webChannelSettingsInfoProviderMock;
         private Mock<IChannelAccessService> channelAccessServiceMock;
@@ -179,14 +179,16 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
             var page = CreatePageForConfiguration();
             channelAccessServiceMock
                 .Setup(s => s.GetAccessibleWebChannelSettingsIdsAsync())
-                .ReturnsAsync(new[] { 1, 2 });
-
+                .ReturnsAsync(AccessibleChannelIds);
             await ConfigurePageIgnoringAdminRuntimeAsync(page);
 
             var modifier = GetSingleQueryModifier(page);
-
-            Assert.That(modifier, Is.Not.Null);
-            Assert.That(InvokeModifier(modifier!), Does.Contain("WebChannelSettingsID"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(modifier, Is.Not.Null);
+                Assert.That(InvokeModifier(modifier!), Does.Contain("WebChannelSettingsID"));
+            });
+           
         }
 
         [Test]
@@ -200,9 +202,12 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
             await ConfigurePageIgnoringAdminRuntimeAsync(page);
 
             var modifier = GetSingleQueryModifier(page);
-
-            Assert.That(modifier, Is.Not.Null);
-            Assert.That(InvokeModifier(modifier!), Does.Contain("WebChannelSettingsID"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(modifier, Is.Not.Null);
+                Assert.That(InvokeModifier(modifier!), Does.Contain("WebChannelSettingsID"));
+            });
+          
         }
 
         private void SetupProviders(ICollection<ChannelInfo> channels, ICollection<WebChannelSettingsInfo> settings)
