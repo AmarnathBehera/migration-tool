@@ -139,16 +139,25 @@ public class MediaFileCrudService : IMediaFileCrudService
 
     private Uri? BuildAssetUri(string assetUrl)
     {
-        if (Uri.TryCreate(assetUrl.Trim(), UriKind.Absolute, out var absoluteUri))
+        var trimmedAssetUrl = assetUrl.Trim();
+        if (Uri.TryCreate(trimmedAssetUrl, UriKind.Absolute, out var absoluteUri)
+            && (absoluteUri.Scheme == Uri.UriSchemeHttp || absoluteUri.Scheme == Uri.UriSchemeHttps))
         {
             return absoluteUri;
         }
 
-        var normalizedPath = NormalizePath(assetUrl);
+        var normalizedPath = NormalizePath(trimmedAssetUrl);
+        var queryIndex = normalizedPath.IndexOf('?');
+        var path = queryIndex >= 0 ? normalizedPath[..queryIndex] : normalizedPath;
+        var query = queryIndex >= 0 ? normalizedPath[(queryIndex + 1)..] : string.Empty;
 
         if (_hostEnvironment.IsDevelopment())
         {
-            return new UriBuilder(Uri.UriSchemeHttp, DevelopmentLiveSiteHost, DevelopmentLiveSitePort, normalizedPath).Uri;
+            return new UriBuilder(Uri.UriSchemeHttp, DevelopmentLiveSiteHost, DevelopmentLiveSitePort)
+            {
+                Path = path,
+                Query = query
+            }.Uri;
         }
 
         var request = _httpContextAccessor.HttpContext?.Request;
@@ -157,7 +166,11 @@ public class MediaFileCrudService : IMediaFileCrudService
             return null;
         }
 
-        return new UriBuilder(request.Scheme, request.Host.Host, request.Host.Port ?? -1, normalizedPath).Uri;
+        return new UriBuilder(request.Scheme, request.Host.Host, request.Host.Port ?? -1)
+        {
+            Path = path,
+            Query = query
+        }.Uri;
     }
 
     private static string NormalizePath(string assetUrl)
@@ -328,28 +341,41 @@ public class MediaFileCrudService : IMediaFileCrudService
     {
         // Sanitize user-supplied filename: take only the base file name to prevent path traversal
         var fileName = GetSafeFileName(input.File.FileName);
+        var extension = GetSafeExtension(fileName);
         var displayName = input.DisplayName ?? System.IO.Path.GetFileNameWithoutExtension(fileName);
 
         var languageName = await GetDefaultLanguageNameAsync(cancellationToken);
         var user = await _userInfoProvider.GetAsync("administrator", cancellationToken);
         var manager = _contentItemManagerFactory.Create(user.UserID);
 
-        var newItemId = await WithUploadedAssetMetadataAsync(input.File, async assetMetadata =>
+        var assetSource = new ContentItemAssetStreamSource(ct => Task.FromResult<Stream>(input.File.OpenReadStream()));
+        var assetMetadata = new ContentItemAssetMetadataWithSource(
+            assetSource,
+            fileName,
+            extension,
+            input.File.Length,
+            DateTime.UtcNow);
+
+        var createItemData = new ContentItemData(new Dictionary<string, object>
         {
-            var itemData = CreateContentItemData(assetMetadata);
-            var createParameters = new CreateContentItemParameters(
-                ContentAttachment.CONTENT_TYPE_NAME,
-                null,
-                displayName,
-                languageName,
-                workspaceName);
+            { nameof(ContentAttachment.ContentAttachmentAsset), assetMetadata }
+        });
 
-            return await manager.Create(createParameters, itemData, cancellationToken);
-        }, cancellationToken);
+        var attachmentParameters = new CreateContentItemParameters(
+            ContentAttachment.CONTENT_TYPE_NAME,
+            fileName,
+            fileName,
+            languageName,
+            "KenticoDefault")
+        {
+            VersionStatus = VersionStatus.Published
+        };
 
-        await manager.TryPublish(newItemId, languageName, cancellationToken);
+        int createdContentItemId = await manager.Create(attachmentParameters, createItemData, cancellationToken);
 
-        var created = await GetMediaFileByIdAsync(newItemId, cancellationToken);
+        await manager.TryPublish(createdContentItemId, languageName, cancellationToken);
+
+        var created = await GetMediaFileByIdAsync(createdContentItemId, cancellationToken);
         return created!;
     }
 
@@ -362,12 +388,26 @@ public class MediaFileCrudService : IMediaFileCrudService
             return null;
         }
 
+        // Sanitize user-supplied filename: take only the base file name to prevent path traversal
+        var fileName = GetSafeFileName(input.File.FileName);
+        var extension = GetSafeExtension(fileName);
+
         var languageName = await GetDefaultLanguageNameAsync(cancellationToken);
         var user = await _userInfoProvider.GetAsync("administrator", cancellationToken);
         var manager = _contentItemManagerFactory.Create(user.UserID);
 
-        var itemData = await WithUploadedAssetMetadataAsync(input.File, assetMetadata =>
-            Task.FromResult(CreateContentItemData(assetMetadata)), cancellationToken);
+        var assetSource = new ContentItemAssetStreamSource(ct => Task.FromResult<Stream>(input.File.OpenReadStream()));
+        var assetMetadata = new ContentItemAssetMetadataWithSource(
+            assetSource,
+            fileName,
+            extension,
+            input.File.Length,
+            DateTime.UtcNow);
+
+        var itemData = new ContentItemData(new Dictionary<string, object>
+        {
+            { nameof(ContentAttachment.ContentAttachmentAsset), assetMetadata }
+        });
 
         await manager.TryCreateDraft(target.ContentItemId, languageName, cancellationToken);
         await manager.TryUpdateDraft(target.ContentItemId, languageName, itemData, cancellationToken);
@@ -453,7 +493,7 @@ public class MediaFileCrudService : IMediaFileCrudService
             var assetSource = new ContentItemAssetFileSource(tempPath, canMove: true);
             var assetMetadata = new ContentItemAssetMetadataWithSource(
                 assetSource,
-                nameWithoutExtension,
+                fileName,
                 extension,
                 file.Length,
                 DateTime.UtcNow);

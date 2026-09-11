@@ -120,9 +120,12 @@ namespace BDO.GWT.GLOBAL.API.Controllers
                 return NotFound();
             }
 
-            Response.GetTypedHeaders().ContentDisposition = new ContentDispositionHeaderValue("attachment");
+            Response.GetTypedHeaders().ContentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = result.Value.FileName
+            };
 
-            return File(result.Value.Data, MediaTypeNames.Application.Octet);
+            return File(result.Value.Data, result.Value.ContentType, result.Value.FileName);
         }
 
         [HttpPut("{attachmentGUID:guid}")]

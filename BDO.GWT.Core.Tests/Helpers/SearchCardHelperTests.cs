@@ -1,4 +1,6 @@
 ﻿using BDO;
+using BDO.GWT.Core.Constants;
+using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.Entities.Search;
 using BDO.GWT.Core.Helpers;
@@ -6,7 +8,7 @@ using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.Helpers;
 using BDO.GWT.Web.Core.Services;
-
+using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 
 using Moq;
@@ -20,11 +22,10 @@ namespace BDO.GWT.Core.Tests.Helpers
         private const string EVENT_CLASS_NAME = "BDO.Event";
         private const string WEBINAR_CLASS_NAME = "BDO.Webinar";
 
-        //private Mock<IContentPageCardHelper<Insight>> _insightCardHelperMock = null!;
+       
         private Mock<ICultureContext> _cultureContextMock = null!;
-        //private Mock<IEventWebinarCardsService> _eventWebinarCardsServiceMock = null!;
+        private Mock<IContentService> _contentServiceMock = null!;
         private Mock<IPageUrlService> _pageUrlServiceMock = null!;
-        //private Mock<ITypeMapper> _typeMapperMock = null!;
         private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
         private SearchCardHelper _helper = null!;
 
@@ -32,11 +33,11 @@ namespace BDO.GWT.Core.Tests.Helpers
         [SetUp]
         public void Setup()
         {
-            //_insightCardHelperMock = new Mock<IContentPageCardHelper<Insight>>();
+            
             _cultureContextMock = new Mock<ICultureContext>();
-            //_eventWebinarCardsServiceMock = new Mock<IEventWebinarCardsService>();
+            
             _pageUrlServiceMock = new Mock<IPageUrlService>();
-            //_typeMapperMock = new Mock<ITypeMapper>();
+            _contentServiceMock = new Mock<IContentService>();
             _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
 
             _cultureContextMock.SetupGet(x => x.CurrentLanguageTag).Returns(LANGUAGE_TAG);
@@ -46,7 +47,8 @@ namespace BDO.GWT.Core.Tests.Helpers
             _helper = new SearchCardHelper(
                 _cultureContextMock.Object,
                 _pageUrlServiceMock.Object,
-                _httpContextAccessorMock.Object);
+                _httpContextAccessorMock.Object,
+                _contentServiceMock.Object);
         }
 
 
@@ -410,6 +412,109 @@ namespace BDO.GWT.Core.Tests.Helpers
             var card = (InsightSearchCardDto)result[0].DataObject!;
 
             Assert.That(card.ImageURL, Is.EqualTo("https://www.bdo.com/media/image.png"));
+        }
+
+        #endregion
+
+        #region Date
+
+        [Test]
+        public async Task GetSearchCardDtos_ForInsight_WithPublishFromHavingTimeComponent_StripsTimeAndReturnsDateOnly()
+        {
+            var document = Document(1, INSIGHT_CLASS_NAME);
+            document.PublishFrom = new DateTimeOffset(2025, 6, 15, 14, 30, 45, TimeSpan.Zero);
+
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
+            var card = (InsightSearchCardDto)result[0].DataObject!;
+
+            Assert.That(card.Date, Is.EqualTo(new DateTime(2025, 6, 15)));
+        }
+
+
+        [Test]
+        public async Task GetSearchCardDtos_ForInsight_WithNullPublishFrom_LeavesDateNull()
+        {
+            var document = Document(1, INSIGHT_CLASS_NAME);
+            document.PublishFrom = null;
+
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
+            var card = (InsightSearchCardDto)result[0].DataObject!;
+
+            Assert.That(card.Date, Is.Null);
+        }
+
+
+        [Test]
+        public async Task GetSearchCardDtos_ForInsight_DoesNotPopulateUpdatedDate()
+        {
+            // UpdatedDate currently has no corresponding source field on SearchDocument
+            // and is not mapped in MapInsightCardsAsync, so it should remain null.
+            var document = Document(1, INSIGHT_CLASS_NAME);
+
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
+            var card = (InsightSearchCardDto)result[0].DataObject!;
+
+            Assert.That(card.UpdatedDate, Is.Null);
+        }
+
+        #endregion
+
+        #region Event and Webinar specific mappings      
+
+
+        [Test]
+        public async Task GetSearchCardDtos_ForEventOrWebinar_MapsLinkAsLinkItemDto()
+        {
+            const string EVENT_TYPE_NAME = "Webinar Type";
+
+            _contentServiceMock
+                .Setup(x => x.RetrievePagesAsync<EventType>(
+                    It.IsAny<RetrievePagesParameters>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<EventType?>
+                {
+                    new EventType { Name = EVENT_TYPE_NAME, Calltoactiontext = "Register now" }
+                });
+
+            var document = Document(1, EVENT_CLASS_NAME);
+            document.EventType = EVENT_TYPE_NAME;
+
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
+            var card = (EventWebinarSearchCard)result[0].DataObject!;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(card.Link, Is.InstanceOf<LinkItemDto>());
+                Assert.That(card.Link.Title, Is.EqualTo("Register now"));
+                Assert.That(card.Link.URL, Is.EqualTo("/page-1"));
+            });
+        }
+
+
+        [Test]
+        public async Task GetSearchCardDtos_ForEventOrWebinar_WithNoMatchingEventType_UsesEmptyLinkTitle()
+        {
+            var document = Document(1, EVENT_CLASS_NAME);
+            document.EventType = "Unmatched Type";
+
+            var result = await _helper.GetSearchCardDtos([document], LANGUAGE_TAG, CancellationToken.None);
+            var card = (EventWebinarSearchCard)result[0].DataObject!;
+
+            Assert.That(card.Link.Title, Is.Empty);
+        }
+
+
+        [Test]
+        public async Task GetSearchCardDtos_ForEventOrWebinar_WithMissingUrl_UsesEmptyLinkUrl()
+        {
+            _pageUrlServiceMock
+                .Setup(x => x.GetPageRelativeUrlByNodeIdAsync(
+                    It.IsAny<IEnumerable<int>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new Dictionary<int, RelativeLink>());
+
+            var result = await _helper.GetSearchCardDtos([Document(1, WEBINAR_CLASS_NAME)], LANGUAGE_TAG, CancellationToken.None);
+            var card = (EventWebinarSearchCard)result[0].DataObject!;
+
+            Assert.That(card.Link.URL, Is.Empty);
         }
 
         #endregion

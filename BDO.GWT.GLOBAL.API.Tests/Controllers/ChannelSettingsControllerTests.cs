@@ -89,7 +89,6 @@ public class ChannelSettingsControllerTests
         Assert.Multiple(() =>
         {
             Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
-            Assert.That((ChannelSettingOutput[])okResult.Value!, Has.Length.EqualTo(1));
             Assert.That(okResult.Value, Is.EqualTo(expected));
         });
     }
