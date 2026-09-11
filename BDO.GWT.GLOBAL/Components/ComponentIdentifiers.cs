@@ -62,6 +62,8 @@
 
             public const string HTML = WidgetPrefix + "HTML";
 
+            public const string TrendingTopicsCarousel = WidgetPrefix + "TrendingTopicsCarousel";
+
         }
 
         //sections
