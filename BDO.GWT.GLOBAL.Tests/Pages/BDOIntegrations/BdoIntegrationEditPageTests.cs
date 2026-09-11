@@ -129,8 +129,7 @@ namespace BDO.GWT.GLOBAL.Tests.Pages.BDOIntegrations
             var submitConfiguration = pageConfiguration.GetType()
                 .GetProperty("SubmitConfiguration")!
                 .GetValue(pageConfiguration)!;
-
-            Assert.That(submitConfiguration.GetType().GetProperty("Visible")!.GetValue(submitConfiguration), Is.Not.EqualTo(false));
+            Assert.That(submitConfiguration.GetType().GetProperty("Visible")!.GetValue(submitConfiguration), Is.True);
         }
 
         private async Task ConfigurePageIgnoringAdminRuntimeAsync()

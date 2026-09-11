@@ -146,6 +146,9 @@ public class ChannelSettingsControllerTests
 
         var result = await _controller.PutChannelSetting(100, codeName, request, CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+        });
     }
 }
