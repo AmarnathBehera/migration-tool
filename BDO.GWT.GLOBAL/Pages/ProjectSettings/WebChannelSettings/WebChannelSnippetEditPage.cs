@@ -20,11 +20,25 @@ public class WebChannelSnippetEditPage : InfoEditPage<WebChannelSnippetInfo>
     [PageParameter(typeof(IntPageModelBinder))]
     public override int ObjectId
     {
-        get => SettingsInfoProvider.Get()
-                 .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID), WebChannelSettingsId)
-                 .FirstOrDefault()?
-                 .WebChannelSnippetID ?? 0;
-        set { _ = value; }
+ 
+        get
+        {
+            var existing = SettingsInfoProvider.Get()
+                .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID), WebChannelSettingsId)
+                .FirstOrDefault();
+            
+            if (existing != null)
+                return existing.WebChannelSnippetID;
+
+            if (WebChannelSettingsId <= 0)
+                return 0;
+
+            var newsettingInfo = new WebChannelSnippetInfo { WebChannelSnippetWebChannelSettingsID = WebChannelSettingsId };
+            SettingsInfoProvider.Set(newsettingInfo);
+
+            return newsettingInfo.WebChannelSnippetID;
+        }
+        set => _ = value;
     }
 
     public WebChannelSnippetEditPage(
