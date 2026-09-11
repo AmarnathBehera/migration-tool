@@ -130,7 +130,7 @@ public class SidebarService : ISidebarService
         {
             dtsByGuid[person.SystemFields.ContentItemGUID] = new SidebarPersonDto
             {
-                Image = PageHelper.GetImageDto(person.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url, person.MetadataTeaserImageAltText),
+                Image = PageHelper.GetImageDto(person.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset.Url.TrimStart('~'), person.MetadataTeaserImageAltText),
                 FullName = GetPersonDisplayName(person),
                 JobTitle = person.PersonJobTitle,
                 Url = person.GetUrl().RelativePath,
@@ -141,7 +141,7 @@ public class SidebarService : ISidebarService
         {
             dtsByGuid[internalPerson.SystemFields.ContentItemGUID] = new SidebarPersonDto
             {
-                Image = PageHelper.GetImageDto(internalPerson.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset.Url, internalPerson.ImageFileAltText),
+                Image = PageHelper.GetImageDto(internalPerson.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset.Url.TrimStart('~'), internalPerson.ImageFileAltText),
                 FullName = GetInternalPersonDisplayName(internalPerson),
                 JobTitle = internalPerson.JobTitle,
                 Url = _contentService.EnsureAbsoluteUrl(internalPerson.Url)
