@@ -87,12 +87,27 @@ public class SearchCardDtoTests
         SearchCardDto[] cards =
         [
             new SearchCardDto<InsightSearchCardDto> { CardType = INSIGHT_CARD_TYPE, Data = new InsightSearchCardDto { Title = "I" } },
-            new SearchCardDto<EventWebinarSearchCard> { CardType = "EventsAndWebinars", Data = new EventWebinarSearchCard { Title = "E" } },
+            new SearchCardDto<EventWebinarSearchCard>
+            {
+                CardType = "EventsAndWebinars",
+                Data = new EventWebinarSearchCard
+                {
+                    Title = "E",
+                    Link = new LinkItemDto { Title = "Read more", URL = "/event-1" }
+                }
+            },
             new SearchCardDto<GenericSearchCardDto> { CardType = "Generic", Data = new GenericSearchCardDto { Title = "G" } }
         ];
 
-        Assert.That(cards.Select(x => x.CardType),
-            Is.EqualTo(new[] { INSIGHT_CARD_TYPE, "EventsAndWebinars", "Generic" }));
+        Assert.Multiple(() =>
+        {
+            Assert.That(cards.Select(x => x.CardType),
+                Is.EqualTo(new[] { INSIGHT_CARD_TYPE, "EventsAndWebinars", "Generic" }));
+
+            var eventCard = (EventWebinarSearchCard)cards[1].DataObject!;
+            Assert.That(eventCard.Link, Is.InstanceOf<LinkItemDto>());
+            Assert.That(eventCard.Link.URL, Is.EqualTo("/event-1"));
+        });
     }
 
 
