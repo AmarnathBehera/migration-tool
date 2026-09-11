@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <DisplayNameColumn>RedirectSourceUrl</DisplayNameColumn>
+      <GUIDColumn>RedirectGUID</GUIDColumn>
+      <ObjectType>XperienceCommunity.Redirect</ObjectType>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassDisplayName>Redirects</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="RedirectID" columntype="integer" enabled="true" guid="b8c9dba7-f175-4af1-b47d-e16bc16e6724" isPK="true" />
+      <field column="RedirectSourceUrl" columntype="longtext" enabled="true" guid="49b59ed5-6309-4172-a600-8a15ffa24e42" visible="true">
+        <settings>
+          <controlname>Kentico.Administration.TextArea</controlname>
+          <Label>Source URL</Label>
+        </settings>
+      </field>
+      <field column="RedirectTargetWebPageItemGUID" columntype="guid" enabled="true" guid="b28f5ad4-7ff7-49cd-8f84-93770da1d1ba" visible="true">
+        <settings>
+          <controlname>Kentico.Administration.WebPageSelector</controlname>
+          <ExplanationText>
+            <![CDATA[Select the target web page to which requests for the source URL will be redirected to.]]>
+          </ExplanationText>
+          <ExplanationTextAsHtml>True</ExplanationTextAsHtml>
+          <ItemModifierType>
+            <![CDATA[Kentico.Xperience.Admin.Websites.WebPagesWithUrlWebPagePanelItemModifier]]>
+          </ItemModifierType>
+          <Label>Target web page</Label>
+          <MaximumPages>1</MaximumPages>
+        </settings>
+      </field>
+      <field column="RedirectGUID" columntype="guid" enabled="true" guid="4ad6d4d4-2483-4421-a106-feebf5f1efe5" />
+      <field allowempty="true" column="RedirectChannelName" columntype="text" enabled="true" guid="bcccb669-2000-4535-99dd-ebf24a185dcd" visible="true">
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+          <Label>Channel Name</Label>
+        </settings>
+      </field>
+      <field column="RedirectChannelID" columntype="integer" enabled="true" guid="6b323c3d-d8e8-4c82-8225-0e83ef2a220d" />
+      <field allowempty="true" column="RedirectTargetPageURL" columntype="text" enabled="true" guid="36157f28-39e3-44d4-a541-6abfe451069d" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>975df8a5-ffa3-4f22-8b50-7eb2f958da36</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>XperienceCommunity.Redirect</ClassName>
+  <ClassResourceID>
+    <CodeName>XperienceCommunity.Redirect</CodeName>
+    <GUID>82f385c0-e18a-48b4-8b9b-abfae0c8c600</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>XperienceCommunity_Redirect</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

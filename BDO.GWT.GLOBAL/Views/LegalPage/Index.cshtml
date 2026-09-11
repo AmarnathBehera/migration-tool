@@ -1,0 +1,62 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Core.DTOs.LegalPageDto
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+
+    var widgetsList = new[]
+        {
+        ComponentIdentifiers.Widgets.Button,
+        ComponentIdentifiers.Widgets.FlexibleBanner,
+        ComponentIdentifiers.Widgets.Form,
+        ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+    };
+
+    var advancedWidgetList = new[]
+    {
+        ComponentIdentifiers.Widgets.Accordion,
+    };
+}
+ @await Html.PartialAsync("_Hero") 
+
+<div class="legal-wrapper">
+    <div class="@("legal-wrapper-content" + (Model.Links.Count() > 1 ? "" : " legal-wrapper-content--full"))">
+        <aside>
+            @(await ReactService.RenderComponentAsync(
+                        pageId,
+                        ReactComponentType.LegalSideBoxNavigation,
+                        ReactComponentType.LegalSideBoxNavigationGUID,
+                        new { links = Model.Links },
+                        Context.RequestAborted))
+        </aside>
+        <main>
+            @(await ReactService.RenderComponentAsync(
+                        pageId,
+                        ReactComponentType.LegalBodyContent,
+                        ReactComponentType.LegalBodyContentGUID,
+                        Model,
+                        Context.RequestAborted))
+
+            @await Html.Kentico().EditableAreaAsync(
+            "topArea",
+                        new EditableAreaOptions
+                        {
+                            AllowedWidgets = widgetsList
+                        })
+        </main>
+    </div>
+    @await PageBuilderService.AddIdentifier("bottomArea").AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+</div>
+
+@PageBuilderService.GetPageBuilderScripts(Html)

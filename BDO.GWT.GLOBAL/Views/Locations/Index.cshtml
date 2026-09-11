@@ -1,0 +1,61 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model (BDO.GWT.Core.DTOs.Pages.LocationsDto LocationsDto, BDO.GWT.Core.DTOs.SchemaMarkups.OrganizationSchemaMarkupDto LocationsSchemaMarkupDto)
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+
+    var widgetsList = new[]
+        {
+        ComponentIdentifiers.Widgets.Button,
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.Form,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+    };
+}
+@section SchemaMarkup {
+    @Html.Raw(this.Model.LocationsSchemaMarkupDto.ToSchemaMarkupJsString())
+}
+
+ @if (Model.LocationsDto != null && pageId != 0)
+    {
+        @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.Hero,
+        ReactComponentType.HeroGUID,
+        new {
+        data = Model.LocationsDto.Hero,
+        },
+        Context.RequestAborted))
+       
+        @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.LocalLocationsList,
+        ReactComponentType.LocalLocationsListGUID,
+       this.Model.LocationsDto.MainContent,
+        Context.RequestAborted))
+
+        @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.FlexibleBanner,
+        ReactComponentType.FlexibleBannerGUID,
+        new {
+        data = Model.LocationsDto.Banner,
+        },
+        Context.RequestAborted))
+
+    }
+
+@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+
+@PageBuilderService.GetPageBuilderScripts(Html)

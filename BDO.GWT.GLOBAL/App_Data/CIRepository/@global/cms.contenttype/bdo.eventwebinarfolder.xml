@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>EventWebinar folder</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="44030f6b-dd05-475a-a067-8bde88e220d9" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="9391e3d7-2f8f-4cad-a4f0-dbfc0459c745" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="ae13a1f5-508a-467d-bab5-5fd9adadff56" isunique="true" system="true" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>3799ac04-7843-476b-8669-e0ad99e83f53</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-folder-inverted</ClassIconClass>
+  <ClassName>BDO.EventWebinarFolder</ClassName>
+  <ClassShortName>BDOEventWebinarFolder</ClassShortName>
+  <ClassTableName>BDO_EventWebinarFolder</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

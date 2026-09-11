@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Form submission subscriptions</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="FormSubmissionSubscriptionsID" columntype="integer" enabled="true" guid="ddf73f2d-648f-458a-930b-6b6afb80fba8" isPK="true" />
+      <field column="ChannelSnippetWebChannelSettingsID" columnprecision="0" columntype="integer" enabled="true" guid="f079dec7-e02f-4d29-bdac-f042b117e021" refobjtype="bdo.webchannelsettings" reftype="Required" />
+      <field column="Displayname" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="cff68730-bf5e-493e-8044-27be5b9dc96d" />
+      <field column="Codename" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="f935bf47-875a-4982-926b-ce4cc4e5bdb0" />
+      <field column="Description" columnprecision="0" columntype="longtext" enabled="true" guid="75ee1c27-aeb3-4b9c-aff3-6c09e75efa30" />
+      <field column="Form" columnprecision="0" columntype="objectcodenames" enabled="true" guid="dff18497-78e1-4ddb-8b17-5008bb9d7248" />
+      <field column="Endpoint" columnprecision="0" columntype="longtext" enabled="true" guid="238bbb85-ed04-4915-b91f-f29e70034410" />
+      <field column="Method" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="10e8406c-7716-4267-8363-584f924be391" />
+      <field allowempty="true" column="Useauthorization" columnprecision="0" columntype="boolean" enabled="true" guid="e9d4cd9c-8edd-4e54-b1d1-5ba4f16bf7a3" />
+      <field column="Requestcontenttype" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="be4026bb-20ae-4ea9-a4e2-44329df100c1" />
+      <field column="Requestbodyformat" columnprecision="0" columntype="longtext" enabled="true" guid="1e4ec53c-594f-41ef-a0e8-0cab9eddf9b7" />
+      <field allowempty="true" column="Scheme" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="38f30919-c6ee-407c-8254-8d9ae994e8bf">
+        <properties>
+          <defaultvalue>Basic</defaultvalue>
+        </properties>
+      </field>
+      <field allowempty="true" column="Username" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="2508d73b-80eb-4bb6-bcca-f39f881dfbf1" />
+      <field allowempty="true" column="EncryptedPassword" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="81ebca66-d85e-49ba-8d4d-ce4d380b8fba">
+        <properties>
+          <defaultvalue>Encrypted Password</defaultvalue>
+        </properties>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>af2e45df-3907-49de-b692-82bbcc496cfc</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.FormSubmissionSubscriptions</ClassName>
+  <ClassResourceID>
+    <CodeName>BDOIntegrations</CodeName>
+    <GUID>cab4dd77-7704-4867-bcff-37351ca47e1e</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_FormSubmissionSubscriptions</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

@@ -2,7 +2,7 @@
 {
     public static class ComponentIdentifiers
     {
-         private const string Prefix = "BDO.";
+        private const string Prefix = "BDO.";
         // Widgets
         public static class Widgets
         {
@@ -12,20 +12,55 @@
 
             public const string ExternalNavigation = WidgetPrefix + "ExternalNavigation";
 
-            public const string Imagewithtext = WidgetPrefix + "ImageWithText";
+            public const string ImageWithText = WidgetPrefix + "ImageWithText";
+
+            public const string InsightCarousel = WidgetPrefix + "InsightCarousel";
 
             public const string QuoteCard = WidgetPrefix + "QuoteCard";
 
-            public const string TiledLink = WidgetPrefix + "TiledLinkSection";
+            public const string TiledLinkSection = WidgetPrefix + "TiledLinkSection";
 
-            public const string Globallocation = WidgetPrefix + "ViewGlobalLocations";
+            public const string ViewGlobalLocations = WidgetPrefix + "ViewGlobalLocations";
 
             public const string SocialMediaButtons = WidgetPrefix + "SocialMediaButtons";
 
             public const string RichText = WidgetPrefix + "RichText";
 
-            public const string AccordionWidget = WidgetPrefix + "AccordionWidget";
+            public const string Accordion = WidgetPrefix + "AccordionWidget";
+
+            public const string Faq = WidgetPrefix + "FaqWidget";
+
+            public const string EventsWebinarsSlider = WidgetPrefix + "EventWebinarSliderWidget";
+
             public const string Form = "Kentico.FormWidget";
+
+            public const string LocalNavigation = WidgetPrefix + "LocalNavigation";
+
+            public const string NewsCarousel = WidgetPrefix + "NewsCarousel";
+
+            public const string KeyContacts = WidgetPrefix + "KeyContacts";
+
+            public const string FlexibleBanner = WidgetPrefix + "FlexibleBanner";
+
+            public const string FlexibleContent = WidgetPrefix + "FlexibleContent";
+
+            public const string KeyTakeaways = WidgetPrefix + "KeyTakeaways";
+
+            public const string TabAccordion = WidgetPrefix + "TabAccordion";
+
+            public const string RelatedContacts = WidgetPrefix + "RelatedContacts";
+
+            public const string EditorsPick = WidgetPrefix + "EditorsPick";
+
+            public const string InFocus = WidgetPrefix + "InFocus";
+
+            public const string InsightAnimationCard = WidgetPrefix + "AnimatedTileCarouselWidget";
+
+            public const string Hero = WidgetPrefix + "Hero";
+
+            public const string RelatedContentCarousel = WidgetPrefix + "RelatedContentCarousel";
+
+            public const string HTML = WidgetPrefix + "HTML";
 
         }
 
@@ -52,6 +87,28 @@
 
             public const string LocalNavigation = SectionPrefix + "LocalNavigation";
         }
-    }
+        public static class FormSections
+        {
+            public const string DefaultSection = "Kentico.DefaultSection";
+            private const string FormSectionPrefix = Prefix + "FormSection.";
+            public const string TwoColumns = FormSectionPrefix + "TwoColumns";
+          
+        }
+        public static class FormComponents
+        {
+            private const string FormComponentPrefix = Prefix + "FormComponent.";
 
+            public const string TextBoxReload = FormComponentPrefix + "TextBoxReload";
+
+            public const string ConsentAgreement = FormComponentPrefix + "BDOConsentAgreement";
+
+            public const string SecurityCode = FormComponentPrefix + "SecurityCode";
+
+            public const string MonthYear = FormComponentPrefix + "MonthYear";
+
+            public const string OrderedPageSelector = FormComponentPrefix + "OrderedPageSelector";
+        }
+
+
+    }
 }

@@ -7,7 +7,16 @@ using Kentico.Xperience.Admin.Base.UIPages;
     identifier: ProjectSettingsApplication.IDENTIFIER,
     type: typeof(ProjectSettingsApplication),
     slug: "B-settings",
-    name: "BDO settings",
+    name: "BDO Site Settings",
+    category: BaseApplicationCategories.CONFIGURATION,
+    icon: Icons.BoxCogwheel,
+    templateName: TemplateNames.SECTION_LAYOUT)]
+
+[assembly: UIApplication(
+    identifier: BdoIntegrationsApplication.IDENTIFIER,
+    type: typeof(BdoIntegrationsApplication),
+    slug: "BDOIntegrations",
+    name: "BDO Integrations",
     category: BaseApplicationCategories.CONFIGURATION,
     icon: Icons.BoxCogwheel,
     templateName: TemplateNames.SECTION_LAYOUT)]

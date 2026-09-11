@@ -1,0 +1,58 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Core.DTOs.SectionSpecialtiesPageDto
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+
+    var widgetsList = new[]
+        {
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.ImageWithText,
+        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.RelatedContacts,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+    };
+
+    var advancedWidgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.Accordion,
+    };
+}
+
+<div>
+    @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.Hero,
+        ReactComponentType.HeroGUID,
+        new
+        {
+            data = Model.Hero,
+        },
+        Context.RequestAborted))
+</div>
+@await Html.PartialAsync("_LocalNavigation")
+
+<div>
+    @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.MultiLinksCardsGrid,
+        ReactComponentType.MultiLinksCardsGridGUID,
+        Model.MultiLinksCardsGrid,
+        Context.RequestAborted))
+</div>
+
+@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+
+@PageBuilderService.GetPageBuilderScripts(Html)

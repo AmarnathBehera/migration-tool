@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.CareerLevelsFolder</CodeName>
+    <GUID>5e49d095-ce7c-41f4-b5a3-9fffec0bc84a</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.CareerLevels">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.CareerLevels</CodeName>
+        <GUID>6405a035-64c1-4d4e-9274-d19f41d56b0a</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

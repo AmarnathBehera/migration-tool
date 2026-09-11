@@ -1,22 +1,17 @@
-﻿using BDO.GWT.Core;
+using BDO.GWT.Core;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.ReusableFieldsDTOs;
 using BDO.GWT.Core.Services;
-using CMS.Base;
 using CMS.ContentEngine;
-using CMS.Helpers.Internal;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
-using Kentico.Content.Web.Mvc.Routing;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Http;
-using Org.BouncyCastle.Crypto;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
 
 namespace BDO.GWT.GLOBAL.Services;
 
@@ -27,13 +22,15 @@ public class XperiencePageContext : IPageContext
     private readonly IPageBuilderDataContextRetriever _pageBuilderDataContextRetriever;
     private readonly IWebsiteChannelContext _websiteChannelContext;
     private readonly IContentQueryExecutor _queryExecutor;
-    
+
 
     public XperiencePageContext(
         IHttpContextAccessor httpContextAccessor,
         IWebPageDataContextRetriever webPageDataContextRetriever,
-        IPageBuilderDataContextRetriever pageBuilderDataContextRetriever, IWebsiteChannelContext websiteChannelContext,
-        IContentQueryExecutor queryExecutor)
+        IPageBuilderDataContextRetriever pageBuilderDataContextRetriever,
+        IWebsiteChannelContext websiteChannelContext,
+        IContentQueryExecutor queryExecutor
+        )
     {
         _httpContextAccessor = httpContextAccessor;
         _webPageDataContextRetriever = webPageDataContextRetriever;
@@ -44,7 +41,6 @@ public class XperiencePageContext : IPageContext
 
     public bool IsInPreviewMode => _websiteChannelContext.IsPreview;
 
-    
     public bool IsInPageBuilderMode
     {
         get
@@ -56,9 +52,7 @@ public class XperiencePageContext : IPageContext
         }
     }
 
-    
-    // Returning null gracefully here — wire up IContentQueryExecutor for typed models.
-    public async Task<T?> GetCurrentPageAsync<T>(CancellationToken cancellationToken = default)
+    public async Task<T> GetCurrentPageAsync<T>(CancellationToken cancellationToken = default)
         where T : class
     {
         if (!_webPageDataContextRetriever.TryRetrieve(out var ctx))
@@ -69,73 +63,123 @@ public class XperiencePageContext : IPageContext
                 .ForWebsite(ctx.WebPage.WebsiteChannelName)
                 .TopN(1)
                 .WithLinkedItems(1))
-            .InLanguage(ctx.WebPage.LanguageName);
+            .InLanguage(ctx.WebPage.LanguageName)
+        .Parameters(q => q
+        .Where(w => w.WhereEquals(nameof(WebPageFields.WebPageItemID), ctx.WebPage.WebPageItemID))
+    );
 
         var result = await _queryExecutor.GetMappedWebPageResult<T>(query, cancellationToken: cancellationToken);
 
         return result.FirstOrDefault();
     }
 
-
-    // Pull from the WebPageItemInfo fields that are available.
     public async Task<MetaDataSEOItemsDto> GetCurrentPageMetadataAsync(CancellationToken cancellationToken = default)
     {
-       
         var canRetrieve = _webPageDataContextRetriever.TryRetrieve(out var ctx);
 
-        
         if (!canRetrieve || ctx.WebPage == null)
+            return null;
+
+
+        var webPageItemId = ctx.WebPage.WebPageItemID;
+        // Get the content type name from context - avoids querying ALL types
+        var contentTypeName = ctx.WebPage.ContentTypeName;
+
+        //use the content type name to query only pages of tha particular content type.
+        var builder = new ContentItemQueryBuilder()
+       .ForContentType(
+           contentTypeName,
+           subQuery => subQuery
+               .ForWebsite(ctx.WebPage.WebsiteChannelName)
+               .Where(w => w
+                   .WhereEquals(nameof(IWebPageContentQueryDataContainer.WebPageItemID), webPageItemId)
+               )
+               .WithLinkedItems(5)
+       )
+       .InLanguage(ctx.WebPage.LanguageName);
+
+        var options = new ContentQueryExecutionOptions
         {
-            return new MetaDataSEOItemsDto();
+            ForPreview = _websiteChannelContext.IsPreview
+        };
+
+        var pages = await _queryExecutor.GetMappedWebPageResult<IWebPageFieldsSource>(
+            builder, options, cancellationToken);
+
+        var page = pages?.Select(MapToMetaDataSEOItemsDto).FirstOrDefault();
+
+        if (page == null)
+            return null;
+
+        var request = _httpContextAccessor.HttpContext?.Request;
+        if (request != null)
+            ResolveOGMetaDataUrls(page, request);
+
+        return page;
+
+    }
+
+    private static MetaDataSEOItemsDto CreateEmptyMetaDataSEOItemsDto() => new()
+    {
+        MetaData = new MetaDataDto(),
+        OGMetaData = new OGMetaDataDto(),
+        SEOItemsDto = new SearchAndSEODto(),
+        PageMetaData = new PageMetaDataDto()
+    };
+
+    private static MetaDataSEOItemsDto MapToMetaDataSEOItemsDto(IWebPageFieldsSource p)
+    {
+        var result = CreateEmptyMetaDataSEOItemsDto();
+
+        if (p is IMetadata metadata)
+        {
+            result.MetaData.MetaTitle = metadata.MetadataTitle;
+            result.MetaData.MetaDescription = metadata.MetadataDescription;
+            result.MetaData.MetaTeaserImageAltText = metadata.MetadataTeaserImageAltText;
+            result.MetaData.MetaCanonical = metadata.MetadataCanonical;
         }
 
-        
-        var contentTypeName = ctx.WebPage.ContentTypeName;
-        var requestcontext = _httpContextAccessor.HttpContext.Request;
+        if (p is IOGMetadataFields ogMetadata)
+        {
+            result.OGMetaData.MetadataOGTitle = ogMetadata.MetadataOGTitle;
+            result.OGMetaData.MetadataOGDescription = ogMetadata.MetadataOGDescription;
+            result.OGMetaData.MetadataOGImage = ogMetadata.MetadataOGImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+        }
 
-        var page = ctx.WebPage;
+        if (p is ISearchAndSEO seo)
+        {
+            result.SEOItemsDto.IncludeInSitemap = seo.IncludeInSitemap;
+            result.SEOItemsDto.MetadataNofollow = seo.MetadataNofollow;
+            result.SEOItemsDto.MetadataNoindex = seo.MetadataNoindex;
+        }
 
-        var query = new ContentItemQueryBuilder()
-              .ForContentType(ctx.WebPage.ContentTypeName, q => q
-                .ForWebsite(ctx.WebPage.WebsiteChannelName)         
-              .TopN(1))
-              .InLanguage(ctx.WebPage.LanguageName);
+        if (p is IPageMetadata pageMetaData)
+        {
+            result.PageMetaData.PageTitle = pageMetaData.PageTitle;
+            result.PageMetaData.PageDescription = pageMetaData.PageDescription;
+            result.PageMetaData.PageKeywords = pageMetaData.PageKeywords;
+        }
 
-        var result = await _queryExecutor.GetWebPageResult(
-            query,
-            item => new MetaDataSEOItemsDto
-            {
-                MetaData = new MetaDataDto
-                {
-                    MetaTitle = item.TryGetValue("MetadataTitle", out string? metaTitle) ? metaTitle : null,
-                    MetaDescription = item.TryGetValue("MetadataDescription", out string? metaDesc) ? metaDesc : null,
-                    MetaTeaserImageAltText = item.TryGetValue("MetaTeaserImageAltText", out string? metaTeaserImageAltText) ? metaTeaserImageAltText : null,
-                    MetaCanonical = item.TryGetValue("MetaCanonical", out string? metaCanonical) ? metaCanonical : null
-                },
+        return result;
+    }
 
-                OGMetaData = new OGMetaDataDto
-                {
-                    // map your OG fields here
-                    MetadataOGTitle = item.TryGetValue("MetadataOGTitle", out string? ogTitle) ? ogTitle : null,
-                    MetadataOGDescription = item.TryGetValue("MetadataOGDescription", out string? ogDesc) ? ogDesc : null,
-                    Url = $"{requestcontext?.Scheme}://{requestcontext?.Host}" + requestcontext.Path
+    private static void ResolveOGMetaDataUrls(MetaDataSEOItemsDto page, HttpRequest request)
+    {
+        if (page.OGMetaData == null)
+            return;
 
-                },
+        var baseUri = new Uri($"{request.Scheme}://{request.Host}/");
+        page.OGMetaData.Url = new Uri(baseUri, request.Path.Value ?? "/").ToString();
 
-                SEOItemsDto = new SearchAndSEODto
-            {
-                    // map your SEO fields here
-                    IncludeInSitemap = item.TryGetValue("IncludeInSitemap", out bool includeInSitemap) ? includeInSitemap : false,
-                    MetadataNofollow = item.TryGetValue("MetadataNofollow", out bool metadataNofollow) ? metadataNofollow : false,
-                    MetadataNoindex = item.TryGetValue("MetadataNoindex", out bool metadataNoindex) ? metadataNoindex : false
-                }
-            },
-            new ContentQueryExecutionOptions(),
-            cancellationToken);
+        if (string.IsNullOrEmpty(page.OGMetaData.MetadataOGImage))
+            return;
 
-       var curPageMeta = result.FirstOrDefault() ?? new MetaDataSEOItemsDto();
+        var imageUrl = page.OGMetaData.MetadataOGImage;
 
-        return curPageMeta;
+        if (imageUrl.StartsWith("~/"))
+            imageUrl = imageUrl.Substring(2);
+
+        page.OGMetaData.MetadataOGImage = new Uri(baseUri, imageUrl).ToString();
     }
 
 
@@ -151,10 +195,10 @@ public class XperiencePageContext : IPageContext
             return new BaseWebPage();
         }
         var query = new ContentItemQueryBuilder()
-
               .ForContentType(ctx.WebPage.ContentTypeName, q => q
                 .ForWebsite(ctx.WebPage.WebsiteChannelName)
-              .TopN(1))
+                .Where(w => w.WhereEquals(nameof(IWebPageContentQueryDataContainer.WebPageItemID), ctx.WebPage.WebPageItemID))
+                .TopN(1))
               .InLanguage(ctx.WebPage.LanguageName);
 
         var result = await _queryExecutor.GetWebPageResult(
@@ -164,7 +208,6 @@ public class XperiencePageContext : IPageContext
               WebPageItemParentID = item.WebPageItemParentID,
               WebPageItemTreePath = item.WebPageItemTreePath
           },
-
           new ContentQueryExecutionOptions(),
           cancellationToken);
         var curPageMeta = result.FirstOrDefault() ?? new BaseWebPage();
@@ -177,7 +220,7 @@ public class XperiencePageContext : IPageContext
     /// Fetches any page by its ID, regardless of content type.
     /// Returns null if not found.
     /// </summary>
-    public async Task<IWebPageFieldsSource> GetAnyPageByWebPageItemId(int webPageItemId, CancellationToken cancellationToken)
+    public async Task<IWebPageFieldsSource> GetAnyPageByWebPageItemId(int webPageItemId, string languageName, CancellationToken cancellationToken)
     {
         var options = new ContentQueryExecutionOptions
         {
@@ -194,7 +237,7 @@ public class XperiencePageContext : IPageContext
              nameof(IWebPageContentQueryDataContainer.WebPageItemID),
              webPageItemId))
          .TopN(1)
-     );
+     ).InLanguage(languageName);
 
         var results = await _queryExecutor.GetMappedWebPageResult<IWebPageFieldsSource>(builder, options, cancellationToken);
         return results.FirstOrDefault();
@@ -205,7 +248,7 @@ public class XperiencePageContext : IPageContext
     /// Gets the display title for a page by its ID.
     /// Falls back through Title → MetadataTitle → internal page name.
     /// </summary>
-    public async Task<string> GetPageTitleByWebPageItemId(int webPageItemId, CancellationToken cancellationToken)
+    public async Task<string> GetPageTitleByWebPageItemId(int webPageItemId, string languageName, CancellationToken cancellationToken)
     {
         var builder = new ContentItemQueryBuilder()
             .ForContentTypes(config => config
@@ -215,7 +258,7 @@ public class XperiencePageContext : IPageContext
                 .Where(w => w.WhereEquals(
                     nameof(IWebPageContentQueryDataContainer.WebPageItemID), webPageItemId))
                 .TopN(1)
-            );
+            ).InLanguage(languageName);
 
         var results = await _queryExecutor.GetWebPageResult(
             builder,
@@ -223,12 +266,12 @@ public class XperiencePageContext : IPageContext
             {
                 if (item.TryGetValue("Title", out string title) && !string.IsNullOrEmpty(title))
                 {
-                    return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(title.ToLower());
+                    return title;
                 }
 
                 if (item.TryGetValue("MetadataTitle", out string metaTitle) && !string.IsNullOrEmpty(metaTitle))
                 {
-                    return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(metaTitle.ToLower());
+                    return metaTitle;
                 }
 
                 return item.WebPageItemName;

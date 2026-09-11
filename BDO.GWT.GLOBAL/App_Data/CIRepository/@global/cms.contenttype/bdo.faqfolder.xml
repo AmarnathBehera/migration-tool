@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>FAQ Folder</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="af085d29-fe9b-4012-aa3f-40d1b4f98276" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="325a232a-0734-408b-96e5-74b677eac9bf" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="7bf2ae1f-7f5a-4f67-9afa-a400b16db445" isunique="true" system="true" />
+      <field allowempty="true" column="Separator" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="4e812ace-51c8-4b46-a8f9-a21c42a2305d" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Dropdown</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.SQLDropdown</controlname>
+          <Script>select * from cms_form</Script>
+        </settings>
+      </field>
+      <field column="Title" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="534d375d-4949-4e84-9663-23169ac0ba0e" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>dd24464b-b784-4521-95e8-522c4b12bff0</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-folder-inverted</ClassIconClass>
+  <ClassName>BDO.FaqFolder</ClassName>
+  <ClassShortName>BDOFaqFolder</ClassShortName>
+  <ClassTableName>BDO_FaqFolder</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

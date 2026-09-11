@@ -29,35 +29,41 @@ stages:
             fetchDepth: 0
 
           - task: SonarCloudPrepare@4
-            displayName: "Prepare SonarCloud Analysis"
             inputs:
               SonarCloud: "GWT.XbyK.Web - SonarQube Cloud"
               organization: "vsts-sonarcloud41751"
               scannerMode: "dotnet"
-              configMode: file
-              configFile: "sonar-project.properties"
-              projectName: "GWT.XbyK.Web"
               projectKey: "bdo_GWT.XbyK.Web"
+              projectName: "GWT.XbyK.Web"
+              extraProperties: |
+                sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**,**/*.bacpac,**/TestResults/**,**/*.Tests/**,/BDO.GWT.GLOBAL/App_Data/**,BDO.GWT.GLOBAL/wwwroot/**
+                sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/**/coverage.opencover.xml
 
           - task: DotNetCoreCLI@2
-            displayName: Restore CMS Web App
+            displayName: Restore XbyK solution
             inputs:
               command: "restore"
               restoreSolution: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
               feedsToUse: "select"
 
           - task: DotNetCoreCLI@2
-            displayName: Build CMS Web App
+            displayName: Build XbyK solution
             inputs:
               command: "build"
               projects: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
+              arguments: "--configuration Release --no-restore"
 
           - task: DotNetCoreCLI@2
-            displayName: "Test CMS Web App with Code Coverage"
+            displayName: "Test XbyK solution with Code Coverage"
             inputs:
               command: "test"
               projects: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
-              arguments: '--collect "Code Coverage"'
+              arguments: >-
+                --no-build
+                --configuration Release
+                --collect:"XPlat Code Coverage"
+                --settings "$(Build.SourcesDirectory)/coverlet.runsettings"
+              publishTestResults: true
 
           - task: SonarCloudAnalyze@4
             displayName: "Run SonarCloud Analysis"

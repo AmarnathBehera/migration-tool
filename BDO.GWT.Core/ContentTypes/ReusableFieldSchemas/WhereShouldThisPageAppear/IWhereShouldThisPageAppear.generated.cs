@@ -29,19 +29,49 @@ namespace BDO
 		/// <summary>
 		/// ContentType.
 		/// </summary>
-		public IEnumerable<MicrositePlaceholder> ContentType { get; set; }
+		public IEnumerable<Contenttypes> ContentType { get; set; }
 
 
 		/// <summary>
-		/// MicrositeMasterPages.
+		/// MetadataBusinessLine.
 		/// </summary>
-		public IEnumerable<MicrositePlaceholder> MicrositeMasterPages { get; set; }
+		public IEnumerable<BusinessLine> MetadataBusinessLine { get; set; }
+
+
+		/// <summary>
+		/// MetadataServiceAreas.
+		/// </summary>
+		public IEnumerable<ServiceArea> MetadataServiceAreas { get; set; }
+
+
+		/// <summary>
+		/// MetadataServices.
+		/// </summary>
+		public IEnumerable<Service> MetadataServices { get; set; }
+
+
+		/// <summary>
+		/// MetadataIndustryCategories.
+		/// </summary>
+		public IEnumerable<IndustryCategory> MetadataIndustryCategories { get; set; }
+
+
+		/// <summary>
+		/// MetadataIndustries.
+		/// </summary>
+		public IEnumerable<Industry> MetadataIndustries { get; set; }
 
 
 		/// <summary>
 		/// MicrositePages.
 		/// </summary>
-		public IEnumerable<MicrositePlaceholder> MicrositePages { get; set; }
+		public IEnumerable<MicrositePage> MicrositePages { get; set; }
+
+
+		/// <summary>
+		/// MicrositeMasterPages.
+		/// </summary>
+		public IEnumerable<MicrositeMasterPage> MicrositeMasterPages { get; set; }
 
 
 		/// <summary>

@@ -50,18 +50,18 @@ namespace BDO
 		/// <summary>
 		/// TargetURL.
 		/// </summary>
-		public IEnumerable<WebPageRelatedItem> TargetURL { get; set; }
+		public IEnumerable<IWebPageFieldsSource> TargetURL { get; set; }
 
 
 		/// <summary>
-		/// FeaturedImageAltText.
+		/// Image.
 		/// </summary>
-		public string FeaturedImageAltText { get; set; }
+		public IEnumerable<ContentAttachment> Image { get; set; }
 
 
 		/// <summary>
-		/// FeaturedImageFile.
+		/// ImageAltText.
 		/// </summary>
-		public IEnumerable<ContentAttachment> FeaturedImageFile { get; set; }
+		public string ImageAltText { get; set; }
 	}
 }

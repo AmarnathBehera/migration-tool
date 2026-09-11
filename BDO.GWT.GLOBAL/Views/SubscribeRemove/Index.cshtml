@@ -1,0 +1,31 @@
+﻿@using BDO
+@using BDO.GWT.Core.Services
+@using Microsoft.AspNetCore.Antiforgery
+@inject IAntiforgery Antiforgery
+@inject IReactService ReactService
+@inject IPageBuilderService PageBuilderService
+
+@{
+    var widgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.InsightCarousel,
+        ComponentIdentifiers.Widgets.InsightAnimationCard,
+        ComponentIdentifiers.Widgets.FlexibleBanner,
+        ComponentIdentifiers.Widgets.Button,
+        ComponentIdentifiers.Widgets.QuoteCard,
+        ComponentIdentifiers.Widgets.ImageWithText,
+        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.Form,
+    };
+}
+
+
+
+<div class="section-container py-20">
+    @Html.Raw(Model.Message)
+</div>
+
+@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+
+@PageBuilderService.GetPageBuilderScripts(Html)

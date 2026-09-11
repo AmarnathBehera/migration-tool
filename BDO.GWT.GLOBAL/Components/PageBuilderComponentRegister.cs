@@ -1,24 +1,63 @@
 ﻿using BDO;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ButtonWidget;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ExternalNavigationWidget;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.QuoteCardWidget;
-using BDO.GWT.Web.Widgets.RichTextWidget;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWidget;
-using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ViewGlobalLocations;
-using BDO.GWT.Xperience.LiveSite.Components.Section;
-using Kentico.PageBuilder.Web.Mvc;
+using BDO.GWT.Core.Components.Widgets.EditorsPickWidget;
+using BDO.GWT.Core.Components.Widgets.RelatedContentCarouselWidget;
+using BDO.GWT.GLOBAL.Components.Widget.InsightCarouselWidget;
+using BDO.GWT.GLOBAL.Components.Widget.KeyTakeawaysWidget;
+using BDO.GWT.GLOBAL.Components.Widget.LocalNavigationWidget;
+using BDO.GWT.GLOBAL.Widgets;
+using BDO.GWT.Web.Components.Widget.HeroWidget;
+using BDO.GWT.Web.Components.Widget.TabAccordionWidget;
 using BDO.GWT.Web.Widgets.AccordionWidget;
-using BDO.GWT.GLOBAL.Components.Widget.ImageWithTextWidget;
+using BDO.GWT.Web.Widgets.FaqWidget;
+using BDO.GWT.Web.Widgets.FlexibleBannerWidget;
+using BDO.GWT.Web.Widgets.FlexibleContentWidget;
+using BDO.GWT.Web.Widgets.ImageWithTextWidget;
+using BDO.GWT.Web.Widgets.QuoteCardWidget;
+using BDO.GWT.Web.Widgets.RelatedContactsWidget;
+using BDO.GWT.Web.Widgets.RichTextWidget;
+using BDO.GWT.Web.Widgets.SocialMediaButtonsWidget;
+using BDO.GWT.Web.Widgets.TabAccordionWidget;
+using BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents;
+using BDO.GWT.Xperience.Core.LiveSite.Components.FormSections.FormSectionProperties;
+using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ButtonWidget;
+using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.EditorsPickWidget;
+using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.EventsWebinarsSliderWidget;
+using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.ExternalNavigationWidget;
+using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.HtmlWidget;
+using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.RelatedContentCarouselWidget;
+using BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.TiledLinkSectionWidget;
+using BDO.GWT.Xperience.LiveSite.Components.Section;
+using Kentico.Forms.Web.Mvc;
+using Kentico.PageBuilder.Web.Mvc;
 
 // Widgets
-[assembly: RegisterWidget(ComponentIdentifiers.Widgets.Imagewithtext,typeof(ImageWithTextWidget),"ImageWithText",typeof(ImageWithTextWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
-[assembly: RegisterWidget(ComponentIdentifiers.Widgets.QuoteCard,typeof(QuoteCardWidget),"Quote Card Widget",typeof(QuoteCardWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
-[assembly: RegisterWidget(ComponentIdentifiers.Widgets.ExternalNavigation,typeof(ExternalNavigationWidget),"ExternalNavigationWidget",typeof(ExternalNavigationWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
-[assembly: RegisterWidget(ComponentIdentifiers.Widgets.TiledLink,typeof(TiledLinkSectionWidget),"Tiled Link Widget",typeof(TiledLinkSectionWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
-[assembly: RegisterWidget(ComponentIdentifiers.Widgets.Globallocation,typeof(ViewGlobalLocationsWidget),"View Global Location",typeof(ViewGlobalLocationsWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
-[assembly: RegisterWidget(ComponentIdentifiers.Widgets.RichText,typeof(RichTextWidget), "Rich Text", typeof(RichTextWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
-[assembly: RegisterWidget(ComponentIdentifiers.Widgets.AccordionWidget,typeof(AccordionWidget), "Accordion Widget", typeof(AccordionWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
-[assembly: RegisterWidget(ComponentIdentifiers.Widgets.Button, typeof(ButtonWidget), "Button", typeof(ButtonWidgetProperties), AllowCache = true, IconClass = "icon-xml-tag")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.InsightCarousel, typeof(InsightCarouselWidget), "Insight carousel", typeof(InsightCarouselWidgetProperties), AllowCache = true, IconClass = "icon-carousel")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.ImageWithText, typeof(ImageWithTextWidget), "Image With Text", typeof(ImageWithTextWidgetProperties), AllowCache = true, IconClass = "icon-outdent")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.QuoteCard, typeof(QuoteCardWidget), "Quote Card Widget", typeof(QuoteCardWidgetProperties), AllowCache = true, IconClass = "icon-right-double-quotation-mark")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.ExternalNavigation, typeof(ExternalNavigationWidget), "External Navigation Item", typeof(ExternalNavigationWidgetProperties), AllowCache = true, IconClass = "icon-chain")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.TiledLinkSection, typeof(TiledLinkSectionWidget), "Tiled link section", typeof(TiledLinkSectionWidgetProperties), AllowCache = true, IconClass = "icon-l-grid-2-2")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.ViewGlobalLocations, typeof(ViewGlobalLocationsWidget), "View Global Location", typeof(ViewGlobalLocationsWidgetProperties), AllowCache = true, IconClass = "icon-ribbon")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.RichText, typeof(RichTextWidget), "Rich Text", typeof(RichTextWidgetProperties), AllowCache = true, IconClass = "icon-l-text")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.Accordion, typeof(AccordionWidget), "Accordion Widget", typeof(AccordionWidgetProperties), AllowCache = true, IconClass = "icon-accordion")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.Button, typeof(ButtonWidget), "Button", typeof(ButtonWidgetProperties), AllowCache = true, IconClass = "icon-button")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.LocalNavigation, typeof(LocalNavigationWidget), "Local Navigation Item", typeof(LocalNavigationWidgetProperties), AllowCache = true, IconClass = "icon-chain")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.KeyTakeaways, typeof(KeyTakeawaysWidget), "Key Takeaways", typeof(KeyTakeawaysWidgetProperties), AllowCache = true, IconClass = "icon-list-bullets")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.EventsWebinarsSlider, typeof(EventsWebinarsSliderWidget), "Events Webinar Slider Widget", typeof(EventsWebinarsSliderWidgetProperties), AllowCache = true, IconClass = "icon-carousel")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.Faq, typeof(FaqWidget), "FAQ Widget", typeof(FaqWidgetProperties), AllowCache = true, IconClass = "icon-bubbles")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.FlexibleBanner, typeof(FlexibleBannerWidget), "Flexible Banner", typeof(FlexibleBannerWidgetProperties), AllowCache = true, IconClass = "icon-ribbon")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.FlexibleContent, typeof(FlexibleContentWidget), "Flexible Content", typeof(FlexibleContentWidgetProperties), AllowCache = true, IconClass = "icon-newspaper")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.TabAccordion, typeof(TabAccordionWidget), "Reusable Content Tab/Accordion", typeof(TabAccordionWidgetProperties), AllowCache = true, IconClass = "icon-tab")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.NewsCarousel,typeof(NewsCarouselWidget),"News carousel",typeof(NewsCarouselWidgetProperties),AllowCache = true,IconClass = "icon-carousel")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.KeyContacts, typeof(KeyContactsWidget), "Key Contacts", typeof(KeyContactsWidgetProperties), AllowCache = true, IconClass = "icon-app-contact-groups")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.SocialMediaButtons,typeof(SocialMediaButtonsWidget),"Social media buttons",typeof(SocialMediaButtonsWidgetProperties),AllowCache = true,IconClass = "icon-paper-plane")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.EditorsPick,typeof(EditorsPickWidget),"Editors pick widget",typeof(EditorsPickWidgetProperties),AllowCache = true,IconClass = "icon-carousel")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.RelatedContacts, typeof(RelatedContactsWidget), "Related Contacts", typeof(RelatedContactsWidgetProperties), AllowCache = true, IconClass = "icon-app-contact-groups")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.InFocus,typeof(InFocusWidget),"In Focus",typeof(InFocusWidgetProperties),AllowCache = true,IconClass = "icon-tab-vertical")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.InsightAnimationCard,typeof(InsightAnimationCardWidget),"Insight Animation Card Widget",typeof(InsightAnimationCardWidgetProperties),AllowCache = true, IconClass = "icon-carousel")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.Hero,typeof(HeroWidget),"Hero",typeof(HeroWidgetProperties),AllowCache = true,IconClass = "icon-l-img-3-cols-3")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.RelatedContentCarousel, typeof(RelatedContentCarouselWidget), "Related content carousel", typeof(RelatedContentCarouselWidgetProperties), AllowCache = true, IconClass = "icon-carousel")]
+[assembly: RegisterWidget(ComponentIdentifiers.Widgets.HTML,typeof(HtmlWidget),"HTML",typeof(HtmlWidgetProperties),AllowCache = true,IconClass = "icon-xml-tag")]
+
 
 // Sections
 [assembly: RegisterSection(identifier: ComponentIdentifiers.Sections.Container,name: "Container",propertiesType: typeof(BaseSectionProperties),customViewName: "~/Components/Section/SectionView/_ContainerSection.cshtml")]
@@ -29,3 +68,44 @@ using BDO.GWT.GLOBAL.Components.Widget.ImageWithTextWidget;
 [assembly: RegisterSection(identifier: ComponentIdentifiers.Sections.FourColumns,name: "Four Columns: Even", propertiesType: typeof(SectionWithGapProperties),customViewName: "~/Components/Section/SectionView/_FourColumnSection.cshtml")]
 [assembly: RegisterSection(identifier: ComponentIdentifiers.Sections.FiveColumns,name: "Five Columns: Even", propertiesType: typeof(SectionWithGapProperties),customViewName: "~/Components/Section/SectionView/_FiveColumnSection.cshtml")]
 [assembly: RegisterSection(identifier: ComponentIdentifiers.Sections.LocalNavigation,name: "Local Navigation", propertiesType: typeof(BaseSectionProperties),customViewName: "~/Components/Section/SectionView/_LocalNavigationSection.cshtml")]
+
+
+// Register BaseFormSection
+[assembly: RegisterFormSection(ComponentIdentifiers.FormSections.TwoColumns, "Two Columns: Even", customViewName: "~/Components/FormSections/Views/_TwoColumnFormSection.cshtml", PropertiesType = typeof(FormSectionWithGapProperties), IconClass = "icon-l-cols-2")]
+
+
+//custom form component
+[assembly: RegisterFormComponent(
+    TextBoxReload.IDENTIFIER,
+    typeof(TextBoxReload),
+    "Text Box Reload",
+    Description = "Custom text box with reload support",
+    IconClass = "icon-l-text",
+    ViewName = "~/Components/FormComponents/TextBoxReload/TextBoxReload.cshtml"
+)]
+
+[assembly: RegisterFormComponent(
+    ConsentAgreement.IDENTIFIER,
+    typeof(ConsentAgreement),
+    "BDO Consent Agreement",
+    Description = "{$" + ComponentIdentifiers.FormComponents.ConsentAgreement + ".Description$}",
+    IconClass = "icon-cb-check-preview",
+    ViewName = "~/Components/FormComponents/ConsentAgreement/ConsentAgreement.cshtml"
+)]
+
+[assembly: RegisterFormComponent(
+    MonthYear.IDENTIFIER,
+    typeof(MonthYear),
+    "Month Year",
+    IsAvailableInFormBuilderEditor = true,
+    ViewName = "~/Components/FormComponents/MonthYear/_MonthYear.cshtml",
+    Description = "{$" + ComponentIdentifiers.FormComponents.MonthYear + ".Description$}",
+    IconClass = "icon-cb-check-preview")]
+
+[assembly: RegisterFormComponent(
+    ReadOnlyTextComponent.IDENTIFIER,
+    typeof(ReadOnlyTextComponent),
+    "Read Only Text",
+    IsAvailableInFormBuilderEditor = true,
+    ViewName = "~/Components/FormComponents/ReadOnlyText/_ReadOnlyTextComponent.cshtml",
+    IconClass = "icon-cb-check-preview")]

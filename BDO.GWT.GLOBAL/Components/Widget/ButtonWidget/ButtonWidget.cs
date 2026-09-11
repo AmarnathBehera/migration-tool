@@ -19,6 +19,7 @@ public class ButtonWidget : ViewComponent
             ButtonSide = model.Properties.ButtonSide,
             TopMargin = model.Properties.TopMargin,
             BottomMargin = model.Properties.BottomMargin,
+            WidgetID = model.Properties.WidgetID,
         };
         return View("~/Components/Widget/ButtonWidget/_ButtonWidget.cshtml", dto);
     }

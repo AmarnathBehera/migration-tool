@@ -22,16 +22,56 @@ variable "deploy.octopus.workerPool" {
     }
 }
 
-variable "appsettings.azureAdClientId" {
-    value "7e20a3ed-beed-48cd-91cb-f20f5feffd71" {}
+variable "appsettings.aspNetCoreEnvironment" {
+    value "Development" {}
+
+    value "Production" {
+        description = ""
+        environment = ["production", "acceptance", "test-2"]
+    }
 }
 
 variable "appsettings.azureAdTenantId" {
     value "44f4e7a6-4821-44d7-b286-cd90436c6975" {}
 }
 
+variable "appsettings.azureAdInstance" {
+    value "https://login.microsoftonline.com/" {}
+}
+
 variable "appsettings.CMSConnectionString" {
     value "Server=bdo-dbs-gwt-xbyk-#{environment.abbreviation}-eur-we.database.windows.net;Database=bdo-db-gwt-xbyk-#{environment.abbreviation}-eur-we;Authentication=Active Directory Managed Identity;TrustServerCertificate=False;Encrypt=True;" {}
+}
+
+variable "appsettings.syncApiKey" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-sync-apiKey)" {}
+}
+
+variable "appsettings.syncApiUrl" {
+    value "https://bdo-web-gwt-xbyk-syn-#{environment.abbreviation}-eur-we.azurewebsites.net" {}
+}
+
+variable "appsettings.syncRegions" {
+    value "[]" {}
+}
+
+variable "appsettings.BDOAdminSiteUrl" {
+    value "admin-xbyk.#{environment.abbreviation}.bdo.global" {}
+}
+
+variable "appsettings.syncGlobalSiteGuid" {
+    value "" {}
+
+    value "CDD133DB-1319-42C7-B3BD-9A1CF2DBA942" {
+        description = ""
+        environment = ["development"]
+    }
+
+    value "4678b9ef-ab99-4d15-a92a-ddd42a9f0782" {
+        description = ""
+        environment = ["test"]
+    }
+
 }
 
 variable "appsettings.reactAppService" {
@@ -46,24 +86,6 @@ variable "appsettings.CMSAzureCDNEndpoint" {
     value "https://bdosagwtxbyk#{environment.abbreviation}eurwe.blob.core.windows.net" {}
 }
 
-variable "appsettings.azureAdClientSecret" {
-    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-cms-app-secret)" {
-        environment = ["development"]
-    }
-}
-
-variable "appsettings.CMSAzureSharedKey" {
-    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-storage-account-shared-key)" {
-        environment = ["development"]
-    }
-}
-
-variable "appsettings.CMSHashStringSalt" {
-    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-cms-hashStringSalt)" {
-        environment = ["development"]
-    }
-}
-
 variable "appsettings.appInsightsCMSConnectionString" {
     value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ai-gwt-xbyk-cms-#{environment.abbreviation}-eur-we-connectionstring)" {}
 }
@@ -74,4 +96,91 @@ variable "appsettings.appInsightsMVCConnectionString" {
 
 variable "appsettings.appInsightsReactConnectionString" {
     value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ai-gwt-xbyk-react-#{environment.abbreviation}-eur-we-connectionstring)" {}
+}
+
+variable "appsettings.appInsightsAPIConnectionString" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ai-gwt-xbyk-api-#{environment.abbreviation}-eur-we-connectionstring)" {}
+}
+
+variable "appsettings.cmsAppClientId" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-cms-app-id)" {}
+}
+
+variable "appsettings.cmsAppClientSecret" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-cms-app-secret)" {}
+}
+variable "appsettings.apiAppClientId" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-api-app-id)" {}
+}
+
+variable "appsettings.apiAppClientSecret" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-api-app-secret)" {}
+}
+
+variable "appsettings.apiAppAudience" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-api-app-audience)" {}
+}
+
+variable "appsettings.CMSAzureSharedKey" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-storage-account-shared-key)" {}
+}
+
+variable "appsettings.CMSHashStringSalt" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-cms-hashStringSalt)" {}
+}
+
+variable "appsettings.CMSAzureSearchSearchServiceEnabled" {
+    value "true" {}
+}
+
+variable "appsettings.CMSAzureSearchSearchServiceEndPoint" {
+    value "https://bdo-ais-gwt-xbyk-#{environment.abbreviation}-eur-we.search.windows.net/" {}
+}
+
+variable "appsettings.CMSAzureSearchSearchServiceAdminApiKey" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ais-gwt-xbyk-#{environment.abbreviation}-eur-we-primaryKey)" {}
+}
+
+variable "appsettings.CMSAzureSearchSearchServiceQueryApiKey" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ais-gwt-xbyk-#{environment.abbreviation}-eur-we-queryKey)" {}
+}
+
+variable "appsettings.AzureCognitiveSearchServiceUrl" {
+    value "https://bdo-ais-gwt-xbyk-#{environment.abbreviation}-eur-we.search.windows.net/" {}
+}
+
+variable "appsettings.AzureCognitiveSearchQueryKey" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=bdo-ais-gwt-xbyk-#{environment.abbreviation}-eur-we-queryKey)" {}
+}
+
+variable "appsettings.RedirectDomain" {
+    value "admin-xbyk.#{environment.abbreviation}.bdo.global" {}
+    value "admin-xbyk.bdo.global" {
+        description = ""
+        environment = ["production"]
+    }
+}
+
+variable "appsettings.FallbackSendGridClientApiKey" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-sendgrid-apikey)" {}
+}
+
+variable "appsettings.SystemSendGridClientApiKey" {
+    value "@Microsoft.KeyVault(VaultName=bdo-kv-gwt-xbyk-#{environment.abbreviation}-eur;SecretName=gwt-xbyk-sendgrid-apikey)" {}
+}
+
+variable "apim.subscriptionId" {
+    value "#{gwt-xbyk-azure-apim-subscription-id}" {}
+}
+
+variable "apim.resourceGroupName" {
+    value "#{gwt-xbyk-azure-apim-resource-group}" {}
+}
+
+variable "apim.serviceName" {
+    value "#{gwt-xbyk-azure-apim-resourceName}" {}
+}
+
+variable "geography.abbreviation" {
+    value "#{geography.abbreviation}" {}
 }

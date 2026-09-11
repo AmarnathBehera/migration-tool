@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.SectionLegal</CodeName>
+    <GUID>2d1bdba2-9ca8-42ab-a783-33007f1f3e3b</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.LegalPage">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.LegalPage</CodeName>
+        <GUID>ca36fdc4-756f-4f9e-afdf-bdf19fc50427</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

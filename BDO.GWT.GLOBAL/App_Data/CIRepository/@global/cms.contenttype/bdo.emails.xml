@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Email</ClassContentTypeType>
+  <ClassDisplayName>Email</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="0daf5e40-a3f8-48dd-bcb0-350138297eb5" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="48c5a1c0-6cf9-4a61-b883-33a8cada30a1" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="63d1fefc-262c-40c9-abd0-d7994491fbb6" isunique="true" system="true" />
+      <field allowempty="true" column="EmailSenderID" columntype="integer" enabled="true" guid="07699027-030f-479d-846c-8f43690fff8b" refobjtype="emaillibrary.emailchannelsender" reftype="NotRequired" system="true" />
+      <field allowempty="true" column="EmailTemplateID" columntype="integer" enabled="true" guid="e0482ac0-ff88-4d1d-af73-0f7eeec6d4c8" refobjtype="emaillibrary.emailtemplate" reftype="NotRequired" system="true" />
+      <field allowempty="true" column="EmailPlainText" columntype="longtext" enabled="true" guid="500c8865-98e3-4dc0-8511-9e60600e8afb" system="true" />
+      <field allowempty="true" column="EmailSubject" columnsize="450" columntype="text" enabled="true" guid="0caa6761-308d-4491-bd8c-b924559e6475" visible="true">
+        <properties>
+          <fieldcaption>{$digitalmarketing.emails.edit.subject$}</fieldcaption>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues />
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+      <field allowempty="true" column="EmailPreviewText" columntype="longtext" enabled="true" guid="121c5c66-17d7-4c93-8cdb-7297c8767be5" visible="true">
+        <properties>
+          <fieldcaption>{$digitalmarketing.emails.edit.previewtext$}</fieldcaption>
+          <fielddescription>
+            <![CDATA[{$digitalmarketing.emails.edit.previewtext.tooltip$}]]>
+          </fielddescription>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextArea</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>63467a61-3644-4c36-8645-393964b9de15</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>bdo.emails</ClassName>
+  <ClassTableName>Bdo_emails</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

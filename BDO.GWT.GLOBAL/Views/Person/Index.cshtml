@@ -1,0 +1,61 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@using Kentico.Forms.Web.Mvc.Widgets
+@using Kentico.Xperience.Admin.Base.Forms
+@model (BDO.GWT.Core.DTOs.Pages.PersonDto PersonDto, BDO.GWT.Core.DTOs.SchemaMarkups.PersonSchemaMarkupDto PersonSchemaMarkupDto)
+@using System.Collections.Generic
+@using Kentico.PageBuilder.Web.Mvc
+@using Kentico.Web.Mvc
+
+@inject IFormBuilderService FormBuilder
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+
+    var widgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.Button,
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.FlexibleBanner,
+        ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.Form,
+        ComponentIdentifiers.Widgets.SocialMediaButtons,
+        ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.HTML,
+    };
+}
+
+@(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.PeopleBio,
+        ReactComponentType.PeopleBioGUID,
+        new { data = Model.PersonDto },
+        Context.RequestAborted))
+
+@if (this.Model.PersonDto.ParentEnableForm && this.Model.PersonDto.EnableForm)
+{
+    <div class="section-container section-container--md py-20">
+        <div class="ktc-default-section flex flex-col">
+            @await FormBuilder.GetFormBuilderWidget(Html, "bdo_contactpeoplewithemail")
+        </div>
+    </div>
+}
+<div>
+    @await Html.Kentico().EditableAreaAsync(
+    "mainContent",
+        new EditableAreaOptions
+        {
+            AllowedWidgets = widgetsList
+        })
+</div>
+
+ 

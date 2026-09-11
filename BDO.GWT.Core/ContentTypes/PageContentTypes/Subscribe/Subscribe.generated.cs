@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="Subscribe"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class Subscribe : IWebPageFieldsSource, IMetadata
+	public partial class Subscribe : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero, IPageMetadata
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -33,6 +33,150 @@ namespace BDO
 		/// </summary>
 		[SystemField]
 		public WebPageFields SystemFields { get; set; }
+
+
+		/// <summary>
+		/// Formoptions.
+		/// </summary>
+		public string Formoptions { get; set; }
+
+
+		/// <summary>
+		/// FormType.
+		/// </summary>
+		public string FormType { get; set; }
+
+
+		/// <summary>
+		/// EmbedCode.
+		/// </summary>
+		public string EmbedCode { get; set; }
+
+
+		/// <summary>
+		/// Formfieldsettings.
+		/// </summary>
+		public string Formfieldsettings { get; set; }
+
+
+		/// <summary>
+		/// Information.
+		/// </summary>
+		public string Information { get; set; }
+
+
+		/// <summary>
+		/// ShowCompanyField.
+		/// </summary>
+		public bool ShowCompanyField { get; set; }
+
+
+		/// <summary>
+		/// IsCompanyRequired.
+		/// </summary>
+		public bool IsCompanyRequired { get; set; }
+
+
+		/// <summary>
+		/// ShowJobTitleField.
+		/// </summary>
+		public bool ShowJobTitleField { get; set; }
+
+
+		/// <summary>
+		/// IsJobTitleRequired.
+		/// </summary>
+		public bool IsJobTitleRequired { get; set; }
+
+
+		/// <summary>
+		/// ShowCountryField.
+		/// </summary>
+		public bool ShowCountryField { get; set; }
+
+
+		/// <summary>
+		/// IsCountryRequired.
+		/// </summary>
+		public bool IsCountryRequired { get; set; }
+
+
+		/// <summary>
+		/// AddConsentToForm.
+		/// </summary>
+		public bool AddConsentToForm { get; set; }
+
+
+		/// <summary>
+		/// RecaptchaUseV3.
+		/// </summary>
+		public bool RecaptchaUseV3 { get; set; }
+
+
+		/// <summary>
+		/// RecaptchaScoreTreshhold.
+		/// </summary>
+		public decimal RecaptchaScoreTreshhold { get; set; }
+
+
+		/// <summary>
+		/// RedirectPageOnFormSubmission.
+		/// </summary>
+		public IEnumerable<WebPageRelatedItem> RedirectPageOnFormSubmission { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGTitle.
+		/// </summary>
+		public string MetadataOGTitle { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGDescription.
+		/// </summary>
+		public string MetadataOGDescription { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> MetadataOGImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGTwitterImageSizeCheckbox.
+		/// </summary>
+		public bool MetadataOGTwitterImageSizeCheckbox { get; set; }
+
+
+		/// <summary>
+		/// MetadataOGTwitterImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> MetadataOGTwitterImage { get; set; }
+
+
+		/// <summary>
+		/// MetadataNofollow.
+		/// </summary>
+		public bool MetadataNofollow { get; set; }
+
+
+		/// <summary>
+		/// MetadataNoindex.
+		/// </summary>
+		public bool MetadataNoindex { get; set; }
+
+
+		/// <summary>
+		/// IncludeInSitemap.
+		/// </summary>
+		public bool IncludeInSitemap { get; set; }
+
+
+		/// <summary>
+		/// IsSearchExcluded.
+		/// </summary>
+		public bool IsSearchExcluded { get; set; }
 
 
 		/// <summary>
@@ -50,7 +194,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataTeaserImage.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataTeaserImage { get; set; }
+		public IEnumerable<ContentAttachment> MetadataTeaserImage { get; set; }
 
 
 		/// <summary>
@@ -66,8 +210,80 @@ namespace BDO
 
 
 		/// <summary>
-		/// MetadataKeywords.
+		/// HeroLayout.
 		/// </summary>
-		public string MetadataKeywords { get; set; }
+		public string HeroLayout { get; set; }
+
+
+		/// <summary>
+		/// HeroTitle.
+		/// </summary>
+		public string HeroTitle { get; set; }
+
+
+		/// <summary>
+		/// HeroDescription.
+		/// </summary>
+		public string HeroDescription { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImage.
+		/// </summary>
+		public IEnumerable<ContentAttachment> HeroBackgroundImage { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImageAltText.
+		/// </summary>
+		public string HeroBackgroundImageAltText { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImage_Mobile.
+		/// </summary>
+		public IEnumerable<ContentAttachment> HeroBackgroundImage_Mobile { get; set; }
+
+
+		/// <summary>
+		/// HeroBackgroundImage_MobileAltText.
+		/// </summary>
+		public string HeroBackgroundImage_MobileAltText { get; set; }
+
+
+		/// <summary>
+		/// HeroCallToActionButtonType.
+		/// </summary>
+		public string HeroCallToActionButtonType { get; set; }
+
+
+		/// <summary>
+		/// HeroCallToActionButtonText.
+		/// </summary>
+		public string HeroCallToActionButtonText { get; set; }
+
+
+		/// <summary>
+		/// HeroCallToActionButtonUrl.
+		/// </summary>
+		public IEnumerable<IWebPageFieldsSource> HeroCallToActionButtonUrl { get; set; }
+
+
+		/// <summary>
+		/// PageTitle.
+		/// </summary>
+		public string PageTitle { get; set; }
+
+
+		/// <summary>
+		/// PageDescription.
+		/// </summary>
+		public string PageDescription { get; set; }
+
+
+		/// <summary>
+		/// PageKeywords.
+		/// </summary>
+		public string PageKeywords { get; set; }
 	}
 }

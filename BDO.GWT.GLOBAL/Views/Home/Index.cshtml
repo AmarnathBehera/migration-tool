@@ -1,12 +1,11 @@
 ﻿@using BDO
 @using Kentico.Content.Web.Mvc
 @using Kentico.PageBuilder.Web.Mvc
-@using BDO.GWT.Common.Core.LiveSite.Data
 @using BDO.GWT.Core.Constants
 @using BDO.GWT.Core.Services
 @using CMS.Websites
-@using Kentico.Content.Web.Mvc
 @model BDO.GWT.Core.DTOs.HomeDto
+@inject IPageBuilderService PageBuilderService
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
@@ -18,20 +17,21 @@
 @{
     Layout = "_Layout";
 
-
     var widgetsList = new[]
+        {
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.ImageWithText,
+        ComponentIdentifiers.Widgets.TiledLinkSection,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+    };
+
+    var sectionsList = new[]
     {
-        ComponentIdentifiers.Widgets.ExternalNavigation,
-        ComponentIdentifiers.Widgets.Imagewithtext,
-        ComponentIdentifiers.Widgets.QuoteCard,
-        ComponentIdentifiers.Widgets.TiledLink,
-        ComponentIdentifiers.Widgets.Globallocation
+        ComponentIdentifiers.Sections.DefaultSection,
+        ComponentIdentifiers.Sections.Container
     };
 }
 
-
-
-<div>
     @if (Model != null && pageId != 0)
     {
         @(await ReactService.RenderComponentAsync(
@@ -40,19 +40,24 @@
         ReactComponentType.HomeHeroGUID,
         new {
         homeHero = Model.HomeHeroSlides,
+
         },
         Context.RequestAborted))
     }
+
+<div class="elevated">
+    @if (Model != null && pageId != 0)
+    {
+        @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.TrendingTopics,
+        ReactComponentType.TrendingTopicsGUID,
+        new {
+        data = Model.TrendingTopics
+        },
+        Context.RequestAborted))
+    }
+    @await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddSections(sectionsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
 </div>
 
-
-            <div class="elevated">
-                 @await Html.Kentico().EditableAreaAsync(
-    "mainContent", // Unique identifier
-        new EditableAreaOptions
-        {
-
-            AllowedWidgets = widgetsList
-        })
-   
-</div>
+@PageBuilderService.GetPageBuilderScripts(Html)

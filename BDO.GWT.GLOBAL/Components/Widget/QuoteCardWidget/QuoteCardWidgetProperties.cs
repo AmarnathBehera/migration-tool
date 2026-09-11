@@ -5,9 +5,9 @@ using Kentico.PageBuilder.Web.Mvc;
 using Kentico.Xperience.Admin.Base.FormAnnotations;
 using System.Collections.Generic;
 
-namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.QuoteCardWidget;
+namespace BDO.GWT.Web.Widgets.QuoteCardWidget;
 
-public class QuoteCardWidgetProperties : IWidgetProperties
+public class QuoteCardWidgetProperties : BaseWidgetProperties
 {
     [TextInputComponent(Label = "Heading", Order = 0)]
     public string Heading { get; set; }
@@ -18,10 +18,12 @@ public class QuoteCardWidgetProperties : IWidgetProperties
     [ContentItemSelectorComponent(ContentAttachment.CONTENT_TYPE_NAME,
     Label = "Image",
     Order = 2,
-    ExplanationText = "Recommended size depends on usage but a 3:2 aspect ratio works well for most instances.")]
+    ExplanationText = "Recommended size depends on usage but a 3:2 aspect ratio works well for most instances.",MaximumItems =1)]
     public IEnumerable<ContentItemReference> Image { get; set; } = new List<ContentItemReference>();
   
     [TextInputComponent(Label = "Image alt text", Order = 3)]
+    [RequiredValidationRule]
+    [VisibleIfNotEmpty(nameof(Image))]
     public string ImageAltText { get; set; }
 
     [RichTextEditorComponent(Order = 4, Label = "Quote text", ExplanationText = "Recommended quote text length is under 100 words.")]
@@ -38,19 +40,35 @@ public class QuoteCardWidgetProperties : IWidgetProperties
     [TextInputComponent(Label = "Button text", Order = 7)]
     public string ButtonText { get; set; } = null!;
 
-    [ContentItemSelectorComponent(new string[] { HomePage.CONTENT_TYPE_NAME, Navigation.CONTENT_TYPE_NAME }, Label = "Button URL", Order = 8)]
-    public IEnumerable<ContentItemReference> ButtonUrl { get; set; } = new List<ContentItemReference>();
+    [DropDownComponent(Label = "URL Source", Order = 8, Options = "content;Content item\r\nmanual;Manual URL")]
+    public string UrlSource { get; set; } = "content";
 
-    [DropDownComponent(Label = "Primary Button link target", Order = 9, Options = "_self;Same tab\r\n_blank;New tab")]
+    [TextInputComponent(Label = "Manual URL", Order = 9)]
+    [VisibleIfEqualTo(nameof(UrlSource), "manual")]
+    public string ManualUrl { get; set; }
+
+    [ContentItemSelectorComponent(
+        contentTypeNames: [HomePage.CONTENT_TYPE_NAME, Navigation.CONTENT_TYPE_NAME],
+        Label = "Button url",
+        Order = 10,
+        MaximumItems = 1)]
+
+    [VisibleIfEqualTo(nameof(UrlSource), "content")]
+    public IEnumerable<ContentItemReference> ButtonUrl { get; set; }
+
+    
+    [DropDownComponent(Label = "Primary Button link target", Order = 11, Options = "_self;Same tab\r\n_blank;New tab")]
 
     public string PrimaryButtonLinkTarget { get; set; } = "_self";
-
-    [RadioGroupComponent(Label = "Quote text", Order = 10, Options = "small;Small\r\nmedium;Medium\r\nlarge;Large")]
+                                                                      
+    [RadioGroupComponent(Label = "Quote text", Order = 12, Options = "small;Small\r\nstandard;Standard\r\nlarge;Large")]
     public string Size { get; set; } = "standard";
 
-    [DropDownComponent(Label = "Top margin", Order = 11, Options = "0px;None\n20px\n40px\n60px\n80px")]
+    [DropDownComponent(Label = "Top margin", Order = 13, Options = "0px;None\n20px\n40px\n60px\n80px")]
     public string TopMargin { get; set; }
 
-    [DropDownComponent(Label = "Bottom margin", Order = 12, Options = "0px;None\n20px\n40px\n60px\n80px")]
+    [DropDownComponent(Label = "Bottom margin", Order = 14, Options = "0px;None\n20px\n40px\n60px\n80px")]
     public string BottomMargin { get; set; }
+
+
 }

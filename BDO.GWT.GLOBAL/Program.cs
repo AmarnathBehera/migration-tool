@@ -1,28 +1,45 @@
-﻿using BDO;
+﻿using AngleSharp;
+using AutoMapper;
+using BDO;
 using BDO.GWT.Common;
-using Kentico.Membership;
-using Kentico.Web.Mvc;
 using BDO.GWT.Common.Options;
 using BDO.GWT.Core;
+using BDO.GWT.Core.Constants;
+using BDO.GWT.Core.Mappers;
+using BDO.GWT.Core.Services;
 using BDO.GWT.Domain.Services;
+using BDO.GWT.GLOBAL.Search;
+using BDO.GWT.GLOBAL.Services;
+using BDO.GWT.Web.Core.Services;
+using BDO.GWT.Web.Services;
+using BDO.GWT.Xperience.Core.Services;
 using BDO.GWT.Xperience.LiveSite.Services;
 using Kentico.Activities.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
+using Kentico.Membership;
 using Kentico.OnlineMarketing.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
+using Kentico.Web.Mvc;
+using Kentico.Xperience.SendGrid;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.WebEncoders;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using SendGrid;
+using System;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
-
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using XperienceCommunity.MultiChoiceFormControl.Admin.Helpers.Components.MultiChoice;
+using XperienceCommunity.Redirects;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,14 +49,7 @@ builder.Services.AddKentico(features =>
     {
         DefaultSectionIdentifier = ComponentIdentifiers.Sections.Container,
         RegisterDefaultSection = true,
-        ContentTypeNames = new[]
-        {
-          "BDO.HomePage",
-          "BDO.SectionAbout",
-          "BDO.AboutPage",
-          "BDO.HomePage",
-          "BDO.Contact"
-       }
+        ContentTypeNames = PageBuilderContentTypes.ContentTypes
     }); features.UseActivityTracking();
     features.UseWebPageRouting();
     features.UseEmailStatisticsLogging();
@@ -49,12 +59,15 @@ builder.Services.AddKentico(features =>
 builder.Configuration.AddInMemoryCollection(
     builder.Configuration
         .GetSection("AzureStorageProviderSettings")
-        .GetChildren().ToDictionary(x => x.Key, x => x.Value)
+        .GetChildren()
+        .Where(x => x.Value != null)
+        .ToDictionary(x => x.Key, x => x.Value!)
 );
 builder.Services.Configure<WebEncoderOptions>(options =>
 {
     options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All);
 });
+builder.Services.AddTransient<IMultiChoiceOptionsProviderActivator, MultiChoiceOptionsProviderActivator>();
 
 builder.Services.Configure<ReactOptions>(
     builder.Configuration.GetSection("ReactOptions"));
@@ -70,11 +83,35 @@ builder.Services.Configure<WebEncoderOptions>(options =>
 
 builder.Services.AddAuthentication();
 builder.Services.AddContentServices();
+builder.Services.AddScoped<IDealCardsService, DealCardsService>();
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddScoped<IPageBuilderService, PageBuilderService>();
 builder.Services.AddScoped<IContentService, ContentService>();
-builder.Services.AddXperience();
+builder.Services.AddScoped<ICachingService, CachingService>();
+builder.Services.AddScoped<ISiteContext, SiteContext>();
+builder.Services.AddScoped<SiteConfigurationProviders>();
+builder.Services.AddScoped<ISiteConfigurationService, SiteConfigurationService>();
+builder.Services.AddScoped<ILocalizedUrlsBuilder, LocalizedUrlsBuilder>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllersWithViews();
+
+// Register Kentico Azure AI Search with our custom indexing strategy.
+// The strategy name ("GlobalSearchStrategy") is selected per-index in the Xperience admin UI.
+builder.Services.AddKenticoAzureSearch(searchBuilder =>
+{
+    searchBuilder.RegisterStrategy<GlobalAzureSearchIndexingStrategy, GlobalSearchModel>("GlobalSearchStrategy");
+}, builder.Configuration);
+
+// Register AutoMapper so IMapper can be resolved for SearchService / SearchQueryHelper.
+// Scan the assemblies that contain your AutoMapper Profile classes and the search types.
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddMaps(
+        typeof(BDO.GWT.Core.Helpers.SearchQueryHelper).Assembly,        // BDO.GWT.Core
+        typeof(BDO.GWT.AzureCognitiveSearch.Services.SearchService).Assembly);
+    cfg.AddProfile<SearchDocumentProfile>();
+});
+builder.Services.AddXperienceCommunityRedirects();
 builder.Services.AddXperienceCommunityLocalization();
 builder.Services.AddAdminExternalAuthenticationProvider(
     authBuilder => authBuilder.AddMicrosoftIdentityWebApp(options =>
@@ -105,17 +142,31 @@ builder.Services.AddAdminExternalAuthenticationProvider(
         options.UserSynchronizationFrequency = UserSynchronizationFrequency.Always;
     }
 );
-
-builder.Services.Configure<AdminIdentityOptions>(options =>
-
+if (builder.Environment.IsDevelopment())
 {
+    builder.Services.Configure<AdminIdentityOptions>(options =>
+    {
+        options.AuthenticationOptions.Mode = AdminAuthenticationMode.MaintainForms;
+    });
+}
 
-    options.AuthenticationOptions.Mode = AdminAuthenticationMode.MaintainForms;
-
-});
+builder.Services.AddOptions<BDO.GWT.Core.Extensions.AzureCognitiveSearchOptions>()
+    .BindConfiguration("AzureCognitiveSearch");   // section name in appsettings.json
 
 // Add Application Insights telemetry
 builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
+
+// Loads the administration redirect domain (AdminRedirectOptions) from a configuration file section
+builder.Services.Configure<AdminRedirectOptions>(builder.Configuration.GetSection("AdminRedirectOptions"));
+
+// Configures email sending via SendGrid for system emails
+builder.Services.AddXperienceSystemSendGrid();
+// Configures email sending via SendGrid for the fallback situation
+builder.Services.AddXperienceSendGrid();
+
+// Loads the SendGrid API keys from configuration file sections
+builder.Services.ConfigureSystemSendGridClientOptions(builder.Configuration.GetSection("SystemSendGridClientOptions"));
+builder.Services.Configure<SendGridClientOptions>(builder.Configuration.GetSection("FallbackSendGridClientOptions"));
 
 var app = builder.Build();
 
@@ -127,20 +178,67 @@ app.UseCookiePolicy();
 
 app.UseAuthentication();
 
+
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseWhen(
+        context => !context.Request.Host.Host.StartsWith(
+            builder.Configuration["BDOAdminSiteUrl"],
+            StringComparison.OrdinalIgnoreCase),
+        branch =>
+        {
+            branch.UseExceptionHandler("/Error/500");
+        });
+
+    app.UseHsts();
+}
+
+app.UseWhen(
+    context => !context.Request.Host.Host.StartsWith(
+        builder.Configuration["BDOAdminSiteUrl"],
+        StringComparison.OrdinalIgnoreCase),
+    branch =>
+    {
+        branch.UseStatusCodePagesWithReExecute("/Error/{0}");
+    });
+
+
+if (!builder.Environment.IsDevelopment() && builder.Configuration.GetSection("AdminRedirectOptions")?.GetSection("RedirectDomain")?.Value.Trim() != string.Empty)
+{
+    // Configures the URL rewriting options
+    var rewriteOptions = new RewriteOptions()
+    .Add(context =>
+    {
+        var httpContext = context.HttpContext;
+        var request = httpContext.Request;
+
+        // Checks if the URL path starts with '/admin'
+        if (request.Path.StartsWithSegments("/admin", StringComparison.OrdinalIgnoreCase))
+        {
+            // Gets the redirect domain for the administration
+            string adminDomain = httpContext.RequestServices
+                .GetRequiredService<IOptions<AdminRedirectOptions>>().Value.RedirectDomain;
+
+            // Checks if the current host is not already the administration domain
+            if (!adminDomain.Equals(request.Host.ToString(), StringComparison.OrdinalIgnoreCase))
+            {
+                // Redirects the request to the new domain
+                httpContext.Response.Redirect($"//{adminDomain}{request.Path}{request.QueryString}", permanent: false);
+                context.Result = RuleResult.EndResponse;
+            }
+        }
+    });
+
+    // Adds the URL rewriting middleware to the request pipeline using the configured RewriteOptions
+    app.UseRewriter(rewriteOptions);
+}
+
+
+
 app.UseKentico();
-
+app.UseMiddleware<RedirectMiddleware>();
 app.Kentico().MapRoutes();
-
-app.MapControllerRoute(
-   name: "error",
-   pattern: "error/{code}",
-   defaults: new { controller = "HttpErrors", action = "Error" }
-);
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=About}/{action=Index}/{id?}"
-);
 app.MapControllerRoute(
     name: "default",
     pattern: $"{{{WebPageRoutingOptions.LANGUAGE_ROUTE_VALUE_KEY}}}/{{controller}}/{{action}}",

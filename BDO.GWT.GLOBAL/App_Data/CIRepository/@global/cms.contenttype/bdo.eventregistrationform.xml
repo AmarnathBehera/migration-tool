@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Event registration form</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="8ed05f22-eb63-4100-b953-dd2861e1f52e" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="ea10f259-0b28-4ee4-9291-9048ea0feec5" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="851bb4ca-6d24-48d1-a65c-8f8d88212731" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
+        <properties />
+      </schema>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+      <field column="FormType" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="82a5b4a3-792f-4c5e-a83d-97902c34b206" visible="true">
+        <properties>
+          <defaultvalue>form</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Type</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.RadioGroup</controlname>
+          <Inline>False</Inline>
+          <Options>
+<![CDATA[
+form;Form List
+embedCode;Embed Code
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+      </field>
+      <field allowempty="true" column="Form" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="f842a7b5-e322-47f7-9854-514d3aaaed01" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Registration form</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.SQLDropdown</controlname>
+          <Script>Select * from cms_form</Script>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>form</Value>
+              <CaseSensitive>true</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="EmbedCode" columnprecision="0" columntype="longtext" enabled="true" guid="06aae26b-814e-431b-9db5-816a57eb7c2a" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>EmbedCode</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextArea</controlname>
+          <CopyButtonVisible>False</CopyButtonVisible>
+          <MaxRowsNumber>5</MaxRowsNumber>
+          <MinRowsNumber>3</MinRowsNumber>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>embedCode</Value>
+              <CaseSensitive>true</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>2b7d3728-523e-429b-9a52-0336adbc8fd5</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-doc</ClassIconClass>
+  <ClassName>BDO.EventRegistrationForm</ClassName>
+  <ClassShortName>BDOEventRegistrationForm</ClassShortName>
+  <ClassTableName>BDO_EventRegistrationForm</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>

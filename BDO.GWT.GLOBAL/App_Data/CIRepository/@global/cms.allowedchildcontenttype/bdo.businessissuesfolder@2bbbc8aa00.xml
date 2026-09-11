@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.BusinessIssuesFolder</CodeName>
+    <GUID>ec9f8d4b-f38b-4552-a3c3-958bff31a01e</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.Businessissue">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.Businessissue</CodeName>
+        <GUID>252cdc0e-f6a0-424f-bd6b-2584655e66c7</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

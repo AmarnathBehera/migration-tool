@@ -24,7 +24,7 @@
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
-      <field column="DescriptionBody" columnprecision="0" columntype="longtext" enabled="true" guid="edd04f8d-30b1-4574-9209-bb2c9f8f80cd" visible="true">
+      <field column="DescriptionBody" columnprecision="0" columntype="richtexthtml" enabled="true" guid="edd04f8d-30b1-4574-9209-bb2c9f8f80cd" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Body content</fieldcaption>
@@ -62,16 +62,19 @@ embedCode;Embed Code
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
-          <controlname>Kentico.Administration.DropDownSelector</controlname>
-          <Options>
-<![CDATA[
-select FormName, FormDisplayName from CMS_Form
-WHERE FormSiteID = {%CurrentSite.SiteID#%}
-ORDER BY FormDisplayName
-]]>
-          </Options>
-          <OptionsValueSeparator>;</OptionsValueSeparator>
+          <controlname>BDO.SQLDropdown</controlname>
+          <Script>select  * from cms_form</Script>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>form</Value>
+              <CaseSensitive>false</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <field allowempty="true" column="EmbedCode" columnprecision="0" columnsize="1000" columntype="text" enabled="true" guid="3417bd73-bbae-4a70-bae5-887dfc474345" visible="true">
         <properties>
@@ -86,6 +89,16 @@ ORDER BY FormDisplayName
           <MaxRowsNumber>5</MaxRowsNumber>
           <MinRowsNumber>3</MinRowsNumber>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>embedCode</Value>
+              <CaseSensitive>false</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
         <properties />
@@ -93,10 +106,14 @@ ORDER BY FormDisplayName
       <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
         <properties />
       </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
     </form>
   </ClassFormDefinition>
   <ClassGUID>74635906-cb04-4ffd-9936-9dcde92c7f58</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-mobile</ClassIconClass>
   <ClassName>BDO.Contact</ClassName>
   <ClassShortName>BDOContact</ClassShortName>
   <ClassTableName>BDO_Contact</ClassTableName>

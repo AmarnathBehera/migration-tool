@@ -1,0 +1,57 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Core.DTOs.Pages.SectionEventsDto
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+
+    var widgetsList = new[]
+        {
+        ComponentIdentifiers.Widgets.Button,
+        ComponentIdentifiers.Widgets.Form,
+        ComponentIdentifiers.Widgets.HTML,
+        ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+        ComponentIdentifiers.Widgets.InsightAnimationCard,
+    };
+
+    var topWidgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.Button,
+        ComponentIdentifiers.Widgets.FlexibleBanner,
+        ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.HTML,
+        ComponentIdentifiers.Widgets.QuoteCard,
+        ComponentIdentifiers.Widgets.ImageWithText,
+    };
+}
+
+@(await ReactService.RenderComponentAsync(
+    pageId,
+    ReactComponentType.Hero,
+    ReactComponentType.HeroGUID,
+    new { data = Model.Hero },
+    Context.RequestAborted))
+
+@await PageBuilderService.AddIdentifier("topArea").AddWidgets(topWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+
+@(await ReactService.RenderComponentAsync(
+    pageId,
+    ReactComponentType.EventWebinarCardsGrid,
+    ReactComponentType.EventWebinarCardsGridGUID,
+    Model.CardsGrid,
+    Context.RequestAborted))
+
+@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+
+@PageBuilderService.GetPageBuilderScripts(Html)

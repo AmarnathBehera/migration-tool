@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.RSSCategoriesFolder</CodeName>
+    <GUID>d4f9677f-117b-45e7-b1e2-e082dcb6d1b0</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.RSSCategories">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.RSSCategories</CodeName>
+        <GUID>efbd7409-7bd1-4d81-84a2-ea84616ff232</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

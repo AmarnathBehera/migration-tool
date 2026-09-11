@@ -1,0 +1,65 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Core.DTOs.Pages.SpecialtiesPageDto
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+
+    var widgetsList = new[]
+        {
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.ImageWithText,
+        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.RelatedContacts,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+    };
+}
+
+@(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.Hero,
+        ReactComponentType.HeroGUID,
+        new
+        {
+            data = Model.Hero,
+        },
+        Context.RequestAborted))
+
+@await Html.PartialAsync("_LocalNavigation")
+
+@{
+    var isSideBoxVisible = Model.SideBox is not null && Model.SideBox.Links.Any();
+}
+
+<div class="service-wrapper">
+    <div class="@($"service-wrapper-content{(isSideBoxVisible ? "" : " service-wrapper-content--full")}")">
+        <main>
+            @await PageBuilderService.AddIdentifier("topArea").AddDefaultWidgets().AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+        </main>
+        @if (isSideBoxVisible)
+        {
+            <aside>
+                @(await ReactService.RenderComponentAsync(
+                            pageId,
+                            ReactComponentType.SideBoxNavigation,
+                            ReactComponentType.SideBoxNavigationGUID,
+                            Model.SideBox,
+                            Context.RequestAborted))
+            </aside>
+        }
+    </div>
+    @await PageBuilderService.AddIdentifier("bottomArea").AddDefaultWidgets().AddWidgets(widgetsList).BuildEditableAreaAsync(Html,Context.RequestAborted))
+</div>
+
+@PageBuilderService.GetPageBuilderScripts(Html)

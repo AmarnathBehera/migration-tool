@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.Locations</CodeName>
+    <GUID>afbf6f00-540b-44f1-b40b-ea7975a6185e</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.LocationCity">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.LocationCity</CodeName>
+        <GUID>efaa910b-971a-4c92-9535-fde264dc8ecf</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

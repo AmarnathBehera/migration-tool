@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Blog Post</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="4c26d9a8-6441-45a2-ac28-d2caf973766e" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="a9d249be-5463-4c50-99d9-e1f530bc337d" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="deecb175-c643-4447-b641-5a795dc6d309" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <schema guid="8099d1e6-091f-4610-888f-46e361eb27bd" name="8099d1e6-091f-4610-888f-46e361eb27bd">
+        <properties />
+      </schema>
+      <schema guid="45af2efa-f3b7-44e5-87f2-3e7c9afb8843" name="45af2efa-f3b7-44e5-87f2-3e7c9afb8843">
+        <properties />
+      </schema>
+      <schema guid="e87987a6-ebfd-4d15-981c-fbaacdfbf6bc" name="e87987a6-ebfd-4d15-981c-fbaacdfbf6bc">
+        <properties />
+      </schema>
+      <schema guid="b760a373-943b-4321-ac39-d5067101ff82" name="b760a373-943b-4321-ac39-d5067101ff82">
+        <properties />
+      </schema>
+      <schema guid="34bc2c94-d4b6-4c53-a6f4-9b9520a24493" name="34bc2c94-d4b6-4c53-a6f4-9b9520a24493">
+        <properties />
+      </schema>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
+      <schema guid="6bf9af2e-ee19-461b-a071-2b6541b36653" name="6bf9af2e-ee19-461b-a071-2b6541b36653">
+        <properties />
+      </schema>
+      <field column="MetadataKeywordsBlog" columnprecision="0" columntype="longtext" enabled="true" guid="fca5b4eb-d973-4608-a3aa-9108e4af9e82" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Keywords</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataBusinessIssues" columnprecision="0" columntype="contentitemreference" enabled="true" guid="e02fe3e1-085e-4ea2-a37b-5e00e146f704" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Business Issue</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["252cdc0e-f6a0-424f-bd6b-2584655e66c7"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>75615b26-2702-4a3a-bf7d-34c13b87bb63</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-doc</ClassIconClass>
+  <ClassName>BDO.BlogPost</ClassName>
+  <ClassShortName>BDOBlogPost</ClassShortName>
+  <ClassTableName>BDO_BlogPost</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>

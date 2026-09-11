@@ -1,46 +1,40 @@
-﻿using Kentico.Components.Web.Mvc.FormComponents;
+﻿using BDO.GWT.Web.Widgets;
 using Kentico.Forms.Web.Mvc;
-using Kentico.PageBuilder.Web.Mvc;
+using Kentico.Xperience.Admin.Base.FormAnnotations;
+using Kentico.Xperience.Admin.Base.Forms;
 
+namespace BDO.GWT.GLOBAL.Widgets;
 
-namespace BDO;
-
-public class ViewGlobalLocationsWidgetProperties : IWidgetProperties
+public class ViewGlobalLocationsWidgetProperties : BaseWidgetProperties
 {
-    [EditingComponent(TextInputComponent.IDENTIFIER, Order = 0, Label = "Title")]
-    public string? Title { get; set; }
-    
-    [EditingComponent(TextInputComponent.IDENTIFIER, Order = 1, Label = "Description")]
-    public string? Description { get; set; }
+    [TextInputComponent(Label = "Title", ExplanationText = "This field is read-only. The title displayed for the Global Locations widget is automatically populated from the resource string 'BDO.LiveSite.ViewGlobalLocations.Title'.", EditMode = FormEditMode.Disabled, Order = 0)]
+    public string Title { get; set; }
 
-    [EditingComponent(RadioButtonsComponent.IDENTIFIER, Order = 2, Label = "Light / Dark theme")]
-    [EditingComponentProperty(nameof(RadioButtonsProperties.DataSource), "dark;Dark theme\r\nlight;Light theme")]
+    [TextAreaComponent(Label = "Description", ExplanationText = "This field is read-only. The description displayed for the Global Locations widget is automatically populated from the resource string 'BDO.LiveSite.ViewGlobalLocations.Description'.", EditMode = FormEditMode.Disabled, Order = 1)]
+    public string Description { get; set; }
+
+    [RadioGroupComponent(Label = "Light / Dark theme", Options = "dark;Dark theme\r\nlight;Light theme", Order = 2)]
     public string Theme { get; set; } = "dark";
 
-    [EditingComponent(RadioButtonsComponent.IDENTIFIER, Order = 3, Label = "Layout")]
-    [EditingComponentProperty(nameof(RadioButtonsProperties.DataSource), "col-1;One column\r\ncol-1-shadowed;One column shadowed")]
+    [RadioGroupComponent(Label = "Layout", Options = "col-1;One column\r\ncol-1-shadowed;One column shadowed", Order = 3)]
     public string Layout { get; set; } = "col-1";
 
     #region button
 
-    [EditingComponent(TextInputComponent.IDENTIFIER, Order = 4, Label = "Button text")]
-    public string? ButtonText { get; set; }
+    [TextInputComponent(Label = "Button text", ExplanationText = "This field is read-only. The text displayed on the button is automatically populated from the resource string 'BDO.LiveSite.ViewGlobalLocations.Button'.", EditMode = FormEditMode.Disabled, Order = 4)]
+    public string ButtonText { get; set; }
 
-    [EditingComponent(UrlSelector.IDENTIFIER, Order = 5, Label = "Button URL", ExplanationText = "Please ensure that the provided URL directs to the official BDO Global locations page. This page contains information about BDO offices worldwide.")]
-    public string? ButtonUrl { get; set; }
+    [TextInputComponent(Label = "Button URL", ExplanationText = "Please ensure that the provided URL directs to the official BDO Global Locations page. This page contains information regarding BDO offices worldwide.", Order = 5)]
+    public string ButtonUrl { get; set; }
 
-    [EditingComponent(DropDownComponent.IDENTIFIER, Order = 6, Label = "Button link target")]
-    [EditingComponentProperty(nameof(DropDownProperties.DataSource), "_self;Same tab\r\n_blank;New tab")]
+    [DropDownComponent(Label = "Button link target", Options = "_self;Same tab\r\n_blank;New tab", Order = 6)]
     public string ButtonLinkTarget { get; set; } = "_self";
 
     #endregion
 
-    [EditingComponent(DropDownComponent.IDENTIFIER, Label = "Top margin", Order = 7)]
-    [EditingComponentProperty(nameof(DropDownProperties.DataSource), "0px;None\r\n20px\r\n40px\r\n60px\r\n80px")]
+    [DropDownComponent(Label = "Top margin", Options = "0px;None\r\n20px\r\n40px\r\n60px\r\n80px", Order = 7)]
     public string TopMargin { get; set; } = "0px";
 
-    [EditingComponent(DropDownComponent.IDENTIFIER, Label = "Bottom margin", Order = 8)]
-    [EditingComponentProperty(nameof(DropDownProperties.DataSource), "0px;None\r\n20px\r\n40px\r\n60px\r\n80px")]
+    [DropDownComponent(Label = "Bottom margin", Options = "0px;None\r\n20px\r\n40px\r\n60px\r\n80px", Order = 8)]
     public string BottomMargin { get; set; } = "0px";
-
 }

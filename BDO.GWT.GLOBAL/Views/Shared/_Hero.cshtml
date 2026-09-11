@@ -1,0 +1,21 @@
+﻿@using BDO
+@inject IPageBuilderService PageBuilderService
+
+
+@using Kentico.PageBuilder.Web.Mvc
+@{
+    var areaOptions = new EditableAreaOptions
+    {
+        AllowedWidgets = new[]
+            {
+            ComponentIdentifiers.Widgets.Hero
+        },
+        AllowedSections = new[]
+    {
+            ComponentIdentifiers.Sections.DefaultSection
+        },
+        DefaultSectionIdentifier = ComponentIdentifiers.Sections.DefaultSection
+        
+    };
+}
+@await Html.Kentico().EditableAreaAsync(ComponentIdentifiers.Sections.DefaultSection, areaOptions)

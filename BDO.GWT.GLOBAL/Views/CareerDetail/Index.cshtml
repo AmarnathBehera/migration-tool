@@ -1,0 +1,97 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+
+@model BDO.GWT.Core.DTOs.Pages.CareerPageDto
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IFormBuilderService FormBuilder
+@inject IPageBuilderService PageBuilderService
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    var widgetsList = new[]
+        {
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.Faq,
+        ComponentIdentifiers.Widgets.Form,
+        ComponentIdentifiers.Widgets.EventsWebinarsSlider,
+        ComponentIdentifiers.Widgets.FlexibleBanner,
+        ComponentIdentifiers.Widgets.ImageWithText,
+        ComponentIdentifiers.Widgets.InFocus,
+        ComponentIdentifiers.Widgets.InsightCarousel,
+        ComponentIdentifiers.Widgets.InsightAnimationCard,
+        ComponentIdentifiers.Widgets.NewsCarousel,
+        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.QuoteCard,
+        ComponentIdentifiers.Widgets.RelatedContacts,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+    };
+
+    var advancedWidgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.TabAccordion,
+    };
+}
+
+@* @section Styles {
+    @PageBuilderService.GetPageBuilderStyles(Html)
+} *@
+
+<div>
+    @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.Hero,
+        ReactComponentType.HeroGUID,
+        new
+        {
+            data = Model.Hero,
+        },
+        Context.RequestAborted))
+</div>
+@await Html.PartialAsync("_LocalNavigation") 
+<section class="career-details-section">
+    <article class="career-details-wrapper">
+        <div class="@($"career-details-container{(Model.Sidebar != null ? "" : "--no-sidebar")}")">
+            @(await ReactService.RenderComponentAsync(
+                        pageId,
+                        ReactComponentType.CareerDetails,
+                        ReactComponentType.CareerDetailsGUID,
+
+                            Model.Content,
+
+                        Context.RequestAborted))
+
+                        
+            @if (!string.IsNullOrEmpty(Model.Form))
+            {
+                <div class="career-form-container">
+                    @await FormBuilder.GetFormBuilderWidget(Html, Model.Form)
+                </div>
+            }
+        </div>
+        @if (Model.Sidebar != null)
+        {
+            <div>
+            @(await ReactService.RenderComponentAsync(
+                    pageId,
+                    "CareerSidebar",
+                    ReactComponentType.CareerSidebarGUID,
+
+                        Model.Sidebar,
+
+                    Context.RequestAborted))
+            </div>
+        }
+    </article>
+</section>
+
+@await PageBuilderService.AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+
+@PageBuilderService.GetPageBuilderScripts(Html)

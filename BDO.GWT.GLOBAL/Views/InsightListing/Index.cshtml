@@ -1,0 +1,49 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.DTOs
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model InsightCardListingDto
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@inject IPageBuilderService PageBuilderService
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+
+    var widgetsList = new[]
+        {
+        ComponentIdentifiers.Widgets.Button,
+        ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.Form,
+        ComponentIdentifiers.Widgets.RichText,
+        //ComponentIdentifiers.Widgets.TrendingTopicsCarousel,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+        ComponentIdentifiers.Widgets.InsightAnimationCard,
+    };
+}
+
+@(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.Hero,
+        ReactComponentType.HeroGUID,
+        new
+        {
+            data = Model.Hero,
+        },
+ Context.RequestAborted))
+
+@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+
+@(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.CardsGrid,
+        ReactComponentType.CardsGridGUID,
+        Model.CardsGrid,
+        Context.RequestAborted))
+
+@PageBuilderService.GetPageBuilderScripts(Html)

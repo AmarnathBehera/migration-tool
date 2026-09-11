@@ -1,0 +1,31 @@
+﻿@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Core.DTOs.FaqDto;
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+
+@if (Model != null && pageId != 0)
+{
+    @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.FaqWidget,
+        ReactComponentType.FaqWidgetGUID,
+        Model,
+        Context.RequestAborted))
+}
+
+
+
+@* @inject IReactHelper ReactHelper
+@using BDO.GWT.Web.Core.LiveSite.Constants
+@using BDO.GWT.Web.Core.LiveSite.Helpers
+
+
+@ReactHelper.RenderComponent(Html, ReactComponent.Faq, Model)
+<h1>this is faq widget</h1> *@

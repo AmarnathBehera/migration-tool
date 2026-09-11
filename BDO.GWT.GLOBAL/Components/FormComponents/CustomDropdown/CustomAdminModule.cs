@@ -1,5 +1,4 @@
-﻿// GWTXbyKWeb/FormComponents/CustomAdminModule.cs
-using CMS;
+﻿using CMS;
 using CMS.Core;
 using GWTXbyKWeb.FormComponents;
 using Kentico.Xperience.Admin.Base;
@@ -18,7 +17,7 @@ namespace GWTXbyKWeb.FormComponents
         {
             base.OnInit(parameters);
 
-            RegisterClientModule("bdo", "custom-dropdown");
+            RegisterClientModule("bdo", "custom-components");
         }
     }
 }

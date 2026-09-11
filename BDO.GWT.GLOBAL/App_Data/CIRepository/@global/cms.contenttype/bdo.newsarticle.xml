@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>News Article</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="4a403fc0-c385-4549-bdf2-f01f5832523e" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="d75f4dea-d853-4683-a224-4f98f14c385c" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="f536e271-5b1e-443c-a309-08eedb9c729b" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <schema guid="8099d1e6-091f-4610-888f-46e361eb27bd" name="8099d1e6-091f-4610-888f-46e361eb27bd">
+        <properties />
+      </schema>
+      <schema guid="b760a373-943b-4321-ac39-d5067101ff82" name="b760a373-943b-4321-ac39-d5067101ff82">
+        <properties />
+      </schema>
+      <schema guid="34bc2c94-d4b6-4c53-a6f4-9b9520a24493" name="34bc2c94-d4b6-4c53-a6f4-9b9520a24493">
+        <properties />
+      </schema>
+      <schema guid="45af2efa-f3b7-44e5-87f2-3e7c9afb8843" name="45af2efa-f3b7-44e5-87f2-3e7c9afb8843">
+        <properties />
+      </schema>
+      <schema guid="6bf9af2e-ee19-461b-a071-2b6541b36653" name="6bf9af2e-ee19-461b-a071-2b6541b36653">
+        <properties />
+      </schema>
+      <schema guid="e87987a6-ebfd-4d15-981c-fbaacdfbf6bc" name="e87987a6-ebfd-4d15-981c-fbaacdfbf6bc">
+        <properties />
+      </schema>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>4a8412a4-b16a-4e13-85f3-1bd503c0043e</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-l-header-list-img</ClassIconClass>
+  <ClassName>BDO.NewsArticle</ClassName>
+  <ClassShortName>BDONewsArticle</ClassShortName>
+  <ClassTableName>BDO_NewsArticle</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>

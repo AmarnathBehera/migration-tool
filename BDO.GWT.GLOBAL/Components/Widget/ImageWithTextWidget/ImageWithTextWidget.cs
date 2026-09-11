@@ -1,5 +1,5 @@
-﻿using BDO.GWT.Common.Core.LiveSite.Data;
-using BDO.GWT.Core.Entities;
+﻿using BDO.GWT.Core.Data.ImageWithTextData;
+using BDO.GWT.Core;
 using CMS.ContentEngine;
 using Kentico.Content.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
@@ -8,16 +8,16 @@ using Microsoft.AspNetCore.Mvc.ViewComponents;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BDO.GWT.GLOBAL.Components.Widget.ImageWithTextWidget;
+namespace BDO.GWT.Web.Widgets.ImageWithTextWidget;
 
 public class ImageWithTextWidget : ViewComponent
 {
     private readonly IContentRetriever _contentRetriever;
-    private readonly IContentRetrieverWrapper _wrapper;
-    public ImageWithTextWidget(IContentRetriever contentRetriever, IContentRetrieverWrapper wrapper)
+    private readonly IContentService _contentService;
+    public ImageWithTextWidget(IContentRetriever contentRetriever, IContentService contentService)
     {
         _contentRetriever = contentRetriever;
-        _wrapper = wrapper;
+        _contentService = contentService;
     }
 
     public async Task<ViewViewComponentResult> InvokeAsync(ComponentViewModel<ImageWithTextWidgetProperties> model)
@@ -39,26 +39,31 @@ public class ImageWithTextWidget : ViewComponent
                 new RetrieveContentParameters { LinkedItemsMaxLevel = 3 })
             : Enumerable.Empty<ContentAttachment>();
 
-        var contentTypes = new[] { ContentAttachment.CONTENT_TYPE_NAME, SocialLinks.CONTENT_TYPE_NAME };
-
-        var buttonurl = model.Properties?.ButtonURL?.Any() == true
-            ? await _wrapper.RetrieveButtonUrlAsync(
-                model.Properties.ButtonURL.Select(i => i.Identifier).ToList(),
-                contentTypes
-                )
-            : Enumerable.Empty<IContentItemFieldsSource>();
-
         string url = null;
-
-        var item = buttonurl.FirstOrDefault();
-
-        if (item is ContentAttachment attachment)
+        if (model.Properties.UrlSource == "manual")
         {
-            url = attachment.ContentAttachmentAsset?.Url;
+            url = model.Properties.ManualUrl;
         }
-        else if (item is SocialLinks social)
+        else
         {
-            url = social.Url;
+            var contentTypes = new[] { ContentAttachment.CONTENT_TYPE_NAME, SocialLinks.CONTENT_TYPE_NAME };
+
+            var buttonurl = model.Properties.ButtonURL?.Any() == true
+                ? await _contentService.RetrieveButtonUrlAsync(
+                    model.Properties.ButtonURL.Select(i => i.Identifier).ToList(),
+                    contentTypes)
+                : Enumerable.Empty<IContentItemFieldsSource>();
+
+            var item = buttonurl.FirstOrDefault();
+
+            if (item is ContentAttachment attachment)
+            {
+                url = attachment.ContentAttachmentAsset?.Url;
+            }
+            else if (item is SocialLinks social)
+            {
+                url = social.Url;
+            }
         }
 
         var dto = new ImageWithTextData
@@ -79,6 +84,7 @@ public class ImageWithTextWidget : ViewComponent
             Theme = model.Properties.Theme,
             TopMargin = model.Properties.TopMargin,
             BottomMargin = model.Properties.BottomMargin,
+            WidgetID = model.Properties.WidgetID,
         };
 
         return View("~/Components/Widget/ImageWithTextWidget/_ImageWithTextWidget.cshtml", dto);

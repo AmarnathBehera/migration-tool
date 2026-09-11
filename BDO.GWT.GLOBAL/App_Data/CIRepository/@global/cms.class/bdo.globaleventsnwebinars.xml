@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>
+    <![CDATA[Global Events & Webinars]]>
+  </ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="GlobalEventsnWebinarsID" columntype="integer" enabled="true" guid="f9195e4a-49ae-462b-b09f-926c020e34be" isPK="true" />
+      <field column="Minutestotriggercalendarreminder" columnprecision="0" columntype="integer" enabled="true" guid="029bc5f5-d93b-4868-82d8-aa574c6c377a" />
+      <field column="Displaylocationtitleinasidebar" columnprecision="0" columntype="boolean" enabled="true" guid="8ab4df05-bbe7-4a62-badb-35aaceef8d04" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>1b78e3b7-825e-4ff9-bd90-56a3f1b76e11</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.GlobalEventsnWebinars</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_GlobalEventsnWebinars</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

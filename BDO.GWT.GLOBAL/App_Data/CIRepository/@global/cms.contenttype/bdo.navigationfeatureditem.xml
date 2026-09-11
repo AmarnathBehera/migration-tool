@@ -27,32 +27,34 @@
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
-      <field column="TargetURL" columnprecision="0" columntype="webpages" enabled="true" guid="916edcfc-66d4-475a-98f0-f0bdd1011ec6" visible="true">
+      <field allowempty="true" column="TargetURL" columnprecision="0" columntype="contentitemreference" enabled="true" guid="916edcfc-66d4-475a-98f0-f0bdd1011ec6" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Target URL</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
         </properties>
         <settings>
-          <controlname>Kentico.Administration.WebPageSelector</controlname>
-          <MaximumPages>1</MaximumPages>
-          <Sortable>False</Sortable>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["b1d1ea96-03a2-4a44-82f7-92973086a93b","b6cac6be-487b-4d72-b82a-eadaed297432","7de84a06-569a-4dac-b701-55df640a4a49","c9ad5d32-9b92-477d-abd0-6b732dc1e86f","afb8a1ec-5001-46e6-8e98-4b9e28995e48","d7c0b1af-52c7-4f1b-b856-6aec846290cb","ddbf4830-0766-4cff-a420-f0ca936fd21f","ceb7b7b1-256e-4158-96cf-a33fcbe96c2c","1ab55e4f-344f-4d36-a64b-5812140fcfa3","e95256dc-44da-4237-a5d0-2f39834f7755","392e5450-56f2-49da-96a0-fc49215599d8","43fcea42-e42d-4773-95dc-b415ea3e7547"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
+          <SelectionType>contentTypes</SelectionType>
         </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>Please select one page</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
       </field>
-      <field column="FeaturedImageAltText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="211e5471-217b-49da-b3ad-b2e7112b350c" visible="true">
+      <field allowempty="true" column="Image" columnprecision="0" columntype="contentitemreference" enabled="true" guid="ea7325ac-ba9d-4fe2-9fcd-a426781d0705" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Featured Image Alt Text</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-        </properties>
-        <settings>
-          <controlname>Kentico.Administration.TextInput</controlname>
-        </settings>
-      </field>
-      <field allowempty="true" column="FeaturedImageFile" columnprecision="0" columntype="contentitemreference" enabled="true" guid="ea7325ac-ba9d-4fe2-9fcd-a426781d0705" visible="true">
-        <properties>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>FeaturedImageFile</fieldcaption>
+          <fieldcaption>Image</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
         </properties>
         <settings>
@@ -60,7 +62,20 @@
             <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field column="ImageAltText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="211e5471-217b-49da-b3ad-b2e7112b350c" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Image Alt Text</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
     </form>

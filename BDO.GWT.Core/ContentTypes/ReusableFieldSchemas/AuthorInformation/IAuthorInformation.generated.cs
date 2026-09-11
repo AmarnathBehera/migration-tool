@@ -11,6 +11,7 @@
 
 using System;
 using System.Collections.Generic;
+using CMS.Websites;
 
 namespace BDO
 {
@@ -26,14 +27,14 @@ namespace BDO
 
 
 		/// <summary>
-		/// PeopleSort.
+		/// RelevantContactPerson.
 		/// </summary>
-		public string PeopleSort { get; set; }
+		public IEnumerable<IWebPageFieldsSource> RelevantContactPerson { get; set; }
 
 
 		/// <summary>
 		/// RelatedExternalPeople.
 		/// </summary>
-		public IEnumerable<MicrositePlaceholder> RelatedExternalPeople { get; set; }
+		public IEnumerable<ExternalPerson> RelatedExternalPeople { get; set; }
 	}
 }

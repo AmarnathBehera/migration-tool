@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Section News</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="59c2c991-fa5a-44aa-a8a9-98f3bcf88508" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="d7be4623-54f0-4a18-ac28-816266fb95e6" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="bba11a47-ad71-497a-8adf-cd89313bc8d9" isunique="true" system="true" />
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
+        <properties />
+      </schema>
+      <schema guid="f652f54b-8be8-4f2c-9e40-7dd3ab5dd149" name="f652f54b-8be8-4f2c-9e40-7dd3ab5dd149">
+        <properties />
+      </schema>
+      <field allowempty="true" column="ItemListFilters" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="f9b04177-9edd-45d1-8cdc-f766bd744768" visible="true">
+        <properties>
+          <defaultvalue>contentType;businessLine;industryCategory</defaultvalue>
+          <explanationtext>
+            <![CDATA[Filters that visitor will be able to filter news articles by.]]>
+          </explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Filters</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>
+            <![CDATA[XperienceCommunity.Multichoiceformcontrol.MultiChoice]]>
+          </controlname>
+          <Options>
+<![CDATA[
+contentType;Type
+businessLine;Service (Business Line)
+serviceArea;Service Area
+industryCategory;Industry (Industry Category)
+micrositeMasterPage;Microsite (Microsite Master Page)
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>ItemListFilteringEnabled</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="ItemListFeaturedItems" columnprecision="0" columntype="contentitemreference" enabled="true" guid="baaa6698-1e7c-4fe7-a5f4-bb950a677a77" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Featured items</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["4a8412a4-b16a-4e13-85f3-1bd503c0043e"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field column="ShowCopyUrlButtonInNewsArticle" columnprecision="0" columntype="boolean" enabled="true" guid="5d288c7d-2410-4a6a-9a4b-44a1b1238959" visible="true">
+        <properties>
+          <explanationtext>
+            <![CDATA[Should the copy URL button be shown in descendant News Article Pages?]]>
+          </explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show copy URL button in News Article</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>ceb7b7b1-256e-4158-96cf-a33fcbe96c2c</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-windows</ClassIconClass>
+  <ClassName>BDO.SectionNews</ClassName>
+  <ClassShortName>BDOSectionNews</ClassShortName>
+  <ClassTableName>BDO_SectionNews</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>

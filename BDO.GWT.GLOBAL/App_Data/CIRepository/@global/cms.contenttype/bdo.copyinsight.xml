@@ -1,0 +1,370 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Reusable</ClassContentTypeType>
+  <ClassDisplayName>Insight Content</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="450abcd5-5d1c-4f85-b9ca-0e212ea8b8db" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="eda81811-c72b-4fdb-9928-dd8c7f605158" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="77d69ebd-8047-462f-a3b6-d18622b6b088" isunique="true" system="true" />
+      <field column="Title" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="0a67bfeb-9e03-455c-87ca-12aebb2b3eab" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="ShowInsightTitle" columnprecision="0" columntype="boolean" enabled="true" guid="182ecdc2-3aee-49bd-b4ce-90b7de087b85" visible="true">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show title</fieldcaption>
+          <fielddescription>
+            <![CDATA[Changing this option may affect SEO if the page already has a Main Heading (H1) tag title.]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field column="Description" columnprecision="0" columntype="richtexthtml" enabled="true" guid="7baac961-aa81-486e-a0fc-024ff0b5316e" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Description</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <ConfigurationName>Kentico.Administration.StructuredContent</ConfigurationName>
+          <controlname>Kentico.Administration.RichTextEditor</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="ShowInsightDescription" columnprecision="0" columntype="boolean" enabled="true" guid="adb12fab-85bf-42ca-9bd2-d511be83ec74" visible="true">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show Description</fieldcaption>
+          <fielddescription>Should the description be shown inside the page?</fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="InsightContent" columnprecision="0" columntype="richtexthtml" enabled="true" guid="0db530d0-6668-4f01-b6e6-23c5b254387e" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Content</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.RichTextEditor</controlname>
+        </settings>
+      </field>
+      <schema guid="34bc2c94-d4b6-4c53-a6f4-9b9520a24493" name="34bc2c94-d4b6-4c53-a6f4-9b9520a24493">
+        <properties />
+      </schema>
+      <field allowempty="true" column="CallToActionPosition" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="3af56f39-526d-4d1c-87e6-a736d4967d99" visible="true">
+        <properties>
+          <defaultvalue>Left</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Call to action position</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.RadioGroup</controlname>
+          <Inline>False</Inline>
+          <Options>
+<![CDATA[
+left;Left
+right;Right
+center;Center
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+      </field>
+      <schema guid="65e4cd93-2087-4be4-8787-e7acd5bf632e" name="65e4cd93-2087-4be4-8787-e7acd5bf632e">
+        <properties />
+      </schema>
+      <field allowempty="true" column="Attachments" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="da2ab6a5-7453-4560-acd7-2a91e95e122d" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Attachments</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="InsightAttachment" columnprecision="0" columntype="contentitemasset" enabled="true" guid="ede9b57d-6ff7-4e51-8e09-5b5fc18f5c17" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Attachment</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedExtensions>_INHERITED_</AllowedExtensions>
+          <controlname>Kentico.Administration.ContentItemAssetUploader</controlname>
+          <IsFormatConversionEnabled>False</IsFormatConversionEnabled>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This input field is required.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+      <field column="DownloadButtonTitle" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="91a75beb-be99-48d0-b5e8-ec9c82de4620" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Download button tooltip</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field column="DownloadButtonText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="3cfc3626-18a6-4ac6-9cd0-589f4b1fd671" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Download button text</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="Contentsharing" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="07947af6-8b80-4c9b-bbee-6aa14431f959" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Content sharing</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="SharingOptOut" columnprecision="0" columntype="boolean" enabled="true" guid="121b9573-e2fe-4dd2-b7a6-a25467505617" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Disable content sharing for this insight</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="SharingHeadline" columnprecision="0" columntype="boolean" enabled="true" guid="52ef26cc-7293-414a-b174-0d151bc8d648" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Sharing Headline</fieldcaption>
+          <fielddescription>
+            <![CDATA[A headline insight is one that a BDO Member Firm wishes to promote internally above all others, perhaps due to it's global relevance. Check this box if you wish to flag this insight. This flag will appear under 'Headline Insight' on the central repository and users will be able to filter on all of these accordingly.]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field column="OriginalSiteGuid" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="de419f8f-84a1-41d8-bcba-801e63393345" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Original Site</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.SQLDropdown</controlname>
+          <Script>
+<![CDATA[
+SELECT ChannelName 
+FROM CMS_Channel;
+]]>
+          </Script>
+        </settings>
+      </field>
+      <field column="OriginalDocumentAttachmentType" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="3118c56e-7d54-4edb-8c0e-845760479b4f" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Attachment</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.DropDownSelector</controlname>
+          <Options>
+<![CDATA[
+;No attachment
+Download;Direct download
+Gated;Gated download
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+      </field>
+      <field allowempty="true" column="OriginalIndustries" columnprecision="0" columntype="contentitemreference" enabled="true" guid="8cc432f6-6eb0-4818-af00-ecdb2e122836" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Industries</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["1ddec4b5-dabe-4e5d-a38a-1cf710c59244"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="OriginalServiceLines" columnprecision="0" columntype="contentitemreference" enabled="true" guid="b7b443a2-a79a-4a09-8a2f-8c9e34871b53" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Business lines</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["b70d2494-90c7-42c5-a7d6-44da7013729b"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="OriginalInvolvedCountriesAll" columnprecision="0" columntype="boolean" enabled="true" guid="9285d926-493a-4e78-915f-6711271b7cd0" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>For all countries</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="OriginalInvolvedCountries" columnprecision="0" columntype="objectcodenames" enabled="true" guid="08923913-f2a4-415b-a7bf-06784c1ff3e8" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Involved countries</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.ObjectCodeNameSelector</controlname>
+          <MaximumItems>5</MaximumItems>
+          <ObjectType>CMS.Country</ObjectType>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsFalseVisibilityCondition</Identifier>
+            <Properties>
+              <PropertyName>OriginalInvolvedCountriesAll</PropertyName>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="OriginalDocumentOwnerOptOut" columnprecision="0" columntype="boolean" enabled="true" guid="9c4f59ad-f293-45b6-b8d1-84f82952f32a" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>
+            <![CDATA[I don't want to receive notifications when my content is copied]]>
+          </fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field column="OriginalDocumentOwnerName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="400fb10c-2146-4cb9-abbe-c2e28b87929e" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Creator name</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.SQLDropdown</controlname>
+          <Script>select firstname from cms_user</Script>
+        </settings>
+      </field>
+      <field column="OriginalDocumentOwnerEmail" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="33bb92ae-bf4e-465e-99a8-3abde4673ccc" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Creator email address</fieldcaption>
+          <fielddescription>
+            <![CDATA[Mandatory when content sharing has not been disabled for this Insight]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.SQLDropdown</controlname>
+          <Script>select Email from cms_user;</Script>
+        </settings>
+      </field>
+      <field allowempty="true" column="SharingSourceFirm" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="531566c3-4027-4c87-acd1-b9fd9f406b55" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Insight source country</fieldcaption>
+          <fielddescription>
+            <![CDATA[The place the insight has originated from, this is not editable as this is filled based on the site the insight is created on.]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.SQLDropdown</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="SharingInstructions" columnprecision="0" columntype="longtext" enabled="true" guid="80bd49b8-6676-4b2f-ab74-5e9d83326159" visible="true">
+        <properties>
+          <defaultvalue>
+<![CDATA[
+You are about to copy [name of insight], originally created by [name of author / BDO MF]. Before continuing, you may find the following information about this insight useful:
+
+- This insight is intended for CFOs of SMEs in the retail sector with a turnover between 100-500 million euro
+- There is an infographic that accompanies this insight: you can request it here (link to email)
+- An executive summary can be found here [link]
+- We ran a two hour breakfast event that outlined the key findings of the report – details here [link]
+
+For any questions, please contact [link to insight creator’s email]
+
+Remember, in order to proceed, you must check the box to indicate that you agree to comply with the protocol and requirements outlined above
+]]>
+          </defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Instructions</fieldcaption>
+          <fielddescription>Instructions for Member Firms copying this Insight</fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.RichTextEditor</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>4ce005da-7a7f-4d90-9465-fb743e9a943f</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-arrow-crooked-right</ClassIconClass>
+  <ClassName>BDO.CopyInsight</ClassName>
+  <ClassShortName>BDOCopyInsight</ClassShortName>
+  <ClassTableName>BDO_CopyInsight</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

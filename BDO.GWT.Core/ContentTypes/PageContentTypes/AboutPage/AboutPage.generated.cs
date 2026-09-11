@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="AboutPage"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class AboutPage : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero
+	public partial class AboutPage : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IHero, IPageMetadata
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -62,7 +62,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataOGTwitterImage.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataOGTwitterImage { get; set; }
+		public IEnumerable<ContentAttachment> MetadataOGTwitterImage { get; set; }
 
 
 		/// <summary>
@@ -84,6 +84,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// IsSearchExcluded.
+		/// </summary>
+		public bool IsSearchExcluded { get; set; }
+
+
+		/// <summary>
 		/// MetadataTitle.
 		/// </summary>
 		public string MetadataTitle { get; set; }
@@ -98,7 +104,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataTeaserImage.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataTeaserImage { get; set; }
+		public IEnumerable<ContentAttachment> MetadataTeaserImage { get; set; }
 
 
 		/// <summary>
@@ -111,12 +117,6 @@ namespace BDO
 		/// MetadataCanonical.
 		/// </summary>
 		public string MetadataCanonical { get; set; }
-
-
-		/// <summary>
-		/// MetadataKeywords.
-		/// </summary>
-		public string MetadataKeywords { get; set; }
 
 
 		/// <summary>
@@ -177,5 +177,23 @@ namespace BDO
 		/// HeroCallToActionButtonUrl.
 		/// </summary>
 		public IEnumerable<IWebPageFieldsSource> HeroCallToActionButtonUrl { get; set; }
+
+
+		/// <summary>
+		/// PageTitle.
+		/// </summary>
+		public string PageTitle { get; set; }
+
+
+		/// <summary>
+		/// PageDescription.
+		/// </summary>
+		public string PageDescription { get; set; }
+
+
+		/// <summary>
+		/// PageKeywords.
+		/// </summary>
+		public string PageKeywords { get; set; }
 	}
 }

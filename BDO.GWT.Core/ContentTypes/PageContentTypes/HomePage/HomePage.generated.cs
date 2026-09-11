@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="HomePage"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class HomePage : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata
+	public partial class HomePage : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IPageMetadata
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -33,12 +33,6 @@ namespace BDO
 		/// </summary>
 		[SystemField]
 		public WebPageFields SystemFields { get; set; }
-
-
-		/// <summary>
-		/// DocumentName.
-		/// </summary>
-		public string DocumentName { get; set; }
 
 
 		/// <summary>
@@ -68,7 +62,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataOGTwitterImage.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataOGTwitterImage { get; set; }
+		public IEnumerable<ContentAttachment> MetadataOGTwitterImage { get; set; }
 
 
 		/// <summary>
@@ -90,6 +84,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// IsSearchExcluded.
+		/// </summary>
+		public bool IsSearchExcluded { get; set; }
+
+
+		/// <summary>
 		/// MetadataTitle.
 		/// </summary>
 		public string MetadataTitle { get; set; }
@@ -104,7 +104,7 @@ namespace BDO
 		/// <summary>
 		/// MetadataTeaserImage.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataTeaserImage { get; set; }
+		public IEnumerable<ContentAttachment> MetadataTeaserImage { get; set; }
 
 
 		/// <summary>
@@ -120,8 +120,20 @@ namespace BDO
 
 
 		/// <summary>
-		/// MetadataKeywords.
+		/// PageTitle.
 		/// </summary>
-		public string MetadataKeywords { get; set; }
+		public string PageTitle { get; set; }
+
+
+		/// <summary>
+		/// PageDescription.
+		/// </summary>
+		public string PageDescription { get; set; }
+
+
+		/// <summary>
+		/// PageKeywords.
+		/// </summary>
+		public string PageKeywords { get; set; }
 	}
 }

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.SectionIndustries</CodeName>
+    <GUID>d7c0b1af-52c7-4f1b-b856-6aec846290cb</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.IndustryCategory">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.IndustryCategory</CodeName>
+        <GUID>23d38e4a-908a-4b31-9ae2-2fbaeaed4940</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>
