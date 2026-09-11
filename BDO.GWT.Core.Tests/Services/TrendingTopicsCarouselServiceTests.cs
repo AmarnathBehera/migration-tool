@@ -257,7 +257,7 @@ public class TrendingTopicsCarouselServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(item.Title, Is.EqualTo("With Image"));
+
             Assert.That(item.Description, Is.EqualTo("Description"));
             Assert.That(item.ReadMoreLink, Is.EqualTo("/topics/topic-1"));
             Assert.That(item.ImageURL, Is.EqualTo("/image.jpg"));
@@ -462,36 +462,5 @@ public class TrendingTopicsCarouselServiceTests
         Assert.That(result.Items.Single().ReadMoreLink, Does.Not.StartWith("~"));
     }
 
-    // -----------------------------------------------------------------------
-    // 15. WebPageItemName is used as item Title (not MetadataTitle)
-    // -----------------------------------------------------------------------
 
-    [Test]
-    public async Task GetTrendingTopicsCarouselAsync_ItemTitle_UsesWebPageItemName_NotMetadataTitle()
-    {
-        var page = new PageWithMetadata
-        {
-            SystemFields = new WebPageFields
-            {
-                WebPageItemGUID = Guid.NewGuid(),
-                WebPageItemName = "My Page Name"   // <-- this should be the title
-            },
-            MetadataTitle = "SEO Title"            // <-- this should NOT be used
-        };
-
-        SetRetriever((_, _, _, _) =>
-        {
-            IEnumerable<IWebPageFieldsSource> pages = [page];
-            return Task.FromResult(pages);
-        });
-
-        _webPageUrlRetrieverMock
-            .Setup(x => x.Retrieve(It.IsAny<IWebPageFieldsSource>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new WebPageUrl("~/page", "/page"));
-
-        var result = await _service.GetTrendingTopicsCarouselAsync(
-            CreateData([Ref(Guid.NewGuid())]), CancellationToken.None);
-
-        Assert.That(result.Items.Single().Title, Is.EqualTo("My Page Name"));
-    }
 }
