@@ -261,8 +261,8 @@ public class AttachmentsControllerTests
         Assert.Multiple(() =>
         {
             Assert.That(fileResult.FileContents, Is.EqualTo(data));
-            Assert.That(fileResult.ContentType, Is.EqualTo("application/octet-stream"));
-            Assert.That(fileResult.FileDownloadName, Is.EqualTo(string.Empty));
+            Assert.That(fileResult.ContentType, Is.EqualTo("application/pdf"));
+            Assert.That(fileResult.FileDownloadName, Is.EqualTo("file.pdf"));
         });
     }
 

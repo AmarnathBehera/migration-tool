@@ -8,6 +8,7 @@ using BDO.GWT.Core.Utilities;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Helpers;
 using BDO.GWT.Web.Core.Services;
+using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using BDO.GWT.Core;
 
 namespace BDO.GWT.Core.Helpers
 {
@@ -51,12 +53,15 @@ namespace BDO.GWT.Core.Helpers
         private readonly IPageUrlService _pageUrlService;        
         private readonly IHttpContextAccessor _httpContextAccessor;
         private string _currentLanguage;
-        public SearchCardHelper(ICultureContext cultureContext, IPageUrlService pageUrlService,IHttpContextAccessor httpContextAccessor)
+        private readonly IContentService _contentService;
+        public SearchCardHelper(ICultureContext cultureContext, IPageUrlService pageUrlService,
+            IHttpContextAccessor httpContextAccessor, IContentService contentService)
         {
             
             _cultureContext = cultureContext;           
             _pageUrlService = pageUrlService;
             _httpContextAccessor = httpContextAccessor;
+            _contentService = contentService;
             _currentLanguage = _cultureContext.CurrentLanguageTag;
         }
 
@@ -128,6 +133,8 @@ namespace BDO.GWT.Core.Helpers
                     Description = HtmlHelper.ExtractTextFromHtml(document.MetadataDescription) ?? string.Empty,
                     ImageURL = GetAbsoluteAssetUrl(document.InsightImage),
                     ImageAltText = document.InsightImageAltText ?? string.Empty,
+                    Date = document.PublishFrom.HasValue ? document.PublishFrom.Value.Date
+                    : null,
                     ReadMoreLink = new LinkItemDto
                     {
                         Title = ResourceStringKey.LiveSite.ReadMore,
@@ -149,6 +156,10 @@ namespace BDO.GWT.Core.Helpers
                 documentList.Select(x => x.NodeId), _currentLanguage, cancellationToken);
 
             var cards = new List<EventWebinarSearchCard>(documentList.Count);
+            // getting the event types from the content service to populate the Type property of the EventWebinarSearchCard
+            var eventTypes = (await _contentService.RetrievePagesAsync<EventType>(
+                new RetrievePagesParameters { LinkedItemsMaxLevel = 1, LanguageName = _currentLanguage },
+                cancellationToken)) ?? Enumerable.Empty<EventType?>();
 
             foreach (var document in documentList)
             {
@@ -160,6 +171,8 @@ namespace BDO.GWT.Core.Helpers
                     : null;
                 var location = FirstNotEmpty(document.EventLocationCity, document.EventLocationTitle) ?? string.Empty;
 
+                var eventTypeSel = eventTypes.FirstOrDefault(et => et?.Name == document.EventType);
+
                 var card = new EventWebinarSearchCard
                 {
                     Title = title,
@@ -170,7 +183,7 @@ namespace BDO.GWT.Core.Helpers
                     Location = location,
                     Link = new LinkItemDto
                     {
-                        Title = ResourceStringKey.LiveSite.ReadMore,
+                        Title = eventTypeSel?.Calltoactiontext ?? string.Empty,
                         URL = relativeUrlByNodeId.TryGetValue(document.NodeId, out var url) ? url.ToHtmlCompatibleString() : string.Empty,
                     },
                 };

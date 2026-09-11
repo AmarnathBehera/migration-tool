@@ -34,8 +34,7 @@ namespace BDO.GWT.Core.Tests.Services
         private Mock<ICultureContext> _cultureContextMock = null!;        
         private Mock<ITypeMapper> _typeMapperMock = null!;
         private Mock<ISearchService> _searchServiceMock = null!;       
-        private Mock<ISearchCardHelper> _searchCardHelperMock = null!;
-        private Mock<IEventLogService> _eventLogServiceMock = null!;
+        private Mock<ISearchCardHelper> _searchCardHelperMock = null!;       
         private SearchPageService _service = null!;
 
         private static readonly string[] ExpectedSortOptions =
@@ -51,8 +50,7 @@ namespace BDO.GWT.Core.Tests.Services
             _cultureContextMock = new Mock<ICultureContext>();       
             _typeMapperMock = new Mock<ITypeMapper>();
             _searchServiceMock = new Mock<ISearchService>();           
-            _searchCardHelperMock = new Mock<ISearchCardHelper>();
-            _eventLogServiceMock = new Mock<IEventLogService>();
+            _searchCardHelperMock = new Mock<ISearchCardHelper>();           
             _cultureContextMock.SetupGet(x => x.CurrentLanguageTag).Returns(LANGUAGE_TAG);
 
             _typeMapperMock
@@ -78,8 +76,8 @@ namespace BDO.GWT.Core.Tests.Services
             _service = new SearchPageService(                              
                 _typeMapperMock.Object,
                 _searchServiceMock.Object,               
-                _searchCardHelperMock.Object,
-                _eventLogServiceMock.Object);
+                _searchCardHelperMock.Object
+                );
         }
 
 
