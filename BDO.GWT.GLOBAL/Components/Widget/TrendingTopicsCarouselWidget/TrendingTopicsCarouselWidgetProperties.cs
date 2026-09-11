@@ -21,7 +21,7 @@ public class TrendingTopicsCarouselWidgetProperties : BaseWidgetProperties
 
     [DropDownComponent(Label = "Topics page type", ExplanationText = "Type of pages that will be shown for this widget.", Order = 2,
         Options = "Blog\r\nIndustry\r\nInsight\r\nMicrosite\r\nService\r\nSpecialty")]
-    public string TrendingTopicsPageType { get; set; } = null!;
+    public string TrendingTopicsPageType { get; set; } = null;
 
     [ContentItemSelectorComponent(contentTypeNames: [SectionBlogs.CONTENT_TYPE_NAME,Blog.CONTENT_TYPE_NAME,BlogPost.CONTENT_TYPE_NAME], Label = "Pages", Order = 3)]
     [VisibleIfEqualTo(nameof(TrendingTopicsPageType), "Blog")]
