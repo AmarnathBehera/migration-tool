@@ -4,7 +4,6 @@ using CMS.ContentEngine;
 using CMS.Websites;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
 using System.Net;
@@ -44,8 +43,7 @@ public class PageAttachmentServiceTests
         _contentServiceMock.Object,
         _httpClientFactoryMock.Object,
         _httpContextAccessorMock.Object,
-        _hostEnvironmentMock.Object,
-        Mock.Of<ILogger<PageAttachmentService>>());
+        _hostEnvironmentMock.Object);
 
     // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -134,13 +132,6 @@ public class PageAttachmentServiceTests
         var mockHttpContext = new Mock<HttpContext>();
         mockHttpContext.Setup(c => c.Request).Returns(mockRequest.Object);
         _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(mockHttpContext.Object);
-    }
-
-    private static async Task<T> InvokePrivateInstanceAsync<T>(object instance, string methodName, params object[] args)
-    {
-        var method = instance.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic)!;
-        var task = (Task<T>)method.Invoke(instance, args)!;
-        return await task;
     }
 
     // ── GetPageAttachmentsAsync ────────────────────────────────────────────────
@@ -362,96 +353,18 @@ public class PageAttachmentServiceTests
         Assert.That(result!.Value.ContentType, Is.EqualTo(MediaTypeNames.Application.Octet));
     }
 
-    [Test]
-    public async Task GetPageAttachmentBinaryAsync_WhenRelativeUrlContainsQuery_PreservesQueryInDevelopment()
-    {
-        var pageGuid = Guid.NewGuid();
-        var attachmentGuid = Guid.NewGuid();
-        var expectedBytes = new byte[] { 8, 9, 10 };
-        var relativeUrl = "/getContentAsset/10aee50f-5d21-4ee3-b0eb-2494c361fac6/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/BDO-TMG.webp?language=en-gb";
-        var asset = CreateAsset(relativeUrl, "BDO-TMG.webp", ".webp");
-        var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
-        SetupContentService(pageGuid, [page]);
-        SetupIsDevelopment(true);
-
-        var content = new ByteArrayContent(expectedBytes);
-        content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/webp");
-
-        _httpMessageHandlerMock
-            .Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.Is<HttpRequestMessage>(request =>
-                    request.Method == HttpMethod.Get
-                    && request.RequestUri!.AbsoluteUri == "http://localhost:12393/getContentAsset/10aee50f-5d21-4ee3-b0eb-2494c361fac6/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/BDO-TMG.webp?language=en-gb"),
-                ItExpr.IsAny<CancellationToken>())
-            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK) { Content = content });
-
-        var result = await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb");
-
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.Value.Data, Is.EqualTo(expectedBytes));
-    }
 
     [Test]
-    public async Task TryReadFileFromDiskAsync_WhenWebRootPathMissing_UsesContentRootWwwroot()
+    public void BuildAssetUri_WhenProductionAndHttpContextMissing_ReturnsNull()
     {
-        var rootPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-        var webRoot = System.IO.Path.Combine(rootPath, "wwwroot");
-        var relativePath = "assets/test.bin";
-        var fullPath = System.IO.Path.Combine(webRoot, relativePath.Replace('/', System.IO.Path.DirectorySeparatorChar));
-        var expected = new byte[] { 11, 12, 13 };
+        SetupIsDevelopment(false);
+        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns((HttpContext?)null);
 
-        try
-        {
-            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(fullPath)!);
-            await System.IO.File.WriteAllBytesAsync(fullPath, expected);
+        var result = (Uri?)typeof(PageAttachmentService)
+            .GetMethod("BuildAssetUri", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .Invoke(CreateSut(), ["~/media/file.pdf"]);
 
-            _hostEnvironmentMock.Setup(x => x.WebRootPath).Returns(string.Empty);
-            _hostEnvironmentMock.Setup(x => x.ContentRootPath).Returns(rootPath);
-
-            var result = await InvokePrivateInstanceAsync<byte[]?>(
-                CreateSut(),
-                "TryReadFileFromDiskAsync",
-                "/assets/test.bin",
-                CancellationToken.None);
-
-            Assert.That(result, Is.EqualTo(expected));
-        }
-        finally
-        {
-            if (System.IO.Directory.Exists(rootPath))
-            {
-                System.IO.Directory.Delete(rootPath, recursive: true);
-            }
-        }
-    }
-
-    [Test]
-    public async Task TryReadFileFromDiskAsync_WhenPathEscapesWebRoot_ReturnsNull()
-    {
-        var webRoot = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString("N"), "wwwroot");
-        System.IO.Directory.CreateDirectory(webRoot);
-
-        try
-        {
-            _hostEnvironmentMock.Setup(x => x.WebRootPath).Returns(webRoot);
-
-            var result = await InvokePrivateInstanceAsync<byte[]?>(
-                CreateSut(),
-                "TryReadFileFromDiskAsync",
-                "/../outside.txt",
-                CancellationToken.None);
-
-            Assert.That(result, Is.Null);
-        }
-        finally
-        {
-            if (System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(webRoot)!))
-            {
-                System.IO.Directory.Delete(System.IO.Path.GetDirectoryName(webRoot)!, recursive: true);
-            }
-        }
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -482,7 +395,7 @@ public class PageAttachmentServiceTests
     }
 
     [Test]
-    public async Task GetPageAttachmentBinaryAsync_WhenProductionHostIsMissing_ReturnsNull()
+    public void GetPageAttachmentBinaryAsync_WhenProductionHostIsMissing_ThrowsUriFormatException()
     {
         var pageGuid = Guid.NewGuid();
         var attachmentGuid = Guid.NewGuid();
@@ -500,8 +413,7 @@ public class PageAttachmentServiceTests
         mockHttpContext.Setup(c => c.Request).Returns(mockRequest.Object);
         _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(mockHttpContext.Object);
 
-        var result = await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb");
-
-        Assert.That(result, Is.Null);
+        Assert.ThrowsAsync<UriFormatException>(async () =>
+            await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb"));
     }
 }

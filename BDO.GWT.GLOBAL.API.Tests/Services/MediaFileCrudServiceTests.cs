@@ -100,14 +100,10 @@ public class MediaFileCrudServiceTests
             hostEnvironment: Mock.Of<IWebHostEnvironment>(),
             languageInfoProvider: languageProviderMock.Object);
 
-        var input = new MediaFileInput
-        {
-            File = new FormFile(new MemoryStream([1, 2, 3]), 0, 3, "File", "new.jpg"),
-            DisplayName = "New file"
-        };
+        var file = new FormFile(new MemoryStream([1, 2, 3]), 0, 3, "File", "new.jpg");
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await service.CreateMediaFileAsync("Demo", input, CancellationToken.None));
+            await service.CreateMediaFileAsync("Demo", file, CancellationToken.None));
 
         Assert.Multiple(() =>
         {
@@ -131,14 +127,10 @@ public class MediaFileCrudServiceTests
             hostEnvironment: Mock.Of<IWebHostEnvironment>(),
             languageInfoProvider: languageProviderMock.Object);
 
-        var input = new MediaFileInput
-        {
-            File = new FormFile(new MemoryStream([4, 5, 6]), 0, 3, "File", "fallback-name.jpg"),
-            DisplayName = null
-        };
+        var file = new FormFile(new MemoryStream([4, 5, 6]), 0, 3, "File", "fallback-name.jpg");
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await service.CreateMediaFileAsync("Demo", input, CancellationToken.None));
+            await service.CreateMediaFileAsync("Demo", file, CancellationToken.None));
 
         Assert.Multiple(() =>
         {
@@ -152,13 +144,10 @@ public class MediaFileCrudServiceTests
     public void UpdateMediaFileAsync_WhenDependenciesAreUnavailable_ThrowsInvalidOperationException()
     {
         var service = (MediaFileCrudService)RuntimeHelpers.GetUninitializedObject(typeof(MediaFileCrudService));
-        var input = new MediaFileInput
-        {
-            File = new FormFile(new MemoryStream([1, 2]), 0, 2, "File", "replace.jpg")
-        };
+        var file = new FormFile(new MemoryStream([1, 2]), 0, 2, "File", "replace.jpg");
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await service.UpdateMediaFileAsync("Demo", Guid.NewGuid(), input, CancellationToken.None));
+            await service.UpdateMediaFileAsync("Demo", Guid.NewGuid(), file, CancellationToken.None));
 
         Assert.Multiple(() =>
         {
@@ -273,14 +262,12 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
-    public void GetSafeExtension_WhenContainsInvalidCharacter_ReturnsEmpty()
+    public void GetSafeExtension_WhenContainsInvalidCharacter_Throws()
     {
-        var result = (string)InvokePrivateStatic("GetSafeExtension", "photo.jp|g");
+        var ex = Assert.Throws<TargetInvocationException>(() =>
+            InvokePrivateStatic("GetSafeExtension", "photo.jp|g"));
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(result, Is.EqualTo(string.Empty));
-        });
+        Assert.That(ex!.InnerException, Is.InstanceOf<InvalidOperationException>());
     }
 
     [Test]
@@ -550,14 +537,11 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
-    public void GetSafeExtension_WhenNullFileName_ReturnsEmpty()
+    public void GetSafeExtension_WhenNullFileName_ReturnsNull()
     {
-        var result = (string)InvokePrivateStatic("GetSafeExtension", new object?[] { null });
+        var result = (string?)InvokePrivateStatic("GetSafeExtension", new object?[] { null });
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(result, Is.EqualTo(string.Empty));
-        });
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -576,21 +560,16 @@ public class MediaFileCrudServiceTests
     {
         var result = (string)InvokePrivateStatic("GetSafeExtension", "photo.jp\\g");
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(result, Is.EqualTo(string.Empty));
-        });
+        Assert.That(result, Is.EqualTo(string.Empty));
     }
 
     [Test]
-    public void GetSafeExtension_WhenContainsNullChar_ReturnsEmpty()
+    public void GetSafeExtension_WhenContainsNullChar_Throws()
     {
-        var result = (string)InvokePrivateStatic("GetSafeExtension", "photo.jp\0g");
+        var ex = Assert.Throws<TargetInvocationException>(() =>
+            InvokePrivateStatic("GetSafeExtension", "photo.jp\0g"));
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(result, Is.EqualTo(string.Empty));
-        });
+        Assert.That(ex!.InnerException, Is.InstanceOf<InvalidOperationException>());
     }
 
     [Test]

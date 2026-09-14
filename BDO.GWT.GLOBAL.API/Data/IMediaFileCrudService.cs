@@ -1,4 +1,5 @@
 using BDO.GWT.GLOBAL.API.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace BDO.GWT.GLOBAL.API.Data;
 
@@ -37,20 +38,20 @@ public interface IMediaFileCrudService
     /// Creates a new media file content item in the specified Content Hub workspace.
     /// </summary>
     /// <param name="workspaceName">The name of the content hub workspace.</param>
-    /// <param name="input">The file and optional display name.</param>
+    /// <param name="file">The file to upload.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The created media file output.</returns>
-    Task<MediaFileOutput> CreateMediaFileAsync(string workspaceName, MediaFileInput input, CancellationToken cancellationToken);
+    Task<MediaFileOutput> CreateMediaFileAsync(string workspaceName, IFormFile file, CancellationToken cancellationToken);
 
     /// <summary>
     /// Updates the asset of an existing media file content item.
     /// </summary>
     /// <param name="workspaceName">The name of the content hub workspace.</param>
     /// <param name="attachmentGuid">The GUID of the media file to update.</param>
-    /// <param name="input">The replacement file and optional display name.</param>
+    /// <param name="file">The replacement file.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The updated media file output, or null if not found.</returns>
-    Task<MediaFileOutput?> UpdateMediaFileAsync(string workspaceName, Guid attachmentGuid, MediaFileInput input, CancellationToken cancellationToken);
+    Task<MediaFileOutput?> UpdateMediaFileAsync(string workspaceName, Guid attachmentGuid, IFormFile file, CancellationToken cancellationToken);
 
     /// <summary>
     /// Deletes a media file content item by GUID.
