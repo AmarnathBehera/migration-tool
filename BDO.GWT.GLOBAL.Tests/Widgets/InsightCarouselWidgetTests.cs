@@ -63,7 +63,7 @@ namespace BDO.GWT.GLOBAL.Tests.Widgets
 
             foreach (var f in fields)
             {
-                TestContext.WriteLine($"{f.Name} : {f.FieldType}");
+                TestContext.Out.WriteLine($"{f.Name} : {f.FieldType}");
             }
 
             var props = typeof(RoutedWebPage).GetProperties(
@@ -73,8 +73,11 @@ namespace BDO.GWT.GLOBAL.Tests.Widgets
 
             foreach (var p in props)
             {
-                TestContext.WriteLine($"{p.Name} : {p.PropertyType} (CanWrite={p.CanWrite})");
+                TestContext.Out.WriteLine($"{p.Name} : {p.PropertyType} (CanWrite={p.CanWrite})");
             }
+
+            Assert.That(fields, Is.Not.Empty);
+            Assert.That(props, Is.Not.Empty);
         }
         private static RoutedWebPage CreateRoutedWebPage(Guid webPageItemGuid, string contentTypeName)
         {
