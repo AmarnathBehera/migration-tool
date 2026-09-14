@@ -180,28 +180,31 @@ app.UseAuthentication();
 
 
 
-//if (!app.Environment.IsDevelopment())
-//{
-//    app.UseWhen(
-//        context => !context.Request.Host.Host.StartsWith(
-//            builder.Configuration["BDOAdminSiteUrl"],
-//            StringComparison.OrdinalIgnoreCase),
-//        branch =>
-//        {
-//            branch.UseExceptionHandler("/Error/500");
-//        });
+var isadminsite = builder.Configuration["IsAdminSite"];
+if (!app.Environment.IsDevelopment())
+{
+    if (isadminsite.Equals(false))
+    {
+        app.UseWhen(
+        context => !context.Request.Headers.UserAgent.ToString()
+            .Contains("Edge Health Probe", StringComparison.OrdinalIgnoreCase),
+        branch =>
+        {
+            branch.UseExceptionHandler("/Error/500");
+        });
+    }
 
-//    app.UseHsts();
-//}
-
-//app.UseWhen(
-//    context => !context.Request.Host.Host.StartsWith(
-//        builder.Configuration["BDOAdminSiteUrl"],
-//        StringComparison.OrdinalIgnoreCase),
-//    branch =>
-//    {
-//        branch.UseStatusCodePagesWithReExecute("/Error/{0}");
-//    });
+    app.UseHsts();
+}
+if (isadminsite.Equals(false))
+{
+    app.UseWhen(
+    context => !context.Request.Headers.UserAgent.ToString().Contains("Edge Health Probe", StringComparison.OrdinalIgnoreCase),
+    branch =>
+    {
+        branch.UseStatusCodePagesWithReExecute("/Error/{0}");
+    });
+}
 
 
 if (!builder.Environment.IsDevelopment() && builder.Configuration.GetSection("AdminRedirectOptions")?.GetSection("RedirectDomain")?.Value.Trim() != string.Empty)
