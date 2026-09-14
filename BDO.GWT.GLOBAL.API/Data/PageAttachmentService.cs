@@ -7,7 +7,6 @@ namespace BDO.GWT.GLOBAL.API.Data
 {
     public class PageAttachmentService : IPageAttachmentService
     {
-        private const string DevelopmentLiveSiteBaseUrl = "http://localhost:12393";
         private static readonly FileExtensionContentTypeProvider ContentTypeProvider = new();
 
         private readonly IContentService _contentService;
