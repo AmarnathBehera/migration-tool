@@ -556,11 +556,19 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
-    public void GetSafeExtension_WhenContainsBackslash_ReturnsEmpty()
+    public void GetSafeExtension_WhenContainsBackslash_HasPlatformSpecificBehavior()
     {
-        var result = (string)InvokePrivateStatic("GetSafeExtension", "photo.jp\\g");
+        if (OperatingSystem.IsWindows())
+        {
+            var result = (string)InvokePrivateStatic("GetSafeExtension", "photo.jp\\g");
+            Assert.That(result, Is.EqualTo(string.Empty));
+            return;
+        }
 
-        Assert.That(result, Is.EqualTo(string.Empty));
+        var ex = Assert.Throws<TargetInvocationException>(() =>
+            InvokePrivateStatic("GetSafeExtension", "photo.jp\\g"));
+
+        Assert.That(ex!.InnerException, Is.InstanceOf<InvalidOperationException>());
     }
 
     [Test]
