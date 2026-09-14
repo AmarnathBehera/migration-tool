@@ -2,6 +2,7 @@
 <cms.class>
   <ClassCodeGenerationSettings>
     <Data>
+      <DisplayNameColumn>WebChannelSnippetID</DisplayNameColumn>
       <GUIDColumn>WebSettingsGUID</GUIDColumn>
       <ObjectType>BDO.WebChannelSnippet</ObjectType>
       <UseGuidHashtable>False</UseGuidHashtable>
