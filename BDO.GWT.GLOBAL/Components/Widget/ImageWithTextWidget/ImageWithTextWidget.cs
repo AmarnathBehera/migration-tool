@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
 using System.Linq;
 using System.Threading.Tasks;
+using CMS.Websites;
+using CMS.Websites.Routing;
 
 namespace BDO.GWT.Web.Widgets.ImageWithTextWidget;
 
@@ -14,10 +16,19 @@ public class ImageWithTextWidget : ViewComponent
 {
     private readonly IContentRetriever _contentRetriever;
     private readonly IContentService _contentService;
-    public ImageWithTextWidget(IContentRetriever contentRetriever, IContentService contentService)
+    private readonly IContentQueryExecutor _queryExecutor;
+    private readonly IWebsiteChannelContext _channelContext;
+
+    public ImageWithTextWidget(
+        IContentRetriever contentRetriever,
+        IContentService contentService,
+        IContentQueryExecutor queryExecutor,
+        IWebsiteChannelContext channelContext)
     {
         _contentRetriever = contentRetriever;
         _contentService = contentService;
+        _queryExecutor = queryExecutor;
+        _channelContext = channelContext;
     }
 
     public async Task<ViewViewComponentResult> InvokeAsync(ComponentViewModel<ImageWithTextWidgetProperties> model)
@@ -39,30 +50,57 @@ public class ImageWithTextWidget : ViewComponent
                 new RetrieveContentParameters { LinkedItemsMaxLevel = 3 })
             : Enumerable.Empty<ContentAttachment>();
 
-        string url = null;
+        string? url = null;
+
         if (model.Properties.UrlSource == "manual")
         {
             url = model.Properties.ManualUrl;
         }
         else
         {
-            var contentTypes = new[] { ContentAttachment.CONTENT_TYPE_NAME, SocialLinks.CONTENT_TYPE_NAME };
+            var buttonGuids = model.Properties.ButtonURL?.Select(i => i.Identifier).ToList() ?? [];
 
-            var buttonurl = model.Properties.ButtonURL?.Any() == true
-                ? await _contentService.RetrieveButtonUrlAsync(
-                    model.Properties.ButtonURL.Select(i => i.Identifier).ToList(),
-                    contentTypes)
-                : Enumerable.Empty<IContentItemFieldsSource>();
-
-            var item = buttonurl.FirstOrDefault();
-
-            if (item is ContentAttachment attachment)
+            if (buttonGuids.Count > 0)
             {
-                url = attachment.ContentAttachmentAsset?.Url;
-            }
-            else if (item is SocialLinks social)
-            {
-                url = social.Url;
+                var contentItemGuid = buttonGuids.First();
+
+                // ForContentTypes uses Parameters() for filtering, not Where() directly
+                var builder = new ContentItemQueryBuilder()
+                    .ForContentTypes(q => q
+                        .ForWebsite(_channelContext.WebsiteChannelName, includeUrlPath: true))
+                    .Parameters(q => q
+                        .Where(w => w.WhereEquals(
+                            nameof(IContentQueryDataContainer.ContentItemGUID),
+                            contentItemGuid))
+                        .TopN(1))
+                    .InLanguage(_contentService.GetCurrentLanguage());
+
+                var options = new ContentQueryExecutionOptions
+                {
+                    ForPreview = _channelContext.IsPreview
+                };
+
+                var results = await _queryExecutor.GetResult<string>(
+                    builder,
+                    container => container.GetValue<string>("WebPageUrlPath"),
+                    options);
+
+                var urlPath = results.FirstOrDefault();
+
+                if (!string.IsNullOrEmpty(urlPath))
+                {
+                    url = _contentService.EnsureAbsoluteUrl("/" + urlPath.TrimStart('/'));
+                }
+
+                // Fallback: try as ContentAttachment (file/media asset)
+                if (url is null)
+                {
+                    var attachments = await _contentRetriever.RetrieveContentByGuids<ContentAttachment>(
+                        buttonGuids,
+                        new RetrieveContentParameters { LinkedItemsMaxLevel = 1 });
+
+                    url = attachments.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+                }
             }
         }
 
