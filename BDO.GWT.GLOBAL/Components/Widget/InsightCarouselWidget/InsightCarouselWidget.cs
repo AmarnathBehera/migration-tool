@@ -1,37 +1,34 @@
-﻿using BDO.GWT.Core;
-using BDO.GWT.Core.DTOs;
+﻿using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.LiveSite.Services;
 using BDO.GWT.GLOBAL.Components.Widget.InsightCarouselWidget;
 using BDO.GWT.Web.Core.Data;
+using CMS.Websites;
 using Kentico.Content.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 namespace BDO.GWT.GLOBAL.Widgets;
 public class InsightCarouselWidget : ViewComponent
 {
     private readonly IInsightCarouselService _insightCarouselService;
     private readonly IContentRetriever _contentRetriever;
-    private readonly IContentService _contentService;
+
     public InsightCarouselWidget(
         IInsightCarouselService insightCarouselService,
-       IContentService contentService,
-       IContentRetriever contentRetriever)
+        IContentRetriever contentRetriever)
     {
         _insightCarouselService = insightCarouselService;
-        _contentService = contentService;
         _contentRetriever = contentRetriever;
     }
     public async Task<IViewComponentResult> InvokeAsync(ComponentViewModel<InsightCarouselWidgetProperties> model)
     {
         var page = model.Page?.WebPageItemGUID;
+
         if (page is null)
-        {
-            return View("~/Components/Widget/InsightCarouselWidget/_InsightCarouselWidget.cshtml", new InsightCarouselDto { FilteringTooltipEnabled = false });
-        }
-        var currentPage = await _contentService.GetCurrentPageAsync(page.Value, HttpContext.RequestAborted);
-        if (currentPage is null)
         {
             return View("~/Components/Widget/InsightCarouselWidget/_InsightCarouselWidget.cshtml", new InsightCarouselDto { FilteringTooltipEnabled = false });
         }
@@ -56,7 +53,11 @@ public class InsightCarouselWidget : ViewComponent
             BottomMargin = model.Properties.BottomMargin,
             WidgetID = model.Properties.WidgetID,
         };
-        var dto = await _insightCarouselService.GetInsightCarouselAsync(currentPage, data, HttpContext.RequestAborted);
+        var dto = await _insightCarouselService.GetInsightCarouselAsync(
+            page.Value,
+            model.Page.ContentTypeName,
+            data,
+            HttpContext.RequestAborted);
         return View("~/Components/Widget/InsightCarouselWidget/_InsightCarouselWidget.cshtml", dto);
     }
 }

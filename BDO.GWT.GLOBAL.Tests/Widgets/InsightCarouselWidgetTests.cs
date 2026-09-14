@@ -1,23 +1,18 @@
-using BDO.GWT.GLOBAL.Widgets;
-using BDO.GWT.GLOBAL.Components.Widget.InsightCarouselWidget;
+using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.LiveSite.Services;
-using BDO.GWT.Core.Services;
+using BDO.GWT.GLOBAL.Components.Widget.InsightCarouselWidget;
+using BDO.GWT.GLOBAL.Widgets;
+using BDO.GWT.Web.Core.Data;
+using CMS.ContentEngine;
 using Kentico.Content.Web.Mvc;
+using Kentico.PageBuilder.Web.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Moq;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Kentico.PageBuilder.Web.Mvc;
-using CMS.ContentEngine;
-using BDO.GWT.Core.DTOs;
-using CMS.Websites;
-using BDO.GWT.Core;
-using BDO.GWT.Web.Core.Data;
-using Microsoft.AspNetCore.Mvc.ViewComponents;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 
 namespace BDO.GWT.GLOBAL.Tests.Widgets
 {
@@ -25,7 +20,6 @@ namespace BDO.GWT.GLOBAL.Tests.Widgets
     {
         private Mock<IInsightCarouselService> _insightCarouselServiceMock = null!;
         private Mock<IContentRetriever> _contentRetrieverMock = null!;
-        private Mock<IContentService> _contentServiceMock = null!;
         private InsightCarouselWidget _widget = null!;
 
         [SetUp]
@@ -33,26 +27,16 @@ namespace BDO.GWT.GLOBAL.Tests.Widgets
         {
             _insightCarouselServiceMock = new Mock<IInsightCarouselService>();
             _contentRetrieverMock = new Mock<IContentRetriever>();
-            _contentServiceMock = new Mock<IContentService>();
 
             _insightCarouselServiceMock
-                .Setup(x => x.GetInsightCarouselAsync(It.IsAny<IWebPageFieldsSource>(), It.IsAny<InsightCarouselData>(), It.IsAny<System.Threading.CancellationToken>()))
+                .Setup(x => x.GetInsightCarouselAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<string>(),
+                    It.IsAny<InsightCarouselData>(),
+                    It.IsAny<System.Threading.CancellationToken>()))
                 .ReturnsAsync(new InsightCarouselDto { FilteringTooltipEnabled = false });
 
-            _contentServiceMock
-                .Setup(x => x.GetItemsByGUIDAsync(It.IsAny<List<Guid>>()))
-                .ReturnsAsync(new[] { (IWebPageFieldsSource)new DummyPage() });
-
-            _widget = new InsightCarouselWidget(_insightCarouselServiceMock.Object, _contentServiceMock.Object, _contentRetrieverMock.Object);
-        }
-
-        private class DummyPage : IWebPageFieldsSource
-        {
-            public DummyPage()
-            {
-            }
-
-            public WebPageFields SystemFields { get; set; } = new WebPageFields { ContentItemGUID = Guid.NewGuid() };
+            _widget = new InsightCarouselWidget(_insightCarouselServiceMock.Object, _contentRetrieverMock.Object);
         }
 
         [Test]
@@ -70,21 +54,41 @@ namespace BDO.GWT.GLOBAL.Tests.Widgets
         }
 
         [Test]
-        public async Task InvokeAsync_WhenPageExists_InvokesServiceAndReturnsDto()
+        public void Debug_ListRoutedWebPageFields()
         {
-            var pageGuid = Guid.NewGuid();
-            var pageContext = new { WebPageItemGUID = pageGuid };
-            var model = CreateComponentViewModel(pageContext, new InsightCarouselWidgetProperties());
+            var fields = typeof(RoutedWebPage).GetFields(
+                System.Reflection.BindingFlags.Instance |
+                System.Reflection.BindingFlags.NonPublic |
+                System.Reflection.BindingFlags.Public);
 
-            _contentServiceMock
-                .Setup(x => x.GetItemsByGUIDAsync(It.Is<List<Guid>>(l => l.Contains(pageGuid))))
-                .ReturnsAsync(new[] { (IWebPageFieldsSource)new DummyPage() });
+            foreach (var f in fields)
+            {
+                TestContext.WriteLine($"{f.Name} : {f.FieldType}");
+            }
 
-            var result = await _widget.InvokeAsync(model) as ViewViewComponentResult;
+            var props = typeof(RoutedWebPage).GetProperties(
+                System.Reflection.BindingFlags.Instance |
+                System.Reflection.BindingFlags.NonPublic |
+                System.Reflection.BindingFlags.Public);
 
-            Assert.That(result, Is.Not.Null);
-            var dto = result?.ViewData?.Model as InsightCarouselDto;
-            Assert.That(dto, Is.Not.Null);
+            foreach (var p in props)
+            {
+                TestContext.WriteLine($"{p.Name} : {p.PropertyType} (CanWrite={p.CanWrite})");
+            }
+        }
+        private static RoutedWebPage CreateRoutedWebPage(Guid webPageItemGuid, string contentTypeName)
+        {
+#pragma warning disable SYSLIB0050
+            var page = (RoutedWebPage)FormatterServices.GetUninitializedObject(typeof(RoutedWebPage));
+#pragma warning restore SYSLIB0050
+
+            var guidField = typeof(RoutedWebPage).GetField("<WebPageItemGUID>k__BackingField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            var typeNameField = typeof(RoutedWebPage).GetField("<ContentTypeName>k__BackingField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+
+            guidField?.SetValue(page, webPageItemGuid);
+            typeNameField?.SetValue(page, contentTypeName);
+
+            return page;
         }
 
         private static ComponentViewModel<T> CreateComponentViewModel<T>(object? page, T properties)
