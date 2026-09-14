@@ -61,33 +61,22 @@ public class InsightCarouselServiceTests
             _stateStoreMock.Object);
     }
 
-    private sealed class DummyPage : IWebPageFieldsSource
-    {
-        public WebPageFields SystemFields { get; set; } = new() { ContentItemGUID = Guid.NewGuid() };
-    }
-
-    private sealed class businessLine : IWebPageFieldsSource
-    {
-        public WebPageFields SystemFields { get; set; } = new() { ContentItemGUID = Guid.NewGuid() };
-    }
+    private const string DummyPageType = "DummyPage";
+    private const string BusinessLineType = "businessLine";
 
     [Test]
-    public void GetInsightCarouselAsync_Throws_WhenArgumentsAreNull()
+    public void GetInsightCarouselAsync_Throws_WhenDataIsNull()
     {
-        var page = new DummyPage();
-        var data = new InsightCarouselData();
+        var pageGuid = Guid.NewGuid();
 
-        Assert.Multiple(() =>
-        {
-            Assert.ThrowsAsync<ArgumentNullException>(() => _service.GetInsightCarouselAsync<DummyPage>(null!, data, CancellationToken.None));
-            Assert.ThrowsAsync<ArgumentNullException>(() => _service.GetInsightCarouselAsync(page, null!, CancellationToken.None));
-        });
+        Assert.ThrowsAsync<ArgumentNullException>(
+            () => _service.GetInsightCarouselAsync(pageGuid, DummyPageType, null!, CancellationToken.None));
     }
 
     [Test]
     public async Task GetInsightCarouselAsync_FilteringEnabled_PopulatesDto_AndStoresState()
     {
-        var page = new DummyPage();
+        var pageGuid = Guid.NewGuid();
         var pageCard = new ContentPageCardDto { Title = "item-1" };
         HashSet<ContentItemReference>? storedFeatured = null;
 
@@ -144,7 +133,7 @@ public class InsightCarouselServiceTests
                 new() { SystemFields = new WebPageFields { ContentItemGUID = featuredGuid } },
             });
 
-        var dto = await _service.GetInsightCarouselAsync(page, data, CancellationToken.None);
+        var dto = await _service.GetInsightCarouselAsync(pageGuid, DummyPageType, data, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -155,8 +144,8 @@ public class InsightCarouselServiceTests
             Assert.That(dto.Items!.Single().Title, Is.EqualTo("item-1"));
             Assert.That(dto.SeeAllLink, Is.Not.Null);
             Assert.That(dto.SeeAllLink!.Target, Is.EqualTo("_self"));
-            Assert.That(dto.CurrentPageGuid, Is.EqualTo(page.SystemFields.ContentItemGUID));
-            Assert.That(dto.PageType, Is.EqualTo(nameof(DummyPage)));
+            Assert.That(dto.CurrentPageGuid, Is.EqualTo(pageGuid));
+            Assert.That(dto.PageType, Is.EqualTo(DummyPageType));
             Assert.That(dto.StateGUID, Is.Not.EqualTo(Guid.Empty));
             Assert.That(storedFeatured, Is.Not.Null);
             Assert.That(storedFeatured!.Any(x => x.Identifier == featuredGuid), Is.True);
@@ -168,9 +157,9 @@ public class InsightCarouselServiceTests
     [Test]
     public async Task GetInsightCarouselAsync_FilteringDisabled_DoesNotCreateFilters_AndKeepsSeeAllLinkNull()
     {
-        var page = new DummyPage();
+        var pageGuid = Guid.NewGuid();
 
-        var dto = await _service.GetInsightCarouselAsync(page, new InsightCarouselData { FilteringEnabled = false }, CancellationToken.None);
+        var dto = await _service.GetInsightCarouselAsync(pageGuid, DummyPageType, new InsightCarouselData { FilteringEnabled = false }, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -184,7 +173,7 @@ public class InsightCarouselServiceTests
     [Test]
     public async Task GetFilteredItemsAsync_KnownFilterType_UsesDecoratorAndFilteredDefaults()
     {
-        var page = new businessLine();
+        var pageGuid = Guid.NewGuid();
         var featuredGuid = Guid.NewGuid();
 
         CardsQuery? capturedQuery = null;
@@ -210,7 +199,8 @@ public class InsightCarouselServiceTests
             .ReturnsAsync((PaginationDto<ContentPageCardDto>)null!);
 
         var result = await _service.GetFilteredItemsAsync(
-            page,
+            pageGuid,
+            BusinessLineType,
             [new ContentItemReference { Identifier = featuredGuid }],
             new CardsQuery(),
             CancellationToken.None);
@@ -234,7 +224,7 @@ public class InsightCarouselServiceTests
     [Test]
     public async Task GetFilteredItemsAsync_UnknownType_UsesUnfilteredDefaultsAndNoDecorator()
     {
-        var page = new DummyPage();
+        var pageGuid = Guid.NewGuid();
         CardsQuery? capturedQuery = null;
         Action<RetrievePagesQueryParameters>? capturedDecorator = null;
 
@@ -257,7 +247,7 @@ public class InsightCarouselServiceTests
                 TotalCount = 0,
             });
 
-        await _service.GetFilteredItemsAsync(page, null!, null!, CancellationToken.None);
+        await _service.GetFilteredItemsAsync(pageGuid, DummyPageType, null!, null!, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -305,7 +295,7 @@ public class InsightCarouselServiceTests
             new CardsQuery
             {
                 State = state,
-                PageType = nameof(businessLine),
+                PageType = BusinessLineType,
                 CurrentPageGuid = Guid.NewGuid(),
                 CurrentPage = null,
                 PageSize = null,
@@ -328,7 +318,7 @@ public class InsightCarouselServiceTests
     [Test]
     public async Task GetInsightCarouselAsync_UsesProvidedSeeAllLinkTarget_WhenSpecified()
     {
-        var page = new DummyPage();
+        var pageGuid = Guid.NewGuid();
         var data = new InsightCarouselData
         {
             FilteringEnabled = false,
@@ -337,7 +327,7 @@ public class InsightCarouselServiceTests
             SeeAllLinkURLTarget = "_blank",
         };
 
-        var dto = await _service.GetInsightCarouselAsync(page, data, CancellationToken.None);
+        var dto = await _service.GetInsightCarouselAsync(pageGuid, DummyPageType, data, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -351,7 +341,7 @@ public class InsightCarouselServiceTests
     [Test]
     public async Task GetInsightCarouselAsync_SeeAllLinkNull_WhenLinkTextMissing()
     {
-        var page = new DummyPage();
+        var pageGuid = Guid.NewGuid();
         var data = new InsightCarouselData
         {
             FilteringEnabled = false,
@@ -359,7 +349,7 @@ public class InsightCarouselServiceTests
             SeeAllLinkUrl = "/insights",
         };
 
-        var dto = await _service.GetInsightCarouselAsync(page, data, CancellationToken.None);
+        var dto = await _service.GetInsightCarouselAsync(pageGuid, DummyPageType, data, CancellationToken.None);
 
         Assert.That(dto.SeeAllLink, Is.Null);
     }
@@ -367,10 +357,10 @@ public class InsightCarouselServiceTests
     [Test]
     public async Task GetInsightCarouselAsync_SavesFeaturedStateExactlyOnce()
     {
-        var page = new DummyPage();
+        var pageGuid = Guid.NewGuid();
         var data = new InsightCarouselData { FilteringEnabled = false };
 
-        await _service.GetInsightCarouselAsync(page, data, CancellationToken.None);
+        await _service.GetInsightCarouselAsync(pageGuid, DummyPageType, data, CancellationToken.None);
 
         _stateStoreMock.Verify(
             x => x.Save(It.IsAny<Guid>(), It.IsAny<HashSet<ContentItemReference>>()),
