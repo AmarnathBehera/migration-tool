@@ -49,8 +49,12 @@ namespace BDO.GWT.GLOBAL.Tests.Widgets
 
             Assert.That(result, Is.Not.Null);
             var dto = result?.ViewData?.Model as InsightCarouselDto;
-            Assert.That(dto, Is.Not.Null);
-            Assert.That(dto!.FilteringTooltipEnabled, Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(dto, Is.Not.Null);
+                Assert.That(dto!.FilteringTooltipEnabled, Is.False);
+            });
+            
         }
 
         [Test]
@@ -75,9 +79,12 @@ namespace BDO.GWT.GLOBAL.Tests.Widgets
             {
                 TestContext.Out.WriteLine($"{p.Name} : {p.PropertyType} (CanWrite={p.CanWrite})");
             }
-
-            Assert.That(fields, Is.Not.Empty);
-            Assert.That(props, Is.Not.Empty);
+            Assert.Multiple(() =>
+            {
+                Assert.That(fields, Is.Not.Empty);
+                Assert.That(props, Is.Not.Empty);
+            });
+           
         }
         private static RoutedWebPage CreateRoutedWebPage(Guid webPageItemGuid, string contentTypeName)
         {
