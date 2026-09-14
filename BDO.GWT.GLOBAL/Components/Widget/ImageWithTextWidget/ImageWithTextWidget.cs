@@ -62,9 +62,8 @@ public class ImageWithTextWidget : ViewComponent
 
             if (buttonGuids.Count > 0)
             {
-                var contentItemGuid = buttonGuids.First();
+                var contentItemGuid = buttonGuids.FirstOrDefault();
 
-                // ForContentTypes uses Parameters() for filtering, not Where() directly
                 var builder = new ContentItemQueryBuilder()
                     .ForContentTypes(q => q
                         .ForWebsite(_channelContext.WebsiteChannelName, includeUrlPath: true))
@@ -92,18 +91,23 @@ public class ImageWithTextWidget : ViewComponent
                     url = _contentService.EnsureAbsoluteUrl("/" + urlPath.TrimStart('/'));
                 }
 
-                // Fallback: try as ContentAttachment (file/media asset)
                 if (url is null)
                 {
-                    var attachments = await _contentRetriever.RetrieveContentByGuids<ContentAttachment>(
-                        buttonGuids,
-                        new RetrieveContentParameters { LinkedItemsMaxLevel = 1 });
+                    var attachments = model.Properties.ButtonURL?.Any() == true
+                        ? await _contentService.RetrieveButtonUrlAsync(
+                            model.Properties.ButtonURL.Select(i => i.Identifier).ToList(),
+                            [ContentAttachment.CONTENT_TYPE_NAME])
+                        : Enumerable.Empty<IContentItemFieldsSource>();
 
-                    url = attachments.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+                    var attachment = attachments.FirstOrDefault();
+
+                    if (attachment is ContentAttachment contentAttachment)
+                    {
+                        url = contentAttachment?.ContentAttachmentAsset?.Url;
+                    }
                 }
             }
         }
-
         var dto = new ImageWithTextData
         {
             Title = model.Properties.Title,
@@ -114,10 +118,10 @@ public class ImageWithTextWidget : ViewComponent
             ButtonType = model.Properties.ButtonType,
             MediaType = model.Properties.MediaType,
             EmbedCode = model.Properties.EmbedCode,
-            ImageURL = imageurl.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+            ImageURL = imageurl.FirstOrDefault()?.ContentAttachmentAsset?.Url.TrimStart('~'),
             ImageAltText = model.Properties.ImageAltText,
             MediaPosition = model.Properties.MediaPosition,
-            BackgroundImageURL = backgroundimageurl.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+            BackgroundImageURL = backgroundimageurl.FirstOrDefault()?.ContentAttachmentAsset?.Url.TrimStart('~'),
             BackgroundImageAltText = string.IsNullOrEmpty(model.Properties.BackgroundImageAltText) ? null : model.Properties.BackgroundImageAltText,
             Theme = model.Properties.Theme,
             TopMargin = model.Properties.TopMargin,
@@ -127,4 +131,5 @@ public class ImageWithTextWidget : ViewComponent
 
         return View("~/Components/Widget/ImageWithTextWidget/_ImageWithTextWidget.cshtml", dto);
     }
+
 }

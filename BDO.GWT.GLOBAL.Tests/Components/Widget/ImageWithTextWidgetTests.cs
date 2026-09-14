@@ -2,7 +2,6 @@
 using BDO.GWT.Core;
 using BDO.GWT.Web.Widgets.ImageWithTextWidget;
 using CMS.ContentEngine;
-using CMS.Helpers;
 using Kentico.Content.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Http;
@@ -114,13 +113,10 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
                 }
             };
 
-            _contentRetrieverMock
-                .Setup(x => x.RetrieveContent<ContentAttachment, ContentAttachment>(
-                    It.Is<RetrieveContentParameters>(p => p.LinkedItemsMaxLevel == 1),
-                    It.IsAny<Action<RetrieveContentQueryParameters>>(),
-                    It.IsAny<RetrievalCacheSettings>(),
-                    It.IsAny<Func<IContentQueryDataContainer, ContentAttachment, Task<ContentAttachment>>>(),
-                    It.IsAny<CancellationToken>()))
+            _contentServiceMock
+                .Setup(x => x.RetrieveButtonUrlAsync(
+                    It.Is<IEnumerable<Guid>>(g => g.Contains(guid)),
+                    It.Is<string[]>(types => types.SequenceEqual(new[] { ContentAttachment.CONTENT_TYPE_NAME }))))
                 .ReturnsAsync([attachment]);
 
             var props = new ImageWithTextWidgetProperties
@@ -137,8 +133,79 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var result = await _widget.InvokeAsync(model);
             var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as ImageWithTextData;
 
+            _contentServiceMock.Verify(x => x.RetrieveButtonUrlAsync(
+                It.Is<IEnumerable<Guid>>(g => g.Contains(guid)),
+                It.Is<string[]>(types => types.SequenceEqual(new[] { ContentAttachment.CONTENT_TYPE_NAME }))), Times.Once);
+
             Assert.That(viewModel, Is.Not.Null);
             Assert.That(viewModel!.ButtonURL, Is.EqualTo("/button.pdf"));
+        }
+
+        [Test]
+        public async Task InvokeAsync_WithManualUrl_UsesManualUrlWithoutResolvingContent()
+        {
+            var props = new ImageWithTextWidgetProperties
+            {
+                Title = "Title",
+                Description = "Desc",
+                UrlSource = "manual",
+                ManualUrl = "https://example.com/manual"
+            };
+
+            var model = GetModel(props);
+            var result = await _widget.InvokeAsync(model);
+            var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as ImageWithTextData;
+
+            _queryExecutorMock.Verify(x => x.GetResult<string>(
+                It.IsAny<ContentItemQueryBuilder>(),
+                It.IsAny<Func<IContentQueryDataContainer, string>>(),
+                It.IsAny<ContentQueryExecutionOptions>(),
+                It.IsAny<CancellationToken>()), Times.Never);
+            _contentServiceMock.Verify(x => x.RetrieveButtonUrlAsync(
+                It.IsAny<IEnumerable<Guid>>(),
+                It.IsAny<string[]>()), Times.Never);
+
+            Assert.That(viewModel, Is.Not.Null);
+            Assert.That(viewModel!.ButtonURL, Is.EqualTo("https://example.com/manual"));
+        }
+
+        [Test]
+        public async Task InvokeAsync_WithPageButtonUrl_DoesNotFallbackToAttachment()
+        {
+            var guid = Guid.NewGuid();
+
+            _queryExecutorMock
+                .Setup(x => x.GetResult<string>(
+                    It.IsAny<ContentItemQueryBuilder>(),
+                    It.IsAny<Func<IContentQueryDataContainer, string>>(),
+                    It.IsAny<ContentQueryExecutionOptions>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(["test-page"]);
+
+            _contentServiceMock
+                .Setup(x => x.EnsureAbsoluteUrl("/test-page"))
+                .Returns("https://example.com/test-page");
+
+            var props = new ImageWithTextWidgetProperties
+            {
+                Title = "Title",
+                Description = "Desc",
+                ButtonURL =
+                [
+                    new ContentItemReference { Identifier = guid }
+                ]
+            };
+
+            var model = GetModel(props);
+            var result = await _widget.InvokeAsync(model);
+            var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as ImageWithTextData;
+
+            _contentServiceMock.Verify(x => x.RetrieveButtonUrlAsync(
+                It.IsAny<IEnumerable<Guid>>(),
+                It.IsAny<string[]>()), Times.Never);
+
+            Assert.That(viewModel, Is.Not.Null);
+            Assert.That(viewModel!.ButtonURL, Is.EqualTo("https://example.com/test-page"));
         }
 
         [Test]
@@ -242,6 +309,9 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 
             _contentServiceMock.Verify(x => x.GetCurrentLanguage(), Times.Once);
             _contentServiceMock.Verify(x => x.EnsureAbsoluteUrl("/test-page"), Times.Once);
+            _contentServiceMock.Verify(x => x.RetrieveButtonUrlAsync(
+                It.IsAny<IEnumerable<Guid>>(),
+                It.IsAny<string[]>()), Times.Never);
 
             Assert.That(viewModel, Is.Not.Null);
             Assert.That(viewModel!.ButtonURL, Is.EqualTo("https://example.com/test-page"));
