@@ -180,28 +180,28 @@ app.UseAuthentication();
 
 
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseWhen(
-        context => !context.Request.Host.Host.StartsWith(
-            builder.Configuration["BDOAdminSiteUrl"],
-            StringComparison.OrdinalIgnoreCase),
-        branch =>
-        {
-            branch.UseExceptionHandler("/Error/500");
-        });
+//if (!app.Environment.IsDevelopment())
+//{
+//    app.UseWhen(
+//        context => !context.Request.Host.Host.StartsWith(
+//            builder.Configuration["BDOAdminSiteUrl"],
+//            StringComparison.OrdinalIgnoreCase),
+//        branch =>
+//        {
+//            branch.UseExceptionHandler("/Error/500");
+//        });
 
-    app.UseHsts();
-}
+//    app.UseHsts();
+//}
 
-app.UseWhen(
-    context => !context.Request.Host.Host.StartsWith(
-        builder.Configuration["BDOAdminSiteUrl"],
-        StringComparison.OrdinalIgnoreCase),
-    branch =>
-    {
-        branch.UseStatusCodePagesWithReExecute("/Error/{0}");
-    });
+//app.UseWhen(
+//    context => !context.Request.Host.Host.StartsWith(
+//        builder.Configuration["BDOAdminSiteUrl"],
+//        StringComparison.OrdinalIgnoreCase),
+//    branch =>
+//    {
+//        branch.UseStatusCodePagesWithReExecute("/Error/{0}");
+//    });
 
 
 if (!builder.Environment.IsDevelopment() && builder.Configuration.GetSection("AdminRedirectOptions")?.GetSection("RedirectDomain")?.Value.Trim() != string.Empty)
