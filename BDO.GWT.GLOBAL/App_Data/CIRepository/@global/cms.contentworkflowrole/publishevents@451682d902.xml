@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentworkflowrole>
+  <Parent>
+    <CodeName>PublishEvents</CodeName>
+    <GUID>cc61c0fb-e6ea-46fb-9d6d-84f349bd7b2c</GUID>
+    <ObjectType>cms.contentworkflow</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.role_Administrator">
+      <ContentWorkflowRoleRoleID>
+        <CodeName>Administrator</CodeName>
+        <GUID>2c98af39-5f89-4639-8451-0b80eb100df8</GUID>
+        <ObjectType>cms.role</ObjectType>
+      </ContentWorkflowRoleRoleID>
+    </Binding>
+  </Bindings>
+</cms.contentworkflowrole>

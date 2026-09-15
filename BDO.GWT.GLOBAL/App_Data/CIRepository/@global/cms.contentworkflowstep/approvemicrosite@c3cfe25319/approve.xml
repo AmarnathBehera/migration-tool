@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentworkflowstep>
+  <ContentWorkflowStepDisplayName>Approve</ContentWorkflowStepDisplayName>
+  <ContentWorkflowStepGUID>8e0b1abd-6402-4f08-8061-46ed90fbcf68</ContentWorkflowStepGUID>
+  <ContentWorkflowStepIconClass>xp-check</ContentWorkflowStepIconClass>
+  <ContentWorkflowStepIsNotificationEnabled>True</ContentWorkflowStepIsNotificationEnabled>
+  <ContentWorkflowStepName>Approve</ContentWorkflowStepName>
+  <ContentWorkflowStepOrder>1</ContentWorkflowStepOrder>
+  <ContentWorkflowStepType>3</ContentWorkflowStepType>
+  <ContentWorkflowStepWorkflowID>
+    <CodeName>ApproveMicrosite</CodeName>
+    <GUID>c80962e7-6474-478d-a349-93558d71d129</GUID>
+    <ObjectType>cms.contentworkflow</ObjectType>
+  </ContentWorkflowStepWorkflowID>
+</cms.contentworkflowstep>
