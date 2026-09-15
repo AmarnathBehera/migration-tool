@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <cms.contentworkflowsteprole>
   <Parent>
-    <CodeName>Buffer</CodeName>
-    <GUID>ed69e196-e2f0-4a4a-80e3-1fb2f517fbe9</GUID>
+    <CodeName>Approve</CodeName>
+    <GUID>8e0b1abd-6402-4f08-8061-46ed90fbcf68</GUID>
     <ObjectType>cms.contentworkflowstep</ObjectType>
     <Parent>
-      <CodeName>AdditionalApprovalStep</CodeName>
-      <GUID>9f10643a-fd7a-46f5-aec1-f2c75ea58d13</GUID>
+      <CodeName>ApproveMicrosite</CodeName>
+      <GUID>c80962e7-6474-478d-a349-93558d71d129</GUID>
       <ObjectType>cms.contentworkflow</ObjectType>
     </Parent>
   </Parent>
   <Bindings>
-    <Binding id="cms.role_Administrator">
+    <Binding id="cms.role_BDOPublisher">
       <ContentWorkflowStepRoleRoleID>
-        <CodeName>Administrator</CodeName>
-        <GUID>2c98af39-5f89-4639-8451-0b80eb100df8</GUID>
+        <CodeName>BDOPublisher</CodeName>
+        <GUID>44781a9c-7814-497f-8714-a6cc13b8e629</GUID>
         <ObjectType>cms.role</ObjectType>
       </ContentWorkflowStepRoleRoleID>
     </Binding>
