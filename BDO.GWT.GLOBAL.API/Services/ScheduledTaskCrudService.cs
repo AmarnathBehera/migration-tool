@@ -1,11 +1,9 @@
 ﻿using BDO.GWT.Common.Core.Exceptions;
-using BDO.GWT.Common.Core.Services;
 using BDO.GWT.Core.Exceptions;
 using BDO.GWT.GLOBAL.API.DTOs;
 using CMS.DataEngine;
 using CMS.Scheduler;
 using CMS.Scheduler.Internal;
-using Ical.Net;
 
 namespace BDO.GWT.GLOBAL.API.Services;
 
