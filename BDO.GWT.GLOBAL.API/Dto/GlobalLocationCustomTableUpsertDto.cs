@@ -1,5 +1,7 @@
-﻿namespace BDO.GWT.GLOBAL.API.Dto;
-public class GlobalLocationCustomTableAPIDto
+﻿using System.Text.Json.Serialization;
+
+namespace BDO.GWT.GLOBAL.API.Dto;
+public class GlobalLocationCustomTableApiDto
 {
     public int ItemId { get; set; }
     public Guid ItemGuid { get; set; }
@@ -38,7 +40,9 @@ public class GlobalLocationCustomTableUpsertDto
     public decimal? GlobalLocationLatitude { get; set; }
     public decimal? GlobalLocationLongitude { get; set; }
     public string? GlobalLocationUrl { get; set; }
+    [JsonRequired]
     public int MemberFirmId { get; set; }
+    [JsonRequired]
     public int ChannelId { get; set; }
     public int? ItemOrder { get; set; }
 }

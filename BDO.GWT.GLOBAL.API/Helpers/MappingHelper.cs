@@ -746,59 +746,6 @@ namespace BDO.GWT.GLOBAL.API.Helpers
                 ? attachments.FirstOrDefault(a => a.SystemFields.ContentItemGUID == guid)
                 : attachments.FirstOrDefault(a => UrlsMatch(a.ContentAttachmentAsset?.Url, value));
 
-            var assetUrl = match?.ContentAttachmentAsset?.Url;
-            if (string.IsNullOrWhiteSpace(assetUrl))
-            {
-                return null;
-            }
-
-            var assetUri = BuildAssetUri(assetUrl);
-            if (assetUri is null)
-            {
-                return null;
-            }
-
-            var response = await _httpClientFactory.CreateClient().GetAsync(assetUri, cancellationToken);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var errorBody = await response.Content.ReadAsStringAsync(cancellationToken);
-                throw new InvalidOperationException(
-                    $"Failed to download asset from '{assetUri}'. Status: {(int)response.StatusCode} {response.ReasonPhrase}. Body: {errorBody}");
-            }
-
-            var fileName = GetFileNameFromUrl(assetUrl);
-            var extension = System.IO.Path.GetExtension(fileName);
-            var nameWithoutExtension = extension.Length > 0 && fileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase)
-                ? fileName[..^extension.Length]
-                : fileName;
-
-            var tempPath = CreateSafeTempUploadPath();
-
-            try
-            {
-                await using (var fs = System.IO.File.Create(tempPath))
-                {
-                    await response.Content.CopyToAsync(fs, cancellationToken);
-                }
-
-                var fileInfo = new System.IO.FileInfo(tempPath);
-                var assetSource = new ContentItemAssetFileSource(tempPath, canMove: true);
-
-                return new ContentItemAssetMetadataWithSource(
-                    assetSource,
-                    nameWithoutExtension,
-                    extension,
-                    fileInfo.Length,
-                    DateTime.UtcNow);
-            }
-            finally
-            {
-                if (System.IO.File.Exists(tempPath))
-                {
-                    System.IO.File.Delete(tempPath);
-                }
-            }
         }
 
         private Uri? BuildAssetUri(string assetUrl)

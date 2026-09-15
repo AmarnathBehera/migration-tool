@@ -7,9 +7,9 @@ namespace BDO.GWT.GLOBAL.API.Services;
 
 public interface ICustomGlobalLocationsService
 {
-    Task<List<GlobalLocationCustomTableAPIDto>> GetAllAsync(int? memberFirmId);
-    Task<GlobalLocationCustomTableAPIDto> CreateAsync(GlobalLocationCustomTableUpsertDto dto);
-    Task<GlobalLocationCustomTableAPIDto?> UpdateAsync(int memberFirmId, GlobalLocationCustomTableUpsertDto dto);
+    Task<List<GlobalLocationCustomTableApiDto>> GetAllAsync(int? memberFirmId);
+    Task<GlobalLocationCustomTableApiDto> CreateAsync(GlobalLocationCustomTableUpsertDto dto);
+    Task<GlobalLocationCustomTableApiDto?> UpdateAsync(int memberFirmId, GlobalLocationCustomTableUpsertDto dto);
 }
 
 public class DuplicateMemberFirmException : Exception
@@ -25,6 +25,8 @@ public class GlobalLocationPersistenceException : Exception
 
 public class CustomGlobalLocationsService : ICustomGlobalLocationsService
 {
+    private const string MemberFirmIdParameter = "@MemberFirmID";
+
     private readonly IConfiguration _configuration;
     private readonly IEventLogService eventLogService;
 
@@ -36,9 +38,9 @@ public class CustomGlobalLocationsService : ICustomGlobalLocationsService
         this.eventLogService = eventLogService;
     }
 
-    public async Task<List<GlobalLocationCustomTableAPIDto>> GetAllAsync(int? memberFirmId)
+    public async Task<List<GlobalLocationCustomTableApiDto>> GetAllAsync(int? memberFirmId)
     {
-        var locations = new List<GlobalLocationCustomTableAPIDto>();
+        var locations = new List<GlobalLocationCustomTableApiDto>();
 
         try
         {
@@ -59,7 +61,7 @@ public class CustomGlobalLocationsService : ICustomGlobalLocationsService
             ORDER BY GlobalLocationTitle";
 
             await using var command = new SqlCommand(sql, connection);
-            command.Parameters.Add("@MemberFirmID", SqlDbType.Int).Value = (object?)memberFirmId ?? DBNull.Value;
+            command.Parameters.Add(MemberFirmIdParameter, SqlDbType.Int).Value = (object?)memberFirmId ?? DBNull.Value;
 
             await using var reader = await command.ExecuteReaderAsync();
 
@@ -76,7 +78,7 @@ public class CustomGlobalLocationsService : ICustomGlobalLocationsService
         return locations;
     }
 
-    public async Task<GlobalLocationCustomTableAPIDto> CreateAsync(GlobalLocationCustomTableUpsertDto dto)
+    public async Task<GlobalLocationCustomTableApiDto> CreateAsync(GlobalLocationCustomTableUpsertDto dto)
     {
         try
         {
@@ -126,7 +128,7 @@ public class CustomGlobalLocationsService : ICustomGlobalLocationsService
             command.Parameters.Add("@GlobalLocationLatitude", SqlDbType.Decimal).Value = (object?)dto.GlobalLocationLatitude ?? DBNull.Value;
             command.Parameters.Add("@GlobalLocationLongitude", SqlDbType.Decimal).Value = (object?)dto.GlobalLocationLongitude ?? DBNull.Value;
             command.Parameters.Add("@GlobalLocationUrl", SqlDbType.NVarChar).Value = (object?)dto.GlobalLocationUrl ?? DBNull.Value;
-            command.Parameters.Add("@MemberFirmID", SqlDbType.Int).Value = dto.MemberFirmId;
+            command.Parameters.Add(MemberFirmIdParameter, SqlDbType.Int).Value = dto.MemberFirmId;
             command.Parameters.Add("@ChannelID", SqlDbType.Int).Value = dto.ChannelId;
             command.Parameters.Add("@ItemCreatedWhen", SqlDbType.DateTime2).Value = now;
             command.Parameters.Add("@ItemModifiedWhen", SqlDbType.DateTime2).Value = now;
@@ -150,7 +152,7 @@ public class CustomGlobalLocationsService : ICustomGlobalLocationsService
         }
     }
 
-    public async Task<GlobalLocationCustomTableAPIDto?> UpdateAsync(int memberFirmId, GlobalLocationCustomTableUpsertDto dto)
+    public async Task<GlobalLocationCustomTableApiDto?> UpdateAsync(int memberFirmId, GlobalLocationCustomTableUpsertDto dto)
     {
         try
         {
@@ -194,7 +196,7 @@ public class CustomGlobalLocationsService : ICustomGlobalLocationsService
             WHERE MemberFirmID = @MemberFirmID";
 
             await using var command = new SqlCommand(sql, connection);
-            command.Parameters.Add("@MemberFirmID", SqlDbType.Int).Value = memberFirmId;
+            command.Parameters.Add(MemberFirmIdParameter, SqlDbType.Int).Value = memberFirmId;
             command.Parameters.Add("@NewMemberFirmID", SqlDbType.Int).Value = dto.MemberFirmId;
             command.Parameters.Add("@MetadataLocationPinColour", SqlDbType.NVarChar).Value = (object?)dto.MetadataLocationPinColour ?? DBNull.Value;
             command.Parameters.Add("@GlobalLocationTitle", SqlDbType.NVarChar).Value = (object?)dto.GlobalLocationTitle ?? DBNull.Value;
@@ -241,15 +243,15 @@ public class CustomGlobalLocationsService : ICustomGlobalLocationsService
         ) THEN 1 ELSE 0 END";
 
         await using var command = new SqlCommand(sql, connection);
-        command.Parameters.Add("@MemberFirmID", SqlDbType.Int).Value = memberFirmId;
+        command.Parameters.Add(MemberFirmIdParameter, SqlDbType.Int).Value = memberFirmId;
 
         var result = await command.ExecuteScalarAsync();
         return result is int exists && exists == 1;
     }
 
-    private static GlobalLocationCustomTableAPIDto MapReaderToDto(SqlDataReader reader)
+    private static GlobalLocationCustomTableApiDto MapReaderToDto(SqlDataReader reader)
     {
-        return new GlobalLocationCustomTableAPIDto
+        return new GlobalLocationCustomTableApiDto
         {
             ItemId = (int)reader["ItemID"],
             ItemGuid = (Guid)reader["ItemGUID"],

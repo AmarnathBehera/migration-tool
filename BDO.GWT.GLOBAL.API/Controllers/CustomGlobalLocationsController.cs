@@ -27,7 +27,7 @@ public class CustomGlobalLocationsController : EntityControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns>200 OK with the list of matching locations.</returns>
     [HttpGet]
-    public async Task<ActionResult<List<GlobalLocationCustomTableAPIDto>>> Get(
+    public async Task<ActionResult<List<GlobalLocationCustomTableApiDto>>> Get(
         [FromQuery] int? memberFirmId,
         CancellationToken cancellationToken)
     {
@@ -42,7 +42,7 @@ public class CustomGlobalLocationsController : EntityControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns>200 OK with the created location, or 409 Conflict if the member firm ID already has a location.</returns>
     [HttpPost]
-    public async Task<ActionResult<GlobalLocationCustomTableAPIDto>> Create(
+    public async Task<ActionResult<GlobalLocationCustomTableApiDto>> Create(
         [FromBody] GlobalLocationCustomTableUpsertDto dto,
         CancellationToken cancellationToken)
     {
@@ -72,7 +72,7 @@ public class CustomGlobalLocationsController : EntityControllerBase
     /// or 409 Conflict if the update would reassign the location to a member firm ID already in use.
     /// </returns>
     [HttpPut("{memberFirmId:int}")]
-    public async Task<ActionResult<GlobalLocationCustomTableAPIDto>> Update(
+    public async Task<ActionResult<GlobalLocationCustomTableApiDto>> Update(
         int memberFirmId,
         [FromBody] GlobalLocationCustomTableUpsertDto dto,
         CancellationToken cancellationToken)

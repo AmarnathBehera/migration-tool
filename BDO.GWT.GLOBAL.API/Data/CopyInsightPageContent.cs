@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace BDO.GWT.GLOBAL.API.Data
 {
@@ -8,10 +9,12 @@ namespace BDO.GWT.GLOBAL.API.Data
         [MaxLength(200)]
         public string Title { get; set; } = null!;
 
+        [JsonRequired]
         public bool ShowInsightTitle { get; set; }
 
         public string? Description { get; set; }
 
+        [JsonRequired]
         public bool ShowInsightDescription { get; set; }
 
         public string? InsightContent { get; set; }
@@ -34,8 +37,10 @@ namespace BDO.GWT.GLOBAL.API.Data
         [MaxLength(200)]
         public string? Contentsharing { get; set; }
 
+        [JsonRequired]
         public bool SharingOptOut { get; set; }
 
+        [JsonRequired]
         public bool SharingHeadline { get; set; }
 
         [MaxLength(200)]
@@ -50,11 +55,13 @@ namespace BDO.GWT.GLOBAL.API.Data
         [MaxLength(200)]
         public List<string> OriginalServiceLines { get; set; } = [];
 
+        [JsonRequired]
         public bool OriginalInvolvedCountriesAll { get; set; }
 
         [MaxLength(200)]
         public List<string> OriginalInvolvedCountries { get; set; } = [];
 
+        [JsonRequired]
         public bool OriginalDocumentOwnerOptOut { get; set; }
 
         [MaxLength(200)]
@@ -68,6 +75,7 @@ namespace BDO.GWT.GLOBAL.API.Data
 
         public string? SharingInstructions { get; set; }
 
+        [JsonRequired]
         public bool ShowCallToAction { get; set; }
 
         public string? CallToActionDescription { get; set; }
