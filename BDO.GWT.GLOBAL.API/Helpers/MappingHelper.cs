@@ -92,8 +92,6 @@ namespace BDO.GWT.GLOBAL.API.Helpers
         /// 
         Task<List<ContentItemReference>> BuildOrUpdateCopyInsightReferencesAsync(
             List<string>? items, CancellationToken cancellationToken);
-        Task<ContentItemAssetMetadataWithSource?> BuildContentItemAssetFromExistingAttachmentAsync(string? url, CancellationToken cancellationToken);
-
     }
 
     public class MappingHelper : IMappingHelper
@@ -728,87 +726,6 @@ namespace BDO.GWT.GLOBAL.API.Helpers
             }
 
             return result;
-        }
-        public async Task<ContentItemAssetMetadataWithSource?> BuildContentItemAssetFromExistingAttachmentAsync(string? url, CancellationToken cancellationToken)
-        {
-            if (string.IsNullOrWhiteSpace(url))
-            {
-                return null;
-            }
-
-            var value = url.Trim();
-
-            var attachments = await _contentRetriever.GetItemsAsync<ContentAttachment>(
-                builder => builder.Parameters(p => p.Where(w => w.WhereNotNull("ContentAttachmentAsset"))),
-                cancellationToken);
-
-            var match = Guid.TryParse(value, out var guid)
-                ? attachments.FirstOrDefault(a => a.SystemFields.ContentItemGUID == guid)
-                : attachments.FirstOrDefault(a => UrlsMatch(a.ContentAttachmentAsset?.Url, value));
-
-        }
-
-        private Uri? BuildAssetUri(string assetUrl)
-        {
-            if (Uri.TryCreate(assetUrl.Trim(), UriKind.Absolute, out var absoluteUri))
-            {
-                return absoluteUri;
-            }
-
-            var normalizedPath = NormalizePath(assetUrl);
-
-            if (_hostEnvironment.IsDevelopment())
-            {
-                return new UriBuilder(Uri.UriSchemeHttp, DevelopmentLiveSiteHost, DevelopmentLiveSitePort, normalizedPath).Uri;
-            }
-
-            var request = _httpContextAccessor.HttpContext?.Request;
-            if (request is null)
-            {
-                return null;
-            }
-
-            return new UriBuilder(request.Scheme, request.Host.Host, request.Host.Port ?? -1, normalizedPath).Uri;
-        }
-
-        private static string NormalizePath(string assetUrl)
-        {
-            var normalizedPath = assetUrl.Trim().TrimStart('~');
-            return normalizedPath.StartsWith('/') ? normalizedPath : $"/{normalizedPath}";
-        }
-
-        private static string GetFileNameFromUrl(string url)
-        {
-            if (string.IsNullOrEmpty(url))
-            {
-                return string.Empty;
-            }
-
-            var queryIndex = url.IndexOf('?');
-            if (queryIndex > 0)
-            {
-                url = url[..queryIndex];
-            }
-
-            return System.IO.Path.GetFileName(url);
-        }
-
-        private static string CreateSafeTempUploadPath()
-        {
-            var tempDirectory = System.IO.Path.Combine(AppContext.BaseDirectory, "App_Data", "Uploads", "Temp");
-            System.IO.Directory.CreateDirectory(tempDirectory);
-
-            var rootPath = System.IO.Path.GetFullPath(tempDirectory);
-            var tempFileName = System.IO.Path.ChangeExtension(System.IO.Path.GetRandomFileName(), ".tmp");
-            var candidatePath = System.IO.Path.Combine(rootPath, tempFileName);
-            var fullPath = System.IO.Path.GetFullPath(candidatePath);
-
-            if (!fullPath.StartsWith(rootPath + System.IO.Path.DirectorySeparatorChar, StringComparison.Ordinal))
-            {
-                throw new InvalidOperationException("Invalid temporary file path.");
-            }
-
-            return fullPath;
         }
     }
 }

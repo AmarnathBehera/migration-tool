@@ -25,7 +25,7 @@ public interface IInsightCrudService
     Task<ActionResult<PageOutput<InsightPageContent>>> CreatePageCultureVersionAsync(int channelId, Guid pageGUID, string? fromCulture, string? toCulture, InsightPageContent request, CancellationToken cancellationToken);
     Task<ActionResult<PageOutput<InsightPageContent>>> UpdatePageAsync(int channelId, Guid pageGUID, string? culture, InsightPageContent request, CancellationToken cancellationToken);
     Task DeletePageAsync(int channelId, Guid pageGUID, string? culture, bool deleteAllCultures, CancellationToken cancellationToken);
-    Task<ActionResult<PageOutput<CopyInsightPageContent>>> CreateCopyInsightAsync(int channelId, string Culture, string workspaceName, CopyInsightPageContent input, CancellationToken cancellationToken);
+    Task<ActionResult<PageOutput<CopyInsightPageContent>>> CreateCopyInsightAsync(int channelId, string culture, string workspaceName, CopyInsightPageContent request, CancellationToken cancellationToken);
         }
 
 public class InsightCrudService : IInsightCrudService
@@ -579,7 +579,7 @@ public class InsightCrudService : IInsightCrudService
                 throw new NotFoundException("Invalid culture specified");
             }
 
-            var channel = await _channelInfoProvider.GetAsync(channelId);
+            var channel = await _channelInfoProvider.GetAsync(channelId, cancellationToken);
             if (string.IsNullOrEmpty(channel?.ChannelName))
             {
                 throw new NotFoundException("Channel not found");
@@ -592,7 +592,7 @@ public class InsightCrudService : IInsightCrudService
             // The content item display name shown in the admin UI
             string displayName = request.Title ?? "New Copy Insight Created by API";
 
-            var itemData = await CreateCopyInsightItemData(request, channel.ChannelName, currentCulture.Locale, cancellationToken);
+            var itemData = await CreateCopyInsightItemData(request, cancellationToken);
 
             // CopyInsight is a reusable content item (not a web page), created the same way
             // MediaFileCrudService creates ContentAttachment items.
@@ -814,12 +814,10 @@ public class InsightCrudService : IInsightCrudService
         };
     }
 
-    private async Task<ContentItemData> CreateCopyInsightItemData(CopyInsightPageContent content, string? channelName, string? culture, CancellationToken cancellationToken)
+    private async Task<ContentItemData> CreateCopyInsightItemData(CopyInsightPageContent content, CancellationToken cancellationToken)
     {
         var industries = await _mappingHelper.BuildReferencesPageAsync<Industry>(content.OriginalIndustries, x => x.MetadataTitle, cancellationToken);
         var businessLines = await _mappingHelper.BuildReferencesPageAsync<BusinessLine>(content.OriginalServiceLines, x => x.MetadataTitle, cancellationToken);
-        var businessLine= businessLines.FirstOrDefault();
-        //var insightAttachment = await _mappingHelper.BuildContentItemAssetFromExistingAttachmentAsync(content.InsightAttachment, cancellationToken);
 
         var imageFile = new List<ContentItemReference>();
         foreach (var image in content.ImageFile)
@@ -845,7 +843,7 @@ public class InsightCrudService : IInsightCrudService
             { nameof(CopyInsight.OriginalSiteGuid), content.OriginalSiteGuid ?? string.Empty},
             { nameof(CopyInsight.OriginalDocumentAttachmentType), content.OriginalDocumentAttachmentType ?? string.Empty},
             { nameof(CopyInsight.OriginalIndustries), industries },
-            { nameof(CopyInsight.OriginalServiceLines), businessLine },
+            { nameof(CopyInsight.OriginalServiceLines), businessLines },
             { nameof(CopyInsight.OriginalInvolvedCountriesAll), content.OriginalInvolvedCountriesAll },
             { nameof(CopyInsight.OriginalInvolvedCountries), content.OriginalInvolvedCountries },
             { nameof(CopyInsight.OriginalDocumentOwnerOptOut), content.OriginalDocumentOwnerOptOut },
@@ -860,11 +858,6 @@ public class InsightCrudService : IInsightCrudService
             { nameof(CopyInsight.ImageFile), imageFile },
             { nameof(CopyInsight.ImageFileAltText), content.ImageFileAltText ?? string.Empty },
         };
-
-        //if (insightAttachment is not null)
-        //{
-        //    itemDataDict[nameof(CopyInsight.InsightAttachment)] = insightAttachment;
-        //}
 
         return new ContentItemData(itemDataDict);
     }
