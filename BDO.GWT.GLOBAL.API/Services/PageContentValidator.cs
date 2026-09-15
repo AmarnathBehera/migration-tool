@@ -168,6 +168,25 @@ public class PageContentValidator : IPageContentValidator
             FieldDataType.Integer => ValidateIntegerFieldDataType(field, controlName, value),
             FieldDataType.LongText => ValidateLongTextFieldDataType(field, controlName, value),
             FieldDataType.Text => ValidateTextFieldDataType(field, controlName, value),
+            FieldDataType.RichTextHTML => ValidateTextFieldDataType(field, controlName, value),
+            FieldDataType.ContentItemAsset => value switch
+            {
+                null => ValidateAndNormalizeString(field, null, DoNothing),
+                string s => ValidateAndNormalizeString(field, s, DoNothing),
+                IEnumerable<string> list => list
+                    .Select(v => ValidateAndNormalizeString(field, v, DoNothing))
+                    .ToList(),
+                _ => throw new ArgumentException(
+                    $"Validation for field data type '{field.DataType}' is not implemented, value type was '{value.GetType().FullName}'."),
+            },
+            FieldDataType.ObjectCodeNames => value switch
+            {
+                null => ValidateAndNormalizeMultipleValues(field, (List<string>?)null, DoNothing),
+                List<string> list => ValidateAndNormalizeMultipleValues(field, list, DoNothing),
+                IEnumerable<string> enumerable => ValidateAndNormalizeMultipleValues(field, enumerable.ToList(), DoNothing),
+                _ => throw new ArgumentException(
+                    $"Validation for field data type '{field.DataType}' is not implemented, value type was '{value.GetType().FullName}'."),
+            },
             FieldDataType.ContentItemReference => value switch
             {
                 string s => ValidateContentItemReferenceFieldDataType(field, controlName, s),
@@ -187,6 +206,8 @@ public class PageContentValidator : IPageContentValidator
                 _ => throw new ArgumentException(
                     $"Validation for field data type '{field.DataType}' is not implemented, value type was '{value.GetType().FullName}'."),
             },
+            _ => throw new NotImplementedException(
+                $"Validation for field '{field.Name}' with data type '{field.DataType}' is not implemented."),
         };
     }
     private string? ValidateWebPagePathString(FormFieldInfo field, string controlName, string? value)
@@ -360,6 +381,8 @@ public class PageContentValidator : IPageContentValidator
             case "kentico.emailinput":
             case "kentico.numericinput":
             case "kentico.objectselector":
+            //RichTextHTML
+            case "kentico.administration.richtexteditor":
             // Admin dropdown selector stores a plain string value.
             case "kentico.administration.dropdownselector":
             // Custom SQL-driven dropdown stores a plain string value; its

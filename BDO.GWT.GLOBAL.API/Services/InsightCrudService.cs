@@ -25,7 +25,8 @@ public interface IInsightCrudService
     Task<ActionResult<PageOutput<InsightPageContent>>> CreatePageCultureVersionAsync(int channelId, Guid pageGUID, string? fromCulture, string? toCulture, InsightPageContent request, CancellationToken cancellationToken);
     Task<ActionResult<PageOutput<InsightPageContent>>> UpdatePageAsync(int channelId, Guid pageGUID, string? culture, InsightPageContent request, CancellationToken cancellationToken);
     Task DeletePageAsync(int channelId, Guid pageGUID, string? culture, bool deleteAllCultures, CancellationToken cancellationToken);
-}
+    Task<ActionResult<PageOutput<CopyInsightPageContent>>> CreateCopyInsightAsync(int channelId, string Culture, string workspaceName, CopyInsightPageContent input, CancellationToken cancellationToken);
+        }
 
 public class InsightCrudService : IInsightCrudService
 {
@@ -36,6 +37,8 @@ public class InsightCrudService : IInsightCrudService
     private readonly IInfoProvider<ChannelInfo> _channelInfoProvider;
     private readonly IWebPageManager _webPageManager;
     private readonly IMappingHelper _mappingHelper;
+    private readonly IContentItemManager _contentItemManager;
+    private readonly IContentQueryExecutor _contentQueryExecutor;
     private static readonly LanguageTag defaultCulture = LanguageTag.GB;
     private const string INSIGHT_CONTENT_TYPE = Insight.CONTENT_TYPE_NAME;
     private const string WEB_PAGE_GUID = "WebPageItemGUID";
@@ -50,12 +53,16 @@ public class InsightCrudService : IInsightCrudService
         IInfoProvider<ChannelInfo> channelInfoProvider,
         IWebPageManagerFactory webPageManagerFactory,
         IUserInfoProvider userInfoProvider,
-        IMappingHelper mappingHelper)
+        IMappingHelper mappingHelper,
+        IContentItemManagerFactory contentItemManagerFactory,
+        IContentQueryExecutor contentQueryExecutor)
 #pragma warning restore S107
     {
         UserInfo user = userInfoProvider.Get("administrator");
 
         _contentRetriever = contentRetriever;
+        _contentItemManager = contentItemManagerFactory.Create(user.UserID);
+        _contentQueryExecutor = contentQueryExecutor;
         _validationState = validationState;
         _cultureService = cultureService;
         _pageContentValidator = pageContentValidator;
@@ -63,7 +70,6 @@ public class InsightCrudService : IInsightCrudService
         _webPageManager = webPageManagerFactory.Create(websiteChannelContext.WebsiteChannelID == 0 ? 1 : websiteChannelContext.WebsiteChannelID, user.UserID);
         _mappingHelper = mappingHelper;
     }
-
     public async Task<ActionResult<IEnumerable<PageOutput<InsightPageContent>>>> GetInsightPagesAsync(int channelId, string? culture, bool? onlyPublished, CancellationToken cancellationToken)
     {
         try
@@ -557,6 +563,87 @@ public class InsightCrudService : IInsightCrudService
         }
     }
 
+    public async Task<ActionResult<PageOutput<CopyInsightPageContent>>> CreateCopyInsightAsync(int channelId, string culture, string workspaceName, CopyInsightPageContent request, CancellationToken cancellationToken)
+    {
+        if (request is null)
+        {
+            return new BadRequestResult();
+        }
+
+        try
+        {
+            var currentCulture = await _mappingHelper.ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+
+            if (string.IsNullOrEmpty(currentCulture.Locale))
+            {
+                throw new NotFoundException("Invalid culture specified");
+            }
+
+            var channel = await _channelInfoProvider.GetAsync(channelId);
+            if (string.IsNullOrEmpty(channel?.ChannelName))
+            {
+                throw new NotFoundException("Channel not found");
+            }
+
+            _pageContentValidator.ValidateAndNormalizePageContent(request);
+
+            _validationState.ThrowIfThereAreErrors();
+
+            // The content item display name shown in the admin UI
+            string displayName = request.Title ?? "New Copy Insight Created by API";
+
+            var itemData = await CreateCopyInsightItemData(request, channel.ChannelName, currentCulture.Locale, cancellationToken);
+
+            // CopyInsight is a reusable content item (not a web page), created the same way
+            // MediaFileCrudService creates ContentAttachment items.
+            var createParameters = new CreateContentItemParameters(
+                CopyInsight.CONTENT_TYPE_NAME,
+                null,
+                displayName,
+                currentCulture.Locale,
+                workspaceName);
+
+            int newContentItemId = await _contentItemManager.Create(createParameters, itemData, cancellationToken);
+
+            // Publish the newly created content item
+            if (!await _contentItemManager.TryPublish(newContentItemId, currentCulture.Locale, cancellationToken))
+            {
+                throw new NotFoundException("Failed to publish created copy insight");
+            }
+
+            // Retrieve the created content item and return it
+            var query = new ContentItemQueryBuilder()
+                .ForContentType(
+                    CopyInsight.CONTENT_TYPE_NAME,
+                    subQuery => subQuery
+                        .Where(w => w.WhereEquals(nameof(ContentItemFields.ContentItemID), newContentItemId))
+                        .TopN(1));
+
+            var createdResult = await _contentQueryExecutor.GetMappedResult<CopyInsight>(query, cancellationToken: cancellationToken);
+
+            var createdCopyInsight = createdResult?.FirstOrDefault();
+            return createdCopyInsight != null ? MapCopyInsightToPageOutput(createdCopyInsight, currentCulture.Locale) : new BadRequestResult();
+        }
+        catch (ValidationException ex)
+        {
+            // Surface the actual field-level errors once ValidationException's error
+            // collection shape is confirmed — placeholder using ex.Message for now.
+            return new UnprocessableEntityObjectResult(ex.Message);
+        }
+        catch (UnprocessableEntityException)
+        {
+            return new UnprocessableEntityObjectResult("One or more validation errors occurred.");
+        }
+        catch (NotFoundException ex)
+        {
+            return new NotFoundObjectResult(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return new ObjectResult(ex.Message) { StatusCode = StatusCodes.Status500InternalServerError };
+        }
+    }
+
     /// <summary>
     /// Builds the <see cref="ContentItemData"/> used to create or update an <see cref="Insight"/> page
     /// from the incoming API request. <paramref name="channelName"/> and <paramref name="culture"/> are
@@ -723,6 +810,126 @@ public class InsightCrudService : IInsightCrudService
             {
                 ShowInMenu = false,
                 ShowInSitemap = insight.IncludeInSitemap,
+            },
+        };
+    }
+
+    private async Task<ContentItemData> CreateCopyInsightItemData(CopyInsightPageContent content, string? channelName, string? culture, CancellationToken cancellationToken)
+    {
+        var industries = await _mappingHelper.BuildReferencesPageAsync<Industry>(content.OriginalIndustries, x => x.MetadataTitle, cancellationToken);
+        var businessLines = await _mappingHelper.BuildReferencesPageAsync<BusinessLine>(content.OriginalServiceLines, x => x.MetadataTitle, cancellationToken);
+        var businessLine= businessLines.FirstOrDefault();
+        //var insightAttachment = await _mappingHelper.BuildContentItemAssetFromExistingAttachmentAsync(content.InsightAttachment, cancellationToken);
+
+        var imageFile = new List<ContentItemReference>();
+        foreach (var image in content.ImageFile)
+        {
+            var imageReferences = await _mappingHelper.BuildContentAttachmentImageReferences(image, cancellationToken);
+            imageFile.AddRange(imageReferences);
+        }
+
+        var itemDataDict = new Dictionary<string, object>
+        {
+            { nameof(CopyInsight.Title), content.Title ?? string.Empty },
+            { nameof(CopyInsight.ShowInsightTitle), content.ShowInsightTitle },
+            { nameof(CopyInsight.Description), content.Description ?? string.Empty },
+            { nameof(CopyInsight.ShowInsightDescription), content.ShowInsightDescription },
+            { nameof(CopyInsight.InsightContent), content.InsightContent ?? string.Empty },
+            { nameof(CopyInsight.CallToActionPosition), content.CallToActionPosition ?? string.Empty },
+            { nameof(CopyInsight.Attachments), content.Attachments ?? string.Empty },
+            { nameof(CopyInsight.DownloadButtonTitle), content.DownloadButtonTitle ?? string.Empty },
+            { nameof(CopyInsight.DownloadButtonText), content.DownloadButtonText ?? string.Empty },
+            { nameof(CopyInsight.Contentsharing), content.Contentsharing ?? string.Empty},
+            { nameof(CopyInsight.SharingOptOut), content.SharingOptOut },
+            { nameof(CopyInsight.SharingHeadline), content.SharingHeadline },
+            { nameof(CopyInsight.OriginalSiteGuid), content.OriginalSiteGuid ?? string.Empty},
+            { nameof(CopyInsight.OriginalDocumentAttachmentType), content.OriginalDocumentAttachmentType ?? string.Empty},
+            { nameof(CopyInsight.OriginalIndustries), industries },
+            { nameof(CopyInsight.OriginalServiceLines), businessLine },
+            { nameof(CopyInsight.OriginalInvolvedCountriesAll), content.OriginalInvolvedCountriesAll },
+            { nameof(CopyInsight.OriginalInvolvedCountries), content.OriginalInvolvedCountries },
+            { nameof(CopyInsight.OriginalDocumentOwnerOptOut), content.OriginalDocumentOwnerOptOut },
+            { nameof(CopyInsight.OriginalDocumentOwnerName), content.OriginalDocumentOwnerName ?? string.Empty},
+            { nameof(CopyInsight.OriginalDocumentOwnerEmail), content.OriginalDocumentOwnerEmail ?? string.Empty},
+            { nameof(CopyInsight.SharingSourceFirm), content.SharingSourceFirm ?? string.Empty},
+            { nameof(CopyInsight.SharingInstructions), content.SharingInstructions ?? string.Empty},
+            { nameof(CopyInsight.ShowCallToAction), content.ShowCallToAction },
+            { nameof(CopyInsight.CallToActionDescription), content.CallToActionDescription ?? string.Empty},
+            { nameof(CopyInsight.CallToActionButtonText), content.CallToActionButtonText ?? string.Empty },
+            { nameof(CopyInsight.CallToActionButtonUrl), content.CallToActionButtonUrl ?? string.Empty },
+            { nameof(CopyInsight.ImageFile), imageFile },
+            { nameof(CopyInsight.ImageFileAltText), content.ImageFileAltText ?? string.Empty },
+        };
+
+        //if (insightAttachment is not null)
+        //{
+        //    itemDataDict[nameof(CopyInsight.InsightAttachment)] = insightAttachment;
+        //}
+
+        return new ContentItemData(itemDataDict);
+    }
+
+    private static PageOutput<CopyInsightPageContent> MapCopyInsightToPageOutput(CopyInsight copyInsight, string culture)
+    {
+        return new PageOutput<CopyInsightPageContent>
+        {
+            General = new PageGeneralOutput
+            {
+                Name = copyInsight.SystemFields?.ContentItemName ?? string.Empty,
+                Culture = culture ?? string.Empty,
+                ContentItemGuid = copyInsight.SystemFields?.ContentItemGUID ?? Guid.Empty,
+                ContentItemID = copyInsight.SystemFields?.ContentItemID ?? 0,
+                //Path = copyInsight.SystemFields?.ContentItemTreePath ?? string.Empty
+            },
+            Content = new CopyInsightPageContent
+            {
+                Title = copyInsight.Title,
+                ShowInsightTitle = copyInsight.ShowInsightTitle,
+                Description = copyInsight.Description,
+                ShowInsightDescription = copyInsight.ShowInsightDescription,
+                InsightContent = copyInsight.InsightContent,
+                CallToActionPosition = copyInsight.CallToActionPosition,
+                Attachments = copyInsight.Attachments,
+                InsightAttachment = copyInsight.InsightAttachment?.Url,
+                DownloadButtonTitle = copyInsight.DownloadButtonTitle,
+                DownloadButtonText = copyInsight.DownloadButtonText,
+                Contentsharing = copyInsight.Contentsharing,
+                SharingOptOut = copyInsight.SharingOptOut,
+                SharingHeadline = copyInsight.SharingHeadline,
+                OriginalSiteGuid = copyInsight.OriginalSiteGuid,
+                OriginalDocumentAttachmentType = copyInsight.OriginalDocumentAttachmentType,
+                OriginalIndustries = copyInsight.OriginalIndustries?.Select(c => c.MetadataTitle).ToList() ?? new List<string>(),
+                OriginalServiceLines = copyInsight.OriginalServiceLines?.Select(c => c.MetadataTitle).ToList() ?? new List<string>(),
+                OriginalInvolvedCountriesAll = copyInsight.OriginalInvolvedCountriesAll,
+                OriginalInvolvedCountries = copyInsight.OriginalInvolvedCountries?.ToList() ?? new List<string>(),
+                OriginalDocumentOwnerOptOut = copyInsight.OriginalDocumentOwnerOptOut,
+                OriginalDocumentOwnerName = copyInsight.OriginalDocumentOwnerName,
+                OriginalDocumentOwnerEmail = copyInsight.OriginalDocumentOwnerEmail,
+                SharingSourceFirm = copyInsight.SharingSourceFirm,
+                SharingInstructions = copyInsight.SharingInstructions,
+                ShowCallToAction = copyInsight.ShowCallToAction,
+                CallToActionDescription = copyInsight.CallToActionDescription,
+                CallToActionButtonText = copyInsight.CallToActionButtonText,
+                CallToActionButtonUrl = copyInsight.CallToActionButtonUrl,
+                ImageFile = copyInsight.ImageFile?
+                    .Select(c => c.ContentAttachmentAsset?.Url)
+                    .Where(url => url is not null)
+                    .Select(url => url!)
+                    .ToList() ?? new List<string>(),
+                ImageFileAltText = copyInsight.ImageFileAltText,
+                PublishFrom = copyInsight.SystemFields?.ContentItemCommonDataFirstPublishedWhen,
+                PublishTo = copyInsight.SystemFields?.ContentItemCommonDataLastPublishedWhen,
+            },
+            Metadata = new PageMetadataOutput
+            {
+                PageTitle = new InheritableString { Value = copyInsight.Title ?? string.Empty },
+                PageDescription = new InheritableString { Value = copyInsight.Description ?? string.Empty },
+                PageKeywords = new InheritableString { Value = string.Empty },
+            },
+            Navigation = new PageNavigationOutput
+            {
+                ShowInMenu = false,
+                ShowInSitemap = false,
             },
         };
     }

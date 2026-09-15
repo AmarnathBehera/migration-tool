@@ -92,23 +92,39 @@ namespace BDO.GWT.GLOBAL.API.Helpers
         /// 
         Task<List<ContentItemReference>> BuildOrUpdateCopyInsightReferencesAsync(
             List<string>? items, CancellationToken cancellationToken);
+        Task<ContentItemAssetMetadataWithSource?> BuildContentItemAssetFromExistingAttachmentAsync(string? url, CancellationToken cancellationToken);
 
     }
 
     public class MappingHelper : IMappingHelper
     {
+        private const string DevelopmentLiveSiteHost = "localhost";
+        private const int DevelopmentLiveSitePort = 12393;
         private readonly IContentService _contentRetriever;
         private readonly ICultureService _cultureService;
         private readonly IWebsiteChannelContext _websiteChannelContext;
         private readonly IValidationState _validationState;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IWebHostEnvironment _hostEnvironment;
         private static readonly LanguageTag defaultCulture = LanguageTag.GB;
 
-        public MappingHelper(IContentService contentRetriever, ICultureService cultureService, IWebsiteChannelContext websiteChannelContext, IValidationState validationState)
+        public MappingHelper(
+        IContentService contentRetriever,
+        ICultureService cultureService,
+        IWebsiteChannelContext websiteChannelContext,
+        IValidationState validationState,
+        IHttpClientFactory httpClientFactory,
+        IHttpContextAccessor httpContextAccessor,
+        IWebHostEnvironment hostEnvironment)
         {
             _contentRetriever = contentRetriever;
             _cultureService = cultureService;
             _websiteChannelContext = websiteChannelContext;
             _validationState = validationState;
+            _httpClientFactory = httpClientFactory;
+            _httpContextAccessor = httpContextAccessor;
+            _hostEnvironment = hostEnvironment;
         }
 
         /// <summary>
@@ -712,6 +728,140 @@ namespace BDO.GWT.GLOBAL.API.Helpers
             }
 
             return result;
+        }
+        public async Task<ContentItemAssetMetadataWithSource?> BuildContentItemAssetFromExistingAttachmentAsync(string? url, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return null;
+            }
+
+            var value = url.Trim();
+
+            var attachments = await _contentRetriever.GetItemsAsync<ContentAttachment>(
+                builder => builder.Parameters(p => p.Where(w => w.WhereNotNull("ContentAttachmentAsset"))),
+                cancellationToken);
+
+            var match = Guid.TryParse(value, out var guid)
+                ? attachments.FirstOrDefault(a => a.SystemFields.ContentItemGUID == guid)
+                : attachments.FirstOrDefault(a => UrlsMatch(a.ContentAttachmentAsset?.Url, value));
+
+            var assetUrl = match?.ContentAttachmentAsset?.Url;
+            if (string.IsNullOrWhiteSpace(assetUrl))
+            {
+                return null;
+            }
+
+            var assetUri = BuildAssetUri(assetUrl);
+            if (assetUri is null)
+            {
+                return null;
+            }
+
+            var response = await _httpClientFactory.CreateClient().GetAsync(assetUri, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorBody = await response.Content.ReadAsStringAsync(cancellationToken);
+                throw new InvalidOperationException(
+                    $"Failed to download asset from '{assetUri}'. Status: {(int)response.StatusCode} {response.ReasonPhrase}. Body: {errorBody}");
+            }
+
+            var fileName = GetFileNameFromUrl(assetUrl);
+            var extension = System.IO.Path.GetExtension(fileName);
+            var nameWithoutExtension = extension.Length > 0 && fileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase)
+                ? fileName[..^extension.Length]
+                : fileName;
+
+            var tempPath = CreateSafeTempUploadPath();
+
+            try
+            {
+                await using (var fs = System.IO.File.Create(tempPath))
+                {
+                    await response.Content.CopyToAsync(fs, cancellationToken);
+                }
+
+                var fileInfo = new System.IO.FileInfo(tempPath);
+                var assetSource = new ContentItemAssetFileSource(tempPath, canMove: true);
+
+                return new ContentItemAssetMetadataWithSource(
+                    assetSource,
+                    nameWithoutExtension,
+                    extension,
+                    fileInfo.Length,
+                    DateTime.UtcNow);
+            }
+            finally
+            {
+                if (System.IO.File.Exists(tempPath))
+                {
+                    System.IO.File.Delete(tempPath);
+                }
+            }
+        }
+
+        private Uri? BuildAssetUri(string assetUrl)
+        {
+            if (Uri.TryCreate(assetUrl.Trim(), UriKind.Absolute, out var absoluteUri))
+            {
+                return absoluteUri;
+            }
+
+            var normalizedPath = NormalizePath(assetUrl);
+
+            if (_hostEnvironment.IsDevelopment())
+            {
+                return new UriBuilder(Uri.UriSchemeHttp, DevelopmentLiveSiteHost, DevelopmentLiveSitePort, normalizedPath).Uri;
+            }
+
+            var request = _httpContextAccessor.HttpContext?.Request;
+            if (request is null)
+            {
+                return null;
+            }
+
+            return new UriBuilder(request.Scheme, request.Host.Host, request.Host.Port ?? -1, normalizedPath).Uri;
+        }
+
+        private static string NormalizePath(string assetUrl)
+        {
+            var normalizedPath = assetUrl.Trim().TrimStart('~');
+            return normalizedPath.StartsWith('/') ? normalizedPath : $"/{normalizedPath}";
+        }
+
+        private static string GetFileNameFromUrl(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                return string.Empty;
+            }
+
+            var queryIndex = url.IndexOf('?');
+            if (queryIndex > 0)
+            {
+                url = url[..queryIndex];
+            }
+
+            return System.IO.Path.GetFileName(url);
+        }
+
+        private static string CreateSafeTempUploadPath()
+        {
+            var tempDirectory = System.IO.Path.Combine(AppContext.BaseDirectory, "App_Data", "Uploads", "Temp");
+            System.IO.Directory.CreateDirectory(tempDirectory);
+
+            var rootPath = System.IO.Path.GetFullPath(tempDirectory);
+            var tempFileName = System.IO.Path.ChangeExtension(System.IO.Path.GetRandomFileName(), ".tmp");
+            var candidatePath = System.IO.Path.Combine(rootPath, tempFileName);
+            var fullPath = System.IO.Path.GetFullPath(candidatePath);
+
+            if (!fullPath.StartsWith(rootPath + System.IO.Path.DirectorySeparatorChar, StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException("Invalid temporary file path.");
+            }
+
+            return fullPath;
         }
     }
 }
