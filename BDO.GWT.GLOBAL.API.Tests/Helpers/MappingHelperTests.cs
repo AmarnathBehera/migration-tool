@@ -39,18 +39,12 @@ public class MappingHelperTests
         _cultureServiceMock = new Mock<ICultureService>();
         _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
         _validationStateMock = new Mock<IValidationState>();
-        _httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
-        _webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
 
         _mappingHelper = new MappingHelper(
             _contentServiceMock.Object,
             _cultureServiceMock.Object,
             _websiteChannelContextMock.Object,
-            _validationStateMock.Object,
-            _httpClientFactoryMock.Object,
-            _httpContextAccessorMock.Object,
-            _webHostEnvironmentMock.Object);
+            _validationStateMock.Object);
     }
 
     private static MethodInfo GetPrivateStaticMethod(string name) =>
