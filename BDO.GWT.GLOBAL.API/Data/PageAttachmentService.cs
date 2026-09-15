@@ -12,18 +12,15 @@ namespace BDO.GWT.GLOBAL.API.Data
         private readonly IContentService _contentService;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IWebHostEnvironment _hostEnvironment;
 
         public PageAttachmentService(
             IContentService contentService,
             IHttpClientFactory httpClientFactory,
-            IHttpContextAccessor httpContextAccessor,
-            IWebHostEnvironment hostEnvironment)
+            IHttpContextAccessor httpContextAccessor)
         {
             _contentService = contentService;
             _httpClientFactory = httpClientFactory;
             _httpContextAccessor = httpContextAccessor;
-            _hostEnvironment = hostEnvironment;
         }
 
         public async Task<IEnumerable<ContentAttachment>> GetPageAttachmentsAsync(
@@ -108,11 +105,13 @@ namespace BDO.GWT.GLOBAL.API.Data
 
             var normalizedPath = NormalizePath(assetUrl);
 
-
             var request = _httpContextAccessor.HttpContext?.Request;
-            return request is null
-                ? null
-                : new Uri($"{request.Scheme}://{request.Host}{normalizedPath}");
+            if (request is null)
+            {
+                return null;
+            }
+
+            return new UriBuilder(request.Scheme, request.Host.Host, request.Host.Port ?? -1, normalizedPath).Uri;
         }
 
         private static IEnumerable<ContentAttachment> GetAttachmentsFromPage(IWebPageFieldsSource page)
@@ -140,7 +139,5 @@ namespace BDO.GWT.GLOBAL.API.Data
                 }
             }
         }
-
-
     }
 }
