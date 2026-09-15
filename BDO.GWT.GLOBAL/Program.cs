@@ -180,10 +180,10 @@ app.UseAuthentication();
 
 
 
-var isadminsite = builder.Configuration["IsAdminSite"];
+bool isadminsite = bool.Parse(builder.Configuration["IsAdminSite"]);
 if (!app.Environment.IsDevelopment())
 {
-    if (isadminsite.Equals(false))
+    if (!isadminsite)
     {
         app.UseWhen(
         context => !context.Request.Headers.UserAgent.ToString()
@@ -196,7 +196,7 @@ if (!app.Environment.IsDevelopment())
 
     app.UseHsts();
 }
-if (isadminsite.Equals(false))
+if (!isadminsite)
 {
     app.UseWhen(
     context => !context.Request.Headers.UserAgent.ToString().Contains("Edge Health Probe", StringComparison.OrdinalIgnoreCase),
