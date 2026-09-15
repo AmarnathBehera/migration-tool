@@ -118,15 +118,12 @@ public class MediaFileController : EntityControllerBase
     public async Task<ActionResult<MediaFileOutput>> CreateMediaFileAsync(
         [FromRoute] int memberFirmID,
         [FromRoute] string workspaceName,
-        [FromForm] MediaFileInput input,
+        [FromForm] AttachmentRequest input,
         CancellationToken cancellationToken)
     {
-        if (!TrySanitizeInput(input))
-        {
-            return BadRequest("Invalid file name.");
-        }
+       
 
-        var result = await _mediaFileCrudService.CreateMediaFileAsync(workspaceName, input, cancellationToken);
+        var result = await _mediaFileCrudService.CreateMediaFileAsync(workspaceName, input.File, cancellationToken);
 
         return CreatedAtRoute(
             "GetMediaFileByAttachmentGuid",
@@ -156,7 +153,7 @@ public class MediaFileController : EntityControllerBase
             return BadRequest("Invalid file name.");
         }
 
-        var result = await _mediaFileCrudService.UpdateMediaFileAsync(workspaceName, attachmentGuid, input, cancellationToken);
+        var result = await _mediaFileCrudService.UpdateMediaFileAsync(workspaceName, attachmentGuid, input.File, cancellationToken);
 
         return result is null
             ? NotFound()

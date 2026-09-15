@@ -156,10 +156,10 @@ public class MediaFileControllerTests
     public async Task CreateMediaFileAsync_ReturnsCreatedAtRouteWithPayloadAndRouteValues()
     {
         var createdGuid = Guid.NewGuid();
-        var input = new MediaFileInput
+        var input = new AttachmentRequest
         {
-            File = new FormFile(new MemoryStream([10, 11]), 0, 2, "File", "new.jpg"),
-            DisplayName = "Hero image"
+            Culture = "en-US",
+            File = new FormFile(new MemoryStream([10, 11]), 0, 2, "File", "new.jpg")
         };
 
         var expected = new MediaFileOutput
@@ -173,7 +173,7 @@ public class MediaFileControllerTests
         };
 
         _mediaFileCrudServiceMock
-            .Setup(x => x.CreateMediaFileAsync("Demo", input, It.IsAny<CancellationToken>()))
+            .Setup(x => x.CreateMediaFileAsync("Demo", input.File, It.IsAny<CancellationToken>()))
             .ReturnsAsync(expected);
 
         var result = await _controller.CreateMediaFileAsync(100, "Demo", input, CancellationToken.None);
@@ -191,7 +191,7 @@ public class MediaFileControllerTests
             Assert.That(created.RouteValues["attachmentGuid"], Is.EqualTo(createdGuid));
         });
 
-        _mediaFileCrudServiceMock.Verify(x => x.CreateMediaFileAsync("Demo", input, CancellationToken.None), Times.Once);
+        _mediaFileCrudServiceMock.Verify(x => x.CreateMediaFileAsync("Demo", input.File, CancellationToken.None), Times.Once);
     }
 
     [Test]
@@ -207,7 +207,11 @@ public class MediaFileControllerTests
         var expected = new MediaFileOutput { Id = 12, Guid = attachmentGuid, Path = "replace.png", MimeType = "image/png", Extension = ".png", Link = "~/getmedia/replace.png" };
 
         _mediaFileCrudServiceMock
-            .Setup(x => x.UpdateMediaFileAsync("Demo", attachmentGuid, input, It.IsAny<CancellationToken>()))
+            .Setup(x => x.UpdateMediaFileAsync(
+                "Demo",
+                attachmentGuid,
+                It.Is<IFormFile>(f => f.FileName == "replace.png"),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(expected);
 
         var result = await _controller.UpdateMediaFileAsync(100, "Demo", attachmentGuid, input, CancellationToken.None);
@@ -220,7 +224,11 @@ public class MediaFileControllerTests
             Assert.That(okResult.Value, Is.EqualTo(expected));
         });
 
-        _mediaFileCrudServiceMock.Verify(x => x.UpdateMediaFileAsync("Demo", attachmentGuid, input, CancellationToken.None), Times.Once);
+        _mediaFileCrudServiceMock.Verify(x => x.UpdateMediaFileAsync(
+            "Demo",
+            attachmentGuid,
+            It.Is<IFormFile>(f => f.FileName == "replace.png"),
+            CancellationToken.None), Times.Once);
     }
 
     [Test]
@@ -233,7 +241,11 @@ public class MediaFileControllerTests
         };
 
         _mediaFileCrudServiceMock
-            .Setup(x => x.UpdateMediaFileAsync("Demo", attachmentGuid, input, It.IsAny<CancellationToken>()))
+            .Setup(x => x.UpdateMediaFileAsync(
+                "Demo",
+                attachmentGuid,
+                It.Is<IFormFile>(f => f.FileName == "replace.png"),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync((MediaFileOutput?)null);
 
         var result = await _controller.UpdateMediaFileAsync(100, "Demo", attachmentGuid, input, CancellationToken.None);
@@ -244,25 +256,45 @@ public class MediaFileControllerTests
             Assert.That(result.Value, Is.Null);
         });
 
-        _mediaFileCrudServiceMock.Verify(x => x.UpdateMediaFileAsync("Demo", attachmentGuid, input, CancellationToken.None), Times.Once);
+        _mediaFileCrudServiceMock.Verify(x => x.UpdateMediaFileAsync(
+            "Demo",
+            attachmentGuid,
+            It.Is<IFormFile>(f => f.FileName == "replace.png"),
+            CancellationToken.None), Times.Once);
     }
 
     [Test]
-    public async Task CreateMediaFileAsync_WhenFileNameIsInvalid_ReturnsBadRequest()
+    public async Task CreateMediaFileAsync_WhenFileNameIsEmpty_ForwardsRequestToService()
     {
-        var input = new MediaFileInput
+        var createdGuid = Guid.NewGuid();
+        var input = new AttachmentRequest
         {
+            Culture = "en-US",
             File = new FormFile(new MemoryStream([7, 8]), 0, 2, "File", string.Empty)
         };
+
+        var expected = new MediaFileOutput
+        {
+            Id = 13,
+            Guid = createdGuid,
+            Path = string.Empty,
+            MimeType = "application/octet-stream",
+            Extension = string.Empty,
+            Link = "~/getmedia/"
+        };
+
+        _mediaFileCrudServiceMock
+            .Setup(x => x.CreateMediaFileAsync("Demo", input.File, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expected);
 
         var result = await _controller.CreateMediaFileAsync(100, "Demo", input, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
-            Assert.That(result.Result, Is.InstanceOf<BadRequestObjectResult>());
+            Assert.That(result.Result, Is.InstanceOf<CreatedAtRouteResult>());
         });
 
-        _mediaFileCrudServiceMock.VerifyNoOtherCalls();
+        _mediaFileCrudServiceMock.Verify(x => x.CreateMediaFileAsync("Demo", input.File, CancellationToken.None), Times.Once);
     }
 
     [Test]
@@ -281,7 +313,7 @@ public class MediaFileControllerTests
             .Setup(x => x.UpdateMediaFileAsync(
                 "Demo",
                 attachmentGuid,
-                It.Is<MediaFileInput>(m => m.File.FileName == "replace.png" && m.DisplayName == "Replacement"),
+                It.Is<IFormFile>(f => f.FileName == "replace.png"),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expected);
 
@@ -297,7 +329,7 @@ public class MediaFileControllerTests
         _mediaFileCrudServiceMock.Verify(x => x.UpdateMediaFileAsync(
             "Demo",
             attachmentGuid,
-            It.Is<MediaFileInput>(m => m.File.FileName == "replace.png" && m.DisplayName == "Replacement"),
+            It.Is<IFormFile>(f => f.FileName == "replace.png"),
             CancellationToken.None), Times.Once);
     }
 
