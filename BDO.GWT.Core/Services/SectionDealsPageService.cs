@@ -287,7 +287,8 @@ public class SectionDealsPageService : ISectionDealsPageService
         {
             return items
                 .OfType<Deal>()
-                .Select(x => x.DealCountry.Trim())
+                .Select(x => x.DealCountry?.Trim())
+                .Where(x => !string.IsNullOrWhiteSpace(x))
                 .Distinct()
                 .OrderByDescending(x => x)
                 .Select(x => FilterDtoUtility.CreateOptionDto(x, x))
