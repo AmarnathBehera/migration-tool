@@ -97,7 +97,10 @@ public class CustomGlobalLocationsServiceTests
 
         var ex = new GlobalLocationPersistenceException("failed", inner);
 
-        Assert.That(ex.Message, Is.EqualTo("failed"));
-        Assert.That(ex.InnerException, Is.SameAs(inner));
+        Assert.Multiple(() =>
+        {
+            Assert.That(ex.Message, Is.EqualTo("failed"));
+            Assert.That(ex.InnerException, Is.SameAs(inner));
+        });
     }
 }

@@ -339,6 +339,148 @@ public class InsightCrudServiceTests
             Assert.That(interfaceType.GetMethod("CreatePageCultureVersionAsync"), Is.Not.Null);
             Assert.That(interfaceType.GetMethod("UpdatePageAsync"), Is.Not.Null);
             Assert.That(interfaceType.GetMethod("DeletePageAsync"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("CreateCopyInsightAsync"), Is.Not.Null);
+        });
+    }
+
+    [Test]
+    public async Task CreateCopyInsightAsync_WithNullRequest_ReturnsBadRequest()
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        var result = await service.CreateCopyInsightAsync(
+            channelId: 1,
+            culture: "en-gb",
+            workspaceName: "KenticoDefault",
+            request: null!,
+            cancellationToken: CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
+    }
+
+    [Test]
+    public async Task CreateCopyInsightAsync_WhenDependenciesUnavailable_ReturnsInternalServerError()
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        var request = new CopyInsightPageContent
+        {
+            Title = "Copied Insight",
+            ImageFileAltText = "Alt text"
+        };
+
+        var result = await service.CreateCopyInsightAsync(
+            channelId: 1,
+            culture: "en-gb",
+            workspaceName: "KenticoDefault",
+            request: request,
+            cancellationToken: CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
+    }
+
+    [Test]
+    public void CopyInsightPageContent_DefaultValues_AreInitialized()
+    {
+        var content = new CopyInsightPageContent
+        {
+            Title = "T",
+            ImageFileAltText = "A"
+        };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(content.OriginalIndustries, Is.Empty);
+            Assert.That(content.OriginalServiceLines, Is.Empty);
+            Assert.That(content.OriginalInvolvedCountries, Is.Empty);
+            Assert.That(content.ImageFile, Is.Empty);
+            Assert.That(content.ShowInsightTitle, Is.False);
+            Assert.That(content.ShowInsightDescription, Is.False);
+            Assert.That(content.ShowCallToAction, Is.False);
+            Assert.That(content.SharingOptOut, Is.False);
+        });
+    }
+
+    [Test]
+    public void CopyInsightPageContent_Properties_CanBeSet()
+    {
+        var from = new DateTime(2024, 1, 1);
+        var to = new DateTime(2024, 12, 31);
+
+        var content = new CopyInsightPageContent
+        {
+            Title = "Copied Insight",
+            ShowInsightTitle = true,
+            Description = "A description",
+            ShowInsightDescription = true,
+            InsightContent = "<p>body</p>",
+            CallToActionPosition = "top",
+            DownloadButtonTitle = "Download",
+            DownloadButtonText = "Get it",
+            SharingOptOut = true,
+            SharingHeadline = true,
+            OriginalSiteGuid = Guid.NewGuid().ToString(),
+            OriginalInvolvedCountriesAll = true,
+            OriginalDocumentOwnerOptOut = true,
+            OriginalDocumentOwnerName = "Owner",
+            OriginalDocumentOwnerEmail = "owner@example.com",
+            ShowCallToAction = true,
+            CallToActionButtonText = "Click",
+            CallToActionButtonUrl = "https://example.com",
+            ImageFileAltText = "Alt text",
+            OriginalIndustries = ["ind1"],
+            OriginalServiceLines = ["sl1"],
+            OriginalInvolvedCountries = ["US"],
+            ImageFile = ["image.jpg"],
+            PublishFrom = from,
+            PublishTo = to,
+            RedirectOnUnpublish = "/redirect"
+        };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(content.Title, Is.EqualTo("Copied Insight"));
+            Assert.That(content.ShowInsightTitle, Is.True);
+            Assert.That(content.Description, Is.EqualTo("A description"));
+            Assert.That(content.ShowInsightDescription, Is.True);
+            Assert.That(content.InsightContent, Is.EqualTo("<p>body</p>"));
+            Assert.That(content.SharingOptOut, Is.True);
+            Assert.That(content.SharingHeadline, Is.True);
+            Assert.That(content.OriginalInvolvedCountriesAll, Is.True);
+            Assert.That(content.OriginalDocumentOwnerOptOut, Is.True);
+            Assert.That(content.OriginalDocumentOwnerEmail, Is.EqualTo("owner@example.com"));
+            Assert.That(content.ShowCallToAction, Is.True);
+            Assert.That(content.CallToActionButtonUrl, Is.EqualTo("https://example.com"));
+            Assert.That(content.ImageFileAltText, Is.EqualTo("Alt text"));
+            Assert.That(content.OriginalIndustries, Has.Count.EqualTo(1));
+            Assert.That(content.OriginalServiceLines, Has.Count.EqualTo(1));
+            Assert.That(content.OriginalInvolvedCountries, Has.Count.EqualTo(1));
+            Assert.That(content.ImageFile, Has.Count.EqualTo(1));
+            Assert.That(content.PublishFrom, Is.EqualTo(from));
+            Assert.That(content.PublishTo, Is.EqualTo(to));
+            Assert.That(content.RedirectOnUnpublish, Is.EqualTo("/redirect"));
+        });
+    }
+
+    [Test]
+    public void PageOutput_CopyInsightPageContent_CanBeConstructed()
+    {
+        var guid = Guid.NewGuid();
+        var content = new CopyInsightPageContent { Title = "T", ImageFileAltText = "A" };
+        var output = new PageOutput<CopyInsightPageContent>
+        {
+            General = new PageGeneralOutput { PageGuid = guid },
+            Content = content
+        };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(output.General.PageGuid, Is.EqualTo(guid));
+            Assert.That(output.Content, Is.SameAs(content));
         });
     }
 }

@@ -21,9 +21,6 @@ public class MappingHelperTests
     private Mock<ICultureService> _cultureServiceMock = null!;
     private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
     private Mock<IValidationState> _validationStateMock = null!;
-    private Mock<IHttpClientFactory> _httpClientFactoryMock = null!;
-    private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
-    private Mock<IWebHostEnvironment> _webHostEnvironmentMock = null!;
     private MappingHelper _mappingHelper = null!;
 
     private static readonly string[] WhitespaceIdentifiersWithNull = new[] { "", "   ", null! };
