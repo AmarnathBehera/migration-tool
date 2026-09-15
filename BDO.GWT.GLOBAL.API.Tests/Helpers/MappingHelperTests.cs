@@ -7,7 +7,10 @@ using CMS.ContentEngine;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Moq;
+using System.Net.Http;
 using System.Reflection;
 
 namespace BDO.GWT.GLOBAL.API.Tests.Helpers;
@@ -18,6 +21,9 @@ public class MappingHelperTests
     private Mock<ICultureService> _cultureServiceMock = null!;
     private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
     private Mock<IValidationState> _validationStateMock = null!;
+    private Mock<IHttpClientFactory> _httpClientFactoryMock = null!;
+    private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
+    private Mock<IWebHostEnvironment> _webHostEnvironmentMock = null!;
     private MappingHelper _mappingHelper = null!;
 
     private static readonly string[] WhitespaceIdentifiersWithNull = new[] { "", "   ", null! };
@@ -33,11 +39,18 @@ public class MappingHelperTests
         _cultureServiceMock = new Mock<ICultureService>();
         _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
         _validationStateMock = new Mock<IValidationState>();
+        _httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+        _webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+
         _mappingHelper = new MappingHelper(
             _contentServiceMock.Object,
             _cultureServiceMock.Object,
             _websiteChannelContextMock.Object,
-            _validationStateMock.Object);
+            _validationStateMock.Object,
+            _httpClientFactoryMock.Object,
+            _httpContextAccessorMock.Object,
+            _webHostEnvironmentMock.Object);
     }
 
     private static MethodInfo GetPrivateStaticMethod(string name) =>
