@@ -142,10 +142,28 @@ public class SectionDealsPageService : ISectionDealsPageService
 
     private async Task<FilterItemDto<OptionDto>[]> CreateDealsFiltersAsync(HashSet<string> filterParameterNames, CancellationToken cancellationToken)
     {
+        // Define the canonical order of filters (single source of truth)
+        // Filters are displayed in this order regardless of which are enabled/disabled
+        var canonicalFilterOrder = new[]
+        {
+            FilterParameterName.Industry,
+            FilterParameterName.SubIndustry,
+            FilterParameterName.DealType,
+            FilterParameterName.Year,
+            FilterParameterName.Country
+        };
+
         var filterItems = new List<FilterItemDto<OptionDto>>(filterParameterNames.Count);
 
-        foreach (var filterParameterName in filterParameterNames)
+        // Iterate in canonical order, adding only enabled filters
+        foreach (var filterParameterName in canonicalFilterOrder)
         {
+            // If this filter is not enabled, skip it
+            if (!filterParameterNames.Contains(filterParameterName))
+            {
+                continue;
+            }
+
             var filterParameterData = FilterUtility.GetFilterParameterData(filterParameterName);
 
             if (filterParameterData is null)
