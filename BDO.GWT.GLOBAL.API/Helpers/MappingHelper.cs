@@ -96,33 +96,22 @@ namespace BDO.GWT.GLOBAL.API.Helpers
 
     public class MappingHelper : IMappingHelper
     {
-        private const string DevelopmentLiveSiteHost = "localhost";
-        private const int DevelopmentLiveSitePort = 12393;
         private readonly IContentService _contentRetriever;
         private readonly ICultureService _cultureService;
         private readonly IWebsiteChannelContext _websiteChannelContext;
         private readonly IValidationState _validationState;
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IWebHostEnvironment _hostEnvironment;
         private static readonly LanguageTag defaultCulture = LanguageTag.GB;
 
         public MappingHelper(
         IContentService contentRetriever,
         ICultureService cultureService,
         IWebsiteChannelContext websiteChannelContext,
-        IValidationState validationState,
-        IHttpClientFactory httpClientFactory,
-        IHttpContextAccessor httpContextAccessor,
-        IWebHostEnvironment hostEnvironment)
+        IValidationState validationState)
         {
             _contentRetriever = contentRetriever;
             _cultureService = cultureService;
             _websiteChannelContext = websiteChannelContext;
             _validationState = validationState;
-            _httpClientFactory = httpClientFactory;
-            _httpContextAccessor = httpContextAccessor;
-            _hostEnvironment = hostEnvironment;
         }
 
         /// <summary>

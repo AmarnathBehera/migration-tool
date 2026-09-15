@@ -1,5 +1,5 @@
 using BDO.GWT.Common.Core.Exceptions;
-using BDO.GWT.Common.Core.Services;
+using BDO.GWT.Core.Exceptions;
 using BDO.GWT.GLOBAL.API.DTOs;
 using BDO.GWT.GLOBAL.API.Services;
 using Moq;
@@ -157,6 +157,52 @@ public class ScheduledTaskCrudServiceTests
         var result = await serviceMock.Object.GetScheduledTasksDtosAsync(CancellationToken.None);
 
         Assert.That(result, Is.Empty);
+    }
+
+    #endregion
+
+    #region ExecuteScheduledTaskAsync (interface behavior)
+
+    [Test]
+    public async Task ExecuteScheduledTaskAsync_Completes_WhenTaskExecutesSuccessfully()
+    {
+        var taskGuid = Guid.NewGuid();
+        var serviceMock = new Mock<IScheduledTaskCrudService>();
+        serviceMock
+            .Setup(x => x.ExecuteScheduledTaskAsync(taskGuid, It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        await serviceMock.Object.ExecuteScheduledTaskAsync(taskGuid, CancellationToken.None);
+
+        serviceMock.Verify(
+            x => x.ExecuteScheduledTaskAsync(taskGuid, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public void ExecuteScheduledTaskAsync_NotFound_ThrowsNotFoundException()
+    {
+        var missingGuid = Guid.NewGuid();
+        var serviceMock = new Mock<IScheduledTaskCrudService>();
+        serviceMock
+            .Setup(x => x.ExecuteScheduledTaskAsync(missingGuid, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new NotFoundException());
+
+        Assert.ThrowsAsync<NotFoundException>(
+            () => serviceMock.Object.ExecuteScheduledTaskAsync(missingGuid, CancellationToken.None));
+    }
+
+    [Test]
+    public void ExecuteScheduledTaskAsync_AlreadyRunning_ThrowsAlreadyRunningException()
+    {
+        var taskGuid = Guid.NewGuid();
+        var serviceMock = new Mock<IScheduledTaskCrudService>();
+        serviceMock
+            .Setup(x => x.ExecuteScheduledTaskAsync(taskGuid, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new ScheduledTaskIsAlreadyRunningException());
+
+        Assert.ThrowsAsync<ScheduledTaskIsAlreadyRunningException>(
+            () => serviceMock.Object.ExecuteScheduledTaskAsync(taskGuid, CancellationToken.None));
     }
 
     #endregion
