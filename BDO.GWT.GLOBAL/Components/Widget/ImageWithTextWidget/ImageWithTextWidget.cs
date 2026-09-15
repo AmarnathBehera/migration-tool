@@ -81,7 +81,7 @@ public class ImageWithTextWidget : ViewComponent
             return null;
         }
 
-        return await ResolvePageUrlAsync(buttonGuids.First())
+        return await ResolvePageUrlAsync(buttonGuids[0])
             ?? await ResolveAttachmentUrlAsync(properties.ButtonURL);
     }
 
