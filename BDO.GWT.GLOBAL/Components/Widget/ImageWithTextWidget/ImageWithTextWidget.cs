@@ -52,7 +52,7 @@ public class ImageWithTextWidget : ViewComponent
     }
 
     // Retrieves the URL of a ContentAttachment from a list of ContentItemReferences.
-    private async Task<string?> RetrieveAttachmentUrlAsync(IEnumerable<ContentItemReference> references)
+    private async Task<string> RetrieveAttachmentUrlAsync(IEnumerable<ContentItemReference> references)
     {
         if (references?.Any() != true)
         {
@@ -81,7 +81,7 @@ public class ImageWithTextWidget : ViewComponent
             return null;
         }
 
-        return await ResolvePageUrlAsync(buttonGuids.FirstOrDefault())
+        return await ResolvePageUrlAsync(buttonGuids.First())
             ?? await ResolveAttachmentUrlAsync(properties.ButtonURL);
     }
 
