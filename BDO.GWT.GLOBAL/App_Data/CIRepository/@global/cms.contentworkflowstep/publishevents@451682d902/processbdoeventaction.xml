@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentworkflowstep>
+  <ContentWorkflowStepDisplayName>Process BDO Event Action</ContentWorkflowStepDisplayName>
+  <ContentWorkflowStepGUID>f0f1fcd6-2b79-4a68-ae04-e5f93e731451</ContentWorkflowStepGUID>
+  <ContentWorkflowStepIconClass>xp-wizard-stick</ContentWorkflowStepIconClass>
+  <ContentWorkflowStepIsNotificationEnabled>True</ContentWorkflowStepIsNotificationEnabled>
+  <ContentWorkflowStepName>ProcessBDOEventAction</ContentWorkflowStepName>
+  <ContentWorkflowStepOrder>1</ContentWorkflowStepOrder>
+  <ContentWorkflowStepType>3</ContentWorkflowStepType>
+  <ContentWorkflowStepWorkflowID>
+    <CodeName>PublishEvents</CodeName>
+    <GUID>cc61c0fb-e6ea-46fb-9d6d-84f349bd7b2c</GUID>
+    <ObjectType>cms.contentworkflow</ObjectType>
+  </ContentWorkflowStepWorkflowID>
+</cms.contentworkflowstep>
