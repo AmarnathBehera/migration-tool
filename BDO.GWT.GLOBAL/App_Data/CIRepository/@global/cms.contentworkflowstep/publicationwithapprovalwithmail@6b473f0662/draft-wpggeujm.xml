@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentworkflowstep>
+  <ContentWorkflowStepDisplayName>Draft</ContentWorkflowStepDisplayName>
+  <ContentWorkflowStepGUID>99435082-c15e-4d97-ab5a-1a0f739a0fda</ContentWorkflowStepGUID>
+  <ContentWorkflowStepIconClass />
+  <ContentWorkflowStepIsNotificationEnabled>False</ContentWorkflowStepIsNotificationEnabled>
+  <ContentWorkflowStepName>Draft-wpggeujm</ContentWorkflowStepName>
+  <ContentWorkflowStepOrder>0</ContentWorkflowStepOrder>
+  <ContentWorkflowStepType>1</ContentWorkflowStepType>
+  <ContentWorkflowStepWorkflowID>
+    <CodeName>PublicationWithApprovalWithMail</CodeName>
+    <GUID>b60d25ab-04d6-4a42-bac1-10822d1330e5</GUID>
+    <ObjectType>cms.contentworkflow</ObjectType>
+  </ContentWorkflowStepWorkflowID>
+</cms.contentworkflowstep>

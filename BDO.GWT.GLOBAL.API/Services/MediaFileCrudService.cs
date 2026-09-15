@@ -161,7 +161,10 @@ public class MediaFileCrudService : IMediaFileCrudService
         }
 
         var request = _httpContextAccessor.HttpContext?.Request;
-        if (request is null)
+        if (request is null
+            || string.IsNullOrWhiteSpace(request.Scheme)
+            || !request.Host.HasValue
+            || string.IsNullOrWhiteSpace(request.Host.Host))
         {
             return null;
         }
@@ -312,75 +315,48 @@ public class MediaFileCrudService : IMediaFileCrudService
     private static readonly SearchValues<char> InvalidFileNameChars =
         SearchValues.Create(System.IO.Path.GetInvalidFileNameChars());
 
-    private static string GetSafeFileName(string? fileName)
+
+
+
+    public async Task<MediaFileOutput> CreateMediaFileAsync(string workspaceName, IFormFile file, CancellationToken cancellationToken)
     {
-        var value = fileName ?? string.Empty;
-        var separatorIndex = value.LastIndexOfAny(['/', '\\']);
-        return separatorIndex >= 0 ? value[(separatorIndex + 1)..] : value;
-    }
-
-    private static string GetSafeExtension(string fileName)
-    {
-        var extension = System.IO.Path.GetExtension(fileName ?? string.Empty);
-
-        if (string.IsNullOrWhiteSpace(extension))
-        {
-            return string.Empty;
-        }
-
-        if (extension.AsSpan().IndexOfAny(UnsafeExtensionChars) >= 0)
-        {
-            return string.Empty;
-        }
-
-        return extension;
-    }
-
-
-    public async Task<MediaFileOutput> CreateMediaFileAsync(string workspaceName, MediaFileInput input, CancellationToken cancellationToken)
-    {
-        // Sanitize user-supplied filename: take only the base file name to prevent path traversal
-        var fileName = GetSafeFileName(input.File.FileName);
-        var extension = GetSafeExtension(fileName);
-        var displayName = input.DisplayName ?? System.IO.Path.GetFileNameWithoutExtension(fileName);
-
         var languageName = await GetDefaultLanguageNameAsync(cancellationToken);
         var user = await _userInfoProvider.GetAsync("administrator", cancellationToken);
         var manager = _contentItemManagerFactory.Create(user.UserID);
 
-        var assetSource = new ContentItemAssetStreamSource(ct => Task.FromResult<Stream>(input.File.OpenReadStream()));
-        var assetMetadata = new ContentItemAssetMetadataWithSource(
-            assetSource,
-            fileName,
-            extension,
-            input.File.Length,
-            DateTime.UtcNow);
+        int createdContentItemId = await WithUploadedAssetMetadataAsync(
+            file,
+            async assetMetadata =>
+            {
+                var createItemData = CreateContentItemData(assetMetadata);
 
-        var createItemData = new ContentItemData(new Dictionary<string, object>
-        {
-            { nameof(ContentAttachment.ContentAttachmentAsset), assetMetadata }
-        });
+                var attachmentParameters = new CreateContentItemParameters(
+                    ContentAttachment.CONTENT_TYPE_NAME,
+                    assetMetadata.Name,
+                    assetMetadata.Name,
+                    languageName,
+                    workspaceName)
+                {
+                    VersionStatus = VersionStatus.Published
+                };
 
-        var attachmentParameters = new CreateContentItemParameters(
-            ContentAttachment.CONTENT_TYPE_NAME,
-            fileName,
-            fileName,
-            languageName,
-            "KenticoDefault")
-        {
-            VersionStatus = VersionStatus.Published
-        };
-
-        int createdContentItemId = await manager.Create(attachmentParameters, createItemData, cancellationToken);
+                return await manager.Create(attachmentParameters, createItemData, cancellationToken);
+            },
+            cancellationToken);
 
         await manager.TryPublish(createdContentItemId, languageName, cancellationToken);
 
         var created = await GetMediaFileByIdAsync(createdContentItemId, cancellationToken);
-        return created!;
+        if (created is null)
+        {
+            throw new InvalidOperationException("Media file was created but could not be retrieved.");
+        }
+
+        return created;
     }
 
 
-    public async Task<MediaFileOutput?> UpdateMediaFileAsync(string workspaceName, Guid attachmentGuid, MediaFileInput input, CancellationToken cancellationToken)
+    public async Task<MediaFileOutput?> UpdateMediaFileAsync(string workspaceName, Guid attachmentGuid, IFormFile file, CancellationToken cancellationToken)
     {
         var target = await GetMediaFileTargetAsync(attachmentGuid, cancellationToken);
         if (target is null)
@@ -388,26 +364,14 @@ public class MediaFileCrudService : IMediaFileCrudService
             return null;
         }
 
-        // Sanitize user-supplied filename: take only the base file name to prevent path traversal
-        var fileName = GetSafeFileName(input.File.FileName);
-        var extension = GetSafeExtension(fileName);
-
         var languageName = await GetDefaultLanguageNameAsync(cancellationToken);
         var user = await _userInfoProvider.GetAsync("administrator", cancellationToken);
         var manager = _contentItemManagerFactory.Create(user.UserID);
 
-        var assetSource = new ContentItemAssetStreamSource(ct => Task.FromResult<Stream>(input.File.OpenReadStream()));
-        var assetMetadata = new ContentItemAssetMetadataWithSource(
-            assetSource,
-            fileName,
-            extension,
-            input.File.Length,
-            DateTime.UtcNow);
-
-        var itemData = new ContentItemData(new Dictionary<string, object>
-        {
-            { nameof(ContentAttachment.ContentAttachmentAsset), assetMetadata }
-        });
+        var itemData = await WithUploadedAssetMetadataAsync(
+            file,
+            assetMetadata => Task.FromResult(CreateContentItemData(assetMetadata)),
+            cancellationToken);
 
         await manager.TryCreateDraft(target.ContentItemId, languageName, cancellationToken);
         await manager.TryUpdateDraft(target.ContentItemId, languageName, itemData, cancellationToken);
@@ -440,6 +404,24 @@ public class MediaFileCrudService : IMediaFileCrudService
         {
             [nameof(ContentAttachment.ContentAttachmentAsset)] = assetMetadata
         });
+    }
+
+    private static string GetSafeFileName(string? fileName)
+    {
+        var value = fileName ?? string.Empty;
+        var separatorIndex = value.LastIndexOfAny(['/', '\\']);
+        return separatorIndex >= 0 ? value[(separatorIndex + 1)..] : value;
+    }
+
+    private static string GetSafeExtension(string fileName)
+    {
+        var extension = System.IO.Path.GetExtension(fileName);
+        if (extension.AsSpan().IndexOfAny(UnsafeExtensionChars) >= 0)
+        {
+            throw new InvalidOperationException("Invalid file extension.");
+        }
+
+        return extension;
     }
 
     private static string CreateSafeTempUploadPath()
@@ -476,11 +458,6 @@ public class MediaFileCrudService : IMediaFileCrudService
         // Sanitize user-supplied filename: take only the base file name to prevent path traversal
         var fileName = GetSafeFileName(file.FileName);
         var extension = GetSafeExtension(fileName);
-        // Derive display name without extension using string trimming — avoids Path API on user data
-        var nameWithoutExtension = extension.Length > 0 && fileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase)
-            ? fileName[..^extension.Length]
-            : fileName;
-
         var tempPath = CreateSafeTempUploadPath();
 
         try

@@ -6,10 +6,17 @@
     <ObjectType>cms.contentworkflow</ObjectType>
   </Parent>
   <Bindings>
-    <Binding id="cms.contenttype_BDO.SectionCareers">
+    <Binding id="cms.contenttype_BDO.CopyInsight">
       <ContentWorkflowContentTypeContentTypeID>
-        <CodeName>BDO.SectionCareers</CodeName>
-        <GUID>7de84a06-569a-4dac-b701-55df640a4a49</GUID>
+        <CodeName>BDO.CopyInsight</CodeName>
+        <GUID>4ce005da-7a7f-4d90-9465-fb743e9a943f</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </ContentWorkflowContentTypeContentTypeID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.Insight">
+      <ContentWorkflowContentTypeContentTypeID>
+        <CodeName>BDO.Insight</CodeName>
+        <GUID>afb8b736-7f16-4a85-ab17-081c7833188c</GUID>
         <ObjectType>cms.contenttype</ObjectType>
       </ContentWorkflowContentTypeContentTypeID>
     </Binding>
