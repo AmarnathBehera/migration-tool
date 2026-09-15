@@ -183,7 +183,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
                 .ReturnsAsync(["test-page"]);
 
             _contentServiceMock
-                .Setup(x => x.EnsureAbsoluteUrl("/test-page"))
+                .Setup(x => x.EnsureAbsoluteUrl("test-page"))
                 .Returns("https://example.com/test-page");
 
             var props = new ImageWithTextWidgetProperties
@@ -290,7 +290,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
                 .ReturnsAsync(["test-page"]);
 
             _contentServiceMock
-                .Setup(x => x.EnsureAbsoluteUrl("/test-page"))
+                .Setup(x => x.EnsureAbsoluteUrl("test-page"))
                 .Returns("https://example.com/test-page");
 
             var props = new ImageWithTextWidgetProperties
@@ -308,7 +308,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as ImageWithTextData;
 
             _contentServiceMock.Verify(x => x.GetCurrentLanguage(), Times.Once);
-            _contentServiceMock.Verify(x => x.EnsureAbsoluteUrl("/test-page"), Times.Once);
+            _contentServiceMock.Verify(x => x.EnsureAbsoluteUrl("test-page"), Times.Once);
             _contentServiceMock.Verify(x => x.RetrieveButtonUrlAsync(
                 It.IsAny<IEnumerable<Guid>>(),
                 It.IsAny<string[]>()), Times.Never);
