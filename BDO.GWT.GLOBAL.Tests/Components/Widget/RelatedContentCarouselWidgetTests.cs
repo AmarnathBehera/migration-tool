@@ -49,7 +49,8 @@ public class RelatedContentCarouselWidgetTests
         // Default: carousel service returns an empty DTO
         _relatedContentCarouselServiceMock
             .Setup(x => x.GetRelatedContentCarouselDtoAsync(
-                It.IsAny<IWebPageFieldsSource>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<RelatedContentCarouselData>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new RelatedContentCarouselDto { FilteringTooltipEnabled = false });
