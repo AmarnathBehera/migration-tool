@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BDO.GWT.Core.DTOs.AzureCognitiveSearch.Models;
 using SearchDocument = BDO.GWT.Core.Entities.Search.SearchDocument;
+using System.Linq;
 
 namespace BDO.GWT.Core.Mappers
 {
@@ -15,20 +16,10 @@ namespace BDO.GWT.Core.Mappers
                     o => o.MapFrom(s => s.MetadataDescription))
                 .ForMember(d => d.Url,
                     o => o.MapFrom(s => s.NodeAliasPath))
-                .ForMember(
-                    d => d.PublishFrom,
-                    o => o.MapFrom(s =>
-                    s.PublishFrom.HasValue &&
-                    s.PublishFrom.Value > DateTimeOffset.MinValue
-                        ? s.PublishFrom.Value.UtcDateTime
-                        : (DateTime?)null))
-                .ForMember(
-                    d => d.PublishTo,
-                    o => o.MapFrom(s =>
-                    s.PublishTo.HasValue &&
-                    s.PublishTo.Value > DateTimeOffset.MinValue
-                        ? s.PublishTo.Value.UtcDateTime
-                        : (DateTime?)null))
+                .ForMember(d => d.PublishFrom,
+                    o => o.MapFrom(s => ToUtcDateTime(s.PublishFrom)))
+                .ForMember(d => d.PublishTo,
+                    o => o.MapFrom(s => ToUtcDateTime(s.PublishTo)))
                 .ForMember(d => d.ClassName,
                     o => o.MapFrom(s => s.ClassName))
                 .ForMember(d => d.DocumentID,
@@ -45,19 +36,10 @@ namespace BDO.GWT.Core.Mappers
                     o => o.MapFrom(s => s.InsightImageAltText))
                 .ForMember(d => d.SortDate,
                     o => o.MapFrom(s => s.SortDate))
-               .ForMember(
-                    d => d.EventDateFrom,
-                    o => o.MapFrom(s =>
-                    s.EventDateFrom.HasValue &&
-                    s.EventDateFrom.Value > DateTimeOffset.MinValue
-                        ? s.EventDateFrom.Value
-                        : (DateTime?)null))
+                .ForMember(d => d.EventDateFrom,
+                    o => o.MapFrom(s => ToDateTime(s.EventDateFrom)))
                 .ForMember(d => d.EventDateTo,
-                    o => o.MapFrom(s =>
-                         s.EventDateTo.HasValue &&
-                         s.EventDateTo.Value > DateTimeOffset.MinValue
-                            ? s.EventDateTo.Value
-                            : (DateTime?)null))
+                    o => o.MapFrom(s => ToDateTime(s.EventDateTo)))
                 .ForMember(d => d.EventLocationTitle,
                     o => o.MapFrom(s => s.EventLocationTitle))
                 .ForMember(d => d.EventLocationCity,
@@ -76,20 +58,10 @@ namespace BDO.GWT.Core.Mappers
                     o => o.MapFrom(s => FirstNotEmpty(s.MetadataDescription, s.DocumentPageDescription, s.DescriptionBody, s.Content)))
                 .ForMember(d => d.NodeAliasPath,
                     o => o.MapFrom(s => s.Url))
-                .ForMember(
-                  d => d.PublishFrom,
-                  o => o.MapFrom(s =>
-                  s.PublishFrom.HasValue &&
-                  s.PublishFrom.Value > DateTimeOffset.MinValue
-                  ? s.PublishFrom.Value.UtcDateTime
-                   : (DateTime?)null))
-                .ForMember(
-                 d => d.PublishTo,
-                 o => o.MapFrom(s =>
-                 s.PublishTo.HasValue &&
-                 s.PublishTo.Value > DateTimeOffset.MinValue
-                 ? s.PublishTo.Value.UtcDateTime
-                    : (DateTime?)null))
+                .ForMember(d => d.PublishFrom,
+                    o => o.MapFrom(s => ToUtcDateTime(s.PublishFrom)))
+                .ForMember(d => d.PublishTo,
+                    o => o.MapFrom(s => ToUtcDateTime(s.PublishTo)))
                 .ForMember(d => d.ClassName,
                     o => o.MapFrom(s => s.ClassName))
                 .ForMember(d => d.DocumentId,
@@ -100,27 +72,18 @@ namespace BDO.GWT.Core.Mappers
                     o => o.MapFrom(s => s.Content))
                 .ForMember(d => d.MetadataTitle,
                     o => o.MapFrom(s => FirstNotEmpty(s.MetadataTitle, s.DocumentPageTitle, s.DocumentName)))
-                 .ForMember(d => d.InsightImage,
+                .ForMember(d => d.InsightImage,
                     o => o.MapFrom(s => s.Image == null ? null : s.Image))
                 .ForMember(d => d.InsightImageAltText,
                     o => o.MapFrom(s => s.ImageAltText ?? string.Empty))
                 .ForMember(d => d.SortDate,
                     o => o.MapFrom(s => s.SortDate))
                 .ForMember(d => d.CreatedWhen,
-                    o => o.MapFrom(s => s.DocumentCreatedWhen.HasValue ? s.DocumentCreatedWhen.Value.UtcDateTime : DateTime.MinValue))
-               .ForMember(
-                  d => d.EventDateFrom,
-                  o => o.MapFrom(s =>
-                  s.EventDateFrom.HasValue &&
-                  s.EventDateFrom.Value > DateTimeOffset.MinValue
-                  ? s.EventDateFrom.Value.UtcDateTime
-                   : (DateTime?)null))
+                    o => o.MapFrom(s => ToUtcDateTimeOrMin(s.DocumentCreatedWhen)))
+                .ForMember(d => d.EventDateFrom,
+                    o => o.MapFrom(s => ToUtcDateTime(s.EventDateFrom)))
                 .ForMember(d => d.EventDateTo,
-                    o => o.MapFrom(s =>
-                         s.EventDateTo.HasValue &&
-                         s.EventDateTo.Value > DateTimeOffset.MinValue
-                         ? s.EventDateTo.Value.UtcDateTime
-                            : (DateTime?)null))
+                    o => o.MapFrom(s => ToUtcDateTime(s.EventDateTo)))
                 .ForMember(d => d.EventLocationTitle,
                     o => o.MapFrom(s => s.EventLocationTitle))
                 .ForMember(d => d.EventLocationCity,
@@ -133,10 +96,23 @@ namespace BDO.GWT.Core.Mappers
                     o => o.MapFrom(s => s.SysCulture));
         }
 
-        private static string? FirstNotEmpty(params string?[] values)
-        {
-            return values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
-        }
+        // Returns the UTC DateTime when the offset has a meaningful value; otherwise null.
+        private static DateTime? ToUtcDateTime(DateTimeOffset? value) =>
+            HasValue(value) ? value!.Value.UtcDateTime : null;
 
+        // Returns the raw DateTime (offset's local .Value) when meaningful; otherwise null.
+        private static DateTime? ToDateTime(DateTimeOffset? value) =>
+            HasValue(value) ? value!.Value.DateTime : null;
+
+        // Same as ToUtcDateTime but falls back to DateTime.MinValue instead of null.
+        private static DateTime ToUtcDateTimeOrMin(DateTimeOffset? value) =>
+            HasValue(value) ? value!.Value.UtcDateTime : DateTime.MinValue;
+
+        // Returns the first non-null/non-whitespace value, or null if none qualify.
+        private static string? FirstNotEmpty(params string?[] values) =>
+            values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
+
+        private static bool HasValue(DateTimeOffset? value) =>
+            value.HasValue && value.Value > DateTimeOffset.MinValue;
     }
 }
