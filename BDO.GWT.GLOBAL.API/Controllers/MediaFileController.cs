@@ -1,6 +1,5 @@
 using BDO.GWT.GLOBAL.API.Bases;
 using BDO.GWT.GLOBAL.API.Data;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Swashbuckle.AspNetCore.Annotations;
@@ -121,7 +120,7 @@ public class MediaFileController : EntityControllerBase
         [FromForm] AttachmentRequest input,
         CancellationToken cancellationToken)
     {
-       
+
 
         var result = await _mediaFileCrudService.CreateMediaFileAsync(workspaceName, input.File, cancellationToken);
 
@@ -145,12 +144,12 @@ public class MediaFileController : EntityControllerBase
         [FromRoute] int memberFirmID,
         [FromRoute] string workspaceName,
         [FromRoute] Guid attachmentGuid,
-        [FromForm] MediaFileInput input,
+        [FromForm] AttachmentRequest input,
         CancellationToken cancellationToken)
     {
-        if (!TrySanitizeInput(input))
+        if (input?.File is not null)
         {
-            return BadRequest("Invalid file name.");
+            input.File = SanitizeFile(input.File);
         }
 
         var result = await _mediaFileCrudService.UpdateMediaFileAsync(workspaceName, attachmentGuid, input.File, cancellationToken);
@@ -179,31 +178,20 @@ public class MediaFileController : EntityControllerBase
         return deleted ? NoContent() : NotFound();
     }
 
-    private static bool TrySanitizeInput(MediaFileInput input)
+    private static IFormFile SanitizeFile(IFormFile file)
     {
-        if (input?.File is null)
+        ArgumentNullException.ThrowIfNull(file);
+
+        var safeFileName = GetSafeFileName(file.FileName);
+        if (string.IsNullOrWhiteSpace(safeFileName) || safeFileName.AsSpan().IndexOfAny(UnsafeFileNameChars) >= 0)
         {
-            return false;
+            return file;
         }
 
-        var safeFileName = GetSafeFileName(input.File.FileName);
-        if (string.IsNullOrWhiteSpace(safeFileName))
+        return new FormFile(file.OpenReadStream(), 0, file.Length, file.Name, safeFileName)
         {
-            return false;
-        }
-
-        if (safeFileName.AsSpan().IndexOfAny(UnsafeFileNameChars) >= 0)
-        {
-            return false;
-        }
-
-        input.File = new FormFile(input.File.OpenReadStream(), 0, input.File.Length, input.File.Name, safeFileName)
-        {
-            Headers = input.File.Headers ?? new HeaderDictionary()
+            Headers = file.Headers ?? new HeaderDictionary()
         };
-        input.DisplayName = input.DisplayName?.Trim();
-
-        return true;
     }
 
     private static string GetSafeFileName(string? fileName)
