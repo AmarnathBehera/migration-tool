@@ -10,6 +10,7 @@ using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.Services;
 using CMS.Websites;
+using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 
 namespace BDO.GWT.Core.Services;
@@ -36,17 +37,21 @@ public class SectionPeoplePageService : ISectionPeoplePageService
     private readonly IContentService _contentRetriever;
     private readonly IPeopleCardsService _peopleCardsService;
     private readonly IFilteringHelper _filteringHelper;
+    private readonly IWebsiteChannelContext _websiteChannelContext;
 
     public SectionPeoplePageService(
         IContentService pageRetriever,
         IHeroService heroService,
         IPeopleCardsService peopleCardsService,
-        IFilteringHelper filteringHelper)
+        IFilteringHelper filteringHelper,
+        IWebsiteChannelContext websiteChannelContext
+        )
     {
         _contentRetriever = pageRetriever;
         _heroService = heroService;
         _peopleCardsService = peopleCardsService;
         _filteringHelper = filteringHelper;
+        _websiteChannelContext = websiteChannelContext;
     }
 
     public async Task<SectionPeopleDto> GetSectionPeoplePageDtoAsync(SectionPeoplePage page, CancellationToken cancellationToken)
@@ -89,19 +94,24 @@ public class SectionPeoplePageService : ISectionPeoplePageService
 
     public async Task<PaginationDto<PersonCardDto>> GetSectionPeoplePersonPaginationDtoAsync(Guid pageGuid, string language, CardsQuery cardsQuery, CancellationToken cancellationToken)
     {
+        var isPreview = _websiteChannelContext.IsPreview;
+
         var sectionPeople = (await _contentRetriever.GetPagesAsync<SectionPeoplePage>(
             new RetrievePagesParameters
             {
                 LanguageName = language,
-                UseLanguageFallbacks = false
+                UseLanguageFallbacks = isPreview,
+                IsForPreview = isPreview,
             },
-           query => query
-               .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
-               .Where(w => w.WhereEquals("ContentItemGUID", pageGuid)),
-           RetrievalCacheSettings.CacheDisabled,
-           cancellationToken
-       )).FirstOrDefault();
-
+            query => query
+                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
+                .Where(w => w
+                    .WhereEquals("ContentItemGUID", pageGuid)
+                    .Or()
+                    .WhereEquals(nameof(IWebPageContentQueryDataContainer.WebPageItemGUID), pageGuid)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken
+        )).FirstOrDefault();
         if (sectionPeople is null)
         {
             throw new MissingSectionPageException($"'{nameof(SectionPeoplePage)} page with GUID '{pageGuid}' not found.");

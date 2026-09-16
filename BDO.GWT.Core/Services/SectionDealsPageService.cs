@@ -117,18 +117,24 @@ public class SectionDealsPageService : ISectionDealsPageService
 
     public async Task<PaginationDto<DealCardDto>> GetSectionDealsDealPaginationDtoAsync(string language,Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken)
     {
+        var isPreview = _websiteChannelContext.IsPreview;
+
         var sectionDeal = (await _contentRetriever.GetPagesAsync<SectionDeals>(
-            new RetrievePagesParameters
-            {
-                LanguageName = language,
-                UseLanguageFallbacks = false
-            },
-           query => query
-               .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
-               .Where(w => w.WhereEquals("ContentItemGUID", pageGuid)),
-           RetrievalCacheSettings.CacheDisabled,
-           cancellationToken
-       )).FirstOrDefault();
+             new RetrievePagesParameters
+             {
+                 LanguageName = language,
+                 UseLanguageFallbacks = isPreview,
+                 IsForPreview = isPreview,
+             },
+            query => query
+                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
+                .Where(w => w
+                    .WhereEquals("ContentItemGUID", pageGuid)
+                    .Or()
+                    .WhereEquals(nameof(IWebPageContentQueryDataContainer.WebPageItemGUID), pageGuid)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken
+        )).FirstOrDefault();
 
         if (sectionDeal is null)
         {
