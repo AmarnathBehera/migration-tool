@@ -178,7 +178,16 @@ public class MediaFileCrudService : IMediaFileCrudService
 
     private static string NormalizePath(string assetUrl)
     {
-        var normalizedPath = assetUrl.Trim().TrimStart('~');
+        const string virtualContextAssetMarker = "/-/";
+
+        var normalizedPath = assetUrl.Trim();
+        var markerIndex = normalizedPath.IndexOf(virtualContextAssetMarker, StringComparison.Ordinal);
+        if (markerIndex >= 0)
+        {
+            normalizedPath = normalizedPath[(markerIndex + virtualContextAssetMarker.Length)..];
+        }
+
+        normalizedPath = normalizedPath.TrimStart('~');
         return normalizedPath.StartsWith('/') ? normalizedPath : $"/{normalizedPath}";
     }
 

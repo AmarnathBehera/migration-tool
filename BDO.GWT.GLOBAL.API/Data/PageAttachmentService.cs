@@ -7,13 +7,15 @@ namespace BDO.GWT.GLOBAL.API.Data
 {
     public class PageAttachmentService : IPageAttachmentService
     {
+        private const string DevelopmentLiveSiteHost = "localhost";
+        private const int DevelopmentLiveSitePort = 12393;
+
         private static readonly FileExtensionContentTypeProvider ContentTypeProvider = new();
 
         private readonly IContentService _contentService;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebHostEnvironment _hostEnvironment;
-
         public PageAttachmentService(
             IContentService contentService,
             IHttpClientFactory httpClientFactory,
@@ -85,7 +87,16 @@ namespace BDO.GWT.GLOBAL.API.Data
 
         private static string NormalizePath(string assetUrl)
         {
-            var normalizedPath = assetUrl.Trim().TrimStart('~');
+            const string virtualContextAssetMarker = "/-/";
+
+            var normalizedPath = assetUrl.Trim();
+            var markerIndex = normalizedPath.IndexOf(virtualContextAssetMarker, StringComparison.Ordinal);
+            if (markerIndex >= 0)
+            {
+                normalizedPath = normalizedPath[(markerIndex + virtualContextAssetMarker.Length)..];
+            }
+
+            normalizedPath = normalizedPath.TrimStart('~');
             return normalizedPath.StartsWith('/') ? normalizedPath : $"/{normalizedPath}";
         }
 
@@ -101,18 +112,41 @@ namespace BDO.GWT.GLOBAL.API.Data
 
         private Uri? BuildAssetUri(string assetUrl)
         {
-            if (Uri.TryCreate(assetUrl.Trim(), UriKind.Absolute, out var absoluteAssetUri))
+            var trimmedAssetUrl = assetUrl.Trim();
+            if (Uri.TryCreate(trimmedAssetUrl, UriKind.Absolute, out var absoluteAssetUri)
+                && (absoluteAssetUri.Scheme == Uri.UriSchemeHttp || absoluteAssetUri.Scheme == Uri.UriSchemeHttps))
             {
                 return absoluteAssetUri;
             }
 
-            var normalizedPath = NormalizePath(assetUrl);
+            var normalizedPath = NormalizePath(trimmedAssetUrl);
+            var queryIndex = normalizedPath.IndexOf('?');
+            var path = queryIndex >= 0 ? normalizedPath[..queryIndex] : normalizedPath;
+            var query = queryIndex >= 0 ? normalizedPath[(queryIndex + 1)..] : string.Empty;
 
+            if (_hostEnvironment.IsDevelopment())
+            {
+                return new UriBuilder(Uri.UriSchemeHttp, DevelopmentLiveSiteHost, DevelopmentLiveSitePort)
+                {
+                    Path = path,
+                    Query = query
+                }.Uri;
+            }
 
             var request = _httpContextAccessor.HttpContext?.Request;
-            return request is null
-                ? null
-                : new Uri($"{request.Scheme}://{request.Host}{normalizedPath}");
+            if (request is null
+                || string.IsNullOrWhiteSpace(request.Scheme)
+                || !request.Host.HasValue
+                || string.IsNullOrWhiteSpace(request.Host.Host))
+            {
+                return null;
+            }
+
+            return new UriBuilder(request.Scheme, request.Host.Host, request.Host.Port ?? -1)
+            {
+                Path = path,
+                Query = query
+            }.Uri;
         }
 
         private static IEnumerable<ContentAttachment> GetAttachmentsFromPage(IWebPageFieldsSource page)
