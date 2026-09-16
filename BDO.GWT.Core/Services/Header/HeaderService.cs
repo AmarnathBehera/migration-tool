@@ -314,7 +314,7 @@ public class HeaderService : IHeaderService
                 Title = featured.Title ?? string.Empty,
                 Description = featured.Description ?? string.Empty,
                 URL = featured.TargetURL?.FirstOrDefault()?.GetUrl()?.RelativePath ?? string.Empty,
-                ImageURL = imageUrl,
+                ImageURL = imageUrl.TrimStart('~'),
                 ImageAltText = featured.ImageAltText,
             });
         }

@@ -1,3 +1,4 @@
+using BDO.GWT.Core.Exceptions;
 using BDO.GWT.GLOBAL.API.Controllers;
 using BDO.GWT.GLOBAL.API.DTOs;
 using BDO.GWT.GLOBAL.API.Services;
@@ -96,6 +97,32 @@ public class ScheduledTasksControllerTests
             Times.Once);
     }
 
+    [Test]
+    public void GetScheduledTasksAsync_ServiceThrows_PropagatesException()
+    {
+        _scheduledTaskCrudServiceMock
+            .Setup(x => x.GetScheduledTasksDtosAsync(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("boom"));
+
+        Assert.ThrowsAsync<InvalidOperationException>(
+            () => _controller.GetScheduledTasksAsync(CancellationToken.None));
+    }
+
+    [Test]
+    public async Task GetScheduledTasksAsync_PassesCancellationTokenToService()
+    {
+        using var cts = new CancellationTokenSource();
+        _scheduledTaskCrudServiceMock
+            .Setup(x => x.GetScheduledTasksDtosAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        await _controller.GetScheduledTasksAsync(cts.Token);
+
+        _scheduledTaskCrudServiceMock.Verify(
+            x => x.GetScheduledTasksDtosAsync(cts.Token),
+            Times.Once);
+    }
+
     #endregion
 
     #region GetScheduledTaskAsync
@@ -144,6 +171,63 @@ public class ScheduledTasksControllerTests
 
         Assert.ThrowsAsync<Exception>(
             () => _controller.GetScheduledTaskAsync(taskGuid, CancellationToken.None));
+    }
+
+    #endregion
+
+    #region ExecuteScheduledTaskAsync
+
+    [Test]
+    public async Task ExecuteScheduledTaskAsync_ReturnsAcceptedResult()
+    {
+        var taskGuid = Guid.NewGuid();
+        _scheduledTaskCrudServiceMock
+            .Setup(x => x.ExecuteScheduledTaskAsync(taskGuid, It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        var result = await _controller.ExecuteScheduledTaskAsync(taskGuid, CancellationToken.None);
+
+        Assert.That(result, Is.InstanceOf<AcceptedResult>());
+    }
+
+    [Test]
+    public async Task ExecuteScheduledTaskAsync_PassesGuidAndTokenToService()
+    {
+        using var cts = new CancellationTokenSource();
+        var taskGuid = Guid.NewGuid();
+        _scheduledTaskCrudServiceMock
+            .Setup(x => x.ExecuteScheduledTaskAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        await _controller.ExecuteScheduledTaskAsync(taskGuid, cts.Token);
+
+        _scheduledTaskCrudServiceMock.Verify(
+            x => x.ExecuteScheduledTaskAsync(taskGuid, cts.Token),
+            Times.Once);
+    }
+
+    [Test]
+    public void ExecuteScheduledTaskAsync_TaskAlreadyRunning_PropagatesException()
+    {
+        var taskGuid = Guid.NewGuid();
+        _scheduledTaskCrudServiceMock
+            .Setup(x => x.ExecuteScheduledTaskAsync(taskGuid, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new ScheduledTaskIsAlreadyRunningException());
+
+        Assert.ThrowsAsync<ScheduledTaskIsAlreadyRunningException>(
+            () => _controller.ExecuteScheduledTaskAsync(taskGuid, CancellationToken.None));
+    }
+
+    [Test]
+    public void ExecuteScheduledTaskAsync_TaskNotFound_PropagatesException()
+    {
+        var taskGuid = Guid.NewGuid();
+        _scheduledTaskCrudServiceMock
+            .Setup(x => x.ExecuteScheduledTaskAsync(taskGuid, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new Exception("Not found"));
+
+        Assert.ThrowsAsync<Exception>(
+            () => _controller.ExecuteScheduledTaskAsync(taskGuid, CancellationToken.None));
     }
 
     #endregion

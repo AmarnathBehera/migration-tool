@@ -292,6 +292,45 @@ public class PageAttachmentServiceTests
     }
 
     [Test]
+    public async Task GetPageAttachmentBinaryAsync_WhenAssetUrlIsVirtualContextWrapped_UsesInnerAssetPath()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+        var expectedBytes = new byte[] { 1, 2, 3 };
+        var asset = CreateAsset(
+            "/cmsctx/pm/token/lang/en-gb/wpid/72/cid/1/cdid/82/ts/1/readonly/0/h/hash/-/~/getContentAsset/5ed65831-9e46-4827-8011-d91f5c2e130e/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/file.pdf?language=en-gb",
+            "file.pdf",
+            ".pdf");
+        var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
+        SetupContentService(pageGuid, [page]);
+        SetupIsDevelopment(false);
+        SetupHttpContext("https", "mysite.com");
+
+        var content = new ByteArrayContent(expectedBytes);
+        content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
+
+        _httpMessageHandlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(request =>
+                    request.Method == HttpMethod.Get
+                    && request.RequestUri == new Uri("https://mysite.com/getContentAsset/5ed65831-9e46-4827-8011-d91f5c2e130e/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/file.pdf?language=en-gb")),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK) { Content = content });
+
+        var result = await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb");
+
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.Value.Data, Is.EqualTo(expectedBytes));
+            Assert.That(result.Value.ContentType, Is.EqualTo("application/pdf"));
+            Assert.That(result.Value.FileName, Is.EqualTo("file.pdf"));
+        });
+    }
+
+    [Test]
     public async Task GetPageAttachmentBinaryAsync_WhenSuccessful_ReturnsBinaryData()
     {
         var pageGuid = Guid.NewGuid();
@@ -368,6 +407,33 @@ public class PageAttachmentServiceTests
     }
 
     [Test]
+    public void BuildAssetUri_WhenDevelopmentAndRelativePath_UsesDevelopmentBaseUrl()
+    {
+        SetupIsDevelopment(true);
+
+        var result = (Uri?)typeof(PageAttachmentService)
+            .GetMethod("BuildAssetUri", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .Invoke(CreateSut(), ["~/media/file.pdf?language=en-gb"]);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.AbsoluteUri, Is.EqualTo("http://localhost:12393/media/file.pdf?language=en-gb"));
+    }
+
+    [Test]
+    public void BuildAssetUri_WhenVirtualContextWrappedPath_UsesInnerAssetPath()
+    {
+        SetupIsDevelopment(false);
+        SetupHttpContext("https", "mysite.com");
+
+        var result = (Uri?)typeof(PageAttachmentService)
+            .GetMethod("BuildAssetUri", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .Invoke(CreateSut(), ["/cmsctx/pm/token/lang/en-gb/wpid/72/cid/1/cdid/82/ts/1/readonly/0/h/hash/-/~/getContentAsset/5ed65831-9e46-4827-8011-d91f5c2e130e/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/file.pdf?language=en-gb"]);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.AbsoluteUri, Is.EqualTo("https://mysite.com/getContentAsset/5ed65831-9e46-4827-8011-d91f5c2e130e/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/file.pdf?language=en-gb"));
+    }
+
+    [Test]
     public async Task GetPageAttachmentBinaryAsync_UsesHttpContextWhenNoLiveSiteBaseUrl()
     {
         var pageGuid = Guid.NewGuid();
@@ -395,7 +461,7 @@ public class PageAttachmentServiceTests
     }
 
     [Test]
-    public void GetPageAttachmentBinaryAsync_WhenProductionHostIsMissing_ThrowsUriFormatException()
+    public async Task GetPageAttachmentBinaryAsync_WhenProductionHostIsMissing_ReturnsNull()
     {
         var pageGuid = Guid.NewGuid();
         var attachmentGuid = Guid.NewGuid();
@@ -413,7 +479,8 @@ public class PageAttachmentServiceTests
         mockHttpContext.Setup(c => c.Request).Returns(mockRequest.Object);
         _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(mockHttpContext.Object);
 
-        Assert.ThrowsAsync<UriFormatException>(async () =>
-            await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb"));
+        var result = await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb");
+
+        Assert.That(result, Is.Null);
     }
 }
