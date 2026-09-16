@@ -41,6 +41,36 @@ public class AuthoredContentService : IAuthoredContentService
             cancellationToken
         )).FirstOrDefault();
 
+        if (parent is null)
+        {
+           var blogParent = (await _contentService.GetPagesAsync<BlogContributors>(
+            new RetrievePagesParameters
+            {
+                LinkedItemsMaxLevel = 3,
+                LanguageName = _cultureContext.CurrentLanguageTag,
+                UseLanguageFallbacks = false,
+            },
+            query => query
+                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
+                .Where(w => w.WhereEquals("WebPageItemID", person.SystemFields.WebPageItemParentID)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken
+        )).FirstOrDefault();
+
+            if (blogParent is null || blogParent is not { ShowAuthoredBlogs: true })
+            {
+                return null;
+            }
+            var contentPageBlogCards = await GetPersonAuthoredBlogPosts(blogParent, person, cancellationToken);
+
+            return new AuthoredContentDto
+            {
+                Title = blogParent.AuthoredBlogTitle,
+                Description = blogParent.AuthoredBlogDescription,
+                BackgroundImageURL = blogParent.AuthoredBlogsBackgroundImageUrl?.FirstOrDefault()?.ContentAttachmentAsset.Url,
+                Items = contentPageBlogCards,
+            };
+        }
         if (parent is not { ShowAuthoredInsights: true })
         {
             return null;
@@ -55,6 +85,19 @@ public class AuthoredContentService : IAuthoredContentService
             BackgroundImageURL = parent.AuthoredInsightsBackgroundImageUrl?.FirstOrDefault()?.ContentAttachmentAsset.Url,
             Items = contentPageCards,
         };
+    }
+
+    private async Task<AuthoredContentCardDto[]> GetPersonAuthoredBlogPosts(BlogContributors blogContributors, Person person, CancellationToken cancellationToken)
+    {
+        var results = new[] {await GetPersonAuthoredBlogPostCardsAsync(person, cancellationToken) };
+
+        var authoredBlogCards = results
+            .SelectMany(cards => cards)
+            .ToArray();
+
+        var sortedAuthoredBlogCards = authoredBlogCards.OrderByDescending(x => x.Date).ToArray();
+
+        return sortedAuthoredBlogCards;
     }
     private async Task<AuthoredContentCardDto[]> GetPersonAuthoredContentAsync(
         SectionPeoplePage sectionPeoplePage,
@@ -80,7 +123,8 @@ public class AuthoredContentService : IAuthoredContentService
         if (displayedTypes.Contains(nameof(BlogPost)))
             tasks.Add(GetPersonAuthoredBlogPostCardsAsync(person, cancellationToken));
 
-        // Add INSIGHT here.
+        if (displayedTypes.Contains(nameof(Insight)))
+            tasks.Add(GetPersonAuthoredInsightCardsAsync(person, cancellationToken));
 
         var results = await Task.WhenAll(tasks);
 
@@ -211,6 +255,36 @@ public class AuthoredContentService : IAuthoredContentService
         return pages
             .Select(p => MapToCard(
                 contentType: "blogPost",
+                imageUrl: p.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+                imageAltText: p.MetadataTeaserImageAltText,
+                date: p.SystemFields.ContentItemCommonDataLastPublishedWhen
+                              ?? p.SystemFields.ContentItemCommonDataFirstPublishedWhen,
+                title: p.MetadataTitle,
+                description: p.MetadataDescription,
+                url: p.GetUrl().RelativePath))
+            .ToArray();
+    }
+    private async Task<AuthoredContentCardDto[]> GetPersonAuthoredInsightCardsAsync(
+        Person person,
+        CancellationToken cancellationToken)
+    {
+        var personGuid = person.SystemFields.ContentItemGUID.ToString();
+
+        var pages = (await _contentService.GetPagesAsync<Insight>(
+            new RetrievePagesParameters
+            {
+                LinkedItemsMaxLevel = 2,
+                LanguageName = _cultureContext.CurrentLanguageTag,
+                UseLanguageFallbacks = false,
+            },
+            query => query.Where(w => w.WhereContains(nameof(Insight.RelevantContactPerson), personGuid)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken
+        ))?.ToArray() ?? Array.Empty<Insight>();
+
+        return pages
+            .Select(p => MapToCard(
+                contentType: "insight",
                 imageUrl: p.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
                 imageAltText: p.MetadataTeaserImageAltText,
                 date: p.SystemFields.ContentItemCommonDataLastPublishedWhen
