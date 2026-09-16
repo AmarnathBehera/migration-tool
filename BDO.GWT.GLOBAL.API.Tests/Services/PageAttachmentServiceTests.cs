@@ -4,6 +4,7 @@ using CMS.ContentEngine;
 using CMS.Websites;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using Moq;
 using Moq.Protected;
 using System.Net;
@@ -20,6 +21,7 @@ public class PageAttachmentServiceTests
     private Mock<IHttpClientFactory> _httpClientFactoryMock = null!;
     private Mock<HttpMessageHandler> _httpMessageHandlerMock = null!;
     private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
+    private Mock<IWebHostEnvironment> _hostEnvironmentMock = null!;
 
     [SetUp]
     public void Setup()
@@ -34,12 +36,20 @@ public class PageAttachmentServiceTests
             .Returns(httpClient);
 
         _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+        _hostEnvironmentMock = new Mock<IWebHostEnvironment>();
+        SetupIsDevelopment(true);
     }
 
     private PageAttachmentService CreateSut() => new(
         _contentServiceMock.Object,
         _httpClientFactoryMock.Object,
-        _httpContextAccessorMock.Object);
+        _httpContextAccessorMock.Object,
+        _hostEnvironmentMock.Object);
+
+    private void SetupIsDevelopment(bool isDevelopment) =>
+        _hostEnvironmentMock
+            .Setup(x => x.EnvironmentName)
+            .Returns(isDevelopment ? Environments.Development : Environments.Production);
 
     // ── Helpers ────────────────────────────────────────────────────────────────
 

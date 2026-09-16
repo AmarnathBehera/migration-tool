@@ -13,15 +13,19 @@ namespace BDO.GWT.GLOBAL.API.Data
         private readonly IContentService _contentService;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private IWebHostEnvironment _hostEnvironment;
+
 
         public PageAttachmentService(
             IContentService contentService,
             IHttpClientFactory httpClientFactory,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IWebHostEnvironment hostEnvironment)
         {
             _contentService = contentService;
             _httpClientFactory = httpClientFactory;
             _httpContextAccessor = httpContextAccessor;
+            _hostEnvironment = hostEnvironment;
         }
 
         public async Task<IEnumerable<ContentAttachment>> GetPageAttachmentsAsync(
