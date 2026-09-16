@@ -34,8 +34,7 @@ namespace BDO.GWT.Core.Services
     public class SearchPageService(           
         ITypeMapper typeMapper,
         ISearchService searchService,   
-        ISearchCardHelper searchCardHelper,
-        IEventLogService eventLogService
+        ISearchCardHelper searchCardHelper       
 
             ) : ISearchPageService
     {
@@ -154,10 +153,7 @@ namespace BDO.GWT.Core.Services
                 q.Take(pageSize);
             }, cancellationToken);
 
-            var currentLanguageTag = currentLanguage;
-            // TEMP DEBUG - remove after diagnosis
-            eventLogService.LogInformation("SearchPageService", "GetSearchResultsAsync",
-                $"CurrentLanguageTag (query side): '{currentLanguageTag}'");
+            var currentLanguageTag = currentLanguage;            
 
             var existingDocuments = response.Documents.ToList();
 

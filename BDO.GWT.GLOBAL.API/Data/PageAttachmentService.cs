@@ -7,8 +7,6 @@ namespace BDO.GWT.GLOBAL.API.Data
 {
     public class PageAttachmentService : IPageAttachmentService
     {
-        private const string DevelopmentLiveSiteHost = "localhost";
-        private const int DevelopmentLiveSitePort = 12393;
         private static readonly FileExtensionContentTypeProvider ContentTypeProvider = new();
 
         private readonly IContentService _contentService;
@@ -110,18 +108,11 @@ namespace BDO.GWT.GLOBAL.API.Data
 
             var normalizedPath = NormalizePath(assetUrl);
 
-            if (_hostEnvironment.IsDevelopment())
-            {
-                return new UriBuilder(Uri.UriSchemeHttp, DevelopmentLiveSiteHost, DevelopmentLiveSitePort, normalizedPath).Uri;
-            }
 
             var request = _httpContextAccessor.HttpContext?.Request;
-            if (request is null)
-            {
-                return null;
-            }
-
-            return new UriBuilder(request.Scheme, request.Host.Host, request.Host.Port ?? -1, normalizedPath).Uri;
+            return request is null
+                ? null
+                : new Uri($"{request.Scheme}://{request.Host}{normalizedPath}");
         }
 
         private static IEnumerable<ContentAttachment> GetAttachmentsFromPage(IWebPageFieldsSource page)
@@ -149,5 +140,7 @@ namespace BDO.GWT.GLOBAL.API.Data
                 }
             }
         }
+
+
     }
 }

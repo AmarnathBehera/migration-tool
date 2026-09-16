@@ -15,18 +15,18 @@ namespace BDO.GWT.Core.LiveSite.Services;
 
 public interface IInsightCarouselService
 {
-    Task<InsightCarouselDto> GetInsightCarouselAsync<T>(
-        T currentPage,
+    Task<InsightCarouselDto> GetInsightCarouselAsync(
+        Guid currentPageGuid,
+        string pageTypeName,
         InsightCarouselData data,
-        CancellationToken cancellationToken)
-        where T : IWebPageFieldsSource;
+        CancellationToken cancellationToken);
 
-    Task<ICollection<ContentPageCardDto>> GetFilteredItemsAsync<T>(
-        T currentPage,
+    Task<ICollection<ContentPageCardDto>> GetFilteredItemsAsync(
+        Guid currentPageGuid,
+        string pageTypeName,
         HashSet<ContentItemReference> featuredGuids,
         CardsQuery query,
-        CancellationToken cancellationToken)
-        where T : IWebPageFieldsSource;
+        CancellationToken cancellationToken);
 
     Task<ICollection<ContentPageCardDto>> GetAPIFilteredItemsAsync(
         CardsQuery query,
@@ -59,13 +59,12 @@ public class InsightCarouselService : IInsightCarouselService
         _stateStore = stateStore;
     }
 
-    public async Task<InsightCarouselDto> GetInsightCarouselAsync<T>(
-        T currentPage,
+    public async Task<InsightCarouselDto> GetInsightCarouselAsync(
+        Guid currentPageGuid,
+        string pageTypeName,
         InsightCarouselData data,
         CancellationToken cancellationToken)
-        where T : IWebPageFieldsSource
     {
-        ArgumentNullException.ThrowIfNull(currentPage);
         ArgumentNullException.ThrowIfNull(data);
 
         var filters = data.FilteringEnabled
@@ -121,7 +120,8 @@ public class InsightCarouselService : IInsightCarouselService
                     cancellationToken),
 
             Items = await GetFilteredItemsAsync(
-                currentPage,
+                currentPageGuid,
+                pageTypeName,
                 featuredReferences,
                 new CardsQuery(),
                 cancellationToken),
@@ -145,29 +145,27 @@ public class InsightCarouselService : IInsightCarouselService
             TopMargin = data.TopMargin,
             BottomMargin = data.BottomMargin,
             WidgetID = data.WidgetID,
-            CurrentPageGuid = currentPage.SystemFields.ContentItemGUID,
-            PageType = currentPage.GetType().Name,
+            CurrentPageGuid = currentPageGuid,
+            PageType = pageTypeName,
             StateGUID = stateGuid
         };
 
         return dto;
     }
 
-    public async Task<ICollection<ContentPageCardDto>> GetFilteredItemsAsync<T>(
-        T currentPage,
+    public async Task<ICollection<ContentPageCardDto>> GetFilteredItemsAsync(
+        Guid currentPageGuid,
+        string pageTypeName,
         HashSet<ContentItemReference> featuredGuids,
         CardsQuery query,
         CancellationToken cancellationToken)
-        where T : IWebPageFieldsSource
     {
-        ArgumentNullException.ThrowIfNull(currentPage);
-
         featuredGuids ??= new HashSet<ContentItemReference>();
         query ??= new CardsQuery();
 
         return await BuildAndExecuteQueryAsync(
-            currentPage.SystemFields.ContentItemGUID.ToString(),
-            currentPage.GetType().Name,
+            currentPageGuid.ToString(),
+            pageTypeName,
             featuredGuids,
             query,
             null,

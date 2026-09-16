@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentworkflow>
+  <ContentWorkflowDisplayName>Publish Events</ContentWorkflowDisplayName>
+  <ContentWorkflowGUID>cc61c0fb-e6ea-46fb-9d6d-84f349bd7b2c</ContentWorkflowGUID>
+  <ContentWorkflowName>PublishEvents</ContentWorkflowName>
+</cms.contentworkflow>

@@ -45,7 +45,7 @@
         },
         Context.RequestAborted))
 
-@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).BuildEditableAreaAsync(Html,Context.RequestAborted))
+@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).BuildEditableAreaAsync(Html,Context.RequestAborted)
 
 @if (Model.Authors is not null)
 {
@@ -64,6 +64,6 @@
 }
 
 
-@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddIdentifier("bottomArea").BuildEditableAreaAsync(Html, Context.RequestAborted))
+@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddIdentifier("bottomArea").BuildEditableAreaAsync(Html, Context.RequestAborted)
 
 @PageBuilderService.GetPageBuilderScripts(Html)

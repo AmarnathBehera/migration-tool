@@ -317,7 +317,7 @@ Gated;Gated download
           <Script>select Email from cms_user;</Script>
         </settings>
       </field>
-      <field allowempty="true" column="SharingSourceFirm" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="531566c3-4027-4c87-acd1-b9fd9f406b55" visible="true">
+      <field allowempty="true" column="SharingSourceFirm" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="531566c3-4027-4c87-acd1-b9fd9f406b55">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Insight source country</fieldcaption>
@@ -327,9 +327,6 @@ Gated;Gated download
           <fielddescriptionashtml>False</fielddescriptionashtml>
           <includeintranslation>True</includeintranslation>
         </properties>
-        <settings>
-          <controlname>BDO.SQLDropdown</controlname>
-        </settings>
       </field>
       <field allowempty="true" column="SharingInstructions" columnprecision="0" columntype="longtext" enabled="true" guid="80bd49b8-6676-4b2f-ab74-5e9d83326159" visible="true">
         <properties>

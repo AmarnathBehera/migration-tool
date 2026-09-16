@@ -37,7 +37,7 @@
         {
             @Html.Raw(Model.EmbedCode)
         }
-        @if ((Model.FormType is "form"))
+        @if (Model.FormType is "form")
         {
             <input id="RequestVerificationToken" type="hidden" value="@Antiforgery.GetAndStoreTokens(Context).RequestToken"/>
             @(await ReactService.RenderComponentAsync(
@@ -45,7 +45,7 @@
                     ReactComponentType.SubscribeForm,
                     ReactComponentType.SubscribeFormGUID,
                     Model.SubscribeFormDto,
-                    Context.RequestAborted)) 
+                    Context.RequestAborted))
         }        
     </div>
     <div>

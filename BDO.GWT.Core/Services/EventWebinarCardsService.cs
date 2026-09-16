@@ -272,7 +272,7 @@ public class EventWebinarCardsService : IEventWebinarCardsService
                 
                 var firstEventType = eventOrWebinar.EventType?.FirstOrDefault();
                 var eventTypeName = firstEventType?.Name;
-
+                var calltoaction = firstEventType?.Calltoactiontext;
                 return new EventsWebinarsCardDto
                 {
                     IsFeatured = isFeatured(eventOrWebinar),
@@ -290,7 +290,7 @@ public class EventWebinarCardsService : IEventWebinarCardsService
                         : HtmlHelper.ExtractTextFromHtml(eventOrWebinar.MetadataDescription),
                     Link = new LinkItemDto
                     {
-                        Title = eventTypeName ?? string.Empty,
+                        Title = calltoaction ?? string.Empty,
                         URL = urlByGuid[eventOrWebinar.SystemFields.WebPageItemGUID],
                     },
                 };

@@ -97,6 +97,7 @@
             serviceCollection.AddScoped<IInsightCarouselService, InsightCarouselService>();
             serviceCollection.AddScoped<IInsightCarouselStateStore, InsightCarouselStateStore>();
             serviceCollection.AddScoped<IViewGlobalLocationsService, ViewGlobalLocationsService>();
+            serviceCollection.AddScoped<ITrendingTopicsCarouselService, TrendingTopicsCarouselService>();
 
             serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
             serviceCollection.AddScoped<IEventWebinarPageService, EventWebinarPageService>();

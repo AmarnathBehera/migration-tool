@@ -353,6 +353,20 @@ public class PageAttachmentServiceTests
         Assert.That(result!.Value.ContentType, Is.EqualTo(MediaTypeNames.Application.Octet));
     }
 
+
+    [Test]
+    public void BuildAssetUri_WhenProductionAndHttpContextMissing_ReturnsNull()
+    {
+        SetupIsDevelopment(false);
+        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns((HttpContext?)null);
+
+        var result = (Uri?)typeof(PageAttachmentService)
+            .GetMethod("BuildAssetUri", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .Invoke(CreateSut(), ["~/media/file.pdf"]);
+
+        Assert.That(result, Is.Null);
+    }
+
     [Test]
     public async Task GetPageAttachmentBinaryAsync_UsesHttpContextWhenNoLiveSiteBaseUrl()
     {
@@ -378,5 +392,28 @@ public class PageAttachmentServiceTests
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result!.Value.Data, Is.EqualTo(new byte[] { 1, 2, 3 }));
+    }
+
+    [Test]
+    public void GetPageAttachmentBinaryAsync_WhenProductionHostIsMissing_ThrowsUriFormatException()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+        var asset = CreateAsset("~/media/file.pdf", "file.pdf", ".pdf");
+        var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
+        SetupContentService(pageGuid, [page]);
+
+        SetupIsDevelopment(false);
+
+        var mockRequest = new Mock<HttpRequest>();
+        mockRequest.Setup(r => r.Scheme).Returns("https");
+        mockRequest.Setup(r => r.Host).Returns(default(HostString));
+
+        var mockHttpContext = new Mock<HttpContext>();
+        mockHttpContext.Setup(c => c.Request).Returns(mockRequest.Object);
+        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(mockHttpContext.Object);
+
+        Assert.ThrowsAsync<UriFormatException>(async () =>
+            await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb"));
     }
 }
