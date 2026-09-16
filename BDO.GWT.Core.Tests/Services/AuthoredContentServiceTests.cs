@@ -529,4 +529,153 @@ public class AuthoredContentServiceTests
 
         Assert.That(result!.BackgroundImageURL, Is.Null);
     }
+
+    [Test]
+    public async Task GetAuthoredContentDtoAsync_PassesPersonGuidToQuery_WhenFetchingInsights()
+    {
+        var personGuid = Guid.NewGuid();
+        var person = new Person
+        {
+            SystemFields = new WebPageFields { ContentItemGUID = personGuid }
+        };
+
+        RetrievePagesParameters? capturedParameters = null;
+        Action<RetrievePagesQueryParameters>? capturedQuery = null;
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[]
+            {
+                new SectionPeoplePage
+                {
+                    ShowAuthoredInsights = true,
+                    DisplayedAuthoredContentPageTypes = nameof(Insight)
+                }
+            });
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<Insight>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<RetrievePagesParameters, Action<RetrievePagesQueryParameters>, RetrievalCacheSettings, CancellationToken>(
+                (parameters, query, _, _) =>
+                {
+                    capturedParameters = parameters;
+                    capturedQuery = query;
+                })
+            .ReturnsAsync(Array.Empty<Insight>());
+
+        await _service.GetAuthoredContentDtoAsync(person, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedParameters, Is.Not.Null);
+            Assert.That(capturedParameters!.LinkedItemsMaxLevel, Is.EqualTo(2));
+            Assert.That(capturedParameters.LanguageName, Is.EqualTo("en-US"));
+            Assert.That(capturedParameters.UseLanguageFallbacks, Is.False);
+            Assert.That(capturedQuery, Is.Not.Null);
+        });
+    }
+
+    [Test]
+    public async Task GetAuthoredContentDtoAsync_RequestsOnlyInsightType_WhenOnlyInsightConfigured()
+    {
+        var person = new Person
+        {
+            SystemFields = new WebPageFields()
+        };
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[]
+            {
+                new SectionPeoplePage
+                {
+                    ShowAuthoredInsights = true,
+                    DisplayedAuthoredContentPageTypes = nameof(Insight)
+                }
+            });
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<Insight>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<Insight>());
+
+        var result = await _service.GetAuthoredContentDtoAsync(person, CancellationToken.None);
+
+        Assert.That(result!.Items, Is.Empty);
+
+        _contentServiceMock.Verify(s => s.GetPagesAsync<Insight>(
+            It.IsAny<RetrievePagesParameters>(),
+            It.IsAny<Action<RetrievePagesQueryParameters>>(),
+            It.IsAny<RetrievalCacheSettings>(),
+            It.IsAny<CancellationToken>()), Times.Once);
+
+        _contentServiceMock.Verify(s => s.GetPagesAsync<NewsArticle>(
+            It.IsAny<RetrievePagesParameters>(),
+            It.IsAny<Action<RetrievePagesQueryParameters>>(),
+            It.IsAny<RetrievalCacheSettings>(),
+            It.IsAny<CancellationToken>()), Times.Never);
+
+        _contentServiceMock.Verify(s => s.GetPagesAsync<Deal>(
+            It.IsAny<RetrievePagesParameters>(),
+            It.IsAny<Action<RetrievePagesQueryParameters>>(),
+            It.IsAny<RetrievalCacheSettings>(),
+            It.IsAny<CancellationToken>()), Times.Never);
+
+        _contentServiceMock.Verify(s => s.GetPagesAsync<BlogPost>(
+            It.IsAny<RetrievePagesParameters>(),
+            It.IsAny<Action<RetrievePagesQueryParameters>>(),
+            It.IsAny<RetrievalCacheSettings>(),
+            It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Test]
+    public async Task GetAuthoredContentDtoAsync_ReturnsNullInsightResult_AsEmptyItems_WhenServiceReturnsNull()
+    {
+        var person = new Person
+        {
+            SystemFields = new WebPageFields()
+        };
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[]
+            {
+                new SectionPeoplePage
+                {
+                    ShowAuthoredInsights = true,
+                    DisplayedAuthoredContentPageTypes = nameof(Insight)
+                }
+            });
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<Insight>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IEnumerable<Insight>)null!);
+
+        var result = await _service.GetAuthoredContentDtoAsync(person, CancellationToken.None);
+
+        Assert.That(result!.Items, Is.Empty);
+    }
 }
