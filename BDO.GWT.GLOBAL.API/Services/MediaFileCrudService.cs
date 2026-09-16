@@ -373,24 +373,6 @@ public class MediaFileCrudService : IMediaFileCrudService
         return extension;
     }
 
-    private static string CreateSafeTempUploadPath()
-    {
-        var tempDirectory = System.IO.Path.Combine(AppContext.BaseDirectory, "App_Data", "Uploads", "Temp");
-        System.IO.Directory.CreateDirectory(tempDirectory);
-
-        var rootPath = System.IO.Path.GetFullPath(tempDirectory);
-        var tempFileName = System.IO.Path.ChangeExtension(System.IO.Path.GetRandomFileName(), ".tmp");
-        var candidatePath = System.IO.Path.Combine(rootPath, tempFileName);
-        var fullPath = System.IO.Path.GetFullPath(candidatePath);
-
-        if (!fullPath.StartsWith(rootPath + System.IO.Path.DirectorySeparatorChar, StringComparison.Ordinal))
-        {
-            throw new InvalidOperationException("Invalid temporary file path.");
-        }
-
-        return fullPath;
-    }
-
     private static async Task<T> WithUploadedAssetMetadataAsync<T>(
         IFormFile file,
         Func<ContentItemAssetMetadataWithSource, Task<T>> action,

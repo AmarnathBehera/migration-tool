@@ -13,7 +13,7 @@ namespace BDO.GWT.GLOBAL.API.Data
         private readonly IContentService _contentService;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private IWebHostEnvironment _hostEnvironment;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
 
         public PageAttachmentService(
