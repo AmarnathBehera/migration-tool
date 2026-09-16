@@ -290,10 +290,11 @@ public class MediaFileCrudServiceTests
             }),
             CancellationToken.None);
 
-        Assert.That(result, Is.True);
-        Assert.That(captured, Is.Not.Null);
+
         Assert.Multiple(() =>
         {
+            Assert.That(result, Is.True);
+            Assert.That(captured, Is.Not.Null);
             Assert.That(GetMetadataPropertyValue(captured!, "Name"), Is.EqualTo("photo.png"));
             Assert.That(GetMetadataPropertyValue(captured!, "Extension"), Is.EqualTo(".png"));
             Assert.That(GetMetadataPropertyValue(captured!, "Size"), Is.EqualTo((long)fileBytes.Length));
