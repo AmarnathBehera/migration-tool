@@ -1,7 +1,17 @@
+using BDO.GWT.Core;
+using BDO.GWT.Core.Services;
+using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.GLOBAL.API.Data;
+using BDO.GWT.GLOBAL.API.DTOs;
+using BDO.GWT.GLOBAL.API.Helpers;
 using BDO.GWT.GLOBAL.API.Services;
+using CMS.ContentEngine;
+using CMS.DataEngine;
+using CMS.Websites;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -12,6 +22,292 @@ public class InsightCrudServiceTests
 {
     private static InsightCrudService CreateServiceWithoutConstructor() =>
         (InsightCrudService)RuntimeHelpers.GetUninitializedObject(typeof(InsightCrudService));
+
+    // ---- Mock-injected service setup ------------------------------------------------
+    // The real constructor resolves a Kentico UserInfo (an AbstractInfoBase) which triggers
+    // the CMS IoC container and fails outside a running CMS runtime. So the service is created
+    // without its constructor and the mocked dependencies are injected into the private fields.
+    private Mock<IContentService> _contentRetrieverMock = null!;
+    private Mock<IValidationState> _validationStateMock = null!;
+    private Mock<ICultureService> _cultureServiceMock = null!;
+    private Mock<IPageContentValidator> _pageContentValidatorMock = null!;
+    private Mock<IInfoProvider<ChannelInfo>> _channelInfoProviderMock = null!;
+    private Mock<IInfoByIdProvider<ChannelInfo>> _channelByIdProviderMock = null!;
+    private Mock<IWebPageManager> _webPageManagerMock = null!;
+    private Mock<IMappingHelper> _mappingHelperMock = null!;
+
+    [SetUp]
+    public void Setup()
+    {
+        _contentRetrieverMock = new Mock<IContentService>();
+        _validationStateMock = new Mock<IValidationState>();
+        _cultureServiceMock = new Mock<ICultureService>();
+        _pageContentValidatorMock = new Mock<IPageContentValidator>();
+        _channelInfoProviderMock = new Mock<IInfoProvider<ChannelInfo>>();
+        _channelByIdProviderMock = _channelInfoProviderMock.As<IInfoByIdProvider<ChannelInfo>>();
+        _webPageManagerMock = new Mock<IWebPageManager>();
+        _mappingHelperMock = new Mock<IMappingHelper>();
+    }
+
+    private InsightCrudService CreateService()
+    {
+        var service = CreateServiceWithoutConstructor();
+
+        SetPrivateField(service, "_contentRetriever", _contentRetrieverMock.Object);
+        SetPrivateField(service, "_validationState", _validationStateMock.Object);
+        SetPrivateField(service, "_cultureService", _cultureServiceMock.Object);
+        SetPrivateField(service, "_pageContentValidator", _pageContentValidatorMock.Object);
+        SetPrivateField(service, "_channelInfoProvider", _channelInfoProviderMock.Object);
+        SetPrivateField(service, "_webPageManager", _webPageManagerMock.Object);
+        SetPrivateField(service, "_mappingHelper", _mappingHelperMock.Object);
+
+        return service;
+    }
+
+    private static void SetPrivateField(object target, string fieldName, object value)
+    {
+        var field = target.GetType().GetField(
+            fieldName,
+            BindingFlags.Instance | BindingFlags.NonPublic);
+
+        if (field is null)
+        {
+            Assert.Fail($"Field '{fieldName}' was not found on {target.GetType().Name}. " +
+                        "The service's private field names may have changed.");
+        }
+
+        field!.SetValue(target, value);
+    }
+
+    // A LanguageTag whose Locale/Language are populated (valid culture).
+    private static LanguageTag ValidCulture => LanguageTag.GB;
+
+    // A LanguageTag whose Locale is empty (used to trigger "Invalid culture specified").
+    private static LanguageTag EmptyLocaleCulture => new("en", null, "GB", "");
+
+    // A LanguageTag whose Language is empty (used to trigger "Invalid from/to culture specified").
+    private static LanguageTag EmptyLanguageCulture => new("", null, "GB", "en-GB");
+
+    private void SetupCulture(LanguageTag? culture) =>
+        _mappingHelperMock
+            .Setup(x => x.ValidateAndNormalizeSiteCultureAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(culture);
+
+    private void SetupChannel(ChannelInfo? channel) =>
+        _channelByIdProviderMock
+            .Setup(x => x.GetAsync(It.IsAny<int>(), It.IsAny<CancellationToken?>()))
+            .ReturnsAsync(channel!);
+
+    #region GetInsightPagesAsync
+
+    [Test]
+    public async Task GetInsightPagesAsync_InvalidCulture_ReturnsNotFound()
+    {
+        SetupCulture(EmptyLocaleCulture);
+        var service = CreateService();
+
+        var result = await service.GetInsightPagesAsync(1, "en-gb", true, CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+    }
+
+    [Test]
+    public async Task GetInsightPagesAsync_ChannelNotFound_ReturnsNotFound()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(null);
+        var service = CreateService();
+
+        var result = await service.GetInsightPagesAsync(1, "en-gb", true, CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+    }
+
+    #endregion
+
+    #region GetInsightPageAsync
+
+    [Test]
+    public async Task GetInsightPageAsync_InvalidCulture_ReturnsNotFound()
+    {
+        SetupCulture(EmptyLocaleCulture);
+        var service = CreateService();
+
+        var result = await service.GetInsightPageAsync(1, Guid.NewGuid(), "en-gb", CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+    }
+
+    [Test]
+    public async Task GetInsightPageAsync_ChannelNotFound_ReturnsNotFound()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(null);
+        var service = CreateService();
+
+        var result = await service.GetInsightPageAsync(1, Guid.NewGuid(), "en-gb", CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+    }
+
+    [Test]
+    public async Task GetInsightPageAsync_NullCulture_DefaultsAndReturnsNotFound_WhenChannelMissing()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(null);
+        var service = CreateService();
+
+        var result = await service.GetInsightPageAsync(1, Guid.NewGuid(), culture: null, CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+    }
+
+    #endregion
+
+    #region CreatePageAsync
+
+    [Test]
+    public async Task CreatePageAsync_InvalidCulture_ReturnsNotFound()
+    {
+        SetupCulture(EmptyLocaleCulture);
+        var service = CreateService();
+
+        var result = await service.CreatePageAsync(1, 10, "en-gb", new InsightPageContent(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+    }
+
+    [Test]
+    public async Task CreatePageAsync_ChannelNotFound_ReturnsNotFound()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(null);
+        var service = CreateService();
+
+        var result = await service.CreatePageAsync(1, 10, "en-gb", new InsightPageContent(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+    }
+
+    #endregion
+
+    #region CreatePageCultureVersionAsync
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_InvalidFromCulture_ReturnsNotFound()
+    {
+        SetupCulture(EmptyLanguageCulture);
+        var service = CreateService();
+
+        var result = await service.CreatePageCultureVersionAsync(
+            1, Guid.NewGuid(), "en-gb", "en-us", new InsightPageContent(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+    }
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_ChannelNotFound_ReturnsNotFound()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(null);
+        var service = CreateService();
+
+        var result = await service.CreatePageCultureVersionAsync(
+            1, Guid.NewGuid(), "en-gb", "en-us", new InsightPageContent(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+    }
+
+    #endregion
+
+    #region UpdatePageAsync
+
+    [Test]
+    public async Task UpdatePageAsync_InvalidCulture_ReturnsNotFound()
+    {
+        SetupCulture(EmptyLocaleCulture);
+        var service = CreateService();
+
+        var result = await service.UpdatePageAsync(1, Guid.NewGuid(), "en-gb", new InsightPageContent(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+    }
+
+    [Test]
+    public async Task UpdatePageAsync_ChannelNotFound_ReturnsNotFound()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(null);
+        var service = CreateService();
+
+        var result = await service.UpdatePageAsync(1, Guid.NewGuid(), "en-gb", new InsightPageContent(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+    }
+
+    #endregion
+
+    #region DeletePageAsync
+
+    [Test]
+    public void DeletePageAsync_InvalidCulture_ThrowsNotFoundException()
+    {
+        SetupCulture(EmptyLocaleCulture);
+        var service = CreateService();
+
+        Assert.ThrowsAsync<BDO.GWT.Common.Core.Exceptions.NotFoundException>(() =>
+            service.DeletePageAsync(1, Guid.NewGuid(), "en-gb", deleteAllCultures: false, CancellationToken.None));
+    }
+
+    [Test]
+    public void DeletePageAsync_ChannelNotFound_ThrowsNotFoundException()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(null);
+        var service = CreateService();
+
+        Assert.ThrowsAsync<BDO.GWT.Common.Core.Exceptions.NotFoundException>(() =>
+            service.DeletePageAsync(1, Guid.NewGuid(), "en-gb", deleteAllCultures: false, CancellationToken.None));
+    }
+
+    #endregion
+
+    #region CreateCopyInsightAsync
+
+    [Test]
+    public async Task CreateCopyInsightAsync_NullRequest_ReturnsBadRequest()
+    {
+        var service = CreateService();
+
+        var result = await service.CreateCopyInsightAsync(1, "en-gb", "workspace", null!, CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
+    }
+
+    [Test]
+    public async Task CreateCopyInsightAsync_InvalidCulture_ReturnsNotFound()
+    {
+        SetupCulture(EmptyLocaleCulture);
+        var service = CreateService();
+
+        var result = await service.CreateCopyInsightAsync(1, "en-gb", "workspace", new CopyInsightPageContent(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+    }
+
+    [Test]
+    public async Task CreateCopyInsightAsync_ChannelNotFound_ReturnsNotFound()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(null);
+        var service = CreateService();
+
+        var result = await service.CreateCopyInsightAsync(1, "en-gb", "workspace", new CopyInsightPageContent(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+    }
+
+    #endregion
 
     [Test]
     public async Task CreatePageAsync_WithNullRequest_ReturnsBadRequest()
@@ -483,4 +779,161 @@ public class InsightCrudServiceTests
             Assert.That(output.Content, Is.SameAs(content));
         });
     }
+
+    #region CopyInsightDto
+
+    [Test]
+    public void CopyInsightDto_DefaultValues_AreInitialized()
+    {
+        var dto = new CopyInsightDto
+        {
+            Title = "My Insight",
+            ImageFileAltText = "Alt text"
+        };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.Title, Is.EqualTo("My Insight"));
+            Assert.That(dto.ImageFileAltText, Is.EqualTo("Alt text"));
+            Assert.That(dto.ShowInsightTitle, Is.False);
+            Assert.That(dto.Description, Is.Null);
+            Assert.That(dto.ShowInsightDescription, Is.False);
+            Assert.That(dto.InsightContent, Is.Null);
+            Assert.That(dto.CallToActionPosition, Is.Null);
+            Assert.That(dto.Attachments, Is.Null);
+            Assert.That(dto.InsightAttachment, Is.Null);
+            Assert.That(dto.DownloadButtonTitle, Is.Null);
+            Assert.That(dto.DownloadButtonText, Is.Null);
+            Assert.That(dto.Contentsharing, Is.Null);
+            Assert.That(dto.SharingOptOut, Is.False);
+            Assert.That(dto.SharingHeadline, Is.False);
+            Assert.That(dto.OriginalSiteGuid, Is.Null);
+            Assert.That(dto.OriginalDocumentAttachmentType, Is.Null);
+            Assert.That(dto.OriginalIndustries, Is.Empty);
+            Assert.That(dto.OriginalServiceLines, Is.Empty);
+            Assert.That(dto.OriginalInvolvedCountriesAll, Is.False);
+            Assert.That(dto.OriginalInvolvedCountries, Is.Empty);
+            Assert.That(dto.OriginalDocumentOwnerOptOut, Is.False);
+            Assert.That(dto.OriginalDocumentOwnerName, Is.Null);
+            Assert.That(dto.OriginalDocumentOwnerEmail, Is.Null);
+            Assert.That(dto.SharingSourceFirm, Is.Null);
+            Assert.That(dto.SharingInstructions, Is.Null);
+            Assert.That(dto.ShowCallToAction, Is.False);
+            Assert.That(dto.CallToActionDescription, Is.Null);
+            Assert.That(dto.CallToActionButtonText, Is.Null);
+            Assert.That(dto.CallToActionButtonUrl, Is.Null);
+            Assert.That(dto.ImageFile, Is.Empty);
+        });
+    }
+
+    [Test]
+    public void CopyInsightDto_Properties_CanBeSet()
+    {
+        var dto = new CopyInsightDto
+        {
+            Title = "Title",
+            ShowInsightTitle = true,
+            Description = "Description",
+            ShowInsightDescription = true,
+            InsightContent = "Content",
+            CallToActionPosition = "Top",
+            Attachments = "attach",
+            InsightAttachment = "insight-attach",
+            DownloadButtonTitle = "Download",
+            DownloadButtonText = "Click",
+            Contentsharing = "sharing",
+            SharingOptOut = true,
+            SharingHeadline = true,
+            OriginalSiteGuid = "site-guid",
+            OriginalDocumentAttachmentType = "pdf",
+            OriginalIndustries = ["Finance", "Tech"],
+            OriginalServiceLines = ["Audit"],
+            OriginalInvolvedCountriesAll = true,
+            OriginalInvolvedCountries = ["US", "UK"],
+            OriginalDocumentOwnerOptOut = true,
+            OriginalDocumentOwnerName = "Owner",
+            OriginalDocumentOwnerEmail = "owner@example.com",
+            SharingSourceFirm = "Firm",
+            SharingInstructions = "Instructions",
+            ShowCallToAction = true,
+            CallToActionDescription = "CTA description",
+            CallToActionButtonText = "Go",
+            CallToActionButtonUrl = "https://example.com",
+            ImageFile = ["image.png"],
+            ImageFileAltText = "Alt"
+        };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.Title, Is.EqualTo("Title"));
+            Assert.That(dto.ShowInsightTitle, Is.True);
+            Assert.That(dto.Description, Is.EqualTo("Description"));
+            Assert.That(dto.ShowInsightDescription, Is.True);
+            Assert.That(dto.InsightContent, Is.EqualTo("Content"));
+            Assert.That(dto.CallToActionPosition, Is.EqualTo("Top"));
+            Assert.That(dto.Attachments, Is.EqualTo("attach"));
+            Assert.That(dto.InsightAttachment, Is.EqualTo("insight-attach"));
+            Assert.That(dto.DownloadButtonTitle, Is.EqualTo("Download"));
+            Assert.That(dto.DownloadButtonText, Is.EqualTo("Click"));
+            Assert.That(dto.Contentsharing, Is.EqualTo("sharing"));
+            Assert.That(dto.SharingOptOut, Is.True);
+            Assert.That(dto.SharingHeadline, Is.True);
+            Assert.That(dto.OriginalSiteGuid, Is.EqualTo("site-guid"));
+            Assert.That(dto.OriginalDocumentAttachmentType, Is.EqualTo("pdf"));
+            Assert.That(dto.OriginalIndustries, Is.EqualTo(new[] { "Finance", "Tech" }));
+            Assert.That(dto.OriginalServiceLines, Is.EqualTo(new[] { "Audit" }));
+            Assert.That(dto.OriginalInvolvedCountriesAll, Is.True);
+            Assert.That(dto.OriginalInvolvedCountries, Is.EqualTo(new[] { "US", "UK" }));
+            Assert.That(dto.OriginalDocumentOwnerOptOut, Is.True);
+            Assert.That(dto.OriginalDocumentOwnerName, Is.EqualTo("Owner"));
+            Assert.That(dto.OriginalDocumentOwnerEmail, Is.EqualTo("owner@example.com"));
+            Assert.That(dto.SharingSourceFirm, Is.EqualTo("Firm"));
+            Assert.That(dto.SharingInstructions, Is.EqualTo("Instructions"));
+            Assert.That(dto.ShowCallToAction, Is.True);
+            Assert.That(dto.CallToActionDescription, Is.EqualTo("CTA description"));
+            Assert.That(dto.CallToActionButtonText, Is.EqualTo("Go"));
+            Assert.That(dto.CallToActionButtonUrl, Is.EqualTo("https://example.com"));
+            Assert.That(dto.ImageFile, Is.EqualTo(new[] { "image.png" }));
+            Assert.That(dto.ImageFileAltText, Is.EqualTo("Alt"));
+        });
+    }
+
+    [Test]
+    public void CopyInsightDto_MissingRequiredFields_FailValidation()
+    {
+        var dto = new CopyInsightDto();
+        var results = new List<ValidationResult>();
+        var context = new ValidationContext(dto);
+
+        var isValid = Validator.TryValidateObject(dto, context, results, validateAllProperties: true);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(isValid, Is.False);
+            Assert.That(results, Has.Some.Matches<ValidationResult>(r => r.MemberNames.Contains(nameof(CopyInsightDto.Title))));
+            Assert.That(results, Has.Some.Matches<ValidationResult>(r => r.MemberNames.Contains(nameof(CopyInsightDto.ImageFileAltText))));
+        });
+    }
+
+    [Test]
+    public void CopyInsightDto_ValidRequiredFields_PassValidation()
+    {
+        var dto = new CopyInsightDto
+        {
+            Title = "Title",
+            ImageFileAltText = "Alt"
+        };
+        var results = new List<ValidationResult>();
+        var context = new ValidationContext(dto);
+
+        var isValid = Validator.TryValidateObject(dto, context, results, validateAllProperties: true);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(isValid, Is.True);
+            Assert.That(results, Is.Empty);
+        });
+    }
+
+    #endregion
 }

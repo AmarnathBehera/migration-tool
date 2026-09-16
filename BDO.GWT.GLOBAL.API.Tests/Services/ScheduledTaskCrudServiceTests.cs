@@ -130,22 +130,7 @@ public class ScheduledTaskCrudServiceTests
 
     #endregion
 
-    #region GetValidatedScheduledTask (NotFound behavior via service interface)
-
-    [Test]
-    public async Task GetScheduledTaskDtoAsync_NotFound_ThrowsNotFoundException()
-    {
-        var notFoundGuid = Guid.NewGuid();
-
-        // Use a mock of the interface to verify NotFoundException is propagated
-        var serviceMock = new Mock<IScheduledTaskCrudService>();
-        serviceMock
-            .Setup(x => x.GetScheduledTaskDtoAsync(notFoundGuid, It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new NotFoundException());
-
-        Assert.ThrowsAsync<NotFoundException>(
-            () => serviceMock.Object.GetScheduledTaskDtoAsync(notFoundGuid, CancellationToken.None));
-    }
+    #region GetScheduledTasksDtosAsync
 
     [Test]
     public async Task GetScheduledTasksDtosAsync_ReturnsEmptyArray_WhenNoTasksExist()
@@ -160,9 +145,78 @@ public class ScheduledTaskCrudServiceTests
         Assert.That(result, Is.Empty);
     }
 
+    [Test]
+    public async Task GetScheduledTasksDtosAsync_ReturnsAllTasks_WhenTasksExist()
+    {
+        var expected = new[]
+        {
+            new ScheduledTaskDto { Id = 1, Guid = Guid.NewGuid(), Name = "TaskOne", DisplayName = "Task One", Interval = "00:05:00", ScheduledTaskIdentifier = "task.one", LastModified = DateTime.UtcNow },
+            new ScheduledTaskDto { Id = 2, Guid = Guid.NewGuid(), Name = "TaskTwo", DisplayName = "Task Two", Interval = "01:00:00", ScheduledTaskIdentifier = "task.two", LastModified = DateTime.UtcNow },
+        };
+        var serviceMock = new Mock<IScheduledTaskCrudService>();
+        serviceMock
+            .Setup(x => x.GetScheduledTasksDtosAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expected);
+
+        var result = await serviceMock.Object.GetScheduledTasksDtosAsync(CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Length.EqualTo(2));
+            Assert.That(result[0].Name, Is.EqualTo("TaskOne"));
+            Assert.That(result[1].Name, Is.EqualTo("TaskTwo"));
+        });
+    }
+
     #endregion
 
-    #region ExecuteScheduledTaskAsync (interface behavior)
+    #region GetScheduledTaskDtoAsync
+
+    [Test]
+    public async Task GetScheduledTaskDtoAsync_ReturnsDto_WhenTaskExists()
+    {
+        var guid = Guid.NewGuid();
+        var expected = new ScheduledTaskDto
+        {
+            Id = 5,
+            Guid = guid,
+            Name = "ExistingTask",
+            DisplayName = "Existing Task",
+            Interval = "00:05:00",
+            ScheduledTaskIdentifier = "existing.task",
+            LastModified = DateTime.UtcNow
+        };
+        var serviceMock = new Mock<IScheduledTaskCrudService>();
+        serviceMock
+            .Setup(x => x.GetScheduledTaskDtoAsync(guid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expected);
+
+        var result = await serviceMock.Object.GetScheduledTaskDtoAsync(guid, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Id, Is.EqualTo(5));
+            Assert.That(result.Guid, Is.EqualTo(guid));
+            Assert.That(result.Name, Is.EqualTo("ExistingTask"));
+        });
+    }
+
+    [Test]
+    public void GetScheduledTaskDtoAsync_NotFound_ThrowsNotFoundException()
+    {
+        var notFoundGuid = Guid.NewGuid();
+        var serviceMock = new Mock<IScheduledTaskCrudService>();
+        serviceMock
+            .Setup(x => x.GetScheduledTaskDtoAsync(notFoundGuid, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new NotFoundException());
+
+        Assert.ThrowsAsync<NotFoundException>(
+            () => serviceMock.Object.GetScheduledTaskDtoAsync(notFoundGuid, CancellationToken.None));
+    }
+
+    #endregion
+
+    #region ExecuteScheduledTaskAsync
 
     [Test]
     public async Task ExecuteScheduledTaskAsync_Completes_WhenTaskExecutesSuccessfully()
