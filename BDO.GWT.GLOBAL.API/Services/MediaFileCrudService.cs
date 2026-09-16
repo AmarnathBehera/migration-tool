@@ -137,10 +137,6 @@ public class MediaFileCrudService : IMediaFileCrudService
 
     private Uri? BuildAssetUri(string assetUrl) =>
         AssetUrlHelper.BuildAssetUri(assetUrl, _httpContextAccessor, _hostEnvironment);
-
-    private static string NormalizePath(string assetUrl) =>
-        AssetUrlHelper.NormalizePath(assetUrl);
-
     private static string GetMimeType(string extension)
     {
         if (_contentTypeProvider.TryGetContentType($"file{extension}", out var contentType))

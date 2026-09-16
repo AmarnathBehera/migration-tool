@@ -83,9 +83,6 @@ namespace BDO.GWT.GLOBAL.API.Data
             return (data, contentType, fileName);
         }
 
-        private static string NormalizePath(string assetUrl) =>
-            AssetUrlHelper.NormalizePath(assetUrl);
-
         private static string GetMimeType(string extension)
         {
             if (ContentTypeProvider.TryGetContentType($"file{extension}", out var contentType))
