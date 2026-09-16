@@ -49,10 +49,10 @@
         }        
     </div>
     <div>
-        @await PageBuilderService.AddIdentifier("topArea").AddWidgets(widgetsList).BuildEditableAreaAsync(Html,Context.RequestAborted))
+        @await PageBuilderService.AddIdentifier("topArea").AddWidgets(widgetsList).BuildEditableAreaAsync(Html,Context.RequestAborted)
     </div>
 </div>
 
-@await PageBuilderService.AddIdentifier("bottomArea").AddWidgets(widgetsList).BuildEditableAreaAsync(Html,Context.RequestAborted))
+@await PageBuilderService.AddIdentifier("bottomArea").AddWidgets(widgetsList).BuildEditableAreaAsync(Html,Context.RequestAborted)
 
 @PageBuilderService.GetPageBuilderScripts(Html)

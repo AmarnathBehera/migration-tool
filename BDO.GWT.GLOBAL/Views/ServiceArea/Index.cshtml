@@ -62,7 +62,7 @@
                         ReactComponentType.ServiceContentGUID,
                         Model,
                         Context.RequestAborted))
-            @await PageBuilderService.AddIdentifier("topArea").AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html,Context.RequestAborted))
+            @await PageBuilderService.AddIdentifier("topArea").AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html,Context.RequestAborted)
         </main>
         @if (isSideBoxVisible)
         {
@@ -76,6 +76,6 @@
             </aside>
         }
     </div>
-    @await PageBuilderService.AddIdentifier("bottomArea").AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html,Context.RequestAborted))
+    @await PageBuilderService.AddIdentifier("bottomArea").AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html,Context.RequestAborted)
 </div>
 @PageBuilderService.GetPageBuilderScripts(Html)
