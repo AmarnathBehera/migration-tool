@@ -1,4 +1,5 @@
 ﻿using BDO.GWT.Core;
+using BDO.GWT.GLOBAL.API.Helpers;
 using CMS.Websites;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Net.Mime;
@@ -82,20 +83,8 @@ namespace BDO.GWT.GLOBAL.API.Data
             return (data, contentType, fileName);
         }
 
-        private static string NormalizePath(string assetUrl)
-        {
-            const string virtualContextAssetMarker = "/-/";
-
-            var normalizedPath = assetUrl.Trim();
-            var markerIndex = normalizedPath.IndexOf(virtualContextAssetMarker, StringComparison.Ordinal);
-            if (markerIndex >= 0)
-            {
-                normalizedPath = normalizedPath[(markerIndex + virtualContextAssetMarker.Length)..];
-            }
-
-            normalizedPath = normalizedPath.TrimStart('~');
-            return normalizedPath.StartsWith('/') ? normalizedPath : $"/{normalizedPath}";
-        }
+        private static string NormalizePath(string assetUrl) =>
+            AssetUrlHelper.NormalizePath(assetUrl);
 
         private static string GetMimeType(string extension)
         {
@@ -107,36 +96,8 @@ namespace BDO.GWT.GLOBAL.API.Data
             return MediaTypeNames.Application.Octet;
         }
 
-        private Uri? BuildAssetUri(string assetUrl)
-        {
-            var trimmedAssetUrl = assetUrl.Trim();
-            if (Uri.TryCreate(trimmedAssetUrl, UriKind.Absolute, out var absoluteAssetUri)
-                && (absoluteAssetUri.Scheme == Uri.UriSchemeHttp || absoluteAssetUri.Scheme == Uri.UriSchemeHttps))
-            {
-                return absoluteAssetUri;
-            }
-
-            var normalizedPath = NormalizePath(trimmedAssetUrl);
-            var queryIndex = normalizedPath.IndexOf('?');
-            var path = queryIndex >= 0 ? normalizedPath[..queryIndex] : normalizedPath;
-            var query = queryIndex >= 0 ? normalizedPath[(queryIndex + 1)..] : string.Empty;
-
-
-            var request = _httpContextAccessor.HttpContext?.Request;
-            if (request is null
-                || string.IsNullOrWhiteSpace(request.Scheme)
-                || !request.Host.HasValue
-                || string.IsNullOrWhiteSpace(request.Host.Host))
-            {
-                return null;
-            }
-
-            return new UriBuilder(request.Scheme, request.Host.Host, request.Host.Port ?? -1)
-            {
-                Path = path,
-                Query = query
-            }.Uri;
-        }
+        private Uri? BuildAssetUri(string assetUrl) =>
+            AssetUrlHelper.BuildAssetUri(assetUrl, _httpContextAccessor, _hostEnvironment);
 
         private static IEnumerable<ContentAttachment> GetAttachmentsFromPage(IWebPageFieldsSource page)
         {

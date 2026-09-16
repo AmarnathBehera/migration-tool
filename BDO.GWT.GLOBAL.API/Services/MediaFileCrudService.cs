@@ -1,4 +1,5 @@
 using BDO.GWT.GLOBAL.API.Data;
+using BDO.GWT.GLOBAL.API.Helpers;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Membership;
@@ -13,9 +14,6 @@ namespace BDO.GWT.GLOBAL.API.Services;
 /// </summary>
 public class MediaFileCrudService : IMediaFileCrudService
 {
-    private const string DevelopmentLiveSiteHost = "localhost";
-    private const int DevelopmentLiveSitePort = 12393;
-
     private static readonly FileExtensionContentTypeProvider _contentTypeProvider = new();
 
     private const string FallbackLanguageName = "en-US";
@@ -137,59 +135,11 @@ public class MediaFileCrudService : IMediaFileCrudService
             : new MediaFileTarget(item.SystemFields.ContentItemID, asset);
     }
 
-    private Uri? BuildAssetUri(string assetUrl)
-    {
-        var trimmedAssetUrl = assetUrl.Trim();
-        if (Uri.TryCreate(trimmedAssetUrl, UriKind.Absolute, out var absoluteUri)
-            && (absoluteUri.Scheme == Uri.UriSchemeHttp || absoluteUri.Scheme == Uri.UriSchemeHttps))
-        {
-            return absoluteUri;
-        }
+    private Uri? BuildAssetUri(string assetUrl) =>
+        AssetUrlHelper.BuildAssetUri(assetUrl, _httpContextAccessor, _hostEnvironment);
 
-        var normalizedPath = NormalizePath(trimmedAssetUrl);
-        var queryIndex = normalizedPath.IndexOf('?');
-        var path = queryIndex >= 0 ? normalizedPath[..queryIndex] : normalizedPath;
-        var query = queryIndex >= 0 ? normalizedPath[(queryIndex + 1)..] : string.Empty;
-
-        if (_hostEnvironment.IsDevelopment())
-        {
-            return new UriBuilder(Uri.UriSchemeHttp, DevelopmentLiveSiteHost, DevelopmentLiveSitePort)
-            {
-                Path = path,
-                Query = query
-            }.Uri;
-        }
-
-        var request = _httpContextAccessor.HttpContext?.Request;
-        if (request is null
-            || string.IsNullOrWhiteSpace(request.Scheme)
-            || !request.Host.HasValue
-            || string.IsNullOrWhiteSpace(request.Host.Host))
-        {
-            return null;
-        }
-
-        return new UriBuilder(request.Scheme, request.Host.Host, request.Host.Port ?? -1)
-        {
-            Path = path,
-            Query = query
-        }.Uri;
-    }
-
-    private static string NormalizePath(string assetUrl)
-    {
-        const string virtualContextAssetMarker = "/-/";
-
-        var normalizedPath = assetUrl.Trim();
-        var markerIndex = normalizedPath.IndexOf(virtualContextAssetMarker, StringComparison.Ordinal);
-        if (markerIndex >= 0)
-        {
-            normalizedPath = normalizedPath[(markerIndex + virtualContextAssetMarker.Length)..];
-        }
-
-        normalizedPath = normalizedPath.TrimStart('~');
-        return normalizedPath.StartsWith('/') ? normalizedPath : $"/{normalizedPath}";
-    }
+    private static string NormalizePath(string assetUrl) =>
+        AssetUrlHelper.NormalizePath(assetUrl);
 
     private static string GetMimeType(string extension)
     {

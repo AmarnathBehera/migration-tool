@@ -147,12 +147,13 @@ public class MediaFileController : EntityControllerBase
         [FromForm] AttachmentRequest input,
         CancellationToken cancellationToken)
     {
-        if (input?.File is not null)
+        if (input?.File is null)
         {
-            input.File = SanitizeFile(input.File);
+            return BadRequest();
         }
 
-        var result = await _mediaFileCrudService.UpdateMediaFileAsync(workspaceName, attachmentGuid, input.File, cancellationToken);
+        var file = SanitizeFile(input.File);
+        var result = await _mediaFileCrudService.UpdateMediaFileAsync(workspaceName, attachmentGuid, file, cancellationToken);
 
         return result is null
             ? NotFound()
