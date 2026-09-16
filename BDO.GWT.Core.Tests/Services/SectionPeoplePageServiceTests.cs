@@ -5,6 +5,7 @@ using BDO.GWT.Core.DTOs.Cards;
 using BDO.GWT.Core.Helpers;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Web.Core.Services;
+using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Moq;
 
@@ -17,6 +18,7 @@ public class SectionPeoplePageServiceTests
     private Mock<IPeopleCardsService> _peopleCardsServiceMock = null!;
     private Mock<ICultureContext> _cultureContextMock = null!;
     private Mock<IFilteringHelper> _filteringHelperMock = null!;
+    private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
     private SectionPeoplePageService _service = null!;
 
     [SetUp]
@@ -27,11 +29,13 @@ public class SectionPeoplePageServiceTests
         _peopleCardsServiceMock = new Mock<IPeopleCardsService>();
         _cultureContextMock = new Mock<ICultureContext>();
         _filteringHelperMock = new Mock<IFilteringHelper>();
+        _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
         _service = new SectionPeoplePageService(
             _contentServiceMock.Object,
             _heroServiceMock.Object,
             _peopleCardsServiceMock.Object,
-          _filteringHelperMock.Object);
+            _filteringHelperMock.Object,
+            _websiteChannelContextMock.Object);
     }
 
     [Test]
