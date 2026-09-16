@@ -3,6 +3,7 @@ using BDO.GWT.GLOBAL.API.Services;
 using CMS.Core;
 using Microsoft.Extensions.Configuration;
 using Moq;
+using System.Text.Json;
 
 namespace BDO.GWT.GLOBAL.API.Tests.Services;
 
@@ -103,4 +104,216 @@ public class CustomGlobalLocationsServiceTests
             Assert.That(ex.InnerException, Is.SameAs(inner));
         });
     }
+
+    #region GlobalLocationCustomTableUpsertDto
+
+    [Test]
+    public void UpsertDto_Properties_CanBeSetAndRetrieved()
+    {
+        var dto = new GlobalLocationCustomTableUpsertDto
+        {
+            MetadataLocationPinColour = "Red",
+            GlobalLocationTitle = "Title",
+            GlobalLocationAddress1 = "Address1",
+            GlobalLocationAddress2 = "Address2",
+            GlobalLocationCity = "City",
+            GlobalLocationState = "State",
+            GlobalLocationCountry = "Country",
+            GlobalLocationPostalCode = "12345",
+            GlobalLocationRegion = "Region",
+            GlobalLocationLatitude = 1.23m,
+            GlobalLocationLongitude = 4.56m,
+            GlobalLocationUrl = "https://example.com",
+            MemberFirmId = 1,
+            ChannelId = 2,
+            ItemOrder = 3
+        };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.MetadataLocationPinColour, Is.EqualTo("Red"));
+            Assert.That(dto.GlobalLocationTitle, Is.EqualTo("Title"));
+            Assert.That(dto.GlobalLocationAddress1, Is.EqualTo("Address1"));
+            Assert.That(dto.GlobalLocationAddress2, Is.EqualTo("Address2"));
+            Assert.That(dto.GlobalLocationCity, Is.EqualTo("City"));
+            Assert.That(dto.GlobalLocationState, Is.EqualTo("State"));
+            Assert.That(dto.GlobalLocationCountry, Is.EqualTo("Country"));
+            Assert.That(dto.GlobalLocationPostalCode, Is.EqualTo("12345"));
+            Assert.That(dto.GlobalLocationRegion, Is.EqualTo("Region"));
+            Assert.That(dto.GlobalLocationLatitude, Is.EqualTo(1.23m));
+            Assert.That(dto.GlobalLocationLongitude, Is.EqualTo(4.56m));
+            Assert.That(dto.GlobalLocationUrl, Is.EqualTo("https://example.com"));
+            Assert.That(dto.MemberFirmId, Is.EqualTo(1));
+            Assert.That(dto.ChannelId, Is.EqualTo(2));
+            Assert.That(dto.ItemOrder, Is.EqualTo(3));
+        });
+    }
+
+    [Test]
+    public void UpsertDto_Properties_DefaultToNullOrDefaultValues()
+    {
+        var dto = new GlobalLocationCustomTableUpsertDto();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.MetadataLocationPinColour, Is.Null);
+            Assert.That(dto.GlobalLocationTitle, Is.Null);
+            Assert.That(dto.GlobalLocationAddress1, Is.Null);
+            Assert.That(dto.GlobalLocationAddress2, Is.Null);
+            Assert.That(dto.GlobalLocationCity, Is.Null);
+            Assert.That(dto.GlobalLocationState, Is.Null);
+            Assert.That(dto.GlobalLocationCountry, Is.Null);
+            Assert.That(dto.GlobalLocationPostalCode, Is.Null);
+            Assert.That(dto.GlobalLocationRegion, Is.Null);
+            Assert.That(dto.GlobalLocationLatitude, Is.Null);
+            Assert.That(dto.GlobalLocationLongitude, Is.Null);
+            Assert.That(dto.GlobalLocationUrl, Is.Null);
+            Assert.That(dto.MemberFirmId, Is.EqualTo(0));
+            Assert.That(dto.ChannelId, Is.EqualTo(0));
+            Assert.That(dto.ItemOrder, Is.Null);
+        });
+    }
+
+    [Test]
+    public void UpsertDto_Deserialize_MissingMemberFirmId_ThrowsJsonException()
+    {
+        var json = """
+        {
+            "ChannelId": 2
+        }
+        """;
+
+        Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<GlobalLocationCustomTableUpsertDto>(json));
+    }
+
+    [Test]
+    public void UpsertDto_Deserialize_MissingChannelId_ThrowsJsonException()
+    {
+        var json = """
+        {
+            "MemberFirmId": 1
+        }
+        """;
+
+        Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<GlobalLocationCustomTableUpsertDto>(json));
+    }
+
+    [Test]
+    public void UpsertDto_Deserialize_WithRequiredFields_Succeeds()
+    {
+        var json = """
+        {
+            "MemberFirmId": 1,
+            "ChannelId": 2,
+            "GlobalLocationTitle": "Title"
+        }
+        """;
+
+        var dto = JsonSerializer.Deserialize<GlobalLocationCustomTableUpsertDto>(json);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto, Is.Not.Null);
+            Assert.That(dto!.MemberFirmId, Is.EqualTo(1));
+            Assert.That(dto.ChannelId, Is.EqualTo(2));
+            Assert.That(dto.GlobalLocationTitle, Is.EqualTo("Title"));
+        });
+    }
+
+    #endregion
+
+    #region GlobalLocationCustomTableApiDto
+
+    [Test]
+    public void ApiDto_Properties_CanBeSetAndRetrieved()
+    {
+        var itemGuid = Guid.NewGuid();
+        var createdWhen = new DateTime(2024, 1, 1);
+        var modifiedWhen = new DateTime(2024, 2, 1);
+
+        var dto = new GlobalLocationCustomTableApiDto
+        {
+            ItemId = 10,
+            ItemGuid = itemGuid,
+            MetadataLocationPinColour = "Blue",
+            GlobalLocationTitle = "Title",
+            GlobalLocationAddress1 = "Address1",
+            GlobalLocationAddress2 = "Address2",
+            GlobalLocationCity = "City",
+            GlobalLocationState = "State",
+            GlobalLocationCountry = "Country",
+            GlobalLocationPostalCode = "54321",
+            GlobalLocationRegion = "Region",
+            GlobalLocationLatitude = 9.87m,
+            GlobalLocationLongitude = 6.54m,
+            GlobalLocationUrl = "https://example.com/api",
+            MemberFirmId = 5,
+            ChannelId = 6,
+            ItemCreatedBy = 7,
+            ItemCreatedWhen = createdWhen,
+            ItemModifiedBy = 8,
+            ItemModifiedWhen = modifiedWhen,
+            ItemOrder = 9
+        };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.ItemId, Is.EqualTo(10));
+            Assert.That(dto.ItemGuid, Is.EqualTo(itemGuid));
+            Assert.That(dto.MetadataLocationPinColour, Is.EqualTo("Blue"));
+            Assert.That(dto.GlobalLocationTitle, Is.EqualTo("Title"));
+            Assert.That(dto.GlobalLocationAddress1, Is.EqualTo("Address1"));
+            Assert.That(dto.GlobalLocationAddress2, Is.EqualTo("Address2"));
+            Assert.That(dto.GlobalLocationCity, Is.EqualTo("City"));
+            Assert.That(dto.GlobalLocationState, Is.EqualTo("State"));
+            Assert.That(dto.GlobalLocationCountry, Is.EqualTo("Country"));
+            Assert.That(dto.GlobalLocationPostalCode, Is.EqualTo("54321"));
+            Assert.That(dto.GlobalLocationRegion, Is.EqualTo("Region"));
+            Assert.That(dto.GlobalLocationLatitude, Is.EqualTo(9.87m));
+            Assert.That(dto.GlobalLocationLongitude, Is.EqualTo(6.54m));
+            Assert.That(dto.GlobalLocationUrl, Is.EqualTo("https://example.com/api"));
+            Assert.That(dto.MemberFirmId, Is.EqualTo(5));
+            Assert.That(dto.ChannelId, Is.EqualTo(6));
+            Assert.That(dto.ItemCreatedBy, Is.EqualTo(7));
+            Assert.That(dto.ItemCreatedWhen, Is.EqualTo(createdWhen));
+            Assert.That(dto.ItemModifiedBy, Is.EqualTo(8));
+            Assert.That(dto.ItemModifiedWhen, Is.EqualTo(modifiedWhen));
+            Assert.That(dto.ItemOrder, Is.EqualTo(9));
+        });
+    }
+
+    [Test]
+    public void ApiDto_Properties_DefaultToNullOrDefaultValues()
+    {
+        var dto = new GlobalLocationCustomTableApiDto();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.ItemId, Is.EqualTo(0));
+            Assert.That(dto.ItemGuid, Is.EqualTo(Guid.Empty));
+            Assert.That(dto.MetadataLocationPinColour, Is.Null);
+            Assert.That(dto.GlobalLocationTitle, Is.Null);
+            Assert.That(dto.GlobalLocationAddress1, Is.Null);
+            Assert.That(dto.GlobalLocationAddress2, Is.Null);
+            Assert.That(dto.GlobalLocationCity, Is.Null);
+            Assert.That(dto.GlobalLocationState, Is.Null);
+            Assert.That(dto.GlobalLocationCountry, Is.Null);
+            Assert.That(dto.GlobalLocationPostalCode, Is.Null);
+            Assert.That(dto.GlobalLocationRegion, Is.Null);
+            Assert.That(dto.GlobalLocationLatitude, Is.Null);
+            Assert.That(dto.GlobalLocationLongitude, Is.Null);
+            Assert.That(dto.GlobalLocationUrl, Is.Null);
+            Assert.That(dto.MemberFirmId, Is.EqualTo(0));
+            Assert.That(dto.ChannelId, Is.EqualTo(0));
+            Assert.That(dto.ItemCreatedBy, Is.Null);
+            Assert.That(dto.ItemCreatedWhen, Is.Null);
+            Assert.That(dto.ItemModifiedBy, Is.Null);
+            Assert.That(dto.ItemModifiedWhen, Is.Null);
+            Assert.That(dto.ItemOrder, Is.Null);
+        });
+    }
+
+    #endregion
 }

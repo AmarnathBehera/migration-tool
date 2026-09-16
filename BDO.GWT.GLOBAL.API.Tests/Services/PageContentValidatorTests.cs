@@ -12,6 +12,9 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services;
 
 public class PageContentValidatorTests
 {
+    private static readonly string[] s_abcValues = ["a", "b", "c"];
+    private static readonly string[] s_oneTwoValues = ["one", "two"];
+
     [Test]
     public void GetClassNameFromPageContentType_ResolvesGeneratedXbyKContentType()
     {
@@ -259,7 +262,7 @@ public class PageContentValidatorTests
     {
         var method = GetPrivateStaticMethod(nameof(PageContentValidator), "FormatStringValues");
 
-        var result = method.Invoke(null, [new[] { "a", "b", "c" }]);
+        var result = method.Invoke(null, [s_abcValues]);
 
         Assert.That(result, Is.EqualTo("'a', 'b', 'c'"));
     }
@@ -418,7 +421,7 @@ public class PageContentValidatorTests
 
         var result = (HashSet<string>)InvokeInstance(validator, "GetValidFieldOptions", field)!;
 
-        Assert.That(result, Is.EquivalentTo(new[] { "one", "two" }));
+        Assert.That(result, Is.EquivalentTo(s_oneTwoValues));
     }
 
     [Test]
@@ -515,7 +518,7 @@ public class PageContentValidatorTests
 
         var result = InvokeInstance(validator, "ValidateBooleanFieldDataType", field, "kentico.checkbox", (object?)true);
 
-        Assert.That(result, Is.EqualTo(true));
+        Assert.That(result, Is.True);
     }
 
     [Test]

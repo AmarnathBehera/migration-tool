@@ -20,6 +20,11 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services;
 [TestFixture]
 public class InsightCrudServiceTests
 {
+    private static readonly List<string> s_originalIndustries = ["Finance", "Tech"];
+    private static readonly List<string> s_originalServiceLines = ["Audit"];
+    private static readonly List<string> s_originalInvolvedCountries = ["US", "UK"];
+    private static readonly List<string> s_imageFile = ["image.png"];
+
     private static InsightCrudService CreateServiceWithoutConstructor() =>
         (InsightCrudService)RuntimeHelpers.GetUninitializedObject(typeof(InsightCrudService));
 
@@ -846,10 +851,10 @@ public class InsightCrudServiceTests
             SharingHeadline = true,
             OriginalSiteGuid = "site-guid",
             OriginalDocumentAttachmentType = "pdf",
-            OriginalIndustries = ["Finance", "Tech"],
-            OriginalServiceLines = ["Audit"],
+            OriginalIndustries = s_originalIndustries,
+            OriginalServiceLines = s_originalServiceLines,
             OriginalInvolvedCountriesAll = true,
-            OriginalInvolvedCountries = ["US", "UK"],
+            OriginalInvolvedCountries = s_originalInvolvedCountries,
             OriginalDocumentOwnerOptOut = true,
             OriginalDocumentOwnerName = "Owner",
             OriginalDocumentOwnerEmail = "owner@example.com",
@@ -859,7 +864,7 @@ public class InsightCrudServiceTests
             CallToActionDescription = "CTA description",
             CallToActionButtonText = "Go",
             CallToActionButtonUrl = "https://example.com",
-            ImageFile = ["image.png"],
+            ImageFile = s_imageFile,
             ImageFileAltText = "Alt"
         };
 
@@ -880,10 +885,10 @@ public class InsightCrudServiceTests
             Assert.That(dto.SharingHeadline, Is.True);
             Assert.That(dto.OriginalSiteGuid, Is.EqualTo("site-guid"));
             Assert.That(dto.OriginalDocumentAttachmentType, Is.EqualTo("pdf"));
-            Assert.That(dto.OriginalIndustries, Is.EqualTo(new[] { "Finance", "Tech" }));
-            Assert.That(dto.OriginalServiceLines, Is.EqualTo(new[] { "Audit" }));
+            Assert.That(dto.OriginalIndustries, Is.EqualTo(s_originalIndustries));
+            Assert.That(dto.OriginalServiceLines, Is.EqualTo(s_originalServiceLines));
             Assert.That(dto.OriginalInvolvedCountriesAll, Is.True);
-            Assert.That(dto.OriginalInvolvedCountries, Is.EqualTo(new[] { "US", "UK" }));
+            Assert.That(dto.OriginalInvolvedCountries, Is.EqualTo(s_originalInvolvedCountries));
             Assert.That(dto.OriginalDocumentOwnerOptOut, Is.True);
             Assert.That(dto.OriginalDocumentOwnerName, Is.EqualTo("Owner"));
             Assert.That(dto.OriginalDocumentOwnerEmail, Is.EqualTo("owner@example.com"));
@@ -893,7 +898,7 @@ public class InsightCrudServiceTests
             Assert.That(dto.CallToActionDescription, Is.EqualTo("CTA description"));
             Assert.That(dto.CallToActionButtonText, Is.EqualTo("Go"));
             Assert.That(dto.CallToActionButtonUrl, Is.EqualTo("https://example.com"));
-            Assert.That(dto.ImageFile, Is.EqualTo(new[] { "image.png" }));
+            Assert.That(dto.ImageFile, Is.EqualTo(s_imageFile));
             Assert.That(dto.ImageFileAltText, Is.EqualTo("Alt"));
         });
     }
