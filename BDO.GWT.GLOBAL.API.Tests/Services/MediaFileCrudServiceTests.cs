@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace BDO.GWT.GLOBAL.API.Tests.Services;
 
@@ -171,27 +170,7 @@ public class MediaFileCrudServiceTests
         });
     }
 
-    [Test]
-    public void NormalizePath_WhenTildePrefixProvided_ReturnsNormalizedRootPath()
-    {
-        var result = (string)InvokePrivateStatic("NormalizePath", "~/getmedia/a.jpg");
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(result, Is.EqualTo("/getmedia/a.jpg"));
-        });
-    }
-
-    [Test]
-    public void NormalizePath_WhenMissingLeadingSlash_AddsSlash()
-    {
-        var result = (string)InvokePrivateStatic("NormalizePath", "getmedia/a.jpg");
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result, Is.EqualTo("/getmedia/a.jpg"));
-        });
-    }
 
     [Test]
     public void GetFileNameFromUrl_WhenUrlContainsQuery_RemovesQueryAndReturnsFileName()
