@@ -325,4 +325,208 @@ public class AuthoredContentServiceTests
             Assert.That(capturedParameters.UseLanguageFallbacks, Is.False);
         });
     }
+
+    [Test]
+    public async Task GetAuthoredContentDtoAsync_ReturnsNull_WhenParentAndBlogParentNotFound()
+    {
+        var person = new Person
+        {
+            SystemFields = new WebPageFields()
+        };
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<SectionPeoplePage>());
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<BlogContributors>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<BlogContributors>());
+
+        var result = await _service.GetAuthoredContentDtoAsync(person, CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task GetAuthoredContentDtoAsync_ReturnsNull_WhenShowAuthoredBlogsIsFalse()
+    {
+        var person = new Person
+        {
+            SystemFields = new WebPageFields()
+        };
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<SectionPeoplePage>());
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<BlogContributors>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { new BlogContributors { ShowAuthoredBlogs = false } });
+
+        var result = await _service.GetAuthoredContentDtoAsync(person, CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task GetAuthoredContentDtoAsync_ReturnsBlogDto_WhenShowAuthoredBlogsIsTrue()
+    {
+        var person = new Person
+        {
+            SystemFields = new WebPageFields()
+        };
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<SectionPeoplePage>());
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<BlogContributors>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[]
+            {
+                new BlogContributors
+                {
+                    ShowAuthoredBlogs = true,
+                    AuthoredBlogTitle = "Authored blogs",
+                    AuthoredBlogDescription = "Blog description"
+                }
+            });
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<BlogPost>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<BlogPost>());
+
+        var result = await _service.GetAuthoredContentDtoAsync(person, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Title, Is.EqualTo("Authored blogs"));
+            Assert.That(result.Description, Is.EqualTo("Blog description"));
+            Assert.That(result.Items, Is.Empty);
+        });
+    }
+
+    [Test]
+    public async Task GetAuthoredContentDtoAsync_ReturnsBlogDtoWithBackgroundImageUrl_WhenImagePresent()
+    {
+        var person = new Person
+        {
+            SystemFields = new WebPageFields()
+        };
+        var expectedUrl = "https://cdn.example.com/blog-bg.jpg";
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<SectionPeoplePage>());
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<BlogContributors>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[]
+            {
+                new BlogContributors
+                {
+                    ShowAuthoredBlogs = true,
+                    AuthoredBlogsBackgroundImageUrl = new[]
+                    {
+                        new ContentAttachment
+                        {
+                            ContentAttachmentAsset = new ContentItemAsset { Url = expectedUrl }
+                        }
+                    }
+                }
+            });
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<BlogPost>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<BlogPost>());
+
+        var result = await _service.GetAuthoredContentDtoAsync(person, CancellationToken.None);
+
+        Assert.That(result!.BackgroundImageURL, Is.EqualTo(expectedUrl));
+    }
+
+    [Test]
+    public async Task GetAuthoredContentDtoAsync_ReturnsBlogDtoWithNullBackgroundImageUrl_WhenNoImageConfigured()
+    {
+        var person = new Person
+        {
+            SystemFields = new WebPageFields()
+        };
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<SectionPeoplePage>());
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<BlogContributors>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[]
+            {
+                new BlogContributors
+                {
+                    ShowAuthoredBlogs = true,
+                    AuthoredBlogsBackgroundImageUrl = null
+                }
+            });
+
+        _contentServiceMock
+            .Setup(s => s.GetPagesAsync<BlogPost>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<BlogPost>());
+
+        var result = await _service.GetAuthoredContentDtoAsync(person, CancellationToken.None);
+
+        Assert.That(result!.BackgroundImageURL, Is.Null);
+    }
 }

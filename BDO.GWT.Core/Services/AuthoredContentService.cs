@@ -57,11 +57,11 @@ public class AuthoredContentService : IAuthoredContentService
             cancellationToken
         )).FirstOrDefault();
 
-            if (blogParent is null || blogParent is not { ShowAuthoredBlogs: true })
+            if (blogParent is not { ShowAuthoredBlogs: true })
             {
                 return null;
             }
-            var contentPageBlogCards = await GetPersonAuthoredBlogPosts(blogParent, person, cancellationToken);
+            var contentPageBlogCards = await GetPersonAuthoredBlogPosts(person, cancellationToken);
 
             return new AuthoredContentDto
             {
@@ -87,7 +87,7 @@ public class AuthoredContentService : IAuthoredContentService
         };
     }
 
-    private async Task<AuthoredContentCardDto[]> GetPersonAuthoredBlogPosts(BlogContributors blogContributors, Person person, CancellationToken cancellationToken)
+    private async Task<AuthoredContentCardDto[]> GetPersonAuthoredBlogPosts(Person person, CancellationToken cancellationToken)
     {
         var results = new[] {await GetPersonAuthoredBlogPostCardsAsync(person, cancellationToken) };
 
