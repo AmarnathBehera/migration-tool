@@ -2,6 +2,7 @@
 <cms.class>
   <ClassCodeGenerationSettings>
     <Data>
+      <DisplayNameColumn>WebChannelSnippetID</DisplayNameColumn>
       <GUIDColumn>WebSettingsGUID</GUIDColumn>
       <ObjectType>BDO.WebChannelSnippet</ObjectType>
       <UseGuidHashtable>False</UseGuidHashtable>
@@ -84,6 +85,16 @@
       <field allowempty="true" column="CookieID" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7fd26cc9-f564-4978-a181-f8be7a2649cf" />
       <field allowempty="true" column="CustomCookiebotScriptInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="01a0738d-bb74-44fe-a44a-853e2e7afcc0" />
       <field allowempty="true" column="CustomCookiebotScript" columnprecision="0" columntype="longtext" enabled="true" guid="c7e0fda2-945f-49e5-9932-2e85faeb556e" />
+      <field allowempty="true" column="ShowAdvancedWidgets" columnprecision="0" columntype="boolean" enabled="true" guid="abed7706-66e0-46a2-bc34-d8cfec765196">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+        </properties>
+      </field>
+      <field allowempty="true" column="ShowAdvancedWidgetsInheritfromglobalsettings" columnprecision="0" columntype="boolean" enabled="true" guid="b8b721e2-d795-4bc1-ae46-64305453e957">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+        </properties>
+      </field>
     </form>
   </ClassFormDefinition>
   <ClassGUID>b8d0d5cb-4b0a-48fa-a8a4-54dc06ee7bfa</ClassGUID>

@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentworkflowsteprole>
+  <Parent>
+    <CodeName>Event_Approve</CodeName>
+    <GUID>7fbc9d53-d22c-4029-bfcc-5689335ba815</GUID>
+    <ObjectType>cms.contentworkflowstep</ObjectType>
+    <Parent>
+      <CodeName>PublishEvents</CodeName>
+      <GUID>cc61c0fb-e6ea-46fb-9d6d-84f349bd7b2c</GUID>
+      <ObjectType>cms.contentworkflow</ObjectType>
+    </Parent>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.role_BDOEditor">
+      <ContentWorkflowStepRoleRoleID>
+        <CodeName>BDOEditor</CodeName>
+        <GUID>4cc5e9d8-851e-4025-8665-7d197dc1cb40</GUID>
+        <ObjectType>cms.role</ObjectType>
+      </ContentWorkflowStepRoleRoleID>
+    </Binding>
+    <Binding id="cms.role_BDOPublisher">
+      <ContentWorkflowStepRoleRoleID>
+        <CodeName>BDOPublisher</CodeName>
+        <GUID>44781a9c-7814-497f-8714-a6cc13b8e629</GUID>
+        <ObjectType>cms.role</ObjectType>
+      </ContentWorkflowStepRoleRoleID>
+    </Binding>
+    <Binding id="cms.role_EVEditor">
+      <ContentWorkflowStepRoleRoleID>
+        <CodeName>EVEditor</CodeName>
+        <GUID>f9ada92a-4fbc-4a7c-bb1a-e653d0874571</GUID>
+        <ObjectType>cms.role</ObjectType>
+      </ContentWorkflowStepRoleRoleID>
+    </Binding>
+  </Bindings>
+</cms.contentworkflowsteprole>

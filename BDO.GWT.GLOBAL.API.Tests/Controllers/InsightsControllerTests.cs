@@ -249,4 +249,77 @@ public class InsightsControllerTests
             x => x.GetInsightPagesAsync(42, "en-gb", onlyPublished, It.IsAny<CancellationToken>()),
             Times.Once);
     }
+
+    [Test]
+    public async Task CreateCopyInsight_ReturnsCreatedAtAction_WithNewContentItem()
+    {
+        var request = new CopyInsightPageContent { Title = "Copied", ImageFileAltText = "Alt" };
+        var contentItemGuid = Guid.NewGuid();
+        var expected = new PageOutput<CopyInsightPageContent>
+        {
+            General = new PageGeneralOutput { ContentItemGuid = contentItemGuid },
+            Content = request
+        };
+        var serviceResult = new ActionResult<PageOutput<CopyInsightPageContent>>(expected);
+
+        _insightCrudServiceMock
+            .Setup(x => x.CreateCopyInsightAsync(42, "en-gb", "KenticoDefault", request, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(serviceResult);
+
+        var result = await _controller.CreateCopyInsight(1, "en-gb", "KenticoDefault", request, CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<CreatedAtActionResult>());
+        var createdResult = (CreatedAtActionResult)result.Result!;
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(createdResult.ActionName, Is.EqualTo("Get"));
+            Assert.That(createdResult.Value, Is.EqualTo(expected));
+            Assert.That(createdResult.RouteValues!["pageGuid"], Is.EqualTo(contentItemGuid));
+        }
+
+        _insightCrudServiceMock.Verify(
+            x => x.CreateCopyInsightAsync(42, "en-gb", "KenticoDefault", request, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task CreateCopyInsight_ForwardsChannelIdAndArguments_ToService()
+    {
+        var request = new CopyInsightPageContent { Title = "Copied", ImageFileAltText = "Alt" };
+        var expected = new PageOutput<CopyInsightPageContent>
+        {
+            General = new PageGeneralOutput { ContentItemGuid = Guid.NewGuid() },
+            Content = request
+        };
+        var serviceResult = new ActionResult<PageOutput<CopyInsightPageContent>>(expected);
+
+        _insightCrudServiceMock
+            .Setup(x => x.CreateCopyInsightAsync(42, "fr-fr", "CustomWorkspace", request, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(serviceResult);
+
+        await _controller.CreateCopyInsight(7, "fr-fr", "CustomWorkspace", request, CancellationToken.None);
+
+        _insightCrudServiceMock.Verify(
+            x => x.CreateCopyInsightAsync(42, "fr-fr", "CustomWorkspace", request, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task CreateCopyInsight_WhenServiceReturnsBadRequest_PropagatesResult()
+    {
+        var request = new CopyInsightPageContent { Title = "Copied", ImageFileAltText = "Alt" };
+        var serviceResult = new ActionResult<PageOutput<CopyInsightPageContent>>(new BadRequestResult());
+
+        _insightCrudServiceMock
+            .Setup(x => x.CreateCopyInsightAsync(42, "en-gb", "KenticoDefault", request, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(serviceResult);
+
+        var result = await _controller.CreateCopyInsight(1, "en-gb", "KenticoDefault", request, CancellationToken.None);
+
+        // When the service returns a non-value ActionResult, Value is null so
+        // CreatedAtAction is still produced with a null body.
+        Assert.That(result.Result, Is.InstanceOf<CreatedAtActionResult>());
+        var createdResult = (CreatedAtActionResult)result.Result!;
+        Assert.That(createdResult.Value, Is.Null);
+    }
 }

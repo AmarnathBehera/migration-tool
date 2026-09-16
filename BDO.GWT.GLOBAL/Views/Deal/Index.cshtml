@@ -1,7 +1,6 @@
 ﻿@using BDO
 @using BDO.GWT.Core.Constants
 @using BDO.GWT.Core.Services
-@using BDO.GWT.Xperience.LiveSite.Services
 @using Kentico.Content.Web.Mvc
 @inject IFormBuilderService FormBuilder
 @inject IReactService ReactService
@@ -16,27 +15,30 @@
 
 @{
     Layout = "_Layout";
+
     var widgetsList = new[]
-    {
-        ComponentIdentifiers.Widgets.AccordionWidget,
+        {
+        ComponentIdentifiers.Widgets.Accordion,
         ComponentIdentifiers.Widgets.Button,
-        //ComponentIdentifiers.Widgets.EditorsPick,
-        //ComponentIdentifiers.Widgets.FlexibleBanner,
-        //ComponentIdentifiers.Widgets.FlexibleContent,
-        ComponentIdentifiers.Widgets.Imagewithtext,
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.FlexibleBanner,
+        ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.ImageWithText,
         ComponentIdentifiers.Widgets.KeyContacts,
-        //ComponentIdentifiers.Widgets.KeyTakeaways,
+        ComponentIdentifiers.Widgets.KeyTakeaways,
         ComponentIdentifiers.Widgets.QuoteCard,
-        //ComponentIdentifiers.Widgets.RelatedContacts,
+        ComponentIdentifiers.Widgets.RelatedContacts,
         ComponentIdentifiers.Widgets.RichText,
         ComponentIdentifiers.Widgets.SocialMediaButtons,
-        //ComponentIdentifiers.Widgets.TabAccordion,
-        //ComponentIdentifiers.Widgets.TiledLinkSection,
-        //ComponentIdentifiers.Widgets.TrendingTopicsCarousel
+        ComponentIdentifiers.Widgets.TabAccordion,
+        ComponentIdentifiers.Widgets.TiledLinkSection,
+        ComponentIdentifiers.Widgets.TrendingTopicsCarousel
     };
 }
 
 @PageBuilderService.GetPageBuilderStyles(Html)
+
+@await Html.PartialAsync("_Hero")
 
 @(await ReactService.RenderComponentAsync(
     pageId,
@@ -44,17 +46,14 @@
     ReactComponentType.HeroGUID,
     new
     {
-        data = Model.Hero,
+       data = Model.Hero,
     }, Context.RequestAborted))
 
-        @(await ReactService.RenderComponentAsync(
-                pageId,
-                ReactComponentType.DealDetails,
-                ReactComponentType.DealDetailsGUID,
-                Model, Context.RequestAborted))
-        @await Html.Kentico().EditableAreaAsync(
-        "mainContent",
-                new EditableAreaOptions
-                {
-                    AllowedWidgets = widgetsList
-                })
+@(await ReactService.RenderComponentAsync(
+     pageId,
+     ReactComponentType.DealDetails,
+     ReactComponentType.DealDetailsGUID,
+     Model, Context.RequestAborted))
+
+@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
+

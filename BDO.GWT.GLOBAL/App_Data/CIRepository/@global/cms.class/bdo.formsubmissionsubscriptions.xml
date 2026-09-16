@@ -4,6 +4,7 @@
   <ClassFormDefinition>
     <form>
       <field column="FormSubmissionSubscriptionsID" columntype="integer" enabled="true" guid="ddf73f2d-648f-458a-930b-6b6afb80fba8" isPK="true" />
+      <field column="ChannelSnippetWebChannelSettingsID" columnprecision="0" columntype="integer" enabled="true" guid="f079dec7-e02f-4d29-bdac-f042b117e021" refobjtype="bdo.webchannelsettings" reftype="Required" />
       <field column="Displayname" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="cff68730-bf5e-493e-8044-27be5b9dc96d" />
       <field column="Codename" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="f935bf47-875a-4982-926b-ce4cc4e5bdb0" />
       <field column="Description" columnprecision="0" columntype="longtext" enabled="true" guid="75ee1c27-aeb3-4b9c-aff3-6c09e75efa30" />

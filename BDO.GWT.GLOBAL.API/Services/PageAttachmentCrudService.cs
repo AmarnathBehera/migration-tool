@@ -1,7 +1,6 @@
 using BDO.GWT.Core;
 using BDO.GWT.GLOBAL.API.Data;
 using CMS.ContentEngine;
-using CMS.ContentEngine.Internal;
 using CMS.Membership;
 using CMS.Websites;
 
@@ -213,6 +212,8 @@ namespace BDO.GWT.GLOBAL.API.Services
             {
                 return null;
             }
+
+
 
             return await pageAttachmentService.GetPageAttachmentBinaryAsync(
                 pageGuid,

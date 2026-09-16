@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentworkflow>
+  <ContentWorkflowDisplayName> Publication with approval with mail</ContentWorkflowDisplayName>
+  <ContentWorkflowGUID>b60d25ab-04d6-4a42-bac1-10822d1330e5</ContentWorkflowGUID>
+  <ContentWorkflowName>PublicationWithApprovalWithMail</ContentWorkflowName>
+</cms.contentworkflow>

@@ -6,26 +6,21 @@
 @model InsightPageDto
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
 @{
     var widgetsList = new[]
     {
-        ComponentIdentifiers.Widgets.AccordionWidget,
-        //ComponentIdentifiers.Widgets.DescriptionText,
-        //ComponentIdentifiers.Widgets.EditorsPick
-        ComponentIdentifiers.Widgets.FaqWidget,
-        //ComponentIdentifiers.Widgets.FeaturedEvent,
-        //ComponentIdentifiers.Widgets.FeaturedBusinessSolutions,
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.Faq,
         ComponentIdentifiers.Widgets.FlexibleContent,
-        ComponentIdentifiers.Widgets.Imagewithtext,
-      //  ComponentIdentifiers.Widgets.InFocus,
+        ComponentIdentifiers.Widgets.ImageWithText,
+        ComponentIdentifiers.Widgets.InFocus,
         ComponentIdentifiers.Widgets.KeyContacts,
         ComponentIdentifiers.Widgets.KeyTakeaways,
-        // ComponentIdentifiers.Widgets.RelatedContentCarousel,
-        // ComponentIdentifiers.Widgets.RelatedContacts,
-        //  ComponentIdentifiers.Widgets.InsightAnimationCard,
-        //ComponentIdentifiers.Widgets.PurposeIcon,
-        //ComponentIdentifiers.Widgets.SubscriptionButton,
-        ComponentIdentifiers.Widgets.InsightCarousel
+        ComponentIdentifiers.Widgets.RelatedContentCarousel,
+        ComponentIdentifiers.Widgets.RelatedContacts,
+         ComponentIdentifiers.Widgets.InsightAnimationCard,
     };
 }
 @{
@@ -37,8 +32,8 @@
 }
 
 
-@* @await Html.PartialAsync("_Hero")
- *@
+ @await Html.PartialAsync("_Hero")
+
 @await Html.PartialAsync("_LocalNavigation")
 @(await ReactService.RenderComponentAsync(
         pageId,
@@ -50,12 +45,7 @@
         },
         Context.RequestAborted))
 
-@await Html.Kentico().EditableAreaAsync(
-       "mainContent",
-        new EditableAreaOptions
-        {
-            AllowedWidgets = widgetsList
-        })
+@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).BuildEditableAreaAsync(Html,Context.RequestAborted)
 
 @if (Model.Authors is not null)
 {
@@ -72,10 +62,8 @@
             Context.RequestAborted))
     </div>
 }
-@await Html.Kentico().EditableAreaAsync(
-"bottomArea",
-        new EditableAreaOptions
-        {
-            AllowedWidgets = widgetsList
-        })
 
+
+@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddIdentifier("bottomArea").BuildEditableAreaAsync(Html, Context.RequestAborted)
+
+@PageBuilderService.GetPageBuilderScripts(Html)

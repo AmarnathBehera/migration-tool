@@ -1,5 +1,7 @@
-using BDO.GWT.Core.DTOs.Pages;
+using BDO;
+using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Services;
+using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
 using CMS.ContactManagement;
 using CMS.DataEngine;
@@ -8,6 +10,8 @@ using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Moq;
+using System.Data;
+using System.Linq;
 
 namespace BDO.GWT.Core.Tests.Services;
 
@@ -31,6 +35,10 @@ public class SubscribePageServiceTests
         _captchaSettingsProviderMock = new Mock<IInfoProvider<WebsiteCaptchaSettingsInfo>>();
         _countryInfoProviderMock = new Mock<IInfoProvider<CountryInfo>>();
 
+        _heroServiceMock
+            .Setup(h => h.GetHeroDtoAsync(It.IsAny<HeroData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new HeroDto { Layout = "hero" });
+
         _service = new SubscribePageService(
             _countryInfoProviderMock.Object,
             _recipientListInfoProviderMock.Object,
@@ -40,17 +48,13 @@ public class SubscribePageServiceTests
             _captchaSettingsProviderMock.Object);
     }
 
-    // --- GetSubscribeDtoAsync ----------------------------------------------------
-
     [Test]
     public async Task GetSubscribeDtoAsync_WhenPageIsNull_ReturnsDefaultDto()
     {
         var result = await _service.GetSubscribeDtoAsync(null, CancellationToken.None);
 
-        Assert.That(result, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(result.Hero, Is.Not.Null);
             Assert.That(result.Hero.Layout, Is.EqualTo(string.Empty));
             Assert.That(result.FormType, Is.Null);
             Assert.That(result.EmbedCode, Is.Null);
@@ -59,36 +63,144 @@ public class SubscribePageServiceTests
     }
 
     [Test]
-    public async Task GetSubscribeDtoAsync_WhenPageIsNull_DoesNotCallHeroService()
+    public async Task GetSubscribeDtoAsync_WhenNotFormType_MapsPageAndSkipsFormDto()
     {
-        await _service.GetSubscribeDtoAsync(null, CancellationToken.None);
+        HeroData? capturedHero = null;
+        _heroServiceMock
+            .Setup(h => h.GetHeroDtoAsync(It.IsAny<HeroData>(), It.IsAny<CancellationToken>()))
+            .Callback<HeroData, CancellationToken>((hero, _) => capturedHero = hero)
+            .ReturnsAsync(new HeroDto { Layout = "banner" });
 
-        _heroServiceMock.Verify(
-            h => h.GetHeroDtoAsync(It.IsAny<BDO.GWT.Core.Data.HeroData>(), It.IsAny<CancellationToken>()),
-            Times.Never);
-    }
+        var page = new Subscribe
+        {
+            SystemFields = new WebPageFields { WebPageItemGUID = Guid.NewGuid() },
+            HeroLayout = "L1",
+            HeroTitle = "Title",
+            HeroDescription = "Desc",
+            HeroCallToActionButtonType = "primary",
+            HeroCallToActionButtonText = "Read more",
+            FormType = "embed",
+            EmbedCode = "<iframe></iframe>",
+            RedirectPageOnFormSubmission = [],
+        };
 
-    [Test]
-    public async Task GetSubscribeDtoAsync_WhenPageIsNull_DoesNotQueryRecipientLists()
-    {
-        await _service.GetSubscribeDtoAsync(null, CancellationToken.None);
+        var dto = await _service.GetSubscribeDtoAsync(page, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.Hero.Layout, Is.EqualTo("banner"));
+            Assert.That(dto.FormType, Is.EqualTo("embed"));
+            Assert.That(dto.EmbedCode, Is.EqualTo("<iframe></iframe>"));
+            Assert.That(dto.SubscribeFormDto, Is.Null);
+            Assert.That(capturedHero, Is.Not.Null);
+            Assert.That(capturedHero!.Layout, Is.EqualTo("L1"));
+            Assert.That(capturedHero.Title, Is.EqualTo("Title"));
+            Assert.That(capturedHero.Description, Is.EqualTo("Desc"));
+        });
 
         _recipientListInfoProviderMock.Verify(p => p.Get(), Times.Never);
-    }
-
-    [Test]
-    public async Task GetSubscribeDtoAsync_WhenPageIsNull_DoesNotQueryCaptchaSettings()
-    {
-        await _service.GetSubscribeDtoAsync(null, CancellationToken.None);
-
+        _countryInfoProviderMock.Verify(p => p.Get(), Times.Never);
         _captchaSettingsProviderMock.Verify(p => p.Get(), Times.Never);
     }
 
     [Test]
-    public async Task GetSubscribeDtoAsync_WhenPageIsNull_DoesNotUseContentRetriever()
+    public void GetSubscribeDtoAsync_WhenFormType_InvokesCaptchaLookupBeforeProviderFailure()
     {
-        await _service.GetSubscribeDtoAsync(null, CancellationToken.None);
+        _websiteChannelContextMock.SetupGet(x => x.WebsiteChannelID).Returns(10);
 
-        _contentRetrieverMock.VerifyNoOtherCalls();
+        _captchaSettingsProviderMock
+            .Setup(p => p.Get())
+            .Throws(new InvalidOperationException("captcha query unavailable"));
+
+        _recipientListInfoProviderMock
+            .Setup(p => p.Get())
+            .Throws(new InvalidOperationException("newsletter query unavailable"));
+
+        _countryInfoProviderMock
+            .Setup(p => p.Get())
+            .Throws(new InvalidOperationException("country query unavailable"));
+
+        var page = new Subscribe
+        {
+            SystemFields = new WebPageFields { WebPageItemGUID = Guid.NewGuid() },
+            FormType = "form",
+            RedirectPageOnFormSubmission = [],
+        };
+
+        Assert.ThrowsAsync<InvalidOperationException>(() => _service.GetSubscribeDtoAsync(page, CancellationToken.None));
+        _captchaSettingsProviderMock.Verify(p => p.Get(), Times.Once);
+    }
+
+    [Test]
+    public async Task GetAllCountriesOptionDtosAsync_ReturnsOnlyDefaultOption_WhenNoCountries()
+    {
+        var queryMock = new Mock<ObjectQuery<CountryInfo>>();
+
+        _countryInfoProviderMock
+            .Setup(p => p.Get())
+            .Returns(queryMock.Object);
+
+        queryMock
+            .Setup(q => q.Columns(It.IsAny<string[]>()))
+            .Returns(queryMock.Object);
+        queryMock
+            .Setup(q => q.OrderBy(It.IsAny<string>()))
+            .Returns(queryMock.Object);
+        queryMock
+            .Setup(q => q.GetEnumerableTypedResultAsync(It.IsAny<CommandBehavior>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        var result = await _service.GetAllCountriesOptionDtosAsync(CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Length.EqualTo(1));
+            Assert.That(result[0].Value, Is.EqualTo(string.Empty));
+            Assert.That(result[0].Label, Is.EqualTo("Please select"));
+        });
+    }
+
+    [Test]
+    public async Task GetAllCountriesOptionDtosAsync_ReturnsDefaultThenMappedCountries()
+    {
+        var queryMock = new Mock<ObjectQuery<CountryInfo>>();
+
+        var country1 = new Mock<CountryInfo>();
+        var country1Guid = Guid.NewGuid();
+        country1.SetupGet(x => x.CountryGUID).Returns(country1Guid);
+        country1.SetupGet(x => x.CountryDisplayName).Returns("France");
+
+        var country2 = new Mock<CountryInfo>();
+        var country2Guid = Guid.NewGuid();
+        country2.SetupGet(x => x.CountryGUID).Returns(country2Guid);
+        country2.SetupGet(x => x.CountryDisplayName).Returns("Germany");
+
+        _countryInfoProviderMock
+            .Setup(p => p.Get())
+            .Returns(queryMock.Object);
+
+        queryMock
+            .Setup(q => q.Columns(It.IsAny<string[]>()))
+            .Returns(queryMock.Object);
+        queryMock
+            .Setup(q => q.OrderBy(It.IsAny<string>()))
+            .Returns(queryMock.Object);
+        queryMock
+            .Setup(q => q.GetEnumerableTypedResultAsync(It.IsAny<CommandBehavior>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([country1.Object, country2.Object]);
+
+        var result = await _service.GetAllCountriesOptionDtosAsync(CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Length.EqualTo(3));
+            Assert.That(result[0].Value, Is.EqualTo(string.Empty));
+            Assert.That(result[0].Label, Is.EqualTo("Please select"));
+
+            Assert.That(result[1].Value, Is.EqualTo(country1Guid.ToString()));
+            Assert.That(result[1].Label, Is.EqualTo("France"));
+            Assert.That(result[2].Value, Is.EqualTo(country2Guid.ToString()));
+            Assert.That(result[2].Label, Is.EqualTo("Germany"));
+        });
     }
 }

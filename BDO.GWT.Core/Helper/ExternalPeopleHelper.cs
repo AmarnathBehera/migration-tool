@@ -44,7 +44,7 @@ public class ExternalPeopleHelper : IExternalPeopleHelper
                 {
                     Image = imageFile != null ? new ImageDto
                     {
-                        Url = imageFile.ContentAttachmentAsset.Url,
+                        Url = imageFile.ContentAttachmentAsset.Url.TrimStart('~'),
                         AltText = externalPerson.ImageFileAltText
                     } : null,
                     FullName = await GetDisplayNameAsync(externalPerson),

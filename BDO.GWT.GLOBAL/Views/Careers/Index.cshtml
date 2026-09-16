@@ -7,6 +7,7 @@
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
 
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
@@ -15,23 +16,17 @@
 
 
 @{
+
     var widgetsList = new[]
-    {
-        ComponentIdentifiers.Widgets.AccordionWidget,
-        //ComponentIdentifiers.Widgets.BannerWithIcons,
-        //ComponentIdentifiers.Widgets.CommunityInvolvement,
-        //ComponentIdentifiers.Widgets.DescriptionText,
-
-        // widgets_not_there_yet:
-
+        {
+        ComponentIdentifiers.Widgets.Button,
+        ComponentIdentifiers.Widgets.Faq,
         ComponentIdentifiers.Widgets.FlexibleContent,
-        ComponentIdentifiers.Widgets.FaqWidget,
-        ComponentIdentifiers.Widgets.Imagewithtext,
+        ComponentIdentifiers.Widgets.Form,
         ComponentIdentifiers.Widgets.InFocus,
-        ComponentIdentifiers.Widgets.KeyContacts,
-        //ComponentIdentifiers.Widgets.PurposeIcon,
-        //ComponentIdentifiers.Widgets.TwitterCarousel,
-        ComponentIdentifiers.Widgets.Globallocation,
+        ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.TrendingTopicsCarousel,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
     };
 }
 
@@ -50,19 +45,11 @@
         },
         Context.RequestAborted))
 </div>
-@* 
-@await Html.PartialAsync("_LocalNavigation") *@
+@await Html.PartialAsync("_LocalNavigation") 
 
 
-@await Html.Kentico().EditableAreaAsync(
-"mainContent", // Unique identifier
-                        new EditableAreaOptions
-                        {
-
-                            AllowedWidgets = widgetsList
-                        })
-
-        <div>
+@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
+<div>
     @(await ReactService.RenderComponentAsync(
         pageId,
                 "CareersCardsGrid",
@@ -72,3 +59,4 @@
         ,
         Context.RequestAborted))
 </div>
+@PageBuilderService.GetPageBuilderScripts(Html)

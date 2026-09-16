@@ -2,6 +2,7 @@ using BDO.GWT.GLOBAL.API.Controllers;
 using BDO.GWT.GLOBAL.API.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace BDO.GWT.GLOBAL.API.Tests.Controllers;
@@ -20,7 +21,7 @@ public class AttachmentsControllerTests
         var httpContext = new DefaultHttpContext();
         httpContext.Items["ChannelId"] = 42;
 
-        _controller = new AttachmentsController(_attachmentServiceMock.Object)
+        _controller = new AttachmentsController(_attachmentServiceMock.Object, Mock.Of<ILogger<AttachmentsController>>())
         {
             ControllerContext = new ControllerContext
             {
@@ -261,8 +262,8 @@ public class AttachmentsControllerTests
         Assert.Multiple(() =>
         {
             Assert.That(fileResult.FileContents, Is.EqualTo(data));
-            Assert.That(fileResult.ContentType, Is.EqualTo("application/octet-stream"));
-            Assert.That(fileResult.FileDownloadName, Is.EqualTo(string.Empty));
+            Assert.That(fileResult.ContentType, Is.EqualTo("application/pdf"));
+            Assert.That(fileResult.FileDownloadName, Is.EqualTo("file.pdf"));
         });
     }
 

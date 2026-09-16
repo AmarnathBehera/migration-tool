@@ -1,10 +1,12 @@
-using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Queries;
 using BDO.GWT.GLOBAL.API.Services;
 using CMS.DataEngine;
 using Moq;
+using System.Data;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
+using ChannelSettingInput = BDO.GWT.Web.Core.API.Data.ChannelSettingInput;
 
 namespace BDO.GWT.GLOBAL.API.Tests.Services;
 
@@ -20,177 +22,6 @@ public class ChannelSettingCrudServiceTests
     }
 
     [Test]
-    public void ChannelSettingOutput_DefaultValues()
-    {
-        var output = new ChannelSettingOutput
-        {
-            CodeName = "BDO.Email",
-            DisplayName = "Email",
-            InheritFromGlobalSettings = false,
-            Type = "Email"
-        };
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(output.CodeName, Is.EqualTo("BDO.Email"));
-            Assert.That(output.DisplayName, Is.EqualTo("Email"));
-            Assert.That(output.InheritFromGlobalSettings, Is.False);
-            Assert.That(output.Type, Is.EqualTo("Email"));
-            Assert.That(output.Value, Is.Null);
-        });
-    }
-
-    [Test]
-    public void ChannelSettingOutput_CanSetInheritFromGlobalSettings()
-    {
-        var output = new ChannelSettingOutput
-        {
-            CodeName = "BDO.Email",
-            DisplayName = "Email",
-            InheritFromGlobalSettings = true,
-            Type = "Email"
-        };
-
-        Assert.That(output.InheritFromGlobalSettings, Is.True);
-    }
-
-    [Test]
-    public void ChannelSettingOutput_CanStoreValue()
-    {
-        var value = new Dictionary<string, object> { ["Field"] = "Value" };
-        var output = new ChannelSettingOutput
-        {
-            CodeName = "BDO.SEOSettings",
-            DisplayName = "SEO Settings",
-            InheritFromGlobalSettings = false,
-            Type = "SEOSettings",
-            Value = value
-        };
-
-        Assert.That(output.Value, Is.SameAs(value));
-    }
-
-    [TestCase("Include Custom Scripts")]
-    [TestCase("Email")]
-    [TestCase("Events & Webinar")]
-    [TestCase("General Setting")]
-    [TestCase("SEO Settings")]
-    [TestCase("Print or Share")]
-    [TestCase("Filtering")]
-    [TestCase("Our People")]
-    public void SettingsQuery_AcceptsAllKnownChannelSettingDisplayNames(string displayName)
-    {
-        var query = new SettingsQuery { DisplayName = displayName };
-
-        Assert.That(query.DisplayName, Is.EqualTo(displayName));
-    }
-
-    [TestCase("BDO.WebChannelSnippet")]
-    [TestCase("BDO.Email")]
-    [TestCase("BDO.EventsWebinars")]
-    [TestCase("BDO.GeneralSetting")]
-    [TestCase("BDO.SEOSettings")]
-    [TestCase("BDO.PrintorShare")]
-    [TestCase("BDO.Filtering")]
-    [TestCase("BDO.OurPeople")]
-    public void ChannelSettingOutput_AcceptsAllKnownCodeNames(string codeName)
-    {
-        var output = new ChannelSettingOutput
-        {
-            CodeName = codeName,
-            DisplayName = "Test",
-            InheritFromGlobalSettings = false,
-            Type = "Test"
-        };
-
-        Assert.That(output.CodeName, Is.EqualTo(codeName));
-    }
-
-    [Test]
-    public void GetChannelSettings_WhenDependenciesUnavailable_Throws()
-    {
-        var service = (ChannelSettingCrudService)RuntimeHelpers.GetUninitializedObject(typeof(ChannelSettingCrudService));
-        var query = new SettingsQuery();
-
-        Assert.ThrowsAsync<NullReferenceException>(async () =>
-            await service.GetChannelSettings(query, CancellationToken.None));
-    }
-
-    [Test]
-    public void GetChannelSettings_WithDisplayNameFilter_WhenDependenciesUnavailable_Throws()
-    {
-        var service = (ChannelSettingCrudService)RuntimeHelpers.GetUninitializedObject(typeof(ChannelSettingCrudService));
-        var query = new SettingsQuery { DisplayName = "Include Custom Scripts" };
-
-        Assert.ThrowsAsync<NullReferenceException>(async () =>
-            await service.GetChannelSettings(query, CancellationToken.None));
-    }
-
-    [Test]
-    public void GetChannelSetting_WhenDependenciesUnavailable_Throws()
-    {
-        var service = (ChannelSettingCrudService)RuntimeHelpers.GetUninitializedObject(typeof(ChannelSettingCrudService));
-
-        Assert.ThrowsAsync<NullReferenceException>(async () =>
-            await service.GetChannelSetting("BDO.WebChannelSnippet", CancellationToken.None));
-    }
-
-    // --- Guard branches reachable without provider access ------------------------
-
-    [TestCase("Email")]
-    [TestCase("SEO Settings")]
-    [TestCase("Filtering")]
-    public async Task GetChannelSettings_ReturnsEmpty_WhenDisplayNameIsNotIncludeCustomScripts(string displayName)
-    {
-        // A non-"Include Custom Scripts" DisplayName short-circuits before touching the
-        // provider, so a mocked (never-configured) provider is sufficient.
-        var providerMock = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
-        var service = new ChannelSettingCrudService(providerMock.Object);
-        var query = new SettingsQuery { DisplayName = displayName };
-
-        var result = await service.GetChannelSettings(query, CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.Empty);
-            providerMock.Verify(p => p.Get(), Times.Never);
-        });
-    }
-
-    [TestCase("BDO.Email")]
-    [TestCase("BDO.Cookiebot")]
-    [TestCase("")]
-    public async Task GetChannelSetting_ReturnsNull_WhenCodeNameIsNotWebChannelSnippet(string codeName)
-    {
-        var providerMock = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
-        var service = new ChannelSettingCrudService(providerMock.Object);
-
-        var result = await service.GetChannelSetting(codeName, CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result, Is.Null);
-            providerMock.Verify(p => p.Get(), Times.Never);
-        });
-    }
-
-    [Test]
-    public async Task GetChannelSetting_IsCaseSensitive_ForWebChannelSnippetCodeName()
-    {
-        // The comparison uses StringComparison.Ordinal, so a differently-cased value
-        // must not match and must return null without querying the provider.
-        var providerMock = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
-        var service = new ChannelSettingCrudService(providerMock.Object);
-
-        var result = await service.GetChannelSetting("bdo.webchannelsnippet", CancellationToken.None);
-
-        Assert.That(result, Is.Null);
-    }
-
-
-
-    [Test]
     public void ChannelSettingCrudService_Interface_HasExpectedMethods()
     {
         var interfaceType = typeof(IChannelSettingCrudService);
@@ -199,71 +30,187 @@ public class ChannelSettingCrudServiceTests
         {
             Assert.That(interfaceType.GetMethod("GetChannelSettings"), Is.Not.Null);
             Assert.That(interfaceType.GetMethod("GetChannelSetting"), Is.Not.Null);
+            Assert.That(interfaceType.GetMethod("UpdateChannelSetting"), Is.Not.Null);
         });
     }
 
     [Test]
-    public void ChannelSettingOutput_Type_CanBeSetToAnyString()
+    public async Task GetChannelSettings_ReturnsEmpty_WhenNoSnippetFound()
     {
-        var output = new ChannelSettingOutput
-        {
-            CodeName = "BDO.Test",
-            DisplayName = "Test",
-            InheritFromGlobalSettings = false,
-            Type = "CustomType"
-        };
+        var service = new ChannelSettingCrudService(BuildProvider([]).Object);
 
-        Assert.That(output.Type, Is.EqualTo("CustomType"));
+        var result = await service.GetChannelSettings(100, new SettingsQuery(), CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
-    public void ChannelSettingInput_DefaultValues_AreInitialized()
+    public async Task GetChannelSetting_ReturnsNull_WhenCodeNameNotFound()
     {
-        var input = new BDO.GWT.Web.Core.API.Data.ChannelSettingInput
+        var service = new ChannelSettingCrudService(BuildProvider([]).Object);
+
+        var result = await service.GetChannelSetting(100, "BDO_DoesNotExist", CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task UpdateChannelSetting_ReturnsNull_WhenSnippetNotFound()
+    {
+        var providerMock = BuildProvider([]);
+        var service = new ChannelSettingCrudService(providerMock.Object);
+
+        var result = await service.UpdateChannelSetting(
+            100,
+            "BDO_ScriptHeadKeyValue",
+            new ChannelSettingInput { InheritFromGlobalSettings = true, Value = "updated" },
+            CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+        providerMock.Verify(x => x.SetAsync(It.IsAny<WebChannelSnippetInfo>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Test]
+    public void ResolveSettingType_CoversAllBranches()
+    {
+        Assert.Multiple(() =>
         {
-            InheritFromGlobalSettings = false
-        };
+            Assert.That(InvokeResolveSettingType(null), Is.EqualTo("string"));
+            Assert.That(InvokeResolveSettingType(DBNull.Value), Is.EqualTo("string"));
+            Assert.That(InvokeResolveSettingType("x"), Is.EqualTo("string"));
+            Assert.That(InvokeResolveSettingType(true), Is.EqualTo("boolean"));
+            Assert.That(InvokeResolveSettingType(1), Is.EqualTo("integer"));
+            Assert.That(InvokeResolveSettingType(1.2m), Is.EqualTo("number"));
+            Assert.That(InvokeResolveSettingType(DateTime.UtcNow), Is.EqualTo("datetime"));
+            Assert.That(InvokeResolveSettingType(Guid.NewGuid()), Is.EqualTo("guid"));
+            Assert.That(InvokeResolveSettingType(new Version(1, 0)), Is.EqualTo("Version"));
+        });
+    }
+
+    [Test]
+    public void ConvertJsonElement_CoversFallbackBranches()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(InvokeConvertJsonElement(ParseElement("null"), "x"), Is.Null);
+            Assert.That(InvokeConvertJsonElement(ParseElement("true"), null), Is.True);
+            Assert.That(InvokeConvertJsonElement(ParseElement("\"txt\""), null), Is.EqualTo("txt"));
+            Assert.That(InvokeConvertJsonElement(ParseElement("12"), null), Is.EqualTo(12L));
+            Assert.That(InvokeConvertJsonElement(ParseElement("12.5"), null), Is.EqualTo(12.5m));
+            Assert.That(InvokeConvertJsonElement(ParseElement("[1,2]"), null), Is.EqualTo("[1,2]"));
+            Assert.That(InvokeConvertJsonElement(ParseElement("{\"a\":1}"), null), Is.EqualTo("{\"a\":1}"));
+        });
+    }
+
+    [Test]
+    public void ConvertJsonElement_CoversCurrentTypeConversions()
+    {
+        var guid = Guid.NewGuid();
 
         Assert.Multiple(() =>
         {
-            Assert.That(input.InheritFromGlobalSettings, Is.False);
-            Assert.That(input.Value, Is.Null);
+            Assert.That(InvokeConvertJsonElement(ParseElement("\"true\""), false), Is.True);
+            Assert.That(InvokeConvertJsonElement(ParseElement("\"abc\""), false), Is.False);
+            Assert.That(InvokeConvertJsonElement(ParseElement("\"5\""), 1), Is.EqualTo(5));
+            Assert.That(InvokeConvertJsonElement(ParseElement("\"abc\""), 1), Is.EqualTo(1));
+            Assert.That(InvokeConvertJsonElement(ParseElement("\"6\""), 1L), Is.EqualTo(6L));
+            Assert.That(InvokeConvertJsonElement(ParseElement("\"abc\""), 1L), Is.EqualTo(1L));
+            Assert.That(InvokeConvertJsonElement(ParseElement("\"7.5\""), 1.0m), Is.EqualTo(7.5m));
+            Assert.That(InvokeConvertJsonElement(ParseElement("\"abc\""), 1.0m), Is.EqualTo(1.0m));
+            Assert.That(InvokeConvertJsonElement(ParseElement($"\"{guid}\""), Guid.Empty), Is.EqualTo(guid));
+            Assert.That(InvokeConvertJsonElement(ParseElement("\"bad-guid\""), guid), Is.EqualTo(guid));
         });
     }
 
     [Test]
-    public void ChannelSettingInput_InheritFromGlobalSettings_CanBeSetToTrue()
+    public void RemoveInheritSuffix_ReturnsOriginal_WhenNoSuffixFound()
     {
-        var input = new BDO.GWT.Web.Core.API.Data.ChannelSettingInput
-        {
-            InheritFromGlobalSettings = true
-        };
+        var service = new ChannelSettingCrudService(BuildProvider([]).Object);
+        var result = InvokeRemoveInheritSuffix(service, "ScriptHead");
 
-        Assert.That(input.InheritFromGlobalSettings, Is.True);
+        Assert.That(result, Is.EqualTo("ScriptHead"));
     }
 
     [Test]
-    public void ChannelSettingInput_Value_CanBeSet()
+    public void RemoveInheritSuffix_StripsMatchingSuffix()
     {
-        var value = new Dictionary<string, object> { ["key"] = "val" };
-        var input = new BDO.GWT.Web.Core.API.Data.ChannelSettingInput
-        {
-            InheritFromGlobalSettings = false,
-            Value = value
-        };
+        var service = new ChannelSettingCrudService(BuildProvider([]).Object);
+        var result = InvokeRemoveInheritSuffix(service, "ScriptHeadInheritfromglobalsettings");
 
-        Assert.That(input.Value, Is.SameAs(value));
+        Assert.That(result, Is.EqualTo("ScriptHead"));
     }
 
     [Test]
-    public void ChannelSettingInput_Value_CanBeString()
+    public void NormalizeColumnNameForInheritMatch_StripsKeyValue()
     {
-        var input = new BDO.GWT.Web.Core.API.Data.ChannelSettingInput
+        Assert.Multiple(() =>
         {
-            InheritFromGlobalSettings = true,
-            Value = "some-value"
-        };
+            Assert.That(InvokeNormalizeColumnNameForInheritMatch("ScriptHeadKeyValue"), Is.EqualTo("ScriptHead"));
+            Assert.That(InvokeNormalizeColumnNameForInheritMatch("DisplayName"), Is.EqualTo("DisplayName"));
+        });
+    }
 
-        Assert.That(input.Value, Is.EqualTo("some-value"));
+    [Test]
+    public void GetMethods_WhenDependenciesUnavailable_Throw()
+    {
+        var service = (ChannelSettingCrudService)RuntimeHelpers.GetUninitializedObject(typeof(ChannelSettingCrudService));
+
+        Assert.Multiple(() =>
+        {
+            Assert.ThrowsAsync<NullReferenceException>(async () => await service.GetChannelSettings(1, new SettingsQuery(), CancellationToken.None));
+            Assert.ThrowsAsync<NullReferenceException>(async () => await service.GetChannelSetting(1, "BDO_ScriptHeadKeyValue", CancellationToken.None));
+            Assert.ThrowsAsync<NullReferenceException>(async () => await service.UpdateChannelSetting(1, "BDO_ScriptHeadKeyValue", new ChannelSettingInput { InheritFromGlobalSettings = false, Value = "x" }, CancellationToken.None));
+        });
+    }
+
+    private static Mock<IInfoProvider<WebChannelSnippetInfo>> BuildProvider(IEnumerable<WebChannelSnippetInfo> rows)
+    {
+        var query = new Mock<ObjectQuery<WebChannelSnippetInfo>>();
+        query.Setup(x => x.WhereEquals(It.IsAny<string>(), It.IsAny<object>())).Returns(query.Object);
+        query.Setup(x => x.GetEnumerableTypedResult(It.IsAny<CommandBehavior>(), It.IsAny<bool>())).Returns(rows);
+        query.Setup(x => x.GetEnumerableTypedResultAsync(It.IsAny<CommandBehavior>(), It.IsAny<bool>(), It.IsAny<CancellationToken?>())).ReturnsAsync(rows);
+
+        var providerMock = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
+        providerMock.Setup(x => x.Get()).Returns(query.Object);
+
+        return providerMock;
+    }
+
+    private static string InvokeResolveSettingType(object? value)
+    {
+        var method = typeof(ChannelSettingCrudService).GetMethod("ResolveSettingType", BindingFlags.Static | BindingFlags.NonPublic);
+        Assert.That(method, Is.Not.Null);
+
+        return (string)method!.Invoke(null, [value])!;
+    }
+
+    private static object? InvokeConvertJsonElement(JsonElement element, object? currentValue)
+    {
+        var method = typeof(ChannelSettingCrudService).GetMethod("ConvertJsonElement", BindingFlags.Static | BindingFlags.NonPublic);
+        Assert.That(method, Is.Not.Null);
+
+        return method!.Invoke(null, [element, currentValue]);
+    }
+
+    private static string InvokeRemoveInheritSuffix(ChannelSettingCrudService service, string columnName)
+    {
+        var method = typeof(ChannelSettingCrudService).GetMethod("RemoveInheritSuffix", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.That(method, Is.Not.Null);
+
+        return (string)method!.Invoke(service, [columnName])!;
+    }
+
+    private static string InvokeNormalizeColumnNameForInheritMatch(string columnName)
+    {
+        var method = typeof(ChannelSettingCrudService).GetMethod("NormalizeColumnNameForInheritMatch", BindingFlags.Static | BindingFlags.NonPublic);
+        Assert.That(method, Is.Not.Null);
+
+        return (string)method!.Invoke(null, [columnName])!;
+    }
+
+    private static JsonElement ParseElement(string json)
+    {
+        using var document = JsonDocument.Parse(json);
+        return document.RootElement.Clone();
     }
 }

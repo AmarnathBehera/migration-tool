@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentworkflowsteprole>
+  <Parent>
+    <CodeName>ProcessBDOEventAction</CodeName>
+    <GUID>f0f1fcd6-2b79-4a68-ae04-e5f93e731451</GUID>
+    <ObjectType>cms.contentworkflowstep</ObjectType>
+    <Parent>
+      <CodeName>PublishEvents</CodeName>
+      <GUID>cc61c0fb-e6ea-46fb-9d6d-84f349bd7b2c</GUID>
+      <ObjectType>cms.contentworkflow</ObjectType>
+    </Parent>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.role_Administrator">
+      <ContentWorkflowStepRoleRoleID>
+        <CodeName>Administrator</CodeName>
+        <GUID>2c98af39-5f89-4639-8451-0b80eb100df8</GUID>
+        <ObjectType>cms.role</ObjectType>
+      </ContentWorkflowStepRoleRoleID>
+    </Binding>
+  </Bindings>
+</cms.contentworkflowsteprole>

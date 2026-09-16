@@ -6,6 +6,7 @@
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
 
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
@@ -16,15 +17,23 @@
 
     var widgetsList = new[]
     {
-        ComponentIdentifiers.Widgets.Imagewithtext,
-        ComponentIdentifiers.Widgets.QuoteCard,
-        ComponentIdentifiers.Widgets.TiledLink,
-        ComponentIdentifiers.Widgets.RichText,
-        ComponentIdentifiers.Widgets.Globallocation,
-        ComponentIdentifiers.Widgets.AccordionWidget,
-        ComponentIdentifiers.Widgets.FaqWidget,
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.EditorsPick,
         ComponentIdentifiers.Widgets.KeyContacts,
-        ComponentIdentifiers.Widgets.InFocus
+        ComponentIdentifiers.Widgets.RelatedContacts,
+        ComponentIdentifiers.Widgets.TiledLinkSection,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+        ComponentIdentifiers.Widgets.InsightAnimationCard,
+    };
+
+    var advancedWidgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.Faq,
+        ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.ImageWithText,
+        ComponentIdentifiers.Widgets.InFocus,
+        ComponentIdentifiers.Widgets.TabAccordion,
+        ComponentIdentifiers.Widgets.TrendingTopicsCarousel,
     };
 }
 <div>
@@ -38,6 +47,8 @@
         },
         Context.RequestAborted))
 </div>
+@await Html.PartialAsync("_LocalNavigation")
+
 <div>
     @(await ReactService.RenderComponentAsync(
         pageId,
@@ -46,13 +57,7 @@
         Model,
         Context.RequestAborted))
 </div>
-@await Html.PartialAsync("_LocalNavigation")
 
-<div>
-@await Html.Kentico().EditableAreaAsync(
-"mainContent",
-    new EditableAreaOptions
-    {
-        AllowedWidgets = widgetsList
-    })
-</div>
+@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+
+@PageBuilderService.GetPageBuilderScripts(Html)

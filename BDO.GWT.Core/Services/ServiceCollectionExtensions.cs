@@ -1,9 +1,7 @@
 ﻿namespace BDO.GWT.Core
 {
     using BDO.GWT.AzureCognitiveSearch.Services;
-    using BDO.GWT.Common.Core.Services;
     using BDO.GWT.Common.Helpers;
-    using BDO.GWT.Core;
     using BDO.GWT.Core.Helper;
     using BDO.GWT.Core.Helpers;
     using BDO.GWT.Core.LiveSite.Services;
@@ -14,9 +12,6 @@
     using BDO.GWT.Core.Services.Footer;
     using BDO.GWT.Core.Services.Header;
     using BDO.GWT.Core.Services.Widget;
-    using BDO.GWT.Core.ValueObjects;
-    using BDO.GWT.Domain.Core.Helpers;
-    using BDO.GWT.Domain.Core.Services;
     using BDO.GWT.GLOBAL.Services;
     using BDO.GWT.Web.Core.LiveSite.Services;
     using BDO.GWT.Web.Core.Services;
@@ -24,10 +19,6 @@
     using BDO.GWT.Xperience.Admin.Pages.ProjectSettings.WebChannelSettings;
     using BDO.GWT.Xperience.Core.LiveSite.Services;
     using BDO.GWT.Xperience.Core.Services;
-    using CMS.ContentEngine;
-    using CMS.Helpers;
-    using CMS.Websites;
-    using Microsoft.AspNetCore.Authentication;
     using Microsoft.Extensions.DependencyInjection;
 
     public static class ServiceCollectionExtensions
@@ -105,6 +96,8 @@
             serviceCollection.AddScoped<IInsightCardService, InsightCardService>();
             serviceCollection.AddScoped<IInsightCarouselService, InsightCarouselService>();
             serviceCollection.AddScoped<IInsightCarouselStateStore, InsightCarouselStateStore>();
+            serviceCollection.AddScoped<IViewGlobalLocationsService, ViewGlobalLocationsService>();
+            serviceCollection.AddScoped<ITrendingTopicsCarouselService, TrendingTopicsCarouselService>();
 
             serviceCollection.AddScoped<IGlobalLocationCustomTableDataService, GlobalLocationCustomTableDataService>();
             serviceCollection.AddScoped<IEventWebinarPageService, EventWebinarPageService>();
@@ -135,6 +128,8 @@
             serviceCollection.AddScoped<ITimeZoneService, TimeZoneService>();
             serviceCollection.AddScoped<ICookieBannerService, CookieBannerService>();        
             serviceCollection.AddScoped<IDateTimeProviderSearch, DateTimeProviderSearch>();
+            serviceCollection.AddScoped<IGlobalLocationsPageService, GlobalLocationsPageService>();
+
             serviceCollection.AddScoped<ISitemapPageService, SitemapPageService>();
             serviceCollection.AddScoped<ISitemapService, SitemapService>();
             serviceCollection.AddScoped<ILanguageProvider, LanguageProvider>();

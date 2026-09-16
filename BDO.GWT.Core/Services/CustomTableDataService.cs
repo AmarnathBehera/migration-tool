@@ -9,6 +9,7 @@ using System.CodeDom;
 using CMS.EventLog;
 using Microsoft.AspNetCore.Mvc;
 using CMS.Core;
+using BDO.GWT.Core.Entities;
 
 
 namespace BDO.GWT.Core.Services;
@@ -16,6 +17,7 @@ namespace BDO.GWT.Core.Services;
 public interface IGlobalLocationCustomTableDataService
 {
     Task<GlobalLocationCustomTableDto> GetLocationsAsync(int? memberFirmId);
+    Task<List<GlobalLocation>> GetAllGlobalLocationsAsync();
 }
 public class GlobalLocationCustomTableDataService : IGlobalLocationCustomTableDataService
 {
@@ -105,5 +107,50 @@ public class GlobalLocationCustomTableDataService : IGlobalLocationCustomTableDa
             return new GlobalLocationCustomTableDto();
     }
 
-}
+    public async Task<List<GlobalLocation>> GetAllGlobalLocationsAsync()
+    {
+        var locations = new List<GlobalLocation>();
 
+        try
+        {
+            string connectionString =
+                   _configuration.GetConnectionString("CMSConnectionString")!;
+
+
+            await using var connection = new SqlConnection(connectionString);
+
+            await connection.OpenAsync();
+
+            const string sql = @"
+            SELECT
+                GlobalLocationTitle,
+                GlobalLocationRegion,
+                GlobalLocationUrl
+            FROM dbo.BDO_GlobalLocation_Custom
+            ORDER BY GlobalLocationTitle";
+
+            await using var command = new SqlCommand(sql, connection);
+
+            await using var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                locations.Add(new GlobalLocation
+                {
+                    Title = reader["GlobalLocationTitle"]?.ToString() ?? string.Empty,
+                    Region = reader["GlobalLocationRegion"]?.ToString() ?? string.Empty,
+                    Url = reader["GlobalLocationUrl"]?.ToString() ?? string.Empty,
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            eventLogService.LogException("GlobalLocationCustomTableDataService", "GetLocationsAsync", ex, ex.Message);
+        }
+
+        if (locations.Count > 0)
+            return locations;
+        else
+            return new List<GlobalLocation>();
+    }
+}

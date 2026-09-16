@@ -178,14 +178,33 @@ app.UseCookiePolicy();
 
 app.UseAuthentication();
 
-//if (!app.Environment.IsDevelopment())
-//{
-//    app.UseExceptionHandler("/Error/500");
-//    app.UseHsts();  
-//}
 
 
-//app.UseStatusCodePagesWithReExecute("/Error/{0}");
+bool isadminsite = bool.Parse(builder.Configuration["IsAdminSite"]);
+if (!app.Environment.IsDevelopment())
+{
+    if (!isadminsite)
+    {
+        app.UseWhen(
+        context => !context.Request.Headers.UserAgent.ToString()
+            .Contains("Edge Health Probe", StringComparison.OrdinalIgnoreCase),
+        branch =>
+        {
+            branch.UseExceptionHandler("/Error/500");
+        });
+    }
+
+    app.UseHsts();
+}
+if (!isadminsite)
+{
+    app.UseWhen(
+    context => !context.Request.Headers.UserAgent.ToString().Contains("Edge Health Probe", StringComparison.OrdinalIgnoreCase),
+    branch =>
+    {
+        branch.UseStatusCodePagesWithReExecute("/Error/{0}");
+    });
+}
 
 
 if (!builder.Environment.IsDevelopment() && builder.Configuration.GetSection("AdminRedirectOptions")?.GetSection("RedirectDomain")?.Value.Trim() != string.Empty)

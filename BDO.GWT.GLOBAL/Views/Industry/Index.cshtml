@@ -16,25 +16,25 @@
     Layout = "_Layout";
 
     var widgetsList = new[]
-    {
-        ComponentIdentifiers.Widgets.Imagewithtext,
-        ComponentIdentifiers.Widgets.QuoteCard,
-        ComponentIdentifiers.Widgets.TiledLink,
-        ComponentIdentifiers.Widgets.RichText,
-        ComponentIdentifiers.Widgets.Globallocation,
-        ComponentIdentifiers.Widgets.AccordionWidget,
-        ComponentIdentifiers.Widgets.FaqWidget,
-        ComponentIdentifiers.Widgets.KeyContacts
+        {
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.RelatedContacts,
+        ComponentIdentifiers.Widgets.RelatedContentCarousel,
+        ComponentIdentifiers.Widgets.TiledLinkSection,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+         ComponentIdentifiers.Widgets.InsightAnimationCard,
     };
+
     var advancedWidgetsList = new[]
     {
-        // ComponentIdentifiers.Widgets.Faq,
+        ComponentIdentifiers.Widgets.Faq,
         ComponentIdentifiers.Widgets.FlexibleContent,
-        ComponentIdentifiers.Widgets.Imagewithtext,
+        ComponentIdentifiers.Widgets.ImageWithText,
         ComponentIdentifiers.Widgets.InFocus,
-        //ComponentIdentifiers.Widgets.PurposeIcon,
         ComponentIdentifiers.Widgets.TabAccordion,
-        //ComponentIdentifiers.Widgets.TrendingTopicsCarousel,
+        ComponentIdentifiers.Widgets.TrendingTopicsCarousel,
     };
 }
 <div>
@@ -58,6 +58,7 @@
         Model,
         Context.RequestAborted))
 </div>
-<div>    
-   @await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
-</div>
+
+@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+
+@PageBuilderService.GetPageBuilderScripts(Html)
