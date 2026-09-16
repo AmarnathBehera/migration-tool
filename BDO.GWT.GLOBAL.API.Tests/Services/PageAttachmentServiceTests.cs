@@ -292,6 +292,45 @@ public class PageAttachmentServiceTests
     }
 
     [Test]
+    public async Task GetPageAttachmentBinaryAsync_WhenAssetUrlIsVirtualContextWrapped_UsesInnerAssetPath()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+        var expectedBytes = new byte[] { 1, 2, 3 };
+        var asset = CreateAsset(
+            "/cmsctx/pm/token/lang/en-gb/wpid/72/cid/1/cdid/82/ts/1/readonly/0/h/hash/-/~/getContentAsset/5ed65831-9e46-4827-8011-d91f5c2e130e/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/file.pdf?language=en-gb",
+            "file.pdf",
+            ".pdf");
+        var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
+        SetupContentService(pageGuid, [page]);
+        SetupIsDevelopment(false);
+        SetupHttpContext("https", "mysite.com");
+
+        var content = new ByteArrayContent(expectedBytes);
+        content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
+
+        _httpMessageHandlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(request =>
+                    request.Method == HttpMethod.Get
+                    && request.RequestUri == new Uri("https://mysite.com/getContentAsset/5ed65831-9e46-4827-8011-d91f5c2e130e/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/file.pdf?language=en-gb")),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK) { Content = content });
+
+        var result = await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb");
+
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.Value.Data, Is.EqualTo(expectedBytes));
+            Assert.That(result.Value.ContentType, Is.EqualTo("application/pdf"));
+            Assert.That(result.Value.FileName, Is.EqualTo("file.pdf"));
+        });
+    }
+
+    [Test]
     public async Task GetPageAttachmentBinaryAsync_WhenSuccessful_ReturnsBinaryData()
     {
         var pageGuid = Guid.NewGuid();
