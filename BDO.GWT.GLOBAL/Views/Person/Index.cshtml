@@ -43,12 +43,22 @@
 
 @if (this.Model.PersonDto.ParentEnableForm && this.Model.PersonDto.EnableForm)
 {
-    <div class="section-container section-container--md py-20">
+    <div class="person-contact-form section-container section-container--md py-8">
         <div class="ktc-default-section flex flex-col">
             @await FormBuilder.GetFormBuilderWidget(Html, "bdo_contactpeoplewithemail")
         </div>
     </div>
 }
+
+<style>
+    .person-contact-form .formwidget-submit-text {
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 12px;
+    }
+
+</style>
 <div>
     @await Html.Kentico().EditableAreaAsync(
     "mainContent",

@@ -7,7 +7,10 @@ using CMS.ContentEngine;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Moq;
+using System.Net.Http;
 using System.Reflection;
 
 namespace BDO.GWT.GLOBAL.API.Tests.Helpers;
@@ -33,6 +36,7 @@ public class MappingHelperTests
         _cultureServiceMock = new Mock<ICultureService>();
         _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
         _validationStateMock = new Mock<IValidationState>();
+
         _mappingHelper = new MappingHelper(
             _contentServiceMock.Object,
             _cultureServiceMock.Object,
