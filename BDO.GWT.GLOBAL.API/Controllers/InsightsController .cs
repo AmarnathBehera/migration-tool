@@ -160,5 +160,24 @@ namespace BDO.GWT.GLOBAL.API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
+        /// <summary>
+        /// Creates a new Copy Insight content item in the specified Content Hub workspace.
+        /// </summary>
+        [AllowAnonymous]
+        [HttpPost("{workspaceName}/CopyInsight")]
+        //[HasPermission(ApiMethodGroupName.Insights, ApiPermission.Manage)]
+        [SwaggerResponse(StatusCodes.Status201Created, null, typeof(PageOutput<CopyInsightPageContent>), MediaTypeNames.Application.Json)]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid request.")]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error.")]
+        public async Task<ActionResult<PageOutput<CopyInsightPageContent>>> CreateCopyInsight(
+            [FromRoute] int memberFirmID, [FromQuery][Required] string culture, [FromRoute] string workspaceName,
+             [FromBody] CopyInsightPageContent request, CancellationToken cancellationToken)
+        {
+            int channelId = Convert.ToInt32(HttpContext.Items["ChannelId"]);
+            var result = await _insightCrudService.CreateCopyInsightAsync(channelId, culture, workspaceName, request, cancellationToken);
+
+            return CreatedAtAction(nameof(Get), new { memberFirmID, pageGuid = result.Value?.General?.ContentItemGuid }, result.Value);
+        }
     }
 }

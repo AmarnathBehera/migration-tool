@@ -1,8 +1,9 @@
 ﻿using BDO.GWT.Common.Core.Exceptions;
-using BDO.GWT.Common.Core.Services;
+using BDO.GWT.Core.Exceptions;
 using BDO.GWT.GLOBAL.API.DTOs;
 using CMS.DataEngine;
 using CMS.Scheduler;
+using CMS.Scheduler.Internal;
 
 namespace BDO.GWT.GLOBAL.API.Services;
 
@@ -12,19 +13,24 @@ public interface IScheduledTaskCrudService
 
     Task<ScheduledTaskDto> GetScheduledTaskDtoAsync(Guid scheduledTaskGuid, CancellationToken cancellationToken);
 
+    Task ExecuteScheduledTaskAsync(Guid scheduledTaskGuid, CancellationToken cancellationToken);
+
 }
 
 public class ScheduledTaskCrudService : IScheduledTaskCrudService
 {
     private readonly IInfoProvider<ScheduledTaskConfigurationInfo> _scheduledTaskConfigurationInfoProvider;
     private readonly IValidationState _validationState;
+    private readonly ISchedulingExecutor _schedulingExecutor;
 
     public ScheduledTaskCrudService(
         IInfoProvider<ScheduledTaskConfigurationInfo> scheduledTaskConfigurationInfoProvider,
-        IValidationState validationState)
+        IValidationState validationState,
+        ISchedulingExecutor schedulingExecutor)
     {
         _scheduledTaskConfigurationInfoProvider = scheduledTaskConfigurationInfoProvider;
         _validationState = validationState;
+        _schedulingExecutor = schedulingExecutor;
     }
 
     public async Task<ScheduledTaskDto[]> GetScheduledTasksDtosAsync(CancellationToken cancellationToken)
@@ -58,7 +64,21 @@ public class ScheduledTaskCrudService : IScheduledTaskCrudService
 
         return scheduledTask;
     }
+    public async Task ExecuteScheduledTaskAsync(Guid scheduledTaskGuid, CancellationToken cancellationToken)
+    {
+        var scheduledTask = await GetValidatedScheduledTaskAsync(scheduledTaskGuid, cancellationToken);
 
+        try
+        {
+            await _schedulingExecutor.ExecuteTask(scheduledTask.ScheduledTaskConfigurationID, cancellationToken);
+        }
+        catch (ScheduledTaskIsRunningException)
+        {
+            _validationState.AddError("scheduledTaskGuid", $"Scheduled task with '{scheduledTaskGuid}' GUID is already running.");
+
+            throw new ScheduledTaskIsAlreadyRunningException();
+        }
+    }
     private static ScheduledTaskDto ToScheduledTaskDto(ScheduledTaskConfigurationInfo scheduledTask)
     {
         return new ScheduledTaskDto
