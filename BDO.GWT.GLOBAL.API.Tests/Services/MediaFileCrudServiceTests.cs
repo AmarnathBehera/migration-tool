@@ -272,16 +272,31 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
-    public void CreateSafeTempUploadPath_ReturnsPathInExpectedTempDirectory()
+    public async Task WithUploadedAssetMetadataAsync_WhenInvoked_UsesSafeMetadataFromUploadedFile()
     {
-        var result = (string)InvokePrivateStatic("CreateSafeTempUploadPath");
-        var expectedRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "App_Data", "Uploads", "Temp"));
-        var fullPath = Path.GetFullPath(result);
+        var fileBytes = new byte[] { 1, 2, 3, 4 };
+        var file = new FormFile(new MemoryStream(fileBytes), 0, fileBytes.Length, "File", "folder\\photo.png");
 
+        ContentItemAssetMetadataWithSource? captured = null;
+
+        var result = await InvokePrivateStaticAsync<bool>(
+            "WithUploadedAssetMetadataAsync",
+            [typeof(bool)],
+            file,
+            new Func<ContentItemAssetMetadataWithSource, Task<bool>>(metadata =>
+            {
+                captured = metadata;
+                return Task.FromResult(true);
+            }),
+            CancellationToken.None);
+
+        Assert.That(result, Is.True);
+        Assert.That(captured, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(fullPath, Does.StartWith(expectedRoot + Path.DirectorySeparatorChar));
-            Assert.That(Path.GetExtension(fullPath), Is.EqualTo(".tmp"));
+            Assert.That(GetMetadataPropertyValue(captured!, "Name"), Is.EqualTo("photo.png"));
+            Assert.That(GetMetadataPropertyValue(captured!, "Extension"), Is.EqualTo(".png"));
+            Assert.That(GetMetadataPropertyValue(captured!, "Size"), Is.EqualTo((long)fileBytes.Length));
         });
     }
 
@@ -713,6 +728,20 @@ public class MediaFileCrudServiceTests
         }
 
         property!.SetValue(target, value);
+    }
+
+    private static object? GetMetadataPropertyValue(object target, string propertyName)
+    {
+        var type = target.GetType();
+        PropertyInfo? property = null;
+
+        while (type != null && property == null)
+        {
+            property = type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            type = type.BaseType;
+        }
+
+        return property?.GetValue(target);
     }
 
     private static object InvokePrivateStatic(string methodName, params object?[] args)
