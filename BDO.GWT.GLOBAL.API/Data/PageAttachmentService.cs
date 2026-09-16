@@ -1,4 +1,5 @@
 ﻿using BDO.GWT.Core;
+using BDO.GWT.GLOBAL.API.Helpers;
 using CMS.Websites;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Net.Mime;
@@ -13,7 +14,6 @@ namespace BDO.GWT.GLOBAL.API.Data
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebHostEnvironment _hostEnvironment;
-
         public PageAttachmentService(
             IContentService contentService,
             IHttpClientFactory httpClientFactory,
@@ -83,12 +83,6 @@ namespace BDO.GWT.GLOBAL.API.Data
             return (data, contentType, fileName);
         }
 
-        private static string NormalizePath(string assetUrl)
-        {
-            var normalizedPath = assetUrl.Trim().TrimStart('~');
-            return normalizedPath.StartsWith('/') ? normalizedPath : $"/{normalizedPath}";
-        }
-
         private static string GetMimeType(string extension)
         {
             if (ContentTypeProvider.TryGetContentType($"file{extension}", out var contentType))
@@ -99,21 +93,8 @@ namespace BDO.GWT.GLOBAL.API.Data
             return MediaTypeNames.Application.Octet;
         }
 
-        private Uri? BuildAssetUri(string assetUrl)
-        {
-            if (Uri.TryCreate(assetUrl.Trim(), UriKind.Absolute, out var absoluteAssetUri))
-            {
-                return absoluteAssetUri;
-            }
-
-            var normalizedPath = NormalizePath(assetUrl);
-
-
-            var request = _httpContextAccessor.HttpContext?.Request;
-            return request is null
-                ? null
-                : new Uri($"{request.Scheme}://{request.Host}{normalizedPath}");
-        }
+        private Uri? BuildAssetUri(string assetUrl) =>
+            AssetUrlHelper.BuildAssetUri(assetUrl, _httpContextAccessor, _hostEnvironment);
 
         private static IEnumerable<ContentAttachment> GetAttachmentsFromPage(IWebPageFieldsSource page)
         {

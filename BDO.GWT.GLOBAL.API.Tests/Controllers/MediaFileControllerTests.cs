@@ -4,7 +4,6 @@ using BDO.GWT.Web.Core.API.Controllers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using System.Net.Mime;
 
 namespace BDO.GWT.GLOBAL.API.Tests.Controllers;
 
@@ -198,10 +197,9 @@ public class MediaFileControllerTests
     public async Task UpdateMediaFileAsync_WhenFound_ReturnsOkWithPayload()
     {
         var attachmentGuid = Guid.NewGuid();
-        var input = new MediaFileInput
+        var input = new AttachmentRequest
         {
-            File = new FormFile(new MemoryStream([1, 2]), 0, 2, "File", "replace.png"),
-            DisplayName = "Replacement"
+            File = new FormFile(new MemoryStream([1, 2]), 0, 2, "File", "replace.png")
         };
 
         var expected = new MediaFileOutput { Id = 12, Guid = attachmentGuid, Path = "replace.png", MimeType = "image/png", Extension = ".png", Link = "~/getmedia/replace.png" };
@@ -235,7 +233,7 @@ public class MediaFileControllerTests
     public async Task UpdateMediaFileAsync_WhenNotFound_ReturnsNotFound()
     {
         var attachmentGuid = Guid.NewGuid();
-        var input = new MediaFileInput
+        var input = new AttachmentRequest
         {
             File = new FormFile(new MemoryStream([1, 2]), 0, 2, "File", "replace.png")
         };
@@ -301,10 +299,9 @@ public class MediaFileControllerTests
     public async Task UpdateMediaFileAsync_WhenFileNameContainsPath_SanitizesBeforeServiceCall()
     {
         var attachmentGuid = Guid.NewGuid();
-        var input = new MediaFileInput
+        var input = new AttachmentRequest
         {
-            File = new FormFile(new MemoryStream([1, 2, 3]), 0, 3, "File", "folder\\replace.png"),
-            DisplayName = " Replacement "
+            File = new FormFile(new MemoryStream([1, 2, 3]), 0, 3, "File", "folder\\replace.png")
         };
 
         var expected = new MediaFileOutput { Id = 21, Guid = attachmentGuid, Path = "replace.png", MimeType = "image/png", Extension = ".png", Link = "~/getmedia/replace.png" };
