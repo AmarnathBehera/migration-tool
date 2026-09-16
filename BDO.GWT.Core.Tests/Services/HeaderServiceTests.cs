@@ -10,6 +10,8 @@ using CMS.Helpers;
 using Moq;
 using Kentico.Content.Web.Mvc.Routing;
 using CMS.ContentEngine;
+using Microsoft.Testing.Platform.Configurations;
+using Microsoft.Extensions.Configuration;
 
 namespace BDO.GWT.Core.Tests.Services
 {
@@ -25,6 +27,8 @@ namespace BDO.GWT.Core.Tests.Services
         private Mock<IProgressiveCache> _progressiveCacheMock = null!;
         private Mock<IPreferredLanguageRetriever> _preferredLanguageRetrieverMock = null!;
         private Mock<IWebPageUrlResolver> _urlResolverMock = null!;
+        private Mock<Microsoft.Extensions.Configuration.IConfiguration> _configurationMock = null!;
+        private Microsoft.Extensions.Configuration.IConfiguration _configuration = null!;
         private HeaderService _service = null!;
 
         [SetUp]
@@ -40,6 +44,14 @@ namespace BDO.GWT.Core.Tests.Services
             _preferredLanguageRetrieverMock = new Mock<IPreferredLanguageRetriever>();
             _progressiveCacheMock = new Mock<IProgressiveCache>();
             _urlResolverMock = new Mock<IWebPageUrlResolver>();
+
+            _configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["HeaderMenuCacheInMin"] = "10"
+                })
+                .Build();
+
             _service = new HeaderService(
                 _contentServiceMock.Object,
                 _contentRetrieverMock.Object,
@@ -50,7 +62,8 @@ namespace BDO.GWT.Core.Tests.Services
                 _httpContextAccessorMock.Object,
                 _progressiveCacheMock.Object,
                 _preferredLanguageRetrieverMock.Object,
-                _urlResolverMock.Object
+                _urlResolverMock.Object,
+                _configuration
             );
         }
 
