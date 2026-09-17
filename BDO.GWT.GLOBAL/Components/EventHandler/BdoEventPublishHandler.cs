@@ -136,9 +136,11 @@ namespace BDO.GWT.GLOBAL.Components.EventHandler
 
             return userInfoProvider.Get(userName);
         }
-        private BizFormInfo CreateEventRegistrationForm(string eventDisplayName, DateTime eventDate)
+        protected virtual BizFormInfo? GetTemplateForm() => bizFormInfoProvider.Get(TEMPLATE_FORM_CODE_NAME);
+
+        protected virtual BizFormInfo CreateEventRegistrationForm(string eventDisplayName, DateTime eventDate)
         {
-            BizFormInfo templateForm = bizFormInfoProvider.Get(TEMPLATE_FORM_CODE_NAME)
+            BizFormInfo templateForm = GetTemplateForm()
                 ?? throw new InvalidOperationException(
                     $"Template form '{TEMPLATE_FORM_CODE_NAME}' was not found. Create it once in the Forms application (Name, Email, Phone fields) before this handler runs.");
 
@@ -178,7 +180,7 @@ namespace BDO.GWT.GLOBAL.Components.EventHandler
             return id != 0;
         }
 
-        private async Task<int> GetChildRegistrationFormIdAsync(
+        protected virtual async Task<int> GetChildRegistrationFormIdAsync(
             int parentPageId,
             string websiteChannelName,
             string languageName,
