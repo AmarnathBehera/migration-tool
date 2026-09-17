@@ -55,4 +55,20 @@ public class ScheduledTasksController : EntityControllerBase
         return Ok(scheduledTask);
     }
 
+
+    /// <summary>
+    /// Executes a scheduled task.
+    /// </summary>
+    /// <param name="scheduledTaskGuid">GUID of the scheduled task you want to execute.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [HttpPost("{scheduledTaskGuid:guid}/Execute")]
+    [SwaggerResponse(StatusCodes.Status202Accepted, "Returns when the scheduled task is successfully executed.")]
+    [SwaggerResponse(StatusCodes.Status409Conflict, "Returns when the scheduled task is already running.", typeof(ProblemDetails), MediaTypeNames.Application.Json)]
+    public async Task<ActionResult> ExecuteScheduledTaskAsync(Guid scheduledTaskGuid, CancellationToken cancellationToken)
+    {
+        await _scheduledTaskCrudService.ExecuteScheduledTaskAsync(scheduledTaskGuid, cancellationToken);
+
+        return Accepted();
     }
+}

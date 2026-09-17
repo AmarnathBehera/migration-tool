@@ -56,7 +56,7 @@
                         })
         </main>
     </div>
-    @await PageBuilderService.AddIdentifier("bottomArea").AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+    @await PageBuilderService.AddIdentifier("bottomArea").AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetList).BuildEditableAreaAsync(Html, Context.RequestAborted)
 </div>
 
 @PageBuilderService.GetPageBuilderScripts(Html)

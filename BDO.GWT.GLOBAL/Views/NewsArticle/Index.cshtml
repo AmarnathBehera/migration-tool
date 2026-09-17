@@ -37,6 +37,6 @@
         new { data = Model },
         Context.RequestAborted))
 
-@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
 
 @PageBuilderService.GetPageBuilderScripts(Html)

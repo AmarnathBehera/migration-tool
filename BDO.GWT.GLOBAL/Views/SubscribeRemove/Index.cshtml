@@ -26,6 +26,6 @@
     @Html.Raw(Model.Message)
 </div>
 
-@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
 
 @PageBuilderService.GetPageBuilderScripts(Html)

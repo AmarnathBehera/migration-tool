@@ -117,18 +117,24 @@ public class SectionDealsPageService : ISectionDealsPageService
 
     public async Task<PaginationDto<DealCardDto>> GetSectionDealsDealPaginationDtoAsync(string language,Guid pageGuid, CardsQuery cardsQuery, CancellationToken cancellationToken)
     {
+        var isPreview = _websiteChannelContext.IsPreview;
+
         var sectionDeal = (await _contentRetriever.GetPagesAsync<SectionDeals>(
-            new RetrievePagesParameters
-            {
-                LanguageName = language,
-                UseLanguageFallbacks = false
-            },
-           query => query
-               .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
-               .Where(w => w.WhereEquals("ContentItemGUID", pageGuid)),
-           RetrievalCacheSettings.CacheDisabled,
-           cancellationToken
-       )).FirstOrDefault();
+             new RetrievePagesParameters
+             {
+                 LanguageName = language,
+                 UseLanguageFallbacks = isPreview,
+                 IsForPreview = isPreview,
+             },
+            query => query
+                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
+                .Where(w => w
+                    .WhereEquals("ContentItemGUID", pageGuid)
+                    .Or()
+                    .WhereEquals(nameof(IWebPageContentQueryDataContainer.WebPageItemGUID), pageGuid)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken
+        )).FirstOrDefault();
 
         if (sectionDeal is null)
         {
@@ -142,10 +148,28 @@ public class SectionDealsPageService : ISectionDealsPageService
 
     private async Task<FilterItemDto<OptionDto>[]> CreateDealsFiltersAsync(HashSet<string> filterParameterNames, CancellationToken cancellationToken)
     {
+        // Define the canonical order of filters (single source of truth)
+        // Filters are displayed in this order regardless of which are enabled/disabled
+        var canonicalFilterOrder = new[]
+        {
+            FilterParameterName.Industry,
+            FilterParameterName.SubIndustry,
+            FilterParameterName.DealType,
+            FilterParameterName.Year,
+            FilterParameterName.Country
+        };
+
         var filterItems = new List<FilterItemDto<OptionDto>>(filterParameterNames.Count);
 
-        foreach (var filterParameterName in filterParameterNames)
+        // Iterate in canonical order, adding only enabled filters
+        foreach (var filterParameterName in canonicalFilterOrder)
         {
+            // If this filter is not enabled, skip it
+            if (!filterParameterNames.Contains(filterParameterName))
+            {
+                continue;
+            }
+
             var filterParameterData = FilterUtility.GetFilterParameterData(filterParameterName);
 
             if (filterParameterData is null)
@@ -269,7 +293,8 @@ public class SectionDealsPageService : ISectionDealsPageService
         {
             return items
                 .OfType<Deal>()
-                .Select(x => x.DealCountry.Trim())
+                .Select(x => x.DealCountry?.Trim())
+                .Where(x => !string.IsNullOrWhiteSpace(x))
                 .Distinct()
                 .OrderByDescending(x => x)
                 .Select(x => FilterDtoUtility.CreateOptionDto(x, x))

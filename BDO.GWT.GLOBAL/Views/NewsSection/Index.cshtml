@@ -34,7 +34,7 @@
         new { data = Model.Hero },
         Context.RequestAborted))
 
-@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted))
+@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
 
 @(await ReactService.RenderComponentAsync(
         pageId,

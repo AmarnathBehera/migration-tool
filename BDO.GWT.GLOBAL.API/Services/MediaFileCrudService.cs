@@ -1,4 +1,5 @@
 using BDO.GWT.GLOBAL.API.Data;
+using BDO.GWT.GLOBAL.API.Helpers;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Membership;
@@ -13,9 +14,6 @@ namespace BDO.GWT.GLOBAL.API.Services;
 /// </summary>
 public class MediaFileCrudService : IMediaFileCrudService
 {
-    private const string DevelopmentLiveSiteHost = "localhost";
-    private const int DevelopmentLiveSitePort = 12393;
-
     private static readonly FileExtensionContentTypeProvider _contentTypeProvider = new();
 
     private const string FallbackLanguageName = "en-US";
@@ -137,51 +135,8 @@ public class MediaFileCrudService : IMediaFileCrudService
             : new MediaFileTarget(item.SystemFields.ContentItemID, asset);
     }
 
-    private Uri? BuildAssetUri(string assetUrl)
-    {
-        var trimmedAssetUrl = assetUrl.Trim();
-        if (Uri.TryCreate(trimmedAssetUrl, UriKind.Absolute, out var absoluteUri)
-            && (absoluteUri.Scheme == Uri.UriSchemeHttp || absoluteUri.Scheme == Uri.UriSchemeHttps))
-        {
-            return absoluteUri;
-        }
-
-        var normalizedPath = NormalizePath(trimmedAssetUrl);
-        var queryIndex = normalizedPath.IndexOf('?');
-        var path = queryIndex >= 0 ? normalizedPath[..queryIndex] : normalizedPath;
-        var query = queryIndex >= 0 ? normalizedPath[(queryIndex + 1)..] : string.Empty;
-
-        if (_hostEnvironment.IsDevelopment())
-        {
-            return new UriBuilder(Uri.UriSchemeHttp, DevelopmentLiveSiteHost, DevelopmentLiveSitePort)
-            {
-                Path = path,
-                Query = query
-            }.Uri;
-        }
-
-        var request = _httpContextAccessor.HttpContext?.Request;
-        if (request is null
-            || string.IsNullOrWhiteSpace(request.Scheme)
-            || !request.Host.HasValue
-            || string.IsNullOrWhiteSpace(request.Host.Host))
-        {
-            return null;
-        }
-
-        return new UriBuilder(request.Scheme, request.Host.Host, request.Host.Port ?? -1)
-        {
-            Path = path,
-            Query = query
-        }.Uri;
-    }
-
-    private static string NormalizePath(string assetUrl)
-    {
-        var normalizedPath = assetUrl.Trim().TrimStart('~');
-        return normalizedPath.StartsWith('/') ? normalizedPath : $"/{normalizedPath}";
-    }
-
+    private Uri? BuildAssetUri(string assetUrl) =>
+        AssetUrlHelper.BuildAssetUri(assetUrl, _httpContextAccessor, _hostEnvironment);
     private static string GetMimeType(string extension)
     {
         if (_contentTypeProvider.TryGetContentType($"file{extension}", out var contentType))
@@ -312,12 +267,6 @@ public class MediaFileCrudService : IMediaFileCrudService
     private static readonly SearchValues<char> UnsafeExtensionChars =
         SearchValues.Create(['\0', '/', '\\', '|', '<', '>', ':', '"', '?', '*']);
 
-    private static readonly SearchValues<char> InvalidFileNameChars =
-        SearchValues.Create(System.IO.Path.GetInvalidFileNameChars());
-
-
-
-
     public async Task<MediaFileOutput> CreateMediaFileAsync(string workspaceName, IFormFile file, CancellationToken cancellationToken)
     {
         var languageName = await GetDefaultLanguageNameAsync(cancellationToken);
@@ -424,30 +373,6 @@ public class MediaFileCrudService : IMediaFileCrudService
         return extension;
     }
 
-    private static string CreateSafeTempUploadPath()
-    {
-        var tempDirectory = System.IO.Path.Combine(AppContext.BaseDirectory, "App_Data", "Uploads", "Temp");
-        System.IO.Directory.CreateDirectory(tempDirectory);
-
-        var rootPath = System.IO.Path.GetFullPath(tempDirectory);
-        var randomFileName = System.IO.Path.GetRandomFileName();
-        if (randomFileName.AsSpan().IndexOfAny(InvalidFileNameChars) >= 0)
-        {
-            throw new InvalidOperationException("Invalid temporary file name.");
-        }
-
-        var tempFileName = System.IO.Path.ChangeExtension(randomFileName, ".tmp");
-        var candidatePath = System.IO.Path.Combine(rootPath, tempFileName);
-        var fullPath = System.IO.Path.GetFullPath(candidatePath);
-
-        if (!fullPath.StartsWith(rootPath + System.IO.Path.DirectorySeparatorChar, StringComparison.Ordinal))
-        {
-            throw new InvalidOperationException("Invalid temporary file path.");
-        }
-
-        return fullPath;
-    }
-
     private static async Task<T> WithUploadedAssetMetadataAsync<T>(
         IFormFile file,
         Func<ContentItemAssetMetadataWithSource, Task<T>> action,
@@ -455,35 +380,24 @@ public class MediaFileCrudService : IMediaFileCrudService
     {
         ArgumentNullException.ThrowIfNull(file);
 
-        // Sanitize user-supplied filename: take only the base file name to prevent path traversal
         var fileName = GetSafeFileName(file.FileName);
         var extension = GetSafeExtension(fileName);
-        var tempPath = CreateSafeTempUploadPath();
 
-        try
-        {
-            await using (var fs = System.IO.File.Create(tempPath))
-            {
-                await file.CopyToAsync(fs, cancellationToken);
-            }
+        await using var uploadStream = file.OpenReadStream();
+        using var bufferedStream = new MemoryStream();
+        await uploadStream.CopyToAsync(bufferedStream, cancellationToken);
 
-            var assetSource = new ContentItemAssetFileSource(tempPath, canMove: true);
-            var assetMetadata = new ContentItemAssetMetadataWithSource(
-                assetSource,
-                fileName,
-                extension,
-                file.Length,
-                DateTime.UtcNow);
+        var bufferedContent = bufferedStream.ToArray();
+        var assetSource = new ContentItemAssetStreamSource(_ =>
+            Task.FromResult<Stream>(new MemoryStream(bufferedContent, writable: false)));
+        var assetMetadata = new ContentItemAssetMetadataWithSource(
+            assetSource,
+            fileName,
+            extension,
+            file.Length,
+            DateTime.UtcNow);
 
-            return await action(assetMetadata);
-        }
-        finally
-        {
-            if (System.IO.File.Exists(tempPath))
-            {
-                System.IO.File.Delete(tempPath);
-            }
-        }
+        return await action(assetMetadata);
     }
 
     private async Task<string> GetDefaultLanguageNameAsync(CancellationToken cancellationToken)
