@@ -174,8 +174,10 @@ public class ContentCategoryService : IContentCategoryService
             categoryFilters ??= Array.Empty<ContentCategoryFilter>();
             ValidateContentCategoryFilters(categoryFilters);
 
-            insightCount ??= 15;
-
+            if (insightCount is null or <= 0)
+            {
+                insightCount = 15;
+            }
             var subCategoryIdsByCategoryCode = BuildSubCategoryIdsByCategoryCode(categoryFilters);
 
             var retrieveParameters = new RetrievePagesParameters
