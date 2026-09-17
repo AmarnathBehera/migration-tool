@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace BDO.GWT.GLOBAL.API.Tests.Services;
 
@@ -171,27 +170,7 @@ public class MediaFileCrudServiceTests
         });
     }
 
-    [Test]
-    public void NormalizePath_WhenTildePrefixProvided_ReturnsNormalizedRootPath()
-    {
-        var result = (string)InvokePrivateStatic("NormalizePath", "~/getmedia/a.jpg");
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(result, Is.EqualTo("/getmedia/a.jpg"));
-        });
-    }
-
-    [Test]
-    public void NormalizePath_WhenMissingLeadingSlash_AddsSlash()
-    {
-        var result = (string)InvokePrivateStatic("NormalizePath", "getmedia/a.jpg");
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result, Is.EqualTo("/getmedia/a.jpg"));
-        });
-    }
 
     [Test]
     public void GetFileNameFromUrl_WhenUrlContainsQuery_RemovesQueryAndReturnsFileName()
@@ -293,16 +272,32 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
-    public void CreateSafeTempUploadPath_ReturnsPathInExpectedTempDirectory()
+    public async Task WithUploadedAssetMetadataAsync_WhenInvoked_UsesSafeMetadataFromUploadedFile()
     {
-        var result = (string)InvokePrivateStatic("CreateSafeTempUploadPath");
-        var expectedRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "App_Data", "Uploads", "Temp"));
-        var fullPath = Path.GetFullPath(result);
+        var fileBytes = new byte[] { 1, 2, 3, 4 };
+        var file = new FormFile(new MemoryStream(fileBytes), 0, fileBytes.Length, "File", "folder\\photo.png");
+
+        ContentItemAssetMetadataWithSource? captured = null;
+
+        var result = await InvokePrivateStaticAsync<bool>(
+            "WithUploadedAssetMetadataAsync",
+            [typeof(bool)],
+            file,
+            new Func<ContentItemAssetMetadataWithSource, Task<bool>>(metadata =>
+            {
+                captured = metadata;
+                return Task.FromResult(true);
+            }),
+            CancellationToken.None);
+
 
         Assert.Multiple(() =>
         {
-            Assert.That(fullPath, Does.StartWith(expectedRoot + Path.DirectorySeparatorChar));
-            Assert.That(Path.GetExtension(fullPath), Is.EqualTo(".tmp"));
+            Assert.That(result, Is.True);
+            Assert.That(captured, Is.Not.Null);
+            Assert.That(GetMetadataPropertyValue(captured!, "Name"), Is.EqualTo("photo.png"));
+            Assert.That(GetMetadataPropertyValue(captured!, "Extension"), Is.EqualTo(".png"));
+            Assert.That(GetMetadataPropertyValue(captured!, "Size"), Is.EqualTo((long)fileBytes.Length));
         });
     }
 
@@ -467,6 +462,30 @@ public class MediaFileCrudServiceTests
         {
             Assert.That(result, Is.Not.Null);
             Assert.That(result!.AbsoluteUri, Is.EqualTo("https://example.com/getmedia/img.jpg?language=en-gb"));
+        });
+    }
+
+    [Test]
+    public void BuildAssetUri_WhenVirtualContextWrappedPath_UsesInnerAssetPath()
+    {
+        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
+        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
+
+        var httpContext = new DefaultHttpContext();
+        httpContext.Request.Scheme = "https";
+        httpContext.Request.Host = new HostString("example.com");
+
+        var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+        httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
+
+        var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
+
+        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "/cmsctx/pm/token/lang/en-gb/wpid/72/cid/1/cdid/82/ts/1/readonly/0/h/hash/-/~/getContentAsset/5ed65831-9e46-4827-8011-d91f5c2e130e/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/img.jpg?language=en-gb");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.AbsoluteUri, Is.EqualTo("https://example.com/getContentAsset/5ed65831-9e46-4827-8011-d91f5c2e130e/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/img.jpg?language=en-gb"));
         });
     }
 
@@ -710,6 +729,20 @@ public class MediaFileCrudServiceTests
         }
 
         property!.SetValue(target, value);
+    }
+
+    private static object? GetMetadataPropertyValue(object target, string propertyName)
+    {
+        var type = target.GetType();
+        PropertyInfo? property = null;
+
+        while (type != null && property == null)
+        {
+            property = type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            type = type.BaseType;
+        }
+
+        return property?.GetValue(target);
     }
 
     private static object InvokePrivateStatic(string methodName, params object?[] args)

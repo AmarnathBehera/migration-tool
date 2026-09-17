@@ -199,7 +199,8 @@ namespace BDO.GWT.Core.Tests.Helpers
         {
             await _helper.GetSearchCardDtos([Document(1, "BDO.Person")], LANGUAGE_TAG, CancellationToken.None);
 
-            
+            _contentServiceMock.Verify(x => x.RetrievePagesAsync<EventType>(
+                It.IsAny<RetrievePagesParameters>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
 

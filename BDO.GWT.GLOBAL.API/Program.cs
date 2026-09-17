@@ -1,5 +1,6 @@
 using BDO.GWT.Common.Core.Exceptions;
 using BDO.GWT.Core;
+using BDO.GWT.Core.Exceptions;
 using BDO.GWT.Core.Services;
 using BDO.GWT.GLOBAL.API.Constants;
 using BDO.GWT.GLOBAL.API.Extensions;
@@ -132,7 +133,6 @@ public static class Program
                 options.SwaggerEndpoint("/swagger/v2/swagger.json", "GWT API");
             });
         }
-
         app.UseExceptionHandler(errorApp =>
         {
             errorApp.Run(async context =>
@@ -141,6 +141,14 @@ public static class Program
 
                 switch (exception)
                 {
+                    case ValidationException ex:
+                        context.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
+                        await context.Response.WriteAsJsonAsync(new
+                        {
+                            errors = ex.Message
+                        });
+                        break;
+
                     case UnprocessableEntityException ex:
                         context.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
                         await context.Response.WriteAsJsonAsync(new
@@ -148,8 +156,17 @@ public static class Program
                             error = ex.Message
                         });
                         break;
+
                     case NotFoundException ex:
                         context.Response.StatusCode = StatusCodes.Status404NotFound;
+                        await context.Response.WriteAsJsonAsync(new
+                        {
+                            error = ex.Message
+                        });
+                        break;
+
+                    case ScheduledTaskIsAlreadyRunningException ex:
+                        context.Response.StatusCode = StatusCodes.Status409Conflict;
                         await context.Response.WriteAsJsonAsync(new
                         {
                             error = ex.Message
