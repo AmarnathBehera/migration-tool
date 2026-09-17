@@ -9,6 +9,7 @@ using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.Services;
 using CMS.Websites;
+using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
 using Moq;
@@ -22,6 +23,7 @@ public class BlogContributorsPageServiceTests
     private Mock<IHeroService> _heroServiceMock;
     private Mock<ICultureContext> _cultureContextMock;
     private Mock<IPreferredLanguageRetriever> _preferredLanguageRetrieverMock;
+    private Mock<IWebsiteChannelContext> _websiteChannelContextMock;
     private BlogContributorsPageService _service;
 
     [SetUp]
@@ -32,13 +34,15 @@ public class BlogContributorsPageServiceTests
         _heroServiceMock = new Mock<IHeroService>();
         _cultureContextMock = new Mock<ICultureContext>();
         _preferredLanguageRetrieverMock = new Mock<IPreferredLanguageRetriever>();
+        _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
 
         _service = new BlogContributorsPageService(
             _peopleCardsServiceMock.Object,
             _contentServiceMock.Object,
             _heroServiceMock.Object,
             _cultureContextMock.Object,
-            _preferredLanguageRetrieverMock.Object);
+            _preferredLanguageRetrieverMock.Object,
+            _websiteChannelContextMock.Object);
     }
 
     #region GetSectionPeoplePageDtoAsync

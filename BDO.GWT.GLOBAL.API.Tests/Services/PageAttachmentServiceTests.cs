@@ -4,6 +4,7 @@ using CMS.ContentEngine;
 using CMS.Websites;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using Moq;
 using Moq.Protected;
 using System.Net;
@@ -36,7 +37,7 @@ public class PageAttachmentServiceTests
 
         _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
         _hostEnvironmentMock = new Mock<IWebHostEnvironment>();
-        _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
+        SetupIsDevelopment(true);
     }
 
     private PageAttachmentService CreateSut() => new(
@@ -44,6 +45,11 @@ public class PageAttachmentServiceTests
         _httpClientFactoryMock.Object,
         _httpContextAccessorMock.Object,
         _hostEnvironmentMock.Object);
+
+    private void SetupIsDevelopment(bool isDevelopment) =>
+        _hostEnvironmentMock
+            .Setup(x => x.EnvironmentName)
+            .Returns(isDevelopment ? Environments.Development : Environments.Production);
 
     // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -119,9 +125,6 @@ public class PageAttachmentServiceTests
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage(statusCode) { Content = content });
     }
-
-    private void SetupIsDevelopment(bool isDevelopment) =>
-        _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns(isDevelopment ? "Development" : "Production");
 
     private void SetupHttpContext(string scheme = "https", string host = "localhost")
     {
@@ -252,7 +255,6 @@ public class PageAttachmentServiceTests
         var asset = CreateAsset(absoluteUrl, "file.pdf", ".pdf");
         var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
         SetupContentService(pageGuid, [page]);
-        SetupIsDevelopment(true);
 
         var content = new ByteArrayContent(expectedBytes);
         content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
@@ -282,7 +284,6 @@ public class PageAttachmentServiceTests
         var asset = CreateAsset("/media/file.pdf", "file.pdf", ".pdf");
         var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
         SetupContentService(pageGuid, [page]);
-        SetupIsDevelopment(true);
         SetupHttpContext();
         SetupHttpResponse(HttpStatusCode.NotFound);
 
@@ -339,7 +340,6 @@ public class PageAttachmentServiceTests
         var asset = CreateAsset("/media/file.pdf", "file.pdf", ".pdf");
         var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
         SetupContentService(pageGuid, [page]);
-        SetupIsDevelopment(true);
         SetupHttpContext();
         SetupHttpResponse(HttpStatusCode.OK, expectedBytes, "application/pdf");
 
@@ -363,7 +363,6 @@ public class PageAttachmentServiceTests
         var asset = CreateAsset("/media/file.pdf", "file.pdf", ".pdf");
         var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
         SetupContentService(pageGuid, [page]);
-        SetupIsDevelopment(true);
         SetupHttpContext();
         // No media type on the response — service must fall back to extension-based MIME
         SetupHttpResponse(HttpStatusCode.OK, expectedBytes, mediaType: null);
@@ -382,7 +381,6 @@ public class PageAttachmentServiceTests
         var asset = CreateAsset("/media/file.xyz", "file.xyz", ".xyz");
         var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
         SetupContentService(pageGuid, [page]);
-        SetupIsDevelopment(true);
         SetupHttpContext();
         SetupHttpResponse(HttpStatusCode.OK, [1, 2], mediaType: null);
 
@@ -391,7 +389,6 @@ public class PageAttachmentServiceTests
         Assert.That(result, Is.Not.Null);
         Assert.That(result!.Value.ContentType, Is.EqualTo(MediaTypeNames.Application.Octet));
     }
-
 
     [Test]
     public void BuildAssetUri_WhenProductionAndHttpContextMissing_ReturnsNull()
@@ -441,8 +438,6 @@ public class PageAttachmentServiceTests
         var asset = CreateAsset("~/media/file.pdf", "file.pdf", ".pdf");
         var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
         SetupContentService(pageGuid, [page]);
-
-        SetupIsDevelopment(false);
 
         var mockRequest = new Mock<HttpRequest>();
         mockRequest.Setup(r => r.Scheme).Returns("https");

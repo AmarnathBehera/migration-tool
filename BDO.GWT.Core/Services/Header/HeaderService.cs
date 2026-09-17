@@ -6,6 +6,7 @@ using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace BDO.GWT.Core.Services.Header;
 
@@ -27,6 +28,7 @@ public class HeaderService : IHeaderService
     private readonly IProgressiveCache _cache;
     private readonly IPreferredLanguageRetriever _preferredLanguageRetriever;
     private readonly IWebPageUrlResolver _urlResolver;
+    private readonly IConfiguration _configuration;
     private readonly string navRootPath = "/";
 
     public HeaderService(
@@ -39,7 +41,8 @@ public class HeaderService : IHeaderService
         IHttpContextAccessor httpContextAccessor,
         IProgressiveCache cache,
         IPreferredLanguageRetriever preferredLanguageRetriever,
-        IWebPageUrlResolver urlResolver)
+        IWebPageUrlResolver urlResolver,
+        IConfiguration configuration)
     {
         _contentService = contentService;
         _contentRetriever = contentRetriever;
@@ -51,6 +54,7 @@ public class HeaderService : IHeaderService
         _cache = cache;
         _preferredLanguageRetriever = preferredLanguageRetriever;
         _urlResolver = urlResolver;
+        _configuration = configuration;
     }
 
     public async Task<HeaderDto?> GetAsync(IContentService contentservice, CancellationToken cancellationToken)
@@ -58,9 +62,11 @@ public class HeaderService : IHeaderService
         // The header (menus, contact, etc.) is language-specific, so the current
         // culture MUST be part of the cache key. Without it, the first language to
         // populate the cache is served to every other language on the channel.
+        int headerMenuCacheMinutes = _configuration.GetValue<int?>("HeaderMenuCacheInMin") ?? 5;
+
         var languageName = _preferredLanguageRetriever.Get();
         var cacheSettings = new CacheSettings(
-            cacheMinutes: 10,
+            cacheMinutes: headerMenuCacheMinutes,
             cacheItemNameParts:
             [
                 nameof(HeaderService),

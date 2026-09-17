@@ -12,10 +12,10 @@ namespace BDO.GWT.Core.LiveSite.Services;
 
 public interface INewsCarouselService
 {
-    Task<NewsCarouselDto> GetNewsCarouselAsync<T>(T currentPage, NewsCarouselData data, CancellationToken cancellationToken)
+    Task<NewsCarouselDto> GetNewsCarouselAsync<T>(Guid currentPage,string pageTypeName, NewsCarouselData data, CancellationToken cancellationToken)
         where T : IWebPageFieldsSource;
 
-    Task<ICollection<NewsPageCardDto>> GetFilteredItemsAsync<T>(T currentPage, HashSet<ContentItemReference> featuredGuids, CardsQuery query, CancellationToken cancellationToken)
+    Task<ICollection<NewsPageCardDto>> GetFilteredItemsAsync<T>(Guid currentPage, string pageTypeName, HashSet<ContentItemReference> featuredGuids, CardsQuery query, CancellationToken cancellationToken)
         where T : IWebPageFieldsSource;
 
     Task<ICollection<NewsPageCardDto>> GetAPIFilteredItemsAsync(CardsQuery query, CancellationToken cancellationToken);
@@ -34,7 +34,7 @@ public class NewsCarouselService : INewsCarouselService
         _contentService = contentService;
     }
 
-    public async Task<NewsCarouselDto> GetNewsCarouselAsync<T>(T currentPage, NewsCarouselData data, CancellationToken cancellationToken)
+    public async Task<NewsCarouselDto> GetNewsCarouselAsync<T>(Guid currentPage,string pageTypeName, NewsCarouselData data, CancellationToken cancellationToken)
         where T : IWebPageFieldsSource
     {
         var dto = new NewsCarouselDto
@@ -43,7 +43,7 @@ public class NewsCarouselService : INewsCarouselService
             Description = data.Description,
             Filters = data.FilteringEnabled ? await _newsArticleCardsService.CreateFiltersAsync(data.Filters, null, cancellationToken) : null,
             FilteringTooltipEnabled = await _filteringHelper.IsFilteringTooltipEnabledAsync(data.FilteringEnabled, cancellationToken),
-            Items = await GetFilteredItemsAsync(currentPage, data.NodeGuidsOfFeaturedNews.ToHashSet(), new CardsQuery(), cancellationToken),
+            Items = await GetFilteredItemsAsync<T>(currentPage, pageTypeName, data.NodeGuidsOfFeaturedNews.ToHashSet(), new CardsQuery(), cancellationToken),
             BackgroundImageURL = data.BackgroundImageURL,
             BackgroundImageAltText = data.BackgroundImageAltText,
             SeeAllLink = data is { SeeAllLinkText: not null, SeeAllLinkUrl: not null }
@@ -57,19 +57,19 @@ public class NewsCarouselService : INewsCarouselService
             TopMargin = data.TopMargin,
             BottomMargin = data.BottomMargin,
             WidgetID = data.WidgetID,
-            CurrentPageGuid = currentPage.SystemFields.ContentItemGUID,
-            PageType = currentPage.GetType().Name,
+            CurrentPageGuid = currentPage,
+            PageType = pageTypeName,
         };
 
         return dto;
     }
 
-    public async Task<ICollection<NewsPageCardDto>> GetFilteredItemsAsync<T>(T currentPage, HashSet<ContentItemReference> featuredGuids, CardsQuery query, CancellationToken cancellationToken)
+    public async Task<ICollection<NewsPageCardDto>> GetFilteredItemsAsync<T>(Guid currentPage, string pageTypeName, HashSet<ContentItemReference> featuredGuids, CardsQuery query, CancellationToken cancellationToken)
         where T : IWebPageFieldsSource
     {
         return await BuildAndExecuteQueryAsync(
-            currentPage.SystemFields.ContentItemGUID.ToString(),
-            currentPage.GetType().Name,
+            currentPage.ToString() ?? string.Empty,
+            pageTypeName,
             featuredGuids,
             query,
             cancellationToken);
