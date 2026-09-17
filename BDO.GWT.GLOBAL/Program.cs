@@ -154,18 +154,18 @@ builder.Services.AddOptions<BDO.GWT.Core.Extensions.AzureCognitiveSearchOptions>
     .BindConfiguration("AzureCognitiveSearch");   // section name in appsettings.json
 
 // Add Application Insights telemetry
-builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
+//builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
 // Loads the administration redirect domain (AdminRedirectOptions) from a configuration file section
 builder.Services.Configure<AdminRedirectOptions>(builder.Configuration.GetSection("AdminRedirectOptions"));
 
 // Configures email sending via SendGrid for system emails
-builder.Services.AddXperienceSystemSendGrid();
+//builder.Services.AddXperienceSystemSendGrid();
 // Configures email sending via SendGrid for the fallback situation
-builder.Services.AddXperienceSendGrid();
+//builder.Services.AddXperienceSendGrid();
 
 // Loads the SendGrid API keys from configuration file sections
-builder.Services.ConfigureSystemSendGridClientOptions(builder.Configuration.GetSection("SystemSendGridClientOptions"));
+//builder.Services.ConfigureSystemSendGridClientOptions(builder.Configuration.GetSection("SystemSendGridClientOptions"));
 builder.Services.Configure<SendGridClientOptions>(builder.Configuration.GetSection("FallbackSendGridClientOptions"));
 
 var app = builder.Build();
@@ -179,33 +179,37 @@ app.UseCookiePolicy();
 app.UseAuthentication();
 
 
+bool errorPagesEnabled = bool.TryParse(builder.Configuration["EnableErrorPages"], out var result) && result;
 
-bool isadminsite = bool.Parse(builder.Configuration["IsAdminSite"]);
-if (!app.Environment.IsDevelopment())
+if (errorPagesEnabled)
 {
+
+    bool isadminsite = bool.TryParse(builder.Configuration["IsAdminSite"], out var isAdminSiteResult) && isAdminSiteResult;
+    if (!app.Environment.IsDevelopment())
+    {
+        if (!isadminsite)
+        {
+            app.UseWhen(
+            context => !context.Request.Headers.UserAgent.ToString()
+                .Contains("Edge Health Probe", StringComparison.OrdinalIgnoreCase),
+            branch =>
+            {
+                branch.UseExceptionHandler("/Error/500");
+            });
+        }
+
+        app.UseHsts();
+    }
     if (!isadminsite)
     {
         app.UseWhen(
-        context => !context.Request.Headers.UserAgent.ToString()
-            .Contains("Edge Health Probe", StringComparison.OrdinalIgnoreCase),
+        context => !context.Request.Headers.UserAgent.ToString().Contains("Edge Health Probe", StringComparison.OrdinalIgnoreCase),
         branch =>
         {
-            branch.UseExceptionHandler("/Error/500");
+            branch.UseStatusCodePagesWithReExecute("/Error/{0}");
         });
     }
-
-    app.UseHsts();
 }
-if (!isadminsite)
-{
-    app.UseWhen(
-    context => !context.Request.Headers.UserAgent.ToString().Contains("Edge Health Probe", StringComparison.OrdinalIgnoreCase),
-    branch =>
-    {
-        branch.UseStatusCodePagesWithReExecute("/Error/{0}");
-    });
-}
-
 
 if (!builder.Environment.IsDevelopment() && builder.Configuration.GetSection("AdminRedirectOptions")?.GetSection("RedirectDomain")?.Value.Trim() != string.Empty)
 {
