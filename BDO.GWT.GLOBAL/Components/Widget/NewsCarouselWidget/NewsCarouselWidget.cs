@@ -5,8 +5,6 @@ using BDO.GWT.Core.LiveSite.Services;
 using Kentico.Content.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,15 +14,12 @@ public class NewsCarouselWidget : ViewComponent
 {
     private readonly INewsCarouselService _newsCarouselService;
     private readonly IContentRetriever _contentRetriever;
-    private readonly IContentService _contentService;
 
     public NewsCarouselWidget(
         INewsCarouselService newsCarouselService, 
-       IContentService contentService,
        IContentRetriever contentRetriever)
     {
         _newsCarouselService = newsCarouselService;
-        _contentService = contentService;
         _contentRetriever = contentRetriever;
     }
 
@@ -36,7 +31,6 @@ public class NewsCarouselWidget : ViewComponent
         {
             return View("~/Components/Widget/NewsCarouselWidget/_NewsCarouselWidget.cshtml", new NewsCarouselDto { FilteringTooltipEnabled = false });
         }
-        var currentPage = (await _contentService.GetItemsByGUIDAsync(new List<Guid> { page.Value })).FirstOrDefault();
 
         var backgroundimageurl = model.Properties?.BackgroundImages?.Any() == true
             ? await _contentRetriever.RetrieveContentByGuids<ContentAttachment>(
@@ -61,7 +55,7 @@ public class NewsCarouselWidget : ViewComponent
             WidgetID = model.Properties.WidgetID,
         };
 
-        var dto = await _newsCarouselService.GetNewsCarouselAsync(currentPage, data, HttpContext.RequestAborted);
+        var dto = await _newsCarouselService.GetNewsCarouselAsync<NewsArticle>(page.Value,model.Page.ContentTypeName, data, HttpContext.RequestAborted);
 
         return View("~/Components/Widget/NewsCarouselWidget/_NewsCarouselWidget.cshtml",dto);
     }
