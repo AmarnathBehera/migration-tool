@@ -27,7 +27,6 @@ namespace BDO.GWT.Core.Tests.Services
         private Mock<IProgressiveCache> _progressiveCacheMock = null!;
         private Mock<IPreferredLanguageRetriever> _preferredLanguageRetrieverMock = null!;
         private Mock<IWebPageUrlResolver> _urlResolverMock = null!;
-        private Mock<Microsoft.Extensions.Configuration.IConfiguration> _configurationMock = null!;
         private Microsoft.Extensions.Configuration.IConfiguration _configuration = null!;
         private HeaderService _service = null!;
 
@@ -48,7 +47,7 @@ namespace BDO.GWT.Core.Tests.Services
             _configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    ["HeaderMenuCacheInMin"] = "10"
+                    ["HeaderMenuCacheInMin"] = "5"
                 })
                 .Build();
 
