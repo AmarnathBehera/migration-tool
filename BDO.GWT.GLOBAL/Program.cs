@@ -180,32 +180,7 @@ app.UseCookiePolicy();
 app.UseAuthentication();
 
 RegisterErrorPageMiddleware(app, builder.Configuration, app.Environment);
-
-if (!builder.Environment.IsDevelopment() && builder.Configuration.GetSection("AdminRedirectOptions")?.GetSection("RedirectDomain")?.Value.Trim() != string.Empty)
-{
-    var rewriteOptions = new RewriteOptions()
-    .Add(context =>
-    {
-        var httpContext = context.HttpContext;
-        var request = httpContext.Request;
-
-        if (request.Path.StartsWithSegments("/admin", StringComparison.OrdinalIgnoreCase))
-        {
-            string adminDomain = httpContext.RequestServices
-                .GetRequiredService<IOptions<AdminRedirectOptions>>().Value.RedirectDomain;
-
-            if (!adminDomain.Equals(request.Host.ToString(), StringComparison.OrdinalIgnoreCase))
-            {
-                httpContext.Response.Redirect($"//{adminDomain}{request.Path}{request.QueryString}", permanent: false);
-                context.Result = RuleResult.EndResponse;
-            }
-        }
-    });
-
-    app.UseRewriter(rewriteOptions);
-}
-
-
+RegisterAdminRedirectRewriter(app, builder.Configuration, builder.Environment);
 
 app.UseKentico();
 app.UseMiddleware<RedirectMiddleware>();
@@ -244,6 +219,49 @@ void RegisterErrorPageMiddleware(WebApplication app, IConfiguration config, IHos
         context => !IsEdgeHealthProbe(context),
         branch => branch.UseStatusCodePagesWithReExecute("/Error/{0}")
     );
+}
+
+void RegisterAdminRedirectRewriter(WebApplication app, IConfiguration config, IHostEnvironment env)
+{
+    if (!ShouldRegisterAdminRedirect(env, config))
+    {
+        return;
+    }
+
+    app.UseRewriter(CreateAdminRedirectRewriteOptions());
+}
+
+static bool ShouldRegisterAdminRedirect(IHostEnvironment env, IConfiguration config) =>
+    !env.IsDevelopment() &&
+    !string.IsNullOrWhiteSpace(config["AdminRedirectOptions:RedirectDomain"]);
+
+static RewriteOptions CreateAdminRedirectRewriteOptions() =>
+    new RewriteOptions().Add(ApplyAdminRedirect);
+
+static void ApplyAdminRedirect(RewriteContext context)
+{
+    var httpContext = context.HttpContext;
+    var request = httpContext.Request;
+
+    if (!request.Path.StartsWithSegments("/admin", StringComparison.OrdinalIgnoreCase))
+    {
+        return;
+    }
+
+    string adminDomain = httpContext.RequestServices
+        .GetRequiredService<IOptions<AdminRedirectOptions>>()
+        .Value.RedirectDomain;
+
+    if (adminDomain.Equals(request.Host.ToString(), StringComparison.OrdinalIgnoreCase))
+    {
+        return;
+    }
+
+    httpContext.Response.Redirect(
+        $"//{adminDomain}{request.Path}{request.QueryString}",
+        permanent: false);
+
+    context.Result = RuleResult.EndResponse;
 }
 
 static bool IsEdgeHealthProbe(HttpContext context) =>
