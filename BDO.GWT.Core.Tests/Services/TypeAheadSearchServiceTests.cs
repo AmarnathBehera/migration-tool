@@ -21,7 +21,6 @@ namespace BDO.GWT.Core.Tests.Services
         private const string LANGUAGE_TAG = "en-US";
 
         private Mock<ICultureContext> _cultureContextMock = null!;
-        private Mock<IDateTimeProviderSearch> _dateTimeProviderMock = null!;
         private Mock<IPageUrlService> _pageUrlServiceMock = null!;
         private Mock<ISearchService> _searchServiceMock = null!;
         private TypeAheadSearchService _service = null!;
@@ -30,7 +29,6 @@ namespace BDO.GWT.Core.Tests.Services
         public void Setup()
         {
             _cultureContextMock = new Mock<ICultureContext>();
-            _dateTimeProviderMock = new Mock<IDateTimeProviderSearch>();
             _pageUrlServiceMock = new Mock<IPageUrlService>();
             _searchServiceMock = new Mock<ISearchService>();
 
@@ -38,7 +36,6 @@ namespace BDO.GWT.Core.Tests.Services
 
             _service = new TypeAheadSearchService(
                 _cultureContextMock.Object,
-                _dateTimeProviderMock.Object,
                 _pageUrlServiceMock.Object,
                 _searchServiceMock.Object);
         }
