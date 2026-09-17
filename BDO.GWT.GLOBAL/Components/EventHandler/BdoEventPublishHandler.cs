@@ -93,14 +93,14 @@ namespace BDO.GWT.GLOBAL.Components.EventHandler
                     UrlSlug = urlSlug
                 };
 
-                await webPageManager.Create(createPageParameters);
+                await webPageManager.Create(createPageParameters, cancellationToken);
 
                 int newPageId = await GetChildRegistrationFormIdAsync(
                     data.ID, data.WebsiteChannelName, data.ContentLanguageName, cancellationToken);
 
                 if (newPageId != 0)
                 {
-                    bool published = await webPageManager.TryPublish(newPageId, data.ContentLanguageName);
+                    bool published = await webPageManager.TryPublish(newPageId, data.ContentLanguageName, cancellationToken);
                     if (!published)
                     {
                         eventLogService.LogEvent(
@@ -136,7 +136,7 @@ namespace BDO.GWT.GLOBAL.Components.EventHandler
 
             return userInfoProvider.Get(userName);
         }
-        protected virtual BizFormInfo? GetTemplateForm() => bizFormInfoProvider.Get(TEMPLATE_FORM_CODE_NAME);
+        protected virtual BizFormInfo GetTemplateForm() => bizFormInfoProvider.Get(TEMPLATE_FORM_CODE_NAME);
 
         protected virtual BizFormInfo CreateEventRegistrationForm(string eventDisplayName, DateTime eventDate)
         {
