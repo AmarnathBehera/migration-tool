@@ -305,7 +305,7 @@ public class AuthoredContentService : IAuthoredContentService
         new()
         {
             ContentType = contentType,
-            ImageURL = imageUrl,
+            ImageURL = imageUrl.TrimStart('~'),
             ImageAltText = imageAltText,
             IsFeatured = false,
             Type = null,
