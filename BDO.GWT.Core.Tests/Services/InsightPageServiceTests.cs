@@ -23,6 +23,10 @@ public class InsightPageServiceTests
     private static readonly string[] ExpectedPersonMetadataTitle = new[] { "Person Metadata Title" };
     private static readonly string[] ExpectedExternalComposedName = new[] { "Ada van Lovelace" };
     private static readonly string[] ExpectedExternalMetadataTitle = new[] { "External Metadata Title" };
+    private static readonly string[] SchemaAuthorNames = new[] { "BDO Test" };
+    private static readonly string[] TwoAuthorsNames = new[] { "Ada Lovelace", "Grace van Hopper" };
+    private static readonly DateTime SchemaPublishDate = new(2026, 01, 01);
+    private static readonly DateTime SchemaModifyDate = new(2026, 02, 01);
 
     private Mock<IContentRetriever> _contentRetrieverMock = null!;
     private Mock<IInfoProvider<WebsiteChannelInfo>> _websiteChannelInfoProviderMock = null!;
@@ -1198,16 +1202,18 @@ public class InsightPageServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(result.Author.Select(x => x.Name), Is.EqualTo(new[] { "BDO Test" }));
+            Assert.That(result.Author, Is.Not.Null);
+            Assert.That(result.Author!.Select(x => x.Name), Is.EqualTo(SchemaAuthorNames));
             Assert.That(result.MainEntityOfPage, Is.EqualTo("https://example.com"));
             Assert.That(result.Headline, Is.EqualTo("Insight page"));
             Assert.That(result.Description, Is.EqualTo("Description"));
             Assert.That(result.Image, Is.Null);
             Assert.That(result.Url, Is.EqualTo("~//insights/test"));
-            Assert.That(result.Publisher.Name, Is.EqualTo("BDO Test"));
-            Assert.That(result.Publisher.Logo, Is.EqualTo("/media/logo.png"));
-            Assert.That(result.DatePublished, Is.EqualTo(new DateTime(2026, 01, 01)));
-            Assert.That(result.DateModified, Is.EqualTo(new DateTime(2026, 02, 01)));
+            Assert.That(result.Publisher, Is.Not.Null);
+            Assert.That(result.Publisher!.Name, Is.EqualTo("BDO Test"));
+            Assert.That(result.Publisher!.Logo, Is.EqualTo("/media/logo.png"));
+            Assert.That(result.DatePublished, Is.EqualTo(SchemaPublishDate));
+            Assert.That(result.DateModified, Is.EqualTo(SchemaModifyDate));
         });
     }
 
@@ -1246,9 +1252,10 @@ public class InsightPageServiceTests
 
         var result = await InvokeGetInsightSchemaMarkupDtoAsync(insight);
 
+        Assert.That(result.Author, Is.Not.Null);
         Assert.That(
-            result.Author.Select(x => x.Name),
-            Is.EqualTo(new[] { "Ada Lovelace", "Grace van Hopper" }));
+            result.Author!.Select(x => x.Name),
+            Is.EqualTo(TwoAuthorsNames));
     }
 
     [Test]

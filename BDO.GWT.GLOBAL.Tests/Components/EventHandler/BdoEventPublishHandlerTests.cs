@@ -17,6 +17,8 @@ namespace BDO.GWT.GLOBAL.Tests.Components.EventHandler;
 public class BdoEventPublishHandlerTests
 {
     private const BindingFlags PrivateInstance = BindingFlags.Instance | BindingFlags.NonPublic;
+    private static readonly string WebinarContentType = "BDO.Webinar";
+    private static readonly string EventContentType = "BDO.Event";
 
     private Mock<IWebPageManagerFactory> _webPageManagerFactoryMock = null!;
     private Mock<IContentQueryExecutor> _contentQueryExecutorMock = null!;
@@ -188,7 +190,7 @@ public class BdoEventPublishHandlerTests
     [Test]
     public async Task HandleAsync_WhenContentTypeIsWebinar_CreatesRegistrationPage()
     {
-        var data = CreateEventData("BDO.Webinar");
+        var data = CreateEventData(WebinarContentType);
         var asyncEvent = CreateAfterPublishEvent(data);
         var webPageManagerMock = SetupCreationPipeline(newPageId: 456, publishResult: true);
 
@@ -357,7 +359,7 @@ public class BdoEventPublishHandlerTests
 
     private static PublishWebPageEventData CreateEventData()
     {
-        return CreateEventData("BDO.Event");
+        return CreateEventData(EventContentType);
     }
 
     private static PublishWebPageEventData CreateEventData(string contentTypeName)
