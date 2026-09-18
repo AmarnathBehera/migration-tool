@@ -44,14 +44,18 @@ public class BdoEventPublishHandlerTests
     [Test]
     public void Constructor_AssignsInjectedDependencies()
     {
-        Assert.That(GetFieldValue<IWebPageManagerFactory>("webPageManagerFactory"), Is.SameAs(_webPageManagerFactoryMock.Object));
+        Assert.Multiple(() =>
+        {
+         Assert.That(GetFieldValue<IWebPageManagerFactory>("webPageManagerFactory"), Is.SameAs(_webPageManagerFactoryMock.Object));
         Assert.That(GetFieldValue<IContentQueryExecutor>("contentQueryExecutor"), Is.SameAs(_contentQueryExecutorMock.Object));
         Assert.That(GetFieldValue<IHttpContextAccessor>("httpContextAccessor"), Is.SameAs(_httpContextAccessorMock.Object));
         Assert.That(GetFieldValue<IContentItemCodeNameProvider>("contentItemCodeNameProvider"), Is.SameAs(_contentItemCodeNameProviderMock.Object));
         Assert.That(GetFieldValue<IInfoProvider<BizFormInfo>>("bizFormInfoProvider"), Is.SameAs(_bizFormInfoProviderMock.Object));
         Assert.That(GetFieldValue<IEventLogService>("eventLogService"), Is.SameAs(_eventLogServiceMock.Object));
         Assert.That(GetFieldValue<IUserInfoProvider>("userInfoProvider"), Is.SameAs(_userInfoProviderMock.Object));
+        });
     }
+
 
     [Test]
     public async Task HandleAsync_WhenContentTypeIsUnsupported_ReturnsWithoutDoingWork()
@@ -157,9 +161,11 @@ public class BdoEventPublishHandlerTests
 
         var exception = Assert.Throws<TargetInvocationException>(() =>
             InvokePrivate<object>("CreateEventRegistrationForm", "Tax Event", new DateTime(2025, 1, 10)));
-
-        Assert.That(exception!.InnerException, Is.TypeOf<InvalidOperationException>());
-        Assert.That(exception.InnerException!.Message, Does.Contain("Template form 'EventRegistrationTemplate' was not found."));
+        Assert.Multiple(() =>
+        {
+            Assert.That(exception!.InnerException, Is.TypeOf<InvalidOperationException>());
+            Assert.That(exception.InnerException!.Message, Does.Contain("Template form 'EventRegistrationTemplate' was not found."));
+        });
     }
 
     private TestableHandler CreateHandler()
@@ -269,6 +275,6 @@ public class BdoEventPublishHandlerTests
         }
 
         protected override BizFormInfo GetTemplateForm()
-            => GetTemplateImpl != null ? GetTemplateImpl() : null;
+     => (GetTemplateImpl != null ? GetTemplateImpl() : null)!;
     }
 }
