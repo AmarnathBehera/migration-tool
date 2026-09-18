@@ -40,6 +40,7 @@ using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using XperienceCommunity.MultiChoiceFormControl.Admin.Helpers.Components.MultiChoice;
 using XperienceCommunity.Redirects;
+using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -178,66 +179,8 @@ app.UseCookiePolicy();
 
 app.UseAuthentication();
 
-
-
-bool isadminsite = bool.Parse(builder.Configuration["IsAdminSite"]);
-if (!app.Environment.IsDevelopment())
-{
-    if (!isadminsite)
-    {
-        app.UseWhen(
-        context => !context.Request.Headers.UserAgent.ToString()
-            .Contains("Edge Health Probe", StringComparison.OrdinalIgnoreCase),
-        branch =>
-        {
-            branch.UseExceptionHandler("/Error/500");
-        });
-    }
-
-    app.UseHsts();
-}
-if (!isadminsite)
-{
-    app.UseWhen(
-    context => !context.Request.Headers.UserAgent.ToString().Contains("Edge Health Probe", StringComparison.OrdinalIgnoreCase),
-    branch =>
-    {
-        branch.UseStatusCodePagesWithReExecute("/Error/{0}");
-    });
-}
-
-
-if (!builder.Environment.IsDevelopment() && builder.Configuration.GetSection("AdminRedirectOptions")?.GetSection("RedirectDomain")?.Value.Trim() != string.Empty)
-{
-    // Configures the URL rewriting options
-    var rewriteOptions = new RewriteOptions()
-    .Add(context =>
-    {
-        var httpContext = context.HttpContext;
-        var request = httpContext.Request;
-
-        // Checks if the URL path starts with '/admin'
-        if (request.Path.StartsWithSegments("/admin", StringComparison.OrdinalIgnoreCase))
-        {
-            // Gets the redirect domain for the administration
-            string adminDomain = httpContext.RequestServices
-                .GetRequiredService<IOptions<AdminRedirectOptions>>().Value.RedirectDomain;
-
-            // Checks if the current host is not already the administration domain
-            if (!adminDomain.Equals(request.Host.ToString(), StringComparison.OrdinalIgnoreCase))
-            {
-                // Redirects the request to the new domain
-                httpContext.Response.Redirect($"//{adminDomain}{request.Path}{request.QueryString}", permanent: false);
-                context.Result = RuleResult.EndResponse;
-            }
-        }
-    });
-
-    // Adds the URL rewriting middleware to the request pipeline using the configured RewriteOptions
-    app.UseRewriter(rewriteOptions);
-}
-
-
+RegisterErrorPageMiddleware(app, builder.Configuration, app.Environment);
+RegisterAdminRedirectRewriter(app, builder.Configuration, builder.Environment);
 
 app.UseKentico();
 app.UseMiddleware<RedirectMiddleware>();
@@ -251,3 +194,76 @@ app.MapControllerRoute(
     }
 );
 app.Run();
+
+// --- Local functions ---
+
+void RegisterErrorPageMiddleware(WebApplication app, IConfiguration config, IHostEnvironment env)
+{
+    bool errorPagesEnabled = bool.TryParse(config["EnableErrorPages"], out var result) && result;
+    if (!errorPagesEnabled) return;
+
+    bool isAdminSite = bool.TryParse(config["IsAdminSite"], out var isAdminSiteResult) && isAdminSiteResult;
+    if (isAdminSite) return;
+
+    if (!env.IsDevelopment())
+    {
+        app.UseWhen(
+            context => !IsEdgeHealthProbe(context),
+            branch => branch.UseExceptionHandler("/Error/500")
+        );
+
+        app.UseHsts();
+    }
+
+    app.UseWhen(
+        context => !IsEdgeHealthProbe(context),
+        branch => branch.UseStatusCodePagesWithReExecute("/Error/{0}")
+    );
+}
+
+void RegisterAdminRedirectRewriter(WebApplication app, IConfiguration config, IHostEnvironment env)
+{
+    if (!ShouldRegisterAdminRedirect(env, config))
+    {
+        return;
+    }
+
+    app.UseRewriter(CreateAdminRedirectRewriteOptions());
+}
+
+static bool ShouldRegisterAdminRedirect(IHostEnvironment env, IConfiguration config) =>
+    !env.IsDevelopment() &&
+    !string.IsNullOrWhiteSpace(config["AdminRedirectOptions:RedirectDomain"]);
+
+static RewriteOptions CreateAdminRedirectRewriteOptions() =>
+    new RewriteOptions().Add(ApplyAdminRedirect);
+
+static void ApplyAdminRedirect(RewriteContext context)
+{
+    var httpContext = context.HttpContext;
+    var request = httpContext.Request;
+
+    if (!request.Path.StartsWithSegments("/admin", StringComparison.OrdinalIgnoreCase))
+    {
+        return;
+    }
+
+    string adminDomain = httpContext.RequestServices
+        .GetRequiredService<IOptions<AdminRedirectOptions>>()
+        .Value.RedirectDomain;
+
+    if (adminDomain.Equals(request.Host.ToString(), StringComparison.OrdinalIgnoreCase))
+    {
+        return;
+    }
+
+    httpContext.Response.Redirect(
+        $"//{adminDomain}{request.Path}{request.QueryString}",
+        permanent: false);
+
+    context.Result = RuleResult.EndResponse;
+}
+
+static bool IsEdgeHealthProbe(HttpContext context) =>
+    context.Request.Headers.UserAgent.ToString()
+        .Contains("Edge Health Probe", StringComparison.OrdinalIgnoreCase);
