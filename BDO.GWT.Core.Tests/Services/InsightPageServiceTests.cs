@@ -4,6 +4,7 @@ using BDO;
 using BDO.GWT.Common.Exceptions;
 using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.SchemaMarkups;
 using BDO.GWT.Core.Services;
 using CMS.ContentEngine;
 using CMS.DataEngine;
@@ -22,6 +23,10 @@ public class InsightPageServiceTests
     private static readonly string[] ExpectedPersonMetadataTitle = new[] { "Person Metadata Title" };
     private static readonly string[] ExpectedExternalComposedName = new[] { "Ada van Lovelace" };
     private static readonly string[] ExpectedExternalMetadataTitle = new[] { "External Metadata Title" };
+    private static readonly string[] SchemaAuthorNames = new[] { "BDO Test" };
+    private static readonly string[] TwoAuthorsNames = new[] { "Ada Lovelace", "Grace van Hopper" };
+    private static readonly DateTime SchemaPublishDate = new(2026, 01, 01);
+    private static readonly DateTime SchemaModifyDate = new(2026, 02, 01);
 
     private Mock<IContentRetriever> _contentRetrieverMock = null!;
     private Mock<IInfoProvider<WebsiteChannelInfo>> _websiteChannelInfoProviderMock = null!;
@@ -47,6 +52,11 @@ public class InsightPageServiceTests
         _websiteChannelContextMock
             .Setup(x => x.WebsiteChannelID)
             .Returns(1);
+
+        // The GetAsync(int, CancellationToken?) extension used by the service internally casts the
+        // provider to IInfoByIdProvider<WebsiteChannelInfo>, so the mock must also implement it.
+        // Moq requires As<T>() to be called prior to any .Object access.
+        _websiteChannelInfoProviderMock.As<IInfoByIdProvider<WebsiteChannelInfo>>();
 
         _websiteChannelContextMock
             .Setup(x => x.WebsiteChannelName)
@@ -1157,5 +1167,175 @@ public class InsightPageServiceTests
             Assert.That(result.SocialMediaButtons, Is.Not.Null);
             Assert.That(result.SocialMediaButtons!.ShowCopyLinkButton, Is.True);
         });
+    }
+
+    [Test]
+    public async Task GetInsightPageDtoAsync_ReturnsEmptyDto_WhenCurrentPageIsNull()
+    {
+        _contentRetrieverMock
+            .Setup(x => x.RetrieveCurrentPage<Insight>(
+                It.IsAny<RetrieveCurrentPageParameters>(),
+                It.IsAny<Action<RetrieveCurrentPageQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, Insight, Task<Insight>>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Insight)null!);
+
+        var result = await _service.GetInsightPageDtoAsync(null, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.SchemaMarkup, Is.TypeOf<ArticleSchemaMarkupDto>());
+            Assert.That(result.BaseContent, Is.Null);
+        });
+    }
+
+    [Test]
+    public async Task GetInsightSchemaMarkupDtoAsync_UsesChannelName_WhenNoAuthorsAreLinked()
+    {
+        SetupWebsiteChannel("https://example.com");
+
+        var insight = CreateInsight(title: "Insight page", showSidebar: false);
+
+        var result = await InvokeGetInsightSchemaMarkupDtoAsync(insight);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Author, Is.Not.Null);
+            Assert.That(result.Author!.Select(x => x.Name), Is.EqualTo(SchemaAuthorNames));
+            Assert.That(result.MainEntityOfPage, Is.EqualTo("https://example.com"));
+            Assert.That(result.Headline, Is.EqualTo("Insight page"));
+            Assert.That(result.Description, Is.EqualTo("Description"));
+            Assert.That(result.Image, Is.Null);
+            Assert.That(result.Url, Is.EqualTo("~//insights/test"));
+            Assert.That(result.Publisher, Is.Not.Null);
+            Assert.That(result.Publisher!.Name, Is.EqualTo("BDO Test"));
+            Assert.That(result.Publisher!.Logo, Is.EqualTo("/media/logo.png"));
+            Assert.That(result.DatePublished, Is.EqualTo(SchemaPublishDate));
+            Assert.That(result.DateModified, Is.EqualTo(SchemaModifyDate));
+        });
+    }
+
+    [Test]
+    public async Task GetInsightSchemaMarkupDtoAsync_ComposesAuthors_FromRelevantAndExternalPeople()
+    {
+        SetupUsePersonPageTitleSetting(false);
+        SetupWebsiteChannel("https://example.com");
+
+        var insight = CreateInsight(title: "Insight page", showSidebar: false);
+
+        var person = CreatePerson(
+            contentItemId: 1,
+            metadataTitle: "Person Title",
+            firstName: "Ada",
+            surnamePrefix: string.Empty,
+            lastName: "Lovelace",
+            jobTitle: "Developer",
+            url: "/people/ada");
+
+        var externalPerson = CreateExternalPerson(
+            contentItemGuid: Guid.NewGuid(),
+            metadataTitle: "External Metadata Title",
+            firstName: "Grace",
+            surnamePrefix: "van",
+            lastName: "Hopper",
+            jobTitle: "Engineer",
+            url: "/people/grace");
+
+        SetCollection(insight, nameof(Insight.RelevantContactPerson), person);
+        SetCollection(insight, nameof(Insight.RelatedExternalPeople), externalPerson);
+
+        SetupContentPages(person);
+        SetupContentPages(Array.Empty<InternalPerson>());
+        SetupContentPages(externalPerson);
+
+        var result = await InvokeGetInsightSchemaMarkupDtoAsync(insight);
+
+        Assert.That(result.Author, Is.Not.Null);
+        Assert.That(
+            result.Author!.Select(x => x.Name),
+            Is.EqualTo(TwoAuthorsNames));
+    }
+
+    [Test]
+    public async Task GetInsightSchemaMarkupDtoAsync_MapsImage_WhenCopyInsightHasImage()
+    {
+        SetupWebsiteChannel(null);
+
+        var insight = CreateInsight(title: "Insight page", showSidebar: false);
+        var copyInsight = insight.InsightContent.First()!;
+
+        SetAssetCollection(copyInsight, "ImageFile", "/media/insight.png");
+
+        var result = await InvokeGetInsightSchemaMarkupDtoAsync(insight);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Image, Is.EqualTo("/media/insight.png"));
+            Assert.That(result.MainEntityOfPage, Is.Null);
+        });
+    }
+
+    [Test]
+    public void GetCallToActionDto_ReturnsNull_WhenButtonTextOrLinkIsMissing()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(InsightPageService.GetCallToActionDto("desc", null, "/link", "right"), Is.Null);
+            Assert.That(InsightPageService.GetCallToActionDto("desc", "text", null, "right"), Is.Null);
+        });
+    }
+
+    [Test]
+    public void GetCallToActionDto_MapsValuesAndDefaultsPosition()
+    {
+        var withPosition = InsightPageService.GetCallToActionDto("desc", "text", "/link", "right");
+        var withoutPosition = InsightPageService.GetCallToActionDto("desc", "text", "/link", null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(withPosition!.Position, Is.EqualTo("right"));
+            Assert.That(withPosition.CallToActionDto!.Description, Is.EqualTo("desc"));
+            Assert.That(withPosition.CallToActionDto.ButtonTitle, Is.EqualTo("text"));
+            Assert.That(withPosition.CallToActionDto.ButtonUrl, Is.EqualTo("/link"));
+            Assert.That(withPosition.CallToActionDto.Position, Is.EqualTo("right"));
+            Assert.That(withoutPosition!.Position, Is.EqualTo("left"));
+            Assert.That(withoutPosition.CallToActionDto!.Position, Is.EqualTo("left"));
+        });
+    }
+
+    private void SetupWebsiteChannel(string? domain)
+    {
+        WebsiteChannelInfo? channel = null;
+
+        if (domain is not null)
+        {
+            var testChannel = (TestWebsiteChannelInfo)System.Runtime.CompilerServices.RuntimeHelpers
+                .GetUninitializedObject(typeof(TestWebsiteChannelInfo));
+            testChannel.WebsiteChannelDomain = domain;
+            channel = testChannel;
+        }
+
+        _websiteChannelInfoProviderMock
+            .As<IInfoByIdProvider<WebsiteChannelInfo>>()
+            .Setup(x => x.GetAsync(It.IsAny<int>(), It.IsAny<CancellationToken?>()))
+            .ReturnsAsync(channel!);
+    }
+
+    private sealed class TestWebsiteChannelInfo : WebsiteChannelInfo
+    {
+        public override string WebsiteChannelDomain { get; set; } = string.Empty;
+    }
+
+    private async Task<ArticleSchemaMarkupDto> InvokeGetInsightSchemaMarkupDtoAsync(Insight insight)
+    {
+        var method = typeof(InsightPageService).GetMethod(
+            "GetInsightSchemaMarkupDtoAsync",
+            BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+        return await (Task<ArticleSchemaMarkupDto>)method.Invoke(
+            _service,
+            new object[] { insight, CancellationToken.None })!;
     }
 }
