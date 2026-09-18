@@ -298,7 +298,7 @@ public class BdoEventPublishHandlerTests
         return webPageManagerMock;
     }
 
-    private static BizFormInfo CreateBizForm(string formDisplayName)
+    private static TestBizFormInfo CreateBizForm(string formDisplayName)
     {
         var form = (TestBizFormInfo)RuntimeHelpers.GetUninitializedObject(typeof(TestBizFormInfo));
         form.FormDisplayName = formDisplayName;
