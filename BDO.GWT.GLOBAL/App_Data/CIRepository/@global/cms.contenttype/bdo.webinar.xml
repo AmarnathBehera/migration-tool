@@ -138,12 +138,15 @@
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Event Type</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
             <![CDATA[["ed59f954-8d98-4783-8dfa-bdd81de58862"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MinimumItems>0</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
