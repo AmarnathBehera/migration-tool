@@ -168,6 +168,167 @@ public class BdoEventPublishHandlerTests
         });
     }
 
+    [Test]
+    public async Task HandleAsync_WhenRegistrationPageIsCreatedAndPublished_DoesNotLogAnything()
+    {
+        var asyncEvent = CreateAfterPublishEvent(CreateEventData());
+        var webPageManagerMock = SetupCreationPipeline(newPageId: 456, publishResult: true);
+
+        await _handler.HandleAsync(asyncEvent, CancellationToken.None);
+
+        webPageManagerMock.Verify(x => x.Create(
+            It.Is<CreateWebPageParameters>(p =>
+                p.ParentWebPageItemID == 123 &&
+                p.UrlSlug == "tax-event-registration"),
+            It.IsAny<CancellationToken>()), Times.Once);
+        webPageManagerMock.Verify(x => x.TryPublish(456, "en-US", It.IsAny<CancellationToken>()), Times.Once);
+        _eventLogServiceMock.Verify(x => x.LogEvent(It.IsAny<EventLogData>()), Times.Never);
+    }
+
+    [Test]
+    public async Task HandleAsync_WhenContentTypeIsWebinar_CreatesRegistrationPage()
+    {
+        var data = CreateEventData("BDO.Webinar");
+        var asyncEvent = CreateAfterPublishEvent(data);
+        var webPageManagerMock = SetupCreationPipeline(newPageId: 456, publishResult: true);
+
+        await _handler.HandleAsync(asyncEvent, CancellationToken.None);
+
+        webPageManagerMock.Verify(x => x.Create(It.IsAny<CreateWebPageParameters>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Test]
+    public async Task HandleAsync_WhenPublishFails_LogsPublishWarning()
+    {
+        var asyncEvent = CreateAfterPublishEvent(CreateEventData());
+        SetupCreationPipeline(newPageId: 456, publishResult: false);
+
+        await _handler.HandleAsync(asyncEvent, CancellationToken.None);
+
+        _eventLogServiceMock.Verify(x => x.LogEvent(It.Is<EventLogData>(d =>
+            d.EventCode == "REGFORM_PUBLISH_FAILED" &&
+            d.EventType == EventTypeEnum.Warning)), Times.Once);
+    }
+
+    [Test]
+    public async Task HandleAsync_WhenCreatedPageCannotBeFound_DoesNotPublish()
+    {
+        var asyncEvent = CreateAfterPublishEvent(CreateEventData());
+        var webPageManagerMock = SetupCreationPipeline(newPageId: 0, publishResult: true);
+
+        await _handler.HandleAsync(asyncEvent, CancellationToken.None);
+
+        webPageManagerMock.Verify(x => x.TryPublish(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        _eventLogServiceMock.Verify(x => x.LogEvent(It.IsAny<EventLogData>()), Times.Never);
+    }
+
+    [Test]
+    public async Task HandleAsync_WhenUrlPathCollisionOccurs_LogsCollisionEvent()
+    {
+        var asyncEvent = CreateAfterPublishEvent(CreateEventData());
+        var webPageManagerMock = SetupCreationPipeline(newPageId: 456, publishResult: true);
+
+        webPageManagerMock
+            .Setup(x => x.Create(It.IsAny<CreateWebPageParameters>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(CreateUrlPathCollisionException());
+
+        await _handler.HandleAsync(asyncEvent, CancellationToken.None);
+
+        _eventLogServiceMock.Verify(x => x.LogEvent(It.Is<EventLogData>(d =>
+            d.EventCode == "REGFORM_URL_COLLISION")), Times.Once);
+    }
+
+    [Test]
+    public void CreateEventRegistrationForm_WhenTemplateFormExists_IsInvokedWithEventDisplayName()
+    {
+        string? capturedName = null;
+        _handler.CreateFormImpl = (displayName, _) =>
+        {
+            capturedName = displayName;
+            return CreateBizForm("Tax Event 2025-01-10");
+        };
+
+        var result = InvokePrivate<object>("CreateEventRegistrationForm", "Tax Event", new DateTime(2025, 1, 10));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedName, Is.EqualTo("Tax Event"));
+            Assert.That(((BizFormInfo)result).FormDisplayName, Is.EqualTo("Tax Event 2025-01-10"));
+        });
+    }
+
+    private Mock<IWebPageManager> SetupCreationPipeline(int newPageId, bool publishResult)
+    {
+        var calls = 0;
+        _handler.GetChildIdImpl = (_, _, _, _) =>
+        {
+            calls++;
+            return Task.FromResult(calls == 1 ? 0 : newPageId);
+        };
+
+        _handler.CreateFormImpl = (displayName, date) => CreateBizForm($"{displayName} {date:yyyy-MM-dd}");
+
+        var user = (UserInfo)RuntimeHelpers.GetUninitializedObject(typeof(TestUserInfo));
+        var httpContext = new DefaultHttpContext
+        {
+            User = new ClaimsPrincipal(new ClaimsIdentity([new Claim(ClaimTypes.Name, "event.user")], "Test"))
+        };
+
+        _httpContextAccessorMock.SetupGet(x => x.HttpContext).Returns(httpContext);
+        _userInfoProviderMock.Setup(x => x.Get("event.user")).Returns(user);
+
+        _contentItemCodeNameProviderMock
+            .Setup(x => x.Get(It.IsAny<string>()))
+            .ReturnsAsync("tax-event-registration");
+
+        var webPageManagerMock = new Mock<IWebPageManager>(MockBehavior.Loose);
+        webPageManagerMock
+            .Setup(x => x.Create(It.IsAny<CreateWebPageParameters>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(newPageId);
+        webPageManagerMock
+            .Setup(x => x.TryPublish(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(publishResult);
+
+        _webPageManagerFactoryMock
+            .Setup(x => x.Create(It.IsAny<int>(), It.IsAny<int>()))
+            .Returns(webPageManagerMock.Object);
+
+        return webPageManagerMock;
+    }
+
+    private static BizFormInfo CreateBizForm(string formDisplayName)
+    {
+        var form = (TestBizFormInfo)RuntimeHelpers.GetUninitializedObject(typeof(TestBizFormInfo));
+        form.FormDisplayName = formDisplayName;
+        return form;
+    }
+
+    private static UrlPathCollisionException CreateUrlPathCollisionException()
+    {
+        var constructor = typeof(UrlPathCollisionException)
+            .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .OrderBy(c => c.GetParameters().Length)
+            .First();
+
+        var args = constructor.GetParameters()
+            .Select(p => p.ParameterType == typeof(string)
+                ? "collision"
+                : p.ParameterType.IsValueType ? Activator.CreateInstance(p.ParameterType) : null)
+            .ToArray();
+
+        return (UrlPathCollisionException)constructor.Invoke(args);
+    }
+
+    private sealed class TestBizFormInfo : BizFormInfo
+    {
+        public override string FormDisplayName { get; set; } = string.Empty;
+    }
+
+    private sealed class TestUserInfo : UserInfo
+    {
+        public override int UserID { get; set; }
+    }
+
     private TestableHandler CreateHandler()
     {
         return new TestableHandler(
@@ -196,9 +357,14 @@ public class BdoEventPublishHandlerTests
 
     private static PublishWebPageEventData CreateEventData()
     {
+        return CreateEventData("BDO.Event");
+    }
+
+    private static PublishWebPageEventData CreateEventData(string contentTypeName)
+    {
         return new PublishWebPageEventData
         {
-            ContentTypeName = "BDO.Event",
+            ContentTypeName = contentTypeName,
             ContentLanguageName = "en-US",
             DisplayName = "Tax Event",
             ID = 123,
@@ -251,6 +417,7 @@ public class BdoEventPublishHandlerTests
     {
         public Func<int, string, string, CancellationToken, Task<int>>? GetChildIdImpl { get; set; }
         public Func<BizFormInfo?>? GetTemplateImpl { get; set; }
+        public Func<string, DateTime, BizFormInfo>? CreateFormImpl { get; set; }
         public int GetChildIdCallCount { get; private set; }
 
         public TestableHandler(
@@ -276,5 +443,10 @@ public class BdoEventPublishHandlerTests
 
         protected override BizFormInfo GetTemplateForm()
      => (GetTemplateImpl != null ? GetTemplateImpl() : null)!;
+
+        protected override BizFormInfo CreateEventRegistrationForm(string eventDisplayName, DateTime eventDate)
+            => CreateFormImpl != null
+                ? CreateFormImpl(eventDisplayName, eventDate)
+                : base.CreateEventRegistrationForm(eventDisplayName, eventDate);
     }
 }
