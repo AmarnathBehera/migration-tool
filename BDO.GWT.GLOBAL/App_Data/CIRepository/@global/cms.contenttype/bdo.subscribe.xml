@@ -71,20 +71,31 @@ embedCode;Embed code
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Form field settings</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
           <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>form</Value>
+              <CaseSensitive>true</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <field allowempty="true" column="Information" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="5a177be9-9bed-4e7f-aaf2-1f7f5121e49f" visible="true">
         <properties>
-          <explanationtext>
-            <![CDATA[All field labels can be changed in 'BDO Site localization'  module with key prefix 'BDO.LiveSite.SubscribeForm'.]]>
-          </explanationtext>
           <explanationtextashtml>True</explanationtextashtml>
-          <fieldcaption>Information</fieldcaption>
+          <fieldcaption>
+            <![CDATA[All field labels can be changed in 'BDO Site localization'  module with key prefix 'BDO.LiveSite.SubscribeForm'.]]>
+          </fieldcaption>
           <fielddescriptionashtml>True</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
@@ -241,6 +252,28 @@ embedCode;Embed code
           </VisibilityConditionConfiguration>
         </visibilityconditiondata>
       </field>
+      <field allowempty="true" column="reCAPTCHAsettings" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="3eee0351-737c-4349-98f4-895250101366" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>reCAPTCHA settings</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
+            <Properties>
+              <PropertyName>FormType</PropertyName>
+              <Value>form</Value>
+              <CaseSensitive>true</CaseSensitive>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
       <field allowempty="true" column="RecaptchaUseV3" columnprecision="0" columntype="boolean" enabled="true" guid="3503c535-4f82-43ed-8df0-29d8db8a5459" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
@@ -264,7 +297,6 @@ embedCode;Embed code
       <field allowempty="true" column="RecaptchaScoreTreshhold" columnprecision="27" columnsize="28" columntype="decimal" enabled="true" guid="baf39fe7-bd1a-4e1b-8fe6-e20206456d68" visible="true">
         <properties>
           <defaultvalue>0.5</defaultvalue>
-          <explanationtext>Enter a decimal or whole number (e.g. 0.3)</explanationtext>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Score Threshold</fieldcaption>
           <fielddescription>A decimal number between 0 and 1</fielddescription>
@@ -284,7 +316,7 @@ embedCode;Embed code
           </VisibilityConditionConfiguration>
         </visibilityconditiondata>
       </field>
-      <field allowempty="true" column="RedirectPageOnFormSubmission" columnprecision="0" columntype="webpages" enabled="true" guid="16300ee2-a10e-4a6a-8d15-c7a93a407a7a" visible="true">
+      <field column="RedirectPageOnFormSubmission" columnprecision="0" columntype="webpages" enabled="true" guid="16300ee2-a10e-4a6a-8d15-c7a93a407a7a" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Redirect to page on form submission</fieldcaption>
@@ -295,16 +327,6 @@ embedCode;Embed code
           <MaximumPages>1</MaximumPages>
           <Sortable>False</Sortable>
         </settings>
-        <visibilityconditiondata>
-          <VisibilityConditionConfiguration>
-            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
-            <Properties>
-              <PropertyName>FormType</PropertyName>
-              <Value>form</Value>
-              <CaseSensitive>true</CaseSensitive>
-            </Properties>
-          </VisibilityConditionConfiguration>
-        </visibilityconditiondata>
       </field>
       <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
         <properties />
@@ -319,6 +341,7 @@ embedCode;Embed code
   </ClassFormDefinition>
   <ClassGUID>2294b5d1-7695-4868-bcff-00b9d7373a97</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-message</ClassIconClass>
   <ClassName>BDO.Subscribe</ClassName>
   <ClassShortName>BDOSubscribe</ClassShortName>
   <ClassTableName>BDO_Subscribe</ClassTableName>
