@@ -14,23 +14,20 @@ namespace BDO.GWT.GLOBAL.API.Data
 
         private readonly IContentService _contentService;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IWebHostEnvironment _hostEnvironment;
+        private readonly IAssetUrlResolver _assetUrlResolver;
         private readonly IEventLogService _eventLogService;
         private readonly IChannelWebsiteDomainService _channelWebsiteDomainService;
 
         public PageAttachmentService(
             IContentService contentService,
             IHttpClientFactory httpClientFactory,
-            IHttpContextAccessor httpContextAccessor,
-            IWebHostEnvironment hostEnvironment,
+            IAssetUrlResolver assetUrlResolver,
             IEventLogService eventLogService,
             IChannelWebsiteDomainService channelWebsiteDomainService)
         {
             _contentService = contentService;
             _httpClientFactory = httpClientFactory;
-            _httpContextAccessor = httpContextAccessor;
-            _hostEnvironment = hostEnvironment;
+            _assetUrlResolver = assetUrlResolver;
             _eventLogService = eventLogService;
             _channelWebsiteDomainService = channelWebsiteDomainService;
         }
@@ -132,7 +129,7 @@ namespace BDO.GWT.GLOBAL.API.Data
             BuildAssetUri(assetUrl, websiteDomain: null);
 
         private Uri? BuildAssetUri(string assetUrl, string? websiteDomain) =>
-            AssetUrlHelper.BuildAssetUri(assetUrl, _httpContextAccessor, _hostEnvironment, websiteDomain);
+            _assetUrlResolver.BuildAssetUri(assetUrl, websiteDomain);
 
         private static IEnumerable<ContentAttachment> GetAttachmentsFromPage(IWebPageFieldsSource page)
         {

@@ -21,8 +21,7 @@ public class MediaFileCrudService : IMediaFileCrudService
 
     private readonly IContentQueryExecutor _contentQueryExecutor;
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IWebHostEnvironment _hostEnvironment;
+    private readonly IAssetUrlResolver _assetUrlResolver;
     private readonly IChannelWebsiteDomainService _channelWebsiteDomainService;
     private readonly IContentItemManagerFactory _contentItemManagerFactory;
     private readonly IUserInfoProvider _userInfoProvider;
@@ -33,8 +32,7 @@ public class MediaFileCrudService : IMediaFileCrudService
     public MediaFileCrudService(
         IContentQueryExecutor contentQueryExecutor,
         IHttpClientFactory httpClientFactory,
-        IHttpContextAccessor httpContextAccessor,
-        IWebHostEnvironment hostEnvironment,
+        IAssetUrlResolver assetUrlResolver,
         IChannelWebsiteDomainService channelWebsiteDomainService,
         IContentItemManagerFactory contentItemManagerFactory,
         IUserInfoProvider userInfoProvider,
@@ -42,8 +40,7 @@ public class MediaFileCrudService : IMediaFileCrudService
     {
         _contentQueryExecutor = contentQueryExecutor;
         _httpClientFactory = httpClientFactory;
-        _httpContextAccessor = httpContextAccessor;
-        _hostEnvironment = hostEnvironment;
+        _assetUrlResolver = assetUrlResolver;
         _channelWebsiteDomainService = channelWebsiteDomainService;
         _contentItemManagerFactory = contentItemManagerFactory;
         _userInfoProvider = userInfoProvider;
@@ -144,7 +141,7 @@ public class MediaFileCrudService : IMediaFileCrudService
         BuildAssetUri(assetUrl, websiteDomain: null);
 
     private Uri? BuildAssetUri(string assetUrl, string? websiteDomain) =>
-        AssetUrlHelper.BuildAssetUri(assetUrl, _httpContextAccessor, _hostEnvironment, websiteDomain);
+        _assetUrlResolver.BuildAssetUri(assetUrl, websiteDomain);
     private static string GetMimeType(string extension)
     {
         if (_contentTypeProvider.TryGetContentType($"file{extension}", out var contentType))

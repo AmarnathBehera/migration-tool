@@ -26,6 +26,7 @@ public class PageAttachmentServiceTests
     private Mock<IWebHostEnvironment> _hostEnvironmentMock = null!;
     private Mock<IEventLogService> _eventLogServiceMock = null!;
     private Mock<IChannelWebsiteDomainService> _channelWebsiteDomainServiceMock = null!;
+    private IAssetUrlResolver _assetUrlResolver = null!;
 
     [SetUp]
     public void Setup()
@@ -43,14 +44,14 @@ public class PageAttachmentServiceTests
         _hostEnvironmentMock = new Mock<IWebHostEnvironment>();
         _eventLogServiceMock = new Mock<IEventLogService>();
         _channelWebsiteDomainServiceMock = new Mock<IChannelWebsiteDomainService>();
+        _assetUrlResolver = new AssetUrlResolver(_httpContextAccessorMock.Object, _hostEnvironmentMock.Object);
         SetupIsDevelopment(true);
     }
 
     private PageAttachmentService CreateSut() => new(
         _contentServiceMock.Object,
         _httpClientFactoryMock.Object,
-        _httpContextAccessorMock.Object,
-        _hostEnvironmentMock.Object,
+        new AssetUrlResolver(_httpContextAccessorMock.Object, _hostEnvironmentMock.Object),
         _eventLogServiceMock.Object,
         _channelWebsiteDomainServiceMock.Object);
 

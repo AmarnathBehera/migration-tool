@@ -801,14 +801,17 @@ public class MediaFileCrudServiceTests
         IHttpClientFactory? httpClientFactory = null,
         IHttpContextAccessor? httpContextAccessor = null,
         IWebHostEnvironment? hostEnvironment = null,
+        IAssetUrlResolver? assetUrlResolver = null,
         IChannelWebsiteDomainService? channelWebsiteDomainService = null,
         IInfoProvider<ContentLanguageInfo>? languageInfoProvider = null)
     {
+        var resolvedHttpContextAccessor = httpContextAccessor ?? Mock.Of<IHttpContextAccessor>();
+        var resolvedHostEnvironment = hostEnvironment ?? Mock.Of<IWebHostEnvironment>();
+
         return new MediaFileCrudService(
             queryExecutor ?? Mock.Of<IContentQueryExecutor>(),
             httpClientFactory ?? Mock.Of<IHttpClientFactory>(),
-            httpContextAccessor ?? Mock.Of<IHttpContextAccessor>(),
-            hostEnvironment ?? Mock.Of<IWebHostEnvironment>(),
+            assetUrlResolver ?? new AssetUrlResolver(resolvedHttpContextAccessor, resolvedHostEnvironment),
             channelWebsiteDomainService ?? Mock.Of<IChannelWebsiteDomainService>(),
             Mock.Of<IContentItemManagerFactory>(),
             Mock.Of<CMS.Membership.IUserInfoProvider>(),

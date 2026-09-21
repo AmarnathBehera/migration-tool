@@ -62,6 +62,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IScheduledTaskCrudService, ScheduledTaskCrudService>();
         serviceCollection.AddScoped<IPageAttachmentService, PageAttachmentService>();
         serviceCollection.AddScoped<IPageChannelResolver, PageChannelResolver>();
+        serviceCollection.AddScoped<IAssetUrlResolver, AssetUrlResolver>();
         serviceCollection.AddScoped<IContentItemInfoService, ContentItemInfoService>();
         serviceCollection.AddScoped<IPageAttachmentCrudService, PageAttachmentCrudService>();
         serviceCollection.AddScoped<IMediaFileCrudService, MediaFileCrudService>();
