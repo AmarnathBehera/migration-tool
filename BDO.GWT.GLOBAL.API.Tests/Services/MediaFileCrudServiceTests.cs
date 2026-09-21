@@ -346,7 +346,7 @@ public class MediaFileCrudServiceTests
     {
         var service = CreateSut();
 
-        var result = _assetUrlResolver.BuildAssetUri("https://cdn.example.com/a.png");
+        var result = _assetUrlResolver!.BuildAssetUri("https://cdn.example.com/a.png");
 
         Assert.Multiple(() =>
         {
@@ -360,7 +360,7 @@ public class MediaFileCrudServiceTests
     {
         _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Development");
 
-        var result = _assetUrlResolver.BuildAssetUri("~/getmedia/img.jpg");
+        var result = _assetUrlResolver!.BuildAssetUri("~/getmedia/img.jpg");
 
         Assert.Multiple(() =>
         {
@@ -374,7 +374,7 @@ public class MediaFileCrudServiceTests
     {
         _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Development");
 
-        var result = _assetUrlResolver.BuildAssetUri("~/getmedia/img.jpg?language=en-gb");
+        var result = _assetUrlResolver!.BuildAssetUri("~/getmedia/img.jpg?language=en-gb");
 
         Assert.Multiple(() =>
         {
@@ -394,7 +394,7 @@ public class MediaFileCrudServiceTests
 
         var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
 
-        var result = _assetUrlResolver.BuildAssetUri("~/getmedia/img.jpg");
+        var result = _assetUrlResolver!.BuildAssetUri("~/getmedia/img.jpg");
 
         Assert.Multiple(() =>
         {
@@ -413,7 +413,7 @@ public class MediaFileCrudServiceTests
 
         _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var result = _assetUrlResolver.BuildAssetUri("~/getmedia/img.jpg");
+        var result = _assetUrlResolver!.BuildAssetUri("~/getmedia/img.jpg");
 
         Assert.Multiple(() =>
         {
@@ -432,7 +432,7 @@ public class MediaFileCrudServiceTests
 
         _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var result = _assetUrlResolver.BuildAssetUri("getmedia/img.jpg");
+        var result = _assetUrlResolver!.BuildAssetUri("getmedia/img.jpg");
 
         Assert.Multiple(() =>
         {
@@ -452,7 +452,7 @@ public class MediaFileCrudServiceTests
 
         _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var result = _assetUrlResolver.BuildAssetUri("getmedia/img.jpg?language=en-gb");
+        var result = _assetUrlResolver!.BuildAssetUri("getmedia/img.jpg?language=en-gb");
 
         Assert.Multiple(() =>
         {
@@ -472,7 +472,7 @@ public class MediaFileCrudServiceTests
 
         var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
 
-        var result = _assetUrlResolver.BuildAssetUri("~/getmedia/img.jpg", "gwt-xbyk.dev.bdo.global");
+        var result = _assetUrlResolver!.BuildAssetUri("~/getmedia/img.jpg", "gwt-xbyk.dev.bdo.global");
 
         Assert.Multiple(() =>
         {
@@ -492,7 +492,7 @@ public class MediaFileCrudServiceTests
 
         _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var result = _assetUrlResolver.BuildAssetUri("/cmsctx/pm/token/lang/en-gb/wpid/72/cid/1/cdid/82/ts/1/readonly/0/h/hash/-/~/getContentAsset/5ed65831-9e46-4827-8011-d91f5c2e130e/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/img.jpg?language=en-gb");
+        var result = _assetUrlResolver!.BuildAssetUri("/cmsctx/pm/token/lang/en-gb/wpid/72/cid/1/cdid/82/ts/1/readonly/0/h/hash/-/~/getContentAsset/5ed65831-9e46-4827-8011-d91f5c2e130e/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/img.jpg?language=en-gb");
 
         Assert.Multiple(() =>
         {
@@ -638,7 +638,7 @@ public class MediaFileCrudServiceTests
     {
         _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Development");
 
-        var result = _assetUrlResolver.BuildAssetUri("~/getmedia/img.jpg");
+        var result = _assetUrlResolver!.BuildAssetUri("~/getmedia/img.jpg");
 
         Assert.Multiple(() =>
         {

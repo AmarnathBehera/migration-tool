@@ -469,7 +469,7 @@ public class PageAttachmentServiceTests
         SetupIsDevelopment(false);
         _httpContextAccessorMock.Setup(x => x.HttpContext).Returns((HttpContext?)null);
 
-        var result = _assetUrlResolver.BuildAssetUri("~/media/file.pdf");
+        var result = _assetUrlResolver!.BuildAssetUri("~/media/file.pdf");
 
         Assert.That(result, Is.Null);
     }
@@ -479,7 +479,7 @@ public class PageAttachmentServiceTests
     {
         SetupIsDevelopment(true);
 
-        var result = _assetUrlResolver.BuildAssetUri("~/media/file.pdf?language=en-gb");
+        var result = _assetUrlResolver!.BuildAssetUri("~/media/file.pdf?language=en-gb");
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result!.AbsoluteUri, Is.EqualTo("http://localhost:12393/media/file.pdf?language=en-gb"));
@@ -491,7 +491,7 @@ public class PageAttachmentServiceTests
         SetupIsDevelopment(false);
         SetupHttpContext("https", "mysite.com");
 
-        var result = _assetUrlResolver.BuildAssetUri("/cmsctx/pm/token/lang/en-gb/wpid/72/cid/1/cdid/82/ts/1/readonly/0/h/hash/-/~/getContentAsset/5ed65831-9e46-4827-8011-d91f5c2e130e/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/file.pdf?language=en-gb");
+        var result = _assetUrlResolver!.BuildAssetUri("/cmsctx/pm/token/lang/en-gb/wpid/72/cid/1/cdid/82/ts/1/readonly/0/h/hash/-/~/getContentAsset/5ed65831-9e46-4827-8011-d91f5c2e130e/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/file.pdf?language=en-gb");
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result!.AbsoluteUri, Is.EqualTo("https://mysite.com/getContentAsset/5ed65831-9e46-4827-8011-d91f5c2e130e/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/file.pdf?language=en-gb"));
