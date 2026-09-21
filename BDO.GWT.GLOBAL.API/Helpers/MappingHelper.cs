@@ -92,7 +92,6 @@ namespace BDO.GWT.GLOBAL.API.Helpers
         /// 
         Task<List<ContentItemReference>> BuildOrUpdateCopyInsightReferencesAsync(
             List<string>? items, CancellationToken cancellationToken);
-
     }
 
     public class MappingHelper : IMappingHelper
@@ -103,7 +102,11 @@ namespace BDO.GWT.GLOBAL.API.Helpers
         private readonly IValidationState _validationState;
         private static readonly LanguageTag defaultCulture = LanguageTag.GB;
 
-        public MappingHelper(IContentService contentRetriever, ICultureService cultureService, IWebsiteChannelContext websiteChannelContext, IValidationState validationState)
+        public MappingHelper(
+        IContentService contentRetriever,
+        ICultureService cultureService,
+        IWebsiteChannelContext websiteChannelContext,
+        IValidationState validationState)
         {
             _contentRetriever = contentRetriever;
             _cultureService = cultureService;

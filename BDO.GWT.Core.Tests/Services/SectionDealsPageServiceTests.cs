@@ -514,6 +514,60 @@ public class SectionDealsPageServiceTests
     }
 
     [Test]
+    public async Task GetSectionDealsDealPaginationDtoAsync_WhenPageGuidMatchesWebPageItemGUID_ReturnsSectionDeals()
+    {
+        // This test covers the .Or() clause that checks both ContentItemGUID and WebPageItemGUID
+        var contentItemGuid = Guid.NewGuid();
+        var webPageItemGuid = Guid.NewGuid();
+        var pageGuid = webPageItemGuid; // Pass the WebPageItemGUID as the pageGuid parameter
+
+        var page = new SectionDeals
+        {
+            IsGlobal = false,
+            SectionDealsFilteringEnabled = false,
+            GlobalSectionDealsFilters = null,
+            SectionDealsFilters = null,
+            SystemFields = new WebPageFields
+            {
+                ContentItemID = 100,
+                ContentItemGUID = contentItemGuid, // Different from pageGuid
+                ContentItemName = "Section Deals",
+                WebPageItemID = 200,
+                WebPageItemGUID = webPageItemGuid, // Matches pageGuid
+                WebPageItemName = "Section Deals Page",
+                WebPageUrlPath = "/deals",
+                WebPageItemTreePath = "/deals",
+            },
+        };
+
+        SetupSectionDealsPages(new[] { page });
+
+        var expectedPagination = new PaginationDto<DealCardDto>
+        {
+            Data = Array.Empty<DealCardDto>(),
+            TotalCount = 0,
+        };
+
+        _dealCardsServiceMock
+            .Setup(x => x.GetFilteredItemsAsync(
+                It.IsAny<SectionDeals>(),
+                It.IsAny<string>(),
+                It.IsAny<CardsQuery>(),
+                It.IsAny<Action<CMS.ContentEngine.ContentItemQueryBuilder>>(),
+                It.IsAny<Func<Deal, bool>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expectedPagination);
+
+        var result = await _service.GetSectionDealsDealPaginationDtoAsync(
+            "en-gb",
+            pageGuid, // Pass WebPageItemGUID instead of ContentItemGUID
+            new CardsQuery(),
+            CancellationToken.None);
+
+        Assert.That(result, Is.SameAs(expectedPagination));
+    }
+
+    [Test]
     public async Task GetSectionDealsDealPaginationDtoAsync_QueriesWithPassedLanguageAndNoFallbacks()
     {
         var page = CreateDefaultSectionDealsPage();

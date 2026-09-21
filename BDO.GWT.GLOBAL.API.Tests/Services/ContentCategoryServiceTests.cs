@@ -431,6 +431,244 @@ public class ContentCategoryServiceTests
     }
 
     [Test]
+    public async Task GetContentAsync_WithNullInsightCount_DefaultsTo15AndReturnsContentDto()
+    {
+        var mapping = new Mock<IMappingHelper>();
+        var channelProvider = new Mock<IInfoProvider<ChannelInfo>>();
+        var validation = new Mock<IValidationState>();
+        var websiteProvider = new Mock<IInfoProvider<WebsiteChannelInfo>>();
+        var contentService = new Mock<IContentService>();
+        var webPageUrlRetriever = new Mock<IWebPageUrlRetriever>();
+
+        mapping.Setup(x => x.ValidateAndNormalizeSiteCultureAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(LanguageTag.GB);
+        validation.Setup(x => x.HasUnprocessableEntityErrors()).Returns(false);
+        validation.Setup(x => x.HasErrors()).Returns(false);
+
+        channelProvider.As<IInfoByIdProvider<ChannelInfo>>()
+            .Setup(x => x.Get(1))
+            .Returns(CreateChannelInfo("Global"));
+        websiteProvider.As<IInfoByIdProvider<WebsiteChannelInfo>>()
+            .Setup(x => x.Get(1))
+            .Returns(CreateWebsiteChannelInfo("example.com"));
+
+        var blogPost = new BlogPost
+        {
+            SystemFields = new WebPageFields
+            {
+                ContentItemGUID = Guid.NewGuid(),
+                ContentItemCommonDataLastPublishedWhen = new DateTime(2025, 2, 1),
+                WebPageUrlPath = "/blog/1"
+            },
+            MetadataTitle = "Blog one",
+            MetadataDescription = "Summary",
+            MetadataTeaserImage = Array.Empty<ContentAttachment>(),
+            MetadataBusinessIssues = Array.Empty<Businessissue>(),
+            MetadataBusinessLine = Array.Empty<BusinessLine>(),
+            MetadataServiceAreas = Array.Empty<ServiceArea>(),
+            MetadataIndustries = Array.Empty<Industry>()
+        };
+
+        var insight = new Insight
+        {
+            SystemFields = new WebPageFields
+            {
+                ContentItemGUID = Guid.NewGuid(),
+                ContentItemCommonDataLastPublishedWhen = new DateTime(2025, 2, 2),
+                WebPageUrlPath = "/insight/1"
+            },
+            MetadataTitle = "Insight one",
+            MetadataDescription = "Insight summary",
+            MetadataTeaserImage = Array.Empty<ContentAttachment>(),
+            MetadataBusinessIssues = Array.Empty<Businessissue>(),
+            MetadataBusinessLine = Array.Empty<BusinessLine>(),
+            MetadataServiceAreas = Array.Empty<ServiceArea>(),
+            MetadataIndustries = Array.Empty<Industry>()
+        };
+
+        contentService.Setup(x => x.GetPagesAsync<BlogPost>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([blogPost]);
+
+        contentService.Setup(x => x.GetPagesAsync<Insight>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([insight]);
+
+        webPageUrlRetriever
+            .Setup(x => x.Retrieve(500, "en-gb", It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new WebPageUrl("~/search", "https://example.com/en-gb/search"));
+
+        var contentExecutor = CreateContentQueryExecutorProxy((method, args) =>
+        {
+            if (method.Name == "GetResult")
+            {
+                var selector = args![1]!;
+                var row = new Mock<IContentQueryDataContainer>();
+                row.Setup(x => x.GetValue<int>(It.IsAny<string>()))
+                    .Returns((string key) => key == "WebPageItemID" ? 500 : 21);
+                row.Setup(x => x.GetValue<string>(It.IsAny<string>())).Returns("Search");
+
+                var projected = selector.GetType().GetMethod("Invoke")!.Invoke(selector, [row.Object])!;
+                var payloadType = method.ReturnType.GetGenericArguments()[0];
+                var array = Array.CreateInstance(projected.GetType(), 1);
+                array.SetValue(projected, 0);
+
+                return typeof(Task)
+                    .GetMethod(nameof(Task.FromResult))!
+                    .MakeGenericMethod(payloadType)
+                    .Invoke(null, [array])!;
+            }
+
+            return GetDefaultReturnValue(method.ReturnType);
+        });
+
+        var service = new ContentCategoryService(
+            contentExecutor,
+            contentService.Object,
+            mapping.Object,
+            channelProvider.Object,
+            validation.Object,
+            websiteProvider.Object,
+            webPageUrlRetriever.Object);
+
+        // Pass null for insightCount - should default to 15
+        var result = await service.GetContentAsync(1, "en-gb", null, 5, Array.Empty<ContentCategoryFilter>(), CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.Null);
+            Assert.That(result.Value, Is.Not.Null);
+            Assert.That(result.Value!.InsightsSearchURL, Is.EqualTo("https://example.com/en-GB/search"));
+            Assert.That(result.Value.Insights, Has.Count.EqualTo(2));
+        });
+    }
+
+    [Test]
+    public async Task GetContentAsync_WithInsightCountZero_DefaultsTo15AndReturnsContentDto()
+    {
+        var mapping = new Mock<IMappingHelper>();
+        var channelProvider = new Mock<IInfoProvider<ChannelInfo>>();
+        var validation = new Mock<IValidationState>();
+        var websiteProvider = new Mock<IInfoProvider<WebsiteChannelInfo>>();
+        var contentService = new Mock<IContentService>();
+        var webPageUrlRetriever = new Mock<IWebPageUrlRetriever>();
+
+        mapping.Setup(x => x.ValidateAndNormalizeSiteCultureAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(LanguageTag.GB);
+        validation.Setup(x => x.HasUnprocessableEntityErrors()).Returns(false);
+        validation.Setup(x => x.HasErrors()).Returns(false);
+
+        channelProvider.As<IInfoByIdProvider<ChannelInfo>>()
+            .Setup(x => x.Get(1))
+            .Returns(CreateChannelInfo("Global"));
+        websiteProvider.As<IInfoByIdProvider<WebsiteChannelInfo>>()
+            .Setup(x => x.Get(1))
+            .Returns(CreateWebsiteChannelInfo("example.com"));
+
+        var blogPost = new BlogPost
+        {
+            SystemFields = new WebPageFields
+            {
+                ContentItemGUID = Guid.NewGuid(),
+                ContentItemCommonDataLastPublishedWhen = new DateTime(2025, 2, 1),
+                WebPageUrlPath = "/blog/1"
+            },
+            MetadataTitle = "Blog one",
+            MetadataDescription = "Summary",
+            MetadataTeaserImage = Array.Empty<ContentAttachment>(),
+            MetadataBusinessIssues = Array.Empty<Businessissue>(),
+            MetadataBusinessLine = Array.Empty<BusinessLine>(),
+            MetadataServiceAreas = Array.Empty<ServiceArea>(),
+            MetadataIndustries = Array.Empty<Industry>()
+        };
+
+        var insight = new Insight
+        {
+            SystemFields = new WebPageFields
+            {
+                ContentItemGUID = Guid.NewGuid(),
+                ContentItemCommonDataLastPublishedWhen = new DateTime(2025, 2, 2),
+                WebPageUrlPath = "/insight/1"
+            },
+            MetadataTitle = "Insight one",
+            MetadataDescription = "Insight summary",
+            MetadataTeaserImage = Array.Empty<ContentAttachment>(),
+            MetadataBusinessIssues = Array.Empty<Businessissue>(),
+            MetadataBusinessLine = Array.Empty<BusinessLine>(),
+            MetadataServiceAreas = Array.Empty<ServiceArea>(),
+            MetadataIndustries = Array.Empty<Industry>()
+        };
+
+        contentService.Setup(x => x.GetPagesAsync<BlogPost>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([blogPost]);
+
+        contentService.Setup(x => x.GetPagesAsync<Insight>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([insight]);
+
+        webPageUrlRetriever
+            .Setup(x => x.Retrieve(500, "en-gb", It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new WebPageUrl("~/search", "https://example.com/en-gb/search"));
+
+        var contentExecutor = CreateContentQueryExecutorProxy((method, args) =>
+        {
+            if (method.Name == "GetResult")
+            {
+                var selector = args![1]!;
+                var row = new Mock<IContentQueryDataContainer>();
+                row.Setup(x => x.GetValue<int>(It.IsAny<string>()))
+                    .Returns((string key) => key == "WebPageItemID" ? 500 : 21);
+                row.Setup(x => x.GetValue<string>(It.IsAny<string>())).Returns("Search");
+
+                var projected = selector.GetType().GetMethod("Invoke")!.Invoke(selector, [row.Object])!;
+                var payloadType = method.ReturnType.GetGenericArguments()[0];
+                var array = Array.CreateInstance(projected.GetType(), 1);
+                array.SetValue(projected, 0);
+
+                return typeof(Task)
+                    .GetMethod(nameof(Task.FromResult))!
+                    .MakeGenericMethod(payloadType)
+                    .Invoke(null, [array])!;
+            }
+
+            return GetDefaultReturnValue(method.ReturnType);
+        });
+
+        var service = new ContentCategoryService(
+            contentExecutor,
+            contentService.Object,
+            mapping.Object,
+            channelProvider.Object,
+            validation.Object,
+            websiteProvider.Object,
+            webPageUrlRetriever.Object);
+
+        // Pass 0 for insightCount - should default to 15
+        var result = await service.GetContentAsync(1, "en-gb", 0, 5, Array.Empty<ContentCategoryFilter>(), CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.Null);
+            Assert.That(result.Value, Is.Not.Null);
+            Assert.That(result.Value!.InsightsSearchURL, Is.EqualTo("https://example.com/en-GB/search"));
+            Assert.That(result.Value.Insights, Has.Count.EqualTo(2));
+        });
+    }
+
+    [Test]
     public async Task GetInsightSearchUrlByDomainAsync_WhenDomainWithoutScheme_ReturnsNormalizedUrl()
     {
         var websiteProvider = new Mock<IInfoProvider<WebsiteChannelInfo>>();

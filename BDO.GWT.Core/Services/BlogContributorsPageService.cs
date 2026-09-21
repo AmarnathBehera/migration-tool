@@ -8,6 +8,7 @@ using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Web.Core.Services;
 using CMS.Websites;
+using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
 
@@ -34,7 +35,9 @@ public class BlogContributorsPageService : IBlogContributorsPageService
     private readonly IPeopleCardsService _peopleCardsService;
     private readonly IContentService _contentService;
     private readonly IHeroService _heroService;
- 
+    private readonly IWebsiteChannelContext _websiteChannelContext;
+
+
 
 
     public BlogContributorsPageService(
@@ -42,12 +45,14 @@ public class BlogContributorsPageService : IBlogContributorsPageService
         IContentService contentService,
         IHeroService heroService,
         ICultureContext cultureContext,
-        IPreferredLanguageRetriever preferredLanguageRetriever)
+        IPreferredLanguageRetriever preferredLanguageRetriever,
+        IWebsiteChannelContext websiteChannelContext)
     {
         _peopleCardsService = peopleCardsService;
         _contentService = contentService;
         _heroService = heroService;
-       
+        _websiteChannelContext = websiteChannelContext;
+
     }
 
     public async Task<BlogContributorsDto> GetSectionPeoplePageDtoAsync(BlogContributors page, CancellationToken cancellationToken)
@@ -95,15 +100,21 @@ public class BlogContributorsPageService : IBlogContributorsPageService
 
     public async Task<PaginationDto<PersonCardDto>> GetBlogContributorsPaginationDtoAsync(Guid pageGuid, string language, CardsQuery cardsQuery, CancellationToken cancellationToken = default)
     {
+        var isPreview = true;
+
         var blogContributorsPage = (await _contentService.GetPagesAsync<BlogContributors>(
-            new RetrievePagesParameters
-            {
-                LanguageName = language,
-                UseLanguageFallbacks = false
-            },
+           new RetrievePagesParameters
+           {
+               LanguageName = language,
+               UseLanguageFallbacks = isPreview,
+               IsForPreview = isPreview,
+           },
             query => query
                 .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
-                .Where(w => w.WhereEquals("ContentItemGUID", pageGuid)),
+                .Where(w => w
+                    .WhereEquals("ContentItemGUID", pageGuid)
+                    .Or()
+                    .WhereEquals(nameof(IWebPageContentQueryDataContainer.WebPageItemGUID), pageGuid)),
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken
         )).FirstOrDefault();

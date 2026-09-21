@@ -1,4 +1,5 @@
-﻿using BDO.GWT.Common.Exceptions;
+﻿using AngleSharp.Dom;
+using BDO.GWT.Common.Exceptions;
 using BDO.GWT.Core.Constants;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
@@ -357,7 +358,7 @@ namespace BDO.GWT.Core.Services
                     Image = PageHelper.GetImageDto(person.MetadataTeaserImage.FirstOrDefault()?.ContentAttachmentAsset.Url, person.MetadataTeaserImageAltText),
                     FullName = fullName,
                     JobTitle = person.PersonJobTitle,
-                    Url = person.SystemFields.WebPageUrlPath,
+                    Url = $"~/{person.SystemFields.WebPageUrlPath}",
                 };
             }));
 
@@ -496,7 +497,8 @@ namespace BDO.GWT.Core.Services
                     Name = name,
                     Logo =  _contentService.GetCurrentSiteLogoImageUrlAsync(),
                 },
-                Url = insights.SystemFields.WebPageUrlPath
+                Url = $"~/{insights.SystemFields.WebPageUrlPath}",
+                
             };
         }
 

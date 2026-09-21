@@ -147,6 +147,8 @@
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Download button attachment</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>b760a373-943b-4321-ac39-d5067101ff82</kxp_schema_identifier>
         </properties>
         <settings>
@@ -155,7 +157,7 @@
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <MaximumItems>1</MaximumItems>
-          <MinimumItems>1</MinimumItems>
+          <MinimumItems>0</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -226,6 +228,8 @@
           <explanationtextashtml>True</explanationtextashtml>
           <fieldcaption>OG metadata image</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>15e80c44-954e-403a-8fc9-1ae3d222cbf3</kxp_schema_identifier>
         </properties>
         <settings>
@@ -234,7 +238,7 @@
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <MaximumItems>1</MaximumItems>
-          <MinimumItems>1</MinimumItems>
+          <MinimumItems>0</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -256,6 +260,8 @@
           <fieldcaption>Twitter OG metadata image</fieldcaption>
           <fielddescription>Used only for Twitter images with aspect ratio 1:1</fielddescription>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>15e80c44-954e-403a-8fc9-1ae3d222cbf3</kxp_schema_identifier>
         </properties>
         <settings>
@@ -264,7 +270,7 @@
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <MaximumItems>1</MaximumItems>
-          <MinimumItems>1</MinimumItems>
+          <MinimumItems>0</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -365,6 +371,8 @@
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Teaser image</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>8b79d460-a816-437b-83fe-597bcc6fe7cf</kxp_schema_identifier>
         </properties>
         <settings>
@@ -373,7 +381,7 @@
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <MaximumItems>1</MaximumItems>
-          <MinimumItems>1</MinimumItems>
+          <MinimumItems>0</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -679,6 +687,8 @@ heroImage;Hero
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Image</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>b3326bf5-1ba7-415e-9366-fab20a18b931</kxp_schema_identifier>
         </properties>
         <settings>
@@ -687,7 +697,7 @@ heroImage;Hero
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <MaximumItems>1</MaximumItems>
-          <MinimumItems>1</MinimumItems>
+          <MinimumItems>0</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
         <validationrulesdata>
@@ -745,6 +755,8 @@ heroImage;Hero
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Mobile image</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>b3326bf5-1ba7-415e-9366-fab20a18b931</kxp_schema_identifier>
         </properties>
         <settings>
@@ -753,7 +765,7 @@ heroImage;Hero
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <MaximumItems>1</MaximumItems>
-          <MinimumItems>1</MinimumItems>
+          <MinimumItems>0</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
         <validationrulesdata>
@@ -967,6 +979,8 @@ tertiary;Tertiary
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Background image</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>c7c96373-2939-43c4-ac0f-85b345f6c005</kxp_schema_identifier>
         </properties>
         <settings>
@@ -975,7 +989,7 @@ tertiary;Tertiary
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <MaximumItems>1</MaximumItems>
-          <MinimumItems>1</MinimumItems>
+          <MinimumItems>0</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
         <visibilityconditiondata>
@@ -1157,6 +1171,8 @@ MicrositePage;Microsite Page
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Image</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>65e4cd93-2087-4be4-8787-e7acd5bf632e</kxp_schema_identifier>
         </properties>
         <settings>
@@ -1165,6 +1181,7 @@ MicrositePage;Microsite Page
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <MaximumItems>1</MaximumItems>
+          <MinimumItems>0</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
