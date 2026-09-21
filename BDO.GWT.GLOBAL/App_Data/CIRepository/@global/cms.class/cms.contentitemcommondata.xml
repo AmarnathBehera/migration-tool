@@ -366,9 +366,23 @@
           <controlname>Kentico.Administration.RichTextEditor</controlname>
         </settings>
       </field>
-      <field allowempty="true" column="MetadataTeaserImage" columnprecision="0" columntype="contentitemreference" enabled="true" guid="8f060a96-d942-4969-ac2e-83ebdfce3762" visible="true">
+      <field allowempty="true" column="MetadataCanonical" columnprecision="0" columnsize="2000" columntype="text" enabled="true" guid="cdd314fa-bacd-468e-b191-6aae02c8a259" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Canonical link</fieldcaption>
+          <fielddescription>
+            <![CDATA[link to the original page where the content from this page is copied from]]>
+          </fielddescription>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <kxp_schema_identifier>8b79d460-a816-437b-83fe-597bcc6fe7cf</kxp_schema_identifier>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataTeaserImage" columnprecision="0" columntype="contentitemreference" enabled="true" guid="8f060a96-d942-4969-ac2e-83ebdfce3762" visible="true">
+        <properties>
+          <explanationtextashtml>True</explanationtextashtml>
           <fieldcaption>Teaser image</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
           <includeincontentgeneration>False</includeincontentgeneration>
@@ -413,20 +427,6 @@
             </Properties>
           </VisibilityConditionConfiguration>
         </visibilityconditiondata>
-      </field>
-      <field allowempty="true" column="MetadataCanonical" columnprecision="0" columnsize="2000" columntype="text" enabled="true" guid="cdd314fa-bacd-468e-b191-6aae02c8a259" visible="true">
-        <properties>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Canonical link</fieldcaption>
-          <fielddescription>
-            <![CDATA[link to the original page where the content from this page is copied from]]>
-          </fielddescription>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-          <kxp_schema_identifier>8b79d460-a816-437b-83fe-597bcc6fe7cf</kxp_schema_identifier>
-        </properties>
-        <settings>
-          <controlname>Kentico.Administration.TextInput</controlname>
-        </settings>
       </field>
       <schema guid="6bf9af2e-ee19-461b-a071-2b6541b36653" name="WhereShouldThisPageAppear">
         <properties>
@@ -1766,6 +1766,12 @@ after;After
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>BDO.NonEnglishOrAdminVisibilityCondition</Identifier>
+            <Properties />
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <field allowempty="true" column="DescriptionBodyforGlobal" columnprecision="0" columntype="longtext" enabled="true" guid="9555902d-a845-48ff-af4a-f004ee3931d3" visible="true">
         <properties>
@@ -1785,6 +1791,12 @@ after;After
           <MaxRowsNumber>5</MaxRowsNumber>
           <MinRowsNumber>3</MinRowsNumber>
         </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>BDO.NonEnglishOrAdminVisibilityCondition</Identifier>
+            <Properties />
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
     </form>
   </ClassFormDefinition>

@@ -4,6 +4,7 @@ using CMS.ContentEngine;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
+using Kentico.Content.Web.Mvc.Routing;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
@@ -20,6 +21,7 @@ public class ImageWithTextWidget : ViewComponent
     private readonly IContentService _contentService;
     private readonly IContentQueryExecutor _queryExecutor;
     private readonly IWebsiteChannelContext _channelContext;
+    private readonly IWebPageUrlRetriever _webPageUrlRetriever;
 
     private const string ViewPath = "~/Components/Widget/ImageWithTextWidget/_ImageWithTextWidget.cshtml";
 
@@ -27,12 +29,14 @@ public class ImageWithTextWidget : ViewComponent
         IContentRetriever contentRetriever,
         IContentService contentService,
         IContentQueryExecutor queryExecutor,
-        IWebsiteChannelContext channelContext)
+        IWebsiteChannelContext channelContext,
+        IWebPageUrlRetriever webPageUrlRetriever)
     {
         _contentRetriever = contentRetriever;
         _contentService = contentService;
         _queryExecutor = queryExecutor;
         _channelContext = channelContext;
+        _webPageUrlRetriever = webPageUrlRetriever;
     }
 
     public async Task<ViewViewComponentResult> InvokeAsync(ComponentViewModel<ImageWithTextWidgetProperties> model)
@@ -85,7 +89,7 @@ public class ImageWithTextWidget : ViewComponent
             ?? await ResolveAttachmentUrlAsync(properties.ButtonURL);
     }
 
-    // Queries WebPageUrlPath by ContentItemGUID — single lightweight indexed lookup.
+    // Queries the linked page and resolves its full URL path.
     private async Task<string> ResolvePageUrlAsync(Guid contentItemGuid)
     {
         var builder = new ContentItemQueryBuilder()
@@ -103,16 +107,21 @@ public class ImageWithTextWidget : ViewComponent
             ForPreview = _channelContext.IsPreview
         };
 
-        var results = await _queryExecutor.GetResult<string>(
+        var results = await _queryExecutor.GetResult<int>(
             builder,
-            container => container.GetValue<string>("WebPageUrlPath"),
+            container => container.GetValue<int>("WebPageItemID"),
             options);
 
-        var urlPath = results.FirstOrDefault();
+        var webPageItemId = results.FirstOrDefault();
 
-        return string.IsNullOrEmpty(urlPath)
-            ? null
-            : _contentService.EnsureAbsoluteUrl(urlPath);
+        if (webPageItemId == 0)
+        {
+            return null;
+        }
+
+        var pageUrl = await _webPageUrlRetriever.Retrieve(webPageItemId, _contentService.GetCurrentLanguage());
+
+        return pageUrl?.RelativePath?.Replace("~", string.Empty);
     }
 
     // Fallback: resolves URL from a ContentAttachment content item.
