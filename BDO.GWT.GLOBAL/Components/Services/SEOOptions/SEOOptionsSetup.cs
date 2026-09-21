@@ -44,7 +44,7 @@ public class SEOOptionsSetup : IConfigureOptions<SEOOptions>
         if(seoSettings?.SeoSettingsSecurityInheritfromGlobal ?? true)
         {
             var globalSettings = _provider.Get().FirstOrDefault();
-            options.SecurityText = globalSettings?.SeoSettingsRobots ?? string.Empty;
+            options.SecurityText = globalSettings?.SeoSettingsSecurity ?? string.Empty;
         }
         else
         {
