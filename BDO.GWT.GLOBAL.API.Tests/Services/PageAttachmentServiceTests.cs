@@ -26,7 +26,7 @@ public class PageAttachmentServiceTests
     private Mock<IWebHostEnvironment> _hostEnvironmentMock = null!;
     private Mock<IEventLogService> _eventLogServiceMock = null!;
     private Mock<IChannelWebsiteDomainService> _channelWebsiteDomainServiceMock = null!;
-    private IAssetUrlResolver _assetUrlResolver = null!;
+    private AssetUrlResolver? _assetUrlResolver;
 
     [SetUp]
     public void Setup()

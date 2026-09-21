@@ -17,7 +17,7 @@ public class MediaFileCrudServiceTests
 {
     private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
     private Mock<IWebHostEnvironment> _hostEnvironmentMock = null!;
-    private IAssetUrlResolver _assetUrlResolver = null!;
+    private AssetUrlResolver? _assetUrlResolver;
 
     [SetUp]
     public void SetUp()
