@@ -1,5 +1,6 @@
 ﻿using BDO.GWT.Core;
 using BDO.GWT.GLOBAL.API.Helpers;
+using CMS.Core;
 using CMS.Websites;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Net.Mime;
@@ -9,21 +10,29 @@ namespace BDO.GWT.GLOBAL.API.Data
     public class PageAttachmentService : IPageAttachmentService
     {
         private static readonly FileExtensionContentTypeProvider ContentTypeProvider = new();
+        private const string EventSource = nameof(PageAttachmentService);
 
         private readonly IContentService _contentService;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebHostEnvironment _hostEnvironment;
+        private readonly IEventLogService _eventLogService;
+        private readonly IChannelWebsiteDomainService _channelWebsiteDomainService;
+
         public PageAttachmentService(
             IContentService contentService,
             IHttpClientFactory httpClientFactory,
             IHttpContextAccessor httpContextAccessor,
-            IWebHostEnvironment hostEnvironment)
+            IWebHostEnvironment hostEnvironment,
+            IEventLogService eventLogService,
+            IChannelWebsiteDomainService channelWebsiteDomainService)
         {
             _contentService = contentService;
             _httpClientFactory = httpClientFactory;
             _httpContextAccessor = httpContextAccessor;
             _hostEnvironment = hostEnvironment;
+            _eventLogService = eventLogService;
+            _channelWebsiteDomainService = channelWebsiteDomainService;
         }
 
         public async Task<IEnumerable<ContentAttachment>> GetPageAttachmentsAsync(
@@ -54,33 +63,59 @@ namespace BDO.GWT.GLOBAL.API.Data
             string culture,
             CancellationToken cancellationToken = default)
         {
-            var attachments = await GetPageAttachmentsAsync(pageGuid, channelName, culture, cancellationToken);
-            var attachment = attachments.FirstOrDefault(x => x.SystemFields.ContentItemGUID == attachmentGuid);
-            var asset = attachment?.ContentAttachmentAsset;
-
-            if (asset?.Url is null)
+            try
             {
-                return null;
-            }
+                var attachments = await GetPageAttachmentsAsync(pageGuid, channelName, culture, cancellationToken);
+                var attachment = attachments.FirstOrDefault(x => x.SystemFields.ContentItemGUID == attachmentGuid);
+                var asset = attachment?.ContentAttachmentAsset;
 
-            var assetUri = BuildAssetUri(asset.Url);
-            if (assetUri is null)
+                if (asset?.Url is null)
+                {
+                    _eventLogService.LogWarning(
+                        EventSource,
+                        nameof(GetPageAttachmentBinaryAsync),
+                        $"Attachment binary was skipped because the asset URL was missing. PageGUID: {pageGuid}, AttachmentGUID: {attachmentGuid}, Channel: {channelName}, Culture: {culture}.");
+                    return null;
+                }
+
+                var websiteDomain = await _channelWebsiteDomainService.GetWebsiteDomainAsync(channelName, cancellationToken);
+                var assetUri = BuildAssetUri(asset.Url, websiteDomain);
+                if (assetUri is null)
+                {
+                    _eventLogService.LogWarning(
+                        EventSource,
+                        nameof(GetPageAttachmentBinaryAsync),
+                        $"Attachment binary could not be resolved to a downloadable URI. PageGUID: {pageGuid}, AttachmentGUID: {attachmentGuid}, Channel: {channelName}, Culture: {culture}, WebsiteDomain: {websiteDomain ?? string.Empty}, AssetUrl: {asset.Url}.");
+                    return null;
+                }
+
+                var response = await _httpClientFactory.CreateClient().GetAsync(assetUri, cancellationToken);
+                if (!response.IsSuccessStatusCode)
+                {
+                    _eventLogService.LogWarning(
+                        EventSource,
+                        nameof(GetPageAttachmentBinaryAsync),
+                        $"Attachment binary download failed with HTTP {(int)response.StatusCode} {response.ReasonPhrase ?? string.Empty}. PageGUID: {pageGuid}, AttachmentGUID: {attachmentGuid}, Channel: {channelName}, Culture: {culture}, Uri: {assetUri}.");
+                    return null;
+                }
+
+                var data = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+                var metadata = asset.Metadata;
+                var contentType = response.Content.Headers.ContentType?.MediaType
+                    ?? GetMimeType(metadata?.Extension ?? string.Empty);
+                var fileName = metadata?.Name ?? "attachment";
+
+                return (data, contentType, fileName);
+            }
+            catch (Exception ex)
             {
-                return null;
+                _eventLogService.LogException(
+                    EventSource,
+                    nameof(GetPageAttachmentBinaryAsync),
+                    ex,
+                    $"Attachment binary retrieval failed. PageGUID: {pageGuid}, AttachmentGUID: {attachmentGuid}, Channel: {channelName}, Culture: {culture}.");
+                throw;
             }
-
-            var response = await _httpClientFactory.CreateClient().GetAsync(assetUri, cancellationToken);
-            if (!response.IsSuccessStatusCode)
-            {
-                return null;
-            }
-
-            var data = await response.Content.ReadAsByteArrayAsync(cancellationToken);
-            var contentType = response.Content.Headers.ContentType?.MediaType
-                ?? GetMimeType(asset.Metadata.Extension ?? string.Empty);
-            var fileName = asset.Metadata.Name ?? "attachment";
-
-            return (data, contentType, fileName);
         }
 
         private static string GetMimeType(string extension)
@@ -94,7 +129,10 @@ namespace BDO.GWT.GLOBAL.API.Data
         }
 
         private Uri? BuildAssetUri(string assetUrl) =>
-            AssetUrlHelper.BuildAssetUri(assetUrl, _httpContextAccessor, _hostEnvironment);
+            BuildAssetUri(assetUrl, websiteDomain: null);
+
+        private Uri? BuildAssetUri(string assetUrl, string? websiteDomain) =>
+            AssetUrlHelper.BuildAssetUri(assetUrl, _httpContextAccessor, _hostEnvironment, websiteDomain);
 
         private static IEnumerable<ContentAttachment> GetAttachmentsFromPage(IWebPageFieldsSource page)
         {
@@ -121,7 +159,6 @@ namespace BDO.GWT.GLOBAL.API.Data
                 }
             }
         }
-
 
     }
 }

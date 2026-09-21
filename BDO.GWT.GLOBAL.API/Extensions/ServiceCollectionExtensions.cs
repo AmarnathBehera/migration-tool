@@ -55,6 +55,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IChannelSettingCrudService, ChannelSettingCrudService>();
         serviceCollection.AddScoped<IChannelCrudService, ChannelCrudService>();
         serviceCollection.AddScoped<IChannelInfoService, ChannelInfoService>();
+        serviceCollection.AddScoped<IChannelWebsiteDomainService, ChannelWebsiteDomainService>();
         serviceCollection.AddScoped<IUserCrudService, UserCrudService>();
         serviceCollection.AddScoped<IUserApiPermissionsCrudService, UserApiPermissionsCrudService>();
         serviceCollection.AddScoped<ILicenseKeysCrudService, LicenseKeysCrudService>();
