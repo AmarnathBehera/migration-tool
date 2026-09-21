@@ -108,6 +108,7 @@ public class BlogContributorsPageService : IBlogContributorsPageService
                LanguageName = language,
                UseLanguageFallbacks = isPreview,
                IsForPreview = isPreview,
+               ChannelName = _websiteChannelContext.WebsiteChannelName
            },
             query => query
                 .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
