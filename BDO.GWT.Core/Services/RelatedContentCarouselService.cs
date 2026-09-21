@@ -16,18 +16,17 @@ namespace BDO.GWT.Core.Services;
 
 public interface IRelatedContentCarouselService
 {
-    Task<RelatedContentCarouselDto> GetRelatedContentCarouselDtoAsync<T>(T currentPage, RelatedContentCarouselData data, CancellationToken cancellationToken)
+    Task<RelatedContentCarouselDto> GetRelatedContentCarouselDtoAsync(Guid currentPageGuid, string pageTypeName, RelatedContentCarouselData data, CancellationToken cancellationToken);
 
-        where T : IWebPageFieldsSource;
-
-    Task<ICollection<ContentPageCardDto>> GetFilteredItemsAsync<T>(T currentPage, HashSet<ContentItemReference> featuredGuids, RelatedContentCardsQuery query, CancellationToken cancellationToken)
-        where T : IWebPageFieldsSource;
+    Task<ICollection<ContentPageCardDto>> GetFilteredItemsAsync(Guid currentPageGuid, string pageTypeName, HashSet<ContentItemReference> featuredGuids, RelatedContentCardsQuery query, CancellationToken cancellationToken);
 
     Task<ICollection<ContentPageCardDto>> GetAPIFilteredItemsAsync(RelatedContentCardsQuery query, CancellationToken cancellationToken);
 }
 
 public class RelatedContentCarouselService : IRelatedContentCarouselService
 {
+    private const int DefaultPageSizeUnfiltered = 10;
+    private const int DefaultPageSizeFiltered = 20;
     private readonly IFilteringHelper _filteringHelper;
     private readonly IRelatedContentCardService _relatedContentCardService;
     private readonly IContentService _contentService;
@@ -39,8 +38,7 @@ public class RelatedContentCarouselService : IRelatedContentCarouselService
         _contentService = contentService;
     }
 
-    public async Task<RelatedContentCarouselDto> GetRelatedContentCarouselDtoAsync<T>(T currentPage, RelatedContentCarouselData data, CancellationToken cancellationToken)
-        where T : IWebPageFieldsSource
+    public async Task<RelatedContentCarouselDto> GetRelatedContentCarouselDtoAsync(Guid currentPageGuid, string pageTypeName, RelatedContentCarouselData data, CancellationToken cancellationToken)
     {
         var filters = data.FilteringEnabled
           ? await _relatedContentCardService.CreateFiltersAsync(
@@ -59,7 +57,7 @@ public class RelatedContentCarouselService : IRelatedContentCarouselService
             ApiEndpoint = "relatedContentCarousel/items",
             SelectedPageTypes = data.SelectedPageTypes,
             FilteringTooltipEnabled = await _filteringHelper.IsFilteringTooltipEnabledAsync(data.FilteringEnabled, cancellationToken),
-            Items = await GetFilteredItemsAsync(currentPage, featuredSet, new RelatedContentCardsQuery() { SelectedPageTypes=data.SelectedPageTypes} , cancellationToken),
+            Items = await GetFilteredItemsAsync(currentPageGuid, pageTypeName, featuredSet, new RelatedContentCardsQuery() { SelectedPageTypes=data.SelectedPageTypes} , cancellationToken),
             BackgroundImageURL = data.BackgroundImageUrl,
             BackgroundImageAltText = data.BackgroundImageAltText,
             SeeAllLink = data is { SeeAllLinkText: not null, SeeAllLinkUrl: not null }
@@ -73,19 +71,19 @@ public class RelatedContentCarouselService : IRelatedContentCarouselService
             TopMargin = data.TopMargin,
             BottomMargin = data.BottomMargin,
             WidgetID = data.WidgetID,
-            CurrentPageGuid = currentPage.SystemFields.ContentItemGUID,
-            PageType = currentPage.GetType().Name,
+            CurrentPageGuid = currentPageGuid,
+            PageType = pageTypeName
+
         };
 
         return dto;
     }
 
-    public async Task<ICollection<ContentPageCardDto>> GetFilteredItemsAsync<T>(T currentPage, HashSet<ContentItemReference> featuredGuids, RelatedContentCardsQuery query, CancellationToken cancellationToken)
-        where T : IWebPageFieldsSource
+    public async Task<ICollection<ContentPageCardDto>> GetFilteredItemsAsync(Guid currentPageGuid, string pageTypeName, HashSet<ContentItemReference> featuredGuids, RelatedContentCardsQuery query, CancellationToken cancellationToken)
     {
         return await BuildAndExecuteQueryAsync(
-            currentPage.SystemFields.ContentItemGUID.ToString(),
-            currentPage.GetType().Name,
+            currentPageGuid.ToString(),
+            pageTypeName,
             featuredGuids,
             query,
             cancellationToken);
@@ -143,7 +141,7 @@ public class RelatedContentCarouselService : IRelatedContentCarouselService
             whereExpressions.Add(filter);
 
         query.CurrentPage ??= 1;
-        query.PageSize ??= filter is null ? 10 : 20;
+        query.PageSize ??= filter is null ? DefaultPageSizeUnfiltered : DefaultPageSizeFiltered;
 
         // Removed unused retrieval of all insights (was unused).
         Action<RetrievePagesQueryParameters>? decorateQuery = null;

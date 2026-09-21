@@ -100,7 +100,7 @@ public class BlogContributorsPageService : IBlogContributorsPageService
 
     public async Task<PaginationDto<PersonCardDto>> GetBlogContributorsPaginationDtoAsync(Guid pageGuid, string language, CardsQuery cardsQuery, CancellationToken cancellationToken = default)
     {
-        var isPreview = _websiteChannelContext.IsPreview;
+        var isPreview = true;
 
         var blogContributorsPage = (await _contentService.GetPagesAsync<BlogContributors>(
            new RetrievePagesParameters

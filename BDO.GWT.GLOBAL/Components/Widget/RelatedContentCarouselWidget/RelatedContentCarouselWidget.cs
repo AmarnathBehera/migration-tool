@@ -39,7 +39,6 @@ public class RelatedContentCarouselWidget : ViewComponent
             return View("~/Components/Widget/RelatedContentCarouselWidget/_RelatedContentCarouselWidget.cshtml", new RelatedContentCarouselDto { FilteringTooltipEnabled = false });
         }
 
-        var currentPage = (await _contentService.GetItemsByGUIDAsync(new List<Guid> { page.Value })).FirstOrDefault();
 
         var backgroundimageurl = model.Properties?.BackgroundImages?.Any() == true
             ? await _contentRetriever.RetrieveContentByGuids<ContentAttachment>(
@@ -70,7 +69,7 @@ public class RelatedContentCarouselWidget : ViewComponent
             
         };
 
-        var dto = await _relatedContentCarouselService.GetRelatedContentCarouselDtoAsync(currentPage, data, HttpContext.RequestAborted);
+        var dto = await _relatedContentCarouselService.GetRelatedContentCarouselDtoAsync(page.Value, model.Page.ContentTypeName, data, HttpContext.RequestAborted);
 
         return View("~/Components/Widget/RelatedContentCarouselWidget/_RelatedContentCarouselWidget.cshtml", dto);
     }
