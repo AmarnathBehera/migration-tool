@@ -8,6 +8,8 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services;
 [TestFixture]
 public class ContentQueryMapperTests
 {
+    private static readonly Type[] ExpectedGenericArguments = { typeof(BDO.ContentAttachment) };
+    private static readonly int[] ExpectedContentItemIds = { 1, 2 };
     [Test]
     public void Constructor_WhenContentQueryExecutorIsNull_ThrowsArgumentNullException()
     {
@@ -103,11 +105,7 @@ public class ContentQueryMapperTests
 
             Assert.That(
                 invokedMethod.GetGenericArguments(),
-                Is.EqualTo(
-                    new[]
-                    {
-                        typeof(BDO.ContentAttachment)
-                    }));
+                Is.EqualTo(ExpectedGenericArguments));
 
             Assert.That(invokedArguments, Is.Not.Null);
             Assert.That(invokedArguments, Is.Not.Empty);
@@ -197,7 +195,7 @@ public class ContentQueryMapperTests
             Assert.That(
                 result.Select(
                     item => item.SystemFields.ContentItemID),
-                Is.EqualTo(new[] { 1, 2 }));
+                Is.EqualTo(ExpectedContentItemIds));
 
             Assert.That(
                 result.Select(
@@ -373,19 +371,22 @@ public class ContentQueryMapperTests
                     parameter.ParameterType ==
                     typeof(CancellationToken));
 
-        Assert.That(
-            cancellationTokenParameterIndex,
-            Is.GreaterThanOrEqualTo(0),
-            "The GetMappedResult method does not have a CancellationToken parameter.");
+        Assert.Multiple(() =>
+        {
+            Assert.That(
+                cancellationTokenParameterIndex,
+                Is.GreaterThanOrEqualTo(0),
+                "The GetMappedResult method does not have a CancellationToken parameter.");
 
-        Assert.That(
-            invokedArguments.Length,
-            Is.EqualTo(parameters.Length),
-            "The captured argument count does not match the method parameter count.");
+            Assert.That(
+                invokedArguments,
+                Has.Length.EqualTo(parameters.Length),
+                "The captured argument count does not match the method parameter count.");
 
-        Assert.That(
-            invokedArguments[cancellationTokenParameterIndex],
-            Is.EqualTo(expectedCancellationToken));
+            Assert.That(
+                invokedArguments[cancellationTokenParameterIndex],
+                Is.EqualTo(expectedCancellationToken));
+        });
     }
 
     private static IContentQueryExecutor CreateContentQueryExecutorProxy(
