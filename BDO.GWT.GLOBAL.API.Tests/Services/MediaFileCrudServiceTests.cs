@@ -5,8 +5,9 @@ using CMS.ContentEngine;
 using CMS.DataEngine;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using Moq.Protected;
+using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -17,6 +18,8 @@ public class MediaFileCrudServiceTests
 {
     private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
     private Mock<IWebHostEnvironment> _hostEnvironmentMock = null!;
+    private Mock<HttpMessageHandler> _httpMessageHandlerMock = null!;
+    private Mock<IHttpClientFactory> _httpClientFactoryMock = null!;
     private AssetUrlResolver? _assetUrlResolver;
 
     [SetUp]
@@ -24,6 +27,12 @@ public class MediaFileCrudServiceTests
     {
         _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
         _hostEnvironmentMock = new Mock<IWebHostEnvironment>();
+        _httpMessageHandlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        var httpClient = new HttpClient(_httpMessageHandlerMock.Object);
+        _httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        _httpClientFactoryMock
+            .Setup(x => x.CreateClient(It.IsAny<string>()))
+            .Returns(httpClient);
         _assetUrlResolver = new AssetUrlResolver(_httpContextAccessorMock.Object, _hostEnvironmentMock.Object);
     }
 
@@ -183,8 +192,6 @@ public class MediaFileCrudServiceTests
             Assert.That(ex!.Message, Does.Contain("does not support automatic mapping"));
         });
     }
-
-
 
     [Test]
     public void GetFileNameFromUrl_WhenUrlContainsQuery_RemovesQueryAndReturnsFileName()
@@ -699,6 +706,46 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
+    public void CreateContentItemData_WhenCalled_StoresAssetMetadataUnderContentAttachmentAssetKey()
+    {
+        var assetSource = new ContentItemAssetStreamSource(_ =>
+            Task.FromResult<Stream>(new MemoryStream([1, 2, 3])));
+        var assetMetadata = new ContentItemAssetMetadataWithSource(
+            assetSource,
+            "photo.png",
+            ".png",
+            3,
+            DateTime.UtcNow);
+
+        var result = (ContentItemData)InvokePrivateStatic("CreateContentItemData", assetMetadata);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.TryGetValue<ContentItemAssetMetadataWithSource>(
+                nameof(BDO.ContentAttachment.ContentAttachmentAsset), out var storedValue), Is.True);
+            Assert.That(storedValue, Is.SameAs(assetMetadata));
+        });
+    }
+
+    [Test]
+    public void GetDefaultLanguageNameAsync_WhenLanguageProviderGetThrows_PropagatesExceptionAndCallsGetOnce()
+    {
+        var languageProviderMock = new Mock<IInfoProvider<ContentLanguageInfo>>();
+        var marker = new InvalidOperationException("Get() called");
+        languageProviderMock
+            .Setup(x => x.Get())
+            .Throws(marker);
+
+        var service = CreateSut(languageInfoProvider: languageProviderMock.Object);
+
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await InvokePrivateInstanceAsync<string>(service, "GetDefaultLanguageNameAsync", CancellationToken.None));
+
+        Assert.That(ex, Is.SameAs(marker));
+        languageProviderMock.Verify(x => x.Get(), Times.Once);
+    }
+
+    [Test]
     public void WithUploadedAssetMetadataAsync_WhenFileIsNull_ThrowsArgumentNullException()
     {
         Assert.ThrowsAsync<ArgumentNullException>(async () =>
@@ -771,6 +818,16 @@ public class MediaFileCrudServiceTests
 
         var genericMethod = method.MakeGenericMethod(genericTypes);
         var task = (Task<T>)genericMethod.Invoke(null, args)!;
+        return await task;
+    }
+
+    private static async Task<T> InvokePrivateInstanceAsync<T>(MediaFileCrudService instance, string methodName, params object?[] args)
+    {
+        var method = typeof(MediaFileCrudService)
+            .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
+            .Single(m => m.Name == methodName && m.GetParameters().Length == args.Length);
+
+        var task = (Task<T>)method.Invoke(instance, args)!;
         return await task;
     }
 
