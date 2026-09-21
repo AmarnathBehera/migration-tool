@@ -3,10 +3,12 @@ using BDO.GWT.GLOBAL.API.Helpers;
 using BDO.GWT.GLOBAL.API.Services;
 using CMS.ContentEngine;
 using CMS.DataEngine;
+using CMS.Membership;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Moq.Protected;
+using System.Data;
 using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -201,6 +203,69 @@ public class MediaFileCrudServiceTests
             await service.DeleteMediaFileAsync(Guid.NewGuid(), CancellationToken.None));
 
         Assert.That(ex, Is.SameAs(marker));
+    }
+
+    [Test]
+    public async Task DeleteMediaFileAsync_WhenTargetNotFound_ReturnsFalse()
+    {
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
+
+        var result = await service.DeleteMediaFileAsync(Guid.NewGuid(), CancellationToken.None);
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public async Task DeleteMediaFileAsync_WhenTargetFound_DeletesAndReturnsTrue()
+    {
+        var item = new BDO.ContentAttachment
+        {
+            SystemFields = new ContentItemFields { ContentItemID = 11, ContentItemGUID = Guid.NewGuid() },
+            ContentAttachmentAsset = CreateAsset("delete.png", ".png", 5, "/assets/delete.png")
+        };
+
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([item]);
+
+        var userInfoMock = new Mock<UserInfo>();
+        userInfoMock.Setup(u => u.UserID).Returns(1);
+        var userInfoProviderMock = new Mock<IUserInfoProvider>();
+        userInfoProviderMock
+            .Setup(x => x.GetAsync("administrator", It.IsAny<CancellationToken?>()))
+            .ReturnsAsync(userInfoMock.Object);
+
+        var contentItemManagerMock = new Mock<IContentItemManager>();
+        contentItemManagerMock
+            .Setup(x => x.Delete(It.IsAny<DeleteContentItemParameters>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        var managerFactoryMock = new Mock<IContentItemManagerFactory>();
+        managerFactoryMock.Setup(x => x.Create(1)).Returns(contentItemManagerMock.Object);
+
+        var languageProviderMock = new Mock<IInfoProvider<ContentLanguageInfo>>();
+        languageProviderMock
+            .Setup(x => x.Get())
+            .Returns(QueryReturning(Array.Empty<ContentLanguageInfo>()).Object);
+
+        var service = CreateSut(
+            contentQueryMapper: mapperMock.Object,
+            contentItemManagerFactory: managerFactoryMock.Object,
+            userInfoProvider: userInfoProviderMock.Object,
+            languageInfoProvider: languageProviderMock.Object);
+
+        var result = await service.DeleteMediaFileAsync(Guid.NewGuid(), CancellationToken.None);
+
+        Assert.That(result, Is.True);
+        contentItemManagerMock.Verify(
+            x => x.Delete(It.Is<DeleteContentItemParameters>(p => p.ContentItemID == 11), It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [Test]
@@ -860,6 +925,21 @@ public class MediaFileCrudServiceTests
                 CancellationToken.None));
     }
 
+    private static Mock<ObjectQuery<ContentLanguageInfo>> QueryReturning(IEnumerable<ContentLanguageInfo> rows)
+    {
+        var query = new Mock<ObjectQuery<ContentLanguageInfo>>();
+
+        query.Setup(x => x.TopN(It.IsAny<int>())).Returns(query.Object);
+        query.Setup(x => x.Columns(It.IsAny<string[]>())).Returns(query.Object);
+        query.Setup(x => x.GetEnumerableTypedResultAsync(
+                It.IsAny<CommandBehavior>(),
+                It.IsAny<bool>(),
+                It.IsAny<CancellationToken?>()))
+            .ReturnsAsync(rows);
+
+        return query;
+    }
+
     private static ContentItemAsset CreateAsset(string name, string extension, long size, string url)
     {
         var asset = new ContentItemAsset { Url = url };
@@ -942,6 +1022,8 @@ public class MediaFileCrudServiceTests
         IWebHostEnvironment? hostEnvironment = null,
         IAssetUrlResolver? assetUrlResolver = null,
         IChannelWebsiteDomainService? channelWebsiteDomainService = null,
+        IContentItemManagerFactory? contentItemManagerFactory = null,
+        CMS.Membership.IUserInfoProvider? userInfoProvider = null,
         IInfoProvider<ContentLanguageInfo>? languageInfoProvider = null)
     {
         var resolvedHttpContextAccessor = httpContextAccessor ?? Mock.Of<IHttpContextAccessor>();
@@ -952,8 +1034,8 @@ public class MediaFileCrudServiceTests
             httpClientFactory ?? Mock.Of<IHttpClientFactory>(),
             assetUrlResolver ?? new AssetUrlResolver(resolvedHttpContextAccessor, resolvedHostEnvironment),
             channelWebsiteDomainService ?? Mock.Of<IChannelWebsiteDomainService>(),
-            Mock.Of<IContentItemManagerFactory>(),
-            Mock.Of<CMS.Membership.IUserInfoProvider>(),
+            contentItemManagerFactory ?? Mock.Of<IContentItemManagerFactory>(),
+            userInfoProvider ?? Mock.Of<CMS.Membership.IUserInfoProvider>(),
             languageInfoProvider ?? Mock.Of<IInfoProvider<ContentLanguageInfo>>());
     }
 

@@ -2,9 +2,6 @@ using CMS.ContentEngine;
 
 namespace BDO.GWT.GLOBAL.API.Services;
 
-/// <summary>
-/// Default <see cref="IContentQueryMapper"/> implementation delegating to <see cref="IContentQueryExecutor"/>.
-/// </summary>
 public class ContentQueryMapper : IContentQueryMapper
 {
     private readonly IContentQueryExecutor _contentQueryExecutor;
