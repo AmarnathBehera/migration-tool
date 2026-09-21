@@ -19,14 +19,13 @@ namespace BDO.GWT.Xperience.Core.LiveSite.Components.Widgets.RelatedContentCarou
 public class RelatedContentCarouselWidget : ViewComponent
 {
     private readonly IRelatedContentCarouselService _relatedContentCarouselService;
-    private readonly IContentService _contentService;
     private readonly IContentRetriever _contentRetriever;
 
-    public RelatedContentCarouselWidget(IRelatedContentCarouselService relatedContentCarouselService, IContentRetriever contentRetriever, IContentService contentService)
+    public RelatedContentCarouselWidget(IRelatedContentCarouselService relatedContentCarouselService, IContentRetriever contentRetriever)
     {
         _relatedContentCarouselService = relatedContentCarouselService;
         _contentRetriever = contentRetriever;
-        _contentService = contentService;
+
 
     }
 
