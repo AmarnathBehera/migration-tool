@@ -64,48 +64,54 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
-    public void GetMediaFilesAsync_WhenDependenciesAreUnavailable_ThrowsInvalidOperationException()
+    public void GetMediaFilesAsync_WhenQueryMapperThrows_PropagatesException()
     {
-        var service = (MediaFileCrudService)RuntimeHelpers.GetUninitializedObject(typeof(MediaFileCrudService));
+        var marker = new InvalidOperationException("The executor does not support automatic mapping to content type models.");
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(marker);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await service.GetMediaFilesAsync("Demo", CancellationToken.None));
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(ex, Is.Not.Null);
-            Assert.That(ex!.Message, Does.Contain("does not support automatic mapping"));
-        });
+        Assert.That(ex, Is.SameAs(marker));
     }
 
     [Test]
-    public void GetMediaFileAsync_WhenDependenciesAreUnavailable_ThrowsInvalidOperationException()
+    public void GetMediaFileAsync_WhenQueryMapperThrows_PropagatesException()
     {
-        var service = (MediaFileCrudService)RuntimeHelpers.GetUninitializedObject(typeof(MediaFileCrudService));
+        var marker = new InvalidOperationException("The executor does not support automatic mapping to content type models.");
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(marker);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await service.GetMediaFileAsync("Demo", Guid.NewGuid(), CancellationToken.None));
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(ex, Is.Not.Null);
-            Assert.That(ex!.Message, Does.Contain("does not support automatic mapping"));
-        });
+        Assert.That(ex, Is.SameAs(marker));
     }
 
     [Test]
-    public void DownloadMediaFileAsync_WhenDependenciesAreUnavailable_ThrowsInvalidOperationException()
+    public void DownloadMediaFileAsync_WhenQueryMapperThrows_PropagatesException()
     {
-        var service = (MediaFileCrudService)RuntimeHelpers.GetUninitializedObject(typeof(MediaFileCrudService));
+        var marker = new InvalidOperationException("The executor does not support automatic mapping to content type models.");
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(marker);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await service.DownloadMediaFileAsync("Demo", Guid.NewGuid(), CancellationToken.None));
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(ex, Is.Not.Null);
-            Assert.That(ex!.Message, Does.Contain("does not support automatic mapping"));
-        });
+        Assert.That(ex, Is.SameAs(marker));
     }
 
     [Test]
@@ -163,33 +169,130 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
-    public void UpdateMediaFileAsync_WhenDependenciesAreUnavailable_ThrowsInvalidOperationException()
+    public void UpdateMediaFileAsync_WhenQueryMapperThrows_PropagatesException()
     {
-        var service = (MediaFileCrudService)RuntimeHelpers.GetUninitializedObject(typeof(MediaFileCrudService));
+        var marker = new InvalidOperationException("The executor does not support automatic mapping to content type models.");
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(marker);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
         var file = new FormFile(new MemoryStream([1, 2]), 0, 2, "File", "replace.jpg");
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await service.UpdateMediaFileAsync("Demo", Guid.NewGuid(), file, CancellationToken.None));
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(ex, Is.Not.Null);
-            Assert.That(ex!.Message, Does.Contain("does not support automatic mapping"));
-        });
+        Assert.That(ex, Is.SameAs(marker));
     }
 
     [Test]
-    public void DeleteMediaFileAsync_WhenDependenciesAreUnavailable_ThrowsInvalidOperationException()
+    public void DeleteMediaFileAsync_WhenQueryMapperThrows_PropagatesException()
     {
-        var service = (MediaFileCrudService)RuntimeHelpers.GetUninitializedObject(typeof(MediaFileCrudService));
+        var marker = new InvalidOperationException("The executor does not support automatic mapping to content type models.");
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(marker);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await service.DeleteMediaFileAsync(Guid.NewGuid(), CancellationToken.None));
 
+        Assert.That(ex, Is.SameAs(marker));
+    }
+
+    [Test]
+    public async Task GetMediaFilesAsync_WhenQueryMapperReturnsItemsWithMixedAssets_FiltersOutNullAssetsAndMapsRest()
+    {
+        var withAsset = new BDO.ContentAttachment
+        {
+            SystemFields = new ContentItemFields { ContentItemID = 1, ContentItemGUID = Guid.NewGuid() },
+            ContentAttachmentAsset = CreateAsset("keep.png", ".png", 10, "/assets/keep.png")
+        };
+        var withoutAsset = new BDO.ContentAttachment
+        {
+            SystemFields = new ContentItemFields { ContentItemID = 2, ContentItemGUID = Guid.NewGuid() },
+            ContentAttachmentAsset = null!
+        };
+
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<BDO.ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([withAsset, withoutAsset]);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
+
+        var results = (await service.GetMediaFilesAsync("Demo", CancellationToken.None)).ToList();
+
         Assert.Multiple(() =>
         {
-            Assert.That(ex, Is.Not.Null);
-            Assert.That(ex!.Message, Does.Contain("does not support automatic mapping"));
+            Assert.That(results, Has.Count.EqualTo(1));
+            Assert.That(results[0].Id, Is.EqualTo(1));
+        });
+    }
+
+    [Test]
+    public async Task GetMediaFileAsync_WhenQueryMapperReturnsNoItems_ReturnsNull()
+    {
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<BDO.ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
+
+        var result = await service.GetMediaFileAsync("Demo", Guid.NewGuid(), CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task GetMediaFileAsync_WhenItemHasNullAsset_ReturnsNull()
+    {
+        var item = new BDO.ContentAttachment
+        {
+            SystemFields = new ContentItemFields { ContentItemID = 5, ContentItemGUID = Guid.NewGuid() },
+            ContentAttachmentAsset = null!
+        };
+
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<BDO.ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([item]);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
+
+        var result = await service.GetMediaFileAsync("Demo", Guid.NewGuid(), CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task GetMediaFileAsync_WhenItemAndAssetPresent_ReturnsMappedMediaFileOutput()
+    {
+        var itemGuid = Guid.NewGuid();
+        var item = new BDO.ContentAttachment
+        {
+            SystemFields = new ContentItemFields { ContentItemID = 7, ContentItemGUID = itemGuid },
+            ContentAttachmentAsset = CreateAsset("photo.png", ".png", 42, "/assets/photo.png")
+        };
+
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<BDO.ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([item]);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
+
+        var result = await service.GetMediaFileAsync("Demo", itemGuid, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Id, Is.EqualTo(7));
+            Assert.That(result.Guid, Is.EqualTo(itemGuid));
         });
     }
 
@@ -833,7 +936,7 @@ public class MediaFileCrudServiceTests
 
 
     private static MediaFileCrudService CreateSut(
-        IContentQueryExecutor? queryExecutor = null,
+        IContentQueryMapper? contentQueryMapper = null,
         IHttpClientFactory? httpClientFactory = null,
         IHttpContextAccessor? httpContextAccessor = null,
         IWebHostEnvironment? hostEnvironment = null,
@@ -845,7 +948,7 @@ public class MediaFileCrudServiceTests
         var resolvedHostEnvironment = hostEnvironment ?? Mock.Of<IWebHostEnvironment>();
 
         return new MediaFileCrudService(
-            queryExecutor ?? Mock.Of<IContentQueryExecutor>(),
+            contentQueryMapper ?? Mock.Of<IContentQueryMapper>(),
             httpClientFactory ?? Mock.Of<IHttpClientFactory>(),
             assetUrlResolver ?? new AssetUrlResolver(resolvedHttpContextAccessor, resolvedHostEnvironment),
             channelWebsiteDomainService ?? Mock.Of<IChannelWebsiteDomainService>(),
