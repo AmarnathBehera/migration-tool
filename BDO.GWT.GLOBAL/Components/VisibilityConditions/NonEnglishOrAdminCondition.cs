@@ -1,38 +1,55 @@
-﻿using Kentico.Xperience.Admin.Base.Authentication;
+﻿#nullable enable
+
+using Kentico.Xperience.Admin.Base.Authentication;
 using Kentico.Xperience.Admin.Base.Forms;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Text.RegularExpressions;
 
 [assembly: RegisterFormVisibilityCondition(
-    identifier: NonEnglishOrAdminCondition.IDENTIFIER,
-    conditionType: typeof(NonEnglishOrAdminCondition),
+    identifier: BDO.GWT.GLOBAL.Components.VisibilityConditions.NonEnglishOrAdminCondition.IDENTIFIER,
+    conditionType: typeof(BDO.GWT.GLOBAL.Components.VisibilityConditions.NonEnglishOrAdminCondition),
     name: "Non-English culture or Administrator")]
 
-public class NonEnglishOrAdminCondition : VisibilityCondition
+namespace BDO.GWT.GLOBAL.Components.VisibilityConditions;
+
+public partial class NonEnglishOrAdminCondition : VisibilityCondition
 {
     internal const string IDENTIFIER = "BDO.NonEnglishOrAdminVisibilityCondition";
 
     private readonly IAuthenticatedUserAccessor userAccessor;
     private readonly IHttpContextAccessor httpContextAccessor;
+    private readonly ILogger<NonEnglishOrAdminCondition> logger;
     private const string ENGLISH_PREFIX = "en";
     private const string LANGUAGE_SEGMENT_PATTERN = @"/([a-zA-Z]{2}(?:-[a-zA-Z]{2})?)_\d+(?:/|$)";
 
-    public NonEnglishOrAdminCondition(IAuthenticatedUserAccessor userAccessor, IHttpContextAccessor httpContextAccessor)
+    public NonEnglishOrAdminCondition(
+        IAuthenticatedUserAccessor userAccessor,
+        IHttpContextAccessor httpContextAccessor,
+        ILogger<NonEnglishOrAdminCondition> logger)
     {
         this.userAccessor = userAccessor;
         this.httpContextAccessor = httpContextAccessor;
+        this.logger = logger;
     }
 
     public override bool Evaluate(IFormFieldValueProvider formFieldValueProvider)
     {
-        var currentUser = userAccessor.Get().Result;
-        bool isAdmin = currentUser.IsAdministrator();
-        var httpContext = httpContextAccessor.HttpContext;
+        try
+        {
+            var currentUser = userAccessor.Get().Result;
+            bool isAdmin = currentUser.IsAdministrator();
 
-        bool isNonEnglish = !CurrentLanguageStartsWithEn();
+            bool isNonEnglish = !CurrentLanguageStartsWithEn();
 
-        return isNonEnglish || isAdmin;
+            return isNonEnglish || isAdmin;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to evaluate {Condition}.", nameof(NonEnglishOrAdminCondition));
+            return true;
+        }
     }
     private bool CurrentLanguageStartsWithEn()
     {
@@ -44,7 +61,7 @@ public class NonEnglishOrAdminCondition : VisibilityCondition
             return false;
         }
 
-        var match = Regex.Match(referer, LANGUAGE_SEGMENT_PATTERN);
+        var match = LanguageSegmentRegex().Match(referer);
 
         if (!match.Success)
         {
@@ -55,4 +72,7 @@ public class NonEnglishOrAdminCondition : VisibilityCondition
 
         return languageCode.StartsWith(ENGLISH_PREFIX, StringComparison.OrdinalIgnoreCase);
     }
+
+    [GeneratedRegex(LANGUAGE_SEGMENT_PATTERN, RegexOptions.None, matchTimeoutMilliseconds: 1000)]
+    private static partial Regex LanguageSegmentRegex();
 }
