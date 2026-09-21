@@ -77,7 +77,7 @@ public class RelatedContentCarouselServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
 
-        await _sut.GetRelatedContentCarouselDtoAsync(currentPage, data, CancellationToken.None);
+        await _sut.GetRelatedContentCarouselDtoAsync(currentPage.SystemFields.WebPageItemGUID, currentPage.GetType().Name, data, CancellationToken.None);
 
         _relatedContentCardServiceMock.Verify(x =>
             x.CreateFiltersAsync(
@@ -93,7 +93,7 @@ public class RelatedContentCarouselServiceTests
         var currentPage = CreateFakePage();
         var data = CreateData(filteringEnabled: false);
 
-        await _sut.GetRelatedContentCarouselDtoAsync(currentPage, data, CancellationToken.None);
+        await _sut.GetRelatedContentCarouselDtoAsync(currentPage.SystemFields.WebPageItemGUID, currentPage.GetType().Name, data, CancellationToken.None);
 
         _relatedContentCardServiceMock.Verify(x =>
             x.CreateFiltersAsync(
@@ -109,7 +109,7 @@ public class RelatedContentCarouselServiceTests
         var currentPage = CreateFakePage();
         var data = CreateData(filteringEnabled: false);
 
-        var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage, data, CancellationToken.None);
+        var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage.SystemFields.WebPageItemGUID, currentPage.GetType().Name, data, CancellationToken.None);
 
         Assert.That(dto.Filters, Is.Null);
     }
@@ -120,9 +120,9 @@ public class RelatedContentCarouselServiceTests
         var currentPage = CreateFakePage();
         var data = CreateData();
 
-        var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage, data, CancellationToken.None);
+        var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage.SystemFields.WebPageItemGUID, currentPage.GetType().Name, data, CancellationToken.None);
 
-        Assert.That(dto.CurrentPageGuid, Is.EqualTo(currentPage.SystemFields.ContentItemGUID));
+        Assert.That(dto.CurrentPageGuid, Is.EqualTo(currentPage.SystemFields.WebPageItemGUID));
     }
 
     [Test]
@@ -131,7 +131,7 @@ public class RelatedContentCarouselServiceTests
         var currentPage = CreateFakePage();
         var data = CreateData();
 
-        var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage, data, CancellationToken.None);
+        var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage.SystemFields.WebPageItemGUID, currentPage.GetType().Name, data, CancellationToken.None);
 
         Assert.That(dto.PageType, Is.EqualTo(currentPage.GetType().Name));
     }
@@ -145,7 +145,7 @@ public class RelatedContentCarouselServiceTests
         data.SeeAllLinkUrl = "/insights";
         data.SeeAllLinkURLTarget = "_blank";
 
-        var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage, data, CancellationToken.None);
+        var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage.SystemFields.WebPageItemGUID, currentPage.GetType().Name, data, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -164,7 +164,7 @@ public class RelatedContentCarouselServiceTests
         data.SeeAllLinkText = null;
         data.SeeAllLinkUrl = "/insights";
 
-        var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage, data, CancellationToken.None);
+        var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage.SystemFields.WebPageItemGUID, currentPage.GetType().Name, data, CancellationToken.None);
 
         Assert.That(dto.SeeAllLink, Is.Null);
     }
@@ -177,7 +177,7 @@ public class RelatedContentCarouselServiceTests
         data.SeeAllLinkText = "See All";
         data.SeeAllLinkUrl = null;
 
-        var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage, data, CancellationToken.None);
+        var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage.SystemFields.WebPageItemGUID, currentPage.GetType().Name, data, CancellationToken.None);
 
         Assert.That(dto.SeeAllLink, Is.Null);
     }
@@ -191,7 +191,7 @@ public class RelatedContentCarouselServiceTests
         data.SeeAllLinkUrl = "/insights";
         data.SeeAllLinkURLTarget = null;
 
-        var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage, data, CancellationToken.None);
+        var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage.SystemFields.WebPageItemGUID, currentPage.GetType().Name, data, CancellationToken.None);
 
         Assert.That(dto.SeeAllLink?.Target, Is.EqualTo("_self"));
     }
@@ -203,7 +203,7 @@ public class RelatedContentCarouselServiceTests
         var selectedTypes = new List<string> { nameof(Insight), nameof(BlogPost) };
         var data = CreateData(selectedPageTypes: selectedTypes);
 
-        var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage, data, CancellationToken.None);
+        var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage.SystemFields.WebPageItemGUID, currentPage.GetType().Name, data, CancellationToken.None);
 
         Assert.That(dto.SelectedPageTypes, Is.EquivalentTo(selectedTypes));
     }
@@ -228,7 +228,7 @@ public class RelatedContentCarouselServiceTests
                 (q, _, _, _, _, _) => capturedQuery = q)
             .ReturnsAsync(new PaginationDto<ContentPageCardDto> { Data = Array.Empty<ContentPageCardDto>(), TotalCount = 0 });
 
-        await _sut.GetRelatedContentCarouselDtoAsync(currentPage, data, CancellationToken.None);
+        await _sut.GetRelatedContentCarouselDtoAsync(currentPage.SystemFields.WebPageItemGUID, currentPage.GetType().Name, data, CancellationToken.None);        await _sut.GetRelatedContentCarouselDtoAsync(currentPage.SystemFields.WebPageItemGUID, currentPage.GetType().Name, data, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -248,7 +248,7 @@ public class RelatedContentCarouselServiceTests
         data.BottomMargin = "mb-4";
         data.WidgetID = "widget-123";
 
-        var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage, data, CancellationToken.None);
+        var dto = await _sut.GetRelatedContentCarouselDtoAsync(currentPage.SystemFields.WebPageItemGUID, currentPage.GetType().Name, data, CancellationToken.None);
 
         Assert.Multiple(() =>
         {

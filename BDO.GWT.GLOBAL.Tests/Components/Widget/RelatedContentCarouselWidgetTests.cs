@@ -49,7 +49,8 @@ public class RelatedContentCarouselWidgetTests
         // Default: carousel service returns an empty DTO
         _relatedContentCarouselServiceMock
             .Setup(x => x.GetRelatedContentCarouselDtoAsync(
-                It.IsAny<IWebPageFieldsSource>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<RelatedContentCarouselData>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new RelatedContentCarouselDto { FilteringTooltipEnabled = false });
@@ -99,7 +100,8 @@ public class RelatedContentCarouselWidgetTests
 
         _relatedContentCarouselServiceMock.Verify(x =>
             x.GetRelatedContentCarouselDtoAsync(
-                It.IsAny<IWebPageFieldsSource>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<RelatedContentCarouselData>(),
                 It.IsAny<CancellationToken>()),
             Times.Never);
@@ -121,17 +123,7 @@ public class RelatedContentCarouselWidgetTests
     // Happy path — page resolved correctly
     // -------------------------------------------------------------------------
 
-    [Test]
-    public async Task InvokeAsync_ValidPage_CallsGetItemsByGUIDWithCorrectGuid()
-    {
-        var model = CreateModel(new ModelOptions { Guid = PageGuid });
-
-        await _sut.InvokeAsync(model);
-
-        _contentServiceMock.Verify(x =>
-            x.GetItemsByGUIDAsync(It.Is<List<Guid>>(list => list.Contains(PageGuid))),
-            Times.Once);
-    }
+    
 
     [Test]
     public async Task InvokeAsync_ValidPage_CallsCarouselService()
@@ -142,7 +134,8 @@ public class RelatedContentCarouselWidgetTests
 
         _relatedContentCarouselServiceMock.Verify(x =>
             x.GetRelatedContentCarouselDtoAsync(
-                It.IsAny<IWebPageFieldsSource>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<RelatedContentCarouselData>(),
                 It.IsAny<CancellationToken>()),
             Times.Once);
@@ -159,7 +152,8 @@ public class RelatedContentCarouselWidgetTests
 
         _relatedContentCarouselServiceMock
             .Setup(x => x.GetRelatedContentCarouselDtoAsync(
-                It.IsAny<IWebPageFieldsSource>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<RelatedContentCarouselData>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedDto);
@@ -196,11 +190,12 @@ public class RelatedContentCarouselWidgetTests
         RelatedContentCarouselData? capturedData = null;
         _relatedContentCarouselServiceMock
             .Setup(x => x.GetRelatedContentCarouselDtoAsync(
-                It.IsAny<IWebPageFieldsSource>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<RelatedContentCarouselData>(),
                 It.IsAny<CancellationToken>()))
-            .Callback<IWebPageFieldsSource, RelatedContentCarouselData, CancellationToken>(
-                (_, data, _) => capturedData = data)
+            .Callback<Guid, string, RelatedContentCarouselData, CancellationToken>(
+                (_, _, data, _) => capturedData = data)
             .ReturnsAsync(new RelatedContentCarouselDto { FilteringTooltipEnabled = false });
 
         await _sut.InvokeAsync(model);
@@ -227,11 +222,12 @@ public class RelatedContentCarouselWidgetTests
         RelatedContentCarouselData? capturedData = null;
         _relatedContentCarouselServiceMock
             .Setup(x => x.GetRelatedContentCarouselDtoAsync(
-                It.IsAny<IWebPageFieldsSource>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<RelatedContentCarouselData>(),
                 It.IsAny<CancellationToken>()))
-            .Callback<IWebPageFieldsSource, RelatedContentCarouselData, CancellationToken>(
-                (_, data, _) => capturedData = data)
+            .Callback<Guid, string, RelatedContentCarouselData, CancellationToken>(
+                (_, _, data, _) => capturedData = data)
             .ReturnsAsync(new RelatedContentCarouselDto { FilteringTooltipEnabled = false });
 
         await _sut.InvokeAsync(model);
@@ -251,11 +247,12 @@ public class RelatedContentCarouselWidgetTests
         RelatedContentCarouselData? capturedData = null;
         _relatedContentCarouselServiceMock
             .Setup(x => x.GetRelatedContentCarouselDtoAsync(
-                It.IsAny<IWebPageFieldsSource>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<RelatedContentCarouselData>(),
                 It.IsAny<CancellationToken>()))
-            .Callback<IWebPageFieldsSource, RelatedContentCarouselData, CancellationToken>(
-                (_, data, _) => capturedData = data)
+            .Callback<Guid, string, RelatedContentCarouselData, CancellationToken>(
+                (_, _, data, _) => capturedData = data)
             .ReturnsAsync(new RelatedContentCarouselDto { FilteringTooltipEnabled = false });
 
         await _sut.InvokeAsync(model);
@@ -278,11 +275,12 @@ public class RelatedContentCarouselWidgetTests
         RelatedContentCarouselData? capturedData = null;
         _relatedContentCarouselServiceMock
             .Setup(x => x.GetRelatedContentCarouselDtoAsync(
-                It.IsAny<IWebPageFieldsSource>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<RelatedContentCarouselData>(),
                 It.IsAny<CancellationToken>()))
-            .Callback<IWebPageFieldsSource, RelatedContentCarouselData, CancellationToken>(
-                (_, data, _) => capturedData = data)
+            .Callback<Guid, string, RelatedContentCarouselData, CancellationToken>(
+                (_, _, data, _) => capturedData = data)
             .ReturnsAsync(new RelatedContentCarouselDto { FilteringTooltipEnabled = false });
 
         await _sut.InvokeAsync(model);
@@ -313,11 +311,12 @@ public class RelatedContentCarouselWidgetTests
         RelatedContentCarouselData? capturedData = null;
         _relatedContentCarouselServiceMock
             .Setup(x => x.GetRelatedContentCarouselDtoAsync(
-                It.IsAny<IWebPageFieldsSource>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<RelatedContentCarouselData>(),
                 It.IsAny<CancellationToken>()))
-            .Callback<IWebPageFieldsSource, RelatedContentCarouselData, CancellationToken>(
-                (_, data, _) => capturedData = data)
+            .Callback<Guid, string, RelatedContentCarouselData, CancellationToken>(
+                (_, _, data, _) => capturedData = data)
             .ReturnsAsync(new RelatedContentCarouselDto { FilteringTooltipEnabled = false });
 
         await _sut.InvokeAsync(model);
@@ -344,11 +343,12 @@ public class RelatedContentCarouselWidgetTests
         RelatedContentCarouselData? capturedData = null;
         _relatedContentCarouselServiceMock
             .Setup(x => x.GetRelatedContentCarouselDtoAsync(
-                It.IsAny<IWebPageFieldsSource>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<RelatedContentCarouselData>(),
                 It.IsAny<CancellationToken>()))
-            .Callback<IWebPageFieldsSource, RelatedContentCarouselData, CancellationToken>(
-                (_, data, _) => capturedData = data)
+            .Callback<Guid, string, RelatedContentCarouselData, CancellationToken>(
+                (_, _, data, _) => capturedData = data)
             .ReturnsAsync(new RelatedContentCarouselDto { FilteringTooltipEnabled = false });
 
         await _sut.InvokeAsync(model);
@@ -364,11 +364,12 @@ public class RelatedContentCarouselWidgetTests
         RelatedContentCarouselData? capturedData = null;
         _relatedContentCarouselServiceMock
             .Setup(x => x.GetRelatedContentCarouselDtoAsync(
-                It.IsAny<IWebPageFieldsSource>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<RelatedContentCarouselData>(),
                 It.IsAny<CancellationToken>()))
-            .Callback<IWebPageFieldsSource, RelatedContentCarouselData, CancellationToken>(
-                (_, data, _) => capturedData = data)
+            .Callback<Guid, string, RelatedContentCarouselData, CancellationToken>(
+                (_, _, data, _) => capturedData = data)
             .ReturnsAsync(new RelatedContentCarouselDto { FilteringTooltipEnabled = false });
 
         await _sut.InvokeAsync(model);
@@ -391,11 +392,12 @@ public class RelatedContentCarouselWidgetTests
         RelatedContentCarouselData? capturedData = null;
         _relatedContentCarouselServiceMock
             .Setup(x => x.GetRelatedContentCarouselDtoAsync(
-                It.IsAny<IWebPageFieldsSource>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<RelatedContentCarouselData>(),
                 It.IsAny<CancellationToken>()))
-            .Callback<IWebPageFieldsSource, RelatedContentCarouselData, CancellationToken>(
-                (_, data, _) => capturedData = data)
+            .Callback<Guid, string, RelatedContentCarouselData, CancellationToken>(
+                (_, _, data, _) => capturedData = data)
             .ReturnsAsync(new RelatedContentCarouselDto { FilteringTooltipEnabled = false });
 
         await _sut.InvokeAsync(model);
@@ -415,11 +417,12 @@ public class RelatedContentCarouselWidgetTests
         RelatedContentCarouselData? capturedData = null;
         _relatedContentCarouselServiceMock
             .Setup(x => x.GetRelatedContentCarouselDtoAsync(
-                It.IsAny<IWebPageFieldsSource>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<RelatedContentCarouselData>(),
                 It.IsAny<CancellationToken>()))
-            .Callback<IWebPageFieldsSource, RelatedContentCarouselData, CancellationToken>(
-                (_, data, _) => capturedData = data)
+            .Callback<Guid, string, RelatedContentCarouselData, CancellationToken>(
+                (_, _, data, _) => capturedData = data)
             .ReturnsAsync(new RelatedContentCarouselDto { FilteringTooltipEnabled = false });
 
         await _sut.InvokeAsync(model);
@@ -440,11 +443,12 @@ public class RelatedContentCarouselWidgetTests
         RelatedContentCarouselData? capturedData = null;
         _relatedContentCarouselServiceMock
             .Setup(x => x.GetRelatedContentCarouselDtoAsync(
-                It.IsAny<IWebPageFieldsSource>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<RelatedContentCarouselData>(),
                 It.IsAny<CancellationToken>()))
-            .Callback<IWebPageFieldsSource, RelatedContentCarouselData, CancellationToken>(
-                (_, data, _) => capturedData = data)
+            .Callback<Guid, string, RelatedContentCarouselData, CancellationToken>(
+                (_, _, data, _) => capturedData = data)
             .ReturnsAsync(new RelatedContentCarouselDto { FilteringTooltipEnabled = false });
 
         await _sut.InvokeAsync(model);
