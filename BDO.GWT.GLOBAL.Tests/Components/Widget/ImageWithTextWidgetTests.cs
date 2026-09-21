@@ -2,7 +2,10 @@
 using BDO.GWT.Core;
 using BDO.GWT.Web.Widgets.ImageWithTextWidget;
 using CMS.ContentEngine;
+using CMS.Websites;
+using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
+using Kentico.Content.Web.Mvc.Routing;
 using Kentico.PageBuilder.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -10,7 +13,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Moq;
-using CMS.Websites.Routing;
 
 namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 {
@@ -21,6 +23,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
         private Mock<IContentService> _contentServiceMock;
         private Mock<IContentQueryExecutor> _queryExecutorMock;
         private Mock<IWebsiteChannelContext> _channelContextMock;
+        private Mock<IWebPageUrlRetriever> _webPageUrlRetrieverMock;
 
 
         [SetUp]
@@ -30,15 +33,15 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             _contentServiceMock = new Mock<IContentService>();
             _queryExecutorMock = new Mock<IContentQueryExecutor>();
             _channelContextMock = new Mock<IWebsiteChannelContext>();
+            _webPageUrlRetrieverMock = new Mock<IWebPageUrlRetriever>();
 
             _channelContextMock.SetupGet(x => x.WebsiteChannelName).Returns("BDOGlobal");
             _channelContextMock.SetupGet(x => x.IsPreview).Returns(false);
             _contentServiceMock.Setup(x => x.GetCurrentLanguage()).Returns("en-US");
-            _contentServiceMock.Setup(x => x.EnsureAbsoluteUrl(It.IsAny<string?>())).Returns<string?>(x => x);
             _queryExecutorMock
-                .Setup(x => x.GetResult<string>(
+                .Setup(x => x.GetResult<int>(
                     It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<Func<IContentQueryDataContainer, string>>(),
+                    It.IsAny<Func<IContentQueryDataContainer, int>>(),
                     It.IsAny<ContentQueryExecutionOptions>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync([]);
@@ -47,7 +50,8 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
                 _contentRetrieverMock.Object,
                 _contentServiceMock.Object,
                 _queryExecutorMock.Object,
-                _channelContextMock.Object);
+                _channelContextMock.Object,
+                _webPageUrlRetrieverMock.Object);
 
             _widget.ViewComponentContext = new ViewComponentContext
             {
@@ -156,11 +160,12 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var result = await _widget.InvokeAsync(model);
             var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as ImageWithTextData;
 
-            _queryExecutorMock.Verify(x => x.GetResult<string>(
+            _queryExecutorMock.Verify(x => x.GetResult<int>(
                 It.IsAny<ContentItemQueryBuilder>(),
-                It.IsAny<Func<IContentQueryDataContainer, string>>(),
+                It.IsAny<Func<IContentQueryDataContainer, int>>(),
                 It.IsAny<ContentQueryExecutionOptions>(),
                 It.IsAny<CancellationToken>()), Times.Never);
+            _webPageUrlRetrieverMock.Verify(x => x.Retrieve(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
             _contentServiceMock.Verify(x => x.RetrieveButtonUrlAsync(
                 It.IsAny<IEnumerable<Guid>>(),
                 It.IsAny<string[]>()), Times.Never);
@@ -175,16 +180,16 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var guid = Guid.NewGuid();
 
             _queryExecutorMock
-                .Setup(x => x.GetResult<string>(
+                .Setup(x => x.GetResult<int>(
                     It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<Func<IContentQueryDataContainer, string>>(),
+                    It.IsAny<Func<IContentQueryDataContainer, int>>(),
                     It.IsAny<ContentQueryExecutionOptions>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(["test-page"]);
+                .ReturnsAsync([123]);
 
-            _contentServiceMock
-                .Setup(x => x.EnsureAbsoluteUrl("test-page"))
-                .Returns("https://example.com/test-page");
+            _webPageUrlRetrieverMock
+                .Setup(x => x.Retrieve(123, "en-US"))
+                .ReturnsAsync(new WebPageUrl("~/section/test-page", "https://example.com/section/test-page"));
 
             var props = new ImageWithTextWidgetProperties
             {
@@ -205,7 +210,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
                 It.IsAny<string[]>()), Times.Never);
 
             Assert.That(viewModel, Is.Not.Null);
-            Assert.That(viewModel!.ButtonURL, Is.EqualTo("https://example.com/test-page"));
+            Assert.That(viewModel!.ButtonURL, Is.EqualTo("/section/test-page"));
         }
 
         [Test]
@@ -282,16 +287,16 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var guid = Guid.NewGuid();
 
             _queryExecutorMock
-                .Setup(x => x.GetResult<string>(
+                .Setup(x => x.GetResult<int>(
                     It.IsAny<ContentItemQueryBuilder>(),
-                    It.IsAny<Func<IContentQueryDataContainer, string>>(),
+                    It.IsAny<Func<IContentQueryDataContainer, int>>(),
                     It.IsAny<ContentQueryExecutionOptions>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(["test-page"]);
+                .ReturnsAsync([123]);
 
-            _contentServiceMock
-                .Setup(x => x.EnsureAbsoluteUrl("test-page"))
-                .Returns("https://example.com/test-page");
+            _webPageUrlRetrieverMock
+                .Setup(x => x.Retrieve(123, "en-US"))
+                .ReturnsAsync(new WebPageUrl("~/section/test-page", "https://example.com/section/test-page"));
 
             var props = new ImageWithTextWidgetProperties
             {
@@ -307,14 +312,19 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
             var result = await _widget.InvokeAsync(model);
             var viewModel = (result as ViewViewComponentResult)?.ViewData?.Model as ImageWithTextData;
 
-            _contentServiceMock.Verify(x => x.GetCurrentLanguage(), Times.Once);
-            _contentServiceMock.Verify(x => x.EnsureAbsoluteUrl("test-page"), Times.Once);
+            _contentServiceMock.Verify(x => x.GetCurrentLanguage(), Times.Exactly(2));
+            _queryExecutorMock.Verify(x => x.GetResult<int>(
+                It.IsAny<ContentItemQueryBuilder>(),
+                It.IsAny<Func<IContentQueryDataContainer, int>>(),
+                It.IsAny<ContentQueryExecutionOptions>(),
+                It.IsAny<CancellationToken>()), Times.Once);
+            _webPageUrlRetrieverMock.Verify(x => x.Retrieve(123, "en-US"), Times.Once);
             _contentServiceMock.Verify(x => x.RetrieveButtonUrlAsync(
                 It.IsAny<IEnumerable<Guid>>(),
                 It.IsAny<string[]>()), Times.Never);
 
             Assert.That(viewModel, Is.Not.Null);
-            Assert.That(viewModel!.ButtonURL, Is.EqualTo("https://example.com/test-page"));
+            Assert.That(viewModel!.ButtonURL, Is.EqualTo("/section/test-page"));
         }
     }
 }
