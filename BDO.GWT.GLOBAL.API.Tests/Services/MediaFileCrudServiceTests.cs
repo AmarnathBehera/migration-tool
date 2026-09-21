@@ -1,9 +1,11 @@
 using BDO.GWT.GLOBAL.API.Data;
+using BDO.GWT.GLOBAL.API.Helpers;
 using BDO.GWT.GLOBAL.API.Services;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -466,6 +468,26 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
+    public void BuildAssetUri_WhenWebsiteDomainProvided_UsesWebsiteDomain()
+    {
+        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
+        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
+
+        var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+        httpContextAccessorMock.Setup(x => x.HttpContext).Returns((HttpContext?)null);
+
+        var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
+
+        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "~/getmedia/img.jpg", "gwt-xbyk.dev.bdo.global");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.AbsoluteUri, Is.EqualTo("https://gwt-xbyk.dev.bdo.global/getmedia/img.jpg"));
+        });
+    }
+
+    [Test]
     public void BuildAssetUri_WhenVirtualContextWrappedPath_UsesInnerAssetPath()
     {
         var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
@@ -747,13 +769,19 @@ public class MediaFileCrudServiceTests
 
     private static object InvokePrivateStatic(string methodName, params object?[] args)
     {
-        var method = typeof(MediaFileCrudService).GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic)!;
+        var method = typeof(MediaFileCrudService)
+            .GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
+            .Single(m => m.Name == methodName && m.GetParameters().Length == args.Length);
+
         return method.Invoke(null, args)!;
     }
 
     private static async Task<T> InvokePrivateStaticAsync<T>(string methodName, Type[] genericTypes, params object[] args)
     {
-        var method = typeof(MediaFileCrudService).GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic)!;
+        var method = typeof(MediaFileCrudService)
+            .GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
+            .Single(m => m.Name == methodName && m.GetParameters().Length == args.Length);
+
         var genericMethod = method.MakeGenericMethod(genericTypes);
         var task = (Task<T>)genericMethod.Invoke(null, args)!;
         return await task;
@@ -761,7 +789,10 @@ public class MediaFileCrudServiceTests
 
     private static object? InvokePrivateInstance(MediaFileCrudService instance, string methodName, params object[] args)
     {
-        var method = typeof(MediaFileCrudService).GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var method = typeof(MediaFileCrudService)
+            .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
+            .Single(m => m.Name == methodName && m.GetParameters().Length == args.Length);
+
         return method.Invoke(instance, args);
     }
 
@@ -770,13 +801,18 @@ public class MediaFileCrudServiceTests
         IHttpClientFactory? httpClientFactory = null,
         IHttpContextAccessor? httpContextAccessor = null,
         IWebHostEnvironment? hostEnvironment = null,
+        IAssetUrlResolver? assetUrlResolver = null,
+        IChannelWebsiteDomainService? channelWebsiteDomainService = null,
         IInfoProvider<ContentLanguageInfo>? languageInfoProvider = null)
     {
+        var resolvedHttpContextAccessor = httpContextAccessor ?? Mock.Of<IHttpContextAccessor>();
+        var resolvedHostEnvironment = hostEnvironment ?? Mock.Of<IWebHostEnvironment>();
+
         return new MediaFileCrudService(
             queryExecutor ?? Mock.Of<IContentQueryExecutor>(),
             httpClientFactory ?? Mock.Of<IHttpClientFactory>(),
-            httpContextAccessor ?? Mock.Of<IHttpContextAccessor>(),
-            hostEnvironment ?? Mock.Of<IWebHostEnvironment>(),
+            assetUrlResolver ?? new AssetUrlResolver(resolvedHttpContextAccessor, resolvedHostEnvironment),
+            channelWebsiteDomainService ?? Mock.Of<IChannelWebsiteDomainService>(),
             Mock.Of<IContentItemManagerFactory>(),
             Mock.Of<CMS.Membership.IUserInfoProvider>(),
             languageInfoProvider ?? Mock.Of<IInfoProvider<ContentLanguageInfo>>());

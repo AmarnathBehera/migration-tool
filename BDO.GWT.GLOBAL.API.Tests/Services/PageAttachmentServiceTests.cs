@@ -1,6 +1,8 @@
 using BDO.GWT.Core;
 using BDO.GWT.GLOBAL.API.Data;
+using BDO.GWT.GLOBAL.API.Helpers;
 using CMS.ContentEngine;
+using CMS.Core;
 using CMS.Websites;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -22,6 +24,9 @@ public class PageAttachmentServiceTests
     private Mock<HttpMessageHandler> _httpMessageHandlerMock = null!;
     private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
     private Mock<IWebHostEnvironment> _hostEnvironmentMock = null!;
+    private Mock<IEventLogService> _eventLogServiceMock = null!;
+    private Mock<IChannelWebsiteDomainService> _channelWebsiteDomainServiceMock = null!;
+    private IAssetUrlResolver _assetUrlResolver = null!;
 
     [SetUp]
     public void Setup()
@@ -37,14 +42,18 @@ public class PageAttachmentServiceTests
 
         _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
         _hostEnvironmentMock = new Mock<IWebHostEnvironment>();
+        _eventLogServiceMock = new Mock<IEventLogService>();
+        _channelWebsiteDomainServiceMock = new Mock<IChannelWebsiteDomainService>();
+        _assetUrlResolver = new AssetUrlResolver(_httpContextAccessorMock.Object, _hostEnvironmentMock.Object);
         SetupIsDevelopment(true);
     }
 
     private PageAttachmentService CreateSut() => new(
         _contentServiceMock.Object,
         _httpClientFactoryMock.Object,
-        _httpContextAccessorMock.Object,
-        _hostEnvironmentMock.Object);
+        new AssetUrlResolver(_httpContextAccessorMock.Object, _hostEnvironmentMock.Object),
+        _eventLogServiceMock.Object,
+        _channelWebsiteDomainServiceMock.Object);
 
     private void SetupIsDevelopment(bool isDevelopment) =>
         _hostEnvironmentMock
@@ -136,6 +145,11 @@ public class PageAttachmentServiceTests
         mockHttpContext.Setup(c => c.Request).Returns(mockRequest.Object);
         _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(mockHttpContext.Object);
     }
+
+    private void SetupChannelWebsiteDomain(string? domain) =>
+        _channelWebsiteDomainServiceMock
+            .Setup(x => x.GetWebsiteDomainAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(domain);
 
     // ── GetPageAttachmentsAsync ────────────────────────────────────────────────
 
@@ -275,7 +289,6 @@ public class PageAttachmentServiceTests
         Assert.That(result!.Value.Data, Is.EqualTo(expectedBytes));
     }
 
-
     [Test]
     public async Task GetPageAttachmentBinaryAsync_WhenHttpRequestFails_ReturnsNull()
     {
@@ -332,12 +345,72 @@ public class PageAttachmentServiceTests
     }
 
     [Test]
+    public async Task GetPageAttachmentBinaryAsync_WhenChannelDomainIsAvailable_UsesChannelDomain()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+        var expectedBytes = new byte[] { 1, 2, 3, 4 };
+        var asset = CreateAsset("~/media/file.pdf", "file.pdf", ".pdf");
+        var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
+        SetupContentService(pageGuid, [page]);
+        SetupChannelWebsiteDomain("gwt-xbyk.dev.bdo.global");
+
+        var content = new ByteArrayContent(expectedBytes);
+        content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
+
+        _httpMessageHandlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(request =>
+                    request.Method == HttpMethod.Get
+                    && request.RequestUri == new Uri("https://gwt-xbyk.dev.bdo.global/media/file.pdf")),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK) { Content = content });
+
+        var result = await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb");
+
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.Value.Data, Is.EqualTo(expectedBytes));
+            Assert.That(result.Value.ContentType, Is.EqualTo("application/pdf"));
+            Assert.That(result.Value.FileName, Is.EqualTo("file.pdf"));
+        });
+    }
+
+    [Test]
     public async Task GetPageAttachmentBinaryAsync_WhenSuccessful_ReturnsBinaryData()
     {
         var pageGuid = Guid.NewGuid();
         var attachmentGuid = Guid.NewGuid();
         var expectedBytes = new byte[] { 1, 2, 3, 4 };
         var asset = CreateAsset("/media/file.pdf", "file.pdf", ".pdf");
+        var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
+        SetupContentService(pageGuid, [page]);
+        SetupChannelWebsiteDomain(null);
+        SetupHttpContext();
+        SetupHttpResponse(HttpStatusCode.OK, expectedBytes, "application/pdf");
+
+        var result = await CreateSut().GetPageAttachmentBinaryAsync(pageGuid, attachmentGuid, "ch", "en-gb");
+
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.Value.Data, Is.EqualTo(expectedBytes));
+            Assert.That(result.Value.ContentType, Is.EqualTo("application/pdf"));
+            Assert.That(result.Value.FileName, Is.EqualTo("file.pdf"));
+        });
+    }
+
+    [Test]
+    public async Task GetPageAttachmentBinaryAsync_WhenMetadataIsMissing_UsesFallbackValues()
+    {
+        var pageGuid = Guid.NewGuid();
+        var attachmentGuid = Guid.NewGuid();
+        var expectedBytes = new byte[] { 9, 8, 7 };
+        var asset = new ContentItemAsset();
+        typeof(ContentItemAsset).GetProperty("Url")!.SetValue(asset, "/media/file.pdf");
         var page = new FakePage { Attachments = [CreateAttachment(attachmentGuid, asset)] };
         SetupContentService(pageGuid, [page]);
         SetupHttpContext();
@@ -350,7 +423,7 @@ public class PageAttachmentServiceTests
         {
             Assert.That(result!.Value.Data, Is.EqualTo(expectedBytes));
             Assert.That(result.Value.ContentType, Is.EqualTo("application/pdf"));
-            Assert.That(result.Value.FileName, Is.EqualTo("file.pdf"));
+            Assert.That(result.Value.FileName, Is.EqualTo("attachment"));
         });
     }
 
@@ -397,7 +470,8 @@ public class PageAttachmentServiceTests
         _httpContextAccessorMock.Setup(x => x.HttpContext).Returns((HttpContext?)null);
 
         var result = (Uri?)typeof(PageAttachmentService)
-            .GetMethod("BuildAssetUri", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
+            .Single(m => m.Name == "BuildAssetUri" && m.GetParameters().Length == 1)
             .Invoke(CreateSut(), ["~/media/file.pdf"]);
 
         Assert.That(result, Is.Null);
@@ -409,7 +483,8 @@ public class PageAttachmentServiceTests
         SetupIsDevelopment(true);
 
         var result = (Uri?)typeof(PageAttachmentService)
-            .GetMethod("BuildAssetUri", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
+            .Single(m => m.Name == "BuildAssetUri" && m.GetParameters().Length == 1)
             .Invoke(CreateSut(), ["~/media/file.pdf?language=en-gb"]);
 
         Assert.That(result, Is.Not.Null);
@@ -423,7 +498,8 @@ public class PageAttachmentServiceTests
         SetupHttpContext("https", "mysite.com");
 
         var result = (Uri?)typeof(PageAttachmentService)
-            .GetMethod("BuildAssetUri", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
+            .Single(m => m.Name == "BuildAssetUri" && m.GetParameters().Length == 1)
             .Invoke(CreateSut(), ["/cmsctx/pm/token/lang/en-gb/wpid/72/cid/1/cdid/82/ts/1/readonly/0/h/hash/-/~/getContentAsset/5ed65831-9e46-4827-8011-d91f5c2e130e/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/file.pdf?language=en-gb"]);
 
         Assert.That(result, Is.Not.Null);

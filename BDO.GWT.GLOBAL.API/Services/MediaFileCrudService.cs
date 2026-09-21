@@ -3,6 +3,7 @@ using BDO.GWT.GLOBAL.API.Helpers;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Membership;
+using CMS.Websites;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Buffers;
 using System.Net.Mime;
@@ -20,8 +21,8 @@ public class MediaFileCrudService : IMediaFileCrudService
 
     private readonly IContentQueryExecutor _contentQueryExecutor;
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IWebHostEnvironment _hostEnvironment;
+    private readonly IAssetUrlResolver _assetUrlResolver;
+    private readonly IChannelWebsiteDomainService _channelWebsiteDomainService;
     private readonly IContentItemManagerFactory _contentItemManagerFactory;
     private readonly IUserInfoProvider _userInfoProvider;
     private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageInfoProvider;
@@ -31,16 +32,16 @@ public class MediaFileCrudService : IMediaFileCrudService
     public MediaFileCrudService(
         IContentQueryExecutor contentQueryExecutor,
         IHttpClientFactory httpClientFactory,
-        IHttpContextAccessor httpContextAccessor,
-        IWebHostEnvironment hostEnvironment,
+        IAssetUrlResolver assetUrlResolver,
+        IChannelWebsiteDomainService channelWebsiteDomainService,
         IContentItemManagerFactory contentItemManagerFactory,
         IUserInfoProvider userInfoProvider,
         IInfoProvider<ContentLanguageInfo> contentLanguageInfoProvider)
     {
         _contentQueryExecutor = contentQueryExecutor;
         _httpClientFactory = httpClientFactory;
-        _httpContextAccessor = httpContextAccessor;
-        _hostEnvironment = hostEnvironment;
+        _assetUrlResolver = assetUrlResolver;
+        _channelWebsiteDomainService = channelWebsiteDomainService;
         _contentItemManagerFactory = contentItemManagerFactory;
         _userInfoProvider = userInfoProvider;
         _contentLanguageInfoProvider = contentLanguageInfoProvider;
@@ -73,7 +74,8 @@ public class MediaFileCrudService : IMediaFileCrudService
             return null;
         }
 
-        var assetUri = BuildAssetUri(target.Asset.Url);
+        var websiteDomain = await _channelWebsiteDomainService.GetCurrentWebsiteDomainAsync(cancellationToken);
+        var assetUri = BuildAssetUri(target.Asset.Url, websiteDomain);
         if (assetUri is null)
         {
             return null;
@@ -136,7 +138,10 @@ public class MediaFileCrudService : IMediaFileCrudService
     }
 
     private Uri? BuildAssetUri(string assetUrl) =>
-        AssetUrlHelper.BuildAssetUri(assetUrl, _httpContextAccessor, _hostEnvironment);
+        BuildAssetUri(assetUrl, websiteDomain: null);
+
+    private Uri? BuildAssetUri(string assetUrl, string? websiteDomain) =>
+        _assetUrlResolver.BuildAssetUri(assetUrl, websiteDomain);
     private static string GetMimeType(string extension)
     {
         if (_contentTypeProvider.TryGetContentType($"file{extension}", out var contentType))
