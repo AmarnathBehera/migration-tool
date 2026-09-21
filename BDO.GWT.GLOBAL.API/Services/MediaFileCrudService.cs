@@ -74,7 +74,7 @@ public class MediaFileCrudService : IMediaFileCrudService
         }
 
         var websiteDomain = await _channelWebsiteDomainService.GetCurrentWebsiteDomainAsync(cancellationToken);
-        var assetUri = BuildAssetUri(target.Asset.Url, websiteDomain);
+        var assetUri = _assetUrlResolver.BuildAssetUri(target.Asset.Url, websiteDomain);
         if (assetUri is null)
         {
             return null;
@@ -135,12 +135,6 @@ public class MediaFileCrudService : IMediaFileCrudService
             ? null
             : new MediaFileTarget(item.SystemFields.ContentItemID, asset);
     }
-
-    private Uri? BuildAssetUri(string assetUrl) =>
-        _assetUrlResolver.BuildAssetUri(assetUrl);
-
-    private Uri? BuildAssetUri(string assetUrl, string? websiteDomain) =>
-        _assetUrlResolver.BuildAssetUri(assetUrl, websiteDomain);
 
     private static string GetMimeType(string extension)
     {

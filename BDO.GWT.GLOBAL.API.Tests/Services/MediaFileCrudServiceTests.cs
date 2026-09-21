@@ -15,6 +15,18 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services;
 [TestFixture]
 public class MediaFileCrudServiceTests
 {
+    private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
+    private Mock<IWebHostEnvironment> _hostEnvironmentMock = null!;
+    private IAssetUrlResolver _assetUrlResolver = null!;
+
+    [SetUp]
+    public void SetUp()
+    {
+        _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+        _hostEnvironmentMock = new Mock<IWebHostEnvironment>();
+        _assetUrlResolver = new AssetUrlResolver(_httpContextAccessorMock.Object, _hostEnvironmentMock.Object);
+    }
+
     [Test]
     public void MediaFileCrudService_ImplementsIMediaFileCrudService()
     {
@@ -334,7 +346,7 @@ public class MediaFileCrudServiceTests
     {
         var service = CreateSut();
 
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "https://cdn.example.com/a.png");
+        var result = _assetUrlResolver.BuildAssetUri("https://cdn.example.com/a.png");
 
         Assert.Multiple(() =>
         {
@@ -346,12 +358,9 @@ public class MediaFileCrudServiceTests
     [Test]
     public void BuildAssetUri_WhenDevelopmentAndRelativePath_UsesDevelopmentBaseUrl()
     {
-        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
-        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Development");
+        _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Development");
 
-        var service = CreateSut(hostEnvironment: hostEnvironmentMock.Object);
-
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "~/getmedia/img.jpg");
+        var result = _assetUrlResolver.BuildAssetUri("~/getmedia/img.jpg");
 
         Assert.Multiple(() =>
         {
@@ -363,12 +372,9 @@ public class MediaFileCrudServiceTests
     [Test]
     public void BuildAssetUri_WhenDevelopmentAndRelativePathHasQuery_PreservesQuery()
     {
-        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
-        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Development");
+        _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Development");
 
-        var service = CreateSut(hostEnvironment: hostEnvironmentMock.Object);
-
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "~/getmedia/img.jpg?language=en-gb");
+        var result = _assetUrlResolver.BuildAssetUri("~/getmedia/img.jpg?language=en-gb");
 
         Assert.Multiple(() =>
         {
@@ -388,7 +394,7 @@ public class MediaFileCrudServiceTests
 
         var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
 
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "~/getmedia/img.jpg");
+        var result = _assetUrlResolver.BuildAssetUri("~/getmedia/img.jpg");
 
         Assert.Multiple(() =>
         {
@@ -399,19 +405,15 @@ public class MediaFileCrudServiceTests
     [Test]
     public void BuildAssetUri_WhenProductionAndHostIsMissing_ReturnsNull()
     {
-        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
-        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
+        _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Scheme = "https";
         httpContext.Request.Host = default;
 
-        var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
-        httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
+        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
-
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "~/getmedia/img.jpg");
+        var result = _assetUrlResolver.BuildAssetUri("~/getmedia/img.jpg");
 
         Assert.Multiple(() =>
         {
@@ -422,19 +424,15 @@ public class MediaFileCrudServiceTests
     [Test]
     public void BuildAssetUri_WhenProductionAndHttpContextPresent_UsesRequestSchemeAndHost()
     {
-        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
-        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
+        _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Scheme = "https";
         httpContext.Request.Host = new HostString("example.com");
 
-        var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
-        httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
+        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
-
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "getmedia/img.jpg");
+        var result = _assetUrlResolver.BuildAssetUri("getmedia/img.jpg");
 
         Assert.Multiple(() =>
         {
@@ -446,19 +444,15 @@ public class MediaFileCrudServiceTests
     [Test]
     public void BuildAssetUri_WhenProductionAndHttpContextPresentAndPathHasQuery_PreservesQuery()
     {
-        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
-        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
+        _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Scheme = "https";
         httpContext.Request.Host = new HostString("example.com");
 
-        var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
-        httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
+        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
-
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "getmedia/img.jpg?language=en-gb");
+        var result = _assetUrlResolver.BuildAssetUri("getmedia/img.jpg?language=en-gb");
 
         Assert.Multiple(() =>
         {
@@ -478,7 +472,7 @@ public class MediaFileCrudServiceTests
 
         var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
 
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "~/getmedia/img.jpg", "gwt-xbyk.dev.bdo.global");
+        var result = _assetUrlResolver.BuildAssetUri("~/getmedia/img.jpg", "gwt-xbyk.dev.bdo.global");
 
         Assert.Multiple(() =>
         {
@@ -490,19 +484,15 @@ public class MediaFileCrudServiceTests
     [Test]
     public void BuildAssetUri_WhenVirtualContextWrappedPath_UsesInnerAssetPath()
     {
-        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
-        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
+        _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Scheme = "https";
         httpContext.Request.Host = new HostString("example.com");
 
-        var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
-        httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
+        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
-
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "/cmsctx/pm/token/lang/en-gb/wpid/72/cid/1/cdid/82/ts/1/readonly/0/h/hash/-/~/getContentAsset/5ed65831-9e46-4827-8011-d91f5c2e130e/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/img.jpg?language=en-gb");
+        var result = _assetUrlResolver.BuildAssetUri("/cmsctx/pm/token/lang/en-gb/wpid/72/cid/1/cdid/82/ts/1/readonly/0/h/hash/-/~/getContentAsset/5ed65831-9e46-4827-8011-d91f5c2e130e/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/img.jpg?language=en-gb");
 
         Assert.Multiple(() =>
         {
@@ -646,12 +636,9 @@ public class MediaFileCrudServiceTests
     [Test]
     public void BuildAssetUri_WhenDevelopmentEnvironment_ReturnsLocalhostUri()
     {
-        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
-        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Development");
+        _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Development");
 
-        var service = CreateSut(hostEnvironment: hostEnvironmentMock.Object);
-
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "~/getmedia/img.jpg");
+        var result = _assetUrlResolver.BuildAssetUri("~/getmedia/img.jpg");
 
         Assert.Multiple(() =>
         {
@@ -787,23 +774,6 @@ public class MediaFileCrudServiceTests
         return await task;
     }
 
-    private static object? InvokePrivateInstance(MediaFileCrudService instance, string methodName, params object[] args)
-    {
-        var parameterTypes = args.Select(arg => arg?.GetType() ?? typeof(string)).ToArray();
-        var method = typeof(MediaFileCrudService).GetMethod(
-            methodName,
-            BindingFlags.Instance | BindingFlags.NonPublic,
-            binder: null,
-            types: parameterTypes,
-            modifiers: null);
-
-        if (method is null)
-        {
-            throw new InvalidOperationException($"Method '{methodName}' with {args.Length} argument(s) was not found.");
-        }
-
-        return method.Invoke(instance, args);
-    }
 
     private static MediaFileCrudService CreateSut(
         IContentQueryExecutor? queryExecutor = null,
