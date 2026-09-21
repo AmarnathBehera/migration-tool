@@ -789,9 +789,18 @@ public class MediaFileCrudServiceTests
 
     private static object? InvokePrivateInstance(MediaFileCrudService instance, string methodName, params object[] args)
     {
-        var method = typeof(MediaFileCrudService)
-            .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
-            .Single(m => m.Name == methodName && m.GetParameters().Length == args.Length);
+        var parameterTypes = args.Select(arg => arg?.GetType() ?? typeof(string)).ToArray();
+        var method = typeof(MediaFileCrudService).GetMethod(
+            methodName,
+            BindingFlags.Instance | BindingFlags.NonPublic,
+            binder: null,
+            types: parameterTypes,
+            modifiers: null);
+
+        if (method is null)
+        {
+            throw new InvalidOperationException($"Method '{methodName}' with {args.Length} argument(s) was not found.");
+        }
 
         return method.Invoke(instance, args);
     }

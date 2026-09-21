@@ -3,7 +3,6 @@ using BDO.GWT.GLOBAL.API.Helpers;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Membership;
-using CMS.Websites;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Buffers;
 using System.Net.Mime;
@@ -138,10 +137,11 @@ public class MediaFileCrudService : IMediaFileCrudService
     }
 
     private Uri? BuildAssetUri(string assetUrl) =>
-        BuildAssetUri(assetUrl, websiteDomain: null);
+        _assetUrlResolver.BuildAssetUri(assetUrl);
 
     private Uri? BuildAssetUri(string assetUrl, string? websiteDomain) =>
         _assetUrlResolver.BuildAssetUri(assetUrl, websiteDomain);
+
     private static string GetMimeType(string extension)
     {
         if (_contentTypeProvider.TryGetContentType($"file{extension}", out var contentType))

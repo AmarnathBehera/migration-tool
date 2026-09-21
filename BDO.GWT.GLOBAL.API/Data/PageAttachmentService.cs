@@ -126,7 +126,7 @@ namespace BDO.GWT.GLOBAL.API.Data
         }
 
         private Uri? BuildAssetUri(string assetUrl) =>
-            BuildAssetUri(assetUrl, websiteDomain: null);
+            _assetUrlResolver.BuildAssetUri(assetUrl);
 
         private Uri? BuildAssetUri(string assetUrl, string? websiteDomain) =>
             _assetUrlResolver.BuildAssetUri(assetUrl, websiteDomain);
