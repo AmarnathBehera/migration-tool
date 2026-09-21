@@ -176,11 +176,10 @@ public class SEOOptionsSetupTests
 
         _setup.Configure(options);
 
-        // NOTE: service currently maps SecurityText from global.SeoSettingsRobots when inheriting.
         Assert.Multiple(() =>
         {
             Assert.That(options.RobotsText, Is.EqualTo("robots-global"));
-            Assert.That(options.SecurityText, Is.EqualTo("robots-global"));
+            Assert.That(options.SecurityText, Is.EqualTo("security-global"));
             _globalProviderMock.Verify(p => p.Get(), Times.Exactly(2));
         });
     }
