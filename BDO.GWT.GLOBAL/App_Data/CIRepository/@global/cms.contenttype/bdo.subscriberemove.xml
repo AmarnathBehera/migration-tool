@@ -21,7 +21,7 @@
           <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
         </settings>
       </field>
-      <field column="SuccessfulUnubscribeMessage" columnprecision="0" columntype="longtext" enabled="true" guid="b4e31e3f-05ad-4ce1-a114-4547b9dcae3b" visible="true">
+      <field allowempty="true" column="SuccessfulUnubscribeMessage" columnprecision="0" columntype="longtext" enabled="true" guid="b4e31e3f-05ad-4ce1-a114-4547b9dcae3b" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Successful subscription cancellation text</fieldcaption>
@@ -29,17 +29,19 @@
             <![CDATA[Text to be displayed when successfully unsubscribed from newsletter.]]>
           </fielddescription>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
           <controlname>Kentico.Administration.RichTextEditor</controlname>
         </settings>
       </field>
-      <field column="UnsuccessfulUnsubscribeMessage" columnprecision="0" columntype="longtext" enabled="true" guid="e508a153-befa-4edb-b019-fbf9f1b1a528" visible="true">
+      <field allowempty="true" column="UnsuccessfulUnsubscribeMessage" columnprecision="0" columntype="longtext" enabled="true" guid="e508a153-befa-4edb-b019-fbf9f1b1a528" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Unsuccessful subscription cancellation text</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
