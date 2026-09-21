@@ -60,8 +60,8 @@ public class RelatedContentCarouselWidgetTests
 
         _sut = new RelatedContentCarouselWidget(
             _relatedContentCarouselServiceMock.Object,
-            _contentRetrieverMock.Object,
-            _contentServiceMock.Object);
+            _contentRetrieverMock.Object
+            );
 
         var httpContext = new DefaultHttpContext();
         _sut.ViewComponentContext = new ViewComponentContext
