@@ -5,6 +5,7 @@ using BDO.GWT.Xperience.Core.Services;
 using CMS.ContentEngine;
 using CMS.Core;
 using CMS.DataEngine;
+using CMS.EventLog;
 using CMS.Helpers;
 using CMS.Websites;
 using CMS.Websites.Routing;
@@ -13,7 +14,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using XperienceCommunity.Localization;
-using CmsService = CMS.Core.Service;
+
 
 namespace BDO.GWT.Web.Core.Services;
 
@@ -97,11 +98,12 @@ public class SiteConfigurationService : ISiteConfigurationService
         var temp4 = RequestContext.RawURL;
         var temp5 = GetWebsiteDomain();
 
-        CmsService.Resolve<IEventLogService>().LogInformation(
-            nameof(SiteConfigurationService),
-            nameof(GetSiteConfigurationDtoAsync),
-            $"RequestContext.CurrentDomain: {temp}, RequestContext.URL.AbsolutePath: {temp1}, RequestContext.URL.AbsoluteUri: {temp2}, RequestContext.FullDomain: {temp3}, RequestContext.RawURL: {temp4}, GetWebsiteDomain(): {temp5}"
-        );
+       EventLogProvider.LogEvent(new EventLogInfo
+{
+    Source = nameof(SiteConfigurationService),
+    EventCode = nameof(GetSiteConfigurationDtoAsync),
+    EventDescription = $"RequestContext.CurrentDomain: {temp}, RequestContext.URL.AbsolutePath: {temp1}, RequestContext.URL.AbsoluteUri: {temp2}, RequestContext.FullDomain: {temp3}, RequestContext.RawURL: {temp4}, GetWebsiteDomain(): {temp5}"
+});     
 
         var result = new SiteConfigurationDto
         {
