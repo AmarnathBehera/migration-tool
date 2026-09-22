@@ -3,14 +3,21 @@ using BDO.GWT.Core.Entities;
 using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience.Core.Services;
 using CMS.ContentEngine;
+using CMS.Core;
 using CMS.DataEngine;
+using CMS.EventLog;
+using CMS.Helpers;
 using CMS.Websites;
 using CMS.Websites.Routing;
+using Kentico.Xperience.Headless.Internal;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using XperienceCommunity.Localization;
+
 
 namespace BDO.GWT.Web.Core.Services;
 
@@ -48,19 +55,23 @@ public class SiteConfigurationService : ISiteConfigurationService
             "bdo.webchannelsettings|all",
             "bdo.generalsetting|all",
         ];
-
+    private const string EventSource = nameof(SiteConfigurationService);
     private readonly ICachingService _cachingService;
     private readonly ISiteContext _siteContext;
     private readonly SiteConfigurationProviders _providers;
+    private readonly IEventLogService _eventLogService;
+
     public SiteConfigurationService(
         ICachingService cachingService,
         IContentQueryExecutor executor,
         ISiteContext siteContext,
-        SiteConfigurationProviders providers)
+        SiteConfigurationProviders providers,
+        IEventLogService eventLogService)
     {
         _cachingService = cachingService;
         _siteContext = siteContext;
         _providers = providers;
+        _eventLogService = eventLogService;
     }
 
     public string GetCachedSiteConfigurationHash()
@@ -87,10 +98,23 @@ public class SiteConfigurationService : ISiteConfigurationService
             )
         );
 
+        var temp = RequestContext.CurrentDomain;
+        var temp1 = RequestContext.URL.AbsolutePath;
+        var temp2 = RequestContext.URL.AbsoluteUri;
+        var temp3 = RequestContext.FullDomain;
+        var temp4 = RequestContext.RawURL;
+        var temp5 = GetWebsiteDomain();
+
+        _eventLogService.LogWarning(
+                        EventSource,
+                        nameof(SiteConfigurationService),
+                        $"RequestContext.CurrentDomain: {temp}, RequestContext.URL.AbsolutePath: {temp1}, RequestContext.URL.AbsoluteUri: {temp2}, RequestContext.FullDomain: {temp3}, RequestContext.RawURL: {temp4}, GetWebsiteDomain(): {temp5}");
+
         var result = new SiteConfigurationDto
         {
             Translations = translations,
-            SiteSettings = GetSiteSettings()
+            SiteSettings = GetSiteSettings(),
+            LiveSiteURL = GetWebsiteDomain() ?? string.Empty
         };
 
         var calculatedHash = await _cachingService.LoadAsync(
@@ -104,14 +128,24 @@ public class SiteConfigurationService : ISiteConfigurationService
         return result;
     }
 
+    private string GetWebsiteDomain()
+    {
+        return GetWebsiteChannel()?.WebsiteChannelDomain ?? string.Empty;
+    }
+
+    private WebsiteChannelInfo GetWebsiteChannel()
+    {
+        return _providers.WebsiteChannel.Get()
+            .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelID), _siteContext.CurrentSiteID)
+            .TopN(1)
+            .FirstOrDefault();
+    }
+
     private SiteSettingsDto GetSiteSettings()
     {
         var settings = new SiteSettingsDto();
 
-        var websiteChannel = _providers.WebsiteChannel.Get()
-            .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelID), _siteContext.CurrentSiteID)
-            .TopN(1)
-            .FirstOrDefault();
+        var websiteChannel = GetWebsiteChannel();
 
         if (websiteChannel == null)
         {
