@@ -55,14 +55,17 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IChannelSettingCrudService, ChannelSettingCrudService>();
         serviceCollection.AddScoped<IChannelCrudService, ChannelCrudService>();
         serviceCollection.AddScoped<IChannelInfoService, ChannelInfoService>();
+        serviceCollection.AddScoped<IChannelWebsiteDomainService, ChannelWebsiteDomainService>();
         serviceCollection.AddScoped<IUserCrudService, UserCrudService>();
         serviceCollection.AddScoped<IUserApiPermissionsCrudService, UserApiPermissionsCrudService>();
         serviceCollection.AddScoped<ILicenseKeysCrudService, LicenseKeysCrudService>();
         serviceCollection.AddScoped<IScheduledTaskCrudService, ScheduledTaskCrudService>();
         serviceCollection.AddScoped<IPageAttachmentService, PageAttachmentService>();
         serviceCollection.AddScoped<IPageChannelResolver, PageChannelResolver>();
+        serviceCollection.AddScoped<IAssetUrlResolver, AssetUrlResolver>();
         serviceCollection.AddScoped<IContentItemInfoService, ContentItemInfoService>();
         serviceCollection.AddScoped<IPageAttachmentCrudService, PageAttachmentCrudService>();
+        serviceCollection.AddScoped<IContentQueryMapper, ContentQueryMapper>();
         serviceCollection.AddScoped<IMediaFileCrudService, MediaFileCrudService>();
         serviceCollection.AddScoped<IContentCategoryService, ContentCategoryService>();
         serviceCollection.AddScoped<IEventLogCrudService, EventLogCrudService>();

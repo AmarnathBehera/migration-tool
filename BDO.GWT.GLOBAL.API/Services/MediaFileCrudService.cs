@@ -18,10 +18,10 @@ public class MediaFileCrudService : IMediaFileCrudService
 
     private const string FallbackLanguageName = "en-US";
 
-    private readonly IContentQueryExecutor _contentQueryExecutor;
+    private readonly IContentQueryMapper _contentQueryMapper;
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IWebHostEnvironment _hostEnvironment;
+    private readonly IAssetUrlResolver _assetUrlResolver;
+    private readonly IChannelWebsiteDomainService _channelWebsiteDomainService;
     private readonly IContentItemManagerFactory _contentItemManagerFactory;
     private readonly IUserInfoProvider _userInfoProvider;
     private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageInfoProvider;
@@ -29,18 +29,18 @@ public class MediaFileCrudService : IMediaFileCrudService
     private sealed record MediaFileTarget(int ContentItemId, ContentItemAsset Asset);
 
     public MediaFileCrudService(
-        IContentQueryExecutor contentQueryExecutor,
+        IContentQueryMapper contentQueryMapper,
         IHttpClientFactory httpClientFactory,
-        IHttpContextAccessor httpContextAccessor,
-        IWebHostEnvironment hostEnvironment,
+        IAssetUrlResolver assetUrlResolver,
+        IChannelWebsiteDomainService channelWebsiteDomainService,
         IContentItemManagerFactory contentItemManagerFactory,
         IUserInfoProvider userInfoProvider,
         IInfoProvider<ContentLanguageInfo> contentLanguageInfoProvider)
     {
-        _contentQueryExecutor = contentQueryExecutor;
+        _contentQueryMapper = contentQueryMapper;
         _httpClientFactory = httpClientFactory;
-        _httpContextAccessor = httpContextAccessor;
-        _hostEnvironment = hostEnvironment;
+        _assetUrlResolver = assetUrlResolver;
+        _channelWebsiteDomainService = channelWebsiteDomainService;
         _contentItemManagerFactory = contentItemManagerFactory;
         _userInfoProvider = userInfoProvider;
         _contentLanguageInfoProvider = contentLanguageInfoProvider;
@@ -73,7 +73,8 @@ public class MediaFileCrudService : IMediaFileCrudService
             return null;
         }
 
-        var assetUri = BuildAssetUri(target.Asset.Url);
+        var websiteDomain = await _channelWebsiteDomainService.GetCurrentWebsiteDomainAsync(cancellationToken);
+        var assetUri = _assetUrlResolver.BuildAssetUri(target.Asset.Url, websiteDomain);
         if (assetUri is null)
         {
             return null;
@@ -121,7 +122,7 @@ public class MediaFileCrudService : IMediaFileCrudService
                     .Where(w => w.WhereEquals(nameof(ContentItemFields.ContentItemGUID), attachmentGuid))
                     .TopN(1));
 
-        var results = await _contentQueryExecutor.GetMappedResult<T>(query, cancellationToken: cancellationToken);
+        var results = await _contentQueryMapper.GetMappedResultAsync<T>(query, cancellationToken);
         var item = results.FirstOrDefault();
 
         if (item is null)
@@ -135,8 +136,6 @@ public class MediaFileCrudService : IMediaFileCrudService
             : new MediaFileTarget(item.SystemFields.ContentItemID, asset);
     }
 
-    private Uri? BuildAssetUri(string assetUrl) =>
-        AssetUrlHelper.BuildAssetUri(assetUrl, _httpContextAccessor, _hostEnvironment);
     private static string GetMimeType(string extension)
     {
         if (_contentTypeProvider.TryGetContentType($"file{extension}", out var contentType))
@@ -156,7 +155,7 @@ public class MediaFileCrudService : IMediaFileCrudService
         var query = new ContentItemQueryBuilder()
             .ForContentType(contentTypeName);
 
-        var results = await _contentQueryExecutor.GetMappedResult<T>(query, cancellationToken: cancellationToken);
+        var results = await _contentQueryMapper.GetMappedResultAsync<T>(query, cancellationToken);
 
         var outputs = new List<MediaFileOutput>();
         foreach (var item in results)
@@ -187,7 +186,7 @@ public class MediaFileCrudService : IMediaFileCrudService
                     .Where(w => w.WhereEquals(nameof(ContentItemFields.ContentItemGUID), attachmentGuid))
                     .TopN(1));
 
-        var results = await _contentQueryExecutor.GetMappedResult<T>(query, cancellationToken: cancellationToken);
+        var results = await _contentQueryMapper.GetMappedResultAsync<T>(query, cancellationToken);
 
         var item = results.FirstOrDefault();
         if (item == null)
@@ -419,7 +418,7 @@ public class MediaFileCrudService : IMediaFileCrudService
                     .Where(w => w.WhereEquals(nameof(ContentItemFields.ContentItemID), contentItemId))
                     .TopN(1));
 
-        var results = await _contentQueryExecutor.GetMappedResult<ContentAttachment>(query, cancellationToken: cancellationToken);
+        var results = await _contentQueryMapper.GetMappedResultAsync<ContentAttachment>(query, cancellationToken);
         var item = results.FirstOrDefault();
         if (item is null)
         {

@@ -21,7 +21,7 @@
           <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
         </settings>
       </field>
-      <field column="SuccessfulSubscribeMessage" columnprecision="0" columntype="longtext" enabled="true" guid="818dac56-8877-4ff3-9789-9098a79801e1" visible="true">
+      <field allowempty="true" column="SuccessfulSubscribeMessage" columnprecision="0" columntype="longtext" enabled="true" guid="818dac56-8877-4ff3-9789-9098a79801e1" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Successful approval text</fieldcaption>
@@ -29,13 +29,14 @@
             <![CDATA[Text to be displayed when a subscription was successfully approved.]]>
           </fielddescription>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
           <controlname>Kentico.Administration.RichTextEditor</controlname>
         </settings>
       </field>
-      <field column="UnsuccessfulSubscribeMessage" columnprecision="0" columntype="longtext" enabled="true" guid="218e37ad-eb28-449e-af2f-d811e271544f" visible="true">
+      <field allowempty="true" column="UnsuccessfulSubscribeMessage" columnprecision="0" columntype="longtext" enabled="true" guid="218e37ad-eb28-449e-af2f-d811e271544f" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Unsuccessful approval text</fieldcaption>
@@ -43,6 +44,7 @@
             <![CDATA[Text to be displayed when a subscription was not approved. (malformed URL, newsletter doesn't exist anymore) ]]>
           </fielddescription>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
