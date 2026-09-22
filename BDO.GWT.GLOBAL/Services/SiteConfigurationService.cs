@@ -3,14 +3,20 @@ using BDO.GWT.Core.Entities;
 using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience.Core.Services;
 using CMS.ContentEngine;
+using CMS.Core;
 using CMS.DataEngine;
+using CMS.EventLog;
+using CMS.Helpers;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using XperienceCommunity.Localization;
+using CmsService = CMS.Core.Service;
 
 namespace BDO.GWT.Web.Core.Services;
 
@@ -87,10 +93,24 @@ public class SiteConfigurationService : ISiteConfigurationService
             )
         );
 
+        var temp = RequestContext.CurrentDomain;
+        var temp1 = RequestContext.URL.AbsolutePath;
+        var temp2 = RequestContext.URL.AbsoluteUri;
+        var temp3 = RequestContext.FullDomain;
+        var temp4 = RequestContext.RawURL;
+        var temp5 = GetWebsiteDomain();
+
+        CmsService.Resolve<IEventLogService>().LogInformation(
+            nameof(SiteConfigurationService),
+            nameof(GetSiteConfigurationDtoAsync),
+            $"RequestContext.CurrentDomain: {temp}, RequestContext.URL.AbsolutePath: {temp1}, RequestContext.URL.AbsoluteUri: {temp2}, RequestContext.FullDomain: {temp3}, RequestContext.RawURL: {temp4}, GetWebsiteDomain(): {temp5}"
+        );
+
         var result = new SiteConfigurationDto
         {
             Translations = translations,
-            SiteSettings = GetSiteSettings()
+            SiteSettings = GetSiteSettings(),
+            LiveSiteURL = GetWebsiteDomain() ?? string.Empty
         };
 
         var calculatedHash = await _cachingService.LoadAsync(
@@ -104,14 +124,24 @@ public class SiteConfigurationService : ISiteConfigurationService
         return result;
     }
 
+    private string? GetWebsiteDomain()
+    {
+        return GetWebsiteChannel()?.WebsiteChannelDomain;
+    }
+
+    private WebsiteChannelInfo GetWebsiteChannel()
+    {
+        return _providers.WebsiteChannel.Get()
+            .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelID), _siteContext.CurrentSiteID)
+            .TopN(1)
+            .FirstOrDefault();
+    }
+
     private SiteSettingsDto GetSiteSettings()
     {
         var settings = new SiteSettingsDto();
 
-        var websiteChannel = _providers.WebsiteChannel.Get()
-            .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelID), _siteContext.CurrentSiteID)
-            .TopN(1)
-            .FirstOrDefault();
+        var websiteChannel = GetWebsiteChannel();
 
         if (websiteChannel == null)
         {

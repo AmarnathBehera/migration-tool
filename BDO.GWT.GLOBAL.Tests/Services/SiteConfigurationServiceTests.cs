@@ -385,13 +385,52 @@ public class SiteConfigurationServiceTests
             Assert.That(result.Hash, Is.EqualTo("hash-123"));
             Assert.That(result.Translations, Is.Empty);
             Assert.That(result.SiteSettings.ExternalLinkWarningEnabled, Is.False);
+            Assert.That(result.LiveSiteURL, Is.EqualTo(string.Empty));
         });
+    }
+
+    [Test]
+    public async Task GetSiteConfigurationDtoAsync_SetsLiveSiteUrl_FromWebsiteChannelDomain()
+    {
+        const string websiteDomain = "https://global.example.com";
+
+        _siteContextMock.SetupGet(x => x.CurrentSiteID).Returns(10);
+
+        _localizationKeyProviderMock.Setup(p => p.Get())
+            .Returns(BuildAsyncQuery<LocalizationKeyInfo>([]).Object);
+        _localizationTranslationProviderMock.Setup(p => p.Get())
+            .Returns(BuildAsyncQuery<XperienceCommunity.Localization.LocalizationTranslationItemInfo>([]).Object);
+        _contentLanguageProviderMock.Setup(p => p.Get())
+            .Returns(BuildAsyncQuery<ContentLanguageInfo>([]).Object);
+        _websiteChannelProviderMock.Setup(p => p.Get())
+            .Returns(BuildQuery<WebsiteChannelInfo>([
+                new TestWebsiteChannelInfo
+                {
+                    WebsiteChannelID = 10,
+                    WebsiteChannelChannelID = 77,
+                    WebsiteChannelDomain = websiteDomain,
+                }]).Object);
+        _webChannelSettingsProviderMock.Setup(p => p.Get())
+            .Returns(BuildQuery<WebChannelSettingsInfo>([]).Object);
+
+        _cachingServiceMock
+            .Setup(x => x.LoadAsync(
+                It.IsAny<Func<CancellationToken, Task<string>>>(),
+                It.IsAny<string>(),
+                It.IsAny<string?[]>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync("hash-123");
+
+        var result = await _service.GetSiteConfigurationDtoAsync(CancellationToken.None);
+
+        Assert.That(result.LiveSiteURL, Is.EqualTo(websiteDomain));
     }
 
     private sealed class TestWebsiteChannelInfo : WebsiteChannelInfo
     {
         public override int WebsiteChannelID { get; set; }
         public override int WebsiteChannelChannelID { get; set; }
+        public override string WebsiteChannelDomain { get; set; } = string.Empty;
     }
 
     private sealed class TestWebChannelSettingsInfo : WebChannelSettingsInfo
