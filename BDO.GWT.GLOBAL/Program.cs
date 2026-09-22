@@ -208,7 +208,7 @@ void RegisterErrorPageMiddleware(WebApplication app, IConfiguration config, IHos
     if (!env.IsDevelopment())
     {
         app.UseWhen(
-            context => !IsEdgeHealthProbe(context),
+            context => !ShouldSkipErrorPages(context),
             branch => branch.UseExceptionHandler("/Error/500")
         );
 
@@ -216,9 +216,28 @@ void RegisterErrorPageMiddleware(WebApplication app, IConfiguration config, IHos
     }
 
     app.UseWhen(
-        context => !IsEdgeHealthProbe(context),
+        context => !ShouldSkipErrorPages(context),
         branch => branch.UseStatusCodePagesWithReExecute("/Error/{0}")
     );
+}
+
+static bool ShouldSkipErrorPages(HttpContext context) =>
+    IsEdgeHealthProbe(context) ||
+    IsHealthCheckPath(context);
+
+static bool IsEdgeHealthProbe(HttpContext context)
+{
+    var ua = context.Request.Headers.UserAgent.ToString();
+    return ua.Contains("Edge Health Probe", StringComparison.OrdinalIgnoreCase)
+        || ua.Contains("HealthCheck", StringComparison.OrdinalIgnoreCase);
+}
+
+static bool IsHealthCheckPath(HttpContext context)
+{
+    var path = context.Request.Path.Value ?? string.Empty;
+    return path.StartsWith("/robots", StringComparison.OrdinalIgnoreCase)
+        || path.StartsWith("/health", StringComparison.OrdinalIgnoreCase)
+        || path.StartsWith("/ping", StringComparison.OrdinalIgnoreCase);
 }
 
 void RegisterAdminRedirectRewriter(WebApplication app, IConfiguration config, IHostEnvironment env)
@@ -263,7 +282,3 @@ static void ApplyAdminRedirect(RewriteContext context)
 
     context.Result = RuleResult.EndResponse;
 }
-
-static bool IsEdgeHealthProbe(HttpContext context) =>
-    context.Request.Headers.UserAgent.ToString()
-        .Contains("Edge Health Probe", StringComparison.OrdinalIgnoreCase);

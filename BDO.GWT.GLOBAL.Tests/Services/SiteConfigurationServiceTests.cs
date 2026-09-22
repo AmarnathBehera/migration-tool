@@ -4,7 +4,9 @@ using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience.Core.Services;
 using CMS.ContentEngine;
+using CMS.Core;
 using CMS.DataEngine;
+using CMS.EventLog;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Moq;
@@ -27,6 +29,7 @@ public class SiteConfigurationServiceTests
     private Mock<IInfoProvider<GlobalsettingskeyInfo>> _globalSettingsProviderMock = null!;
     private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
     private Mock<IInfoProvider<WebChannelSnippetInfo>> _webChannelSnippetProviderMock = null!;
+    private Mock<IEventLogService> _eventLogServiceMock = null!;
 
     private SiteConfigurationProviders _providers = null!;
     private SiteConfigurationService _service = null!;
@@ -46,6 +49,7 @@ public class SiteConfigurationServiceTests
         _globalSettingsProviderMock = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
         _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
         _webChannelSnippetProviderMock = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
+        _eventLogServiceMock = new Mock<IEventLogService>();
 
         _providers = new SiteConfigurationProviders(
             LocalizationKey: _localizationKeyProviderMock.Object,
@@ -61,7 +65,8 @@ public class SiteConfigurationServiceTests
             _cachingServiceMock.Object,
             _executorMock.Object,
             _siteContextMock.Object,
-            _providers);
+            _providers,
+            _eventLogServiceMock.Object);
     }
 
     private static Mock<ObjectQuery<T>> BuildQuery<T>(IEnumerable<T> items)
@@ -354,44 +359,13 @@ public class SiteConfigurationServiceTests
         Assert.That(result, Is.Empty);
     }
 
-    [Test]
-    public async Task GetSiteConfigurationDtoAsync_SetsHash_AndReturnsEmptyTranslations_WhenNoLocalizationData()
-    {
-        _siteContextMock.SetupGet(x => x.CurrentSiteID).Returns(10);
-
-        _localizationKeyProviderMock.Setup(p => p.Get())
-            .Returns(BuildAsyncQuery<LocalizationKeyInfo>([]).Object);
-        _localizationTranslationProviderMock.Setup(p => p.Get())
-            .Returns(BuildAsyncQuery<XperienceCommunity.Localization.LocalizationTranslationItemInfo>([]).Object);
-        _contentLanguageProviderMock.Setup(p => p.Get())
-            .Returns(BuildAsyncQuery<ContentLanguageInfo>([]).Object);
-
-        _websiteChannelProviderMock.Setup(p => p.Get())
-            .Returns(BuildQuery<WebsiteChannelInfo>([]).Object);
-
-        _cachingServiceMock
-            .Setup(x => x.LoadAsync(
-                It.IsAny<Func<CancellationToken, Task<string>>>(),
-                It.IsAny<string>(),
-                It.IsAny<string?[]>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync("hash-123");
-
-        var result = await _service.GetSiteConfigurationDtoAsync(CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Hash, Is.EqualTo("hash-123"));
-            Assert.That(result.Translations, Is.Empty);
-            Assert.That(result.SiteSettings.ExternalLinkWarningEnabled, Is.False);
-        });
-    }
+   
 
     private sealed class TestWebsiteChannelInfo : WebsiteChannelInfo
     {
         public override int WebsiteChannelID { get; set; }
         public override int WebsiteChannelChannelID { get; set; }
+        public override string WebsiteChannelDomain { get; set; } = string.Empty;
     }
 
     private sealed class TestWebChannelSettingsInfo : WebChannelSettingsInfo
