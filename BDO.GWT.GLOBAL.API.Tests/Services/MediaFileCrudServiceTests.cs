@@ -3,10 +3,13 @@ using BDO.GWT.GLOBAL.API.Helpers;
 using BDO.GWT.GLOBAL.API.Services;
 using CMS.ContentEngine;
 using CMS.DataEngine;
+using CMS.Membership;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using Moq.Protected;
+using System.Data;
+using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -15,6 +18,26 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services;
 [TestFixture]
 public class MediaFileCrudServiceTests
 {
+    private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
+    private Mock<IWebHostEnvironment> _hostEnvironmentMock = null!;
+    private Mock<HttpMessageHandler> _httpMessageHandlerMock = null!;
+    private Mock<IHttpClientFactory> _httpClientFactoryMock = null!;
+    private AssetUrlResolver? _assetUrlResolver;
+
+    [SetUp]
+    public void SetUp()
+    {
+        _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+        _hostEnvironmentMock = new Mock<IWebHostEnvironment>();
+        _httpMessageHandlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        var httpClient = new HttpClient(_httpMessageHandlerMock.Object);
+        _httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        _httpClientFactoryMock
+            .Setup(x => x.CreateClient(It.IsAny<string>()))
+            .Returns(httpClient);
+        _assetUrlResolver = new AssetUrlResolver(_httpContextAccessorMock.Object, _hostEnvironmentMock.Object);
+    }
+
     [Test]
     public void MediaFileCrudService_ImplementsIMediaFileCrudService()
     {
@@ -43,48 +66,54 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
-    public void GetMediaFilesAsync_WhenDependenciesAreUnavailable_ThrowsInvalidOperationException()
+    public void GetMediaFilesAsync_WhenQueryMapperThrows_PropagatesException()
     {
-        var service = (MediaFileCrudService)RuntimeHelpers.GetUninitializedObject(typeof(MediaFileCrudService));
+        var marker = new InvalidOperationException("The executor does not support automatic mapping to content type models.");
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(marker);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await service.GetMediaFilesAsync("Demo", CancellationToken.None));
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(ex, Is.Not.Null);
-            Assert.That(ex!.Message, Does.Contain("does not support automatic mapping"));
-        });
+        Assert.That(ex, Is.SameAs(marker));
     }
 
     [Test]
-    public void GetMediaFileAsync_WhenDependenciesAreUnavailable_ThrowsInvalidOperationException()
+    public void GetMediaFileAsync_WhenQueryMapperThrows_PropagatesException()
     {
-        var service = (MediaFileCrudService)RuntimeHelpers.GetUninitializedObject(typeof(MediaFileCrudService));
+        var marker = new InvalidOperationException("The executor does not support automatic mapping to content type models.");
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(marker);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await service.GetMediaFileAsync("Demo", Guid.NewGuid(), CancellationToken.None));
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(ex, Is.Not.Null);
-            Assert.That(ex!.Message, Does.Contain("does not support automatic mapping"));
-        });
+        Assert.That(ex, Is.SameAs(marker));
     }
 
     [Test]
-    public void DownloadMediaFileAsync_WhenDependenciesAreUnavailable_ThrowsInvalidOperationException()
+    public void DownloadMediaFileAsync_WhenQueryMapperThrows_PropagatesException()
     {
-        var service = (MediaFileCrudService)RuntimeHelpers.GetUninitializedObject(typeof(MediaFileCrudService));
+        var marker = new InvalidOperationException("The executor does not support automatic mapping to content type models.");
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(marker);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await service.DownloadMediaFileAsync("Demo", Guid.NewGuid(), CancellationToken.None));
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(ex, Is.Not.Null);
-            Assert.That(ex!.Message, Does.Contain("does not support automatic mapping"));
-        });
+        Assert.That(ex, Is.SameAs(marker));
     }
 
     [Test]
@@ -142,37 +171,195 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
-    public void UpdateMediaFileAsync_WhenDependenciesAreUnavailable_ThrowsInvalidOperationException()
+    public void UpdateMediaFileAsync_WhenQueryMapperThrows_PropagatesException()
     {
-        var service = (MediaFileCrudService)RuntimeHelpers.GetUninitializedObject(typeof(MediaFileCrudService));
+        var marker = new InvalidOperationException("The executor does not support automatic mapping to content type models.");
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(marker);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
         var file = new FormFile(new MemoryStream([1, 2]), 0, 2, "File", "replace.jpg");
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await service.UpdateMediaFileAsync("Demo", Guid.NewGuid(), file, CancellationToken.None));
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(ex, Is.Not.Null);
-            Assert.That(ex!.Message, Does.Contain("does not support automatic mapping"));
-        });
+        Assert.That(ex, Is.SameAs(marker));
     }
 
     [Test]
-    public void DeleteMediaFileAsync_WhenDependenciesAreUnavailable_ThrowsInvalidOperationException()
+    public void DeleteMediaFileAsync_WhenQueryMapperThrows_PropagatesException()
     {
-        var service = (MediaFileCrudService)RuntimeHelpers.GetUninitializedObject(typeof(MediaFileCrudService));
+        var marker = new InvalidOperationException("The executor does not support automatic mapping to content type models.");
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(marker);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await service.DeleteMediaFileAsync(Guid.NewGuid(), CancellationToken.None));
 
+        Assert.That(ex, Is.SameAs(marker));
+    }
+
+    [Test]
+    public async Task DeleteMediaFileAsync_WhenTargetNotFound_ReturnsFalse()
+    {
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
+
+        var result = await service.DeleteMediaFileAsync(Guid.NewGuid(), CancellationToken.None);
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public async Task DeleteMediaFileAsync_WhenTargetFound_DeletesAndReturnsTrue()
+    {
+        var item = new BDO.ContentAttachment
+        {
+            SystemFields = new ContentItemFields { ContentItemID = 11, ContentItemGUID = Guid.NewGuid() },
+            ContentAttachmentAsset = CreateAsset("delete.png", ".png", 5, "/assets/delete.png")
+        };
+
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([item]);
+
+        var userInfoMock = new Mock<UserInfo>();
+        userInfoMock.Setup(u => u.UserID).Returns(1);
+        var userInfoProviderMock = new Mock<IUserInfoProvider>();
+        userInfoProviderMock
+            .Setup(x => x.GetAsync("administrator", It.IsAny<CancellationToken?>()))
+            .ReturnsAsync(userInfoMock.Object);
+
+        var contentItemManagerMock = new Mock<IContentItemManager>();
+        contentItemManagerMock
+            .Setup(x => x.Delete(It.IsAny<DeleteContentItemParameters>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        var managerFactoryMock = new Mock<IContentItemManagerFactory>();
+        managerFactoryMock.Setup(x => x.Create(1)).Returns(contentItemManagerMock.Object);
+
+        var languageProviderMock = new Mock<IInfoProvider<ContentLanguageInfo>>();
+        languageProviderMock
+            .Setup(x => x.Get())
+            .Returns(QueryReturning(Array.Empty<ContentLanguageInfo>()).Object);
+
+        var service = CreateSut(
+            contentQueryMapper: mapperMock.Object,
+            contentItemManagerFactory: managerFactoryMock.Object,
+            userInfoProvider: userInfoProviderMock.Object,
+            languageInfoProvider: languageProviderMock.Object);
+
+        var result = await service.DeleteMediaFileAsync(Guid.NewGuid(), CancellationToken.None);
+
+        Assert.That(result, Is.True);
+        contentItemManagerMock.Verify(
+            x => x.Delete(It.Is<DeleteContentItemParameters>(p => p.ContentItemID == 11), It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task GetMediaFilesAsync_WhenQueryMapperReturnsItemsWithMixedAssets_FiltersOutNullAssetsAndMapsRest()
+    {
+        var withAsset = new BDO.ContentAttachment
+        {
+            SystemFields = new ContentItemFields { ContentItemID = 1, ContentItemGUID = Guid.NewGuid() },
+            ContentAttachmentAsset = CreateAsset("keep.png", ".png", 10, "/assets/keep.png")
+        };
+        var withoutAsset = new BDO.ContentAttachment
+        {
+            SystemFields = new ContentItemFields { ContentItemID = 2, ContentItemGUID = Guid.NewGuid() },
+            ContentAttachmentAsset = null!
+        };
+
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<BDO.ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([withAsset, withoutAsset]);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
+
+        var results = (await service.GetMediaFilesAsync("Demo", CancellationToken.None)).ToList();
+
         Assert.Multiple(() =>
         {
-            Assert.That(ex, Is.Not.Null);
-            Assert.That(ex!.Message, Does.Contain("does not support automatic mapping"));
+            Assert.That(results, Has.Count.EqualTo(1));
+            Assert.That(results[0].Id, Is.EqualTo(1));
         });
     }
 
+    [Test]
+    public async Task GetMediaFileAsync_WhenQueryMapperReturnsNoItems_ReturnsNull()
+    {
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<BDO.ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
 
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
+
+        var result = await service.GetMediaFileAsync("Demo", Guid.NewGuid(), CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task GetMediaFileAsync_WhenItemHasNullAsset_ReturnsNull()
+    {
+        var item = new BDO.ContentAttachment
+        {
+            SystemFields = new ContentItemFields { ContentItemID = 5, ContentItemGUID = Guid.NewGuid() },
+            ContentAttachmentAsset = null!
+        };
+
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<BDO.ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([item]);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
+
+        var result = await service.GetMediaFileAsync("Demo", Guid.NewGuid(), CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task GetMediaFileAsync_WhenItemAndAssetPresent_ReturnsMappedMediaFileOutput()
+    {
+        var itemGuid = Guid.NewGuid();
+        var item = new BDO.ContentAttachment
+        {
+            SystemFields = new ContentItemFields { ContentItemID = 7, ContentItemGUID = itemGuid },
+            ContentAttachmentAsset = CreateAsset("photo.png", ".png", 42, "/assets/photo.png")
+        };
+
+        var mapperMock = new Mock<IContentQueryMapper>();
+        mapperMock
+            .Setup(x => x.GetMappedResultAsync<BDO.ContentAttachment>(It.IsAny<ContentItemQueryBuilder>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([item]);
+
+        var service = CreateSut(contentQueryMapper: mapperMock.Object);
+
+        var result = await service.GetMediaFileAsync("Demo", itemGuid, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Id, Is.EqualTo(7));
+            Assert.That(result.Guid, Is.EqualTo(itemGuid));
+        });
+    }
 
     [Test]
     public void GetFileNameFromUrl_WhenUrlContainsQuery_RemovesQueryAndReturnsFileName()
@@ -334,7 +521,7 @@ public class MediaFileCrudServiceTests
     {
         var service = CreateSut();
 
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "https://cdn.example.com/a.png");
+        var result = _assetUrlResolver!.BuildAssetUri("https://cdn.example.com/a.png");
 
         Assert.Multiple(() =>
         {
@@ -346,12 +533,9 @@ public class MediaFileCrudServiceTests
     [Test]
     public void BuildAssetUri_WhenDevelopmentAndRelativePath_UsesDevelopmentBaseUrl()
     {
-        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
-        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Development");
+        _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Development");
 
-        var service = CreateSut(hostEnvironment: hostEnvironmentMock.Object);
-
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "~/getmedia/img.jpg");
+        var result = _assetUrlResolver!.BuildAssetUri("~/getmedia/img.jpg");
 
         Assert.Multiple(() =>
         {
@@ -363,12 +547,9 @@ public class MediaFileCrudServiceTests
     [Test]
     public void BuildAssetUri_WhenDevelopmentAndRelativePathHasQuery_PreservesQuery()
     {
-        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
-        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Development");
+        _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Development");
 
-        var service = CreateSut(hostEnvironment: hostEnvironmentMock.Object);
-
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "~/getmedia/img.jpg?language=en-gb");
+        var result = _assetUrlResolver!.BuildAssetUri("~/getmedia/img.jpg?language=en-gb");
 
         Assert.Multiple(() =>
         {
@@ -388,7 +569,7 @@ public class MediaFileCrudServiceTests
 
         var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
 
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "~/getmedia/img.jpg");
+        var result = _assetUrlResolver!.BuildAssetUri("~/getmedia/img.jpg");
 
         Assert.Multiple(() =>
         {
@@ -399,19 +580,15 @@ public class MediaFileCrudServiceTests
     [Test]
     public void BuildAssetUri_WhenProductionAndHostIsMissing_ReturnsNull()
     {
-        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
-        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
+        _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Scheme = "https";
         httpContext.Request.Host = default;
 
-        var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
-        httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
+        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
-
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "~/getmedia/img.jpg");
+        var result = _assetUrlResolver!.BuildAssetUri("~/getmedia/img.jpg");
 
         Assert.Multiple(() =>
         {
@@ -422,19 +599,15 @@ public class MediaFileCrudServiceTests
     [Test]
     public void BuildAssetUri_WhenProductionAndHttpContextPresent_UsesRequestSchemeAndHost()
     {
-        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
-        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
+        _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Scheme = "https";
         httpContext.Request.Host = new HostString("example.com");
 
-        var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
-        httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
+        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
-
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "getmedia/img.jpg");
+        var result = _assetUrlResolver!.BuildAssetUri("getmedia/img.jpg");
 
         Assert.Multiple(() =>
         {
@@ -446,19 +619,15 @@ public class MediaFileCrudServiceTests
     [Test]
     public void BuildAssetUri_WhenProductionAndHttpContextPresentAndPathHasQuery_PreservesQuery()
     {
-        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
-        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
+        _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Scheme = "https";
         httpContext.Request.Host = new HostString("example.com");
 
-        var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
-        httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
+        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
-
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "getmedia/img.jpg?language=en-gb");
+        var result = _assetUrlResolver!.BuildAssetUri("getmedia/img.jpg?language=en-gb");
 
         Assert.Multiple(() =>
         {
@@ -478,7 +647,7 @@ public class MediaFileCrudServiceTests
 
         var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
 
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "~/getmedia/img.jpg", "gwt-xbyk.dev.bdo.global");
+        var result = _assetUrlResolver!.BuildAssetUri("~/getmedia/img.jpg", "gwt-xbyk.dev.bdo.global");
 
         Assert.Multiple(() =>
         {
@@ -490,19 +659,15 @@ public class MediaFileCrudServiceTests
     [Test]
     public void BuildAssetUri_WhenVirtualContextWrappedPath_UsesInnerAssetPath()
     {
-        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
-        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
+        _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Production");
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Scheme = "https";
         httpContext.Request.Host = new HostString("example.com");
 
-        var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
-        httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
+        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var service = CreateSut(httpContextAccessor: httpContextAccessorMock.Object, hostEnvironment: hostEnvironmentMock.Object);
-
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "/cmsctx/pm/token/lang/en-gb/wpid/72/cid/1/cdid/82/ts/1/readonly/0/h/hash/-/~/getContentAsset/5ed65831-9e46-4827-8011-d91f5c2e130e/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/img.jpg?language=en-gb");
+        var result = _assetUrlResolver!.BuildAssetUri("/cmsctx/pm/token/lang/en-gb/wpid/72/cid/1/cdid/82/ts/1/readonly/0/h/hash/-/~/getContentAsset/5ed65831-9e46-4827-8011-d91f5c2e130e/50c2bc4c-a8ff-46ba-95c2-0e74752d147f/img.jpg?language=en-gb");
 
         Assert.Multiple(() =>
         {
@@ -646,12 +811,9 @@ public class MediaFileCrudServiceTests
     [Test]
     public void BuildAssetUri_WhenDevelopmentEnvironment_ReturnsLocalhostUri()
     {
-        var hostEnvironmentMock = new Mock<IWebHostEnvironment>();
-        hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Development");
+        _hostEnvironmentMock.Setup(x => x.EnvironmentName).Returns("Development");
 
-        var service = CreateSut(hostEnvironment: hostEnvironmentMock.Object);
-
-        var result = (Uri?)InvokePrivateInstance(service, "BuildAssetUri", "~/getmedia/img.jpg");
+        var result = _assetUrlResolver!.BuildAssetUri("~/getmedia/img.jpg");
 
         Assert.Multiple(() =>
         {
@@ -712,6 +874,46 @@ public class MediaFileCrudServiceTests
     }
 
     [Test]
+    public void CreateContentItemData_WhenCalled_StoresAssetMetadataUnderContentAttachmentAssetKey()
+    {
+        var assetSource = new ContentItemAssetStreamSource(_ =>
+            Task.FromResult<Stream>(new MemoryStream([1, 2, 3])));
+        var assetMetadata = new ContentItemAssetMetadataWithSource(
+            assetSource,
+            "photo.png",
+            ".png",
+            3,
+            DateTime.UtcNow);
+
+        var result = (ContentItemData)InvokePrivateStatic("CreateContentItemData", assetMetadata);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.TryGetValue<ContentItemAssetMetadataWithSource>(
+                nameof(BDO.ContentAttachment.ContentAttachmentAsset), out var storedValue), Is.True);
+            Assert.That(storedValue, Is.SameAs(assetMetadata));
+        });
+    }
+
+    [Test]
+    public void GetDefaultLanguageNameAsync_WhenLanguageProviderGetThrows_PropagatesExceptionAndCallsGetOnce()
+    {
+        var languageProviderMock = new Mock<IInfoProvider<ContentLanguageInfo>>();
+        var marker = new InvalidOperationException("Get() called");
+        languageProviderMock
+            .Setup(x => x.Get())
+            .Throws(marker);
+
+        var service = CreateSut(languageInfoProvider: languageProviderMock.Object);
+
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await InvokePrivateInstanceAsync<string>(service, "GetDefaultLanguageNameAsync", CancellationToken.None));
+
+        Assert.That(ex, Is.SameAs(marker));
+        languageProviderMock.Verify(x => x.Get(), Times.Once);
+    }
+
+    [Test]
     public void WithUploadedAssetMetadataAsync_WhenFileIsNull_ThrowsArgumentNullException()
     {
         Assert.ThrowsAsync<ArgumentNullException>(async () =>
@@ -721,6 +923,21 @@ public class MediaFileCrudServiceTests
                 null!,
                 new Func<ContentItemAssetMetadataWithSource, Task<bool>>(_ => Task.FromResult(true)),
                 CancellationToken.None));
+    }
+
+    private static Mock<ObjectQuery<ContentLanguageInfo>> QueryReturning(IEnumerable<ContentLanguageInfo> rows)
+    {
+        var query = new Mock<ObjectQuery<ContentLanguageInfo>>();
+
+        query.Setup(x => x.TopN(It.IsAny<int>())).Returns(query.Object);
+        query.Setup(x => x.Columns(It.IsAny<string[]>())).Returns(query.Object);
+        query.Setup(x => x.GetEnumerableTypedResultAsync(
+                It.IsAny<CommandBehavior>(),
+                It.IsAny<bool>(),
+                It.IsAny<CancellationToken?>()))
+            .ReturnsAsync(rows);
+
+        return query;
     }
 
     private static ContentItemAsset CreateAsset(string name, string extension, long size, string url)
@@ -787,34 +1004,38 @@ public class MediaFileCrudServiceTests
         return await task;
     }
 
-    private static object? InvokePrivateInstance(MediaFileCrudService instance, string methodName, params object[] args)
+    private static async Task<T> InvokePrivateInstanceAsync<T>(MediaFileCrudService instance, string methodName, params object?[] args)
     {
         var method = typeof(MediaFileCrudService)
             .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
             .Single(m => m.Name == methodName && m.GetParameters().Length == args.Length);
 
-        return method.Invoke(instance, args);
+        var task = (Task<T>)method.Invoke(instance, args)!;
+        return await task;
     }
 
+
     private static MediaFileCrudService CreateSut(
-        IContentQueryExecutor? queryExecutor = null,
+        IContentQueryMapper? contentQueryMapper = null,
         IHttpClientFactory? httpClientFactory = null,
         IHttpContextAccessor? httpContextAccessor = null,
         IWebHostEnvironment? hostEnvironment = null,
         IAssetUrlResolver? assetUrlResolver = null,
         IChannelWebsiteDomainService? channelWebsiteDomainService = null,
+        IContentItemManagerFactory? contentItemManagerFactory = null,
+        CMS.Membership.IUserInfoProvider? userInfoProvider = null,
         IInfoProvider<ContentLanguageInfo>? languageInfoProvider = null)
     {
         var resolvedHttpContextAccessor = httpContextAccessor ?? Mock.Of<IHttpContextAccessor>();
         var resolvedHostEnvironment = hostEnvironment ?? Mock.Of<IWebHostEnvironment>();
 
         return new MediaFileCrudService(
-            queryExecutor ?? Mock.Of<IContentQueryExecutor>(),
+            contentQueryMapper ?? Mock.Of<IContentQueryMapper>(),
             httpClientFactory ?? Mock.Of<IHttpClientFactory>(),
             assetUrlResolver ?? new AssetUrlResolver(resolvedHttpContextAccessor, resolvedHostEnvironment),
             channelWebsiteDomainService ?? Mock.Of<IChannelWebsiteDomainService>(),
-            Mock.Of<IContentItemManagerFactory>(),
-            Mock.Of<CMS.Membership.IUserInfoProvider>(),
+            contentItemManagerFactory ?? Mock.Of<IContentItemManagerFactory>(),
+            userInfoProvider ?? Mock.Of<CMS.Membership.IUserInfoProvider>(),
             languageInfoProvider ?? Mock.Of<IInfoProvider<ContentLanguageInfo>>());
     }
 

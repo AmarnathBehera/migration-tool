@@ -76,7 +76,7 @@ namespace BDO.GWT.GLOBAL.API.Data
                 }
 
                 var websiteDomain = await _channelWebsiteDomainService.GetWebsiteDomainAsync(channelName, cancellationToken);
-                var assetUri = BuildAssetUri(asset.Url, websiteDomain);
+                var assetUri = _assetUrlResolver.BuildAssetUri(asset.Url, websiteDomain);
                 if (assetUri is null)
                 {
                     _eventLogService.LogWarning(
@@ -124,12 +124,6 @@ namespace BDO.GWT.GLOBAL.API.Data
 
             return MediaTypeNames.Application.Octet;
         }
-
-        private Uri? BuildAssetUri(string assetUrl) =>
-            BuildAssetUri(assetUrl, websiteDomain: null);
-
-        private Uri? BuildAssetUri(string assetUrl, string? websiteDomain) =>
-            _assetUrlResolver.BuildAssetUri(assetUrl, websiteDomain);
 
         private static IEnumerable<ContentAttachment> GetAttachmentsFromPage(IWebPageFieldsSource page)
         {

@@ -3,7 +3,6 @@ using BDO.GWT.GLOBAL.API.Helpers;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Membership;
-using CMS.Websites;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Buffers;
 using System.Net.Mime;
@@ -19,7 +18,7 @@ public class MediaFileCrudService : IMediaFileCrudService
 
     private const string FallbackLanguageName = "en-US";
 
-    private readonly IContentQueryExecutor _contentQueryExecutor;
+    private readonly IContentQueryMapper _contentQueryMapper;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IAssetUrlResolver _assetUrlResolver;
     private readonly IChannelWebsiteDomainService _channelWebsiteDomainService;
@@ -30,7 +29,7 @@ public class MediaFileCrudService : IMediaFileCrudService
     private sealed record MediaFileTarget(int ContentItemId, ContentItemAsset Asset);
 
     public MediaFileCrudService(
-        IContentQueryExecutor contentQueryExecutor,
+        IContentQueryMapper contentQueryMapper,
         IHttpClientFactory httpClientFactory,
         IAssetUrlResolver assetUrlResolver,
         IChannelWebsiteDomainService channelWebsiteDomainService,
@@ -38,7 +37,7 @@ public class MediaFileCrudService : IMediaFileCrudService
         IUserInfoProvider userInfoProvider,
         IInfoProvider<ContentLanguageInfo> contentLanguageInfoProvider)
     {
-        _contentQueryExecutor = contentQueryExecutor;
+        _contentQueryMapper = contentQueryMapper;
         _httpClientFactory = httpClientFactory;
         _assetUrlResolver = assetUrlResolver;
         _channelWebsiteDomainService = channelWebsiteDomainService;
@@ -75,7 +74,7 @@ public class MediaFileCrudService : IMediaFileCrudService
         }
 
         var websiteDomain = await _channelWebsiteDomainService.GetCurrentWebsiteDomainAsync(cancellationToken);
-        var assetUri = BuildAssetUri(target.Asset.Url, websiteDomain);
+        var assetUri = _assetUrlResolver.BuildAssetUri(target.Asset.Url, websiteDomain);
         if (assetUri is null)
         {
             return null;
@@ -123,7 +122,7 @@ public class MediaFileCrudService : IMediaFileCrudService
                     .Where(w => w.WhereEquals(nameof(ContentItemFields.ContentItemGUID), attachmentGuid))
                     .TopN(1));
 
-        var results = await _contentQueryExecutor.GetMappedResult<T>(query, cancellationToken: cancellationToken);
+        var results = await _contentQueryMapper.GetMappedResultAsync<T>(query, cancellationToken);
         var item = results.FirstOrDefault();
 
         if (item is null)
@@ -137,11 +136,6 @@ public class MediaFileCrudService : IMediaFileCrudService
             : new MediaFileTarget(item.SystemFields.ContentItemID, asset);
     }
 
-    private Uri? BuildAssetUri(string assetUrl) =>
-        BuildAssetUri(assetUrl, websiteDomain: null);
-
-    private Uri? BuildAssetUri(string assetUrl, string? websiteDomain) =>
-        _assetUrlResolver.BuildAssetUri(assetUrl, websiteDomain);
     private static string GetMimeType(string extension)
     {
         if (_contentTypeProvider.TryGetContentType($"file{extension}", out var contentType))
@@ -161,7 +155,7 @@ public class MediaFileCrudService : IMediaFileCrudService
         var query = new ContentItemQueryBuilder()
             .ForContentType(contentTypeName);
 
-        var results = await _contentQueryExecutor.GetMappedResult<T>(query, cancellationToken: cancellationToken);
+        var results = await _contentQueryMapper.GetMappedResultAsync<T>(query, cancellationToken);
 
         var outputs = new List<MediaFileOutput>();
         foreach (var item in results)
@@ -192,7 +186,7 @@ public class MediaFileCrudService : IMediaFileCrudService
                     .Where(w => w.WhereEquals(nameof(ContentItemFields.ContentItemGUID), attachmentGuid))
                     .TopN(1));
 
-        var results = await _contentQueryExecutor.GetMappedResult<T>(query, cancellationToken: cancellationToken);
+        var results = await _contentQueryMapper.GetMappedResultAsync<T>(query, cancellationToken);
 
         var item = results.FirstOrDefault();
         if (item == null)
@@ -424,7 +418,7 @@ public class MediaFileCrudService : IMediaFileCrudService
                     .Where(w => w.WhereEquals(nameof(ContentItemFields.ContentItemID), contentItemId))
                     .TopN(1));
 
-        var results = await _contentQueryExecutor.GetMappedResult<ContentAttachment>(query, cancellationToken: cancellationToken);
+        var results = await _contentQueryMapper.GetMappedResultAsync<ContentAttachment>(query, cancellationToken);
         var item = results.FirstOrDefault();
         if (item is null)
         {
