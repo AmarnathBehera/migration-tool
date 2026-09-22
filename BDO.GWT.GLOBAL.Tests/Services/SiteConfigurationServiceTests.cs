@@ -6,7 +6,6 @@ using BDO.GWT.Xperience.Core.Services;
 using CMS.ContentEngine;
 using CMS.Core;
 using CMS.DataEngine;
-using CMS.EventLog;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Moq;
@@ -29,7 +28,6 @@ public class SiteConfigurationServiceTests
     private Mock<IInfoProvider<GlobalsettingskeyInfo>> _globalSettingsProviderMock = null!;
     private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
     private Mock<IInfoProvider<WebChannelSnippetInfo>> _webChannelSnippetProviderMock = null!;
-    private Mock<IEventLogService> _eventLogServiceMock = null!;
 
     private SiteConfigurationProviders _providers = null!;
     private SiteConfigurationService _service = null!;
@@ -49,7 +47,6 @@ public class SiteConfigurationServiceTests
         _globalSettingsProviderMock = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
         _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
         _webChannelSnippetProviderMock = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
-        _eventLogServiceMock = new Mock<IEventLogService>();
 
         _providers = new SiteConfigurationProviders(
             LocalizationKey: _localizationKeyProviderMock.Object,
@@ -66,7 +63,7 @@ public class SiteConfigurationServiceTests
             _executorMock.Object,
             _siteContextMock.Object,
             _providers,
-            _eventLogServiceMock.Object);
+            _websiteChannelContextMock.Object);
     }
 
     private static Mock<ObjectQuery<T>> BuildQuery<T>(IEnumerable<T> items)
