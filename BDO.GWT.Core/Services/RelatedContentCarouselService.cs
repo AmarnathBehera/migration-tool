@@ -18,9 +18,9 @@ public interface IRelatedContentCarouselService
 {
     Task<RelatedContentCarouselDto> GetRelatedContentCarouselDtoAsync(Guid currentPageGuid, string pageTypeName, RelatedContentCarouselData data, CancellationToken cancellationToken);
 
-    Task<ICollection<ContentPageCardDto>> GetFilteredItemsAsync(Guid currentPageGuid, string pageTypeName, HashSet<ContentItemReference> featuredGuids, RelatedContentCardsQuery query, CancellationToken cancellationToken);
+    Task<ICollection<RelatedContentCardDto>> GetFilteredItemsAsync(Guid currentPageGuid, string pageTypeName, HashSet<ContentItemReference> featuredGuids, RelatedContentCardsQuery query, CancellationToken cancellationToken);
 
-    Task<ICollection<ContentPageCardDto>> GetAPIFilteredItemsAsync(RelatedContentCardsQuery query, CancellationToken cancellationToken);
+    Task<ICollection<RelatedContentCardDto>> GetAPIFilteredItemsAsync(RelatedContentCardsQuery query, CancellationToken cancellationToken);
 }
 
 public class RelatedContentCarouselService : IRelatedContentCarouselService
@@ -79,7 +79,7 @@ public class RelatedContentCarouselService : IRelatedContentCarouselService
         return dto;
     }
 
-    public async Task<ICollection<ContentPageCardDto>> GetFilteredItemsAsync(Guid currentPageGuid, string pageTypeName, HashSet<ContentItemReference> featuredGuids, RelatedContentCardsQuery query, CancellationToken cancellationToken)
+    public async Task<ICollection<RelatedContentCardDto>> GetFilteredItemsAsync(Guid currentPageGuid, string pageTypeName, HashSet<ContentItemReference> featuredGuids, RelatedContentCardsQuery query, CancellationToken cancellationToken)
     {
         return await BuildAndExecuteQueryAsync(
             currentPageGuid.ToString(),
@@ -90,7 +90,7 @@ public class RelatedContentCarouselService : IRelatedContentCarouselService
     }
 
 
-    public async Task<ICollection<ContentPageCardDto>> GetAPIFilteredItemsAsync(RelatedContentCardsQuery query, CancellationToken cancellationToken)
+    public async Task<ICollection<RelatedContentCardDto>> GetAPIFilteredItemsAsync(RelatedContentCardsQuery query, CancellationToken cancellationToken)
     {
         // Safe null handling for CurrentPageGuid
         return await BuildAndExecuteQueryAsync(
@@ -101,7 +101,7 @@ public class RelatedContentCarouselService : IRelatedContentCarouselService
             cancellationToken);
     }
 
-    private async Task<ICollection<ContentPageCardDto>> BuildAndExecuteQueryAsync(
+    private async Task<ICollection<RelatedContentCardDto>> BuildAndExecuteQueryAsync(
         string guid,
         string pageTypeName,
         HashSet<ContentItemReference> featuredGuids,
@@ -135,7 +135,7 @@ public class RelatedContentCarouselService : IRelatedContentCarouselService
 
         // If the pageTypeName signals a known filter but we couldn't build a filter expression, return an empty result.
         if (filter is null && isOneOfAllowedTypes)
-            return Array.Empty<ContentPageCardDto>();
+            return Array.Empty<RelatedContentCardDto>();
 
         if (filter is not null)
             whereExpressions.Add(filter);
@@ -168,6 +168,6 @@ public class RelatedContentCarouselService : IRelatedContentCarouselService
             item => featuredGuids.Any(r => r.Identifier == item.SystemFields.ContentItemGUID),
             cancellationToken);
 
-        return paginationDto?.Data ?? Array.Empty<ContentPageCardDto>();
+        return paginationDto?.Data ?? Array.Empty<RelatedContentCardDto>();
     }
 }

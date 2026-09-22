@@ -16,7 +16,7 @@ public interface IRelatedContentCardService
         string? nodeAliasPath,
         CancellationToken cancellationToken);
 
-    Task<PaginationDto<ContentPageCardDto>> GetFilteredItemsAsync(
+    Task<PaginationDto<RelatedContentCardDto>> GetFilteredItemsAsync(
         RelatedContentCardsQuery cardsQuery,
         string parentPath,
         string language,
@@ -54,7 +54,7 @@ public class RelatedContentCardService : IRelatedContentCardService
         return await _cardsService.CreateFiltersAsync(filterParameterNames, nodeAliasPath, cancellationToken);
     }
 
-    public async Task<PaginationDto<ContentPageCardDto>> GetFilteredItemsAsync(
+    public async Task<PaginationDto<RelatedContentCardDto>> GetFilteredItemsAsync(
         RelatedContentCardsQuery cardsQuery,
         string parentPath,
         string language,
@@ -107,9 +107,7 @@ public class RelatedContentCardService : IRelatedContentCardService
 
         var ordered = ((IEnumerable<IWebPageFieldsSource>)filtered)
             .OrderByDescending(x => isFeatured(x))
-            .ThenByDescending(x =>
-                x.SystemFields.ContentItemCommonDataLastPublishedWhen
-                ?? x.SystemFields.ContentItemCommonDataFirstPublishedWhen)
+            .ThenBy(x => GetOrderingDate(x))
             .ToArray();
 
         var currentPage = cardsQuery.CurrentPage ?? 1;
@@ -125,11 +123,22 @@ public class RelatedContentCardService : IRelatedContentCardService
             .Where(card => card is not null)
             .ToArray();
 
-        return new PaginationDto<ContentPageCardDto>
+        return new PaginationDto<RelatedContentCardDto>
         {
             Data = itemDtos!,
             TotalCount = ordered.Length
         };
+    }
+
+    private static DateTime GetOrderingDate(IWebPageFieldsSource page)
+    {
+        // Events are ordered by their start date, soonest upcoming event first.
+        if (page is Event e)
+            return DateTime.MaxValue - (e.EventDateFrom - DateTime.MinValue);
+
+        return page.SystemFields.ContentItemCommonDataLastPublishedWhen
+               ?? page.SystemFields.ContentItemCommonDataFirstPublishedWhen
+               ?? DateTime.MinValue;
     }
 
     private static void ApplyCommonFilter(RetrievePagesQueryParameters pageQuery)
@@ -250,7 +259,7 @@ public class RelatedContentCardService : IRelatedContentCardService
         return UrlPathSeparator + url;
     }
 
-    private Task<ContentPageCardDto> GetContentPageCardDtoAsync(
+    private Task<RelatedContentCardDto> GetContentPageCardDtoAsync(
         IWebPageFieldsSource page,
         Func<IWebPageFieldsSource, bool> isFeatured)
     {
@@ -266,7 +275,7 @@ public class RelatedContentCardService : IRelatedContentCardService
 
             BlogPost b     => BuildCard(b, isFeatured, new CardContent(Teaser(b.MetadataTeaserImage), b.MetadataTeaserImageAltText, b.ContentType?.FirstOrDefault()?.Name, b.MetadataTitle, b.MetadataDescription)),
             NewsArticle n  => BuildCard(n, isFeatured, new CardContent(Teaser(n.MetadataTeaserImage), n.MetadataTeaserImageAltText, n.ContentType?.FirstOrDefault()?.Name, n.MetadataTitle, n.MetadataDescription)),
-            Event e        => BuildCard(e, isFeatured, new CardContent(Teaser(e.MetadataTeaserImage), e.MetadataTeaserImageAltText, e.ContentType?.FirstOrDefault()?.Name, e.MetadataTitle, e.MetadataDescription)),
+            Event e        => BuildCard(e, isFeatured, new CardContent(Teaser(e.MetadataTeaserImage), e.MetadataTeaserImageAltText, e.ContentType?.FirstOrDefault()?.Name, e.MetadataTitle, e.MetadataDescription, DateOverride: e.EventDateFrom, DateToOverride: e.EventDateTo)),
             Webinar w      => BuildCard(w, isFeatured, new CardContent(Teaser(w.MetadataTeaserImage), w.MetadataTeaserImageAltText, w.ContentType?.FirstOrDefault()?.Name, w.MetadataTitle, w.MetadataDescription)),
             MicrositePage m => BuildCard(m, isFeatured, new CardContent(Teaser(m.MetadataTeaserImage), m.MetadataTeaserImageAltText, m.MicrositeContentType?.FirstOrDefault()?.Name, m.MetadataTitle, m.MetadataDescription)),
 
@@ -276,11 +285,11 @@ public class RelatedContentCardService : IRelatedContentCardService
         return Task.FromResult(card!);
     }
 
-    private ContentPageCardDto BuildCard(
+    private RelatedContentCardDto BuildCard(
         IWebPageFieldsSource page,
         Func<IWebPageFieldsSource, bool> isFeatured,
         CardContent content) =>
-        new ContentPageCardDto
+        new RelatedContentCardDto
         {
             IsFeatured = isFeatured(page),
             ImageURL = GetAbsoluteAssetUrl(content.ImageUrl),
@@ -288,9 +297,12 @@ public class RelatedContentCardService : IRelatedContentCardService
             ImageAltText = content.ImageAltText,
             Type = content.Type,
             Title = content.Title ?? string.Empty,
-            Date = page.SystemFields.ContentItemCommonDataLastPublishedWhen
+            Date = content.DateOverride
+                   ?? page.SystemFields.ContentItemCommonDataLastPublishedWhen
                    ?? page.SystemFields.ContentItemCommonDataFirstPublishedWhen,
+            DateTo = content.DateToOverride,
             UpdatedOnDate = null,
+
             Description = HtmlHelper.ExtractTextFromHtml(content.Description),
             ReadMoreLink = new LinkItemDto
             {
@@ -305,5 +317,7 @@ public class RelatedContentCardService : IRelatedContentCardService
         string? Type,
         string? Title,
         string? Description,
-        bool IsComingSoon = false);
+        bool IsComingSoon = false,
+        DateTime? DateOverride = null,
+        DateTime? DateToOverride = null);
 }
