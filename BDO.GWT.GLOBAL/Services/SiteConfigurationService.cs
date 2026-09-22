@@ -98,12 +98,13 @@ public class SiteConfigurationService : ISiteConfigurationService
         var temp4 = RequestContext.RawURL;
         var temp5 = GetWebsiteDomain();
 
-       EventLogProvider.LogEvent(new EventLogInfo
-{
-    Source = nameof(SiteConfigurationService),
-    EventCode = nameof(GetSiteConfigurationDtoAsync),
-    EventDescription = $"RequestContext.CurrentDomain: {temp}, RequestContext.URL.AbsolutePath: {temp1}, RequestContext.URL.AbsoluteUri: {temp2}, RequestContext.FullDomain: {temp3}, RequestContext.RawURL: {temp4}, GetWebsiteDomain(): {temp5}"
-});     
+        EventLogProvider.LogEvent(new EventLogInfo
+        {
+            EventType = EventTypeEnum.Information.ToStringRepresentation(), // "I"
+            Source = nameof(SiteConfigurationService),
+            EventCode = nameof(GetSiteConfigurationDtoAsync),
+            EventDescription = $"RequestContext.CurrentDomain: {temp}, RequestContext.URL.AbsolutePath: {temp1}, RequestContext.URL.AbsoluteUri: {temp2}, RequestContext.FullDomain: {temp3}, RequestContext.RawURL: {temp4}, GetWebsiteDomain(): {temp5}"
+        });
 
         var result = new SiteConfigurationDto
         {
