@@ -9,8 +9,11 @@ using CMS.EventLog;
 using CMS.Helpers;
 using CMS.Websites;
 using CMS.Websites.Routing;
+using Kentico.Xperience.Headless.Internal;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using XperienceCommunity.Localization;
@@ -52,19 +55,23 @@ public class SiteConfigurationService : ISiteConfigurationService
             "bdo.webchannelsettings|all",
             "bdo.generalsetting|all",
         ];
-
+    private const string EventSource = nameof(SiteConfigurationService);
     private readonly ICachingService _cachingService;
     private readonly ISiteContext _siteContext;
     private readonly SiteConfigurationProviders _providers;
+    private readonly IEventLogService _eventLogService;
+
     public SiteConfigurationService(
         ICachingService cachingService,
         IContentQueryExecutor executor,
         ISiteContext siteContext,
-        SiteConfigurationProviders providers)
+        SiteConfigurationProviders providers,
+        IEventLogService eventLogService)
     {
         _cachingService = cachingService;
         _siteContext = siteContext;
         _providers = providers;
+        _eventLogService = eventLogService;
     }
 
     public string GetCachedSiteConfigurationHash()
@@ -98,13 +105,10 @@ public class SiteConfigurationService : ISiteConfigurationService
         var temp4 = RequestContext.RawURL;
         var temp5 = GetWebsiteDomain();
 
-        EventLogProvider.LogEvent(new EventLogInfo
-        {
-            EventType = EventTypeEnum.Information.ToStringRepresentation(), // "I"
-            Source = nameof(SiteConfigurationService),
-            EventCode = nameof(GetSiteConfigurationDtoAsync),
-            EventDescription = $"RequestContext.CurrentDomain: {temp}, RequestContext.URL.AbsolutePath: {temp1}, RequestContext.URL.AbsoluteUri: {temp2}, RequestContext.FullDomain: {temp3}, RequestContext.RawURL: {temp4}, GetWebsiteDomain(): {temp5}"
-        });
+        _eventLogService.LogWarning(
+                        EventSource,
+                        nameof(SiteConfigurationService),
+                        $"RequestContext.CurrentDomain: {temp}, RequestContext.URL.AbsolutePath: {temp1}, RequestContext.URL.AbsoluteUri: {temp2}, RequestContext.FullDomain: {temp3}, RequestContext.RawURL: {temp4}, GetWebsiteDomain(): {temp5}");
 
         var result = new SiteConfigurationDto
         {
