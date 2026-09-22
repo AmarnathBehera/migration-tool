@@ -128,9 +128,9 @@ public class SiteConfigurationService : ISiteConfigurationService
         return result;
     }
 
-    private string? GetWebsiteDomain()
+    private string GetWebsiteDomain()
     {
-        return GetWebsiteChannel()?.WebsiteChannelDomain;
+        return GetWebsiteChannel()?.WebsiteChannelDomain ?? string.Empty;
     }
 
     private WebsiteChannelInfo GetWebsiteChannel()
