@@ -208,15 +208,12 @@ public class NonAsciiUrlReplacementService : INonAsciiUrlReplacementService
 
         var outcome = ApplyRules(input, rules);
 
-        if (outcome.ReplacementCount > 0)
+        if (outcome.ReplacementCount > 0 && _logger.IsEnabled(LogLevel.Information))
         {
-            if (_logger.IsEnabled(LogLevel.Information))
-            {
-                _logger.LogInformation(
-                    "Applied non-ASCII URL replacements for website channel {WebsiteChannelId}; {ReplacementCount} replacement(s) were made.",
-                    websiteChannelId,
-                    outcome.ReplacementCount);
-            }
+            _logger.LogInformation(
+                "Applied non-ASCII URL replacements for website channel {WebsiteChannelId}; {ReplacementCount} replacement(s) were made.",
+                websiteChannelId,
+                outcome.ReplacementCount);
         }
 
         return outcome.Value;

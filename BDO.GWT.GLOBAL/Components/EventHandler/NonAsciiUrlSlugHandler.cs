@@ -100,11 +100,7 @@ public sealed partial class NonAsciiUrlSlugHandler : IAsyncEventHandler<BeforeCr
                     asyncEvent.Data.WebsiteChannelID);
             }
         }
-        catch (OperationCanceledException)
-        {
-            throw;
-        }
-        catch (Exception)
+        catch
         {
             throw;
         }

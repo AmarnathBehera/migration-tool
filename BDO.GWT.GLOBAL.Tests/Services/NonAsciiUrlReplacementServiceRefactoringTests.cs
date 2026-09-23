@@ -32,7 +32,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
         // Assert: Comments should be filtered out
         Assert.Multiple(() =>
         {
-            Assert.That(rules.Count, Is.EqualTo(2));
+            Assert.That(rules, Has.Count.EqualTo(2));
             Assert.That(rules[0].Search, Is.EqualTo("ä"));
             Assert.That(rules[1].Search, Is.EqualTo("ö"));
         });
@@ -50,7 +50,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
         // Assert: Comments should be filtered out
         Assert.Multiple(() =>
         {
-            Assert.That(rules.Count, Is.EqualTo(2));
+            Assert.That(rules, Has.Count.EqualTo(2));
             Assert.That(rules[0].Search, Is.EqualTo("ä"));
             Assert.That(rules[1].Search, Is.EqualTo("ö"));
         });
@@ -68,7 +68,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
         // Assert: Empty lines filtered, only mappings remain
         Assert.Multiple(() =>
         {
-            Assert.That(rules.Count, Is.EqualTo(2));
+            Assert.That(rules, Has.Count.EqualTo(2));
         });
     }
 
@@ -84,7 +84,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
         // Assert: Invalid formats filtered, only valid entry remains
         Assert.Multiple(() =>
         {
-            Assert.That(rules.Count, Is.EqualTo(1));
+            Assert.That(rules, Has.Count.EqualTo(1));
             Assert.That(rules[0].Search, Is.EqualTo("ä"));
             Assert.That(rules[0].Replacement, Is.EqualTo("ae"));
         });
@@ -102,7 +102,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
         // Assert: Only entries with both key and value remain
         Assert.Multiple(() =>
         {
-            Assert.That(rules.Count, Is.EqualTo(1));
+            Assert.That(rules, Has.Count.EqualTo(1));
             Assert.That(rules[0].Search, Is.EqualTo("ö"));
         });
     }
@@ -119,7 +119,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
         // Assert: Only entries where both are non-whitespace remain
         Assert.Multiple(() =>
         {
-            Assert.That(rules.Count, Is.EqualTo(1));
+            Assert.That(rules, Has.Count.EqualTo(1));
             Assert.That(rules[0].Search, Is.EqualTo("ö"));
         });
     }
@@ -136,7 +136,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
         // Assert: Whitespace trimmed but key/value preserved
         Assert.Multiple(() =>
         {
-            Assert.That(rules.Count, Is.EqualTo(2));
+            Assert.That(rules, Has.Count.EqualTo(2));
             Assert.That(rules[0].Search, Is.EqualTo("ä"));
             Assert.That(rules[0].Replacement, Is.EqualTo("ae"));
             Assert.That(rules[1].Search, Is.EqualTo("ö"));
@@ -160,7 +160,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
         // Assert: All duplicates included in rules (sorted), so longest key+last value should apply
         Assert.Multiple(() =>
         {
-            Assert.That(rules.Count, Is.EqualTo(1));
+            Assert.That(rules, Has.Count.EqualTo(1));
             Assert.That(rules[0].Search, Is.EqualTo("ä"));
             Assert.That(rules[0].Replacement, Is.EqualTo("third"));
         });
@@ -234,7 +234,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
         // Assert: Sorted by length descending, then alphabetically
         Assert.Multiple(() =>
         {
-            Assert.That(rules.Count, Is.EqualTo(4));
+            Assert.That(rules, Has.Count.EqualTo(4));
             Assert.That(rules[0].Search, Is.EqualTo("abc"));
             Assert.That(rules[1].Search, Is.EqualTo("abd"));
             Assert.That(rules[2].Search, Is.EqualTo("ab"));
@@ -254,7 +254,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
         // Assert: Longest keys first
         Assert.Multiple(() =>
         {
-            Assert.That(rules.Count, Is.EqualTo(3));
+            Assert.That(rules, Has.Count.EqualTo(3));
             Assert.That(rules[0].Search, Is.EqualTo("äeä"));
             Assert.That(rules[1].Search, Is.EqualTo("äe"));
             Assert.That(rules[2].Search, Is.EqualTo("ä"));
@@ -272,7 +272,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(rules.Count, Is.EqualTo(0));
+            Assert.That(rules, Has.Count.EqualTo(0));
         });
     }
 
@@ -283,7 +283,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(rules.Count, Is.EqualTo(0));
+            Assert.That(rules, Has.Count.EqualTo(0));
         });
     }
 
@@ -294,7 +294,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(rules.Count, Is.EqualTo(0));
+            Assert.That(rules, Has.Count.EqualTo(0));
         });
     }
 
@@ -307,7 +307,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(rules.Count, Is.EqualTo(0));
+            Assert.That(rules, Has.Count.EqualTo(0));
         });
     }
 
@@ -444,7 +444,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
             var rules = NonAsciiUrlReplacementService.ParseRules(dictionary, null);
             Assert.Multiple(() =>
             {
-                Assert.That(rules.Count, Is.EqualTo(1));
+                Assert.That(rules, Has.Count.EqualTo(1));
             });
         });
     }
@@ -466,7 +466,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
         // Assert: No Log calls should occur (guard prevented evaluation)
         mockLogger.Verify(
             x => x.Log(
-                It.IsAny<LogLevel>(),
+                LogLevel.Warning,
                 It.IsAny<EventId>(),
                 It.IsAny<It.IsAnyType>(),
                 It.IsAny<Exception?>(),
