@@ -1,4 +1,4 @@
-ï»¿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -48,9 +48,9 @@ public class RelatedContentCarouselServiceTests
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<Func<IWebPageFieldsSource, bool>>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PaginationDto<ContentPageCardDto>
+            .ReturnsAsync(new PaginationDto<RelatedContentCardDto>
             {
-                Data = Array.Empty<ContentPageCardDto>(),
+                Data = Array.Empty<RelatedContentCardDto>(),
                 TotalCount = 0
             });
 
@@ -226,7 +226,7 @@ public class RelatedContentCarouselServiceTests
                 It.IsAny<CancellationToken>()))
             .Callback<RelatedContentCardsQuery, string, string, Action<RetrievePagesQueryParameters>, Func<IWebPageFieldsSource, bool>, CancellationToken>(
                 (q, _, _, _, _, _) => capturedQuery = q)
-            .ReturnsAsync(new PaginationDto<ContentPageCardDto> { Data = Array.Empty<ContentPageCardDto>(), TotalCount = 0 });
+            .ReturnsAsync(new PaginationDto<RelatedContentCardDto> { Data = Array.Empty<RelatedContentCardDto>(), TotalCount = 0 });
 
         await _sut.GetRelatedContentCarouselDtoAsync(currentPage.SystemFields.WebPageItemGUID, currentPage.GetType().Name, data, CancellationToken.None);        await _sut.GetRelatedContentCarouselDtoAsync(currentPage.SystemFields.WebPageItemGUID, currentPage.GetType().Name, data, CancellationToken.None);
 
@@ -286,7 +286,7 @@ public class RelatedContentCarouselServiceTests
                 It.IsAny<CancellationToken>()))
             .Callback<RelatedContentCardsQuery, string, string, Action<RetrievePagesQueryParameters>, Func<IWebPageFieldsSource, bool>, CancellationToken>(
                 (q, _, _, _, _, _) => capturedQuery = q)
-            .ReturnsAsync(new PaginationDto<ContentPageCardDto> { Data = Array.Empty<ContentPageCardDto>(), TotalCount = 0 });
+            .ReturnsAsync(new PaginationDto<RelatedContentCardDto> { Data = Array.Empty<RelatedContentCardDto>(), TotalCount = 0 });
 
         await _sut.GetAPIFilteredItemsAsync(query, CancellationToken.None);
 
@@ -326,7 +326,7 @@ public class RelatedContentCarouselServiceTests
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<Func<IWebPageFieldsSource, bool>>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync((PaginationDto<ContentPageCardDto>)null!);
+            .ReturnsAsync((PaginationDto<RelatedContentCardDto>)null!);
 
         var result = await _sut.GetAPIFilteredItemsAsync(query, CancellationToken.None);
 
@@ -353,7 +353,7 @@ public class RelatedContentCarouselServiceTests
                 It.IsAny<CancellationToken>()))
             .Callback<RelatedContentCardsQuery, string, string, Action<RetrievePagesQueryParameters>, Func<IWebPageFieldsSource, bool>, CancellationToken>(
                 (q, _, _, _, _, _) => capturedQuery = q)
-            .ReturnsAsync(new PaginationDto<ContentPageCardDto> { Data = Array.Empty<ContentPageCardDto>(), TotalCount = 0 });
+            .ReturnsAsync(new PaginationDto<RelatedContentCardDto> { Data = Array.Empty<RelatedContentCardDto>(), TotalCount = 0 });
 
         await _sut.GetAPIFilteredItemsAsync(query, CancellationToken.None);
 
@@ -364,7 +364,7 @@ public class RelatedContentCarouselServiceTests
     public async Task GetAPIFilteredItemsAsync_UnknownPageType_NoDecorateQuery()
     {
         // When pageType is not a known filter type (e.g. a regular page), 
-        // decorateQuery should be null â€” no DB-level filter applied
+        // decorateQuery should be null — no DB-level filter applied
         var query = new RelatedContentCardsQuery
         {
             PageType = "SomePage",
@@ -383,7 +383,7 @@ public class RelatedContentCarouselServiceTests
                 It.IsAny<CancellationToken>()))
             .Callback<RelatedContentCardsQuery, string, string, Action<RetrievePagesQueryParameters>, Func<IWebPageFieldsSource, bool>, CancellationToken>(
                 (_, _, _, d, _, _) => capturedDecorate = d)
-            .ReturnsAsync(new PaginationDto<ContentPageCardDto> { Data = Array.Empty<ContentPageCardDto>(), TotalCount = 0 });
+            .ReturnsAsync(new PaginationDto<RelatedContentCardDto> { Data = Array.Empty<RelatedContentCardDto>(), TotalCount = 0 });
 
         await _sut.GetAPIFilteredItemsAsync(query, CancellationToken.None);
 
@@ -412,7 +412,7 @@ public class RelatedContentCarouselServiceTests
                 It.IsAny<CancellationToken>()))
             .Callback<RelatedContentCardsQuery, string, string, Action<RetrievePagesQueryParameters>, Func<IWebPageFieldsSource, bool>, CancellationToken>(
                 (_, _, _, d, _, _) => capturedDecorate = d)
-            .ReturnsAsync(new PaginationDto<ContentPageCardDto> { Data = Array.Empty<ContentPageCardDto>(), TotalCount = 0 });
+            .ReturnsAsync(new PaginationDto<RelatedContentCardDto> { Data = Array.Empty<RelatedContentCardDto>(), TotalCount = 0 });
 
         await _sut.GetAPIFilteredItemsAsync(query, CancellationToken.None);
 
@@ -440,7 +440,7 @@ public class RelatedContentCarouselServiceTests
                 It.IsAny<CancellationToken>()))
             .Callback<RelatedContentCardsQuery, string, string, Action<RetrievePagesQueryParameters>, Func<IWebPageFieldsSource, bool>, CancellationToken>(
                 (q, _, _, _, _, _) => capturedQuery = q)
-            .ReturnsAsync(new PaginationDto<ContentPageCardDto> { Data = Array.Empty<ContentPageCardDto>(), TotalCount = 0 });
+            .ReturnsAsync(new PaginationDto<RelatedContentCardDto> { Data = Array.Empty<RelatedContentCardDto>(), TotalCount = 0 });
 
         await _sut.GetAPIFilteredItemsAsync(query, CancellationToken.None);
 
@@ -469,7 +469,7 @@ public class RelatedContentCarouselServiceTests
                 It.IsAny<CancellationToken>()))
             .Callback<RelatedContentCardsQuery, string, string, Action<RetrievePagesQueryParameters>, Func<IWebPageFieldsSource, bool>, CancellationToken>(
                 (q, _, _, _, _, _) => capturedQuery = q)
-            .ReturnsAsync(new PaginationDto<ContentPageCardDto> { Data = Array.Empty<ContentPageCardDto>(), TotalCount = 0 });
+            .ReturnsAsync(new PaginationDto<RelatedContentCardDto> { Data = Array.Empty<RelatedContentCardDto>(), TotalCount = 0 });
 
         await _sut.GetAPIFilteredItemsAsync(query, CancellationToken.None);
 
@@ -500,7 +500,7 @@ public class RelatedContentCarouselServiceTests
     }
 
     /// <summary>
-    /// Minimal IWebPageFieldsSource fake â€” avoids sealed XbyK types.
+    /// Minimal IWebPageFieldsSource fake — avoids sealed XbyK types.
     /// </summary>
     private class FakePage : IWebPageFieldsSource
     {
