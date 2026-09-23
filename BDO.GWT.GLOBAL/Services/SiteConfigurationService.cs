@@ -5,19 +5,14 @@ using BDO.GWT.Xperience.Core.Services;
 using CMS.ContentEngine;
 using CMS.Core;
 using CMS.DataEngine;
-using CMS.EventLog;
-using CMS.Helpers;
 using CMS.Websites;
 using CMS.Websites.Routing;
-using Kentico.Xperience.Headless.Internal;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using XperienceCommunity.Localization;
-
 
 namespace BDO.GWT.Web.Core.Services;
 
@@ -55,23 +50,22 @@ public class SiteConfigurationService : ISiteConfigurationService
             "bdo.webchannelsettings|all",
             "bdo.generalsetting|all",
         ];
-    private const string EventSource = nameof(SiteConfigurationService);
+
     private readonly ICachingService _cachingService;
     private readonly ISiteContext _siteContext;
     private readonly SiteConfigurationProviders _providers;
-    private readonly IEventLogService _eventLogService;
-
+    private readonly IWebsiteChannelContext _websiteChannelContext;
     public SiteConfigurationService(
         ICachingService cachingService,
         IContentQueryExecutor executor,
         ISiteContext siteContext,
         SiteConfigurationProviders providers,
-        IEventLogService eventLogService)
+        IWebsiteChannelContext websiteChannelContext)
     {
         _cachingService = cachingService;
         _siteContext = siteContext;
         _providers = providers;
-        _eventLogService = eventLogService;
+        _websiteChannelContext = websiteChannelContext;
     }
 
     public string GetCachedSiteConfigurationHash()
@@ -98,23 +92,24 @@ public class SiteConfigurationService : ISiteConfigurationService
             )
         );
 
-        var temp = RequestContext.CurrentDomain;
-        var temp1 = RequestContext.URL.AbsolutePath;
-        var temp2 = RequestContext.URL.AbsoluteUri;
-        var temp3 = RequestContext.FullDomain;
-        var temp4 = RequestContext.RawURL;
-        var temp5 = GetWebsiteDomain();
+        var channelID = _websiteChannelContext.WebsiteChannelID;
 
-        _eventLogService.LogWarning(
-                        EventSource,
-                        nameof(SiteConfigurationService),
-                        $"RequestContext.CurrentDomain: {temp}, RequestContext.URL.AbsolutePath: {temp1}, RequestContext.URL.AbsoluteUri: {temp2}, RequestContext.FullDomain: {temp3}, RequestContext.RawURL: {temp4}, GetWebsiteDomain(): {temp5}");
+        var websiteChannels = WebsiteChannelInfo.Provider.Get().ToList();
+
+        var websitedomain= websiteChannels.FirstOrDefault(x => x.WebsiteChannelID == channelID)?.WebsiteChannelDomain;
+
+        CMS.Core.Service.Resolve<CMS.Core.IEventLogService>()
+            .LogInformation(
+                source: "CustomCode", 
+                eventCode: "DOMAIN_LOG",
+                eventDescription: $"Website domain: {websitedomain}" 
+            );  
 
         var result = new SiteConfigurationDto
         {
             Translations = translations,
             SiteSettings = GetSiteSettings(),
-            LiveSiteURL = GetWebsiteDomain() ?? string.Empty
+            LiveSiteURL= websitedomain
         };
 
         var calculatedHash = await _cachingService.LoadAsync(
@@ -128,24 +123,14 @@ public class SiteConfigurationService : ISiteConfigurationService
         return result;
     }
 
-    private string GetWebsiteDomain()
-    {
-        return GetWebsiteChannel()?.WebsiteChannelDomain ?? string.Empty;
-    }
-
-    private WebsiteChannelInfo GetWebsiteChannel()
-    {
-        return _providers.WebsiteChannel.Get()
-            .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelID), _siteContext.CurrentSiteID)
-            .TopN(1)
-            .FirstOrDefault();
-    }
-
     private SiteSettingsDto GetSiteSettings()
     {
         var settings = new SiteSettingsDto();
 
-        var websiteChannel = GetWebsiteChannel();
+        var websiteChannel = _providers.WebsiteChannel.Get()
+            .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelID), _siteContext.CurrentSiteID)
+            .TopN(1)
+            .FirstOrDefault();
 
         if (websiteChannel == null)
         {
@@ -161,7 +146,7 @@ public class SiteConfigurationService : ISiteConfigurationService
         {
             return settings;
         }
-       
+
         var generalSetting = _providers.webChannelSnippetInfoProvider.Get()
             .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID), webChannelSettings.WebChannelSettingsID)
             .FirstOrDefault();
