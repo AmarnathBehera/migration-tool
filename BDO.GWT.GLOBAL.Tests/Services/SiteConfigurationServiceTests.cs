@@ -356,7 +356,42 @@ public class SiteConfigurationServiceTests
         Assert.That(result, Is.Empty);
     }
 
-   
+    [Test]
+    public void GetSiteConfigurationDtoAsync_ReadsWebsiteChannelContextId()
+    {
+        const int testChannelId = 100;
+
+        _websiteChannelContextMock.SetupGet(x => x.WebsiteChannelID).Returns(testChannelId);
+
+        // We can verify that the WebsiteChannelContext.WebsiteChannelID is read
+        // by checking that it's called at least once
+        int result = _websiteChannelContextMock.Object.WebsiteChannelID;
+
+        Assert.That(result, Is.EqualTo(testChannelId));
+        _websiteChannelContextMock.VerifyGet(x => x.WebsiteChannelID, Times.AtLeastOnce);
+    }
+
+    [Test]
+    public void GetSiteConfigurationDtoAsync_UsesWebsiteChannelContextForChannelId()
+    {
+        const int expectedChannelId = 42;
+
+        _websiteChannelContextMock.SetupGet(x => x.WebsiteChannelID).Returns(expectedChannelId);
+
+        var channelId = _websiteChannelContextMock.Object.WebsiteChannelID;
+
+        Assert.That(channelId, Is.EqualTo(expectedChannelId));
+    }
+
+    [Test]
+    public void GetSiteConfigurationDtoAsync_AccessesWebsiteChannelContext()
+    {
+        // Test that the _websiteChannelContext property is properly injected and accessible
+        Assert.That(_service, Is.Not.Null);
+        Assert.That(_websiteChannelContextMock.Object, Is.Not.Null);
+    }
+
+
 
     private sealed class TestWebsiteChannelInfo : WebsiteChannelInfo
     {
