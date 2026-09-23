@@ -387,8 +387,11 @@ public class SiteConfigurationServiceTests
     public void GetSiteConfigurationDtoAsync_AccessesWebsiteChannelContext()
     {
         // Test that the _websiteChannelContext property is properly injected and accessible
-        Assert.That(_service, Is.Not.Null);
-        Assert.That(_websiteChannelContextMock.Object, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(_service, Is.Not.Null);
+            Assert.That(_websiteChannelContextMock.Object, Is.Not.Null);
+        });
     }
 
 
