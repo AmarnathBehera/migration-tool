@@ -82,9 +82,12 @@ public sealed class NonAsciiUrlReplacementSettingProvider : INonAsciiUrlReplacem
         // If channel settings don't exist, fall back to global settings
         if (channelSettings is null)
         {
-            _logger.LogInformation(
-                "Channel settings not found for website channel {WebsiteChannelId}; attempting to use global settings.",
-                websiteChannelId);
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogInformation(
+                    "Channel settings not found for website channel {WebsiteChannelId}; attempting to use global settings.",
+                    websiteChannelId);
+            }
 
             var globalDict = GetGlobalDictionary();
             if (string.IsNullOrWhiteSpace(globalDict))
@@ -106,9 +109,12 @@ public sealed class NonAsciiUrlReplacementSettingProvider : INonAsciiUrlReplacem
 
         if (snippet is null)
         {
-            _logger.LogInformation(
-                "Channel snippet not found for website channel {WebsiteChannelId}; attempting to use global settings.",
-                websiteChannelId);
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogInformation(
+                    "Channel snippet not found for website channel {WebsiteChannelId}; attempting to use global settings.",
+                    websiteChannelId);
+            }
 
             var globalDict = GetGlobalDictionary();
             if (string.IsNullOrWhiteSpace(globalDict))
@@ -130,9 +136,12 @@ public sealed class NonAsciiUrlReplacementSettingProvider : INonAsciiUrlReplacem
         // If the channel setting is empty and inheritance is enabled, use global
         if (string.IsNullOrWhiteSpace(rawDictionary))
         {
-            _logger.LogInformation(
-                "Channel setting was empty for website channel {WebsiteChannelId}; checking global settings.",
-                websiteChannelId);
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogInformation(
+                    "Channel setting was empty for website channel {WebsiteChannelId}; checking global settings.",
+                    websiteChannelId);
+            }
 
             rawDictionary = GetGlobalDictionary();
         }
@@ -199,10 +208,13 @@ public class NonAsciiUrlReplacementService : INonAsciiUrlReplacementService
 
         if (outcome.ReplacementCount > 0)
         {
-            _logger.LogInformation(
-                "Applied non-ASCII URL replacements for website channel {WebsiteChannelId}; {ReplacementCount} replacement(s) were made.",
-                websiteChannelId,
-                outcome.ReplacementCount);
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogInformation(
+                    "Applied non-ASCII URL replacements for website channel {WebsiteChannelId}; {ReplacementCount} replacement(s) were made.",
+                    websiteChannelId,
+                    outcome.ReplacementCount);
+            }
         }
 
         return outcome.Value;
@@ -225,7 +237,7 @@ public class NonAsciiUrlReplacementService : INonAsciiUrlReplacementService
         {
             var line = lines[index].Trim();
 
-            if (line.Length == 0 || line.StartsWith("#", StringComparison.Ordinal) || line.StartsWith("//", StringComparison.Ordinal))
+            if (line.Length == 0 || line.StartsWith('#') || line.StartsWith("//"))
             {
                 continue;
             }
@@ -233,9 +245,12 @@ public class NonAsciiUrlReplacementService : INonAsciiUrlReplacementService
             var equalsIndex = line.IndexOf('=');
             if (equalsIndex <= 0 || equalsIndex == line.Length - 1)
             {
-                logger?.LogWarning(
-                    "Ignored invalid non-ASCII URL replacement entry at line {LineNumber}.",
-                    index + 1);
+                if (logger?.IsEnabled(LogLevel.Warning) == true)
+                {
+                    logger.LogWarning(
+                        "Ignored invalid non-ASCII URL replacement entry at line {LineNumber}.",
+                        index + 1);
+                }
                 continue;
             }
 
@@ -244,17 +259,23 @@ public class NonAsciiUrlReplacementService : INonAsciiUrlReplacementService
 
             if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
             {
-                logger?.LogWarning(
-                    "Ignored invalid non-ASCII URL replacement entry at line {LineNumber}.",
-                    index + 1);
+                if (logger?.IsEnabled(LogLevel.Warning) == true)
+                {
+                    logger.LogWarning(
+                        "Ignored invalid non-ASCII URL replacement entry at line {LineNumber}.",
+                        index + 1);
+                }
                 continue;
             }
 
             if (replacements.ContainsKey(key))
             {
-                logger?.LogWarning(
-                    "Duplicate non-ASCII URL replacement key {ReplacementKey} was overwritten by a later entry.",
-                    key);
+                if (logger?.IsEnabled(LogLevel.Warning) == true)
+                {
+                    logger.LogWarning(
+                        "Duplicate non-ASCII URL replacement key {ReplacementKey} was overwritten by a later entry.",
+                        key);
+                }
             }
 
             replacements[key] = value;

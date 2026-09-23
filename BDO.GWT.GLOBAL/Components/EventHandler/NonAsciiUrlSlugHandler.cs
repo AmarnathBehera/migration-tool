@@ -3,15 +3,29 @@ using CMS.Websites;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using BDO.GWT.GLOBAL.Services;
 
 namespace BDO.GWT.GLOBAL.Components.EventHandler;
 
-public sealed class NonAsciiUrlSlugHandler : IAsyncEventHandler<BeforeCreateWebPageEvent>
+public sealed partial class NonAsciiUrlSlugHandler : IAsyncEventHandler<BeforeCreateWebPageEvent>
 {
     private static readonly AsyncLocal<bool> IsHandling = new();
+    private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(5);
+
+    private static partial class RegexPatterns
+    {
+        [GeneratedRegex(@"[\s_]+")]
+        internal static partial Regex WhitespaceAndUnderscore();
+
+        [GeneratedRegex(@"[^a-z0-9\-]")]
+        internal static partial Regex NonAlphanumericExceptDash();
+
+        [GeneratedRegex(@"-+")]
+        internal static partial Regex MultipleDashes();
+    }
 
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ILogger<NonAsciiUrlSlugHandler> _logger;
@@ -48,11 +62,17 @@ public sealed class NonAsciiUrlSlugHandler : IAsyncEventHandler<BeforeCreateWebP
         {
             IsHandling.Value = true;
 
-            _logger.LogInformation(
-                "BeforeCreateWebPageEvent processing: DisplayName={DisplayName}, UrlPathSlug={UrlPathSlug}, ContentTypeName={ContentTypeName}",
-                asyncEvent.Data.DisplayName,
-                asyncEvent.Data.UrlPathSlug ?? "[null/empty]",
-                asyncEvent.Data.ContentTypeName);
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogInformation(
+                    "BeforeCreateWebPageEvent processing: DisplayName={DisplayName}, UrlPathSlug={UrlPathSlug}, ContentTypeName={ContentTypeName}",
+                    asyncEvent.Data.DisplayName,
+                    asyncEvent.Data.UrlPathSlug ?? "[null/empty]",
+                    asyncEvent.Data.ContentTypeName);
+            }
+
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(DefaultTimeout);
 
             // Create a scope to resolve the scoped service
             using var scope = _serviceScopeFactory.CreateScope();
@@ -67,17 +87,12 @@ public sealed class NonAsciiUrlSlugHandler : IAsyncEventHandler<BeforeCreateWebP
                 return;
             }
 
-            // CRITICAL: Apply custom replacement INSTEAD of Kentico's default normalization
+           
             // This converts non-ASCII characters using our configured mappings BEFORE Kentico normalizes
             var replacedValue = await replacementService.ApplyReplacementsAsync(
                 asyncEvent.Data.DisplayName,
                 asyncEvent.Data.WebsiteChannelID,
-                cancellationToken).ConfigureAwait(false);
-
-            _logger.LogInformation(
-                "Custom non-ASCII replacement applied: Original={Original}, Replaced={Replaced}",
-                asyncEvent.Data.DisplayName,
-                replacedValue);
+                cts.Token).ConfigureAwait(false);
 
             // Generate URL slug from the replaced value using standard URL formatting
             var urlSlug = GenerateUrlSlug(replacedValue);
@@ -86,11 +101,23 @@ public sealed class NonAsciiUrlSlugHandler : IAsyncEventHandler<BeforeCreateWebP
             // This prevents Kentico from applying its default normalization
             asyncEvent.Data.UrlPathSlug = urlSlug;
 
-            _logger.LogInformation(
-                "Custom URL slug set: {UrlSlug} for content type {ContentTypeName} in website channel {WebsiteChannelId}.",
-                urlSlug,
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogInformation(
+                    "Custom URL slug set: {UrlSlug} for content type {ContentTypeName} in website channel {WebsiteChannelId}.",
+                    urlSlug,
+                    asyncEvent.Data.ContentTypeName,
+                    asyncEvent.Data.WebsiteChannelID);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogError(
+                "Non-ASCII URL slug generation timed out (exceeded {TimeoutSeconds}s) for content type {ContentTypeName} in website channel {WebsiteChannelId}.",
+                DefaultTimeout.TotalSeconds,
                 asyncEvent.Data.ContentTypeName,
                 asyncEvent.Data.WebsiteChannelID);
+            throw;
         }
         catch (Exception ex)
         {
@@ -125,13 +152,13 @@ public sealed class NonAsciiUrlSlugHandler : IAsyncEventHandler<BeforeCreateWebP
         var slug = input.ToLowerInvariant();
 
         // Replace spaces and underscores with dashes
-        slug = System.Text.RegularExpressions.Regex.Replace(slug, @"[\s_]+", "-");
+        slug = RegexPatterns.WhitespaceAndUnderscore().Replace(slug, "-");
 
         // Remove any remaining non-alphanumeric characters except dashes
-        slug = System.Text.RegularExpressions.Regex.Replace(slug, @"[^a-z0-9\-]", string.Empty);
+        slug = RegexPatterns.NonAlphanumericExceptDash().Replace(slug, string.Empty);
 
         // Replace multiple consecutive dashes with single dash
-        slug = System.Text.RegularExpressions.Regex.Replace(slug, @"-+", "-");
+        slug = RegexPatterns.MultipleDashes().Replace(slug, "-");
 
         // Trim dashes from start and end
         slug = slug.Trim('-');
