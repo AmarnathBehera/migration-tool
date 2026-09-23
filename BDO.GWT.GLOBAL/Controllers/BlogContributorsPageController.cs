@@ -34,11 +34,11 @@ namespace BDO.GWT.Web.Controllers
                 return NotFound();
 
             var channelID = _websiteChannelContext.WebsiteChannelID;
+            var channelname = _websiteChannelContext.WebsiteChannelName;
             if (channelID == 0)
             {
-                CMS.Core.Service.Resolve<IEventLogService>().LogWarning("SiteConfigurationService", "GetSiteConfigurationDtoAsync", $"WebsiteChannelID is 0 for site {_siteContext.CurrentSiteName}.");
+                CMS.Core.Service.Resolve<IEventLogService>().LogWarning("SiteConfigurationService", "GetSiteConfigurationDtoAsync", $"WebsiteChannelID is 0 for site {channelname}.");
             }
-            var channelname = _websiteChannelContext.WebsiteChannelName;
 
 
             var websiteChannels = WebsiteChannelInfo.Provider.Get().ToList();
