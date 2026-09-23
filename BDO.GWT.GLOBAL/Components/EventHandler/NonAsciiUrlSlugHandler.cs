@@ -62,15 +62,6 @@ public sealed partial class NonAsciiUrlSlugHandler : IAsyncEventHandler<BeforeCr
         {
             IsHandling.Value = true;
 
-            if (_logger.IsEnabled(LogLevel.Information))
-            {
-                _logger.LogInformation(
-                    "BeforeCreateWebPageEvent processing: DisplayName={DisplayName}, UrlPathSlug={UrlPathSlug}, ContentTypeName={ContentTypeName}",
-                    asyncEvent.Data.DisplayName,
-                    asyncEvent.Data.UrlPathSlug ?? "[null/empty]",
-                    asyncEvent.Data.ContentTypeName);
-            }
-
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             cts.CancelAfter(DefaultTimeout);
 
@@ -87,7 +78,6 @@ public sealed partial class NonAsciiUrlSlugHandler : IAsyncEventHandler<BeforeCr
                 return;
             }
 
-           
             // This converts non-ASCII characters using our configured mappings BEFORE Kentico normalizes
             var replacedValue = await replacementService.ApplyReplacementsAsync(
                 asyncEvent.Data.DisplayName,
@@ -112,20 +102,10 @@ public sealed partial class NonAsciiUrlSlugHandler : IAsyncEventHandler<BeforeCr
         }
         catch (OperationCanceledException)
         {
-            _logger.LogError(
-                "Non-ASCII URL slug generation timed out (exceeded {TimeoutSeconds}s) for content type {ContentTypeName} in website channel {WebsiteChannelId}.",
-                DefaultTimeout.TotalSeconds,
-                asyncEvent.Data.ContentTypeName,
-                asyncEvent.Data.WebsiteChannelID);
             throw;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            _logger.LogError(
-                ex,
-                "Non-ASCII URL slug generation failed for content type {ContentTypeName} in website channel {WebsiteChannelId}.",
-                asyncEvent.Data.ContentTypeName,
-                asyncEvent.Data.WebsiteChannelID);
             throw;
         }
         finally

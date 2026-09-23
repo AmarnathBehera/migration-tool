@@ -1,3 +1,5 @@
+#nullable enable
+
 using BDO.GWT.Web.Services;
 using CMS.DataEngine;
 using Microsoft.Extensions.Logging;
@@ -235,50 +237,7 @@ public class NonAsciiUrlReplacementService : INonAsciiUrlReplacementService
 
         for (var index = 0; index < lines.Length; index++)
         {
-            var line = lines[index].Trim();
-
-            if (line.Length == 0 || line.StartsWith('#') || line.StartsWith("//"))
-            {
-                continue;
-            }
-
-            var equalsIndex = line.IndexOf('=');
-            if (equalsIndex <= 0 || equalsIndex == line.Length - 1)
-            {
-                if (logger?.IsEnabled(LogLevel.Warning) == true)
-                {
-                    logger.LogWarning(
-                        "Ignored invalid non-ASCII URL replacement entry at line {LineNumber}.",
-                        index + 1);
-                }
-                continue;
-            }
-
-            var key = line[..equalsIndex].Trim();
-            var value = line[(equalsIndex + 1)..].Trim();
-
-            if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
-            {
-                if (logger?.IsEnabled(LogLevel.Warning) == true)
-                {
-                    logger.LogWarning(
-                        "Ignored invalid non-ASCII URL replacement entry at line {LineNumber}.",
-                        index + 1);
-                }
-                continue;
-            }
-
-            if (replacements.ContainsKey(key))
-            {
-                if (logger?.IsEnabled(LogLevel.Warning) == true)
-                {
-                    logger.LogWarning(
-                        "Duplicate non-ASCII URL replacement key {ReplacementKey} was overwritten by a later entry.",
-                        key);
-                }
-            }
-
-            replacements[key] = value;
+            ProcessLine(lines[index], index, replacements, logger);
         }
 
         if (replacements.Count == 0)
@@ -292,6 +251,68 @@ public class NonAsciiUrlReplacementService : INonAsciiUrlReplacementService
             .ThenBy(pair => pair.Key, StringComparer.Ordinal)
             .Select(pair => new NonAsciiUrlReplacementRule(pair.Key, pair.Value))
             .ToArray();
+    }
+
+    private static void ProcessLine(string line, int lineNumber, Dictionary<string, string> replacements, ILogger? logger)
+    {
+        line = line.Trim();
+
+        if (IsCommentOrEmpty(line))
+        {
+            return;
+        }
+
+        var equalsIndex = line.IndexOf('=');
+        if (!IsValidFormat(equalsIndex, line.Length))
+        {
+            LogInvalidEntry(logger, lineNumber);
+            return;
+        }
+
+        var key = line[..equalsIndex].Trim();
+        var value = line[(equalsIndex + 1)..].Trim();
+
+        if (!IsValidKeyValue(key, value))
+        {
+            LogInvalidEntry(logger, lineNumber);
+            return;
+        }
+
+        if (replacements.ContainsKey(key))
+        {
+            LogDuplicateKey(logger, key);
+        }
+
+        replacements[key] = value;
+    }
+
+    private static bool IsCommentOrEmpty(string line)
+        => line.Length == 0 || line.StartsWith('#') || line.StartsWith("//");
+
+    private static bool IsValidFormat(int equalsIndex, int lineLength)
+        => equalsIndex > 0 && equalsIndex < lineLength - 1;
+
+    private static bool IsValidKeyValue(string key, string value)
+        => !string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(value);
+
+    private static void LogInvalidEntry(ILogger? logger, int lineNumber)
+    {
+        if (logger?.IsEnabled(LogLevel.Warning) == true)
+        {
+            logger.LogWarning(
+                "Ignored invalid non-ASCII URL replacement entry at line {LineNumber}.",
+                lineNumber + 1);
+        }
+    }
+
+    private static void LogDuplicateKey(ILogger? logger, string key)
+    {
+        if (logger?.IsEnabled(LogLevel.Warning) == true)
+        {
+            logger.LogWarning(
+                "Duplicate non-ASCII URL replacement key {ReplacementKey} was overwritten by a later entry.",
+                key);
+        }
     }
 
     public static NonAsciiUrlReplacementResult ApplyRules(string input, IReadOnlyList<NonAsciiUrlReplacementRule> rules)
