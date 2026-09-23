@@ -1,3 +1,5 @@
+#nullable enable
+
 using BDO.GWT.GLOBAL.Components.EventHandler;
 using BDO.GWT.GLOBAL.Services;
 using CMS.Websites;
@@ -135,7 +137,7 @@ public class NonAsciiUrlSlugHandlerHardeningTests
         // Arrange: Service provider returns null for replacement service
         _scopedServiceProviderMock
             .Setup(x => x.GetService(typeof(INonAsciiUrlReplacementService)))
-            .Returns(null);  // Service not available
+            .Returns((object?)null);  // Service not available
 
         var data = new CreateWebPageEventData
         {
