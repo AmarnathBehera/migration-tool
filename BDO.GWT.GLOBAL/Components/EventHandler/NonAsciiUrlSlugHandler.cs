@@ -100,10 +100,6 @@ public sealed partial class NonAsciiUrlSlugHandler : IAsyncEventHandler<BeforeCr
                     asyncEvent.Data.WebsiteChannelID);
             }
         }
-        catch
-        {
-            throw;
-        }
         finally
         {
             IsHandling.Value = false;
