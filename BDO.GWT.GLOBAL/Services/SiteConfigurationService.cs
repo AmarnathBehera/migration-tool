@@ -3,9 +3,11 @@ using BDO.GWT.Core.Entities;
 using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience.Core.Services;
 using CMS.ContentEngine;
+using CMS.Core;
 using CMS.DataEngine;
 using CMS.Websites;
 using CMS.Websites.Routing;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -52,15 +54,18 @@ public class SiteConfigurationService : ISiteConfigurationService
     private readonly ICachingService _cachingService;
     private readonly ISiteContext _siteContext;
     private readonly SiteConfigurationProviders _providers;
+    private readonly IWebsiteChannelContext _websiteChannelContext;
     public SiteConfigurationService(
         ICachingService cachingService,
         IContentQueryExecutor executor,
         ISiteContext siteContext,
-        SiteConfigurationProviders providers)
+        SiteConfigurationProviders providers,
+        IWebsiteChannelContext websiteChannelContext)
     {
         _cachingService = cachingService;
         _siteContext = siteContext;
         _providers = providers;
+        _websiteChannelContext = websiteChannelContext;
     }
 
     public string GetCachedSiteConfigurationHash()
@@ -87,10 +92,24 @@ public class SiteConfigurationService : ISiteConfigurationService
             )
         );
 
+        var channelID = _websiteChannelContext.WebsiteChannelID;
+
+        var websiteChannels = WebsiteChannelInfo.Provider.Get().ToList();
+
+        var websitedomain= websiteChannels.FirstOrDefault(x => x.WebsiteChannelID == channelID)?.WebsiteChannelDomain;
+
+        CMS.Core.Service.Resolve<CMS.Core.IEventLogService>()
+            .LogInformation(
+                source: "CustomCode", 
+                eventCode: "DOMAIN_LOG",
+                eventDescription: $"Website domain: {websitedomain}" 
+            );  
+
         var result = new SiteConfigurationDto
         {
             Translations = translations,
-            SiteSettings = GetSiteSettings()
+            SiteSettings = GetSiteSettings(),
+            LiveSiteURL= websitedomain
         };
 
         var calculatedHash = await _cachingService.LoadAsync(
@@ -127,7 +146,7 @@ public class SiteConfigurationService : ISiteConfigurationService
         {
             return settings;
         }
-       
+
         var generalSetting = _providers.webChannelSnippetInfoProvider.Get()
             .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID), webChannelSettings.WebChannelSettingsID)
             .FirstOrDefault();
