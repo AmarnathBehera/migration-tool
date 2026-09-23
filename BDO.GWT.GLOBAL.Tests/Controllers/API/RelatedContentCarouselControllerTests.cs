@@ -29,10 +29,10 @@ public class RelatedContentCarouselControllerTests
         // Arrange
         var query = new RelatedContentCardsQuery();
 
-        var expectedItems = new List<ContentPageCardDto>
+        var expectedItems = new List<RelatedContentCardDto>
         {
-            new ContentPageCardDto(),
-            new ContentPageCardDto()
+            new RelatedContentCardDto(),
+            new RelatedContentCardDto()
         };
 
         var cancellationToken = CancellationToken.None;
@@ -63,7 +63,7 @@ public class RelatedContentCarouselControllerTests
         var query = new RelatedContentCardsQuery();
         var cancellationToken = new CancellationTokenSource().Token;
 
-        var expectedItems = new List<ContentPageCardDto>();
+        var expectedItems = new List<RelatedContentCardDto>();
 
         _relatedContentCarouselServiceMock
             .Setup(x => x.GetAPIFilteredItemsAsync(
@@ -90,11 +90,11 @@ public class RelatedContentCarouselControllerTests
         // Arrange
         var query = new RelatedContentCardsQuery();
 
-        var expectedItems = new List<ContentPageCardDto>
+        var expectedItems = new List<RelatedContentCardDto>
         {
-            new ContentPageCardDto(),
-            new ContentPageCardDto(),
-            new ContentPageCardDto()
+            new RelatedContentCardDto(),
+            new RelatedContentCardDto(),
+            new RelatedContentCardDto()
         };
 
         var cancellationToken = CancellationToken.None;
@@ -123,7 +123,7 @@ public class RelatedContentCarouselControllerTests
         // Arrange
         var query = new RelatedContentCardsQuery();
 
-        var expectedItems = new List<ContentPageCardDto>();
+        var expectedItems = new List<RelatedContentCardDto>();
 
         var cancellationToken = CancellationToken.None;
 
@@ -157,7 +157,7 @@ public class RelatedContentCarouselControllerTests
             .Setup(x => x.GetAPIFilteredItemsAsync(
                 It.IsAny<RelatedContentCardsQuery>(),
                 cancellationToken))
-            .ReturnsAsync(new List<ContentPageCardDto>());
+            .ReturnsAsync(new List<RelatedContentCardDto>());
 
         SetControllerContext();
 
