@@ -160,7 +160,8 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 
             _serviceMock.Verify(
                 x => x.GetEventsWebinarsSliderAsync(
-                    It.IsAny<IWebPageFieldsSource>(),
+                    It.IsAny<Guid>(),
+                    It.IsAny<string>(),
                     It.IsAny<EventsWebinarsSliderData>(),
                     It.IsAny<CancellationToken>()),
                 Times.Never);
@@ -180,11 +181,12 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 
             _serviceMock
                 .Setup(x => x.GetEventsWebinarsSliderAsync(
-                    currentPageMock.Object,
+                    pageGuid,
+                    currentPageMock.Object.GetType().Name,
                     It.IsAny<EventsWebinarsSliderData>(),
                     It.IsAny<CancellationToken>()))
-                .Callback<IWebPageFieldsSource, EventsWebinarsSliderData, CancellationToken>(
-                    (_, data, _) => capturedData = data)
+                .Callback<Guid, string, EventsWebinarsSliderData, CancellationToken>(
+                    (_, __, data, _) => capturedData = data)
                 .ReturnsAsync(expectedDto);
 
             var properties = new EventsWebinarsSliderWidgetProperties
@@ -242,11 +244,12 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 
             _serviceMock
                 .Setup(x => x.GetEventsWebinarsSliderAsync(
-                    It.IsAny<IWebPageFieldsSource>(),
+                    It.IsAny<Guid>(),
+                    It.IsAny<string>(),
                     It.IsAny<EventsWebinarsSliderData>(),
                     It.IsAny<CancellationToken>()))
-                .Callback<IWebPageFieldsSource, EventsWebinarsSliderData, CancellationToken>(
-                    (_, data, _) => capturedData = data)
+                .Callback<Guid, string, EventsWebinarsSliderData, CancellationToken>(
+                    (_, __, data, _) => capturedData = data)
                 .ReturnsAsync(CreateDto());
 
             var model = CreateModel(new EventsWebinarsSliderWidgetProperties
@@ -273,11 +276,12 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 
             _serviceMock
                 .Setup(x => x.GetEventsWebinarsSliderAsync(
-                    It.IsAny<IWebPageFieldsSource>(),
+                    It.IsAny<Guid>(),
+                    It.IsAny<string>(),
                     It.IsAny<EventsWebinarsSliderData>(),
                     It.IsAny<CancellationToken>()))
-                .Callback<IWebPageFieldsSource, EventsWebinarsSliderData, CancellationToken>(
-                    (_, data, _) => capturedData = data)
+                .Callback<Guid, string, EventsWebinarsSliderData, CancellationToken>(
+                    (_, __, data, _) => capturedData = data)
                 .ReturnsAsync(CreateDto());
 
             var model = CreateModel(new EventsWebinarsSliderWidgetProperties
@@ -302,7 +306,8 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
 
             _serviceMock
                 .Setup(x => x.GetEventsWebinarsSliderAsync(
-                    It.IsAny<IWebPageFieldsSource>(),
+                    It.IsAny<Guid>(),
+                    It.IsAny<string>(),
                     It.IsAny<EventsWebinarsSliderData>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(CreateDto());
