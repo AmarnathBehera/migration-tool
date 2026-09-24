@@ -37,8 +37,13 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
                 _websiteChannelContextMock.Object,
                 _webChannelSettingsProviderMock.Object,
                 _websiteChannelInfoProviderMock.Object);
+
+            _websiteChannelInfoProviderMock.SetupWebsiteChannel(1, 1);   // identity mapping
         }
 
+        // ══════════════════════════════════════════════════════════════════════════
+        // Stub inner classes — override virtual properties to avoid CMS IoC calls.
+        // ══════════════════════════════════════════════════════════════════════════
         // ─── Helper: build a mocked ObjectQuery<T> ──────────────────────────────────
         private static Mock<ObjectQuery<T>> SetupQueryReturning<T>(IEnumerable<T> items)
             where T : AbstractInfo<T, IInfoProvider<T>>, new()
@@ -50,6 +55,8 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
                      .Returns(mockQuery.Object);
             mockQuery.Setup(q => q.TopN(It.IsAny<int>()))
                      .Returns(mockQuery.Object);
+            mockQuery.Setup(q => q.Columns(It.IsAny<string[]>()))
+                     .Returns(mockQuery.Object);
 
             mockQuery.As<IEnumerable<T>>()
                      .Setup(q => q.GetEnumerator())
@@ -60,13 +67,14 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
                          It.IsAny<bool>()))
                      .Returns(itemList);
 
+            mockQuery.Setup(q => q.GetEnumerableTypedResultAsync(
+                         It.IsAny<System.Data.CommandBehavior>(),
+                         It.IsAny<bool>(),
+                         It.IsAny<CancellationToken>()))
+                     .ReturnsAsync(itemList);
+
             return mockQuery;
         }
-
-        // ══════════════════════════════════════════════════════════════════════════
-        // Stub inner classes — override virtual properties to avoid CMS IoC calls.
-        // ══════════════════════════════════════════════════════════════════════════
-
         private sealed class StubChannelSettings : WebChannelSettingsInfo
         {
             private readonly int _id;
@@ -91,6 +99,29 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
             public override string ScriptsTopofPageHeadKeyValue => _keyValue;
             internal StubGlobalSettings(string keyValue) => _keyValue = keyValue;
         }
+
+        private sealed class StubWebsiteChannel : WebsiteChannelInfo
+        {
+            private readonly int _websiteChannelId;
+            private readonly int _channelId;
+            public override int WebsiteChannelID => _websiteChannelId;
+            public override int WebsiteChannelChannelID => _channelId;
+
+            internal StubWebsiteChannel(int websiteChannelId, int channelId)
+            {
+                _websiteChannelId = websiteChannelId;
+                _channelId = channelId;
+            }
+        }
+
+        /// <summary>Maps CMS_WebsiteChannel PK -> CMS_Channel FK for the base component lookup.</summary>
+        private void SetupWebsiteChannel(int websiteChannelId, int channelId) =>
+            _websiteChannelInfoProviderMock
+                .Setup(p => p.Get())
+                .Returns(SetupQueryReturning<WebsiteChannelInfo>(
+                    [new StubWebsiteChannel(websiteChannelId, channelId)]).Object);
+
+       
 
         // ── Factory helpers ──────────────────────────────────────────────────────────
         private static StubChannelSettings MakeChannelSettings(int settingsId, int channelId)
@@ -453,7 +484,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
         // ════════════════════════════════════════════════════════════════════════════
 
         [Test]
-        public async Task InvokeAsync_FiltersChannelByCurrentWebsiteChannelID()
+        public async Task InvokeAsyncFiltersChannelByCurrentWebsiteChannelID()
         {
             _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(42);
             var channelQuery = SetupQueryReturning<WebChannelSettingsInfo>([]);
@@ -586,6 +617,58 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
             var result = await _component.InvokeAsync(CancellationToken.None);
 
             Assert.That(result, Is.TypeOf<ViewViewComponentResult>());
+        }
+
+        [Test]
+        public async Task InvokeAsync_FiltersChannelByCurrentWebsiteChannelID()
+        {
+            const int websiteChannelId = 3;
+            const int channelId = 4;
+            _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(websiteChannelId);
+            SetupWebsiteChannel(websiteChannelId, channelId);
+
+            var settingsQuery = SetupQueryReturning<WebChannelSettingsInfo>([]);
+            _webChannelSettingsProviderMock.Setup(p => p.Get()).Returns(settingsQuery.Object);
+
+            await _component.InvokeAsync(CancellationToken.None);
+
+            settingsQuery.Verify(q => q.WhereEquals(
+                nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), channelId), Times.Once);
+        }
+    }
+
+    internal static class ScriptViewComponentTestHelpers
+    {
+        // ─── Helper: build a mocked ObjectQuery<T> ──────────────────────────────────
+        private static Mock<ObjectQuery<T>> SetupQueryReturning<T>(IEnumerable<T> items)
+            where T : AbstractInfo<T, IInfoProvider<T>>, new()
+        {
+            var itemList = items.ToList();
+            var mockQuery = new Mock<ObjectQuery<T>>();
+
+            mockQuery.Setup(q => q.WhereEquals(It.IsAny<string>(), It.IsAny<object>()))
+                     .Returns(mockQuery.Object);
+            mockQuery.Setup(q => q.TopN(It.IsAny<int>()))
+                     .Returns(mockQuery.Object);
+            mockQuery.Setup(q => q.Columns(It.IsAny<string[]>()))
+                     .Returns(mockQuery.Object);
+
+            mockQuery.As<IEnumerable<T>>()
+                     .Setup(q => q.GetEnumerator())
+                     .Returns(() => itemList.GetEnumerator());
+
+            mockQuery.Setup(q => q.GetEnumerableTypedResult(
+                         It.IsAny<System.Data.CommandBehavior>(),
+                         It.IsAny<bool>()))
+                     .Returns(itemList);
+
+            mockQuery.Setup(q => q.GetEnumerableTypedResultAsync(
+                         It.IsAny<System.Data.CommandBehavior>(),
+                         It.IsAny<bool>(),
+                         It.IsAny<CancellationToken>()))
+                     .ReturnsAsync(itemList);
+
+            return mockQuery;
         }
     }
 }

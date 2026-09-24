@@ -7,6 +7,7 @@ using CMS.Websites.Routing;
 using GWTXbyKWeb.Components.ViewComponents;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Moq;
+using static BDO.GWT.GLOBAL.Tests.Components.ViewComponents.ScriptQueryMockFactory;
 
 namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 {
@@ -36,31 +37,10 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
                 _websiteChannelContextMock.Object,
                 _webChannelSettingsProviderMock.Object,
                 _websiteChannelInfoProviderMock.Object);
+            _websiteChannelInfoProviderMock.SetupWebsiteChannel(1, 1);   // identity mapping
         }
 
-        // ─── Helper: mocked ObjectQuery<T> ──────────────────────────────────────────
-        private static Mock<ObjectQuery<T>> SetupQueryReturning<T>(IEnumerable<T> items)
-            where T : AbstractInfo<T, IInfoProvider<T>>, new()
-        {
-            var itemList = items.ToList();
-            var mockQuery = new Mock<ObjectQuery<T>>();
-
-            mockQuery.Setup(q => q.WhereEquals(It.IsAny<string>(), It.IsAny<object>()))
-                     .Returns(mockQuery.Object);
-            mockQuery.Setup(q => q.TopN(It.IsAny<int>()))
-                     .Returns(mockQuery.Object);
-
-            mockQuery.As<IEnumerable<T>>()
-                     .Setup(q => q.GetEnumerator())
-                     .Returns(() => itemList.GetEnumerator());
-
-            mockQuery.Setup(q => q.GetEnumerableTypedResult(
-                         It.IsAny<System.Data.CommandBehavior>(),
-                         It.IsAny<bool>()))
-                     .Returns(itemList);
-
-            return mockQuery;
-        }
+        
 
         // ══════════════════════════════════════════════════════════════════════════
         // Stub inner classes — override virtual properties to avoid CMS IoC calls.
@@ -493,6 +473,31 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
             var result = await _component.InvokeAsync(CancellationToken.None);
 
             Assert.That(result, Is.TypeOf<ViewViewComponentResult>());
+        }
+
+        [Test]
+        public async Task InvokeAsync_FiltersChannelSettingsByResolvedChannelID()
+        {
+            const int websiteChannelId = 3;   // CMS_WebsiteChannel PK
+            const int channelId = 4;          // CMS_Channel PK — deliberately different
+
+            _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(websiteChannelId);
+            _websiteChannelInfoProviderMock.SetupWebsiteChannel(websiteChannelId, channelId);   // ← here
+
+            var settingsQuery = SetupQueryReturning<WebChannelSettingsInfo>(
+                [MakeChannelSettings(10, channelId)]);
+            _webChannelSettingsProviderMock.Setup(p => p.Get()).Returns(settingsQuery.Object);
+
+            _siteProviderMock.Setup(p => p.Get())
+                .Returns(SetupQueryReturning<WebChannelSnippetInfo>([]).Object);
+
+            await _component.InvokeAsync(CancellationToken.None);
+
+            settingsQuery.Verify(q => q.WhereEquals(
+                nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), channelId), Times.Once);
+
+            settingsQuery.Verify(q => q.WhereEquals(
+                nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), websiteChannelId), Times.Never);
         }
     }
 }

@@ -59,9 +59,11 @@ namespace GWTXbyKWeb.Components.ViewComponents
                 return View("~/Views/Shared/Components/Scripts/Default.cshtml");
             }
 
-            var currentChannelSettings = _webChannelSettingsInfoProvider
-                .Get()
-                .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), channelId)  // was currentWebsiteID (line 45)
+            var currentChannelSettings = (await _webChannelSettingsInfoProvider
+                    .Get()
+                    .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), channelId)
+                    .TopN(1)
+                    .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
                 .FirstOrDefault();
 
             if (currentChannelSettings == null)
@@ -69,11 +71,11 @@ namespace GWTXbyKWeb.Components.ViewComponents
                 return View("~/Views/Shared/Components/Scripts/Default.cshtml");
             }
 
-            var sitescript = _siteProvider.Get()
-                .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID),
-                    currentChannelSettings.WebChannelSettingsID)
-                .TopN(1)
-                .GetEnumerableTypedResult()
+            var sitescript = (await _siteProvider.Get()
+                    .WhereEquals(nameof(WebChannelSnippetInfo.WebChannelSnippetWebChannelSettingsID),
+                        currentChannelSettings.WebChannelSettingsID)
+                    .TopN(1)
+                    .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
                 .FirstOrDefault();
 
             if (sitescript == null)
@@ -84,9 +86,9 @@ namespace GWTXbyKWeb.Components.ViewComponents
             string value;
             if (GetInheritFromGlobal(sitescript))
             {
-                var globalSettings = _provider.Get()
-                    .TopN(1)
-                    .GetEnumerableTypedResult()
+                var globalSettings = (await _provider.Get()
+                        .TopN(1)
+                        .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
                     .FirstOrDefault();
                 value = globalSettings != null ? GetGlobalValue(globalSettings) : null;
             }

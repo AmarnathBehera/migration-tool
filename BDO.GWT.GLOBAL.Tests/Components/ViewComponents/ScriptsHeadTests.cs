@@ -7,6 +7,7 @@ using CMS.Websites.Routing;
 using GWTXbyKWeb.Components.ViewComponents;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Moq;
+using static BDO.GWT.GLOBAL.Tests.Components.ViewComponents.ScriptQueryMockFactory;
 
 namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 {
@@ -37,31 +38,11 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
                 _websiteChannelContextMock.Object,
                 _webChannelSettingsProviderMock.Object,
                 _websiteChannelInfoProviderMock.Object);
+            _websiteChannelInfoProviderMock.SetupWebsiteChannel(1, 1);
         }
 
         // ─── Helper: build a mocked ObjectQuery<T> ──────────────────────────────────
-        private static Mock<ObjectQuery<T>> SetupQueryReturning<T>(IEnumerable<T> items)
-            where T : AbstractInfo<T, IInfoProvider<T>>, new()
-        {
-            var itemList = items.ToList();
-            var mockQuery = new Mock<ObjectQuery<T>>();
-
-            mockQuery.Setup(q => q.WhereEquals(It.IsAny<string>(), It.IsAny<object>()))
-                     .Returns(mockQuery.Object);
-            mockQuery.Setup(q => q.TopN(It.IsAny<int>()))
-                     .Returns(mockQuery.Object);
-
-            mockQuery.As<IEnumerable<T>>()
-                     .Setup(q => q.GetEnumerator())
-                     .Returns(() => itemList.GetEnumerator());
-
-            mockQuery.Setup(q => q.GetEnumerableTypedResult(
-                         It.IsAny<System.Data.CommandBehavior>(),
-                         It.IsAny<bool>()))
-                     .Returns(itemList);
-
-            return mockQuery;
-        }
+        
 
         // ══════════════════════════════════════════════════════════════════════════
         // Stub inner classes — override virtual properties to avoid CMS IoC calls.
