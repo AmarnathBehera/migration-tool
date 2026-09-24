@@ -1,6 +1,7 @@
 using BDO;
 using BDO.GWT.Common;
 using CMS.DataEngine;
+using CMS.Websites;
 using CMS.Websites.Routing;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
@@ -16,17 +17,20 @@ namespace GWTXbyKWeb.Components.ViewComponents
         private readonly IInfoProvider<WebChannelSnippetInfo> _siteProvider;
         private readonly IWebsiteChannelContext _websiteChannelContext;
         private readonly IInfoProvider<WebChannelSettingsInfo> _webChannelSettingsInfoProvider;
+        private readonly IInfoProvider<WebsiteChannelInfo> _websiteChannelInfoProvider;
 
         protected ScriptViewComponentBase(
             IInfoProvider<GlobalsettingskeyInfo> provider,
             IInfoProvider<WebChannelSnippetInfo> siteProvider,
             IWebsiteChannelContext websiteChannelContext,
-            IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider)
+            IInfoProvider<WebChannelSettingsInfo> webChannelSettingsInfoProvider,
+            IInfoProvider<WebsiteChannelInfo> websiteChannelInfoProvider)
         {
             _provider = provider;
             _siteProvider = siteProvider;
             _websiteChannelContext = websiteChannelContext;
             _webChannelSettingsInfoProvider = webChannelSettingsInfoProvider;
+            _websiteChannelInfoProvider = websiteChannelInfoProvider;
         }
 
         protected abstract bool GetInheritFromGlobal(WebChannelSnippetInfo siteScript);
@@ -38,11 +42,26 @@ namespace GWTXbyKWeb.Components.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken)
         {
-            int currentWebsiteID = _websiteChannelContext.WebsiteChannelID;
+            //int currentWebsiteID = _websiteChannelContext.WebsiteChannelID;
+
+            
+
+            int channelId = (await _websiteChannelInfoProvider
+                    .Get()
+                    .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelID), _websiteChannelContext.WebsiteChannelID)
+                    .Columns(nameof(WebsiteChannelInfo.WebsiteChannelChannelID))
+                    .TopN(1)
+                    .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
+                .FirstOrDefault()?.WebsiteChannelChannelID ?? 0;
+
+            if (channelId == 0)
+            {
+                return View("~/Views/Shared/Components/Scripts/Default.cshtml");
+            }
 
             var currentChannelSettings = _webChannelSettingsInfoProvider
                 .Get()
-                .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), currentWebsiteID)
+                .WhereEquals(nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), channelId)  // was currentWebsiteID (line 45)
                 .FirstOrDefault();
 
             if (currentChannelSettings == null)
