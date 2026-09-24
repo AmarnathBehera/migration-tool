@@ -91,6 +91,7 @@ public class ChannelAccessService : IChannelAccessService
         var accessibleChannelIds = allChannels
             .Where(ch =>
             {
+                //channel code name will be contained in ChannelName property of ChannelInfo object
                 var channelKey = ch.ChannelName.ToLowerInvariant();
                 return userRoleNames.Any(role =>
                     role.StartsWith(channelKey + "-") || role == channelKey);
