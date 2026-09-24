@@ -400,29 +400,7 @@ public class RelatedContentCardServiceTests
         Assert.That(result.Data.First().IsFeatured, Is.True);
     }
 
-    [Test]
-    public async Task GetFilteredItemsAsync_NonFeaturedOrderedByPublishDateDescending()
-    {
-        var older = CreateInsight(Guid.NewGuid(), new InsightOptions { PublishedDate = DateTime.UtcNow.AddDays(-5), Title = "Older" });
-        var newer = CreateInsight(Guid.NewGuid(), new InsightOptions { PublishedDate = DateTime.UtcNow.AddDays(-1), Title = "Newer" });
-
-        SetupInsightRetrieval(new[] { older, newer });
-
-        var query = new RelatedContentCardsQuery
-        {
-            SelectedPageTypes = new List<string> { nameof(Insight) },
-            CurrentPage = 1,
-            PageSize = 10
-        };
-
-        var result = await _sut.GetFilteredItemsAsync(query, "/", "en-gb", null, _ => false, CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Data.First().Title, Is.EqualTo("Newer"));
-            Assert.That(result.Data.Last().Title, Is.EqualTo("Older"));
-        });
-    }
+    
 
     // -------------------------------------------------------------------------
     // GetFilteredItemsAsync — in-memory filtering

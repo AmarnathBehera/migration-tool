@@ -2,7 +2,7 @@
 
 namespace BDO.GWT.Core.DTOs;
 
-public class RelatedContentCarouselDto : ICardsCarouselDto<ContentPageCardDto>, IFilterableComponentDto
+public class RelatedContentCarouselDto : ICardsCarouselDto<RelatedContentCardDto>, IFilterableComponentDto
 {
     public string? Title { get; set; }
 
@@ -14,7 +14,7 @@ public class RelatedContentCarouselDto : ICardsCarouselDto<ContentPageCardDto>, 
 
     public required bool FilteringTooltipEnabled { get; set; }
 
-    public IEnumerable<ContentPageCardDto> Items { get; set; } = null!;
+    public IEnumerable<RelatedContentCardDto> Items { get; set; } = null!;
 
     public string? BackgroundImageURL { get; set; }
 
