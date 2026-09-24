@@ -1,14 +1,22 @@
 ﻿@using BDO.GWT.Core.Constants
 @using BDO.GWT.Core.Services
+@using CMS.Websites.Routing
 @using Kentico.Content.Web.Mvc
 @model BDO.GWT.Core.DTOs.BlogContributorsDto
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IWebsiteChannelContext WebsiteChannelContext
+@inject ICultureContext CultureContext
 
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
     var pageId = pageContext.WebPage.WebPageItemID;
+    if (WebsiteChannelContext.IsPreview && Model != null && !string.IsNullOrEmpty(Model.ApiEndpoint))
+    {
+        var culture = CultureContext.CurrentLanguageTag.ToLowerInvariant();
+        Model.ApiEndpoint = Url.Kentico().ApplyPreviewContext($"/api/{culture}/{Model.ApiEndpoint}");
+    }
 }
 @{
     Layout = "_Layout";
