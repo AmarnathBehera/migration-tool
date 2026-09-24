@@ -2,6 +2,7 @@
 using BDO.GWT.Common;
 using BDO.GWT.Xperience;
 using CMS.DataEngine;
+using CMS.Websites;
 using CMS.Websites.Routing;
 using GWTXbyKWeb.Components.ViewComponents;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
@@ -15,6 +16,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
         private Mock<IInfoProvider<WebChannelSnippetInfo>> _siteProviderMock = null!;
         private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
         private Mock<IInfoProvider<WebChannelSettingsInfo>> _webChannelSettingsProviderMock = null!;
+        private Mock<IInfoProvider<WebsiteChannelInfo>> _websiteChannelInfoProviderMock = null!;
         private ScriptsTopBody _component = null!;
 
         private const string ExpectedViewPath = "~/Views/Shared/Components/Scripts/Default.cshtml";
@@ -26,12 +28,14 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
             _siteProviderMock = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
             _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
             _webChannelSettingsProviderMock = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
+            _websiteChannelInfoProviderMock = new Mock<IInfoProvider<WebsiteChannelInfo>>();
 
             _component = new ScriptsTopBody(
                 _globalProviderMock.Object,
                 _siteProviderMock.Object,
                 _websiteChannelContextMock.Object,
-                _webChannelSettingsProviderMock.Object);
+                _webChannelSettingsProviderMock.Object,
+                _websiteChannelInfoProviderMock.Object);
         }
 
         // ─── Helper: mocked ObjectQuery<T> ──────────────────────────────────────────
