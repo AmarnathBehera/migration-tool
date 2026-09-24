@@ -93,6 +93,12 @@ public class SiteConfigurationService : ISiteConfigurationService
         );
 
         var channelID = _websiteChannelContext.WebsiteChannelID;
+        if (channelID==0)
+        {
+            CMS.Core.Service.Resolve<IEventLogService>().LogWarning("SiteConfigurationService", "GetSiteConfigurationDtoAsync", $"WebsiteChannelID is 0 for site {_siteContext.CurrentSiteName}.");
+        }
+        var channelname = _websiteChannelContext.WebsiteChannelName;
+
 
         var websiteChannels = WebsiteChannelInfo.Provider.Get().ToList();
 
@@ -102,7 +108,7 @@ public class SiteConfigurationService : ISiteConfigurationService
             .LogInformation(
                 source: "CustomCode", 
                 eventCode: "DOMAIN_LOG",
-                eventDescription: $"Website domain: {websitedomain}" 
+                eventDescription: $"Website domain: {websitedomain}, Website channel name: {channelname}" 
             );  
 
         var result = new SiteConfigurationDto

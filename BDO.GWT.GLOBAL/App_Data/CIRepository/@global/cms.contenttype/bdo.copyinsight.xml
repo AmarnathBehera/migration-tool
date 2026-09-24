@@ -105,16 +105,22 @@ center;Center
           <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
         </settings>
       </field>
-      <field allowempty="true" column="InsightAttachment" columnprecision="0" columntype="contentitemasset" enabled="true" guid="ede9b57d-6ff7-4e51-8e09-5b5fc18f5c17" visible="true">
+      <field allowempty="true" column="InsightAttachment" columnprecision="0" columntype="contentitemreference" enabled="true" guid="ede9b57d-6ff7-4e51-8e09-5b5fc18f5c17" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Attachment</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
-          <AllowedExtensions>_INHERITED_</AllowedExtensions>
-          <controlname>Kentico.Administration.ContentItemAssetUploader</controlname>
-          <IsFormatConversionEnabled>False</IsFormatConversionEnabled>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>0</MinimumItems>
+          <SelectionType>contentTypes</SelectionType>
         </settings>
         <validationrulesdata>
           <ValidationRuleConfiguration>
