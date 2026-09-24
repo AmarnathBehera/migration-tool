@@ -24,7 +24,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
     public void ParseRules_FiltersCommentLines_WithHashPrefix()
     {
         // Arrange: Dictionary with hash-prefixed comments
-        var dictionary = "# This is a comment\nä=ae\n# Another comment\nö=oe";
+        var dictionary = "# This is a comment;ä=ae;# Another comment;ö=oe";
 
         // Act
         var rules = NonAsciiUrlReplacementService.ParseRules(dictionary, NullLogger.Instance);
@@ -42,7 +42,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
     public void ParseRules_FiltersCommentLines_WithDoubleSlashPrefix()
     {
         // Arrange: Dictionary with // comments
-        var dictionary = "// This is a comment\nä=ae\n// Another comment\nö=oe";
+        var dictionary = "// This is a comment;ä=ae;// Another comment;ö=oe";
 
         // Act
         var rules = NonAsciiUrlReplacementService.ParseRules(dictionary, NullLogger.Instance);
@@ -60,7 +60,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
     public void ParseRules_FiltersEmptyLines()
     {
         // Arrange: Dictionary with empty lines
-        var dictionary = "\n\nä=ae\n\nö=oe\n\n\n";
+        var dictionary = ";;ä=ae;;ö=oe;;;";
 
         // Act
         var rules = NonAsciiUrlReplacementService.ParseRules(dictionary, NullLogger.Instance);
@@ -76,7 +76,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
     public void ParseRules_ValidatesFormatWithEqualsSign()
     {
         // Arrange: Dictionary with various invalid formats
-        var dictionary = "no_equals\n=only_value\nkey_=\nä=ae";
+        var dictionary = "no_equals;=only_value;key_=;ä=ae";
 
         // Act
         var rules = NonAsciiUrlReplacementService.ParseRules(dictionary, NullLogger.Instance);
@@ -94,7 +94,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
     public void ParseRules_ValidatesKeyAndValueAreNonEmpty()
     {
         // Arrange: Dictionary with empty key or value
-        var dictionary = "=ae\nä=\nö=oe";
+        var dictionary = "=ae;ä=;ö=oe";
 
         // Act
         var rules = NonAsciiUrlReplacementService.ParseRules(dictionary, NullLogger.Instance);
@@ -111,7 +111,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
     public void ParseRules_ValidatesKeyAndValueAreNotJustWhitespace()
     {
         // Arrange: Dictionary with whitespace-only key or value
-        var dictionary = "   =ae\nä=   \nö=oe";
+        var dictionary = "   =ae;ä=   ;ö=oe";
 
         // Act
         var rules = NonAsciiUrlReplacementService.ParseRules(dictionary, NullLogger.Instance);
@@ -128,7 +128,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
     public void ParseRules_TrimsMeaninglessWhitespaceAroundKeyAndValue()
     {
         // Arrange: Dictionary with spaces around key/value
-        var dictionary = "  ä  =  ae  \n  ö  =  oe  ";
+        var dictionary = "  ä  =  ae  ;  ö  =  oe  ";
 
         // Act
         var rules = NonAsciiUrlReplacementService.ParseRules(dictionary, NullLogger.Instance);
@@ -152,7 +152,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
     public void ParseRules_HandlesDuplicateKeys_LastValueWins()
     {
         // Arrange: Dictionary with duplicate keys
-        var dictionary = "ä=first\nä=second\nä=third";
+        var dictionary = "ä=first;ä=second;ä=third";
 
         // Act
         var rules = NonAsciiUrlReplacementService.ParseRules(dictionary, NullLogger.Instance);
@@ -175,7 +175,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
             .Setup(x => x.IsEnabled(LogLevel.Warning))
             .Returns(true);  // Logger is enabled
 
-        var dictionary = "ä=ae\nä=aa";  // Duplicate
+        var dictionary = "ä=ae;ä=aa";  // Duplicate
 
         // Act
         var rules = NonAsciiUrlReplacementService.ParseRules(dictionary, mockLogger.Object);
@@ -201,7 +201,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
             .Setup(x => x.IsEnabled(LogLevel.Warning))
             .Returns(true);  // Logger is enabled
 
-        var dictionary = "invalid_format\nä=ae";  // First line is invalid
+        var dictionary = "invalid_format;ä=ae";  // First entry is invalid
 
         // Act
         var rules = NonAsciiUrlReplacementService.ParseRules(dictionary, mockLogger.Object);
@@ -226,7 +226,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
     public void ParseRules_SortsByKeyLengthDescending_ThenAlphabetically()
     {
         // Arrange: Dictionary with keys of varying lengths
-        var dictionary = "a=A\nab=AB\nabc=ABC\nabd=ABD";
+        var dictionary = "a=A;ab=AB;abc=ABC;abd=ABD";
 
         // Act
         var rules = NonAsciiUrlReplacementService.ParseRules(dictionary, NullLogger.Instance);
@@ -246,7 +246,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
     public void ParseRules_PrioritizesLongerKeysInSorting()
     {
         // Arrange: Longer keys should be processed first in replacements
-        var dictionary = "ä=ae\näe=aeX\näeä=aeXae";
+        var dictionary = "ä=ae;äe=aeX;äeä=aeXae";
 
         // Act
         var rules = NonAsciiUrlReplacementService.ParseRules(dictionary, NullLogger.Instance);
@@ -301,7 +301,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
     [Test]
     public void ParseRules_ReturnsEmptyArray_WhenAllLinesAreComments()
     {
-        var dictionary = "# Comment\n// Comment\n# Another";
+        var dictionary = "# Comment;// Comment;# Another";
 
         var rules = NonAsciiUrlReplacementService.ParseRules(dictionary, NullLogger.Instance);
 
@@ -436,7 +436,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
     public void ParseRules_DoesNotCallLogger_WhenLoggerIsNull()
     {
         // Arrange: Null logger should not cause NullReferenceException
-        var dictionary = "invalid-entry\nä=ae";
+        var dictionary = "invalid-entry;ä=ae";
 
         // Act & Assert: Should not throw
         Assert.DoesNotThrow(() =>
@@ -458,7 +458,7 @@ public class NonAsciiUrlReplacementServiceRefactoringTests
             .Setup(x => x.IsEnabled(LogLevel.Warning))
             .Returns(false);
 
-        var dictionary = "invalid-entry\nä=ae";
+        var dictionary = "invalid-entry;ä=ae";
 
         // Act
         var rules = NonAsciiUrlReplacementService.ParseRules(dictionary, mockLogger.Object);

@@ -230,7 +230,7 @@ public class NonAsciiUrlReplacementService : INonAsciiUrlReplacementService
         }
 
         var replacements = new Dictionary<string, string>(StringComparer.Ordinal);
-        var lines = rawDictionary.Split(['\r', '\n', ';'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var lines = rawDictionary.Split([';'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
         for (var index = 0; index < lines.Length; index++)
         {
@@ -290,7 +290,13 @@ public class NonAsciiUrlReplacementService : INonAsciiUrlReplacementService
         => equalsIndex > 0 && equalsIndex < lineLength - 1;
 
     private static bool IsValidKeyValue(string key, string value)
-        => !string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(value);
+        => !string.IsNullOrWhiteSpace(key)
+            && !string.IsNullOrWhiteSpace(value)
+            && !ContainsUnsupportedSeparator(key)
+            && !ContainsUnsupportedSeparator(value);
+
+    private static bool ContainsUnsupportedSeparator(string input)
+        => input.Contains('\r') || input.Contains('\n');
 
     private static void LogInvalidEntry(ILogger? logger, int lineNumber)
     {

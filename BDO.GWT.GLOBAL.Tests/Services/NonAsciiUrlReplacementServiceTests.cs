@@ -24,7 +24,7 @@ public class NonAsciiUrlReplacementServiceTests
     [TestCase("plainascii", "plainascii")]
     public async Task ApplyReplacementsAsync_AppliesConfiguredMappings(string input, string expected)
     {
-        _settingProvider.RawDictionary = "ä=ae\nö=oe\nü=ue\nß=ss";
+        _settingProvider.RawDictionary = "ä=ae;ö=oe;ü=ue;ß=ss";
 
         var result = await _service.ApplyReplacementsAsync(input, websiteChannelId: 42, CancellationToken.None);
 
@@ -64,7 +64,7 @@ public class NonAsciiUrlReplacementServiceTests
     [Test]
     public async Task ApplyReplacementsAsync_IgnoresMalformedEntries_AndStillAppliesValidMappings()
     {
-        _settingProvider.RawDictionary = "invalid-entry\n=\nä=ae\nö=oe";
+        _settingProvider.RawDictionary = "invalid-entry;=;ä=ae;ö=oe";
 
         var result = await _service.ApplyReplacementsAsync("schön", websiteChannelId: 42, CancellationToken.None);
 
@@ -74,7 +74,7 @@ public class NonAsciiUrlReplacementServiceTests
     [Test]
     public async Task ApplyReplacementsAsync_UsesLatestDuplicateMappingValue()
     {
-        _settingProvider.RawDictionary = "ä=ae\nä=aa";
+        _settingProvider.RawDictionary = "ä=ae;ä=aa";
 
         var result = await _service.ApplyReplacementsAsync("btpnewä", websiteChannelId: 42, CancellationToken.None);
 
@@ -84,7 +84,7 @@ public class NonAsciiUrlReplacementServiceTests
     [Test]
     public async Task ApplyReplacementsAsync_UsesConfiguredUppercaseMappings()
     {
-        _settingProvider.RawDictionary = "Ä=AE\nÖ=OE\nÜ=UE";
+        _settingProvider.RawDictionary = "Ä=AE;Ö=OE;Ü=UE";
 
         var result = await _service.ApplyReplacementsAsync("BÄR", websiteChannelId: 42, CancellationToken.None);
 
@@ -94,11 +94,19 @@ public class NonAsciiUrlReplacementServiceTests
     [Test]
     public void ApplyRules_PrioritizesLongerKeysFirst()
     {
-        var rules = NonAsciiUrlReplacementService.ParseRules("ä=ae\näe=aeX");
+        var rules = NonAsciiUrlReplacementService.ParseRules("ä=ae;äe=aeX");
 
         var result = NonAsciiUrlReplacementService.ApplyRules("äe", rules);
 
         Assert.That(result.Value, Is.EqualTo("aeX"));
+    }
+
+    [Test]
+    public void ParseRules_IgnoresEntriesSeparatedOnlyByNewlines()
+    {
+        var rules = NonAsciiUrlReplacementService.ParseRules("ä=ae\nö=oe");
+
+        Assert.That(rules, Is.Empty);
     }
 
     private sealed class StubSettingProvider : INonAsciiUrlReplacementSettingProvider
