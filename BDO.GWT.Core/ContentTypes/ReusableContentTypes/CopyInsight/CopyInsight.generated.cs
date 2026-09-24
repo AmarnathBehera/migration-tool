@@ -79,7 +79,7 @@ namespace BDO
 		/// <summary>
 		/// InsightAttachment.
 		/// </summary>
-		public ContentItemAsset InsightAttachment { get; set; }
+		public IEnumerable<ContentAttachment> InsightAttachment { get; set; }
 
 
 		/// <summary>
