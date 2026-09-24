@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Error Pages</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="3ba60131-25a1-4c39-b9ad-b2a5033314e6" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="dec01a73-fcf5-48f6-adf5-b7ab91102a2d" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="53c79eea-abfa-4f18-bae9-1db7d3abe55b" isunique="true" system="true" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>9aa163e9-84a9-44fb-9e09-64edc091244e</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-folder-inverted</ClassIconClass>
+  <ClassName>BDO.ErrorPages</ClassName>
+  <ClassShortName>BDOErrorPages</ClassShortName>
+  <ClassTableName>BDO_ErrorPages</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>
