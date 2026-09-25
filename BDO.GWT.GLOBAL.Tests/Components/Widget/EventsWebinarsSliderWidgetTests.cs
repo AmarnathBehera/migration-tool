@@ -171,22 +171,18 @@ namespace BDO.GWT.GLOBAL.Tests.Components.Widget
         public async Task InvokeAsync_WithAllProperties_MapsPropertiesToDataCorrectly()
         {
             var pageGuid = Guid.NewGuid();
-            var currentPageMock = new Mock<IWebPageFieldsSource>();
-
-            SetupContentServiceMock(currentPageMock.Object);
 
             EventsWebinarsSliderData? capturedData = null;
-
             var expectedDto = CreateDto();
 
             _serviceMock
                 .Setup(x => x.GetEventsWebinarsSliderAsync(
                     pageGuid,
-                    currentPageMock.Object.GetType().Name,
+                    It.IsAny<string>(),               // widget passes "RoutedWebPage"
                     It.IsAny<EventsWebinarsSliderData>(),
                     It.IsAny<CancellationToken>()))
                 .Callback<Guid, string, EventsWebinarsSliderData, CancellationToken>(
-                    (_, __, data, _) => capturedData = data)
+                    (_, __, data, ___) => capturedData = data)
                 .ReturnsAsync(expectedDto);
 
             var properties = new EventsWebinarsSliderWidgetProperties
