@@ -63,7 +63,8 @@ public class ErrorService : IErrorService
             .GetPagesAsync<StatusCode>(
             new RetrievePagesParameters { 
                 LanguageName = languageName,
-                ChannelName = channelName
+                ChannelName = channelName,
+                IsForPreview=false
             }
                 ,
                 query =>

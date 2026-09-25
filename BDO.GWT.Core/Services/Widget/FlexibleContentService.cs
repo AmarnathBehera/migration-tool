@@ -104,7 +104,7 @@ public class FlexibleContentService : IFlexibleContentService
                     ? HtmlHelper.ExtractTextFromHtml(desc)
                     : null,
                 ReadMoreLink = url,
-                ImageURL = metadata?.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
+                ImageURL = metadata?.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url.TrimStart('~'),
                 ImageAltText = metadata?.MetadataTeaserImageAltText,
                 IsFeatured = featuredGuids.Contains(guid),
             });
