@@ -73,6 +73,7 @@ public class SectionEventsService : ISectionEventsService
         {
             Title = page.EventsWebinarsListTitle,
             Description = page.EventsWebinarsListDescription,
+            ApiEndpointName = "EventsSectionPage/Items",
             Filters = page.EventsWebinarsListFilteringEnabled
                 ? await _eventWebinarCardsService.CreateFiltersAsync(filters, null, cancellationToken)
                 : null,

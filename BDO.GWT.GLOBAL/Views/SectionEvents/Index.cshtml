@@ -14,7 +14,7 @@
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
     var pageId = pageContext.WebPage.WebPageItemID;
-    if (WebsiteChannelContext.IsPreview && Model != null && !string.IsNullOrEmpty(Model.CardsGrid.ApiEndpointName))
+    if (WebsiteChannelContext.IsPreview && Model?.CardsGrid != null && !string.IsNullOrEmpty(Model.CardsGrid.ApiEndpointName))
     {
         var culture = CultureContext.CurrentLanguageTag.ToLowerInvariant();
         Model.CardsGrid.ApiEndpointName = Url.Kentico().ApplyPreviewContext($"/api/{culture}/{Model.CardsGrid.ApiEndpointName}");
