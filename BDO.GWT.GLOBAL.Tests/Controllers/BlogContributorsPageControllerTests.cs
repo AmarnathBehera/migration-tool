@@ -141,7 +141,7 @@ public class BlogContributorsPageControllerTests
 
         _contentServiceMock
             .Setup(s => s.RetrieveCurrentPageAsync<BlogContributors>(
-                It.Is<RetrieveCurrentPageParameters>(p => p.LinkedItemsMaxLevel == 4),
+                It.Is<RetrieveCurrentPageParameters>(p => p.LinkedItemsMaxLevel == 2),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(page);
 
@@ -153,7 +153,7 @@ public class BlogContributorsPageControllerTests
 
         _contentServiceMock.Verify(
             s => s.RetrieveCurrentPageAsync<BlogContributors>(
-                It.Is<RetrieveCurrentPageParameters>(p => p.LinkedItemsMaxLevel == 4),
+                It.Is<RetrieveCurrentPageParameters>(p => p.LinkedItemsMaxLevel == 2),
                 It.IsAny<CancellationToken>()),
             Times.Once);
     }
