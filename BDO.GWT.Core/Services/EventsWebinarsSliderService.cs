@@ -14,12 +14,6 @@ namespace BDO.GWT.Core.Services;
 
 public interface IEventsWebinarsSliderService
 {
-    //Task<EventsWebinarsSliderDto> GetEventsWebinarsSliderAsync<T>(
-    //    T currentPage,
-    //    EventsWebinarsSliderData data,
-    //    CancellationToken cancellationToken)
-    //    where T : IWebPageFieldsSource;
-
     Task<EventsWebinarsSliderDto> GetEventsWebinarsSliderAsync(
     Guid currentPageGuid,
     string? pageTypeName,
