@@ -14,18 +14,18 @@ namespace BDO.GWT.Core.Services;
 
 public interface IEventsWebinarsSliderService
 {
-    Task<EventsWebinarsSliderDto> GetEventsWebinarsSliderAsync<T>(
-        T currentPage,
-        EventsWebinarsSliderData data,
-        CancellationToken cancellationToken)
-        where T : IWebPageFieldsSource;
+    Task<EventsWebinarsSliderDto> GetEventsWebinarsSliderAsync(
+    Guid currentPageGuid,
+    string? pageTypeName,
+    EventsWebinarsSliderData data,
+    CancellationToken cancellationToken);
 
-    Task<ICollection<EventsWebinarsCardDto>> GetFilteredItemsAsync<T>(
-        T currentPage,
+    Task<ICollection<EventsWebinarsCardDto>> GetFilteredItemsAsync(
+        Guid currentPageGuid,
+        string? pageTypeName,
         HashSet<ContentItemReference> featuredGuids,
         CardsQuery query,
-        CancellationToken cancellationToken)
-        where T : IWebPageFieldsSource;
+        CancellationToken cancellationToken);
 
     Task<ICollection<EventsWebinarsCardDto>> GetAPIFilteredItemsAsync(
         CardsQuery query,
@@ -62,13 +62,13 @@ public class EventsWebinarsSliderService : IEventsWebinarsSliderService
         _contentQueryExecutor = contentQueryExecutor;
     }
 
-    public async Task<EventsWebinarsSliderDto> GetEventsWebinarsSliderAsync<T>(
-        T currentPage,
+    public async Task<EventsWebinarsSliderDto> GetEventsWebinarsSliderAsync(
+        Guid currentPageGuid,
+        string? pageTypeName,
         EventsWebinarsSliderData data,
         CancellationToken cancellationToken)
-        where T : IWebPageFieldsSource
     {
-        ArgumentNullException.ThrowIfNull(currentPage);
+        //ArgumentNullException.ThrowIfNull(currentPage);
         ArgumentNullException.ThrowIfNull(data);
 
         var featuredGuids = (data.FeaturedEventAndWebinarNodeGuids
@@ -91,7 +91,8 @@ public class EventsWebinarsSliderService : IEventsWebinarsSliderService
         // empty CardsQuery() here is correct; there's no filter selection to
         // carry through it.
         var items = await GetFilteredItemsAsync(
-            currentPage,
+            currentPageGuid,
+            pageTypeName,
             featuredGuids,
             new CardsQuery(),
             cancellationToken);
@@ -118,25 +119,24 @@ public class EventsWebinarsSliderService : IEventsWebinarsSliderService
             TopMargin = data.TopMargin ?? string.Empty,
             BottomMargin = data.BottomMargin ?? string.Empty,
             WidgetID = data.WidgetID,
-            CurrentPageGuid = currentPage.SystemFields.ContentItemGUID,
-            PageType = currentPage.GetType().Name
+            CurrentPageGuid = currentPageGuid,
+            PageType = pageTypeName
         };
     }
 
-    public async Task<ICollection<EventsWebinarsCardDto>> GetFilteredItemsAsync<T>(
-        T currentPage,
+    public async Task<ICollection<EventsWebinarsCardDto>> GetFilteredItemsAsync(
+        Guid currentPageGuid,
+        string? pageTypeName,
         HashSet<ContentItemReference> featuredGuids,
         CardsQuery query,
         CancellationToken cancellationToken)
-        where T : IWebPageFieldsSource
     {
-        ArgumentNullException.ThrowIfNull(currentPage);
         query ??= new CardsQuery();
         featuredGuids ??= new HashSet<ContentItemReference>();
 
         return await BuildAndExecuteQueryAsync(
-            currentPage.SystemFields.ContentItemGUID,
-            currentPage.GetType().Name,
+            currentPageGuid,
+            pageTypeName,
             featuredGuids,
             query,
             cancellationToken);
