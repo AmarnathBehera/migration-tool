@@ -22,7 +22,7 @@ namespace BDO.GWT.Web.Controllers
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
             var currentPage = await _contentService.RetrieveCurrentPageAsync<BlogContributors>(
-            new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 }, cancellationToken);
+            new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 2 }, cancellationToken);
 
             if (currentPage is null)
                 return NotFound();
