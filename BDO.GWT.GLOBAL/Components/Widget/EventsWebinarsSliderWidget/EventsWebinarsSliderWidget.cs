@@ -58,12 +58,11 @@ public class EventsWebinarsSliderWidget : ViewComponent
 
         var pageGuid = model.Page?.WebPageItemGUID;
 
-        if (model.Page is null)
+        if (model.Page is null || pageGuid is null)
         {
             return View("~/Components/Widget/EventsWebinarsSliderWidget/_EventsWebinarsSliderWidget.cshtml", new EventsWebinarsSliderDto { FilteringTooltipEnabled = false });
         }
-        //var currentPage = (await _contentService.GetItemsByGUIDAsync(new List<Guid> { page.Value })).FirstOrDefault();
-
+        
         var dto = await _eventsWebinarsSliderService.GetEventsWebinarsSliderAsync(
             pageGuid.Value, model.Page?.GetType().Name, data, cancellationToken);
 
