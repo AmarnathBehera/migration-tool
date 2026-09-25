@@ -68,7 +68,6 @@ public class EventsWebinarsSliderService : IEventsWebinarsSliderService
         EventsWebinarsSliderData data,
         CancellationToken cancellationToken)
     {
-        //ArgumentNullException.ThrowIfNull(currentPage);
         ArgumentNullException.ThrowIfNull(data);
 
         var featuredGuids = (data.FeaturedEventAndWebinarNodeGuids

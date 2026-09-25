@@ -16,16 +16,14 @@ public class EventsWebinarsSliderWidget : ViewComponent
 {
     private readonly IEventsWebinarsSliderService _eventsWebinarsSliderService;
     private readonly IContentRetriever _contentRetriever;
-    private readonly IContentService _contentService;
-
+    
     public EventsWebinarsSliderWidget(
         IEventsWebinarsSliderService eventsWebinarsSliderService,
         IContentRetriever contentRetriever, IContentService contentService)
     {
         _eventsWebinarsSliderService = eventsWebinarsSliderService;
         _contentRetriever = contentRetriever;
-        _contentService= contentService;
-    }
+     }
 
     public async Task<IViewComponentResult> InvokeAsync(
         ComponentViewModel<EventsWebinarsSliderWidgetProperties> model)
