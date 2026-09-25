@@ -516,6 +516,17 @@ where T : class
             // content types that don't have the column causes a SQL error.
             var hasNameProperty = type.GetProperty("Name") is not null;
 
+            // Person pages have no single title column - the filter option value is the
+            // composed "first last" name, so it has to be matched against the individual
+            // name columns instead.
+            var hasPersonNameProperties =
+                type.GetProperty("PersonFirstName") is not null &&
+                type.GetProperty("PersonLastName") is not null;
+
+            var personNameParts = hasPersonNameProperties
+                ? SplitPersonName(pageName)
+                : null;
+
             var builder = new ContentItemQueryBuilder()
                 .ForContentType(contentTypeName, q => q
                     .ForWebsite(_websiteChannelContext.WebsiteChannelName)
@@ -534,6 +545,14 @@ where T : class
                         {
                             clause.Or().WhereEquals("Name", pageName);
                         }
+
+                        if (personNameParts is not null)
+                        {
+                            clause.Or().Where(personWhere => personWhere
+                                .WhereEquals("PersonFirstName", personNameParts.Value.FirstName)
+                                .And()
+                                .WhereEquals("PersonLastName", personNameParts.Value.LastName));
+                        }
                     })
                     .TopN(1)
                 );
@@ -548,6 +567,28 @@ where T : class
                     cancellationToken);
 
             return result.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Splits a composed person display name into the first and last name used by the
+        /// PersonFirstName/PersonLastName columns. Any middle parts (surname prefixes such
+        /// as "van der") are treated as part of the last name.
+        /// </summary>
+        private static (string FirstName, string LastName)? SplitPersonName(string pageName)
+        {
+            if (string.IsNullOrWhiteSpace(pageName))
+            {
+                return null;
+            }
+
+            var parts = pageName.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            if (parts.Length < 2)
+            {
+                return null;
+            }
+
+            return (parts[0], parts[^1]);
         }
 
         public async Task<IEnumerable<T>> GetPagesByGuidsAsync<T>(
