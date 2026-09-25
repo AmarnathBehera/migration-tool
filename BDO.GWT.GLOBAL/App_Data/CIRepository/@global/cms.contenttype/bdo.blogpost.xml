@@ -16,9 +16,50 @@
       <schema guid="45af2efa-f3b7-44e5-87f2-3e7c9afb8843" name="45af2efa-f3b7-44e5-87f2-3e7c9afb8843">
         <properties />
       </schema>
-      <schema guid="e87987a6-ebfd-4d15-981c-fbaacdfbf6bc" name="e87987a6-ebfd-4d15-981c-fbaacdfbf6bc">
-        <properties />
-      </schema>
+      <field allowempty="true" column="AuthorInformationSeperator" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="c1923695-2dd6-4b97-a79a-e45f5b4eea55" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Author Information</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="BlogRelevantContactPerson" columnprecision="0" columntype="contentitemreference" enabled="true" guid="016cce8e-3e2f-4bc7-ae1b-19eb6baea1b5" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Relevant contact people</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>True</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["f3c1aa73-5245-4566-ae9c-ac80c54a6ce2"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="BlogRelatedExternalPeople" columnprecision="0" columntype="contentitemreference" enabled="true" guid="af587b95-ad53-4de2-bdf5-9109ec17dbf9" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Related external people</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>True</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["d62bd1c1-a3bf-4a66-a3f6-431f4f534317"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
       <schema guid="b760a373-943b-4321-ac39-d5067101ff82" name="b760a373-943b-4321-ac39-d5067101ff82">
         <properties />
       </schema>

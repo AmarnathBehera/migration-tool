@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="BlogPost"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class BlogPost : IWebPageFieldsSource, ICallToAction, ISidebar, IOGMetadataFields, ISearchAndSEO, IMetadata, IWhereShouldThisPageAppear, IAuthorInformation, IPageMetadata, IContentPage, IImageM
+	public partial class BlogPost : IWebPageFieldsSource, ICallToAction, ISidebar, IOGMetadataFields, ISearchAndSEO, IMetadata, IWhereShouldThisPageAppear, IPageMetadata, IContentPage, IImageM
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -33,6 +33,24 @@ namespace BDO
 		/// </summary>
 		[SystemField]
 		public WebPageFields SystemFields { get; set; }
+
+
+		/// <summary>
+		/// AuthorInformationSeperator.
+		/// </summary>
+		public string AuthorInformationSeperator { get; set; }
+
+
+		/// <summary>
+		/// BlogRelevantContactPerson.
+		/// </summary>
+		public IEnumerable<Person> BlogRelevantContactPerson { get; set; }
+
+
+		/// <summary>
+		/// BlogRelatedExternalPeople.
+		/// </summary>
+		public IEnumerable<ExternalPerson> BlogRelatedExternalPeople { get; set; }
 
 
 		/// <summary>
@@ -162,6 +180,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// MetadataCanonical.
+		/// </summary>
+		public string MetadataCanonical { get; set; }
+
+
+		/// <summary>
 		/// MetadataTeaserImage.
 		/// </summary>
 		public IEnumerable<ContentAttachment> MetadataTeaserImage { get; set; }
@@ -171,12 +195,6 @@ namespace BDO
 		/// MetadataTeaserImageAltText.
 		/// </summary>
 		public string MetadataTeaserImageAltText { get; set; }
-
-
-		/// <summary>
-		/// MetadataCanonical.
-		/// </summary>
-		public string MetadataCanonical { get; set; }
 
 
 		/// <summary>
@@ -237,18 +255,6 @@ namespace BDO
 		/// MetadataRssImage.
 		/// </summary>
 		public IEnumerable<IContentItemFieldsSource> MetadataRssImage { get; set; }
-
-
-		/// <summary>
-		/// RelevantContactPerson.
-		/// </summary>
-		public IEnumerable<IWebPageFieldsSource> RelevantContactPerson { get; set; }
-
-
-		/// <summary>
-		/// RelatedExternalPeople.
-		/// </summary>
-		public IEnumerable<ExternalPerson> RelatedExternalPeople { get; set; }
 
 
 		/// <summary>
