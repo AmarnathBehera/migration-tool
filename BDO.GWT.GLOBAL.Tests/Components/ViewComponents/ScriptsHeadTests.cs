@@ -1,11 +1,13 @@
 ﻿using BDO;
 using BDO.GWT.Common;
 using BDO.GWT.Xperience;
+using CMS.Websites;
 using CMS.DataEngine;
 using CMS.Websites.Routing;
 using GWTXbyKWeb.Components.ViewComponents;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Moq;
+using static BDO.GWT.GLOBAL.Tests.Components.ViewComponents.ScriptQueryMockFactory;
 
 namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 {
@@ -15,6 +17,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
         private Mock<IInfoProvider<WebChannelSnippetInfo>> _siteProviderMock = null!;
         private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
         private Mock<IInfoProvider<WebChannelSettingsInfo>> _webChannelSettingsProviderMock = null!;
+        private Mock<IInfoProvider<WebsiteChannelInfo>> _websiteChannelInfoProviderMock = null!;
         private ScriptsHead _component = null!;
 
         // Shared expected view path
@@ -27,37 +30,19 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
             _siteProviderMock = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
             _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
             _webChannelSettingsProviderMock = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
+            _websiteChannelInfoProviderMock = new Mock<IInfoProvider<WebsiteChannelInfo>>();
 
             _component = new ScriptsHead(
                 _globalProviderMock.Object,
                 _siteProviderMock.Object,
                 _websiteChannelContextMock.Object,
-                _webChannelSettingsProviderMock.Object);
+                _webChannelSettingsProviderMock.Object,
+                _websiteChannelInfoProviderMock.Object);
+            _websiteChannelInfoProviderMock.SetupWebsiteChannel(1, 1);
         }
 
         // ─── Helper: build a mocked ObjectQuery<T> ──────────────────────────────────
-        private static Mock<ObjectQuery<T>> SetupQueryReturning<T>(IEnumerable<T> items)
-            where T : AbstractInfo<T, IInfoProvider<T>>, new()
-        {
-            var itemList = items.ToList();
-            var mockQuery = new Mock<ObjectQuery<T>>();
-
-            mockQuery.Setup(q => q.WhereEquals(It.IsAny<string>(), It.IsAny<object>()))
-                     .Returns(mockQuery.Object);
-            mockQuery.Setup(q => q.TopN(It.IsAny<int>()))
-                     .Returns(mockQuery.Object);
-
-            mockQuery.As<IEnumerable<T>>()
-                     .Setup(q => q.GetEnumerator())
-                     .Returns(() => itemList.GetEnumerator());
-
-            mockQuery.Setup(q => q.GetEnumerableTypedResult(
-                         It.IsAny<System.Data.CommandBehavior>(),
-                         It.IsAny<bool>()))
-                     .Returns(itemList);
-
-            return mockQuery;
-        }
+        
 
         // ══════════════════════════════════════════════════════════════════════════
         // Stub inner classes — override virtual properties to avoid CMS IoC calls.

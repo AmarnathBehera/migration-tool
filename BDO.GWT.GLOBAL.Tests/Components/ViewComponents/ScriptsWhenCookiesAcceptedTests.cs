@@ -1,11 +1,13 @@
 ﻿using BDO;
 using BDO.GWT.Common;
 using BDO.GWT.Xperience;
+using CMS.Websites;
 using CMS.DataEngine;
 using CMS.Websites.Routing;
 using GWTXbyKWeb.Components.ViewComponents;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Moq;
+using static BDO.GWT.GLOBAL.Tests.Components.ViewComponents.ScriptQueryMockFactory;
 
 namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
 {
@@ -15,6 +17,7 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
         private Mock<IInfoProvider<WebChannelSnippetInfo>> _siteProviderMock = null!;
         private Mock<IWebsiteChannelContext> _websiteChannelContextMock = null!;
         private Mock<IInfoProvider<WebChannelSettingsInfo>> _webChannelSettingsProviderMock = null!;
+        private Mock<IInfoProvider<WebsiteChannelInfo>> _websiteChannelInfoProviderMock = null!;
         private ScriptsWhenCookiesAccepted _component = null!;
 
         // Shared expected view path
@@ -27,12 +30,16 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
             _siteProviderMock = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
             _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
             _webChannelSettingsProviderMock = new Mock<IInfoProvider<WebChannelSettingsInfo>>();
+            _websiteChannelInfoProviderMock = new Mock<IInfoProvider<WebsiteChannelInfo>>();
 
             _component = new ScriptsWhenCookiesAccepted(
                 _globalProviderMock.Object,
                 _siteProviderMock.Object,
                 _websiteChannelContextMock.Object,
-                _webChannelSettingsProviderMock.Object);
+                _webChannelSettingsProviderMock.Object,
+                _websiteChannelInfoProviderMock.Object);
+
+            _websiteChannelInfoProviderMock.SetupWebsiteChannel(1, 1);   // identity mapping
         }
 
         private static Mock<ObjectQuery<T>> SetupQueryReturning<T>(IEnumerable<T> items)
@@ -46,6 +53,10 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
             mockQuery.Setup(q => q.TopN(It.IsAny<int>()))
                      .Returns(mockQuery.Object);
 
+            // NEW — used by the WebsiteChannelInfo lookup
+            mockQuery.Setup(q => q.Columns(It.IsAny<string[]>()))
+                     .Returns(mockQuery.Object);
+
             mockQuery.As<IEnumerable<T>>()
                      .Setup(q => q.GetEnumerator())
                      .Returns(() => itemList.GetEnumerator());
@@ -54,6 +65,13 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
                          It.IsAny<System.Data.CommandBehavior>(),
                          It.IsAny<bool>()))
                      .Returns(itemList);
+
+            // NEW — used by the channel lookup and the settings query
+            mockQuery.Setup(q => q.GetEnumerableTypedResultAsync(
+                         It.IsAny<System.Data.CommandBehavior>(),
+                         It.IsAny<bool>(),
+                         It.IsAny<CancellationToken>()))
+                     .ReturnsAsync(itemList);
 
             return mockQuery;
         }
@@ -86,6 +104,27 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
             public override string ScriptexecutedwhencookiesareacceptedKeyValue => _keyValue;
             internal StubGlobalSettings(string keyValue) => _keyValue = keyValue;
         }
+
+        private sealed class StubWebsiteChannel : WebsiteChannelInfo
+        {
+            private readonly int _websiteChannelId;
+            private readonly int _channelId;
+            public override int WebsiteChannelID => _websiteChannelId;
+            public override int WebsiteChannelChannelID => _channelId;
+
+            internal StubWebsiteChannel(int websiteChannelId, int channelId)
+            {
+                _websiteChannelId = websiteChannelId;
+                _channelId = channelId;
+            }
+        }
+
+        /// <summary>Maps CMS_WebsiteChannel PK -> CMS_Channel FK for the base component lookup.</summary>
+        private void SetupWebsiteChannel(int websiteChannelId, int channelId) =>
+            _websiteChannelInfoProviderMock
+                .Setup(p => p.Get())
+                .Returns(SetupQueryReturning<WebsiteChannelInfo>(
+                    [new StubWebsiteChannel(websiteChannelId, channelId)]).Object);
 
         // ── Factory helpers ──────────────────────────────────────────────────────────
         private static StubChannelSettings MakeChannelSettings(int settingsId, int channelId)
@@ -580,6 +619,29 @@ namespace BDO.GWT.GLOBAL.Tests.Components.ViewComponents
             var result = await _component.InvokeAsync(CancellationToken.None);
 
             Assert.That(result, Is.TypeOf<ViewViewComponentResult>());
+        }
+
+        [Test]
+        public async Task InvokeAsync_FiltersChannelSettingsByResolvedChannelID()
+        {
+            const int websiteChannelId = 3;
+            const int channelId = 4;
+
+            _websiteChannelContextMock.SetupGet(c => c.WebsiteChannelID).Returns(websiteChannelId);
+            SetupWebsiteChannel(websiteChannelId, channelId);
+
+            var settingsQuery = SetupQueryReturning<WebChannelSettingsInfo>(
+                [MakeChannelSettings(10, channelId)]);
+            _webChannelSettingsProviderMock.Setup(p => p.Get()).Returns(settingsQuery.Object);
+            _siteProviderMock.Setup(p => p.Get())
+                .Returns(SetupQueryReturning<WebChannelSnippetInfo>([]).Object);
+
+            await _component.InvokeAsync(CancellationToken.None);
+
+            settingsQuery.Verify(q => q.WhereEquals(
+                nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), channelId), Times.Once);
+            settingsQuery.Verify(q => q.WhereEquals(
+                nameof(WebChannelSettingsInfo.WebChannelSettingsChannelID), websiteChannelId), Times.Never);
         }
     }
 }
