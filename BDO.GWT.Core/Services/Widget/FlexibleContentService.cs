@@ -21,10 +21,14 @@ public class FlexibleContentService : IFlexibleContentService
         IndustryCategory.CONTENT_TYPE_NAME,
         Industry.CONTENT_TYPE_NAME,
         IndustryService.CONTENT_TYPE_NAME,
+        Insight.CONTENT_TYPE_NAME,
+        MicrositePage.CONTENT_TYPE_NAME,
         BusinessLine.CONTENT_TYPE_NAME,
         ServiceArea.CONTENT_TYPE_NAME,
         Service.CONTENT_TYPE_NAME,
         Sub_Service.CONTENT_TYPE_NAME,
+        SpecialtiesPage.CONTENT_TYPE_NAME,
+        SpecialtiesArea.CONTENT_TYPE_NAME,
     ];
 
     private readonly IContentRetriever _contentRetriever;
