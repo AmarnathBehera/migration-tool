@@ -182,8 +182,8 @@ public class RelatedContentCardService : IRelatedContentCardService
                     Insight i => MatchesLinkedItemName(i.MetadataBusinessLine, filterParameterValue),
                     BlogPost b => MatchesLinkedItemName(b.MetadataBusinessLine, filterParameterValue),
                     NewsArticle n => MatchesLinkedItemName(n.MetadataBusinessLine, filterParameterValue),
-                    Event e => MatchesLinkedItemName(e.MetadataBusinessLine, filterParameterValue),
-                    Webinar w => MatchesLinkedItemName(w.MetadataBusinessLine, filterParameterValue),
+                    Event e => MatchesLinkedItemName(e.MetadataBusinessLineEvent, filterParameterValue),
+                    Webinar w => MatchesLinkedItemName(w.MetadataBusinessLineEvent, filterParameterValue),
                     MicrositePage m => MatchesLinkedItemName(m.BusinessLines, filterParameterValue),
                     _ => false
                 },
@@ -193,8 +193,8 @@ public class RelatedContentCardService : IRelatedContentCardService
                     Insight i => MatchesLinkedItemName(i.MetadataServiceAreas, filterParameterValue),
                     BlogPost b => MatchesLinkedItemName(b.MetadataServiceAreas, filterParameterValue),
                     NewsArticle n => MatchesLinkedItemName(n.MetadataServiceAreas, filterParameterValue),
-                    Event e => MatchesLinkedItemName(e.MetadataServiceAreas, filterParameterValue),
-                    Webinar w => MatchesLinkedItemName(w.MetadataServiceAreas, filterParameterValue),
+                    Event e => MatchesLinkedItemName(e.MetadataServiceAreasEvent, filterParameterValue),
+                    Webinar w => MatchesLinkedItemName(w.MetadataServiceAreasEvent, filterParameterValue),
                     MicrositePage m => MatchesLinkedItemName(m.ServiceAreas, filterParameterValue),
                     _ => false
                 },
@@ -204,8 +204,8 @@ public class RelatedContentCardService : IRelatedContentCardService
                     Insight i => MatchesLinkedItemName(i.MetadataIndustryCategories, filterParameterValue),
                     BlogPost b => MatchesLinkedItemName(b.MetadataIndustryCategories, filterParameterValue),
                     NewsArticle n => MatchesLinkedItemName(n.MetadataIndustryCategories, filterParameterValue),
-                    Event e => MatchesLinkedItemName(e.MetadataIndustryCategories, filterParameterValue),
-                    Webinar w => MatchesLinkedItemName(w.MetadataIndustryCategories, filterParameterValue),
+                    Event e => MatchesLinkedItemName(e.MetadataIndustryCategoriesEvent, filterParameterValue),
+                    Webinar w => MatchesLinkedItemName(w.MetadataIndustryCategoriesEvent, filterParameterValue),
                     MicrositePage m => MatchesLinkedItemName(m.IndustryCategories, filterParameterValue),
                     _ => false
                 },
@@ -215,8 +215,8 @@ public class RelatedContentCardService : IRelatedContentCardService
                     Insight i => MatchesLinkedItemName(i.ContentType, filterParameterValue),
                     BlogPost b => MatchesLinkedItemName(b.ContentType, filterParameterValue),
                     NewsArticle n => MatchesLinkedItemName(n.ContentType, filterParameterValue),
-                    Event e => MatchesLinkedItemName(e.ContentType, filterParameterValue),
-                    Webinar w => MatchesLinkedItemName(w.ContentType, filterParameterValue),
+                    Event e => MatchesLinkedItemName(e.ContentTypeEvent, filterParameterValue),
+                    Webinar w => MatchesLinkedItemName(w.ContentTypeEvent, filterParameterValue),
                     MicrositePage m => MatchesLinkedItemName(m.MicrositeContentType, filterParameterValue),
                     _ => false
                 },
@@ -291,8 +291,8 @@ public class RelatedContentCardService : IRelatedContentCardService
 
             BlogPost b     => BuildCard(b, isFeatured, new CardContent(Teaser(b.MetadataTeaserImage), b.MetadataTeaserImageAltText, b.ContentType?.FirstOrDefault()?.Name, b.MetadataTitle, b.MetadataDescription)),
             NewsArticle n  => BuildCard(n, isFeatured, new CardContent(Teaser(n.MetadataTeaserImage), n.MetadataTeaserImageAltText, n.ContentType?.FirstOrDefault()?.Name, n.MetadataTitle, n.MetadataDescription)),
-            Event e        => BuildCard(e, isFeatured, new CardContent(Teaser(e.MetadataTeaserImage), e.MetadataTeaserImageAltText, e.ContentType?.FirstOrDefault()?.Name, e.MetadataTitle, e.MetadataDescription, DateOverride: e.EventDateFrom, DateToOverride: e.EventDateTo)),
-            Webinar w      => BuildCard(w, isFeatured, new CardContent(Teaser(w.MetadataTeaserImage), w.MetadataTeaserImageAltText, w.ContentType?.FirstOrDefault()?.Name, w.MetadataTitle, w.MetadataDescription, DateOverride: w.EventDateFrom, DateToOverride: w.EventDateTo)),
+            Event e        => BuildCard(e, isFeatured, new CardContent(Teaser(e.MetadataTeaserImage), e.MetadataTeaserImageAltText, e.ContentTypeEvent?.FirstOrDefault()?.Name, e.MetadataTitle, e.MetadataDescription, DateOverride: e.EventDateFrom, DateToOverride: e.EventDateTo)),
+            Webinar w      => BuildCard(w, isFeatured, new CardContent(Teaser(w.MetadataTeaserImage), w.MetadataTeaserImageAltText, w.ContentTypeEvent?.FirstOrDefault()?.Name, w.MetadataTitle, w.MetadataDescription, DateOverride: w.EventDateFrom, DateToOverride: w.EventDateTo)),
             MicrositePage m => BuildCard(m, isFeatured, new CardContent(Teaser(m.MetadataTeaserImage), m.MetadataTeaserImageAltText, m.MicrositeContentType?.FirstOrDefault()?.Name, m.MetadataTitle, m.MetadataDescription)),
 
             _ => null

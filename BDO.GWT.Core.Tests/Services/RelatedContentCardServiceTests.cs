@@ -1242,10 +1242,10 @@ public class RelatedContentCardServiceTests
 
         SetProperty(ev, nameof(Event.SystemFields), CreateWebPageFields(guid));
         SetProperty(ev, nameof(Event.MetadataTitle), title);
-        SetProperty(ev, nameof(Event.ContentType), Enumerable.Empty<Contenttypes>());
-        SetProperty(ev, nameof(Event.MetadataBusinessLine), Enumerable.Empty<BusinessLine>());
-        SetProperty(ev, nameof(Event.MetadataServiceAreas), Enumerable.Empty<ServiceArea>());
-        SetProperty(ev, nameof(Event.MetadataIndustryCategories), Enumerable.Empty<IndustryCategory>());
+        SetProperty(ev, nameof(Event.ContentTypeEvent), Enumerable.Empty<Contenttypes>());
+        SetProperty(ev, nameof(Event.MetadataBusinessLineEvent), Enumerable.Empty<BusinessLine>());
+        SetProperty(ev, nameof(Event.MetadataServiceAreasEvent), Enumerable.Empty<ServiceArea>());
+        SetProperty(ev, nameof(Event.MetadataIndustryCategoriesEvent), Enumerable.Empty<IndustryCategory>());
 
         var teaserImage = teaserImageUrl is not null
             ? new[] { CreateTeaserImageAttachment(teaserImageUrl) }
@@ -1264,10 +1264,10 @@ public class RelatedContentCardServiceTests
 
         SetProperty(webinar, nameof(Webinar.SystemFields), CreateWebPageFields(guid));
         SetProperty(webinar, nameof(Webinar.MetadataTitle), title);
-        SetProperty(webinar, nameof(Webinar.ContentType), Enumerable.Empty<Contenttypes>());
-        SetProperty(webinar, nameof(Webinar.MetadataBusinessLine), Enumerable.Empty<BusinessLine>());
-        SetProperty(webinar, nameof(Webinar.MetadataServiceAreas), Enumerable.Empty<ServiceArea>());
-        SetProperty(webinar, nameof(Webinar.MetadataIndustryCategories), Enumerable.Empty<IndustryCategory>());
+        SetProperty(webinar, nameof(Webinar.ContentTypeEvent), Enumerable.Empty<Contenttypes>());
+        SetProperty(webinar, nameof(Webinar.MetadataBusinessLineEvent), Enumerable.Empty<BusinessLine>());
+        SetProperty(webinar, nameof(Webinar.MetadataServiceAreasEvent), Enumerable.Empty<ServiceArea>());
+        SetProperty(webinar, nameof(Webinar.MetadataIndustryCategoriesEvent), Enumerable.Empty<IndustryCategory>());
 
         var teaserImage = teaserImageUrl is not null
             ? new[] { CreateTeaserImageAttachment(teaserImageUrl) }
