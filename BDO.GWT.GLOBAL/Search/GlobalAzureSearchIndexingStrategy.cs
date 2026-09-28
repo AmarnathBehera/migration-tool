@@ -264,12 +264,7 @@ public class GlobalAzureSearchIndexingStrategy : BaseAzureSearchIndexingStrategy
 
             if (pageWebPageSource is not null)
             {
-                //result.PublishFrom =
-                //       pageWebPageSource?.SystemFields.ContentItemCommonDataLastPublishedWhen is DateTime from
-                //       ? new DateTimeOffset(from)
-                //       : DateTimeOffset.MinValue;
-
-                //result.PublishTo = null;
+                
                 MapDateFields(result, pageWebPageSource);
             }
            
@@ -298,27 +293,7 @@ public class GlobalAzureSearchIndexingStrategy : BaseAzureSearchIndexingStrategy
 
         //date time offset is used to ensure that the date is stored in UTC format in the index,
         //which is important for accurate filtering and sorting of search results based on publish dates.
-        //result.PublishFrom = page.SystemFields.ContentItemCommonDataLastPublishedWhen.HasValue
-        //                    ? new DateTimeOffset(
-        //                    DateTime.SpecifyKind(
-        //                    page.SystemFields.ContentItemCommonDataLastPublishedWhen.Value,
-        //                    DateTimeKind.Utc))
-        //                   : null;
-        //result.PublishTo = null;
-
-        //result.SortDate = page.SystemFields.ContentItemCommonDataLastPublishedWhen.HasValue
-        //                   ? new DateTimeOffset(
-        //                   DateTime.SpecifyKind(
-        //                   page.SystemFields.ContentItemCommonDataLastPublishedWhen.Value,
-        //                   DateTimeKind.Utc))
-        //                  : null;
-        //result.CreatedWhen = page.SystemFields.ContentItemCommonDataFirstPublishedWhen.HasValue
-        //                   ? new DateTimeOffset(
-        //                   DateTime.SpecifyKind(
-        //                   page.SystemFields.ContentItemCommonDataFirstPublishedWhen.Value,
-        //                   DateTimeKind.Utc))
-        //                  : null;
-        MapDateFields(result, page);
+         MapDateFields(result, page);
     }
 
     /// <summary>
@@ -439,10 +414,10 @@ public class GlobalAzureSearchIndexingStrategy : BaseAzureSearchIndexingStrategy
     /// Sets PublishFrom / SortDate / CreatedWhen from the page system fields, with a fallback chain so the
     /// sortable fields are never null (null values break "Most recent" ordering in Azure AI Search).
     /// </summary>
-    private static void MapDateFields(GlobalSearchModel result, IWebPageFieldsSource? page)
+    private static void MapDateFields(GlobalSearchModel result, IWebPageFieldsSource page)
     {
-        var lastPublished  = ToUtcOffset(page?.SystemFields.ContentItemCommonDataLastPublishedWhen);
-        var firstPublished = ToUtcOffset(page?.SystemFields.ContentItemCommonDataFirstPublishedWhen);
+        var lastPublished  = ToUtcOffset(page.SystemFields.ContentItemCommonDataLastPublishedWhen);
+        var firstPublished = ToUtcOffset(page.SystemFields.ContentItemCommonDataFirstPublishedWhen);
 
         result.PublishFrom = firstPublished ?? lastPublished;
         result.PublishTo   = null;
