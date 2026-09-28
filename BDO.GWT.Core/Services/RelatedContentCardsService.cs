@@ -118,7 +118,7 @@ public class RelatedContentCardService : IRelatedContentCardService
 
         var ordered = ((IEnumerable<IWebPageFieldsSource>)filtered)
             .OrderByDescending(x => isFeatured(x))
-            .ThenBy(x => GetOrderingDate(x))
+            .ThenByDescending(x => GetOrderingDate(x))
             .ToArray();
 
         var currentPage = cardsQuery.CurrentPage ?? 1;
