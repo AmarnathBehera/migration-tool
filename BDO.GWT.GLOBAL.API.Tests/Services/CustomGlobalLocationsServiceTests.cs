@@ -36,6 +36,7 @@ public class CustomGlobalLocationsServiceTests
     private static GlobalLocationCustomTableUpsertDto CreateUpsertDto() => new()
     {
         GlobalLocationTitle = "Head Office",
+        GlobalLocationRegion = "1",
         MemberFirmId = 1,
         ChannelId = 42
     };
