@@ -104,10 +104,6 @@ namespace BDO.GWT.Core.Mappers
         private static DateTime? ToDateTime(DateTimeOffset? value) =>
             HasValue(value) ? value!.Value.DateTime : null;
 
-        // Same as ToUtcDateTime but falls back to DateTime.MinValue instead of null.
-        private static DateTime ToUtcDateTimeOrMin(DateTimeOffset? value) =>
-            HasValue(value) ? value!.Value.UtcDateTime : DateTime.MinValue;
-
         // Returns the first non-null/non-whitespace value, or null if none qualify.
         private static string? FirstNotEmpty(params string?[] values) =>
             values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
