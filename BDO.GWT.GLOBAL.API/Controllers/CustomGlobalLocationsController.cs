@@ -51,6 +51,10 @@ public class CustomGlobalLocationsController : EntityControllerBase
             var result = await _service.CreateAsync(dto);
             return Ok(result);
         }
+        catch (InvalidGlobalLocationRegionException ex)
+        {
+            return BadRequest(ex.Message);
+        }
         catch (DuplicateMemberFirmException ex)
         {
             return Conflict(ex.Message);
@@ -87,6 +91,10 @@ public class CustomGlobalLocationsController : EntityControllerBase
             }
 
             return Ok(result);
+        }
+        catch (InvalidGlobalLocationRegionException ex)
+        {
+            return BadRequest(ex.Message);
         }
         catch (DuplicateMemberFirmException ex)
         {
