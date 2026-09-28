@@ -344,7 +344,7 @@ Advanced
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
-      <schema guid="6bf9af2e-ee19-461b-a071-2b6541b36653" name="6bf9af2e-ee19-461b-a071-2b6541b36653">
+      <schema guid="423a61e5-83a9-485d-8de4-a8ec03a13585" name="423a61e5-83a9-485d-8de4-a8ec03a13585">
         <properties />
       </schema>
       <field allowempty="true" column="MetadataBusinessIssues" columnprecision="0" columntype="contentitemreference" enabled="true" guid="b634b9a0-ad2d-4f09-999a-2516581c3fa7" visible="true">
