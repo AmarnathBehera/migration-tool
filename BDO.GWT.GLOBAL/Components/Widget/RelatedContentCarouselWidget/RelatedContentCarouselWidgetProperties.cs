@@ -7,6 +7,7 @@ using Kentico.Forms.Web.Mvc;
 using Kentico.Xperience.Admin.Base.FormAnnotations;
 using Kentico.Xperience.Admin.Base.Forms;
 using Kentico.Xperience.Admin.Websites.FormAnnotations;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,13 +48,20 @@ public class RelatedContentCarouselWidgetProperties : BaseWidgetProperties
 
     [GeneralSelectorComponent(dataProviderType: typeof(FiltersDataProvider), Label = "Filters", ExplanationText = "Filters that visitor will be able to filter related content by. Some filter values will not work for some page types.", Order = 3)]
     [VisibleIfTrue(nameof(FilteringEnabled))]
+    // ObjectCreationHandling.Replace prevents the stored values from being appended to the
+    // default list below, which would otherwise duplicate every entry.
+    [JsonProperty(ObjectCreationHandling = ObjectCreationHandling.Replace)]
     public List<string> Filters { get; set; } = RelatedContentFilters
         .Where(x => x.IsDefault)
         .Select(x => x.ParameterName)
         .ToList();
 
     [GeneralSelectorComponent(dataProviderType: typeof(SelectedPageTypesConfiguration), Label = "Related content page types", ExplanationText = "Note: All content is sorted in descending order - by \"Publish From\" for general content (newest first), and by start date for events (latest upcoming first).", Order = 4)]
-    public List<string> SelectedPageTypes { get; set; }
+    [JsonProperty(ObjectCreationHandling = ObjectCreationHandling.Replace)]
+    public List<string> SelectedPageTypes { get; set; } = AvailablePageTypes
+        .Where(x => x.IsDefault)
+        .Select(x => x.ParameterName)
+        .ToList();
 
     [ContentItemSelectorComponent(contentTypeNames: [BlogPost.CONTENT_TYPE_NAME, Event.CONTENT_TYPE_NAME, Insight.CONTENT_TYPE_NAME, MicrositePage.CONTENT_TYPE_NAME, NewsArticle.CONTENT_TYPE_NAME, Webinar.CONTENT_TYPE_NAME], Label = "Featured related content", ExplanationText = "Related content that will be tagged as featured and that will appear in front of other related content.", Order = 5)]
     public IEnumerable<ContentItemReference> FeaturedPages { get; set; }
