@@ -17,6 +17,13 @@ public class DuplicateMemberFirmException : Exception
     public DuplicateMemberFirmException(int memberFirmId)
         : base($"A location with MemberFirmID '{memberFirmId}' already exists.") { }
 }
+
+public class InvalidGlobalLocationRegionException : Exception
+{
+    public InvalidGlobalLocationRegionException(string? region)
+        : base($"GlobalLocationRegion '{region}' is invalid. Allowed values are 1, 2 or 3. " +
+            $"1 for AMERICAS, 2 for EMEA, and 3 for ASIA PACIFIC.") { }
+}
 public class GlobalLocationPersistenceException : Exception
 {
     public GlobalLocationPersistenceException(string message, Exception innerException)
@@ -26,6 +33,7 @@ public class GlobalLocationPersistenceException : Exception
 public class CustomGlobalLocationsService : ICustomGlobalLocationsService
 {
     private const string MemberFirmIdParameter = "@MemberFirmID";
+    private static readonly string[] AllowedRegions = { "1", "2", "3" };
 
     private readonly IConfiguration _configuration;
     private readonly IEventLogService eventLogService;
@@ -82,6 +90,7 @@ public class CustomGlobalLocationsService : ICustomGlobalLocationsService
     {
         try
         {
+            ValidateRegion(dto.GlobalLocationRegion);
             string connectionString = _configuration.GetConnectionString("CMSConnectionString")!;
 
             await using var connection = new SqlConnection(connectionString);
@@ -139,6 +148,10 @@ public class CustomGlobalLocationsService : ICustomGlobalLocationsService
 
             return MapReaderToDto(reader);
         }
+        catch (InvalidGlobalLocationRegionException)
+        {
+            throw;
+        }
         catch (DuplicateMemberFirmException)
         {
             // Known business rule violation - let it bubble up as-is so the
@@ -156,6 +169,7 @@ public class CustomGlobalLocationsService : ICustomGlobalLocationsService
     {
         try
         {
+            ValidateRegion(dto.GlobalLocationRegion);
             string connectionString = _configuration.GetConnectionString("CMSConnectionString")!;
 
             await using var connection = new SqlConnection(connectionString);
@@ -222,6 +236,10 @@ public class CustomGlobalLocationsService : ICustomGlobalLocationsService
             }
             return null;
         }
+        catch (InvalidGlobalLocationRegionException)
+        {
+            throw;
+        }
         catch (DuplicateMemberFirmException)
         {
             throw;
@@ -233,6 +251,13 @@ public class CustomGlobalLocationsService : ICustomGlobalLocationsService
         }
     }
 
+    private static void ValidateRegion(string? region)
+    {
+        if (!AllowedRegions.Contains(region.Trim()))
+        {
+            throw new InvalidGlobalLocationRegionException(region);
+        }
+    }
     private static async Task<bool> MemberFirmIdExistsAsync(SqlConnection connection, int memberFirmId)
     {
         const string sql = @"
