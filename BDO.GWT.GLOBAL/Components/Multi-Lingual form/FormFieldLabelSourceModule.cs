@@ -25,7 +25,7 @@ namespace BDO.Components.Widgets.FormWidget
     /// </summary>
     internal class FormFieldLabelSourceModule : Module
     {
-        private static IHttpContextAccessor httpContextAccessor;
+        private IHttpContextAccessor httpContextAccessor;
 
         public FormFieldLabelSourceModule()
             : base(nameof(FormFieldLabelSourceModule))
@@ -41,7 +41,7 @@ namespace BDO.Components.Widgets.FormWidget
             FormFieldRenderingConfiguration.GetConfiguration.Execute += SetLabelFromCode;
         }
 
-        private static void SetLabelFromCode(object sender, GetFormFieldRenderingConfigurationEventArgs e)
+        private void SetLabelFromCode(object sender, GetFormFieldRenderingConfigurationEventArgs e)
         {
             var rawLabel = e.FormComponent?.BaseProperties?.Label;
 
@@ -65,7 +65,7 @@ namespace BDO.Components.Widgets.FormWidget
         /// Resolves a localization key name to the translation text for the current culture,
         /// falling back from a specific culture like "en-gb" to its base language "en".
         /// </summary>
-        private static string ResolveResourceString(string resourceKey, string languageName)
+        private string ResolveResourceString(string resourceKey, string languageName)
         {
             var requestServices = httpContextAccessor.HttpContext?.RequestServices;
             if (requestServices == null)
