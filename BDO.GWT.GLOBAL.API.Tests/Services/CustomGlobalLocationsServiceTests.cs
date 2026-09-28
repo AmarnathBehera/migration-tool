@@ -83,6 +83,60 @@ public class CustomGlobalLocationsServiceTests
             Throws.TypeOf<GlobalLocationPersistenceException>());
     }
 
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("4")]
+    [TestCase("invalid")]
+    public void CreateAsync_WhenRegionIsInvalid_ThrowsInvalidGlobalLocationRegionException(string? region)
+    {
+        var service = CreateService();
+        var dto = CreateUpsertDto();
+        dto.GlobalLocationRegion = region;
+
+        Assert.That(
+            async () => await service.CreateAsync(dto),
+            Throws.TypeOf<InvalidGlobalLocationRegionException>());
+    }
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("4")]
+    [TestCase("invalid")]
+    public void UpdateAsync_WhenRegionIsInvalid_ThrowsInvalidGlobalLocationRegionException(string? region)
+    {
+        var service = CreateService();
+        var dto = CreateUpsertDto();
+        dto.GlobalLocationRegion = region;
+
+        Assert.That(
+            async () => await service.UpdateAsync(1, dto),
+            Throws.TypeOf<InvalidGlobalLocationRegionException>());
+    }
+
+    [TestCase("1")]
+    [TestCase("2")]
+    [TestCase("3")]
+    public void CreateAsync_WhenRegionIsValid_ThrowsPersistenceException_NotRegionException(string region)
+    {
+        // With a valid region, the region check passes and the failure surfaces
+        // as a connection/persistence error rather than InvalidGlobalLocationRegionException.
+        var service = CreateService("this is not a valid connection string");
+        var dto = CreateUpsertDto();
+        dto.GlobalLocationRegion = region;
+
+        Assert.That(
+            async () => await service.CreateAsync(dto),
+            Throws.TypeOf<GlobalLocationPersistenceException>());
+    }
+
+    [Test]
+    public void InvalidGlobalLocationRegionException_MessageContainsRegionValue()
+    {
+        var ex = new InvalidGlobalLocationRegionException("9");
+
+        Assert.That(ex.Message, Does.Contain("9"));
+    }
+
     [Test]
     public void DuplicateMemberFirmException_MessageContainsMemberFirmId()
     {

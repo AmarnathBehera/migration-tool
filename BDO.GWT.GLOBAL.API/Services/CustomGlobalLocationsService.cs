@@ -253,7 +253,7 @@ public class CustomGlobalLocationsService : ICustomGlobalLocationsService
 
     private static void ValidateRegion(string? region)
     {
-        if (!AllowedRegions.Contains(region.Trim()))
+        if (region is null || !AllowedRegions.Contains(region.Trim()))
         {
             throw new InvalidGlobalLocationRegionException(region);
         }
