@@ -20,7 +20,7 @@ namespace BDO
 	/// Represents a page of type <see cref="Webinar"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class Webinar : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IWhereShouldThisPageAppear, IPageMetadata, IBDOLocationandcontactinformation
+	public partial class Webinar : IWebPageFieldsSource, IOGMetadataFields, ISearchAndSEO, IMetadata, IPageMetadata, IBDOLocationandcontactinformation, IWhereShouldThisPageAppearEvent
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -180,12 +180,6 @@ namespace BDO
 
 
 		/// <summary>
-		/// MetadataBusinessLines.
-		/// </summary>
-		public IEnumerable<BusinessLine> MetadataBusinessLines { get; set; }
-
-
-		/// <summary>
 		/// MetadataOfficeLocation.
 		/// </summary>
 		public IEnumerable<LocationOffice> MetadataOfficeLocation { get; set; }
@@ -276,6 +270,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// MetadataCanonical.
+		/// </summary>
+		public string MetadataCanonical { get; set; }
+
+
+		/// <summary>
 		/// MetadataTeaserImage.
 		/// </summary>
 		public IEnumerable<ContentAttachment> MetadataTeaserImage { get; set; }
@@ -285,72 +285,6 @@ namespace BDO
 		/// MetadataTeaserImageAltText.
 		/// </summary>
 		public string MetadataTeaserImageAltText { get; set; }
-
-
-		/// <summary>
-		/// MetadataCanonical.
-		/// </summary>
-		public string MetadataCanonical { get; set; }
-
-
-		/// <summary>
-		/// ContentType.
-		/// </summary>
-		public IEnumerable<Contenttypes> ContentType { get; set; }
-
-
-		/// <summary>
-		/// MetadataBusinessLine.
-		/// </summary>
-		public IEnumerable<BusinessLine> MetadataBusinessLine { get; set; }
-
-
-		/// <summary>
-		/// MetadataServiceAreas.
-		/// </summary>
-		public IEnumerable<ServiceArea> MetadataServiceAreas { get; set; }
-
-
-		/// <summary>
-		/// MetadataServices.
-		/// </summary>
-		public IEnumerable<Service> MetadataServices { get; set; }
-
-
-		/// <summary>
-		/// MetadataIndustryCategories.
-		/// </summary>
-		public IEnumerable<IndustryCategory> MetadataIndustryCategories { get; set; }
-
-
-		/// <summary>
-		/// MetadataIndustries.
-		/// </summary>
-		public IEnumerable<Industry> MetadataIndustries { get; set; }
-
-
-		/// <summary>
-		/// MicrositePages.
-		/// </summary>
-		public IEnumerable<MicrositePage> MicrositePages { get; set; }
-
-
-		/// <summary>
-		/// MicrositeMasterPages.
-		/// </summary>
-		public IEnumerable<MicrositeMasterPage> MicrositeMasterPages { get; set; }
-
-
-		/// <summary>
-		/// MetadataRssCategory.
-		/// </summary>
-		public IEnumerable<MicrositePlaceholder> MetadataRssCategory { get; set; }
-
-
-		/// <summary>
-		/// MetadataRssImage.
-		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> MetadataRssImage { get; set; }
 
 
 		/// <summary>
@@ -459,5 +393,65 @@ namespace BDO
 		/// EventContactEmail.
 		/// </summary>
 		public string EventContactEmail { get; set; }
+
+
+		/// <summary>
+		/// ContentTypeEvent.
+		/// </summary>
+		public IEnumerable<Contenttypes> ContentTypeEvent { get; set; }
+
+
+		/// <summary>
+		/// MetadataBusinessLineEvent.
+		/// </summary>
+		public IEnumerable<BusinessLine> MetadataBusinessLineEvent { get; set; }
+
+
+		/// <summary>
+		/// MetadataServiceAreasEvent.
+		/// </summary>
+		public IEnumerable<ServiceArea> MetadataServiceAreasEvent { get; set; }
+
+
+		/// <summary>
+		/// MetadataServicesEvent.
+		/// </summary>
+		public IEnumerable<Service> MetadataServicesEvent { get; set; }
+
+
+		/// <summary>
+		/// MetadataIndustryCategoriesEvent.
+		/// </summary>
+		public IEnumerable<IndustryCategory> MetadataIndustryCategoriesEvent { get; set; }
+
+
+		/// <summary>
+		/// MetadataIndustriesEvent.
+		/// </summary>
+		public IEnumerable<Industry> MetadataIndustriesEvent { get; set; }
+
+
+		/// <summary>
+		/// MicrositePagesEvent.
+		/// </summary>
+		public IEnumerable<MicrositePage> MicrositePagesEvent { get; set; }
+
+
+		/// <summary>
+		/// MicrositeMasterPagesEvent.
+		/// </summary>
+		public IEnumerable<MicrositeMasterPage> MicrositeMasterPagesEvent { get; set; }
+
+
+		/// <summary>
+		/// MetadataRssCategoryEvent.
+		/// </summary>
+		public IEnumerable<RSSCategories> MetadataRssCategoryEvent { get; set; }
+
+
+		/// <summary>
+		/// MetadataRssImageEvent.
+		/// </summary>
+		public IEnumerable<IContentItemFieldsSource> MetadataRssImageEvent { get; set; }
 	}
 }

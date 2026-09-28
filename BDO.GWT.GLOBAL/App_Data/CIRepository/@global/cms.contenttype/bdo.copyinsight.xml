@@ -72,10 +72,11 @@
       </schema>
       <field allowempty="true" column="CallToActionPosition" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="3af56f39-526d-4d1c-87e6-a736d4967d99" visible="true">
         <properties>
-          <defaultvalue>Left</defaultvalue>
+          <defaultvalue>left</defaultvalue>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Call to action position</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>

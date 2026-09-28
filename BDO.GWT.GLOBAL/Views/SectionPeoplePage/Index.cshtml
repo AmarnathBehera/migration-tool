@@ -1,14 +1,24 @@
-﻿@using Kentico.Content.Web.Mvc
+﻿@using CMS.Websites.Routing
+@using Kentico.Content.Web.Mvc
 @using BDO.GWT.Core.Constants
 @using BDO.GWT.Core.Services
 @model BDO.GWT.Core.DTOs.Pages.SectionPeopleDto
 
 @inject IReactService ReactService
 @inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IWebsiteChannelContext WebsiteChannelContext
+@inject ICultureContext CultureContext
 
 @{
     var pageContext = WebPageDataContextRetriever.Retrieve();
     var pageId = pageContext.WebPage.WebPageItemID;
+
+   
+    if (WebsiteChannelContext.IsPreview && Model != null && !string.IsNullOrEmpty(Model.ApiEndpoint))
+    {
+        var culture = CultureContext.CurrentLanguageTag.ToLowerInvariant();
+        Model.ApiEndpoint = Url.Kentico().ApplyPreviewContext($"/api/{culture}/{Model.ApiEndpoint}");
+    }
 }
 @{
     Layout = "_Layout";
@@ -22,14 +32,14 @@
         ReactComponentType.Hero,
         ReactComponentType.HeroGUID,
         new {
-        data = Model.Hero,
+            data = Model.Hero,
         },
         Context.RequestAborted))
 
-         @(await ReactService.RenderComponentAsync(
-        pageId,
-        ReactComponentType.PeopleAdvancedGrid,
-        ReactComponentType.PeopleAdvancedGridGUID,Model,
-        Context.RequestAborted))
+        @(await ReactService.RenderComponentAsync(
+       pageId,
+       ReactComponentType.PeopleAdvancedGrid,
+       ReactComponentType.PeopleAdvancedGridGUID,Model,
+       Context.RequestAborted))
     }
-</div>
+</div> 
