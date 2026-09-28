@@ -76,9 +76,9 @@ public class BlogPostPageService : IBlogPostPageService
             BlogPostDtoObj.CallToAction = PageHelper.GetCallToActionDto(blogpostPage);
         }
 
-        if (blogpostPage.RelevantContactPerson != null)
+        if (blogpostPage.BlogRelevantContactPerson != null)
         {
-            relevantPersonGuids = blogpostPage.RelevantContactPerson.Select(p => p.SystemFields.ContentItemGUID).ToList();
+            relevantPersonGuids = blogpostPage.BlogRelevantContactPerson.Select(p => p.SystemFields.ContentItemGUID).ToList();
         }
 
         //check if ShowTitle and ShowDescription are true before setting the values in DTO
@@ -102,10 +102,10 @@ public class BlogPostPageService : IBlogPostPageService
             sideBarObj = await _sidebarService.GetContentPageSidebarDetails(sideBarObj, cancellationToken,
                                                                           relevantPersonGuids, publishedDate, updatedDate);
 
-            if (blogpostPage.RelatedExternalPeople != null)
+            if (blogpostPage.BlogRelatedExternalPeople != null)
             {
                 sideBarObj.RelatedExternalPeople = await _externalPeopleHelper.GetSidebarExternalPeopleDtosAsync(
-                             blogpostPage.RelatedExternalPeople.Select(p => p.SystemFields.ContentItemGUID).ToList(),
+                             blogpostPage.BlogRelatedExternalPeople.Select(p => p.SystemFields.ContentItemGUID).ToList(),
                         cancellationToken);
             }
         }

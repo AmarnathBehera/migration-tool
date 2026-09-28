@@ -368,6 +368,7 @@ namespace BDO.GWT.Core.Services
                 FilterParameterName.IndustryPage => x => x.WhereContains(nameof(BlogPost.MetadataIndustries), guid),
                 FilterParameterName.MicrositeMasterPage => x => x.WhereContains(nameof(BlogPost.MicrositeMasterPages), guid),
                 FilterParameterName.MicrositePage => x => x.WhereContains(nameof(BlogPost.MicrositePages), guid),
+                FilterParameterName.Person => x => x.WhereContains(nameof(BlogPost.BlogRelevantContactPerson), guid),
                 _ => null,
             };
         }

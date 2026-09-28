@@ -476,10 +476,10 @@ namespace BDO.GWT.Core.Tests.Services
             var guid2 = Guid.NewGuid();
             var page = CreateBlogPostPage();
             page.ShowSidebar = true;
-            page.RelevantContactPerson = new[]
+            page.BlogRelevantContactPerson = new[]
             {
-                CreateWebPageFieldsSourceWithGuid(guid1),
-                CreateWebPageFieldsSourceWithGuid(guid2)
+                CreatePersonWithGuid(guid1),
+                CreatePersonWithGuid(guid2)
             };
 
             List<Guid>? capturedGuids = null;
@@ -515,7 +515,7 @@ namespace BDO.GWT.Core.Tests.Services
         {
             var page = CreateBlogPostPage();
             page.ShowSidebar = true;
-            page.RelevantContactPerson = null;
+            page.BlogRelevantContactPerson = null;
 
             List<Guid>? capturedGuids = null;
 
@@ -554,7 +554,7 @@ namespace BDO.GWT.Core.Tests.Services
             var extPersonGuid = Guid.NewGuid();
             var page = CreateBlogPostPage();
             page.ShowSidebar = true;
-            page.RelatedExternalPeople = new[]
+            page.BlogRelatedExternalPeople = new[]
             {
                 new ExternalPerson
                 {
@@ -607,7 +607,7 @@ namespace BDO.GWT.Core.Tests.Services
         {
             var page = CreateBlogPostPage();
             page.ShowSidebar = true;
-            page.RelatedExternalPeople = null;
+            page.BlogRelatedExternalPeople = null;
 
             _sidebarServiceMock
                 .Setup(x => x.GetSidebarDtoAsync(It.IsAny<BlogPost>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -634,7 +634,7 @@ namespace BDO.GWT.Core.Tests.Services
         {
             var page = CreateBlogPostPage();
             page.ShowSidebar = false;
-            page.RelatedExternalPeople = new[]
+            page.BlogRelatedExternalPeople = new[]
             {
                 new ExternalPerson
                 {
@@ -790,8 +790,8 @@ namespace BDO.GWT.Core.Tests.Services
                 MicrositePages = Array.Empty<MicrositePage>(),
                 MicrositeMasterPages = Array.Empty<MicrositeMasterPage>(),
                 MetadataRssCategory = Array.Empty<MicrositePlaceholder>(),
-                RelevantContactPerson = Array.Empty<IWebPageFieldsSource>(),
-                RelatedExternalPeople = Array.Empty<ExternalPerson>(),
+                BlogRelevantContactPerson = Array.Empty<Person>(),
+                BlogRelatedExternalPeople = Array.Empty<ExternalPerson>(),
                 PageTitle = "Test Blog Post",
                 PageDescription = string.Empty,
                 PageKeywords = string.Empty,
@@ -801,14 +801,15 @@ namespace BDO.GWT.Core.Tests.Services
             };
         }
 
-        private static IWebPageFieldsSource CreateWebPageFieldsSourceWithGuid(Guid guid)
+        private static Person CreatePersonWithGuid(Guid guid)
         {
-            var mock = new Mock<IWebPageFieldsSource>();
-            mock.Setup(x => x.SystemFields).Returns(new WebPageFields
+            return new Person
             {
-                ContentItemGUID = guid
-            });
-            return mock.Object;
+                SystemFields = new WebPageFields
+                {
+                    ContentItemGUID = guid
+                }
+            };
         }
     }
 }
