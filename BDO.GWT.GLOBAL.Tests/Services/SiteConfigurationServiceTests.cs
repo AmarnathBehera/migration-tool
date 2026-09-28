@@ -4,7 +4,6 @@ using BDO.GWT.Web.Core.Services;
 using BDO.GWT.Web.Services;
 using BDO.GWT.Xperience.Core.Services;
 using CMS.ContentEngine;
-using CMS.Core;
 using CMS.DataEngine;
 using CMS.Websites;
 using CMS.Websites.Routing;
@@ -62,8 +61,7 @@ public class SiteConfigurationServiceTests
             _cachingServiceMock.Object,
             _executorMock.Object,
             _siteContextMock.Object,
-            _providers,
-            _websiteChannelContextMock.Object);
+            _providers);
     }
 
     private static Mock<ObjectQuery<T>> BuildQuery<T>(IEnumerable<T> items)
@@ -357,50 +355,43 @@ public class SiteConfigurationServiceTests
     }
 
     [Test]
-    public void GetSiteConfigurationDtoAsync_ReadsWebsiteChannelContextId()
+    public async Task GetSiteConfigurationDtoAsync_SetsHash_AndReturnsEmptyTranslations_WhenNoLocalizationData()
     {
-        const int testChannelId = 100;
+        _siteContextMock.SetupGet(x => x.CurrentSiteID).Returns(10);
 
-        _websiteChannelContextMock.SetupGet(x => x.WebsiteChannelID).Returns(testChannelId);
+        _localizationKeyProviderMock.Setup(p => p.Get())
+            .Returns(BuildAsyncQuery<LocalizationKeyInfo>([]).Object);
+        _localizationTranslationProviderMock.Setup(p => p.Get())
+            .Returns(BuildAsyncQuery<XperienceCommunity.Localization.LocalizationTranslationItemInfo>([]).Object);
+        _contentLanguageProviderMock.Setup(p => p.Get())
+            .Returns(BuildAsyncQuery<ContentLanguageInfo>([]).Object);
 
-        // We can verify that the WebsiteChannelContext.WebsiteChannelID is read
-        // by checking that it's called at least once
-        int result = _websiteChannelContextMock.Object.WebsiteChannelID;
+        _websiteChannelProviderMock.Setup(p => p.Get())
+            .Returns(BuildQuery<WebsiteChannelInfo>([]).Object);
 
-        Assert.That(result, Is.EqualTo(testChannelId));
-        _websiteChannelContextMock.VerifyGet(x => x.WebsiteChannelID, Times.AtLeastOnce);
-    }
+        _cachingServiceMock
+            .Setup(x => x.LoadAsync(
+                It.IsAny<Func<CancellationToken, Task<string>>>(),
+                It.IsAny<string>(),
+                It.IsAny<string?[]>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync("hash-123");
 
-    [Test]
-    public void GetSiteConfigurationDtoAsync_UsesWebsiteChannelContextForChannelId()
-    {
-        const int expectedChannelId = 42;
+        var result = await _service.GetSiteConfigurationDtoAsync(CancellationToken.None);
 
-        _websiteChannelContextMock.SetupGet(x => x.WebsiteChannelID).Returns(expectedChannelId);
-
-        var channelId = _websiteChannelContextMock.Object.WebsiteChannelID;
-
-        Assert.That(channelId, Is.EqualTo(expectedChannelId));
-    }
-
-    [Test]
-    public void GetSiteConfigurationDtoAsync_AccessesWebsiteChannelContext()
-    {
-        // Test that the _websiteChannelContext property is properly injected and accessible
         Assert.Multiple(() =>
         {
-            Assert.That(_service, Is.Not.Null);
-            Assert.That(_websiteChannelContextMock.Object, Is.Not.Null);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Hash, Is.EqualTo("hash-123"));
+            Assert.That(result.Translations, Is.Empty);
+            Assert.That(result.SiteSettings.ExternalLinkWarningEnabled, Is.False);
         });
     }
-
-
 
     private sealed class TestWebsiteChannelInfo : WebsiteChannelInfo
     {
         public override int WebsiteChannelID { get; set; }
         public override int WebsiteChannelChannelID { get; set; }
-        public override string WebsiteChannelDomain { get; set; } = string.Empty;
     }
 
     private sealed class TestWebChannelSettingsInfo : WebChannelSettingsInfo

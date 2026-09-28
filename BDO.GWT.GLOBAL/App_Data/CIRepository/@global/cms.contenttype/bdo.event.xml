@@ -356,7 +356,7 @@ Advanced
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
       </field>
-      <schema guid="6bf9af2e-ee19-461b-a071-2b6541b36653" name="6bf9af2e-ee19-461b-a071-2b6541b36653">
+      <schema guid="423a61e5-83a9-485d-8de4-a8ec03a13585" name="423a61e5-83a9-485d-8de4-a8ec03a13585">
         <properties />
       </schema>
       <field allowempty="true" column="MetadataBusinessIssues" columnprecision="0" columntype="contentitemreference" enabled="true" guid="9103235a-17e7-4695-b74d-8595b2a666d3" visible="true">
@@ -396,20 +396,6 @@ Advanced
         <settings>
           <AllowedContentItemTypeIdentifiers>
             <![CDATA[["ddc2c96a-2502-4adf-8b89-5ec17af92366"]]]>
-          </AllowedContentItemTypeIdentifiers>
-          <controlname>Kentico.Administration.ContentItemSelector</controlname>
-          <SelectionType>contentTypes</SelectionType>
-        </settings>
-      </field>
-      <field allowempty="true" column="MetadataBusinessLines" columnprecision="0" columntype="contentitemreference" enabled="true" guid="baaf43c7-636e-4708-b7aa-d607869a6df6" visible="true">
-        <properties>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Business Lines</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-        </properties>
-        <settings>
-          <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["b70d2494-90c7-42c5-a7d6-44da7013729b"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
