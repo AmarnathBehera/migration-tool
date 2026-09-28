@@ -77,9 +77,9 @@ namespace BDO.GWT.Core.Mappers
                 .ForMember(d => d.InsightImageAltText,
                     o => o.MapFrom(s => s.ImageAltText ?? string.Empty))
                 .ForMember(d => d.SortDate,
-                    o => o.MapFrom(s => s.SortDate))
+                    o => o.MapFrom(s => ToUtcDateTime(s.SortDate)))
                 .ForMember(d => d.CreatedWhen,
-                    o => o.MapFrom(s => ToUtcDateTimeOrMin(s.DocumentCreatedWhen)))
+                    o => o.MapFrom(s => ToUtcDateTime(s.DocumentCreatedWhen)))
                 .ForMember(d => d.EventDateFrom,
                     o => o.MapFrom(s => ToUtcDateTime(s.EventDateFrom)))
                 .ForMember(d => d.EventDateTo,
@@ -104,15 +104,13 @@ namespace BDO.GWT.Core.Mappers
         private static DateTime? ToDateTime(DateTimeOffset? value) =>
             HasValue(value) ? value!.Value.DateTime : null;
 
-        // Same as ToUtcDateTime but falls back to DateTime.MinValue instead of null.
-        private static DateTime ToUtcDateTimeOrMin(DateTimeOffset? value) =>
-            HasValue(value) ? value!.Value.UtcDateTime : DateTime.MinValue;
-
         // Returns the first non-null/non-whitespace value, or null if none qualify.
         private static string? FirstNotEmpty(params string?[] values) =>
             values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
 
         private static bool HasValue(DateTimeOffset? value) =>
             value.HasValue && value.Value > DateTimeOffset.MinValue;
+
+        
     }
 }
