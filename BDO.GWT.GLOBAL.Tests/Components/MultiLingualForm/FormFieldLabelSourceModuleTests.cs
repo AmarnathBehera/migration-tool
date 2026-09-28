@@ -14,7 +14,12 @@ namespace BDO.GWT.GLOBAL.Tests.Components.MultiLingualForm;
 [TestFixture]
 public class FormFieldLabelSourceModuleTests
 {
-    private const BindingFlags PrivateStatic = BindingFlags.Static | BindingFlags.NonPublic;
+    private const BindingFlags PrivateInstance = BindingFlags.Instance | BindingFlags.NonPublic;
+
+    private FormFieldLabelSourceModule module = null!;
+
+    [SetUp]
+    public void SetUp() => module = new FormFieldLabelSourceModule();
 
     [TearDown]
     public void TearDown() => SetHttpContextAccessor(null);
@@ -36,8 +41,6 @@ public class FormFieldLabelSourceModuleTests
     [Test]
     public void Module_HasExpectedModuleName()
     {
-        var module = new FormFieldLabelSourceModule();
-
         Assert.That(module.Name, Is.EqualTo(nameof(FormFieldLabelSourceModule)));
     }
 
@@ -208,19 +211,19 @@ public class FormFieldLabelSourceModuleTests
         return Equals(actual, Convert.ChangeType(expected, actual?.GetType() ?? expected.GetType()));
     }
 
-    private static string? InvokeResolveResourceString(string resourceKey, string languageName)
+    private string? InvokeResolveResourceString(string resourceKey, string languageName)
     {
-        var method = typeof(FormFieldLabelSourceModule).GetMethod("ResolveResourceString", PrivateStatic);
+        var method = typeof(FormFieldLabelSourceModule).GetMethod("ResolveResourceString", PrivateInstance);
         Assert.That(method, Is.Not.Null);
 
-        return (string?)method!.Invoke(null, [resourceKey, languageName]);
+        return (string?)method!.Invoke(module, [resourceKey, languageName]);
     }
 
-    private static void SetHttpContextAccessor(IHttpContextAccessor? accessor)
+    private void SetHttpContextAccessor(IHttpContextAccessor? accessor)
     {
-        var field = typeof(FormFieldLabelSourceModule).GetField("httpContextAccessor", PrivateStatic);
+        var field = typeof(FormFieldLabelSourceModule).GetField("httpContextAccessor", PrivateInstance);
         Assert.That(field, Is.Not.Null);
-        field!.SetValue(null, accessor);
+        field!.SetValue(module, accessor);
     }
 
     private static TestLocalizationKeyInfo CreateLocalizationKey(int id, string itemName) => new()
