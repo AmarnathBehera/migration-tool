@@ -300,6 +300,220 @@ public class ReactServiceTests
     }
 
     // -----------------------------------------------------------------------
+    // TC-08b  Two instances served one cached render (identical props, e.g. a
+    //         copy/pasted widget) must not share a container id, otherwise every
+    //         hydrate() call resolves to the first matching DOM element.
+    // -----------------------------------------------------------------------
+    [Test]
+    public async Task RenderComponentAsync_WhenCachedRenderIsReusedOnSamePage_AssignsDistinctContainerIds()
+    {
+        // Arrange - the cache hands back the very same instance for both calls
+        var cached = new ReactResponseBodyDto
+        {
+            ContainerId = "container-abc",
+            HtmlContent = "<div id=\"container-abc\">rendered</div>",
+        };
+
+        SetupCacheToAlwaysReturn(cached);
+
+        var sut = CreateSut();
+
+        // Act - same component, identical props, exactly as a copy/pasted widget produces
+        var first = RenderHtmlContent(await sut.RenderComponentAsync(
+            PageId, ComponentType, PersistentUniqueIdentifier, new { N = 1 }, CancellationToken.None));
+        var second = RenderHtmlContent(await sut.RenderComponentAsync(
+            PageId, ComponentType, PersistentUniqueIdentifier, new { N = 1 }, CancellationToken.None));
+
+        var script = RenderHtmlContent(sut.RenderCombinedScript());
+        var secondId = ExtractContainerId(second);
+
+        Assert.Multiple(() =>
+        {
+            // First instance keeps the renderer's id, the second is re-issued
+            Assert.That(first, Does.Contain("id=\"container-abc\""));
+            Assert.That(second, Does.Not.Contain("id=\"container-abc\""));
+            Assert.That(secondId, Does.Match("^react_[0-9a-f]{32}$"));
+
+            // Inner content survives the HtmlAgilityPack round-trip
+            Assert.That(second, Does.Contain("rendered"));
+
+            // Hydration targets two different containers
+            Assert.That(script, Does.Contain($"widgetRenderer.hydrate('{ComponentType}', 'container-abc'"));
+            Assert.That(script, Does.Contain($"widgetRenderer.hydrate('{ComponentType}', '{secondId}'"));
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // TC-08c  The cached DTO is shared across requests and must never be mutated
+    // -----------------------------------------------------------------------
+    [Test]
+    public async Task RenderComponentAsync_WhenRewritingContainerId_DoesNotMutateCachedResponse()
+    {
+        // Arrange
+        var cached = new ReactResponseBodyDto
+        {
+            ContainerId = "container-abc",
+            HtmlContent = "<div id=\"container-abc\">rendered</div>",
+        };
+
+        SetupCacheToAlwaysReturn(cached);
+
+        var sut = CreateSut();
+
+        // Act
+        await sut.RenderComponentAsync(
+            PageId, ComponentType, PersistentUniqueIdentifier, new { N = 1 }, CancellationToken.None);
+        await sut.RenderComponentAsync(
+            PageId, ComponentType, PersistentUniqueIdentifier, new { N = 1 }, CancellationToken.None);
+
+        // Assert - a mutated cache entry would poison every later request
+        Assert.Multiple(() =>
+        {
+            Assert.That(cached.ContainerId, Is.EqualTo("container-abc"));
+            Assert.That(cached.HtmlContent, Is.EqualTo("<div id=\"container-abc\">rendered</div>"));
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // TC-08d  A third identical instance also gets its own container id
+    // -----------------------------------------------------------------------
+    [Test]
+    public async Task RenderComponentAsync_WhenCachedRenderIsReusedThreeTimes_AllContainerIdsAreUnique()
+    {
+        // Arrange
+        SetupCacheToAlwaysReturn(new ReactResponseBodyDto
+        {
+            ContainerId = "c1",
+            HtmlContent = "<div id=\"c1\">rendered</div>",
+        });
+
+        var sut = CreateSut();
+        var ids = new List<string>();
+
+        // Act
+        for (var i = 0; i < 3; i++)
+        {
+            var html = RenderHtmlContent(await sut.RenderComponentAsync(
+                PageId, ComponentType, PersistentUniqueIdentifier, new { N = 1 }, CancellationToken.None));
+
+            ids.Add(ExtractContainerId(html));
+        }
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(ids[0], Is.EqualTo("c1"));
+            Assert.That(ids, Is.Unique);
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // TC-08e  Distinct props are separate cache entries with their own container
+    //         ids already, so nothing must be rewritten
+    // -----------------------------------------------------------------------
+    [Test]
+    public async Task RenderComponentAsync_WhenContainerIdsAlreadyDiffer_LeavesHtmlUntouched()
+    {
+        // Arrange
+        var bodies = new Queue<ReactResponseBodyDto>(
+        [
+            new ReactResponseBodyDto { ContainerId = "c1", HtmlContent = "<div id=\"c1\">a</div>" },
+            new ReactResponseBodyDto { ContainerId = "c2", HtmlContent = "<div id=\"c2\">b</div>" },
+        ]);
+
+        _reactCachingServiceMock
+            .Setup(c => c.LoadAsync(
+                It.IsAny<Func<CancellationToken, Task<ReactResponseBodyDto>>>(),
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(bodies.Dequeue);
+
+        var sut = CreateSut();
+
+        // Act
+        var first = RenderHtmlContent(await sut.RenderComponentAsync(
+            PageId, ComponentType, PersistentUniqueIdentifier, new { N = 1 }, CancellationToken.None));
+        var second = RenderHtmlContent(await sut.RenderComponentAsync(
+            PageId, ComponentType, PersistentUniqueIdentifier, new { N = 2 }, CancellationToken.None));
+
+        // Assert - returned verbatim, no HtmlAgilityPack round-trip
+        Assert.Multiple(() =>
+        {
+            Assert.That(first, Is.EqualTo("<div id=\"c1\">a</div>"));
+            Assert.That(second, Is.EqualTo("<div id=\"c2\">b</div>"));
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // TC-08f  An empty container id (the empty-response fallback) is left alone
+    //         rather than being treated as a duplicate
+    // -----------------------------------------------------------------------
+    [Test]
+    public async Task RenderComponentAsync_WhenContainerIdIsEmpty_DoesNotRewrite()
+    {
+        // Arrange
+        SetupCacheToAlwaysReturn(new ReactResponseBodyDto
+        {
+            ContainerId = string.Empty,
+            HtmlContent = string.Empty,
+        });
+
+        var sut = CreateSut();
+
+        // Act
+        await sut.RenderComponentAsync(
+            PageId, ComponentType, PersistentUniqueIdentifier, new { N = 1 }, CancellationToken.None);
+        await sut.RenderComponentAsync(
+            PageId, ComponentType, PersistentUniqueIdentifier, new { N = 1 }, CancellationToken.None);
+
+        var script = RenderHtmlContent(sut.RenderCombinedScript());
+
+        // Assert - both hydrate calls keep the empty id, no GUID is issued
+        Assert.That(script, Does.Not.Contain("react_"));
+    }
+
+    // -----------------------------------------------------------------------
+    // TC-08g  A duplicate whose HTML does not actually contain the container
+    //         element is surfaced as UnexpectedBodyException
+    // -----------------------------------------------------------------------
+    [Test]
+    public async Task RenderComponentAsync_WhenDuplicateHtmlHasNoContainerElement_ThrowsUnexpectedBodyException()
+    {
+        // Arrange - ContainerId does not match any id in the markup
+        SetupCacheToAlwaysReturn(new ReactResponseBodyDto
+        {
+            ContainerId = "container-abc",
+            HtmlContent = "<div id=\"something-else\">rendered</div>",
+        });
+
+        var sut = CreateSut();
+
+        // First render succeeds - the duplicate branch is not entered yet
+        await sut.RenderComponentAsync(
+            PageId, ComponentType, PersistentUniqueIdentifier, new { N = 1 }, CancellationToken.None);
+
+        // Act & Assert
+        Assert.ThrowsAsync<UnexpectedBodyException>(async () =>
+            await sut.RenderComponentAsync(
+                PageId, ComponentType, PersistentUniqueIdentifier, new { N = 1 }, CancellationToken.None));
+    }
+
+    /// <summary>
+    /// Makes the caching service return the same instance for every call, which is what
+    /// happens when several widgets on a page hash to the same cache key.
+    /// </summary>
+    private void SetupCacheToAlwaysReturn(ReactResponseBodyDto body) =>
+        _reactCachingServiceMock
+            .Setup(c => c.LoadAsync(
+                It.IsAny<Func<CancellationToken, Task<ReactResponseBodyDto>>>(),
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(body);
+
+    private static string ExtractContainerId(string html) =>
+        System.Text.RegularExpressions.Regex.Match(html, "id=\"([^\"]+)\"").Groups[1].Value;
+
+    // -----------------------------------------------------------------------
     // TC-09  RenderCombinedScript: props are serialized with camelCase policy
     // -----------------------------------------------------------------------
     [Test]
