@@ -20,30 +20,36 @@ public class TrendingTopicsCarouselService : ITrendingTopicsCarouselService
     private readonly IWebPageUrlRetriever _webPageUrlRetriever;
     private readonly IContentRetriever _contentRetriever;
 
-    private static readonly string[] TrendingTopicsContentTypes =
-[
-SectionBlogs.CONTENT_TYPE_NAME,
+
+    private static readonly string[] BlogContentTypes = [SectionBlogs.CONTENT_TYPE_NAME,
 Blog.CONTENT_TYPE_NAME,
-BlogPost.CONTENT_TYPE_NAME,
-SectionServices.CONTENT_TYPE_NAME,
+BlogPost.CONTENT_TYPE_NAME];
+
+    private static readonly string[] ServiceContentTypes = [SectionServices.CONTENT_TYPE_NAME,
 Service.CONTENT_TYPE_NAME,
 BusinessLine.CONTENT_TYPE_NAME,
 ServiceArea.CONTENT_TYPE_NAME,
-Sub_Service.CONTENT_TYPE_NAME,
-SectionIndustries.CONTENT_TYPE_NAME,
+Sub_Service.CONTENT_TYPE_NAME];
+
+    private static readonly string[] IndustryContentTypes = [SectionIndustries.CONTENT_TYPE_NAME,
 Industry.CONTENT_TYPE_NAME,
 IndustryCategory.CONTENT_TYPE_NAME,
-IndustryService.CONTENT_TYPE_NAME,
-SectionMicrosites.CONTENT_TYPE_NAME,
+IndustryService.CONTENT_TYPE_NAME];
+
+    private static readonly string[] MicrositeContentTypes = [SectionMicrosites.CONTENT_TYPE_NAME,
 MicrositeMasterPage.CONTENT_TYPE_NAME,
-MicrositePage.CONTENT_TYPE_NAME,
-SectionSpecialties.CONTENT_TYPE_NAME,
+MicrositePage.CONTENT_TYPE_NAME];
+
+    private static readonly string[] SpecialtyContentTypes = [SectionSpecialties.CONTENT_TYPE_NAME,
 SpecialtiesArea.CONTENT_TYPE_NAME,
 SpecialtiesCategory.CONTENT_TYPE_NAME,
-SpecialtiesPage.CONTENT_TYPE_NAME,
-SectionInsightsPage.CONTENT_TYPE_NAME,
+SpecialtiesPage.CONTENT_TYPE_NAME];
+
+    private static readonly string[] InsightContentTypes = [SectionInsightsPage.CONTENT_TYPE_NAME,
 Insight.CONTENT_TYPE_NAME,
 InsightCategory.CONTENT_TYPE_NAME];
+
+
 
     private readonly Func<IEnumerable<string>, IEnumerable<Guid>, RetrieveContentOfContentTypesParameters, CancellationToken, Task<IEnumerable<IWebPageFieldsSource>>> _retrieveContentByGuidsAsync;
     public TrendingTopicsCarouselService(
@@ -65,7 +71,7 @@ InsightCategory.CONTENT_TYPE_NAME];
         CancellationToken cancellationToken)
     {
         var itemDtos = await GetTrendingTopicsCarouselItemDtosAsync(
-            data.TrendingTopicsPages, cancellationToken);
+            data.TrendingTopicsPages,data.TrendingTopicsPageType, cancellationToken);
 
         return new TrendingTopicsCarouselDto
         {
@@ -80,7 +86,7 @@ InsightCategory.CONTENT_TYPE_NAME];
     }
 
     private async Task<TrendingTopicsCarouselItemDto[]> GetTrendingTopicsCarouselItemDtosAsync(
-        IEnumerable<ContentItemReference> trendingTopicsPages,
+        IEnumerable<ContentItemReference> trendingTopicsPages,string trendingTopicsPageType,
         CancellationToken cancellationToken)
     {
         // Extract GUIDs from ContentItemReference — IContentService.GetItemsByGUIDAsync takes List<Guid>
@@ -93,11 +99,20 @@ InsightCategory.CONTENT_TYPE_NAME];
             return Array.Empty<TrendingTopicsCarouselItemDto>();
         }
 
-        var pages = await _retrieveContentByGuidsAsync(
-                TrendingTopicsContentTypes,
-                guids,
-                new RetrieveContentOfContentTypesParameters() { LinkedItemsMaxLevel = 2 },
-                cancellationToken);
+
+
+        var task = trendingTopicsPageType switch
+        {
+            "Blog" => _retrieveContentByGuidsAsync(BlogContentTypes, guids, new RetrieveContentOfContentTypesParameters { LinkedItemsMaxLevel = 2 }, cancellationToken),
+            "Service" => _retrieveContentByGuidsAsync(ServiceContentTypes, guids, new RetrieveContentOfContentTypesParameters { LinkedItemsMaxLevel = 2 }, cancellationToken),
+            "Industry" => _retrieveContentByGuidsAsync(IndustryContentTypes, guids, new RetrieveContentOfContentTypesParameters { LinkedItemsMaxLevel = 2 }, cancellationToken),
+            "Microsite" => _retrieveContentByGuidsAsync(MicrositeContentTypes, guids, new RetrieveContentOfContentTypesParameters { LinkedItemsMaxLevel = 2 }, cancellationToken),
+            "Specialty" => _retrieveContentByGuidsAsync(SpecialtyContentTypes, guids, new RetrieveContentOfContentTypesParameters { LinkedItemsMaxLevel = 2 }, cancellationToken),
+            "Insight" => _retrieveContentByGuidsAsync(InsightContentTypes, guids, new RetrieveContentOfContentTypesParameters { LinkedItemsMaxLevel = 2 }, cancellationToken),
+            _ => throw new ArgumentException($"Invalid trendingTopicsPageType: {trendingTopicsPageType}")
+        };
+
+        var pages = await task;
 
         var itemDtos = new List<TrendingTopicsCarouselItemDto>();
 

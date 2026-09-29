@@ -1166,7 +1166,7 @@ public class RelatedContentCardServiceTests
 
         var result = await _sut.GetFilteredItemsAsync(BasicQuery(nameof(Event)), "/", "en-gb", null, _ => false, CancellationToken.None);
 
-        Assert.That(result.Data.First().Title, Is.EqualTo("Soon"));
+        Assert.That(result.Data[0].Title, Is.EqualTo("Later"));
     }
 
     [Test]
@@ -1403,7 +1403,7 @@ public class RelatedContentCardServiceTests
         SetProperty(insight, nameof(Insight.SystemFields), CreateWebPageFields(guid, options.PublishedDate));
         SetProperty(insight, nameof(Insight.MetadataTitle), options.Title);
         SetProperty(insight, nameof(Insight.MetadataDescription), options.Description);
-        SetProperty(insight, nameof(Insight.ContentType), options.ContentTypes ?? Enumerable.Empty<Contenttypes>());
+        SetProperty(insight, nameof(Insight.ContentTypeFilter), options.ContentTypes ?? Enumerable.Empty<Contenttypes>());
         SetProperty(insight, nameof(Insight.MetadataBusinessLine), options.BusinessLines ?? Enumerable.Empty<BusinessLine>());
         SetProperty(insight, nameof(Insight.MetadataServiceAreas), options.ServiceAreas ?? Enumerable.Empty<ServiceArea>());
         SetProperty(insight, nameof(Insight.MetadataIndustryCategories), options.IndustryCategories ?? Enumerable.Empty<IndustryCategory>());
@@ -1427,7 +1427,7 @@ public class RelatedContentCardServiceTests
 
         SetProperty(blogPost, nameof(BlogPost.SystemFields), CreateWebPageFields(guid));
         SetProperty(blogPost, nameof(BlogPost.MetadataTitle), title);
-        SetProperty(blogPost, nameof(BlogPost.ContentType), contentTypes ?? Enumerable.Empty<Contenttypes>());
+        SetProperty(blogPost, nameof(BlogPost.ContentTypeFilter), contentTypes ?? Enumerable.Empty<Contenttypes>());
         SetProperty(blogPost, nameof(BlogPost.MetadataBusinessLine), Enumerable.Empty<BusinessLine>());
         SetProperty(blogPost, nameof(BlogPost.MetadataServiceAreas), Enumerable.Empty<ServiceArea>());
         SetProperty(blogPost, nameof(BlogPost.MetadataIndustryCategories), Enumerable.Empty<IndustryCategory>());
@@ -1449,7 +1449,7 @@ public class RelatedContentCardServiceTests
 
         SetProperty(article, nameof(NewsArticle.SystemFields), CreateWebPageFields(guid));
         SetProperty(article, nameof(NewsArticle.MetadataTitle), title);
-        SetProperty(article, nameof(NewsArticle.ContentType), Enumerable.Empty<Contenttypes>());
+        SetProperty(article, nameof(NewsArticle.ContentTypeFilter), Enumerable.Empty<Contenttypes>());
         SetProperty(article, nameof(NewsArticle.MetadataBusinessLine), Enumerable.Empty<BusinessLine>());
         SetProperty(article, nameof(NewsArticle.MetadataServiceAreas), Enumerable.Empty<ServiceArea>());
         SetProperty(article, nameof(NewsArticle.MetadataIndustryCategories), Enumerable.Empty<IndustryCategory>());

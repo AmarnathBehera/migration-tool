@@ -61,16 +61,31 @@ public class ReactService : IReactService
 
         var body = await _reactCachingService.LoadAsync(async _ => await RenderComponentExternallyAsync(componentType, dto, cancellationToken), cacheKey, cancellationToken);
 
+        var containerId = body.ContainerId;
+        var htmlContent = body.HtmlContent;
+
+        if (!string.IsNullOrEmpty(containerId) && _renderedComponents.Any(component => component.ContainerId == containerId))
+        {
+            var document = new HtmlAgilityPack.HtmlDocument();
+            document.LoadHtml(htmlContent);
+            var container = document.GetElementbyId(containerId)
+                ?? throw new UnexpectedBodyException($"React renderer returned HTML without container '{containerId}'.");
+
+            containerId = $"react_{Guid.NewGuid():N}";
+            container.SetAttributeValue("id", containerId);
+            htmlContent = document.DocumentNode.OuterHtml;
+        }
+
         var component = new ComponentData
         {
             ComponentType = componentType,
-            ContainerId = body.ContainerId,
+            ContainerId = containerId,
             Props = props,
         };
 
         _renderedComponents.Add(component);
 
-        return new HtmlString(body.HtmlContent);
+        return new HtmlString(htmlContent);
     }
 
     private async Task<ReactResponseBodyDto> RenderComponentExternallyAsync<TProps>(string componentType, ReactComponentDto<TProps> dto, CancellationToken cancellationToken)

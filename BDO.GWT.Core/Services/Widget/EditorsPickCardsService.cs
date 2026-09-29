@@ -72,7 +72,7 @@ public class EditorsPickCardService : IEditorsPickCardService
     {
         cardsQuery ??= new CardsQuery();
         cardsQuery.CurrentPage ??= 1;
-        cardsQuery.PageSize ??= 10;
+        cardsQuery.PageSize ??= 20;
 
         if (selectedPageGuids.Count == 0)
         {

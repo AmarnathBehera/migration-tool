@@ -697,7 +697,7 @@ public class InsightCrudService : IInsightCrudService
             { nameof(Insight.DownloadButtonAttachment), downloadAttachment },
 
             { nameof(Insight.MetadataBusinessIssues), metadataBusinessIssues },
-            { nameof(Insight.ContentType), contentType },
+            { nameof(Insight.ContentTypeFilter), contentType },
             { nameof(Insight.MetadataBusinessLine), metadataBusinessLines },
             { nameof(Insight.MetadataServiceAreas), metadataServiceAreas },
             { nameof(Insight.MetadataServices), metadataServices },
@@ -767,7 +767,7 @@ public class InsightCrudService : IInsightCrudService
                 DownloadButtonAttachment=insight.DownloadButtonAttachment?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
                 //MetadataRssImage = insight.MetadataRssImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
                 MetadataBusinessIssues = insight.MetadataBusinessIssues.Select(c => c.Name).ToList(),
-                ContentType = insight.ContentType.Select(c => c.Name).ToList(),
+                ContentType = insight.ContentTypeFilter.Select(c => c.Name).ToList(),
                 MetadataBusinessLines = insight.MetadataBusinessLine.Select(c => c.MetadataTitle).ToList(),
                 MetadataServiceAreas = insight.MetadataServiceAreas.Select(c => c.MetadataTitle).ToList(),
                 MetadataServices = insight.MetadataServices.Select(c => c.MetadataTitle).ToList(),

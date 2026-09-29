@@ -622,7 +622,7 @@ public class DealCrudService : IDealCrudService
             { nameof(Deal.RelatedDeals), deal.RelatedDeals },
             { nameof(Deal.DealMetadataRssCategory), deal.MetadataRssCategory ?? string.Empty },
             { nameof(Deal.DealMetadataRssImage), rssImageReferences },
-            { nameof(Deal.DealShowSocialMediaButtons), deal.ShowSocialMediaButtons },
+            { nameof(Deal.ShowSocialMediaButtons), deal.ShowSocialMediaButtons },
             { nameof(Deal.SharingOptIn), deal.SharingOptIn },
             { nameof(Deal.DealCountry), deal.DealCountry ?? string.Empty },
             { nameof(Deal.DisplayedContacts), deal.DisplayedContacts ?? string.Empty },

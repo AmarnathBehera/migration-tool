@@ -113,7 +113,7 @@ public class RelatedContentCarouselService : IRelatedContentCarouselService
         // Map filter parameter names to the correct Insight fields
         Action<WhereParameters>? filter = pageTypeName switch
         {
-            FilterParameterName.ContentType => x => x.WhereContains(nameof(Insight.ContentType), guid),
+            FilterParameterName.ContentType => x => x.WhereContains(nameof(Insight.ContentTypeFilter), guid),
             FilterParameterName.BusinessLine => x => x.WhereContains(nameof(Insight.MetadataBusinessLine), guid),
             FilterParameterName.ServiceArea => x => x.WhereContains(nameof(Insight.MetadataServiceAreas), guid),
             FilterParameterName.IndustryCategory => x => x.WhereContains(nameof(Insight.MetadataIndustryCategories), guid),
