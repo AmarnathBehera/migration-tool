@@ -8,6 +8,8 @@ public class InsightCarouselDto : ICardsCarouselDto<ContentPageCardDto>, IFilter
 
     public string? Description { get; set; }
 
+    public string ApiEndpoint { get; set; } = "InsightCarousel/Items";
+
     public IEnumerable<FilterItemDto<OptionDto>>? Filters { get; set; }
 
     public required bool FilteringTooltipEnabled { get; set; }
