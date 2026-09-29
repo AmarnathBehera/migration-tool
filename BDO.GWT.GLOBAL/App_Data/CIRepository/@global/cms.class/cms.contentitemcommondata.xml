@@ -438,6 +438,8 @@
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Type</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>6bf9af2e-ee19-461b-a071-2b6541b36653</kxp_schema_identifier>
         </properties>
         <settings>
@@ -445,6 +447,8 @@
             <![CDATA[["327fb912-7a4d-4bb6-8d7d-d1f288ab5b67"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>0</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
