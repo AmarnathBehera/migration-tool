@@ -147,15 +147,15 @@ public class RelatedContentCardService : IRelatedContentCardService
     }
 
     // Returns a key that is always sorted with ThenByDescending: regular pages keep their
-    // "most recently published first" order, while Events and Webinars use an inverted start
-    // date so that the soonest upcoming one appears first.
+    // "most recently published first" order, while Events and Webinars sort by start date
+    // with the latest/future dates appearing first.
     private static DateTime GetOrderingDate(IWebPageFieldsSource page)
     {
         if (page is Event e)
-            return DateTime.MaxValue - (e.EventDateFrom - DateTime.MinValue);
+            return e.EventDateFrom;
 
         if (page is Webinar w)
-            return DateTime.MaxValue - (w.EventDateFrom - DateTime.MinValue);
+            return w.EventDateFrom;
 
         return page.SystemFields.ContentItemCommonDataLastPublishedWhen
                ?? page.SystemFields.ContentItemCommonDataFirstPublishedWhen

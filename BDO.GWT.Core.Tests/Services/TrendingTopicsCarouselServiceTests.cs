@@ -1,3 +1,5 @@
+// TrendingTopicsCarouselServiceTests.cs
+using BDO.GWT.Core;
 using BDO.GWT.Core.Data;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Services;
@@ -18,10 +20,6 @@ public class TrendingTopicsCarouselServiceTests
     private Func<IEnumerable<string>, IEnumerable<Guid>, RetrieveContentOfContentTypesParameters, CancellationToken, Task<IEnumerable<IWebPageFieldsSource>>> _originalRetriever = null!;
     private int _retrieveCallCount;
 
-    // -----------------------------------------------------------------------
-    // Setup / Teardown
-    // -----------------------------------------------------------------------
-
     [SetUp]
     public void SetUp()
     {
@@ -39,12 +37,10 @@ public class TrendingTopicsCarouselServiceTests
             _cultureContextMock.Object,
             _webPageUrlRetrieverMock.Object);
 
-        // Capture the real delegate so TearDown can restore it.
         var field = RetrieveField();
         _originalRetriever = (Func<IEnumerable<string>, IEnumerable<Guid>, RetrieveContentOfContentTypesParameters, CancellationToken, Task<IEnumerable<IWebPageFieldsSource>>>)
             field.GetValue(_service)!;
 
-        // Default stub: return nothing and count calls.
         SetRetriever((_, _, _, _) =>
         {
             _retrieveCallCount++;
@@ -53,14 +49,7 @@ public class TrendingTopicsCarouselServiceTests
     }
 
     [TearDown]
-    public void TearDown()
-    {
-        RetrieveField().SetValue(_service, _originalRetriever);
-    }
-
-    // -----------------------------------------------------------------------
-    // Helpers
-    // -----------------------------------------------------------------------
+    public void TearDown() => RetrieveField().SetValue(_service, _originalRetriever);
 
     private static FieldInfo RetrieveField() =>
         typeof(TrendingTopicsCarouselService)
@@ -71,20 +60,23 @@ public class TrendingTopicsCarouselServiceTests
         Func<IEnumerable<string>, IEnumerable<Guid>, RetrieveContentOfContentTypesParameters, CancellationToken, Task<IEnumerable<IWebPageFieldsSource>>> func)
         => RetrieveField().SetValue(_service, func);
 
-    private static TrendingTopicsCarouselData CreateData(IEnumerable<ContentItemReference>? pages = null) => new()
-    {
-        Title = "Title",
-        Description = "Description",
-        TrendingTopicsPages = pages ?? Enumerable.Empty<ContentItemReference>(),
-        LearnMoreButtonURLTarget = "_blank",
-        TopMargin = "20px",
-        BottomMargin = "40px",
-        WidgetID = "widget-1"
-    };
+    // CreateData defaults TrendingTopicsPageType to "Blog" so the switch never hits _
+    private static TrendingTopicsCarouselData CreateData(
+        IEnumerable<ContentItemReference>? pages = null,
+        string pageType = "Blog") => new()
+        {
+            Title = "Title",
+            Description = "Description",
+            TrendingTopicsPages = pages ?? Enumerable.Empty<ContentItemReference>(),
+            TrendingTopicsPageType = pageType,
+            LearnMoreButtonURLTarget = "_blank",
+            TopMargin = "20px",
+            BottomMargin = "40px",
+            WidgetID = "widget-1"
+        };
 
     private static ContentItemReference Ref(Guid guid) => new() { Identifier = guid };
 
-    /// <summary>Implements both IWebPageFieldsSource and IMetadata — the "happy path" page.</summary>
     private sealed class PageWithMetadata : IWebPageFieldsSource, IMetadata
     {
         public WebPageFields SystemFields { get; set; } = new()
@@ -92,7 +84,6 @@ public class TrendingTopicsCarouselServiceTests
             WebPageItemGUID = Guid.NewGuid(),
             WebPageItemName = "Page Title"
         };
-
         public string MetadataTitle { get; set; } = "Meta Title";
         public string MetadataDescription { get; set; } = "<p>Meta Description</p>";
         public IEnumerable<ContentAttachment> MetadataTeaserImage { get; set; } = [];
@@ -100,7 +91,6 @@ public class TrendingTopicsCarouselServiceTests
         public string MetadataCanonical { get; set; } = string.Empty;
     }
 
-    /// <summary>Implements IWebPageFieldsSource only — filtered out because it lacks IMetadata.</summary>
     private sealed class PageWithoutMetadata : IWebPageFieldsSource
     {
         public WebPageFields SystemFields { get; set; } = new()
@@ -110,7 +100,6 @@ public class TrendingTopicsCarouselServiceTests
         };
     }
 
-    /// <summary>Happy-path page that also carries a teaser image attachment.</summary>
     private sealed class PageWithAttachment : IWebPageFieldsSource, IMetadata
     {
         public WebPageFields SystemFields { get; set; } = new()
@@ -118,7 +107,6 @@ public class TrendingTopicsCarouselServiceTests
             WebPageItemGUID = Guid.NewGuid(),
             WebPageItemName = "With Image"
         };
-
         public string MetadataTitle { get; set; } = "Title";
         public string MetadataDescription { get; set; } = "Description";
         public IEnumerable<ContentAttachment> MetadataTeaserImage { get; set; } =
@@ -132,10 +120,7 @@ public class TrendingTopicsCarouselServiceTests
         public string MetadataCanonical { get; set; } = string.Empty;
     }
 
-    // -----------------------------------------------------------------------
     // 1. Top-level DTO field mapping
-    // -----------------------------------------------------------------------
-
     [Test]
     public async Task GetTrendingTopicsCarouselAsync_MapsTopLevelFields()
     {
@@ -153,10 +138,7 @@ public class TrendingTopicsCarouselServiceTests
         });
     }
 
-    // -----------------------------------------------------------------------
     // 2. Retriever not called when no pages are provided
-    // -----------------------------------------------------------------------
-
     [Test]
     public async Task GetTrendingTopicsCarouselAsync_NoPages_DoesNotInvokeRetriever()
     {
@@ -165,10 +147,7 @@ public class TrendingTopicsCarouselServiceTests
         Assert.That(_retrieveCallCount, Is.EqualTo(0));
     }
 
-    // -----------------------------------------------------------------------
     // 3. Correct GUIDs forwarded to retriever
-    // -----------------------------------------------------------------------
-
     [Test]
     public async Task GetTrendingTopicsCarouselAsync_WithOnePage_ForwardsCorrectGuid()
     {
@@ -181,7 +160,6 @@ public class TrendingTopicsCarouselServiceTests
             return Task.FromResult<IEnumerable<IWebPageFieldsSource>>([new PageWithMetadata()]);
         });
 
-        // IWebPageUrlRetriever.Retrieve(IWebPageFieldsSource, string, CancellationToken)
         _webPageUrlRetrieverMock
             .Setup(x => x.Retrieve(It.IsAny<IWebPageFieldsSource>(), "en-gb", It.IsAny<CancellationToken>()))
             .ReturnsAsync(new WebPageUrl("~/page", "/page"));
@@ -191,10 +169,7 @@ public class TrendingTopicsCarouselServiceTests
         Assert.That(captured, Is.EquivalentTo(new[] { guid }));
     }
 
-    // -----------------------------------------------------------------------
     // 4. Pages without IMetadata are excluded from results
-    // -----------------------------------------------------------------------
-
     [Test]
     public async Task GetTrendingTopicsCarouselAsync_IgnoresPagesWithoutMetadata()
     {
@@ -210,10 +185,7 @@ public class TrendingTopicsCarouselServiceTests
         Assert.That(result.Items, Is.Empty);
     }
 
-    // -----------------------------------------------------------------------
     // 5. Mixed pages: only those with IMetadata produce items
-    // -----------------------------------------------------------------------
-
     [Test]
     public async Task GetTrendingTopicsCarouselAsync_MixedPages_OnlyMetadataPagesProduceItems()
     {
@@ -233,10 +205,7 @@ public class TrendingTopicsCarouselServiceTests
         Assert.That(result.Items.Count(), Is.EqualTo(1));
     }
 
-    // -----------------------------------------------------------------------
-    // 6. Item DTO fields mapped correctly (image, URL, alt text)
-    // -----------------------------------------------------------------------
-
+    // 6. Item DTO fields mapped correctly
     [Test]
     public async Task GetTrendingTopicsCarouselAsync_MapsItemFields_ImageAndUrl()
     {
@@ -245,7 +214,6 @@ public class TrendingTopicsCarouselServiceTests
             IEnumerable<IWebPageFieldsSource> pages = [new PageWithAttachment()];
             return Task.FromResult(pages);
         });
-
 
         _webPageUrlRetrieverMock
             .Setup(x => x.Retrieve(It.IsAny<IWebPageFieldsSource>(), "en-gb", It.IsAny<CancellationToken>()))
@@ -257,7 +225,6 @@ public class TrendingTopicsCarouselServiceTests
 
         Assert.Multiple(() =>
         {
-
             Assert.That(item.Description, Is.EqualTo("Description"));
             Assert.That(item.ReadMoreLink, Is.EqualTo("/topics/topic-1"));
             Assert.That(item.ImageURL, Is.EqualTo("/image.jpg"));
@@ -266,10 +233,7 @@ public class TrendingTopicsCarouselServiceTests
         });
     }
 
-    // -----------------------------------------------------------------------
-    // 7. Culture context language tag is forwarded to IWebPageUrlRetriever
-    // -----------------------------------------------------------------------
-
+    // 7. Culture context language tag forwarded to IWebPageUrlRetriever
     [Test]
     public async Task GetTrendingTopicsCarouselAsync_UsesCultureContextForUrlRetrieval()
     {
@@ -291,10 +255,7 @@ public class TrendingTopicsCarouselServiceTests
         Assert.That(result.Items.Single().ReadMoreLink, Is.EqualTo("/fr/page"));
     }
 
-    // -----------------------------------------------------------------------
-    // 8. CancellationToken is forwarded to the retriever delegate
-    // -----------------------------------------------------------------------
-
+    // 8. CancellationToken forwarded to retriever delegate
     [Test]
     public async Task GetTrendingTopicsCarouselAsync_PreservesCancellationToken()
     {
@@ -317,10 +278,7 @@ public class TrendingTopicsCarouselServiceTests
         Assert.That(receivedToken, Is.EqualTo(token));
     }
 
-    // -----------------------------------------------------------------------
     // 9. Multiple pages all produce items
-    // -----------------------------------------------------------------------
-
     [Test]
     public async Task GetTrendingTopicsCarouselAsync_ProcessesMultiplePages()
     {
@@ -340,10 +298,7 @@ public class TrendingTopicsCarouselServiceTests
         Assert.That(result.Items.Count(), Is.EqualTo(2));
     }
 
-    // -----------------------------------------------------------------------
     // 10. Empty page collection returns empty Items without calling retriever
-    // -----------------------------------------------------------------------
-
     [Test]
     public async Task GetTrendingTopicsCarouselAsync_EmptyPageCollection_ReturnsEmptyItems()
     {
@@ -357,20 +312,13 @@ public class TrendingTopicsCarouselServiceTests
         });
     }
 
-    // -----------------------------------------------------------------------
-    // 11. IsFeatured is always false (no featured logic in service)
-    // -----------------------------------------------------------------------
-
+    // 11. IsFeatured is always false
     [Test]
     public async Task GetTrendingTopicsCarouselAsync_IsFeatured_IsAlwaysFalse()
     {
         SetRetriever((_, _, _, _) =>
         {
-            IEnumerable<IWebPageFieldsSource> pages =
-            [
-                new PageWithAttachment(),
-                new PageWithMetadata()
-            ];
+            IEnumerable<IWebPageFieldsSource> pages = [new PageWithAttachment(), new PageWithMetadata()];
             return Task.FromResult(pages);
         });
 
@@ -384,16 +332,13 @@ public class TrendingTopicsCarouselServiceTests
         Assert.That(result.Items.All(i => i.IsFeatured == false), Is.True);
     }
 
-    // -----------------------------------------------------------------------
     // 12. Page with no teaser image yields null ImageURL
-    // -----------------------------------------------------------------------
-
     [Test]
     public async Task GetTrendingTopicsCarouselAsync_NoTeaserImage_ImageUrlIsNull()
     {
         SetRetriever((_, _, _, _) =>
         {
-            IEnumerable<IWebPageFieldsSource> pages = [new PageWithMetadata()]; // MetadataTeaserImage = []
+            IEnumerable<IWebPageFieldsSource> pages = [new PageWithMetadata()];
             return Task.FromResult(pages);
         });
 
@@ -407,10 +352,7 @@ public class TrendingTopicsCarouselServiceTests
         Assert.That(result.Items.Single().ImageURL, Is.Null);
     }
 
-    // -----------------------------------------------------------------------
     // 13. HTML stripped from MetadataDescription
-    // -----------------------------------------------------------------------
-
     [Test]
     public async Task GetTrendingTopicsCarouselAsync_StripHtmlFromDescription()
     {
@@ -432,15 +374,11 @@ public class TrendingTopicsCarouselServiceTests
         var result = await _service.GetTrendingTopicsCarouselAsync(
             CreateData([Ref(Guid.NewGuid())]), CancellationToken.None);
 
-        // HtmlHelper.ExtractTextFromHtml should strip all tags
         Assert.That(result.Items.Single().Description, Does.Not.Contain("<p>"));
         Assert.That(result.Items.Single().Description, Does.Not.Contain("<strong>"));
     }
 
-    // -----------------------------------------------------------------------
-    // 14. Tilde (~) prefix is stripped from ReadMoreLink via WebPageUrl.RelativePath
-    // -----------------------------------------------------------------------
-
+    // 14. Tilde stripped from ReadMoreLink
     [Test]
     public async Task GetTrendingTopicsCarouselAsync_ReadMoreLink_UsesRelativePath_NotAbsolutePath()
     {
@@ -450,7 +388,6 @@ public class TrendingTopicsCarouselServiceTests
             return Task.FromResult(pages);
         });
 
-        // WebPageUrl ctor: (absolutePath, relativePath) — RelativePath is the second arg
         _webPageUrlRetrieverMock
             .Setup(x => x.Retrieve(It.IsAny<IWebPageFieldsSource>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new WebPageUrl("~/insights/article", "/insights/article"));
@@ -462,5 +399,36 @@ public class TrendingTopicsCarouselServiceTests
         Assert.That(result.Items.Single().ReadMoreLink, Does.Not.StartWith("~"));
     }
 
+    // 15. Switch routes to correct content type group per page type
+    [TestCase("Blog", new[] { "BDO.SectionBlogs", "BDO.Blog", "BDO.BlogPost" })]
+    [TestCase("Service", new[] { "BDO.SectionServices", "BDO.Service", "BDO.BusinessLine", "BDO.ServiceArea", "BDO.Sub_Service" })]
+    [TestCase("Industry", new[] { "BDO.SectionIndustries", "BDO.Industry", "BDO.IndustryCategory", "BDO.IndustryService" })]
+    [TestCase("Microsite", new[] { "BDO.SectionMicrosites", "BDO.MicrositeMasterPage", "BDO.MicrositePage" })]
+    [TestCase("Specialty", new[] { "BDO.SectionSpecialties", "BDO.SpecialtiesArea", "BDO.SpecialtiesCategory", "BDO.SpecialtiesPage" })]
+    [TestCase("Insight", new[] { "BDO.SectionInsightsPage", "BDO.Insight", "BDO.InsightCategory" })]
+    public async Task GetTrendingTopicsCarouselAsync_RoutesCorrectContentTypesForPageType(
+        string pageType, string[] expectedTypes)
+    {
+        IEnumerable<string>? capturedTypes = null;
 
+        SetRetriever((types, _, _, _) =>
+        {
+            capturedTypes = types;
+            return Task.FromResult(Enumerable.Empty<IWebPageFieldsSource>());
+        });
+
+        await _service.GetTrendingTopicsCarouselAsync(
+            CreateData([Ref(Guid.NewGuid())], pageType), CancellationToken.None);
+
+        Assert.That(capturedTypes, Is.EquivalentTo(expectedTypes));
+    }
+
+    // 16. Invalid page type throws ArgumentException
+    [Test]
+    public async Task GetTrendingTopicsCarouselAsync_InvalidPageType_ThrowsArgumentException()
+    {
+        Assert.ThrowsAsync<ArgumentException>(() =>
+            _service.GetTrendingTopicsCarouselAsync(
+                CreateData([Ref(Guid.NewGuid())], "InvalidType"), CancellationToken.None));
+    }
 }

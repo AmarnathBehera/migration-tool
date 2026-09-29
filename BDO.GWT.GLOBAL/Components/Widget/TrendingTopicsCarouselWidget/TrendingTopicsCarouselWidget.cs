@@ -66,6 +66,7 @@ public class TrendingTopicsCarouselWidget : ViewComponent
             TopMargin = model.Properties.TopMargin,
             BottomMargin = model.Properties.BottomMargin,
             WidgetID = model.Properties.WidgetID,
+            TrendingTopicsPageType = model.Properties.TrendingTopicsPageType,
         };
         
         var dto = await _trendingTopicsCarouselService.GetTrendingTopicsCarouselAsync(data, cancellationToken);
