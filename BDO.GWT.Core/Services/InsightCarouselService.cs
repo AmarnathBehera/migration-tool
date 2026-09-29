@@ -210,7 +210,7 @@ public class InsightCarouselService : IInsightCarouselService
         Action<WhereParameters>? filter = pageTypeName switch
         {
             FilterParameterName.ContentType =>
-                x => x.WhereContains(nameof(Insight.ContentType), guid),
+                x => x.WhereContains(nameof(Insight.ContentTypeFilter), guid),
 
             FilterParameterName.BusinessLine =>
                 x => x.WhereContains(nameof(Insight.MetadataBusinessLine), guid),

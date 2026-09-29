@@ -637,7 +637,7 @@ public class InsightPageServiceTests
             showDescription: true,
             showCallToAction: false));
 
-        SetCollection(insight, nameof(Insight.ContentType), Array.Empty<object>());
+        SetCollection(insight, nameof(Insight.ContentTypeFilter), Array.Empty<object>());
         SetCollection(insight, nameof(Insight.RelevantContactPerson), Array.Empty<object>());
         SetCollection(insight, nameof(Insight.RelatedExternalPeople), Array.Empty<object>());
         SetCollection(insight, nameof(Insight.MetadataTeaserImage), Array.Empty<object>());
@@ -789,7 +789,7 @@ public class InsightPageServiceTests
         Insight insight,
         string name)
     {
-        var property = typeof(Insight).GetProperty(nameof(Insight.ContentType));
+        var property = typeof(Insight).GetProperty(nameof(Insight.ContentTypeFilter));
         if (property is null)
         {
             throw new InvalidOperationException("ContentType property was not found.");
@@ -800,7 +800,7 @@ public class InsightPageServiceTests
 
         SetPropertyValue(item, "Name", name);
 
-        SetCollection(insight, nameof(Insight.ContentType), item);
+        SetCollection(insight, nameof(Insight.ContentTypeFilter), item);
     }
 
     private static void SetAssetCollection(

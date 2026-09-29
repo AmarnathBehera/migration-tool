@@ -108,6 +108,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// MetadataCanonical.
+		/// </summary>
+		public string MetadataCanonical { get; set; }
+
+
+		/// <summary>
 		/// MetadataTeaserImage.
 		/// </summary>
 		public IEnumerable<ContentAttachment> MetadataTeaserImage { get; set; }
@@ -117,12 +123,6 @@ namespace BDO
 		/// MetadataTeaserImageAltText.
 		/// </summary>
 		public string MetadataTeaserImageAltText { get; set; }
-
-
-		/// <summary>
-		/// MetadataCanonical.
-		/// </summary>
-		public string MetadataCanonical { get; set; }
 
 
 		/// <summary>

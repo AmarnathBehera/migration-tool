@@ -762,7 +762,7 @@ namespace BDO.GWT.Core.Tests.Services
                 MetadataDescription = "Test description",
                 ImageFileM = Array.Empty<ContentAttachment>(),
                 ImageFileAltTextM = "alt text",
-                ContentType = Array.Empty<Contenttypes>(),
+                ContentTypeFilter = Array.Empty<Contenttypes>(),
                 UpdatedOn = DateTime.MinValue,
                 MetadataKeywordsBlog = string.Empty,
                 MetadataBusinessIssues = Array.Empty<Businessissue>(),
