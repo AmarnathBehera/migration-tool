@@ -1166,7 +1166,7 @@ public class RelatedContentCardServiceTests
 
         var result = await _sut.GetFilteredItemsAsync(BasicQuery(nameof(Event)), "/", "en-gb", null, _ => false, CancellationToken.None);
 
-        Assert.That(result.Data.First().Title, Is.EqualTo("Soon"));
+        Assert.That(result.Data[0].Title, Is.EqualTo("Later"));
     }
 
     [Test]
