@@ -26,6 +26,7 @@
   </ClassFormDefinition>
   <ClassGUID>392e5450-56f2-49da-96a0-fc49215599d8</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-l-grid-2-2</ClassIconClass>
   <ClassName>BDO.SectionAbout</ClassName>
   <ClassShortName>BDOSectionAbout</ClassShortName>
   <ClassTableName>BDO_SectionAbout</ClassTableName>

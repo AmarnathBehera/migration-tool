@@ -12,6 +12,8 @@ public class EventsWebinarsSliderDto : ICardsCarouselDto<EventsWebinarsCardDto>,
 
     public string? BackgroundImageAltText { get; set; }
 
+    public string ApiEndpoint { get; set; } = "EventsWebinarsSlider/Items";
+
     public FilterItemDto<OptionDto>[]? Filters { get; set; }
 
     public required bool FilteringTooltipEnabled { get; set; }
