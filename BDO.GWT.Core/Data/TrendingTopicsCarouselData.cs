@@ -18,4 +18,6 @@ public class TrendingTopicsCarouselData : BaseWidgetData
     public string TopMargin { get; set; } = null!;
 
     public string BottomMargin { get; set; } = null!;
+
+    public string TrendingTopicsPageType { get; set; } = null!;
 }
