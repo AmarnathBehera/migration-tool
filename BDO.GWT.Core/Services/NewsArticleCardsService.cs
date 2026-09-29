@@ -229,10 +229,10 @@ public class NewsArticleCardsService : INewsArticleCardsService
             var card = new NewsPageCardDto
             {
                 IsFeatured = isPageFeatured(contentPage),
-                ImageURL = urlHelper.Content(contentPage.ImageFileM.FirstOrDefault()?.ContentAttachmentAsset.Url),
+                ImageURL = urlHelper.Content(contentPage.ImageFileM?.FirstOrDefault()?.ContentAttachmentAsset?.Url ?? string.Empty),
                 isComingSoon = isComingSoon,
                 ImageAltText = contentPage.ImageFileAltTextM,
-                Type = contentPage.ContentTypeFilter.FirstOrDefault()?.Name,
+                Type = contentPage.ContentTypeFilter?.FirstOrDefault()?.Name,
                 Title = contentPage.MetadataTitle,
                 Date = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen ?? contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen,
                 UpdatedOnDate = contentPage.UpdatedOn == DateTime.MinValue ? null : contentPage.UpdatedOn,

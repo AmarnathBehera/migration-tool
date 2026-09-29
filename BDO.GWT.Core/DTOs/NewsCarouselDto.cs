@@ -8,6 +8,8 @@ public class NewsCarouselDto : ICardsCarouselDto<NewsPageCardDto>, IFilterableCo
 
     public string? Description { get; set; }
 
+    public string ApiEndpoint { get; set; } = "NewsCarousel/Items";
+
     public IEnumerable<FilterItemDto<OptionDto>>? Filters { get; set; }
 
     public required bool FilteringTooltipEnabled { get; set; }
