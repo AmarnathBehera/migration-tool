@@ -62,6 +62,7 @@
   </ClassFormDefinition>
   <ClassGUID>efaa910b-971a-4c92-9535-fde264dc8ecf</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-map-marker</ClassIconClass>
   <ClassName>BDO.LocationCity</ClassName>
   <ClassShortName>BDOLocationCity</ClassShortName>
   <ClassTableName>BDO_LocationCity</ClassTableName>
