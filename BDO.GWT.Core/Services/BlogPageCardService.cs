@@ -403,7 +403,7 @@ namespace BDO.GWT.Core.Services
             var cards = new List<BlogPageCardDto>();
             foreach (var contentPage in contentPages)
             {
-                 var type = contentPage.ContentType.FirstOrDefault();
+                 var type = contentPage.ContentTypeFilter.FirstOrDefault();
                 string typeConst = string.Empty;
                
                 if(type != null)

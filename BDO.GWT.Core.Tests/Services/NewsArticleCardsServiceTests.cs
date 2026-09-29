@@ -464,7 +464,7 @@ public class NewsArticleCardsServiceTests
     {
         var newsSection = CreateSectionNews(100);
         var article = CreateNewsArticle(1);
-        article.ContentType = new[]
+        article.ContentTypeFilter = new[]
         {
             new Contenttypes { Name = "Press Release" }
         };
@@ -483,7 +483,7 @@ public class NewsArticleCardsServiceTests
     {
         var newsSection = CreateSectionNews(100);
         var article = CreateNewsArticle(1);
-        article.ContentType = Array.Empty<Contenttypes>();
+        article.ContentTypeFilter = Array.Empty<Contenttypes>();
 
         SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
         SetupNewsArticleReturns(new[] { article });
@@ -727,7 +727,7 @@ public class NewsArticleCardsServiceTests
                 ? new[] { new ContentAttachment { ContentAttachmentAsset = new ContentItemAsset { Url = imageUrl } } }
                 : Array.Empty<ContentAttachment>(),
             ImageFileAltTextM = imageAlt,
-            ContentType = Array.Empty<Contenttypes>(),
+            ContentTypeFilter = Array.Empty<Contenttypes>(),
             UpdatedOn = updatedOn ?? DateTime.MinValue
         };
     }
