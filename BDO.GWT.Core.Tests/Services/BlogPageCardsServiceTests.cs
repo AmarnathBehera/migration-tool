@@ -761,7 +761,7 @@ namespace BDO.GWT.Core.Tests.Services
                 MetadataDescription = $"Description for {title}",
                 ImageFileM = Array.Empty<ContentAttachment>(),
                 ImageFileAltTextM = "alt",
-                ContentType = Array.Empty<Contenttypes>(),
+                ContentTypeFilter = Array.Empty<Contenttypes>(),
                 UpdatedOn = DateTime.MinValue,
                 MetadataKeywordsBlog = string.Empty,
                 MetadataBusinessIssues = Array.Empty<Businessissue>(),

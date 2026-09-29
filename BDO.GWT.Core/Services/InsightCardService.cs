@@ -153,7 +153,7 @@ public class InsightCardService : IInsightCardService
                     predicate = x => MatchesLinkedItemName(x.MetadataBusinessIssues, filterParameterValue);
                     break;
                 case FilterParameterName.ContentType:
-                    predicate = x => MatchesLinkedItemName(x.ContentType, filterParameterValue);
+                    predicate = x => MatchesLinkedItemName(x.ContentTypeFilter, filterParameterValue);
                     break;
             }
 
@@ -242,7 +242,7 @@ public class InsightCardService : IInsightCardService
             ImageURL = GetAbsoluteAssetUrl(imageUrl),
             isComingSoon = page.ComingSoon,
             ImageAltText = page.InsightContent.FirstOrDefault()?.ImageFileAltText,
-            Type = page.ContentType?.FirstOrDefault()?.Name,
+            Type = page.ContentTypeFilter?.FirstOrDefault()?.Name,
             Title = page.InsightContent.FirstOrDefault()?.Title ?? page.MetadataTitle,
             Date = page.SystemFields.ContentItemCommonDataLastPublishedWhen ?? page.SystemFields.ContentItemCommonDataFirstPublishedWhen,
             UpdatedOnDate = null,
