@@ -34,7 +34,7 @@
   </ClassFormDefinition>
   <ClassGUID>a7bec4dd-14be-4451-84ef-8183386feebf</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
-  <ClassIconClass>xp-exclamation-triangle-inverted</ClassIconClass>
+  <ClassIconClass>xp-exclamation-triangle</ClassIconClass>
   <ClassName>BDO.StatusCode</ClassName>
   <ClassShortName>BDOStatusCode</ClassShortName>
   <ClassTableName>BDO_StatusCode</ClassTableName>
