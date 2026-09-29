@@ -98,6 +98,22 @@ public class CustomGlobalLocationsControllerTests
     }
 
     [Test]
+    public async Task Create_ReturnsBadRequest_WhenInvalidGlobalLocationRegion()
+    {
+        var request = CreateUpsertDto();
+
+        _serviceMock
+            .Setup(x => x.CreateAsync(request))
+            .ThrowsAsync(new InvalidGlobalLocationRegionException("9"));
+
+        var result = await _controller.Create(request, CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<BadRequestObjectResult>());
+        var badRequest = (BadRequestObjectResult)result.Result!;
+        Assert.That(badRequest.Value, Does.Contain("9"));
+    }
+
+    [Test]
     public async Task Create_ReturnsConflict_WhenDuplicateMemberFirm()
     {
         var request = CreateUpsertDto();
@@ -164,6 +180,23 @@ public class CustomGlobalLocationsControllerTests
         Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
         var notFound = (NotFoundObjectResult)result.Result!;
         Assert.That(notFound.Value, Does.Contain(memberFirmId.ToString()));
+    }
+
+    [Test]
+    public async Task Update_ReturnsBadRequest_WhenInvalidGlobalLocationRegion()
+    {
+        const int memberFirmId = 1;
+        var request = CreateUpsertDto(memberFirmId);
+
+        _serviceMock
+            .Setup(x => x.UpdateAsync(memberFirmId, request))
+            .ThrowsAsync(new InvalidGlobalLocationRegionException("9"));
+
+        var result = await _controller.Update(memberFirmId, request, CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<BadRequestObjectResult>());
+        var badRequest = (BadRequestObjectResult)result.Result!;
+        Assert.That(badRequest.Value, Does.Contain("9"));
     }
 
     [Test]

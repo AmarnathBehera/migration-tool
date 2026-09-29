@@ -1378,6 +1378,7 @@ public class RelatedContentCardServiceTests
     {
         var fields = (WebPageFields)RuntimeHelpers.GetUninitializedObject(typeof(WebPageFields));
         SetProperty(fields, nameof(WebPageFields.ContentItemGUID), guid);
+        SetProperty(fields, nameof(WebPageFields.WebPageItemGUID), guid);
         SetProperty(fields, nameof(WebPageFields.ContentItemCommonDataLastPublishedWhen), publishedDate ?? DateTime.UtcNow);
         return fields;
     }

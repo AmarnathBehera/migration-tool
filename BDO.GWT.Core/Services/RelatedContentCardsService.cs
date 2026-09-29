@@ -65,7 +65,10 @@ public class RelatedContentCardService : IRelatedContentCardService
         if (string.IsNullOrWhiteSpace(parentPath))
             throw new ArgumentException("Parent path cannot be null or empty.", nameof(parentPath));
 
-        var selectedTypes = cardsQuery.SelectedPageTypes ?? new List<string>();
+        var selectedTypes = cardsQuery.SelectedPageTypes?
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList() ?? new List<string>();
         var allPages = new List<IWebPageFieldsSource>();
 
         async Task<IEnumerable<IWebPageFieldsSource>> RetrieveAsync<T>()
@@ -114,6 +117,8 @@ public class RelatedContentCardService : IRelatedContentCardService
 
         var filtered = allPages
             .Where(page => filters.All(f => f(page)))
+            .GroupBy(page => page.SystemFields.WebPageItemGUID)
+            .Select(group => group.First())
             .ToArray();
 
         var ordered = ((IEnumerable<IWebPageFieldsSource>)filtered)
