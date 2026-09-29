@@ -198,9 +198,9 @@ namespace BDO
 
 
 		/// <summary>
-		/// ContentType.
+		/// ContentTypeFilter.
 		/// </summary>
-		public IEnumerable<Contenttypes> ContentType { get; set; }
+		public IEnumerable<Contenttypes> ContentTypeFilter { get; set; }
 
 
 		/// <summary>

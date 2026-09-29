@@ -217,9 +217,9 @@ public class RelatedContentCardService : IRelatedContentCardService
 
                 FilterParameterName.ContentType =>  page => page switch
                 {
-                    Insight i => MatchesLinkedItemName(i.ContentType, filterParameterValue),
-                    BlogPost b => MatchesLinkedItemName(b.ContentType, filterParameterValue),
-                    NewsArticle n => MatchesLinkedItemName(n.ContentType, filterParameterValue),
+                    Insight i => MatchesLinkedItemName(i.ContentTypeFilter, filterParameterValue),
+                    BlogPost b => MatchesLinkedItemName(b.ContentTypeFilter, filterParameterValue),
+                    NewsArticle n => MatchesLinkedItemName(n.ContentTypeFilter, filterParameterValue),
                     Event e => MatchesLinkedItemName(e.ContentTypeEvent, filterParameterValue),
                     Webinar w => MatchesLinkedItemName(w.ContentTypeEvent, filterParameterValue),
                     MicrositePage m => MatchesLinkedItemName(m.MicrositeContentType, filterParameterValue),
@@ -292,10 +292,10 @@ public class RelatedContentCardService : IRelatedContentCardService
             Insight i => BuildCard(i, isFeatured, new CardContent(
                 i.InsightContent.FirstOrDefault()?.ImageFile.FirstOrDefault()?.ContentAttachmentAsset?.Url,
                 i.InsightContent.FirstOrDefault()?.ImageFileAltText,
-                i.ContentType?.FirstOrDefault()?.Name, i.MetadataTitle, i.MetadataDescription, i.ComingSoon)),
+                i.ContentTypeFilter?.FirstOrDefault()?.Name, i.MetadataTitle, i.MetadataDescription, i.ComingSoon)),
 
-            BlogPost b     => BuildCard(b, isFeatured, new CardContent(Teaser(b.MetadataTeaserImage), b.MetadataTeaserImageAltText, b.ContentType?.FirstOrDefault()?.Name, b.MetadataTitle, b.MetadataDescription)),
-            NewsArticle n  => BuildCard(n, isFeatured, new CardContent(Teaser(n.MetadataTeaserImage), n.MetadataTeaserImageAltText, n.ContentType?.FirstOrDefault()?.Name, n.MetadataTitle, n.MetadataDescription)),
+            BlogPost b     => BuildCard(b, isFeatured, new CardContent(Teaser(b.MetadataTeaserImage), b.MetadataTeaserImageAltText, b.ContentTypeFilter?.FirstOrDefault()?.Name, b.MetadataTitle, b.MetadataDescription)),
+            NewsArticle n  => BuildCard(n, isFeatured, new CardContent(Teaser(n.MetadataTeaserImage), n.MetadataTeaserImageAltText, n.ContentTypeFilter?.FirstOrDefault()?.Name, n.MetadataTitle, n.MetadataDescription)),
             Event e        => BuildCard(e, isFeatured, new CardContent(Teaser(e.MetadataTeaserImage), e.MetadataTeaserImageAltText, e.ContentTypeEvent?.FirstOrDefault()?.Name, e.MetadataTitle, e.MetadataDescription, DateOverride: e.EventDateFrom, DateToOverride: e.EventDateTo)),
             Webinar w      => BuildCard(w, isFeatured, new CardContent(Teaser(w.MetadataTeaserImage), w.MetadataTeaserImageAltText, w.ContentTypeEvent?.FirstOrDefault()?.Name, w.MetadataTitle, w.MetadataDescription, DateOverride: w.EventDateFrom, DateToOverride: w.EventDateTo)),
             MicrositePage m => BuildCard(m, isFeatured, new CardContent(Teaser(m.MetadataTeaserImage), m.MetadataTeaserImageAltText, m.MicrositeContentType?.FirstOrDefault()?.Name, m.MetadataTitle, m.MetadataDescription)),

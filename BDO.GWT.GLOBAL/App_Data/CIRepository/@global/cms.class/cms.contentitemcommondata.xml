@@ -433,12 +433,12 @@
           <fieldcaption>Where should this page appear?</fieldcaption>
         </properties>
       </schema>
-      <field allowempty="true" column="ContentType" columnprecision="0" columntype="contentitemreference" enabled="true" guid="be3b48ec-7eb2-4b5a-8cc7-71c3d28100f1" visible="true">
+      <field allowempty="true" column="ContentTypeFilter" columnprecision="0" columntype="contentitemreference" enabled="true" guid="69511c69-7cc8-4ea4-817b-8a679a0fad57" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Type</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
-          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeincontentgeneration>True</includeincontentgeneration>
           <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>6bf9af2e-ee19-461b-a071-2b6541b36653</kxp_schema_identifier>
         </properties>
