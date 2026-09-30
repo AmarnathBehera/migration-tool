@@ -1,7 +1,16 @@
+using BDO.GWT.Common.Core.Exceptions;
+using BDO.GWT.Core;
+using BDO.GWT.Core.Services;
+using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.GLOBAL.API.Data;
+using BDO.GWT.GLOBAL.API.Helpers;
 using BDO.GWT.GLOBAL.API.Services;
+using CMS.ContentEngine;
+using CMS.DataEngine;
+using CMS.Websites;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -302,4 +311,415 @@ public class SectionEventsCrudServiceTests
             Assert.That(interfaceType.GetMethod("DeletePageAsync"), Is.Not.Null);
         });
     }
+}
+
+[TestFixture]
+public class SectionEventsCrudServiceBranchTests
+{
+    private Mock<IContentService> _contentRetrieverMock = null!;
+    private Mock<IValidationState> _validationStateMock = null!;
+    private Mock<ICultureService> _cultureServiceMock = null!;
+    private Mock<IPageContentValidator> _pageContentValidatorMock = null!;
+    private Mock<IInfoProvider<ChannelInfo>> _channelInfoProviderMock = null!;
+    private Mock<IInfoByIdProvider<ChannelInfo>> _channelByIdProviderMock = null!;
+    private Mock<IWebPageManager> _webPageManagerMock = null!;
+    private Mock<IMappingHelper> _mappingHelperMock = null!;
+
+    private static LanguageTag EmptyLocaleCulture => new("en", null, "GB", "");
+    private static LanguageTag EmptyLanguageCulture => new("", null, "GB", "en-GB");
+
+    [SetUp]
+    public void Setup()
+    {
+        _contentRetrieverMock = new Mock<IContentService>();
+        _validationStateMock = new Mock<IValidationState>();
+        _cultureServiceMock = new Mock<ICultureService>();
+        _pageContentValidatorMock = new Mock<IPageContentValidator>();
+        _channelInfoProviderMock = new Mock<IInfoProvider<ChannelInfo>>();
+        _channelByIdProviderMock = _channelInfoProviderMock.As<IInfoByIdProvider<ChannelInfo>>();
+        _webPageManagerMock = new Mock<IWebPageManager>();
+        _mappingHelperMock = new Mock<IMappingHelper>();
+    }
+
+    private SectionEventsCrudService CreateService()
+    {
+        var service = (SectionEventsCrudService)RuntimeHelpers.GetUninitializedObject(typeof(SectionEventsCrudService));
+
+        SetPrivateField(service, "_contentRetriever", _contentRetrieverMock.Object);
+        SetPrivateField(service, "_validationState", _validationStateMock.Object);
+        SetPrivateField(service, "_cultureService", _cultureServiceMock.Object);
+        SetPrivateField(service, "_pageContentValidator", _pageContentValidatorMock.Object);
+        SetPrivateField(service, "_channelInfoProvider", _channelInfoProviderMock.Object);
+        SetPrivateField(service, "_webPageManager", _webPageManagerMock.Object);
+        SetPrivateField(service, "_mappingHelper", _mappingHelperMock.Object);
+
+        return service;
+    }
+
+    private static void SetPrivateField(object target, string fieldName, object value)
+    {
+        var field = target.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
+        if (field is null)
+        {
+            Assert.Fail($"Field '{fieldName}' was not found on {target.GetType().Name}.");
+        }
+
+        field!.SetValue(target, value);
+    }
+
+    private void SetupCulture(LanguageTag? culture) =>
+        _mappingHelperMock
+            .Setup(x => x.ValidateAndNormalizeSiteCultureAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(culture);
+
+    private void SetupCultureSequence(LanguageTag first, LanguageTag second) =>
+        _mappingHelperMock
+            .SetupSequence(x => x.ValidateAndNormalizeSiteCultureAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(first)
+            .ReturnsAsync(second);
+
+    private void SetupChannel(ChannelInfo? channel) =>
+        _channelByIdProviderMock
+            .Setup(x => x.GetAsync(It.IsAny<int>(), It.IsAny<CancellationToken?>()))
+            .ReturnsAsync(channel!);
+
+    private void SetupChannelThrows(Exception exception) =>
+        _channelByIdProviderMock
+            .Setup(x => x.GetAsync(It.IsAny<int>(), It.IsAny<CancellationToken?>()))
+            .ThrowsAsync(exception);
+
+    private static SectionEventsPageContent CreateRequest() => new()
+    {
+        MetadataTitle = "Events",
+        MetadataTeaserImageAltText = "alt",
+    };
+
+    private static void AssertNotFoundWithMessage<T>(ActionResult<T> result, string expectedMessage)
+    {
+        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+        Assert.That(((NotFoundObjectResult)result.Result!).Value, Is.EqualTo(expectedMessage));
+    }
+
+    private static void Assert500WithMessage<T>(ActionResult<T> result, string expectedMessage)
+    {
+        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+        var objectResult = (ObjectResult)result.Result!;
+        Assert.Multiple(() =>
+        {
+            Assert.That(objectResult.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+            Assert.That(objectResult.Value, Is.EqualTo(expectedMessage));
+        });
+    }
+
+    #region GetPagesAsync
+
+    [Test]
+    public async Task GetPagesAsync_InvalidCulture_ReturnsNotFoundWithMessage()
+    {
+        SetupCulture(EmptyLocaleCulture);
+
+        var result = await CreateService().GetPagesAsync(1, "en-gb", true, CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Invalid culture specified");
+    }
+
+    [Test]
+    public async Task GetPagesAsync_ChannelNotFound_ReturnsNotFoundWithMessage()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(null);
+
+        var result = await CreateService().GetPagesAsync(1, "en-gb", true, CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Channel not found");
+    }
+
+    [Test]
+    public async Task GetPagesAsync_NullCultureFromValidator_FallsBackToDefault_ThenChannelNotFound()
+    {
+        SetupCulture(null);
+        SetupChannel(null);
+
+        var result = await CreateService().GetPagesAsync(1, null, null, CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Channel not found");
+        _mappingHelperMock.Verify(
+            x => x.ValidateAndNormalizeSiteCultureAsync(1, LanguageTag.GB.Language, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task GetPagesAsync_UnprocessableEntityThrown_Returns422()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannelThrows(new UnprocessableEntityException());
+
+        var result = await CreateService().GetPagesAsync(1, "en-gb", true, CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<UnprocessableEntityObjectResult>());
+    }
+
+    [Test]
+    public async Task GetPagesAsync_UnexpectedException_Returns500WithMessage()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannelThrows(new InvalidOperationException("boom"));
+
+        var result = await CreateService().GetPagesAsync(1, "en-gb", true, CancellationToken.None);
+
+        Assert500WithMessage(result, "boom");
+    }
+
+    #endregion
+
+    #region GetPageAsync
+
+    [Test]
+    public async Task GetPageAsync_InvalidCulture_ReturnsNotFoundWithMessage()
+    {
+        SetupCulture(EmptyLocaleCulture);
+
+        var result = await CreateService().GetPageAsync(1, Guid.NewGuid(), "en-gb", CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Invalid culture specified");
+    }
+
+    [Test]
+    public async Task GetPageAsync_ChannelNotFound_ReturnsNotFoundWithMessage()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(null);
+
+        var result = await CreateService().GetPageAsync(1, Guid.NewGuid(), null, CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Channel not found");
+    }
+
+    [Test]
+    public async Task GetPageAsync_UnprocessableEntityThrown_Returns422()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannelThrows(new UnprocessableEntityException());
+
+        var result = await CreateService().GetPageAsync(1, Guid.NewGuid(), "en-gb", CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<UnprocessableEntityObjectResult>());
+    }
+
+    [Test]
+    public async Task GetPageAsync_UnexpectedException_Returns500WithMessage()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannelThrows(new InvalidOperationException("fail"));
+
+        var result = await CreateService().GetPageAsync(1, Guid.NewGuid(), "en-gb", CancellationToken.None);
+
+        Assert500WithMessage(result, "fail");
+    }
+
+    #endregion
+
+    #region CreatePageAsync
+
+    [Test]
+    public async Task CreatePageAsync_InvalidCulture_ReturnsNotFoundWithMessage()
+    {
+        SetupCulture(EmptyLocaleCulture);
+
+        var result = await CreateService().CreatePageAsync(1, 10, "en-gb", CreateRequest(), CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Invalid culture specified");
+    }
+
+    [Test]
+    public async Task CreatePageAsync_ChannelNotFound_ReturnsNotFoundWithMessage()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(null);
+
+        var result = await CreateService().CreatePageAsync(1, 10, null, CreateRequest(), CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Channel not found");
+        _pageContentValidatorMock.Verify(x => x.ValidateAndNormalizePageContent(It.IsAny<SectionEventsPageContent>()), Times.Never);
+    }
+
+    [Test]
+    public async Task CreatePageAsync_UnprocessableEntityThrown_Returns422()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannelThrows(new UnprocessableEntityException());
+
+        var result = await CreateService().CreatePageAsync(1, 10, "en-gb", CreateRequest(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<UnprocessableEntityObjectResult>());
+    }
+
+    [Test]
+    public async Task CreatePageAsync_UnexpectedException_Returns500WithMessage()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannelThrows(new InvalidOperationException("create failed"));
+
+        var result = await CreateService().CreatePageAsync(1, 10, "en-gb", CreateRequest(), CancellationToken.None);
+
+        Assert500WithMessage(result, "create failed");
+        _webPageManagerMock.VerifyNoOtherCalls();
+    }
+
+    #endregion
+
+    #region CreatePageCultureVersionAsync
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_InvalidFromCulture_ReturnsNotFoundWithMessage()
+    {
+        SetupCulture(EmptyLanguageCulture);
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), "xx", "en-us", CreateRequest(), CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Invalid from culture specified");
+    }
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_InvalidToCulture_ReturnsNotFoundWithMessage()
+    {
+        SetupCultureSequence(LanguageTag.GB, EmptyLanguageCulture);
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), "en-gb", "xx", CreateRequest(), CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Invalid to culture specified");
+    }
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_ChannelNotFound_ReturnsNotFoundWithMessage()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(null);
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), null, null, CreateRequest(), CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Channel not found");
+        _mappingHelperMock.Verify(
+            x => x.ValidateAndNormalizeSiteCultureAsync(1, LanguageTag.GB.Language, It.IsAny<CancellationToken>()),
+            Times.Exactly(2));
+    }
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_UnprocessableEntityThrown_Returns422()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannelThrows(new UnprocessableEntityException());
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), "en-gb", "en-us", CreateRequest(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<UnprocessableEntityObjectResult>());
+    }
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_UnexpectedException_Returns500WithMessage()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannelThrows(new InvalidOperationException("variant failed"));
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), "en-gb", "en-us", CreateRequest(), CancellationToken.None);
+
+        Assert500WithMessage(result, "variant failed");
+    }
+
+    #endregion
+
+    #region UpdatePageAsync
+
+    [Test]
+    public async Task UpdatePageAsync_InvalidCulture_ReturnsNotFoundWithMessage()
+    {
+        SetupCulture(EmptyLocaleCulture);
+
+        var result = await CreateService().UpdatePageAsync(1, Guid.NewGuid(), "en-gb", CreateRequest(), CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Invalid culture specified");
+    }
+
+    [Test]
+    public async Task UpdatePageAsync_ChannelNotFound_ReturnsNotFoundWithMessage()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(null);
+
+        var result = await CreateService().UpdatePageAsync(1, Guid.NewGuid(), null, CreateRequest(), CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Channel not found");
+        _mappingHelperMock.Verify(
+            x => x.ValidateAndNormalizeSiteCultureAsync(1, LanguageTag.GB.Locale, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task UpdatePageAsync_UnprocessableEntityThrown_Returns422()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannelThrows(new UnprocessableEntityException());
+
+        var result = await CreateService().UpdatePageAsync(1, Guid.NewGuid(), "en-gb", CreateRequest(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<UnprocessableEntityObjectResult>());
+    }
+
+    [Test]
+    public async Task UpdatePageAsync_UnexpectedException_Returns500WithMessage()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannelThrows(new InvalidOperationException("update failed"));
+
+        var result = await CreateService().UpdatePageAsync(1, Guid.NewGuid(), "en-gb", CreateRequest(), CancellationToken.None);
+
+        Assert500WithMessage(result, "update failed");
+    }
+
+    #endregion
+
+    #region DeletePageAsync
+
+    [Test]
+    public void DeletePageAsync_InvalidCulture_ThrowsNotFoundException()
+    {
+        SetupCulture(EmptyLocaleCulture);
+
+        var ex = Assert.ThrowsAsync<NotFoundException>(() =>
+            CreateService().DeletePageAsync(1, Guid.NewGuid(), "en-gb", false, CancellationToken.None));
+
+        Assert.That(ex!.Message, Is.EqualTo("Invalid culture specified"));
+    }
+
+    [Test]
+    public void DeletePageAsync_ChannelNotFound_ThrowsNotFoundException()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(null);
+
+        var ex = Assert.ThrowsAsync<NotFoundException>(() =>
+            CreateService().DeletePageAsync(1, Guid.NewGuid(), null, true, CancellationToken.None));
+
+        Assert.That(ex!.Message, Is.EqualTo("Channel not found"));
+        _cultureServiceMock.Verify(
+            x => x.GetSiteCulturesLanguageCodeAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        _webPageManagerMock.VerifyNoOtherCalls();
+    }
+
+    [Test]
+    public void DeletePageAsync_NullCultureFromValidator_UsesDefaultLocale()
+    {
+        SetupCulture(null);
+        SetupChannel(null);
+
+        Assert.ThrowsAsync<NotFoundException>(() =>
+            CreateService().DeletePageAsync(1, Guid.NewGuid(), null, false, CancellationToken.None));
+
+        _mappingHelperMock.Verify(
+            x => x.ValidateAndNormalizeSiteCultureAsync(1, LanguageTag.GB.Locale, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    #endregion
 }

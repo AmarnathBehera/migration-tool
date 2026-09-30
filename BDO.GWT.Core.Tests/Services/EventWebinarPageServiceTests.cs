@@ -1,17 +1,18 @@
-using System.Reflection;
-using BDO.GWT.Core;
+﻿using BDO.GWT.Core.DTOs.Pages;
+using BDO.GWT.Core.DTOs.SchemaMarkups;
 using BDO.GWT.Core.DTOs;
-using BDO.GWT.Core.DTOs.Pages;
 using BDO.GWT.Core.Services;
+using BDO.GWT.Core;
 using BDO.GWT.Web.Core.DTOs;
 using BDO.GWT.Web.Core.LiveSite.DTOs.Pages;
 using BDO.GWT.Web.Core.Services;
 using CMS.DataEngine;
-using CMS.Websites;
 using CMS.Websites.Routing;
-using Kentico.Content.Web.Mvc;
+using CMS.Websites;
 using Kentico.Content.Web.Mvc.Routing;
+using Kentico.Content.Web.Mvc;
 using Moq;
+using System.Reflection;
 
 namespace BDO.GWT.Core.Tests.Services
 {
@@ -312,12 +313,12 @@ namespace BDO.GWT.Core.Tests.Services
 
         #endregion
 
-        #region GenerateOutlookEventCardContent – null path (no CMS context required)
+        #region GenerateOutlookEventCardContent â€“ null path (no CMS context required)
 
         [Test]
         public async Task GenerateOutlookEventCardContent_ReturnsNull_WhenNoPageFound()
         {
-            // GetPagesAsync returns empty → page is null → iCal method returns null early
+            // GetPagesAsync returns empty â†’ page is null â†’ iCal method returns null early
             _contentServiceMock
                 .Setup(x => x.GetPagesAsync<Event>(
                     It.IsAny<RetrievePagesParameters>(),
@@ -351,7 +352,7 @@ namespace BDO.GWT.Core.Tests.Services
 
         #endregion
 
-        #region GenerateOutlookWebinarCardContent – null path (no CMS context required)
+        #region GenerateOutlookWebinarCardContent â€“ null path (no CMS context required)
 
         [Test]
         public async Task GenerateOutlookWebinarCardContent_ReturnsNull_WhenNoPageFound()
@@ -389,7 +390,7 @@ namespace BDO.GWT.Core.Tests.Services
 
         #endregion
 
-        #region EventWebinarDto – DTO property coverage
+        #region EventWebinarDto â€“ DTO property coverage
 
         [Test]
         public void EventWebinarDto_DefaultValues_AreCorrect()
@@ -435,7 +436,7 @@ namespace BDO.GWT.Core.Tests.Services
 
         #endregion
 
-        #region EventWebinarDetailsRegistrationCardDto – DTO property coverage
+        #region EventWebinarDetailsRegistrationCardDto â€“ DTO property coverage
 
         [Test]
         public void RegistrationCardDto_SetProperties_RetainsValues()
@@ -490,7 +491,7 @@ namespace BDO.GWT.Core.Tests.Services
 
         #endregion
 
-        #region PresenterDto – DTO property coverage
+        #region PresenterDto â€“ DTO property coverage
 
         [Test]
         public void PresenterDto_SetProperties_RetainsValues()
@@ -645,6 +646,508 @@ namespace BDO.GWT.Core.Tests.Services
 
             Assert.ThrowsAsync<OperationCanceledException>(
                 () => _service.GenerateOutlookEventCardContent(page.SystemFields.ContentItemGUID, null, cts.Token));
+        }
+
+        #endregion
+    }
+}
+
+
+namespace BDO.GWT.Core.Tests.Services
+{
+    public class EventWebinarPageServiceCoverageTests
+    {
+        private Mock<IContentService> _contentServiceMock = null!;
+        private Mock<IWebPageUrlRetriever> _pageUrlRetrieverMock = null!;
+        private Mock<IInfoProvider<GlobalsettingskeyInfo>> _globalSettingsMock = null!;
+        private Mock<IInfoProvider<WebChannelSnippetInfo>> _snippetMock = null!;
+        private Mock<IPreferredLanguageRetriever> _preferredLanguageRetrieverMock = null!;
+        private Mock<ISocialMediaButtonsService> _socialMediaButtonsServiceMock = null!;
+        private EventWebinarPageService _service = null!;
+
+        [SetUp]
+        public void Setup()
+        {
+            _contentServiceMock = new Mock<IContentService>();
+            _pageUrlRetrieverMock = new Mock<IWebPageUrlRetriever>();
+            _globalSettingsMock = new Mock<IInfoProvider<GlobalsettingskeyInfo>>();
+            _snippetMock = new Mock<IInfoProvider<WebChannelSnippetInfo>>();
+            _preferredLanguageRetrieverMock = new Mock<IPreferredLanguageRetriever>();
+            _socialMediaButtonsServiceMock = new Mock<ISocialMediaButtonsService>();
+
+            _contentServiceMock.Setup(x => x.GetCurrentSiteLegalNameAsync()).Returns("BDO");
+            _contentServiceMock.Setup(x => x.GetCurrentSiteLogoImageUrlAsync()).Returns("/logo.png");
+
+            _snippetMock.Setup(p => p.Get()).Returns(BuildEmptyQuery<WebChannelSnippetInfo>().Object);
+            _globalSettingsMock.Setup(p => p.Get()).Returns(BuildEmptyQuery<GlobalsettingskeyInfo>().Object);
+
+            _service = new EventWebinarPageService(
+                _contentServiceMock.Object,
+                _pageUrlRetrieverMock.Object,
+                _globalSettingsMock.Object,
+                _snippetMock.Object,
+                _preferredLanguageRetrieverMock.Object,
+                _socialMediaButtonsServiceMock.Object);
+        }
+
+        #region Helpers
+
+        private static Mock<ObjectQuery<T>> BuildEmptyQuery<T>() where T : BaseInfo
+        {
+            var queryMock = new Mock<ObjectQuery<T>>();
+            queryMock.Setup(q => q.TopN(It.IsAny<int>())).Returns(queryMock.Object);
+            queryMock.As<IEnumerable<T>>()
+                .Setup(x => x.GetEnumerator())
+                .Returns(() => Enumerable.Empty<T>().GetEnumerator());
+            return queryMock;
+        }
+
+        private static Event BuildEvent(Action<Event>? configure = null)
+        {
+            var page = new Event
+            {
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemGUID = Guid.NewGuid(),
+                    WebPageItemID = 10,
+                    WebPageUrlPath = "/events/test-event",
+                    WebPageItemWebsiteChannelId = 1,
+                },
+                MetadataTitle = "Test Event",
+                MetadataDescription = "Event description",
+                EventDateFrom = new DateTime(2030, 1, 1, 10, 0, 0, DateTimeKind.Utc),
+                EventDateTo = new DateTime(2030, 1, 1, 12, 0, 0, DateTimeKind.Utc),
+                EventType = new List<EventType>(),
+            };
+            configure?.Invoke(page);
+            return page;
+        }
+
+        private static Webinar BuildWebinar(Action<Webinar>? configure = null)
+        {
+            var page = new Webinar
+            {
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemGUID = Guid.NewGuid(),
+                    WebPageItemID = 20,
+                    WebPageUrlPath = "/webinars/test-webinar",
+                    WebPageItemWebsiteChannelId = 1,
+                },
+                MetadataTitle = "Test Webinar",
+                MetadataDescription = "Webinar description",
+                EventDateFrom = new DateTime(2030, 2, 1, 10, 0, 0, DateTimeKind.Utc),
+                EventDateTo = new DateTime(2030, 2, 1, 12, 0, 0, DateTimeKind.Utc),
+                EventType = new List<EventType>(),
+            };
+            configure?.Invoke(page);
+            return page;
+        }
+
+        private void SetupEventPages(params Event[] pages) =>
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<Event>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(pages);
+
+        private void SetupWebinarPages(params Webinar[] pages) =>
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<Webinar>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(pages);
+
+        private static MethodInfo GetPrivateStatic(string name) =>
+            typeof(EventWebinarPageService).GetMethod(name, BindingFlags.NonPublic | BindingFlags.Static)
+                ?? throw new MissingMethodException(nameof(EventWebinarPageService), name);
+
+        private static string BuildLocation(string? title, string? addr1, string? addr2, string? city, string? state, string? zip) =>
+            (string)GetPrivateStatic("BuildLocationString").Invoke(null, [title, addr1, addr2, city, state, zip])!;
+
+        private static string? EventPostDescription(Event? page) =>
+            (string?)GetPrivateStatic("GetEventPostDescription").Invoke(null, [page]);
+
+        private static string? WebinarPostDescription(Webinar? page) =>
+            (string?)GetPrivateStatic("GetWebinarPostDescription").Invoke(null, [page]);
+
+        private OrganizationSchemaMarkupDto OrganizerMarkup(string? url) =>
+            (OrganizationSchemaMarkupDto)typeof(EventWebinarPageService)
+                .GetMethod("GetEventOrganizerSchemaMarkup", BindingFlags.NonPublic | BindingFlags.Instance)!
+                .Invoke(_service, [url])!;
+
+        #endregion
+
+        #region BuildLocationString
+
+        [Test]
+        public void BuildLocationString_AllParts_ContainsEachPart()
+        {
+            var result = BuildLocation("HQ", "1 Main St", "Suite 2", "Toronto", "ON", "M5V");
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Does.StartWith("HQ"));
+                Assert.That(result, Does.Contain("1 Main St"));
+                Assert.That(result, Does.Contain("Suite 2"));
+                Assert.That(result, Does.Contain("Toronto, ON"));
+                Assert.That(result, Does.EndWith("M5V"));
+            });
+        }
+
+        [Test]
+        public void BuildLocationString_TitleOnly_RemovesTrailingEscapedNewline()
+        {
+            var result = BuildLocation("HQ", null, null, null, null, null);
+
+            Assert.That(result.Trim(), Is.EqualTo("HQ"));
+            Assert.That(result, Does.Not.EndWith("\\n"));
+        }
+
+        [Test]
+        public void BuildLocationString_AllNull_ReturnsEmpty()
+        {
+            var result = BuildLocation(null, null, null, null, null, null);
+
+            Assert.That(result, Is.Empty);
+        }
+
+        [Test]
+        public void BuildLocationString_StateWithoutCity_HasNoComma()
+        {
+            var result = BuildLocation("HQ", null, null, null, "ON", null);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Does.Contain("ON"));
+                Assert.That(result, Does.Not.Contain(","));
+            });
+        }
+
+        [Test]
+        public void BuildLocationString_CityWithoutState_HasNoComma()
+        {
+            var result = BuildLocation("HQ", "1 Main St", null, "Toronto", null, null);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Does.Contain("Toronto"));
+                Assert.That(result, Does.Not.Contain(","));
+            });
+        }
+
+        [Test]
+        public void BuildLocationString_DoesNotContainDoubleSpaces()
+        {
+            var result = BuildLocation("HQ", null, null, "Toronto", null, "M5V");
+
+            Assert.That(result, Does.Not.Contain("  "));
+        }
+
+        #endregion
+
+        #region Post description fallback
+
+        [Test]
+        public void GetEventPostDescription_NullPage_ReturnsNull()
+        {
+            Assert.That(EventPostDescription(null), Is.Null);
+        }
+
+        [Test]
+        public void GetEventPostDescription_PrefersMetadataDescription()
+        {
+            var page = BuildEvent(e =>
+            {
+                e.MetadataDescription = "meta";
+                e.EventPostDescription = "post";
+            });
+
+            Assert.That(EventPostDescription(page), Is.EqualTo("meta"));
+        }
+
+        [Test]
+        public void GetEventPostDescription_FallsBackToEventPostDescription()
+        {
+            var page = BuildEvent(e =>
+            {
+                e.MetadataDescription = " ";
+                e.EventPostDescription = "post";
+            });
+
+            Assert.That(EventPostDescription(page), Is.EqualTo("post"));
+        }
+
+        [Test]
+        public void GetEventPostDescription_FallsBackToCpeDescription()
+        {
+            var page = BuildEvent(e =>
+            {
+                e.MetadataDescription = null!;
+                e.EventPostDescription = "";
+                e.CpeDescription = "cpe";
+            });
+
+            Assert.That(EventPostDescription(page), Is.EqualTo("cpe"));
+        }
+
+        [Test]
+        public void GetEventPostDescription_FallsBackToCustomBodyText()
+        {
+            var page = BuildEvent(e =>
+            {
+                e.MetadataDescription = null!;
+                e.EventPostDescription = null!;
+                e.CpeDescription = null!;
+                e.CustomBodyText = "body";
+            });
+
+            Assert.That(EventPostDescription(page), Is.EqualTo("body"));
+        }
+
+        [Test]
+        public void GetWebinarPostDescription_NullPage_ReturnsNull()
+        {
+            Assert.That(WebinarPostDescription(null), Is.Null);
+        }
+
+        [Test]
+        public void GetWebinarPostDescription_PrefersMetadataDescription()
+        {
+            Assert.That(WebinarPostDescription(BuildWebinar(w => w.MetadataDescription = "meta")), Is.EqualTo("meta"));
+        }
+
+        [Test]
+        public void GetWebinarPostDescription_FallsBackThroughChain()
+        {
+            var post = BuildWebinar(w => { w.MetadataDescription = ""; w.EventPostDescription = "post"; });
+            var cpe = BuildWebinar(w => { w.MetadataDescription = ""; w.EventPostDescription = ""; w.CpeDescription = "cpe"; });
+            var body = BuildWebinar(w => { w.MetadataDescription = ""; w.EventPostDescription = ""; w.CpeDescription = ""; w.CustomBodyText = "body"; });
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(WebinarPostDescription(post), Is.EqualTo("post"));
+                Assert.That(WebinarPostDescription(cpe), Is.EqualTo("cpe"));
+                Assert.That(WebinarPostDescription(body), Is.EqualTo("body"));
+            });
+        }
+
+        [Test]
+        public void GetWebinarPostDescription_AllEmpty_ReturnsLastCandidate()
+        {
+            var page = BuildWebinar(w =>
+            {
+                w.MetadataDescription = "";
+                w.EventPostDescription = "";
+                w.CpeDescription = "";
+                w.CustomBodyText = null!;
+            });
+
+            Assert.That(WebinarPostDescription(page), Is.Null);
+        }
+
+        #endregion
+
+        #region Organizer schema markup
+
+        [Test]
+        public void GetEventOrganizerSchemaMarkup_ValidAbsoluteUrl_ReturnsSchemeAndAuthority()
+        {
+            var result = OrganizerMarkup("https://www.bdo.com:8443/events/x?y=1");
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Url, Is.EqualTo("https://www.bdo.com:8443"));
+                Assert.That(result.Name, Is.EqualTo("BDO"));
+                Assert.That(result.Logo, Is.EqualTo("/logo.png"));
+            });
+        }
+
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase("   ")]
+        [TestCase("/relative/path")]
+        public void GetEventOrganizerSchemaMarkup_InvalidOrMissingUrl_ReturnsNullUrl(string? url)
+        {
+            var result = OrganizerMarkup(url);
+
+            Assert.That(result.Url, Is.Null);
+        }
+
+        [Test]
+        public void GetEventOrganizerSchemaMarkup_NullSiteNameAndLogo_DefaultToEmpty()
+        {
+            _contentServiceMock.Setup(x => x.GetCurrentSiteLegalNameAsync()).Returns((string)null!);
+            _contentServiceMock.Setup(x => x.GetCurrentSiteLogoImageUrlAsync()).Returns((string)null!);
+
+            var result = OrganizerMarkup("https://bdo.com");
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Name, Is.Empty);
+                Assert.That(result.Logo, Is.Empty);
+            });
+        }
+
+        #endregion
+
+        #region iCal generation
+
+        [Test]
+        public async Task GenerateOutlookEventCardContent_IncludesLocation_WhenLocationPartsPresent()
+        {
+            var page = BuildEvent(e =>
+            {
+                e.EventLocationTitle = "HQ";
+                e.EventLocationCity = "Toronto";
+                e.EventLocationState = "ON";
+            });
+            SetupEventPages(page);
+
+            var result = await _service.GenerateOutlookEventCardContent(Guid.NewGuid(), null, CancellationToken.None);
+
+            Assert.That(result, Does.Contain("LOCATION:"));
+            Assert.That(result, Does.Contain("Toronto"));
+        }
+
+        [Test]
+        public async Task GenerateOutlookEventCardContent_OmitsLocation_WhenAllLocationPartsEmpty()
+        {
+            SetupEventPages(BuildEvent());
+
+            var result = await _service.GenerateOutlookEventCardContent(Guid.NewGuid(), null, CancellationToken.None);
+
+            Assert.That(result, Does.Not.Contain("LOCATION:"));
+        }
+
+        [Test]
+        public async Task GenerateOutlookEventCardContent_AddsHtmlAltDescription_WhenCustomBodyPresent()
+        {
+            SetupEventPages(BuildEvent(e => e.CustomBodyText = "<p>Hello</p>"));
+
+            var result = await _service.GenerateOutlookEventCardContent(Guid.NewGuid(), null, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Does.Contain("X-ALT-DESC"));
+                Assert.That(result, Does.Contain("DESCRIPTION:"));
+            });
+        }
+
+        [Test]
+        public async Task GenerateOutlookEventCardContent_NoAlarm_WhenSettingsDefault()
+        {
+            SetupEventPages(BuildEvent());
+
+            var result = await _service.GenerateOutlookEventCardContent(Guid.NewGuid(), null, CancellationToken.None);
+
+            Assert.That(result, Does.Not.Contain("BEGIN:VALARM"));
+        }
+
+        [Test]
+        public async Task GenerateOutlookEventCardContent_HasProductIdAndVersion()
+        {
+            SetupEventPages(BuildEvent());
+
+            var result = await _service.GenerateOutlookEventCardContent(Guid.NewGuid(), null, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Does.Contain("PRODID:-//BDO.Calendar//EN"));
+                Assert.That(result, Does.Contain("VERSION:2.0"));
+                Assert.That(result, Does.Contain("END:VCALENDAR"));
+            });
+        }
+
+        [Test]
+        public async Task GenerateOutlookEventCardContent_UsesUtcStartAndEnd()
+        {
+            SetupEventPages(BuildEvent());
+
+            var result = await _service.GenerateOutlookEventCardContent(Guid.NewGuid(), null, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Does.Contain("20300101T100000"));
+                Assert.That(result, Does.Contain("20300101T120000"));
+            });
+        }
+
+        [Test]
+        public async Task GenerateOutlookEventCardContent_UsesFirstPage_WhenMultipleReturned()
+        {
+            SetupEventPages(BuildEvent(e => e.MetadataTitle = "First"), BuildEvent(e => e.MetadataTitle = "Second"));
+
+            var result = await _service.GenerateOutlookEventCardContent(Guid.NewGuid(), null, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Does.Contain("SUMMARY:First"));
+                Assert.That(result, Does.Not.Contain("SUMMARY:Second"));
+            });
+        }
+
+        [Test]
+        public async Task GenerateOutlookWebinarCardContent_OmitsAltDescription_WhenNoCustomBody()
+        {
+            SetupWebinarPages(BuildWebinar(w => w.CustomBodyText = null!));
+
+            var result = await _service.GenerateOutlookWebinarCardContent(Guid.NewGuid(), null, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Does.Contain("BEGIN:VEVENT"));
+                Assert.That(result, Does.Not.Contain("X-ALT-DESC"));
+            });
+        }
+
+        [Test]
+        public async Task GenerateOutlookWebinarCardContent_IncludesLocation_WhenCityPresent()
+        {
+            SetupWebinarPages(BuildWebinar(w =>
+            {
+                w.EventLocationTitle = "Online";
+                w.EventLocationCity = "Chicago";
+            }));
+
+            var result = await _service.GenerateOutlookWebinarCardContent(Guid.NewGuid(), null, CancellationToken.None);
+
+            Assert.That(result, Does.Contain("Chicago"));
+        }
+
+        [Test]
+        public async Task GenerateOutlookWebinarCardContent_NoAlarm_WhenSettingsDefault()
+        {
+            SetupWebinarPages(BuildWebinar());
+
+            var result = await _service.GenerateOutlookWebinarCardContent(Guid.NewGuid(), null, CancellationToken.None);
+
+            Assert.That(result, Does.Not.Contain("BEGIN:VALARM"));
+        }
+
+        [Test]
+        public void GenerateOutlookWebinarCardContent_ThrowsOperationCanceled_WhenTokenCancelled()
+        {
+            SetupWebinarPages(BuildWebinar());
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            Assert.CatchAsync<OperationCanceledException>(() =>
+                _service.GenerateOutlookWebinarCardContent(Guid.NewGuid(), null, cts.Token));
+        }
+
+        [Test]
+        public async Task GenerateOutlookWebinarCardContent_ReturnsNull_WhenEmptyResult()
+        {
+            SetupWebinarPages();
+
+            var result = await _service.GenerateOutlookWebinarCardContent(Guid.NewGuid(), null, CancellationToken.None);
+
+            Assert.That(result, Is.Null);
         }
 
         #endregion

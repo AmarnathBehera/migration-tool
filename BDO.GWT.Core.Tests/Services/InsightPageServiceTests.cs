@@ -1305,6 +1305,250 @@ public class InsightPageServiceTests
         });
     }
 
+    [Test]
+    public async Task GetSidebarDtoAsync_HidesPrintDownloadAndCopyLink_WhenDisabledInSettings()
+    {
+        _settingServiceMock
+            .Setup(x => x.GetPrintorShareInfo())
+            .ReturnsAsync(new WebChannelSnippetInfo[]
+            {
+                new TestPrintShareSnippetInfo { DisablePrint = true, DisableDownload = true, DisableCopyLinkButton = true }
+            });
+
+        var insight = CreateInsight(title: "Insight page", showSidebar: true);
+        insight.ShowPrintButton = true;
+        insight.ShowSocialMediaButtons = false;
+        SetAssetCollection(insight, nameof(Insight.DownloadButtonAttachment), "/media/download.pdf");
+
+        var result = await _service.GetSidebarDtoAsync(insight, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.ShowPrintButton, Is.False);
+            Assert.That(result.DownloadButtonAttachment, Is.Null);
+            Assert.That(result.ShowCopyLinkButton, Is.False);
+        });
+    }
+
+    [Test]
+    public async Task GetSidebarDtoAsync_KeepsPrintDownloadAndCopyLink_WhenSettingsDoNotDisable()
+    {
+        _settingServiceMock
+            .Setup(x => x.GetPrintorShareInfo())
+            .ReturnsAsync(new WebChannelSnippetInfo[] { new TestPrintShareSnippetInfo() });
+
+        var insight = CreateInsight(title: "Insight page", showSidebar: true);
+        insight.ShowPrintButton = true;
+        insight.ShowSocialMediaButtons = false;
+        SetAssetCollection(insight, nameof(Insight.DownloadButtonAttachment), "/media/file.pdf");
+
+        var result = await _service.GetSidebarDtoAsync(insight, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.ShowPrintButton, Is.True);
+            Assert.That(result.DownloadButtonAttachment, Is.EqualTo("/media/file.pdf"));
+            Assert.That(result.ShowCopyLinkButton, Is.True);
+        });
+    }
+
+    [Test]
+    public async Task GetSidebarExternalPeopleDtosAsync_ReturnsEmpty_WhenInputIsNullOrHasNoGuids()
+    {
+        var withoutGuid = CreateExternalPerson(Guid.Empty, "t", "a", "", "b", "j", "/u");
+
+        var fromNull = await _service.GetSidebarExternalPeopleDtosAsync(null!, CancellationToken.None);
+        var fromEmptyGuid = await _service.GetSidebarExternalPeopleDtosAsync(new[] { withoutGuid }, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(fromNull, Is.Empty);
+            Assert.That(fromEmptyGuid, Is.Empty);
+        });
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<ExternalPerson>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task GetSidebarExternalPeopleDtosAsync_ReturnsEmpty_WhenLookupReturnsNull()
+    {
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<ExternalPerson>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IEnumerable<ExternalPerson>)null!);
+
+        var person = CreateExternalPerson(Guid.NewGuid(), "t", "a", "", "b", "j", "/u");
+
+        var result = await _service.GetSidebarExternalPeopleDtosAsync(new[] { person }, CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetKeyContactsDisplayNames_TreatsWhitespacePrefixAsMissing()
+    {
+        SetupUsePersonPageTitleSetting(false);
+        var person = CreatePerson(1, "Title", "Ada", "   ", "Lovelace", "Dev", "/people/ada");
+        SetupContentPages(person);
+        SetupContentPages(Array.Empty<InternalPerson>());
+
+        var result = await _service.GetKeyContactsDisplayNames(SingleContactId, CancellationToken.None);
+
+        Assert.That(result, Is.EqualTo(new[] { "Ada Lovelace" }));
+    }
+
+    [Test]
+    public async Task ShowCopyLinkOption_ReturnsFalse_WhenParentIdIsZero()
+    {
+        var insight = CreateInsight(title: "Insight page", showSidebar: true);
+        SetSystemFields(insight, 10, Guid.NewGuid(), "Insight", 100, 0, "/insights/test", "/Insights/Test");
+
+        var result = await InvokeShowCopyLinkOptionAsync(insight, true);
+
+        Assert.That(result, Is.False);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<SectionInsightsPage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [TestCase(true, true, true)]
+    [TestCase(true, false, false)]
+    [TestCase(false, true, false)]
+    public async Task ShowCopyLinkOption_DirectParentSection_CombinesFlags(bool sectionFlag, bool input, bool expected)
+    {
+        var insight = CreateInsight(title: "Insight page", showSidebar: true);
+        SetupSectionPagesSequence(new SectionInsightsPage { ShowCopyUrlButtonInInsightPage = sectionFlag });
+
+        var result = await InvokeShowCopyLinkOptionAsync(insight, input);
+
+        Assert.That(result, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public async Task ShowCopyLinkOption_FindsSectionViaInsightGroup()
+    {
+        var insight = CreateInsight(title: "Insight page", showSidebar: true);
+        var group = new InsightGroup();
+        SetSystemFields(group, 1, Guid.NewGuid(), "Group", 50, 20, "/g", "/g");
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<InsightGroup>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { group });
+        SetupSectionPagesSequence(null, new SectionInsightsPage { ShowCopyUrlButtonInInsightPage = true });
+
+        var result = await InvokeShowCopyLinkOptionAsync(insight, true);
+
+        Assert.That(result, Is.True);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<InsightCategory>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task ShowCopyLinkOption_FindsSectionViaInsightCategory()
+    {
+        var insight = CreateInsight(title: "Insight page", showSidebar: true);
+        var category = new InsightCategory();
+        SetSystemFields(category, 1, Guid.NewGuid(), "Category", 50, 30, "/c", "/c");
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<InsightGroup>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<InsightGroup>());
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<InsightCategory>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { category });
+        SetupSectionPagesSequence(null, null, new SectionInsightsPage { ShowCopyUrlButtonInInsightPage = true });
+
+        var result = await InvokeShowCopyLinkOptionAsync(insight, true);
+
+        Assert.That(result, Is.True);
+    }
+
+    [Test]
+    public async Task ShowCopyLinkOption_ReturnsFalse_WhenNoSectionFoundInHierarchy()
+    {
+        var insight = CreateInsight(title: "Insight page", showSidebar: true);
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<InsightGroup>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<InsightGroup>());
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<InsightCategory>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<InsightCategory>());
+        SetupSectionPagesSequence(null, null, null);
+
+        var result = await InvokeShowCopyLinkOptionAsync(insight, true);
+
+        Assert.That(result, Is.False);
+    }
+
+    private void SetupSectionPagesSequence(params SectionInsightsPage?[] pages)
+    {
+        var sequence = _contentServiceMock
+            .SetupSequence(x => x.GetPagesAsync<SectionInsightsPage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()));
+
+        foreach (var page in pages)
+        {
+            sequence = sequence.ReturnsAsync(page is null ? Array.Empty<SectionInsightsPage>() : new[] { page });
+        }
+    }
+
+    private Task<bool> InvokeShowCopyLinkOptionAsync(Insight insight, bool showCopyLinkButton)
+    {
+        var method = typeof(InsightPageService).GetMethod(
+            "GetShowCopyLinkOptionFromSectionPageAsync",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+
+        Assert.That(method, Is.Not.Null);
+        return (Task<bool>)method!.Invoke(_service, new object[] { insight, showCopyLinkButton, CancellationToken.None })!;
+    }
+
+    private sealed class TestPrintShareSnippetInfo : WebChannelSnippetInfo
+    {
+        public override bool DisablePrint { get; set; }
+        public override bool DisableDownload { get; set; }
+        public override bool DisableCopyLinkButton { get; set; }
+    }
+
     private void SetupWebsiteChannel(string? domain)
     {
         WebsiteChannelInfo? channel = null;
