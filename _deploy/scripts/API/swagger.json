@@ -5,7 +5,412 @@
     "version": "v2"
   },
   "paths": {
-    "/memberFirms/{memberFirmID}/Careers/{pageGUID}": {
+    "/memberFirms/{memberFirmID}/Pages/{pageGUID}/Attachments": {
+      "get": {
+        "tags": [
+          "Attachments"
+        ],
+        "summary": "Gets all attachments for a page",
+        "parameters": [
+          {
+            "name": "memberFirmID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageGUID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "culture",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of attachments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PageAttachmentOutput"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Page not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Attachments"
+        ],
+        "summary": "Creates a new attachment for a page",
+        "parameters": [
+          {
+            "name": "memberFirmID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageGUID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "Culture",
+                  "File"
+                ],
+                "type": "object",
+                "properties": {
+                  "Culture": {
+                    "type": "string",
+                    "description": "Language tag in the form of RFC 5646 (e.g. \"en-US\")."
+                  },
+                  "File": {
+                    "type": "string",
+                    "description": "The attachment file to upload.",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "Culture": {
+                  "style": "form"
+                },
+                "File": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Attachment created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageAttachmentOutput"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "404": {
+            "description": "Page not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/memberFirms/{memberFirmID}/Pages/{pageGUID}/Attachments/{attachmentGUID}": {
+      "get": {
+        "tags": [
+          "Attachments"
+        ],
+        "summary": "Gets a specific attachment by GUID",
+        "parameters": [
+          {
+            "name": "memberFirmID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageGUID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "attachmentGUID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "culture",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Attachment details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageAttachmentOutput"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Attachment or page not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Attachments"
+        ],
+        "summary": "Updates an existing attachment for a page",
+        "parameters": [
+          {
+            "name": "memberFirmID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageGUID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "attachmentGUID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "Culture",
+                  "File"
+                ],
+                "type": "object",
+                "properties": {
+                  "Culture": {
+                    "type": "string",
+                    "description": "Language tag in the form of RFC 5646 (e.g. \"en-US\")."
+                  },
+                  "File": {
+                    "type": "string",
+                    "description": "The attachment file to upload.",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "Culture": {
+                  "style": "form"
+                },
+                "File": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Attachment updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageAttachmentOutput"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "404": {
+            "description": "Attachment or page not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Attachments"
+        ],
+        "summary": "Deletes an attachment from a page",
+        "parameters": [
+          {
+            "name": "memberFirmID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageGUID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "attachmentGUID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "culture",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Attachment deleted"
+          },
+          "404": {
+            "description": "Attachment or page not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/memberFirms/{memberFirmID}/Pages/{pageGUID}/Attachments/{attachmentGUID}/binary": {
+      "get": {
+        "tags": [
+          "Attachments"
+        ],
+        "summary": "Gets attachment binary content",
+        "parameters": [
+          {
+            "name": "memberFirmID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageGUID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "attachmentGUID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "culture",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Attachment file content",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Attachment or page not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/memberFirms/{memberFirmID}/Careers/{pageGuid}": {
       "get": {
         "tags": [
           "Career"
@@ -23,7 +428,7 @@
             }
           },
           {
-            "name": "pageGUID",
+            "name": "pageGuid",
             "in": "path",
             "description": "Page GUID of a career page.",
             "required": true,
@@ -72,7 +477,7 @@
             }
           },
           {
-            "name": "pageGUID",
+            "name": "pageGuid",
             "in": "path",
             "description": "Page GUID of the career page.",
             "required": true,
@@ -141,7 +546,7 @@
             }
           },
           {
-            "name": "pageGUID",
+            "name": "pageGuid",
             "in": "path",
             "description": "Page GUID of the career page.",
             "required": true,
@@ -243,7 +648,7 @@
             }
           },
           {
-            "name": "nodeParentID",
+            "name": "webPageParentID",
             "in": "query",
             "description": "Node ID of the page that will contain the created Career page.\r\n            \n\nThis value can be taken from <b>Kentico Pages module</b> by selecting the parent page. \r\n            On the right side panel click on <b>Properties tab</b>, expand <b>Information</b>. The <b>Page / Node ID</b> property will contain the required value.",
             "required": true,
@@ -296,7 +701,7 @@
         }
       }
     },
-    "/memberFirms/{memberFirmID}/Careers/{pageGUID}/CreateNewCultureVersion": {
+    "/memberFirms/{memberFirmID}/Careers/{pageGuid}/CreateNewCultureVersion": {
       "post": {
         "tags": [
           "Career"
@@ -314,7 +719,7 @@
             }
           },
           {
-            "name": "pageGUID",
+            "name": "pageGuid",
             "in": "path",
             "description": "WebPageItemGuid is the Page GUID of the career to copy content from.",
             "required": true,
@@ -376,24 +781,15 @@
         }
       }
     },
-    "/memberFirms/{memberFirmID}/Channels": {
+    "/Channels": {
       "get": {
         "tags": [
           "Channel"
         ],
-        "summary": "Returns all channels.",
         "parameters": [
           {
             "name": "AdministrationDomain",
             "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "memberFirmID",
-            "in": "path",
-            "required": true,
             "schema": {
               "type": "string"
             }
@@ -414,31 +810,58 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Channel"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelInput"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelInput"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelOutput"
+                }
+              }
+            }
+          }
+        }
       }
     },
-    "/memberFirms/{memberFirmID}/Channels/{channelGUID}": {
+    "/Channels/{channelGuid}": {
       "get": {
         "tags": [
           "Channel"
         ],
-        "summary": "Returns a single channel having the specified GUID.",
+        "operationId": "GetChannel",
         "parameters": [
           {
-            "name": "channelGUID",
+            "name": "channelGuid",
             "in": "path",
-            "description": "GUID of the channel you want to retrieve.",
             "required": true,
             "schema": {
               "type": "string",
               "format": "uuid"
-            }
-          },
-          {
-            "name": "memberFirmID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -454,6 +877,74 @@
             }
           }
         }
+      },
+      "put": {
+        "tags": [
+          "Channel"
+        ],
+        "parameters": [
+          {
+            "name": "channelGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelInput"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelInput"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelOutput"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Channel"
+        ],
+        "parameters": [
+          {
+            "name": "channelGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
       }
     },
     "/memberFirms/{memberFirmID}/ChannelSettings": {
@@ -461,12 +952,10 @@
         "tags": [
           "ChannelSettings"
         ],
-        "summary": "Returns all channel settings.",
         "parameters": [
           {
             "name": "memberFirmID",
             "in": "path",
-            "description": "ID of the member firm for which the channel settings should be retrieved.",
             "required": true,
             "schema": {
               "type": "integer",
@@ -504,12 +993,10 @@
         "tags": [
           "ChannelSettings"
         ],
-        "summary": "Returns a single channel setting having the specified code name.",
         "parameters": [
           {
             "name": "memberFirmID",
             "in": "path",
-            "description": "ID of the member firm for which the channel setting should be retrieved.",
             "required": true,
             "schema": {
               "type": "integer",
@@ -519,7 +1006,6 @@
           {
             "name": "codeName",
             "in": "path",
-            "description": "Code name of the channel setting you want to retrieve.",
             "required": true,
             "schema": {
               "type": "string"
@@ -533,6 +1019,349 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ChannelSettingOutput"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ChannelSettings"
+        ],
+        "parameters": [
+          {
+            "name": "memberFirmID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "codeName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelSettingInput"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelSettingInput"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelSettingInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelSettingOutput"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/memberFirms/{memberFirmId}/{culture}/content/categories": {
+      "get": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "GetContentCategories",
+        "parameters": [
+          {
+            "name": "memberFirmId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "culture",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContentCategoryDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/memberFirms/{memberFirmId}/{culture}/content": {
+      "post": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "GetContentFromCategories",
+        "parameters": [
+          {
+            "name": "memberFirmId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "culture",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "countInsights",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "countWhatsNew",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ContentCategoryFilter"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ContentCategoryFilter"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ContentCategoryFilter"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/GlobalLocations": {
+      "get": {
+        "tags": [
+          "CustomGlobalLocations"
+        ],
+        "summary": "Retrieves global location(s). If a member firm ID is supplied, only the location\r\nbelonging to that member firm is returned; otherwise all locations are returned.",
+        "parameters": [
+          {
+            "name": "memberFirmId",
+            "in": "query",
+            "description": "ID of the member firm to filter locations by. Omit to retrieve all locations.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GlobalLocationCustomTableApiDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GlobalLocationCustomTableApiDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GlobalLocationCustomTableApiDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "CustomGlobalLocations"
+        ],
+        "summary": "Creates a new global location for the specified member firm.",
+        "requestBody": {
+          "description": "The location details to create, including the member firm ID it belongs to.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GlobalLocationCustomTableUpsertDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GlobalLocationCustomTableUpsertDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GlobalLocationCustomTableUpsertDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlobalLocationCustomTableApiDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlobalLocationCustomTableApiDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlobalLocationCustomTableApiDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/GlobalLocations/{memberFirmId}": {
+      "put": {
+        "tags": [
+          "CustomGlobalLocations"
+        ],
+        "summary": "Updates the global location belonging to the specified member firm.",
+        "parameters": [
+          {
+            "name": "memberFirmId",
+            "in": "path",
+            "description": "ID of the member firm whose location should be updated.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The updated location details.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GlobalLocationCustomTableUpsertDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GlobalLocationCustomTableUpsertDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GlobalLocationCustomTableUpsertDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlobalLocationCustomTableApiDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlobalLocationCustomTableApiDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlobalLocationCustomTableApiDto"
                 }
               }
             }
@@ -607,7 +1436,7 @@
             }
           },
           {
-            "name": "nodeParentID",
+            "name": "webPageParentID",
             "in": "query",
             "description": "Node ID of the page that will contain the created deal page.\r\n            \n\nThis value can be taken from <b>Kentico Pages module</b> by selecting the parent. Select <b>General tab</b>, then click <b>Advanced</b>. The <b>Node ID</b> property will contain the required value.",
             "required": true,
@@ -660,7 +1489,7 @@
         }
       }
     },
-    "/memberFirms/{memberFirmID}/Deals/{pageGUID}": {
+    "/memberFirms/{memberFirmID}/Deals/{pageGuid}": {
       "get": {
         "tags": [
           "Deals"
@@ -678,7 +1507,7 @@
             }
           },
           {
-            "name": "pageGUID",
+            "name": "pageGuid",
             "in": "path",
             "description": "Page GUID of an deal page.",
             "required": true,
@@ -727,7 +1556,7 @@
             }
           },
           {
-            "name": "pageGUID",
+            "name": "pageGuid",
             "in": "path",
             "description": "Page GUID of the deal page.",
             "required": true,
@@ -796,7 +1625,7 @@
             }
           },
           {
-            "name": "pageGUID",
+            "name": "pageGuid",
             "in": "path",
             "description": "Page GUID of the deal.",
             "required": true,
@@ -831,7 +1660,7 @@
         }
       }
     },
-    "/memberFirms/{memberFirmID}/Deals/{pageGUID}/CreateNewCultureVersion": {
+    "/memberFirms/{memberFirmID}/Deals/{pageGuid}/CreateNewCultureVersion": {
       "post": {
         "tags": [
           "Deals"
@@ -849,7 +1678,7 @@
             }
           },
           {
-            "name": "pageGUID",
+            "name": "pageGuid",
             "in": "path",
             "description": "Page GUID of the deal to copy content from.",
             "required": true,
@@ -907,6 +1736,19 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/EventLog": {
+      "delete": {
+        "tags": [
+          "EventLog"
+        ],
+        "summary": "Deletes all event log entries.",
+        "responses": {
+          "204": {
+            "description": "No Content"
           }
         }
       }
@@ -978,7 +1820,7 @@
             }
           },
           {
-            "name": "WebPageParentID",
+            "name": "webPageParentID",
             "in": "query",
             "description": "WebPageParent ID of the page that will contain the created section events page.\r\n            \n\nThis value can be taken from <b>Kentico Pages module</b> by selecting the parent. Select <b>General tab</b>, then click <b>Advanced</b>. The <b>Node ID</b> property will contain the required value.",
             "required": true,
@@ -1031,7 +1873,7 @@
         }
       }
     },
-    "/memberFirms/{memberFirmID}/EventSections/{PageGuid}": {
+    "/memberFirms/{memberFirmID}/EventSections/{pageGuid}": {
       "get": {
         "tags": [
           "EventSections"
@@ -1049,7 +1891,7 @@
             }
           },
           {
-            "name": "PageGuid",
+            "name": "pageGuid",
             "in": "path",
             "description": "Page GUID of an section events page.",
             "required": true,
@@ -1098,7 +1940,7 @@
             }
           },
           {
-            "name": "PageGuid",
+            "name": "pageGuid",
             "in": "path",
             "description": "Page GUID of the section events page.",
             "required": true,
@@ -1167,7 +2009,7 @@
             }
           },
           {
-            "name": "PageGuid",
+            "name": "pageGuid",
             "in": "path",
             "description": "Page GUID of the section events.",
             "required": true,
@@ -1202,7 +2044,7 @@
         }
       }
     },
-    "/memberFirms/{memberFirmID}/EventSections/{PageGuid}/CreateNewCultureVersion": {
+    "/memberFirms/{memberFirmID}/EventSections/{pageGuid}/CreateNewCultureVersion": {
       "post": {
         "tags": [
           "EventSections"
@@ -1220,7 +2062,7 @@
             }
           },
           {
-            "name": "PageGuid",
+            "name": "pageGuid",
             "in": "path",
             "description": "Page GUID of the section events to copy content from.",
             "required": true,
@@ -1599,7 +2441,7 @@
         }
       }
     },
-    "/memberFirms/{memberFirmID}/GlobalSettings": {
+    "/GlobalSettings": {
       "get": {
         "tags": [
           "GlobalSettings"
@@ -1610,14 +2452,6 @@
             "name": "DisplayName",
             "in": "query",
             "description": "Display name of the setting in the administration UI.",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "memberFirmID",
-            "in": "path",
-            "required": true,
             "schema": {
               "type": "string"
             }
@@ -1640,7 +2474,7 @@
         }
       }
     },
-    "/memberFirms/{memberFirmID}/GlobalSettings/{codeName}": {
+    "/GlobalSettings/{codeName}": {
       "get": {
         "tags": [
           "GlobalSettings"
@@ -1655,16 +2489,57 @@
             "schema": {
               "type": "string"
             }
-          },
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlobalSettingOutput"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "GlobalSettings"
+        ],
+        "summary": "Updates a single global setting having the specified code name.",
+        "parameters": [
           {
-            "name": "memberFirmID",
+            "name": "codeName",
             "in": "path",
+            "description": "Code name of the global setting.",
             "required": true,
             "schema": {
               "type": "string"
             }
           }
         ],
+        "requestBody": {
+          "description": "Updated global setting data.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GlobalSettingInput"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GlobalSettingInput"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GlobalSettingInput"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -1746,7 +2621,7 @@
             }
           },
           {
-            "name": "WebPageParentID",
+            "name": "webPageParentID",
             "in": "query",
             "description": "WebPageParent ID of the page that will contain the created insight page.\r\n            \n\nThis value can be taken from <b>Kentico Pages module</b> by selecting the parent. Select <b>General tab</b>, then click <b>Advanced</b>. The <b>Node ID</b> property will contain the required value.",
             "required": true,
@@ -1799,7 +2674,7 @@
         }
       }
     },
-    "/memberFirms/{memberFirmID}/Insights/{PageGuid}": {
+    "/memberFirms/{memberFirmID}/Insights/{pageGuid}": {
       "get": {
         "tags": [
           "Insights"
@@ -1817,7 +2692,7 @@
             }
           },
           {
-            "name": "PageGuid",
+            "name": "pageGuid",
             "in": "path",
             "description": "Page GUID of an insight page.",
             "required": true,
@@ -1866,7 +2741,7 @@
             }
           },
           {
-            "name": "PageGuid",
+            "name": "pageGuid",
             "in": "path",
             "description": "Page GUID of the insight page.",
             "required": true,
@@ -1935,7 +2810,7 @@
             }
           },
           {
-            "name": "PageGuid",
+            "name": "pageGuid",
             "in": "path",
             "description": "Page GUID of the insight.",
             "required": true,
@@ -1970,7 +2845,7 @@
         }
       }
     },
-    "/memberFirms/{memberFirmID}/Insights/{PageGuid}/CreateNewCultureVersion": {
+    "/memberFirms/{memberFirmID}/Insights/{pageGuid}/CreateNewCultureVersion": {
       "post": {
         "tags": [
           "Insights"
@@ -1988,7 +2863,7 @@
             }
           },
           {
-            "name": "PageGuid",
+            "name": "pageGuid",
             "in": "path",
             "description": "Page GUID of the insight to copy content from.",
             "required": true,
@@ -2050,15 +2925,32 @@
         }
       }
     },
-    "/memberFirms/{memberFirmID}/LicenseKeys": {
-      "get": {
+    "/memberFirms/{memberFirmID}/Insights/{workspaceName}/CopyInsight": {
+      "post": {
         "tags": [
-          "LicenseKeys"
+          "Insights"
         ],
-        "summary": "Returns all license keys.",
+        "summary": "Creates a new Copy Insight content item in the specified Content Hub workspace.",
         "parameters": [
           {
             "name": "memberFirmID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "culture",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workspaceName",
             "in": "path",
             "required": true,
             "schema": {
@@ -2066,6 +2958,51 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyInsightPageContent"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyInsightPageContent"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyInsightPageContent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CopyInsightPageContentPageOutput"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      }
+    },
+    "/LicenseKeys": {
+      "get": {
+        "tags": [
+          "LicenseKeys"
+        ],
+        "summary": "Returns all license keys.",
         "responses": {
           "200": {
             "description": "OK",
@@ -2079,75 +3016,6 @@
                 }
               }
             }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "LicenseKeys"
-        ],
-        "summary": "Creates a new license key.",
-        "parameters": [
-          {
-            "name": "memberFirmID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input data of the new license key.",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LicenseKeyInput"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LicenseKeyInput"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/LicenseKeyInput"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LicenseKeyOutput"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "LicenseKeys"
-        ],
-        "summary": "Deletes a single license key having the specified ID.",
-        "parameters": [
-          {
-            "name": "memberFirmID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
           }
         }
       }
@@ -2213,7 +3081,7 @@
             }
           },
           {
-            "name": "WebPageParentID",
+            "name": "webPageParentID",
             "in": "query",
             "required": true,
             "schema": {
@@ -2263,7 +3131,7 @@
         }
       }
     },
-    "/memberFirms/{memberFirmID}/LocationOffices/{PageGuid}": {
+    "/memberFirms/{memberFirmID}/LocationOffices/{pageGuid}": {
       "get": {
         "tags": [
           "LocationOffices"
@@ -2279,7 +3147,7 @@
             }
           },
           {
-            "name": "PageGuid",
+            "name": "pageGuid",
             "in": "path",
             "required": true,
             "schema": {
@@ -2324,7 +3192,7 @@
             }
           },
           {
-            "name": "PageGuid",
+            "name": "pageGuid",
             "in": "path",
             "required": true,
             "schema": {
@@ -2388,7 +3256,7 @@
             }
           },
           {
-            "name": "PageGuid",
+            "name": "pageGuid",
             "in": "path",
             "required": true,
             "schema": {
@@ -2420,7 +3288,7 @@
         }
       }
     },
-    "/memberFirms/{memberFirmID}/LocationOffices/{PageGuid}/CreateNewCultureVersion": {
+    "/memberFirms/{memberFirmID}/LocationOffices/{pageGuid}/CreateNewCultureVersion": {
       "post": {
         "tags": [
           "LocationOffices"
@@ -2436,7 +3304,7 @@
             }
           },
           {
-            "name": "PageGuid",
+            "name": "pageGuid",
             "in": "path",
             "required": true,
             "schema": {
@@ -2490,6 +3358,370 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/memberFirms/{memberFirmID}/workspaces/{workspaceName}/mediafiles": {
+      "get": {
+        "tags": [
+          "MediaFile"
+        ],
+        "summary": "Returns all media files in the specified Content Hub workspace.",
+        "parameters": [
+          {
+            "name": "memberFirmID",
+            "in": "path",
+            "description": "The ID of the member firm.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "workspaceName",
+            "in": "path",
+            "description": "The name of the Content Hub workspace.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns all media files in the workspace.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MediaFileOutput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "MediaFile"
+        ],
+        "summary": "Creates a new attachment in the specified Content Hub workspace.",
+        "parameters": [
+          {
+            "name": "memberFirmID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "workspaceName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "Culture",
+                  "File"
+                ],
+                "type": "object",
+                "properties": {
+                  "Culture": {
+                    "type": "string",
+                    "description": "Language tag in the form of RFC 5646 (e.g. \"en-US\")."
+                  },
+                  "File": {
+                    "type": "string",
+                    "description": "The attachment file to upload.",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "Culture": {
+                  "style": "form"
+                },
+                "File": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Media file created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaFileOutput"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      }
+    },
+    "/memberFirms/{memberFirmID}/workspaces/{workspaceName}/mediafiles/{attachmentGuid}": {
+      "get": {
+        "tags": [
+          "MediaFile"
+        ],
+        "summary": "Returns a single media file for a page having the specified media file GUID.",
+        "operationId": "GetMediaFileByAttachmentGuid",
+        "parameters": [
+          {
+            "name": "memberFirmID",
+            "in": "path",
+            "description": "The ID of the member firm.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "workspaceName",
+            "in": "path",
+            "description": "The name of the Content Hub workspace.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "attachmentGuid",
+            "in": "path",
+            "description": "The GUID of the media file attachment.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the media file information.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaFileOutput"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Media file not found."
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "MediaFile"
+        ],
+        "summary": "Updates an existing attachment in the specified Content Hub workspace.",
+        "parameters": [
+          {
+            "name": "memberFirmID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "workspaceName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "attachmentGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "Culture",
+                  "File"
+                ],
+                "type": "object",
+                "properties": {
+                  "Culture": {
+                    "type": "string",
+                    "description": "Language tag in the form of RFC 5646 (e.g. \"en-US\")."
+                  },
+                  "File": {
+                    "type": "string",
+                    "description": "The attachment file to upload.",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "Culture": {
+                  "style": "form"
+                },
+                "File": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Media file updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaFileOutput"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request."
+          },
+          "404": {
+            "description": "Media file not found."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "MediaFile"
+        ],
+        "summary": "Deletes an attachment file from the specified Content Hub workspace.",
+        "parameters": [
+          {
+            "name": "memberFirmID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "workspaceName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "attachmentGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Media file deleted."
+          },
+          "404": {
+            "description": "Media file not found."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      }
+    },
+    "/memberFirms/{memberFirmID}/workspaces/{workspaceName}/mediafiles/{attachmentGuid}/binary": {
+      "get": {
+        "tags": [
+          "MediaFile"
+        ],
+        "summary": "Gets the binary content of a media file having the specified GUID.",
+        "parameters": [
+          {
+            "name": "memberFirmID",
+            "in": "path",
+            "description": "The ID of the member firm.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "workspaceName",
+            "in": "path",
+            "description": "The name of the Content Hub workspace.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "attachmentGuid",
+            "in": "path",
+            "description": "The GUID of the media file attachment.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Media file binary content.",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Media file not found."
+          },
+          "500": {
+            "description": "Internal server error."
           }
         }
       }
@@ -2561,7 +3793,7 @@
             }
           },
           {
-            "name": "WebPageParentID",
+            "name": "webPageParentID",
             "in": "query",
             "description": "WebPageParentItem ID of the page that will contain the created person page.\r\n            \n\nThis value can be taken from <b>Kentico Pages module</b> by selecting the parent. Select <b>General tab</b>, then click <b>Advanced</b>. The <b>Node ID</b> property will contain the required value.",
             "required": true,
@@ -2614,7 +3846,7 @@
         }
       }
     },
-    "/memberFirms/{memberFirmID}/People/{WebPageItemGuid}": {
+    "/memberFirms/{memberFirmID}/People/{pageGuid}": {
       "get": {
         "tags": [
           "People"
@@ -2632,7 +3864,7 @@
             }
           },
           {
-            "name": "WebPageItemGuid",
+            "name": "pageGuid",
             "in": "path",
             "description": "WebPageItem GUID of a person page.",
             "required": true,
@@ -2663,89 +3895,7 @@
             }
           }
         }
-      }
-    },
-    "/memberFirms/{memberFirmID}/People/{PageGuid}/CreateNewCultureVersion": {
-      "post": {
-        "tags": [
-          "People"
-        ],
-        "summary": "Creates a new culture version of a person page.",
-        "parameters": [
-          {
-            "name": "memberFirmID",
-            "in": "path",
-            "description": "ID of the member firm in which the page should be created.",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "PageGuid",
-            "in": "path",
-            "description": "Page GUID of the person to copy content from.",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "fromCulture",
-            "in": "query",
-            "description": "Culture of the existing page version.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "toCulture",
-            "in": "query",
-            "description": "Culture of the new page version.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "New culture version data.",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PersonPageContent"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PersonPageContent"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/PersonPageContent"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PersonPageContentPageOutput"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/memberFirms/{memberFirmID}/People/{PageGuid}": {
+      },
       "put": {
         "tags": [
           "People"
@@ -2763,7 +3913,7 @@
             }
           },
           {
-            "name": "PageGuid",
+            "name": "pageGuid",
             "in": "path",
             "description": "Page GUID of the person page.",
             "required": true,
@@ -2832,7 +3982,7 @@
             }
           },
           {
-            "name": "PageGuid",
+            "name": "pageGuid",
             "in": "path",
             "description": "Page GUID of the person.",
             "required": true,
@@ -2867,22 +4017,92 @@
         }
       }
     },
-    "/memberFirms/{memberFirmID}/ScheduledTasks": {
-      "get": {
+    "/memberFirms/{memberFirmID}/People/{pageGuid}/CreateNewCultureVersion": {
+      "post": {
         "tags": [
-          "ScheduledTasks"
+          "People"
         ],
-        "summary": "Returns all scheduled tasks.",
+        "summary": "Creates a new culture version of a person page.",
         "parameters": [
           {
             "name": "memberFirmID",
             "in": "path",
+            "description": "ID of the member firm in which the page should be created.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageGuid",
+            "in": "path",
+            "description": "Page GUID of the person to copy content from.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "fromCulture",
+            "in": "query",
+            "description": "Culture of the existing page version.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "toCulture",
+            "in": "query",
+            "description": "Culture of the new page version.",
             "required": true,
             "schema": {
               "type": "string"
             }
           }
         ],
+        "requestBody": {
+          "description": "New culture version data.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PersonPageContent"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PersonPageContent"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PersonPageContent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonPageContentPageOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ScheduledTasks": {
+      "get": {
+        "tags": [
+          "ScheduledTasks"
+        ],
+        "summary": "Returns all scheduled tasks.",
         "responses": {
           "200": {
             "description": "OK",
@@ -2900,7 +4120,7 @@
         }
       }
     },
-    "/memberFirms/{memberFirmID}/ScheduledTasks/{scheduledTaskGuid}": {
+    "/ScheduledTasks/{scheduledTaskGuid}": {
       "get": {
         "tags": [
           "ScheduledTasks"
@@ -2915,14 +4135,6 @@
             "schema": {
               "type": "string",
               "format": "uuid"
-            }
-          },
-          {
-            "name": "memberFirmID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -2953,7 +4165,42 @@
         }
       }
     },
-    "/memberFirms/{memberFirmID}/Users/Users": {
+    "/ScheduledTasks/{scheduledTaskGuid}/Execute": {
+      "post": {
+        "tags": [
+          "ScheduledTasks"
+        ],
+        "summary": "Executes a scheduled task.",
+        "parameters": [
+          {
+            "name": "scheduledTaskGuid",
+            "in": "path",
+            "description": "GUID of the scheduled task you want to execute.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Returns when the scheduled task is successfully executed."
+          },
+          "409": {
+            "description": "Returns when the scheduled task is already running.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Users": {
       "get": {
         "tags": [
           "Users"
@@ -2962,14 +4209,6 @@
           {
             "name": "userName",
             "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "memberFirmID",
-            "in": "path",
-            "required": true,
             "schema": {
               "type": "string"
             }
@@ -2994,17 +4233,6 @@
       "post": {
         "tags": [
           "Users"
-        ],
-        "parameters": [
-          {
-            "name": "memberFirmID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
         ],
         "requestBody": {
           "content": {
@@ -3039,27 +4267,19 @@
         }
       }
     },
-    "/memberFirms/{memberFirmID}/Users/Users/{userGUID}": {
+    "/Users/{userGuid}": {
       "get": {
         "tags": [
           "Users"
         ],
         "parameters": [
           {
-            "name": "userGUID",
+            "name": "userGuid",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
               "format": "uuid"
-            }
-          },
-          {
-            "name": "memberFirmID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -3082,20 +4302,12 @@
         ],
         "parameters": [
           {
-            "name": "userGUID",
+            "name": "userGuid",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
               "format": "uuid"
-            }
-          },
-          {
-            "name": "memberFirmID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -3137,26 +4349,128 @@
         ],
         "parameters": [
           {
-            "name": "userGUID",
+            "name": "userGuid",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
               "format": "uuid"
             }
-          },
-          {
-            "name": "memberFirmID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
           "204": {
             "description": "No Content"
+          }
+        }
+      }
+    },
+    "/memberFirms/{memberFirmID}/Users/{userGuid}/ApiPermissions": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "memberFirmID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "userGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/ApiEndpointGroupPermissions"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "memberFirmID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "userGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/ApiEndpointGroupPermissions"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/ApiEndpointGroupPermissions"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/ApiEndpointGroupPermissions"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/ApiEndpointGroupPermissions"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -3171,6 +4485,21 @@
           "reloadForm"
         ],
         "type": "string"
+      },
+      "ApiEndpointGroupPermissions": {
+        "type": "object",
+        "properties": {
+          "read": {
+            "type": "boolean",
+            "description": "Gets or sets a value indicating whether read permission is granted."
+          },
+          "manage": {
+            "type": "boolean",
+            "description": "Gets or sets a value indicating whether manage permission is granted."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Defines API endpoint group permissions for access control."
       },
       "CareerPageContent": {
         "required": [
@@ -3412,6 +4741,103 @@
         },
         "additionalProperties": false
       },
+      "ChannelCultureInput": {
+        "required": [
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChannelDomainAliasInput": {
+        "required": [
+          "presentationURL"
+        ],
+        "type": "object",
+        "properties": {
+          "presentationURL": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChannelDomainAliasesInput": {
+        "type": "object",
+        "properties": {
+          "liveSite": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChannelDomainAliasInput"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChannelGeneralInput": {
+        "required": [
+          "codeName",
+          "displayName",
+          "presentationURL"
+        ],
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "codeName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "presentationURL": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "defaultContentCulture": {
+            "type": "string",
+            "nullable": true
+          },
+          "defaultVisitorCulture": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChannelInput": {
+        "required": [
+          "domainAliases",
+          "general"
+        ],
+        "type": "object",
+        "properties": {
+          "general": {
+            "$ref": "#/components/schemas/ChannelGeneralInput"
+          },
+          "domainAliases": {
+            "$ref": "#/components/schemas/ChannelDomainAliasesInput"
+          },
+          "cultures": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChannelCultureInput"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "ChannelOutput": {
         "required": [
           "general"
@@ -3426,6 +4852,21 @@
             "items": {
               "$ref": "#/components/schemas/CultureSummaryOutput"
             },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChannelSettingInput": {
+        "required": [
+          "inheritFromGlobalSettings"
+        ],
+        "type": "object",
+        "properties": {
+          "inheritFromGlobalSettings": {
+            "type": "boolean"
+          },
+          "value": {
             "nullable": true
           }
         },
@@ -3461,16 +4902,258 @@
         },
         "additionalProperties": false
       },
-      "ChannelSummaryOutput": {
+      "ContentCategoryDto": {
         "type": "object",
         "properties": {
-          "guid": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "displayName": {
+          "Name": {
             "type": "string",
             "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "SubCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContentSubCategoryDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContentCategoryFilter": {
+        "type": "object",
+        "properties": {
+          "CategoryCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "SubCategoryIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContentDto": {
+        "type": "object",
+        "properties": {
+          "InsightsSearchURL": {
+            "type": "string",
+            "nullable": true
+          },
+          "Insights": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InsightContentDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContentSubCategoryDto": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CopyInsightPageContent": {
+        "required": [
+          "imageFileAltText",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "showInsightTitle": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "showInsightDescription": {
+            "type": "boolean"
+          },
+          "insightContent": {
+            "type": "string",
+            "nullable": true
+          },
+          "callToActionPosition": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "attachments": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "insightAttachment": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "downloadButtonTitle": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "downloadButtonText": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "contentsharing": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "sharingOptOut": {
+            "type": "boolean"
+          },
+          "sharingHeadline": {
+            "type": "boolean"
+          },
+          "originalSiteGuid": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "originalDocumentAttachmentType": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "originalIndustries": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "originalServiceLines": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "originalInvolvedCountriesAll": {
+            "type": "boolean"
+          },
+          "originalInvolvedCountries": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "originalDocumentOwnerOptOut": {
+            "type": "boolean"
+          },
+          "originalDocumentOwnerName": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "originalDocumentOwnerEmail": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "sharingSourceFirm": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "sharingInstructions": {
+            "type": "string",
+            "nullable": true
+          },
+          "showCallToAction": {
+            "type": "boolean"
+          },
+          "callToActionDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "callToActionButtonText": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "callToActionButtonUrl": {
+            "maxLength": 2000,
+            "type": "string",
+            "nullable": true
+          },
+          "imageFile": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "imageFileAltText": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "publishFrom": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "publishTo": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "redirectOnUnpublish": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CopyInsightPageContentPageOutput": {
+        "type": "object",
+        "properties": {
+          "general": {
+            "$ref": "#/components/schemas/PageGeneralOutput"
+          },
+          "content": {
+            "$ref": "#/components/schemas/CopyInsightPageContent"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/PageMetadataOutput"
+          },
+          "navigation": {
+            "$ref": "#/components/schemas/PageNavigationOutput"
           }
         },
         "additionalProperties": false
@@ -3958,10 +5641,186 @@
         },
         "additionalProperties": false
       },
+      "GlobalLocationCustomTableApiDto": {
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "itemGuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "metadataLocationPinColour": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalLocationTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalLocationAddress1": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalLocationAddress2": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalLocationCity": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalLocationState": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalLocationCountry": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalLocationPostalCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalLocationRegion": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalLocationLatitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "globalLocationLongitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "globalLocationUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "memberFirmId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "channelId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "itemCreatedBy": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "itemCreatedWhen": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "itemModifiedBy": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "itemModifiedWhen": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "itemOrder": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GlobalLocationCustomTableUpsertDto": {
+        "type": "object",
+        "properties": {
+          "metadataLocationPinColour": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalLocationTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalLocationAddress1": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalLocationAddress2": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalLocationCity": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalLocationState": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalLocationCountry": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalLocationPostalCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalLocationRegion": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalLocationLatitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "globalLocationLongitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "globalLocationUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "memberFirmId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "channelId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "itemOrder": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GlobalSettingInput": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "GlobalSettingOutput": {
         "required": [
           "codeName",
-          "displayName"
+          "displayName",
+          "type"
         ],
         "type": "object",
         "properties": {
@@ -3970,6 +5829,10 @@
             "nullable": true
           },
           "displayName": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
             "type": "string",
             "nullable": true
           },
@@ -3986,6 +5849,72 @@
             "type": "boolean"
           },
           "value": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "InsightContentDto": {
+        "type": "object",
+        "properties": {
+          "GUID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "PageType": {
+            "type": "string",
+            "nullable": true
+          },
+          "PageSubType": {
+            "type": "string",
+            "nullable": true
+          },
+          "Title_Full": {
+            "type": "string",
+            "nullable": true
+          },
+          "Title_TwoThirds": {
+            "type": "string",
+            "nullable": true
+          },
+          "Title_OneThird": {
+            "type": "string",
+            "nullable": true
+          },
+          "Summary_Full": {
+            "type": "string",
+            "nullable": true
+          },
+          "Summary_TwoThirds": {
+            "type": "string",
+            "nullable": true
+          },
+          "Summary_OneThird": {
+            "type": "string",
+            "nullable": true
+          },
+          "ImageURL_Full": {
+            "type": "string",
+            "nullable": true
+          },
+          "ImageURL_TwoThirds": {
+            "type": "string",
+            "nullable": true
+          },
+          "ImageURL_OneThird": {
+            "type": "string",
+            "nullable": true
+          },
+          "Date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "DisplayDate": {
+            "type": "string",
+            "nullable": true
+          },
+          "URL": {
             "type": "string",
             "nullable": true
           }
@@ -4291,19 +6220,6 @@
         },
         "additionalProperties": false
       },
-      "LicenseKeyInput": {
-        "required": [
-          "key"
-        ],
-        "type": "object",
-        "properties": {
-          "key": {
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "LicenseKeyOutput": {
         "required": [
           "id"
@@ -4519,6 +6435,109 @@
           },
           "navigation": {
             "$ref": "#/components/schemas/PageNavigationOutput"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MediaFileOutput": {
+        "required": [
+          "extension",
+          "guid",
+          "id",
+          "link",
+          "mimeType",
+          "path"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets or sets the unique identifier of the media file.",
+            "format": "int32"
+          },
+          "path": {
+            "type": "string",
+            "description": "Gets or sets the path/filename of the media file.",
+            "nullable": true
+          },
+          "mimeType": {
+            "type": "string",
+            "description": "Gets or sets the MIME type of the media file.",
+            "nullable": true
+          },
+          "extension": {
+            "type": "string",
+            "description": "Gets or sets the file extension.",
+            "nullable": true
+          },
+          "guid": {
+            "type": "string",
+            "description": "Gets or sets the GUID of the media file.",
+            "format": "uuid"
+          },
+          "link": {
+            "type": "string",
+            "description": "Gets or sets the link to access the media file.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents the output model for a media file."
+      },
+      "PageAttachmentOutput": {
+        "type": "object",
+        "properties": {
+          "guid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "extension": {
+            "type": "string",
+            "nullable": true
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mimeType": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageWidth": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "imageHeight": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastModified": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -5410,13 +7429,6 @@
           "general": {
             "$ref": "#/components/schemas/UserGeneralOutput"
           },
-          "channels": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ChannelSummaryOutput"
-            },
-            "nullable": true
-          },
           "roles": {
             "type": "array",
             "items": {
@@ -5444,10 +7456,6 @@
   ],
   "tags": [
     {
-      "name": "Channel",
-      "description": "Provides methods to read and manage channels."
-    },
-    {
       "name": "EventSections",
       "description": "Provides methods to read and manage event sections."
     },
@@ -5456,12 +7464,20 @@
       "description": "Provides methods to read and manage global settings."
     },
     {
+      "name": "MediaFile",
+      "description": "Provides methods to retrieve media files from the Content Hub."
+    },
+    {
       "name": "Career",
       "description": "Provides methods to read and manage careers."
     },
     {
       "name": "Deals",
       "description": "Provides methods to read and manage deals."
+    },
+    {
+      "name": "EventLog",
+      "description": "Provides methods to read and manage event log."
     },
     {
       "name": "Footer",
