@@ -17,7 +17,6 @@ using System.Threading.Tasks;
 
 namespace BDO.GWT.GLOBAL.Controllers
 {
-    [Route("Error/{code:int}")]
     public partial class ErrorController : Controller
     {
         private const string DefaultLanguageName = "en-gb";
@@ -46,7 +45,24 @@ namespace BDO.GWT.GLOBAL.Controllers
             _languageProvider = languageProvider;
         }
 
-        public async Task<IActionResult> Index(int code, CancellationToken cancellationToken)
+        public async Task<IActionResult> Index(CancellationToken cancellationToken)
+        {
+            var page = await _errorService.GetCurrentStatusCodePageAsync(cancellationToken);
+            if (page is null)
+            {
+                return NotFound();
+            }
+
+            if (page.HttpStatusCode is >= 400 and <= 599)
+            {
+                Response.StatusCode = page.HttpStatusCode;
+            }
+
+            return View(nameof(Index), page);
+        }
+
+        [Route("Error/{code:int}")]
+        public async Task<IActionResult> ReExecute(int code, CancellationToken cancellationToken)
         {
             // Log the exception to the CMS event log (only for server errors)
             LogExceptionToCms(code);
@@ -79,7 +95,7 @@ namespace BDO.GWT.GLOBAL.Controllers
                 WebsiteChannelName = _websiteChannelContext.WebsiteChannelName,
             });
 
-            return View(statusCodePage);
+            return View(nameof(Index), statusCodePage);
         }
 
         private void LogExceptionToCms(int code)

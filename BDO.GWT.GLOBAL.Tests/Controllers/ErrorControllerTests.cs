@@ -84,7 +84,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync((StatusCode?)null);
 
-            var result = await _controller.Index(404, CancellationToken.None);
+            var result = await _controller.ReExecute(404, CancellationToken.None);
 
             var statusResult = result as StatusCodeResult;
             Assert.That(statusResult, Is.Not.Null);
@@ -106,7 +106,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(statusPage);
 
-            var result = await _controller.Index(500, CancellationToken.None);
+            var result = await _controller.ReExecute(500, CancellationToken.None);
 
             var viewResult = result as ViewResult;
             Assert.That(viewResult, Is.Not.Null);
@@ -137,7 +137,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync((StatusCode?)null);
 
-            await _controller.Index(500, CancellationToken.None);
+            await _controller.ReExecute(500, CancellationToken.None);
 
             _eventLogServiceMock.Verify(
                 x => x.LogEvent(It.Is<EventLogData>(d =>
@@ -160,7 +160,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync((StatusCode?)null);
 
-            await _controller.Index(404, CancellationToken.None);
+            await _controller.ReExecute(404, CancellationToken.None);
 
             _eventLogServiceMock.Verify(
                 x => x.LogEvent(It.IsAny<EventLogData>()),
@@ -239,7 +239,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 .Setup(x => x.Initialize(It.IsAny<RoutedWebPage>()))
                 .Callback<RoutedWebPage>(p => captured = p);
 
-            await _controller.Index(500, CancellationToken.None);
+            await _controller.ReExecute(500, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -263,7 +263,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                     (_, lang, _, _) => capturedLanguage = lang)
                 .ReturnsAsync((StatusCode?)null);
 
-            await _controller.Index(code, CancellationToken.None);
+            await _controller.ReExecute(code, CancellationToken.None);
 
             return capturedLanguage;
         }

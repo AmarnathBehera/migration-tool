@@ -13,6 +13,8 @@ public interface IErrorService
         string languageName,
         string channelName,
         CancellationToken cancellationToken);
+
+    Task<StatusCode?> GetCurrentStatusCodePageAsync(CancellationToken cancellationToken);
 }
 
 public class ErrorService : IErrorService
@@ -53,6 +55,9 @@ public class ErrorService : IErrorService
         return statusCodePage;
     }
 
+    public Task<StatusCode?> GetCurrentStatusCodePageAsync(CancellationToken cancellationToken) =>
+        _contentRetriever.RetrieveCurrentPageAsync<StatusCode>(new RetrieveCurrentPageParameters(), cancellationToken);
+
     private async Task<StatusCode?> RetrieveStatusCodePageAsync(
     int originalStatusCode,
     string languageName,
@@ -63,8 +68,7 @@ public class ErrorService : IErrorService
             .GetPagesAsync<StatusCode>(
             new RetrievePagesParameters { 
                 LanguageName = languageName,
-                ChannelName = channelName,
-                IsForPreview=false
+                ChannelName = channelName
             }
                 ,
                 query =>
