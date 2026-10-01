@@ -93,6 +93,7 @@ public class HomePageService : IHomePageService
 
     public async Task<string?> GetHomePageUrl(CancellationToken cancellationToken)
     {
+        int channelId = await _contentRetriever.GetCurrentChannelIDChannelInfo(cancellationToken);
         var homePages = await _contentRetriever.GetPagesAsync<HomePage>(
            new RetrievePagesParameters
            {
@@ -101,7 +102,7 @@ public class HomePageService : IHomePageService
            {
                query.Where(w =>
                {
-                   w.WhereEquals("ContentItemChannelID", _contentRetriever.GetCurrentChannelID());
+                   w.WhereEquals("ContentItemChannelID", channelId);
                });
            }, RetrievalCacheSettings.CacheDisabled,
                cancellationToken

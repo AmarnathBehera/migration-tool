@@ -14,6 +14,7 @@ using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 
 namespace BDO.GWT.Web.Core.Services;
+
 public interface IInsightSectionCardListingPageService
 {
     Task<InsightCardListingDto> GetContentSectionDtoAsync(SectionInsightsPage insightPage, CancellationToken cancellationToken);
@@ -113,14 +114,19 @@ public class InsightSectionCardListingPageService : IInsightSectionCardListingPa
         return await SectionInsightsPageRetriever.GetRequiredSectionInsightsPageAsync(
             _contentRetriever,
             _websiteChannelContext,
+            _contentService,
             cancellationToken);
     }
 
     private async Task<ISet<int>> GetFeaturedContentPageIdsAsync(CancellationToken cancellationToken)
     {
-        var insightSection = await GetInsightSectionPage(null, cancellationToken);
+        var insightSection = await SectionInsightsPageRetriever.GetSectionInsightsPageAsync(
+            _contentRetriever,
+            _contentService,
+            _websiteChannelContext,
+            cancellationToken);
 
-        return insightSection.InsightListFeaturedItems?
+        return insightSection?.InsightListFeaturedItems?
             .Select(x => x.SystemFields.WebPageItemID)
             .Where(id => id > 0)
             .ToHashSet()
