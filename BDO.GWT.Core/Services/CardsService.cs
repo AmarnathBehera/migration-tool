@@ -61,11 +61,12 @@ public class CardsService : ICardsService
     }
     private async Task<OptionDto[]> BuildOptionsForPageFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
     {
+        int channelId = await _contentService.GetCurrentChannelIDChannelInfo(cancellationToken);
         var entityType = filterParameterData.EntityType;
 
         var items = await _contentService.GetItemsByTypesAsync(
             new[] { entityType },
-            _websiteChannelContext.WebsiteChannelID,
+            channelId,
             cancellationToken);
 
         var options = items

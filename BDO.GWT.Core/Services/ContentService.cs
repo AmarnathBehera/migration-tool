@@ -72,12 +72,13 @@
      CancellationToken cancellationToken = default)
      where T : class
         {
+            int channelId = await GetCurrentChannelIDChannelInfo(cancellationToken);
             var builder = new ContentItemQueryBuilder();
 
             builder.ForContentType(GetContentTypeName<T>(), subquery =>
             {
                 subquery.Where(w =>
-                    w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
+                    w.WhereEquals("ContentItemChannelID", channelId));
             });
             configure?.Invoke(builder);
 
