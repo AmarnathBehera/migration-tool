@@ -562,11 +562,13 @@
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>RSS category</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>6bf9af2e-ee19-461b-a071-2b6541b36653</kxp_schema_identifier>
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["2fbc3346-16df-4d75-a048-f3a714cd5592"]]]>
+            <![CDATA[["efbd7409-7bd1-4d81-84a2-ea84616ff232"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>
