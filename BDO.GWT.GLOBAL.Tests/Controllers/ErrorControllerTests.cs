@@ -249,6 +249,81 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
             });
         }
 
+        [Test]
+        public async Task CmsIndex_ReturnsNotFound_WhenCurrentStatusCodePageIsNull()
+        {
+            _errorServiceMock
+                .Setup(x => x.GetCurrentStatusCodePageAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync((StatusCode?)null);
+
+            var result = await _controller.Index(CancellationToken.None);
+
+            Assert.That(result, Is.TypeOf<NotFoundResult>());
+        }
+
+        [TestCase(404)]
+        [TestCase(500)]
+        public async Task CmsIndex_ReturnsViewAndSetsResponseStatus_WhenPageHasErrorStatusCode(int httpStatusCode)
+        {
+            var statusPage = CreateStatusCodePage();
+            statusPage.HttpStatusCode = httpStatusCode;
+
+            _errorServiceMock
+                .Setup(x => x.GetCurrentStatusCodePageAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(statusPage);
+
+            var result = await _controller.Index(CancellationToken.None);
+
+            var viewResult = result as ViewResult;
+            Assert.Multiple(() =>
+            {
+                Assert.That(viewResult, Is.Not.Null);
+                Assert.That(viewResult!.ViewName, Is.EqualTo(nameof(ErrorController.Index)));
+                Assert.That(viewResult.Model, Is.SameAs(statusPage));
+                Assert.That(_httpContext.Response.StatusCode, Is.EqualTo(httpStatusCode));
+            });
+        }
+
+        [TestCase(0)]
+        [TestCase(200)]
+        [TestCase(600)]
+        public async Task CmsIndex_KeepsDefaultResponseStatus_WhenPageStatusCodeIsOutsideErrorRange(int httpStatusCode)
+        {
+            var statusPage = CreateStatusCodePage();
+            statusPage.HttpStatusCode = httpStatusCode;
+
+            _errorServiceMock
+                .Setup(x => x.GetCurrentStatusCodePageAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(statusPage);
+
+            var result = await _controller.Index(CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.TypeOf<ViewResult>());
+                Assert.That(_httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+            });
+        }
+
+        [Test]
+        public void Routing_OnlyReExecuteHasAttributeRoute_SoCmsIndexStaysConventionallyRouted()
+        {
+            var controllerRoute = typeof(ErrorController).GetCustomAttributes(typeof(RouteAttribute), inherit: true);
+            var indexRoute = typeof(ErrorController).GetMethod(nameof(ErrorController.Index))!
+                .GetCustomAttributes(typeof(RouteAttribute), inherit: true);
+            var reExecuteRoute = (RouteAttribute?)Attribute.GetCustomAttribute(
+                typeof(ErrorController).GetMethod(nameof(ErrorController.ReExecute))!,
+                typeof(RouteAttribute));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(controllerRoute, Is.Empty);
+                Assert.That(indexRoute, Is.Empty);
+                Assert.That(reExecuteRoute, Is.Not.Null);
+                Assert.That(reExecuteRoute!.Template, Is.EqualTo("Error/{code:int}"));
+            });
+        }
+
         private async Task<string?> CaptureLanguageAsync(int code)
         {
             string? capturedLanguage = null;
