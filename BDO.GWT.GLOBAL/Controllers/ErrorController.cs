@@ -17,6 +17,10 @@ using System.Threading.Tasks;
 
 namespace BDO.GWT.GLOBAL.Controllers
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Major Code Smell",
+        "S6934:A Route attribute should be added to the controller when a route template is specified at the action level",
+        Justification = "Index is reached through Kentico conventional page routing; a controller-level route would make it attribute-routed only and break CMS-rendered status code pages.")]
     public partial class ErrorController : Controller
     {
         private const string DefaultLanguageName = "en-gb";

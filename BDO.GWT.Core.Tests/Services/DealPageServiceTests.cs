@@ -499,8 +499,11 @@ namespace BDO.GWT.Core.Tests.Services
 
             var result = await _service.GetDealPageDtoAsync(CancellationToken.None);
 
-            Assert.That(result.Title, Is.Null);
-            Assert.That(result.ClientName, Is.EqualTo("Acme Inc."));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Title, Is.Null);
+                Assert.That(result.ClientName, Is.EqualTo("Acme Inc."));
+            });
         }
 
         [Test]
@@ -660,7 +663,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             Assert.That(result.Sidebar, Is.Null);
         }
-
+        private static readonly string[] ExpectedContactNames = ["A", "B"];
         [Test]
         public async Task GetDealPageDtoAsync_LimitsContacts_ToDisplayedContactsCount()
         {
@@ -673,7 +676,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             var result = await _service.GetDealPageDtoAsync(CancellationToken.None);
 
-            Assert.That(result.Sidebar!.Contacts.Select(c => c.FullName), Is.EqualTo(new[] { "A", "B" }));
+            Assert.That(result.Sidebar!.Contacts.Select(c => c.FullName), Is.EqualTo(ExpectedContactNames));
         }
 
         [TestCase("abc")]

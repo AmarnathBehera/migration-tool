@@ -1391,6 +1391,7 @@ public class InsightPageServiceTests
 
         Assert.That(result, Is.Empty);
     }
+    private static readonly string[] KeyContactname= { "Ada Lovelace" };
 
     [Test]
     public async Task GetKeyContactsDisplayNames_TreatsWhitespacePrefixAsMissing()
@@ -1402,7 +1403,7 @@ public class InsightPageServiceTests
 
         var result = await _service.GetKeyContactsDisplayNames(SingleContactId, CancellationToken.None);
 
-        Assert.That(result, Is.EqualTo(new[] { "Ada Lovelace" }));
+        Assert.That(result, Is.EqualTo(KeyContactname));
     }
 
     [Test]

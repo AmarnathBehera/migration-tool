@@ -396,8 +396,11 @@ public class SectionEventsCrudServiceBranchTests
 
     private static void AssertNotFoundWithMessage<T>(ActionResult<T> result, string expectedMessage)
     {
-        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
-        Assert.That(((NotFoundObjectResult)result.Result!).Value, Is.EqualTo(expectedMessage));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+            Assert.That(((NotFoundObjectResult)result.Result!).Value, Is.EqualTo(expectedMessage));
+        });
     }
 
     private static void Assert500WithMessage<T>(ActionResult<T> result, string expectedMessage)

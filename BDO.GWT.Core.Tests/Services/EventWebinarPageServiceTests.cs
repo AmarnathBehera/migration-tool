@@ -804,8 +804,10 @@ namespace BDO.GWT.Core.Tests.Services
         {
             var result = BuildLocation("HQ", null, null, null, null, null);
 
-            Assert.That(result.Trim(), Is.EqualTo("HQ"));
-            Assert.That(result, Does.Not.EndWith("\\n"));
+            Assert.Multiple(()=>{
+                Assert.That(result.Trim(), Is.EqualTo("HQ"));
+                Assert.That(result, Does.Not.EndWith("\\n"));
+            });
         }
 
         [Test]

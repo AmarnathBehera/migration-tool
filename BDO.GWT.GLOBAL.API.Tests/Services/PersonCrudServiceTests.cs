@@ -1094,8 +1094,11 @@ public class PersonCrudServiceCoverageTests
 
     private static void AssertNotFoundWithMessage<T>(ActionResult<T> result, string expectedMessage)
     {
-        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
-        Assert.That(((NotFoundObjectResult)result.Result!).Value, Is.EqualTo(expectedMessage));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+            Assert.That(((NotFoundObjectResult)result.Result!).Value, Is.EqualTo(expectedMessage));
+        });
     }
 
     #endregion
@@ -1168,9 +1171,13 @@ public class PersonCrudServiceCoverageTests
         var result = await CreateService().GetPersonPagesAsync(1, "en-gb", true, CancellationToken.None);
 
         var obj = result.Result as ObjectResult;
-        Assert.That(obj, Is.Not.Null);
-        Assert.That(obj!.StatusCode, Is.EqualTo(500));
-        Assert.That(obj.Value, Is.EqualTo("boom"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(obj, Is.Not.Null);
+            Assert.That(obj!.StatusCode, Is.EqualTo(500));
+            Assert.That(obj.Value, Is.EqualTo("boom"));
+
+        });
     }
 
     [Test]
@@ -1231,8 +1238,11 @@ public class PersonCrudServiceCoverageTests
 
         var result = await CreateService().GetPersonPageAsync(1, Guid.NewGuid(), "en-gb", CancellationToken.None);
 
-        Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(500));
-        Assert.That(((ObjectResult)result.Result!).Value, Is.EqualTo("db down"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(500));
+            Assert.That(((ObjectResult)result.Result!).Value, Is.EqualTo("db down"));
+        });
     }
 
     #endregion
@@ -1423,8 +1433,10 @@ public class PersonCrudServiceCoverageTests
 
         var result = await CreateService().UpdatePageAsync(1, Guid.NewGuid(), "en-gb", CreateRequest(), CancellationToken.None);
 
-        Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(500));
-        Assert.That(((ObjectResult)result.Result!).Value, Is.EqualTo("update failed"));
+        Assert.Multiple(()=>{
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(500));
+            Assert.That(((ObjectResult)result.Result!).Value, Is.EqualTo("update failed"));
+        });
     }
 
     #endregion
