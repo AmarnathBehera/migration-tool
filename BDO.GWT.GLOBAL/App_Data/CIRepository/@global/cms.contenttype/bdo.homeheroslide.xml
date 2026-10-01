@@ -170,6 +170,7 @@
   </ClassFormDefinition>
   <ClassGUID>1282eef7-14b2-47db-82ab-1272813e8c31</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-carousel</ClassIconClass>
   <ClassName>BDO.HomeHeroSlide</ClassName>
   <ClassShortName>BDOHomeHeroSlide</ClassShortName>
   <ClassTableName>BDO_HomeHeroSlide</ClassTableName>

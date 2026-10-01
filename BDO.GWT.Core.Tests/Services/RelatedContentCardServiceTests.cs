@@ -1403,7 +1403,7 @@ public class RelatedContentCardServiceTests
         SetProperty(insight, nameof(Insight.SystemFields), CreateWebPageFields(guid, options.PublishedDate));
         SetProperty(insight, nameof(Insight.MetadataTitle), options.Title);
         SetProperty(insight, nameof(Insight.MetadataDescription), options.Description);
-        SetProperty(insight, nameof(Insight.ContentType), options.ContentTypes ?? Enumerable.Empty<Contenttypes>());
+        SetProperty(insight, nameof(Insight.ContentTypeFilter), options.ContentTypes ?? Enumerable.Empty<Contenttypes>());
         SetProperty(insight, nameof(Insight.MetadataBusinessLine), options.BusinessLines ?? Enumerable.Empty<BusinessLine>());
         SetProperty(insight, nameof(Insight.MetadataServiceAreas), options.ServiceAreas ?? Enumerable.Empty<ServiceArea>());
         SetProperty(insight, nameof(Insight.MetadataIndustryCategories), options.IndustryCategories ?? Enumerable.Empty<IndustryCategory>());
@@ -1427,7 +1427,7 @@ public class RelatedContentCardServiceTests
 
         SetProperty(blogPost, nameof(BlogPost.SystemFields), CreateWebPageFields(guid));
         SetProperty(blogPost, nameof(BlogPost.MetadataTitle), title);
-        SetProperty(blogPost, nameof(BlogPost.ContentType), contentTypes ?? Enumerable.Empty<Contenttypes>());
+        SetProperty(blogPost, nameof(BlogPost.ContentTypeFilter), contentTypes ?? Enumerable.Empty<Contenttypes>());
         SetProperty(blogPost, nameof(BlogPost.MetadataBusinessLine), Enumerable.Empty<BusinessLine>());
         SetProperty(blogPost, nameof(BlogPost.MetadataServiceAreas), Enumerable.Empty<ServiceArea>());
         SetProperty(blogPost, nameof(BlogPost.MetadataIndustryCategories), Enumerable.Empty<IndustryCategory>());
@@ -1449,7 +1449,7 @@ public class RelatedContentCardServiceTests
 
         SetProperty(article, nameof(NewsArticle.SystemFields), CreateWebPageFields(guid));
         SetProperty(article, nameof(NewsArticle.MetadataTitle), title);
-        SetProperty(article, nameof(NewsArticle.ContentType), Enumerable.Empty<Contenttypes>());
+        SetProperty(article, nameof(NewsArticle.ContentTypeFilter), Enumerable.Empty<Contenttypes>());
         SetProperty(article, nameof(NewsArticle.MetadataBusinessLine), Enumerable.Empty<BusinessLine>());
         SetProperty(article, nameof(NewsArticle.MetadataServiceAreas), Enumerable.Empty<ServiceArea>());
         SetProperty(article, nameof(NewsArticle.MetadataIndustryCategories), Enumerable.Empty<IndustryCategory>());
@@ -1471,10 +1471,10 @@ public class RelatedContentCardServiceTests
 
         SetProperty(ev, nameof(Event.SystemFields), CreateWebPageFields(guid));
         SetProperty(ev, nameof(Event.MetadataTitle), title);
-        SetProperty(ev, nameof(Event.ContentTypeEvent), Enumerable.Empty<Contenttypes>());
-        SetProperty(ev, nameof(Event.MetadataBusinessLineEvent), Enumerable.Empty<BusinessLine>());
-        SetProperty(ev, nameof(Event.MetadataServiceAreasEvent), Enumerable.Empty<ServiceArea>());
-        SetProperty(ev, nameof(Event.MetadataIndustryCategoriesEvent), Enumerable.Empty<IndustryCategory>());
+        SetProperty(ev, nameof(Event.ContentTypeFilter), Enumerable.Empty<Contenttypes>());
+        SetProperty(ev, nameof(Event.MetadataBusinessLine), Enumerable.Empty<BusinessLine>());
+        SetProperty(ev, nameof(Event.MetadataServiceAreas), Enumerable.Empty<ServiceArea>());
+        SetProperty(ev, nameof(Event.MetadataIndustryCategories), Enumerable.Empty<IndustryCategory>());
 
         var teaserImage = teaserImageUrl is not null
             ? new[] { CreateTeaserImageAttachment(teaserImageUrl) }
@@ -1493,10 +1493,10 @@ public class RelatedContentCardServiceTests
 
         SetProperty(webinar, nameof(Webinar.SystemFields), CreateWebPageFields(guid));
         SetProperty(webinar, nameof(Webinar.MetadataTitle), title);
-        SetProperty(webinar, nameof(Webinar.ContentTypeEvent), Enumerable.Empty<Contenttypes>());
-        SetProperty(webinar, nameof(Webinar.MetadataBusinessLineEvent), Enumerable.Empty<BusinessLine>());
-        SetProperty(webinar, nameof(Webinar.MetadataServiceAreasEvent), Enumerable.Empty<ServiceArea>());
-        SetProperty(webinar, nameof(Webinar.MetadataIndustryCategoriesEvent), Enumerable.Empty<IndustryCategory>());
+        SetProperty(webinar, nameof(Webinar.ContentTypeFilter), Enumerable.Empty<Contenttypes>());
+        SetProperty(webinar, nameof(Webinar.MetadataBusinessLine), Enumerable.Empty<BusinessLine>());
+        SetProperty(webinar, nameof(Webinar.MetadataServiceAreas), Enumerable.Empty<ServiceArea>());
+        SetProperty(webinar, nameof(Webinar.MetadataIndustryCategories), Enumerable.Empty<IndustryCategory>());
 
         var teaserImage = teaserImageUrl is not null
             ? new[] { CreateTeaserImageAttachment(teaserImageUrl) }

@@ -212,7 +212,7 @@ public class NewsArticleCardsService : INewsArticleCardsService
         return filterName switch
         {
 
-            FilterParameterName.ContentType => w => w.WhereContains(nameof(NewsArticle.ContentType), guid),
+            FilterParameterName.ContentType => w => w.WhereContains(nameof(NewsArticle.ContentTypeFilter), guid),
 
             _ => null,
         };

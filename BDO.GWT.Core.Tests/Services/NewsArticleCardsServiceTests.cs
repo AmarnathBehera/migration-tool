@@ -464,7 +464,7 @@ public class NewsArticleCardsServiceTests
     {
         var newsSection = CreateSectionNews(100);
         var article = CreateNewsArticle(1);
-        article.ContentType = new[]
+        article.ContentTypeFilter = new[]
         {
             new Contenttypes { Name = "Press Release" }
         };
@@ -483,7 +483,7 @@ public class NewsArticleCardsServiceTests
     {
         var newsSection = CreateSectionNews(100);
         var article = CreateNewsArticle(1);
-        article.ContentType = Array.Empty<Contenttypes>();
+        article.ContentTypeFilter = Array.Empty<Contenttypes>();
 
         SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
         SetupNewsArticleReturns(new[] { article });
@@ -493,6 +493,29 @@ public class NewsArticleCardsServiceTests
 
         Assert.That(result.Data[0].Type, Is.Null);
     }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_HandlesNullImageAndContentTypeRelations()
+    {
+        var newsSection = CreateSectionNews(100);
+        var article = CreateNewsArticle(1);
+        article.ImageFileM = null!;
+        article.ContentTypeFilter = null!;
+
+        SetupNewsGroupReturns(new[] { CreateNewsGroup(200) });
+        SetupNewsArticleReturns(new[] { article });
+
+        var result = await _service.GetFilteredItemsAsync(
+            [newsSection], "en-US", new CardsQuery(), null, _ => false, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Data, Has.Length.EqualTo(1));
+            Assert.That(result.Data[0].ImageURL, Is.Empty);
+            Assert.That(result.Data[0].Type, Is.Null);
+        });
+    }
+
     [Test]
     public async Task GetFilteredItemsAsync_AppliesQueryFilters_WhenProvided()
     {
@@ -727,7 +750,7 @@ public class NewsArticleCardsServiceTests
                 ? new[] { new ContentAttachment { ContentAttachmentAsset = new ContentItemAsset { Url = imageUrl } } }
                 : Array.Empty<ContentAttachment>(),
             ImageFileAltTextM = imageAlt,
-            ContentType = Array.Empty<Contenttypes>(),
+            ContentTypeFilter = Array.Empty<Contenttypes>(),
             UpdatedOn = updatedOn ?? DateTime.MinValue
         };
     }
