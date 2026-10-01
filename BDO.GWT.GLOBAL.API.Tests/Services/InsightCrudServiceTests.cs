@@ -941,4 +941,250 @@ public class InsightCrudServiceTests
     }
 
     #endregion
+
+    #region Branch coverage (mocked channel and pages)
+
+    private sealed class FakeChannelInfo : ChannelInfo
+    {
+        private string? channelName;
+
+        public override string ChannelName
+        {
+            get => channelName ?? string.Empty;
+            set => channelName = value;
+        }
+    }
+
+    private void SetupNamedChannel(string channelName)
+    {
+        var channel = (FakeChannelInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeChannelInfo));
+        channel.ChannelName = channelName;
+        SetupChannel(channel);
+    }
+
+    private void SetupInsights(params IEnumerable<Insight>?[] results)
+    {
+        var sequence = _contentRetrieverMock.SetupSequence(x => x.GetPagesAsync<Insight>(
+            It.IsAny<RetrievePagesParameters>(),
+            It.IsAny<Action<RetrievePagesQueryParameters>>(),
+            It.IsAny<RetrievalCacheSettings>(),
+            It.IsAny<CancellationToken>()));
+
+        foreach (var result in results)
+        {
+            sequence = sequence.ReturnsAsync(result!);
+        }
+    }
+
+    private void SetupSectionInsights(IEnumerable<SectionInsightsPage>? result) =>
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<SectionInsightsPage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(result!);
+
+    private static Insight CreateInsight(int id) =>
+        new() { SystemFields = new WebPageFields { WebPageItemID = id, ContentItemName = "insight" } };
+
+    private static void AssertNotFoundMessage<T>(ActionResult<T> result, string message)
+    {
+        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+        Assert.That(((NotFoundObjectResult)result.Result!).Value, Is.EqualTo(message));
+    }
+
+    [Test]
+    public async Task GetInsightPagesAsync_NullResults_ReturnsEmptyList()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        SetupInsights((IEnumerable<Insight>?)null);
+
+        var result = await CreateService().GetInsightPagesAsync(1, "en-gb", false, CancellationToken.None);
+
+        Assert.That(result.Value, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetInsightPageAsync_PageMissing_ReturnsNotFoundResult()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        SetupInsights(Enumerable.Empty<Insight>());
+
+        var result = await CreateService().GetInsightPageAsync(1, Guid.NewGuid(), "en-gb", CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+    }
+
+    [Test]
+    public async Task CreatePageAsync_ParentNull_Returns422AndAddsError()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        SetupSectionInsights(null);
+
+        var result = await CreateService().CreatePageAsync(1, 10, "en-gb", new InsightPageContent(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<UnprocessableEntityObjectResult>());
+        _validationStateMock.Verify(x => x.AddUnprocessableEntityError("nodeParentID", It.IsAny<string>()), Times.Once);
+    }
+
+    [Test]
+    public async Task CreatePageAsync_UnprocessableValidationErrors_Returns422WithoutCreatingPage()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        SetupSectionInsights(Enumerable.Empty<SectionInsightsPage>());
+        _validationStateMock.Setup(x => x.HasUnprocessableEntityErrors()).Returns(true);
+
+        var result = await CreateService().CreatePageAsync(1, 10, "en-gb", new InsightPageContent(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<UnprocessableEntityObjectResult>());
+        _webPageManagerMock.Verify(x => x.Create(It.IsAny<CreateWebPageParameters>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Test]
+    public async Task CreatePageAsync_UnexpectedException_Returns500WithMessage()
+    {
+        SetupCulture(ValidCulture);
+        _channelByIdProviderMock
+            .Setup(x => x.GetAsync(It.IsAny<int>(), It.IsAny<CancellationToken?>()))
+            .ThrowsAsync(new InvalidOperationException("boom"));
+
+        var result = await CreateService().CreatePageAsync(1, 10, "en-gb", new InsightPageContent(), CancellationToken.None);
+
+        var objectResult = (ObjectResult)result.Result!;
+        Assert.Multiple(() =>
+        {
+            Assert.That(objectResult.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+            Assert.That(objectResult.Value, Is.EqualTo("boom"));
+        });
+    }
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_InvalidToCulture_ReturnsNotFoundMessage()
+    {
+        _mappingHelperMock
+            .SetupSequence(x => x.ValidateAndNormalizeSiteCultureAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ValidCulture)
+            .ReturnsAsync(EmptyLanguageCulture);
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), "en-gb", "fr-fr", new InsightPageContent(), CancellationToken.None);
+
+        AssertNotFoundMessage(result, "Invalid to culture specified");
+    }
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_SourceMissing_ReturnsNotFoundResult()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        SetupInsights(Enumerable.Empty<Insight>());
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), null, null, new InsightPageContent(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+    }
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_SystemFieldsMissing_ReturnsNotFoundMessage()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        SetupInsights(new[] { new Insight { SystemFields = null! } });
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), "en-gb", "en-gb", new InsightPageContent(), CancellationToken.None);
+
+        AssertNotFoundMessage(result, "Page system fields are missing");
+    }
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_ValidationErrors_Returns422()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        _validationStateMock.Setup(x => x.HasUnprocessableEntityErrors()).Returns(true);
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), "en-gb", "en-gb", new InsightPageContent(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<UnprocessableEntityObjectResult>());
+    }
+
+    [Test]
+    public async Task UpdatePageAsync_PageMissing_ReturnsNotFoundResult()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        SetupInsights((IEnumerable<Insight>?)null);
+
+        var result = await CreateService().UpdatePageAsync(1, Guid.NewGuid(), null, new InsightPageContent(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+    }
+
+    [Test]
+    public async Task UpdatePageAsync_SystemFieldsMissing_ReturnsNotFoundMessage()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        SetupInsights(new[] { new Insight { SystemFields = null! } });
+
+        var result = await CreateService().UpdatePageAsync(1, Guid.NewGuid(), "en-gb", new InsightPageContent(), CancellationToken.None);
+
+        AssertNotFoundMessage(result, "Page system fields are missing");
+        _webPageManagerMock.Verify(x => x.TryCreateDraft(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Test]
+    public void DeletePageAsync_SingleCulture_PageMissing_ThrowsNotFound()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        SetupInsights(Enumerable.Empty<Insight>());
+
+        Assert.ThrowsAsync<BDO.GWT.Common.Core.Exceptions.NotFoundException>(() =>
+            CreateService().DeletePageAsync(1, Guid.NewGuid(), "en-gb", deleteAllCultures: false, CancellationToken.None));
+
+        _webPageManagerMock.Verify(x => x.Delete(It.IsAny<DeleteWebPageParameters>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Test]
+    public async Task DeletePageAsync_SingleCulture_DeletesPermanently()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        SetupInsights(new[] { CreateInsight(12) });
+        DeleteWebPageParameters? captured = null;
+        _webPageManagerMock
+            .Setup(x => x.Delete(It.IsAny<DeleteWebPageParameters>(), It.IsAny<CancellationToken>()))
+            .Callback<DeleteWebPageParameters, CancellationToken>((p, _) => captured = p)
+            .Returns(Task.CompletedTask);
+
+        await CreateService().DeletePageAsync(1, Guid.NewGuid(), "en-gb", deleteAllCultures: false, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(captured!.WebPageItemID, Is.EqualTo(12));
+            Assert.That(captured.Permanently, Is.True);
+        });
+    }
+
+    [Test]
+    public async Task DeletePageAsync_AllCultures_DeletesOnlyFoundVariants()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        _cultureServiceMock
+            .Setup(x => x.GetSiteCulturesLanguageCodeAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<LanguageTag> { LanguageTag.GB, LanguageTag.GB });
+        SetupInsights(new[] { CreateInsight(4) }, Enumerable.Empty<Insight>());
+
+        await CreateService().DeletePageAsync(1, Guid.NewGuid(), "en-gb", deleteAllCultures: true, CancellationToken.None);
+
+        _webPageManagerMock.Verify(x => x.Delete(It.IsAny<DeleteWebPageParameters>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    #endregion
 }
