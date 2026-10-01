@@ -233,7 +233,7 @@ public class NewsArticleCardsService : INewsArticleCardsService
                 ImageURL = urlHelper.Content(contentPage.ImageFileM?.FirstOrDefault()?.ContentAttachmentAsset.Url),
                 isComingSoon = isComingSoon,
                 ImageAltText = contentPage.ImageFileAltTextM,
-                Type = contentPage.ContentType?.FirstOrDefault()?.Name,
+                Type = contentPage.ContentTypeFilter?.FirstOrDefault()?.Name,
                 Title = contentPage.MetadataTitle,
                 Date = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen ?? contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen,
                 UpdatedOnDate = contentPage.UpdatedOn == DateTime.MinValue ? null : contentPage.UpdatedOn,
