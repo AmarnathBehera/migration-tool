@@ -1,6 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace BDO.GWT.GLOBAL.API.Data;
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum rolesalloweddropdown
+{
+    Editor,
+    Administrator
+}
 
 public class RoleInput
 {
@@ -126,4 +134,15 @@ public class AssignRolePermissionsInput
     /// Redirects, a custom application, etc.), by its raw ApplicationName.
     /// </summary>
     public List<ApplicationPermissionInput>? Applications { get; set; }
+}
+
+public class    CreateChannelRoleInput
+{
+    /// <summary>Channel name of the website channel, e.g. "Ind".</summary>
+    [Required]
+    public string WebsiteChannel { get; set; } = string.Empty;
+
+    /// <summary>Editor or Administrator. Role is named "{WebsiteChannel}-{RoleType}".</summary>
+    [Required]
+    public rolesalloweddropdown RoleType { get; set; }
 }
