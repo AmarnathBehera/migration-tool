@@ -829,6 +829,122 @@ public class ContentCategoryServiceTests
         });
     }
 
+    [TestCase("/media/image.jpg", "https://public.example/media/image.jpg")]
+    [TestCase("~/media/image.jpg", "https://public.example/media/image.jpg")]
+    [TestCase("media/image.jpg", "https://public.example/media/image.jpg")]
+    [TestCase("https://cdn.example/image.jpg?width=640&height=320", "https://cdn.example/image.jpg?width=640&height=320")]
+    [TestCase("//cdn.example/image.jpg", "https://cdn.example/image.jpg")]
+    [TestCase("/media/my image.jpg?width=640&height=320", "https://public.example/media/my%20image.jpg?width=640&height=320")]
+    [TestCase(null, "")]
+    [TestCase("", "")]
+    [TestCase("javascript:alert(1)", "")]
+    [TestCase("/media/image.jpg", "https://public.example/media/image.jpg", "fr-FR")]
+    [SetCulture("en-US")]
+    public async Task GetContentAsync_ResolvesUrlsAndFirstLinkedSubtype(string? imageUrl, string expectedImageUrl, string culture = "en-GB")
+    {
+        var mapping = new Mock<IMappingHelper>();
+        mapping.Setup(helper => helper.ValidateAndNormalizeSiteCultureAsync(1, culture, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new LanguageTag(culture[..2], culture[3..], culture));
+        var channelProvider = new Mock<IInfoProvider<ChannelInfo>>();
+        channelProvider.As<IInfoByIdProvider<ChannelInfo>>()
+            .Setup(provider => provider.Get(1)).Returns(CreateChannelInfo("Global"));
+        var contentService = new Mock<IContentService>();
+        var subtypes = new[] { new Contenttypes { Name = "Article" }, new Contenttypes { Name = "Report" } };
+        var images = new[] { new ContentAttachment { ContentAttachmentAsset = new ContentItemAsset { Url = imageUrl! } } };
+        var blog = new BlogPost
+        {
+            SystemFields = new WebPageFields { WebPageItemID = 101, WebPageUrlPath = "incorrect-relative-path", ContentItemCommonDataFirstPublishedWhen = new DateTime(2025, 1, 2), ContentItemCommonDataLastPublishedWhen = new DateTime(2025, 1, 2) },
+            ContentTypeFilter = subtypes,
+            MetadataTeaserImage = images,
+        };
+        var insight = new Insight
+        {
+            SystemFields = new WebPageFields { WebPageItemID = 102, WebPageUrlPath = "incorrect-relative-path", ContentItemCommonDataFirstPublishedWhen = new DateTime(2025, 1, 1), ContentItemCommonDataLastPublishedWhen = new DateTime(2025, 1, 3) },
+            ContentTypeFilter = subtypes,
+            MetadataTeaserImage = images,
+        };
+        contentService.Setup(service => service.GetPagesAsync<BlogPost>(It.IsAny<RetrievePagesParameters>(), It.IsAny<Action<RetrievePagesQueryParameters>>(), It.IsAny<RetrievalCacheSettings>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([blog]);
+        contentService.Setup(service => service.GetPagesAsync<Insight>(It.IsAny<RetrievePagesParameters>(), It.IsAny<Action<RetrievePagesQueryParameters>>(), It.IsAny<RetrievalCacheSettings>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([insight]);
+        using var cancellation = new CancellationTokenSource();
+        var urlRetriever = new Mock<IWebPageUrlRetriever>(MockBehavior.Strict);
+        urlRetriever.Setup(retriever => retriever.Retrieve(101, culture, false, cancellation.Token))
+            .ReturnsAsync(new WebPageUrl("~/en-GB/blog", "https://public.example/en-GB/blog"));
+        urlRetriever.Setup(retriever => retriever.Retrieve(102, culture, false, cancellation.Token))
+            .ReturnsAsync(new WebPageUrl("~/en-GB/insight", "https://public.example/en-GB/insight"));
+        var service = new ContentCategoryService(CreateContentQueryExecutorProxy(), contentService.Object, mapping.Object,
+            channelProvider.Object, Mock.Of<IValidationState>(), Mock.Of<IInfoProvider<WebsiteChannelInfo>>(), urlRetriever.Object);
+
+        var result = await service.GetContentAsync(1, culture, 2, null, [], cancellation.Token);
+
+        Assert.That(result.Result, Is.Null);
+        Assert.That(result.Value!.Insights, Has.Count.EqualTo(2));
+        Assert.That(result.Value.Insights[0].Date, Is.EqualTo(new DateTime(2025, 1, 2)));
+        Assert.That(result.Value.Insights[0].DisplayDate, Is.EqualTo(culture == "fr-FR" ? "02 janvier 2025" : "02 January 2025"));
+        Assert.That(result.Value.Insights[1].Date, Is.EqualTo(new DateTime(2025, 1, 1)));
+        Assert.That(result.Value.Insights.Select(item => item.URL), Is.EqualTo(new[] { "https://public.example/en-GB/blog", "https://public.example/en-GB/insight" }));
+        foreach (var item in result.Value.Insights)
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(item.PageSubType, Is.EqualTo("Article"));
+                Assert.That(item.ImageUrlFull, Is.EqualTo(expectedImageUrl));
+                Assert.That(item.ImageUrlTwoThirds, Is.EqualTo(expectedImageUrl));
+                Assert.That(item.ImageUrlOneThird, Is.EqualTo(expectedImageUrl));
+            });
+        }
+        urlRetriever.VerifyAll();
+        urlRetriever.Invocations.Clear();
+
+        var limitedResult = await service.GetContentAsync(1, culture, 1, null, [], cancellation.Token);
+
+        Assert.That(limitedResult.Value!.Insights, Has.Count.EqualTo(1));
+        urlRetriever.Verify(retriever => retriever.Retrieve(101, culture, false, cancellation.Token), Times.Once);
+        urlRetriever.Verify(retriever => retriever.Retrieve(102, culture, false, cancellation.Token), Times.Never);
+
+        blog.MetadataIndustries = [new Industry { SystemFields = new WebPageFields { ContentItemID = 20 } }];
+        insight.MetadataBusinessIssues = [new Businessissue { SystemFields = new WebPageFields { ContentItemID = 10 } }];
+        urlRetriever.Invocations.Clear();
+
+        var filteredResult = await service.GetContentAsync(1, culture, 1, null,
+            [new ContentCategoryFilter { CategoryCode = "BusinessIssue", SubCategoryIds = [10] }], cancellation.Token);
+
+        Assert.That(filteredResult.Value!.Insights.Single().PageType, Is.EqualTo("Insight"));
+        urlRetriever.Verify(retriever => retriever.Retrieve(101, culture, false, cancellation.Token), Times.Never);
+        urlRetriever.Verify(retriever => retriever.Retrieve(102, culture, false, cancellation.Token), Times.Once);
+
+        var combinedResult = await service.GetContentAsync(1, culture, 2, null,
+            [new ContentCategoryFilter { CategoryCode = "BusinessIssue", SubCategoryIds = [10] },
+             new ContentCategoryFilter { CategoryCode = "Industry", SubCategoryIds = [20] }], cancellation.Token);
+
+        Assert.That(combinedResult.Value!.Insights.Select(item => item.PageType), Is.EqualTo(new[] { "BlogPost", "Insight" }));
+
+        blog.SystemFields.ContentItemCommonDataFirstPublishedWhen = null;
+        var beforeRequest = DateTime.Now;
+
+        var missingDateResult = await service.GetContentAsync(1, culture, 2, null, [], cancellation.Token);
+
+        Assert.That(missingDateResult.Value!.Insights.Select(item => item.PageType), Is.EqualTo(new[] { "Insight", "BlogPost" }));
+        Assert.That(missingDateResult.Value.Insights[1].Date, Is.InRange(beforeRequest, DateTime.Now));
+        Assert.That(missingDateResult.Value.Insights[1].DisplayDate,
+            Is.EqualTo(missingDateResult.Value.Insights[1].Date.ToString("dd MMMM yyyy", System.Globalization.CultureInfo.GetCultureInfo(culture))));
+    }
+
+    [TestCase("fr-FR", "MetadataTitle COLLATE French_CI_AS ASC")]
+    [TestCase("sv-SE", "MetadataTitle COLLATE Finnish_Swedish_CI_AS ASC")]
+    [TestCase("tr-TR", "MetadataTitle COLLATE Turkish_CI_AS ASC")]
+    [TestCase("en-GB", "[MetadataTitle] ASC")]
+    public void GetCategoryOrderColumn_UsesLegacyCultureCollation(string culture, string expectedExpression)
+    {
+        var method = typeof(ContentCategoryService).GetMethod("GetCategoryOrderColumn", BindingFlags.Static | BindingFlags.NonPublic)!;
+
+        var column = (OrderByColumn)method.Invoke(null, ["MetadataTitle", new LanguageTag(culture[..2], culture[3..], culture)])!;
+
+        Assert.That(column.GetExpression(), Is.EqualTo(expectedExpression));
+        Assert.That(column.Direction, Is.EqualTo(OrderDirection.Ascending));
+    }
+
     [Test]
     public void InsightProjection_ToDto_MapsExpectedValues()
     {
@@ -854,6 +970,26 @@ public class ContentCategoryServiceTests
             Assert.That(dto.URL, Is.EqualTo("/url"));
             Assert.That(dto.DisplayDate, Is.EqualTo("15 January 2025"));
         });
+    }
+
+    [TestCase("en-GB", "02 January 2025")]
+    [TestCase("fr-FR", "02 janvier 2025")]
+    [TestCase("de-DE", "02 Januar 2025")]
+    [SetCulture("en-US")]
+    public void InsightProjection_ToDto_FormatsDateUsingRequestedCulture(string culture, string expectedDate)
+    {
+        var projectionType = typeof(ContentCategoryService).GetNestedType("InsightProjection", BindingFlags.NonPublic)!;
+        var projection = projectionType.GetConstructors()
+            .Single(constructor => constructor.GetParameters().Length == 11)
+            .Invoke([
+                Guid.NewGuid(), "Insight", "Title", "Summary", null, new DateTime(2025, 1, 2), string.Empty,
+                Array.Empty<int>(), Array.Empty<int>(), Array.Empty<int>(), Array.Empty<int>()
+            ]);
+        projectionType.GetProperty("DateCulture")!.SetValue(projection, System.Globalization.CultureInfo.GetCultureInfo(culture));
+
+        var dto = (InsightContentDto)projectionType.GetMethod("ToDto")!.Invoke(projection, null)!;
+
+        Assert.That(dto.DisplayDate, Is.EqualTo(expectedDate));
     }
 
     [Test]
@@ -895,7 +1031,7 @@ public class ContentCategoryServiceTests
                 WebPageUrlPath = "/blog/post"
             },
             MetadataTitle = "Blog title",
-            MetadataDescription = "Blog summary",
+            MetadataDescription = "<p>Blog &amp; summary</p>",
             MetadataTeaserImage =
             [
                 new ContentAttachment { ContentAttachmentAsset = new ContentItemAsset { Url = "https://cdn/img.jpg" } }
@@ -913,7 +1049,9 @@ public class ContentCategoryServiceTests
         {
             Assert.That(dto.PageType, Is.EqualTo("BlogPost"));
             Assert.That(dto.TitleFull, Is.EqualTo("Blog title"));
-            Assert.That(dto.SummaryFull, Is.EqualTo("Blog summary"));
+            Assert.That(dto.SummaryFull, Is.EqualTo("Blog & summary"));
+            Assert.That(dto.SummaryTwoThirds, Is.EqualTo("Blog & summary"));
+            Assert.That(dto.SummaryOneThird, Is.EqualTo("Blog & summary"));
             Assert.That(dto.ImageUrlFull, Is.EqualTo("https://cdn/img.jpg"));
             Assert.That(dto.URL, Is.EqualTo("/blog/post"));
         });
@@ -947,6 +1085,7 @@ public class ContentCategoryServiceTests
         Assert.Multiple(() =>
         {
             Assert.That(dto.PageType, Is.EqualTo("Insight"));
+            Assert.That(dto.PageSubType, Is.Empty);
             Assert.That(dto.TitleFull, Is.EqualTo(string.Empty));
             Assert.That(dto.SummaryFull, Is.EqualTo(string.Empty));
             Assert.That(dto.ImageUrlFull, Is.EqualTo(string.Empty));

@@ -2,6 +2,7 @@
 using BDO.GWT.Common.Core.Services;
 using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
+using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.GLOBAL.API.DTOs;
 using BDO.GWT.GLOBAL.API.Helpers;
@@ -11,6 +12,7 @@ using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace BDO.GWT.GLOBAL.API.Services;
 
@@ -102,7 +104,7 @@ public class ContentCategoryService : IContentCategoryService
                 .ForWebsite(channelName)
                 .Columns(nameof(Businessissue.SystemFields.ContentItemID), nameof(Businessissue.Name)))
             .InLanguage(languageTag.Locale)
-            .Parameters(q => q.OrderBy(new OrderByColumn(nameof(Businessissue.Name))));
+            .Parameters(q => q.OrderBy(GetCategoryOrderColumn(nameof(Businessissue.Name), languageTag)));
 
         var businessIssues = await _contentQueryExecutor.GetMappedResult<Businessissue>(
             builder, cancellationToken: cancellationToken);
@@ -129,7 +131,7 @@ public class ContentCategoryService : IContentCategoryService
                 .ForWebsite(channelName)
                 .Columns("ContentItemID", "MetadataTitle"))
             .InLanguage(languageTag.Locale)
-            .Parameters(q => q.OrderBy(new OrderByColumn("MetadataTitle")));
+            .Parameters(q => q.OrderBy(GetCategoryOrderColumn("MetadataTitle", languageTag)));
 
         var pages = await _contentQueryExecutor.GetResult(builder, row => new
         {
@@ -151,6 +153,12 @@ public class ContentCategoryService : IContentCategoryService
         };
     }
 
+
+    private static OrderByColumn GetCategoryOrderColumn(string columnName, LanguageTag languageTag)
+    {
+        var collation = CultureToCollationMapper.GetCollationForCulture(languageTag.Locale);
+        return new OrderByColumn(collation is null ? columnName : $"{columnName} COLLATE {collation}", OrderDirection.Ascending);
+    }
 
     public async Task<ActionResult<ContentDto>> GetContentAsync(
         int channelId, string culture, int? insightCount, int? whatsNewCount,
@@ -190,13 +198,13 @@ public class ContentCategoryService : IContentCategoryService
 
             var blogPosts = await _contentRetriever.GetPagesAsync<BlogPost>(
                 retrieveParameters,
-                query => query.Where(w => w.WhereEquals("IsSearchExcluded", false)),
+                query => query.Where(w => w.WhereEquals("IsSearchExcluded", false).Or().WhereNull("IsSearchExcluded")),
                 RetrievalCacheSettings.CacheDisabled,
                 cancellationToken);
 
             var insights = await _contentRetriever.GetPagesAsync<Insight>(
                 retrieveParameters,
-                query => query.Where(w => w.WhereEquals("IsSearchExcluded", false)),
+                query => query.Where(w => w.WhereEquals("IsSearchExcluded", false).Or().WhereNull("IsSearchExcluded")),
                 RetrievalCacheSettings.CacheDisabled,
                 cancellationToken);
 
@@ -212,14 +220,27 @@ public class ContentCategoryService : IContentCategoryService
                     item.IndustryIds.Intersect(subCategoryIdsByCategoryCode["Industry"]).Any());
             }
 
+            var insightDtos = new List<InsightContentDto>();
+            var dateCulture = CultureInfo.GetCultureInfo(currentCulture.Locale);
+            var fallbackDate = DateTime.Now;
+            foreach (var item in allInsights.OrderByDescending(item => item.Date).Take(insightCount.Value))
+            {
+                var pageUrl = await _webPageUrlRetriever.Retrieve(item.WebPageItemId, currentCulture.Locale, cancellationToken: cancellationToken);
+                var absoluteUrl = pageUrl?.AbsoluteUrl ?? string.Empty;
+                var resolvedItem = item with
+                {
+                    Url = absoluteUrl,
+                    ImageUrl = GetAbsoluteImageUrl(item.ImageUrl, absoluteUrl),
+                    DateCulture = dateCulture,
+                    Date = item.Date == default ? fallbackDate : item.Date,
+                };
+                insightDtos.Add(resolvedItem.ToDto());
+            }
+
             var dto = new ContentDto
             {
                 InsightsSearchURL = await GetInsightSearchUrlAsync(channelId, channel.ChannelName, currentCulture.Locale, cancellationToken),
-                Insights = allInsights
-                    .OrderByDescending(i => i.Date)
-                    .Take(insightCount.Value)
-                    .Select(i => i.ToDto())
-                    .ToList(),
+                Insights = insightDtos,
             };
 
             return dto;
@@ -236,6 +257,46 @@ public class ContentCategoryService : IContentCategoryService
         {
             return new ObjectResult(ex.Message) { StatusCode = StatusCodes.Status500InternalServerError };
         }
+    }
+
+    private static string GetAbsoluteImageUrl(string? imageUrl, string pageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+        {
+            return string.Empty;
+        }
+
+        var hasPageUrl = Uri.TryCreate(pageUrl, UriKind.Absolute, out var pageUri)
+            && (pageUri.Scheme == Uri.UriSchemeHttp || pageUri.Scheme == Uri.UriSchemeHttps);
+
+        if (imageUrl.StartsWith("//", StringComparison.Ordinal))
+        {
+            imageUrl = $"{(hasPageUrl ? pageUri!.Scheme : Uri.UriSchemeHttps)}:{imageUrl}";
+        }
+        else if (imageUrl.StartsWith("~/", StringComparison.Ordinal))
+        {
+            imageUrl = imageUrl[1..];
+        }
+
+        if (!Uri.TryCreate(imageUrl, UriKind.RelativeOrAbsolute, out var imageUri))
+        {
+            return string.Empty;
+        }
+
+        if (imageUri.IsAbsoluteUri)
+        {
+            return imageUri.Scheme == Uri.UriSchemeHttp || imageUri.Scheme == Uri.UriSchemeHttps
+                ? imageUrl
+                : string.Empty;
+        }
+
+        if (!hasPageUrl)
+        {
+            return string.Empty;
+        }
+
+        var origin = new Uri(pageUri!.GetLeftPart(UriPartial.Authority) + "/");
+        return new Uri(origin, imageUri).AbsoluteUri;
     }
 
     private async Task<string?> GetInsightSearchUrlAsync(int channelId, string channelName, string culture, CancellationToken cancellationToken)
@@ -351,11 +412,15 @@ public class ContentCategoryService : IContentCategoryService
         DateTime Date, string Url,
         int[] BusinessIssueIds, int[] BusinessLineIds, int[] ServiceAreaIds, int[] IndustryIds)
     {
+        public string PageSubType { get; init; } = string.Empty;
+        public int WebPageItemId { get; init; }
+        public CultureInfo DateCulture { get; init; } = CultureInfo.GetCultureInfo(defaultCulture.Locale);
+
         public InsightContentDto ToDto() => new()
         {
             GUID = Guid,
             PageType = PageType,
-            PageSubType = string.Empty,
+            PageSubType = PageSubType,
             TitleFull = Title,
             TitleTwoThirds = Title,
             TitleOneThird = Title,
@@ -366,7 +431,7 @@ public class ContentCategoryService : IContentCategoryService
             ImageUrlTwoThirds = ImageUrl ?? string.Empty,
             ImageUrlOneThird = ImageUrl ?? string.Empty,
             Date = Date,
-            DisplayDate = Date == default ? string.Empty : Date.ToString("d MMMM yyyy"),
+            DisplayDate = Date == default ? string.Empty : Date.ToString("dd MMMM yyyy", DateCulture),
             URL = Url,
         };
     }
@@ -375,25 +440,33 @@ public class ContentCategoryService : IContentCategoryService
         Guid: page.SystemFields.ContentItemGUID,
         PageType: nameof(BlogPost),
         Title: page.MetadataTitle ?? string.Empty,
-        Summary: page.MetadataDescription ?? string.Empty,
+        Summary: HtmlHelper.ExtractTextFromHtml(page.MetadataDescription) ?? string.Empty,
         ImageUrl: page.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
-        Date: page.SystemFields.ContentItemCommonDataLastPublishedWhen ?? default,
+        Date: page.SystemFields.ContentItemCommonDataFirstPublishedWhen ?? default,
         Url: page.SystemFields.WebPageUrlPath ?? string.Empty,
         BusinessIssueIds: page.MetadataBusinessIssues?.Select(x => x.SystemFields.ContentItemID).ToArray() ?? Array.Empty<int>(),
         BusinessLineIds: page.MetadataBusinessLine?.Select(x => x.SystemFields.ContentItemID).ToArray() ?? Array.Empty<int>(),
         ServiceAreaIds: page.MetadataServiceAreas?.Select(x => x.SystemFields.ContentItemID).ToArray() ?? Array.Empty<int>(),
-        IndustryIds: page.MetadataIndustries?.Select(x => x.SystemFields.ContentItemID).ToArray() ?? Array.Empty<int>());
+        IndustryIds: page.MetadataIndustries?.Select(x => x.SystemFields.ContentItemID).ToArray() ?? Array.Empty<int>())
+    {
+        PageSubType = page.ContentTypeFilter?.FirstOrDefault()?.Name ?? string.Empty,
+        WebPageItemId = page.SystemFields.WebPageItemID,
+    };
 
     private static InsightProjection MapInsightToProjection(Insight page) => new(
         Guid: page.SystemFields.ContentItemGUID,
         PageType: nameof(Insight),
         Title: page.MetadataTitle ?? string.Empty,
-        Summary: page.MetadataDescription ?? string.Empty,
+        Summary: HtmlHelper.ExtractTextFromHtml(page.MetadataDescription) ?? string.Empty,
         ImageUrl: page.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
-        Date: page.SystemFields.ContentItemCommonDataLastPublishedWhen ?? default,
+        Date: page.SystemFields.ContentItemCommonDataFirstPublishedWhen ?? default,
         Url: page.SystemFields.WebPageUrlPath ?? string.Empty,
         BusinessIssueIds: page.MetadataBusinessIssues?.Select(x => x.SystemFields.ContentItemID).ToArray() ?? Array.Empty<int>(),
         BusinessLineIds: page.MetadataBusinessLine?.Select(x => x.SystemFields.ContentItemID).ToArray() ?? Array.Empty<int>(),
         ServiceAreaIds: page.MetadataServiceAreas?.Select(x => x.SystemFields.ContentItemID).ToArray() ?? Array.Empty<int>(),
-        IndustryIds: page.MetadataIndustries?.Select(x => x.SystemFields.ContentItemID).ToArray() ?? Array.Empty<int>());
+        IndustryIds: page.MetadataIndustries?.Select(x => x.SystemFields.ContentItemID).ToArray() ?? Array.Empty<int>())
+    {
+        PageSubType = page.ContentTypeFilter?.FirstOrDefault()?.Name ?? string.Empty,
+        WebPageItemId = page.SystemFields.WebPageItemID,
+    };
 }
