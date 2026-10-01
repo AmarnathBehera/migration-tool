@@ -105,11 +105,12 @@ public class CardsService : ICardsService
 
     private async Task<OptionDto[]> BuildOptionsForTagPageFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
     {
-       var entityType = filterParameterData.EntityType;
+        int channelId = await _contentService.GetCurrentChannelIDChannelInfo(cancellationToken);
+        var entityType = filterParameterData.EntityType;
 
         var items = await _contentService.GetItemsByTypesAsync(
             new[] { entityType },
-            _websiteChannelContext.WebsiteChannelID,
+            channelId,
             cancellationToken);
 
         var options = items
@@ -157,12 +158,13 @@ public class CardsService : ICardsService
    
    private async Task<OptionDto[]> BuildOptionsForFieldFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
     {
+        int channelId = await _contentService.GetCurrentChannelIDChannelInfo(cancellationToken);
         var entityType = filterParameterData.EntityType;
         var options = Array.Empty<OptionDto>();
 
         var items = await _contentService.GetItemsByTypesAsync(
             new[] { entityType },
-            _websiteChannelContext.WebsiteChannelID,
+            channelId,
             cancellationToken);
 
         if(items is null || !items.Any())
