@@ -226,6 +226,7 @@ _blank;New tab
   </ClassFormDefinition>
   <ClassGUID>afbf6f00-540b-44f1-b40b-ea7975a6185e</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-earth</ClassIconClass>
   <ClassName>BDO.Locations</ClassName>
   <ClassShortName>BDOLocations</ClassShortName>
   <ClassTableName>BDO_Locations</ClassTableName>

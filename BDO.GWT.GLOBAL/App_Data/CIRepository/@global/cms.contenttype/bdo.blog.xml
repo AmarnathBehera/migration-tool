@@ -88,6 +88,7 @@ keywords;Keywords
   </ClassFormDefinition>
   <ClassGUID>b6a2aff8-7c0d-446a-be33-221a26bcac37</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-notebook</ClassIconClass>
   <ClassName>BDO.Blog</ClassName>
   <ClassShortName>BDOBlog</ClassShortName>
   <ClassTableName>BDO_Blog</ClassTableName>

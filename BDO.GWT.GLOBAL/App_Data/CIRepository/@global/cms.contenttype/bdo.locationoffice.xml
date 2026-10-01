@@ -266,6 +266,7 @@ afterCountry;After country
   </ClassFormDefinition>
   <ClassGUID>28595e58-3d13-4414-8f96-8a31285037fe</ClassGUID>
   <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-building</ClassIconClass>
   <ClassName>BDO.LocationOffice</ClassName>
   <ClassShortName>BDOLocationOffice</ClassShortName>
   <ClassTableName>BDO_LocationOffice</ClassTableName>
