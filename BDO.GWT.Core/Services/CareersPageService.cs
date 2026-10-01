@@ -110,6 +110,8 @@ public class CareersPageService : ICareersPageService
                 $"Careers page with GUID '{pageGuid}' not found.");
         }
 
+        int channelId = await _contentRetriever.GetCurrentChannelIDChannelInfo(cancellationToken);
+
         var careerPages = await _contentRetriever.GetPagesAsync<Career>(
             new RetrievePagesParameters
             {
@@ -119,7 +121,7 @@ public class CareersPageService : ICareersPageService
             },
             q => q.Where(w =>
             {
-                w.WhereEquals("ContentItemChannelID", _contentRetriever.GetCurrentChannelID());
+                w.WhereEquals("ContentItemChannelID", channelId);
                 w.WhereEquals("WebPageItemParentID", careersPage.SystemFields.WebPageItemID);
             }),
             cacheSettings: RetrievalCacheSettings.CacheDisabled,
