@@ -88,6 +88,9 @@ public class PersonPageService : IPersonPageService
         var (photoMediaType, photoData) = await RetrieveImageBinaryAsync(photoUrl, cancellationToken);
         var (logoMediaType, logoData) = await RetrieveImageBinaryAsync(_contentService.GetCurrentSiteLogoImageUrlAsync(), cancellationToken);
 
+
+        int channelId = await _contentService.GetCurrentChannelIDChannelInfo(cancellationToken);
+
         var offices = await _contentService.GetPagesAsync<LocationOffice>(
         new RetrievePagesParameters
         {
@@ -98,7 +101,7 @@ public class PersonPageService : IPersonPageService
         {
             query.Where(w =>
             {
-                w.WhereEquals("ContentItemChannelID", _contentService.GetCurrentChannelID());
+                w.WhereEquals("ContentItemChannelID", channelId);
                 w.WhereIn(nameof(LocationOffice.SystemFields.ContentItemGUID), person.MetadataOfficeLocation.Select(x => x.SystemFields.ContentItemGUID));
             });
             query.Columns(
@@ -114,6 +117,9 @@ public class PersonPageService : IPersonPageService
         );
         var parentNodeIDsOfOffices = offices?.Where(y => y is not null).Select(y => y!.SystemFields.WebPageItemParentID).Where(id => id > 0).ToArray();
 
+
+        int channelId = await _contentService.GetCurrentChannelIDChannelInfo(cancellationToken);
+
         var cities = await _contentService.GetPagesAsync<LocationCity>(
         new RetrievePagesParameters
         {
@@ -125,7 +131,7 @@ public class PersonPageService : IPersonPageService
         {
             query.Where(w =>
             {
-                w.WhereEquals("ContentItemChannelID", _contentService.GetCurrentChannelID());
+                w.WhereEquals("ContentItemChannelID", channelId);
                 w.WhereIn(nameof(LocationCity.SystemFields.WebPageItemID), parentNodeIDsOfOffices);
             });
             query.Columns(
@@ -264,6 +270,7 @@ public class PersonPageService : IPersonPageService
     }
     private async Task<IEnumerable<LinkItemDto>> GetLocationLinkItemsAsync(Person person, CancellationToken cancellationToken = default)
     {
+        int channelId = await _contentService.GetCurrentChannelIDChannelInfo(cancellationToken);
         var locationOffices = await _contentService.GetPagesAsync<LocationOffice>(
              new RetrievePagesParameters
              {
@@ -274,7 +281,7 @@ public class PersonPageService : IPersonPageService
             {
                 query.Where(w =>
                 {
-                    w.WhereEquals("ContentItemChannelID", _contentService.GetCurrentChannelID());
+                    w.WhereEquals("ContentItemChannelID", channelId);
                     w.WhereIn(nameof(LocationOffice.SystemFields.ContentItemGUID), person.MetadataOfficeLocation.Select(x => x.SystemFields.ContentItemGUID));
                 });
                 query.Columns(
@@ -300,7 +307,7 @@ public class PersonPageService : IPersonPageService
             {
                 query.Where(w =>
                 {
-                    w.WhereEquals("ContentItemChannelID", _contentService.GetCurrentChannelID());
+                    w.WhereEquals("ContentItemChannelID", channelId);
                     w.WhereIn(nameof(LocationCity.SystemFields.WebPageItemID), locationOfficesNodeParentIds);
                 });
             }, RetrievalCacheSettings.CacheDisabled,
