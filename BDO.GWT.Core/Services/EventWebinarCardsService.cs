@@ -115,20 +115,20 @@ public class EventWebinarCardsService : IEventWebinarCardsService
         var guid = page.SystemFields.ContentItemGUID.ToString();
 
         return filterName switch
-        {
-            FilterParameterName.Service => x => x.WhereContains(nameof(IEventOrWebinar.MetadataServices), guid),
-            FilterParameterName.ServiceArea => x => x.WhereContains(nameof(IEventOrWebinar.MetadataServiceAreas), guid),
-            FilterParameterName.IndustryCategory => x => x.WhereContains(nameof(IEventOrWebinar.MetadataIndustryCategories), guid),
-            FilterParameterName.IndustryPage => x => x.WhereContains(nameof(IEventOrWebinar.MetadataIndustries), guid),
-            FilterParameterName.BusinessLine => x => x.WhereContains(nameof(IEventOrWebinar.MicrositeMasterPages), guid),
-            FilterParameterName.SpecialtyCategory => x => x.WhereContains(nameof(IEventOrWebinar.MetadataSpecialtiesCategories), guid),
-            FilterParameterName.OfficeLocation => x => x.WhereContains(nameof(IEventOrWebinar.MetadataOfficeLocation), guid),
-            FilterParameterName.ShowAllPastEvents => x => x.WhereContains(nameof(IEventOrWebinar.ShowPastEvent), guid),
-            FilterParameterName.MicrositeMasterPage => x => x.WhereContains(nameof(IEventOrWebinar.MicrositeMasterPages), guid),
-            FilterParameterName.MicrositePage => x => x.WhereContains(nameof(IEventOrWebinar.MicrositePages), guid),
+         {
+             FilterParameterName.Service => x => x.WhereContains(nameof(IEventOrWebinar.MetadataServices), guid),
+             FilterParameterName.ServiceArea => x => x.WhereContains(nameof(IEventOrWebinar.MetadataServiceAreas), guid),
+             FilterParameterName.IndustryCategory => x => x.WhereContains(nameof(IEventOrWebinar.MetadataIndustryCategories), guid),
+             FilterParameterName.IndustryPage => x => x.WhereContains(nameof(IEventOrWebinar.MetadataIndustries), guid),
+             FilterParameterName.BusinessLine => x => x.WhereContains(nameof(IEventOrWebinar.MetadataBusinessLines), guid),
+             FilterParameterName.SpecialtyCategory => x => x.WhereContains(nameof(IEventOrWebinar.MetadataSpecialtiesCategories), guid),
+             FilterParameterName.OfficeLocation => x => x.WhereContains(nameof(IEventOrWebinar.MetadataOfficeLocation), guid),
+             FilterParameterName.ShowAllPastEvents => x => x.WhereContains(nameof(IEventOrWebinar.ShowPastEvent), guid),
+             FilterParameterName.MicrositeMasterPage => x => x.WhereContains(nameof(IEventOrWebinar.MicrositeMasterPages), guid),
+             FilterParameterName.MicrositePage => x => x.WhereContains(nameof(IEventOrWebinar.MicrositePages), guid),
 
-            _ => null,
-        };
+             _ => null,
+         };
     }
 
     private async Task<Action<WhereParameters>?> GetTagPageFilterAsync(string filterName, string filterValue)
