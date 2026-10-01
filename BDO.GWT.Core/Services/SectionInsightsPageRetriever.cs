@@ -1,4 +1,5 @@
 using BDO.GWT.Common.Exceptions;
+using BDO.GWT.Core;
 using CMS.ContentEngine;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
@@ -9,9 +10,11 @@ internal static class SectionInsightsPageRetriever
 {
     public static async Task<SectionInsightsPage?> GetSectionInsightsPageAsync(
         IContentRetriever contentRetriever,
+        IContentService contentService,
         IWebsiteChannelContext websiteChannelContext,
         CancellationToken cancellationToken)
     {
+        int channelId = await contentService.GetCurrentChannelIDChannelInfo(cancellationToken);
         var insightSection = await contentRetriever.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
             new RetrievePagesParameters
             {
@@ -20,7 +23,7 @@ internal static class SectionInsightsPageRetriever
             query =>
             {
                 query.Where(w =>
-                    w.WhereEquals("ContentItemChannelID", websiteChannelContext.WebsiteChannelID));
+                    w.WhereEquals("ContentItemChannelID", channelId));
             },
             RetrievalCacheSettings.CacheDisabled,
             (_, item) => Task.FromResult(item),
@@ -31,10 +34,10 @@ internal static class SectionInsightsPageRetriever
 
     public static async Task<SectionInsightsPage> GetRequiredSectionInsightsPageAsync(
         IContentRetriever contentRetriever,
-        IWebsiteChannelContext websiteChannelContext,
+        IWebsiteChannelContext websiteChannelContext, IContentService contentService,
         CancellationToken cancellationToken)
     {
-        var page = await GetSectionInsightsPageAsync(contentRetriever, websiteChannelContext, cancellationToken);
+        var page = await GetSectionInsightsPageAsync(contentRetriever, contentService, websiteChannelContext, cancellationToken);
 
         if (page is null)
         {

@@ -112,6 +112,7 @@
         public string GetCurrentSiteLegalNameAsync();
         public string GetCurrentLanguage();
         public int GetCurrentChannelID();
+        public Task<int> GetCurrentChannelIDChannelInfo(CancellationToken cancellationToken);
         Task<T?> RetrieveCurrentPageAsync<T>(RetrieveCurrentPageParameters parameters, CancellationToken cancellationToken = default) where T : class;
 
         Task<IWebPageFieldsSource?> GetPageByTypeAndNameAsync(

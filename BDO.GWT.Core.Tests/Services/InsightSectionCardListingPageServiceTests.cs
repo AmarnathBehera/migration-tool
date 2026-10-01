@@ -120,7 +120,7 @@ public class InsightSectionCardListingPageServiceTests
     }
 
     [Test]
-    public void GetContentPaginationResultAsync_ThrowsMissingSectionPageException_WhenNoSectionInsightsPageExists()
+    public async Task GetContentPaginationResultAsync_ReturnsResults_WhenNoSectionInsightsPageExists()
     {
         var pageGuid = Guid.NewGuid();
         var groupPage = new InsightGroup
@@ -152,10 +152,10 @@ public class InsightSectionCardListingPageServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new[] { groupPage });
 
-        var exception = Assert.ThrowsAsync<MissingSectionPageException>(async () =>
-            await _service.GetContentPaginationResultAsync(pageGuid, new CardsQuery(), CancellationToken.None));
+        var result = await _service.GetContentPaginationResultAsync(pageGuid, new CardsQuery(), CancellationToken.None);
 
-        Assert.That(exception!.Message, Does.Contain(nameof(SectionInsightsPage)));
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.TotalCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -257,7 +257,7 @@ public class InsightSectionCardListingPageServiceTests
             Assert.That(result.CardsGrid.FilteringTooltipEnabled, Is.True);
             Assert.That(result.CardsGrid.ApiEndpointName, Is.EqualTo($"Insights/{pageGuid}"));
         });
-        }
+    }
 
     private static Insight CreateInsight(int webPageItemId)
     {
