@@ -117,9 +117,6 @@ public class PersonPageService : IPersonPageService
         );
         var parentNodeIDsOfOffices = offices?.Where(y => y is not null).Select(y => y!.SystemFields.WebPageItemParentID).Where(id => id > 0).ToArray();
 
-
-        int channelId = await _contentService.GetCurrentChannelIDChannelInfo(cancellationToken);
-
         var cities = await _contentService.GetPagesAsync<LocationCity>(
         new RetrievePagesParameters
         {
