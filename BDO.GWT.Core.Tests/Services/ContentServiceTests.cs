@@ -1,7 +1,9 @@
 using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
 using CMS.ContentEngine;
+using CMS.DataEngine;
 using CMS.Helpers;
+using CMS.Websites;
 using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Moq;
@@ -16,6 +18,7 @@ namespace BDO.GWT.Core.Tests.Services
         private Mock<IContentRetriever> _contentRetrieverMock = null!;
         private Mock<IContentQueryModelTypeMapper> _modelTypeMapperMock = null!;
         private Mock<ICultureContext> _cultureContextMock = null!;
+        private Mock<IInfoProvider<WebsiteChannelInfo>> _websiteChannelInfoProviderMock = null!;
 
         private ContentService _service = null!;
 
@@ -28,6 +31,8 @@ namespace BDO.GWT.Core.Tests.Services
             _contentRetrieverMock = new Mock<IContentRetriever>();
             _modelTypeMapperMock = new Mock<IContentQueryModelTypeMapper>();
             _cultureContextMock = new Mock<ICultureContext>();
+            _websiteChannelInfoProviderMock = new Mock<IInfoProvider<WebsiteChannelInfo>>();
+
 
             _websiteChannelContextMock.SetupGet(x => x.WebsiteChannelID).Returns(42);
             _websiteChannelContextMock.SetupGet(x => x.WebsiteChannelName).Returns("BDOGlobal");
@@ -41,7 +46,8 @@ namespace BDO.GWT.Core.Tests.Services
                 _contentRetrieverMock.Object,
                 _executorMock.Object,
                 _modelTypeMapperMock.Object,
-                _cultureContextMock.Object);
+                _cultureContextMock.Object,
+                _websiteChannelInfoProviderMock.Object);
         }
 
         [Test]
@@ -55,7 +61,8 @@ namespace BDO.GWT.Core.Tests.Services
                     _contentRetrieverMock.Object,
                     _executorMock.Object,
                     _modelTypeMapperMock.Object,
-                    _cultureContextMock.Object));
+                    _cultureContextMock.Object,
+                     _websiteChannelInfoProviderMock.Object));
         }
 
         [Test]
@@ -69,7 +76,8 @@ namespace BDO.GWT.Core.Tests.Services
                     _contentRetrieverMock.Object,
                     _executorMock.Object,
                     _modelTypeMapperMock.Object,
-                    _cultureContextMock.Object));
+                    _cultureContextMock.Object,
+                     _websiteChannelInfoProviderMock.Object));
         }
 
         [Test]
@@ -83,7 +91,8 @@ namespace BDO.GWT.Core.Tests.Services
                     _contentRetrieverMock.Object,
                     _executorMock.Object,
                     _modelTypeMapperMock.Object,
-                    _cultureContextMock.Object));
+                    _cultureContextMock.Object,
+                     _websiteChannelInfoProviderMock.Object));
         }
 
         [Test]
@@ -97,7 +106,8 @@ namespace BDO.GWT.Core.Tests.Services
                     null!,
                     _executorMock.Object,
                     _modelTypeMapperMock.Object,
-                    _cultureContextMock.Object));
+                    _cultureContextMock.Object,
+                     _websiteChannelInfoProviderMock.Object));
         }
 
         [Test]
@@ -111,7 +121,8 @@ namespace BDO.GWT.Core.Tests.Services
                     _contentRetrieverMock.Object,
                     null!,
                     _modelTypeMapperMock.Object,
-                    _cultureContextMock.Object));
+                    _cultureContextMock.Object,
+                     _websiteChannelInfoProviderMock.Object));
         }
 
         [Test]
@@ -125,7 +136,8 @@ namespace BDO.GWT.Core.Tests.Services
                     _contentRetrieverMock.Object,
                     _executorMock.Object,
                     null!,
-                    _cultureContextMock.Object));
+                    _cultureContextMock.Object,
+                     _websiteChannelInfoProviderMock.Object));
         }
 
         [Test]
@@ -251,7 +263,8 @@ namespace BDO.GWT.Core.Tests.Services
                 _contentRetrieverMock.Object,
                 _executorMock.Object,
                 _modelTypeMapperMock.Object,
-                null!));
+                null!,
+                _websiteChannelInfoProviderMock.Object));
         }
 
         [Test]
