@@ -1,73 +1,85 @@
-//using BDO;
-//using BDO.GWT.Common.Exceptions;
-//using BDO.GWT.Web.Core.Services;
-//using CMS.ContentEngine;
-//using CMS.Websites.Routing;
-//using Kentico.Content.Web.Mvc;
-//using Moq;
+using BDO;
+using BDO.GWT.Common.Exceptions;
+using BDO.GWT.Web.Core.Services;
+using CMS.ContentEngine;
+using CMS.Websites.Routing;
+using Kentico.Content.Web.Mvc;
+using Moq;
 
-//namespace BDO.GWT.Core.Tests.Services;
+namespace BDO.GWT.Core.Tests.Services;
 
-//public class SectionInsightsPageRetrieverTests
-//{
-//    [Test]
-//    public async Task GetSectionInsightsPageAsync_ReturnsFirstPage_WhenPageExists()
-//    {
-//        var contentRetrieverMock = new Mock<IContentRetriever>();
-//        var websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
+public class SectionInsightsPageRetrieverTests
+{
+    [Test]
+    public async Task GetSectionInsightsPageAsync_ReturnsFirstPage_WhenPageExists()
+    {
+        var contentRetrieverMock = new Mock<IContentRetriever>();
+        var websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
+        var contentServiceMock = new Mock<IContentService>();
 
-//        websiteChannelContextMock
-//            .Setup(x => x.WebsiteChannelID)
-//            .Returns(17);
+        websiteChannelContextMock
+            .Setup(x => x.WebsiteChannelID)
+            .Returns(17);
 
-//        var expectedPage = new SectionInsightsPage
-//        {
-//            InsightListFilters = "businessLine"
-//        };
+        contentServiceMock
+            .Setup(x => x.GetCurrentChannelIDChannelInfo(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(17);
 
-//        contentRetrieverMock
-//            .Setup(x => x.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
-//                It.IsAny<RetrievePagesParameters>(),
-//                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-//                It.IsAny<RetrievalCacheSettings>(),
-//                It.IsAny<Func<IContentQueryDataContainer, SectionInsightsPage, Task<SectionInsightsPage>>>(),
-//                It.IsAny<CancellationToken>()))
-//            .ReturnsAsync(new[] { expectedPage });
+        var expectedPage = new SectionInsightsPage
+        {
+            InsightListFilters = "businessLine"
+        };
 
-//        var result = await SectionInsightsPageRetriever.GetSectionInsightsPageAsync(
-//            contentRetrieverMock.Object,
-//            websiteChannelContextMock.Object,
-//            CancellationToken.None);
+        contentRetrieverMock
+            .Setup(x => x.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, SectionInsightsPage, Task<SectionInsightsPage>>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { expectedPage });
 
-//        Assert.That(result, Is.SameAs(expectedPage));
-//    }
+        var result = await SectionInsightsPageRetriever.GetSectionInsightsPageAsync(
+            contentRetrieverMock.Object,
+            contentServiceMock.Object,
+            websiteChannelContextMock.Object,
+            CancellationToken.None);
 
-//    [Test]
-//    public async Task GetRequiredSectionInsightsPageAsync_ThrowsMissingSectionPageException_WhenNoPageExists()
-//    {
-//        var contentRetrieverMock = new Mock<IContentRetriever>();
-//        var websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
+        Assert.That(result, Is.SameAs(expectedPage));
+    }
 
-//        websiteChannelContextMock
-//            .Setup(x => x.WebsiteChannelID)
-//            .Returns(17);
+    [Test]
+    public async Task GetRequiredSectionInsightsPageAsync_ThrowsMissingSectionPageException_WhenNoPageExists()
+    {
+        var contentRetrieverMock = new Mock<IContentRetriever>();
+        var websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
+        var contentServiceMock = new Mock<IContentService>();
 
-//        contentRetrieverMock
-//            .Setup(x => x.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
-//                It.IsAny<RetrievePagesParameters>(),
-//                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-//                It.IsAny<RetrievalCacheSettings>(),
-//                It.IsAny<Func<IContentQueryDataContainer, SectionInsightsPage, Task<SectionInsightsPage>>>(),
-//                It.IsAny<CancellationToken>()))
-//            .ReturnsAsync(Array.Empty<SectionInsightsPage>());
+        websiteChannelContextMock
+            .Setup(x => x.WebsiteChannelID)
+            .Returns(17);
 
-//        var exception = Assert.ThrowsAsync<MissingSectionPageException>(async () =>
-//            await SectionInsightsPageRetriever.GetRequiredSectionInsightsPageAsync(
-//                contentRetrieverMock.Object,
-//                websiteChannelContextMock.Object,
-//                CancellationToken.None));
+        contentServiceMock
+            .Setup(x => x.GetCurrentChannelIDChannelInfo(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(17);
 
-//        Assert.That(exception, Is.Not.Null);
-//        Assert.That(exception!.Message, Does.Contain(nameof(SectionInsightsPage)));
-//    }
-//}
+        contentRetrieverMock
+            .Setup(x => x.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, SectionInsightsPage, Task<SectionInsightsPage>>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<SectionInsightsPage>());
+
+        var exception = Assert.ThrowsAsync<MissingSectionPageException>(async () =>
+            await SectionInsightsPageRetriever.GetRequiredSectionInsightsPageAsync(
+                contentRetrieverMock.Object,
+                websiteChannelContextMock.Object,
+                contentServiceMock.Object,
+                CancellationToken.None));
+
+        Assert.That(exception, Is.Not.Null);
+        Assert.That(exception!.Message, Does.Contain(nameof(SectionInsightsPage)));
+    }
+}
