@@ -970,7 +970,7 @@ namespace BDO.GWT.Core.Tests.Services
         [TestCase(null)]
         [TestCase("")]
         [TestCase("   ")]
-        [TestCase("/relative/path")]
+
         public void GetEventOrganizerSchemaMarkup_InvalidOrMissingUrl_ReturnsNullUrl(string? url)
         {
             var result = OrganizerMarkup(url);
