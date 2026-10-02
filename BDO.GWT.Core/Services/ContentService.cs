@@ -31,7 +31,7 @@
 
         // Default cache duration – override via constructor / options if needed.
         private static readonly TimeSpan DefaultCacheDuration = TimeSpan.FromMinutes(10);
-
+        private const string channelIdColumnName = "ContentItemChannelID";
         public ContentService(
             IContentQueryExecutor executor,
             IWebsiteChannelContext websiteChannelContext,
@@ -72,12 +72,13 @@
      CancellationToken cancellationToken = default)
      where T : class
         {
+            int channelId = await GetCurrentChannelIDChannelInfo(cancellationToken);
             var builder = new ContentItemQueryBuilder();
 
             builder.ForContentType(GetContentTypeName<T>(), subquery =>
             {
                 subquery.Where(w =>
-                    w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
+                    w.WhereEquals(channelIdColumnName, channelId));
             });
             configure?.Invoke(builder);
 
@@ -99,7 +100,7 @@ where T : class
             {
                 subquery
                  .Where(w =>
-                    w.WhereEquals("ContentItemChannelID", channelId));
+                    w.WhereEquals(channelIdColumnName, channelId));
             });
             configure?.Invoke(builder);
 
@@ -270,7 +271,7 @@ where T : class
                     var languageBuilder = builder.InLanguage(_cultureContext.CurrentLanguageTag, useLanguageFallbacks: false);
                     languageBuilder.Parameters(p =>
                     {
-                        p.Where(w => w.WhereEquals("ContentItemChannelID", WebsiteChannelID));
+                        p.Where(w => w.WhereEquals(channelIdColumnName, WebsiteChannelID));
                     });
                 };
 
@@ -450,7 +451,7 @@ where T : class
                 queryAction?.Invoke(query);
 
                 // Add channel filter
-                query.Where(w => w.WhereEquals("ContentItemChannelID", channelId));
+                query.Where(w => w.WhereEquals(channelIdColumnName, channelId));
             };
 
             // Call the extension method with decorated query
