@@ -42,11 +42,12 @@
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
-      <field column="MenuBackgroundImageAltText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="46971371-ce83-48c4-a0ab-07a348ff4492" visible="true">
+      <field allowempty="true" column="MenuBackgroundImageAltText" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="46971371-ce83-48c4-a0ab-07a348ff4492" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Background image alt text</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
