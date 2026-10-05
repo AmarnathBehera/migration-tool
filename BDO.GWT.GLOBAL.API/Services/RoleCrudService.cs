@@ -66,6 +66,9 @@ public class RoleCrudService : IRoleCrudService
         [RolesAllowedDropdown.Administrator] = new[] { "View", "ManagePermissions", "OverrideContentLock" }
     };
 
+    private sealed record ApplicationGrant(string ApplicationName, string[] Permissions);
+    private sealed record WorkspaceGrant(int WorkspaceId, string[] Permissions);
+
     private static string ChannelApplicationName(Guid websiteChannelGuid) =>
         ChannelApplicationPrefix + websiteChannelGuid.ToString("D").ToLowerInvariant();
 
@@ -166,7 +169,7 @@ public class RoleCrudService : IRoleCrudService
             using (var actionContext = new CMSActionContext(caller))
             {
                 actionContext.UseGlobalAdminContext = true;
-                _roleInfoProvider.Set(role);
+                await _roleInfoProvider.SetAsync(role, cancellationToken);
             }
 
             var context = await BuildContextAsync(cancellationToken);
@@ -202,7 +205,7 @@ public class RoleCrudService : IRoleCrudService
             using (var actionContext = new CMSActionContext(caller))
             {
                 actionContext.UseGlobalAdminContext = true;
-                _roleInfoProvider.Set(role);
+                await _roleInfoProvider.SetAsync(role, cancellationToken);
             }
 
             var context = await BuildContextAsync(cancellationToken);
@@ -276,7 +279,7 @@ public class RoleCrudService : IRoleCrudService
                 foreach (var link in aclLinks)
                     await _webPageAclRoleInfoProvider.DeleteAsync(link, cancellationToken);
 
-                _roleInfoProvider.Delete(role);
+                await _roleInfoProvider.DeleteAsync(role, cancellationToken);
             }
         }
         catch (Exception ex) when (!IsExpected(ex))
@@ -311,235 +314,238 @@ public class RoleCrudService : IRoleCrudService
                 .FirstOrDefault()
                 ?? throw new InvalidOperationException($"Cannot find role '{input.RoleName}'.");
 
-            // ---- Resolve and validate everything first, so nothing is written if any entry is invalid ----
-
-            var channelGrants = new List<(string ApplicationName, string[] Permissions)>();
-
-            for (var i = 0; i < channelInputs.Count; i++)
-            {
-                var entry = channelInputs[i];
-
-                if (string.IsNullOrWhiteSpace(entry.WebsiteChannel))
-                    throw new InvalidOperationException($"websiteChannels[{i}].websiteChannel is required.");
-
-                var permissions = NormalizePermissions(entry.Permissions, AllowedPermissions, DefaultPermissions);
-
-                var channel = (await _channelInfoProvider.Get()
-                    .WhereEquals(nameof(ChannelInfo.ChannelName), entry.WebsiteChannel.Trim())
-                    .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
-                    .FirstOrDefault()
-                    ?? throw new ChannelNotFoundException(entry.WebsiteChannel);
-
-                var websiteChannel = (await _websiteChannelInfoProvider.Get()
-                    .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelChannelID), channel.ChannelID)
-                    .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
-                    .FirstOrDefault()
-                    ?? throw new ChannelNotFoundException(entry.WebsiteChannel);
-
-                channelGrants.Add((ChannelApplicationName(websiteChannel.WebsiteChannelGUID), permissions));
-            }
-
-            var emailChannelGrants = new List<(string ApplicationName, string[] Permissions)>();
-
-            for (var i = 0; i < emailChannelInputs.Count; i++)
-            {
-                var entry = emailChannelInputs[i];
-
-                if (string.IsNullOrWhiteSpace(entry.EmailChannel))
-                    throw new InvalidOperationException($"emailChannels[{i}].emailChannel is required.");
-
-                var permissions = NormalizePermissions(entry.Permissions, AllowedEmailChannelPermissions, DefaultPermissions);
-
-                var channel = (await _channelInfoProvider.Get()
-                    .WhereEquals(nameof(ChannelInfo.ChannelName), entry.EmailChannel.Trim())
-                    .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
-                    .FirstOrDefault()
-                    ?? throw new ChannelNotFoundException(entry.EmailChannel);
-
-                var emailChannel = (await _emailChannelInfoProvider.Get()
-                    .WhereEquals(nameof(EmailChannelInfo.EmailChannelChannelID), channel.ChannelID)
-                    .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
-                    .FirstOrDefault()
-                    ?? throw new ChannelNotFoundException(entry.EmailChannel);
-
-                emailChannelGrants.Add((EmailChannelApplicationName(emailChannel.EmailChannelGUID), permissions));
-            }
-
-            var genericApplicationGrants = new List<(string ApplicationName, string[] Permissions)>();
-
-            for (var i = 0; i < applicationInputs.Count; i++)
-            {
-                var entry = applicationInputs[i];
-
-                if (string.IsNullOrWhiteSpace(entry.ApplicationName))
-                    throw new InvalidOperationException($"applications[{i}].applicationName is required.");
-
-                if (entry.ApplicationName.StartsWith(ChannelApplicationPrefix, StringComparison.OrdinalIgnoreCase)
-                    || entry.ApplicationName.StartsWith(EmailChannelApplicationPrefix, StringComparison.OrdinalIgnoreCase))
-                    throw new InvalidOperationException(
-                        $"applications[{i}].applicationName looks like a channel application. Use 'websiteChannels' or 'emailChannels' instead.");
-
-                // Permission names for generic applications vary per application (View/Create/Update/Delete plus
-                // application-specific ones), so they aren't validated against a fixed list here. "View" is required
-                // by the admin UI for any application to be accessible, so it's always included.
-                var permissions = (entry.Permissions ?? Array.Empty<string>())
-                    .Where(p => !string.IsNullOrWhiteSpace(p))
-                    .Select(p => p.Trim())
-                    .Append("View")
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToArray();
-
-                genericApplicationGrants.Add((entry.ApplicationName.Trim(), permissions));
-            }
-
-            var workspaceGrants = new List<(int WorkspaceId, string[] Permissions)>();
-
-            if (workspaceInputs.Count > 0)
-            {
-                var allWorkspaces = (await _workspaceInfoProvider.Get()
-                    .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
-                    .ToArray();
-
-                for (var i = 0; i < workspaceInputs.Count; i++)
-                {
-                    var entry = workspaceInputs[i];
-
-                    if (string.IsNullOrWhiteSpace(entry.Workspace))
-                        throw new InvalidOperationException($"workspaces[{i}].workspace is required.");
-
-                    var permissions = NormalizePermissions(entry.Permissions, AllowedWorkspacePermissions, DefaultPermissions);
-                    var key = entry.Workspace.Trim();
-
-                    var matches = allWorkspaces
-                        .Where(w => string.Equals(w.WorkspaceName, key, StringComparison.OrdinalIgnoreCase)
-                                 || string.Equals(w.WorkspaceDisplayName, key, StringComparison.OrdinalIgnoreCase))
-                        .ToArray();
-
-                    if (matches.Length == 0)
-                        throw new InvalidOperationException($"Cannot find workspace '{entry.Workspace}'.");
-
-                    var workspace = matches.Length == 1
-                        ? matches[0]
-                        : matches.SingleOrDefault(w => string.Equals(w.WorkspaceName, key, StringComparison.OrdinalIgnoreCase))
-                          ?? throw new InvalidOperationException($"Workspace '{entry.Workspace}' is ambiguous. Use the workspace name instead.");
-
-                    workspaceGrants.Add((workspace.WorkspaceID, permissions));
-                }
-            }
-
-            // ---- Existing rows, so repeated calls never create duplicates ----
-
-            var existingChannelPermissions = (await _applicationPermissionInfoProvider.Get()
-                .WhereEquals(nameof(ApplicationPermissionInfo.RoleID), role.RoleID)
-                .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
-                .GroupBy(p => p.ApplicationName, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(p => p.PermissionName).ToHashSet(StringComparer.OrdinalIgnoreCase),
-                    StringComparer.OrdinalIgnoreCase);
-
-            var existingEmailChannelPermissions = existingChannelPermissions; // same table, same dictionary keyed by ApplicationName
-
-            var existingWorkspacePermissions = (await _workspaceDataPermissionInfoProvider.Get()
-                .WhereEquals(nameof(WorkspaceDataPermissionInfo.WorkspaceDataPermissionRoleID), role.RoleID)
-                .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
-                .Where(p => string.Equals(p.WorkspaceDataPermissionApplicationName, ContentHubApplicationName, StringComparison.OrdinalIgnoreCase))
-                .GroupBy(p => p.WorkspaceDataPermissionWorkspaceID)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(p => p.WorkspaceDataPermissionPermissionName).ToHashSet(StringComparer.OrdinalIgnoreCase));
-
-            // ---- Write ----
+            // Resolve and validate everything first, so nothing is written if any entry is invalid.
+            var applicationGrants = new List<ApplicationGrant>();
+            applicationGrants.AddRange(await ResolveWebsiteChannelGrantsAsync(channelInputs, cancellationToken));
+            applicationGrants.AddRange(await ResolveEmailChannelGrantsAsync(emailChannelInputs, cancellationToken));
+            applicationGrants.AddRange(ResolveGenericApplicationGrants(applicationInputs));
+            var workspaceGrants = await ResolveWorkspaceGrantsAsync(workspaceInputs, cancellationToken);
 
             using (var actionContext = new CMSActionContext(caller))
             {
                 actionContext.UseGlobalAdminContext = true;
 
-                foreach (var (applicationName, permissions) in channelGrants)
-                {
-                    if (!existingChannelPermissions.TryGetValue(applicationName, out var have))
-                        existingChannelPermissions[applicationName] = have = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-                    foreach (var permission in permissions.Where(p => !have.Contains(p)))
-                    {
-                        await _applicationPermissionInfoProvider.SetAsync(new ApplicationPermissionInfo
-                        {
-                            RoleID = role.RoleID,
-                            ApplicationName = applicationName,
-                            PermissionName = permission
-                        }, cancellationToken);
-
-                        have.Add(permission);
-                    }
-                }
-
-                foreach (var (applicationName, permissions) in emailChannelGrants)
-                {
-                    if (!existingEmailChannelPermissions.TryGetValue(applicationName, out var have))
-                        existingEmailChannelPermissions[applicationName] = have = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-                    foreach (var permission in permissions.Where(p => !have.Contains(p)))
-                    {
-                        await _applicationPermissionInfoProvider.SetAsync(new ApplicationPermissionInfo
-                        {
-                            RoleID = role.RoleID,
-                            ApplicationName = applicationName,
-                            PermissionName = permission
-                        }, cancellationToken);
-
-                        have.Add(permission);
-                    }
-                }
-
-                foreach (var (applicationName, permissions) in genericApplicationGrants)
-                {
-                    if (!existingChannelPermissions.TryGetValue(applicationName, out var have))
-                        existingChannelPermissions[applicationName] = have = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-                    foreach (var permission in permissions.Where(p => !have.Contains(p)))
-                    {
-                        await _applicationPermissionInfoProvider.SetAsync(new ApplicationPermissionInfo
-                        {
-                            RoleID = role.RoleID,
-                            ApplicationName = applicationName,
-                            PermissionName = permission
-                        }, cancellationToken);
-
-                        have.Add(permission);
-                    }
-                }
-
-                foreach (var (workspaceId, permissions) in workspaceGrants)
-                {
-                    if (!existingWorkspacePermissions.TryGetValue(workspaceId, out var have))
-                        existingWorkspacePermissions[workspaceId] = have = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-                    foreach (var permission in permissions.Where(p => !have.Contains(p)))
-                    {
-                        await _workspaceDataPermissionInfoProvider.SetAsync(new WorkspaceDataPermissionInfo
-                        {
-                            WorkspaceDataPermissionWorkspaceID = workspaceId,
-                            WorkspaceDataPermissionRoleID = role.RoleID,
-                            WorkspaceDataPermissionApplicationName = ContentHubApplicationName,
-                            WorkspaceDataPermissionPermissionName = permission
-                        }, cancellationToken);
-
-                        have.Add(permission);
-                    }
-                }
+                await WriteApplicationGrantsAsync(role, applicationGrants, cancellationToken);
+                await WriteWorkspaceGrantsAsync(role, workspaceGrants, cancellationToken);
             }
 
             var context = await BuildContextAsync(cancellationToken);
             return ToRoleOutput(role, context);
         }
-        catch (InvalidOperationException ex)
-        {
-            throw new InvalidOperationException(ex.Message);
-        }
         catch (Exception ex) when (!IsExpected(ex))
         {
             _eventLogService.LogException(ServiceName, nameof(AssignRolePermissionsAsync), ex, ex.Message);
             throw new RolePersistenceException($"Failed to assign permissions to role '{input?.RoleName}'.", ex);
+        }
+    }
+
+    // ---------- Resolve / validate ----------
+
+    private async Task<ChannelInfo> GetChannelByNameAsync(string channelName, CancellationToken cancellationToken) =>
+        (await _channelInfoProvider.Get()
+            .WhereEquals(nameof(ChannelInfo.ChannelName), channelName.Trim())
+            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
+            .FirstOrDefault()
+            ?? throw new ChannelNotFoundException(channelName);
+
+    private async Task<List<ApplicationGrant>> ResolveWebsiteChannelGrantsAsync(
+        IReadOnlyList<ChannelPermissionInput> inputs, CancellationToken cancellationToken)
+    {
+        var grants = new List<ApplicationGrant>();
+
+        for (var i = 0; i < inputs.Count; i++)
+        {
+            var entry = inputs[i];
+
+            if (string.IsNullOrWhiteSpace(entry.WebsiteChannel))
+                throw new InvalidOperationException($"websiteChannels[{i}].websiteChannel is required.");
+
+            var permissions = NormalizePermissions(entry.Permissions, AllowedPermissions, DefaultPermissions);
+            var channel = await GetChannelByNameAsync(entry.WebsiteChannel, cancellationToken);
+
+            var websiteChannel = (await _websiteChannelInfoProvider.Get()
+                .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelChannelID), channel.ChannelID)
+                .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
+                .FirstOrDefault()
+                ?? throw new ChannelNotFoundException(entry.WebsiteChannel);
+
+            grants.Add(new ApplicationGrant(ChannelApplicationName(websiteChannel.WebsiteChannelGUID), permissions));
+        }
+
+        return grants;
+    }
+
+    private async Task<List<ApplicationGrant>> ResolveEmailChannelGrantsAsync(
+        IReadOnlyList<EmailChannelPermissionInput> inputs, CancellationToken cancellationToken)
+    {
+        var grants = new List<ApplicationGrant>();
+
+        for (var i = 0; i < inputs.Count; i++)
+        {
+            var entry = inputs[i];
+
+            if (string.IsNullOrWhiteSpace(entry.EmailChannel))
+                throw new InvalidOperationException($"emailChannels[{i}].emailChannel is required.");
+
+            var permissions = NormalizePermissions(entry.Permissions, AllowedEmailChannelPermissions, DefaultPermissions);
+            var channel = await GetChannelByNameAsync(entry.EmailChannel, cancellationToken);
+
+            var emailChannel = (await _emailChannelInfoProvider.Get()
+                .WhereEquals(nameof(EmailChannelInfo.EmailChannelChannelID), channel.ChannelID)
+                .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
+                .FirstOrDefault()
+                ?? throw new ChannelNotFoundException(entry.EmailChannel);
+
+            grants.Add(new ApplicationGrant(EmailChannelApplicationName(emailChannel.EmailChannelGUID), permissions));
+        }
+
+        return grants;
+    }
+
+    private static bool IsChannelApplicationName(string applicationName) =>
+        applicationName.StartsWith(ChannelApplicationPrefix, StringComparison.OrdinalIgnoreCase)
+        || applicationName.StartsWith(EmailChannelApplicationPrefix, StringComparison.OrdinalIgnoreCase);
+
+    private static List<ApplicationGrant> ResolveGenericApplicationGrants(IReadOnlyList<ApplicationPermissionInput> inputs)
+    {
+        var grants = new List<ApplicationGrant>();
+
+        for (var i = 0; i < inputs.Count; i++)
+        {
+            var entry = inputs[i];
+
+            if (string.IsNullOrWhiteSpace(entry.ApplicationName))
+                throw new InvalidOperationException($"applications[{i}].applicationName is required.");
+
+            if (IsChannelApplicationName(entry.ApplicationName))
+                throw new InvalidOperationException(
+                    $"applications[{i}].applicationName looks like a channel application. Use 'websiteChannels' or 'emailChannels' instead.");
+
+            // Permission names vary per application, so they aren't validated against a fixed list.
+            // "View" is required by the admin UI for any application to be accessible, so it's always included.
+            var permissions = (entry.Permissions ?? Array.Empty<string>())
+                .Where(p => !string.IsNullOrWhiteSpace(p))
+                .Select(p => p.Trim())
+                .Append("View")
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            grants.Add(new ApplicationGrant(entry.ApplicationName.Trim(), permissions));
+        }
+
+        return grants;
+    }
+
+    private async Task<List<WorkspaceGrant>> ResolveWorkspaceGrantsAsync(
+        IReadOnlyList<WorkspacePermissionInput> inputs, CancellationToken cancellationToken)
+    {
+        var grants = new List<WorkspaceGrant>();
+
+        if (inputs.Count == 0)
+            return grants;
+
+        var allWorkspaces = (await _workspaceInfoProvider.Get()
+            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
+            .ToArray();
+
+        for (var i = 0; i < inputs.Count; i++)
+        {
+            var entry = inputs[i];
+
+            if (string.IsNullOrWhiteSpace(entry.Workspace))
+                throw new InvalidOperationException($"workspaces[{i}].workspace is required.");
+
+            var permissions = NormalizePermissions(entry.Permissions, AllowedWorkspacePermissions, DefaultPermissions);
+            var workspace = FindWorkspace(allWorkspaces, entry.Workspace);
+
+            grants.Add(new WorkspaceGrant(workspace.WorkspaceID, permissions));
+        }
+
+        return grants;
+    }
+
+    private static WorkspaceInfo FindWorkspace(WorkspaceInfo[] allWorkspaces, string workspaceKey)
+    {
+        var key = workspaceKey.Trim();
+
+        var matches = allWorkspaces
+            .Where(w => string.Equals(w.WorkspaceName, key, StringComparison.OrdinalIgnoreCase)
+                     || string.Equals(w.WorkspaceDisplayName, key, StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+
+        if (matches.Length == 0)
+            throw new InvalidOperationException($"Cannot find workspace '{workspaceKey}'.");
+
+        if (matches.Length == 1)
+            return matches[0];
+
+        return matches.SingleOrDefault(w => string.Equals(w.WorkspaceName, key, StringComparison.OrdinalIgnoreCase))
+            ?? throw new InvalidOperationException($"Workspace '{workspaceKey}' is ambiguous. Use the workspace name instead.");
+    }
+
+    // ---------- Write (idempotent) ----------
+
+    private async Task WriteApplicationGrantsAsync(
+        RoleInfo role, IEnumerable<ApplicationGrant> grants, CancellationToken cancellationToken)
+    {
+        var existing = (await _applicationPermissionInfoProvider.Get()
+            .WhereEquals(nameof(ApplicationPermissionInfo.RoleID), role.RoleID)
+            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
+            .GroupBy(p => p.ApplicationName, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(p => p.PermissionName).ToHashSet(StringComparer.OrdinalIgnoreCase),
+                StringComparer.OrdinalIgnoreCase);
+
+        foreach (var (applicationName, permissions) in grants)
+        {
+            if (!existing.TryGetValue(applicationName, out var have))
+                existing[applicationName] = have = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            // ToArray(): the lazy filter must not be enumerated while have.Add mutates the set.
+            foreach (var permission in permissions.Where(p => !have.Contains(p)).ToArray())
+            {
+                await _applicationPermissionInfoProvider.SetAsync(new ApplicationPermissionInfo
+                {
+                    RoleID = role.RoleID,
+                    ApplicationName = applicationName,
+                    PermissionName = permission
+                }, cancellationToken);
+
+                have.Add(permission);
+            }
+        }
+    }
+
+    private async Task WriteWorkspaceGrantsAsync(
+        RoleInfo role, IEnumerable<WorkspaceGrant> grants, CancellationToken cancellationToken)
+    {
+        var existing = (await _workspaceDataPermissionInfoProvider.Get()
+            .WhereEquals(nameof(WorkspaceDataPermissionInfo.WorkspaceDataPermissionRoleID), role.RoleID)
+            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
+            .Where(p => string.Equals(p.WorkspaceDataPermissionApplicationName, ContentHubApplicationName, StringComparison.OrdinalIgnoreCase))
+            .GroupBy(p => p.WorkspaceDataPermissionWorkspaceID)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(p => p.WorkspaceDataPermissionPermissionName).ToHashSet(StringComparer.OrdinalIgnoreCase));
+
+        foreach (var (workspaceId, permissions) in grants)
+        {
+            if (!existing.TryGetValue(workspaceId, out var have))
+                existing[workspaceId] = have = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var permission in permissions.Where(p => !have.Contains(p)).ToArray())
+            {
+                await _workspaceDataPermissionInfoProvider.SetAsync(new WorkspaceDataPermissionInfo
+                {
+                    WorkspaceDataPermissionWorkspaceID = workspaceId,
+                    WorkspaceDataPermissionRoleID = role.RoleID,
+                    WorkspaceDataPermissionApplicationName = ContentHubApplicationName,
+                    WorkspaceDataPermissionPermissionName = permission
+                }, cancellationToken);
+
+                have.Add(permission);
+            }
         }
     }
 
@@ -695,7 +701,7 @@ public class RoleCrudService : IRoleCrudService
                     RoleDisplayName = roleName,
                     RoleDescription = $"Auto-created {roleType} role for the '{channel.ChannelName}' website channel."
                 };
-                _roleInfoProvider.Set(role);
+                await _roleInfoProvider.SetAsync(role, cancellationToken);
             }
 
             var applicationName = ChannelApplicationName(websiteChannel.WebsiteChannelGUID);

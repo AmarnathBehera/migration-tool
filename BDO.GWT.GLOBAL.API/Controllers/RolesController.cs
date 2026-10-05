@@ -1,8 +1,7 @@
-﻿using BDO.GWT.Domain.Core.Enums;
-using BDO.GWT.GLOBAL.API.Attributes;
-using BDO.GWT.GLOBAL.API.Bases;
+﻿using BDO.GWT.GLOBAL.API.Bases;
 using BDO.GWT.GLOBAL.API.Data;
 using BDO.GWT.GLOBAL.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Mime;
@@ -12,7 +11,9 @@ namespace BDO.GWT.GLOBAL.API.Controllers;
 /// <summary>
 /// Provides methods to read and manage CMS user roles.
 /// </summary>
-[AuthorizeUserPrivilegeLevel(UserPrivilegeLevel.GlobalAdministrator)]
+[Authorize]
+[ApiController]
+[Route("Roles")]
 public class RolesController : EntityControllerBase
 {
     private readonly IRoleCrudService _roleCrudService;
@@ -25,7 +26,7 @@ public class RolesController : EntityControllerBase
     }
 
     /// <summary>Returns all roles, optionally filtered by role name.</summary>
-    [HttpGet("Roles")]
+    [HttpGet]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(IEnumerable<RoleOutput>), MediaTypeNames.Application.Json)]
     [SwaggerResponse(StatusCodes.Status401Unauthorized)]
     [SwaggerResponse(StatusCodes.Status500InternalServerError)]
@@ -43,7 +44,7 @@ public class RolesController : EntityControllerBase
     }
 
     /// <summary>Returns a single role having the specified GUID.</summary>
-    [HttpGet("Roles/{roleGuid:guid}")]
+    [HttpGet("{roleGuid:guid}")]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(RoleOutput), MediaTypeNames.Application.Json)]
     [SwaggerResponse(StatusCodes.Status401Unauthorized)]
     [SwaggerResponse(StatusCodes.Status404NotFound)]
@@ -65,7 +66,7 @@ public class RolesController : EntityControllerBase
     }
 
     /// <summary>Creates a new role. Role name must be unique.</summary>
-    [HttpPost("Roles")]
+    [HttpPost]
     [SwaggerResponse(StatusCodes.Status201Created, null, typeof(RoleOutput), MediaTypeNames.Application.Json)]
     [SwaggerResponse(StatusCodes.Status400BadRequest)]
     [SwaggerResponse(StatusCodes.Status401Unauthorized)]
@@ -88,7 +89,7 @@ public class RolesController : EntityControllerBase
     }
 
     /// <summary>Updates a single role having the specified GUID.</summary>
-    [HttpPut("Roles/{roleGuid:guid}")]
+    [HttpPut("{roleGuid:guid}")]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(RoleOutput), MediaTypeNames.Application.Json)]
     [SwaggerResponse(StatusCodes.Status400BadRequest)]
     [SwaggerResponse(StatusCodes.Status401Unauthorized)]
@@ -111,7 +112,7 @@ public class RolesController : EntityControllerBase
     }
 
     /// <summary>Deletes a single role having the specified GUID.</summary>
-    [HttpDelete("Roles/{roleGuid:guid}")]
+    [HttpDelete("{roleGuid:guid}")]
     [SwaggerResponse(StatusCodes.Status204NoContent, null, typeof(void))]
     [SwaggerResponse(StatusCodes.Status400BadRequest)]
     [SwaggerResponse(StatusCodes.Status401Unauthorized)]
@@ -135,7 +136,7 @@ public class RolesController : EntityControllerBase
     /// (websiteChannels), email channel permission sets (emailChannels), Content hub workspace
     /// permission sets (workspaces) and/or other applications (applications).
     /// </summary>
-    [HttpPost("Roles/Assign")]
+    [HttpPost("Assign")]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(RoleOutput), MediaTypeNames.Application.Json)]
     [SwaggerResponse(StatusCodes.Status400BadRequest)]
     [SwaggerResponse(StatusCodes.Status401Unauthorized)]
@@ -161,7 +162,7 @@ public class RolesController : EntityControllerBase
     /// Creates "{WebsiteChannel}-{RoleType}" for one channel, granted the standard permission set for
     /// that role type. Returns 404 if the channel doesn't exist and 409 if the role already exists.
     /// </summary>
-    [HttpPost("Roles/CreateForChannel")]
+    [HttpPost("CreateForChannel")]
     [SwaggerResponse(StatusCodes.Status201Created, null, typeof(RoleOutput), MediaTypeNames.Application.Json)]
     [SwaggerResponse(StatusCodes.Status400BadRequest)]
     [SwaggerResponse(StatusCodes.Status401Unauthorized)]
@@ -169,13 +170,13 @@ public class RolesController : EntityControllerBase
     [SwaggerResponse(StatusCodes.Status409Conflict)]
     [SwaggerResponse(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<RoleOutput>> CreateForChannel(
-        [FromQuery] ChannelcodeNameDropdown channelcodeName,
-        [FromQuery] RolesAllowedDropdown rolesallowed,
-        CancellationToken cancellationToken)
+    [FromQuery] string channelcodeName,
+    [FromQuery] RolesAllowedDropdown rolesallowed,
+    CancellationToken cancellationToken)
     {
         try
         {
-            if (channelcodeName is null || string.IsNullOrWhiteSpace(channelcodeName.Value))
+            if (string.IsNullOrWhiteSpace(channelcodeName))
                 return BadRequestProblem("channelcodeName is required.");
 
             if (!Enum.IsDefined(rolesallowed))
@@ -183,12 +184,11 @@ public class RolesController : EntityControllerBase
 
             var input = new CreateChannelRoleInput
             {
-                WebsiteChannel = channelcodeName.Value,
+                WebsiteChannel = channelcodeName,
                 RoleType = rolesallowed
             };
 
             var role = await _roleCrudService.CreateChannelRoleAsync(input, cancellationToken);
-
             return StatusCode(StatusCodes.Status201Created, role);
         }
         catch (Exception ex)
@@ -201,7 +201,7 @@ public class RolesController : EntityControllerBase
     /// Creates "{Channel}-Editor" and "{Channel}-Administrator" (if they don't already exist) for every
     /// website channel, each granted the standard permission set for that role type on its own channel.
     /// </summary>
-    [HttpPost("Roles/CreateForAllChannels")]
+    [HttpPost("CreateForAllChannels")]
     [SwaggerResponse(StatusCodes.Status201Created, null, typeof(IEnumerable<RoleOutput>), MediaTypeNames.Application.Json)]
     [SwaggerResponse(StatusCodes.Status401Unauthorized)]
     [SwaggerResponse(StatusCodes.Status500InternalServerError)]
