@@ -84,7 +84,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync((StatusCode?)null);
 
-            var result = await _controller.Index(404, CancellationToken.None);
+            var result = await _controller.ReExecute(404, CancellationToken.None);
 
             var statusResult = result as StatusCodeResult;
             Assert.That(statusResult, Is.Not.Null);
@@ -106,7 +106,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(statusPage);
 
-            var result = await _controller.Index(500, CancellationToken.None);
+            var result = await _controller.ReExecute(500, CancellationToken.None);
 
             var viewResult = result as ViewResult;
             Assert.That(viewResult, Is.Not.Null);
@@ -137,7 +137,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync((StatusCode?)null);
 
-            await _controller.Index(500, CancellationToken.None);
+            await _controller.ReExecute(500, CancellationToken.None);
 
             _eventLogServiceMock.Verify(
                 x => x.LogEvent(It.Is<EventLogData>(d =>
@@ -160,7 +160,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync((StatusCode?)null);
 
-            await _controller.Index(404, CancellationToken.None);
+            await _controller.ReExecute(404, CancellationToken.None);
 
             _eventLogServiceMock.Verify(
                 x => x.LogEvent(It.IsAny<EventLogData>()),
@@ -239,13 +239,88 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                 .Setup(x => x.Initialize(It.IsAny<RoutedWebPage>()))
                 .Callback<RoutedWebPage>(p => captured = p);
 
-            await _controller.Index(500, CancellationToken.None);
+            await _controller.ReExecute(500, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
                 Assert.That(captured, Is.Not.Null);
                 Assert.That(captured!.LanguageName, Is.EqualTo("fr-fr"));
                 Assert.That(captured.WebsiteChannelName, Is.EqualTo("TestChannel"));
+            });
+        }
+
+        [Test]
+        public async Task CmsIndex_ReturnsNotFound_WhenCurrentStatusCodePageIsNull()
+        {
+            _errorServiceMock
+                .Setup(x => x.GetCurrentStatusCodePageAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync((StatusCode?)null);
+
+            var result = await _controller.Index(CancellationToken.None);
+
+            Assert.That(result, Is.TypeOf<NotFoundResult>());
+        }
+
+        [TestCase(404)]
+        [TestCase(500)]
+        public async Task CmsIndex_ReturnsViewAndSetsResponseStatus_WhenPageHasErrorStatusCode(int httpStatusCode)
+        {
+            var statusPage = CreateStatusCodePage();
+            statusPage.HttpStatusCode = httpStatusCode;
+
+            _errorServiceMock
+                .Setup(x => x.GetCurrentStatusCodePageAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(statusPage);
+
+            var result = await _controller.Index(CancellationToken.None);
+
+            var viewResult = result as ViewResult;
+            Assert.Multiple(() =>
+            {
+                Assert.That(viewResult, Is.Not.Null);
+                Assert.That(viewResult!.ViewName, Is.EqualTo(nameof(ErrorController.Index)));
+                Assert.That(viewResult.Model, Is.SameAs(statusPage));
+                Assert.That(_httpContext.Response.StatusCode, Is.EqualTo(httpStatusCode));
+            });
+        }
+
+        [TestCase(0)]
+        [TestCase(200)]
+        [TestCase(600)]
+        public async Task CmsIndex_KeepsDefaultResponseStatus_WhenPageStatusCodeIsOutsideErrorRange(int httpStatusCode)
+        {
+            var statusPage = CreateStatusCodePage();
+            statusPage.HttpStatusCode = httpStatusCode;
+
+            _errorServiceMock
+                .Setup(x => x.GetCurrentStatusCodePageAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(statusPage);
+
+            var result = await _controller.Index(CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.TypeOf<ViewResult>());
+                Assert.That(_httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+            });
+        }
+
+        [Test]
+        public void Routing_OnlyReExecuteHasAttributeRoute_SoCmsIndexStaysConventionallyRouted()
+        {
+            var controllerRoute = typeof(ErrorController).GetCustomAttributes(typeof(RouteAttribute), inherit: true);
+            var indexRoute = typeof(ErrorController).GetMethod(nameof(ErrorController.Index))!
+                .GetCustomAttributes(typeof(RouteAttribute), inherit: true);
+            var reExecuteRoute = (RouteAttribute?)Attribute.GetCustomAttribute(
+                typeof(ErrorController).GetMethod(nameof(ErrorController.ReExecute))!,
+                typeof(RouteAttribute));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(controllerRoute, Is.Empty);
+                Assert.That(indexRoute, Is.Empty);
+                Assert.That(reExecuteRoute, Is.Not.Null);
+                Assert.That(reExecuteRoute!.Template, Is.EqualTo("Error/{code:int}"));
             });
         }
 
@@ -263,7 +338,7 @@ namespace BDO.GWT.GLOBAL.Tests.Controllers
                     (_, lang, _, _) => capturedLanguage = lang)
                 .ReturnsAsync((StatusCode?)null);
 
-            await _controller.Index(code, CancellationToken.None);
+            await _controller.ReExecute(code, CancellationToken.None);
 
             return capturedLanguage;
         }

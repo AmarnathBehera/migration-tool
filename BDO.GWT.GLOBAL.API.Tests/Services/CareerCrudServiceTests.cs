@@ -645,6 +645,546 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services
         }
 
         #endregion
+
+        #region Additional coverage
+
+        private void SetupChannel(string? name = "TestChannel") =>
+            _channelInfoServiceMock
+                .Setup(x => x.GetChannelNameAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(name!);
+
+        private void SetupParentPages(IEnumerable<Careers> pages) =>
+            _contentRetrieverMock
+                .Setup(x => x.GetPagesAsync<Careers>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(pages);
+
+        private void SetupCareerPagesSequence(params IEnumerable<Career>[] results)
+        {
+            var sequence = _contentRetrieverMock
+                .SetupSequence(x => x.GetPagesAsync<Career>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()));
+
+            foreach (var result in results)
+            {
+                sequence = sequence.ReturnsAsync(result);
+            }
+        }
+
+        private void SetupValidCreatePrerequisites()
+        {
+            SetupValidCulture();
+            SetupChannel();
+            SetupParentPages(new[] { new Careers() });
+        }
+
+        private void SetupSuccessfulVariantCreation(int pageId)
+        {
+            _webPageManagerMock
+                .Setup(x => x.TryCreateLanguageVariant(It.IsAny<CMS.Websites.CreateLanguageVariantParameters>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+            _webPageManagerMock
+                .Setup(x => x.TryUpdateDraft(pageId, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+        }
+
+        private static string InvokePrivateStatic(string methodName, string? argument)
+        {
+            var method = typeof(CareerCrudService).GetMethod(
+                methodName,
+                System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+
+            Assert.That(method, Is.Not.Null, $"Method '{methodName}' not found.");
+            return (string)method!.Invoke(null, new object?[] { argument })!;
+        }
+
+        [TestCase("My Career Page", "my-career-page")]
+        [TestCase("  Senior  Dev (C#) ", "senior-dev-c")]
+        [TestCase("---Hello---World---", "hello-world")]
+        [TestCase("ABC123", "abc123")]
+        [TestCase("", "")]
+        [TestCase("   ", "")]
+        public void GenerateUrlSlug_ReturnsExpectedSlug(string input, string expected)
+        {
+            Assert.That(InvokePrivateStatic("GenerateUrlSlug", input), Is.EqualTo(expected));
+        }
+
+        [TestCase("/careers/my-job", "my-job")]
+        [TestCase("/careers/my-job/", "my-job")]
+        [TestCase("my-job", "my-job")]
+        [TestCase("/", "")]
+        [TestCase("", "")]
+        [TestCase(null, "")]
+        public void GetLastUrlPathSegment_ReturnsExpectedSegment(string? input, string expected)
+        {
+            Assert.That(InvokePrivateStatic("GetLastUrlPathSegment", input), Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void CreateCareerPageAsync_ParentPagesNull_ThrowsUnprocessableEntityException()
+        {
+            SetupValidCulture();
+            SetupChannel();
+            SetupParentPages(null!);
+
+            var service = CreateService();
+
+            Assert.ThrowsAsync<UnprocessableEntityException>(() =>
+                service.CreateCareerPageAsync(1, 5, "en", new CareerPageContent(), CancellationToken.None));
+            _validationStateMock.Verify(
+                x => x.AddUnprocessableEntityError("nodeParentID", It.IsAny<string>()),
+                Times.Once);
+        }
+
+        [Test]
+        public void CreateCareerPageAsync_SlugCollision_ThrowsUnprocessableEntityException()
+        {
+            SetupValidCreatePrerequisites();
+            var sibling = new Career { SystemFields = new WebPageFields { WebPageUrlPath = "/careers/Senior-Developer" } };
+            SetupGetCareerPages(new[] { sibling });
+
+            var service = CreateService();
+
+            Assert.ThrowsAsync<UnprocessableEntityException>(() =>
+                service.CreateCareerPageAsync(1, 5, "en", new CareerPageContent { MetadataTitle = "Senior Developer" }, CancellationToken.None));
+            _validationStateMock.Verify(
+                x => x.AddUnprocessableEntityError(nameof(CareerPageContent.MetadataTitle), It.IsAny<string>()),
+                Times.Once);
+            _webPageManagerMock.Verify(
+                x => x.Create(It.IsAny<CreateWebPageParameters>(), It.IsAny<CancellationToken>()),
+                Times.Never);
+        }
+
+        [Test]
+        public void CreateCareerPageAsync_UpdateDraftFails_ThrowsNotFoundException()
+        {
+            SetupValidCreatePrerequisites();
+            SetupGetCareerPages(Enumerable.Empty<Career>());
+            _webPageManagerMock
+                .Setup(x => x.Create(It.IsAny<CreateWebPageParameters>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(99);
+            _webPageManagerMock
+                .Setup(x => x.TryUpdateDraft(99, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(false);
+
+            var service = CreateService();
+
+            var ex = Assert.ThrowsAsync<NotFoundException>(() =>
+                service.CreateCareerPageAsync(1, 5, "en", new CareerPageContent { MetadataTitle = "Job" }, CancellationToken.None));
+            Assert.That(ex!.Message, Is.EqualTo("Failed to update page draft"));
+        }
+
+        [Test]
+        public void CreateCareerPageAsync_PublishFails_ThrowsNotFoundException()
+        {
+            SetupValidCreatePrerequisites();
+            SetupGetCareerPages(Enumerable.Empty<Career>());
+            _webPageManagerMock
+                .Setup(x => x.Create(It.IsAny<CreateWebPageParameters>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(99);
+            _webPageManagerMock
+                .Setup(x => x.TryUpdateDraft(99, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+            _webPageManagerMock
+                .Setup(x => x.TryPublish(99, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(false);
+
+            var service = CreateService();
+
+            var ex = Assert.ThrowsAsync<NotFoundException>(() =>
+                service.CreateCareerPageAsync(1, 5, "en", new CareerPageContent { MetadataTitle = "Job" }, CancellationToken.None));
+            Assert.That(ex!.Message, Is.EqualTo("Failed to publish updated page"));
+        }
+
+        [Test]
+        public async Task CreateCareerPageAsync_CreatedPageNotRetrieved_ReturnsBadRequest()
+        {
+            SetupValidCreatePrerequisites();
+            SetupGetCareerPages(Enumerable.Empty<Career>());
+            _webPageManagerMock
+                .Setup(x => x.Create(It.IsAny<CreateWebPageParameters>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(99);
+            _webPageManagerMock
+                .Setup(x => x.TryUpdateDraft(99, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+            _webPageManagerMock
+                .Setup(x => x.TryPublish(99, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
+            var service = CreateService();
+
+            var result = await service.CreateCareerPageAsync(1, 5, "en", new CareerPageContent { MetadataTitle = "Job" }, CancellationToken.None);
+
+            Assert.That(result.Result, Is.TypeOf<BadRequestResult>());
+            _webPageManagerMock.Verify(
+                x => x.Create(It.Is<CreateWebPageParameters>(p => p.ParentWebPageItemID == 5), It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
+        [Test]
+        public void CreateCareerPageCultureVersionAsync_CreateVariantFails_ThrowsNotFoundException()
+        {
+            SetupValidCulture();
+            SetupChannel();
+            SetupGetCareerPages(new[] { new Career { SystemFields = new WebPageFields { WebPageItemID = 3 } } });
+            _webPageManagerMock
+                .Setup(x => x.TryCreateLanguageVariant(It.IsAny<CMS.Websites.CreateLanguageVariantParameters>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(false);
+
+            var service = CreateService();
+
+            var ex = Assert.ThrowsAsync<NotFoundException>(() =>
+                service.CreateCareerPageCultureVersionAsync(1, Guid.NewGuid(), "en", "fr", new CareerPageContent(), CancellationToken.None));
+            Assert.That(ex!.Message, Is.EqualTo("Failed to create language variant"));
+        }
+
+        [Test]
+        public void CreateCareerPageCultureVersionAsync_ZeroWebPageItemId_ThrowsNotFoundException()
+        {
+            SetupValidCulture();
+            SetupChannel();
+            SetupGetCareerPages(new[] { new Career { SystemFields = new WebPageFields { WebPageItemID = 0 } } });
+            _webPageManagerMock
+                .Setup(x => x.TryCreateLanguageVariant(It.IsAny<CMS.Websites.CreateLanguageVariantParameters>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
+            var service = CreateService();
+
+            var ex = Assert.ThrowsAsync<NotFoundException>(() =>
+                service.CreateCareerPageCultureVersionAsync(1, Guid.NewGuid(), "en", "fr", new CareerPageContent(), CancellationToken.None));
+            Assert.That(ex!.Message, Is.EqualTo("Existing page does not have a valid WebPageItemID"));
+        }
+
+        [Test]
+        public void CreateCareerPageCultureVersionAsync_UpdateDraftFails_ThrowsNotFoundException()
+        {
+            SetupValidCulture();
+            SetupChannel();
+            SetupGetCareerPages(new[] { new Career { SystemFields = new WebPageFields { WebPageItemID = 3 } } });
+            _webPageManagerMock
+                .Setup(x => x.TryCreateLanguageVariant(It.IsAny<CMS.Websites.CreateLanguageVariantParameters>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+            _webPageManagerMock
+                .Setup(x => x.TryUpdateDraft(3, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(false);
+
+            var service = CreateService();
+
+            var ex = Assert.ThrowsAsync<NotFoundException>(() =>
+                service.CreateCareerPageCultureVersionAsync(1, Guid.NewGuid(), "en", "fr", new CareerPageContent(), CancellationToken.None));
+            Assert.That(ex!.Message, Is.EqualTo("Failed to update page draft"));
+        }
+
+        [Test]
+        public void CreateCareerPageCultureVersionAsync_PublishFails_ThrowsNotFoundException()
+        {
+            SetupValidCulture();
+            SetupChannel();
+            SetupGetCareerPages(new[] { new Career { SystemFields = new WebPageFields { WebPageItemID = 3 } } });
+            SetupSuccessfulVariantCreation(3);
+            _webPageManagerMock
+                .Setup(x => x.TryPublish(3, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(false);
+
+            var service = CreateService();
+
+            var ex = Assert.ThrowsAsync<NotFoundException>(() =>
+                service.CreateCareerPageCultureVersionAsync(1, Guid.NewGuid(), "en", "fr", new CareerPageContent(), CancellationToken.None));
+            Assert.That(ex!.Message, Is.EqualTo("Failed to publish updated page"));
+        }
+
+        [Test]
+        public async Task CreateCareerPageCultureVersionAsync_VariantNotRetrieved_ReturnsBadRequest()
+        {
+            SetupValidCulture();
+            SetupChannel();
+            SetupCareerPagesSequence(
+                new[] { new Career { SystemFields = new WebPageFields { WebPageItemID = 3 } } },
+                Enumerable.Empty<Career>());
+            SetupSuccessfulVariantCreation(3);
+            _webPageManagerMock
+                .Setup(x => x.TryPublish(3, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
+            var service = CreateService();
+
+            var result = await service.CreateCareerPageCultureVersionAsync(1, Guid.NewGuid(), "en", "fr", new CareerPageContent(), CancellationToken.None);
+
+            Assert.That(result.Result, Is.TypeOf<BadRequestResult>());
+        }
+
+        [Test]
+        public async Task UpdateCareerPageAsync_SystemFieldsNull_ReturnsNotFoundObjectResult()
+        {
+            SetupValidCulture();
+            SetupChannel();
+            SetupGetCareerPages(new[] { new Career { SystemFields = null! } });
+
+            var service = CreateService();
+
+            var result = await service.UpdateCareerPageAsync(1, Guid.NewGuid(), "en", new CareerPageContent(), CancellationToken.None);
+
+            var notFound = result.Result as NotFoundObjectResult;
+            Assert.That(notFound, Is.Not.Null);
+            Assert.That(notFound!.Value, Is.EqualTo("Page system fields are missing"));
+        }
+
+        [Test]
+        public async Task UpdateCareerPageAsync_ChannelNotFound_ReturnsNotFoundObjectResult()
+        {
+            SetupValidCulture();
+            SetupChannel(string.Empty);
+
+            var service = CreateService();
+
+            var result = await service.UpdateCareerPageAsync(1, Guid.NewGuid(), "en", new CareerPageContent(), CancellationToken.None);
+
+            var notFound = result.Result as NotFoundObjectResult;
+            Assert.That(notFound, Is.Not.Null);
+            Assert.That(notFound!.Value, Is.EqualTo("Channel not found"));
+        }
+
+        [Test]
+        public async Task UpdateCareerPageAsync_UpdateDraftFails_ReturnsNotFoundObjectResult()
+        {
+            SetupValidCulture();
+            SetupChannel();
+            SetupGetCareerPages(new[] { new Career { SystemFields = new WebPageFields { WebPageItemID = 8 } } });
+            _webPageManagerMock
+                .Setup(x => x.TryUpdateDraft(8, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(false);
+
+            var service = CreateService();
+
+            var result = await service.UpdateCareerPageAsync(1, Guid.NewGuid(), "en", new CareerPageContent(), CancellationToken.None);
+
+            var notFound = result.Result as NotFoundObjectResult;
+            Assert.That(notFound, Is.Not.Null);
+            Assert.That(notFound!.Value, Is.EqualTo("Failed to update page draft"));
+            _webPageManagerMock.Verify(
+                x => x.TryCreateDraft(8, It.IsAny<string>(), It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
+        [Test]
+        public async Task UpdateCareerPageAsync_PublishFails_ReturnsNotFoundObjectResult()
+        {
+            SetupValidCulture();
+            SetupChannel();
+            SetupGetCareerPages(new[] { new Career { SystemFields = new WebPageFields { WebPageItemID = 8 } } });
+            _webPageManagerMock
+                .Setup(x => x.TryUpdateDraft(8, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+            _webPageManagerMock
+                .Setup(x => x.TryPublish(8, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(false);
+
+            var service = CreateService();
+
+            var result = await service.UpdateCareerPageAsync(1, Guid.NewGuid(), "en", new CareerPageContent(), CancellationToken.None);
+
+            var notFound = result.Result as NotFoundObjectResult;
+            Assert.That(notFound, Is.Not.Null);
+            Assert.That(notFound!.Value, Is.EqualTo("Failed to publish updated page"));
+        }
+
+        [Test]
+        public async Task UpdateCareerPageAsync_UpdatedPageNotRetrieved_ReturnsBadRequest()
+        {
+            SetupValidCulture();
+            SetupChannel();
+            SetupCareerPagesSequence(
+                new[] { new Career { SystemFields = new WebPageFields { WebPageItemID = 8 } } },
+                Enumerable.Empty<Career>());
+            _webPageManagerMock
+                .Setup(x => x.TryUpdateDraft(8, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+            _webPageManagerMock
+                .Setup(x => x.TryPublish(8, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
+            var service = CreateService();
+
+            var result = await service.UpdateCareerPageAsync(1, Guid.NewGuid(), "en", new CareerPageContent(), CancellationToken.None);
+
+            Assert.That(result.Result, Is.TypeOf<BadRequestResult>());
+        }
+
+        [Test]
+        public void DeleteCareerPageAsync_SingleCulture_NullResult_ThrowsNotFoundException()
+        {
+            SetupValidCulture();
+            SetupChannel();
+            SetupGetCareerPages(null!);
+
+            var service = CreateService();
+
+            Assert.ThrowsAsync<NotFoundException>(() =>
+                service.DeleteCareerPageAsync(1, Guid.NewGuid(), null, false, CancellationToken.None));
+        }
+
+        [Test]
+        public async Task DeleteCareerPageAsync_SingleCulture_DeletesPermanentlyWithPageId()
+        {
+            SetupValidCulture();
+            SetupChannel();
+            SetupGetCareerPages(new[] { new Career { SystemFields = new WebPageFields { WebPageItemID = 42 } } });
+
+            var service = CreateService();
+
+            await service.DeleteCareerPageAsync(1, Guid.NewGuid(), "en", false, CancellationToken.None);
+
+            _webPageManagerMock.Verify(
+                x => x.Delete(It.Is<DeleteWebPageParameters>(p => p.WebPageItemID == 42 && p.Permanently), It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
+        [Test]
+        public async Task DeleteCareerPageAsync_AllCultures_NoCultures_DoesNotQueryOrDelete()
+        {
+            SetupValidCulture();
+            SetupChannel();
+            _cultureServiceMock
+                .Setup(x => x.GetSiteCulturesLanguageCodeAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<LanguageTag>());
+
+            var service = CreateService();
+
+            await service.DeleteCareerPageAsync(1, Guid.NewGuid(), "en", true, CancellationToken.None);
+
+            _contentRetrieverMock.Verify(
+                x => x.GetPagesAsync<Career>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()),
+                Times.Never);
+            _webPageManagerMock.Verify(
+                x => x.Delete(It.IsAny<DeleteWebPageParameters>(), It.IsAny<CancellationToken>()),
+                Times.Never);
+        }
+
+        [Test]
+        public void GetCareerPageAsync_NullResult_ThrowsNotFoundException()
+        {
+            SetupValidCulture();
+            SetupChannel();
+            SetupGetCareerPages(null!);
+
+            var service = CreateService();
+
+            Assert.ThrowsAsync<NotFoundException>(() =>
+                service.GetCareerPageAsync(1, Guid.NewGuid(), null, CancellationToken.None));
+        }
+
+        [Test]
+        public void GetCareerPagesAsync_NullResults_ThrowsNotFoundException()
+        {
+            SetupValidCulture();
+            SetupChannel();
+            SetupGetCareerPages(null!);
+
+            var service = CreateService();
+
+            Assert.ThrowsAsync<NotFoundException>(() =>
+                service.GetCareerPagesAsync(1, null, null, CancellationToken.None));
+        }
+
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(null, false)]
+        public void GetCareerPagesAsync_OnlyPublished_SetsPreviewFlag(bool? onlyPublished, bool expectedPreview)
+        {
+            SetupValidCulture();
+            SetupChannel();
+            RetrievePagesParameters? captured = null;
+            _contentRetrieverMock
+                .Setup(x => x.GetPagesAsync<Career>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .Callback<RetrievePagesParameters, Action<RetrievePagesQueryParameters>, RetrievalCacheSettings, CancellationToken>(
+                    (p, _, _, _) => captured = p)
+                .ReturnsAsync(Enumerable.Empty<Career>());
+
+            var service = CreateService();
+
+            Assert.ThrowsAsync<NotFoundException>(() =>
+                service.GetCareerPagesAsync(1, "en", onlyPublished, CancellationToken.None));
+            Assert.That(captured, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(captured!.IsForPreview, Is.EqualTo(expectedPreview));
+                Assert.That(captured.ChannelName, Is.EqualTo("TestChannel"));
+                Assert.That(captured.LinkedItemsMaxLevel, Is.EqualTo(5));
+            });
+        }
+
+        [Test]
+        public async Task GetCareerPageAsync_PageFound_MapsOutput()
+        {
+            var contentLanguageProvider = InitializeKenticoContainer();
+            var languageQuery = new Mock<CMS.DataEngine.ObjectQuery<ContentLanguageInfo>>();
+            languageQuery
+                .Setup(q => q.GetEnumerator())
+                .Returns(() => ((IEnumerable<ContentLanguageInfo>)Array.Empty<ContentLanguageInfo>()).GetEnumerator());
+            contentLanguageProvider.Reset();
+            contentLanguageProvider.Setup(p => p.Get()).Returns(languageQuery.Object);
+
+            SetupValidCulture();
+            SetupChannel();
+            var pageGuid = Guid.NewGuid();
+            var career = new Career
+            {
+                MetadataTitle = "Engineer",
+                MetadataDescription = "Desc",
+                HeroLayout = null!,
+                CareerReference = "REF-1",
+                IncludeInSitemap = true,
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 11,
+                    WebPageItemParentID = 2,
+                    WebPageItemGUID = pageGuid,
+                    WebPageItemName = "engineer",
+                    WebPageUrlPath = "/careers/engineer"
+                }
+            };
+            SetupGetCareerPages(new[] { career });
+
+            var service = CreateService();
+
+            var result = await service.GetCareerPageAsync(1, pageGuid, "en", CancellationToken.None);
+
+            var output = result.Value;
+            Assert.That(output, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(output!.General!.Name, Is.EqualTo("engineer"));
+                Assert.That(output.General.Culture, Is.EqualTo("en-gb"));
+                Assert.That(output.General.WebPageItemID, Is.EqualTo(11));
+                Assert.That(output.General.WebPageItemParentID, Is.EqualTo(2));
+                Assert.That(output.General.PageGuid, Is.EqualTo(pageGuid));
+                Assert.That(output.General.Path, Is.EqualTo("/careers/engineer"));
+                Assert.That(output.Content!.MetadataTitle, Is.EqualTo("Engineer"));
+                Assert.That(output.Content.HeroLayout, Is.EqualTo(string.Empty));
+                Assert.That(output.Content.CareerReference, Is.EqualTo("REF-1"));
+                Assert.That(output.Content.CareerJobTitle, Is.EqualTo(string.Empty));
+                Assert.That(output.Content.CareerContactPeopleID, Is.Empty);
+                Assert.That(output.Metadata!.PageTitle!.Value, Is.EqualTo("Engineer"));
+                Assert.That(output.Navigation!.ShowInMenu, Is.False);
+                Assert.That(output.Navigation.ShowInSitemap, Is.True);
+            });
+        }
+
+        #endregion
     }
 
     /// <summary>
