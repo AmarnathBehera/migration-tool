@@ -15,6 +15,8 @@ public class ChannelNameParameterFilterTests
     private Mock<IHttpContextAccessor> _httpContextAccessorMock = null!;
     private ChannelNameParameterFilter _filter = null!;
 
+    private static readonly string[] ChannelNames = { "Ind", "Global" };
+
     [SetUp]
     public void SetUp()
     {
@@ -74,7 +76,7 @@ public class ChannelNameParameterFilterTests
         var roleServiceMock = new Mock<IRoleCrudService>();
         roleServiceMock
             .Setup(x => x.GetWebsiteChannelNamesAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new[] { "Ind", "Global" });
+            .ReturnsAsync(ChannelNames);
 
         var serviceProviderMock = new Mock<IServiceProvider>();
         serviceProviderMock.Setup(x => x.GetService(typeof(IRoleCrudService))).Returns(roleServiceMock.Object);
@@ -90,7 +92,7 @@ public class ChannelNameParameterFilterTests
             Assert.That(parameter.Schema.Type, Is.EqualTo("string"));
             Assert.That(parameter.Schema.Enum, Has.Count.EqualTo(2));
             Assert.That(parameter.Schema.Enum.Cast<OpenApiString>().Select(s => s.Value),
-                Is.EqualTo(new[] { "Ind", "Global" }));
+                Is.EqualTo(ChannelNames));
         });
     }
 

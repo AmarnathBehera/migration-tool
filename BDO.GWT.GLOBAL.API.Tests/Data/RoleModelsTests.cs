@@ -5,6 +5,11 @@ namespace BDO.GWT.GLOBAL.API.Tests.Data;
 [TestFixture]
 public class RoleModelsTests
 {
+    private static readonly string[] ViewPermission = { "View" };
+    private static readonly string[] ViewUpdatePermissions = { "View", "Update" };
+    private static readonly string[] ViewCreatePermissions = { "View", "Create" };
+    private static readonly string[] ViewManagePermissions = { "View", "ManagePermissions" };
+
     [Test]
     public void RoleInput_Defaults_AreEmptyOrNull()
     {
@@ -54,7 +59,7 @@ public class RoleModelsTests
             GUID = guid,
             ChannelName = "Ind",
             DisplayName = "India",
-            Permissions = new[] { "View", "ManagePermissions" }
+            Permissions = ViewManagePermissions
         };
 
         Assert.Multiple(() =>
@@ -62,7 +67,7 @@ public class RoleModelsTests
             Assert.That(output.GUID, Is.EqualTo(guid));
             Assert.That(output.ChannelName, Is.EqualTo("Ind"));
             Assert.That(output.DisplayName, Is.EqualTo("India"));
-            Assert.That(output.Permissions, Is.EqualTo(new[] { "View", "ManagePermissions" }));
+            Assert.That(output.Permissions, Is.EqualTo(ViewManagePermissions));
         });
     }
 
@@ -72,13 +77,13 @@ public class RoleModelsTests
         var output = new RoleApplicationOutput
         {
             ApplicationName = "redirects",
-            Permissions = new[] { "View", "Update" }
+            Permissions = ViewUpdatePermissions
         };
 
         Assert.Multiple(() =>
         {
             Assert.That(output.ApplicationName, Is.EqualTo("redirects"));
-            Assert.That(output.Permissions, Is.EqualTo(new[] { "View", "Update" }));
+            Assert.That(output.Permissions, Is.EqualTo(ViewUpdatePermissions));
         });
     }
 
@@ -103,7 +108,7 @@ public class RoleModelsTests
             GUID = guid,
             ChannelName = "Email",
             DisplayName = "Email Channel",
-            Permissions = new[] { "View" }
+            Permissions = ViewPermission
         };
 
         Assert.Multiple(() =>
@@ -111,7 +116,7 @@ public class RoleModelsTests
             Assert.That(output.GUID, Is.EqualTo(guid));
             Assert.That(output.ChannelName, Is.EqualTo("Email"));
             Assert.That(output.DisplayName, Is.EqualTo("Email Channel"));
-            Assert.That(output.Permissions, Is.EqualTo(new[] { "View" }));
+            Assert.That(output.Permissions, Is.EqualTo(ViewPermission));
         });
     }
 
@@ -124,7 +129,7 @@ public class RoleModelsTests
             GUID = guid,
             WorkspaceName = "KenticoDefault",
             DisplayName = "Default",
-            Permissions = new[] { "View", "Create" }
+            Permissions = ViewCreatePermissions
         };
 
         Assert.Multiple(() =>
@@ -132,7 +137,7 @@ public class RoleModelsTests
             Assert.That(output.GUID, Is.EqualTo(guid));
             Assert.That(output.WorkspaceName, Is.EqualTo("KenticoDefault"));
             Assert.That(output.DisplayName, Is.EqualTo("Default"));
-            Assert.That(output.Permissions, Is.EqualTo(new[] { "View", "Create" }));
+            Assert.That(output.Permissions, Is.EqualTo(ViewCreatePermissions));
         });
     }
 
@@ -181,12 +186,12 @@ public class RoleModelsTests
     [Test]
     public void ChannelPermissionInput_StoresValues()
     {
-        var input = new ChannelPermissionInput { WebsiteChannel = "Ind", Permissions = new[] { "View" } };
+        var input = new ChannelPermissionInput { WebsiteChannel = "Ind", Permissions = ViewPermission };
 
         Assert.Multiple(() =>
         {
             Assert.That(input.WebsiteChannel, Is.EqualTo("Ind"));
-            Assert.That(input.Permissions, Is.EqualTo(new[] { "View" }));
+            Assert.That(input.Permissions, Is.EqualTo(ViewPermission));
         });
     }
 
@@ -205,24 +210,24 @@ public class RoleModelsTests
     [Test]
     public void EmailChannelPermissionInput_StoresValues()
     {
-        var input = new EmailChannelPermissionInput { EmailChannel = "Email", Permissions = new[] { "View", "Update" } };
+        var input = new EmailChannelPermissionInput { EmailChannel = "Email", Permissions = ViewUpdatePermissions };
 
         Assert.Multiple(() =>
         {
             Assert.That(input.EmailChannel, Is.EqualTo("Email"));
-            Assert.That(input.Permissions, Is.EqualTo(new[] { "View", "Update" }));
+            Assert.That(input.Permissions, Is.EqualTo(ViewUpdatePermissions));
         });
     }
 
     [Test]
     public void WorkspacePermissionInput_StoresValues()
     {
-        var input = new WorkspacePermissionInput { Workspace = "KenticoDefault", Permissions = new[] { "View" } };
+        var input = new WorkspacePermissionInput { Workspace = "KenticoDefault", Permissions = ViewPermission };
 
         Assert.Multiple(() =>
         {
             Assert.That(input.Workspace, Is.EqualTo("KenticoDefault"));
-            Assert.That(input.Permissions, Is.EqualTo(new[] { "View" }));
+            Assert.That(input.Permissions, Is.EqualTo(ViewPermission));
         });
     }
 

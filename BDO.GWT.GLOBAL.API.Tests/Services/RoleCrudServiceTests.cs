@@ -20,6 +20,10 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services;
 [TestFixture]
 public class RoleCrudServiceTests
 {
+    private static readonly string[] ViewPermission = { "View" };
+    private static readonly string[] FlyPermission = { "Fly" };
+    private static readonly string[] ExpectedChannelNames = { "Alpha", "Zeta" };
+
     private static RoleCrudService CreateUninitializedService() =>
         (RoleCrudService)RuntimeHelpers.GetUninitializedObject(typeof(RoleCrudService));
 
@@ -297,21 +301,21 @@ public class RoleCrudServiceTests
             Assert.That(websiteChannel.GUID, Is.EqualTo(channelGuid));
             Assert.That(websiteChannel.ChannelName, Is.EqualTo("Global"));
             Assert.That(websiteChannel.DisplayName, Is.EqualTo("Global Site"));
-            Assert.That(websiteChannel.Permissions, Is.EqualTo(new[] { "View" }));
+            Assert.That(websiteChannel.Permissions, Is.EqualTo(ViewPermission));
 
             var emailChannel = result.EmailChannels.Single();
             Assert.That(emailChannel.GUID, Is.EqualTo(channelGuid));
-            Assert.That(emailChannel.Permissions, Is.EqualTo(new[] { "View" }));
+            Assert.That(emailChannel.Permissions, Is.EqualTo(ViewPermission));
 
             var workspace = result.ContentHubWorkspaces.Single();
             Assert.That(workspace.GUID, Is.EqualTo(workspaceGuid));
             Assert.That(workspace.WorkspaceName, Is.EqualTo("KenticoDefault"));
             Assert.That(workspace.DisplayName, Is.EqualTo("Default"));
-            Assert.That(workspace.Permissions, Is.EqualTo(new[] { "View" }));
+            Assert.That(workspace.Permissions, Is.EqualTo(ViewPermission));
 
             var application = result.ApplicationPermissions.Single();
             Assert.That(application.ApplicationName, Is.EqualTo("redirects"));
-            Assert.That(application.Permissions, Is.EqualTo(new[] { "View" }));
+            Assert.That(application.Permissions, Is.EqualTo(ViewPermission));
         });
     }
 
@@ -516,7 +520,7 @@ public class RoleCrudServiceTests
             RoleName = "Editors",
             Applications = new List<ApplicationPermissionInput>
             {
-                new() { ApplicationName = "redirects", Permissions = new[] { "View" } }
+                new() { ApplicationName = "redirects", Permissions = ViewPermission }
             }
         };
 
@@ -628,7 +632,7 @@ public class RoleCrudServiceTests
 
         var result = (await service.GetWebsiteChannelNamesAsync(CancellationToken.None)).ToList();
 
-        Assert.That(result, Is.EqualTo(new[] { "Alpha", "Zeta" }));
+        Assert.That(result, Is.EqualTo(ExpectedChannelNames));
     }
 
     [Test]
@@ -683,7 +687,7 @@ public class RoleCrudServiceTests
             RoleName = "Editors",
             WebsiteChannels = new List<ChannelPermissionInput>
             {
-                new() { WebsiteChannel = "Ind", Permissions = new[] { "Fly" } }
+                new() { WebsiteChannel = "Ind", Permissions = FlyPermission }
             }
         };
 
@@ -703,7 +707,7 @@ public class RoleCrudServiceTests
             RoleName = "Editors",
             WebsiteChannels = new List<ChannelPermissionInput>
             {
-                new() { WebsiteChannel = "Ind", Permissions = new[] { "View" } }
+                new() { WebsiteChannel = "Ind", Permissions = ViewPermission }
             }
         };
 
@@ -754,7 +758,7 @@ public class RoleCrudServiceTests
             RoleName = "Editors",
             Applications = new List<ApplicationPermissionInput>
             {
-                new() { ApplicationName = "Kentico.Xperience.Application.WebPages_abc", Permissions = new[] { "View" } }
+                new() { ApplicationName = "Kentico.Xperience.Application.WebPages_abc", Permissions = ViewPermission }
             }
         };
 
@@ -790,7 +794,7 @@ public class RoleCrudServiceTests
             RoleName = "Editors",
             Workspaces = new List<WorkspacePermissionInput>
             {
-                new() { Workspace = "Default", Permissions = new[] { "View" } }
+                new() { Workspace = "Default", Permissions = ViewPermission }
             }
         };
 
