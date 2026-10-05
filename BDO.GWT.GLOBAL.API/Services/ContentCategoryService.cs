@@ -1,297 +1,515 @@
-﻿using BDO.GWT.Common.Core.Exceptions;
-using BDO.GWT.Common.Core.Services;
+using BDO.GWT.Common.Core.Exceptions;
 using BDO.GWT.Core;
-using BDO.GWT.Core.Services;
+using BDO.GWT.Core.Utilities;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.GLOBAL.API.DTOs;
 using BDO.GWT.GLOBAL.API.Helpers;
 using CMS.ContentEngine;
 using CMS.DataEngine;
+using CMS.Helpers;
 using CMS.Websites;
-using CMS.Websites.Routing;
-using Kentico.Content.Web.Mvc;
-using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace BDO.GWT.GLOBAL.API.Services;
 
 public interface IContentCategoryService
 {
+    Task<IEnumerable<ContentCategoryDto>> GetContentCategoriesAsync(int channelId, string culture, CancellationToken cancellationToken);
 
-    Task<ActionResult<IEnumerable<ContentCategoryDto>>> GetContentCategoriesAsync(int channelId, string culture, CancellationToken cancellationToken);
-
-    Task<ActionResult<ContentDto>> GetContentAsync(int channelId, string culture, int? insightCount, int? whatsNewCount, ContentCategoryFilter[] categoryFilters, CancellationToken cancellationToken);
+    Task<ContentDto> GetContentAsync(int channelId, string culture, int? insightCount, int? whatsNewsCount, ContentCategoryFilter[] categoryFilters, CancellationToken cancellationToken);
 }
 
 public class ContentCategoryService : IContentCategoryService
 {
+    private const int DefaultInsightCount = 15;
+    private const int MaxInsightCount = 50;
+    private const int MaxSubCategoryIdsPerFilter = 50;
+    private const int CacheMinutes = 10;
+    private const string FallbackDisplayDateFormat = "dd MMMM yyyy";
+    private const string MetadataTitleColumn = "MetadataTitle";
     private static readonly HashSet<string> ValidCategoryCodes = new() { "BusinessIssue", "BusinessLine", "ServiceArea", "Industry" };
-    private static readonly LanguageTag defaultCulture = LanguageTag.GB;
+    private static readonly HashSet<string> OrderableCategoryColumns = new(StringComparer.Ordinal)
+    {
+        nameof(Businessissue.Name),
+        MetadataTitleColumn,
+    };
 
     private readonly IContentQueryExecutor _contentQueryExecutor;
-    private readonly IContentService _contentRetriever;
     private readonly IMappingHelper _mappingHelper;
     private readonly IInfoProvider<ChannelInfo> _channelInfoProvider;
-    private readonly IValidationState _validationState;
     private readonly IInfoProvider<WebsiteChannelInfo> _websiteChannelInfoProvider;
+    private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageInfoProvider;
+    private readonly IValidationState _validationState;
     private readonly IWebPageUrlRetriever _webPageUrlRetriever;
+    private readonly IProgressiveCache _cache;
+    private readonly IConfiguration _configuration;
+    private readonly ILogger<ContentCategoryService> _logger;
 
+#pragma warning disable S107
     public ContentCategoryService(
         IContentQueryExecutor contentQueryExecutor,
-        IContentService contentRetriever,
         IMappingHelper mappingHelper,
         IInfoProvider<ChannelInfo> channelInfoProvider,
-        IValidationState validationState,
         IInfoProvider<WebsiteChannelInfo> websiteChannelInfoProvider,
-        IWebPageUrlRetriever webPageUrlRetriever)
+        IInfoProvider<ContentLanguageInfo> contentLanguageInfoProvider,
+        IValidationState validationState,
+        IWebPageUrlRetriever webPageUrlRetriever,
+        IProgressiveCache cache,
+        IConfiguration configuration,
+        ILogger<ContentCategoryService> logger)
+#pragma warning restore S107
     {
         _contentQueryExecutor = contentQueryExecutor;
-        _contentRetriever = contentRetriever;
         _mappingHelper = mappingHelper;
         _channelInfoProvider = channelInfoProvider;
-        _validationState = validationState;
         _websiteChannelInfoProvider = websiteChannelInfoProvider;
+        _contentLanguageInfoProvider = contentLanguageInfoProvider;
+        _validationState = validationState;
         _webPageUrlRetriever = webPageUrlRetriever;
+        _cache = cache;
+        _configuration = configuration;
+        _logger = logger;
     }
 
-
-    public async Task<ActionResult<IEnumerable<ContentCategoryDto>>> GetContentCategoriesAsync(int channelId, string culture, CancellationToken cancellationToken)
+    public async Task<IEnumerable<ContentCategoryDto>> GetContentCategoriesAsync(int channelId, string culture, CancellationToken cancellationToken)
     {
-        try
+        var channel = await GetChannelAsync(channelId, cancellationToken);
+        var languageTag = await ResolveCultureAsync(channelId, culture, cancellationToken);
+
+        return new List<ContentCategoryDto>
         {
-            var currentCulture = await _mappingHelper.ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
-
-            if (string.IsNullOrEmpty(currentCulture.Locale))
-            {
-                throw new NotFoundException("Invalid culture specified");
-            }
-
-            var channel = await GetChannelAsync(channelId);
-            if (string.IsNullOrEmpty(channel?.ChannelName))
-            {
-                throw new NotFoundException("Channel not found");
-            }
-
-            var categories = new List<ContentCategoryDto>
-            {
-                await GetBusinessIssueCategoryDtoAsync(channel.ChannelName, currentCulture, cancellationToken),
-                await GetContentCategoryDtoAsync("Business Line", "BusinessLine", BusinessLine.CONTENT_TYPE_NAME, channel.ChannelName, currentCulture, cancellationToken),
-                await GetContentCategoryDtoAsync("Service Area", "ServiceArea", ServiceArea.CONTENT_TYPE_NAME, channel.ChannelName, currentCulture, cancellationToken),
-                await GetContentCategoryDtoAsync("Industry", "Industry", Industry.CONTENT_TYPE_NAME, channel.ChannelName, currentCulture, cancellationToken),
-            };
-
-            return categories;
-        }
-        catch (UnprocessableEntityException)
-        {
-            return new UnprocessableEntityObjectResult(_validationState.GetErrors());
-        }
-        catch (NotFoundException ex)
-        {
-            return new NotFoundObjectResult(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return new ObjectResult(ex.Message) { StatusCode = StatusCodes.Status500InternalServerError };
-        }
-    }
-
-    private async Task<ContentCategoryDto> GetBusinessIssueCategoryDtoAsync(string channelName, LanguageTag languageTag, CancellationToken cancellationToken)
-    {
-        var builder = new ContentItemQueryBuilder()
-            .ForContentType(Businessissue.CONTENT_TYPE_NAME, config => config
-                .ForWebsite(channelName)
-                .Columns(nameof(Businessissue.SystemFields.ContentItemID), nameof(Businessissue.Name)))
-            .InLanguage(languageTag.Locale)
-            .Parameters(q => q.OrderBy(new OrderByColumn(nameof(Businessissue.Name))));
-
-        var businessIssues = await _contentQueryExecutor.GetMappedResult<Businessissue>(
-            builder, cancellationToken: cancellationToken);
-
-        return new ContentCategoryDto
-        {
-            Name = "Business Issue",
-            Code = "BusinessIssue",
-            SubCategories = businessIssues
-                .Select(businessIssue => new ContentSubCategoryDto
-                {
-                    Id = businessIssue.SystemFields.ContentItemID,
-                    Name = businessIssue.Name,
-                })
-                .ToList(),
+            await GetContentCategoryDtoAsync("Business Issue", "BusinessIssue", Businessissue.CONTENT_TYPE_NAME, nameof(Businessissue.Name), channel.ChannelName, languageTag, cancellationToken),
+            await GetContentCategoryDtoAsync("Business Line", "BusinessLine", BusinessLine.CONTENT_TYPE_NAME, MetadataTitleColumn, channel.ChannelName, languageTag, cancellationToken),
+            await GetContentCategoryDtoAsync("Service Area", "ServiceArea", ServiceArea.CONTENT_TYPE_NAME, MetadataTitleColumn, channel.ChannelName, languageTag, cancellationToken),
+            await GetContentCategoryDtoAsync("Industry", "Industry", Industry.CONTENT_TYPE_NAME, MetadataTitleColumn, channel.ChannelName, languageTag, cancellationToken),
         };
     }
 
-    private async Task<ContentCategoryDto> GetContentCategoryDtoAsync(
-        string name, string codeName, string contentTypeName, string channelName, LanguageTag languageTag, CancellationToken cancellationToken)
+    public async Task<ContentDto> GetContentAsync(
+        int channelId, string culture, int? insightCount, int? whatsNewsCount,
+        ContentCategoryFilter[] categoryFilters, CancellationToken cancellationToken)
     {
-        var builder = new ContentItemQueryBuilder()
-            .ForContentType(contentTypeName, config => config
-                .ForWebsite(channelName)
-                .Columns("ContentItemID", "MetadataTitle"))
-            .InLanguage(languageTag.Locale)
-            .Parameters(q => q.OrderBy(new OrderByColumn("MetadataTitle")));
+        var channel = await GetChannelAsync(channelId, cancellationToken);
+        var languageTag = await ResolveCultureAsync(channelId, culture, cancellationToken);
 
-        var pages = await _contentQueryExecutor.GetResult(builder, row => new
+        categoryFilters ??= Array.Empty<ContentCategoryFilter>();
+        ValidateContentCategoryFilters(categoryFilters);
+
+        var topN = NormalizeInsightCount(insightCount);
+        var subCategoryIdsByCategoryCode = BuildSubCategoryIdsByCategoryCode(categoryFilters);
+
+        var projections = await GetInsightProjectionsAsync(
+            channel.ChannelName, languageTag, topN, categoryFilters.Length != 0, subCategoryIdsByCategoryCode, cancellationToken);
+
+        var insights = await BuildInsightDtosAsync(projections, languageTag, cancellationToken);
+
+        return new ContentDto
         {
-            ContentItemID = row.GetValue<int>("ContentItemID"),
-            MetadataTitle = row.GetValue<string>("MetadataTitle"),
-        }, cancellationToken: cancellationToken);
+            InsightsSearchURL = await GetInsightSearchUrlAsync(channel.ChannelName, languageTag.Locale, cancellationToken),
+            Insights = insights,
+        };
+    }
+
+    private static int NormalizeInsightCount(int? insightCount)
+    {
+        if (insightCount is null or <= 0)
+        {
+            return DefaultInsightCount;
+        }
+
+        return Math.Min(insightCount.Value, MaxInsightCount);
+    }
+
+
+    private async Task<ContentCategoryDto> GetContentCategoryDtoAsync(
+        string name, string codeName, string contentTypeName, string titleColumn,
+        string channelName, LanguageTag languageTag, CancellationToken cancellationToken)
+    {
+        var cacheSettings = new CacheSettings(CacheMinutes, nameof(ContentCategoryService), nameof(GetContentCategoryDtoAsync), channelName, languageTag.Locale, contentTypeName)
+        {
+            GetCacheDependency = () => CacheHelper.GetCacheDependency(new[]
+            {
+                $"webpageitem|bychannel|{channelName}|bycontenttype|{contentTypeName}",
+            }),
+        };
+
+        var subCategories = await _cache.LoadAsync(
+            async _ => await GetSubCategoriesAsync(contentTypeName, titleColumn, channelName, languageTag, cancellationToken),
+            cacheSettings);
 
         return new ContentCategoryDto
         {
             Name = name,
             Code = codeName,
-            SubCategories = pages
-                .Select(page => new ContentSubCategoryDto
-                {
-                    Id = page.ContentItemID,
-                    Name = page.MetadataTitle,
-                })
-                .ToList(),
+            SubCategories = subCategories,
         };
     }
 
-
-    public async Task<ActionResult<ContentDto>> GetContentAsync(
-        int channelId, string culture, int? insightCount, int? whatsNewCount,
-        ContentCategoryFilter[] categoryFilters, CancellationToken cancellationToken)
+    private async Task<List<ContentSubCategoryDto>> GetSubCategoriesAsync(
+        string contentTypeName, string titleColumn, string channelName, LanguageTag languageTag, CancellationToken cancellationToken)
     {
-        try
-        {
-            var currentCulture = await _mappingHelper.ValidateAndNormalizeSiteCultureAsync(channelId, culture ?? defaultCulture.Language, cancellationToken) ?? defaultCulture;
+        var idColumn = nameof(ContentItemFields.ContentItemID);
 
-            if (string.IsNullOrEmpty(currentCulture.Locale))
+        var builder = new ContentItemQueryBuilder()
+            .ForContentType(contentTypeName, config => config
+                .ForWebsite(channelName)
+                .Columns(idColumn, titleColumn)
+                .OrderBy(GetCategoryOrderColumn(titleColumn, languageTag)))
+            .InLanguage(languageTag.Locale);
+
+        var rows = await _contentQueryExecutor.GetResult(
+            builder,
+            row => new ContentSubCategoryDto
             {
-                throw new NotFoundException("Invalid culture specified");
-            }
+                Id = row.GetValue<int>(idColumn),
+                Name = row.GetValue<string>(titleColumn),
+            },
+            cancellationToken: cancellationToken);
 
-            var channel = await GetChannelAsync(channelId);
-            if (string.IsNullOrEmpty(channel?.ChannelName))
-            {
-                throw new NotFoundException("Channel not found");
-            }
-
-            categoryFilters ??= Array.Empty<ContentCategoryFilter>();
-            ValidateContentCategoryFilters(categoryFilters);
-
-            if (insightCount is null or <= 0)
-            {
-                insightCount = 15;
-            }
-            var subCategoryIdsByCategoryCode = BuildSubCategoryIdsByCategoryCode(categoryFilters);
-
-            var retrieveParameters = new RetrievePagesParameters
-            {
-                LinkedItemsMaxLevel = 1,
-                ChannelName = channel.ChannelName,
-                LanguageName = currentCulture.Locale,
-                IsForPreview = false,
-            };
-
-            var blogPosts = await _contentRetriever.GetPagesAsync<BlogPost>(
-                retrieveParameters,
-                query => query.Where(w => w.WhereEquals("IsSearchExcluded", false)),
-                RetrievalCacheSettings.CacheDisabled,
-                cancellationToken);
-
-            var insights = await _contentRetriever.GetPagesAsync<Insight>(
-                retrieveParameters,
-                query => query.Where(w => w.WhereEquals("IsSearchExcluded", false)),
-                RetrievalCacheSettings.CacheDisabled,
-                cancellationToken);
-
-            var allInsights = (blogPosts ?? Enumerable.Empty<BlogPost>()).Select(MapBlogPostToProjection)
-                .Concat((insights ?? Enumerable.Empty<Insight>()).Select(MapInsightToProjection));
-
-            if (categoryFilters.Length != 0)
-            {
-                allInsights = allInsights.Where(item =>
-                    item.BusinessIssueIds.Intersect(subCategoryIdsByCategoryCode["BusinessIssue"]).Any() ||
-                    item.BusinessLineIds.Intersect(subCategoryIdsByCategoryCode["BusinessLine"]).Any() ||
-                    item.ServiceAreaIds.Intersect(subCategoryIdsByCategoryCode["ServiceArea"]).Any() ||
-                    item.IndustryIds.Intersect(subCategoryIdsByCategoryCode["Industry"]).Any());
-            }
-
-            var dto = new ContentDto
-            {
-                InsightsSearchURL = await GetInsightSearchUrlAsync(channelId, channel.ChannelName, currentCulture.Locale, cancellationToken),
-                Insights = allInsights
-                    .OrderByDescending(i => i.Date)
-                    .Take(insightCount.Value)
-                    .Select(i => i.ToDto())
-                    .ToList(),
-            };
-
-            return dto;
-        }
-        catch (UnprocessableEntityException)
-        {
-            return new UnprocessableEntityObjectResult(_validationState.GetErrors());
-        }
-        catch (NotFoundException ex)
-        {
-            return new NotFoundObjectResult(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return new ObjectResult(ex.Message) { StatusCode = StatusCodes.Status500InternalServerError };
-        }
+        return rows.ToList();
     }
 
-    private async Task<string?> GetInsightSearchUrlAsync(int channelId, string channelName, string culture, CancellationToken cancellationToken)
+    private static OrderByColumn GetCategoryOrderColumn(string columnName, LanguageTag languageTag)
     {
-        var pageUrl = await GetInsightSearchUrlByPageAsync(channelName, culture, cancellationToken);
-        if (!string.IsNullOrWhiteSpace(pageUrl))
+        if (!OrderableCategoryColumns.Contains(columnName))
         {
-            return pageUrl;
+            throw new ArgumentException($"Column '{columnName}' is not allowed in ORDER BY.", nameof(columnName));
         }
 
-        return await GetInsightSearchUrlByDomainAsync(channelId, culture);
+        // CultureToCollationMapper is keyed by the full language tag (e.g. "en-GB", "sr-Cyrl-RS").
+        var collation = CultureToCollationMapper.GetCollationForCulture(languageTag.ToString());
+
+        return new OrderByColumn(
+            collation is null ? columnName : $"{columnName} COLLATE {collation}",
+            OrderDirection.Ascending);
     }
 
-    private async Task<string?> GetInsightSearchUrlByPageAsync(string channelName, string culture, CancellationToken cancellationToken)
+
+    private async Task<IReadOnlyList<InsightProjection>> GetInsightProjectionsAsync(
+        string channelName, LanguageTag languageTag, int topN, bool hasFilters,
+        IReadOnlyDictionary<string, int[]> subCategoryIdsByCategoryCode, CancellationToken cancellationToken)
+    {
+        var linkingFields = hasFilters
+            ? GetLinkingFields(subCategoryIdsByCategoryCode)
+            : new List<(string FieldName, int[] Ids)> { (string.Empty, Array.Empty<int>()) };
+
+        if (linkingFields.Count == 0)
+        {
+            return Array.Empty<InsightProjection>();
+        }
+
+        var projections = new List<InsightProjection>();
+
+        foreach (var (fieldName, ids) in linkingFields)
+        {
+            projections.AddRange(await GetPagesAsync<BlogPost>(
+                new PageQuery(BlogPost.CONTENT_TYPE_NAME, nameof(BlogPost), fieldName, ids, 1),
+                channelName, languageTag, topN, MapBlogPost, cancellationToken));
+
+            projections.AddRange(await GetPagesAsync<Insight>(
+                new PageQuery(Insight.CONTENT_TYPE_NAME, nameof(Insight), fieldName, ids, 2),
+                channelName, languageTag, topN, MapInsight, cancellationToken));
+        }
+        return projections
+            .GroupBy(x => x.WebPageItemId)
+            .Select(group => group.First())
+            .OrderByDescending(x => x.Date)
+            .ThenByDescending(x => x.WebPageItemId)
+            .Take(topN)
+            .ToList();
+    }
+
+    private static List<(string FieldName, int[] Ids)> GetLinkingFields(IReadOnlyDictionary<string, int[]> subCategoryIdsByCategoryCode)
+    {
+        var fieldNameByCategoryCode = new (string CategoryCode, string FieldName)[]
+        {
+            ("BusinessIssue", nameof(BlogPost.MetadataBusinessIssues)),
+            ("BusinessLine", nameof(BlogPost.MetadataBusinessLine)),
+            ("ServiceArea", nameof(BlogPost.MetadataServiceAreas)),
+            ("Industry", nameof(BlogPost.MetadataIndustries)),
+        };
+
+        return fieldNameByCategoryCode
+            .Where(x => subCategoryIdsByCategoryCode.TryGetValue(x.CategoryCode, out var ids) && ids.Length != 0)
+            .Select(x => (x.FieldName, subCategoryIdsByCategoryCode[x.CategoryCode]))
+            .ToList();
+    }
+
+    private async Task<IEnumerable<InsightProjection>> GetPagesAsync<TPage>(
+        PageQuery query, string channelName, LanguageTag languageTag, int topN,
+        Func<TPage, string, InsightProjection> map, CancellationToken cancellationToken)
+        where TPage : class, IWebPageFieldsSource
+    {
+        async Task<List<TPage>> LoadPagesAsync()
+        {
+            var builder = new ContentItemQueryBuilder()
+                .ForContentType(query.ContentTypeName, config =>
+                {
+                    config.ForWebsite(channelName)
+                        .WithLinkedItems(query.LinkedItemsDepth);
+
+                    if (!string.IsNullOrEmpty(query.LinkingFieldName) && query.LinkedItemIds.Length != 0)
+                    {
+                        config.Linking(query.LinkingFieldName, query.LinkedItemIds);
+                    }
+
+                    config
+                        .Where(w => w.WhereEquals("IsSearchExcluded", false).Or().WhereNull("IsSearchExcluded"))
+                        .OrderBy(
+                            new OrderByColumn(nameof(ContentItemFields.ContentItemCommonDataFirstPublishedWhen), OrderDirection.Descending),
+                            new OrderByColumn(nameof(WebPageFields.WebPageItemID), OrderDirection.Descending))
+                        .TopN(topN);
+                })
+                .InLanguage(languageTag.Locale, useLanguageFallbacks: true);
+
+            var result = await GetMappedPagesAsync<TPage>(builder, cancellationToken);
+            return result.ToList();
+        }
+
+        List<TPage> pages;
+
+        if (query.LinkedItemIds.Length != 0)
+        {
+            pages = await LoadPagesAsync();
+        }
+        else
+        {
+            var cacheSettings = new CacheSettings(
+                CacheMinutes,
+                nameof(ContentCategoryService),
+                nameof(GetPagesAsync),
+                query.ContentTypeName,
+                channelName,
+                languageTag.Locale,
+                topN.ToString(CultureInfo.InvariantCulture))
+            {
+                GetCacheDependency = () => CacheHelper.GetCacheDependency(new[]
+                {
+                    $"webpageitem|bychannel|{channelName}|bycontenttype|{query.ContentTypeName}",
+                }),
+            };
+
+            pages = await _cache.LoadAsync(async _ => await LoadPagesAsync(), cacheSettings);
+        }
+
+        return pages.Select(page => map(page, query.PageType));
+    }
+
+    private async Task<List<InsightContentDto>> BuildInsightDtosAsync(
+        IReadOnlyList<InsightProjection> projections, LanguageTag languageTag, CancellationToken cancellationToken)
+    {
+        if (projections.Count == 0)
+        {
+            return new List<InsightContentDto>();
+        }
+
+        var urlByWebPageItemId = await GetPageUrlsAsync(
+            projections.Select(x => x.WebPageItemId).Distinct().ToList(), languageTag.Locale, cancellationToken);
+
+        var dateCulture = GetCultureInfo(languageTag);
+        var dateFormat = GetDisplayDateFormat();
+        var fallbackDate = DateTime.Now;
+
+        return projections
+            .Select(projection =>
+            {
+                var pageUrl = urlByWebPageItemId.TryGetValue(projection.WebPageItemId, out var url) ? url : string.Empty;
+                var date = projection.Date == default ? fallbackDate : projection.Date;
+                var imageUrl = GetAbsoluteImageUrl(projection.ImageUrl, pageUrl);
+
+                return new InsightContentDto
+                {
+                    GUID = projection.WebPageItemGuid,
+                    PageType = projection.PageType,
+                    PageSubType = projection.PageSubType,
+                    TitleFull = projection.Title,
+                    TitleTwoThirds = projection.Title,
+                    TitleOneThird = projection.Title,
+                    SummaryFull = projection.Summary,
+                    SummaryTwoThirds = projection.Summary,
+                    SummaryOneThird = projection.Summary,
+                    ImageUrlFull = imageUrl,
+                    ImageUrlTwoThirds = imageUrl,
+                    ImageUrlOneThird = imageUrl,
+                    Date = date,
+                    DisplayDate = date.ToString(dateFormat, dateCulture),
+                    URL = pageUrl,
+                };
+            })
+            .ToList();
+    }
+
+    private async Task<Dictionary<int, string>> GetPageUrlsAsync(
+        List<int> webPageItemIds, string culture, CancellationToken cancellationToken)
+    {
+        var urlByWebPageItemId = new Dictionary<int, string>(webPageItemIds.Count);
+
+        foreach (var webPageItemId in webPageItemIds)
+        {
+            var url = await _webPageUrlRetriever.Retrieve(webPageItemId, culture, false, cancellationToken);
+
+            urlByWebPageItemId[webPageItemId] = ToHtmlCompatibleUrl(url?.AbsoluteUrl);
+        }
+
+        return urlByWebPageItemId;
+    }
+
+    private string GetDisplayDateFormat()
+    {
+        var format = _configuration.GetValue<string?>("Content:DisplayDateFormat");
+
+        return string.IsNullOrWhiteSpace(format) ? FallbackDisplayDateFormat : format;
+    }
+
+    private CultureInfo GetCultureInfo(LanguageTag languageTag)
+    {
+        foreach (var name in new[] { languageTag.ToString(), languageTag.Locale })
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                continue;
+            }
+
+            try
+            {
+                return CultureInfo.GetCultureInfo(name);
+            }
+            catch (CultureNotFoundException)
+            {
+                // try next candidate
+            }
+        }
+
+        _logger.LogWarning("Culture {Culture} is not available on the server, falling back to the invariant culture.", languageTag.Locale);
+
+        return CultureInfo.InvariantCulture;
+    }
+
+    private static string ToHtmlCompatibleUrl(string? url)
+    {
+        return Link.TryParse(url, out var link) ? link.ToHtmlCompatibleString() : string.Empty;
+    }
+
+    private static string GetAbsoluteImageUrl(string? imageUrl, string pageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+        {
+            return string.Empty;
+        }
+
+        var hasPageUrl = Uri.TryCreate(pageUrl, UriKind.Absolute, out var pageUri)
+            && (pageUri.Scheme == Uri.UriSchemeHttp || pageUri.Scheme == Uri.UriSchemeHttps);
+
+        if (imageUrl.StartsWith("//", StringComparison.Ordinal))
+        {
+            imageUrl = $"{(hasPageUrl ? pageUri!.Scheme : Uri.UriSchemeHttps)}:{imageUrl}";
+        }
+        else if (imageUrl.StartsWith("~/", StringComparison.Ordinal))
+        {
+            imageUrl = imageUrl[1..];
+        }
+
+        if (!Uri.TryCreate(imageUrl, UriKind.RelativeOrAbsolute, out var imageUri))
+        {
+            return string.Empty;
+        }
+
+        if (imageUri.IsAbsoluteUri)
+        {
+            return imageUri.Scheme == Uri.UriSchemeHttp || imageUri.Scheme == Uri.UriSchemeHttps
+                ? ToHtmlCompatibleUrl(imageUri.AbsoluteUri)
+                : string.Empty;
+        }
+
+        if (!hasPageUrl)
+        {
+            return string.Empty;
+        }
+
+        // Site root (scheme + host + port) of the page, i.e. "https://host/".
+        var origin = new UriBuilder(pageUri!.Scheme, pageUri.Host, pageUri.Port).Uri;
+
+        return ToHtmlCompatibleUrl(new Uri(origin, imageUri).AbsoluteUri);
+    }
+
+    private async Task<string?> GetInsightSearchUrlAsync(string channelName, string culture, CancellationToken cancellationToken)
     {
         var builder = new ContentItemQueryBuilder()
             .ForContentType(Search.CONTENT_TYPE_NAME, config => config
                 .ForWebsite(channelName)
-                .Columns("WebPageItemID"))
-            .InLanguage(culture)
-            .Parameters(q => q.TopN(1));
+                .Columns(nameof(WebPageFields.WebPageItemID))
+                .TopN(1))
+            .InLanguage(culture);
 
-        var searchPages = await _contentQueryExecutor.GetResult(builder, row => new
-        {
-            WebPageItemID = row.GetValue<int>("WebPageItemID"),
-        }, cancellationToken: cancellationToken);
+        var searchPages = await _contentQueryExecutor.GetResult(
+            builder,
+            row => row.GetValue<int>(nameof(WebPageFields.WebPageItemID)),
+            cancellationToken: cancellationToken);
 
-        var searchPage = searchPages.FirstOrDefault();
+        var webPageItemId = searchPages.FirstOrDefault();
 
-        if (searchPage is null)
+        if (webPageItemId == 0)
         {
             return null;
         }
 
-        var url = await _webPageUrlRetriever.Retrieve(searchPage.WebPageItemID, culture, cancellationToken: cancellationToken);
+        var url = await _webPageUrlRetriever.Retrieve(webPageItemId, culture, false, cancellationToken);
 
-        return url?.AbsoluteUrl;
+        var absoluteUrl = ToHtmlCompatibleUrl(url?.AbsoluteUrl);
+
+        return string.IsNullOrEmpty(absoluteUrl) ? null : absoluteUrl;
     }
 
-    private async Task<string?> GetInsightSearchUrlByDomainAsync(int channelId, string culture)
+    private async Task<ChannelInfo> GetChannelAsync(int channelId, CancellationToken cancellationToken)
     {
-        var websiteChannel = await GetWebsiteChannelAsync(channelId);
+        var channel = await _channelInfoProvider.GetAsync(channelId, cancellationToken);
 
-        var domain = websiteChannel?.WebsiteChannelDomain;
-
-        if (string.IsNullOrWhiteSpace(domain))
+        if (string.IsNullOrEmpty(channel?.ChannelName))
         {
-            return null;
+            throw new NotFoundException($"Channel with ID {channelId} not found.");
         }
 
-        var normalizedDomain = domain.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
-            || domain.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
-                ? domain
-                : $"https://{domain}";
+        return channel;
+    }
 
-        return $"{normalizedDomain.TrimEnd('/')}/{culture}/search";
+    private async Task<LanguageTag> ResolveCultureAsync(int channelId, string culture, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(culture))
+        {
+            culture = await GetChannelDefaultCultureAsync(channelId, cancellationToken);
+        }
+
+        var languageTag = await _mappingHelper.ValidateAndNormalizeSiteCultureAsync(channelId, culture, cancellationToken);
+
+        if (languageTag is null || string.IsNullOrEmpty(languageTag.Locale))
+        {
+            _validationState.AddError("culture", $"Incorrect language tag '{culture}' format.");
+        }
+
+        ThrowIfThereAreValidationErrors();
+
+        return languageTag!;
+    }
+
+    private async Task<string> GetChannelDefaultCultureAsync(int channelId, CancellationToken cancellationToken)
+    {
+        var websiteChannels = await _websiteChannelInfoProvider.Get()
+            .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelChannelID), channelId)
+            .TopN(1)
+            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
+
+        var websiteChannel = websiteChannels.FirstOrDefault()
+            ?? throw new NotFoundException($"Website channel with ID {channelId} not found.");
+
+        var language = await _contentLanguageInfoProvider.GetAsync(websiteChannel.WebsiteChannelPrimaryContentLanguageID, cancellationToken);
+
+        if (string.IsNullOrEmpty(language?.ContentLanguageName))
+        {
+            throw new NotFoundException($"No primary content language is configured for channel with ID {channelId}.");
+        }
+
+        return language.ContentLanguageName;
     }
 
     private void ValidateContentCategoryFilters(ContentCategoryFilter[] filters)
@@ -307,25 +525,32 @@ public class ContentCategoryService : IContentCategoryService
             if (filter.SubCategoryIds is null || filter.SubCategoryIds.Length == 0)
             {
                 _validationState.AddUnprocessableEntityError(nameof(filter.SubCategoryIds), $"List of subcategory ids is empty on {filter.CategoryCode} category");
+                continue;
+            }
+
+            if (filter.SubCategoryIds.Length > MaxSubCategoryIdsPerFilter)
+            {
+                _validationState.AddUnprocessableEntityError(nameof(filter.SubCategoryIds), $"List of subcategory ids on {filter.CategoryCode} category exceeds the maximum of {MaxSubCategoryIdsPerFilter}");
             }
         }
 
-        if (_validationState.HasUnprocessableEntityErrors() || _validationState.HasErrors())
+        ThrowIfThereAreValidationErrors();
+    }
+
+    private void ThrowIfThereAreValidationErrors()
+    {
+        if (!_validationState.HasErrors() && !_validationState.HasUnprocessableEntityErrors())
         {
-            throw new UnprocessableEntityException();
+            return;
         }
-    }
+        var message = string.Join("; ", _validationState.GetErrors().Select(error => $"{error.Key}: {error.Value}"));
 
-    private Task<ChannelInfo?> GetChannelAsync(int channelId)
-    {
-        var provider = _channelInfoProvider as IInfoByIdProvider<ChannelInfo>;
-        return Task.FromResult(provider?.Get(channelId));
-    }
+        if (_validationState.HasErrors())
+        {
+            throw new ValidationException(message);
+        }
 
-    private Task<WebsiteChannelInfo?> GetWebsiteChannelAsync(int channelId)
-    {
-        var provider = _websiteChannelInfoProvider as IInfoByIdProvider<WebsiteChannelInfo>;
-        return Task.FromResult(provider?.Get(channelId));
+        throw new UnprocessableEntityException(message);
     }
 
     private static Dictionary<string, int[]> BuildSubCategoryIdsByCategoryCode(IEnumerable<ContentCategoryFilter> categoryFilters)
@@ -335,6 +560,7 @@ public class ContentCategoryService : IContentCategoryService
         foreach (var filter in categoryFilters)
         {
             if (filter.CategoryCode is null || filter.SubCategoryIds is null) continue;
+
             map[filter.CategoryCode] = filter.SubCategoryIds;
         }
 
@@ -346,54 +572,45 @@ public class ContentCategoryService : IContentCategoryService
         return map;
     }
 
+    protected virtual Task<IEnumerable<TPage>> GetMappedPagesAsync<TPage>(
+        ContentItemQueryBuilder builder, CancellationToken cancellationToken)
+        where TPage : class, IWebPageFieldsSource =>
+        _contentQueryExecutor.GetMappedResult<TPage>(builder, cancellationToken: cancellationToken);
+
+    private sealed record PageQuery(
+        string ContentTypeName,
+        string PageType,
+        string LinkingFieldName,
+        int[] LinkedItemIds,
+        int LinkedItemsDepth);
+
     private sealed record InsightProjection(
-        Guid Guid, string PageType, string Title, string Summary, string? ImageUrl,
-        DateTime Date, string Url,
-        int[] BusinessIssueIds, int[] BusinessLineIds, int[] ServiceAreaIds, int[] IndustryIds)
-    {
-        public InsightContentDto ToDto() => new()
-        {
-            GUID = Guid,
-            PageType = PageType,
-            PageSubType = string.Empty,
-            TitleFull = Title,
-            TitleTwoThirds = Title,
-            TitleOneThird = Title,
-            SummaryFull = Summary,
-            SummaryTwoThirds = Summary,
-            SummaryOneThird = Summary,
-            ImageUrlFull = ImageUrl ?? string.Empty,
-            ImageUrlTwoThirds = ImageUrl ?? string.Empty,
-            ImageUrlOneThird = ImageUrl ?? string.Empty,
-            Date = Date,
-            DisplayDate = Date == default ? string.Empty : Date.ToString("d MMMM yyyy"),
-            URL = Url,
-        };
-    }
+        Guid WebPageItemGuid,
+        int WebPageItemId,
+        string PageType,
+        string PageSubType,
+        string Title,
+        string Summary,
+        string? ImageUrl,
+        DateTime Date);
 
-    private static InsightProjection MapBlogPostToProjection(BlogPost page) => new(
-        Guid: page.SystemFields.ContentItemGUID,
-        PageType: nameof(BlogPost),
-        Title: page.MetadataTitle ?? string.Empty,
-        Summary: page.MetadataDescription ?? string.Empty,
-        ImageUrl: page.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
-        Date: page.SystemFields.ContentItemCommonDataLastPublishedWhen ?? default,
-        Url: page.SystemFields.WebPageUrlPath ?? string.Empty,
-        BusinessIssueIds: page.MetadataBusinessIssues?.Select(x => x.SystemFields.ContentItemID).ToArray() ?? Array.Empty<int>(),
-        BusinessLineIds: page.MetadataBusinessLine?.Select(x => x.SystemFields.ContentItemID).ToArray() ?? Array.Empty<int>(),
-        ServiceAreaIds: page.MetadataServiceAreas?.Select(x => x.SystemFields.ContentItemID).ToArray() ?? Array.Empty<int>(),
-        IndustryIds: page.MetadataIndustries?.Select(x => x.SystemFields.ContentItemID).ToArray() ?? Array.Empty<int>());
+    private static InsightProjection MapBlogPost(BlogPost page, string pageType) => MapPage(
+        page.SystemFields, pageType, page.MetadataTitle, page.MetadataDescription,
+        page.ImageFileM?.FirstOrDefault()?.ContentAttachmentAsset?.Url, page.ContentTypeFilter);
 
-    private static InsightProjection MapInsightToProjection(Insight page) => new(
-        Guid: page.SystemFields.ContentItemGUID,
-        PageType: nameof(Insight),
-        Title: page.MetadataTitle ?? string.Empty,
-        Summary: page.MetadataDescription ?? string.Empty,
-        ImageUrl: page.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
-        Date: page.SystemFields.ContentItemCommonDataLastPublishedWhen ?? default,
-        Url: page.SystemFields.WebPageUrlPath ?? string.Empty,
-        BusinessIssueIds: page.MetadataBusinessIssues?.Select(x => x.SystemFields.ContentItemID).ToArray() ?? Array.Empty<int>(),
-        BusinessLineIds: page.MetadataBusinessLine?.Select(x => x.SystemFields.ContentItemID).ToArray() ?? Array.Empty<int>(),
-        ServiceAreaIds: page.MetadataServiceAreas?.Select(x => x.SystemFields.ContentItemID).ToArray() ?? Array.Empty<int>(),
-        IndustryIds: page.MetadataIndustries?.Select(x => x.SystemFields.ContentItemID).ToArray() ?? Array.Empty<int>());
+    private static InsightProjection MapInsight(Insight page, string pageType) => MapPage(
+        page.SystemFields, pageType, page.MetadataTitle, page.MetadataDescription,
+        page.InsightContent?.FirstOrDefault()?.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset?.Url, page.ContentTypeFilter);
+
+    private static InsightProjection MapPage(
+        WebPageFields systemFields, string pageType, string? title, string? description,
+        string? imageUrl, IEnumerable<Contenttypes>? contentTypeFilter) => new(
+            WebPageItemGuid: systemFields.WebPageItemGUID,
+            WebPageItemId: systemFields.WebPageItemID,
+            PageType: pageType,
+            PageSubType: contentTypeFilter?.FirstOrDefault()?.Name ?? string.Empty,
+            Title: title ?? string.Empty,
+            Summary: HtmlHelper.ExtractTextFromHtml(description) ?? string.Empty,
+            ImageUrl: imageUrl,
+            Date: systemFields.ContentItemCommonDataFirstPublishedWhen ?? default);
 }

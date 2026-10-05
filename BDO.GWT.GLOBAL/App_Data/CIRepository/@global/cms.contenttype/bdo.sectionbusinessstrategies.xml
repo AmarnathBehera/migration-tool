@@ -31,6 +31,8 @@
           <fieldcaption>Menu background image</fieldcaption>
           <fielddescription>Recommended size: 1440x800</fielddescription>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
@@ -38,7 +40,6 @@
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <MaximumItems>1</MaximumItems>
-          <MinimumItems>1</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -53,6 +54,23 @@
         <settings>
           <controlname>Kentico.Administration.TextInput</controlname>
         </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>This is the Required field.</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.MinLengthContentItems</Identifier>
+            <Properties>
+              <PropertyName>MenuBackgroundImage</PropertyName>
+              <Length>1</Length>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
       </field>
       <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
         <properties />
