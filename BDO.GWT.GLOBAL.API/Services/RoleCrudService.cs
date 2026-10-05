@@ -55,6 +55,10 @@ public class RoleCrudService : IRoleCrudService
     private const string ContentHubApplicationName = "Kentico.Xperience.Application.ContentHub";
     private const string ChannelApplicationPrefix = "Kentico.Xperience.Application.WebPages_";
     private const string EmailChannelApplicationPrefix = "Kentico.Xperience.Application.EmailChannel_";
+
+    /// <summary>Upper bound for each list in an Assign request, so one request can't trigger unbounded work.</summary>
+    private const int MaxEntriesPerList = 100;
+
     private static readonly string[] AllowedPermissions = { "View", "ManagePermissions", "OverrideContentLock" };
     private static readonly string[] DefaultPermissions = { "View" };
     private static readonly string[] AllowedWorkspacePermissions = { "View", "Create", "Update", "Delete", "Synchronize" };
@@ -349,13 +353,17 @@ public class RoleCrudService : IRoleCrudService
             ?? throw new ChannelNotFoundException(channelName);
 
     private async Task<List<ApplicationGrant>> ResolveWebsiteChannelGrantsAsync(
-        IReadOnlyList<ChannelPermissionInput> inputs, CancellationToken cancellationToken)
+        List<ChannelPermissionInput> inputs, CancellationToken cancellationToken)
     {
-        var grants = new List<ApplicationGrant>();
+        if (inputs.Count > MaxEntriesPerList)
+            throw new InvalidOperationException($"websiteChannels can contain at most {MaxEntriesPerList} entries.");
 
-        for (var i = 0; i < inputs.Count; i++)
+        var grants = new List<ApplicationGrant>();
+        var i = -1;
+
+        foreach (var entry in inputs)
         {
-            var entry = inputs[i];
+            i++;
 
             if (string.IsNullOrWhiteSpace(entry.WebsiteChannel))
                 throw new InvalidOperationException($"websiteChannels[{i}].websiteChannel is required.");
@@ -376,13 +384,17 @@ public class RoleCrudService : IRoleCrudService
     }
 
     private async Task<List<ApplicationGrant>> ResolveEmailChannelGrantsAsync(
-        IReadOnlyList<EmailChannelPermissionInput> inputs, CancellationToken cancellationToken)
+        List<EmailChannelPermissionInput> inputs, CancellationToken cancellationToken)
     {
-        var grants = new List<ApplicationGrant>();
+        if (inputs.Count > MaxEntriesPerList)
+            throw new InvalidOperationException($"emailChannels can contain at most {MaxEntriesPerList} entries.");
 
-        for (var i = 0; i < inputs.Count; i++)
+        var grants = new List<ApplicationGrant>();
+        var i = -1;
+
+        foreach (var entry in inputs)
         {
-            var entry = inputs[i];
+            i++;
 
             if (string.IsNullOrWhiteSpace(entry.EmailChannel))
                 throw new InvalidOperationException($"emailChannels[{i}].emailChannel is required.");
@@ -406,13 +418,17 @@ public class RoleCrudService : IRoleCrudService
         applicationName.StartsWith(ChannelApplicationPrefix, StringComparison.OrdinalIgnoreCase)
         || applicationName.StartsWith(EmailChannelApplicationPrefix, StringComparison.OrdinalIgnoreCase);
 
-    private static List<ApplicationGrant> ResolveGenericApplicationGrants(IReadOnlyList<ApplicationPermissionInput> inputs)
+    private static List<ApplicationGrant> ResolveGenericApplicationGrants(List<ApplicationPermissionInput> inputs)
     {
-        var grants = new List<ApplicationGrant>();
+        if (inputs.Count > MaxEntriesPerList)
+            throw new InvalidOperationException($"applications can contain at most {MaxEntriesPerList} entries.");
 
-        for (var i = 0; i < inputs.Count; i++)
+        var grants = new List<ApplicationGrant>();
+        var i = -1;
+
+        foreach (var entry in inputs)
         {
-            var entry = inputs[i];
+            i++;
 
             if (string.IsNullOrWhiteSpace(entry.ApplicationName))
                 throw new InvalidOperationException($"applications[{i}].applicationName is required.");
@@ -437,8 +453,11 @@ public class RoleCrudService : IRoleCrudService
     }
 
     private async Task<List<WorkspaceGrant>> ResolveWorkspaceGrantsAsync(
-        IReadOnlyList<WorkspacePermissionInput> inputs, CancellationToken cancellationToken)
+        List<WorkspacePermissionInput> inputs, CancellationToken cancellationToken)
     {
+        if (inputs.Count > MaxEntriesPerList)
+            throw new InvalidOperationException($"workspaces can contain at most {MaxEntriesPerList} entries.");
+
         var grants = new List<WorkspaceGrant>();
 
         if (inputs.Count == 0)
@@ -448,9 +467,11 @@ public class RoleCrudService : IRoleCrudService
             .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
             .ToArray();
 
-        for (var i = 0; i < inputs.Count; i++)
+        var i = -1;
+
+        foreach (var entry in inputs)
         {
-            var entry = inputs[i];
+            i++;
 
             if (string.IsNullOrWhiteSpace(entry.Workspace))
                 throw new InvalidOperationException($"workspaces[{i}].workspace is required.");
