@@ -45,8 +45,11 @@ public class RolesControllerTests
         var result = await _controller.Get("Editors", CancellationToken.None);
 
         var response = result.Result as OkObjectResult;
-        Assert.That(response, Is.Not.Null);
-        Assert.That(response!.Value, Is.EqualTo(expected));
+        Assert.Multiple(() =>
+        {
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response!.Value, Is.EqualTo(expected));
+        });
         _roleCrudServiceMock.Verify(x => x.GetRolesAsync("Editors", It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -59,8 +62,11 @@ public class RolesControllerTests
 
         var result = await _controller.Get(guid, CancellationToken.None);
 
-        Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
-        Assert.That(((OkObjectResult)result.Result!).Value, Is.EqualTo(expected));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
+            Assert.That(((OkObjectResult)result.Result!).Value, Is.EqualTo(expected));
+        });
     }
 
     [Test]
@@ -109,8 +115,11 @@ public class RolesControllerTests
 
         var result = await _controller.Put(guid, input, CancellationToken.None);
 
-        Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
-        Assert.That(((OkObjectResult)result.Result!).Value, Is.EqualTo(expected));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
+            Assert.That(((OkObjectResult)result.Result!).Value, Is.EqualTo(expected));
+        });
     }
 
     [Test]
@@ -133,9 +142,11 @@ public class RolesControllerTests
         _roleCrudServiceMock.Setup(x => x.AssignRolePermissionsAsync(input, It.IsAny<CancellationToken>())).ReturnsAsync(expected);
 
         var result = await _controller.Assign(input, CancellationToken.None);
-
-        Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
-        Assert.That(((OkObjectResult)result.Result!).Value, Is.EqualTo(expected));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
+            Assert.That(((OkObjectResult)result.Result!).Value, Is.EqualTo(expected));
+        });
     }
 
     [Test]
@@ -167,9 +178,12 @@ public class RolesControllerTests
         var result = await _controller.CreateForAllChannels(CancellationToken.None);
 
         var response = result.Result as ObjectResult;
-        Assert.That(response, Is.Not.Null);
-        Assert.That(response!.StatusCode, Is.EqualTo(StatusCodes.Status201Created));
-        Assert.That(response.Value, Is.EqualTo(expected));
+        Assert.Multiple(() =>
+        {
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response!.StatusCode, Is.EqualTo(StatusCodes.Status201Created));
+            Assert.That(response.Value, Is.EqualTo(expected));
+        });
     }
 
     [TestCase(null)]
@@ -260,9 +274,12 @@ public class RolesControllerTests
     private static void AssertProblem(IActionResult? actionResult, int statusCode, string title)
     {
         var response = actionResult as ObjectResult;
-        Assert.That(response, Is.Not.Null);
-        Assert.That(response!.StatusCode, Is.EqualTo(statusCode));
-        Assert.That(response.Value, Is.TypeOf<ProblemDetails>());
-        Assert.That(((ProblemDetails)response.Value!).Title, Is.EqualTo(title));
+        Assert.Multiple(() =>
+        {
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response!.StatusCode, Is.EqualTo(statusCode));
+            Assert.That(response.Value, Is.TypeOf<ProblemDetails>());
+            Assert.That(((ProblemDetails)response.Value!).Title, Is.EqualTo(title));
+        });
     }
 }

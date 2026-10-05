@@ -582,6 +582,161 @@ public class RoleCrudServiceTests
 
     #endregion
 
+    #region AssignRolePermissionsAsync grant resolution / validation
+
+    private static Harness HarnessWithExistingRole(string roleName = "Editors")
+    {
+        var harness = new Harness();
+        harness.SetupValidCaller();
+        harness.Roles.Setup(x => x.Get())
+            .Returns(QueryReturning<RoleInfo>(new RoleInfo[] { CreateRole(1, Guid.NewGuid(), roleName, roleName, "desc") }).Object);
+        return harness;
+    }
+
+    [Test]
+    public void AssignRolePermissionsAsync_WhenWebsiteChannelNameMissing_ThrowsInvalidOperation()
+    {
+        var harness = HarnessWithExistingRole();
+        var input = new AssignRolePermissionsInput
+        {
+            RoleName = "Editors",
+            WebsiteChannels = new List<ChannelPermissionInput> { new() { WebsiteChannel = "  " } }
+        };
+
+        var service = harness.Build();
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await service.AssignRolePermissionsAsync(input, CancellationToken.None));
+    }
+
+    [Test]
+    public void AssignRolePermissionsAsync_WhenWebsiteChannelPermissionUnknown_ThrowsInvalidOperation()
+    {
+        var harness = HarnessWithExistingRole();
+        var input = new AssignRolePermissionsInput
+        {
+            RoleName = "Editors",
+            WebsiteChannels = new List<ChannelPermissionInput>
+            {
+                new() { WebsiteChannel = "Ind", Permissions = new[] { "Fly" } }
+            }
+        };
+
+        var service = harness.Build();
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await service.AssignRolePermissionsAsync(input, CancellationToken.None));
+    }
+
+    [Test]
+    public void AssignRolePermissionsAsync_WhenWebsiteChannelNotFound_ThrowsChannelNotFound()
+    {
+        var harness = HarnessWithExistingRole();
+        harness.Channels.Setup(x => x.Get()).Returns(QueryReturning(Array.Empty<ChannelInfo>()).Object);
+        var input = new AssignRolePermissionsInput
+        {
+            RoleName = "Editors",
+            WebsiteChannels = new List<ChannelPermissionInput>
+            {
+                new() { WebsiteChannel = "Ind", Permissions = new[] { "View" } }
+            }
+        };
+
+        var service = harness.Build();
+
+        Assert.ThrowsAsync<ChannelNotFoundException>(async () =>
+            await service.AssignRolePermissionsAsync(input, CancellationToken.None));
+    }
+
+    [Test]
+    public void AssignRolePermissionsAsync_WhenEmailChannelNameMissing_ThrowsInvalidOperation()
+    {
+        var harness = HarnessWithExistingRole();
+        var input = new AssignRolePermissionsInput
+        {
+            RoleName = "Editors",
+            EmailChannels = new List<EmailChannelPermissionInput> { new() { EmailChannel = " " } }
+        };
+
+        var service = harness.Build();
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await service.AssignRolePermissionsAsync(input, CancellationToken.None));
+    }
+
+    [Test]
+    public void AssignRolePermissionsAsync_WhenApplicationNameMissing_ThrowsInvalidOperation()
+    {
+        var harness = HarnessWithExistingRole();
+        var input = new AssignRolePermissionsInput
+        {
+            RoleName = "Editors",
+            Applications = new List<ApplicationPermissionInput> { new() { ApplicationName = null } }
+        };
+
+        var service = harness.Build();
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await service.AssignRolePermissionsAsync(input, CancellationToken.None));
+    }
+
+    [Test]
+    public void AssignRolePermissionsAsync_WhenApplicationNameLooksLikeChannel_ThrowsInvalidOperation()
+    {
+        var harness = HarnessWithExistingRole();
+        var input = new AssignRolePermissionsInput
+        {
+            RoleName = "Editors",
+            Applications = new List<ApplicationPermissionInput>
+            {
+                new() { ApplicationName = "Kentico.Xperience.Application.WebPages_abc", Permissions = new[] { "View" } }
+            }
+        };
+
+        var service = harness.Build();
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await service.AssignRolePermissionsAsync(input, CancellationToken.None));
+    }
+
+    [Test]
+    public void AssignRolePermissionsAsync_WhenWorkspaceNameMissing_ThrowsInvalidOperation()
+    {
+        var harness = HarnessWithExistingRole();
+        var input = new AssignRolePermissionsInput
+        {
+            RoleName = "Editors",
+            Workspaces = new List<WorkspacePermissionInput> { new() { Workspace = "  " } }
+        };
+
+        var service = harness.Build();
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await service.AssignRolePermissionsAsync(input, CancellationToken.None));
+    }
+
+    [Test]
+    public void AssignRolePermissionsAsync_WhenWorkspaceNotFound_ThrowsInvalidOperation()
+    {
+        var harness = HarnessWithExistingRole();
+        harness.Workspaces.Setup(x => x.Get()).Returns(QueryReturning(Array.Empty<WorkspaceInfo>()).Object);
+        var input = new AssignRolePermissionsInput
+        {
+            RoleName = "Editors",
+            Workspaces = new List<WorkspacePermissionInput>
+            {
+                new() { Workspace = "Default", Permissions = new[] { "View" } }
+            }
+        };
+
+        var service = harness.Build();
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await service.AssignRolePermissionsAsync(input, CancellationToken.None));
+    }
+
+    #endregion
+
     #region Test harness and fakes
 
     private sealed class Harness
