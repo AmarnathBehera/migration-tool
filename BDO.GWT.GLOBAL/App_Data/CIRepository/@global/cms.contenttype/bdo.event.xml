@@ -401,20 +401,6 @@ Advanced
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
-      <field allowempty="true" column="MetadataBusinessLines" columnprecision="0" columntype="contentitemreference" enabled="true" guid="baaf43c7-636e-4708-b7aa-d607869a6df6" visible="true">
-        <properties>
-          <explanationtextashtml>False</explanationtextashtml>
-          <fieldcaption>Business Lines</fieldcaption>
-          <fielddescriptionashtml>False</fielddescriptionashtml>
-        </properties>
-        <settings>
-          <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["b70d2494-90c7-42c5-a7d6-44da7013729b"]]]>
-          </AllowedContentItemTypeIdentifiers>
-          <controlname>Kentico.Administration.ContentItemSelector</controlname>
-          <SelectionType>contentTypes</SelectionType>
-        </settings>
-      </field>
       <field allowempty="true" column="MetadataSpecialtiesAreas" columnprecision="0" columntype="contentitemreference" enabled="true" guid="336efc99-5090-4823-b701-0a300780dcdb" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>

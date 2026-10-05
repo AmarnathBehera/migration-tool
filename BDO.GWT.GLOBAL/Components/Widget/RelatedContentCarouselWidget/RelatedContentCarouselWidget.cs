@@ -45,8 +45,10 @@ public class RelatedContentCarouselWidget : ViewComponent
                 new RetrieveContentParameters { LinkedItemsMaxLevel = 2 })
             : Enumerable.Empty<ContentAttachment>();
 
-        var selectedPageTypes = model.Properties.SelectedPageTypes ?? GetDefaultPageTypes();
-        var filters = model.Properties.Filters ?? GetDefaultFilters();
+        var selectedPageTypes = model.Properties.SelectedPageTypes?.Where(x => !string.IsNullOrWhiteSpace(x)).Distinct(StringComparer.OrdinalIgnoreCase).ToList() is { Count: > 0 } types
+            ? types
+            : GetDefaultPageTypes();
+        var filters = model.Properties.Filters?.Distinct(StringComparer.OrdinalIgnoreCase).ToList() ?? GetDefaultFilters();
 
         var data = new RelatedContentCarouselData
         {

@@ -247,7 +247,7 @@ public class AuthoredContentService : IAuthoredContentService
                 LanguageName = _cultureContext.CurrentLanguageTag,
                 UseLanguageFallbacks = false,
             },
-            query => query.Where(w => w.WhereContains(nameof(BlogPost.RelevantContactPerson), personGuid)),
+            query => query.Where(w => w.WhereContains(nameof(BlogPost.BlogRelevantContactPerson), personGuid)),
             RetrievalCacheSettings.CacheDisabled,
             cancellationToken
         ))?.ToArray() ?? Array.Empty<BlogPost>();

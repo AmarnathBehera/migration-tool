@@ -72,7 +72,7 @@ public class EditorsPickCardService : IEditorsPickCardService
     {
         cardsQuery ??= new CardsQuery();
         cardsQuery.CurrentPage ??= 1;
-        cardsQuery.PageSize ??= 10;
+        cardsQuery.PageSize ??= 20;
 
         if (selectedPageGuids.Count == 0)
         {
@@ -93,7 +93,7 @@ public class EditorsPickCardService : IEditorsPickCardService
 
         var filtered = (await ApplyFiltersAsync(pages, cardsQuery.Filters))
             .OrderByDescending(isFeatured)
-            .ThenByDescending(GetPublishDateUtc)
+            .ThenBy(GetOrderingDate)
             .ToArray();
 
         var paged = filtered
@@ -197,7 +197,8 @@ public class EditorsPickCardService : IEditorsPickCardService
                 ImageURL = GetImageUrl(page)?.TrimStart('~'),
                 ImageAltText = GetStringProperty(page, "MetadataTeaserImageAltText")
                     ?? GetStringProperty(page, "ImageFileAltText"),
-                Date = GetPublishDateUtc(page),
+                Date = GetCardDate(page),
+                DateTo = GetCardDateTo(page),
                 UpdatedOnDate = GetDateTimeProperty(page, "UpdatedOn"),
                 ReadMoreLink = url is null
                     ? null
@@ -353,5 +354,34 @@ public class EditorsPickCardService : IEditorsPickCardService
         var firstPublished = type.GetProperty("ContentItemCommonDataFirstPublishedWhen")?.GetValue(systemFields) as DateTime?;
 
         return lastPublished ?? firstPublished;
+    }
+
+    // Events and Webinars expose their own date range, other page types fall back to the publish date.
+    private static DateTime? GetCardDate(IWebPageFieldsSource page) => page switch
+    {
+        Event e => e.EventDateFrom,
+        Webinar w => w.EventDateFrom,
+        _ => GetPublishDateUtc(page)
+    };
+
+    private static DateTime? GetCardDateTo(IWebPageFieldsSource page) => page switch
+    {
+        Event e => e.EventDateTo,
+        Webinar w => w.EventDateTo,
+        _ => null
+    };
+
+    // Returns a key that is always sorted ascending: regular pages keep their "most recently
+    // published first" order, while Events and Webinars use an inverted start date so that the
+    // latest start date appears first.
+    private static DateTime GetOrderingDate(IWebPageFieldsSource page)
+    {
+        if (page is Event e)
+            return DateTime.MaxValue - (e.EventDateFrom - DateTime.MinValue);
+
+        if (page is Webinar w)
+            return DateTime.MaxValue - (w.EventDateFrom - DateTime.MinValue);
+
+        return DateTime.MaxValue - ((GetPublishDateUtc(page) ?? DateTime.MinValue) - DateTime.MinValue);
     }
 }

@@ -23,6 +23,10 @@ namespace BDO.GWT.GLOBAL.Tests.Services
         private Mock<IContentQueryExecutor> _contentQueryExecutorMock = null!;
         private EventsWebinarsSliderService _service = null!;
 
+        // The service no longer takes an IWebPageFieldsSource - only the
+        // content item GUID and the page type name.
+        private const string TestPageTypeName = "TestPage";
+
         private sealed class TestPage : IWebPageFieldsSource
         {
             public WebPageFields SystemFields { get; set; } = new WebPageFields();
@@ -86,7 +90,7 @@ namespace BDO.GWT.GLOBAL.Tests.Services
         {
             // Arrange
             var cancellationToken = CancellationToken.None;
-            var currentPage = CreateCurrentPage();
+            var currentPageGuid = Guid.NewGuid();
             var data = CreateData();
 
             var cards = new[]
@@ -118,7 +122,8 @@ namespace BDO.GWT.GLOBAL.Tests.Services
 
             // Act
             var result = await _service.GetEventsWebinarsSliderAsync(
-                currentPage,
+                currentPageGuid,
+                TestPageTypeName,
                 data,
                 cancellationToken);
 
@@ -149,7 +154,7 @@ namespace BDO.GWT.GLOBAL.Tests.Services
         {
             // Arrange
             var cancellationToken = CancellationToken.None;
-            var currentPage = CreateCurrentPage();
+            var currentPageGuid = Guid.NewGuid();
 
             var data = CreateData();
             data.FilteringEnabled = false;
@@ -171,9 +176,10 @@ namespace BDO.GWT.GLOBAL.Tests.Services
 
             // Act
             var result = await _service.GetEventsWebinarsSliderAsync(
-                currentPage,
-                data,
-                cancellationToken);
+            currentPageGuid,
+            TestPageTypeName,
+            data,
+            cancellationToken);
 
             // Assert
             Assert.Multiple(() =>
@@ -195,7 +201,7 @@ namespace BDO.GWT.GLOBAL.Tests.Services
         {
             // Arrange
             var cancellationToken = CancellationToken.None;
-            var currentPage = CreateCurrentPage();
+            var currentPageGuid = Guid.NewGuid();
 
             var data = CreateData();
             data.SeeAllLinkText = null;
@@ -224,9 +230,10 @@ namespace BDO.GWT.GLOBAL.Tests.Services
 
             // Act
             var result = await _service.GetEventsWebinarsSliderAsync(
-                currentPage,
-                data,
-                cancellationToken);
+               currentPageGuid,
+               TestPageTypeName,
+               data,
+               cancellationToken);
 
             // Assert
             Assert.That(result.SeeAllLink, Is.Null);

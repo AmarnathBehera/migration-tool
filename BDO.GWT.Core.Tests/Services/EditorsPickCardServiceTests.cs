@@ -142,7 +142,7 @@ public class EditorsPickCardServiceTests
     [Test]
     public async Task GetFilteredItemsAsync_WhenCardsQueryIsNull_UsesDefaultPaging()
     {
-        var pages = Enumerable.Range(1, 12)
+        var pages = Enumerable.Range(1, 20)
             .Select(i => (IWebPageFieldsSource)CreatePage($"Title {i}", publishDateUtc: DateTime.UtcNow.AddDays(-i)))
             .ToArray();
 
@@ -160,8 +160,8 @@ public class EditorsPickCardServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(result.TotalCount, Is.EqualTo(12));
-            Assert.That(result.Data, Has.Length.EqualTo(10)); // default page size
+            Assert.That(result.TotalCount, Is.EqualTo(20));
+            Assert.That(result.Data, Has.Length.EqualTo(20)); // default page size
         });
     }
 

@@ -15,7 +15,7 @@ public class WebinarWrapper : IEventOrWebinar
     public string? EventLocationCity => _webinar.EventLocationCity;
     public string? MetadataDescription => _webinar.MetadataDescription;
     public IEnumerable<Service> MetadataServices => _webinar.MetadataServices;
-    public IEnumerable<BusinessLine> MetadataBusinessLines => _webinar.MetadataBusinessLines;
+    public IEnumerable<BusinessLine> MetadataBusinessLines => _webinar.MetadataBusinessLine;
     public IEnumerable<ServiceArea> MetadataServiceAreas => _webinar.MetadataServiceAreas;
     public IEnumerable<IWebPageFieldsSource> MetadataSpecialtiesCategories => _webinar.MetadataSpecialtiesCategories;
     public IEnumerable<IWebPageFieldsSource> MetadataSpecialtiesAreas => _webinar.MetadataSpecialtiesAreas;

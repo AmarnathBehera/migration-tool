@@ -65,7 +65,10 @@ public class RelatedContentCardService : IRelatedContentCardService
         if (string.IsNullOrWhiteSpace(parentPath))
             throw new ArgumentException("Parent path cannot be null or empty.", nameof(parentPath));
 
-        var selectedTypes = cardsQuery.SelectedPageTypes ?? new List<string>();
+        var selectedTypes = cardsQuery.SelectedPageTypes?
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList() ?? new List<string>();
         var allPages = new List<IWebPageFieldsSource>();
 
         async Task<IEnumerable<IWebPageFieldsSource>> RetrieveAsync<T>()
@@ -114,11 +117,13 @@ public class RelatedContentCardService : IRelatedContentCardService
 
         var filtered = allPages
             .Where(page => filters.All(f => f(page)))
+            .GroupBy(page => page.SystemFields.WebPageItemGUID)
+            .Select(group => group.First())
             .ToArray();
 
         var ordered = ((IEnumerable<IWebPageFieldsSource>)filtered)
             .OrderByDescending(x => isFeatured(x))
-            .ThenBy(x => GetOrderingDate(x))
+            .ThenByDescending(x => GetOrderingDate(x))
             .ToArray();
 
         var currentPage = cardsQuery.CurrentPage ?? 1;
@@ -142,15 +147,15 @@ public class RelatedContentCardService : IRelatedContentCardService
     }
 
     // Returns a key that is always sorted with ThenByDescending: regular pages keep their
-    // "most recently published first" order, while Events and Webinars use an inverted start
-    // date so that the soonest upcoming one appears first.
+    // "most recently published first" order, while Events and Webinars sort by start date
+    // with the latest/future dates appearing first.
     private static DateTime GetOrderingDate(IWebPageFieldsSource page)
     {
         if (page is Event e)
-            return DateTime.MaxValue - (e.EventDateFrom - DateTime.MinValue);
+            return e.EventDateFrom;
 
         if (page is Webinar w)
-            return DateTime.MaxValue - (w.EventDateFrom - DateTime.MinValue);
+            return w.EventDateFrom;
 
         return page.SystemFields.ContentItemCommonDataLastPublishedWhen
                ?? page.SystemFields.ContentItemCommonDataFirstPublishedWhen
@@ -212,11 +217,11 @@ public class RelatedContentCardService : IRelatedContentCardService
 
                 FilterParameterName.ContentType =>  page => page switch
                 {
-                    Insight i => MatchesLinkedItemName(i.ContentType, filterParameterValue),
-                    BlogPost b => MatchesLinkedItemName(b.ContentType, filterParameterValue),
-                    NewsArticle n => MatchesLinkedItemName(n.ContentType, filterParameterValue),
-                    Event e => MatchesLinkedItemName(e.ContentType, filterParameterValue),
-                    Webinar w => MatchesLinkedItemName(w.ContentType, filterParameterValue),
+                    Insight i => MatchesLinkedItemName(i.ContentTypeFilter, filterParameterValue),
+                    BlogPost b => MatchesLinkedItemName(b.ContentTypeFilter, filterParameterValue),
+                    NewsArticle n => MatchesLinkedItemName(n.ContentTypeFilter, filterParameterValue),
+                    Event e => MatchesLinkedItemName(e.ContentTypeFilter, filterParameterValue),
+                    Webinar w => MatchesLinkedItemName(w.ContentTypeFilter, filterParameterValue),
                     MicrositePage m => MatchesLinkedItemName(m.MicrositeContentType, filterParameterValue),
                     _ => false
                 },
@@ -287,12 +292,12 @@ public class RelatedContentCardService : IRelatedContentCardService
             Insight i => BuildCard(i, isFeatured, new CardContent(
                 i.InsightContent.FirstOrDefault()?.ImageFile.FirstOrDefault()?.ContentAttachmentAsset?.Url,
                 i.InsightContent.FirstOrDefault()?.ImageFileAltText,
-                i.ContentType?.FirstOrDefault()?.Name, i.MetadataTitle, i.MetadataDescription, i.ComingSoon)),
+                i.ContentTypeFilter?.FirstOrDefault()?.Name, i.MetadataTitle, i.MetadataDescription, i.ComingSoon)),
 
-            BlogPost b     => BuildCard(b, isFeatured, new CardContent(Teaser(b.MetadataTeaserImage), b.MetadataTeaserImageAltText, b.ContentType?.FirstOrDefault()?.Name, b.MetadataTitle, b.MetadataDescription)),
-            NewsArticle n  => BuildCard(n, isFeatured, new CardContent(Teaser(n.MetadataTeaserImage), n.MetadataTeaserImageAltText, n.ContentType?.FirstOrDefault()?.Name, n.MetadataTitle, n.MetadataDescription)),
-            Event e        => BuildCard(e, isFeatured, new CardContent(Teaser(e.MetadataTeaserImage), e.MetadataTeaserImageAltText, e.ContentType?.FirstOrDefault()?.Name, e.MetadataTitle, e.MetadataDescription, DateOverride: e.EventDateFrom, DateToOverride: e.EventDateTo)),
-            Webinar w      => BuildCard(w, isFeatured, new CardContent(Teaser(w.MetadataTeaserImage), w.MetadataTeaserImageAltText, w.ContentType?.FirstOrDefault()?.Name, w.MetadataTitle, w.MetadataDescription, DateOverride: w.EventDateFrom, DateToOverride: w.EventDateTo)),
+            BlogPost b     => BuildCard(b, isFeatured, new CardContent(Teaser(b.MetadataTeaserImage), b.MetadataTeaserImageAltText, b.ContentTypeFilter?.FirstOrDefault()?.Name, b.MetadataTitle, b.MetadataDescription)),
+            NewsArticle n  => BuildCard(n, isFeatured, new CardContent(Teaser(n.MetadataTeaserImage), n.MetadataTeaserImageAltText, n.ContentTypeFilter?.FirstOrDefault()?.Name, n.MetadataTitle, n.MetadataDescription)),
+            Event e        => BuildCard(e, isFeatured, new CardContent(Teaser(e.MetadataTeaserImage), e.MetadataTeaserImageAltText, e.ContentTypeFilter?.FirstOrDefault()?.Name, e.MetadataTitle, e.MetadataDescription, DateOverride: e.EventDateFrom, DateToOverride: e.EventDateTo)),
+            Webinar w      => BuildCard(w, isFeatured, new CardContent(Teaser(w.MetadataTeaserImage), w.MetadataTeaserImageAltText, w.ContentTypeFilter?.FirstOrDefault()?.Name, w.MetadataTitle, w.MetadataDescription, DateOverride: w.EventDateFrom, DateToOverride: w.EventDateTo)),
             MicrositePage m => BuildCard(m, isFeatured, new CardContent(Teaser(m.MetadataTeaserImage), m.MetadataTeaserImageAltText, m.MicrositeContentType?.FirstOrDefault()?.Name, m.MetadataTitle, m.MetadataDescription)),
 
             _ => null

@@ -64,6 +64,7 @@ public class NewsArticleCardsService : INewsArticleCardsService
     Func<NewsArticle, bool> isFeatured,
     CancellationToken cancellationToken)
     {
+        int channelId = await _contentService.GetCurrentChannelIDChannelInfo(cancellationToken);
         var filterWhereExpressions = await GetFilterParameterWhereExpressionsAsync(cardsQuery.Filters);
 
         var newsGroupIDsList = new List<int>();
@@ -101,7 +102,7 @@ public class NewsArticleCardsService : INewsArticleCardsService
             {
                 query.Where(w =>
                 {
-                    w.WhereEquals("ContentItemChannelID", _contentService.GetCurrentChannelID());
+                    w.WhereEquals("ContentItemChannelID", channelId);
                     w.WhereIn("WebPageItemParentID", newsGroupIDs);
 
                     foreach (var filter in filterWhereExpressions)
@@ -211,7 +212,7 @@ public class NewsArticleCardsService : INewsArticleCardsService
         return filterName switch
         {
 
-            FilterParameterName.ContentType => w => w.WhereContains(nameof(NewsArticle.ContentType), guid),
+            FilterParameterName.ContentType => w => w.WhereContains(nameof(NewsArticle.ContentTypeFilter), guid),
 
             _ => null,
         };
@@ -229,10 +230,10 @@ public class NewsArticleCardsService : INewsArticleCardsService
             var card = new NewsPageCardDto
             {
                 IsFeatured = isPageFeatured(contentPage),
-                ImageURL = urlHelper.Content(contentPage.ImageFileM.FirstOrDefault()?.ContentAttachmentAsset.Url),
+                ImageURL = urlHelper.Content(contentPage.ImageFileM?.FirstOrDefault()?.ContentAttachmentAsset.Url) ?? string.Empty,
                 isComingSoon = isComingSoon,
                 ImageAltText = contentPage.ImageFileAltTextM,
-                Type = contentPage.ContentType.FirstOrDefault()?.Name,
+                Type = contentPage.ContentTypeFilter?.FirstOrDefault()?.Name,
                 Title = contentPage.MetadataTitle,
                 Date = contentPage.SystemFields.ContentItemCommonDataLastPublishedWhen ?? contentPage.SystemFields.ContentItemCommonDataFirstPublishedWhen,
                 UpdatedOnDate = contentPage.UpdatedOn == DateTime.MinValue ? null : contentPage.UpdatedOn,

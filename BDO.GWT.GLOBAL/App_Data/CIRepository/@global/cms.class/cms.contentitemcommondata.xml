@@ -433,11 +433,13 @@
           <fieldcaption>Where should this page appear?</fieldcaption>
         </properties>
       </schema>
-      <field allowempty="true" column="ContentType" columnprecision="0" columntype="contentitemreference" enabled="true" guid="be3b48ec-7eb2-4b5a-8cc7-71c3d28100f1" visible="true">
+      <field allowempty="true" column="ContentTypeFilter" columnprecision="0" columntype="contentitemreference" enabled="true" guid="69511c69-7cc8-4ea4-817b-8a679a0fad57" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Type</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>True</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>6bf9af2e-ee19-461b-a071-2b6541b36653</kxp_schema_identifier>
         </properties>
         <settings>
@@ -445,6 +447,8 @@
             <![CDATA[["327fb912-7a4d-4bb6-8d7d-d1f288ab5b67"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>0</MinimumItems>
           <SelectionType>contentTypes</SelectionType>
         </settings>
       </field>
@@ -558,11 +562,13 @@
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>RSS category</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
           <kxp_schema_identifier>6bf9af2e-ee19-461b-a071-2b6541b36653</kxp_schema_identifier>
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["2fbc3346-16df-4d75-a048-f3a714cd5592"]]]>
+            <![CDATA[["efbd7409-7bd1-4d81-84a2-ea84616ff232"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <SelectionType>contentTypes</SelectionType>

@@ -276,6 +276,12 @@ namespace BDO
 
 
 		/// <summary>
+		/// MetadataCanonical.
+		/// </summary>
+		public string MetadataCanonical { get; set; }
+
+
+		/// <summary>
 		/// MetadataTeaserImage.
 		/// </summary>
 		public IEnumerable<ContentAttachment> MetadataTeaserImage { get; set; }
@@ -288,15 +294,9 @@ namespace BDO
 
 
 		/// <summary>
-		/// MetadataCanonical.
+		/// ContentTypeFilter.
 		/// </summary>
-		public string MetadataCanonical { get; set; }
-
-
-		/// <summary>
-		/// ContentType.
-		/// </summary>
-		public IEnumerable<Contenttypes> ContentType { get; set; }
+		public IEnumerable<Contenttypes> ContentTypeFilter { get; set; }
 
 
 		/// <summary>

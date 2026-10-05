@@ -1092,6 +1092,234 @@ public class RelatedContentCardServiceTests
     }
 
     // -------------------------------------------------------------------------
+    // GetFilteredItemsAsync — exception resilience
+    // -------------------------------------------------------------------------
+
+    [Test]
+    public async Task GetFilteredItemsAsync_RetrievePagesThrowsInvalidOperationException_TreatedAsEmptyForThatType()
+    {
+        _contentRetrieverMock
+            .Setup(x => x.RetrievePages<Insight, Insight>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, Insight, Task<Insight>>>(),
+                It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Unbindable asset field"));
+
+        var query = new RelatedContentCardsQuery
+        {
+            SelectedPageTypes = new List<string> { nameof(Insight) },
+            CurrentPage = 1,
+            PageSize = 10
+        };
+
+        var result = await _sut.GetFilteredItemsAsync(query, "/", "en-gb", null, _ => false, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Data, Is.Empty);
+            Assert.That(result.TotalCount, Is.EqualTo(0));
+        });
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_OnePageTypeThrows_OtherPageTypesStillReturned()
+    {
+        _contentRetrieverMock
+            .Setup(x => x.RetrievePages<Insight, Insight>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<Func<IContentQueryDataContainer, Insight, Task<Insight>>>(),
+                It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Bad asset"));
+
+        SetupBlogPostRetrieval(CreateBlogPosts(2));
+
+        var query = new RelatedContentCardsQuery
+        {
+            SelectedPageTypes = new List<string> { nameof(Insight), nameof(BlogPost) },
+            CurrentPage = 1,
+            PageSize = 10
+        };
+
+        var result = await _sut.GetFilteredItemsAsync(query, "/", "en-gb", null, _ => false, CancellationToken.None);
+
+        Assert.That(result.TotalCount, Is.EqualTo(2));
+    }
+
+    // -------------------------------------------------------------------------
+    // GetFilteredItemsAsync — Event/Webinar ordering by date
+    // -------------------------------------------------------------------------
+
+    [Test]
+    public async Task GetFilteredItemsAsync_Events_OrderedBySoonestUpcomingFirst()
+    {
+        var soon = CreateEvent(Guid.NewGuid(), title: "Soon");
+        SetProperty(soon, nameof(Event.EventDateFrom), DateTime.UtcNow.AddDays(1));
+
+        var later = CreateEvent(Guid.NewGuid(), title: "Later");
+        SetProperty(later, nameof(Event.EventDateFrom), DateTime.UtcNow.AddDays(30));
+
+        SetupRetrieval<Event>(new[] { later, soon });
+
+        var result = await _sut.GetFilteredItemsAsync(BasicQuery(nameof(Event)), "/", "en-gb", null, _ => false, CancellationToken.None);
+
+        Assert.That(result.Data[0].Title, Is.EqualTo("Later"));
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_EventCard_MapsDateToFromEventDateTo()
+    {
+        var from = DateTime.UtcNow.AddDays(1);
+        var to = DateTime.UtcNow.AddDays(2);
+        var ev = CreateEvent(Guid.NewGuid());
+        SetProperty(ev, nameof(Event.EventDateFrom), from);
+        SetProperty(ev, nameof(Event.EventDateTo), to);
+        SetupRetrieval<Event>(new[] { ev });
+
+        var result = await _sut.GetFilteredItemsAsync(BasicQuery(nameof(Event)), "/", "en-gb", null, _ => false, CancellationToken.None);
+        var card = result.Data.Single();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(card.Date, Is.EqualTo(from));
+            Assert.That(card.DateTo, Is.EqualTo(to));
+        });
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_WebinarCard_MapsDateToFromEventDateTo()
+    {
+        var from = DateTime.UtcNow.AddDays(3);
+        var to = DateTime.UtcNow.AddDays(4);
+        var webinar = CreateWebinar(Guid.NewGuid());
+        SetProperty(webinar, nameof(Webinar.EventDateFrom), from);
+        SetProperty(webinar, nameof(Webinar.EventDateTo), to);
+        SetupRetrieval<Webinar>(new[] { webinar });
+
+        var result = await _sut.GetFilteredItemsAsync(BasicQuery(nameof(Webinar)), "/", "en-gb", null, _ => false, CancellationToken.None);
+        var card = result.Data.Single();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(card.Date, Is.EqualTo(from));
+            Assert.That(card.DateTo, Is.EqualTo(to));
+        });
+    }
+
+    // -------------------------------------------------------------------------
+    // GetFilteredItemsAsync — image alt text mapping
+    // -------------------------------------------------------------------------
+
+    [Test]
+    public async Task GetFilteredItemsAsync_BlogPostCard_MapsImageAltText()
+    {
+        var blogPost = CreateBlogPost(Guid.NewGuid(), teaserImageUrl: "https://cdn.example.com/blog.jpg");
+        SetProperty(blogPost, nameof(BlogPost.MetadataTeaserImageAltText), "Blog Alt Text");
+        SetupBlogPostRetrieval(new[] { blogPost });
+
+        var result = await _sut.GetFilteredItemsAsync(BasicQuery(nameof(BlogPost)), "/", "en-gb", null, _ => false, CancellationToken.None);
+
+        Assert.That(result.Data.Single().ImageAltText, Is.EqualTo("Blog Alt Text"));
+    }
+
+    // -------------------------------------------------------------------------
+    // GetFilteredItemsAsync — MicrositePage filters
+    // -------------------------------------------------------------------------
+
+    [Test]
+    public async Task GetFilteredItemsAsync_MicrositePage_BusinessLineFilter_Matches()
+    {
+        var bl = CreateNamedLinkedItem<BusinessLine>("Consulting");
+        var matching = CreateMicrositePage(Guid.NewGuid(), title: "Match");
+        SetProperty(matching, nameof(MicrositePage.BusinessLines), new[] { bl });
+        var other = CreateMicrositePage(Guid.NewGuid(), title: "NoMatch");
+        SetupRetrieval<MicrositePage>(new[] { matching, other });
+
+        var query = new RelatedContentCardsQuery
+        {
+            SelectedPageTypes = new List<string> { nameof(MicrositePage) },
+            Filters = new Dictionary<string, string> { { FilterParameterName.BusinessLine, "Consulting" } },
+            CurrentPage = 1,
+            PageSize = 10
+        };
+
+        var result = await _sut.GetFilteredItemsAsync(query, "/", "en-gb", null, _ => false, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.TotalCount, Is.EqualTo(1));
+            Assert.That(result.Data.Single().Title, Is.EqualTo("Match"));
+        });
+    }
+
+    // -------------------------------------------------------------------------
+    // GetFilteredItemsAsync — combined filters (AND logic)
+    // -------------------------------------------------------------------------
+
+    [Test]
+    public async Task GetFilteredItemsAsync_MultipleFilters_AppliedWithAndLogic()
+    {
+        var bl = CreateNamedLinkedItem<BusinessLine>("Audit");
+        var sa = CreateNamedLinkedItem<ServiceArea>("Tax");
+
+        var matchesBoth = CreateInsight(Guid.NewGuid(), new InsightOptions
+        {
+            Title = "Both",
+            BusinessLines = new[] { bl },
+            ServiceAreas = new[] { sa }
+        });
+        var matchesOnlyBusinessLine = CreateInsight(Guid.NewGuid(), new InsightOptions
+        {
+            Title = "OnlyBL",
+            BusinessLines = new[] { bl }
+        });
+        SetupInsightRetrieval(new[] { matchesBoth, matchesOnlyBusinessLine });
+
+        var query = new RelatedContentCardsQuery
+        {
+            SelectedPageTypes = new List<string> { nameof(Insight) },
+            Filters = new Dictionary<string, string>
+            {
+                { FilterParameterName.BusinessLine, "Audit" },
+                { FilterParameterName.ServiceArea, "Tax" }
+            },
+            CurrentPage = 1,
+            PageSize = 10
+        };
+
+        var result = await _sut.GetFilteredItemsAsync(query, "/", "en-gb", null, _ => false, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.TotalCount, Is.EqualTo(1));
+            Assert.That(result.Data.Single().Title, Is.EqualTo("Both"));
+        });
+    }
+
+    // -------------------------------------------------------------------------
+    // CreateFiltersAsync — additional coverage
+    // -------------------------------------------------------------------------
+
+    [Test]
+    public async Task CreateFiltersAsync_PassesNodeAliasPathThrough()
+    {
+        var filterNames = new HashSet<string> { FilterParameterName.BusinessLine };
+        string? capturedPath = null;
+
+        _cardsServiceMock
+            .Setup(x => x.CreateFiltersAsync(filterNames, It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+            .Callback<HashSet<string>, string?, CancellationToken>((_, path, _) => capturedPath = path)
+            .ReturnsAsync(Array.Empty<FilterItemDto<OptionDto>>());
+
+        await _sut.CreateFiltersAsync(filterNames, "/some/path", CancellationToken.None);
+
+        Assert.That(capturedPath, Is.EqualTo("/some/path"));
+    }
+
+    // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
@@ -1150,6 +1378,7 @@ public class RelatedContentCardServiceTests
     {
         var fields = (WebPageFields)RuntimeHelpers.GetUninitializedObject(typeof(WebPageFields));
         SetProperty(fields, nameof(WebPageFields.ContentItemGUID), guid);
+        SetProperty(fields, nameof(WebPageFields.WebPageItemGUID), guid);
         SetProperty(fields, nameof(WebPageFields.ContentItemCommonDataLastPublishedWhen), publishedDate ?? DateTime.UtcNow);
         return fields;
     }
@@ -1174,7 +1403,7 @@ public class RelatedContentCardServiceTests
         SetProperty(insight, nameof(Insight.SystemFields), CreateWebPageFields(guid, options.PublishedDate));
         SetProperty(insight, nameof(Insight.MetadataTitle), options.Title);
         SetProperty(insight, nameof(Insight.MetadataDescription), options.Description);
-        SetProperty(insight, nameof(Insight.ContentType), options.ContentTypes ?? Enumerable.Empty<Contenttypes>());
+        SetProperty(insight, nameof(Insight.ContentTypeFilter), options.ContentTypes ?? Enumerable.Empty<Contenttypes>());
         SetProperty(insight, nameof(Insight.MetadataBusinessLine), options.BusinessLines ?? Enumerable.Empty<BusinessLine>());
         SetProperty(insight, nameof(Insight.MetadataServiceAreas), options.ServiceAreas ?? Enumerable.Empty<ServiceArea>());
         SetProperty(insight, nameof(Insight.MetadataIndustryCategories), options.IndustryCategories ?? Enumerable.Empty<IndustryCategory>());
@@ -1198,7 +1427,7 @@ public class RelatedContentCardServiceTests
 
         SetProperty(blogPost, nameof(BlogPost.SystemFields), CreateWebPageFields(guid));
         SetProperty(blogPost, nameof(BlogPost.MetadataTitle), title);
-        SetProperty(blogPost, nameof(BlogPost.ContentType), contentTypes ?? Enumerable.Empty<Contenttypes>());
+        SetProperty(blogPost, nameof(BlogPost.ContentTypeFilter), contentTypes ?? Enumerable.Empty<Contenttypes>());
         SetProperty(blogPost, nameof(BlogPost.MetadataBusinessLine), Enumerable.Empty<BusinessLine>());
         SetProperty(blogPost, nameof(BlogPost.MetadataServiceAreas), Enumerable.Empty<ServiceArea>());
         SetProperty(blogPost, nameof(BlogPost.MetadataIndustryCategories), Enumerable.Empty<IndustryCategory>());
@@ -1220,7 +1449,7 @@ public class RelatedContentCardServiceTests
 
         SetProperty(article, nameof(NewsArticle.SystemFields), CreateWebPageFields(guid));
         SetProperty(article, nameof(NewsArticle.MetadataTitle), title);
-        SetProperty(article, nameof(NewsArticle.ContentType), Enumerable.Empty<Contenttypes>());
+        SetProperty(article, nameof(NewsArticle.ContentTypeFilter), Enumerable.Empty<Contenttypes>());
         SetProperty(article, nameof(NewsArticle.MetadataBusinessLine), Enumerable.Empty<BusinessLine>());
         SetProperty(article, nameof(NewsArticle.MetadataServiceAreas), Enumerable.Empty<ServiceArea>());
         SetProperty(article, nameof(NewsArticle.MetadataIndustryCategories), Enumerable.Empty<IndustryCategory>());
@@ -1242,7 +1471,7 @@ public class RelatedContentCardServiceTests
 
         SetProperty(ev, nameof(Event.SystemFields), CreateWebPageFields(guid));
         SetProperty(ev, nameof(Event.MetadataTitle), title);
-        SetProperty(ev, nameof(Event.ContentType), Enumerable.Empty<Contenttypes>());
+        SetProperty(ev, nameof(Event.ContentTypeFilter), Enumerable.Empty<Contenttypes>());
         SetProperty(ev, nameof(Event.MetadataBusinessLine), Enumerable.Empty<BusinessLine>());
         SetProperty(ev, nameof(Event.MetadataServiceAreas), Enumerable.Empty<ServiceArea>());
         SetProperty(ev, nameof(Event.MetadataIndustryCategories), Enumerable.Empty<IndustryCategory>());
@@ -1264,7 +1493,7 @@ public class RelatedContentCardServiceTests
 
         SetProperty(webinar, nameof(Webinar.SystemFields), CreateWebPageFields(guid));
         SetProperty(webinar, nameof(Webinar.MetadataTitle), title);
-        SetProperty(webinar, nameof(Webinar.ContentType), Enumerable.Empty<Contenttypes>());
+        SetProperty(webinar, nameof(Webinar.ContentTypeFilter), Enumerable.Empty<Contenttypes>());
         SetProperty(webinar, nameof(Webinar.MetadataBusinessLine), Enumerable.Empty<BusinessLine>());
         SetProperty(webinar, nameof(Webinar.MetadataServiceAreas), Enumerable.Empty<ServiceArea>());
         SetProperty(webinar, nameof(Webinar.MetadataIndustryCategories), Enumerable.Empty<IndustryCategory>());

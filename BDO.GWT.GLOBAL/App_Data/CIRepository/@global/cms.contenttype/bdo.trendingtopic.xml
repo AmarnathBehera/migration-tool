@@ -59,10 +59,12 @@
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>CTA Link</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["74635906-cb04-4ffd-9936-9dcde92c7f58","ca36fdc4-756f-4f9e-afdf-bdf19fc50427"]]]>
+            <![CDATA[["74635906-cb04-4ffd-9936-9dcde92c7f58","ca36fdc4-756f-4f9e-afdf-bdf19fc50427","43fcea42-e42d-4773-95dc-b415ea3e7547","b6a2aff8-7c0d-446a-be33-221a26bcac37","10cf0436-9df3-42cf-9f9e-668addcc802b","75615b26-2702-4a3a-bf7d-34c13b87bb63","252cdc0e-f6a0-424f-bd6b-2584655e66c7","41966e59-00c5-4397-bf29-c9c851e8b9ba","f350df32-e183-46df-9156-68116ac72958","a44dde57-e1ba-4a8b-ba54-2c0705c12903","b0993231-71af-4db0-b2c7-83fdf89e9071","e95256dc-44da-4237-a5d0-2f39834f7755","1ab55e4f-344f-4d36-a64b-5812140fcfa3","6551b6dd-873d-4535-b72d-a1ab4c4103e3","eb56be66-90a1-4d84-ac39-56bba64e5a69","d62bd1c1-a3bf-4a66-a3f6-431f4f534317","0997154f-0044-4380-a197-7c05464921c6","08e697cb-a6ae-448c-9248-7558255031fc","31f6383b-697e-4d8f-acec-be459fe4ad01","1ddec4b5-dabe-4e5d-a38a-1cf710c59244","23d38e4a-908a-4b31-9ae2-2fbaeaed4940","b3459cfa-8a48-48e5-af1f-eca5d79dd087","afb8b736-7f16-4a85-ab17-081c7833188c","909414d2-8cda-47d0-bfe0-4e2f522eb606","efaa910b-971a-4c92-9535-fde264dc8ecf","28595e58-3d13-4414-8f96-8a31285037fe","afbf6f00-540b-44f1-b40b-ea7975a6185e","f868347c-a9e1-459c-aa63-06b98c5fb82e","14a4e025-0212-44f7-805b-f7604ca10d04","24473f7c-9eb7-44cc-bf31-e1b9c4aa78fc","4a8412a4-b16a-4e13-85f3-1bd503c0043e","f3c1aa73-5245-4566-ae9c-ac80c54a6ce2","48899c62-db47-4d7a-93aa-0d30a2a8ebfc","392e5450-56f2-49da-96a0-fc49215599d8","b1d1ea96-03a2-4a44-82f7-92973086a93b","b6cac6be-487b-4d72-b82a-eadaed297432","7de84a06-569a-4dac-b701-55df640a4a49","288e0d36-148a-4e54-baa4-7cf382b9bb39","c9ad5d32-9b92-477d-abd0-6b732dc1e86f","afb8a1ec-5001-46e6-8e98-4b9e28995e48","d7c0b1af-52c7-4f1b-b856-6aec846290cb","ddbf4830-0766-4cff-a420-f0ca936fd21f","2d1bdba2-9ca8-42ab-a783-33007f1f3e3b","15ff1eef-9fad-4269-85bb-af954f09c301","ceb7b7b1-256e-4158-96cf-a33fcbe96c2c","a15c3744-bd53-4359-b3a8-9fd52bd0c611","9a26850d-e621-4c16-bbd8-c048e2406117","9aa28716-067c-4436-acf7-bb894b843c0b","4cbaa98f-42c8-4bf3-9bd4-21805730b520","28ba1415-0ac5-40c2-bb50-ec5ee5532674","62753fae-0b4b-4b11-9497-a975271396e4","81fa7e92-5ecc-4b38-a9d9-0246c97567d7","ddc2c96a-2502-4adf-8b89-5ec17af92366","1972aba8-80f8-4d07-bfa2-7f088d2f4219","3c5bfaa6-f77c-46a6-947b-87ab1bb8404b","22c19b8d-7418-4f3c-aa47-d58bee1f851b","a0c5bc6c-9409-4fe9-8430-697d961328a6","fb32f974-a837-4685-b43e-b49db033d0d9","df55a00f-7d8c-40ac-945c-2628fd44c833"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <MaximumItems>1</MaximumItems>
@@ -78,10 +80,12 @@
           <fieldcaption>Featured items (3)</fieldcaption>
           <fielddescription>Only 3 selected items will be displayed</fielddescription>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
+          <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
           <AllowedContentItemTypeIdentifiers>
-            <![CDATA[["b3459cfa-8a48-48e5-af1f-eca5d79dd087","1ddec4b5-dabe-4e5d-a38a-1cf710c59244","62753fae-0b4b-4b11-9497-a975271396e4","28ba1415-0ac5-40c2-bb50-ec5ee5532674","3c5bfaa6-f77c-46a6-947b-87ab1bb8404b"]]]>
+            <![CDATA[["b3459cfa-8a48-48e5-af1f-eca5d79dd087","1ddec4b5-dabe-4e5d-a38a-1cf710c59244","62753fae-0b4b-4b11-9497-a975271396e4","28ba1415-0ac5-40c2-bb50-ec5ee5532674","3c5bfaa6-f77c-46a6-947b-87ab1bb8404b","eb56be66-90a1-4d84-ac39-56bba64e5a69","afb8b736-7f16-4a85-ab17-081c7833188c","14a4e025-0212-44f7-805b-f7604ca10d04","24473f7c-9eb7-44cc-bf31-e1b9c4aa78fc","6551b6dd-873d-4535-b72d-a1ab4c4103e3","1977d31f-d844-4267-aeb3-ed0e2465b30d"]]]>
           </AllowedContentItemTypeIdentifiers>
           <controlname>Kentico.Administration.ContentItemSelector</controlname>
           <MaximumItems>3</MaximumItems>

@@ -616,8 +616,10 @@ public class InsightCrudService : IInsightCrudService
                 .ForContentType(
                     CopyInsight.CONTENT_TYPE_NAME,
                     subQuery => subQuery
+                        .WithLinkedItems(2)
                         .Where(w => w.WhereEquals(nameof(ContentItemFields.ContentItemID), newContentItemId))
-                        .TopN(1));
+                        .TopN(1))
+                    .InLanguage(currentCulture.Locale);
 
             var createdResult = await _contentQueryExecutor.GetMappedResult<CopyInsight>(query, cancellationToken: cancellationToken);
 
@@ -695,7 +697,7 @@ public class InsightCrudService : IInsightCrudService
             { nameof(Insight.DownloadButtonAttachment), downloadAttachment },
 
             { nameof(Insight.MetadataBusinessIssues), metadataBusinessIssues },
-            { nameof(Insight.ContentType), contentType },
+            { nameof(Insight.ContentTypeFilter), contentType },
             { nameof(Insight.MetadataBusinessLine), metadataBusinessLines },
             { nameof(Insight.MetadataServiceAreas), metadataServiceAreas },
             { nameof(Insight.MetadataServices), metadataServices },
@@ -765,7 +767,7 @@ public class InsightCrudService : IInsightCrudService
                 DownloadButtonAttachment=insight.DownloadButtonAttachment?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
                 //MetadataRssImage = insight.MetadataRssImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url,
                 MetadataBusinessIssues = insight.MetadataBusinessIssues.Select(c => c.Name).ToList(),
-                ContentType = insight.ContentType.Select(c => c.Name).ToList(),
+                ContentType = insight.ContentTypeFilter.Select(c => c.Name).ToList(),
                 MetadataBusinessLines = insight.MetadataBusinessLine.Select(c => c.MetadataTitle).ToList(),
                 MetadataServiceAreas = insight.MetadataServiceAreas.Select(c => c.MetadataTitle).ToList(),
                 MetadataServices = insight.MetadataServices.Select(c => c.MetadataTitle).ToList(),
@@ -819,6 +821,7 @@ public class InsightCrudService : IInsightCrudService
         var industries = await _mappingHelper.BuildReferencesPageAsync<Industry>(content.OriginalIndustries, x => x.MetadataTitle, cancellationToken);
         var businessLines = await _mappingHelper.BuildReferencesPageAsync<BusinessLine>(content.OriginalServiceLines, x => x.MetadataTitle, cancellationToken);
 
+        var insightAttachment = await _mappingHelper.BuildContentAttachmentImageReferences(content.InsightAttachment, cancellationToken);
         var imageFile = new List<ContentItemReference>();
         foreach (var image in content.ImageFile)
         {
@@ -835,6 +838,7 @@ public class InsightCrudService : IInsightCrudService
             { nameof(CopyInsight.InsightContent), content.InsightContent ?? string.Empty },
             { nameof(CopyInsight.CallToActionPosition), content.CallToActionPosition ?? string.Empty },
             { nameof(CopyInsight.Attachments), content.Attachments ?? string.Empty },
+            { nameof(CopyInsight.InsightAttachment), insightAttachment  },
             { nameof(CopyInsight.DownloadButtonTitle), content.DownloadButtonTitle ?? string.Empty },
             { nameof(CopyInsight.DownloadButtonText), content.DownloadButtonText ?? string.Empty },
             { nameof(CopyInsight.Contentsharing), content.Contentsharing ?? string.Empty},
@@ -883,7 +887,7 @@ public class InsightCrudService : IInsightCrudService
                 InsightContent = copyInsight.InsightContent,
                 CallToActionPosition = copyInsight.CallToActionPosition,
                 Attachments = copyInsight.Attachments,
-                InsightAttachment = copyInsight.InsightAttachment?.Url,
+                InsightAttachment = copyInsight.InsightAttachment?.FirstOrDefault()?.ContentAttachmentAsset.Url,
                 DownloadButtonTitle = copyInsight.DownloadButtonTitle,
                 DownloadButtonText = copyInsight.DownloadButtonText,
                 Contentsharing = copyInsight.Contentsharing,

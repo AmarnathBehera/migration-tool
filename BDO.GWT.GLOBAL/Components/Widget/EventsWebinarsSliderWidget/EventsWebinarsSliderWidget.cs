@@ -16,22 +16,19 @@ public class EventsWebinarsSliderWidget : ViewComponent
 {
     private readonly IEventsWebinarsSliderService _eventsWebinarsSliderService;
     private readonly IContentRetriever _contentRetriever;
-    private readonly IContentService _contentService;
-
+    
     public EventsWebinarsSliderWidget(
         IEventsWebinarsSliderService eventsWebinarsSliderService,
         IContentRetriever contentRetriever, IContentService contentService)
     {
         _eventsWebinarsSliderService = eventsWebinarsSliderService;
         _contentRetriever = contentRetriever;
-        _contentService= contentService;
-    }
+     }
 
     public async Task<IViewComponentResult> InvokeAsync(
         ComponentViewModel<EventsWebinarsSliderWidgetProperties> model)
     {
         var cancellationToken = HttpContext.RequestAborted;
-
        
         var backgroundimageurl = model.Properties.BackgroundImages?.Any() == true
          ? await _contentRetriever.RetrieveContentByGuids<ContentAttachment>(
@@ -56,16 +53,16 @@ public class EventsWebinarsSliderWidget : ViewComponent
             BackgroundImages = backgroundimageurl.FirstOrDefault()?.ContentAttachmentAsset?.Url,
             WidgetID = model.Properties.WidgetID,
         };
-        var page = model.Page?.WebPageItemGUID;
 
-        if (page is null)
+        var pageGuid = model.Page?.WebPageItemGUID;
+
+        if (model.Page is null || pageGuid is null)
         {
             return View("~/Components/Widget/EventsWebinarsSliderWidget/_EventsWebinarsSliderWidget.cshtml", new EventsWebinarsSliderDto { FilteringTooltipEnabled = false });
         }
-        var currentPage = (await _contentService.GetItemsByGUIDAsync(new List<Guid> { page.Value })).FirstOrDefault();
-
+        
         var dto = await _eventsWebinarsSliderService.GetEventsWebinarsSliderAsync(
-            currentPage, data, cancellationToken);
+            pageGuid.Value, model.Page?.GetType().Name, data, cancellationToken);
 
         return View(
             "~/Components/Widget/EventsWebinarsSliderWidget/_EventsWebinarsSliderWidget.cshtml",

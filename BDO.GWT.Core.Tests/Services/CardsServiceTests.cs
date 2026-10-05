@@ -18,8 +18,11 @@ public class CardsServiceTests
     {
         _contentServiceMock = new Mock<IContentService>();
         _websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
-       
+
         _websiteChannelContextMock.Setup(c => c.WebsiteChannelID).Returns(1);
+        _contentServiceMock
+            .Setup(s => s.GetCurrentChannelIDChannelInfo(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
 
         _service = new CardsService(
             _contentServiceMock.Object,
@@ -47,7 +50,7 @@ public class CardsServiceTests
         _contentServiceMock
             .Setup(s => s.GetItemsByTypesAsync(
                  It.IsAny<Type[]>(),
-                1,
+                It.IsAny<int>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<object>());
 
@@ -70,7 +73,7 @@ public class CardsServiceTests
         _contentServiceMock
             .Setup(s => s.GetItemsByTypesAsync(
                 It.IsAny<Type[]>(),
-                1,
+                It.IsAny<int>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<object>());
 
@@ -88,7 +91,7 @@ public class CardsServiceTests
         _contentServiceMock
             .Setup(s => s.GetItemsByTypesAsync(
                 It.IsAny<Type[]>(),
-                1,
+                It.IsAny<int>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<object>());
 
@@ -108,14 +111,17 @@ public class CardsServiceTests
         _contentServiceMock
             .Setup(s => s.GetItemsByTypesAsync(
                 It.IsAny<Type[]>(),
-                1,
+                It.IsAny<int>(),
                 token))
             .ReturnsAsync(new List<object>());
 
         await _service.CreateFiltersAsync(filters, null, token);
 
         _contentServiceMock.Verify(
-            s => s.GetItemsByTypesAsync(It.IsAny<Type[]>(), 1, token),
+            s => s.GetItemsByTypesAsync(
+                It.IsAny<Type[]>(),
+                It.IsAny<int>(),
+                token),
             Times.Once);
     }
 
@@ -127,7 +133,7 @@ public class CardsServiceTests
         _contentServiceMock
             .Setup(s => s.GetItemsByTypesAsync(
                 It.IsAny<Type[]>(),
-                1,
+                It.IsAny<int>(),
                 It.IsAny<CancellationToken>()))
             .ThrowsAsync(new InvalidOperationException("boom"));
 
@@ -136,9 +142,11 @@ public class CardsServiceTests
     }
 
     [Test]
-    public async Task CreateFiltersAsync_UsesWebsiteChannelID_FromContext()
+    public async Task CreateFiltersAsync_UsesCurrentChannelID_FromContentService()
     {
-        _websiteChannelContextMock.Setup(c => c.WebsiteChannelID).Returns(42);
+        _contentServiceMock
+            .Setup(s => s.GetCurrentChannelIDChannelInfo(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(42);
         var filters = new HashSet<string> { "officeLocation" };
 
         _contentServiceMock
