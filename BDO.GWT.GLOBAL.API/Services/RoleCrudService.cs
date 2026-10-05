@@ -60,10 +60,10 @@ public class RoleCrudService : IRoleCrudService
     private static readonly string[] AllowedWorkspacePermissions = { "View", "Create", "Update", "Delete", "Synchronize" };
     private static readonly string[] AllowedEmailChannelPermissions = { "View", "Update", "ManagePermissions", "OverrideContentLock" };
 
-    private static readonly Dictionary<rolesalloweddropdown, string[]> ChannelRoleTypePermissions = new()
+    private static readonly Dictionary<RolesAllowedDropdown, string[]> ChannelRoleTypePermissions = new()
     {
-        [rolesalloweddropdown.Editor] = new[] { "View" },
-        [rolesalloweddropdown.Administrator] = new[] { "View", "ManagePermissions", "OverrideContentLock" }
+        [RolesAllowedDropdown.Editor] = new[] { "View" },
+        [RolesAllowedDropdown.Administrator] = new[] { "View", "ManagePermissions", "OverrideContentLock" }
     };
 
     private static string ChannelApplicationName(Guid websiteChannelGuid) =>
@@ -579,7 +579,7 @@ public class RoleCrudService : IRoleCrudService
 
             foreach (var (channel, websiteChannel) in channelLinks)
             {
-                foreach (var roleType in new[] { rolesalloweddropdown.Editor, rolesalloweddropdown.Administrator })
+                foreach (var roleType in new[] { RolesAllowedDropdown.Editor, RolesAllowedDropdown.Administrator })
                 {
                     // Idempotent: existing roles are skipped (topped up), not treated as an error.
                     var role = await EnsureChannelRoleAsync(caller, channel, websiteChannel, roleType, cancellationToken);
@@ -674,7 +674,7 @@ public class RoleCrudService : IRoleCrudService
     /// the standard permission set for that role type on the given channel. Idempotent.
     /// </summary>
     private async Task<RoleInfo> EnsureChannelRoleAsync(
-        UserInfo caller, ChannelInfo channel, WebsiteChannelInfo websiteChannel, rolesalloweddropdown roleType, CancellationToken cancellationToken)
+        UserInfo caller, ChannelInfo channel, WebsiteChannelInfo websiteChannel, RolesAllowedDropdown roleType, CancellationToken cancellationToken)
     {
         var roleName = $"{channel.ChannelName}-{roleType}";
 

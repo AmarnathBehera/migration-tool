@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace BDO.GWT.GLOBAL.API.Data;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
-public enum rolesalloweddropdown
+public enum RolesAllowedDropdown
 {
     Editor,
     Administrator
@@ -144,5 +144,5 @@ public class    CreateChannelRoleInput
 
     /// <summary>Editor or Administrator. Role is named "{WebsiteChannel}-{RoleType}".</summary>
     [Required]
-    public rolesalloweddropdown RoleType { get; set; }
+    public RolesAllowedDropdown RoleType { get; set; }
 }

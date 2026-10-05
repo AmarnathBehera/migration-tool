@@ -169,8 +169,8 @@ public class RolesController : EntityControllerBase
     [SwaggerResponse(StatusCodes.Status409Conflict)]
     [SwaggerResponse(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<RoleOutput>> CreateForChannel(
-        [FromQuery] channelcodeNameDropdown channelcodeName,
-        [FromQuery] rolesalloweddropdown rolesallowed,
+        [FromQuery] ChannelcodeNameDropdown channelcodeName,
+        [FromQuery] RolesAllowedDropdown rolesallowed,
         CancellationToken cancellationToken)
     {
         try

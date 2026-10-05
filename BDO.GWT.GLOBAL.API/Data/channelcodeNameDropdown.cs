@@ -4,7 +4,7 @@ using System.Globalization;
 namespace BDO.GWT.GLOBAL.API.Data;
 
 [TypeConverter(typeof(ChannelCodeNameDropdownConverter))]
-public class channelcodeNameDropdown
+public class ChannelcodeNameDropdown
 {
     /// <summary>Xperience website channel name, e.g. "Ind".</summary>
     public string Value { get; set; } = string.Empty;
@@ -16,5 +16,5 @@ public class ChannelCodeNameDropdownConverter : TypeConverter
         sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
 
     public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value) =>
-        value is string s ? new channelcodeNameDropdown { Value = s } : base.ConvertFrom(context, culture, value);
+        value is string s ? new ChannelcodeNameDropdown { Value = s } : base.ConvertFrom(context, culture, value);
 }
