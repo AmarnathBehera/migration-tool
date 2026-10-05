@@ -250,6 +250,71 @@ public class RoleCrudServiceTests
         Assert.That(result, Is.Null);
     }
 
+    [Test]
+    public async Task GetRoleAsync_MapsWebsiteEmailWorkspaceAndGenericApplicationPermissions()
+    {
+        var roleGuid = Guid.NewGuid();
+        var channelGuid = Guid.NewGuid();
+        var websiteChannelGuid = Guid.NewGuid();
+        var emailChannelGuid = Guid.NewGuid();
+        var workspaceGuid = Guid.NewGuid();
+
+        var harness = new Harness();
+        harness.Roles.Setup(x => x.Get())
+            .Returns(QueryReturning<RoleInfo>(new RoleInfo[] { CreateRole(1, roleGuid, "Editors", "Editors", "desc") }).Object);
+
+        harness.Channels.Setup(x => x.Get())
+            .Returns(QueryReturning<ChannelInfo>(new ChannelInfo[] { CreateChannel(300, "Global", channelGuid, "Global Site") }).Object);
+        harness.WebsiteChannels.Setup(x => x.Get())
+            .Returns(QueryReturning<WebsiteChannelInfo>(new WebsiteChannelInfo[] { CreateWebsiteChannel(300, websiteChannelGuid) }).Object);
+        harness.EmailChannels.Setup(x => x.Get())
+            .Returns(QueryReturning<EmailChannelInfo>(new EmailChannelInfo[] { CreateEmailChannel(300, emailChannelGuid) }).Object);
+
+        harness.ApplicationPermissions.Setup(x => x.Get())
+            .Returns(QueryReturning<ApplicationPermissionInfo>(new ApplicationPermissionInfo[]
+            {
+                CreateApplicationPermission(1, ChannelApplicationPrefix + websiteChannelGuid.ToString("D"), "View"),
+                CreateApplicationPermission(1, EmailChannelApplicationPrefix + emailChannelGuid.ToString("D"), "View"),
+                CreateApplicationPermission(1, "redirects", "View")
+            }).Object);
+
+        harness.Workspaces.Setup(x => x.Get())
+            .Returns(QueryReturning<WorkspaceInfo>(new WorkspaceInfo[] { CreateWorkspace(50, workspaceGuid, "KenticoDefault", "Default") }).Object);
+        harness.WorkspaceDataPermissions.Setup(x => x.Get())
+            .Returns(QueryReturning<WorkspaceDataPermissionInfo>(new WorkspaceDataPermissionInfo[]
+            {
+                CreateWorkspacePermission(1, 50, ContentHubApplicationName, "View")
+            }).Object);
+
+        var service = harness.Build();
+
+        var result = await service.GetRoleAsync(roleGuid, CancellationToken.None);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            var websiteChannel = result!.WebsiteChannels.Single();
+            Assert.That(websiteChannel.GUID, Is.EqualTo(channelGuid));
+            Assert.That(websiteChannel.ChannelName, Is.EqualTo("Global"));
+            Assert.That(websiteChannel.DisplayName, Is.EqualTo("Global Site"));
+            Assert.That(websiteChannel.Permissions, Is.EqualTo(new[] { "View" }));
+
+            var emailChannel = result.EmailChannels.Single();
+            Assert.That(emailChannel.GUID, Is.EqualTo(channelGuid));
+            Assert.That(emailChannel.Permissions, Is.EqualTo(new[] { "View" }));
+
+            var workspace = result.ContentHubWorkspaces.Single();
+            Assert.That(workspace.GUID, Is.EqualTo(workspaceGuid));
+            Assert.That(workspace.WorkspaceName, Is.EqualTo("KenticoDefault"));
+            Assert.That(workspace.DisplayName, Is.EqualTo("Default"));
+            Assert.That(workspace.Permissions, Is.EqualTo(new[] { "View" }));
+
+            var application = result.ApplicationPermissions.Single();
+            Assert.That(application.ApplicationName, Is.EqualTo("redirects"));
+            Assert.That(application.Permissions, Is.EqualTo(new[] { "View" }));
+        });
+    }
+
     #endregion
 
     #region Caller validation (shared by all write operations)
@@ -880,6 +945,57 @@ public class RoleCrudServiceTests
         return websiteChannel;
     }
 
+    private const string ChannelApplicationPrefix = "Kentico.Xperience.Application.WebPages_";
+    private const string EmailChannelApplicationPrefix = "Kentico.Xperience.Application.EmailChannel_";
+    private const string ContentHubApplicationName = "Kentico.Xperience.Application.ContentHub";
+
+    private static FakeChannelInfo CreateChannel(int id, string channelName, Guid guid, string displayName)
+    {
+        var channel = (FakeChannelInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeChannelInfo));
+        channel.ChannelID = id;
+        channel.ChannelName = channelName;
+        channel.ChannelGUID = guid;
+        channel.ChannelDisplayName = displayName;
+        return channel;
+    }
+
+    private static FakeEmailChannelInfo CreateEmailChannel(int channelId, Guid guid)
+    {
+        var emailChannel = (FakeEmailChannelInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeEmailChannelInfo));
+        emailChannel.EmailChannelChannelID = channelId;
+        emailChannel.EmailChannelGUID = guid;
+        return emailChannel;
+    }
+
+    private static FakeApplicationPermissionInfo CreateApplicationPermission(int roleId, string applicationName, string permissionName)
+    {
+        var permission = (FakeApplicationPermissionInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeApplicationPermissionInfo));
+        permission.RoleID = roleId;
+        permission.ApplicationName = applicationName;
+        permission.PermissionName = permissionName;
+        return permission;
+    }
+
+    private static FakeWorkspaceInfo CreateWorkspace(int id, Guid guid, string name, string displayName)
+    {
+        var workspace = (FakeWorkspaceInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeWorkspaceInfo));
+        workspace.WorkspaceID = id;
+        workspace.WorkspaceGUID = guid;
+        workspace.WorkspaceName = name;
+        workspace.WorkspaceDisplayName = displayName;
+        return workspace;
+    }
+
+    private static FakeWorkspaceDataPermissionInfo CreateWorkspacePermission(int roleId, int workspaceId, string applicationName, string permissionName)
+    {
+        var permission = (FakeWorkspaceDataPermissionInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeWorkspaceDataPermissionInfo));
+        permission.WorkspaceDataPermissionRoleID = roleId;
+        permission.WorkspaceDataPermissionWorkspaceID = workspaceId;
+        permission.WorkspaceDataPermissionApplicationName = applicationName;
+        permission.WorkspaceDataPermissionPermissionName = permissionName;
+        return permission;
+    }
+
     private sealed class FakeUserInfo : UserInfo
     {
         private string userName = string.Empty;
@@ -916,10 +1032,14 @@ public class RoleCrudServiceTests
     private sealed class FakeChannelInfo : ChannelInfo
     {
         private int channelID;
+        private Guid channelGUID;
         private string channelName = string.Empty;
+        private string channelDisplayName = string.Empty;
 
         public override int ChannelID { get => channelID; set => channelID = value; }
+        public override Guid ChannelGUID { get => channelGUID; set => channelGUID = value; }
         public override string ChannelName { get => channelName; set => channelName = value; }
+        public override string ChannelDisplayName { get => channelDisplayName; set => channelDisplayName = value; }
     }
 
     private sealed class FakeWebsiteChannelInfo : WebsiteChannelInfo
@@ -929,6 +1049,52 @@ public class RoleCrudServiceTests
 
         public override int WebsiteChannelChannelID { get => channelID; set => channelID = value; }
         public override Guid WebsiteChannelGUID { get => websiteChannelGUID; set => websiteChannelGUID = value; }
+    }
+
+    private sealed class FakeEmailChannelInfo : EmailChannelInfo
+    {
+        private int channelID;
+        private Guid emailChannelGUID;
+
+        public override int EmailChannelChannelID { get => channelID; set => channelID = value; }
+        public override Guid EmailChannelGUID { get => emailChannelGUID; set => emailChannelGUID = value; }
+    }
+
+    private sealed class FakeApplicationPermissionInfo : ApplicationPermissionInfo
+    {
+        private int roleID;
+        private string applicationName = string.Empty;
+        private string permissionName = string.Empty;
+
+        public override int RoleID { get => roleID; set => roleID = value; }
+        public override string ApplicationName { get => applicationName; set => applicationName = value; }
+        public override string PermissionName { get => permissionName; set => permissionName = value; }
+    }
+
+    private sealed class FakeWorkspaceInfo : WorkspaceInfo
+    {
+        private int workspaceID;
+        private Guid workspaceGUID;
+        private string workspaceName = string.Empty;
+        private string workspaceDisplayName = string.Empty;
+
+        public override int WorkspaceID { get => workspaceID; set => workspaceID = value; }
+        public override Guid WorkspaceGUID { get => workspaceGUID; set => workspaceGUID = value; }
+        public override string WorkspaceName { get => workspaceName; set => workspaceName = value; }
+        public override string WorkspaceDisplayName { get => workspaceDisplayName; set => workspaceDisplayName = value; }
+    }
+
+    private sealed class FakeWorkspaceDataPermissionInfo : WorkspaceDataPermissionInfo
+    {
+        private int roleID;
+        private int workspaceID;
+        private string applicationName = string.Empty;
+        private string permissionName = string.Empty;
+
+        public override int WorkspaceDataPermissionRoleID { get => roleID; set => roleID = value; }
+        public override int WorkspaceDataPermissionWorkspaceID { get => workspaceID; set => workspaceID = value; }
+        public override string WorkspaceDataPermissionApplicationName { get => applicationName; set => applicationName = value; }
+        public override string WorkspaceDataPermissionPermissionName { get => permissionName; set => permissionName = value; }
     }
 
     #endregion

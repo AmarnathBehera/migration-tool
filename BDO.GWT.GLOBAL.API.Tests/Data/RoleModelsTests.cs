@@ -256,7 +256,7 @@ public class RoleModelsTests
     [Test]
     public void RolesAllowedDropdown_HasEditorAndAdministrator()
     {
-        Assert.That(Enum.GetNames(typeof(RolesAllowedDropdown)),
+        Assert.That(Enum.GetNames<RolesAllowedDropdown>(),
             Is.EquivalentTo(new[] { nameof(RolesAllowedDropdown.Editor), nameof(RolesAllowedDropdown.Administrator) }));
     }
 }
