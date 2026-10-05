@@ -15,10 +15,15 @@ public class SectionInsightsPageRetrieverTests
     {
         var contentRetrieverMock = new Mock<IContentRetriever>();
         var websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
+        var contentServiceMock = new Mock<IContentService>();
 
         websiteChannelContextMock
             .Setup(x => x.WebsiteChannelID)
             .Returns(17);
+
+        contentServiceMock
+            .Setup(x => x.GetCurrentChannelIDChannelInfo(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(17);
 
         var expectedPage = new SectionInsightsPage
         {
@@ -36,6 +41,7 @@ public class SectionInsightsPageRetrieverTests
 
         var result = await SectionInsightsPageRetriever.GetSectionInsightsPageAsync(
             contentRetrieverMock.Object,
+            contentServiceMock.Object,
             websiteChannelContextMock.Object,
             CancellationToken.None);
 
@@ -47,10 +53,15 @@ public class SectionInsightsPageRetrieverTests
     {
         var contentRetrieverMock = new Mock<IContentRetriever>();
         var websiteChannelContextMock = new Mock<IWebsiteChannelContext>();
+        var contentServiceMock = new Mock<IContentService>();
 
         websiteChannelContextMock
             .Setup(x => x.WebsiteChannelID)
             .Returns(17);
+
+        contentServiceMock
+            .Setup(x => x.GetCurrentChannelIDChannelInfo(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(17);
 
         contentRetrieverMock
             .Setup(x => x.RetrievePages<SectionInsightsPage, SectionInsightsPage>(
@@ -65,6 +76,7 @@ public class SectionInsightsPageRetrieverTests
             await SectionInsightsPageRetriever.GetRequiredSectionInsightsPageAsync(
                 contentRetrieverMock.Object,
                 websiteChannelContextMock.Object,
+                contentServiceMock.Object,
                 CancellationToken.None));
 
         Assert.That(exception, Is.Not.Null);

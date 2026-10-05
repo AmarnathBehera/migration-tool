@@ -134,11 +134,11 @@ namespace BDO.GWT.Core.Services
                     return Array.Empty<OptionDto>();
                 }
             }
-                  
 
+            int channelId = await _contentService.GetCurrentChannelIDChannelInfo(cancellationToken);
             var items = await _contentService.GetItemsByTypesAsync(
                 new[] { entityType },
-                _websiteChannelContext.WebsiteChannelID,
+                channelId,
                 cancellationToken);
 
             if(items == null)
@@ -183,10 +183,10 @@ namespace BDO.GWT.Core.Services
         private async Task<OptionDto[]> BuildOptionsForTagPageFilterAsync(FilterParameterData filterParameterData, CancellationToken cancellationToken)
         {
             var entityType = filterParameterData.EntityType;
-
+            int channelId = await _contentService.GetCurrentChannelIDChannelInfo(cancellationToken);
             var items = await _contentService.GetItemsByTypesAsync(
                 new[] { entityType },
-                _websiteChannelContext.WebsiteChannelID,
+                channelId,
                 cancellationToken);
 
             var options = items
@@ -218,10 +218,11 @@ namespace BDO.GWT.Core.Services
         {
             var entityType = filterParameterData.EntityType;
             var options = Array.Empty<OptionDto>();
+            int channelId = await _contentService.GetCurrentChannelIDChannelInfo(cancellationToken);
 
             var items = await _contentService.GetItemsByTypesAsync(
                 new[] { entityType },
-                _websiteChannelContext.WebsiteChannelID,
+                channelId,
                 cancellationToken);
 
             if (items is null || !items.Any())
