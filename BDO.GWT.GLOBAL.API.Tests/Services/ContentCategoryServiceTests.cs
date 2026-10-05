@@ -25,6 +25,26 @@ public class ContentCategoryServiceTests
 {
     private const string PageBase = "https://public.example";
 
+    private static readonly int[] Ids1 = [1];
+    private static readonly int[] Ids2And3 = [2, 3];
+    private static readonly int[] Ids3And4 = [3, 4];
+    private static readonly int[] Ids8And9 = [8, 9];
+    private static readonly int[] Ids10 = [10];
+    private static readonly int[] Ids20 = [20];
+    private static readonly int[] Ids99 = [99];
+
+    private static readonly string[] ExpectedCategoryCodes = ["BusinessIssue", "BusinessLine", "ServiceArea", "Industry"];
+    private static readonly string[] ExpectedCategoryNames = ["Business Issue", "Business Line", "Service Area", "Industry"];
+    private static readonly string[] BlogThenInsight = ["BlogPost", "Insight"];
+    private static readonly string[] InsightThenBlog = ["Insight", "BlogPost"];
+    private static readonly string[] ExpectedLinkingFieldNames =
+    [
+        nameof(BlogPost.MetadataBusinessIssues),
+        nameof(BlogPost.MetadataBusinessLine),
+        nameof(BlogPost.MetadataServiceAreas),
+        nameof(BlogPost.MetadataIndustries),
+    ];
+
     #region Interface / basic structure
 
     [Test]
@@ -58,16 +78,19 @@ public class ContentCategoryServiceTests
 
         var result = (await harness.Build().GetContentCategoriesAsync(1, "en-GB", CancellationToken.None)).ToList();
 
-        Assert.That(result, Has.Count.EqualTo(4));
-        Assert.That(result.Select(x => x.Code), Is.EqualTo(new[] { "BusinessIssue", "BusinessLine", "ServiceArea", "Industry" }));
-        Assert.That(result.Select(x => x.Name), Is.EqualTo(new[] { "Business Issue", "Business Line", "Service Area", "Industry" }));
-
-        foreach (var category in result)
+        Assert.Multiple(() =>
         {
-            Assert.That(category.SubCategories, Has.Count.EqualTo(1));
-            Assert.That(category.SubCategories[0].Id, Is.EqualTo(88));
-            Assert.That(category.SubCategories[0].Name, Is.EqualTo("Tax"));
-        }
+            Assert.That(result, Has.Count.EqualTo(4));
+            Assert.That(result.Select(x => x.Code), Is.EqualTo(ExpectedCategoryCodes));
+            Assert.That(result.Select(x => x.Name), Is.EqualTo(ExpectedCategoryNames));
+
+            foreach (var category in result)
+            {
+                Assert.That(category.SubCategories, Has.Count.EqualTo(1));
+                Assert.That(category.SubCategories[0].Id, Is.EqualTo(88));
+                Assert.That(category.SubCategories[0].Name, Is.EqualTo("Tax"));
+            }
+        });
     }
 
     [Test]
@@ -151,13 +174,16 @@ public class ContentCategoryServiceTests
 
         var result = await harness.Build().GetContentAsync(1, "en-GB", 10, 5, [], CancellationToken.None);
 
-        Assert.That(result.InsightsSearchURL, Does.Contain("search").IgnoreCase.Or.Contain("500"));
-        Assert.That(result.Insights, Has.Count.EqualTo(2));
-        Assert.That(result.Insights[0].PageType, Is.EqualTo("BlogPost"));
-        Assert.That(result.Insights[0].Date, Is.EqualTo(new DateTime(2025, 1, 2)));
-        Assert.That(result.Insights[0].URL, Does.Contain("101"));
-        Assert.That(result.Insights[1].PageType, Is.EqualTo("Insight"));
-        Assert.That(result.Insights[1].URL, Does.Contain("102"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.InsightsSearchURL, Does.Contain("search").IgnoreCase.Or.Contain("500"));
+            Assert.That(result.Insights, Has.Count.EqualTo(2));
+            Assert.That(result.Insights[0].PageType, Is.EqualTo("BlogPost"));
+            Assert.That(result.Insights[0].Date, Is.EqualTo(new DateTime(2025, 1, 2)));
+            Assert.That(result.Insights[0].URL, Does.Contain("101"));
+            Assert.That(result.Insights[1].PageType, Is.EqualTo("Insight"));
+            Assert.That(result.Insights[1].URL, Does.Contain("102"));
+        });
     }
 
     [Test]
@@ -210,8 +236,11 @@ public class ContentCategoryServiceTests
         var result = await harness.Build().GetContentAsync(1, "en-GB", 10, null, [], CancellationToken.None);
         var dto = result.Insights.Single();
 
-        Assert.That(dto.TitleFull, Is.EqualTo(string.Empty));
-        Assert.That(dto.SummaryFull, Is.EqualTo(string.Empty));
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.TitleFull, Is.EqualTo(string.Empty));
+            Assert.That(dto.SummaryFull, Is.EqualTo(string.Empty));
+        });
     }
 
     [Test]
@@ -247,8 +276,11 @@ public class ContentCategoryServiceTests
 
         var result = await harness.Build().GetContentAsync(1, "en-GB", 10, null, [], CancellationToken.None);
 
-        Assert.That(result.Insights.Select(x => x.PageType), Is.EqualTo(new[] { "Insight", "BlogPost" }));
-        Assert.That(result.Insights[1].Date, Is.InRange(before, DateTime.Now));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Insights.Select(x => x.PageType), Is.EqualTo(InsightThenBlog));
+            Assert.That(result.Insights[1].Date, Is.InRange(before, DateTime.Now));
+        });
     }
 
     [Test]
@@ -259,8 +291,11 @@ public class ContentCategoryServiceTests
 
         var result = await harness.Build().GetContentAsync(1, "xx-YY", 10, null, [], CancellationToken.None);
 
-        Assert.That(result.Insights, Has.Count.EqualTo(1));
-        Assert.That(result.Insights[0].DisplayDate, Is.Not.Empty);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Insights, Has.Count.EqualTo(1));
+            Assert.That(result.Insights[0].DisplayDate, Is.Not.Empty);
+        });
     }
 
     [Test]
@@ -272,8 +307,11 @@ public class ContentCategoryServiceTests
 
         var result = await harness.Build().GetContentAsync(1, "en-GB", 10, null, [], CancellationToken.None);
 
-        Assert.That(result.Insights, Has.Count.EqualTo(1));
-        Assert.That(result.Insights[0].PageType, Is.EqualTo("BlogPost"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Insights, Has.Count.EqualTo(1));
+            Assert.That(result.Insights[0].PageType, Is.EqualTo("BlogPost"));
+        });
     }
 
     [TestCase(1, 1)]
@@ -299,8 +337,11 @@ public class ContentCategoryServiceTests
 
         var result = await harness.Build().GetContentAsync(1, "en-GB", 10, null, [], CancellationToken.None);
 
-        Assert.That(result.Insights, Is.Empty);
-        Assert.That(result.InsightsSearchURL, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Insights, Is.Empty);
+            Assert.That(result.InsightsSearchURL, Is.Not.Null);
+        });
     }
 
     [Test]
@@ -333,14 +374,17 @@ public class ContentCategoryServiceTests
         harness.Insights.Add(NewInsight(102, new DateTime(2025, 1, 1)));
         ContentCategoryFilter[] filters =
         [
-            new() { CategoryCode = "BusinessIssue", SubCategoryIds = new[] { 10 } },
-            new() { CategoryCode = "Industry", SubCategoryIds = new[] { 20 } },
+            new() { CategoryCode = "BusinessIssue", SubCategoryIds = Ids10 },
+            new() { CategoryCode = "Industry", SubCategoryIds = Ids20 },
         ];
 
         var result = await harness.Build().GetContentAsync(1, "en-GB", 10, null, filters, CancellationToken.None);
 
-        Assert.That(harness.CacheProxy.LoadCount, Is.EqualTo(0));
-        Assert.That(result.Insights.Select(x => x.PageType), Is.EqualTo(new[] { "BlogPost", "Insight" }));
+        Assert.Multiple(() =>
+        {
+            Assert.That(harness.CacheProxy.LoadCount, Is.EqualTo(0));
+            Assert.That(result.Insights.Select(x => x.PageType), Is.EqualTo(BlogThenInsight));
+        });
     }
 
     [Test]
@@ -406,7 +450,7 @@ public class ContentCategoryServiceTests
     public void GetContentAsync_WithInvalidCategoryCode_ThrowsUnprocessableEntity()
     {
         var harness = new Harness();
-        ContentCategoryFilter[] filters = [new() { CategoryCode = "Invalid", SubCategoryIds = new[] { 1 } }];
+        ContentCategoryFilter[] filters = [new() { CategoryCode = "Invalid", SubCategoryIds = Ids1 }];
 
         Assert.ThrowsAsync<UnprocessableEntityException>(async () =>
             await harness.Build().GetContentAsync(1, "en-GB", 10, null, filters, CancellationToken.None));
@@ -419,7 +463,7 @@ public class ContentCategoryServiceTests
     public void GetContentAsync_WithNullCategoryCode_ThrowsUnprocessableEntity()
     {
         var harness = new Harness();
-        ContentCategoryFilter[] filters = [new() { CategoryCode = null, SubCategoryIds = new[] { 1 } }];
+        ContentCategoryFilter[] filters = [new() { CategoryCode = null, SubCategoryIds = Ids1 }];
 
         Assert.ThrowsAsync<UnprocessableEntityException>(async () =>
             await harness.Build().GetContentAsync(1, "en-GB", 10, null, filters, CancellationToken.None));
@@ -488,7 +532,7 @@ public class ContentCategoryServiceTests
     [TestCase(1000, 50)]
     public void NormalizeInsightCount_AppliesDefaultAndMaximum(int? input, int expected)
     {
-        var result = InvokeStatic<int>("NormalizeInsightCount", new object?[] { input });
+        var result = InvokeStatic<int>("NormalizeInsightCount", input);
 
         Assert.That(result, Is.EqualTo(expected));
     }
@@ -496,18 +540,17 @@ public class ContentCategoryServiceTests
     [Test]
     public void BuildSubCategoryIdsByCategoryCode_FillsMissingCodesWithEmptyArrays()
     {
-        var map = InvokeStatic<Dictionary<string, int[]>>("BuildSubCategoryIdsByCategoryCode", new object?[]
-        {
-            new[]
-            {
-                new ContentCategoryFilter { CategoryCode = "BusinessIssue", SubCategoryIds = new[] { 8, 9 } },
-                new ContentCategoryFilter { CategoryCode = null, SubCategoryIds = new[] { 99 } },
-            },
-        });
+        ContentCategoryFilter[] filters =
+        [
+            new() { CategoryCode = "BusinessIssue", SubCategoryIds = Ids8And9 },
+            new() { CategoryCode = null, SubCategoryIds = Ids99 },
+        ];
+
+        var map = InvokeStatic<Dictionary<string, int[]>>("BuildSubCategoryIdsByCategoryCode", (object)filters);
 
         Assert.Multiple(() =>
         {
-            Assert.That(map["BusinessIssue"], Is.EqualTo(new[] { 8, 9 }));
+            Assert.That(map["BusinessIssue"], Is.EqualTo(Ids8And9));
             Assert.That(map["BusinessLine"], Is.Empty);
             Assert.That(map["ServiceArea"], Is.Empty);
             Assert.That(map["Industry"], Is.Empty);
@@ -517,25 +560,23 @@ public class ContentCategoryServiceTests
     [Test]
     public void BuildSubCategoryIdsByCategoryCode_WithRepeatedCategory_UsesLastValue()
     {
-        var map = InvokeStatic<Dictionary<string, int[]>>("BuildSubCategoryIdsByCategoryCode", new object?[]
-        {
-            new[]
-            {
-                new ContentCategoryFilter { CategoryCode = "Industry", SubCategoryIds = new[] { 1 } },
-                new ContentCategoryFilter { CategoryCode = "Industry", SubCategoryIds = new[] { 2, 3 } },
-            },
-        });
+        ContentCategoryFilter[] filters =
+        [
+            new() { CategoryCode = "Industry", SubCategoryIds = Ids1 },
+            new() { CategoryCode = "Industry", SubCategoryIds = Ids2And3 },
+        ];
 
-        Assert.That(map["Industry"], Is.EqualTo(new[] { 2, 3 }));
+        var map = InvokeStatic<Dictionary<string, int[]>>("BuildSubCategoryIdsByCategoryCode", (object)filters);
+
+        Assert.That(map["Industry"], Is.EqualTo(Ids2And3));
     }
 
     [Test]
     public void BuildSubCategoryIdsByCategoryCode_IgnoresNullSubCategoryIds()
     {
-        var map = InvokeStatic<Dictionary<string, int[]>>("BuildSubCategoryIdsByCategoryCode", new object?[]
-        {
-            new[] { new ContentCategoryFilter { CategoryCode = "ServiceArea", SubCategoryIds = null } },
-        });
+        ContentCategoryFilter[] filters = [new() { CategoryCode = "ServiceArea", SubCategoryIds = null }];
+
+        var map = InvokeStatic<Dictionary<string, int[]>>("BuildSubCategoryIdsByCategoryCode", (object)filters);
 
         Assert.That(map["ServiceArea"], Is.Empty);
     }
@@ -545,19 +586,22 @@ public class ContentCategoryServiceTests
     {
         var map = new Dictionary<string, int[]>
         {
-            ["BusinessIssue"] = new[] { 1 },
+            ["BusinessIssue"] = Ids1,
             ["BusinessLine"] = Array.Empty<int>(),
-            ["ServiceArea"] = new[] { 3, 4 },
+            ["ServiceArea"] = Ids3And4,
             ["Industry"] = Array.Empty<int>(),
         };
 
-        var fields = InvokeStatic<List<(string FieldName, int[] Ids)>>("GetLinkingFields", new object?[] { map });
+        var fields = InvokeStatic<List<(string FieldName, int[] Ids)>>("GetLinkingFields", map);
 
-        Assert.That(fields, Has.Count.EqualTo(2));
-        Assert.That(fields[0].FieldName, Is.EqualTo(nameof(BlogPost.MetadataBusinessIssues)));
-        Assert.That(fields[0].Ids, Is.EqualTo(new[] { 1 }));
-        Assert.That(fields[1].FieldName, Is.EqualTo(nameof(BlogPost.MetadataServiceAreas)));
-        Assert.That(fields[1].Ids, Is.EqualTo(new[] { 3, 4 }));
+        Assert.Multiple(() =>
+        {
+            Assert.That(fields, Has.Count.EqualTo(2));
+            Assert.That(fields[0].FieldName, Is.EqualTo(nameof(BlogPost.MetadataBusinessIssues)));
+            Assert.That(fields[0].Ids, Is.EqualTo(Ids1));
+            Assert.That(fields[1].FieldName, Is.EqualTo(nameof(BlogPost.MetadataServiceAreas)));
+            Assert.That(fields[1].Ids, Is.EqualTo(Ids3And4));
+        });
     }
 
     [Test]
@@ -565,36 +609,33 @@ public class ContentCategoryServiceTests
     {
         var map = new Dictionary<string, int[]>
         {
-            ["BusinessIssue"] = new[] { 1 },
-            ["BusinessLine"] = new[] { 2 },
-            ["ServiceArea"] = new[] { 3 },
-            ["Industry"] = new[] { 4 },
+            ["BusinessIssue"] = Ids1,
+            ["BusinessLine"] = Ids2And3,
+            ["ServiceArea"] = Ids3And4,
+            ["Industry"] = Ids10,
         };
 
-        var fields = InvokeStatic<List<(string FieldName, int[] Ids)>>("GetLinkingFields", new object?[] { map });
+        var fields = InvokeStatic<List<(string FieldName, int[] Ids)>>("GetLinkingFields", map);
 
-        Assert.That(fields.Select(x => x.FieldName), Is.EqualTo(new[]
-        {
-            nameof(BlogPost.MetadataBusinessIssues),
-            nameof(BlogPost.MetadataBusinessLine),
-            nameof(BlogPost.MetadataServiceAreas),
-            nameof(BlogPost.MetadataIndustries),
-        }));
+        Assert.That(fields.Select(x => x.FieldName), Is.EqualTo(ExpectedLinkingFieldNames));
     }
 
     [Test]
     public void GetCategoryOrderColumn_ForAllowedColumn_ReturnsAscendingColumn()
     {
-        var column = InvokeStatic<OrderByColumn>("GetCategoryOrderColumn", new object?[] { "MetadataTitle", LanguageTag.GB });
+        var column = InvokeStatic<OrderByColumn>("GetCategoryOrderColumn", "MetadataTitle", LanguageTag.GB);
 
-        Assert.That(column.Direction, Is.EqualTo(OrderDirection.Ascending));
-        Assert.That(column.GetExpression(), Does.Contain("MetadataTitle"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(column.Direction, Is.EqualTo(OrderDirection.Ascending));
+            Assert.That(column.GetExpression(), Does.Contain("MetadataTitle"));
+        });
     }
 
     [Test]
     public void GetCategoryOrderColumn_ForNameColumn_IsAllowed()
     {
-        var column = InvokeStatic<OrderByColumn>("GetCategoryOrderColumn", new object?[] { nameof(Businessissue.Name), LanguageTag.GB });
+        var column = InvokeStatic<OrderByColumn>("GetCategoryOrderColumn", nameof(Businessissue.Name), LanguageTag.GB);
 
         Assert.That(column.GetExpression(), Does.Contain(nameof(Businessissue.Name)));
     }
@@ -603,7 +644,7 @@ public class ContentCategoryServiceTests
     public void GetCategoryOrderColumn_ForDisallowedColumn_ThrowsArgumentException()
     {
         Assert.Throws<ArgumentException>(() =>
-            InvokeStatic<OrderByColumn>("GetCategoryOrderColumn", new object?[] { "Name; DROP TABLE x", LanguageTag.GB }));
+            InvokeStatic<OrderByColumn>("GetCategoryOrderColumn", "Name; DROP TABLE x", LanguageTag.GB));
     }
 
     [TestCase(null)]
@@ -613,7 +654,7 @@ public class ContentCategoryServiceTests
     [TestCase("ftp://cdn.example/image.png")]
     public void GetAbsoluteImageUrl_WithUnusableImage_ReturnsEmpty(string? imageUrl)
     {
-        var result = InvokeStatic<string>("GetAbsoluteImageUrl", new object?[] { imageUrl, PageBase + "/en/blog" });
+        var result = InvokeStatic<string>("GetAbsoluteImageUrl", imageUrl, PageBase + "/en/blog");
 
         Assert.That(result, Is.EqualTo(string.Empty));
     }
@@ -621,7 +662,7 @@ public class ContentCategoryServiceTests
     [Test]
     public void GetAbsoluteImageUrl_WithRelativeImageAndNoPageUrl_ReturnsEmpty()
     {
-        var result = InvokeStatic<string>("GetAbsoluteImageUrl", new object?[] { "/media/image.jpg", string.Empty });
+        var result = InvokeStatic<string>("GetAbsoluteImageUrl", "/media/image.jpg", string.Empty);
 
         Assert.That(result, Is.EqualTo(string.Empty));
     }
@@ -635,7 +676,7 @@ public class ContentCategoryServiceTests
     [TestCase("//cdn.example/image.jpg", "", "https://cdn.example/image.jpg")]
     public void GetAbsoluteImageUrl_ResolvesUrls(string imageUrl, string pageUrl, string expectedPrefix)
     {
-        var result = InvokeStatic<string>("GetAbsoluteImageUrl", new object?[] { imageUrl, pageUrl });
+        var result = InvokeStatic<string>("GetAbsoluteImageUrl", imageUrl, pageUrl);
 
         Assert.That(result, Does.StartWith(expectedPrefix));
     }
@@ -643,7 +684,7 @@ public class ContentCategoryServiceTests
     [Test]
     public void ToHtmlCompatibleUrl_WithNull_ReturnsEmpty()
     {
-        var result = InvokeStatic<string>("ToHtmlCompatibleUrl", new object?[] { null });
+        var result = InvokeStatic<string>("ToHtmlCompatibleUrl", (object?)null);
 
         Assert.That(result, Is.EqualTo(string.Empty));
     }
@@ -651,7 +692,7 @@ public class ContentCategoryServiceTests
     [Test]
     public void ToHtmlCompatibleUrl_WithAbsoluteUrl_ReturnsUrl()
     {
-        var result = InvokeStatic<string>("ToHtmlCompatibleUrl", new object?[] { "https://example.com/page" });
+        var result = InvokeStatic<string>("ToHtmlCompatibleUrl", "https://example.com/page");
 
         Assert.That(result, Does.Contain("example.com/page"));
     }
@@ -684,8 +725,11 @@ public class ContentCategoryServiceTests
     {
         var filter = new ContentCategoryFilter();
 
-        Assert.That(filter.CategoryCode, Is.Null);
-        Assert.That(filter.SubCategoryIds, Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(filter.CategoryCode, Is.Null);
+            Assert.That(filter.SubCategoryIds, Is.Null);
+        });
     }
 
     [Test]
@@ -693,8 +737,11 @@ public class ContentCategoryServiceTests
     {
         var dto = new ContentDto { InsightsSearchURL = "https://example.com/search", Insights = new List<InsightContentDto>() };
 
-        Assert.That(dto.InsightsSearchURL, Is.EqualTo("https://example.com/search"));
-        Assert.That(dto.Insights, Is.Empty);
+        Assert.Multiple(() =>
+        {
+            Assert.That(dto.InsightsSearchURL, Is.EqualTo("https://example.com/search"));
+            Assert.That(dto.Insights, Is.Empty);
+        });
     }
 
     #endregion
@@ -715,7 +762,7 @@ public class ContentCategoryServiceTests
         MetadataDescription = "<p>Insight summary</p>",
     };
 
-    private static T InvokeStatic<T>(string methodName, object?[] args)
+    private static T InvokeStatic<T>(string methodName, params object?[] args)
     {
         var method = typeof(ContentCategoryService).GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic)!;
 
@@ -730,7 +777,7 @@ public class ContentCategoryServiceTests
         }
     }
 
-    private static ChannelInfo CreateChannelInfo(string channelName)
+    private static FakeChannelInfo CreateChannelInfo(string channelName)
     {
         var channel = (FakeChannelInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeChannelInfo));
         channel.ChannelName = channelName;
@@ -749,7 +796,7 @@ public class ContentCategoryServiceTests
             var payload = returnType.GetGenericArguments()[0];
             var value = payload.IsValueType ? Activator.CreateInstance(payload) : null;
 
-            return typeof(Task).GetMethod(nameof(Task.FromResult))!.MakeGenericMethod(payload).Invoke(null, new[] { value });
+            return typeof(Task).GetMethod(nameof(Task.FromResult))!.MakeGenericMethod(payload).Invoke(null, [value]);
         }
 
         return returnType != typeof(void) && returnType.IsValueType ? Activator.CreateInstance(returnType) : null;
@@ -775,7 +822,7 @@ public class ContentCategoryServiceTests
         {
             Mapping
                 .Setup(x => x.ValidateAndNormalizeSiteCultureAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .Returns(() => Task.FromResult(Tag));
+                .Returns(() => Task.FromResult<LanguageTag?>(Tag)!);
 
             // GetAsync(id) used by the service is an extension method (cannot be mocked directly);
             // it resolves through IInfoByIdProvider, so mock both the sync and async members.
@@ -803,7 +850,7 @@ public class ContentCategoryServiceTests
             Validation.Setup(x => x.GetErrors()).Returns(() => errors);
         }
 
-        public ContentCategoryService Build()
+        public TestableContentCategoryService Build()
         {
             var executor = DispatchProxy.Create<IContentQueryExecutor, ExecutorProxy>();
             ((ExecutorProxy)(object)executor).Handler = HandleExecutor;
@@ -844,7 +891,7 @@ public class ContentCategoryServiceTests
 
         private object? HandleExecutor(MethodInfo method, object?[]? args)
         {
-            if (method.Name is not ("GetResult" or "GetMappedResult")
+            if (method.Name != "GetResult"
                 || !method.ReturnType.IsGenericType
                 || !method.ReturnType.GetGenericArguments()[0].IsGenericType)
             {
@@ -853,28 +900,13 @@ public class ContentCategoryServiceTests
 
             var payloadType = method.ReturnType.GetGenericArguments()[0];
             var elementType = payloadType.GetGenericArguments()[0];
+            var selector = args!.OfType<Delegate>().First();
+            var count = elementType == typeof(int) ? SearchRowCount : 1;
             var items = new List<object>();
 
-            if (method.Name == "GetMappedResult")
+            for (var i = 0; i < count; i++)
             {
-                if (elementType == typeof(BlogPost))
-                {
-                    items.AddRange(BlogPosts);
-                }
-                else if (elementType == typeof(Insight))
-                {
-                    items.AddRange(Insights);
-                }
-            }
-            else
-            {
-                var selector = args!.OfType<Delegate>().First();
-                var count = elementType == typeof(int) ? SearchRowCount : 1;
-
-                for (var i = 0; i < count; i++)
-                {
-                    items.Add(selector.DynamicInvoke(CreateRow())!);
-                }
+                items.Add(selector.DynamicInvoke(CreateRow())!);
             }
 
             var array = Array.CreateInstance(elementType, items.Count);
@@ -885,7 +917,7 @@ public class ContentCategoryServiceTests
 
             return typeof(Task).GetMethod(nameof(Task.FromResult))!
                 .MakeGenericMethod(payloadType)
-                .Invoke(null, new object[] { array });
+                .Invoke(null, [array]);
         }
 
         private static IContentQueryDataContainer CreateRow()
