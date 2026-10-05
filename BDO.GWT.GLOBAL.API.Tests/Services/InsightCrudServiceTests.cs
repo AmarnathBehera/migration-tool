@@ -991,8 +991,11 @@ public class InsightCrudServiceTests
 
     private static void AssertNotFoundMessage<T>(ActionResult<T> result, string message)
     {
-        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
-        Assert.That(((NotFoundObjectResult)result.Result!).Value, Is.EqualTo(message));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+            Assert.That(((NotFoundObjectResult)result.Result!).Value, Is.EqualTo(message));
+        });
     }
 
     [Test]

@@ -465,8 +465,11 @@ public class LocationOfficeCrudServiceBranchTests
 
     private static void AssertNotFoundMessage<T>(ActionResult<T> result, string message)
     {
-        Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
-        Assert.That(((NotFoundObjectResult)result.Result!).Value, Is.EqualTo(message));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
+            Assert.That(((NotFoundObjectResult)result.Result!).Value, Is.EqualTo(message));
+        });
     }
 
     private void SetupCreateFlow(int newPageId, bool updateDraft, bool publish)
@@ -584,8 +587,11 @@ public class LocationOfficeCrudServiceBranchTests
 
         var result = await CreateService().CreatePageAsync(1, 10, "en-gb", CreateRequest(), CancellationToken.None);
 
-        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-        Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        });
         _webPageManagerMock.Verify(x => x.Create(It.IsAny<CreateWebPageParameters>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -654,8 +660,11 @@ public class LocationOfficeCrudServiceBranchTests
 
         var result = await CreateService().CreatePageAsync(1, 10, "en-gb", CreateRequest(), CancellationToken.None);
 
-        Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
-        Assert.That(((ObjectResult)result.Result!).Value, Is.EqualTo("boom"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+            Assert.That(((ObjectResult)result.Result!).Value, Is.EqualTo("boom"));
+        });
     }
 
     [Test]
