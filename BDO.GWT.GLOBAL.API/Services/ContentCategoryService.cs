@@ -8,6 +8,7 @@ using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Helpers;
 using CMS.Websites;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace BDO.GWT.GLOBAL.API.Services;
@@ -26,11 +27,12 @@ public class ContentCategoryService : IContentCategoryService
     private const int MaxSubCategoryIdsPerFilter = 50;
     private const int CacheMinutes = 10;
     private const string FallbackDisplayDateFormat = "dd MMMM yyyy";
+    private const string MetadataTitleColumn = "MetadataTitle";
     private static readonly HashSet<string> ValidCategoryCodes = new() { "BusinessIssue", "BusinessLine", "ServiceArea", "Industry" };
     private static readonly HashSet<string> OrderableCategoryColumns = new(StringComparer.Ordinal)
     {
         nameof(Businessissue.Name),
-        "MetadataTitle",
+        MetadataTitleColumn,
     };
 
     private readonly IContentQueryExecutor _contentQueryExecutor;
@@ -76,9 +78,9 @@ public class ContentCategoryService : IContentCategoryService
         return new List<ContentCategoryDto>
         {
             await GetContentCategoryDtoAsync("Business Issue", "BusinessIssue", Businessissue.CONTENT_TYPE_NAME, nameof(Businessissue.Name), channel.ChannelName, languageTag, cancellationToken),
-            await GetContentCategoryDtoAsync("Business Line", "BusinessLine", BusinessLine.CONTENT_TYPE_NAME, "MetadataTitle", channel.ChannelName, languageTag, cancellationToken),
-            await GetContentCategoryDtoAsync("Service Area", "ServiceArea", ServiceArea.CONTENT_TYPE_NAME, "MetadataTitle", channel.ChannelName, languageTag, cancellationToken),
-            await GetContentCategoryDtoAsync("Industry", "Industry", Industry.CONTENT_TYPE_NAME, "MetadataTitle", channel.ChannelName, languageTag, cancellationToken),
+            await GetContentCategoryDtoAsync("Business Line", "BusinessLine", BusinessLine.CONTENT_TYPE_NAME, MetadataTitleColumn, channel.ChannelName, languageTag, cancellationToken),
+            await GetContentCategoryDtoAsync("Service Area", "ServiceArea", ServiceArea.CONTENT_TYPE_NAME, MetadataTitleColumn, channel.ChannelName, languageTag, cancellationToken),
+            await GetContentCategoryDtoAsync("Industry", "Industry", Industry.CONTENT_TYPE_NAME, MetadataTitleColumn, channel.ChannelName, languageTag, cancellationToken),
         };
     }
 
@@ -200,10 +202,12 @@ public class ContentCategoryService : IContentCategoryService
         foreach (var (fieldName, ids) in linkingFields)
         {
             projections.AddRange(await GetPagesAsync<BlogPost>(
-                BlogPost.CONTENT_TYPE_NAME, nameof(BlogPost), channelName, languageTag, topN, fieldName, ids, MapBlogPost, 1, cancellationToken));
+                new PageQuery(BlogPost.CONTENT_TYPE_NAME, nameof(BlogPost), fieldName, ids, 1),
+                channelName, languageTag, topN, MapBlogPost, cancellationToken));
 
             projections.AddRange(await GetPagesAsync<Insight>(
-                Insight.CONTENT_TYPE_NAME, nameof(Insight), channelName, languageTag, topN, fieldName, ids, MapInsight, 2, cancellationToken));
+                new PageQuery(Insight.CONTENT_TYPE_NAME, nameof(Insight), fieldName, ids, 2),
+                channelName, languageTag, topN, MapInsight, cancellationToken));
         }
         return projections
             .GroupBy(x => x.WebPageItemId)
@@ -231,22 +235,21 @@ public class ContentCategoryService : IContentCategoryService
     }
 
     private async Task<IEnumerable<InsightProjection>> GetPagesAsync<TPage>(
-        string contentTypeName, string pageType, string channelName, LanguageTag languageTag, int topN,
-        string linkingFieldName, int[] linkedItemIds, Func<TPage, string, InsightProjection> map,
-        int linkedItemsDepth, CancellationToken cancellationToken)
+        PageQuery query, string channelName, LanguageTag languageTag, int topN,
+        Func<TPage, string, InsightProjection> map, CancellationToken cancellationToken)
         where TPage : class, IWebPageFieldsSource
     {
         async Task<List<TPage>> LoadPagesAsync()
         {
             var builder = new ContentItemQueryBuilder()
-                .ForContentType(contentTypeName, config =>
+                .ForContentType(query.ContentTypeName, config =>
                 {
                     config.ForWebsite(channelName)
-                        .WithLinkedItems(linkedItemsDepth);
+                        .WithLinkedItems(query.LinkedItemsDepth);
 
-                    if (!string.IsNullOrEmpty(linkingFieldName) && linkedItemIds.Length != 0)
+                    if (!string.IsNullOrEmpty(query.LinkingFieldName) && query.LinkedItemIds.Length != 0)
                     {
-                        config.Linking(linkingFieldName, linkedItemIds);
+                        config.Linking(query.LinkingFieldName, query.LinkedItemIds);
                     }
 
                     config
@@ -264,7 +267,7 @@ public class ContentCategoryService : IContentCategoryService
 
         List<TPage> pages;
 
-        if (linkedItemIds.Length != 0)
+        if (query.LinkedItemIds.Length != 0)
         {
             pages = await LoadPagesAsync();
         }
@@ -274,21 +277,21 @@ public class ContentCategoryService : IContentCategoryService
                 CacheMinutes,
                 nameof(ContentCategoryService),
                 nameof(GetPagesAsync),
-                contentTypeName,
+                query.ContentTypeName,
                 channelName,
                 languageTag.Locale,
                 topN.ToString(CultureInfo.InvariantCulture))
             {
                 GetCacheDependency = () => CacheHelper.GetCacheDependency(new[]
                 {
-                    $"webpageitem|bychannel|{channelName}|bycontenttype|{contentTypeName}",
+                    $"webpageitem|bychannel|{channelName}|bycontenttype|{query.ContentTypeName}",
                 }),
             };
 
             pages = await _cache.LoadAsync(async _ => await LoadPagesAsync(), cacheSettings);
         }
 
-        return pages.Select(page => map(page, pageType));
+        return pages.Select(page => map(page, query.PageType));
     }
 
     private async Task<List<InsightContentDto>> BuildInsightDtosAsync(
@@ -336,7 +339,7 @@ public class ContentCategoryService : IContentCategoryService
     }
 
     private async Task<Dictionary<int, string>> GetPageUrlsAsync(
-        IReadOnlyCollection<int> webPageItemIds, string culture, CancellationToken cancellationToken)
+        List<int> webPageItemIds, string culture, CancellationToken cancellationToken)
     {
         var urlByWebPageItemId = new Dictionary<int, string>(webPageItemIds.Count);
 
@@ -422,7 +425,8 @@ public class ContentCategoryService : IContentCategoryService
             return string.Empty;
         }
 
-        var origin = new Uri(pageUri!.GetLeftPart(UriPartial.Authority) + "/");
+        // Site root (scheme + host + port) of the page, i.e. "https://host/".
+        var origin = new UriBuilder(pageUri!.Scheme, pageUri.Host, pageUri.Port).Uri;
 
         return ToHtmlCompatibleUrl(new Uri(origin, imageUri).AbsoluteUri);
     }
@@ -565,10 +569,18 @@ public class ContentCategoryService : IContentCategoryService
 
         return map;
     }
+
     protected virtual Task<IEnumerable<TPage>> GetMappedPagesAsync<TPage>(
-    ContentItemQueryBuilder builder, CancellationToken cancellationToken)
-    where TPage : class, IWebPageFieldsSource =>
-    _contentQueryExecutor.GetMappedResult<TPage>(builder, cancellationToken: cancellationToken);
+        ContentItemQueryBuilder builder, CancellationToken cancellationToken)
+        where TPage : class, IWebPageFieldsSource =>
+        _contentQueryExecutor.GetMappedResult<TPage>(builder, cancellationToken: cancellationToken);
+
+    private sealed record PageQuery(
+        string ContentTypeName,
+        string PageType,
+        string LinkingFieldName,
+        int[] LinkedItemIds,
+        int LinkedItemsDepth);
 
     private sealed record InsightProjection(
         Guid WebPageItemGuid,
@@ -585,8 +597,8 @@ public class ContentCategoryService : IContentCategoryService
         page.ImageFileM?.FirstOrDefault()?.ContentAttachmentAsset?.Url, page.ContentTypeFilter);
 
     private static InsightProjection MapInsight(Insight page, string pageType) => MapPage(
-     page.SystemFields, pageType, page.MetadataTitle, page.MetadataDescription,
-     page.InsightContent?.FirstOrDefault()?.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset?.Url, page.ContentTypeFilter);
+        page.SystemFields, pageType, page.MetadataTitle, page.MetadataDescription,
+        page.InsightContent?.FirstOrDefault()?.ImageFile?.FirstOrDefault()?.ContentAttachmentAsset?.Url, page.ContentTypeFilter);
 
     private static InsightProjection MapPage(
         WebPageFields systemFields, string pageType, string? title, string? description,
