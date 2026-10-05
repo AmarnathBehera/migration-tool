@@ -2,6 +2,7 @@
 {
     using BDO.GWT.Core.Services;
     using CMS.ContentEngine;
+    using CMS.DataEngine;
     using CMS.Helpers;
     using CMS.Websites;
     using CMS.Websites.Routing;
@@ -26,10 +27,11 @@
         private readonly IContentQueryExecutor _contentQueryExecutor;
         private readonly IContentQueryModelTypeMapper _contentQueryModelTypeMapper;
         private readonly ICultureContext _cultureContext;
+        private readonly IInfoProvider<WebsiteChannelInfo> _websiteChannelInfoProvider;
 
         // Default cache duration – override via constructor / options if needed.
         private static readonly TimeSpan DefaultCacheDuration = TimeSpan.FromMinutes(10);
-
+        private const string channelIdColumnName = "ContentItemChannelID";
         public ContentService(
             IContentQueryExecutor executor,
             IWebsiteChannelContext websiteChannelContext,
@@ -37,7 +39,8 @@
             IContentRetriever contentRetriever,
             IContentQueryExecutor contentQueryExecutor,
             IContentQueryModelTypeMapper contentQueryModelTypeMapper,
-            ICultureContext cultureContext
+            ICultureContext cultureContext,
+            IInfoProvider<WebsiteChannelInfo> websiteChannelInfoProvider
             )
         {
             _executor = executor ?? throw new ArgumentNullException(nameof(executor));
@@ -47,6 +50,7 @@
             _contentQueryExecutor = contentQueryExecutor ?? throw new ArgumentNullException(nameof(contentQueryExecutor));
             _contentQueryModelTypeMapper = contentQueryModelTypeMapper ?? throw new ArgumentNullException(nameof(contentQueryModelTypeMapper));
             _cultureContext = cultureContext;
+            _websiteChannelInfoProvider = websiteChannelInfoProvider;
         }
 
         /// <inheritdoc />
@@ -68,12 +72,13 @@
      CancellationToken cancellationToken = default)
      where T : class
         {
+            int channelId = await GetCurrentChannelIDChannelInfo(cancellationToken);
             var builder = new ContentItemQueryBuilder();
 
             builder.ForContentType(GetContentTypeName<T>(), subquery =>
             {
                 subquery.Where(w =>
-                    w.WhereEquals("ContentItemChannelID", _websiteChannelContext.WebsiteChannelID));
+                    w.WhereEquals(channelIdColumnName, channelId));
             });
             configure?.Invoke(builder);
 
@@ -95,7 +100,7 @@ where T : class
             {
                 subquery
                  .Where(w =>
-                    w.WhereEquals("ContentItemChannelID", channelId));
+                    w.WhereEquals(channelIdColumnName, channelId));
             });
             configure?.Invoke(builder);
 
@@ -266,7 +271,7 @@ where T : class
                     var languageBuilder = builder.InLanguage(_cultureContext.CurrentLanguageTag, useLanguageFallbacks: false);
                     languageBuilder.Parameters(p =>
                     {
-                        p.Where(w => w.WhereEquals("ContentItemChannelID", WebsiteChannelID));
+                        p.Where(w => w.WhereEquals(channelIdColumnName, WebsiteChannelID));
                     });
                 };
 
@@ -446,7 +451,7 @@ where T : class
                 queryAction?.Invoke(query);
 
                 // Add channel filter
-                query.Where(w => w.WhereEquals("ContentItemChannelID", channelId));
+                query.Where(w => w.WhereEquals(channelIdColumnName, channelId));
             };
 
             // Call the extension method with decorated query
@@ -498,7 +503,17 @@ where T : class
         {
             return _websiteChannelContext.WebsiteChannelID;
         }
-
+        public async Task<int> GetCurrentChannelIDChannelInfo(CancellationToken cancellationToken)
+        {
+            int channelId = (await _websiteChannelInfoProvider
+                    .Get()
+                    .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelID), _websiteChannelContext.WebsiteChannelID)
+                    .Columns(nameof(WebsiteChannelInfo.WebsiteChannelChannelID))
+                    .TopN(1)
+                    .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken))
+                .FirstOrDefault()?.WebsiteChannelChannelID ?? 0;
+            return channelId;
+        }
         public async Task<T?> RetrieveCurrentPageAsync<T>(RetrieveCurrentPageParameters parameters, CancellationToken cancellationToken = default) where T : class
         {
             return await _contentRetriever.RetrieveCurrentPage<T>(parameters, cancellationToken);

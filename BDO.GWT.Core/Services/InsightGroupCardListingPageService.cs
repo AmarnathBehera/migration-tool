@@ -105,6 +105,7 @@ public class InsightGroupCardListingPageService : IInsightGroupCardListingPageSe
     {
         var insightSection = await SectionInsightsPageRetriever.GetSectionInsightsPageAsync(
             _contentRetriever,
+            _contentService,
             _websiteChannelContext,
             cancellationToken);
 
