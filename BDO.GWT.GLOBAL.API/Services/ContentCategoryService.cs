@@ -46,6 +46,7 @@ public class ContentCategoryService : IContentCategoryService
     private readonly IConfiguration _configuration;
     private readonly ILogger<ContentCategoryService> _logger;
 
+#pragma warning disable S107
     public ContentCategoryService(
         IContentQueryExecutor contentQueryExecutor,
         IMappingHelper mappingHelper,
@@ -57,6 +58,7 @@ public class ContentCategoryService : IContentCategoryService
         IProgressiveCache cache,
         IConfiguration configuration,
         ILogger<ContentCategoryService> logger)
+#pragma warning restore S107
     {
         _contentQueryExecutor = contentQueryExecutor;
         _mappingHelper = mappingHelper;
