@@ -1,4 +1,4 @@
-using BDO.GWT.Common.Core.Exceptions;
+﻿using BDO.GWT.Common.Core.Exceptions;
 using BDO.GWT.Core;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
@@ -307,7 +307,6 @@ public class DealCrudServiceBranchTests
     }
 
     [Test]
-    [Ignore("DealCrudService.CreateCMSTreeItem adds ShowSocialMediaButtons twice (ArgumentException); re-enable once fixed.")]
     public void CreatePageAsync_UpdateDraftFails_ThrowsNotFound()
     {
         SetupChannel("TestChannel");
@@ -322,7 +321,6 @@ public class DealCrudServiceBranchTests
     }
 
     [Test]
-    [Ignore("DealCrudService.CreateCMSTreeItem adds ShowSocialMediaButtons twice (ArgumentException); re-enable once fixed.")]
     public void CreatePageAsync_PublishFails_ThrowsNotFound()
     {
         SetupChannel("TestChannel");
@@ -338,7 +336,6 @@ public class DealCrudServiceBranchTests
     }
 
     [Test]
-    [Ignore("DealCrudService.CreateCMSTreeItem adds ShowSocialMediaButtons twice (ArgumentException); re-enable once fixed.")]
     public async Task CreatePageAsync_CreatedPageNotFound_ReturnsBadRequestAndUsesParentId()
     {
         SetupChannel("TestChannel");
@@ -384,7 +381,6 @@ public class DealCrudServiceBranchTests
     }
 
     [Test]
-    [Ignore("DealCrudService.CreateCMSTreeItem adds ShowSocialMediaButtons twice (ArgumentException); re-enable once fixed.")]
     public void CreatePageCultureVersionAsync_VariantCreationFails_ThrowsNotFound()
     {
         SetupChannel("TestChannel");
@@ -398,7 +394,6 @@ public class DealCrudServiceBranchTests
     }
 
     [Test]
-    [Ignore("DealCrudService.CreateCMSTreeItem adds ShowSocialMediaButtons twice (ArgumentException); re-enable once fixed.")]
     public void CreatePageCultureVersionAsync_UpdateDraftFails_ThrowsNotFound()
     {
         SetupChannel("TestChannel");
@@ -413,7 +408,6 @@ public class DealCrudServiceBranchTests
     }
 
     [Test]
-    [Ignore("DealCrudService.CreateCMSTreeItem adds ShowSocialMediaButtons twice (ArgumentException); re-enable once fixed.")]
     public void CreatePageCultureVersionAsync_PublishFails_ThrowsNotFound()
     {
         SetupChannel("TestChannel");
@@ -429,7 +423,6 @@ public class DealCrudServiceBranchTests
     }
 
     [Test]
-    [Ignore("DealCrudService.CreateCMSTreeItem adds ShowSocialMediaButtons twice (ArgumentException); re-enable once fixed.")]
     public async Task CreatePageCultureVersionAsync_VariantNotFoundAfterPublish_ReturnsBadRequest()
     {
         SetupChannel("TestChannel");
@@ -464,7 +457,6 @@ public class DealCrudServiceBranchTests
     }
 
     [Test]
-    [Ignore("DealCrudService.CreateCMSTreeItem adds ShowSocialMediaButtons twice (ArgumentException); re-enable once fixed.")]
     public void UpdatePageAsync_UpdateDraftFails_ThrowsAfterCreatingDraft()
     {
         SetupChannel("TestChannel");
@@ -479,7 +471,6 @@ public class DealCrudServiceBranchTests
     }
 
     [Test]
-    [Ignore("DealCrudService.CreateCMSTreeItem adds ShowSocialMediaButtons twice (ArgumentException); re-enable once fixed.")]
     public void UpdatePageAsync_PublishFails_ThrowsNotFound()
     {
         SetupChannel("TestChannel");
@@ -494,7 +485,6 @@ public class DealCrudServiceBranchTests
     }
 
     [Test]
-    [Ignore("DealCrudService.CreateCMSTreeItem adds ShowSocialMediaButtons twice (ArgumentException); re-enable once fixed.")]
     public async Task UpdatePageAsync_UpdatedPageNotFound_ReturnsBadRequest()
     {
         SetupChannel("TestChannel");
