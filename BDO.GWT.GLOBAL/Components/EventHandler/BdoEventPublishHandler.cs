@@ -82,7 +82,7 @@ namespace BDO.GWT.GLOBAL.Components.EventHandler
 
                 var itemData = new ContentItemData(new Dictionary<string, object>
                 {
-                    { FORM_FIELD_NAME, newForm.FormDisplayName },
+                    { FORM_FIELD_NAME, newForm.FormName },
                     { META_TITLE_FIELD_NAME, data.DisplayName }
                 });
 

@@ -39,27 +39,18 @@ embedCode;Embed Code
           <OptionsValueSeparator>;</OptionsValueSeparator>
         </settings>
       </field>
-      <field allowempty="true" column="Form" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="f842a7b5-e322-47f7-9854-514d3aaaed01" visible="true">
+      <field allowempty="true" column="Form" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="44a550c6-d079-4b7c-8481-0677ab8d739d" visible="true">
         <properties>
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Registration form</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
           <controlname>BDO.SQLDropdown</controlname>
-          <Script>Select * from cms_form</Script>
+          <Script>Select FormName,  FormDisplayName from cms_form</Script>
         </settings>
-        <visibilityconditiondata>
-          <VisibilityConditionConfiguration>
-            <Identifier>Kentico.Administration.IsEqualToString</Identifier>
-            <Properties>
-              <PropertyName>FormType</PropertyName>
-              <Value>form</Value>
-              <CaseSensitive>true</CaseSensitive>
-            </Properties>
-          </VisibilityConditionConfiguration>
-        </visibilityconditiondata>
       </field>
       <field allowempty="true" column="EmbedCode" columnprecision="0" columntype="longtext" enabled="true" guid="06aae26b-814e-431b-9db5-816a57eb7c2a" visible="true">
         <properties>

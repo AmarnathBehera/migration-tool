@@ -59,11 +59,12 @@ embedCode;Embed Code
           <explanationtextashtml>False</explanationtextashtml>
           <fieldcaption>Form</fieldcaption>
           <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeincontentgeneration>False</includeincontentgeneration>
           <includeintranslation>True</includeintranslation>
         </properties>
         <settings>
           <controlname>BDO.SQLDropdown</controlname>
-          <Script>select  * from cms_form</Script>
+          <Script>Select FormName,  FormDisplayName from cms_form</Script>
         </settings>
         <visibilityconditiondata>
           <VisibilityConditionConfiguration>
