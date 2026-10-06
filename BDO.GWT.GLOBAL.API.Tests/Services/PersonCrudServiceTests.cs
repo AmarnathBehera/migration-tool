@@ -1,4 +1,4 @@
-﻿using BDO.GWT.Common.Core.Exceptions;
+using BDO.GWT.Common.Core.Exceptions;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.ValueObjects;
 using BDO.GWT.Core;
@@ -8,6 +8,7 @@ using BDO.GWT.GLOBAL.API.Services;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Websites;
+using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -125,135 +126,6 @@ public class PersonCrudServiceTests
         Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
     }
 
-    [Test]
-    public async Task GetPersonPagesAsync_WhenDependenciesUnavailable_Returns500()
-    {
-        var service = CreateServiceWithoutConstructor();
-
-        ActionResult<IEnumerable<PageOutput<PersonPageContent>>> result = await service.GetPersonPagesAsync(
-            channelId: 1,
-            culture: "en-gb",
-            onlyPublished: true,
-            cancellationToken: CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
-        });
-    }
-
-    [Test]
-    public async Task GetPersonPageAsync_WhenDependenciesUnavailable_Returns500()
-    {
-        var service = CreateServiceWithoutConstructor();
-
-        ActionResult<PageOutput<PersonPageContent>> result = await service.GetPersonPageAsync(
-            channelId: 1,
-            WebPageItemGuid: Guid.NewGuid(),
-            culture: "en-gb",
-            cancellationToken: CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
-        });
-    }
-
-    [Test]
-    public async Task CreatePageAsync_WhenDependenciesUnavailable_Returns500()
-    {
-        var service = CreateServiceWithoutConstructor();
-        var request = CreateFullPersonPageContent();
-
-        ActionResult<PageOutput<PersonPageContent>> result = await service.CreatePageAsync(
-            channelId: 1,
-            WebPageParentID: 10,
-            culture: "en-gb",
-            request: request,
-            cancellationToken: CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
-        });
-    }
-
-    [Test]
-    public async Task CreatePageCultureVersionAsync_WhenDependenciesUnavailable_Returns500()
-    {
-        var service = CreateServiceWithoutConstructor();
-        var request = CreateFullPersonPageContent();
-
-        ActionResult<PageOutput<PersonPageContent>> result = await service.CreatePageCultureVersionAsync(
-            channelId: 1,
-            WebPageItemGuid: Guid.NewGuid(),
-            fromCulture: "en-gb",
-            toCulture: "fr-fr",
-            request: request,
-            cancellationToken: CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
-        });
-    }
-
-    [Test]
-    public async Task UpdatePageAsync_WhenDependenciesUnavailable_Returns500()
-    {
-        var service = CreateServiceWithoutConstructor();
-        var request = CreateFullPersonPageContent();
-
-        ActionResult<PageOutput<PersonPageContent>> result = await service.UpdatePageAsync(
-            channelId: 1,
-            WebPageItemGuid: Guid.NewGuid(),
-            culture: "en-gb",
-            request: request,
-            cancellationToken: CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
-        });
-    }
-
-    [Test]
-    public void DeletePageAsync_WhenDependenciesUnavailable_Throws()
-    {
-        var service = CreateServiceWithoutConstructor();
-
-        Assert.ThrowsAsync<NullReferenceException>(async () => await service.DeletePageAsync(
-            channelId: 1,
-            WebPageItemGuid: Guid.NewGuid(),
-            culture: "en-gb",
-            deleteAllCultures: false,
-            cancellationToken: CancellationToken.None));
-    }
-
-    [Test]
-    public async Task CreatePageAsync_WithInvalidCultureFormat_Returns500()
-    {
-        var service = CreateServiceWithoutConstructor();
-        var request = CreateFullPersonPageContent();
-
-        ActionResult<PageOutput<PersonPageContent>> result = await service.CreatePageAsync(
-            channelId: 1,
-            WebPageParentID: 10,
-            culture: "not-a-culture!!",
-            request: request,
-            cancellationToken: CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
-        });
-    }
 
     [Test]
     public void PersonCrudService_Implements_IPersonCrudService()
@@ -261,276 +133,6 @@ public class PersonCrudServiceTests
         Assert.That(typeof(IPersonCrudService).IsAssignableFrom(typeof(PersonCrudService)), Is.True);
     }
 
-    [TestCase(0, 0, null)]
-    [TestCase(-1, -1, "")]
-    [TestCase(int.MaxValue, int.MaxValue, "fr-fr")]
-    public async Task CreatePageAsync_WithNullRequest_ReturnsBadRequestResult_Variants(int channelId, int nodeParentID, string? culture)
-    {
-        var service = CreateServiceWithoutConstructor();
-
-        var result = await service.CreatePageAsync(
-            channelId,
-            nodeParentID,
-            culture,
-            request: null!,
-            CancellationToken.None);
-
-        Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
-    }
-
-    [TestCase(null, null)]
-    [TestCase("en-gb", "fr-fr")]
-    [TestCase("", "")]
-    public async Task CreatePageCultureVersionAsync_WithNullRequest_ReturnsBadRequestResult_Variants(string? fromCulture, string? toCulture)
-    {
-        var service = CreateServiceWithoutConstructor();
-
-        var result = await service.CreatePageCultureVersionAsync(
-            channelId: 1,
-            WebPageItemGuid: Guid.NewGuid(),
-            fromCulture,
-            toCulture,
-            request: null!,
-            CancellationToken.None);
-
-        Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
-    }
-
-    [TestCase(null)]
-    [TestCase("")]
-    [TestCase("en-gb")]
-    [TestCase("es-es")]
-    public async Task UpdatePageAsync_WithNullRequest_ReturnsBadRequestResult_Variants(string? culture)
-    {
-        var service = CreateServiceWithoutConstructor();
-
-        var result = await service.UpdatePageAsync(
-            channelId: 1,
-            WebPageItemGuid: Guid.NewGuid(),
-            culture,
-            request: null!,
-            CancellationToken.None);
-
-        Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
-    }
-
-    [Test]
-    public async Task CreatePageAsync_WithNullRequest_HonorsCancelledToken_StillReturnsBadRequest()
-    {
-        var service = CreateServiceWithoutConstructor();
-        using var cts = new CancellationTokenSource();
-        cts.Cancel();
-
-        var result = await service.CreatePageAsync(
-            channelId: 1,
-            WebPageParentID: 10,
-            culture: "en-gb",
-            request: null!,
-            cts.Token);
-
-        Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
-    }
-
-    [Test]
-    public async Task UpdatePageAsync_WithNullRequest_HonorsCancelledToken_StillReturnsBadRequest()
-    {
-        var service = CreateServiceWithoutConstructor();
-        using var cts = new CancellationTokenSource();
-        cts.Cancel();
-
-        var result = await service.UpdatePageAsync(
-            channelId: 1,
-            WebPageItemGuid: Guid.NewGuid(),
-            culture: "en-gb",
-            request: null!,
-            cts.Token);
-
-        Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
-    }
-
-    [Test]
-    public async Task CreatePageCultureVersionAsync_WithNullRequest_HonorsCancelledToken_StillReturnsBadRequest()
-    {
-        var service = CreateServiceWithoutConstructor();
-        using var cts = new CancellationTokenSource();
-        cts.Cancel();
-
-        var result = await service.CreatePageCultureVersionAsync(
-            channelId: 1,
-            WebPageItemGuid: Guid.NewGuid(),
-            fromCulture: "en-gb",
-            toCulture: "fr-fr",
-            request: null!,
-            cts.Token);
-
-        Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
-    }
-
-    [Test]
-    public async Task CreatePageAsync_WithNullRequest_ReturnsResult_WithNullValue()
-    {
-        var service = CreateServiceWithoutConstructor();
-
-        var result = await service.CreatePageAsync(1, 1, "en-gb", null!, CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Result, Is.Not.Null);
-            Assert.That(result.Value, Is.Null);
-        });
-    }
-
-    [Test]
-    public void DeletePageAsync_AllCultures_WhenDependenciesUnavailable_Throws()
-    {
-        var service = CreateServiceWithoutConstructor();
-
-        Assert.ThrowsAsync<NullReferenceException>(async () => await service.DeletePageAsync(
-            channelId: 1,
-            WebPageItemGuid: Guid.NewGuid(),
-            culture: "en-gb",
-            deleteAllCultures: true,
-            cancellationToken: CancellationToken.None));
-    }
-
-    [TestCase("en-gb")]
-    [TestCase("fr-fr")]
-    [TestCase("es-es")]
-    public async Task GetPersonPageAsync_WhenDependenciesUnavailable_Returns500_ForAnyCulture(string culture)
-    {
-        var service = CreateServiceWithoutConstructor();
-
-        var result = await service.GetPersonPageAsync(
-            channelId: 1,
-            WebPageItemGuid: Guid.NewGuid(),
-            culture,
-            CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
-        });
-    }
-
-    [TestCase(true)]
-    [TestCase(false)]
-    [TestCase(null)]
-    public async Task GetPersonPagesAsync_WhenDependenciesUnavailable_Returns500_ForAnyPublishedFlag(bool? onlyPublished)
-    {
-        var service = CreateServiceWithoutConstructor();
-
-        var result = await service.GetPersonPagesAsync(
-            channelId: 1,
-            culture: "en-gb",
-            onlyPublished,
-            CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
-        });
-    }
-
-    [Test]
-    public async Task DeletePageAsync_WithEmptyGuid_ThrowsDueToUnavailableChannelProvider()
-    {
-        var service = CreateServiceWithoutConstructor();
-
-        Assert.ThrowsAsync<NullReferenceException>(async () => await service.DeletePageAsync(
-            channelId: 1,
-            WebPageItemGuid: Guid.Empty,
-            culture: "en-gb",
-            deleteAllCultures: false,
-            cancellationToken: CancellationToken.None));
-    }
-
-    [TestCase(0)]
-    [TestCase(-1)]
-    [TestCase(int.MinValue)]
-    public async Task DeletePageAsync_WithVariousChannelIds_ThrowsDueToUnavailableChannelProvider(int channelId)
-    {
-        var service = CreateServiceWithoutConstructor();
-
-        Assert.ThrowsAsync<NullReferenceException>(async () => await service.DeletePageAsync(
-            channelId,
-            WebPageItemGuid: Guid.NewGuid(),
-            culture: "en-gb",
-            deleteAllCultures: false,
-            cancellationToken: CancellationToken.None));
-    }
-
-    [Test]
-    public async Task GetPersonPageAsync_WithEmptyGuid_Returns500()
-    {
-        var service = CreateServiceWithoutConstructor();
-
-        var result = await service.GetPersonPageAsync(
-            channelId: 1,
-            WebPageItemGuid: Guid.Empty,
-            culture: "en-gb",
-            CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
-        });
-    }
-
-    [Test]
-    public async Task GetPersonPagesAsync_WithCancelledToken_StillReturns500()
-    {
-        var service = CreateServiceWithoutConstructor();
-        using var cts = new CancellationTokenSource();
-        cts.Cancel();
-
-        var result = await service.GetPersonPagesAsync(
-            channelId: 1,
-            culture: "en-gb",
-            onlyPublished: true,
-            cts.Token);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
-            Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
-        });
-    }
-
-    [Test]
-    public void CreatePersonItemData_WithFullContent_ThrowsDueToUnavailableMappingHelper()
-    {
-        var service = CreateServiceWithoutConstructor();
-        var method = GetPrivateMethod("CreatePersonItemData");
-        var request = CreateFullPersonPageContent();
-
-        var invokeResult = method.Invoke(service, new object[] { request, CancellationToken.None });
-        var task = (Task)invokeResult!;
-
-        Assert.ThrowsAsync<NullReferenceException>(async () => await task);
-    }
-
-    [Test]
-    public void CreatePersonItemData_WithEmptyContent_ThrowsDueToUnavailableMappingHelper()
-    {
-        var service = CreateServiceWithoutConstructor();
-        var method = GetPrivateMethod("CreatePersonItemData");
-        var request = new PersonPageContent
-        {
-            MetadataTitle = string.Empty,
-            PersonFirstName = string.Empty,
-            PersonLastName = string.Empty,
-            MetadataTeaserImageAltText = string.Empty,
-        };
-
-        var invokeResult = method.Invoke(service, new object[] { request, CancellationToken.None });
-        var task = (Task)invokeResult!;
-
-        Assert.ThrowsAsync<NullReferenceException>(async () => await task);
-    }
 
     // -------------------------------------------------------------------------
     // PersonPageContent data model tests
@@ -1092,6 +694,71 @@ public class PersonCrudServiceCoverageTests
         MetadataTeaserImageAltText = "alt",
     };
 
+    private static ChannelInfo CreateChannelInfo(string channelName)
+    {
+        var channel = (FakeChannelInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeChannelInfo));
+        channel.ChannelName = channelName;
+        return channel;
+    }
+
+    private static Person CreatePerson(string culture = "en-gb") => new()
+    {
+        MetadataTitle = "Jane Doe",
+        PersonFirstName = "Jane",
+        PersonLastName = "Doe",
+        MetadataTeaserImageAltText = "alt",
+        MetadataDescription = "Desc",
+        PersonCredentials = [],
+        MetadataCity = [],
+        MetadataOfficeLocation = [],
+        MetadataProfileGroups = [],
+        MetadataBusinessLines = [],
+        MetadataServiceAreasPerson = [],
+        MetadataServicesPerson = [],
+        MetadataSubServices = [],
+        MetadataIndustryCategoriesPerson = [],
+        MetadataIndustriesPerson = [],
+        MetadataIndustryServices = [],
+        MetadataSpecialtiesCategories = [],
+        MetadataSpecialtiesAreas = [],
+        MetadataSpecialtiesPages = [],
+        MicrositeMasterPagesPerson = [],
+        MicrositePagesPerson = [],
+        SystemFields = new WebPageFields
+        {
+            WebPageItemID = 42,
+            WebPageItemGUID = Guid.NewGuid(),
+            WebPageItemName = "jane-doe",
+            WebPageItemTreePath = "/people/jane-doe",
+            WebPageItemParentID = 7,
+            ContentItemID = 100,
+            ContentItemGUID = Guid.NewGuid(),
+            ContentItemCommonDataFirstPublishedWhen = new DateTime(2026, 1, 1),
+            ContentItemCommonDataLastPublishedWhen = new DateTime(2026, 2, 1)
+        }
+    };
+
+    private void SetupEmptyMappingHelperOutputs()
+    {
+        _mappingHelperMock.Setup(x => x.BuildReferencesAsync<Credentials>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<Credentials, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesAsync<ProfileGroups>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<ProfileGroups, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<LocationCity>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<LocationCity, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<LocationOffice>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<LocationOffice, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<BusinessLine>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<BusinessLine, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<ServiceArea>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<ServiceArea, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<Service>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<Service, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<Sub_Service>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<Sub_Service, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<IndustryCategory>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<IndustryCategory, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<Industry>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<Industry, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<IndustryService>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<IndustryService, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<SpecialtiesCategory>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<SpecialtiesCategory, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<SpecialtiesArea>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<SpecialtiesArea, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<SpecialtiesPage>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<SpecialtiesPage, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<MicrositeMasterPage>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<MicrositeMasterPage, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<MicrositePage>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<MicrositePage, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildContentAttachmentImageReferences(It.IsAny<string?>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+    }
+
     private static void AssertNotFoundWithMessage<T>(ActionResult<T> result, string expectedMessage)
     {
         Assert.Multiple(() =>
@@ -1099,6 +766,17 @@ public class PersonCrudServiceCoverageTests
             Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
             Assert.That(((NotFoundObjectResult)result.Result!).Value, Is.EqualTo(expectedMessage));
         });
+    }
+
+    private sealed class FakeChannelInfo : ChannelInfo
+    {
+        private string? channelName;
+
+        public override string ChannelName
+        {
+            get => channelName ?? string.Empty;
+            set => channelName = value;
+        }
     }
 
     #endregion
@@ -1191,6 +869,72 @@ public class PersonCrudServiceCoverageTests
         _contentRetrieverMock.VerifyNoOtherCalls();
     }
 
+    [Test]
+    public async Task GetPersonPagesAsync_EmptyResult_ReturnsEmptyCollection()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Enumerable.Empty<Person>());
+
+        var result = await CreateService().GetPersonPagesAsync(1, "en-gb", true, CancellationToken.None);
+
+        Assert.That(result.Value, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetPersonPagesAsync_FoundPage_MapsPersonOutput()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([CreatePerson()]);
+
+        var result = await CreateService().GetPersonPagesAsync(1, "en-gb", true, CancellationToken.None);
+
+        var pages = result.Value!.ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(pages, Has.Count.EqualTo(1));
+            Assert.That(pages[0].General.Name, Is.EqualTo("jane-doe"));
+            Assert.That(pages[0].Content.MetadataTitle, Is.EqualTo("Jane Doe"));
+            Assert.That(pages[0].Metadata.PageTitle.Value, Is.EqualTo("Jane Doe"));
+        });
+    }
+
+    [Test]
+    public async Task GetPersonPagesAsync_OnlyPublishedFalse_UsesPreviewQuery()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Enumerable.Empty<Person>());
+
+        await CreateService().GetPersonPagesAsync(1, "en-gb", false, CancellationToken.None);
+
+        _contentRetrieverMock.Verify(x => x.GetPagesAsync<Person>(
+            It.Is<RetrievePagesParameters>(p => p.IsForPreview == true),
+            It.IsAny<Action<RetrievePagesQueryParameters>>(),
+            It.IsAny<RetrievalCacheSettings>(),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
     #endregion
 
     #region GetPersonPageAsync
@@ -1242,6 +986,48 @@ public class PersonCrudServiceCoverageTests
         {
             Assert.That(((ObjectResult)result.Result!).StatusCode, Is.EqualTo(500));
             Assert.That(((ObjectResult)result.Result!).Value, Is.EqualTo("db down"));
+        });
+    }
+
+    [Test]
+    public async Task GetPersonPageAsync_PageNotFound_ReturnsNotFoundResult()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Enumerable.Empty<Person>());
+
+        var result = await CreateService().GetPersonPageAsync(1, Guid.NewGuid(), "en-gb", CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+    }
+
+    [Test]
+    public async Task GetPersonPageAsync_PageFound_MapsPersonOutput()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        var person = CreatePerson();
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([person]);
+
+        var result = await CreateService().GetPersonPageAsync(1, person.SystemFields.WebPageItemGUID, "en-gb", CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Value, Is.Not.Null);
+            Assert.That(result.Value!.General.PageGuid, Is.EqualTo(person.SystemFields.WebPageItemGUID));
+            Assert.That(result.Value.Content.PersonFirstName, Is.EqualTo("Jane"));
         });
     }
 
@@ -1301,6 +1087,113 @@ public class PersonCrudServiceCoverageTests
 
         Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
         _mappingHelperMock.VerifyNoOtherCalls();
+    }
+
+    [Test]
+    public async Task CreatePageAsync_ParentPageNull_Returns422()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IEnumerable<SectionPeoplePage>?)null);
+
+        var result = await CreateService().CreatePageAsync(1, 10, "en-gb", CreateRequest(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<UnprocessableEntityObjectResult>());
+        _validationStateMock.Verify(x => x.AddUnprocessableEntityError(nameof(Int32), It.IsAny<string>()), Times.Never);
+        _validationStateMock.Verify(x => x.AddUnprocessableEntityError("WebPageParentID", It.IsAny<string>()), Times.Once);
+    }
+
+    [Test]
+    public async Task CreatePageAsync_ValidationStateThrows_Returns422()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([new SectionPeoplePage()]);
+        _validationStateMock.Setup(x => x.HasErrors()).Returns(false);
+        _validationStateMock.Setup(x => x.HasUnprocessableEntityErrors()).Returns(true);
+
+        var result = await CreateService().CreatePageAsync(1, 10, "en-gb", CreateRequest(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<UnprocessableEntityObjectResult>());
+    }
+
+    [Test]
+    public async Task CreatePageAsync_UpdateDraftFails_ReturnsNotFoundWithMessage()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        SetupEmptyMappingHelperOutputs();
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([new SectionPeoplePage()]);
+        _webPageManagerMock
+            .Setup(x => x.Create(It.IsAny<CreateWebPageParameters>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(77);
+        _webPageManagerMock
+            .Setup(x => x.TryUpdateDraft(77, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
+        var result = await CreateService().CreatePageAsync(1, 10, "en-gb", CreateRequest(), CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Failed to update page draft");
+    }
+
+    [Test]
+    public async Task CreatePageAsync_SuccessfullyCreatesAndMapsPage()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        SetupEmptyMappingHelperOutputs();
+        var createdPerson = CreatePerson();
+        createdPerson.SystemFields!.WebPageItemID = 77;
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<SectionPeoplePage>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([new SectionPeoplePage()]);
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([createdPerson]);
+        _webPageManagerMock
+            .Setup(x => x.Create(It.IsAny<CreateWebPageParameters>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(77);
+        _webPageManagerMock
+            .Setup(x => x.TryUpdateDraft(77, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        _webPageManagerMock
+            .Setup(x => x.TryPublish(77, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        var result = await CreateService().CreatePageAsync(1, 10, "en-gb", CreateRequest(), CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Value, Is.Not.Null);
+            Assert.That(result.Value!.General.WebPageItemID, Is.EqualTo(77));
+            Assert.That(result.Value.Content.MetadataTitle, Is.EqualTo("Jane Doe"));
+        });
     }
 
     #endregion
@@ -1376,6 +1269,46 @@ public class PersonCrudServiceCoverageTests
         Assert.That(result.Result, Is.InstanceOf<UnprocessableEntityObjectResult>());
     }
 
+    [Test]
+    public async Task CreatePageCultureVersionAsync_SystemFieldsMissing_ReturnsNotFoundWithMessage()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([new Person { SystemFields = null! }]);
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), "en-gb", "fr-fr", CreateRequest(), CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Page system fields are missing");
+    }
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_CreateVariantFails_ReturnsNotFoundWithMessage()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        SetupEmptyMappingHelperOutputs();
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([CreatePerson()]);
+        _webPageManagerMock
+            .Setup(x => x.TryCreateLanguageVariant(It.IsAny<CMS.Websites.CreateLanguageVariantParameters>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), "en-gb", "fr-fr", CreateRequest(), CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Failed to create language variant");
+    }
+
     #endregion
 
     #region UpdatePageAsync
@@ -1439,6 +1372,58 @@ public class PersonCrudServiceCoverageTests
         });
     }
 
+    [Test]
+    public async Task UpdatePageAsync_SystemFieldsMissing_ReturnsNotFoundWithMessage()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([new Person { SystemFields = null! }]);
+
+        var result = await CreateService().UpdatePageAsync(1, Guid.NewGuid(), "en-gb", CreateRequest(), CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Page system fields are missing");
+    }
+
+    [Test]
+    public async Task UpdatePageAsync_SuccessfullyUpdatesAndMapsPage()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        SetupEmptyMappingHelperOutputs();
+        var existingPerson = CreatePerson();
+        var updatedPerson = CreatePerson();
+        updatedPerson.MetadataTitle = "Updated Jane Doe";
+        _contentRetrieverMock
+            .SetupSequence(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([existingPerson])
+            .ReturnsAsync([updatedPerson]);
+        _webPageManagerMock
+            .Setup(x => x.TryUpdateDraft(existingPerson.SystemFields!.WebPageItemID, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        _webPageManagerMock
+            .Setup(x => x.TryPublish(existingPerson.SystemFields!.WebPageItemID, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        var result = await CreateService().UpdatePageAsync(1, existingPerson.SystemFields.WebPageItemGUID, "en-gb", CreateRequest(), CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Value, Is.Not.Null);
+            Assert.That(result.Value!.Content.MetadataTitle, Is.EqualTo("Updated Jane Doe"));
+            Assert.That(result.Value.Navigation.ShowInSitemap, Is.EqualTo(updatedPerson.IncludeInSitemap));
+        });
+    }
+
     #endregion
 
     #region DeletePageAsync
@@ -1489,6 +1474,99 @@ public class PersonCrudServiceCoverageTests
             CreateService().DeletePageAsync(4, Guid.NewGuid(), null, false, CancellationToken.None));
 
         _mappingHelperMock.Verify(x => x.ValidateAndNormalizeSiteCultureAsync(4, LanguageTag.GB.Locale, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_PageNotFound_ReturnsNotFoundResult()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Enumerable.Empty<Person>());
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), "en-gb", "fr-fr", CreateRequest(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+    }
+
+    [Test]
+    public async Task UpdatePageAsync_PageNotFound_ReturnsNotFoundResult()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Enumerable.Empty<Person>());
+
+        var result = await CreateService().UpdatePageAsync(1, Guid.NewGuid(), "en-gb", CreateRequest(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+    }
+
+    [Test]
+    public async Task DeletePageAsync_SingleCulture_PageNotFound_ThrowsNotFoundException()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Enumerable.Empty<Person>());
+
+        Assert.ThrowsAsync<NotFoundException>(() =>
+            CreateService().DeletePageAsync(1, Guid.NewGuid(), "en-gb", false, CancellationToken.None));
+    }
+
+    [Test]
+    public async Task DeletePageAsync_SingleCulture_PageExists_DeletesVariant()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([CreatePerson()]);
+
+        await CreateService().DeletePageAsync(1, Guid.NewGuid(), "en-gb", false, CancellationToken.None);
+
+        _webPageManagerMock.Verify(x => x.Delete(It.IsAny<DeleteWebPageParameters>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Test]
+    public async Task DeletePageAsync_AllCultures_DeletesExistingVariantsOnly()
+    {
+        SetupCulture(ValidCulture);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _cultureServiceMock
+            .Setup(x => x.GetSiteCulturesLanguageCodeAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([LanguageTag.GB, LanguageTag.US]);
+        _contentRetrieverMock
+            .SetupSequence(x => x.GetPagesAsync<Person>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([CreatePerson()])
+            .ReturnsAsync(Enumerable.Empty<Person>());
+
+        await CreateService().DeletePageAsync(1, Guid.NewGuid(), "en-gb", true, CancellationToken.None);
+
+        _webPageManagerMock.Verify(x => x.Delete(It.IsAny<DeleteWebPageParameters>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     #endregion

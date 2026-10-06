@@ -692,15 +692,17 @@ namespace BDO.GWT.Core.Tests.Services
 
         #region Helpers
 
-        private static Mock<ObjectQuery<T>> BuildEmptyQuery<T>() where T : BaseInfo
+        private static Mock<ObjectQuery<T>> BuildQuery<T>(params T[] items) where T : BaseInfo
         {
             var queryMock = new Mock<ObjectQuery<T>>();
             queryMock.Setup(q => q.TopN(It.IsAny<int>())).Returns(queryMock.Object);
             queryMock.As<IEnumerable<T>>()
                 .Setup(x => x.GetEnumerator())
-                .Returns(() => Enumerable.Empty<T>().GetEnumerator());
+                .Returns(() => items.AsEnumerable().GetEnumerator());
             return queryMock;
         }
+
+        private static Mock<ObjectQuery<T>> BuildEmptyQuery<T>() where T : BaseInfo => BuildQuery<T>();
 
         private static Event BuildEvent(Action<Event>? configure = null)
         {
@@ -1132,6 +1134,57 @@ namespace BDO.GWT.Core.Tests.Services
         }
 
         [Test]
+        public async Task GenerateOutlookEventCardContent_AddsAlarm_WhenGlobalSettingHasMinutesToTrigger()
+        {
+            _globalSettingsMock
+                .Setup(p => p.Get())
+                .Returns(BuildQuery<GlobalsettingskeyInfo>(new TestGlobalSettingsKeyInfo
+                {
+                    Minutestotriggercalendarreminder = 15,
+                    Displaylocationtitleinasidebar = false,
+                }).Object);
+            SetupEventPages(BuildEvent());
+
+            var result = await _service.GenerateOutlookEventCardContent(Guid.NewGuid(), null, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Does.Contain("BEGIN:VALARM"));
+                Assert.That(result, Does.Contain("TRIGGER:-PT15M"));
+            });
+        }
+
+        [Test]
+        public async Task GenerateOutlookWebinarCardContent_UsesChannelSettingMinutes_BeforeGlobal()
+        {
+            _snippetMock
+                .Setup(p => p.Get())
+                .Returns(BuildQuery<WebChannelSnippetInfo>(new TestWebChannelSnippetInfo
+                {
+                    MinutestotriggercalendarreminderInheritfromglobal = false,
+                    Minutestotriggercalendarreminder = 30,
+                    DisplaylocationtitleinasidebarInheritfromglobal = true,
+                }).Object);
+            _globalSettingsMock
+                .Setup(p => p.Get())
+                .Returns(BuildQuery<GlobalsettingskeyInfo>(new TestGlobalSettingsKeyInfo
+                {
+                    Minutestotriggercalendarreminder = 5,
+                    Displaylocationtitleinasidebar = false,
+                }).Object);
+            SetupWebinarPages(BuildWebinar());
+
+            var result = await _service.GenerateOutlookWebinarCardContent(Guid.NewGuid(), null, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Does.Contain("BEGIN:VALARM"));
+                Assert.That(result, Does.Contain("TRIGGER:-PT30M"));
+                Assert.That(result, Does.Not.Contain("TRIGGER:-PT5M"));
+            });
+        }
+
+        [Test]
         public void GenerateOutlookWebinarCardContent_ThrowsOperationCanceled_WhenTokenCancelled()
         {
             SetupWebinarPages(BuildWebinar());
@@ -1153,5 +1206,19 @@ namespace BDO.GWT.Core.Tests.Services
         }
 
         #endregion
+
+        private sealed class TestGlobalSettingsKeyInfo : GlobalsettingskeyInfo
+        {
+            public override int Minutestotriggercalendarreminder { get; set; }
+            public override bool Displaylocationtitleinasidebar { get; set; }
+        }
+
+        private sealed class TestWebChannelSnippetInfo : WebChannelSnippetInfo
+        {
+            public override int Minutestotriggercalendarreminder { get; set; }
+            public override bool MinutestotriggercalendarreminderInheritfromglobal { get; set; }
+            public override bool Displaylocationtitleinasidebar { get; set; }
+            public override bool DisplaylocationtitleinasidebarInheritfromglobal { get; set; }
+        }
     }
 }
