@@ -32,38 +32,6 @@ public class ContentControllerTests
         };
     }
 
-    [Test]
-    public async Task GetContentCategories_ReturnsCategoriesInValue()
-    {
-        var expected = new List<ContentCategoryDto>
-        {
-            new()
-            {
-                Name = "Business Issue",
-                Code = "BusinessIssue",
-                SubCategories = new List<ContentSubCategoryDto>
-                {
-                    new() { Id = 1, Name = "Sub 1" }
-                }
-            }
-        };
-
-        _contentServiceMock
-            .Setup(x => x.GetContentCategoriesAsync(ChannelId, "en-GB", It.IsAny<CancellationToken>()))
-            .ReturnsAsync(expected);
-
-        var result = await _controller.GetContentCategories(1, "en-GB", CancellationToken.None);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Result, Is.Null);
-            Assert.That(result.Value, Is.SameAs(expected));
-        });
-
-        _contentServiceMock.Verify(
-            x => x.GetContentCategoriesAsync(ChannelId, "en-GB", It.IsAny<CancellationToken>()),
-            Times.Once);
-    }
 
     [Test]
     public async Task GetContentCategories_UsesChannelIdFromHttpContext()

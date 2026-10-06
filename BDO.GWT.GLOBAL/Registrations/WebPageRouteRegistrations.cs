@@ -398,7 +398,7 @@ using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 [assembly: RegisterWebPageRoute(BusinessStrategy.CONTENT_TYPE_NAME, typeof(BusinessStrategyController), ActionName = nameof(BusinessStrategyController.Index))]
 [assembly: RegisterWebPageRoute(SectionBusinessStrategies.CONTENT_TYPE_NAME, typeof(SectionBusinessStrategiesController), ActionName = nameof(SectionBusinessStrategiesController.Index))]
 [assembly: RegisterWebPageRoute(Search.CONTENT_TYPE_NAME, typeof(SearchController), ActionName = nameof(SearchController.Index))]
-[assembly: RegisterWebPageRoute(StatusCode.CONTENT_TYPE_NAME, typeof(ErrorController))]
+[assembly: RegisterWebPageRoute(StatusCode.CONTENT_TYPE_NAME, typeof(ErrorController),ActionName =nameof(ErrorController.Index))]
 
 [assembly: RegisterPageTemplate(
     identifier: GlobalLocations.CONTENT_TYPE_NAME,

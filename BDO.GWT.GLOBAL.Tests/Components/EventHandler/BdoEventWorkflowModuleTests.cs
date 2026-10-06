@@ -60,7 +60,7 @@ public class BdoEventWorkflowModuleTests
     }
 
     [Test]
-    public void OnPreInit_RegistersAfterPublishWebPageHandler()
+    public void OnPreInit_RegistersBeforeCreateAndAfterPublishHandlers()
     {
         var module = new BdoEventWorkflowModule();
         var services = new ServiceCollection();
@@ -68,12 +68,21 @@ public class BdoEventWorkflowModuleTests
 
         InvokeOnPreInit(module, parameters);
 
-        var descriptor = services.SingleOrDefault(d =>
+        var createDescriptor = services.SingleOrDefault(d =>
+            d.ServiceType.Name == "IAsyncEventHandler`1" &&
+            d.ServiceType.GenericTypeArguments.SingleOrDefault() == typeof(BeforeCreateWebPageEvent) &&
+            d.ImplementationType == typeof(NonAsciiUrlSlugHandler));
+
+        var publishDescriptor = services.SingleOrDefault(d =>
             d.ServiceType.Name == "IAsyncEventHandler`1" &&
             d.ServiceType.GenericTypeArguments.SingleOrDefault() == typeof(AfterPublishWebPageEvent) &&
             d.ImplementationType == typeof(BdoEventPublishHandler));
 
-        Assert.That(descriptor, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(createDescriptor, Is.Not.Null);
+            Assert.That(publishDescriptor, Is.Not.Null);
+        });
     }
 
     private static Type? GetRegisteredModuleType(RegisterModuleAttribute attribute)

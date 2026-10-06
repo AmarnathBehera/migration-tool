@@ -21,6 +21,7 @@ namespace BDO.GWT.GLOBAL.Components.EventHandler
         protected override void OnPreInit(ModulePreInitParameters parameters)
         {
             base.OnPreInit(parameters);
+            parameters.Services.AddEventHandler<BeforeCreateWebPageEvent, NonAsciiUrlSlugHandler>();
             parameters.Services.AddEventHandler<AfterPublishWebPageEvent, BdoEventPublishHandler>();
         }
     }

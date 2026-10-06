@@ -63,6 +63,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IPageAttachmentService, PageAttachmentService>();
         serviceCollection.AddScoped<IPageChannelResolver, PageChannelResolver>();
         serviceCollection.AddScoped<IAssetUrlResolver, AssetUrlResolver>();
+
         serviceCollection.AddScoped<IContentItemInfoService, ContentItemInfoService>();
         serviceCollection.AddScoped<IPageAttachmentCrudService, PageAttachmentCrudService>();
         serviceCollection.AddScoped<IContentQueryMapper, ContentQueryMapper>();
@@ -71,5 +72,6 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IEventLogCrudService, EventLogCrudService>();
         serviceCollection.AddScoped<ISettingsCrudHelper, SettingsCrudHelper>();
         serviceCollection.AddScoped<ICustomGlobalLocationsService, CustomGlobalLocationsService>();
+        serviceCollection.AddScoped<IRoleCrudService, RoleCrudService>();
     }
 }

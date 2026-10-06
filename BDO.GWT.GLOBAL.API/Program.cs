@@ -4,6 +4,7 @@ using BDO.GWT.Core.Exceptions;
 using BDO.GWT.Core.Services;
 using BDO.GWT.GLOBAL.API.Constants;
 using BDO.GWT.GLOBAL.API.Extensions;
+using BDO.GWT.GLOBAL.API.Filters;
 using BDO.GWT.GLOBAL.Services;
 using Kentico.Web.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -114,6 +115,8 @@ public static class Program
             {
                 c.IncludeXmlComments(System.IO.Path.Combine(AppContext.BaseDirectory, $"{assemblyName}.xml"), true);
             }
+
+            c.ParameterFilter<ChannelNameParameterFilter>();
         });
 
         var app = builder.Build();
