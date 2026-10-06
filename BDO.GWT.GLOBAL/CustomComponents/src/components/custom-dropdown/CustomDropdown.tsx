@@ -22,7 +22,7 @@ export const BDOSQLDropdown = (props: CustomDropdownProps) => {
             >
                 <option value="">{props.defaultValue ?? 'Choose an option'}</option>
                 {props.options?.map(item => (
-                    <option key={item.value} value={item.text}>
+                    <option key={item.value} value={item.value}>
                         {item.text}
                     </option>
                 ))}
