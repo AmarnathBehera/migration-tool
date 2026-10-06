@@ -324,6 +324,8 @@ public class BdoEventPublishHandlerTests
     private sealed class TestBizFormInfo : BizFormInfo
     {
         public override string FormDisplayName { get; set; } = string.Empty;
+        public override Guid FormGUID { get; set; } = Guid.NewGuid();
+        public override string FormName { get; set; } = string.Empty;
     }
 
     private sealed class TestUserInfo : UserInfo
