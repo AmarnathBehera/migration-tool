@@ -47,6 +47,24 @@ public class PeopleCardsServiceTests
             _httpContextAccessorMock.Object);
     }
 
+    [Test]
+    public async Task CreateFiltersAsync_DelegatesToCardsService()
+    {
+        var filters = new HashSet<string> { "officeLocation" };
+        var expected = new[]
+        {
+            new FilterItemDto<OptionDto> { Name = "officeLocation", Type = "select", Options = [] }
+        };
+
+        _cardsServiceMock
+            .Setup(x => x.CreateFiltersAsync(filters, "/people", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expected);
+
+        var result = await _service.CreateFiltersAsync(filters, "/people", CancellationToken.None);
+
+        Assert.That(result, Is.SameAs(expected));
+    }
+
     #region GetFilteredItemsAsync (parentWebPageItemId overload)
 
     [Test]
@@ -249,6 +267,88 @@ public class PeopleCardsServiceTests
         var result = await _service.GetFallbackMetadataDescription(person);
 
         Assert.That(result, Is.EqualTo("Jane Doe"));
+    }
+
+    [Test]
+    public async Task GetFilteredItemsAsync_WithSectionPeoplePage_InvokesDecorateQuery()
+    {
+        var page = new SectionPeoplePage
+        {
+            SystemFields = new WebPageFields
+            {
+                WebPageItemID = 42
+            }
+        };
+
+        var query = new CardsQuery { Order = "asc" };
+        var decorateInvoked = false;
+
+        _contentServiceMock
+            .Setup(s => s.GetChildPagesByParentGuidWithQueryBuilderAsync<Person>(
+                It.IsAny<Action<ContentItemQueryBuilder>>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<Action<ContentItemQueryBuilder>, CancellationToken>((configure, _) => configure(new ContentItemQueryBuilder()))
+            .ReturnsAsync(Enumerable.Empty<Person>());
+
+        var result = await _service.GetFilteredItemsAsync(
+            page,
+            "en",
+            query,
+            _ => decorateInvoked = true,
+            _ => false,
+            CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(decorateInvoked, Is.True);
+            Assert.That(result.TotalCount, Is.EqualTo(0));
+            Assert.That(result.Data, Is.Empty);
+        });
+    }
+
+    [Test]
+    public async Task GetFallbackMetadataDescription_WhenUsePageTitleEnabled_ReturnsMetadataTitle()
+    {
+        var person = new Person
+        {
+            MetadataTitle = "Profile Title",
+            PersonFirstName = "Jane",
+            PersonLastName = "Doe",
+            PersonSurnamePrefixes = "van"
+        };
+
+        _settingServiceMock
+            .Setup(s => s.GetUsePersonPageTitleInfo())
+            .ReturnsAsync(new WebChannelSnippetInfo[] { new TestWebChannelSnippetInfo { UsePageTitleToDisplayPersonName = true } });
+
+        var result = await _service.GetFallbackMetadataDescription(person);
+
+        Assert.That(result, Is.EqualTo("Profile Title"));
+    }
+
+    [Test]
+    public async Task GetFallbackMetadataDescription_WhenSurnamePrefixPresent_ReturnsFullNameWithPrefix()
+    {
+        var person = new Person
+        {
+            MetadataTitle = "Ignored Title",
+            PersonFirstName = "Jane",
+            PersonSurnamePrefixes = "van",
+            PersonLastName = "Doe"
+        };
+
+        _settingServiceMock
+            .Setup(s => s.GetUsePersonPageTitleInfo())
+            .ReturnsAsync(Enumerable.Empty<WebChannelSnippetInfo>());
+
+        var result = await _service.GetFallbackMetadataDescription(person);
+
+        Assert.That(result, Is.EqualTo("Jane van Doe"));
+    }
+
+    private sealed class TestWebChannelSnippetInfo : WebChannelSnippetInfo
+    {
+        public override bool UsePageTitleToDisplayPersonName { get; set; }
     }
 
     #endregion

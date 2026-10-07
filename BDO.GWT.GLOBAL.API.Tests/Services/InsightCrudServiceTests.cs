@@ -399,6 +399,88 @@ public class InsightCrudServiceTests
     }
 
     [Test]
+    public async Task CreatePageAsync_UpdateDraftFails_AfterBuildingItemData_ReturnsNotFoundMessage()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        SetupSectionInsights(Enumerable.Empty<SectionInsightsPage>());
+        SetupEmptyInsightMappingOutputs();
+        _webPageManagerMock.Setup(x => x.Create(It.IsAny<CreateWebPageParameters>(), It.IsAny<CancellationToken>())).ReturnsAsync(42);
+        _webPageManagerMock.Setup(x => x.TryUpdateDraft(42, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>())).ReturnsAsync(false);
+
+        var result = await CreateService().CreatePageAsync(1, 10, "en-gb", new InsightPageContent { MetadataTitle = "New insight" }, CancellationToken.None);
+
+        AssertNotFoundMessage(result, "Failed to update page draft");
+        _webPageManagerMock.Verify(x => x.Create(It.IsAny<CreateWebPageParameters>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Test]
+    public async Task CreatePageAsync_PublishFails_AfterUpdatingDraft_ReturnsNotFoundMessage()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        SetupSectionInsights(Enumerable.Empty<SectionInsightsPage>());
+        SetupEmptyInsightMappingOutputs();
+        _webPageManagerMock.Setup(x => x.Create(It.IsAny<CreateWebPageParameters>(), It.IsAny<CancellationToken>())).ReturnsAsync(42);
+        _webPageManagerMock.Setup(x => x.TryUpdateDraft(42, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _webPageManagerMock.Setup(x => x.TryPublish(42, It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(false);
+
+        var result = await CreateService().CreatePageAsync(1, 10, "en-gb", new InsightPageContent(), CancellationToken.None);
+
+        AssertNotFoundMessage(result, "Failed to publish updated page");
+    }
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_SuccessfullyCreatesPublishesAndMapsVariant()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        var sourceInsight = CreateInsight(42);
+        var createdVariant = CreateInsight(42);
+        createdVariant.MetadataTitle = "French insight";
+        SetupInsights([sourceInsight], [createdVariant]);
+        SetupEmptyInsightMappingOutputs();
+        _webPageManagerMock
+            .Setup(x => x.TryCreateLanguageVariant(It.IsAny<CMS.Websites.CreateLanguageVariantParameters>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        _webPageManagerMock.Setup(x => x.TryUpdateDraft(42, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _webPageManagerMock.Setup(x => x.TryPublish(42, It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), "en-gb", "fr-fr", new InsightPageContent(), CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Value, Is.Not.Null);
+            Assert.That(result.Value!.General.WebPageItemID, Is.EqualTo(42));
+            Assert.That(result.Value.Content.MetadataTitle, Is.EqualTo("French insight"));
+        });
+    }
+
+    [Test]
+    public async Task CreatePageAsync_SuccessfullyCreatesPublishesAndMapsInsight()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        SetupSectionInsights(Enumerable.Empty<SectionInsightsPage>());
+        SetupEmptyInsightMappingOutputs();
+        var createdInsight = CreateInsight(42);
+        createdInsight.MetadataTitle = "Created insight";
+        SetupInsights([createdInsight]);
+        _webPageManagerMock.Setup(x => x.Create(It.IsAny<CreateWebPageParameters>(), It.IsAny<CancellationToken>())).ReturnsAsync(42);
+        _webPageManagerMock.Setup(x => x.TryUpdateDraft(42, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _webPageManagerMock.Setup(x => x.TryPublish(42, It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+
+        var result = await CreateService().CreatePageAsync(1, 10, "en-gb", new InsightPageContent { MetadataTitle = "Created insight" }, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Value, Is.Not.Null);
+            Assert.That(result.Value!.General.WebPageItemID, Is.EqualTo(42));
+            Assert.That(result.Value.Content.MetadataTitle, Is.EqualTo("Created insight"));
+        });
+    }
+
+    [Test]
     public void InsightPageContent_StringProperties_CanBeSet()
     {
         var content = new InsightPageContent
@@ -986,8 +1068,55 @@ public class InsightCrudServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(result!);
 
-    private static Insight CreateInsight(int id) =>
-        new() { SystemFields = new WebPageFields { WebPageItemID = id, ContentItemName = "insight" } };
+    private static Insight CreateInsight(int id) => new()
+    {
+        SystemFields = new WebPageFields { WebPageItemID = id, ContentItemName = "insight" },
+        InsightContent = [],
+        MetadataBusinessIssues = [],
+        MetadataSpecialtiesCategories = [],
+        MetadataSpecialtiesAreas = [],
+        MetadataSpecialtiesPages = [],
+        MetadataOfficeLocation = [],
+        Insights = [],
+        DownloadButtonAttachment = [],
+        MetadataOGImage = [],
+        MetadataOGTwitterImage = [],
+        MetadataTeaserImage = [],
+        ContentTypeFilter = [],
+        MetadataBusinessLine = [],
+        MetadataServiceAreas = [],
+        MetadataServices = [],
+        MetadataIndustryCategories = [],
+        MetadataIndustries = [],
+        MicrositePages = [],
+        MicrositeMasterPages = [],
+        MetadataRssCategory = [],
+        RelevantContactPerson = [],
+        RelatedExternalPeople = [],
+    };
+
+    private void SetupEmptyInsightMappingOutputs()
+    {
+        _mappingHelperMock.Setup(x => x.BuildReferencesAsync<Businessissue>(It.IsAny<IEnumerable<string>?>(), It.IsAny<Func<Businessissue, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesAsync<Contenttypes>(It.IsAny<IEnumerable<string>?>(), It.IsAny<Func<Contenttypes, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<BusinessLine>(It.IsAny<IEnumerable<string>?>(), It.IsAny<Func<BusinessLine, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<ServiceArea>(It.IsAny<IEnumerable<string>?>(), It.IsAny<Func<ServiceArea, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<Service>(It.IsAny<IEnumerable<string>?>(), It.IsAny<Func<Service, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<IndustryCategory>(It.IsAny<IEnumerable<string>?>(), It.IsAny<Func<IndustryCategory, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<Industry>(It.IsAny<IEnumerable<string>?>(), It.IsAny<Func<Industry, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<SpecialtiesCategory>(It.IsAny<IEnumerable<string>?>(), It.IsAny<Func<SpecialtiesCategory, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<SpecialtiesArea>(It.IsAny<IEnumerable<string>?>(), It.IsAny<Func<SpecialtiesArea, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<SpecialtiesPage>(It.IsAny<IEnumerable<string>?>(), It.IsAny<Func<SpecialtiesPage, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<LocationOffice>(It.IsAny<IEnumerable<string>?>(), It.IsAny<Func<LocationOffice, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<MicrositeMasterPage>(It.IsAny<IEnumerable<string>?>(), It.IsAny<Func<MicrositeMasterPage, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<MicrositePage>(It.IsAny<IEnumerable<string>?>(), It.IsAny<Func<MicrositePage, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<Insight>(It.IsAny<IEnumerable<string>?>(), It.IsAny<Func<Insight, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<MicrositePlaceholder>(It.IsAny<IEnumerable<string>?>(), It.IsAny<Func<MicrositePlaceholder, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<ExternalPerson>(It.IsAny<IEnumerable<string>?>(), It.IsAny<Func<ExternalPerson, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildFeaturedPersonOrInternalReferencesAsync(It.IsAny<IEnumerable<string>?>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildContentAttachmentImageReferences(It.IsAny<string?>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildOrUpdateCopyInsightReferencesAsync(It.IsAny<List<string>?>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+    }
 
     private static void AssertNotFoundMessage<T>(ActionResult<T> result, string message)
     {
@@ -1117,6 +1246,81 @@ public class InsightCrudServiceTests
     }
 
     [Test]
+    public async Task CreatePageCultureVersionAsync_CreateVariantFails_AfterBuildingItemData_ReturnsNotFoundMessage()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        SetupInsights([CreateInsight(42)]);
+        SetupEmptyInsightMappingOutputs();
+        _webPageManagerMock
+            .Setup(x => x.TryCreateLanguageVariant(It.IsAny<CMS.Websites.CreateLanguageVariantParameters>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), "en-gb", "fr-fr", new InsightPageContent(), CancellationToken.None);
+
+        AssertNotFoundMessage(result, "Failed to create language variant");
+    }
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_UpdateDraftFails_ReturnsNotFoundMessage()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        SetupInsights([CreateInsight(42)]);
+        SetupEmptyInsightMappingOutputs();
+        _webPageManagerMock
+            .Setup(x => x.TryCreateLanguageVariant(It.IsAny<CMS.Websites.CreateLanguageVariantParameters>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        _webPageManagerMock.Setup(x => x.TryUpdateDraft(42, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>())).ReturnsAsync(false);
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), "en-gb", "fr-fr", new InsightPageContent(), CancellationToken.None);
+
+        AssertNotFoundMessage(result, "Failed to update page draft");
+    }
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_PublishFails_ReturnsNotFoundMessage()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        SetupInsights([CreateInsight(42)]);
+        SetupEmptyInsightMappingOutputs();
+        _webPageManagerMock
+            .Setup(x => x.TryCreateLanguageVariant(It.IsAny<CMS.Websites.CreateLanguageVariantParameters>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        _webPageManagerMock.Setup(x => x.TryUpdateDraft(42, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _webPageManagerMock.Setup(x => x.TryPublish(42, It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(false);
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), "en-gb", "fr-fr", new InsightPageContent(), CancellationToken.None);
+
+        AssertNotFoundMessage(result, "Failed to publish updated page");
+    }
+
+    [Test]
+    public async Task UpdatePageAsync_SuccessfullyCreatesDraftPublishesAndMapsInsight()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        var existingInsight = CreateInsight(42);
+        var updatedInsight = CreateInsight(42);
+        updatedInsight.MetadataTitle = "Updated insight";
+        SetupInsights([existingInsight], [updatedInsight]);
+        SetupEmptyInsightMappingOutputs();
+        _webPageManagerMock.Setup(x => x.TryCreateDraft(42, It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _webPageManagerMock.Setup(x => x.TryUpdateDraft(42, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _webPageManagerMock.Setup(x => x.TryPublish(42, It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+
+        var result = await CreateService().UpdatePageAsync(1, Guid.NewGuid(), "en-gb", new InsightPageContent(), CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Value, Is.Not.Null);
+            Assert.That(result.Value!.General.WebPageItemID, Is.EqualTo(42));
+            Assert.That(result.Value.Content.MetadataTitle, Is.EqualTo("Updated insight"));
+        });
+    }
+
+    [Test]
     public async Task UpdatePageAsync_PageMissing_ReturnsNotFoundResult()
     {
         SetupCulture(ValidCulture);
@@ -1139,6 +1343,37 @@ public class InsightCrudServiceTests
 
         AssertNotFoundMessage(result, "Page system fields are missing");
         _webPageManagerMock.Verify(x => x.TryCreateDraft(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Test]
+    public async Task UpdatePageAsync_UpdateDraftFails_AfterBuildingItemData_ReturnsNotFoundMessage()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        SetupInsights([CreateInsight(42)]);
+        SetupEmptyInsightMappingOutputs();
+        _webPageManagerMock.Setup(x => x.TryCreateDraft(42, It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _webPageManagerMock.Setup(x => x.TryUpdateDraft(42, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>())).ReturnsAsync(false);
+
+        var result = await CreateService().UpdatePageAsync(1, Guid.NewGuid(), "en-gb", new InsightPageContent { MetadataTitle = "Updated insight" }, CancellationToken.None);
+
+        AssertNotFoundMessage(result, "Failed to update page draft");
+    }
+
+    [Test]
+    public async Task UpdatePageAsync_PublishFails_AfterUpdatingDraft_ReturnsNotFoundMessage()
+    {
+        SetupCulture(ValidCulture);
+        SetupNamedChannel("TestChannel");
+        SetupInsights([CreateInsight(42)]);
+        SetupEmptyInsightMappingOutputs();
+        _webPageManagerMock.Setup(x => x.TryCreateDraft(42, It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _webPageManagerMock.Setup(x => x.TryUpdateDraft(42, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _webPageManagerMock.Setup(x => x.TryPublish(42, It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(false);
+
+        var result = await CreateService().UpdatePageAsync(1, Guid.NewGuid(), "en-gb", new InsightPageContent(), CancellationToken.None);
+
+        AssertNotFoundMessage(result, "Failed to publish updated page");
     }
 
     [Test]

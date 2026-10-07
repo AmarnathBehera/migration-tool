@@ -247,6 +247,36 @@ public class HomePageService : IHomePageService
                             Description = HtmlHelper.ExtractTextFromHtml(sub_Service.MetadataDescription),
                             ReadMoreLink = sub_Service.SystemFields?.WebPageUrlPath
                         },
+                        Insight insight => new TrendingTopicItemDto
+                        {
+                            Title = insight.MetadataTitle,
+                            Description = HtmlHelper.ExtractTextFromHtml(insight.MetadataDescription),
+                            ReadMoreLink = insight.SystemFields?.WebPageUrlPath
+                        },
+                        Deal deal => new TrendingTopicItemDto
+                        {
+                            Title = deal.MetadataTitle,
+                            Description = HtmlHelper.ExtractTextFromHtml(deal.MetadataDescription),
+                            ReadMoreLink = deal.SystemFields?.WebPageUrlPath
+                        },
+                        MicrositeMasterPage micrositeMasterPage => new TrendingTopicItemDto
+                        {
+                            Title = micrositeMasterPage.MetadataTitle,
+                            Description = HtmlHelper.ExtractTextFromHtml(micrositeMasterPage.MetadataDescription),
+                            ReadMoreLink = micrositeMasterPage.SystemFields?.WebPageUrlPath
+                        },
+                        MicrositePage micrositePage => new TrendingTopicItemDto
+                        {
+                            Title = micrositePage.MetadataTitle,
+                            Description = HtmlHelper.ExtractTextFromHtml(micrositePage.MetadataDescription),
+                            ReadMoreLink = micrositePage.SystemFields?.WebPageUrlPath
+                        },
+                        Event eventpage => new TrendingTopicItemDto
+                        {
+                            Title = eventpage.MetadataTitle,
+                            Description = HtmlHelper.ExtractTextFromHtml(eventpage.MetadataDescription),
+                            ReadMoreLink = eventpage.SystemFields?.WebPageUrlPath
+                        },
                         _ => new TrendingTopicItemDto
                     {
                        Title = item.SystemFields?.WebPageItemName,

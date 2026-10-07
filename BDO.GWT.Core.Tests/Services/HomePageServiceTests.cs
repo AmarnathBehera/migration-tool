@@ -28,6 +28,57 @@ namespace BDO.GWT.Core.Tests.Services
                 _cultureContextMock.Object);
         }
 
+        private static IWebPageFieldsSource CreateTrendingTopicFeaturedItem(string featuredItemType, string title, string description, string urlPath) =>
+            featuredItemType switch
+            {
+                "Insight" => new Insight
+                {
+                    MetadataTitle = title,
+                    MetadataDescription = description,
+                    SystemFields = new WebPageFields
+                    {
+                        WebPageUrlPath = urlPath
+                    }
+                },
+                "Deal" => new Deal
+                {
+                    MetadataTitle = title,
+                    MetadataDescription = description,
+                    SystemFields = new WebPageFields
+                    {
+                        WebPageUrlPath = urlPath
+                    }
+                },
+                "MicrositeMasterPage" => new MicrositeMasterPage
+                {
+                    MetadataTitle = title,
+                    MetadataDescription = description,
+                    SystemFields = new WebPageFields
+                    {
+                        WebPageUrlPath = urlPath
+                    }
+                },
+                "MicrositePage" => new MicrositePage
+                {
+                    MetadataTitle = title,
+                    MetadataDescription = description,
+                    SystemFields = new WebPageFields
+                    {
+                        WebPageUrlPath = urlPath
+                    }
+                },
+                "Event" => new Event
+                {
+                    MetadataTitle = title,
+                    MetadataDescription = description,
+                    SystemFields = new WebPageFields
+                    {
+                        WebPageUrlPath = urlPath
+                    }
+                },
+                _ => throw new ArgumentOutOfRangeException(nameof(featuredItemType), featuredItemType, null)
+            };
+
         [Test]
         public async Task RetrieveHomeHeroSlidesDtoAsync_ReturnsMappedData()
         {
@@ -943,6 +994,80 @@ namespace BDO.GWT.Core.Tests.Services
 
                 Assert.That(tab.Items?[0].ReadMoreLink,
                     Is.EqualTo("/sub-service"));
+            });
+        }
+
+        [TestCase("Insight")]
+        [TestCase("Deal")]
+        [TestCase("MicrositeMasterPage")]
+        [TestCase("MicrositePage")]
+        [TestCase("Event")]
+        public async Task RetrieveTrendingTopicsDtoAsync_ReturnsMappedDto_ForAdditionalFeaturedItemTypes(string featuredItemType)
+        {
+            var homePage = new HomePage
+            {
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 1
+                }
+            };
+
+            var trendingTopicsContainer = new TrendingTopics
+            {
+                Heading = "Trending",
+                SystemFields = new WebPageFields
+                {
+                    WebPageItemID = 2
+                }
+            };
+
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopics>(
+                    homePage.SystemFields.WebPageItemID,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<TrendingTopics>
+                {
+                    trendingTopicsContainer
+                });
+
+            var expectedTitle = $"{featuredItemType} Title";
+            var expectedDescription = $"{featuredItemType} Desc";
+            var expectedUrl = $"/{featuredItemType.ToLowerInvariant()}";
+            var featuredItem = CreateTrendingTopicFeaturedItem(featuredItemType, expectedTitle, expectedDescription, expectedUrl);
+
+            var trendingTopics = new List<TrendingTopic>
+            {
+                new TrendingTopic
+                {
+                    Title = "Tab Extra",
+                    ImageUrl = new List<ContentAttachment>(),
+                    CTANodeGuid = new List<IWebPageFieldsSource>(),
+                    FeaturedItems = new List<IWebPageFieldsSource>
+                    {
+                        featuredItem
+                    }
+                }
+            };
+
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<TrendingTopic>(
+                    trendingTopicsContainer.SystemFields.WebPageItemID,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(trendingTopics);
+
+            var result = await _service.RetrieveTrendingTopicsDtoAsync(
+                homePage,
+                CancellationToken.None);
+
+            var item = result!.Tabs.Single().Items!.Single();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Heading, Is.EqualTo("Trending"));
+                Assert.That(result.Tabs.Count(), Is.EqualTo(1));
+                Assert.That(item.Title, Is.EqualTo(expectedTitle));
+                Assert.That(item.Description, Is.EqualTo(expectedDescription));
+                Assert.That(item.ReadMoreLink, Is.EqualTo(expectedUrl));
             });
         }
 

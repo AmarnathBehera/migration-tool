@@ -4,6 +4,7 @@ using BDO.GWT.Core.Data;
 using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.DTOs.Cards;
+using BDO.GWT.Core.Helper;
 using BDO.GWT.Core.Retrievers;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Core.Utilities;
@@ -21,6 +22,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,6 +30,11 @@ namespace BDO.GWT.Core.Tests.Services
 {
     public class BlogPageCardsServiceTests
     {
+        private static readonly string[] ExpectedContributorLabels = ["Amy Lee", "Bob", "Zed Young"];
+        private static readonly string[] ExpectedPageFilterLabels = ["Alpha", "Mid", "Zeta"];
+        private static readonly string[] ExpectedTagFilterLabels = ["Alpha", "Beta"];
+        private static readonly string[] ExpectedKeywordLabels = ["alpha", "beta"];
+
         private Mock<ICardsService> _cardsServiceMock = null!;
         private Mock<ICultureContext> _cultureContextMock = null!;
         private Mock<IContentService> _contentServiceMock = null!;
@@ -108,7 +115,6 @@ namespace BDO.GWT.Core.Tests.Services
                 Assert.That(result, Has.Length.EqualTo(2));
             });
         }
-              
 
         [Test]
         public async Task CreateFiltersAsync_EmptyFilterSet_ReturnsEmptyArray()
@@ -128,11 +134,211 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<Type[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<object>());
 
-            var result = await _service.CreateBlogPageFiltersAsync(filters, 1,CancellationToken.None);
+            var result = await _service.CreateBlogPageFiltersAsync(filters, 1, CancellationToken.None);
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Has.Length.EqualTo(2));
         }
+
+        [Test]
+        public async Task CreateBlogPageFiltersAsync_UnknownFilterName_IsSkipped()
+        {
+            var result = await _service.CreateBlogPageFiltersAsync(
+                new HashSet<string> { "this-filter-does-not-exist" }, 1, CancellationToken.None);
+
+            Assert.That(result, Is.Empty);
+        }
+
+        [Test]
+        public async Task CreateBlogPageFiltersAsync_PersonFilter_ReturnsSortedTrimmedContributorNames()
+        {
+            var personFilter = RequireFilter(
+                d => d.FilterParameterType == FilterParameterType.Page && d.EntityType?.Name == "Person",
+                "a Page-type filter whose EntityType is Person");
+
+            const int blogsPageId = 7;
+            var contributorPage = new BlogContributors
+            {
+                SystemFields = new WebPageFields { WebPageItemID = 50 }
+            };
+
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<BlogContributors>(blogsPageId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[] { contributorPage });
+
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<Person>(50, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[]
+                {
+                    new Person { PersonFirstName = "Zed", PersonLastName = "Young" },
+                    new Person { PersonFirstName = "Amy", PersonLastName = "Lee" },
+                    new Person { PersonFirstName = "Bob", PersonLastName = "" },   // trimmed -> "Bob"
+                    new Person { PersonFirstName = "", PersonLastName = "" }       // filtered out
+                });
+
+            var result = await _service.CreateBlogPageFiltersAsync(
+                new HashSet<string> { personFilter }, blogsPageId, CancellationToken.None);
+
+            var options = GetOptions(result.Single());
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(options.Select(o => o.Label), Is.EqualTo(ExpectedContributorLabels));
+                Assert.That(options.Select(o => o.Value), Is.EqualTo(options.Select(o => o.Label)));
+            });
+        }
+
+        [Test]
+        public async Task CreateBlogPageFiltersAsync_PersonFilter_NoContributorPersons_ReturnsEmptyOptions()
+        {
+            var personFilter = RequireFilter(
+                d => d.FilterParameterType == FilterParameterType.Page && d.EntityType?.Name == "Person",
+                "a Page-type filter whose EntityType is Person");
+
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<BlogContributors>(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[] { new BlogContributors { SystemFields = new WebPageFields { WebPageItemID = 50 } } });
+
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<Person>(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Array.Empty<Person>());
+
+            var result = await _service.CreateBlogPageFiltersAsync(
+                new HashSet<string> { personFilter }, 1, CancellationToken.None);
+
+            Assert.That(GetOptions(result.Single()), Is.Empty);
+        }
+
+        [Test]
+        public async Task CreateBlogPageFiltersAsync_PersonFilter_NoContributorPages_ReturnsEmptyOptions()
+        {
+            var personFilter = RequireFilter(
+                d => d.FilterParameterType == FilterParameterType.Page && d.EntityType?.Name == "Person",
+                "a Page-type filter whose EntityType is Person");
+
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<BlogContributors>(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Array.Empty<BlogContributors>());
+
+            var result = await _service.CreateBlogPageFiltersAsync(
+                new HashSet<string> { personFilter }, 1, CancellationToken.None);
+
+            Assert.That(GetOptions(result.Single()), Is.Empty);
+        }
+
+        [Test]
+        public async Task CreateBlogPageFiltersAsync_PageFilter_ResolvesNameFromTitleThenOgTitleThenItemName()
+        {
+            var pageFilter = RequireFilter(
+                d => d.FilterParameterType == FilterParameterType.Page && d.EntityType?.Name != "Person",
+                "a Page-type filter whose EntityType is not Person");
+
+            _contentServiceMock
+                .Setup(x => x.GetItemsByTypesAsync(It.IsAny<Type[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<object>
+                {
+                    new FakePageItem { MetadataTitle = "Zeta" },
+                    new FakePageItem { MetadataOGTitle = "Alpha" },
+                    new FakePageItem { SystemFields = new FakeSystemFields { ContentItemName = "Mid" } },
+                    new FakePageItem(),   // no name anywhere -> filtered out
+                    new object()          // no reflected properties at all -> filtered out
+                });
+
+            var result = await _service.CreateBlogPageFiltersAsync(
+                new HashSet<string> { pageFilter }, 1, CancellationToken.None);
+
+            Assert.That(GetOptions(result.Single()).Select(o => o.Label),
+                Is.EqualTo(ExpectedPageFilterLabels));
+        }
+
+        [Test]
+        public async Task CreateBlogPageFiltersAsync_PageFilter_NullItems_ReturnsEmptyOptions()
+        {
+            var pageFilter = RequireFilter(
+                d => d.FilterParameterType == FilterParameterType.Page && d.EntityType?.Name != "Person",
+                "a Page-type filter whose EntityType is not Person");
+
+            // If GetItemsByTypesAsync returns a non-nullable type this lambda still compiles; adjust if needed.
+            _contentServiceMock
+                .Setup(x => x.GetItemsByTypesAsync(It.IsAny<Type[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => null!);
+
+            var result = await _service.CreateBlogPageFiltersAsync(
+                new HashSet<string> { pageFilter }, 1, CancellationToken.None);
+
+            Assert.That(GetOptions(result.Single()), Is.Empty);
+        }
+
+        [Test]
+        public async Task CreateBlogPageFiltersAsync_TagPageFilter_ReturnsSortedNonEmptyNames()
+        {
+            var tagFilter = RequireFilter(
+                d => d.FilterParameterType == FilterParameterType.Tagpage,
+                "a Tagpage-type filter");
+
+            _contentServiceMock
+                .Setup(x => x.GetItemsByTypesAsync(It.IsAny<Type[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<object>
+                {
+                    new FakeTagItem { Name = "Beta" },
+                    new FakeTagItem { Name = "Alpha" },
+                    new FakeTagItem { Name = "" },   // filtered out
+                    new object()                     // no Name property -> filtered out
+                });
+
+            var result = await _service.CreateBlogPageFiltersAsync(
+                new HashSet<string> { tagFilter }, 1, CancellationToken.None);
+
+            Assert.That(GetOptions(result.Single()).Select(o => o.Label),
+                Is.EqualTo(ExpectedTagFilterLabels));
+        }
+
+        [Test]
+        public async Task CreateBlogPageFiltersAsync_FieldFilter_BlogPostKeywords_ReturnsDistinctKeywords()
+        {
+            var fieldFilter = RequireFilter(
+                d => d.FilterParameterType == FilterParameterType.Field && d.EntityType == typeof(BlogPost),
+                "a Field-type filter whose EntityType is BlogPost");
+
+            var post1 = CreateBlogPost("P1", new DateTime(2024, 1, 1));
+            post1.MetadataKeywordsBlog = "alpha";
+            var post2 = CreateBlogPost("P2", new DateTime(2024, 1, 2));
+            post2.MetadataKeywordsBlog = "beta";
+            var post3 = CreateBlogPost("P3", new DateTime(2024, 1, 3));
+            post3.MetadataKeywordsBlog = "alpha";   // duplicate
+            var post4 = CreateBlogPost("P4", new DateTime(2024, 1, 4));
+            post4.MetadataKeywordsBlog = "";        // ignored
+
+            _contentServiceMock
+                .Setup(x => x.GetItemsByTypesAsync(It.IsAny<Type[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<object> { post1, post2, post3, post4 });
+
+            var result = await _service.CreateBlogPageFiltersAsync(
+                new HashSet<string> { fieldFilter }, 1, CancellationToken.None);
+
+            var labels = GetOptions(result.Single()).Select(o => o.Label).ToArray();
+
+            Assert.That(labels, Is.EquivalentTo(ExpectedKeywordLabels));
+        }
+
+        [Test]
+        public async Task CreateBlogPageFiltersAsync_FieldFilter_NoItems_ReturnsEmptyOptions()
+        {
+            var fieldFilter = RequireFilter(
+                d => d.FilterParameterType == FilterParameterType.Field,
+                "a Field-type filter");
+
+            _contentServiceMock
+                .Setup(x => x.GetItemsByTypesAsync(It.IsAny<Type[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<object>());
+
+            var result = await _service.CreateBlogPageFiltersAsync(
+                new HashSet<string> { fieldFilter }, 1, CancellationToken.None);
+
+            Assert.That(GetOptions(result.Single()), Is.Empty);
+        }
+
+
 
         #endregion
 
@@ -557,6 +763,149 @@ namespace BDO.GWT.Core.Tests.Services
             Assert.That(result.TotalCount, Is.EqualTo(1));
         }
 
+        // ---- Filter expressions / query-builder lambda ------------------------------
+
+        private static IEnumerable<string> PageFilterNames => new[]
+        {
+            FilterParameterName.BusinessLine,
+            FilterParameterName.BusinessIssue,
+            FilterParameterName.ServiceArea,
+            FilterParameterName.Service,
+            FilterParameterName.IndustryCategory,
+            FilterParameterName.IndustryPage,
+            FilterParameterName.MicrositeMasterPage,
+            FilterParameterName.MicrositePage,
+            FilterParameterName.Person
+        };
+
+        [TestCaseSource(nameof(PageFilterNames))]
+        public async Task GetFilteredItemsAsync_PageFilter_ResolvesPageAndAppliesWhere(string filterName)
+        {
+            SetupGroupsAndPosts(CreateBlogPost("Post", new DateTime(2024, 6, 1)));
+
+            _contentServiceMock
+                .Setup(x => x.GetPageByTypeAndNameAsync(It.IsAny<Type>(), It.IsAny<string>()))
+                .ReturnsAsync(CreateBlogPost("Filter page", new DateTime(2024, 1, 1)));
+
+            var result = await _service.GetFilteredItemsAsync(
+                "en-US", Query(new Dictionary<string, string> { [filterName] = "value" }),
+                null, _ => false, 100, CancellationToken.None);
+
+            Assert.That(result.TotalCount, Is.EqualTo(1));
+            _contentServiceMock.Verify(
+                x => x.GetPageByTypeAndNameAsync(It.IsAny<Type>(), "value"), Times.Once);
+        }
+
+        [Test]
+        public async Task GetFilteredItemsAsync_PageFilter_PageNotFound_FilterIsIgnored()
+        {
+            SetupGroupsAndPosts(CreateBlogPost("Post", new DateTime(2024, 6, 1)));
+
+            _contentServiceMock
+                .Setup(x => x.GetPageByTypeAndNameAsync(It.IsAny<Type>(), It.IsAny<string>()))
+                .ReturnsAsync(() => null!);
+
+            var result = await _service.GetFilteredItemsAsync(
+                "en-US", Query(new Dictionary<string, string> { [FilterParameterName.BusinessLine] = "missing" }),
+                null, _ => false, 100, CancellationToken.None);
+
+            Assert.That(result.TotalCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task GetFilteredItemsAsync_MultiplePageFilters_AllAreApplied()
+        {
+            SetupGroupsAndPosts(CreateBlogPost("Post", new DateTime(2024, 6, 1)));
+
+            _contentServiceMock
+                .Setup(x => x.GetPageByTypeAndNameAsync(It.IsAny<Type>(), It.IsAny<string>()))
+                .ReturnsAsync(CreateBlogPost("Filter page", new DateTime(2024, 1, 1)));
+
+            var filters = new Dictionary<string, string>
+            {
+                [FilterParameterName.BusinessLine] = "a",
+                [FilterParameterName.Service] = "b",
+                [FilterParameterName.Person] = "c"
+            };
+
+            var result = await _service.GetFilteredItemsAsync(
+                "en-US", Query(filters), null, _ => false, 100, CancellationToken.None);
+
+            Assert.That(result.TotalCount, Is.EqualTo(1));
+            _contentServiceMock.Verify(
+                x => x.GetPageByTypeAndNameAsync(It.IsAny<Type>(), It.IsAny<string>()), Times.Exactly(3));
+        }
+
+        [Test]
+        public async Task GetFilteredItemsAsync_KeywordsFilter_AppliesFieldExpression()
+        {
+            SetupGroupsAndPosts(CreateBlogPost("Post", new DateTime(2024, 6, 1)));
+
+            var result = await _service.GetFilteredItemsAsync(
+                "en-US", Query(new Dictionary<string, string> { [FilterParameterName.Keywords] = "tax" }),
+                null, _ => false, 100, CancellationToken.None);
+
+            Assert.That(result.TotalCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task GetFilteredItemsAsync_UnknownFilterName_IsIgnored()
+        {
+            SetupGroupsAndPosts(CreateBlogPost("Post", new DateTime(2024, 6, 1)));
+
+            var result = await _service.GetFilteredItemsAsync(
+                "en-US", Query(new Dictionary<string, string> { ["not-a-real-filter"] = "x" }),
+                null, _ => false, 100, CancellationToken.None);
+
+            Assert.That(result.TotalCount, Is.EqualTo(1));
+        }
+
+
+        [Test]
+        public async Task GetFilteredItemsAsync_InvokesDecorateQuery()
+        {
+            SetupGroupsAndPosts(CreateBlogPost("Post", new DateTime(2024, 6, 1)));
+            var decorated = false;
+
+            await _service.GetFilteredItemsAsync(
+                "en-US", Query(new Dictionary<string, string>()),
+                _ => decorated = true, _ => false, 100, CancellationToken.None);
+
+            Assert.That(decorated, Is.True);
+        }
+
+        [Test]
+        public async Task GetFilteredItemsAsync_ParentPageIdZero_SkipsParentFilter()
+        {
+            SetupGroupsAndPosts(CreateBlogPost("Post", new DateTime(2024, 6, 1)));
+
+            var result = await _service.GetFilteredItemsAsync(
+                "en-US", Query(new Dictionary<string, string>()),
+                null, _ => false, 0, CancellationToken.None);
+
+            Assert.That(result.TotalCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task GetFilteredItemsAsync_NoLastPublishedDate_FallsBackToFirstPublished()
+        {
+            var fallbackPost = CreateBlogPostWithDates("Fallback", new DateTime(2024, 9, 1), null);
+            var normalPost = CreateBlogPostWithDates("Normal", new DateTime(2020, 1, 1), new DateTime(2024, 6, 1));
+
+            SetupGroupsAndPosts(normalPost, fallbackPost);
+
+            var result = await _service.GetFilteredItemsAsync(
+                "en-US", Query(new Dictionary<string, string>()),
+                null, _ => false, 100, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Data[0].Title, Is.EqualTo("Fallback"));
+                Assert.That(result.Data[0].Date, Is.EqualTo(new DateTime(2024, 9, 1)));
+                Assert.That(result.Data[1].Title, Is.EqualTo("Normal"));
+            });
+        }
+
         #endregion
 
         // ==========================================================================
@@ -633,9 +982,12 @@ namespace BDO.GWT.Core.Tests.Services
                 new[] { post }, "en-US", _ => false, CancellationToken.None);
 
             // Should contain stripped text (depends on HtmlHelper.ExtractTextFromHtml implementation)
-            Assert.That(result[0].Description, Is.Not.Null);
-            Assert.That(result[0].Description, Does.Not.Contain("<p>"));
-            Assert.That(result[0].Description, Does.Not.Contain("<strong>"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result[0].Description, Is.Not.Null);
+                Assert.That(result[0].Description, Does.Not.Contain("<p>"));
+                Assert.That(result[0].Description, Does.Not.Contain("<strong>"));
+            });
         }
 
         [Test]
@@ -708,11 +1060,143 @@ namespace BDO.GWT.Core.Tests.Services
             Assert.That(result[0].ImageURL, Is.Null.Or.Empty);
         }
 
+        [Test]
+        public async Task GetContentPageCardListAsync_MapsContentTypeName_WhenTypeFilterPresent()
+        {
+            var post = CreateBlogPost("Post", new DateTime(2024, 6, 1));
+            post.ContentTypeFilter = new[] { new Contenttypes { Name = "Insights" } };
+
+            var result = await _service.GetContentPageCardListAsync(
+                new[] { post }, "en-US", _ => false, CancellationToken.None);
+
+            Assert.That(result[0].Type, Is.EqualTo("Insights"));
+        }
+
+        [Test]
+        public async Task GetContentPageCardListAsync_TypeIsEmpty_WhenNoTypeFilter()
+        {
+            var post = CreateBlogPost("Post", new DateTime(2024, 6, 1));
+            post.ContentTypeFilter = Array.Empty<Contenttypes>();
+
+            var result = await _service.GetContentPageCardListAsync(
+                new[] { post }, "en-US", _ => false, CancellationToken.None);
+
+            Assert.That(result[0].Type, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public async Task GetContentPageCardListAsync_BuildsReadMoreLink_AndIsNotComingSoon()
+        {
+            var post = CreateBlogPost("Post", new DateTime(2024, 6, 1));
+
+            var result = await _service.GetContentPageCardListAsync(
+                new[] { post }, "en-US", _ => false, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result[0].ReadMoreLink, Is.Not.Null);
+                Assert.That(result[0].ReadMoreLink.Title, Is.EqualTo(ResourceStringKey.LiveSite.ReadMore));
+                Assert.That(result[0].isComingSoon, Is.False);
+            });
+        }
+
+        [Test]
+        public async Task GetContentPageCardListAsync_DateFallsBackToFirstPublished_WhenLastPublishedIsNull()
+        {
+            var post = CreateBlogPostWithDates("Post", new DateTime(2024, 3, 3), null);
+
+            var result = await _service.GetContentPageCardListAsync(
+                new[] { post }, "en-US", _ => false, CancellationToken.None);
+
+            Assert.That(result[0].Date, Is.EqualTo(new DateTime(2024, 3, 3)));
+        }
+
+        [Test]
+        public async Task GetContentPageCardListAsync_MultiplePosts_ReturnsCardPerPost()
+        {
+            var posts = new[]
+            {
+                CreateBlogPost("A", new DateTime(2024, 1, 1)),
+                CreateBlogPost("B", new DateTime(2024, 1, 2))
+            };
+
+            var result = await _service.GetContentPageCardListAsync(
+                posts, "en-US", p => p.MetadataTitle == "B", CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Has.Count.EqualTo(2));
+                Assert.That(result[0].IsFeatured, Is.False);
+                Assert.That(result[1].IsFeatured, Is.True);
+            });
+        }
+
         #endregion
 
         // ==========================================================================
         // Helpers
         // ==========================================================================
+
+        private static CardsQuery Query(IDictionary<string, string> filters) => new CardsQuery
+        {
+            CurrentPage = 1,
+            PageSize = 10,
+            Filters = filters
+        };
+
+        /// <summary>
+        /// Sets up one blog group and makes the query-builder call run the service's lambda against a
+        /// real ContentItemQueryBuilder (so the language / parent / filter / decorate lines execute).
+        /// </summary>
+        private void SetupGroupsAndPosts(params BlogPost[] posts)
+        {
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<BlogPostGroup>(
+                    It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[] { CreateBlogPostGroup(10) });
+
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidWithQueryBuilderAsync<BlogPost>(
+                    It.IsAny<Action<ContentItemQueryBuilder>>(), It.IsAny<CancellationToken>()))
+                .Callback<Action<ContentItemQueryBuilder>, CancellationToken>(
+                    (configure, _) => configure(new ContentItemQueryBuilder()))
+                .ReturnsAsync(posts);
+        }
+
+        /// <summary>Finds a filter name (from FilterParameterName constants) matching the predicate.</summary>
+        private static string RequireFilter(Func<FilterParameterData, bool> predicate, string description)
+        {
+            var names = typeof(FilterParameterName)
+                .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                .Where(f => f.FieldType == typeof(string))
+                .Select(f => f.GetValue(null) as string)
+                .Where(v => !string.IsNullOrEmpty(v));
+
+            foreach (var name in names)
+            {
+                var data = FilterUtility.GetFilterParameterData(name!);
+                if (data is not null && predicate(data))
+                {
+                    return name!;
+                }
+            }
+
+            Assert.Ignore($"No filter found in FilterParameterName for: {description}.");
+            return string.Empty;
+        }
+
+        /// <summary>Reads the OptionDto[] off a FilterItemDto without depending on the property name.</summary>
+        private static OptionDto[] GetOptions(FilterItemDto<OptionDto> filter)
+        {
+            var options = filter.GetType()
+                .GetProperties()
+                .Select(p => p.GetValue(filter))
+                .OfType<IEnumerable<OptionDto>>()
+                .FirstOrDefault();
+
+            Assert.That(options, Is.Not.Null, "Could not find an OptionDto collection on FilterItemDto.");
+            return options!.ToArray();
+        }
 
         private static BlogPostGroup CreateBlogPostGroup(int webPageItemId = 1)
         {
@@ -733,6 +1217,7 @@ namespace BDO.GWT.Core.Tests.Services
             };
         }
 
+        /// <summary>Creates a post whose first and last published dates are both <paramref name="publishDate"/>.</summary>
         private static BlogPost CreateBlogPost(string title, DateTime publishDate)
         {
             return new BlogPost
@@ -798,6 +1283,33 @@ namespace BDO.GWT.Core.Tests.Services
                 ShowDescription = true,
                 Content = "<p>Content</p>"
             };
+        }
+
+        /// <summary>Same as <see cref="CreateBlogPost"/> but with independent first/last published dates.</summary>
+        private static BlogPost CreateBlogPostWithDates(string title, DateTime firstPublished, DateTime? lastPublished)
+        {
+            var post = CreateBlogPost(title, firstPublished);
+            post.SystemFields.ContentItemCommonDataLastPublishedWhen = lastPublished;
+            return post;
+        }
+
+        // ---- Fakes used by the reflection-based option builders --------------------
+
+        private class FakeSystemFields
+        {
+            public string? ContentItemName { get; set; }
+        }
+
+        private class FakePageItem
+        {
+            public string? MetadataTitle { get; set; }
+            public string? MetadataOGTitle { get; set; }
+            public FakeSystemFields? SystemFields { get; set; }
+        }
+
+        private class FakeTagItem
+        {
+            public string? Name { get; set; }
         }
     }
 }

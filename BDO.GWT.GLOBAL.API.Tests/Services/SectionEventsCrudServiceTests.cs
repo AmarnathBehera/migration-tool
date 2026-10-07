@@ -8,6 +8,7 @@ using BDO.GWT.GLOBAL.API.Services;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Websites;
+using Kentico.Content.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -19,6 +20,9 @@ namespace BDO.GWT.GLOBAL.API.Tests.Services;
 [TestFixture]
 public class SectionEventsCrudServiceTests
 {
+    private static readonly string[] ExpectedTaxAuditFilters = ["Tax", "Audit"];
+    private static readonly string[] ExpectedTaxAuditAdvisoryFilters = ["Tax", "Audit", "Advisory"];
+    private static readonly LanguageTag[] GbAndUsCultures = [LanguageTag.GB, LanguageTag.US];
     private static SectionEventsCrudService CreateServiceWithoutConstructor() =>
         (SectionEventsCrudService)RuntimeHelpers.GetUninitializedObject(typeof(SectionEventsCrudService));
 
@@ -316,6 +320,10 @@ public class SectionEventsCrudServiceTests
 [TestFixture]
 public class SectionEventsCrudServiceBranchTests
 {
+    private static readonly string[] ExpectedTaxAuditFilters = ["Tax", "Audit"];
+    private static readonly string[] ExpectedTaxAuditAdvisoryFilters = ["Tax", "Audit", "Advisory"];
+    private static readonly LanguageTag[] GbAndUsCultures = [LanguageTag.GB, LanguageTag.US];
+
     private Mock<IContentService> _contentRetrieverMock = null!;
     private Mock<IValidationState> _validationStateMock = null!;
     private Mock<ICultureService> _cultureServiceMock = null!;
@@ -394,6 +402,52 @@ public class SectionEventsCrudServiceBranchTests
         MetadataTeaserImageAltText = "alt",
     };
 
+    private static FakeChannelInfo CreateChannelInfo(string channelName)
+    {
+        var channel = (FakeChannelInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeChannelInfo));
+        channel.ChannelName = channelName;
+        return channel;
+    }
+
+    private static SectionEvents CreateSectionEvents() => new()
+    {
+        MetadataTitle = "Events",
+        MetadataDescription = "Desc",
+        MetadataTeaserImageAltText = "alt",
+        HeroLayout = "default",
+        EventsWebinarsListFilters = string.Empty,
+        EventsWebinarsListFeaturedPages = [],
+        SystemFields = new WebPageFields
+        {
+            WebPageItemID = 42,
+            WebPageItemGUID = Guid.NewGuid(),
+            WebPageItemName = "events",
+            WebPageUrlPath = "/events",
+            WebPageItemTreePath = "/events",
+            WebPageItemParentID = 7,
+            ContentItemID = 100,
+            ContentItemGUID = Guid.NewGuid(),
+            WebPageUrlPathContentLanguageID = 1,
+            ContentItemCommonDataFirstPublishedWhen = new DateTime(2026, 1, 1),
+            ContentItemCommonDataLastPublishedWhen = new DateTime(2026, 2, 1)
+        }
+    };
+
+    private void SetupEmptyMappingHelperOutputs()
+    {
+        _mappingHelperMock.Setup(x => x.BuildFeaturedEventOrWebinarReferencesAsync(It.IsAny<IEnumerable<string>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildContentAttachmentImageReferences(It.IsAny<string?>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+    }
+
+    private void SetupSectionEvents(IEnumerable<SectionEvents>? events) =>
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<SectionEvents>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(events!);
+
     private static void AssertNotFoundWithMessage<T>(ActionResult<T> result, string expectedMessage)
     {
         Assert.Multiple(() =>
@@ -412,6 +466,17 @@ public class SectionEventsCrudServiceBranchTests
             Assert.That(objectResult.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
             Assert.That(objectResult.Value, Is.EqualTo(expectedMessage));
         });
+    }
+
+    private sealed class FakeChannelInfo : ChannelInfo
+    {
+        private string? channelName;
+
+        public override string ChannelName
+        {
+            get => channelName ?? string.Empty;
+            set => channelName = value;
+        }
     }
 
     #region GetPagesAsync
@@ -473,6 +538,46 @@ public class SectionEventsCrudServiceBranchTests
         Assert500WithMessage(result, "boom");
     }
 
+    [Test]
+    public async Task GetPagesAsync_EmptyResult_ReturnsEmptyCollection()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<SectionEvents>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Enumerable.Empty<SectionEvents>());
+
+        var result = await CreateService().GetPagesAsync(1, "en-gb", true, CancellationToken.None);
+
+        Assert.That(result.Value, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetPagesAsync_OnlyPublishedFalse_UsesPreviewQuery()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<SectionEvents>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Enumerable.Empty<SectionEvents>());
+
+        await CreateService().GetPagesAsync(1, "en-gb", false, CancellationToken.None);
+
+        _contentRetrieverMock.Verify(x => x.GetPagesAsync<SectionEvents>(
+            It.Is<RetrievePagesParameters>(p => p.IsForPreview == true),
+            It.IsAny<Action<RetrievePagesQueryParameters>>(),
+            It.IsAny<RetrievalCacheSettings>(),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
     #endregion
 
     #region GetPageAsync
@@ -518,6 +623,24 @@ public class SectionEventsCrudServiceBranchTests
         var result = await CreateService().GetPageAsync(1, Guid.NewGuid(), "en-gb", CancellationToken.None);
 
         Assert500WithMessage(result, "fail");
+    }
+
+    [Test]
+    public async Task GetPageAsync_PageNotFound_ReturnsNotFoundResult()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<SectionEvents>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Enumerable.Empty<SectionEvents>());
+
+        var result = await CreateService().GetPageAsync(1, Guid.NewGuid(), "en-gb", CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
     }
 
     #endregion
@@ -567,6 +690,110 @@ public class SectionEventsCrudServiceBranchTests
 
         Assert500WithMessage(result, "create failed");
         _webPageManagerMock.VerifyNoOtherCalls();
+    }
+
+    [Test]
+    public async Task CreatePageAsync_ParentIdZero_SkipsParentLookup_AndReturns500FromMapping()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+
+        var result = await CreateService().CreatePageAsync(1, 0, "en-gb", CreateRequest(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<ObjectResult>());
+        _pageContentValidatorMock.Verify(x => x.ValidateAndNormalizePageContent(It.IsAny<SectionEventsPageContent>()), Times.Once);
+    }
+
+    [Test]
+    public async Task CreatePageAsync_ParentPageNull_Returns422()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        SetupSectionEvents((IEnumerable<SectionEvents>)null!);
+
+        var result = await CreateService().CreatePageAsync(1, 10, "en-gb", CreateRequest(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<UnprocessableEntityObjectResult>());
+    }
+
+    [Test]
+    public async Task CreatePageAsync_FilterList_IsNormalizedBeforeValidation()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<SectionEvents>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([CreateSectionEvents()]);
+
+        var request = CreateRequest();
+        request.EventsWebinarsListFilters = ["Tax;Audit", "Audit", null!, "  Advisory "];
+
+        await CreateService().CreatePageAsync(1, 10, "en-gb", request, CancellationToken.None);
+
+        Assert.That(request.EventsWebinarsListFilters, Is.EquivalentTo(ExpectedTaxAuditAdvisoryFilters));
+    }
+
+    [Test]
+    public async Task CreatePageAsync_UpdateDraftFails_ReturnsNotFoundWithMessage()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        SetupEmptyMappingHelperOutputs();
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<SectionEvents>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([CreateSectionEvents()]);
+        _webPageManagerMock
+            .Setup(x => x.Create(It.IsAny<CreateWebPageParameters>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(77);
+        _webPageManagerMock
+            .Setup(x => x.TryUpdateDraft(77, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
+        var result = await CreateService().CreatePageAsync(1, 10, "en-gb", CreateRequest(), CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Failed to update page draft");
+    }
+
+    [Test]
+    public async Task CreatePageAsync_SuccessfullyCreatesAndMapsPage()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        SetupEmptyMappingHelperOutputs();
+        _mappingHelperMock
+            .Setup(x => x.ResolveWebPageRelatedItemPathAsync(It.IsAny<WebPageRelatedItem?>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+        var createdPage = CreateSectionEvents();
+        createdPage.SystemFields!.WebPageItemID = 77;
+        createdPage.EventsWebinarsListFilters = "Tax,Audit";
+        SetupSectionEvents(new List<SectionEvents> { createdPage });
+        _webPageManagerMock
+            .Setup(x => x.Create(It.IsAny<CreateWebPageParameters>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(77);
+        _webPageManagerMock
+            .Setup(x => x.TryUpdateDraft(77, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        _webPageManagerMock
+            .Setup(x => x.TryPublish(77, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        var result = await CreateService().CreatePageAsync(1, 0, "en-gb", CreateRequest(), CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Value, Is.Not.Null);
+            Assert.That(result.Value!.General.WebPageItemID, Is.EqualTo(77));
+            Assert.That(result.Value.Content.MetadataTitle, Is.EqualTo("Events"));
+            Assert.That(result.Value.Content.EventsWebinarsListFilters, Is.EquivalentTo(ExpectedTaxAuditFilters));
+        });
     }
 
     #endregion
@@ -629,6 +856,67 @@ public class SectionEventsCrudServiceBranchTests
         Assert500WithMessage(result, "variant failed");
     }
 
+    [Test]
+    public async Task CreatePageCultureVersionAsync_PageNotFound_ReturnsNotFoundResult()
+    {
+        SetupCultureSequence(LanguageTag.GB, LanguageTag.US);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<SectionEvents>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Enumerable.Empty<SectionEvents>());
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), "en-gb", "en-us", CreateRequest(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+    }
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_FilterList_IsNormalizedBeforeValidation()
+    {
+        SetupCultureSequence(LanguageTag.GB, LanguageTag.US);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        SetupSectionEvents(new List<SectionEvents> { CreateSectionEvents() });
+
+        var request = CreateRequest();
+        request.EventsWebinarsListFilters = ["Tax;Audit", "Audit"];
+
+        await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), "en-gb", "en-us", request, CancellationToken.None);
+
+        Assert.That(request.EventsWebinarsListFilters, Is.EquivalentTo(ExpectedTaxAuditFilters));
+    }
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_SystemFieldsMissing_ReturnsNotFoundWithMessage()
+    {
+        SetupCultureSequence(LanguageTag.GB, LanguageTag.US);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        SetupSectionEvents(new List<SectionEvents> { new SectionEvents { SystemFields = null! } });
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), "en-gb", "en-us", CreateRequest(), CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Page system fields are missing");
+    }
+
+    [Test]
+    public async Task CreatePageCultureVersionAsync_CreateVariantFails_ReturnsNotFoundWithMessage()
+    {
+        SetupCultureSequence(LanguageTag.GB, LanguageTag.US);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        SetupEmptyMappingHelperOutputs();
+        SetupSectionEvents(new List<SectionEvents> { CreateSectionEvents() });
+        _webPageManagerMock
+            .Setup(x => x.TryCreateLanguageVariant(It.IsAny<CMS.Websites.CreateLanguageVariantParameters>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
+        var result = await CreateService().CreatePageCultureVersionAsync(1, Guid.NewGuid(), "en-gb", "en-us", CreateRequest(), CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Failed to create language variant");
+    }
+
     #endregion
 
     #region UpdatePageAsync
@@ -679,6 +967,74 @@ public class SectionEventsCrudServiceBranchTests
         Assert500WithMessage(result, "update failed");
     }
 
+    [Test]
+    public async Task UpdatePageAsync_PageNotFound_ReturnsNotFoundResult()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<SectionEvents>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Enumerable.Empty<SectionEvents>());
+
+        var result = await CreateService().UpdatePageAsync(1, Guid.NewGuid(), "en-gb", CreateRequest(), CancellationToken.None);
+
+        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+    }
+
+    [Test]
+    public async Task UpdatePageAsync_SystemFieldsMissing_ReturnsNotFoundWithMessage()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        SetupSectionEvents(new List<SectionEvents> { new SectionEvents { SystemFields = null! } });
+
+        var result = await CreateService().UpdatePageAsync(1, Guid.NewGuid(), "en-gb", CreateRequest(), CancellationToken.None);
+
+        AssertNotFoundWithMessage(result, "Page system fields are missing");
+    }
+
+    [Test]
+    public async Task UpdatePageAsync_SuccessfullyUpdatesAndMapsPage()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        SetupEmptyMappingHelperOutputs();
+        _mappingHelperMock
+            .Setup(x => x.ResolveWebPageRelatedItemPathAsync(It.IsAny<WebPageRelatedItem?>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+        var existingPage = CreateSectionEvents();
+        var updatedPage = CreateSectionEvents();
+        updatedPage.MetadataTitle = "Updated Events";
+        updatedPage.EventsWebinarsListFilters = "Tax,Audit";
+        _contentRetrieverMock
+            .SetupSequence(x => x.GetPagesAsync<SectionEvents>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<SectionEvents> { existingPage })
+            .ReturnsAsync(new List<SectionEvents> { updatedPage });
+        _webPageManagerMock
+            .Setup(x => x.TryUpdateDraft(existingPage.SystemFields!.WebPageItemID, It.IsAny<string>(), It.IsAny<UpdateDraftData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        _webPageManagerMock
+            .Setup(x => x.TryPublish(existingPage.SystemFields!.WebPageItemID, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        var result = await CreateService().UpdatePageAsync(1, existingPage.SystemFields.WebPageItemGUID, "en-gb", CreateRequest(), CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Value, Is.Not.Null);
+            Assert.That(result.Value!.Content.MetadataTitle, Is.EqualTo("Updated Events"));
+            Assert.That(result.Value.Content.EventsWebinarsListFilters, Is.EquivalentTo(ExpectedTaxAuditFilters));
+        });
+    }
+
     #endregion
 
     #region DeletePageAsync
@@ -722,6 +1078,63 @@ public class SectionEventsCrudServiceBranchTests
         _mappingHelperMock.Verify(
             x => x.ValidateAndNormalizeSiteCultureAsync(1, LanguageTag.GB.Locale, It.IsAny<CancellationToken>()),
             Times.Once);
+    }
+
+    [Test]
+    public async Task DeletePageAsync_SingleCulture_PageNotFound_ThrowsNotFoundException()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<SectionEvents>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Enumerable.Empty<SectionEvents>());
+
+        Assert.ThrowsAsync<NotFoundException>(() =>
+            CreateService().DeletePageAsync(1, Guid.NewGuid(), "en-gb", false, CancellationToken.None));
+    }
+
+    [Test]
+    public async Task DeletePageAsync_SingleCulture_PageExists_DeletesVariant()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _contentRetrieverMock
+            .Setup(x => x.GetPagesAsync<SectionEvents>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([CreateSectionEvents()]);
+
+        await CreateService().DeletePageAsync(1, Guid.NewGuid(), "en-gb", false, CancellationToken.None);
+
+        _webPageManagerMock.Verify(x => x.Delete(It.IsAny<DeleteWebPageParameters>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Test]
+    public async Task DeletePageAsync_AllCultures_DeletesExistingVariantsOnly()
+    {
+        SetupCulture(LanguageTag.GB);
+        SetupChannel(CreateChannelInfo("TestChannel"));
+        _cultureServiceMock
+            .Setup(x => x.GetSiteCulturesLanguageCodeAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(GbAndUsCultures);
+        _contentRetrieverMock
+            .SetupSequence(x => x.GetPagesAsync<SectionEvents>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync([CreateSectionEvents()])
+            .ReturnsAsync(Enumerable.Empty<SectionEvents>());
+
+        await CreateService().DeletePageAsync(1, Guid.NewGuid(), "en-gb", true, CancellationToken.None);
+
+        _webPageManagerMock.Verify(x => x.Delete(It.IsAny<DeleteWebPageParameters>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     #endregion
