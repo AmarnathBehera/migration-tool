@@ -187,6 +187,7 @@ public class PeopleCardsService : IPeopleCardsService
             var filter = filterData.FilterParameterType switch
             {
                 FilterParameterType.Page => await GetPageFilterAsync(filterName, filterValue),
+                FilterParameterType.Tagpage => await GetTagPageFilterAsync(filterName, filterValue),
                 _ => null,
             };
 
@@ -197,6 +198,25 @@ public class PeopleCardsService : IPeopleCardsService
         }
 
         return filters;
+    }
+    private async Task<Action<WhereParameters>?> GetTagPageFilterAsync(string filterName, string filterValue)
+    {
+
+        var page = await _contentService.GetPageByTypeAndNameAsync(
+            FilterUtility.GetFilterParameterData(filterName)!.EntityType, filterValue);
+
+        if (page is null)
+            return null;
+
+        var guid = page.SystemFields.ContentItemGUID.ToString();
+
+        return filterName switch
+        {
+
+            FilterParameterName.Credential => w => w.WhereContains(nameof(Person.PersonCredentials), guid),
+            FilterParameterName.ProfileGroup => w => w.WhereContains(nameof(Person.MetadataProfileGroups), guid),
+            _ => null,
+        };
     }
 
     private async Task<Action<WhereParameters>?> GetPageFilterAsync(string filterName, string filterValue)
