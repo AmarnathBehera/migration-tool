@@ -1708,7 +1708,7 @@ public class InsightPageServiceTests
             Assert.That(GetPropertyValue(config, "TypeName"), Is.EqualTo("Article"));
             Assert.That(GetPropertyValue(config, "PublishDate"), Is.EqualTo(GetPropertyValue(sidebar, "PublishDate")));
             Assert.That(GetPropertyValue(config, "UpdatedDate"), Is.EqualTo(GetPropertyValue(sidebar, "UpdatedDate")));
-            Assert.That(GetPropertyValue(config, "ShowPrintButton"), Is.EqualTo(true));
+            Assert.That(GetPropertyValue(config, "ShowPrintButton"), Is.True);
             Assert.That(GetPropertyValue(config, "DownloadButtonAttachment"), Is.EqualTo("/media/download.pdf"));
             Assert.That(GetPropertyValue(config, "ShowCopyLinkButton"), Is.EqualTo(showCopyLinkButton));
             Assert.That(GetPropertyValue(config, "SocialMediaButtons"), Is.Null);
@@ -1732,7 +1732,7 @@ public class InsightPageServiceTests
         Assert.Multiple(() =>
         {
             Assert.That(GetPropertyValue(grid, "Title"), Is.EqualTo(ResourceStringKey.LiveSite.Insights.Authors));
-            Assert.That(GetPropertyValue(grid, "UseNameAsLink"), Is.EqualTo(true));
+            Assert.That(GetPropertyValue(grid, "UseNameAsLink"), Is.True);
 
             Assert.That(items, Has.Count.EqualTo(2));
             Assert.That(items.Select(x => GetPropertyValue(x, "DisplayName")), Is.EquivalentTo(ExpectedComposedContactNames));

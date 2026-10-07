@@ -30,6 +30,11 @@ namespace BDO.GWT.Core.Tests.Services
 {
     public class BlogPageCardsServiceTests
     {
+        private static readonly string[] ExpectedContributorLabels = ["Amy Lee", "Bob", "Zed Young"];
+        private static readonly string[] ExpectedPageFilterLabels = ["Alpha", "Mid", "Zeta"];
+        private static readonly string[] ExpectedTagFilterLabels = ["Alpha", "Beta"];
+        private static readonly string[] ExpectedKeywordLabels = ["alpha", "beta"];
+
         private Mock<ICardsService> _cardsServiceMock = null!;
         private Mock<ICultureContext> _cultureContextMock = null!;
         private Mock<IContentService> _contentServiceMock = null!;
@@ -176,8 +181,11 @@ namespace BDO.GWT.Core.Tests.Services
 
             var options = GetOptions(result.Single());
 
-            Assert.That(options.Select(o => o.Label), Is.EqualTo(new[] { "Amy Lee", "Bob", "Zed Young" }));
-            Assert.That(options.Select(o => o.Value), Is.EqualTo(options.Select(o => o.Label)));
+            Assert.Multiple(() =>
+            {
+                Assert.That(options.Select(o => o.Label), Is.EqualTo(ExpectedContributorLabels));
+                Assert.That(options.Select(o => o.Value), Is.EqualTo(options.Select(o => o.Label)));
+            });
         }
 
         [Test]
@@ -240,7 +248,7 @@ namespace BDO.GWT.Core.Tests.Services
                 new HashSet<string> { pageFilter }, 1, CancellationToken.None);
 
             Assert.That(GetOptions(result.Single()).Select(o => o.Label),
-                Is.EqualTo(new[] { "Alpha", "Mid", "Zeta" }));
+                Is.EqualTo(ExpectedPageFilterLabels));
         }
 
         [Test]
@@ -282,7 +290,7 @@ namespace BDO.GWT.Core.Tests.Services
                 new HashSet<string> { tagFilter }, 1, CancellationToken.None);
 
             Assert.That(GetOptions(result.Single()).Select(o => o.Label),
-                Is.EqualTo(new[] { "Alpha", "Beta" }));
+                Is.EqualTo(ExpectedTagFilterLabels));
         }
 
         [Test]
@@ -310,7 +318,7 @@ namespace BDO.GWT.Core.Tests.Services
 
             var labels = GetOptions(result.Single()).Select(o => o.Label).ToArray();
 
-            Assert.That(labels, Is.EquivalentTo(new[] { "alpha", "beta" }));
+            Assert.That(labels, Is.EquivalentTo(ExpectedKeywordLabels));
         }
 
         [Test]
@@ -1003,9 +1011,12 @@ namespace BDO.GWT.Core.Tests.Services
                 new[] { post }, "en-US", _ => false, CancellationToken.None);
 
             // Should contain stripped text (depends on HtmlHelper.ExtractTextFromHtml implementation)
-            Assert.That(result[0].Description, Is.Not.Null);
-            Assert.That(result[0].Description, Does.Not.Contain("<p>"));
-            Assert.That(result[0].Description, Does.Not.Contain("<strong>"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result[0].Description, Is.Not.Null);
+                Assert.That(result[0].Description, Does.Not.Contain("<p>"));
+                Assert.That(result[0].Description, Does.Not.Contain("<strong>"));
+            });
         }
 
         [Test]

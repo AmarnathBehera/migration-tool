@@ -16,6 +16,12 @@ namespace BDO.GWT.Core.Tests.Services
     public class PageUtilityTests
     {
         private static readonly string[] ExpectedIndustryTitlesA = ["Industry A1", "Industry A2"];
+        private static readonly string[] ExpectedSiblingTitles = ["Sibling A", "Sibling B"];
+        private static readonly string[] ExpectedOrderedIndustryTitles = ["First", "Second"];
+        private static readonly string[] ExpectedCombinedTitlesForCategoryA = ["Industry A1", "Report A1"];
+        private static readonly string[] ExpectedCombinedTitlesForCategoryB = ["Industry B1"];
+        private static readonly string[] ExpectedOrderedCombinedTitles = ["R-first", "I-mid", "I-late"];
+        private static readonly string[] ExpectedSingleIndustryTitle = ["Industry A1"];
 
         private Mock<IContentService> _contentServiceMock = null!;
         private Mock<IWebPageUrlResolver> _urlResolverMock = null!;
@@ -283,7 +289,7 @@ namespace BDO.GWT.Core.Tests.Services
             var result = await _pageUtility.GetSideboxDtoAsync<IndustryCategory, IndustryCategory>(
                 "Nav", 10, 20, c => c.DescriptionTitle, c => c.DescriptionTitle);
 
-            Assert.That(result.Links.Select(l => l.Title), Is.EqualTo(new[] { "Sibling A", "Sibling B" }));
+            Assert.That(result.Links.Select(l => l.Title), Is.EqualTo(ExpectedSiblingTitles));
         }
 
         #endregion
@@ -659,7 +665,7 @@ namespace BDO.GWT.Core.Tests.Services
             var links = result[0].ReadMoreLinks;
             Assert.Multiple(() =>
             {
-                Assert.That(links.Select(l => l.Title), Is.EqualTo(new[] { "First", "Second" }));
+                Assert.That(links.Select(l => l.Title), Is.EqualTo(ExpectedOrderedIndustryTitles));
                 Assert.That(links[0].URL, Is.EqualTo("/industry-10"));
                 Assert.That(links[1].URL, Is.EqualTo("/industry-11"));
             });
@@ -789,9 +795,9 @@ namespace BDO.GWT.Core.Tests.Services
             Assert.Multiple(() =>
             {
                 Assert.That(result[0].ReadMoreLinks.Select(l => l.Title),
-                    Is.EqualTo(new[] { "Industry A1", "Report A1" }));
+                    Is.EqualTo(ExpectedCombinedTitlesForCategoryA));
                 Assert.That(result[1].ReadMoreLinks.Select(l => l.Title),
-                    Is.EqualTo(new[] { "Industry B1" }));
+                    Is.EqualTo(ExpectedCombinedTitlesForCategoryB));
                 Assert.That(result[0].ReadMoreLinks[0].URL, Is.EqualTo("/industry-10"));
                 Assert.That(result[0].ReadMoreLinks[1].URL, Is.EqualTo("/category-20"));
             });
@@ -812,7 +818,7 @@ namespace BDO.GWT.Core.Tests.Services
                 i => i.DescriptionTitle, r => r.DescriptionTitle);
 
             Assert.That(result[0].ReadMoreLinks.Select(l => l.Title),
-                Is.EqualTo(new[] { "R-first", "I-mid", "I-late" }));
+                Is.EqualTo(ExpectedOrderedCombinedTitles));
         }
 
         [Test]
@@ -826,7 +832,7 @@ namespace BDO.GWT.Core.Tests.Services
                 100, c => c.DescriptionTitle, c => c.DescriptionBody, c => null, c => null,
                 i => i.DescriptionTitle, r => r.DescriptionTitle);
 
-            Assert.That(result[0].ReadMoreLinks.Select(l => l.Title), Is.EqualTo(new[] { "Industry A1" }));
+            Assert.That(result[0].ReadMoreLinks.Select(l => l.Title), Is.EqualTo(ExpectedSingleIndustryTitle));
         }
 
         [Test]
