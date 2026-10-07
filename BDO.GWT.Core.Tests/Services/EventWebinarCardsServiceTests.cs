@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using BDO.GWT.Core.Data;
+using BDO.GWT.Core.Data.Queries;
 using BDO.GWT.Core.DTOs;
 using BDO.GWT.Core.Services;
 using BDO.GWT.Web.Core.Services;

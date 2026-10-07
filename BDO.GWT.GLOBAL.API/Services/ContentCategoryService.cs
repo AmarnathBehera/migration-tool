@@ -23,8 +23,6 @@ public interface IContentCategoryService
 public class ContentCategoryService : IContentCategoryService
 {
     private const int DefaultInsightCount = 15;
-    private const int MaxInsightCount = 50;
-    private const int MaxSubCategoryIdsPerFilter = 50;
     private const int CacheMinutes = 10;
     private const string FallbackDisplayDateFormat = "dd MMMM yyyy";
     private const string MetadataTitleColumn = "MetadataTitle";
@@ -118,7 +116,7 @@ public class ContentCategoryService : IContentCategoryService
             return DefaultInsightCount;
         }
 
-        return Math.Min(insightCount.Value, MaxInsightCount);
+        return insightCount.Value;
     }
 
 
@@ -528,10 +526,7 @@ public class ContentCategoryService : IContentCategoryService
                 continue;
             }
 
-            if (filter.SubCategoryIds.Length > MaxSubCategoryIdsPerFilter)
-            {
-                _validationState.AddUnprocessableEntityError(nameof(filter.SubCategoryIds), $"List of subcategory ids on {filter.CategoryCode} category exceeds the maximum of {MaxSubCategoryIdsPerFilter}");
-            }
+
         }
 
         ThrowIfThereAreValidationErrors();
