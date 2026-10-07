@@ -694,7 +694,7 @@ public class PersonCrudServiceCoverageTests
         MetadataTeaserImageAltText = "alt",
     };
 
-    private static ChannelInfo CreateChannelInfo(string channelName)
+    private static FakeChannelInfo CreateChannelInfo(string channelName)
     {
         var channel = (FakeChannelInfo)RuntimeHelpers.GetUninitializedObject(typeof(FakeChannelInfo));
         channel.ChannelName = channelName;
@@ -740,22 +740,22 @@ public class PersonCrudServiceCoverageTests
 
     private void SetupEmptyMappingHelperOutputs()
     {
-        _mappingHelperMock.Setup(x => x.BuildReferencesAsync<Credentials>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<Credentials, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
-        _mappingHelperMock.Setup(x => x.BuildReferencesAsync<ProfileGroups>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<ProfileGroups, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
-        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<LocationCity>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<LocationCity, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
-        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<LocationOffice>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<LocationOffice, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
-        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<BusinessLine>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<BusinessLine, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
-        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<ServiceArea>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<ServiceArea, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
-        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<Service>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<Service, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
-        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<Sub_Service>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<Sub_Service, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
-        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<IndustryCategory>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<IndustryCategory, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
-        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<Industry>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<Industry, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
-        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<IndustryService>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<IndustryService, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
-        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<SpecialtiesCategory>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<SpecialtiesCategory, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
-        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<SpecialtiesArea>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<SpecialtiesArea, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
-        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<SpecialtiesPage>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<SpecialtiesPage, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
-        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<MicrositeMasterPage>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<MicrositeMasterPage, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
-        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<MicrositePage>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<MicrositePage, string?>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesAsync<Credentials>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<Credentials, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesAsync<ProfileGroups>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<ProfileGroups, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<LocationCity>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<LocationCity, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<LocationOffice>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<LocationOffice, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<BusinessLine>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<BusinessLine, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<ServiceArea>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<ServiceArea, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<Service>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<Service, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<Sub_Service>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<Sub_Service, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<IndustryCategory>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<IndustryCategory, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<Industry>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<Industry, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<IndustryService>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<IndustryService, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<SpecialtiesCategory>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<SpecialtiesCategory, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<SpecialtiesArea>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<SpecialtiesArea, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<SpecialtiesPage>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<SpecialtiesPage, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<MicrositeMasterPage>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<MicrositeMasterPage, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _mappingHelperMock.Setup(x => x.BuildReferencesPageAsync<MicrositePage>(It.IsAny<IEnumerable<string>>(), It.IsAny<Func<MicrositePage, string>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
         _mappingHelperMock.Setup(x => x.BuildContentAttachmentImageReferences(It.IsAny<string?>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
     }
 
@@ -1100,7 +1100,7 @@ public class PersonCrudServiceCoverageTests
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync((IEnumerable<SectionPeoplePage>?)null);
+            .ReturnsAsync((IEnumerable<SectionPeoplePage>)null!);
 
         var result = await CreateService().CreatePageAsync(1, 10, "en-gb", CreateRequest(), CancellationToken.None);
 
@@ -1120,7 +1120,7 @@ public class PersonCrudServiceCoverageTests
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync([new SectionPeoplePage()]);
+            .ReturnsAsync(new List<SectionPeoplePage> { new SectionPeoplePage() });
         _validationStateMock.Setup(x => x.HasErrors()).Returns(false);
         _validationStateMock.Setup(x => x.HasUnprocessableEntityErrors()).Returns(true);
 
@@ -1141,7 +1141,7 @@ public class PersonCrudServiceCoverageTests
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync([new SectionPeoplePage()]);
+            .ReturnsAsync(new List<SectionPeoplePage> { new SectionPeoplePage() });
         _webPageManagerMock
             .Setup(x => x.Create(It.IsAny<CreateWebPageParameters>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(77);
@@ -1168,7 +1168,7 @@ public class PersonCrudServiceCoverageTests
                 It.IsAny<Action<RetrievePagesQueryParameters>>(),
                 It.IsAny<RetrievalCacheSettings>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync([new SectionPeoplePage()]);
+            .ReturnsAsync(new List<SectionPeoplePage> { new SectionPeoplePage() });
         _contentRetrieverMock
             .Setup(x => x.GetPagesAsync<Person>(
                 It.IsAny<RetrievePagesParameters>(),
