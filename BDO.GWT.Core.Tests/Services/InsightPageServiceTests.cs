@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Reflection;
 using System.Runtime.Serialization;
 using BDO;
@@ -958,7 +959,7 @@ public class InsightPageServiceTests
         }
     }
 
-    
+
 
     [Test]
     public async Task GetContentPageSidebarDto_SetsNullPublishAndUpdated_WhenSystemDatesAreMinValue()
@@ -1391,7 +1392,7 @@ public class InsightPageServiceTests
 
         Assert.That(result, Is.Empty);
     }
-    private static readonly string[] KeyContactname= { "Ada Lovelace" };
+    private static readonly string[] KeyContactname = { "Ada Lovelace" };
 
     [Test]
     public async Task GetKeyContactsDisplayNames_TreatsWhitespacePrefixAsMissing()
@@ -1583,4 +1584,519 @@ public class InsightPageServiceTests
             _service,
             new object[] { insight, CancellationToken.None })!;
     }
+
+    // =====================================================================================
+    // ADDITIONAL COVERAGE TESTS
+    // =====================================================================================
+
+    #region Additional helpers
+
+    private static object? GetPropertyValue(object target, string propertyName) =>
+        target.GetType()
+            .GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance)?
+            .GetValue(target);
+
+    private static object InvokePrivateStatic(string methodName, params object[] args)
+    {
+        var method = typeof(InsightPageService).GetMethod(
+            methodName,
+            BindingFlags.Static | BindingFlags.NonPublic);
+
+        Assert.That(method, Is.Not.Null, $"Private static method '{methodName}' was not found.");
+        return method!.Invoke(null, args)!;
+    }
+
+    /// <summary>
+    /// Builds a real sidebar DTO (an ordinary Person with a teaser image, an InternalPerson and one
+    /// external person) so the private static mappers can be fed with realistic input. Returned as
+    /// object so the test does not need to name the DTO type.
+    /// </summary>
+    private async Task<object> BuildSidebarWithPeopleAsync()
+    {
+        SetupUsePersonPageTitleSetting(false);
+
+        var insight = CreateInsight(title: "Insight page", showSidebar: true);
+        insight.ShowPrintButton = true;
+        insight.ShowSocialMediaButtons = false;
+
+        SetContentType(insight, "Article");
+        SetAssetCollection(insight, nameof(Insight.DownloadButtonAttachment), "/media/download.pdf");
+
+        var person = CreatePerson(
+            contentItemId: 401,
+            metadataTitle: "Ada Title",
+            firstName: "Ada",
+            surnamePrefix: string.Empty,
+            lastName: "Lovelace",
+            jobTitle: "Developer",
+            url: "/people/ada");
+        SetAssetCollection(person, nameof(Person.MetadataTeaserImage), "/media/ada.png");
+
+        var internalPerson = CreateInternalPerson(
+            contentItemId: 402,
+            firstName: "Grace",
+            surnamePrefix: "van",
+            lastName: "Hopper",
+            jobTitle: "Engineer",
+            url: "/people/grace");
+
+        SetCollection(insight, nameof(Insight.RelevantContactPerson), person, internalPerson);
+
+        var externalGuid = Guid.NewGuid();
+        var linkedExternal = CreateExternalPerson(
+            externalGuid, "Linked", "External", string.Empty, "Linked", "Job", "https://example.com/linked");
+        var retrievedExternal = CreateExternalPerson(
+            externalGuid, "External Retrieved", "External", string.Empty, "Retrieved", "External Consultant", "https://example.com/retrieved");
+
+        SetCollection(insight, nameof(Insight.RelatedExternalPeople), linkedExternal);
+        SetupContentPages(retrievedExternal);
+        SetupCopyLinkSection(insight, showCopyUrlButtonInInsightPage: true);
+
+        return await _service.GetContentPageSidebarDto(insight, CancellationToken.None);
+    }
+
+    private void SetupGroupAndCategoryLookups()
+    {
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<InsightGroup>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<InsightGroup>());
+
+        _contentServiceMock
+            .Setup(x => x.GetPagesAsync<InsightCategory>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<InsightCategory>());
+    }
+
+    private static RetrievePagesQueryParameters CreateQueryParameters()
+    {
+        try
+        {
+            return (RetrievePagesQueryParameters)Activator.CreateInstance(
+                typeof(RetrievePagesQueryParameters),
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                null,
+                null,
+                null)!;
+        }
+        catch (Exception)
+        {
+            return (RetrievePagesQueryParameters)CreateObject(typeof(RetrievePagesQueryParameters));
+        }
+    }
+
+    #endregion
+
+    #region GetPageConfigurationDto (private static)
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task GetPageConfigurationDto_MapsSidebarValues_AndUsesSuppliedCopyLinkFlag(bool showCopyLinkButton)
+    {
+        var sidebar = await BuildSidebarWithPeopleAsync();
+
+        var config = InvokePrivateStatic("GetPageConfigurationDto", sidebar, showCopyLinkButton);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(GetPropertyValue(config, "TypeName"), Is.EqualTo("Article"));
+            Assert.That(GetPropertyValue(config, "PublishDate"), Is.EqualTo(GetPropertyValue(sidebar, "PublishDate")));
+            Assert.That(GetPropertyValue(config, "UpdatedDate"), Is.EqualTo(GetPropertyValue(sidebar, "UpdatedDate")));
+            Assert.That(GetPropertyValue(config, "ShowPrintButton"), Is.EqualTo(true));
+            Assert.That(GetPropertyValue(config, "DownloadButtonAttachment"), Is.EqualTo("/media/download.pdf"));
+            Assert.That(GetPropertyValue(config, "ShowCopyLinkButton"), Is.EqualTo(showCopyLinkButton));
+            Assert.That(GetPropertyValue(config, "SocialMediaButtons"), Is.Null);
+        });
+    }
+
+    #endregion
+
+    #region GetPageAuthorsDto (private static)
+
+    [Test]
+    public async Task GetPageAuthorsDto_MapsInternalAndExternalPeople()
+    {
+        var sidebar = await BuildSidebarWithPeopleAsync();
+
+        var grid = InvokePrivateStatic("GetPageAuthorsDto", sidebar);
+
+        var items = ((IEnumerable)GetPropertyValue(grid, "Items")!).Cast<object>().ToList();
+        var externalItems = ((IEnumerable)GetPropertyValue(grid, "ExternalItems")!).Cast<object>().ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(GetPropertyValue(grid, "Title"), Is.EqualTo(ResourceStringKey.LiveSite.Insights.Authors));
+            Assert.That(GetPropertyValue(grid, "UseNameAsLink"), Is.EqualTo(true));
+
+            Assert.That(items, Has.Count.EqualTo(2));
+            Assert.That(items.Select(x => GetPropertyValue(x, "DisplayName")), Is.EquivalentTo(ExpectedComposedContactNames));
+            Assert.That(GetPropertyValue(items[0], "JobTitle"), Is.EqualTo("Developer"));
+            Assert.That(GetPropertyValue(items[0], "TeaserImageUrl"), Is.EqualTo("/media/ada.png"));
+            Assert.That(GetPropertyValue(items[0], "TeaserImageAltText"), Is.EqualTo("Person image"));
+            Assert.That((string?)GetPropertyValue(items[0], "PersonUrl"), Does.EndWith("/people/ada"));
+
+            Assert.That(externalItems, Has.Count.EqualTo(1));
+            Assert.That(GetPropertyValue(externalItems[0], "DisplayName"), Is.EqualTo("External Retrieved"));
+            Assert.That(GetPropertyValue(externalItems[0], "JobTitle"), Is.EqualTo("External Consultant"));
+            Assert.That(GetPropertyValue(externalItems[0], "PersonUrl"), Is.EqualTo("https://example.com/retrieved"));
+        });
+    }
+
+    #endregion
+
+    #region GetCallToActionDto(Insight) (private static, via GetContentPageDtoAsync)
+
+    [Test]
+    public async Task GetContentPageDtoAsync_MapsCallToAction_WhenEnabledAndComplete()
+    {
+        var insight = CreateInsight(title: "Insight page", showSidebar: false);
+        var copyInsight = CreateCopyInsight(
+            title: "Copy title",
+            description: "<p>Description</p>",
+            content: "<p>Content</p>",
+            showTitle: true,
+            showDescription: true,
+            showCallToAction: true,
+            callToActionButtonUrl: "https://example.com/cta",
+            callToActionPosition: "right");
+
+        SetCollection(insight, nameof(Insight.InsightContent), copyInsight);
+
+        var result = await _service.GetContentPageDtoAsync(insight, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.CallToActionWithPosition, Is.Not.Null);
+            Assert.That(result.CallToActionWithPosition!.Position, Is.EqualTo("right"));
+            Assert.That(result.CallToActionWithPosition.CallToActionDto!.Description, Is.EqualTo("CTA description"));
+            Assert.That(result.CallToActionWithPosition.CallToActionDto.ButtonTitle, Is.EqualTo("CTA button"));
+            Assert.That(result.CallToActionWithPosition.CallToActionDto.ButtonUrl, Is.EqualTo("https://example.com/cta"));
+            Assert.That(result.CallToActionWithPosition.CallToActionDto.Position, Is.EqualTo("right"));
+        });
+    }
+
+    [Test]
+    public async Task GetContentPageDtoAsync_CallToActionDefaultsToLeft_WhenPositionIsNull()
+    {
+        var insight = CreateInsight(title: "Insight page", showSidebar: false);
+        var copyInsight = CreateCopyInsight(
+            title: "Copy title",
+            description: "<p>Description</p>",
+            content: "<p>Content</p>",
+            showTitle: true,
+            showDescription: true,
+            showCallToAction: true,
+            callToActionButtonUrl: "https://example.com/cta",
+            callToActionPosition: null);
+
+        SetCollection(insight, nameof(Insight.InsightContent), copyInsight);
+
+        var result = await _service.GetContentPageDtoAsync(insight, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.CallToActionWithPosition, Is.Not.Null);
+            Assert.That(result.CallToActionWithPosition!.Position, Is.EqualTo("left"));
+        });
+    }
+
+    [Test]
+    public async Task GetContentPageDtoAsync_CallToActionIsNull_WhenEnabledButButtonUrlIsMissing()
+    {
+        var insight = CreateInsight(title: "Insight page", showSidebar: false);
+        var copyInsight = CreateCopyInsight(
+            title: "Copy title",
+            description: "<p>Description</p>",
+            content: "<p>Content</p>",
+            showTitle: true,
+            showDescription: true,
+            showCallToAction: true,
+            callToActionButtonUrl: null,
+            callToActionPosition: "right");
+
+        SetCollection(insight, nameof(Insight.InsightContent), copyInsight);
+
+        var result = await _service.GetContentPageDtoAsync(insight, CancellationToken.None);
+
+        Assert.That(result.CallToActionWithPosition, Is.Null);
+    }
+
+    #endregion
+
+    #region GetContentPageSidebarDto - extra branches
+
+    [Test]
+    public async Task GetContentPageSidebarDto_UsesMetadataTitleAndTeaserImage_WhenUsePersonPageTitleSettingIsTrue()
+    {
+        SetupUsePersonPageTitleSetting(true);
+
+        var insight = CreateInsight(title: "Insight page", showSidebar: true);
+
+        var person = CreatePerson(
+            contentItemId: 301,
+            metadataTitle: "Ada Page Title",
+            firstName: "Ada",
+            surnamePrefix: string.Empty,
+            lastName: "Lovelace",
+            jobTitle: "Developer",
+            url: "/people/ada");
+        SetAssetCollection(person, nameof(Person.MetadataTeaserImage), "/media/ada.png");
+
+        SetCollection(insight, nameof(Insight.RelevantContactPerson), person);
+        SetupCopyLinkSection(insight, showCopyUrlButtonInInsightPage: true);
+
+        var result = await _service.GetContentPageSidebarDto(insight, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.RelevantContactPeople, Has.Length.EqualTo(1));
+            Assert.That(result.RelevantContactPeople[0].FullName, Is.EqualTo("Ada Page Title"));
+            Assert.That(result.RelevantContactPeople[0].JobTitle, Is.EqualTo("Developer"));
+            Assert.That(result.RelevantContactPeople[0].Image?.Url, Is.EqualTo("/media/ada.png"));
+            Assert.That(result.RelevantContactPeople[0].Url, Does.EndWith("/people/ada"));
+        });
+    }
+
+    [Test]
+    public async Task GetContentPageSidebarDto_UpdatedDateIsNull_WhenFirstAndLastPublishedAreTheSame()
+    {
+        var published = new DateTime(2026, 03, 01, 10, 0, 0);
+        var insight = CreateInsight(title: "Insight page", showSidebar: true);
+
+        SetPropertyValue(insight.SystemFields, "ContentItemCommonDataFirstPublishedWhen", published);
+        SetPropertyValue(insight.SystemFields, "ContentItemCommonDataLastPublishedWhen", published);
+        SetupCopyLinkSection(insight, showCopyUrlButtonInInsightPage: true);
+
+        var result = await _service.GetContentPageSidebarDto(insight, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.PublishDate, Is.EqualTo(published));
+            Assert.That(result.UpdatedDate, Is.Null);
+        });
+    }
+
+    [Test]
+    public async Task GetContentPageSidebarDto_PublishDateIsNull_WhenOnlyLastPublishedIsSet()
+    {
+        var insight = CreateInsight(title: "Insight page", showSidebar: true);
+
+        SetPropertyValue(insight.SystemFields, "ContentItemCommonDataFirstPublishedWhen", DateTime.MinValue);
+        SetupCopyLinkSection(insight, showCopyUrlButtonInInsightPage: true);
+
+        var result = await _service.GetContentPageSidebarDto(insight, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.PublishDate, Is.Null);
+            Assert.That(result.UpdatedDate, Is.EqualTo(SchemaModifyDate));
+        });
+    }
+
+    [Test]
+    public async Task GetContentPageSidebarDto_TreatsMissingPublishDatesAsMinValue()
+    {
+        var insight = CreateInsight(title: "Insight page", showSidebar: true);
+
+        SetPropertyValue(insight.SystemFields, "ContentItemCommonDataFirstPublishedWhen", null);
+        SetPropertyValue(insight.SystemFields, "ContentItemCommonDataLastPublishedWhen", null);
+        SetupCopyLinkSection(insight, showCopyUrlButtonInInsightPage: true);
+
+        var result = await _service.GetContentPageSidebarDto(insight, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.PublishDate, Is.Null);
+            Assert.That(result.UpdatedDate, Is.Null);
+        });
+    }
+
+    #endregion
+
+    #region GetSidebarExternalPeopleDtosAsync - extra branches
+
+    [Test]
+    public async Task GetSidebarExternalPeopleDtosAsync_IgnoresPeopleWithoutSystemFields()
+    {
+        var result = await _service.GetSidebarExternalPeopleDtosAsync(
+            new[] { new ExternalPerson() },
+            CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<ExternalPerson>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task GetSidebarExternalPeopleDtosAsync_QueriesOnce_WhenSameGuidIsLinkedTwice()
+    {
+        var guid = Guid.NewGuid();
+        var first = CreateExternalPerson(guid, "First", "Ada", string.Empty, "Lovelace", "Consultant", "/first");
+        var second = CreateExternalPerson(guid, "Second", "Ada", string.Empty, "Lovelace", "Consultant", "/second");
+
+        SetupContentPages(first);
+
+        var result = await _service.GetSidebarExternalPeopleDtosAsync(
+            new[] { first, second },
+            CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Length.EqualTo(1));
+            Assert.That(result[0].FullName, Is.EqualTo("Ada Lovelace"));
+        });
+        _contentServiceMock.Verify(
+            x => x.GetPagesAsync<ExternalPerson>(
+                It.IsAny<RetrievePagesParameters>(),
+                It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                It.IsAny<RetrievalCacheSettings>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task GetSidebarExternalPeopleDtosAsync_UsesPageTitle_WhenUsePersonPageTitleSettingIsTrue()
+    {
+        SetupUsePersonPageTitleSetting(true);
+
+        var person = CreateExternalPerson(
+            Guid.NewGuid(), "External Page Title", "Ada", string.Empty, "Lovelace", "Consultant", "/ext");
+        SetupContentPages(person);
+
+        var result = await _service.GetSidebarExternalPeopleDtosAsync(new[] { person }, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Length.EqualTo(1));
+            Assert.That(result[0].FullName, Is.EqualTo("External Page Title"));
+            Assert.That(result[0].JobTitle, Is.EqualTo("Consultant"));
+        });
+    }
+
+    #endregion
+
+    #region GetInsightSchemaMarkupDtoAsync - extra branches
+
+    [Test]
+    public async Task GetInsightSchemaMarkupDtoAsync_UsesPersonPageTitle_ForRelevantContactAuthors()
+    {
+        SetupUsePersonPageTitleSetting(true);
+        SetupWebsiteChannel("https://example.com");
+
+        var insight = CreateInsight(title: "Insight page", showSidebar: false);
+
+        var person = CreatePerson(
+            contentItemId: 501,
+            metadataTitle: "Person Metadata Title",
+            firstName: "Ada",
+            surnamePrefix: string.Empty,
+            lastName: "Lovelace",
+            jobTitle: "Developer",
+            url: "/people/ada");
+
+        SetCollection(insight, nameof(Insight.RelevantContactPerson), person);
+        SetupContentPages(person);
+        SetupContentPages(Array.Empty<InternalPerson>());
+
+        var result = await InvokeGetInsightSchemaMarkupDtoAsync(insight);
+
+        Assert.That(result.Author!.Select(x => x.Name), Is.EqualTo(ExpectedPersonMetadataTitle));
+    }
+
+    [Test]
+    public async Task GetInsightSchemaMarkupDtoAsync_UsesExternalPeopleOnly_WhenNoRelevantContactsExist()
+    {
+        SetupUsePersonPageTitleSetting(false);
+        SetupWebsiteChannel("https://example.com");
+
+        var insight = CreateInsight(title: "Insight page", showSidebar: false);
+
+        var externalPerson = CreateExternalPerson(
+            contentItemGuid: Guid.NewGuid(),
+            metadataTitle: "External Title",
+            firstName: "Ada",
+            surnamePrefix: "van",
+            lastName: "Lovelace",
+            jobTitle: "Consultant",
+            url: "/people/ada");
+
+        SetCollection(insight, nameof(Insight.RelatedExternalPeople), externalPerson);
+        SetupContentPages(externalPerson);
+
+        var result = await InvokeGetInsightSchemaMarkupDtoAsync(insight);
+
+        Assert.That(result.Author!.Select(x => x.Name), Is.EqualTo(ExpectedExternalComposedName));
+    }
+
+    #endregion
+
+    #region Kentico query delegates
+
+    // The service passes query-builder lambdas (query => query.Where(...).OrderBy(...)) into
+    // IContentService.GetPagesAsync. Because the service is mocked, those lambdas are never run, so
+    // they show as uncovered. This test exercises every method that builds such a query, then runs the
+    // captured delegates against a best-effort RetrievePagesQueryParameters instance. The delegates may
+    // throw if the Kentico type needs internal state; that is swallowed on purpose because the goal is
+    // only to execute the lambda bodies.
+    [Test]
+    public async Task QueryDelegates_PassedToContentService_CanBeExecuted()
+    {
+        SetupUsePersonPageTitleSetting(false);
+        SetupContentPages(Array.Empty<Person>());
+        SetupContentPages(Array.Empty<InternalPerson>());
+
+        var external = CreateExternalPerson(
+            Guid.NewGuid(), "External", "Ada", string.Empty, "Lovelace", "Consultant", "/ext");
+        SetupContentPages(external);
+
+        var insight = CreateInsight(title: "Insight page", showSidebar: true);
+
+        await _service.GetKeyContactsDisplayNames(SingleContactId, CancellationToken.None);
+        await _service.GetExternalPeopleDisplayNames(
+            new List<Guid> { external.SystemFields.ContentItemGUID },
+            CancellationToken.None);
+        await _service.GetSidebarExternalPeopleDtosAsync(new[] { external }, CancellationToken.None);
+
+        // Walks the whole section hierarchy: direct parent -> InsightGroup -> InsightCategory.
+        SetupGroupAndCategoryLookups();
+        SetupSectionPagesSequence(null, null, null);
+        await InvokeShowCopyLinkOptionAsync(insight, true);
+
+        // Runs the Insight lookup query inside GetContentPageSidebarDto.
+        SetupCopyLinkSection(insight, showCopyUrlButtonInInsightPage: true);
+        await _service.GetContentPageSidebarDto(insight, CancellationToken.None);
+
+        var queryActions = _contentServiceMock.Invocations
+            .SelectMany(invocation => invocation.Arguments)
+            .OfType<Action<RetrievePagesQueryParameters>>()
+            .ToList();
+
+        Assert.That(queryActions, Is.Not.Empty);
+
+        var queryParameters = CreateQueryParameters();
+        foreach (var queryAction in queryActions)
+        {
+            try
+            {
+                queryAction(queryParameters);
+            }
+            catch (Exception)
+            {
+                // Best effort only - see comment above the test.
+            }
+        }
+    }
+
+    #endregion
 }

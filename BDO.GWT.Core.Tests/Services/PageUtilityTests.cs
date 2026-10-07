@@ -69,6 +69,20 @@ namespace BDO.GWT.Core.Tests.Services
                 DescriptionTitle = title,
             };
 
+        private void SetupCategories(int parentId, params IndustryCategory[] categories) =>
+            _contentServiceMock
+                .Setup(x => x.GetChildPagesByParentGuidAsync<IndustryCategory>(parentId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(categories.ToList());
+
+        private void SetupPages<T>(params T[] pages) where T : class, IWebPageFieldsSource =>
+            _contentServiceMock
+                .Setup(x => x.GetPagesAsync<T>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(pages.ToList());
+
         #endregion
 
         #region GetSideboxDtoAsync
@@ -232,6 +246,109 @@ namespace BDO.GWT.Core.Tests.Services
 
             var link = result.Links.First();
             Assert.That(link.URL, Is.Not.Null.And.Not.Empty);
+        }
+
+        [Test]
+        public async Task GetSideboxDtoAsync_WhenChildrenExist_SiblingsAreNeverQueried()
+        {
+            SetupCategories(10, CreateIndustryCategory(1, 10, 1, "Child"));
+
+            await _pageUtility.GetSideboxDtoAsync<IndustryCategory, IndustryCategory>(
+                "Nav", 10, 20, c => c.DescriptionTitle, c => c.DescriptionTitle);
+
+            _contentServiceMock.Verify(
+                x => x.GetChildPagesByParentGuidAsync<IndustryCategory>(20, It.IsAny<CancellationToken>()),
+                Times.Never);
+        }
+
+        [Test]
+        public async Task GetSideboxDtoAsync_ChildLinkUrlComesFromUrlResolver()
+        {
+            SetupCategories(10, CreateIndustryCategory(1, 10, 1, "Child"));
+
+            var result = await _pageUtility.GetSideboxDtoAsync<IndustryCategory, IndustryCategory>(
+                "Nav", 10, 20, c => c.DescriptionTitle, c => c.DescriptionTitle);
+
+            Assert.That(result.Links.Single().URL, Is.EqualTo("/category-1"));
+        }
+
+        [Test]
+        public async Task GetSideboxDtoAsync_SiblingsAreOrderedByWebPageItemOrder()
+        {
+            SetupCategories(10);
+            SetupCategories(20,
+                CreateIndustryCategory(5, 20, 2, "Sibling B"),
+                CreateIndustryCategory(6, 20, 1, "Sibling A"));
+
+            var result = await _pageUtility.GetSideboxDtoAsync<IndustryCategory, IndustryCategory>(
+                "Nav", 10, 20, c => c.DescriptionTitle, c => c.DescriptionTitle);
+
+            Assert.That(result.Links.Select(l => l.Title), Is.EqualTo(new[] { "Sibling A", "Sibling B" }));
+        }
+
+        #endregion
+
+        #region GetSideboxDtoAsync (single-type overload)
+
+        [Test]
+        public async Task GetSideboxDtoAsync_SingleType_WhenSiblingsExist_ReturnsOrderedSiblingLinks()
+        {
+            SetupCategories(20,
+                CreateIndustryCategory(5, 20, 2, "Sibling B"),
+                CreateIndustryCategory(6, 20, 1, "Sibling A"));
+
+            var result = await _pageUtility.GetSideboxDtoAsync<IndustryCategory>(
+                "Single Nav", 10, 20, c => c.DescriptionTitle, CancellationToken.None);
+
+            var links = result.Links.ToList();
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Title, Is.EqualTo("Single Nav"));
+                Assert.That(links, Has.Count.EqualTo(2));
+                Assert.That(links[0].Title, Is.EqualTo("Sibling A"));
+                Assert.That(links[0].URL, Is.EqualTo("/category-6"));
+                Assert.That(links[1].Title, Is.EqualTo("Sibling B"));
+            });
+        }
+
+        [Test]
+        public async Task GetSideboxDtoAsync_SingleType_WhenOnlyOneSibling_ReturnsEmptyLinks()
+        {
+            SetupCategories(20, CreateIndustryCategory(5, 20, 1, "Only"));
+
+            var result = await _pageUtility.GetSideboxDtoAsync<IndustryCategory>(
+                "Nav", 10, 20, c => c.DescriptionTitle);
+
+            Assert.That(result.Links, Is.Empty);
+        }
+
+        [Test]
+        public async Task GetSideboxDtoAsync_SingleType_WhenNoSiblings_ReturnsEmptyLinks()
+        {
+            SetupCategories(20);
+
+            var result = await _pageUtility.GetSideboxDtoAsync<IndustryCategory>(
+                "Nav", 10, 20, c => c.DescriptionTitle);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Title, Is.EqualTo("Nav"));
+                Assert.That(result.Links, Is.Empty);
+            });
+        }
+
+        [Test]
+        public async Task GetSideboxDtoAsync_SingleType_DoesNotQueryParentChildren()
+        {
+            SetupCategories(20);
+
+            await _pageUtility.GetSideboxDtoAsync<IndustryCategory>(
+                "Nav", 10, 20, c => c.DescriptionTitle);
+
+            _contentServiceMock.Verify(
+                x => x.GetChildPagesByParentGuidAsync<IndustryCategory>(10, It.IsAny<CancellationToken>()),
+                Times.Never);
         }
 
         #endregion
@@ -458,6 +575,272 @@ namespace BDO.GWT.Core.Tests.Services
                     It.IsAny<RetrievalCacheSettings>(),
                     It.IsAny<CancellationToken>()),
                 Times.Never);
+        }
+
+        [Test]
+        public async Task GetMultiLinkCardsAsync_ImageUrlLeadingTildeIsTrimmed()
+        {
+            SetupCategories(100, CreateIndustryCategory(1, 100, 1, "Category A"));
+            SetupPages<Industry>();
+
+            var result = await _pageUtility.GetMultiLinkCardsAsync<IndustryCategory, Industry>(
+                100,
+                c => c.DescriptionTitle,
+                c => c.DescriptionBody,
+                c => "~/images/a.png",
+                c => "alt",
+                i => i.DescriptionTitle);
+
+            Assert.That(result[0].ImageURL, Is.EqualTo("/images/a.png"));
+        }
+
+        [Test]
+        public async Task GetMultiLinkCardsAsync_NullImageUrl_YieldsNullImageUrl()
+        {
+            SetupCategories(100, CreateIndustryCategory(1, 100, 1, "Category A"));
+            SetupPages<Industry>();
+
+            var result = await _pageUtility.GetMultiLinkCardsAsync<IndustryCategory, Industry>(
+                100,
+                c => c.DescriptionTitle,
+                c => c.DescriptionBody,
+                c => null,
+                c => null,
+                i => i.DescriptionTitle);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result[0].ImageURL, Is.Null);
+                Assert.That(result[0].ImageAltText, Is.Null);
+            });
+        }
+
+        [Test]
+        public async Task GetMultiLinkCardsAsync_CardUrlComesFromUrlResolver()
+        {
+            SetupCategories(100, CreateIndustryCategory(7, 100, 1, "Category A"));
+            SetupPages<Industry>();
+
+            var result = await _pageUtility.GetMultiLinkCardsAsync<IndustryCategory, Industry>(
+                100, c => c.DescriptionTitle, c => c.DescriptionBody, c => null, c => null, i => i.DescriptionTitle);
+
+            Assert.That(result[0].Url, Is.EqualTo("/category-7"));
+        }
+
+        [Test]
+        public async Task GetMultiLinkCardsAsync_CategoryWithNoMatchingChildren_HasEmptyReadMoreLinks()
+        {
+            SetupCategories(100,
+                CreateIndustryCategory(1, 100, 1, "Category A"),
+                CreateIndustryCategory(2, 100, 2, "Category B"));
+            SetupPages(CreateIndustry(10, parentId: 1, order: 1, title: "Industry A1"));
+
+            var result = await _pageUtility.GetMultiLinkCardsAsync<IndustryCategory, Industry>(
+                100, c => c.DescriptionTitle, c => c.DescriptionBody, c => null, c => null, i => i.DescriptionTitle);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result[0].ReadMoreLinks, Has.Length.EqualTo(1));
+                Assert.That(result[1].ReadMoreLinks, Is.Empty);
+            });
+        }
+
+        [Test]
+        public async Task GetMultiLinkCardsAsync_ReadMoreLinksAreOrderedAndHaveUrls()
+        {
+            SetupCategories(100, CreateIndustryCategory(1, 100, 1, "Category A"));
+            SetupPages(
+                CreateIndustry(11, parentId: 1, order: 2, title: "Second"),
+                CreateIndustry(10, parentId: 1, order: 1, title: "First"));
+
+            var result = await _pageUtility.GetMultiLinkCardsAsync<IndustryCategory, Industry>(
+                100, c => c.DescriptionTitle, c => c.DescriptionBody, c => null, c => null, i => i.DescriptionTitle);
+
+            var links = result[0].ReadMoreLinks;
+            Assert.Multiple(() =>
+            {
+                Assert.That(links.Select(l => l.Title), Is.EqualTo(new[] { "First", "Second" }));
+                Assert.That(links[0].URL, Is.EqualTo("/industry-10"));
+                Assert.That(links[1].URL, Is.EqualTo("/industry-11"));
+            });
+        }
+
+        [Test]
+        public async Task GetMultiLinkCardsAsync_WhenCategoriesExist_GetPagesAsyncIsCalledOnce()
+        {
+            SetupCategories(100,
+                CreateIndustryCategory(1, 100, 1, "Category A"),
+                CreateIndustryCategory(2, 100, 2, "Category B"));
+            SetupPages<Industry>();
+
+            await _pageUtility.GetMultiLinkCardsAsync<IndustryCategory, Industry>(
+                100, c => c.DescriptionTitle, c => c.DescriptionBody, c => null, c => null, i => i.DescriptionTitle);
+
+            _contentServiceMock.Verify(
+                x => x.GetPagesAsync<Industry>(
+                    It.IsAny<RetrievePagesParameters>(),
+                    It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                    It.IsAny<RetrievalCacheSettings>(),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
+        #endregion
+
+        #region GetMultiLinkCardsAsync2
+
+        // Industry = TChild1, IndustryCategory (reused as a stand-in "report" page) = TChild2.
+
+        [Test]
+        public async Task GetMultiLinkCardsAsync2_WhenNoCategoriesExist_ReturnsEmptyAndSkipsChildQueries()
+        {
+            SetupCategories(100);
+
+            var result = await _pageUtility.GetMultiLinkCardsAsync2<IndustryCategory, Industry, IndustryCategory>(
+                100,
+                c => c.DescriptionTitle,
+                c => c.DescriptionBody,
+                c => null,
+                c => null,
+                i => i.DescriptionTitle,
+                r => r.DescriptionTitle);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Empty);
+                _contentServiceMock.Verify(
+                    x => x.GetPagesAsync<Industry>(
+                        It.IsAny<RetrievePagesParameters>(),
+                        It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                        It.IsAny<RetrievalCacheSettings>(),
+                        It.IsAny<CancellationToken>()),
+                    Times.Never);
+                _contentServiceMock.Verify(
+                    x => x.GetPagesAsync<IndustryCategory>(
+                        It.IsAny<RetrievePagesParameters>(),
+                        It.IsAny<Action<RetrievePagesQueryParameters>>(),
+                        It.IsAny<RetrievalCacheSettings>(),
+                        It.IsAny<CancellationToken>()),
+                    Times.Never);
+            });
+        }
+
+        [Test]
+        public async Task GetMultiLinkCardsAsync2_MapsCardFieldsAndOrdersCards()
+        {
+            SetupCategories(100,
+                CreateIndustryCategory(2, 100, 2, "Category B"),
+                CreateIndustryCategory(1, 100, 1, "Category A"));
+            SetupPages<Industry>();
+            SetupPages<IndustryCategory>();
+
+            var result = await _pageUtility.GetMultiLinkCardsAsync2<IndustryCategory, Industry, IndustryCategory>(
+                100,
+                c => c.DescriptionTitle,
+                c => c.DescriptionBody,
+                c => "~/img.png",
+                c => "alt",
+                i => i.DescriptionTitle,
+                r => r.DescriptionTitle);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Has.Length.EqualTo(2));
+                Assert.That(result[0].Title, Is.EqualTo("Category A"));
+                Assert.That(result[0].Description, Is.EqualTo("Description for Category A"));
+                Assert.That(result[0].ImageURL, Is.EqualTo("/img.png"));
+                Assert.That(result[0].ImageAltText, Is.EqualTo("alt"));
+                Assert.That(result[0].Url, Is.EqualTo("/category-1"));
+                Assert.That(result[0].ReadMoreLinks, Is.Empty);
+                Assert.That(result[1].Title, Is.EqualTo("Category B"));
+            });
+        }
+
+        [Test]
+        public async Task GetMultiLinkCardsAsync2_NullImageUrl_YieldsNullImageUrl()
+        {
+            SetupCategories(100, CreateIndustryCategory(1, 100, 1, "Category A"));
+            SetupPages<Industry>();
+            SetupPages<IndustryCategory>();
+
+            var result = await _pageUtility.GetMultiLinkCardsAsync2<IndustryCategory, Industry, IndustryCategory>(
+                100, c => c.DescriptionTitle, c => c.DescriptionBody, c => null, c => null,
+                i => i.DescriptionTitle, r => r.DescriptionTitle);
+
+            Assert.That(result[0].ImageURL, Is.Null);
+        }
+
+        [Test]
+        public async Task GetMultiLinkCardsAsync2_AttachesBothChildTypesToCorrectCards()
+        {
+            SetupCategories(100,
+                CreateIndustryCategory(1, 100, 1, "Category A"),
+                CreateIndustryCategory(2, 100, 2, "Category B"));
+            SetupPages(
+                CreateIndustry(10, parentId: 1, order: 1, title: "Industry A1"),
+                CreateIndustry(11, parentId: 2, order: 1, title: "Industry B1"));
+            SetupPages(
+                CreateIndustryCategory(20, parentId: 1, order: 2, title: "Report A1"));
+
+            var result = await _pageUtility.GetMultiLinkCardsAsync2<IndustryCategory, Industry, IndustryCategory>(
+                100, c => c.DescriptionTitle, c => c.DescriptionBody, c => null, c => null,
+                i => i.DescriptionTitle, r => r.DescriptionTitle);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result[0].ReadMoreLinks.Select(l => l.Title),
+                    Is.EqualTo(new[] { "Industry A1", "Report A1" }));
+                Assert.That(result[1].ReadMoreLinks.Select(l => l.Title),
+                    Is.EqualTo(new[] { "Industry B1" }));
+                Assert.That(result[0].ReadMoreLinks[0].URL, Is.EqualTo("/industry-10"));
+                Assert.That(result[0].ReadMoreLinks[1].URL, Is.EqualTo("/category-20"));
+            });
+        }
+
+        [Test]
+        public async Task GetMultiLinkCardsAsync2_CombinedChildrenAreOrderedByWebPageItemOrder()
+        {
+            SetupCategories(100, CreateIndustryCategory(1, 100, 1, "Category A"));
+            SetupPages(
+                CreateIndustry(10, parentId: 1, order: 3, title: "I-late"),
+                CreateIndustry(11, parentId: 1, order: 2, title: "I-mid"));
+            SetupPages(
+                CreateIndustryCategory(20, parentId: 1, order: 1, title: "R-first"));
+
+            var result = await _pageUtility.GetMultiLinkCardsAsync2<IndustryCategory, Industry, IndustryCategory>(
+                100, c => c.DescriptionTitle, c => c.DescriptionBody, c => null, c => null,
+                i => i.DescriptionTitle, r => r.DescriptionTitle);
+
+            Assert.That(result[0].ReadMoreLinks.Select(l => l.Title),
+                Is.EqualTo(new[] { "R-first", "I-mid", "I-late" }));
+        }
+
+        [Test]
+        public async Task GetMultiLinkCardsAsync2_OnlyChild1Exists_StillReturnsLinks()
+        {
+            SetupCategories(100, CreateIndustryCategory(1, 100, 1, "Category A"));
+            SetupPages(CreateIndustry(10, parentId: 1, order: 1, title: "Industry A1"));
+            SetupPages<IndustryCategory>();
+
+            var result = await _pageUtility.GetMultiLinkCardsAsync2<IndustryCategory, Industry, IndustryCategory>(
+                100, c => c.DescriptionTitle, c => c.DescriptionBody, c => null, c => null,
+                i => i.DescriptionTitle, r => r.DescriptionTitle);
+
+            Assert.That(result[0].ReadMoreLinks.Select(l => l.Title), Is.EqualTo(new[] { "Industry A1" }));
+        }
+
+        [Test]
+        public async Task GetMultiLinkCardsAsync2_ChildWithUnknownParent_IsNotAttachedToAnyCard()
+        {
+            SetupCategories(100, CreateIndustryCategory(1, 100, 1, "Category A"));
+            SetupPages(CreateIndustry(10, parentId: 999, order: 1, title: "Orphan"));
+            SetupPages<IndustryCategory>();
+
+            var result = await _pageUtility.GetMultiLinkCardsAsync2<IndustryCategory, Industry, IndustryCategory>(
+                100, c => c.DescriptionTitle, c => c.DescriptionBody, c => null, c => null,
+                i => i.DescriptionTitle, r => r.DescriptionTitle);
+
+            Assert.That(result[0].ReadMoreLinks, Is.Empty);
         }
 
         #endregion
