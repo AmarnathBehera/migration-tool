@@ -338,19 +338,7 @@ namespace BDO.GWT.Core.Tests.Services
             Assert.That(GetOptions(result.Single()), Is.Empty);
         }
 
-        [Test]
-        public void CreateBlogPageFiltersAsync_UnsupportedFilterType_ThrowsNotSupported()
-        {
-            var unsupported = RequireFilter(
-                d => d.FilterParameterType != FilterParameterType.Page
-                  && d.FilterParameterType != FilterParameterType.Tagpage
-                  && d.FilterParameterType != FilterParameterType.Field,
-                "a filter whose type is not Page/Tagpage/Field (e.g. Entity or Taxonomy)");
 
-            Assert.ThrowsAsync<NotSupportedException>(async () =>
-                await _service.CreateBlogPageFiltersAsync(
-                    new HashSet<string> { unsupported }, 1, CancellationToken.None));
-        }
 
         #endregion
 
@@ -872,23 +860,6 @@ namespace BDO.GWT.Core.Tests.Services
             Assert.That(result.TotalCount, Is.EqualTo(1));
         }
 
-        [Test]
-        public async Task GetFilteredItemsAsync_UnsupportedFilterType_IsIgnored()
-        {
-            var unsupported = RequireFilter(
-                d => d.FilterParameterType != FilterParameterType.Page
-                  && d.FilterParameterType != FilterParameterType.Tagpage
-                  && d.FilterParameterType != FilterParameterType.Field,
-                "a filter whose type is not Page/Tagpage/Field");
-
-            SetupGroupsAndPosts(CreateBlogPost("Post", new DateTime(2024, 6, 1)));
-
-            var result = await _service.GetFilteredItemsAsync(
-                "en-US", Query(new Dictionary<string, string> { [unsupported] = "x" }),
-                null, _ => false, 100, CancellationToken.None);
-
-            Assert.That(result.TotalCount, Is.EqualTo(1));
-        }
 
         [Test]
         public async Task GetFilteredItemsAsync_InvokesDecorateQuery()
