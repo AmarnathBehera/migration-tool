@@ -709,13 +709,7 @@ public class SectionEventsCrudServiceBranchTests
     {
         SetupCulture(LanguageTag.GB);
         SetupChannel(CreateChannelInfo("TestChannel"));
-        _contentRetrieverMock
-            .Setup(x => x.GetPagesAsync<SectionEvents>(
-                It.IsAny<RetrievePagesParameters>(),
-                It.IsAny<Action<RetrievePagesQueryParameters>>(),
-                It.IsAny<RetrievalCacheSettings>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync((IEnumerable<SectionEvents>?)null);
+        SetupSectionEvents((IEnumerable<SectionEvents>)null!);
 
         var result = await CreateService().CreatePageAsync(1, 10, "en-gb", CreateRequest(), CancellationToken.None);
 
@@ -798,7 +792,7 @@ public class SectionEventsCrudServiceBranchTests
             Assert.That(result.Value, Is.Not.Null);
             Assert.That(result.Value!.General.WebPageItemID, Is.EqualTo(77));
             Assert.That(result.Value.Content.MetadataTitle, Is.EqualTo("Events"));
-            Assert.That(result.Value.Content.EventsWebinarsListFilters, Is.EquivalentTo(new[] { "Tax", "Audit" }));
+            Assert.That(result.Value.Content.EventsWebinarsListFilters, Is.EquivalentTo(ExpectedTaxAuditFilters));
         });
     }
 
@@ -1037,7 +1031,7 @@ public class SectionEventsCrudServiceBranchTests
         {
             Assert.That(result.Value, Is.Not.Null);
             Assert.That(result.Value!.Content.MetadataTitle, Is.EqualTo("Updated Events"));
-            Assert.That(result.Value.Content.EventsWebinarsListFilters, Is.EquivalentTo(new[] { "Tax", "Audit" }));
+            Assert.That(result.Value.Content.EventsWebinarsListFilters, Is.EquivalentTo(ExpectedTaxAuditFilters));
         });
     }
 
