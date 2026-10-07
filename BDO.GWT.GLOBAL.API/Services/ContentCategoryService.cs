@@ -523,7 +523,6 @@ public class ContentCategoryService : IContentCategoryService
             if (filter.SubCategoryIds is null || filter.SubCategoryIds.Length == 0)
             {
                 _validationState.AddUnprocessableEntityError(nameof(filter.SubCategoryIds), $"List of subcategory ids is empty on {filter.CategoryCode} category");
-                continue;
             }
 
 
