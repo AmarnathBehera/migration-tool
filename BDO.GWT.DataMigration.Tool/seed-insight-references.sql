@@ -19,7 +19,7 @@ WHERE page.WebPageItemWebsiteChannelID = @channel
 
 -- ---- Correlate each target Insight -> source InsightID (en-GB): NodeGUID first, then normalized path ----
 IF OBJECT_ID('tempdb..#srcnode') IS NOT NULL DROP TABLE #srcnode;
-SELECT t.NodeGUID, d.DocumentCulture,
+SELECT t.NodeGUID, d.DocumentCulture, d.DocumentSearchExcluded,
        LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(t.NodeAliasPath,'/',''),'-',''),'_',''),' ',''),'(',''),')',''),'.',''),'''','')) AS NormPath,
        d.DocumentForeignKeyValue AS InsightID
 INTO #srcnode
@@ -31,22 +31,43 @@ JOIN [BDO-DB-GWT-TST-EUR].dbo.CMS_Document d ON d.DocumentNodeID = t.NodeID
 WHERE t.NodeSiteID = 1;
 
 IF OBJECT_ID('tempdb..#corr') IS NOT NULL DROP TABLE #corr;
-CREATE TABLE #corr (TargetItemID int, CommonID int, SourceInsightID int);
-INSERT INTO #corr (TargetItemID, CommonID, SourceInsightID)
-SELECT ci.ContentItemID, cd.ContentItemCommonDataID, sn.InsightID
+CREATE TABLE #corr (TargetItemID int, CommonID int, SourceInsightID int, SourceSearchExcluded bit);
+INSERT INTO #corr (TargetItemID, CommonID, SourceInsightID, SourceSearchExcluded)
+SELECT ci.ContentItemID, cd.ContentItemCommonDataID, sn.InsightID, sn.DocumentSearchExcluded
 FROM CMS_WebPageItem w
 JOIN CMS_ContentItem ci ON ci.ContentItemID = w.WebPageItemContentItemID
 JOIN CMS_Class cl ON cl.ClassID = ci.ContentItemContentTypeID AND cl.ClassName = 'BDO.Insight'
 JOIN CMS_ContentItemCommonData cd ON cd.ContentItemCommonDataContentItemID = ci.ContentItemID
      AND cd.ContentItemCommonDataContentLanguageID = @lang AND cd.ContentItemCommonDataIsLatest = 1
 OUTER APPLY (
-    SELECT TOP 1 s.InsightID FROM #srcnode s
+    SELECT TOP 1 s.InsightID, s.DocumentSearchExcluded FROM #srcnode s
     WHERE s.NodeGUID = ci.ContentItemGUID
        OR s.NormPath COLLATE DATABASE_DEFAULT = LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(w.WebPageItemTreePath,'/',''),'-',''),'_',''),' ',''),'(',''),')',''),'.',''),'''',''))
     ORDER BY CASE WHEN s.NodeGUID = ci.ContentItemGUID THEN 0 ELSE 1 END,
       CASE WHEN LOWER(s.DocumentCulture)='en-gb' THEN 1 ELSE 0 END
 ) sn
 WHERE w.WebPageItemWebsiteChannelID = @channel AND sn.InsightID IS NOT NULL;
+
+UPDATE target SET
+  MetadataOGTitle = LEFT(source.MetadataOGTitle, 200),
+  MetadataOGDescription = source.MetadataOGDescription,
+  MetadataOGTwitterImageSizeCheckbox = ISNULL(source.MetadataOGTwitterImageSizeCheckbox, 0),
+  MetadataTitle = LEFT(source.MetadataTitle, 200),
+  MetadataDescription = source.MetadataDescription,
+  MetadataCanonical = source.MetadataCanonical,
+  MetadataNofollow = ISNULL(source.MetadataNofollow, 0),
+  MetadataNoindex = ISNULL(source.MetadataNoindex, 0),
+  IncludeInSitemap = ISNULL(source.IncludeInSitemap, 0),
+  IsSearchExcluded = ISNULL(correlation.SourceSearchExcluded, 0),
+  ShowPrintButton = ISNULL(source.ShowPrintButton, 0)
+FROM CMS_ContentItemCommonData target
+JOIN #corr correlation ON correlation.CommonID = target.ContentItemCommonDataID
+JOIN [BDO-DB-GWT-TST-EUR].dbo.BDO_Insight source ON source.InsightID = correlation.SourceInsightID;
+
+UPDATE target SET ShowAuthorsAtTheTop = source.ShowAuthorsAtTheTop
+FROM BDO_Insight target
+JOIN #corr correlation ON correlation.CommonID = target.ContentItemDataCommonDataID
+JOIN [BDO-DB-GWT-TST-EUR].dbo.BDO_Insight source ON source.InsightID = correlation.SourceInsightID;
 
 -- ---- Source Insight reference field values for the correlated insights ----
 IF OBJECT_ID('tempdb..#srcref') IS NOT NULL DROP TABLE #srcref;
@@ -55,7 +76,7 @@ SELECT bi.InsightID,
        bi.MetadataIndustryCategories, bi.MetadataIndustries, bi.MicrositePages, bi.MicrositeMasterPages,
        bi.MetadataSpecialtiesCategories, bi.MetadataSpecialtiesAreas, bi.MetadataSpecialtiesPages,
        bi.MetadataOfficeLocation, bi.MetadataBusinessIssues, bi.MetadataRssCategory, bi.ContentType,
-       bi.RelevantContactPerson, bi.RelatedExternalPeople
+      bi.RelevantContactPerson, bi.RelatedExternalPeople, bi.Insights
 INTO #srcref
 FROM [BDO-DB-GWT-TST-EUR].dbo.BDO_Insight bi
 WHERE bi.InsightID IN (SELECT SourceInsightID FROM #corr);
@@ -161,14 +182,15 @@ JOIN CMS_ContentItemLanguageMetadata lm ON lm.ContentItemLanguageMetadataContent
 WHERE w.WebPageItemWebsiteChannelID = 10;
 
 IF OBJECT_ID('tempdb..#samap') IS NOT NULL DROP TABLE #samap;
-SELECT s.NodeID, COALESCE(g.TargetItemID, n.TargetItemID) AS TargetItemID, COALESCE(g.ContentItemGUID, n.ContentItemGUID) AS ContentItemGUID
+SELECT s.NodeID, COALESCE(mapped.TargetItemID, g.TargetItemID, n.TargetItemID) AS TargetItemID, COALESCE(mapped.ContentItemGUID, g.ContentItemGUID, n.ContentItemGUID) AS ContentItemGUID
 INTO #samap
 FROM (SELECT DISTINCT t.NodeID, t.NodeGUID, LTRIM(RTRIM(t.NodeName)) AS NodeName
       FROM [BDO-DB-GWT-TST-EUR].dbo.CMS_Tree t
       JOIN [BDO-DB-GWT-TST-EUR].dbo.CMS_Class cl ON cl.ClassID = t.NodeClassID AND cl.ClassName = 'BDO.SpecialtiesArea') s
+LEFT JOIN #nodemap mapped ON mapped.NodeID = s.NodeID
 LEFT JOIN #sa_tgt g ON g.ContentItemGUID = s.NodeGUID
 LEFT JOIN #sa_tgt n ON n.Name = s.NodeName COLLATE DATABASE_DEFAULT
-WHERE COALESCE(g.TargetItemID, n.TargetItemID) IS NOT NULL;
+WHERE COALESCE(mapped.TargetItemID, g.TargetItemID, n.TargetItemID) IS NOT NULL;
 CREATE INDEX IX_samap ON #samap (NodeID);
 
 -- ---- RelevantContactPerson: source stores DocumentID of Person/InternalPerson -> target page (NodeGUID, else name within same class) ----
@@ -182,15 +204,16 @@ JOIN CMS_ContentItemLanguageMetadata lm ON lm.ContentItemLanguageMetadataContent
 WHERE w.WebPageItemWebsiteChannelID = 10;
 
 IF OBJECT_ID('tempdb..#rcpmap') IS NOT NULL DROP TABLE #rcpmap;
-SELECT s.DocumentID, COALESCE(g.TargetItemID, n.TargetItemID) AS TargetItemID, COALESCE(g.ContentItemGUID, n.ContentItemGUID) AS ContentItemGUID
+SELECT s.DocumentID, COALESCE(mapped.TargetItemID, g.TargetItemID, n.TargetItemID) AS TargetItemID, COALESCE(mapped.ContentItemGUID, g.ContentItemGUID, n.ContentItemGUID) AS ContentItemGUID
 INTO #rcpmap
-FROM (SELECT d.DocumentID, t.NodeGUID, cl.ClassName AS Cls, LTRIM(RTRIM(t.NodeName)) AS NodeName
+FROM (SELECT d.DocumentID, t.NodeID, t.NodeGUID, cl.ClassName AS Cls, LTRIM(RTRIM(t.NodeName)) AS NodeName
       FROM [BDO-DB-GWT-TST-EUR].dbo.CMS_Document d
       JOIN [BDO-DB-GWT-TST-EUR].dbo.CMS_Tree t ON t.NodeID = d.DocumentNodeID
       JOIN [BDO-DB-GWT-TST-EUR].dbo.CMS_Class cl ON cl.ClassID = t.NodeClassID AND cl.ClassName IN ('BDO.Person','BDO.InternalPerson')) s
+    LEFT JOIN #nodemap mapped ON mapped.NodeID = s.NodeID
 LEFT JOIN #pp_tgt g ON g.ContentItemGUID = s.NodeGUID
 LEFT JOIN #pp_tgt n ON n.Cls = s.Cls COLLATE DATABASE_DEFAULT AND n.Name = s.NodeName COLLATE DATABASE_DEFAULT
-WHERE COALESCE(g.TargetItemID, n.TargetItemID) IS NOT NULL;
+    WHERE COALESCE(mapped.TargetItemID, g.TargetItemID, n.TargetItemID) IS NOT NULL;
 CREATE INDEX IX_rcpmap ON #rcpmap (DocumentID);
 
 -- ---- RelatedExternalPeople: source stores ExternalPerson NodeGUID -> target page (GUID match, else name) ----
@@ -244,7 +267,8 @@ INSERT INTO #pfields (TargetTable, TargetKeyCol, TargetCol, SourceCol) VALUES
 ('CMS_ContentItemCommonData','ContentItemCommonDataID','MetadataIndustries','MetadataIndustries'),
 ('CMS_ContentItemCommonData','ContentItemCommonDataID','MicrositePages','MicrositePages'),
 ('BDO_Insight','ContentItemDataCommonDataID','MetadataSpecialtiesPages','MetadataSpecialtiesPages'),
-('BDO_Insight','ContentItemDataCommonDataID','MetadataOfficeLocation','MetadataOfficeLocation');
+('BDO_Insight','ContentItemDataCommonDataID','MetadataOfficeLocation','MetadataOfficeLocation'),
+('BDO_Insight','ContentItemDataCommonDataID','Insights','Insights');
 
 DECLARE @tt sysname,@tk sysname,@tc sysname,@sc sysname,@i int=1,@max int=(SELECT MAX(Ord) FROM #pfields);
 WHILE @i <= @max

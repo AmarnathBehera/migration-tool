@@ -5,9 +5,9 @@
   <ClassDisplayName>Legacy attachment</ClassDisplayName>
   <ClassFormDefinition>
     <form>
-      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="5e6888ec-46c8-47a6-b96a-211b22b81657" isPK="true" />
-      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="b4cd342a-e180-413f-891d-bbd2d0e0a066" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
-      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="e55ec3c4-092a-49a7-889c-549b1ba51366" isunique="true" system="true" />
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="747b1e85-e5ac-4bad-b1f2-649720b49a08" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="5e5b6a75-93e6-43a4-8971-2b6ec2a11415" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="16306d99-b403-4865-a1e8-d3fe5ed8a72d" isunique="true" system="true" />
       <field allowempty="true" column="LegacyAttachmentAsset" columntype="contentitemasset" enabled="true" guid="50c2bc4c-a8ff-46ba-95c2-0e74752d147f" visible="true">
         <properties>
           <fieldcaption>Asset</fieldcaption>

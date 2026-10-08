@@ -5,9 +5,9 @@
   <ClassDisplayName>Legacy media link</ClassDisplayName>
   <ClassFormDefinition>
     <form>
-      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="34d3b9e9-8228-4230-baa7-bf8e84020fc9" isPK="true" />
-      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="bf357038-5927-4542-ada1-751dfa7d96af" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
-      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="dd2809f4-457a-42b4-a3b6-e1c697d72903" isunique="true" system="true" />
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="38875788-5117-4545-a007-085aad8f4e44" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="3d6082ce-7c56-45ba-be03-92e219d58e05" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="f9c9abe1-e77b-4116-a8ba-c07fcd3d2611" isunique="true" system="true" />
       <field allowempty="true" column="LegacyMediaLinkURL" columnsize="2083" columntype="text" enabled="true" guid="28c4198d-7aba-47ae-9a54-eda57d8dd362" visible="true">
         <properties>
           <fieldcaption>URL</fieldcaption>

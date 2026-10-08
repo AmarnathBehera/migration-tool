@@ -51,7 +51,7 @@ public static class InsightClassMapping
         mapping.BuildField("MetadataNofollow").SetFrom(SourceClassName, "MetadataNofollow");
         mapping.BuildField("MetadataNoindex").SetFrom(SourceClassName, "MetadataNoindex");
         mapping.BuildField("IncludeInSitemap").SetFrom(SourceClassName, "IncludeInSitemap");
-        mapping.BuildField("IsSearchExcluded").SetFrom(SourceClassName, "IsSearchExcluded");
+        mapping.BuildField("IsSearchExcluded").SetFrom(SourceClassName, "DocumentSearchExcluded");
         mapping.BuildField("MetadataTitle").SetFrom(SourceClassName, "MetadataTitle");
         mapping.BuildField("MetadataDescription").SetFrom(SourceClassName, "MetadataDescription");
         MapEmptyReference(mapping, "MetadataTeaserImage");

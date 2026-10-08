@@ -21,6 +21,7 @@
     ./run-insight-migration.ps1 -SkipBuild         # reuse existing build
     ./run-insight-migration.ps1 -ReferencesOnly    # repair Insight selectors on existing pages
     ./run-insight-migration.ps1 -ReferencesOnly -RestoreReferenceTargets
+    ./run-insight-migration.ps1 -ReferencesOnly -IncludeInsightContent
     ./run-insight-migration.ps1 -PruneOnly -PreviewPrune
     ./run-insight-migration.ps1 -PruneOnly
 #>
@@ -41,6 +42,8 @@ param(
     [switch]$SkipInsight,        # skip the final Insight page migration + CopyInsight seed
     [switch]$ReferencesOnly,
     [switch]$RestoreReferenceTargets,
+    [string[]]$ReferenceTargetClasses = @(),
+    [switch]$IncludeInsightContent,
     [switch]$PruneUnrelatedPages,
     [switch]$PruneOnly,
     [switch]$PreviewPrune
@@ -319,6 +322,15 @@ function Invoke-ScopedMigration([string]$command, [string[]]$classes) {
 if ($RestoreReferenceTargets -and -not $ReferencesOnly) {
     throw '-RestoreReferenceTargets requires -ReferencesOnly.'
 }
+if ($ReferenceTargetClasses.Count -gt 0 -and -not $RestoreReferenceTargets) {
+    throw '-ReferenceTargetClasses requires -RestoreReferenceTargets.'
+}
+if (@($ReferenceTargetClasses | Where-Object { $_ -notin $referencedClasses }).Count -gt 0) {
+    throw '-ReferenceTargetClasses must contain only configured Insight reference page types.'
+}
+if ($IncludeInsightContent -and -not $ReferencesOnly) {
+    throw '-IncludeInsightContent requires -ReferencesOnly.'
+}
 if ($ReferencesOnly) {
     if ($PruneUnrelatedPages -or $PruneOnly -or $SkipInsight) {
         throw '-ReferencesOnly cannot be combined with pruning or -SkipInsight.'
@@ -329,11 +341,17 @@ if ($ReferencesOnly) {
     $script:websiteChannelId = ($channelText -split '\s+' | Where-Object { $_ -match '^\d+$' } | Select-Object -First 1)
     if (-not $websiteChannelId) { throw "Target channel '$TargetChannelName' was not found." }
     if ($RestoreReferenceTargets) {
-        Write-Step 4 'Restore service and industry reference targets'
-        Invoke-ScopedMigration 'pages' @(
+        $restoreClasses = @(
             'BDO.SectionServices', 'BDO.BusinessLine', 'BDO.ServiceArea', 'BDO.Service', 'BDO.SubService',
-            'BDO.SectionIndustries', 'BDO.IndustryCategory', 'BDO.Industry', 'BDO.IndustryService'
+            'BDO.SectionIndustries', 'BDO.IndustryCategory', 'BDO.Industry', 'BDO.IndustryService',
+            'BDO.SectionSpecialties', 'BDO.SpecialtiesCategory', 'BDO.SpecialtiesArea', 'BDO.SpecialtiesPage',
+            'BDO.Locations', 'BDO.LocationCity', 'BDO.LocationOffice',
+            'BDO.SectionPeoplePage', 'BDO.ExternalPeopleFolder', 'BDO.InternalPeopleFolder',
+            'BDO.ExternalPerson', 'BDO.InternalPerson', 'BDO.Person'
         )
+        if ($ReferenceTargetClasses.Count -gt 0) { $restoreClasses = $ReferenceTargetClasses }
+        Write-Step 4 'Restore Insight reference targets'
+        Invoke-ScopedMigration 'pages' $restoreClasses
     }
     foreach ($culture in $TargetCultures) {
         $cultureLiteral = $culture.Replace("'", "''")
@@ -344,9 +362,13 @@ if ($ReferencesOnly) {
         $seedCulture = ($cultureMappings.PSObject.Properties | Where-Object { $_.Value -eq $culture } |
             Sort-Object { if ($_.Name -eq $culture) { 0 } else { 1 } } | Select-Object -First 1).Name
         if (-not $seedCulture) { throw "No source culture maps to '$culture'." }
-        if ($RestoreReferenceTargets -and $culture -eq $DefaultCulture) {
+        if ($RestoreReferenceTargets -and $ReferenceTargetClasses.Count -eq 0 -and $culture -eq $DefaultCulture) {
             Write-Step 3 "Rebuild metadata reference targets ($culture)"
             Invoke-Sql $TargetDb (Join-Path $root 'seed-bdo-metadata-pages.sql') $seedCulture ([int]$languageId)
+        }
+        if ($IncludeInsightContent) {
+            Write-Step 5 "Repair CopyInsight content ($culture)"
+            Invoke-Sql $TargetDb (Join-Path $root 'seed-copyinsight-contenthub.sql') $seedCulture ([int]$languageId)
         }
         Write-Step 5 "Repair Insight page references ($culture)"
         Invoke-Sql $TargetDb (Join-Path $root 'seed-insight-references.sql') $seedCulture ([int]$languageId)
