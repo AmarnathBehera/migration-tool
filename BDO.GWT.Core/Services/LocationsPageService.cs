@@ -71,7 +71,9 @@ public class LocationsPageService : ILocationsPageService
     private async Task<IEnumerable<LocalLocationsDto>> RetrieveLocationList(Locations page, CancellationToken cancellationToken)
     {
         var pages = (await _contentService.GetPagesAsync<LocationCity>(
-           new RetrievePagesParameters { },
+           new RetrievePagesParameters { 
+            LinkedItemsMaxLevel=2
+           },
            query => query
                .OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder))
                .Where(w => w.WhereEquals("WebPageItemParentID", page.SystemFields.WebPageItemID)),
