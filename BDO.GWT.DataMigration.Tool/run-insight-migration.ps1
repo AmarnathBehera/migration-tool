@@ -19,6 +19,8 @@
     ./run-insight-migration.ps1
     ./run-insight-migration.ps1 -SkipModules       # only referenced pages + Insight + CopyInsight
     ./run-insight-migration.ps1 -SkipBuild         # reuse existing build
+    ./run-insight-migration.ps1 -ReferencesOnly    # repair Insight selectors on existing pages
+    ./run-insight-migration.ps1 -ReferencesOnly -RestoreReferenceTargets
     ./run-insight-migration.ps1 -PruneOnly -PreviewPrune
     ./run-insight-migration.ps1 -PruneOnly
 #>
@@ -37,6 +39,8 @@ param(
     [switch]$SkipBuild,          # skip building the CLI
     [switch]$SkipReferencedPages,# skip migrating the Insight-referenced page types
     [switch]$SkipInsight,        # skip the final Insight page migration + CopyInsight seed
+    [switch]$ReferencesOnly,
+    [switch]$RestoreReferenceTargets,
     [switch]$PruneUnrelatedPages,
     [switch]$PruneOnly,
     [switch]$PreviewPrune
@@ -71,6 +75,7 @@ if (-not $DefaultCulture) { $DefaultCulture = $TargetCultures[0] }
 
 $sourceCulture = ($cultureMappings.PSObject.Properties |
     Where-Object { $_.Value -eq $DefaultCulture } |
+    Sort-Object { if ($_.Name -eq $DefaultCulture) { 0 } else { 1 } } |
     Select-Object -First 1).Name
 if (-not $sourceCulture) { throw "No source culture maps to the default target culture '$DefaultCulture'." }
 
@@ -309,6 +314,45 @@ function Invoke-ScopedMigration([string]$command, [string[]]$classes) {
         Remove-Item $backup -Force -ErrorAction SilentlyContinue
         Write-Host '  appsettings.json restored.' -ForegroundColor DarkGray
     }
+}
+
+if ($RestoreReferenceTargets -and -not $ReferencesOnly) {
+    throw '-RestoreReferenceTargets requires -ReferencesOnly.'
+}
+if ($ReferencesOnly) {
+    if ($PruneUnrelatedPages -or $PruneOnly -or $SkipInsight) {
+        throw '-ReferencesOnly cannot be combined with pruning or -SkipInsight.'
+    }
+    $channelLiteral = $TargetChannelName.Replace("'", "''")
+    $channelText = sqlcmd -S $Server -d $TargetDb -U $DbUser -P $DbPassword -N -C -W -l 60 -b -h -1 -Q "SET NOCOUNT ON; SELECT wc.WebsiteChannelID FROM CMS_WebsiteChannel wc JOIN CMS_Channel ch ON ch.ChannelID=wc.WebsiteChannelChannelID WHERE ch.ChannelName=N'$channelLiteral';"
+    if ($LASTEXITCODE -ne 0) { throw 'Failed to resolve the existing target channel.' }
+    $script:websiteChannelId = ($channelText -split '\s+' | Where-Object { $_ -match '^\d+$' } | Select-Object -First 1)
+    if (-not $websiteChannelId) { throw "Target channel '$TargetChannelName' was not found." }
+    if ($RestoreReferenceTargets) {
+        Write-Step 4 'Restore service and industry reference targets'
+        Invoke-ScopedMigration 'pages' @(
+            'BDO.SectionServices', 'BDO.BusinessLine', 'BDO.ServiceArea', 'BDO.Service', 'BDO.SubService',
+            'BDO.SectionIndustries', 'BDO.IndustryCategory', 'BDO.Industry', 'BDO.IndustryService'
+        )
+    }
+    foreach ($culture in $TargetCultures) {
+        $cultureLiteral = $culture.Replace("'", "''")
+        $languageText = sqlcmd -S $Server -d $TargetDb -U $DbUser -P $DbPassword -N -C -W -l 60 -b -h -1 -Q "SET NOCOUNT ON; SELECT ContentLanguageID FROM CMS_ContentLanguage WHERE ContentLanguageCultureFormat=N'$cultureLiteral';"
+        if ($LASTEXITCODE -ne 0) { throw "Failed to resolve language '$culture'." }
+        $languageId = ($languageText -split '\s+' | Where-Object { $_ -match '^\d+$' } | Select-Object -First 1)
+        if (-not $languageId) { throw "Target language '$culture' was not found." }
+        $seedCulture = ($cultureMappings.PSObject.Properties | Where-Object { $_.Value -eq $culture } |
+            Sort-Object { if ($_.Name -eq $culture) { 0 } else { 1 } } | Select-Object -First 1).Name
+        if (-not $seedCulture) { throw "No source culture maps to '$culture'." }
+        if ($RestoreReferenceTargets -and $culture -eq $DefaultCulture) {
+            Write-Step 3 "Rebuild metadata reference targets ($culture)"
+            Invoke-Sql $TargetDb (Join-Path $root 'seed-bdo-metadata-pages.sql') $seedCulture ([int]$languageId)
+        }
+        Write-Step 5 "Repair Insight page references ($culture)"
+        Invoke-Sql $TargetDb (Join-Path $root 'seed-insight-references.sql') $seedCulture ([int]$languageId)
+    }
+    Write-Host 'Insight reference repair completed.' -ForegroundColor Green
+    return
 }
 
 Write-Step 0 'Ensure Switzerland target channel and cultures'

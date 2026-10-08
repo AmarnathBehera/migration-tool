@@ -4,6 +4,8 @@ SET NOCOUNT ON;
 BEGIN TRANSACTION;
 
 DECLARE @websiteChannelID int = 10;
+DECLARE @channelID int = (SELECT WebsiteChannelChannelID FROM CMS_WebsiteChannel WHERE WebsiteChannelID=@websiteChannelID);
+IF @channelID IS NULL THROW 50001, 'Metadata target website channel was not found.', 1;
 DECLARE @seedRun uniqueidentifier = NEWID();
 DECLARE @workspaceID int = 1;
 DECLARE @languageID int = 1;
@@ -121,7 +123,7 @@ CREATE TABLE #items (Name nvarchar(450), CodeName nvarchar(450), Extra nvarchar(
 
 -- Root
 INSERT INTO CMS_ContentItem (ContentItemGUID, ContentItemName, ContentItemIsReusable, ContentItemIsSecured, ContentItemContentTypeID, ContentItemChannelID, ContentItemContentFolderID, ContentItemWorkspaceID)
-VALUES (NEWID(), CONCAT('BDOMetadata-',@websiteChannelID,'-',@seedRun,'-Root'), 0, 0, (SELECT ClassID FROM @class WHERE ClassName='BDO.BDOMetadata'), NULL, NULL, @workspaceID);
+VALUES (NEWID(), CONCAT('BDOMetadata-',@websiteChannelID,'-',@seedRun,'-Root'), 0, 0, (SELECT ClassID FROM @class WHERE ClassName='BDO.BDOMetadata'), @channelID, NULL, @workspaceID);
 SET @rootContentItemID=SCOPE_IDENTITY();
 INSERT INTO CMS_WebPageItem (WebPageItemParentID, WebPageItemGUID, WebPageItemName, WebPageItemTreePath, WebPageItemWebsiteChannelID, WebPageItemContentItemID, WebPageItemOrder)
 VALUES (NULL, (SELECT ContentItemGUID FROM CMS_ContentItem WHERE ContentItemID=@rootContentItemID), 'BDO Metadata', @rootPath, @websiteChannelID, @rootContentItemID, 100);
@@ -141,7 +143,7 @@ WHILE @@FETCH_STATUS=0
 BEGIN
     DECLARE @folderContentID int,@folderWebID int,@folderCommonID int,@folderPath nvarchar(450)=@rootPath+'/'+@folderSlug;
     INSERT INTO CMS_ContentItem (ContentItemGUID, ContentItemName, ContentItemIsReusable, ContentItemIsSecured, ContentItemContentTypeID, ContentItemChannelID, ContentItemContentFolderID, ContentItemWorkspaceID)
-    VALUES (NEWID(), LEFT(CONCAT('BDOMetadata-',@websiteChannelID,'-',@seedRun,'-', @folderClass, '-', @folderTitle), 100), 0, 0, (SELECT ClassID FROM @class WHERE ClassName=@folderClass), NULL, NULL, @workspaceID);
+    VALUES (NEWID(), LEFT(CONCAT('BDOMetadata-',@websiteChannelID,'-',@seedRun,'-', @folderClass, '-', @folderTitle), 100), 0, 0, (SELECT ClassID FROM @class WHERE ClassName=@folderClass), @channelID, NULL, @workspaceID);
     SET @folderContentID=SCOPE_IDENTITY();
     INSERT INTO CMS_WebPageItem (WebPageItemParentID, WebPageItemGUID, WebPageItemName, WebPageItemTreePath, WebPageItemWebsiteChannelID, WebPageItemContentItemID, WebPageItemOrder)
     VALUES (@rootWebPageItemID, (SELECT ContentItemGUID FROM CMS_ContentItem WHERE ContentItemID=@folderContentID), LEFT(CONCAT('BDOMetadata-', @folderSlug), 450), @folderPath, @websiteChannelID, @folderContentID, @sort);
@@ -156,7 +158,14 @@ BEGIN
     VALUES (@folderContentID, @folderTitle, 2, NEWID(), @now, @now, 0, @languageID, @now);
 
     TRUNCATE TABLE #items;
-    DECLARE @loadSql nvarchar(max)=N'INSERT INTO #items(Name,CodeName,Extra) SELECT CAST('+QUOTENAME(@nameColumn)+N' AS nvarchar(450)), CAST('+QUOTENAME(@codeColumn)+N' AS nvarchar(450)), '+CASE WHEN @extraColumn IS NULL THEN N'CAST(NULL AS nvarchar(max))' ELSE N'CAST('+QUOTENAME(@extraColumn)+N' AS nvarchar(max))' END+N' FROM [BDO-DB-GWT-TST-EUR].dbo.'+QUOTENAME(@sourceTable)+N' WHERE '+QUOTENAME(@siteColumn)+N'=1 AND '+QUOTENAME(@cultureColumn)+N'=N''en-GB'' ORDER BY '+QUOTENAME(@nameColumn)+N','+QUOTENAME(@codeColumn)+N';';
+    DECLARE @loadSql nvarchar(max)=N'WITH candidates AS (
+        SELECT CAST('+QUOTENAME(@nameColumn)+N' AS nvarchar(450)) Name,
+               CAST('+QUOTENAME(@codeColumn)+N' AS nvarchar(450)) CodeName,
+               '+CASE WHEN @extraColumn IS NULL THEN N'CAST(NULL AS nvarchar(max))' ELSE N'CAST('+QUOTENAME(@extraColumn)+N' AS nvarchar(max))' END+N' Extra,
+               ROW_NUMBER() OVER (PARTITION BY '+QUOTENAME(@codeColumn)+N' ORDER BY CASE WHEN '+QUOTENAME(@cultureColumn)+N'=N''en-GB'' THEN 0 ELSE 1 END, '+QUOTENAME(@cultureColumn)+N', '+QUOTENAME(@nameColumn)+N') RowNumber
+        FROM [BDO-DB-GWT-TST-EUR].dbo.'+QUOTENAME(@sourceTable)+N'
+        WHERE '+QUOTENAME(@siteColumn)+N'=1 AND '+QUOTENAME(@codeColumn)+N' IS NOT NULL)
+        INSERT INTO #items(Name,CodeName,Extra) SELECT Name,CodeName,Extra FROM candidates WHERE RowNumber=1 ORDER BY Name,CodeName;';
     EXEC sp_executesql @loadSql;
 
     DECLARE @itemName nvarchar(450),@itemCode nvarchar(450),@extra nvarchar(max),@rn int=0;
@@ -168,7 +177,7 @@ BEGIN
         SET @rn+=1;
         DECLARE @itemContentID int,@itemCommonID int,@itemPath nvarchar(450)=LEFT(@folderPath+'/'+REPLACE(REPLACE(REPLACE(COALESCE(NULLIF(@itemCode,''),@itemName),' ','-'),'.','-'),'/','-')+'-'+CAST(@rn AS nvarchar(20)),450);
         INSERT INTO CMS_ContentItem (ContentItemGUID, ContentItemName, ContentItemIsReusable, ContentItemIsSecured, ContentItemContentTypeID, ContentItemChannelID, ContentItemContentFolderID, ContentItemWorkspaceID)
-        VALUES (NEWID(), LEFT(CONCAT('BDOMetadata-',@websiteChannelID,'-',@seedRun,'-',@rn,'-', @itemClass, '-', COALESCE(NULLIF(@itemCode,''),@itemName)),100), 0, 0, (SELECT ClassID FROM @class WHERE ClassName=@itemClass), NULL, NULL, @workspaceID);
+        VALUES (NEWID(), LEFT(CONCAT('BDOMetadata-',@websiteChannelID,'-',@seedRun,'-',@rn,'-', @itemClass, '-', COALESCE(NULLIF(@itemCode,''),@itemName)),100), 0, 0, (SELECT ClassID FROM @class WHERE ClassName=@itemClass), @channelID, NULL, @workspaceID);
         SET @itemContentID=SCOPE_IDENTITY();
         INSERT INTO CMS_WebPageItem (WebPageItemParentID, WebPageItemGUID, WebPageItemName, WebPageItemTreePath, WebPageItemWebsiteChannelID, WebPageItemContentItemID, WebPageItemOrder)
         VALUES (@folderWebID, (SELECT ContentItemGUID FROM CMS_ContentItem WHERE ContentItemID=@itemContentID), LEFT(CONCAT('BDOMetadata-', @itemClass, '-', COALESCE(NULLIF(@itemCode,''),@itemName), '-', @rn),450), @itemPath, @websiteChannelID, @itemContentID, @rn);

@@ -8,6 +8,15 @@ BEGIN TRANSACTION;
 DECLARE @channel int = 10;
 DECLARE @lang int = 1;                -- en-GB
 
+UPDATE item SET ContentItemChannelID = website.WebsiteChannelChannelID
+FROM CMS_ContentItem item
+JOIN CMS_WebPageItem page ON page.WebPageItemContentItemID = item.ContentItemID
+JOIN CMS_WebsiteChannel website ON website.WebsiteChannelID = page.WebPageItemWebsiteChannelID
+WHERE page.WebPageItemWebsiteChannelID = @channel
+  AND (page.WebPageItemTreePath = '/BDO-Metadata' OR page.WebPageItemTreePath LIKE '/BDO-Metadata/%')
+  AND item.ContentItemIsReusable = 0
+  AND item.ContentItemChannelID IS NULL;
+
 -- ---- Correlate each target Insight -> source InsightID (en-GB): NodeGUID first, then normalized path ----
 IF OBJECT_ID('tempdb..#srcnode') IS NOT NULL DROP TABLE #srcnode;
 SELECT t.NodeGUID, d.DocumentCulture,
@@ -56,8 +65,18 @@ IF OBJECT_ID('tempdb..#nodemap') IS NOT NULL DROP TABLE #nodemap;
 SELECT t.NodeID, ci.ContentItemID AS TargetItemID, ci.ContentItemGUID
 INTO #nodemap
 FROM [BDO-DB-GWT-TST-EUR].dbo.CMS_Tree t
-JOIN CMS_ContentItem ci ON ci.ContentItemGUID = t.NodeGUID
-WHERE EXISTS (SELECT 1 FROM CMS_WebPageItem w WHERE w.WebPageItemContentItemID = ci.ContentItemID AND w.WebPageItemWebsiteChannelID = 10);
+JOIN [BDO-DB-GWT-TST-EUR].dbo.CMS_Class sourceClass ON sourceClass.ClassID = t.NodeClassID
+CROSS APPLY (
+    SELECT TOP 1 item.ContentItemID, item.ContentItemGUID
+    FROM CMS_WebPageItem page
+    JOIN CMS_ContentItem item ON item.ContentItemID = page.WebPageItemContentItemID
+    JOIN CMS_Class targetClass ON targetClass.ClassID = item.ContentItemContentTypeID
+    WHERE page.WebPageItemWebsiteChannelID = @channel
+      AND targetClass.ClassName = sourceClass.ClassName COLLATE DATABASE_DEFAULT
+      AND (item.ContentItemGUID = t.NodeGUID
+        OR page.WebPageItemTreePath = t.NodeAliasPath COLLATE DATABASE_DEFAULT)
+    ORDER BY CASE WHEN item.ContentItemGUID = t.NodeGUID THEN 0 ELSE 1 END, item.ContentItemID
+) ci;
 CREATE INDEX IX_nodemap ON #nodemap (NodeID);
 
 -- ---- Metadata-module ID -> target metadata page (matched by CodeName) ----

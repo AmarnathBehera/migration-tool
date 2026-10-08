@@ -5,9 +5,9 @@
   <ClassDisplayName>Legacy media file</ClassDisplayName>
   <ClassFormDefinition>
     <form>
-      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="5e179cb9-4e1d-4523-95df-c2284232923e" isPK="true" />
-      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="f831b217-3db6-4fba-b99e-aa0e592e27e9" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
-      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="1dd23251-7b50-4716-8746-2fdec7831e05" isunique="true" system="true" />
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="fa02f814-ddf7-448c-980b-7bc602d9decc" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="f6225438-0842-4aaa-a8e4-bae81505f55c" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="340f3748-c272-4a20-84a1-869aeaa33f38" isunique="true" system="true" />
       <field allowempty="true" column="LegacyMediaFileAsset" columntype="contentitemasset" enabled="true" guid="dfc3d011-8f63-43f6-9ed8-4b444333a1d0" visible="true">
         <properties>
           <fieldcaption>Asset</fieldcaption>
