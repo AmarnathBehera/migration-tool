@@ -15,6 +15,20 @@ You can create multiple class mappings, each handling different source content t
 - Split one page type into multiple content types
 - Convert custom tables or module classes to content types
 
+## Map Page Builder Editable Areas
+
+If the target page template uses different `<editable-area>` identifiers, map the source identifiers in the page type's existing `MultiClassMapping` before registering it. For example, if a KX13 home page has `area1`, `area2`, and `area3` but the XbyK template renders only `main`:
+
+```csharp
+// Add to the existing home-page mapping, alongside its primary key and field mappings.
+mapping.MapEditableArea("area1", "main");
+mapping.MapEditableArea("area2", "main");
+mapping.MapEditableArea("area3", "main");
+services.AddSingleton<IClassMapping>(mapping);
+```
+
+The migration merges the sections from mapped areas in their original order for published pages and migrated drafts. Only map areas that the target template should display; unmapped areas retain their identifiers. The target template must declare the chosen identifier, and its widget and section types must be available in XbyK. Do not create a new class mapping solely for this remap: class mappings also control content type migration. This does not convert KX13 Razor-rendered content (such as `HomeSections`) into Page Builder widgets. Re-run the page migration to update data already migrated with the old area identifiers.
+
 ## Create Custom Class Mappings
 
 1. Create a new class.

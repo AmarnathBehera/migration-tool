@@ -5,6 +5,7 @@ using Migration.Tool.Source.Model;
 using Newtonsoft.Json.Linq;
 
 namespace Migration.Tool.Source.Mappers.ContentItemMapperDirectives;
+
 internal abstract class ContentItemDirectiveBase : IUmtModel
 {
     public string? PageTemplateIdentifier { get; set; }
@@ -15,6 +16,7 @@ internal abstract class ContentItemDirectiveBase : IUmtModel
     public IEnumerable<FormerPageUrlPath>? FormerUrlPaths { get; set; }
     public List<(string fieldName, ICmsTree)> ChildLinks { get; set; } = [];
     public string? TargetTypeOverride { get; set; }
+    public Dictionary<string, string> EditableAreaMappings { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     #region Mapping results, used for postprocessing
     public Guid ContentItemGuid { get; set; }

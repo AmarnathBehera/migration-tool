@@ -28,6 +28,11 @@ public interface IClassMapping
     Type? MappingHandler { get; }
 }
 
+public interface IEditableAreaMapping
+{
+    IReadOnlyDictionary<string, string> EditableAreaMappings { get; }
+}
+
 public interface IFieldMapping
 {
     bool IsTemplate { get; }
@@ -40,9 +45,19 @@ public record FieldMapping(string TargetFieldName, string SourceClassName, strin
 
 public record FieldMappingWithConversion(string TargetFieldName, string SourceClassName, string SourceFieldName, bool IsTemplate, Func<object?, IConvertorContext, object?> Converter) : IFieldMapping;
 
-public class MultiClassMapping(string targetClassName, Action<DataClassInfo>? classPatcher = null) : IClassMapping
+public class MultiClassMapping(string targetClassName, Action<DataClassInfo>? classPatcher = null) : IClassMapping, IEditableAreaMapping
 {
     public readonly List<NewFieldDefinition> NewFields = [];
+
+    private readonly Dictionary<string, string> editableAreaMappings = new(StringComparer.OrdinalIgnoreCase);
+    public IReadOnlyDictionary<string, string> EditableAreaMappings => editableAreaMappings;
+
+    public void MapEditableArea(string sourceIdentifier, string targetIdentifier)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sourceIdentifier);
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetIdentifier);
+        editableAreaMappings.Add(sourceIdentifier, targetIdentifier);
+    }
 
     public void PatchTargetDataClass(DataClassInfo target)
     {

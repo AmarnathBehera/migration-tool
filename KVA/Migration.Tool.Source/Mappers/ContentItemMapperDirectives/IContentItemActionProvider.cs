@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 
 namespace Migration.Tool.Source.Mappers.ContentItemMapperDirectives;
+
 public interface IContentItemActionProvider : IBaseContentItemActionProvider
 {
     /// <param name="widgetType">Identifier as passed to RegisterWidget attribute in target instance</param>
@@ -32,6 +33,9 @@ public interface IContentItemActionProvider : IBaseContentItemActionProvider
     /// </summary>
     /// <param name="targetTypeName">Class name of the target content type (ClassName of CMS_Class table)</param>
     void OverrideTargetType(string targetTypeName);
+
+    /// <summary>Move Page Builder sections from a source editable area to an area rendered by the target template.</summary>
+    void MapEditableArea(string sourceIdentifier, string targetIdentifier);
 }
 
 public record FormerPageUrlPath(string LanguageName, string Path, DateTime? LastModified = null);

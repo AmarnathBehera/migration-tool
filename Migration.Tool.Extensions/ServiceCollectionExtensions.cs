@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Migration.Tool.Extensions.ClassMappings;
 using Migration.Tool.Extensions.CommunityMigrations;
 using Migration.Tool.Extensions.DefaultMigrations;
 using Migration.Tool.KXP.Api.Services.CmsClass;
@@ -11,13 +10,16 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection UseCustomizations(this IServiceCollection services)
     {
         services.AddTransient<IFieldMigration, AssetMigration>();
+        services.AddTransient<AssetMigration>();
         services.AddTransient<IFieldMigration, SampleTextMigration>();
 
         services.AddTransient<IWidgetPropertyMigration, WidgetFileMigration>();
         services.AddTransient<IWidgetPropertyMigration, WidgetPathSelectorMigration>();
         services.AddTransient<IWidgetPropertyMigration, WidgetPageSelectorMigration>();
-        services.AddContactMapping();
-        services.AddPersonMapping();
+        // Insight page migration: translate its widget selectors to XbyK content item references.
+        services.AddTransient<IWidgetMigration, InsightPageWidgetMigration>();
+        services.AddTransient<IWidgetMigration, BdoWidgetMigration>();
+        services.AddTransient<IWidgetPropertyMigration, InsightPageSelectorMigration>();
 
 
         // services.AddClassMergeExample();

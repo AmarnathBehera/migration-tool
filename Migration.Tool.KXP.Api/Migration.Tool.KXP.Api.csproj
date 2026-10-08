@@ -10,6 +10,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <!-- Insight page migration: match the target XbyK database and application version. -->
         <PackageReference Include="Kentico.Xperience.Admin" Version="31.7.0" />
     </ItemGroup>
 

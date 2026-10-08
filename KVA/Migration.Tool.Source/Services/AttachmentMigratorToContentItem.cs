@@ -22,6 +22,8 @@ public class AttachmentMigratorToContentItem(
     UserService userService
 ) : IAttachmentMigrator
 {
+    public static bool HasAttachmentBinary(ICmsAttachment attachment) => attachment.AttachmentBinary is { Length: > 0 };
+
     public async Task<IMigrateAttachmentResult> TryMigrateAttachmentByPath(string documentPath, string additionalPath)
     {
         if (string.IsNullOrWhiteSpace(documentPath))
@@ -130,15 +132,16 @@ public class AttachmentMigratorToContentItem(
             logger.LogWarning("Attachment {Attachment} link will be broken, new guid {Guid} was required", new { ksAttachment.AttachmentSiteID, ksAttachment.AttachmentID, ksAttachment.AttachmentGUID }, newAttachmentGuid);
         }
 
-        if (ksAttachment.AttachmentBinary is null)
+        if (!HasAttachmentBinary(ksAttachment))
         {
-            logger.LogError("Attachment binary data is null {Attachment} " +
+            logger.LogError("Attachment binary data is empty or null {Attachment} " +
             "Option 1: Via admin web interface of your source instance navigate to the attachment and update the data. " +
             "Option 2: Update the database directly - table CMS_Attachment, column AttachmentBinary. " +
             "Option 3: Via admin web interface of your source instance remove all attachment references, then remove the attachment",
             new { ksAttachment.AttachmentName, ksAttachment.AttachmentSiteID, ksAttachment.AttachmentID });
 
-            throw new InvalidOperationException("Attachment data is null!");
+            protocol.Append(HandbookReferences.TemporaryAttachmentMigrationIsNotSupported.WithData(new { ksAttachment.AttachmentID, ksAttachment.AttachmentGUID, ksAttachment.AttachmentName, ksAttachment.AttachmentSiteID }));
+            return new MigrateAttachmentResultContentItem(false, null);
         }
 
         // language of the migrated attachment = language of the document where the attachment is attached or default site language

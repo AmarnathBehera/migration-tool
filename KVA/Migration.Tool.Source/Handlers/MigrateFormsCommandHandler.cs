@@ -35,9 +35,19 @@ public class MigrateFormsCommandHandler(
 {
     public async Task<CommandResult> Handle(MigrateFormsCommand request, CancellationToken cancellationToken)
     {
+        var migratedSiteIds = modelFacade.GetMigratedSites().Select(site => site.SiteID).ToHashSet();
+        var allForms = modelFacade.SelectAll<ICmsForm>(" ORDER BY FormID").ToList();
+        var selectedForms = allForms.Where(form => migratedSiteIds.Contains(form.FormSiteID)).ToList();
+        var selectedFormsByClass = selectedForms.GroupBy(form => form.FormClassID).ToDictionary(group => group.Key, group => group.ToList());
         var cmsClassForms = modelFacade.Select<ICmsClass>("ClassIsForm = 1", "ClassID");
         foreach (var ksClass in cmsClassForms)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!selectedFormsByClass.TryGetValue(ksClass.ClassID, out var cmsForms))
+            {
+                continue;
+            }
+
             protocol.FetchedSource(ksClass);
 
             var kxoDataClass = kxpClassFacade.GetClass(ksClass.ClassGUID);
@@ -49,10 +59,9 @@ public class MigrateFormsCommandHandler(
                 continue;
             }
 
-            var cmsForms = modelFacade.Select<ICmsForm>("FormClassID = @classId", "FormID", new SqlParameter("ClassID", ksClass.ClassID));
-
             foreach (var ksCmsForm in cmsForms)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 protocol.FetchedSource(ksCmsForm);
 
                 var kxoCmsForm = BizFormInfo.Provider.Get(ksCmsForm.FormGUID);
@@ -100,39 +109,52 @@ public class MigrateFormsCommandHandler(
                     }
                 }
 
-                Debug.Assert(ksClass.ClassTableName != null, "kx13Class.ClassTableName != null");
-                // var csi = new ClassStructureInfo(kx13Class.ClassXmlSchema, kx13Class.ClassXmlSchema, kx13Class.ClassTableName);
-
-                XNamespace nsSchema = "http://www.w3.org/2001/XMLSchema";
-                XNamespace msSchema = "urn:schemas-microsoft-com:xml-msdata";
-                var xDoc = XDocument.Parse(ksClass.ClassXmlSchema);
-                var autoIncrementColumns = xDoc.Descendants(nsSchema + "element")
-                    .Where(x => x.Attribute(msSchema + "AutoIncrement")?.Value == "true")
-                    .Select(x => x.Attribute("name")?.Value).ToImmutableHashSet();
-
-                Debug.Assert(autoIncrementColumns.Count == 1, "autoIncrementColumns.Count == 1");
-
-                var r = (ksClass.ClassTableName, ksClass.ClassGUID, autoIncrementColumns);
-                logger.LogTrace("Class '{ClassGuild}' Resolved as: {Result}", ksClass.ClassGUID, r);
-
-                // check if data is present in target tables
-                if (bulkDataCopyService.CheckIfDataExistsInTargetTable(ksClass.ClassTableName))
-                {
-                    logger.LogWarning("Data exists in target coupled data table '{TableName}' - cannot migrate, skipping form data migration", r.ClassTableName);
-                    protocol.Append(HandbookReferences
-                        .DataMustNotExistInTargetInstanceTable(ksClass.ClassTableName)
-                    );
-                    continue;
-                }
-
-                var bulkCopyRequest = new BulkCopyRequest(
-                    ksClass.ClassTableName, s => !autoIncrementColumns.Contains(s), _ => true,
-                    20000
-                );
-
-                logger.LogTrace("Bulk data copy request: {Request}", bulkCopyRequest);
-                bulkDataCopyService.CopyTableToTable(bulkCopyRequest);
             }
+
+            if (ksClass.ClassTableName is null)
+            {
+                logger.LogWarning("Form class '{ClassName}' has no coupled table; skipping its form data", ksClass.ClassName);
+                continue;
+            }
+
+            XNamespace nsSchema = "http://www.w3.org/2001/XMLSchema";
+            XNamespace msSchema = "urn:schemas-microsoft-com:xml-msdata";
+            var xDoc = XDocument.Parse(ksClass.ClassXmlSchema);
+            var autoIncrementColumns = xDoc.Descendants(nsSchema + "element")
+                .Where(x => x.Attribute(msSchema + "AutoIncrement")?.Value == "true")
+                .Select(x => x.Attribute("name")?.Value).ToImmutableHashSet();
+
+            if (autoIncrementColumns.Count != 1)
+            {
+                logger.LogWarning("Form class '{ClassName}' has {AutoIncrementColumnCount} auto-increment columns; skipping its form data", ksClass.ClassName, autoIncrementColumns.Count);
+                continue;
+            }
+
+            if (bulkDataCopyService.CheckIfDataExistsInTargetTable(ksClass.ClassTableName))
+            {
+                logger.LogWarning("Data exists in target coupled data table '{TableName}' - cannot migrate, skipping form data migration", ksClass.ClassTableName);
+                protocol.Append(HandbookReferences.DataMustNotExistInTargetInstanceTable(ksClass.ClassTableName));
+                continue;
+            }
+
+            bool classUsedByUnselectedSites = allForms.Any(form =>
+                form.FormClassID == ksClass.ClassID && !migratedSiteIds.Contains(form.FormSiteID));
+            bool tableHasSiteColumn = bulkDataCopyService.GetSqlTableColumns(ksClass.ClassTableName, configuration.KxConnectionString)
+                .Any(column => column.ColumnName.Equals("FormSiteID", StringComparison.OrdinalIgnoreCase));
+            if (classUsedByUnselectedSites && !tableHasSiteColumn)
+            {
+                logger.LogWarning("Form class '{ClassName}' is shared by selected and unselected sites, but table '{TableName}' has no FormSiteID column; skipping its shared submissions to avoid cross-site migration", ksClass.ClassName, ksClass.ClassTableName);
+                continue;
+            }
+
+            Func<System.Data.IDataReader, bool> dataFilter = tableHasSiteColumn
+                ? reader => !reader.IsDBNull(reader.GetOrdinal("FormSiteID")) && migratedSiteIds.Contains(reader.GetInt32(reader.GetOrdinal("FormSiteID")))
+                : _ => true;
+            var bulkCopyRequest = new BulkCopyRequest(
+                ksClass.ClassTableName, column => !autoIncrementColumns.Contains(column), dataFilter, 20000);
+
+            logger.LogInformation("Copying submissions for form class '{ClassName}' associated with {SelectedSiteCount} selected site(s)", ksClass.ClassName, migratedSiteIds.Count);
+            bulkDataCopyService.CopyTableToTable(bulkCopyRequest);
         }
 
         await GlobalizeBizFormFiles();

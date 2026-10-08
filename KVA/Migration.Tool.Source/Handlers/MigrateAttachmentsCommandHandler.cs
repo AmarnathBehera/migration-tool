@@ -15,16 +15,13 @@ public class MigrateAttachmentsCommandHandler(
 {
     public async Task<CommandResult> Handle(MigrateAttachmentsCommand request, CancellationToken cancellationToken)
     {
-        var ksCmsAttachments = modelFacade.SelectAll<ICmsAttachment>();
+        var migratedSiteIds = modelFacade.GetMigratedSites().Select(site => site.SiteID).ToHashSet();
+        var ksCmsAttachments = modelFacade.SelectWhere<ICmsAttachment>("AttachmentIsUnsorted = 1 AND AttachmentGroupGUID IS NULL")
+            .Where(attachment => migratedSiteIds.Contains(attachment.AttachmentSiteID));
 
         foreach (var ksCmsAttachment in ksCmsAttachments)
         {
-            if (ksCmsAttachment.AttachmentIsUnsorted != true || ksCmsAttachment.AttachmentGroupGUID != null)
-            {
-                // those must be migrated with pages
-                continue;
-            }
-
+            cancellationToken.ThrowIfCancellationRequested();
             await attachmentMigrator.MigrateAttachment(ksCmsAttachment);
         }
 

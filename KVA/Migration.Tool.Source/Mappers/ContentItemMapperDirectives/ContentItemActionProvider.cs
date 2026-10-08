@@ -3,6 +3,7 @@ using Migration.Tool.Source.Model;
 using Newtonsoft.Json.Linq;
 
 namespace Migration.Tool.Source.Mappers.ContentItemMapperDirectives;
+
 internal partial class ContentItemActionProvider : IContentItemActionProvider
 {
     internal ContentItemDirectiveBase Directive { get; private set; } = new PassthroughDirective();
@@ -36,4 +37,10 @@ internal partial class ContentItemActionProvider : IContentItemActionProvider
         }
     }
     public void OverrideTargetType(string targetType) => Directive.TargetTypeOverride = targetType;
+    public void MapEditableArea(string sourceIdentifier, string targetIdentifier)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sourceIdentifier);
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetIdentifier);
+        Directive.EditableAreaMappings.Add(sourceIdentifier, targetIdentifier);
+    }
 }

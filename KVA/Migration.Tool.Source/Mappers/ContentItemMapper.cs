@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Migration.Tool.Common;
 using Migration.Tool.Common.Abstractions;
 using Migration.Tool.Common.Builders;
+using Migration.Tool.Common.Enumerations;
 using Migration.Tool.Common.Helpers;
 using Migration.Tool.Common.Model;
 using Migration.Tool.Common.Services;
@@ -195,7 +196,7 @@ public class ContentItemMapper(
                 List<IUmtModel>? migratedDraft = null;
                 try
                 {
-                    migratedDraft = MigrateDraft(draftVersion, cmsTree, sourceFormDefinition, targetClassInfo!.ClassFormDefinition, contentItemGuid, languageGuid, sourceNodeClass, websiteChannelInfo, sourceSite, mapping).ToList();
+                    migratedDraft = MigrateDraft(draftVersion, cmsTree, sourceFormDefinition, targetClassInfo!.ClassFormDefinition, contentItemGuid, languageGuid, sourceNodeClass, websiteChannelInfo, sourceSite, mapping, directive).ToList();
                     draftMigrated = true;
                 }
                 catch
@@ -283,7 +284,7 @@ public class ContentItemMapper(
                         break;
                 }
 
-                (contentItemCommonDataVisualBuilderTemplateConfiguration, contentItemCommonDataVisualBuilderWidgets, ndp) = visualBuilderPatcher.PatchJsonDefinitions(source.CmsTree.NodeSiteID, contentItemCommonDataVisualBuilderTemplateConfiguration, contentItemCommonDataVisualBuilderWidgets).GetAwaiter().GetResult();
+                (contentItemCommonDataVisualBuilderTemplateConfiguration, contentItemCommonDataVisualBuilderWidgets, ndp) = visualBuilderPatcher.PatchJsonDefinitions(source.CmsTree.NodeSiteID, contentItemCommonDataVisualBuilderTemplateConfiguration, contentItemCommonDataVisualBuilderWidgets, directive.EditableAreaMappings.Count > 0 ? directive.EditableAreaMappings : (mapping as IEditableAreaMapping)?.EditableAreaMappings).GetAwaiter().GetResult();
             }
 
             if (directive.PageTemplateIdentifier is not null)
@@ -650,7 +651,7 @@ public class ContentItemMapper(
     }
 
     private IEnumerable<IUmtModel> MigrateDraft(ICmsVersionHistory checkoutVersion, ICmsTree cmsTree, string sourceFormClassDefinition, string targetFormDefinition, Guid contentItemGuid,
-        Guid contentLanguageGuid, ICmsClass sourceNodeClass, WebsiteChannelInfo websiteChannelInfo, ICmsSite sourceSite, IClassMapping? mapping)
+        Guid contentLanguageGuid, ICmsClass sourceNodeClass, WebsiteChannelInfo websiteChannelInfo, ICmsSite sourceSite, IClassMapping? mapping, ContentItemDirectiveBase directive)
     {
         var adapter = new NodeXmlAdapter(checkoutVersion.NodeXML);
 
@@ -662,7 +663,7 @@ public class ContentItemMapper(
         {
             string? pageTemplateConfiguration = adapter.DocumentPageTemplateConfiguration;
             string? pageBuildWidgets = adapter.DocumentPageBuilderWidgets;
-            (pageTemplateConfiguration, pageBuildWidgets, bool ndp) = visualBuilderPatcher.PatchJsonDefinitions(checkoutVersion.NodeSiteID, pageTemplateConfiguration, pageBuildWidgets).GetAwaiter().GetResult();
+            (pageTemplateConfiguration, pageBuildWidgets, bool ndp) = visualBuilderPatcher.PatchJsonDefinitions(checkoutVersion.NodeSiteID, pageTemplateConfiguration, pageBuildWidgets, directive.EditableAreaMappings.Count > 0 ? directive.EditableAreaMappings : (mapping as IEditableAreaMapping)?.EditableAreaMappings).GetAwaiter().GetResult();
 
             #region Find existing guid
 
@@ -945,7 +946,11 @@ public class ContentItemMapper(
                             {
                                 if (jToken.Path.EndsWith("NodeGUID", StringComparison.InvariantCultureIgnoreCase))
                                 {
-                                    var patchedGuid = spoiledGuidContext.EnsureNodeGuid(jToken.Value<Guid>(), documentSourceObjectContext.CmsTree.NodeSiteID);
+                                    if (!Guid.TryParse(jToken.ToString(), out var nodeGuid))
+                                    {
+                                        throw new InvalidOperationException($"Field '{targetFieldName}' contains an invalid node GUID.");
+                                    }
+                                    var patchedGuid = spoiledGuidContext.EnsureNodeGuid(nodeGuid, documentSourceObjectContext.CmsTree.NodeSiteID);
                                     jToken.Replace(JToken.FromObject(patchedGuid));
                                 }
                             }
@@ -992,6 +997,10 @@ public class ContentItemMapper(
                 var commonFields = UnpackReusableFieldSchemas(newFormInfo.GetFields<FormSchemaInfo>()).ToArray();
                 newField = commonFields
                     .FirstOrDefault(cf => ReusableSchemaService.RemoveClassPrefix(mapping?.TargetClassName ?? sourceNodeClass.ClassName, cf.Name).Equals(targetColumnName, StringComparison.InvariantCultureIgnoreCase));
+            }
+            if (newField?.DataType.Equals("contentitemreference", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                target[targetFieldName] = await NormalizeReferenceFieldValue(target[targetFieldName], fvmc);
             }
             string? newControlName = newField?.Settings[CLASS_FIELD_CONTROL_NAME]?.ToString()?.ToLowerInvariant();
             if (newControlName?.Equals(FormComponents.AdminRichTextEditorComponent, StringComparison.InvariantCultureIgnoreCase) == true && target[targetColumnName] is string { } html && !string.IsNullOrWhiteSpace(html) &&
@@ -1045,6 +1054,115 @@ public class ContentItemMapper(
                 }
             }
         }
+    }
+
+    private async Task<string> NormalizeReferenceFieldValue(object? value, FieldMigrationContext context)
+    {
+        if (value is null or DBNull || value is string empty && string.IsNullOrWhiteSpace(empty))
+        {
+            return "[]";
+        }
+
+        JToken parsed;
+        if (value is string serialized)
+        {
+            string trimmed = serialized.Trim();
+            if (trimmed.StartsWith('[') || trimmed.StartsWith('{') || trimmed.StartsWith('"'))
+            {
+                parsed = JToken.Parse(trimmed);
+            }
+            else if (Guid.TryParse(trimmed, out var guid))
+            {
+                parsed = new JValue(guid);
+            }
+            else if (context.SourceObjectContext is DocumentSourceObjectContext documentContext)
+            {
+                var mediaMatch = mediaLinkServiceFactory.Create().MatchMediaLink(trimmed, documentContext.Site.SiteID);
+                bool isMedia = mediaMatch is (true, _, MediaKind.MediaFile or MediaKind.Attachment, _, _, _, _);
+                bool isMediaControl = context.SourceFormControl?.Equals("multirenditionmediaselector", StringComparison.OrdinalIgnoreCase) == true;
+                if (isMedia || isMediaControl)
+                {
+                    var assetContext = context with
+                    {
+                        SourceDataType = KsFieldDataType.Text,
+                        SourceFormControl = Kx13FormControls.UserControlForText.MediaSelectionControl
+                    };
+                    var migration = fieldMigrationService.GetFieldMigration(assetContext)
+                        ?? throw new InvalidOperationException($"No asset migration is registered for reference field '{context.FieldName}'.");
+                    var result = await migration.MigrateValue(trimmed, assetContext);
+                    if (!result.Success)
+                    {
+                        logger.LogWarning("Asset conversion failed for reference field '{FieldName}'; keeping the page with an empty asset selection", context.FieldName);
+                        return "[]";
+                    }
+                    return await NormalizeReferenceFieldValue(result.MigratedValue, context);
+                }
+
+                string path = trimmed.StartsWith("~/", StringComparison.Ordinal) ? trimmed[1..] : trimmed;
+                var node = modelFacade.SelectWhere<ICmsTree>("NodeSiteID = @siteId AND NodeAliasPath = @path",
+                    new SqlParameter("siteId", documentContext.Site.SiteID), new SqlParameter("path", path)).FirstOrDefault();
+                if (node != null)
+                {
+                    return JsonConvert.SerializeObject(new[] { new ContentItemReference { Identifier = spoiledGuidContext.EnsureNodeGuid(node) } });
+                }
+
+                throw new InvalidOperationException($"Reference field '{context.FieldName}' contains a scalar value that cannot be resolved as a page or asset. An explicit field mapping is required.");
+            }
+            else
+            {
+                throw new InvalidOperationException($"Reference field '{context.FieldName}' requires a reference array, not a scalar string.");
+            }
+        }
+        else
+        {
+            parsed = JToken.FromObject(value);
+        }
+
+        if (parsed.Type is JTokenType.Null or JTokenType.Undefined)
+        {
+            return "[]";
+        }
+
+        var selections = parsed as JArray ?? new JArray(parsed);
+        var references = new List<ContentItemReference>();
+        foreach (var selection in selections)
+        {
+            if (selection is JObject existing && existing.GetValue("Identifier", StringComparison.OrdinalIgnoreCase) is { } identifier)
+            {
+                if (!Guid.TryParse(identifier.ToString(), out var existingGuid) || existingGuid == Guid.Empty)
+                {
+                    throw new InvalidOperationException($"Reference field '{context.FieldName}' contains an invalid content item GUID.");
+                }
+                references.Add(new ContentItemReference { Identifier = existingGuid });
+                continue;
+            }
+
+            var guidValue = selection is JObject sourceSelection
+                ? sourceSelection.GetValue("nodeGuid", StringComparison.OrdinalIgnoreCase)
+                : selection;
+            if (!Guid.TryParse(guidValue?.ToString(), out var sourceGuid))
+            {
+                throw new InvalidOperationException($"Reference field '{context.FieldName}' contains an unsupported selection. An explicit field mapping is required.");
+            }
+            if (sourceGuid == Guid.Empty)
+            {
+                continue;
+            }
+
+            if (context.SourceObjectContext is not DocumentSourceObjectContext sourceDocument)
+            {
+                throw new InvalidOperationException($"Reference field '{context.FieldName}' requires document context to resolve source GUIDs.");
+            }
+            var sourceNode = modelFacade.SelectWhere<ICmsTree>("NodeSiteID = @siteId AND NodeGUID = @nodeGuid",
+                new SqlParameter("siteId", sourceDocument.Site.SiteID), new SqlParameter("nodeGuid", sourceGuid)).FirstOrDefault();
+            if (sourceNode == null)
+            {
+                throw new InvalidOperationException($"Reference field '{context.FieldName}' refers to a source GUID that is not a page in the selected site. An explicit field mapping is required.");
+            }
+            references.Add(new ContentItemReference { Identifier = spoiledGuidContext.EnsureNodeGuid(sourceNode) });
+        }
+
+        return JsonConvert.SerializeObject(references);
     }
 
     // key = ClassName|FieldName, value = hashset of class IDs, which were already allowed for the target field

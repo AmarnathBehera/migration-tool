@@ -8,3 +8,5 @@ public record DocumentSourceObjectContext(ICmsTree CmsTree, ICmsClass NodeClass,
 
 /// <param name="UniqueKey">String key unique per combination [custom table, table row]. Not applied when the context-dependent operation doesn't work with individual rows</param>
 public record CustomTableSourceObjectContext(string UniqueKey) : ISourceObjectContext;
+
+public record WidgetSourceObjectContext(ICmsSite Site, Guid WidgetGuid, Guid VariantGuid) : ISourceObjectContext;

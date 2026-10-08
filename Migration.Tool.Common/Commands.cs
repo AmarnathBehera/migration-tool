@@ -66,12 +66,12 @@ public record MigrateFormsCommand : IRequest<CommandResult>, ICommand
 
 public record MigrateMediaLibrariesCommand : IRequest<CommandResult>, ICommand
 {
-    public static readonly int Rank = 1 + MigrateSitesCommand.Rank + MigrateUsersCommand.Rank + MigrateCustomModulesCommand.Rank;
+    public static readonly int Rank = 1 + MigrateSitesCommand.Rank;
 
     public static string Moniker => "media-libraries";
     public static string MonikerFriendly => "Media libraries";
 
-    public Type[] Dependencies => [typeof(MigrateSitesCommand), typeof(MigrateUsersCommand), typeof(MigrateCustomModulesCommand)];
+    public Type[] Dependencies => [typeof(MigrateSitesCommand)];
 }
 
 public record MigratePageTypesCommand : IRequest<CommandResult>, ICommand

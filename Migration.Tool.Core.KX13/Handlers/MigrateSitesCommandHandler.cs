@@ -45,7 +45,7 @@ public class MigrateSitesCommandHandler(
         {
             protocol.FetchedSource(kx13CmsSite);
             logger.LogInformation("Migrating site {SiteName} with SiteGuid {SiteGuid}", kx13CmsSite.SiteName, kx13CmsSite.SiteGuid);
-            if (entityConfiguration.ExcludeCodeNames.Contains(kx13CmsSite.SiteName, StringComparer.OrdinalIgnoreCase))
+            if (!entityConfiguration.IncludesCodeName(kx13CmsSite.SiteName))
             {
                 logger.LogInformation("Site excluded in settings");
                 continue;
@@ -77,11 +77,7 @@ public class MigrateSitesCommandHandler(
 
                 if (existing != null)
                 {
-                    if (existing.ContentLanguageGUID != cmsCulture.CultureGuid)
-                    {
-                        existing.ContentLanguageGUID = cmsCulture.CultureGuid;
-                        existing.Update();
-                    }
+                    // Insight page migration: preserve shared XbyK language GUIDs and their existing channel references.
                     migratedCultureCodes.TryAdd(destinationCultureCode, existing);
                 }
                 else
@@ -104,8 +100,18 @@ public class MigrateSitesCommandHandler(
                 }
             }
 
-            if (existingChannels.Any(ch => ch.ChannelName == kx13CmsSite.SiteName))
+            // Insight page migration: use the configured XbyK channel name instead of creating a second Site channel.
+            var targetChannelName = toolConfiguration.TargetWebsiteChannelMappings.TryGetValue(kx13CmsSite.SiteName, out var mappedName)
+                ? mappedName
+                : kx13CmsSite.SiteName;
+            var existingChannel = existingChannels.FirstOrDefault(ch => ch.ChannelName.Equals(targetChannelName, StringComparison.OrdinalIgnoreCase));
+            if (existingChannel != null)
             {
+                var existingWebsiteChannel = WebsiteChannelInfo.Provider.Get()
+                    .WhereEquals(nameof(WebsiteChannelInfo.WebsiteChannelChannelID), existingChannel.ChannelID)
+                    .FirstOrDefault()
+                    ?? throw new InvalidOperationException($"Target channel '{targetChannelName}' is not a website channel.");
+                MigrateCaptchaSettings(kx13CmsSite, existingWebsiteChannel);
                 logger.LogInformation("Site skipped after synchronizing cultures. It already exists.");
                 continue;
             }
@@ -124,12 +130,15 @@ public class MigrateSitesCommandHandler(
                 ? bool.TryParse(storeFormerUrlsStr, out bool sfu) ? sfu : null
                 : null;
 
-            if (!domainSanitizer.GetCandidate(kx13CmsSite.SiteName, kx13CmsSite.SiteDomainName.Trim('/'), out var domainName))
+            var requestedDomain = toolConfiguration.TargetWebsiteChannelDomains.TryGetValue(kx13CmsSite.SiteName, out var targetDomain)
+                ? targetDomain
+                : kx13CmsSite.SiteDomainName.Trim('/');
+            if (!domainSanitizer.GetCandidate(kx13CmsSite.SiteName, requestedDomain, out var domainName))
             {
                 continue;
             }
 
-            var channelResult = await importer.ImportAsync(new ChannelModel { ChannelDisplayName = kx13CmsSite.SiteDisplayName, ChannelName = kx13CmsSite.SiteName, ChannelGUID = kx13CmsSite.SiteGuid, ChannelType = ChannelType.Website });
+            var channelResult = await importer.ImportAsync(new ChannelModel { ChannelDisplayName = kx13CmsSite.SiteDisplayName, ChannelName = targetChannelName, ChannelGUID = kx13CmsSite.SiteGuid, ChannelType = ChannelType.Website });
 
             var websiteChannelModel = new WebsiteChannelModel
             {
@@ -163,55 +172,69 @@ public class MigrateSitesCommandHandler(
             if (webSiteChannelResult.Imported is WebsiteChannelInfo webSiteChannel)
             {
                 domainSanitizer.CommitCandidate(domainName);
-                string? cmsReCaptchaPublicKey = KenticoHelper.GetSettingsKey(kx13ContextFactory, kx13CmsSite.SiteId, "CMSReCaptchaPublicKey");
-                string? cmsReCaptchaPrivateKey = KenticoHelper.GetSettingsKey(kx13ContextFactory, kx13CmsSite.SiteId, "CMSReCaptchaPrivateKey");
-
-                WebsiteCaptchaSettingsInfo? reCaptchaSettings = null;
-                string? cmsReCaptchaV3PrivateKey = KenticoHelper.GetSettingsKey(kx13ContextFactory, kx13CmsSite.SiteId, "CMSReCaptchaV3PrivateKey");
-                string? cmsRecaptchaV3PublicKey = KenticoHelper.GetSettingsKey(kx13ContextFactory, kx13CmsSite.SiteId, "CMSRecaptchaV3PublicKey");
-                double? cmsRecaptchaV3Threshold = KenticoHelper.GetSettingsKey<double>(kx13ContextFactory, kx13CmsSite.SiteId, "CMSRecaptchaV3Threshold");
-
-                if (!string.IsNullOrWhiteSpace(cmsReCaptchaV3PrivateKey) || !string.IsNullOrWhiteSpace(cmsRecaptchaV3PublicKey))
-                {
-                    reCaptchaSettings = new WebsiteCaptchaSettingsInfo
-                    {
-                        WebsiteCaptchaSettingsWebsiteChannelID = webSiteChannel.WebsiteChannelID,
-                        WebsiteCaptchaSettingsReCaptchaSiteKey = cmsRecaptchaV3PublicKey,
-                        WebsiteCaptchaSettingsReCaptchaSecretKey = cmsReCaptchaV3PrivateKey,
-                        WebsiteCaptchaSettingsReCaptchaThreshold = cmsRecaptchaV3Threshold ?? 0.5d,
-                        WebsiteCaptchaSettingsReCaptchaVersion = ReCaptchaVersion.ReCaptchaV3
-                    };
-                }
-
-                if (!string.IsNullOrWhiteSpace(cmsReCaptchaPublicKey) || !string.IsNullOrWhiteSpace(cmsReCaptchaPrivateKey))
-                {
-                    if (reCaptchaSettings is not null)
-                    {
-                        logger.LogError("""
-                                        Conflicting settings found, ReCaptchaV2 and ReCaptchaV3 is set simultaneously.
-                                        Remove setting keys 'CMSReCaptchaPublicKey', 'CMSReCaptchaPrivateKey'
-                                        or remove setting keys 'CMSReCaptchaV3PrivateKey', 'CMSRecaptchaV3PublicKey', 'CMSRecaptchaV3Threshold'.
-                                        """);
-                        throw new InvalidOperationException("Invalid ReCaptcha settings");
-                    }
-
-                    reCaptchaSettings = new WebsiteCaptchaSettingsInfo
-                    {
-                        WebsiteCaptchaSettingsWebsiteChannelID = webSiteChannel.WebsiteChannelID,
-                        WebsiteCaptchaSettingsReCaptchaSiteKey = cmsReCaptchaPublicKey,
-                        WebsiteCaptchaSettingsReCaptchaSecretKey = cmsReCaptchaPrivateKey,
-                        WebsiteCaptchaSettingsReCaptchaVersion = ReCaptchaVersion.ReCaptchaV2
-                    };
-                }
-
-                if (reCaptchaSettings != null)
-                {
-                    WebsiteCaptchaSettingsInfo.Provider.Set(reCaptchaSettings);
-                }
+                MigrateCaptchaSettings(kx13CmsSite, webSiteChannel);
             }
         }
 
         return new GenericCommandResult();
+    }
+
+    private void MigrateCaptchaSettings(CmsSite sourceSite, WebsiteChannelInfo websiteChannel)
+    {
+        string? v2SiteKey = KenticoHelper.GetSettingsKey(kx13ContextFactory, sourceSite.SiteId, "CMSReCaptchaPublicKey");
+        string? v2SecretKey = KenticoHelper.GetSettingsKey(kx13ContextFactory, sourceSite.SiteId, "CMSReCaptchaPrivateKey");
+        string? v3SiteKey = KenticoHelper.GetSettingsKey(kx13ContextFactory, sourceSite.SiteId, "CMSRecaptchaV3PublicKey");
+        string? v3SecretKey = KenticoHelper.GetSettingsKey(kx13ContextFactory, sourceSite.SiteId, "CMSReCaptchaV3PrivateKey");
+        bool hasV2 = !string.IsNullOrWhiteSpace(v2SiteKey) || !string.IsNullOrWhiteSpace(v2SecretKey);
+        bool hasV3 = !string.IsNullOrWhiteSpace(v3SiteKey) || !string.IsNullOrWhiteSpace(v3SecretKey);
+
+        if (toolConfiguration.TargetWebsiteChannelReCaptchaVersions.TryGetValue(sourceSite.SiteName, out var preferredVersion))
+        {
+            if (preferredVersion.Equals("v3", StringComparison.OrdinalIgnoreCase))
+            {
+                if (string.IsNullOrWhiteSpace(v3SiteKey) || string.IsNullOrWhiteSpace(v3SecretKey))
+                {
+                    throw new InvalidOperationException($"Source site '{sourceSite.SiteName}' must have both reCAPTCHA v3 keys configured.");
+                }
+                hasV2 = false;
+            }
+            else if (preferredVersion.Equals("v2", StringComparison.OrdinalIgnoreCase))
+            {
+                if (string.IsNullOrWhiteSpace(v2SiteKey) || string.IsNullOrWhiteSpace(v2SecretKey))
+                {
+                    throw new InvalidOperationException($"Source site '{sourceSite.SiteName}' must have both reCAPTCHA v2 keys configured.");
+                }
+                hasV3 = false;
+            }
+            else
+            {
+                throw new InvalidOperationException($"Invalid reCAPTCHA preference for '{sourceSite.SiteName}'; use 'v2' or 'v3'.");
+            }
+        }
+
+        if (hasV2 && hasV3)
+        {
+            throw new InvalidOperationException($"Source site '{sourceSite.SiteName}' has conflicting reCAPTCHA settings. Configure TargetWebsiteChannelReCaptchaVersions to select 'v2' or 'v3'.");
+        }
+
+        if (!hasV2 && !hasV3)
+        {
+            return;
+        }
+
+        var settings = WebsiteCaptchaSettingsInfo.Provider.Get()
+            .WhereEquals(nameof(WebsiteCaptchaSettingsInfo.WebsiteCaptchaSettingsWebsiteChannelID), websiteChannel.WebsiteChannelID)
+            .FirstOrDefault() ?? new WebsiteCaptchaSettingsInfo();
+        settings.WebsiteCaptchaSettingsWebsiteChannelID = websiteChannel.WebsiteChannelID;
+        settings.WebsiteCaptchaSettingsReCaptchaSiteKey = hasV3 ? v3SiteKey : v2SiteKey;
+        settings.WebsiteCaptchaSettingsReCaptchaSecretKey = hasV3 ? v3SecretKey : v2SecretKey;
+        settings.WebsiteCaptchaSettingsReCaptchaVersion = hasV3 ? ReCaptchaVersion.ReCaptchaV3 : ReCaptchaVersion.ReCaptchaV2;
+        if (hasV3)
+        {
+            settings.WebsiteCaptchaSettingsReCaptchaThreshold = KenticoHelper.GetSettingsKey<double>(kx13ContextFactory, sourceSite.SiteId, "CMSRecaptchaV3Threshold") ?? 0.5d;
+        }
+        WebsiteCaptchaSettingsInfo.Provider.Set(settings);
+        logger.LogInformation("Migrated reCAPTCHA {Version} settings for source site '{SiteName}'", hasV3 ? "v3" : "v2", sourceSite.SiteName);
     }
 
     private string GetSiteCulture(CmsSite site)

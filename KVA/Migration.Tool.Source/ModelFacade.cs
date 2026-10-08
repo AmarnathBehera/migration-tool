@@ -250,5 +250,6 @@ public class ModelFacade(ILogger<ModelFacade> logger, ToolConfiguration configur
         throw new InvalidOperationException($"Unable to hash path '{path}'");
     }
 
-    public IEnumerable<ICmsSite> GetMigratedSites(string? orderBy = null) => SelectAll<ICmsSite>(orderBy).Where(x => !configuration.EntityConfigurations.GetEntityConfiguration<CmsSiteK13>().ExcludeCodeNames.Contains(x.SiteName, StringComparer.OrdinalIgnoreCase)).ToArray();
+    // Insight page migration: respect the configured source-site allowlist for page and widget migration.
+    public IEnumerable<ICmsSite> GetMigratedSites(string? orderBy = null) => SelectAll<ICmsSite>(orderBy).Where(x => configuration.EntityConfigurations.GetEntityConfiguration<CmsSiteK13>().IncludesCodeName(x.SiteName)).ToArray();
 }

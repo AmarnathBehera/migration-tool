@@ -2,6 +2,7 @@
 using CMS.MediaLibrary;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
+using Migration.Tool.Common;
 using Migration.Tool.Common.Enumerations;
 using Migration.Tool.Common.Model;
 using Migration.Tool.Common.Services.Ipc;
@@ -22,10 +23,11 @@ public class VisualBuilderPatcher(
     SourceInstanceContext sourceInstanceContext,
     WidgetMigrationService widgetMigrationService,
     ModelFacade modelFacade,
-    IAttachmentMigrator attachmentMigrator
+    IAttachmentMigrator attachmentMigrator,
+    ToolConfiguration configuration
 )
 {
-    public async Task<PageBuilderPatchResult> PatchJsonDefinitions(int sourceSiteId, string? pageTemplateConfiguration, string? pageBuilderWidgets)
+    public async Task<PageBuilderPatchResult> PatchJsonDefinitions(int sourceSiteId, string? pageTemplateConfiguration, string? pageBuilderWidgets, IReadOnlyDictionary<string, string>? areaMappings = null)
     {
         bool needsDeferredPatch = false;
         if (sourceInstanceContext.HasInfo)
@@ -49,13 +51,31 @@ public class VisualBuilderPatcher(
                 }
             }
 
-            if (pageBuilderWidgets != null)
+        }
+
+        if (pageBuilderWidgets != null)
+        {
+            var areas = JsonConvert.DeserializeObject<EditableAreasConfiguration>(pageBuilderWidgets);
+            if (areas != null)
             {
-                var areas = JsonConvert.DeserializeObject<EditableAreasConfiguration>(pageBuilderWidgets);
-                if (areas?.EditableAreas is { Count: > 0 })
+                if (areas.EditableAreas is { Count: > 0 })
                 {
                     bool ndp = await WalkAreas(sourceSiteId, areas.EditableAreas);
                     needsDeferredPatch = ndp || needsDeferredPatch;
+                }
+
+                if (areaMappings is { Count: > 0 })
+                {
+                    EditableAreaRemapper.Remap(areas, areaMappings);
+                }
+
+                if (!string.IsNullOrWhiteSpace(configuration.TargetEditableAreaIdentifier))
+                {
+                    var targetMappings = areas.EditableAreas
+                        .Select(area => area.Identifier)
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .ToDictionary(identifier => identifier, _ => configuration.TargetEditableAreaIdentifier, StringComparer.OrdinalIgnoreCase);
+                    EditableAreaRemapper.Remap(areas, targetMappings);
                 }
 
                 pageBuilderWidgets = JsonConvert.SerializeObject(areas);
@@ -91,7 +111,9 @@ public class VisualBuilderPatcher(
         {
             logger.LogTrace("Walk section {TypeIdentifier}|{Identifier}", section.TypeIdentifier, section.Identifier);
 
-            var sectionFcs = sourceInstanceContext.GetSectionFormComponents(siteId, section.TypeIdentifier);
+            var sectionFcs = sourceInstanceContext.HasInfo
+                ? sourceInstanceContext.GetSectionFormComponents(siteId, section.TypeIdentifier)
+                : null;
 
             if (section.Properties is { Count: > 0 } properties)
             {
@@ -133,7 +155,9 @@ public class VisualBuilderPatcher(
         {
             logger.LogTrace("Walk widget {TypeIdentifier}|{Identifier}", widget.TypeIdentifier, widget.Identifier);
 
-            var widgetCompos = sourceInstanceContext.GetWidgetPropertyFormComponents(siteId, widget.TypeIdentifier);
+            var widgetCompos = sourceInstanceContext.HasInfo
+                ? sourceInstanceContext.GetWidgetPropertyFormComponents(siteId, widget.TypeIdentifier)
+                : null;
 
             var context = new WidgetMigrationContext(siteId);
             var identifier = new WidgetIdentifier(widget.TypeIdentifier, widget.Identifier);
@@ -157,7 +181,8 @@ public class VisualBuilderPatcher(
 
                 if (variant.Properties is { Count: > 0 } properties)
                 {
-                    await MigrateProperties(siteId, properties, widgetCompos, propertyMigrations);
+                    bool ndp = await MigrateProperties(siteId, properties, widgetCompos, propertyMigrations);
+                    needsDeferredPatch = ndp || needsDeferredPatch;
                 }
             }
         }

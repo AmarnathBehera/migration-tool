@@ -419,8 +419,18 @@ public class MigrateCustomModulesCommandHandler(
             protocol.FetchedSource(k12CmsResource);
 
             var xbkResource = ResourceInfo.Provider.Get().WithGuid(k12CmsResource.ResourceGUID).SingleOrDefault();
+            var xbkResourceWithSameName = ResourceInfo.Provider.Get()
+                .WhereEquals(nameof(ResourceInfo.ResourceName), k12CmsResource.ResourceName)
+                .FirstOrDefault();
 
-            protocol.FetchedTarget(xbkResource);
+            protocol.FetchedTarget(xbkResource ?? xbkResourceWithSameName);
+
+            if (xbkResource != null || xbkResourceWithSameName != null)
+            {
+                logger.LogInformation("CMSResource already exists in target instance ({Resource}) => skipping duplicate import", Printer.GetEntityIdentityPrint(k12CmsResource));
+                protocol.Append(HandbookReferences.NotSupportedSkip<ICmsResource>().WithIdentityPrint(k12CmsResource));
+                continue;
+            }
 
             bool sysResourceInclude = K12SystemResource.ConvertToNonSysResource.Contains(k12CmsResource.ResourceName);
             bool isSystemResource = K12SystemResource.All.Contains(k12CmsResource.ResourceName);

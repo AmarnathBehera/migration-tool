@@ -31,7 +31,9 @@ public class MediaFileMigratorToContentItem(
 
     private async Task MigrateToAssets()
     {
-        var ksMediaFiles = modelFacade.SelectAll<IMediaFile>(" ORDER BY FileLibraryID");
+        var migratedSiteIds = modelFacade.GetMigratedSites().Select(site => site.SiteID).ToHashSet();
+        var ksMediaFiles = modelFacade.SelectAll<IMediaFile>(" ORDER BY FileLibraryID")
+            .Where(mediaFile => migratedSiteIds.Contains(mediaFile.FileSiteID));
         var ksMediaLibraries = new ConcurrentDictionary<int, IMediaLibrary?>();
         var ksSites = new ConcurrentDictionary<int, ICmsSite?>();
         var contentLanguageRetriever = Service.Resolve<IContentLanguageRetriever>();

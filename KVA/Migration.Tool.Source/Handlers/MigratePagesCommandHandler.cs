@@ -150,6 +150,10 @@ public class MigratePagesCommandHandler(
 
                 foreach (var ksTree in ksTrees)
                 {
+                    if (!toolConfiguration.IncludesPagePath(ksTree.NodeAliasPath))
+                    {
+                        continue;
+                    }
                     var xbykContentItemGuid = spoiledGuidContext.EnsureNodeGuid(ksTree.NodeGUID, ksTree.NodeSiteID, ksTree.NodeID);
                     var ksUrlPaths = modelFacade.Select<ICmsPageUrlPath>("PageUrlPathNodeID = @nodeId", "PageUrlPathID", new SqlParameter("nodeId", ksTree.NodeID));
                     foreach (CmsPageUrlPathK13 ksPath in ksUrlPaths)
@@ -204,6 +208,11 @@ public class MigratePagesCommandHandler(
 
                     bool webPageItemFound = false;
                     var redirectedContentItem = ContentItemInfo.Provider.Get(ContentItemGuid);
+                    if (redirectedContentItem is null)
+                    {
+                        logger.LogWarning("Unpublished redirect for Document '{DocumentGuid}' could not be migrated because its source page was not imported", DocumentGuid);
+                        continue;
+                    }
                     var redirectedContentItemLanguageMetadata = ContentItemLanguageMetadataInfo.Provider.Get().WhereEquals(nameof(ContentItemLanguageMetadataInfo.ContentItemLanguageMetadataContentItemID), redirectedContentItem.ContentItemID)
                         .WhereEquals(nameof(ContentItemLanguageMetadataInfo.ContentItemLanguageMetadataContentLanguageID), LanguageInfo.ContentLanguageID).FirstOrDefault();
 
@@ -310,6 +319,12 @@ public class MigratePagesCommandHandler(
                     var ksTreeOriginal = ksTreeDefItem.Item;
                     logger.LogDebug("Page '{NodeAliasPath}' migration", ksTreeOriginal.NodeAliasPath);
 
+                    // Insight page migration: avoid importing unrelated pages from the same K13 site.
+                    if (!toolConfiguration.IncludesPagePath(ksTreeOriginal.NodeAliasPath))
+                    {
+                        continue;
+                    }
+
                     protocol.FetchedSource(ksTreeOriginal);
 
                     var ksNode = ksTreeOriginal;
@@ -400,7 +415,7 @@ public class MigratePagesCommandHandler(
                     }
 
                     var existingContentItem = ContentItemFromNode(ksNode);
-                    if (existingContentItem is not null && WebPageItemInfo.Provider.Get()
+                    if (!toolConfiguration.ReimportExistingPages && existingContentItem is not null && WebPageItemInfo.Provider.Get()
                             .WhereEquals(nameof(WebPageItemInfo.WebPageItemContentItemID), existingContentItem.ContentItemID)
                             .WhereEquals(nameof(WebPageItemInfo.WebPageItemWebsiteChannelID), websiteChannel.WebsiteChannelID)
                             .FirstOrDefault() is not null)
@@ -409,7 +424,14 @@ public class MigratePagesCommandHandler(
                         continue;
                     }
 
-                    Debug.Assert(migratedDocuments.Count > 0, "migratedDocuments.Count > 0");
+                    if (migratedDocuments.Count == 0)
+                    {
+                        logger.LogWarning("Page '{NodeAliasPath}' with NodeID {NodeID} has no source documents; skipping migration", ksNode.NodeAliasPath, ksNode.NodeID);
+                        protocol.Append(HandbookReferences.NotCurrentlySupportedSkip()
+                            .WithMessage($"Page '{ksNode.NodeAliasPath}' has no source documents")
+                            .WithIdentityPrint(ksNode));
+                        continue;
+                    }
 
                     if (ksTreeOriginal is { NodeSKUID: not null })
                     {
@@ -471,9 +493,15 @@ public class MigratePagesCommandHandler(
                             }
                             else
                             {
-                                if (umtModel is ContentItemDataModel { ContentItemContentTypeName: "BDO.Contact" } contactDataModel)
+                                if (umtModel is ContentItemDataModel dataModel && dataModel.CustomProperties.ContainsKey("DocumentName"))
                                 {
-                                    contactDataModel.CustomProperties.Remove("DocumentName");
+                                    var targetType = DataClassInfoProvider.GetDataClassInfo(dataModel.ContentItemContentTypeName);
+                                    var targetForm = new FormInfo(targetType.ClassFormDefinition);
+                                    if (dataModel.ContentItemContentTypeName == "BDO.Contact" || targetForm.GetFormField("DocumentName") is null)
+                                    {
+                                        dataModel.CustomProperties.Remove("DocumentName");
+                                        logger.LogWarning("Legacy DocumentName was omitted from type '{ClassName}' because the target does not support this metadata column", dataModel.ContentItemContentTypeName);
+                                    }
                                 }
 
                                 switch (await importer.ImportAsync(umtModel))

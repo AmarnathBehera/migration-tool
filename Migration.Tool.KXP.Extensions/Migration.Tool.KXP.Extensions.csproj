@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <!-- Insight page migration: match the target XbyK database and application version. -->
         <PackageReference Include="Kentico.Xperience.WebApp" Version="31.7.0" />
     </ItemGroup>
 

@@ -20,6 +20,31 @@ public sealed class EditableAreasConfiguration
     public List<EditableAreaConfiguration> EditableAreas { get; private set; }
 }
 
+public static class EditableAreaRemapper
+{
+    public static void Remap(EditableAreasConfiguration configuration, IReadOnlyDictionary<string, string> mappings)
+    {
+        var targetAreas = new Dictionary<string, EditableAreaConfiguration>(StringComparer.OrdinalIgnoreCase);
+        foreach (var area in configuration.EditableAreas.ToList())
+        {
+            var targetIdentifier = mappings.TryGetValue(area.Identifier, out var mapped) ? mapped : area.Identifier;
+            if (targetAreas.TryGetValue(targetIdentifier, out var targetArea))
+            {
+                if (!ReferenceEquals(targetArea, area))
+                {
+                    targetArea.Sections.AddRange(area.Sections);
+                    configuration.EditableAreas.Remove(area);
+                }
+            }
+            else
+            {
+                area.Identifier = targetIdentifier;
+                targetAreas.Add(targetIdentifier, area);
+            }
+        }
+    }
+}
+
 /// <summary>
 ///     Represents configuration of editable area within the <see cref="T:CMS.DocumentEngine.TreeNode" /> instance.
 /// </summary>

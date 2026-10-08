@@ -78,6 +78,13 @@ public class AssetMigration(
             documentId = null;
             valueKey = $"CustomTable|{customTableContext.UniqueKey}";
         }
+        else if (sourceObjectContext is WidgetSourceObjectContext widgetContext)
+        {
+            cmsSite = widgetContext.Site;
+            oldFormInfo = null;
+            documentId = null;
+            valueKey = $"Widget|{cmsSite.SiteGUID}|{widgetContext.WidgetGuid}|{widgetContext.VariantGuid}";
+        }
         else
         {
             throw new ArgumentNullException(nameof(sourceObjectContext));

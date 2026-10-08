@@ -1,4 +1,6 @@
 using Migration.Tool.Common.Helpers;
+using Migration.Tool.Source.Model;
+using Migration.Tool.Source.Services;
 
 namespace Migration.Tool.Tests;
 
@@ -47,6 +49,38 @@ public class MediaHelperTest
         Assert.Equal(expectedMediaId, mediaGuid);
         Assert.Equal(expectedPath, path);
         Assert.Equal(expectSuccess, success);
+    }
+
+    [Fact]
+    public void AttachmentBinaryNull_IsSkipped()
+    {
+        var attachment = new CmsAttachmentK13(
+            AttachmentID: 117,
+            AttachmentName: "HeroBackgroundImage_Mobile.jpg",
+            AttachmentExtension: ".jpg",
+            AttachmentSize: 0,
+            AttachmentMimeType: "image/jpeg",
+            AttachmentBinary: null,
+            AttachmentImageWidth: null,
+            AttachmentImageHeight: null,
+            AttachmentDocumentID: 1,
+            AttachmentGUID: Guid.NewGuid(),
+            AttachmentSiteID: 1,
+            AttachmentLastModified: DateTime.UtcNow,
+            AttachmentIsUnsorted: false,
+            AttachmentOrder: null,
+            AttachmentGroupGUID: null,
+            AttachmentFormGUID: null,
+            AttachmentHash: null,
+            AttachmentTitle: null,
+            AttachmentDescription: null,
+            AttachmentCustomData: null,
+            AttachmentSearchContent: null,
+            AttachmentVariantDefinitionIdentifier: null,
+            AttachmentVariantParentID: null
+        );
+
+        Assert.False(AttachmentMigratorToContentItem.HasAttachmentBinary(attachment));
     }
 
     [Fact]
