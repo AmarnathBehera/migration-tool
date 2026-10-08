@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <AssemblyName>Migration.Tool.KXP.Api</AssemblyName>
+        <RootNamespace>Migration.Tool.KXP.Api</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Migration.Tool.Common\Migration.Tool.Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Kentico.Xperience.Admin" Version="31.7.0" />
+    </ItemGroup>
+
+</Project>
