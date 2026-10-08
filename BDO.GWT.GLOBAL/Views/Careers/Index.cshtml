@@ -53,8 +53,6 @@
         },
         Context.RequestAborted))
 </div>
-@await Html.PartialAsync("_LocalNavigation") 
-
 
 @await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
 <div>

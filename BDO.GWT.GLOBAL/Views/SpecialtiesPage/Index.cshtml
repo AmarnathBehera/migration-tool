@@ -24,6 +24,12 @@
         ComponentIdentifiers.Widgets.RelatedContacts,
         ComponentIdentifiers.Widgets.ViewGlobalLocations,
     };
+
+    var advancedWidgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.TabAccordion,
+    };
 }
 
 @(await ReactService.RenderComponentAsync(
@@ -59,7 +65,7 @@
             </aside>
         }
     </div>
-    @await PageBuilderService.AddIdentifier("bottomArea").AddDefaultWidgets().AddWidgets(widgetsList).BuildEditableAreaAsync(Html,Context.RequestAborted)
+    @await PageBuilderService.AddIdentifier("bottomArea").AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
 </div>
 
 

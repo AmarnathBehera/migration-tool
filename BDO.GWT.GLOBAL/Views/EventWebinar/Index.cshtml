@@ -29,7 +29,7 @@
 @section SchemaMarkup {
     @Html.Raw(this.Model.SchemaMarkup.ToSchemaMarkupJsString())
 }
-@await PageBuilderService.AddIdentifier("heroSection").AddWidgets(new[] { ComponentIdentifiers.Widgets.RichText }).BuildEditableAreaAsync(Html, Context.RequestAborted)
+@await PageBuilderService.AddIdentifier("heroSection").AddWidgets(new[] { ComponentIdentifiers.Widgets.Hero }).BuildEditableAreaAsync(Html, Context.RequestAborted)
 
 @await Html.PartialAsync("_LocalNavigation")
  
