@@ -1,0 +1,5 @@
+﻿{
+    "Status":  "Failed",
+    "Message":  "Unhandled exception. System.InvalidOperationException: Unknown command \u0027--nowait\u0027",
+    "Stack":  "at \u003cScriptBlock\u003e, C:\\Amarnath\\MigrationTool\\gwt-xbyk-data-migration\\migration-tool\\BDO.GWT.DataMigration.Tool\\run-insight-migration.ps1: line 266\r\nat \u003cScriptBlock\u003e, \u003cNo file\u003e: line 1"
+}

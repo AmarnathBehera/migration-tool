@@ -1,0 +1,5 @@
+﻿{
+    "Status":  "Failed",
+    "Message":  "Unhandled exception. Microsoft.Data.SqlClient.SqlException (0x80131904): Execution Timeout Expired.  The timeout period elapsed prior to completion of the operation or the server is not responding.",
+    "Stack":  "at \u003cScriptBlock\u003e, C:\\Amarnath\\MigrationTool\\gwt-xbyk-data-migration\\migration-tool\\BDO.GWT.DataMigration.Tool\\run-insight-migration.ps1: line 266\r\nat \u003cScriptBlock\u003e, \u003cNo file\u003e: line 1"
+}

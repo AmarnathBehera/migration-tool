@@ -1,0 +1,26 @@
+﻿{
+    "Status":  "Running",
+    "SourceDatabase":  "20261001-bdo-db-gwt-tst2-eur",
+    "TargetDatabase":  "dev-local-xbyk-08102026",
+    "TargetVersion":  "31.7.0",
+    "Sites":  [
+                  "GWT_TST2"
+              ],
+    "PagePathFilters":  [
+
+                        ],
+    "SourceNodes":  668,
+    "SelectedNodes":  663,
+    "WidgetTypes":  27,
+    "WidgetInstances":  869,
+    "TargetEditableArea":  "mainArea",
+    "ReimportExistingPages":  true,
+    "MediaRecords":  1656,
+    "MediaAvailable":  66,
+    "MediaMissing":  1590,
+    "Notes":  [
+                  "Page selection is a preflight candidate list; directors, linked-node dependencies, cultures, target schemas and import validation determine final outcomes.",
+                  "mainArea merging was explicitly requested; target views also contain other areas.",
+                  "Original runner was absent; this is a replacement, not a recovered copy."
+              ]
+}
