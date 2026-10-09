@@ -11,6 +11,13 @@
         4. (LAST) Migrate Insight page types and pages, then create the
          CopyInsight content-hub items from K13 CTA + Content sharing and reference them from
          Insight.InsightContent (seed-copyinsight-contenthub.sql).
+            Repair OG/SEO and print settings, metadata selectors, specialties, office locations,
+            related Insights, and author/contact references for every configured target culture.
+
+        -ReferencesOnly repairs fields on existing Insight pages without remigrating them.
+        Add -IncludeInsightContent to recreate generated CopyInsight items and their links.
+        Add -RestoreReferenceTargets to restore dependencies; -ReferenceTargetClasses limits
+        the restored page types and leaves the existing metadata subtree unchanged.
 
     Each `migrate --pages` run temporarily scopes appsettings IncludeCodeNames and restores it after.
     All SQL seeds are idempotent (delete + rebuild their subtree), so the whole script is re-runnable.
@@ -319,6 +326,32 @@ function Invoke-ScopedMigration([string]$command, [string[]]$classes) {
     }
 }
 
+function Invoke-InsightDataSeeds([switch]$IncludeCopyInsight, [switch]$IncludeRemoteDeals, [switch]$RebuildMetadata) {
+    foreach ($culture in $TargetCultures) {
+        $cultureLiteral = $culture.Replace("'", "''")
+        $languageText = sqlcmd -S $Server -d $TargetDb -U $DbUser -P $DbPassword -N -C -W -l 60 -b -h -1 -Q "SET NOCOUNT ON; SELECT ContentLanguageID FROM CMS_ContentLanguage WHERE ContentLanguageCultureFormat=N'$cultureLiteral';"
+        if ($LASTEXITCODE -ne 0) { throw "Failed to resolve language '$culture'." }
+        $languageId = ($languageText -split '\s+' | Where-Object { $_ -match '^\d+$' } | Select-Object -First 1)
+        if (-not $languageId) { throw "Target language '$culture' was not found." }
+        $seedCulture = ($cultureMappings.PSObject.Properties | Where-Object { $_.Value -eq $culture } |
+            Sort-Object { if ($_.Name -eq $culture) { 0 } else { 1 } } | Select-Object -First 1).Name
+        if (-not $seedCulture) { throw "No source culture maps to '$culture'." }
+        if ($RebuildMetadata -and $culture -eq $DefaultCulture) {
+            Write-Step 3 "Rebuild metadata reference targets ($culture)"
+            Invoke-Sql $TargetDb (Join-Path $root 'seed-bdo-metadata-pages.sql') $seedCulture ([int]$languageId)
+        }
+        if ($IncludeCopyInsight) {
+            Write-Step 5 "Repair CopyInsight content ($culture)"
+            Invoke-Sql $TargetDb (Join-Path $root 'seed-copyinsight-contenthub.sql') $seedCulture ([int]$languageId)
+        }
+        Write-Step 5 "Repair Insight metadata, print settings, and page/author references ($culture)"
+        Invoke-Sql $TargetDb (Join-Path $root 'seed-insight-references.sql') $seedCulture ([int]$languageId)
+        if ($IncludeRemoteDeals) {
+            Invoke-Sql $TargetDb (Join-Path $root 'seed-remote-deal-references.sql') $seedCulture ([int]$languageId)
+        }
+    }
+}
+
 if ($RestoreReferenceTargets -and -not $ReferencesOnly) {
     throw '-RestoreReferenceTargets requires -ReferencesOnly.'
 }
@@ -353,26 +386,7 @@ if ($ReferencesOnly) {
         Write-Step 4 'Restore Insight reference targets'
         Invoke-ScopedMigration 'pages' $restoreClasses
     }
-    foreach ($culture in $TargetCultures) {
-        $cultureLiteral = $culture.Replace("'", "''")
-        $languageText = sqlcmd -S $Server -d $TargetDb -U $DbUser -P $DbPassword -N -C -W -l 60 -b -h -1 -Q "SET NOCOUNT ON; SELECT ContentLanguageID FROM CMS_ContentLanguage WHERE ContentLanguageCultureFormat=N'$cultureLiteral';"
-        if ($LASTEXITCODE -ne 0) { throw "Failed to resolve language '$culture'." }
-        $languageId = ($languageText -split '\s+' | Where-Object { $_ -match '^\d+$' } | Select-Object -First 1)
-        if (-not $languageId) { throw "Target language '$culture' was not found." }
-        $seedCulture = ($cultureMappings.PSObject.Properties | Where-Object { $_.Value -eq $culture } |
-            Sort-Object { if ($_.Name -eq $culture) { 0 } else { 1 } } | Select-Object -First 1).Name
-        if (-not $seedCulture) { throw "No source culture maps to '$culture'." }
-        if ($RestoreReferenceTargets -and $ReferenceTargetClasses.Count -eq 0 -and $culture -eq $DefaultCulture) {
-            Write-Step 3 "Rebuild metadata reference targets ($culture)"
-            Invoke-Sql $TargetDb (Join-Path $root 'seed-bdo-metadata-pages.sql') $seedCulture ([int]$languageId)
-        }
-        if ($IncludeInsightContent) {
-            Write-Step 5 "Repair CopyInsight content ($culture)"
-            Invoke-Sql $TargetDb (Join-Path $root 'seed-copyinsight-contenthub.sql') $seedCulture ([int]$languageId)
-        }
-        Write-Step 5 "Repair Insight page references ($culture)"
-        Invoke-Sql $TargetDb (Join-Path $root 'seed-insight-references.sql') $seedCulture ([int]$languageId)
-    }
+    Invoke-InsightDataSeeds -IncludeCopyInsight:$IncludeInsightContent -RebuildMetadata:($RestoreReferenceTargets -and $ReferenceTargetClasses.Count -eq 0)
     Write-Host 'Insight reference repair completed.' -ForegroundColor Green
     return
 }
@@ -425,19 +439,7 @@ if (-not $SkipInsight) {
     Write-Step 5 'Migrate Insight pages (BDO.SectionInsightsPage + BDO.Insight)'
     Invoke-ScopedMigration 'pages' $insightClasses
 
-    foreach ($culture in $TargetCultures) {
-        $cultureLiteral = $culture.Replace("'", "''")
-        $languageText = sqlcmd -S $Server -d $TargetDb -U $DbUser -P $DbPassword -N -C -W -l 60 -h -1 -Q "SET NOCOUNT ON; SELECT ContentLanguageID FROM CMS_ContentLanguage WHERE ContentLanguageCultureFormat='$cultureLiteral';"
-        if ($LASTEXITCODE -ne 0) { throw "Failed to resolve language '$culture'." }
-        $languageId = ($languageText -split '\s+' | Where-Object { $_ -match '^\d+$' } | Select-Object -First 1)
-        if (-not $languageId) { throw "Target language '$culture' was not found." }
-        $seedCulture = ($cultureMappings.PSObject.Properties | Where-Object { $_.Value -eq $culture } |
-            Sort-Object { if ($_.Name -eq $culture) { 0 } else { 1 } } | Select-Object -First 1).Name
-        Write-Step 5 "CopyInsight content and references ($culture)"
-        Invoke-Sql $TargetDb (Join-Path $root 'seed-copyinsight-contenthub.sql') $seedCulture ([int]$languageId)
-        Invoke-Sql $TargetDb (Join-Path $root 'seed-insight-references.sql') $seedCulture ([int]$languageId)
-        Invoke-Sql $TargetDb (Join-Path $root 'seed-remote-deal-references.sql') $seedCulture ([int]$languageId)
-    }
+    Invoke-InsightDataSeeds -IncludeCopyInsight -IncludeRemoteDeals
 } else {
     Write-Host 'Skipping Insight migration (-SkipInsight).' -ForegroundColor Yellow
 }

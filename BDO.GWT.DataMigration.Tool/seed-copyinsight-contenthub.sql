@@ -11,6 +11,15 @@ DECLARE @folderID int = 11;                  -- existing Insight content folder 
 DECLARE @now datetime2 = SYSUTCDATETIME();
 DECLARE @copyClassID int = (SELECT ClassID FROM CMS_Class WHERE ClassName='BDO.CopyInsight');
 DECLARE @insightClassID int = (SELECT ClassID FROM CMS_Class WHERE ClassName='BDO.Insight');
+DECLARE @copyForm xml = (SELECT ClassFormDefinition FROM CMS_Class WHERE ClassID=@copyClassID);
+DECLARE @creatorNameQuery nvarchar(max) = N'SELECT DISTINCT LTRIM(RTRIM(CONCAT(FirstName, '' '', LastName))) AS CreatorName FROM CMS_User WHERE NULLIF(LTRIM(RTRIM(CONCAT(FirstName, '' '', LastName))), '''') IS NOT NULL UNION SELECT DISTINCT OriginalDocumentOwnerName FROM BDO_CopyInsight WHERE NULLIF(LTRIM(RTRIM(OriginalDocumentOwnerName)), '''') IS NOT NULL;';
+DECLARE @creatorEmailQuery nvarchar(max) = N'SELECT DISTINCT Email FROM CMS_User WHERE NULLIF(LTRIM(RTRIM(Email)), '''') IS NOT NULL UNION SELECT DISTINCT OriginalDocumentOwnerEmail FROM BDO_CopyInsight WHERE NULLIF(LTRIM(RTRIM(OriginalDocumentOwnerEmail)), '''') IS NOT NULL;';
+IF @copyForm.exist('/form/field[@column="OriginalDocumentOwnerName"]/settings[controlname="BDO.SQLDropdown"]/Script/text()') = 1
+    SET @copyForm.modify('replace value of (/form/field[@column="OriginalDocumentOwnerName"]/settings[controlname="BDO.SQLDropdown"]/Script/text())[1] with sql:variable("@creatorNameQuery")');
+IF @copyForm.exist('/form/field[@column="OriginalDocumentOwnerEmail"]/settings[controlname="BDO.SQLDropdown"]/Script/text()') = 1
+    SET @copyForm.modify('replace value of (/form/field[@column="OriginalDocumentOwnerEmail"]/settings[controlname="BDO.SQLDropdown"]/Script/text())[1] with sql:variable("@creatorEmailQuery")');
+UPDATE CMS_Class SET ClassFormDefinition=CONVERT(nvarchar(max), @copyForm)
+WHERE ClassID=@copyClassID AND ClassFormDefinition<>CONVERT(nvarchar(max), @copyForm);
 -- Current channel (where these insights live) -> stored as 'Original Site' (dropdown stores ChannelName)
 DECLARE @channelName nvarchar(200) = (SELECT ch.ChannelName FROM CMS_WebsiteChannel wc JOIN CMS_Channel ch ON ch.ChannelID=wc.WebsiteChannelChannelID WHERE wc.WebsiteChannelID=10);
 
