@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.HomePage</CodeName>
+    <GUID>31f6383b-697e-4d8f-acec-be459fe4ad01</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.HomeHeroSlides">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.HomeHeroSlides</CodeName>
+        <GUID>3fe070b6-8000-439b-b528-68f75988cc60</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.TrendingTopics">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.TrendingTopics</CodeName>
+        <GUID>679d9478-6cee-46a5-98d7-0777bfcfceba</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

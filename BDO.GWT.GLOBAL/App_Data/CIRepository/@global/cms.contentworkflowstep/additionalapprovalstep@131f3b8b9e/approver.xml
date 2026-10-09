@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentworkflowstep>
+  <ContentWorkflowStepDisplayName>Condition</ContentWorkflowStepDisplayName>
+  <ContentWorkflowStepGUID>469ad565-f940-400e-8b38-b743be326518</ContentWorkflowStepGUID>
+  <ContentWorkflowStepIconClass>xp-check</ContentWorkflowStepIconClass>
+  <ContentWorkflowStepIsNotificationEnabled>True</ContentWorkflowStepIsNotificationEnabled>
+  <ContentWorkflowStepName>Approver</ContentWorkflowStepName>
+  <ContentWorkflowStepOrder>1</ContentWorkflowStepOrder>
+  <ContentWorkflowStepType>3</ContentWorkflowStepType>
+  <ContentWorkflowStepWorkflowID>
+    <CodeName>AdditionalApprovalStep</CodeName>
+    <GUID>9f10643a-fd7a-46f5-aec1-f2c75ea58d13</GUID>
+    <ObjectType>cms.contentworkflow</ObjectType>
+  </ContentWorkflowStepWorkflowID>
+</cms.contentworkflowstep>

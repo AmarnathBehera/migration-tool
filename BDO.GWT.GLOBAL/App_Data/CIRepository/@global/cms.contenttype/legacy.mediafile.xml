@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassContentTypeType>Reusable</ClassContentTypeType>
+  <ClassDisplayName>Legacy media file</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="90dd7d11-9dea-4304-b3cd-51e72c6f6092" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="d3619105-dab1-4871-9bfd-1c0042caecb5" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="bafc031f-7c98-4b90-9761-98f78cf565d2" isunique="true" system="true" />
+      <field allowempty="true" column="LegacyMediaFileAsset" columntype="contentitemasset" enabled="true" guid="dfc3d011-8f63-43f6-9ed8-4b444333a1d0" visible="true">
+        <properties>
+          <fieldcaption>Asset</fieldcaption>
+        </properties>
+        <settings>
+          <AllowedExtensions>_INHERITED_</AllowedExtensions>
+          <controlname>Kentico.Administration.ContentItemAssetUploader</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="LegacyMediaFileTitle" columnsize="250" columntype="text" enabled="true" guid="83650744-916b-4e19-a31f-b0250166d47d" visible="true">
+        <properties>
+          <fieldcaption>Title</fieldcaption>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="LegacyMediaFileDescription" columntype="longtext" enabled="true" guid="98f43915-b540-478d-80a4-e294e631c431" visible="true">
+        <properties>
+          <fieldcaption>Description</fieldcaption>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextArea</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>bb17604c-c134-4faa-a401-2727cad93707</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>Legacy.MediaFile</ClassName>
+  <ClassShortName>LegacyMediaFile4a3uyama</ClassShortName>
+  <ClassShowTemplateSelection>False</ClassShowTemplateSelection>
+  <ClassTableName>Legacy_MediaFile</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

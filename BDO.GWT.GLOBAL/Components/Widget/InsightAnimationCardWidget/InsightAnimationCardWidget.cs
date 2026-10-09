@@ -1,0 +1,86 @@
+﻿using AngleSharp.Text;
+using BDO.GWT.Common.Core.Exceptions;
+using BDO.GWT.Core;
+using BDO.GWT.Core.Data;
+using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.Utilities;
+using CMS.Websites;
+using CMS.Websites.Routing;
+using CommandLine;
+using Kentico.Content.Web.Mvc;
+using Kentico.PageBuilder.Web.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace BDO.GWT.GLOBAL.Widgets;
+
+public class InsightAnimationCardWidget: ViewComponent
+{
+    private readonly IContentService _contentService;
+
+
+
+    public InsightAnimationCardWidget(IContentService contentService)
+    {
+        _contentService = contentService;
+
+
+    }
+
+    public async Task<IViewComponentResult> InvokeAsync(ComponentViewModel<InsightAnimationCardWidgetProperties> model)
+    {
+
+
+        var data = new InsightAnimationCardData
+        {
+            Title = model.Properties.Title,
+            Description = model.Properties.Description,
+            InsightCards = model.Properties.InsightCards.Select(x => x.Identifier).ToList(),
+            openInNewTab = model.Properties.openInNewTab,
+            SeeAllLinkText = model.Properties.SeeAllLinkText,
+            SeeAllLinkUrl = model.Properties.SeeAllLinkURL,
+            TopMargin = model.Properties.TopMargin,
+            BottomMargin = model.Properties.BottomMargin,
+            WidgetID = model.Properties.WidgetID,
+        };
+
+
+
+
+
+         var insightAnimationPages = await _contentService.GetPagesAsync<InsightAnimationPage>(
+                new RetrievePagesParameters { LinkedItemsMaxLevel = 2 },
+                query => query.Where(w => w.WhereIn("ContentItemGUID", data.InsightCards)),
+                RetrievalCacheSettings.CacheDisabled,
+                HttpContext.RequestAborted);
+
+
+        var dto = new InsightAnimationCardDto
+        {
+            Title = data.Title,
+            Description = data.Description,
+            Items = insightAnimationPages.Select(x => new InsightAnimationPageDto
+            {
+                Title = x.Title,
+                Description = HtmlHelper.ExtractTextFromHtml(x.Description),
+                ReadMoreIcon = x.Url,
+                ImageURL = x.Image?.FirstOrDefault()?.ContentAttachmentAsset.Url.TrimStart('~'),
+                OpenInNewTab = data.openInNewTab
+            }),
+            SeeAllLink = new LinkItemDto
+            {
+                Title = data.SeeAllLinkText ?? string.Empty,
+                URL = data.SeeAllLinkUrl ?? string.Empty,
+                Target = data.openInNewTab
+            },
+            TopMargin = data.TopMargin ?? "0px",
+            BottomMargin = data.BottomMargin ?? "0px",
+            WidgetID = data.WidgetID,
+        };
+        return View("~/Components/Widget/InsightAnimationCardWidget/_InsightAnimationCardWidget.cshtml", dto);
+    }
+}

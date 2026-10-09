@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.DealCards</CodeName>
+    <GUID>7b19e49b-0002-4a8a-a4ce-ddc69ce5c526</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.DealCardDealType">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.DealCardDealType</CodeName>
+        <GUID>cfe5a014-3dc5-4df5-8727-b21e91016436</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.DealCardIndustry">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.DealCardIndustry</CodeName>
+        <GUID>bdd17a11-079d-4afa-9490-c8c2f90f8353</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.DealCardRange">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.DealCardRange</CodeName>
+        <GUID>b06a34f3-9904-41b9-8a1a-a9747892bb6e</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.DealCards">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.DealCards</CodeName>
+        <GUID>7b19e49b-0002-4a8a-a4ce-ddc69ce5c526</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassContentTypeType>Reusable</ClassContentTypeType>
+  <ClassDisplayName>Legacy media link</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="38875788-5117-4545-a007-085aad8f4e44" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="3d6082ce-7c56-45ba-be03-92e219d58e05" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="f9c9abe1-e77b-4116-a8ba-c07fcd3d2611" isunique="true" system="true" />
+      <field allowempty="true" column="LegacyMediaLinkURL" columnsize="2083" columntype="text" enabled="true" guid="28c4198d-7aba-47ae-9a54-eda57d8dd362" visible="true">
+        <properties>
+          <fieldcaption>URL</fieldcaption>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>205639d0-5385-472a-bd1a-ba685cf3915d</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>Legacy.MediaLink</ClassName>
+  <ClassShortName>LegacyMediaLinkNo78z4ud</ClassShortName>
+  <ClassShowTemplateSelection>False</ClassShowTemplateSelection>
+  <ClassTableName>Legacy_MediaLink</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

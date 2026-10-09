@@ -1,0 +1,78 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Core.DTOs.SectionIndustriesPageDto
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+
+    var widgetsList = new[]
+        {
+        ComponentIdentifiers.Widgets.Button,
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.EventsWebinarsSlider,
+        ComponentIdentifiers.Widgets.FlexibleBanner,
+        ComponentIdentifiers.Widgets.Form,
+        ComponentIdentifiers.Widgets.InsightCarousel,
+        ComponentIdentifiers.Widgets.InsightAnimationCard,
+        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.NewsCarousel,
+        ComponentIdentifiers.Widgets.QuoteCard,
+        ComponentIdentifiers.Widgets.RelatedContacts,
+        ComponentIdentifiers.Widgets.TiledLinkSection,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+    };
+
+    var advancedWidgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.Faq,
+        ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.InFocus,
+        ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.TabAccordion,
+        ComponentIdentifiers.Widgets.TrendingTopicsCarousel,
+    };
+}
+<div>
+    @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.Hero,
+        ReactComponentType.HeroGUID,
+        new
+        {
+            data = Model.Hero,
+        },
+        Context.RequestAborted))
+</div>
+@await Html.PartialAsync("_LocalNavigation")
+
+<div>
+    @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.MultiLinksCardsGrid,
+        ReactComponentType.MultiLinksCardsGridGUID,
+        Model.MultiLinksCardsGrid,
+        Context.RequestAborted))
+</div>
+<div>
+    @await Html.Kentico().EditableAreaAsync(
+        "mainContent",
+        new EditableAreaOptions
+        {
+            AllowedWidgets = widgetsList
+        })
+</div>
+@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddAdvancedWidgets(advancedWidgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
+
+
+

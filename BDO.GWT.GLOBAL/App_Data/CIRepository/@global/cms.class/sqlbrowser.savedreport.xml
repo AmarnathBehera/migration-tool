@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>SQL browser saved report</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="SqlBrowserSavedReportId" columntype="integer" enabled="true" guid="28b618f3-f014-4c94-a0a8-0e173bd3de6a" isPK="true" />
+      <field column="SqlBrowserSavedReportGuid" columnprecision="0" columntype="guid" enabled="true" guid="72c944a1-fd22-4c5f-8447-fae94ae9660d" visible="true" />
+      <field column="SqlBrowserSavedReportName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6b0f136d-23a6-4556-a965-2720da5ebb7b" visible="true" />
+      <field column="SqlBrowserSavedReportQueryId" columnprecision="0" columntype="integer" enabled="true" guid="84e4621c-9862-4e64-91ea-3fdc33dd01dd" visible="true" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>725f994f-3a18-44bf-a0c9-416e6d26d17b</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>SqlBrowser.SavedReport</ClassName>
+  <ClassResourceID>
+    <CodeName>Community.SqlBrowser</CodeName>
+    <GUID>72810bcb-5749-4e55-9fe6-ca67cf72c774</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>SqlBrowser_SavedReport</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

@@ -1,0 +1,117 @@
+﻿[
+  {
+    "Id": 960,
+    "Name": "Localhost",
+    "Website": "https://localhost:5001"
+  },
+  {
+    "Id": 970,
+    "Name": "GWT DEV",
+    "Website": "https://gwtdev.bdo.global"
+  },
+  {
+    "Id": 980,
+    "Name": "GWT TST",
+    "Website": "https://gwttst.bdo.global"
+  },
+  {
+    "Id": 981,
+    "Name": "BDO Integrations",
+    "Website": "https://integrations.gwttst.bdo.global"
+  },
+  {
+    "Id": 987,
+    "Name": "GWT TST2",
+    "Website": "https://gwttst2.bdo.global"
+  },
+  {
+    "Id": 990,
+    "Name": "GWT ACC",
+    "Website": "https://gwtacc.bdo.global"
+  },
+  {
+    "Id": 991,
+    "Name": "AU ACC",
+    "Website": "https://www.au-acc.bdo.global"
+  },
+  {
+    "Id": 992,
+    "Name": "AT ACC",
+    "Website": "https://www.at-acc.bdo.global"
+  },
+  {
+    "Id": 993,
+    "Name": "DK ACC",
+    "Website": "https://www.dk-acc.bdo.global"
+  },
+  {
+    "Id": 994,
+    "Name": "FI ACC",
+    "Website": "https://www.fi-acc.bdo.global"
+  },
+  {
+    "Id": 995,
+    "Name": "DE ACC",
+    "Website": "https://www.de-acc.bdo.global"
+  },
+  {
+    "Id": 996,
+    "Name": "GLOBAL ACC",
+    "Website": "https://www.global-acc.bdo.global"
+  },
+  {
+    "Id": 997,
+    "Name": "IL ACC",
+    "Website": "https://www.il-acc.bdo.global"
+  },
+  {
+    "Id": 998,
+    "Name": "NL ACC",
+    "Website": "https://www.nl-acc.bdo.global"
+  },
+  {
+    "Id": 999,
+    "Name": "NO ACC",
+    "Website": "https://www.no-acc.bdo.global"
+  },
+  {
+    "Id": 1000,
+    "Name": "CH ACC",
+    "Website": "https://www.ch-acc.bdo.global"
+  },
+  {
+    "Id": 1001,
+    "Name": "UK ACC",
+    "Website": "https://www.uk-acc.bdo.global"
+  },
+  {
+    "Id": 1002,
+    "Name": "UA ACC",
+    "Website": "https://www.ua-acc.bdo.global"
+  },
+  {
+    "Id": 1010,
+    "Name": "BDO WOW",
+    "Website": "https://www.bdowow.com"
+  },
+  {
+    "Id": 1020,
+    "Name": "GWT EUR",
+    "Website": "https://gwteur.bdo.global"
+  },
+  {
+    "Id": 1021,
+    "Name": "GWT ASA",
+    "Website": "https://gwtasa.bdo.global"
+  },
+  {
+    "Id": 1022,
+    "Name": "GWT SAM",
+    "Website": "https://gwtsam.bdo.global"
+  },
+  {
+    "Id": 1023,
+    "Name": "MU ACC",
+    "Website": "https://www.mu-acc.bdo.global"
+  }
+]

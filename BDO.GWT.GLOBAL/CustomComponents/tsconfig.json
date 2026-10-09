@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    //"ignoreDeprecations": "6.0",
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "jsx": "react",
+    "strict": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": [ "./src/*" ],
+      "@components/*": [ "./src/components/*" ],
+      "@model/*": [ "./src/model/*" ],
+      "@styles/*": [ "./src/styles/*" ]
+    }
+  },
+  "include": [ "./**/*.ts", "./**/*.tsx" ],
+  "exclude": [ "node_modules", "dist" ]
+}

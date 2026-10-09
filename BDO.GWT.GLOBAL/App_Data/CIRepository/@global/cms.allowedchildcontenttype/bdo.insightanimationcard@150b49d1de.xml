@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.InsightAnimationCard</CodeName>
+    <GUID>3d30cc8a-dfe1-4a46-80dc-e7ddfe1995a0</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.InsightAnimationPage">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.InsightAnimationPage</CodeName>
+        <GUID>f08bb2ba-7514-4aa3-8b47-5c7b74d9e55c</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

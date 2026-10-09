@@ -1,0 +1,25 @@
+﻿@using Kentico.Forms.Web.Mvc
+@using Kentico.Web.Mvc
+@model BDO.GWT.Xperience.Core.LiveSite.Components.FormComponents.ConsentAgreement
+
+@{
+    var htmlAttributes = ViewData.Kentico().GetEditorHtmlAttributes();
+
+    if (htmlAttributes.ContainsKey("class"))
+    {
+        htmlAttributes["class"] += " filled-in";
+    }
+    else
+    {
+        htmlAttributes["class"] = "filled-in";
+    }
+}
+
+<div class="editing-form-control-nested-control">
+    <span class="ktc-checkbox">
+        @Html.CheckBoxFor(m => m.Value, htmlAttributes)
+        <span>
+            @Html.Raw(Model.Label)
+        </span>
+    </span>
+</div>

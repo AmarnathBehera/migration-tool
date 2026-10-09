@@ -1,0 +1,59 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@inject IFormBuilderService FormBuilder
+@inject IReactService ReactService
+@model BDO.GWT.Web.Core.DTOs.Pages.DealDto
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+
+@{
+    Layout = "_Layout";
+
+    var widgetsList = new[]
+        {
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.Button,
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.FlexibleBanner,
+        ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.ImageWithText,
+        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.KeyTakeaways,
+        ComponentIdentifiers.Widgets.QuoteCard,
+        ComponentIdentifiers.Widgets.RelatedContacts,
+        ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.SocialMediaButtons,
+        ComponentIdentifiers.Widgets.TabAccordion,
+        ComponentIdentifiers.Widgets.TiledLinkSection,
+        ComponentIdentifiers.Widgets.TrendingTopicsCarousel
+    };
+}
+
+@PageBuilderService.GetPageBuilderStyles(Html)
+
+@await Html.PartialAsync("_Hero")
+
+@(await ReactService.RenderComponentAsync(
+    pageId,
+    ReactComponentType.Hero,
+    ReactComponentType.HeroGUID,
+    new
+    {
+       data = Model.Hero,
+    }, Context.RequestAborted))
+
+@(await ReactService.RenderComponentAsync(
+     pageId,
+     ReactComponentType.DealDetails,
+     ReactComponentType.DealDetailsGUID,
+     Model, Context.RequestAborted))
+
+@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
+

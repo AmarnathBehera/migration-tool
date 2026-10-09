@@ -1,0 +1,55 @@
+﻿@using BDO
+@using BDO.GWT.Core.DTOs.ReusableFieldsDTOs
+@using Kentico.Content.Web.Mvc
+@using Kentico.PageBuilder.Web.Mvc
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using CMS.Websites
+@using BDO.GWT.Core.DTOs
+
+@model BDO.StatusCode
+@inject IReactService ReactService   
+
+@{
+    var data = new StatusCodePageDto
+            {
+                Title = Model.MetadataTitle,
+                Description = Model.MetadataDescription
+            };
+}
+
+
+@{
+    var pageId = Model.SystemFields.WebPageItemID;
+    ViewData["PageId"] = pageId;
+    ViewData["MetaDataSeoDto"] = new MetaDataSEOItemsDto
+            {
+                MetaData = new MetaDataDto
+                {
+                    MetaTitle = Model.MetadataTitle,
+                    MetaDescription = Model.MetadataDescription,
+                    MetaCanonical = Model.MetadataCanonical
+                },
+                OGMetaData = new OGMetaDataDto
+                {
+                    MetadataOGTitle = Model.MetadataOGTitle,
+                    MetadataOGDescription = Model.MetadataOGDescription,
+                    Url = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}"
+                },
+                SEOItemsDto = new SearchAndSEODto
+                {
+                    MetadataNoindex = Model.MetadataNoindex,
+                    MetadataNofollow = Model.MetadataNofollow,
+                    IncludeInSitemap = Model.IncludeInSitemap
+                }
+            };
+            }
+
+  @(await ReactService.RenderComponentAsync(
+    pageId,
+    ReactComponentType.ErrorPageContent,
+    ReactComponentType.ErrorPageContentGUID,
+    data,
+    Context.RequestAborted))  
+
+

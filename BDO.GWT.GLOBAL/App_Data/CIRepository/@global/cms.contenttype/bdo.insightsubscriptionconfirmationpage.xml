@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Insight subscription confirmation page</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="dc45a657-e0dc-4dd1-882c-f2771eb0610e" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="996a5edd-31ac-49ec-b441-3c97b2fd4760" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="61894523-aac4-4215-bd6a-7dd7fc961a7a" isunique="true" system="true" />
+      <field column="Custom" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="94345aa5-3b49-4a0c-9ab0-8ec12f2b63af" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Name</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>a9fdbc9e-bae2-476c-97e6-9b89da7de0af</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.InsightSubscriptionConfirmationPage</ClassName>
+  <ClassShortName>BDOInsightSubscriptionConfirmationPage</ClassShortName>
+  <ClassTableName>BDO_InsightSubscriptionConfirmationPage</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

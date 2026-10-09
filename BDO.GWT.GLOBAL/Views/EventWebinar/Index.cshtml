@@ -1,0 +1,45 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model (BDO.GWT.Web.Core.LiveSite.DTOs.Pages.EventWebinarDto Page, BDO.GWT.Web.Core.DTOs.SchemaMarkups.EventSchemaMarkupDto SchemaMarkup)
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    var widgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.Button,
+        ComponentIdentifiers.Widgets.EventsWebinarsSlider,
+        ComponentIdentifiers.Widgets.FlexibleBanner,
+        ComponentIdentifiers.Widgets.Form,
+        ComponentIdentifiers.Widgets.HTML,
+        ComponentIdentifiers.Widgets.NewsCarousel,
+        ComponentIdentifiers.Widgets.RelatedContentCarousel,
+        ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+    };
+}
+@section SchemaMarkup {
+    @Html.Raw(this.Model.SchemaMarkup.ToSchemaMarkupJsString())
+}
+@await PageBuilderService.AddIdentifier("heroSection").AddWidgets(new[] { ComponentIdentifiers.Widgets.Hero }).BuildEditableAreaAsync(Html, Context.RequestAborted)
+
+@await Html.PartialAsync("_LocalNavigation")
+ 
+@(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.EventsWebinarsDetails,
+        ReactComponentType.EventsWebinarsDetailsGUID,
+        Model.Page,
+        Context.RequestAborted))
+
+@await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
+
+

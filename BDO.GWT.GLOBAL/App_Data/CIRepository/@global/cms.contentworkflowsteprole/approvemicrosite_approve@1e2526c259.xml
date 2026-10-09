@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentworkflowsteprole>
+  <Parent>
+    <CodeName>Approve</CodeName>
+    <GUID>8e0b1abd-6402-4f08-8061-46ed90fbcf68</GUID>
+    <ObjectType>cms.contentworkflowstep</ObjectType>
+    <Parent>
+      <CodeName>ApproveMicrosite</CodeName>
+      <GUID>c80962e7-6474-478d-a349-93558d71d129</GUID>
+      <ObjectType>cms.contentworkflow</ObjectType>
+    </Parent>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.role_BDOPublisher">
+      <ContentWorkflowStepRoleRoleID>
+        <CodeName>BDOPublisher</CodeName>
+        <GUID>44781a9c-7814-497f-8714-a6cc13b8e629</GUID>
+        <ObjectType>cms.role</ObjectType>
+      </ContentWorkflowStepRoleRoleID>
+    </Binding>
+  </Bindings>
+</cms.contentworkflowsteprole>

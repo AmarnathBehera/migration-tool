@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentworkflowcontenttype>
+  <Parent>
+    <CodeName>PublishEvents</CodeName>
+    <GUID>cc61c0fb-e6ea-46fb-9d6d-84f349bd7b2c</GUID>
+    <ObjectType>cms.contentworkflow</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.Event">
+      <ContentWorkflowContentTypeContentTypeID>
+        <CodeName>BDO.Event</CodeName>
+        <GUID>eb56be66-90a1-4d84-ac39-56bba64e5a69</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </ContentWorkflowContentTypeContentTypeID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.Webinar">
+      <ContentWorkflowContentTypeContentTypeID>
+        <CodeName>BDO.Webinar</CodeName>
+        <GUID>a0c5bc6c-9409-4fe9-8430-697d961328a6</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </ContentWorkflowContentTypeContentTypeID>
+    </Binding>
+  </Bindings>
+</cms.contentworkflowcontenttype>

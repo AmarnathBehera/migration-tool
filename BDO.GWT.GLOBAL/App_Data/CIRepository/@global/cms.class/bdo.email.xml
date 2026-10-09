@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <CodeNameColumn>CodeName</CodeNameColumn>
+      <DisplayNameColumn>CodeName</DisplayNameColumn>
+      <ObjectType>BDO.Email</ObjectType>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassDisplayName>Email</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="EmailID" columntype="integer" enabled="true" guid="53d8c773-2697-4625-b44f-1dd7df0f09be" isPK="true" />
+      <field column="FromEmail" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="ef8b7b9b-0016-43b5-a0e3-70f6b6ab422f" />
+      <field column="EmailSettingsWebChannelSettingID" columnprecision="0" columntype="integer" enabled="true" guid="818fb580-024f-49a9-bc09-c8dc57923298" refobjtype="bdo.webchannelsettings" reftype="Required" />
+      <field column="DisplayName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="6bfdbd88-053d-498b-acb6-0418eb51fe47" />
+      <field column="CodeName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="1f3ae88a-3090-4c86-bc43-5e4f7fda1cfa" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>84fefb69-e61f-47bd-b907-20667a4346a8</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.Email</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_Email</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

@@ -1,0 +1,25 @@
+@using BDO
+@using BDO.GWT.Xperience.LiveSite.Components.Section
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@using Kentico.PageBuilder.Web.Mvc
+@using Kentico.Web.Mvc
+@addTagHelper Kentico.Content.Web.Mvc.WidgetZoneTagHelper, Kentico.Content.Web.Mvc
+@model Kentico.PageBuilder.Web.Mvc.ComponentViewModel<BaseSectionProperties>
+@inject IPageBuilderService PageBuilder
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+
+<nav id="local-nav" class="local-navigation" aria-label="secondary navigation">
+    @(await ReactService.RenderComponentAsync(pageId, ReactComponentType.LocalNavigationJS, ReactComponentType.LocalNavigationJSGUID, new { }, Context.RequestAborted))
+    <ul style="@(Context.Kentico().PageBuilder().EditMode ? "display:block; padding-top:50px;" : "")">
+        @await PageBuilder.AddWidgets(new[] { ComponentIdentifiers.Widgets.ExternalNavigation, ComponentIdentifiers.Widgets.LocalNavigation }).AddIdentifier("local-nav").BuildWidgetZoneAsync(Html, new List<string> { ComponentIdentifiers.Widgets.ExternalNavigation, ComponentIdentifiers.Widgets.LocalNavigation }, default)
+    </ul>
+</nav>
+

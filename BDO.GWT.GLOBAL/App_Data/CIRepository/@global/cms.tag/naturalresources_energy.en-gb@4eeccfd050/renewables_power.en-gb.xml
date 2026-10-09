@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.tag>
+  <TagGUID>c9781c18-32ff-44bc-b1f3-ae6f62031f72</TagGUID>
+  <TagMetadata>
+    <![CDATA[{"Translations":{"8517e6d4-6f93-4003-9e15-e30e302d68e9":{"Title":null,"Description":null},"ee380e62-f7ff-416a-88c1-646fe247d5f3":{"Title":null,"Description":null}}}]]>
+  </TagMetadata>
+  <TagName>Renewables_Power.En-GB</TagName>
+  <TagOrder>1</TagOrder>
+  <TagParentID>
+    <CodeName>NaturalResources_Energy.En-GB</CodeName>
+    <GUID>67001fa7-a190-493b-adf2-8cbc973029c9</GUID>
+    <ObjectType>cms.tag</ObjectType>
+  </TagParentID>
+  <TagTaxonomyID>
+    <CodeName>globalIndustry</CodeName>
+    <GUID>f803b21f-ee55-4715-b348-882acd851bf8</GUID>
+    <ObjectType>cms.taxonomy</ObjectType>
+  </TagTaxonomyID>
+  <TagTitle>
+    <![CDATA[Renewables & power]]>
+  </TagTitle>
+</cms.tag>

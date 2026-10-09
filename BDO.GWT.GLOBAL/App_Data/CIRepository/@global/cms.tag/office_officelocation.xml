@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.tag>
+  <TagGUID>ebe4ca56-c36c-4fed-b403-be4e86c94aa5</TagGUID>
+  <TagMetadata>
+    <![CDATA[{"Translations":{}}]]>
+  </TagMetadata>
+  <TagName>Office_OfficeLocation</TagName>
+  <TagOrder>1</TagOrder>
+  <TagTaxonomyID>
+    <CodeName>CareerListFilters</CodeName>
+    <GUID>87f2995a-a3b8-43bd-8289-42ab24fd7365</GUID>
+    <ObjectType>cms.taxonomy</ObjectType>
+  </TagTaxonomyID>
+  <TagTitle>Office (Office Location)</TagTitle>
+</cms.tag>

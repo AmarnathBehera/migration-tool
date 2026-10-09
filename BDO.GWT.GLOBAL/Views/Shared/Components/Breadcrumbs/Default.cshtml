@@ -1,0 +1,18 @@
+﻿@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@inject IReactService ReactService
+@model BDO.GWT.Core.DTOs.BreadcrumbsDto
+
+@if (Model?.Links?.Any() == true)
+{
+    @(await ReactService.RenderComponentAsync(
+    1,
+    ReactComponentType.Breadcrumbs,
+    ReactComponentType.BreadcrumbsGUID,
+    new
+    {
+        breadcrumbsSettings = Model,
+    },
+    Context.RequestAborted))
+   
+}

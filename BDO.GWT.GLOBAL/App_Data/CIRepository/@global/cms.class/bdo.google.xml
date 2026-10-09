@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Google</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="GoogleID" columntype="integer" enabled="true" guid="10c8e5f8-daec-457d-ae26-49f654b012dc" isPK="true" />
+      <field column="GoogleAnalyticsTrackingID" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7d8402b3-0dad-4008-a520-53aa21c5a919" />
+      <field column="EnableglobalGoogleanalyticsforsite" columnprecision="0" columntype="boolean" enabled="true" guid="080435cf-a640-44c5-8a30-e8e0447c7f15" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>3b395ac5-d631-49b9-bbf5-7deb481faa3d</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.Google</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_Google</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

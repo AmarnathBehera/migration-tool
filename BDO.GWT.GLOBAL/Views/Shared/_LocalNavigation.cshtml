@@ -1,0 +1,18 @@
+﻿@using BDO
+@using Kentico.PageBuilder.Web.Mvc
+@{
+        var areaOptions = new EditableAreaOptions
+            {
+        AllowedWidgets = new[]
+                {
+            ComponentIdentifiers.Widgets.LocalNavigation,
+            ComponentIdentifiers.Widgets.ExternalNavigation
+        },
+         AllowedSections = new[]
+        {
+            ComponentIdentifiers.Sections.LocalNavigation
+        },
+        DefaultSectionIdentifier = ComponentIdentifiers.Sections.LocalNavigation
+        };
+        }
+ @await Html.Kentico().EditableAreaAsync(ComponentIdentifiers.Sections.LocalNavigation, areaOptions)

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.NavigationThirdLevelItem</CodeName>
+    <GUID>bbb47bec-837d-498b-b57c-4c4503a2d5d5</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.BlogPost">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.BlogPost</CodeName>
+        <GUID>75615b26-2702-4a3a-bf7d-34c13b87bb63</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

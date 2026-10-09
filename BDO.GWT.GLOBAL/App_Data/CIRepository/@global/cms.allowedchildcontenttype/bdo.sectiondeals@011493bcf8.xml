@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.SectionDeals</CodeName>
+    <GUID>c9ad5d32-9b92-477d-abd0-6b732dc1e86f</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.Deal">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.Deal</CodeName>
+        <GUID>6551b6dd-873d-4535-b72d-a1ab4c4103e3</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.RemoteDeal">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.RemoteDeal</CodeName>
+        <GUID>1977d31f-d844-4267-aeb3-ed0e2465b30d</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

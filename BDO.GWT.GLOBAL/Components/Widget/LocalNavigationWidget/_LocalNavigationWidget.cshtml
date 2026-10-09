@@ -1,0 +1,22 @@
+﻿@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Core.LocalNavigationData
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+
+@if (Model != null && pageId != 0)
+{ <li>
+    @(await ReactService.RenderComponentAsync(
+        pageId,
+                "LocalNavigationItem",
+            ReactComponentType.LocalNavigationItemGUID,
+        Model,
+        Context.RequestAborted))
+    </li>
+}

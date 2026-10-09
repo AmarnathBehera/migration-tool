@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.resource>
+  <ResourceDisplayName>Project settings</ResourceDisplayName>
+  <ResourceGUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</ResourceGUID>
+  <ResourceIsInDevelopment>False</ResourceIsInDevelopment>
+  <ResourceName>BDO.Projectsettings</ResourceName>
+</cms.resource>

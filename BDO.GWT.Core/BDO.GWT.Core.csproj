@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>$(NoWarn);1591</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="ContentTypes\Classes\GDPRSettings\**" />
+	  <EmbeddedResource Remove="ContentTypes\Classes\GDPRSettings\**" />
+	  <None Remove="ContentTypes\Classes\GDPRSettings\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AutoMapper" Version="16.1.1" />
+		<PackageReference Include="Ical.Net" Version="5.2.2" />
+		<PackageReference Include="Kentico.Xperience.Admin" Version="31.7.0" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
+		<PackageReference Include="Microsoft.Data.SqlClient.Extensions.Azure" Version="7.0.2" />
+		<PackageReference Include="System.ServiceModel.Syndication" Version="10.0.9" />
+		<PackageReference Include="XperienceCommunity.Localization" Version="2.0.1" />
+		<PackageReference Include="XperienceCommunity.MultiChoiceFormControl" Version="1.0.0" />
+		<ProjectReference Include="..\BDO.GWT.Common\BDO.GWT.Common.csproj" />
+		<ProjectReference Include="..\Kentico.Xperience.AzureSearch\Kentico.Xperience.AzureSearch.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Repositories\" />
+	</ItemGroup>
+</Project>

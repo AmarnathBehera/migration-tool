@@ -1,0 +1,553 @@
+step "deploy-cms-app-service" {
+    name = "Deploy CMS App Service"
+    properties = {
+        Octopus.Action.TargetRoles = "xbyk-cms-webapp"
+    }
+
+    action {
+        action_type = "Octopus.AzureAppService"
+        properties = {
+            Octopus.Action.Azure.AppSettings = <<-EOT
+                [
+                  {
+                    "name": "AzureStorageProviderSettings__CMSAzureCDNEndpoint",
+                    "value": "#{appsettings.CMSAzureCDNEndpoint}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureStorageProviderSettings__CMSAzureAccountName",
+                    "value": "#{appsettings.CMSAzureAccountName}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureStorageProviderSettings__CMSAzureSharedKey",
+                    "value": "#{appsettings.CMSAzureSharedKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureStorageProviderSettings__CMSAzureRootContainer",
+                    "value": "cmslibrary",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSHashStringSalt",
+                    "value": "#{appsettings.CMSHashStringSalt}",
+                    "slotSetting": false
+                  },  
+                  {
+                    "name": "BDOSyncApiKey",
+                    "value": "#{appsettings.syncApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "BDOSyncApiUrl",
+                    "value": "#{appsettings.syncApiUrl}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureAd__TenantId",
+                    "value": "#{appsettings.azureAdTenantId}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureAd__ClientId",
+                    "value": "#{appsettings.cmsAppClientId}",
+                    "slotSetting": false
+                  },
+                    {
+                    "name": "AzureAd__ClientSecret",
+                    "value": "#{appsettings.cmsAppClientSecret}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "ReactOptions__ServerUrl",
+                    "value": "#{appsettings.reactAppService}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "FallbackSendGridClientOptions__ApiKey",
+                    "value": "#{appsettings.FallbackSendGridClientApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "SystemSendGridClientOptions__ApiKey",
+                    "value": "#{appsettings.SystemSendGridClientApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AdminRedirectOptions__RedirectDomain",
+                    "value": "#{appsettings.RedirectDomain}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                    "value": "#{appsettings.appInsightsCMSConnectionString}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureSearch__SearchServiceEnabled",
+                    "value": "true",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureSearch__SearchServiceEndPoint",
+                    "value": "#{appsettings.CMSAzureSearchSearchServiceEndPoint}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureSearch__SearchServiceAdminApiKey",
+                    "value": "#{appsettings.CMSAzureSearchSearchServiceAdminApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureSearch__SearchServiceQueryApiKey",
+                    "value": "#{appsettings.CMSAzureSearchSearchServiceQueryApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureCognitiveSearch__ServiceUrl",
+                    "value": "#{appsettings.AzureCognitiveSearchServiceUrl}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureCognitiveSearch__QueryKey",
+                    "value": "#{appsettings.AzureCognitiveSearchQueryKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureCognitiveSearch__IndexSuffix",
+                    "value": "",
+                    "slotSetting": false
+                  }
+                ]
+                EOT
+            Octopus.Action.Azure.ConnectionStrings = <<-EOT
+                [
+                   {
+                      "name": "CMSConnectionString",
+                      "value": "#{appsettings.CMSConnectionString}",
+                      "type": "SQLAzure",
+                      "slotSetting": false
+                   }
+                ]
+                EOT
+            Octopus.Action.Azure.DeploymentType = "Package"
+            Octopus.Action.EnabledFeatures = "Octopus.Features.ConfigurationVariables,Octopus.Features.JsonConfigurationVariables,Octopus.Features.ConfigurationTransforms,Octopus.Features.SubstituteInFiles"
+            Octopus.Action.Package.DownloadOnTentacle = "False"
+            Octopus.Action.Package.FeedId = "octopus-server-built-in"
+            Octopus.Action.Package.PackageId = "GWT.XbyK.CMS.Deploy"
+            OctopusUseBundledTooling = "False"
+        }
+        worker_pool_variable = "deploy.octopus.workerPool"
+
+        packages {
+            acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = "GWT.XbyK.CMS.Deploy"
+            properties = {
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
+step "deploy-mvc-app-service" {
+    name = "Deploy MVC App Service"
+    properties = {
+        Octopus.Action.TargetRoles = "xbyk-mvc-webapp"
+    }
+    start_trigger = "StartWithPrevious"
+
+    action {
+        action_type = "Octopus.AzureAppService"
+        properties = {
+            Octopus.Action.Azure.AppSettings = <<-EOT
+                [
+                  {
+                    "name": "AzureStorageProviderSettings__CMSAzureCDNEndpoint",
+                    "value": "#{appsettings.CMSAzureCDNEndpoint}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureStorageProviderSettings__CMSAzureAccountName",
+                    "value": "#{appsettings.CMSAzureAccountName}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureStorageProviderSettings__CMSAzureSharedKey",
+                    "value": "#{appsettings.CMSAzureSharedKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureStorageProviderSettings__CMSAzureRootContainer",
+                    "value": "cmslibrary",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSHashStringSalt",
+                    "value": "#{appsettings.CMSHashStringSalt}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "BDOAdminSiteUrl",
+                    "value": "#{appsettings.BDOAdminSiteUrl}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "BDOSyncApiKey",
+                    "value": "#{appsettings.syncApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "BDOSyncApiUrl",
+                    "value": "#{appsettings.syncApiUrl}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AdminRedirectOptions__RedirectDomain",
+                    "value": "#{appsettings.RedirectDomain}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "ReactOptions__ServerUrl",
+                    "value": "#{appsettings.reactAppService}",
+                    "slotSetting": false
+                  },  
+                  {
+                    "name": "AzureAd__TenantId",
+                    "value": "#{appsettings.azureAdTenantId}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureAd__ClientId",
+                    "value": "#{appsettings.cmsAppClientId}",
+                    "slotSetting": false
+                  },
+                    {
+                    "name": "AzureAd__ClientSecret",
+                    "value": "#{appsettings.cmsAppClientSecret}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "FallbackSendGridClientOptions__ApiKey",
+                    "value": "#{appsettings.FallbackSendGridClientApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "SystemSendGridClientOptions__ApiKey",
+                    "value": "#{appsettings.SystemSendGridClientApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                    "value": "#{appsettings.appInsightsMVCConnectionString}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureSearch__SearchServiceEnabled",
+                    "value": "true",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureSearch__SearchServiceEndPoint",
+                    "value": "#{appsettings.CMSAzureSearchSearchServiceEndPoint}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureSearch__SearchServiceAdminApiKey",
+                    "value": "#{appsettings.CMSAzureSearchSearchServiceAdminApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "CMSAzureSearch__SearchServiceQueryApiKey",
+                    "value": "#{appsettings.CMSAzureSearchSearchServiceQueryApiKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureCognitiveSearch__ServiceUrl",
+                    "value": "#{appsettings.AzureCognitiveSearchServiceUrl}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureCognitiveSearch__QueryKey",
+                    "value": "#{appsettings.AzureCognitiveSearchQueryKey}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureCognitiveSearch__IndexSuffix",
+                    "value": "",
+                    "slotSetting": false
+                  }
+                ]
+                EOT
+            Octopus.Action.Azure.ConnectionStrings = <<-EOT
+                [
+                   {
+                      "name": "CMSConnectionString",
+                      "value": "#{appsettings.CMSConnectionString}",
+                      "type": "SQLAzure",
+                      "slotSetting": false
+                   }
+                ]
+                EOT
+            Octopus.Action.Azure.DeploymentType = "Package"
+            Octopus.Action.EnabledFeatures = "Octopus.Features.ConfigurationVariables,Octopus.Features.JsonConfigurationVariables,Octopus.Features.ConfigurationTransforms,Octopus.Features.SubstituteInFiles"
+            Octopus.Action.Package.DownloadOnTentacle = "False"
+            Octopus.Action.Package.FeedId = "octopus-server-built-in"
+            Octopus.Action.Package.PackageId = "GWT.XbyK.MVC.Deploy"
+            OctopusUseBundledTooling = "False"
+        }
+        worker_pool_variable = "deploy.octopus.workerPool"
+
+        packages {
+            acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = "GWT.XbyK.MVC.Deploy"
+            properties = {
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
+step "deploy-react-app-service" {
+    name = "Deploy React App Service"
+    properties = {
+        Octopus.Action.TargetRoles = "xbyk-react-webapp"
+    }
+    start_trigger = "StartWithPrevious"
+
+    action {
+        action_type = "Octopus.AzureAppService"
+        properties = {
+            Octopus.Action.Azure.ConnectionStrings = <<-EOT
+                [
+                   {
+                      "name": "CMSConnectionString",
+                      "value": "#{appsettings.CMSConnectionString}",
+                      "type": "SQLAzure",
+                      "slotSetting": false
+                   }
+                ]
+                EOT
+            Octopus.Action.Azure.DeploymentType = "Package"
+            Octopus.Action.EnabledFeatures = "Octopus.Features.ConfigurationVariables,Octopus.Features.JsonConfigurationVariables,Octopus.Features.ConfigurationTransforms,Octopus.Features.SubstituteInFiles"
+            Octopus.Action.Package.DownloadOnTentacle = "False"
+            Octopus.Action.Package.FeedId = "octopus-server-built-in"
+            Octopus.Action.Package.PackageId = "GWT.XbyK.React.Deploy"
+            OctopusUseBundledTooling = "False"
+        }
+        worker_pool_variable = "deploy.octopus.workerPool"
+
+        packages {
+            acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = "GWT.XbyK.React.Deploy"
+            properties = {
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
+step "deploy-api-app-service" {
+    name = "Deploy API App Service"
+    properties = {
+        Octopus.Action.TargetRoles = "xbyk-api-webapp"
+    }
+    start_trigger = "StartWithPrevious"
+
+    action {
+        action_type = "Octopus.AzureAppService"
+        properties = {
+            Octopus.Action.Azure.AppSettings = <<-EOT
+                [
+                  {
+                    "name": "ASPNETCORE_ENVIRONMENT",
+                    "value": "#{appsettings.aspNetCoreEnvironment}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureAd__Instance",
+                    "value": "#{appsettings.azureAdInstance}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureAd__TenantId",
+                    "value": "#{appsettings.azureAdTenantId}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureAd__ClientId",
+                    "value": "#{appsettings.apiAppClientId}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "AzureAd__ClientSecret",
+                    "value": "#{appsettings.apiAppClientSecret}",
+                    "slotSetting": false
+                  },
+                                    {
+                    "name": "AzureAd__Audience",
+                    "value": "#{appsettings.apiAppAudience}",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                    "value": "#{appsettings.appInsightsAPIConnectionString}",
+                    "slotSetting": false
+                  }
+                ]
+                EOT
+            Octopus.Action.Azure.ConnectionStrings = <<-EOT
+                [
+                   {
+                      "name": "CMSConnectionString",
+                      "value": "#{appsettings.CMSConnectionString}",
+                      "type": "SQLAzure",
+                      "slotSetting": false
+                   }
+                ]
+                EOT
+            Octopus.Action.Azure.DeploymentType = "Package"
+            Octopus.Action.EnabledFeatures = "Octopus.Features.ConfigurationVariables,Octopus.Features.JsonConfigurationVariables,Octopus.Features.ConfigurationTransforms,Octopus.Features.SubstituteInFiles"
+            Octopus.Action.Package.DownloadOnTentacle = "False"
+            Octopus.Action.Package.FeedId = "octopus-server-built-in"
+            Octopus.Action.Package.PackageId = "GWT.XbyK.API.Deploy"
+            OctopusUseBundledTooling = "False"
+        }
+        worker_pool_variable = "deploy.octopus.workerPool"
+
+        packages {
+            acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = "GWT.XbyK.API.Deploy"
+            properties = {
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
+step "deploy-sync-app-service" {
+  name = "Deploy Sync App Service"
+  properties = {
+    Octopus.Action.TargetRoles = "xbyk-sync-webapp"
+  }
+  start_trigger = "StartWithPrevious"
+
+  action {
+    action_type = "Octopus.AzureAppService"
+    properties = {
+      Octopus.Action.Azure.AppSettings = <<-EOT
+        [
+          {
+          "name": "ASPNETCORE_ENVIRONMENT",
+          "value": "#{appsettings.aspNetCoreEnvironment}",
+          "slotSetting": false
+          },
+          {
+          "name": "SyncApiKey",
+          "value": "#{appsettings.syncApiKey}",
+          "slotSetting": false
+          },
+          {
+          "name": "Regions__Name",
+          "value": "",
+          "slotSetting": false
+          },
+          {
+          "name": "Regions__SyncServerUrl",
+          "value": "",
+          "slotSetting": false
+          },
+          {
+          "name": "GlobalSiteGUID",
+          "value": "#{appsettings.syncGlobalSiteGuid}",
+          "slotSetting": false
+          }
+        ]
+        EOT
+      Octopus.Action.Azure.ConnectionStrings = <<-EOT
+        [
+           {
+            "name": "CMSConnectionString",
+            "value": "#{appsettings.CMSConnectionString}",
+            "type": "SQLAzure",
+            "slotSetting": false
+           }
+        ]
+        EOT
+      Octopus.Action.Azure.DeploymentType = "Package"
+      Octopus.Action.EnabledFeatures = "Octopus.Features.ConfigurationVariables,Octopus.Features.JsonConfigurationVariables,Octopus.Features.ConfigurationTransforms,Octopus.Features.SubstituteInFiles"
+      Octopus.Action.Package.DownloadOnTentacle = "False"
+      Octopus.Action.Package.FeedId = "octopus-server-built-in"
+      Octopus.Action.Package.PackageId = "GWT.XbyK.Sync.Deploy"
+      OctopusUseBundledTooling = "False"
+    }
+    worker_pool_variable = "deploy.octopus.workerPool"
+
+    packages {
+      acquisition_location = "Server"
+      feed = "octopus-server-built-in"
+      package_id = "GWT.XbyK.Sync.Deploy"
+      properties = {
+        SelectionMode = "immediate"
+      }
+    }
+  }
+}
+
+step "update-apim-api-from-swagger" {
+    name = "Update APIM API from Swagger"
+
+    action {
+        action_type = "Octopus.AzurePowerShell"
+        properties = {
+            Octopus.Action.Azure.AccountId = "#{octopus.azure.account}"
+            Octopus.Action.Package.DownloadOnTentacle = "False"
+            Octopus.Action.Package.FeedId = "octopus-server-built-in"
+            Octopus.Action.Package.PackageId = "GWT.XbyK.API.Deploy"
+            Octopus.Action.Script.ScriptFileName = "Deploy/APIM/Update-ApimApiFromSwagger.ps1"
+            Octopus.Action.Script.ScriptSource = "Package"
+            OctopusUseBundledTooling = "False"
+        }
+        worker_pool_variable = "deploy.octopus.workerPool"
+
+        packages {
+            acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = "GWT.XbyK.API.Deploy"
+            properties = {
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
+step "restore-kentico-ci-database" {
+    name = "Restore Kentico CI Database"
+
+    action {
+        action_type = "Octopus.AzurePowerShell"
+        properties = {
+            Octopus.Action.Azure.AccountId = "#{octopus.azure.account}"
+            Octopus.Action.Package.DownloadOnTentacle = "False"
+            Octopus.Action.Package.FeedId = "octopus-server-built-in"
+            Octopus.Action.Package.PackageId = "GWT.XbyK.CI.Deploy"
+            Octopus.Action.Script.ScriptFileName = "Invoke-KenticoCIRestore.ps1"
+            Octopus.Action.Script.ScriptSource = "Package"
+            OctopusUseBundledTooling = "False"
+        }
+        worker_pool_variable = "deploy.octopus.workerPool"
+
+        packages {
+            acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = "GWT.XbyK.CI.Deploy"
+            properties = {
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}

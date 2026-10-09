@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>FooterPages</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="c8daded6-d638-42f1-a01c-f8e9448df47f" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="c8bf21c2-6a55-42e9-81ff-5622499e9a24" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="14f00abe-f3b6-4ef1-acc4-4d08bd77d542" isunique="true" system="true" />
+      <field column="Title" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="8ef59694-abbf-471e-9452-5c00d06a5bd0" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="FooterLink" columnprecision="0" columntype="contentitemreference" enabled="true" guid="391a8b32-9681-4cea-aac5-1098d6c4964d" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>FooterLink</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["43fcea42-e42d-4773-95dc-b415ea3e7547","b6a2aff8-7c0d-446a-be33-221a26bcac37","75615b26-2702-4a3a-bf7d-34c13b87bb63","252cdc0e-f6a0-424f-bd6b-2584655e66c7","b70d2494-90c7-42c5-a7d6-44da7013729b","f350df32-e183-46df-9156-68116ac72958","1ab55e4f-344f-4d36-a64b-5812140fcfa3","e95256dc-44da-4237-a5d0-2f39834f7755","4e214df1-edd5-4441-a0b7-53849526b1d3","6551b6dd-873d-4535-b72d-a1ab4c4103e3","eb56be66-90a1-4d84-ac39-56bba64e5a69","0997154f-0044-4380-a197-7c05464921c6","afb8b736-7f16-4a85-ab17-081c7833188c","ca36fdc4-756f-4f9e-afdf-bdf19fc50427","28595e58-3d13-4414-8f96-8a31285037fe","24473f7c-9eb7-44cc-bf31-e1b9c4aa78fc","4a8412a4-b16a-4e13-85f3-1bd503c0043e","7de84a06-569a-4dac-b701-55df640a4a49","b1d1ea96-03a2-4a44-82f7-92973086a93b","392e5450-56f2-49da-96a0-fc49215599d8","afb8a1ec-5001-46e6-8e98-4b9e28995e48","c9ad5d32-9b92-477d-abd0-6b732dc1e86f","d7c0b1af-52c7-4f1b-b856-6aec846290cb","2d1bdba2-9ca8-42ab-a783-33007f1f3e3b","ceb7b7b1-256e-4158-96cf-a33fcbe96c2c","a15c3744-bd53-4359-b3a8-9fd52bd0c611","21077305-a3ad-4889-a673-6eb9724c13cc","74635906-cb04-4ffd-9936-9dcde92c7f58","afbf6f00-540b-44f1-b40b-ea7975a6185e"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>5</MaximumItems>
+          <MinimumItems>1</MinimumItems>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>87a001b5-2f24-4964-8c80-6cd3fd7ad7ce</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-building-block</ClassIconClass>
+  <ClassName>BDO.FooterPages</ClassName>
+  <ClassShortName>BDOFooterPages</ClassShortName>
+  <ClassTableName>BDO_FooterPages</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

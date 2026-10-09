@@ -1,0 +1,671 @@
+﻿using BDO.GWT.Common.Core.Helpers;
+using BDO.GWT.Core;
+using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.DTOs.SchemaMarkups;
+using BDO.GWT.Core.Services;
+using BDO.GWT.Core.Utilities;
+using BDO.GWT.Web.Core.DTOs;
+using BDO.GWT.Web.Core.DTOs.SchemaMarkups;
+using BDO.GWT.Web.Core.LiveSite.DTOs.Pages;
+using CMS.DataEngine;
+using CMS.Helpers;
+using CMS.Websites;
+using CMS.Websites.Routing;
+using Ical.Net;
+using Ical.Net.CalendarComponents;
+using Ical.Net.DataTypes;
+using Ical.Net.Serialization;
+using Kentico.Content.Web.Mvc;
+using Kentico.Content.Web.Mvc.Routing;
+using System.Globalization;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+
+namespace BDO.GWT.Web.Core.Services;
+
+public interface IEventWebinarPageService
+{
+    Task<EventWebinarDto> GetEventPageDtoAsync(Event page, CancellationToken cancellationToken);
+    Task<EventWebinarDto> GetWebinarPageDtoAsync(Webinar page, CancellationToken cancellationToken);
+    Task<EventSchemaMarkupDto> GetEventSchemaMarkupDto(Event page, CancellationToken cancellationToken);
+    Task<EventSchemaMarkupDto> GetWebinarSchemaMarkupDto(Webinar page, CancellationToken cancellationToken);
+    Task<string?> GenerateOutlookEventCardContent(Guid pageGuid, string? source, CancellationToken cancellationToken);
+    Task<string?> GenerateOutlookWebinarCardContent(Guid pageGuid, string? source, CancellationToken cancellationToken);
+}
+
+public partial class EventWebinarPageService : IEventWebinarPageService
+{
+    private readonly IInfoProvider<GlobalsettingskeyInfo> _provider;
+    private readonly IInfoProvider<WebChannelSnippetInfo> _siteProvider;
+    private readonly IPreferredLanguageRetriever _preferredLanguageRetriever;
+    private readonly IContentService _contentRetriever;
+    private readonly IWebPageUrlRetriever _pageUrlRetriever;
+    private readonly ISocialMediaButtonsService _socialMediaButtonsService;
+
+    public EventWebinarPageService(
+        IContentService contentRetriever,
+        IWebPageUrlRetriever pageUrlRetriever,
+        IInfoProvider<GlobalsettingskeyInfo> provider,
+        IInfoProvider<WebChannelSnippetInfo> siteProvider,
+        IPreferredLanguageRetriever preferredLanguageRetriever,
+        ISocialMediaButtonsService socialMediaButtonsService)
+    {
+        _contentRetriever = contentRetriever;
+        _pageUrlRetriever = pageUrlRetriever;
+        _provider = provider;
+        _siteProvider = siteProvider;
+        _preferredLanguageRetriever = preferredLanguageRetriever;
+        _socialMediaButtonsService = socialMediaButtonsService;
+    }
+
+    public async Task<string?> GenerateOutlookEventCardContent(Guid pageGuid, string? source, CancellationToken cancellationToken)
+    {
+        var pages = await _contentRetriever.GetPagesAsync<Event>(
+             new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
+             query => query.Where(w =>
+              w.WhereEquals("ContentItemGUID", pageGuid)), RetrievalCacheSettings.CacheDisabled, 
+             cancellationToken);
+        var page = pages?.FirstOrDefault();
+
+        return await GenerateEventICalendarAsync(page, page?.EventLocationCity, page?.EventLocationAddress1, cancellationToken);
+    }
+
+    public async Task<string?> GenerateOutlookWebinarCardContent(Guid pageGuid, string? source, CancellationToken cancellationToken)
+    {
+        var pages = await _contentRetriever.GetPagesAsync<Webinar>(
+            new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
+            query => query.Where(w =>
+                w.WhereEquals("ContentItemGUID", pageGuid)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken);
+
+        var page = pages?.FirstOrDefault();
+        return await GenerateWebinarICalendarAsync(page, page?.EventLocationCity, page?.EventLocationAddress1, cancellationToken);
+    }
+
+    public async Task<EventWebinarDto> GetEventPageDtoAsync(Event page, CancellationToken cancellationToken)
+        => await GetEventInternalDto(
+            page,
+            "Event",
+            page.EventLocationAddress1,
+            page.EventLocationCity,
+            page.EventLocationCountry,
+            cancellationToken);
+
+    public async Task<EventWebinarDto> GetWebinarPageDtoAsync(Webinar page, CancellationToken cancellationToken)
+        => await GetWebinarInternalDto(
+            page,
+            "Webinar",
+            page.EventLocationAddress1,
+            page.EventLocationCity,
+            page.EventLocationCountry,
+            cancellationToken);
+
+    public async Task<EventSchemaMarkupDto> GetEventSchemaMarkupDto(Event page, CancellationToken cancellationToken)
+    {
+        var basicData = await GetEventSchemaMarkupDto(page);
+
+        if (basicData?.Location?.Address != null)
+        {
+            basicData.Location.Address.StreetAddress = page.EventLocationAddress1;
+            basicData.Location.Address.AddressLocality = page.EventLocationCity;
+            basicData.Location.Address.AddressCountry = page.EventLocationCountry;
+        }
+
+        return basicData!;
+    }
+
+    public async Task<EventSchemaMarkupDto> GetWebinarSchemaMarkupDto(Webinar page, CancellationToken cancellationToken)
+    {
+        var basicData = await GetWebinarSchemaMarkupDto(page);
+
+        if (basicData?.Location?.Address != null)
+        {
+            basicData.Location.Address.StreetAddress = page.EventLocationAddress1;
+            basicData.Location.Address.AddressLocality = page.EventLocationCity;
+            basicData.Location.Address.AddressCountry = page.EventLocationCountry;
+        }
+
+        return basicData!;
+    }
+
+    private Task<EventSchemaMarkupDto> GetEventSchemaMarkupDto(Event page)
+    {
+        var pageUrl = ((IWebPageFieldsSource)page).GetUrl().AbsoluteUrl;
+        var imageUrl = page.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+
+        var dto = new EventSchemaMarkupDto
+        {
+            Description = GetEventPostDescription(page),
+            EndDate = page.EventDateTo,
+            Image = imageUrl,
+            Location = new PlaceSchemaMarkupDto
+            {
+                Name = page.EventLocationTitle,
+                Address = new PostalAddressSchemaMarkupDto
+                {
+                    ExtendedAddress = page.EventLocationAddress2,
+                    AddressRegion = page.EventLocationState,
+                    PostalCode = page.EventLocationZip,
+                }
+            },
+            Name = page.MetadataTitle,
+            Offers = new OfferSchemaMarkupDto
+            {
+                Url = pageUrl,
+            },
+            StartDate = page.EventDateFrom,
+            Organizer = GetEventOrganizerSchemaMarkup(pageUrl),
+        };
+
+        return Task.FromResult(dto);
+    }
+    private Task<EventSchemaMarkupDto> GetWebinarSchemaMarkupDto(Webinar page)
+    {
+        var pageUrl = ((IWebPageFieldsSource)page).GetUrl().AbsoluteUrl;
+        var imageUrl = page.MetadataTeaserImage?.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+
+        var dto = new EventSchemaMarkupDto
+        {
+            Description = GetWebinarPostDescription(page),
+            EndDate = page.EventDateTo,
+            Image = imageUrl,
+            Location = new PlaceSchemaMarkupDto
+            {
+                Name = page.EventLocationTitle,
+                Address = new PostalAddressSchemaMarkupDto
+                {
+                    ExtendedAddress = page.EventLocationAddress2,
+                    AddressRegion = page.EventLocationState,
+                    PostalCode = page.EventLocationZip,
+                }
+            },
+            Name = page.MetadataTitle,
+            Offers = new OfferSchemaMarkupDto
+            {
+                Url = pageUrl,
+            },
+            StartDate = page.EventDateFrom,
+            Organizer = GetEventOrganizerSchemaMarkup(pageUrl),
+        };
+
+        return Task.FromResult(dto);
+    }
+
+    private static string? GetEventPostDescription(Event? page)
+    {
+        if (page is null) return null;
+
+        var desc = page.MetadataDescription;
+        if (string.IsNullOrWhiteSpace(desc)) desc = page.EventPostDescription;
+        if (string.IsNullOrWhiteSpace(desc)) desc = page.CpeDescription;
+        if (string.IsNullOrWhiteSpace(desc)) desc = page.CustomBodyText;
+
+        return desc;
+    }
+    private static string? GetWebinarPostDescription(Webinar? page)
+    {
+        if (page is null) return null;
+
+        var desc = page.MetadataDescription;
+        if (string.IsNullOrWhiteSpace(desc)) desc = page.EventPostDescription;
+        if (string.IsNullOrWhiteSpace(desc)) desc = page.CpeDescription;
+        if (string.IsNullOrWhiteSpace(desc)) desc = page.CustomBodyText;
+
+        return desc;
+    }
+    private OrganizationSchemaMarkupDto GetEventOrganizerSchemaMarkup(string? pageAbsoluteUrl)
+    {
+        string? organizationUrl = null;
+        if (!string.IsNullOrWhiteSpace(pageAbsoluteUrl) &&
+            Uri.TryCreate(pageAbsoluteUrl, UriKind.Absolute, out var uri))
+        {
+            organizationUrl = $"{uri.Scheme}://{uri.Authority}";
+        }
+
+        return new OrganizationSchemaMarkupDto
+        {
+            Name = _contentRetriever.GetCurrentSiteLegalNameAsync() ?? string.Empty,
+            Logo = _contentRetriever.GetCurrentSiteLogoImageUrlAsync() ?? string.Empty,
+            Url = organizationUrl,
+        };
+    }
+
+    private Task<string?> GenerateEventICalendarAsync(Event? eventBase, string? locationCity, string? eventLocationAddress1, CancellationToken cancellationToken)
+    {
+        if (eventBase is null)
+            return Task.FromResult<string?>(null);
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var calendarEvent = new CalendarEvent
+        {
+            Start = new CalDateTime(eventBase.EventDateFrom.ToUniversalTime()),
+            End = new CalDateTime(eventBase.EventDateTo.ToUniversalTime()),
+        };
+
+        var location = BuildLocationString(
+            eventBase.EventLocationTitle, eventLocationAddress1,
+            eventBase.EventLocationAddress2, locationCity,
+            eventBase.EventLocationState, eventBase.EventLocationZip);
+
+        if (!string.IsNullOrWhiteSpace(location))
+            calendarEvent.Location = location;
+
+        calendarEvent.Summary = eventBase.MetadataTitle;
+
+        if (!string.IsNullOrWhiteSpace(eventBase.CustomBodyText))
+        {
+            calendarEvent.Description = HtmlHelper.ExtractTextFromHtml(eventBase.CustomBodyText);
+            var htmlDescription = $"""
+                <html><head></head><body><span style='font-family:"Trebuchet MS";font-size:10pt'>{eventBase.CustomBodyText}</span></body></html>
+                """;
+            calendarEvent.AddProperty("X-ALT-DESC;FMTTYPE=text/html", htmlDescription);
+        }
+
+        var (minutesToTriggerRaw, _) = EventnWebinarSetting();
+        int? calendarEventTriggerInMinutes =
+            int.TryParse(minutesToTriggerRaw, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed)
+                ? parsed
+                : null;
+
+        if (calendarEventTriggerInMinutes > 0)
+        {
+            var calendarAlarm = new Alarm
+            {
+                Trigger = new Ical.Net.DataTypes.Trigger(new Ical.Net.DataTypes.Duration(0, 0, 0, -calendarEventTriggerInMinutes.Value, 0)),
+                Action = AlarmAction.Display,
+                Description = "Reminder",
+            };
+            calendarEvent.Alarms.Add(calendarAlarm);
+        }
+
+        var calendar = new Ical.Net.Calendar
+        {
+            Version = "2.0",
+            ProductId = "-//BDO.Calendar//EN",
+        };
+
+        calendar.Events.Add(calendarEvent);
+
+        return Task.FromResult<string?>(new ComponentSerializer().SerializeToString(calendar));
+    }
+    private Task<string?> GenerateWebinarICalendarAsync(Webinar? eventBase, string? locationCity, string? eventLocationAddress1, CancellationToken cancellationToken)
+    {
+        if (eventBase is null)
+            return Task.FromResult<string?>(null);
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var calendarEvent = new CalendarEvent
+        {
+            Start = new CalDateTime(eventBase.EventDateFrom.ToUniversalTime()),
+            End = new CalDateTime(eventBase.EventDateTo.ToUniversalTime()),
+        };
+
+        var location = BuildLocationString(
+            eventBase.EventLocationTitle, eventLocationAddress1,
+            eventBase.EventLocationAddress2, locationCity,
+            eventBase.EventLocationState, eventBase.EventLocationZip);
+
+        if (!string.IsNullOrWhiteSpace(location))
+            calendarEvent.Location = location;
+
+        calendarEvent.Summary = eventBase.MetadataTitle;
+
+        if (!string.IsNullOrWhiteSpace(eventBase.CustomBodyText))
+        {
+            calendarEvent.Description = HtmlHelper.ExtractTextFromHtml(eventBase.CustomBodyText);
+            var htmlDescription = $"""
+                <html><head></head><body><span style='font-family:"Trebuchet MS";font-size:10pt'>{eventBase.CustomBodyText}</span></body></html>
+                """;
+            calendarEvent.AddProperty("X-ALT-DESC;FMTTYPE=text/html", htmlDescription);
+        }
+
+        var (minutesToTriggerRaw, _) = EventnWebinarSetting();
+        int? calendarEventTriggerInMinutes =
+            int.TryParse(minutesToTriggerRaw, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed)
+                ? parsed
+                : null;
+
+        if (calendarEventTriggerInMinutes > 0)
+        {
+            var calendarAlarm = new Alarm
+            {
+                Trigger = new Ical.Net.DataTypes.Trigger(new Ical.Net.DataTypes.Duration(0, 0, 0, -calendarEventTriggerInMinutes.Value, 0)),
+                Action = AlarmAction.Display,
+                Description = "Reminder",
+            };
+            calendarEvent.Alarms.Add(calendarAlarm);
+        }
+
+        var calendar = new Ical.Net.Calendar
+        {
+            Version = "2.0",
+            ProductId = "-//BDO.Calendar//EN",
+        };
+
+        calendar.Events.Add(calendarEvent);
+
+        return Task.FromResult<string?>(new ComponentSerializer().SerializeToString(calendar));
+    }
+
+    private async Task<EventWebinarDto> GetWebinarInternalDto(
+        Webinar page,
+        string type,
+        string? eventLocationAddress1,
+        string? eventLocationCity,
+        string? eventLocationCountry,
+        CancellationToken cancellationToken)
+    {
+        string? registrationButtonUrl = null;
+
+        var directionsUrl = page.ShowEventLocation
+            ? GoogleMapsHelper.GenerateGoogleMapsLink(page.EventLocationLongitude, page.EventLocationLatitude)
+            : GoogleMapsHelper.GenerateGoogleMapsLink(page.EventLocationTitle, eventLocationAddress1, page.EventLocationAddress2, eventLocationCity, page.EventLocationState, page.EventLocationZip);
+
+        var formPage = (await _contentRetriever.GetPagesAsync<EventRegistrationForm>(
+            new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
+            query => query
+                .Where(x => x.WhereEquals("WebPageItemParentID", page.SystemFields.WebPageItemID))
+                .TopN(1),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken)).FirstOrDefault();
+
+        if (formPage is not null)
+        {
+            var url = await _pageUrlRetriever.Retrieve(formPage, _preferredLanguageRetriever.Get(), cancellationToken);
+            registrationButtonUrl = url?.AbsoluteUrl;
+        }
+
+        var pageAbsoluteUrl = ((IWebPageFieldsSource)page).GetUrl().AbsoluteUrl;
+        string? siteUrl = null;
+        if (!string.IsNullOrWhiteSpace(pageAbsoluteUrl) &&
+            Uri.TryCreate(pageAbsoluteUrl, UriKind.Absolute, out var uri))
+        {
+            siteUrl = $"{uri.Scheme}://{uri.Authority}";
+        }
+
+        if (string.Equals(page.RegistrationType, "external", StringComparison.OrdinalIgnoreCase))
+        {
+            registrationButtonUrl = page.RegistrationFormLink;
+        }
+
+        var (_, displayLocationTitle) = EventnWebinarSetting();
+
+        var presenterPages = await _contentRetriever.GetPagesAsync<Presenter>(
+            new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
+            query => query
+                .Where(x => x.WhereEquals("WebPageItemParentID", page.SystemFields.WebPageItemID)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken);
+
+        var presenters = presenterPages?
+            .Select(p => new PresenterDto
+            {
+                Name = p.Name ?? string.Empty,
+                Title = p.Title ?? string.Empty,
+                Link = p.Link,
+            })
+            .ToList() ?? new List<PresenterDto>();
+
+        var sys = page.SystemFields;
+
+        return new EventWebinarDto
+        {
+            Title = page.ShowWebinarTitle ? page.MetadataTitle : null,
+            Description = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(page.MetadataDescription),
+            RegistrationCard = new EventWebinarDetailsRegistrationCardDto
+            {
+                Type = page.EventType.Count() == 1 ? (page.EventType.FirstOrDefault()?.Name) : null,
+                DateFrom = page.EventDateFrom,
+                DateTo = page.EventDateTo,
+                Country = eventLocationCountry,
+                City = eventLocationCity,
+                State = page.EventLocationState,
+                PostalCode = page.EventLocationZip,
+                LocationTitle = displayLocationTitle ? page.EventLocationTitle : null,
+                AddressLine1 = eventLocationAddress1,
+                AddressLine2 = page.EventLocationAddress2,
+                GetDirectionsUrl = directionsUrl,
+                RegistrationButtonUrl = page.EventDateTo > DateTime.UtcNow ? registrationButtonUrl : null,
+                DisableRegistrationButton = !page.AllowRegistration,
+                RecordingUrl = page.EventVideo,
+                DisableAddToCalendar = page.DisableAddToCalendar,
+                AddToCalendarUrl = !page.DisableAddToCalendar && !string.IsNullOrEmpty(siteUrl)
+                    ? $"{siteUrl}/OutlookEvent/{type}/{page.SystemFields.ContentItemGUID}"
+                    : null,
+                ContactEmail = page.EventContactEmail,
+                ContactName = page.EventContactName,
+                ContactPhone = page.EventContactPhone,
+                ZipPositionAfter = page.EventLocationZipPosition == "after",
+                HideEventLocationZipComma = page.HideEventLocationZipComma,
+                DateTextOverride = page.EventDateOverride,
+                TimeTextOverride = page.EventTimeOverride,
+            },
+            CpeEvent = page.CpeEvent,
+            CpeCount = page.CpeEvent ? page.CpeCount : null,
+            CpeCreditNotes = page.CpeEvent ? page.CpeCreditNotes : null,
+            CpeLevel = page.CpeEvent ? page.ProgramLevel : null,
+            CpeDescription = page.CpeEvent
+                ? HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(page.CpeDescription)
+                : null,
+
+            Presenters = presenters,
+            DisablePrintAndShare = page.DisablePrintAndShare,
+            SocialMediaButtons = await _socialMediaButtonsService.GetSocialMediaButtonsDto(page, page.MetadataTitle, cancellationToken),
+            BaseContent = new BaseContent
+            {
+                ContentItemID = sys?.ContentItemID ?? 0,
+                ContentItemGUID = sys?.ContentItemGUID ?? Guid.Empty,
+                ContentItemName = sys?.ContentItemName,
+                ContentItemContentTypeID = sys?.ContentItemContentTypeID ?? 0,
+                ContentItemIsSecured = sys?.ContentItemIsSecured ?? false,
+                ContentItemCommonDataContentLanguageID = sys?.ContentItemCommonDataContentLanguageID ?? 0,
+                ContentItemCommonDataFirstPublishedWhen = sys?.ContentItemCommonDataFirstPublishedWhen ?? default,
+                ContentItemCommonDataLastPublishedWhen = sys?.ContentItemCommonDataLastPublishedWhen ?? default
+            },
+            BaseWebPage = new BaseWebPage
+            {
+                WebPageItemGUID = sys?.WebPageItemGUID ?? Guid.Empty,
+                WebPageItemID = sys?.WebPageItemID ?? 0,
+                WebPageItemName = sys?.WebPageItemName,
+                WebPageItemWebsiteChannelID = sys?.WebPageItemWebsiteChannelId ?? 0,
+                WebPageUrlPath = sys?.WebPageUrlPath,
+                WebPageItemOrder = sys?.WebPageItemOrder ?? 0,
+                WebPageItemTreePath = sys?.WebPageItemTreePath,
+                WebPageUrlPathContentLanguageID = sys?.WebPageUrlPathContentLanguageID ?? 0,
+                WebPageItemParentID = sys?.WebPageItemParentID ?? 0
+            },
+        };
+    }
+
+
+    private async Task<EventWebinarDto> GetEventInternalDto(
+        Event page,
+        string type,
+        string? eventLocationAddress1,
+        string? eventLocationCity,
+        string? eventLocationCountry,
+        CancellationToken cancellationToken)
+    {
+        string? registrationButtonUrl = null;
+
+        var directionsUrl = page.ShowEventLocation
+            ? GoogleMapsHelper.GenerateGoogleMapsLink(page.EventLocationLongitude, page.EventLocationLatitude)
+            : GoogleMapsHelper.GenerateGoogleMapsLink(page.EventLocationTitle, eventLocationAddress1, page.EventLocationAddress2, eventLocationCity, page.EventLocationState, page.EventLocationZip);
+
+        var formPage = (await _contentRetriever.GetPagesAsync<EventRegistrationForm>(
+            new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
+            query => query
+                .Where(x => x.WhereEquals("WebPageItemParentID", page.SystemFields.WebPageItemID))
+                .TopN(1),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken)).FirstOrDefault();
+
+        if (formPage is not null)
+        {
+            var url = await _pageUrlRetriever.Retrieve(formPage, _preferredLanguageRetriever.Get(), cancellationToken);
+            registrationButtonUrl = url?.AbsoluteUrl;
+        }
+
+        var pageAbsoluteUrl = ((IWebPageFieldsSource)page).GetUrl().AbsoluteUrl;
+        string? siteUrl = null;
+        if (!string.IsNullOrWhiteSpace(pageAbsoluteUrl) &&
+            Uri.TryCreate(pageAbsoluteUrl, UriKind.Absolute, out var uri))
+        {
+            siteUrl = $"{uri.Scheme}://{uri.Authority}";
+        }
+
+        if (string.Equals(page.RegistrationType, "external", StringComparison.OrdinalIgnoreCase))
+        {
+            registrationButtonUrl = page.RegistrationFormLink;
+        }
+
+        var (_, displayLocationTitle) = EventnWebinarSetting();
+
+        var presenterPages = await _contentRetriever.GetPagesAsync<Presenter>(
+            new RetrievePagesParameters { LinkedItemsMaxLevel = 1 },
+            query => query
+                .Where(x => x.WhereEquals("WebPageItemParentID", page.SystemFields.WebPageItemID)),
+            RetrievalCacheSettings.CacheDisabled,
+            cancellationToken);
+
+        var presenters = presenterPages?
+            .Select(p => new PresenterDto
+            {
+                Name = p.Name ?? string.Empty,
+                Title = p.Title ?? string.Empty,
+                Link = p.Link,
+            })
+            .ToList() ?? new List<PresenterDto>();
+
+        var sys = page.SystemFields;
+
+        return new EventWebinarDto
+        {
+            Title = page.ShowEventTitle ? page.MetadataTitle : null,
+            Description = HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(page.MetadataDescription),
+            RegistrationCard = new EventWebinarDetailsRegistrationCardDto
+            {
+                Type = page.EventType.Count() == 1 ? (page.EventType.FirstOrDefault()?.Name) : null,
+                DateFrom = page.EventDateFrom,
+                DateTo = page.EventDateTo,
+                Country = eventLocationCountry,
+                City = eventLocationCity,
+                State = page.EventLocationState,
+                PostalCode = page.EventLocationZip,
+                LocationTitle = displayLocationTitle ? page.EventLocationTitle : null,
+                AddressLine1 = eventLocationAddress1,
+                AddressLine2 = page.EventLocationAddress2,
+                GetDirectionsUrl = directionsUrl,
+                RegistrationButtonUrl = page.EventDateTo > DateTime.UtcNow ? registrationButtonUrl : null,
+                DisableRegistrationButton = !page.AllowRegistration,
+                RecordingUrl = page.EventVideo,
+                DisableAddToCalendar = page.DisableAddToCalendar,
+                AddToCalendarUrl = !page.DisableAddToCalendar && !string.IsNullOrEmpty(siteUrl)
+                    ? $"{siteUrl}/OutlookEvent/{type}/{page.SystemFields.ContentItemGUID}"
+                    : null,
+                ContactEmail = page.EventContactEmail,
+                ContactName = page.EventContactName,
+                ContactPhone = page.EventContactPhone,
+                ZipPositionAfter = page.EventLocationZipPosition == "after",
+                HideEventLocationZipComma = page.HideEventLocationZipComma,
+                DateTextOverride = page.EventDateOverride,
+                TimeTextOverride = page.EventTimeOverride,
+            },
+            CpeEvent = page.CpeEvent,
+            CpeCount = page.CpeEvent ? page.CpeCount : null,
+            CpeCreditNotes = page.CpeEvent ? page.CpeCreditNotes : null,
+            CpeLevel = page.CpeEvent ? page.ProgramLevel : null,
+            CpeDescription = page.CpeEvent
+                ? HtmlUtility.RemoveTildeFromUrlTypeHtmlAttributes(page.CpeDescription)
+                : null,
+
+            Presenters = presenters,
+            DisablePrintAndShare = page.DisablePrintAndShare,
+            SocialMediaButtons = await _socialMediaButtonsService.GetSocialMediaButtonsDto(page, page.MetadataTitle, cancellationToken),
+            BaseContent = new BaseContent
+            {
+                ContentItemID = sys?.ContentItemID ?? 0,
+                ContentItemGUID = sys?.ContentItemGUID ?? Guid.Empty,
+                ContentItemName = sys?.ContentItemName,
+                ContentItemContentTypeID = sys?.ContentItemContentTypeID ?? 0,
+                ContentItemIsSecured = sys?.ContentItemIsSecured ?? false,
+                ContentItemCommonDataContentLanguageID = sys?.ContentItemCommonDataContentLanguageID ?? 0,
+                ContentItemCommonDataFirstPublishedWhen = sys?.ContentItemCommonDataFirstPublishedWhen ?? default,
+                ContentItemCommonDataLastPublishedWhen = sys?.ContentItemCommonDataLastPublishedWhen ?? default
+            },
+            BaseWebPage = new BaseWebPage
+            {
+                WebPageItemGUID = sys?.WebPageItemGUID ?? Guid.Empty,
+                WebPageItemID = sys?.WebPageItemID ?? 0,
+                WebPageItemName = sys?.WebPageItemName,
+                WebPageItemWebsiteChannelID = sys?.WebPageItemWebsiteChannelId ?? 0,
+                WebPageUrlPath = sys?.WebPageUrlPath,
+                WebPageItemOrder = sys?.WebPageItemOrder ?? 0,
+                WebPageItemTreePath = sys?.WebPageItemTreePath,
+                WebPageUrlPathContentLanguageID = sys?.WebPageUrlPathContentLanguageID ?? 0,
+                WebPageItemParentID = sys?.WebPageItemParentID ?? 0
+            },
+        };
+    }
+
+    private static string BuildLocationString(string? locationTitle, string? locationAddress, string? locationAddress2, string? locationCity, string? locationState, string? locationZip)
+    {
+        var sb = new StringBuilder();
+        sb.Append(locationTitle + " \\n");
+        sb.Append(!string.IsNullOrEmpty(locationAddress) ? locationAddress + " \\n" : " ");
+        sb.Append(!string.IsNullOrEmpty(locationAddress2) ? locationAddress2 + " \\n" : "");
+        sb.Append(!string.IsNullOrEmpty(locationCity) ? locationCity : " ");
+
+        if (!string.IsNullOrEmpty(locationCity))
+            sb.Append(!string.IsNullOrEmpty(locationState) ? ", " + locationState + " " : " ");
+        else
+            sb.Append(!string.IsNullOrEmpty(locationState) ? " " + locationState + " " : " ");
+
+        sb.Append(!string.IsNullOrEmpty(locationZip) ? locationZip : "");
+
+        var location = sb.ToString();
+        location = TrailingEscapedNewlineRegex().Replace(location.Trim(), "");
+        location = location.Replace("  ", " ");
+        return location;
+    }
+
+    [GeneratedRegex(@"\\n$")]
+    private static partial Regex TrailingEscapedNewlineRegex();
+
+    private (string MinutesToTrigger, bool DisplayLocationInSidebar) EventnWebinarSetting()
+    {
+        var channelSetting = _siteProvider.Get().TopN(1).FirstOrDefault();
+        GlobalsettingskeyInfo? globalSetting = null;
+
+        int minutesToTrigger;
+        if (channelSetting == null || channelSetting.MinutestotriggercalendarreminderInheritfromglobal)
+        {
+            globalSetting = _provider.Get().TopN(1).FirstOrDefault();
+            minutesToTrigger = globalSetting?.Minutestotriggercalendarreminder ?? 0;
+        }
+        else
+        {
+            minutesToTrigger = channelSetting.Minutestotriggercalendarreminder;
+        }
+
+        bool displayLocationInSidebar;
+        if (channelSetting == null || channelSetting.DisplaylocationtitleinasidebarInheritfromglobal)
+        {
+            globalSetting ??= _provider.Get().TopN(1).FirstOrDefault();
+            displayLocationInSidebar = globalSetting?.Displaylocationtitleinasidebar ?? false;
+        }
+        else
+        {
+            displayLocationInSidebar = channelSetting.Displaylocationtitleinasidebar;
+        }
+
+        return (
+            minutesToTrigger.ToString(CultureInfo.InvariantCulture),
+            displayLocationInSidebar
+        );
+    }
+}

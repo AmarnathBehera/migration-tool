@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.ContentTypesFolder</CodeName>
+    <GUID>8b1ae0d6-31df-4491-959e-a6b8d86bb7a9</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.Contenttypes">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.Contenttypes</CodeName>
+        <GUID>327fb912-7a4d-4bb6-8d7d-d1f288ab5b67</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

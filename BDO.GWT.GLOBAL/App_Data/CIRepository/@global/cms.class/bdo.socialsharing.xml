@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>SocialSharing</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="SocialSharingID" columntype="integer" enabled="true" guid="c04a1b8c-e144-4d13-862c-87b39d5ff91f" isPK="true" />
+      <field column="TwitterHandleoftheTwittershare" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="31e088ba-f603-495b-bb05-d6c9a84d11d1" />
+      <field column="FacebookAppID" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="f1fb07ef-a3c6-4ec7-acfc-a6c85ba98456" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>8ccab6af-1fbc-41ba-b5ec-74dcb8d55e4e</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.SocialSharing</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_SocialSharing</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

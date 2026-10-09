@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.allowedchildcontenttype>
+  <Parent>
+    <CodeName>BDO.Metadatafolder</CodeName>
+    <GUID>1bdc9ae4-a4a6-4715-9f06-66bcd88ca24e</GUID>
+    <ObjectType>cms.contenttype</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.BusinessLine">
+      <AllowedChildContentTypeChildID>
+        <CodeName>BDO.BusinessLine</CodeName>
+        <GUID>b70d2494-90c7-42c5-a7d6-44da7013729b</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </AllowedChildContentTypeChildID>
+    </Binding>
+  </Bindings>
+</cms.allowedchildcontenttype>

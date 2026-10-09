@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentworkflowcontenttype>
+  <Parent>
+    <CodeName>AdditionalApprovalStep</CodeName>
+    <GUID>9f10643a-fd7a-46f5-aec1-f2c75ea58d13</GUID>
+    <ObjectType>cms.contentworkflow</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.CopyInsight">
+      <ContentWorkflowContentTypeContentTypeID>
+        <CodeName>BDO.CopyInsight</CodeName>
+        <GUID>4ce005da-7a7f-4d90-9465-fb743e9a943f</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </ContentWorkflowContentTypeContentTypeID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.Insight">
+      <ContentWorkflowContentTypeContentTypeID>
+        <CodeName>BDO.Insight</CodeName>
+        <GUID>afb8b736-7f16-4a85-ab17-081c7833188c</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </ContentWorkflowContentTypeContentTypeID>
+    </Binding>
+  </Bindings>
+</cms.contentworkflowcontenttype>

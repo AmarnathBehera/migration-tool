@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Deal Card - SubIndustry</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="2e115184-f883-48d8-8812-9d6780e7f244" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="8e52d6ae-c1b8-492e-a506-b2818cd4dd5e" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="7cc95fc9-b3a7-4315-9430-1fc6d669c799" isunique="true" system="true" />
+      <field column="Name" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="ba6841a2-2025-4a82-8d4d-dff5962a3c2f" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Name</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field column="CodeName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="972a0939-3220-455d-b7e6-667f55db0e91" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Code Name</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field column="Language" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="4634bfb2-098e-488d-bc28-708d3a26d366" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Language</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>cdab0d33-430e-407a-ad3e-f0a5ac05d5e0</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-pin</ClassIconClass>
+  <ClassName>BDO.DealCardSubIndustry</ClassName>
+  <ClassShortName>BDODealCardSubIndustry</ClassShortName>
+  <ClassTableName>BDO_DealCardSubIndustry</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

@@ -1,0 +1,19 @@
+﻿@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using CMS.Websites
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Web.Core.DTOs.CookieBannerDto
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+
+
+@(await ReactService.RenderComponentAsync(
+    pageId,
+    ReactComponentType.CookieBanner,
+    ReactComponentType.CookieBannerGUID,
+    Model,Context.RequestAborted))

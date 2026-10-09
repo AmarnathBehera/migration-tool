@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassCodeGenerationSettings>
+    <Data>
+      <DisplayNameColumn>WebChannelSnippetID</DisplayNameColumn>
+      <GUIDColumn>WebSettingsGUID</GUIDColumn>
+      <ObjectType>BDO.WebChannelSnippet</ObjectType>
+      <UseGuidHashtable>False</UseGuidHashtable>
+      <UseIdHashtable>False</UseIdHashtable>
+      <UseNameHashtable>False</UseNameHashtable>
+    </Data>
+  </ClassCodeGenerationSettings>
+  <ClassDisplayName>Web channel snippet</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="WebChannelSnippetID" columntype="integer" enabled="true" guid="a969acad-c0b2-4b86-bbed-df2f712c4b66" isPK="true" />
+      <field column="WebChannelSnippetWebChannelSettingsID" columnprecision="0" columntype="integer" enabled="true" guid="fcb17088-e34b-4669-966d-8c2a5e8286f0" refobjtype="bdo.webchannelsettings" reftype="Required">
+        <properties>
+          <defaultvalue>0</defaultvalue>
+        </properties>
+      </field>
+      <field allowempty="true" column="ScriptHeadKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="f69bc0d8-8866-4d1a-a19f-d80f910b81a5" />
+      <field allowempty="true" column="MarketoMunchkinCodeKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="4ec107e7-b3e5-40b1-a4a3-6bf7413d9596" />
+      <field allowempty="true" column="ScriptexecutedwhencookiesareacceptedKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="8942f7cd-063c-4382-993d-68e9664f15aa" />
+      <field allowempty="true" column="ScriptinbottomofBodyKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="2d0e7e52-dce5-4e1b-8ae0-4d6d8c51ea96" />
+      <field allowempty="true" column="ScriptinTopofBodyKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="8a444e9a-6aa2-4650-be6f-6fab1de0ce00" />
+      <field allowempty="true" column="ScriptsTopofPageHeadKeyValue" columnprecision="0" columntype="longtext" enabled="true" guid="c591e432-aa42-46d0-b964-d6c18e077553" />
+      <field column="WebSettingsGUID" columnprecision="0" columntype="guid" enabled="true" guid="7d160e34-c736-43a4-ad71-3676433fb98d" />
+      <field allowempty="true" column="ScriptHeadInheritfromglobalsettings" columnprecision="0" columntype="boolean" enabled="true" guid="83b3f2cc-1cb0-40f6-bb79-20c2c0f76ec0" />
+      <field allowempty="true" column="ScriptsTopofPageInheritfromglobalsetting" columnprecision="0" columntype="boolean" enabled="true" guid="44664618-1f69-49b3-9bea-24ffcd3ba501">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+        </properties>
+      </field>
+      <field allowempty="true" column="ScriptinbottomofBodyInheritFromGlobal" columnprecision="0" columntype="boolean" enabled="true" guid="660e3157-af78-4f2f-8396-9993c3e64827" />
+      <field allowempty="true" column="ScriptinTopofBodyInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="2b5ffc8d-4ab8-4336-a975-31ea181ea868" />
+      <field allowempty="true" column="ScriptexecutedwhencookiesareacceptedInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="6dce8a8f-331e-438e-8efd-36ee0a09d7b6" />
+      <field allowempty="true" column="MarketoMunchkinCodeInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="c181f540-9a92-4597-b77e-3e865c4b8924" />
+      <field allowempty="true" column="FromEmail" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="c483266a-2e8d-4583-824f-498cf7cadfb5" />
+      <field allowempty="true" column="FromEmailInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="b7ac602e-6422-44c9-9d38-715cf753cf8c" />
+      <field allowempty="true" column="DisplayName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="896fa6d9-6e85-403a-81d4-81832213318c">
+        <properties>
+          <defaultvalue>Email</defaultvalue>
+        </properties>
+      </field>
+      <field allowempty="true" column="MinutestotriggercalendarreminderInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="999c7914-f9f1-49c5-b455-b31182ae4874" />
+      <field allowempty="true" column="Minutestotriggercalendarreminder" columnprecision="0" columntype="integer" enabled="true" guid="31567fda-51ad-44f0-91db-c1ab02b3fe94">
+        <properties>
+          <defaultvalue>0</defaultvalue>
+        </properties>
+      </field>
+      <field allowempty="true" column="DisplaylocationtitleinasidebarInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="d04fe874-91e3-429b-80cd-b872fb7da420" />
+      <field allowempty="true" column="Displaylocationtitleinasidebar" columnprecision="0" columntype="boolean" enabled="true" guid="59b07c5d-d4a0-4078-872d-7a1103fcc407" />
+      <field allowempty="true" column="NonASCIItoASCIIcharacterdictionaryInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="adbad557-53d1-430e-8459-9c21c6823240" />
+      <field allowempty="true" column="NonASCIItoASCIIcharacterdictionary" columnprecision="0" columntype="longtext" enabled="true" guid="e02dee50-bb4f-4371-8a9e-dc329c397746" />
+      <field allowempty="true" column="EnableexternallinkwarningInheritfromlocal" columnprecision="0" columntype="boolean" enabled="true" guid="ba1f0c80-da34-487a-8c82-fd79a0cc98ee" />
+      <field allowempty="true" column="Enableexternallinkwarning" columnprecision="0" columntype="boolean" enabled="true" guid="60a239b6-e353-4011-8334-d5750cd1b35b" />
+      <field allowempty="true" column="SeoSettingsRobotsInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="d8b8be54-8ec7-4e17-b89d-3440b21cb0ad" />
+      <field allowempty="true" column="SeoSettingsRobots" columnprecision="0" columnsize="3000" columntype="text" enabled="true" guid="1247d849-665d-4214-817f-6583766a5b69" />
+      <field allowempty="true" column="SeoSettingsSecurityInheritfromGlobal" columnprecision="0" columntype="boolean" enabled="true" guid="4001065c-047c-45ab-9d90-9039b0194d55" />
+      <field allowempty="true" column="SeoSettingsSecurity" columnprecision="0" columnsize="3000" columntype="text" enabled="true" guid="8bbff591-ac90-4dd4-bc3d-2ecd263e71ae" />
+      <field allowempty="true" column="DisableDownloadInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="6cbe028b-6ebf-4a24-a3dc-4f6de2262efe" />
+      <field allowempty="true" column="DisableDownload" columnprecision="0" columntype="boolean" enabled="true" guid="8e0dd078-8e3e-4742-8e3c-d0ea40f89be1" />
+      <field allowempty="true" column="DisablePrintInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="1b2e3e0a-2336-441c-84d8-99d578d01012" />
+      <field allowempty="true" column="DisablePrint" columnprecision="0" columntype="boolean" enabled="true" guid="6619cfd0-7003-4465-82bf-91533b464fe1" />
+      <field allowempty="true" column="DisableFacebookInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="f9a9cf3a-f06d-4e7f-bff8-751c3ec90b9b" />
+      <field allowempty="true" column="DisableFacebook" columnprecision="0" columntype="boolean" enabled="true" guid="79a814b7-4976-44ff-8285-6cd81fbc917b" />
+      <field allowempty="true" column="DisableTwitterInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="07d58174-8a06-42be-a517-acdfea509095" />
+      <field allowempty="true" column="DisableTwitter" columnprecision="0" columntype="boolean" enabled="true" guid="61ac71df-f89c-4032-a9de-b4a7924c3884" />
+      <field allowempty="true" column="DisableLinkedInInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="f55a7eb0-5aba-4fcd-9e8d-7933f1f18044" />
+      <field allowempty="true" column="DisableLinkedIn" columnprecision="0" columntype="boolean" enabled="true" guid="32270c80-7208-4c2a-ad56-9dfcb9761fc2" />
+      <field allowempty="true" column="DisableEmailInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="3b545bd7-b072-4585-aafe-93d7356a64d5" />
+      <field allowempty="true" column="DisableEmail" columnprecision="0" columntype="boolean" enabled="true" guid="3e3bfd3d-f3b7-4349-a0fd-f5f64ad99c3e" />
+      <field allowempty="true" column="DisableCopyLinkButtonInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="6a11c198-3fec-48ef-a34e-3d24d237c9d8" />
+      <field allowempty="true" column="DisableCopyLinkButton" columnprecision="0" columntype="boolean" enabled="true" guid="715985e9-38e0-489a-9e38-d437f52c46e7" />
+      <field allowempty="true" column="ShowtooltipInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="efa9de7f-c7c1-4332-8a84-aacf867c358e" />
+      <field allowempty="true" column="Showtooltip" columnprecision="0" columntype="boolean" enabled="true" guid="cc14ec37-8fcf-42af-ba6b-ac1966be7049" />
+      <field allowempty="true" column="DisplayEmailinvCardInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="d7c49dd5-5bc5-4071-a15e-acda3bd58ac4" />
+      <field allowempty="true" column="DisplayEmailinvCard" columnprecision="0" columntype="boolean" enabled="true" guid="10082559-fbe6-4e97-8c80-86f58f6a17f8" />
+      <field allowempty="true" column="UsePageTitleToDisplayPersonNameInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="f6a6e445-b60e-4beb-90eb-20cf212adcf9" />
+      <field allowempty="true" column="UsePageTitleToDisplayPersonName" columnprecision="0" columntype="boolean" enabled="true" guid="b322c146-2ff8-4383-b0bc-0bbaf65b6e69" />
+      <field allowempty="true" column="EnableCookiebotInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="8c0000f0-40a2-4d26-b81a-5ef879a857cc" />
+      <field allowempty="true" column="EnableCookiebot" columnprecision="0" columntype="boolean" enabled="true" guid="ee7060f6-eea2-4806-8f12-d7dc027f44b4" />
+      <field allowempty="true" column="CookieIDInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="3683db6b-6263-44d8-a24a-c4157bfd9cf5" />
+      <field allowempty="true" column="CookieID" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="7fd26cc9-f564-4978-a181-f8be7a2649cf" />
+      <field allowempty="true" column="CustomCookiebotScriptInheritfromglobal" columnprecision="0" columntype="boolean" enabled="true" guid="01a0738d-bb74-44fe-a44a-853e2e7afcc0" />
+      <field allowempty="true" column="CustomCookiebotScript" columnprecision="0" columntype="longtext" enabled="true" guid="c7e0fda2-945f-49e5-9932-2e85faeb556e" />
+      <field allowempty="true" column="ShowAdvancedWidgets" columnprecision="0" columntype="boolean" enabled="true" guid="abed7706-66e0-46a2-bc34-d8cfec765196">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+        </properties>
+      </field>
+      <field allowempty="true" column="ShowAdvancedWidgetsInheritfromglobalsettings" columnprecision="0" columntype="boolean" enabled="true" guid="b8b721e2-d795-4bc1-ae46-64305453e957">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+        </properties>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>b8d0d5cb-4b0a-48fa-a8a4-54dc06ee7bfa</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.WebChannelSnippet</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_WebChannelSnippet</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

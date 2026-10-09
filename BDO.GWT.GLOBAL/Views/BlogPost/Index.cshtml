@@ -1,0 +1,43 @@
+﻿@using BDO
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using Kentico.Content.Web.Mvc
+@model BDO.GWT.Core.DTOs.BlogPostDto
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+@inject IPageBuilderService PageBuilderService
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+
+    var widgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.EditorsPick,
+        ComponentIdentifiers.Widgets.FlexibleContent,
+        ComponentIdentifiers.Widgets.ImageWithText,
+        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.KeyTakeaways,
+        ComponentIdentifiers.Widgets.RelatedContacts,
+    };    
+}
+
+@await Html.PartialAsync("_Hero")
+
+@await Html.PartialAsync("_LocalNavigation")
+
+@(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.InsightDetails,
+        ReactComponentType.InsightDetailsGUID,
+        new { data = Model },
+        Context.RequestAborted))
+
+@await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
+
+

@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Navigation</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="34318324-9c06-4a5e-a6a7-43f67fdd1597" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="6db2cbd0-cda2-409c-9ef4-0f6ddf4b7906" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="750eaa50-d9f5-4637-9c4d-1742a0eedcd2" isunique="true" system="true" />
+      <field column="Title" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="e5f7f028-ca2c-450b-8163-50cefff5bf2f" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="TopMenu" columnprecision="0" columntype="contentitemreference" enabled="true" guid="adf73ed4-de42-40fd-a4bb-04c56032d8ee" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>TopMenu</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["ceb7b7b1-256e-4158-96cf-a33fcbe96c2c","afb8a1ec-5001-46e6-8e98-4b9e28995e48","7de84a06-569a-4dac-b701-55df640a4a49","afbf6f00-540b-44f1-b40b-ea7975a6185e","a15c3744-bd53-4359-b3a8-9fd52bd0c611","b1d1ea96-03a2-4a44-82f7-92973086a93b","4cbaa98f-42c8-4bf3-9bd4-21805730b520","c9ad5d32-9b92-477d-abd0-6b732dc1e86f"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>5</MaximumItems>
+          <MinimumItems>1</MinimumItems>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>Please select one page</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>bba6a14e-0cf1-44cd-9b10-119588fc6271</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-pin</ClassIconClass>
+  <ClassName>BDO.Navigation</ClassName>
+  <ClassShortName>BDONavigation</ClassShortName>
+  <ClassTableName>BDO_Navigation</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

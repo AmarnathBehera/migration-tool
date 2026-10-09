@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.tag>
+  <TagGUID>1832095a-3a50-417b-874a-c9333af8c72c</TagGUID>
+  <TagMetadata>
+    <![CDATA[{"Translations":{"8517e6d4-6f93-4003-9e15-e30e302d68e9":{"Title":null,"Description":null},"ee380e62-f7ff-416a-88c1-646fe247d5f3":{"Title":null,"Description":null}}}]]>
+  </TagMetadata>
+  <TagName>Construction.En-GB</TagName>
+  <TagOrder>1</TagOrder>
+  <TagParentID>
+    <CodeName>RealEstate.En-GB</CodeName>
+    <GUID>5c99945d-19c1-4968-a4d7-1f7ca1245c8d</GUID>
+    <ObjectType>cms.tag</ObjectType>
+  </TagParentID>
+  <TagTaxonomyID>
+    <CodeName>globalIndustry</CodeName>
+    <GUID>f803b21f-ee55-4715-b348-882acd851bf8</GUID>
+    <ObjectType>cms.taxonomy</ObjectType>
+  </TagTaxonomyID>
+  <TagTitle>Construction</TagTitle>
+</cms.tag>

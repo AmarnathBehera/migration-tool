@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentworkflowcontenttype>
+  <Parent>
+    <CodeName>ApproveMicrosite</CodeName>
+    <GUID>c80962e7-6474-478d-a349-93558d71d129</GUID>
+    <ObjectType>cms.contentworkflow</ObjectType>
+  </Parent>
+  <Bindings>
+    <Binding id="cms.contenttype_BDO.MicrositeMasterPage">
+      <ContentWorkflowContentTypeContentTypeID>
+        <CodeName>BDO.MicrositeMasterPage</CodeName>
+        <GUID>14a4e025-0212-44f7-805b-f7604ca10d04</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </ContentWorkflowContentTypeContentTypeID>
+    </Binding>
+    <Binding id="cms.contenttype_BDO.MicrositePage">
+      <ContentWorkflowContentTypeContentTypeID>
+        <CodeName>BDO.MicrositePage</CodeName>
+        <GUID>24473f7c-9eb7-44cc-bf31-e1b9c4aa78fc</GUID>
+        <ObjectType>cms.contenttype</ObjectType>
+      </ContentWorkflowContentTypeContentTypeID>
+    </Binding>
+  </Bindings>
+</cms.contentworkflowcontenttype>

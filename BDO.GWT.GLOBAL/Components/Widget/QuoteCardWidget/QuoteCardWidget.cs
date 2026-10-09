@@ -1,0 +1,101 @@
+﻿using BDO.GWT.Core.Data.QuoteCardData;
+using BDO.GWT.Core.DTOs;
+using BDO.GWT.Core.Services.Widget;
+using Kentico.Content.Web.Mvc;
+using Kentico.PageBuilder.Web.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace BDO.GWT.Web.Widgets.QuoteCardWidget;
+
+public class QuoteCardWidget : ViewComponent
+{
+    private readonly IContentRetriever _contentRetriever;
+    private readonly IButtonUrlRetriever _buttonUrlRetriever;
+
+    public QuoteCardWidget(IContentRetriever contentRetriever, IButtonUrlRetriever buttonUrlRetriever)
+    {
+        _contentRetriever = contentRetriever;
+        _buttonUrlRetriever = buttonUrlRetriever;
+    }
+
+    public async Task<IViewComponentResult> InvokeAsync(ComponentViewModel<QuoteCardWidgetProperties> model)
+    {
+        var cancellationToken = HttpContext.RequestAborted;
+
+        if (model == null)
+        {
+            return View("~/Components/Widget/QuoteCardWidget/_QuoteCardWidget.cshtml", new QuoteCardData());
+        }
+
+        string buttonUrl = null;
+
+        if (model.Properties.UrlSource == "manual")                             
+        {
+            buttonUrl = model.Properties.ManualUrl;
+        }
+        else
+        {
+            var guids = model.Properties.ButtonUrl?
+                .Where(x => x.Identifier != Guid.Empty)
+                .Select(x => x.Identifier)
+                .ToList();
+
+            if (guids?.Count > 0)
+            {
+                var pages = await _buttonUrlRetriever.GetTilePagesAsync(guids, cancellationToken);
+                buttonUrl = pages.FirstOrDefault()?.URL;
+            }
+        }
+
+        var imageUrl = await GetImageUrlAsync(model.Properties, cancellationToken);
+
+        var dto = new QuoteCardData
+        {
+            TopMargin = model.Properties.TopMargin,
+            BottomMargin = model.Properties.BottomMargin,
+            WidgetID = model.Properties.WidgetID,
+            Data = new QuoteCard
+            {
+                AuthorsJobTitle = model.Properties.AuthorsJobTitle,
+                Button = new LinkItemDto
+                {
+                    Title = model.Properties.ButtonText!,
+                    URL = buttonUrl,
+                    Target = model.Properties.PrimaryButtonLinkTarget,
+                },
+                Size = model.Properties.Size,
+                Heading = model.Properties.Heading,
+                ImageAltText = model.Properties.ImageAltText,
+                ImageURL = imageUrl,
+                SubHeading = model.Properties.Subheading,
+                QuoteText = model.Properties.QuoteText,
+                QuotesAuthor = model.Properties.QuotesAuthor,
+            }
+        };
+
+        return View("~/Components/Widget/QuoteCardWidget/_QuoteCardWidget.cshtml", dto);
+    }
+
+    private async Task<string> GetImageUrlAsync(
+        QuoteCardWidgetProperties properties,
+        CancellationToken cancellationToken)
+    {
+        var imageRef = properties.Image?.FirstOrDefault();
+
+        if (imageRef == null || imageRef.Identifier == Guid.Empty)
+        {
+            return null;
+        }
+
+        var result = await _contentRetriever.RetrieveContentByGuids<ContentAttachment>(
+            new[] { imageRef.Identifier },
+            cancellationToken
+        );
+
+        return result.FirstOrDefault()?.ContentAttachmentAsset?.Url;
+    }
+}

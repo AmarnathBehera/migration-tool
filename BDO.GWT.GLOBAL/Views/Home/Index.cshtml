@@ -1,0 +1,63 @@
+﻿@using BDO
+@using Kentico.Content.Web.Mvc
+@using Kentico.PageBuilder.Web.Mvc
+@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using CMS.Websites
+@model BDO.GWT.Core.DTOs.HomeDto
+@inject IPageBuilderService PageBuilderService
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+@{
+    Layout = "_Layout";
+
+    var widgetsList = new[]
+        {
+        ComponentIdentifiers.Widgets.Accordion,
+        ComponentIdentifiers.Widgets.ImageWithText,
+        ComponentIdentifiers.Widgets.TiledLinkSection,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+    };
+
+    var sectionsList = new[]
+    {
+        ComponentIdentifiers.Sections.DefaultSection,
+        ComponentIdentifiers.Sections.Container
+    };
+}
+
+    @if (Model != null && pageId != 0)
+    {
+        @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.HomeHero,
+        ReactComponentType.HomeHeroGUID,
+        new {
+        homeHero = Model.HomeHeroSlides,
+
+        },
+        Context.RequestAborted))
+    }
+
+<div class="elevated">
+    @if (Model != null && pageId != 0)
+    {
+        @(await ReactService.RenderComponentAsync(
+        pageId,
+        ReactComponentType.TrendingTopics,
+        ReactComponentType.TrendingTopicsGUID,
+        new {
+        data = Model.TrendingTopics
+        },
+        Context.RequestAborted))
+    }
+    @await PageBuilderService.AddDefaultWidgets().AddWidgets(widgetsList).AddSections(sectionsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
+</div>
+
+

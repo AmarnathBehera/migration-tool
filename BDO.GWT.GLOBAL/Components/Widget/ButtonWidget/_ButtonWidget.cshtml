@@ -1,0 +1,25 @@
+﻿@using BDO.GWT.Core.Constants
+@using BDO.GWT.Core.Services
+@using BDO.GWT.Web.Core.LiveSite.Data
+@using CMS.Websites
+@using Kentico.Content.Web.Mvc
+@model ButtonData
+
+
+@inject IReactService ReactService
+@inject IWebPageDataContextRetriever WebPageDataContextRetriever
+
+@{
+    var pageContext = WebPageDataContextRetriever.Retrieve();
+    var pageId = pageContext.WebPage.WebPageItemID;
+}
+
+@if (Model != null && pageId != 0)
+{
+    @(await ReactService.RenderComponentAsync(
+    pageId,
+    ReactComponentType.ButtonWidget,
+    ReactComponentType.ButtonWidgetGUID,
+    Model, Context.RequestAborted))
+}
+

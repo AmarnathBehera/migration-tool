@@ -1,0 +1,27 @@
+# Use this file to catalogue false positives for GitLeaks.
+
+# Added bdo-gwt-xbyk-cms-dev Entra App secret into appsettings.json; secret has been removed and rotated.
+41a4d414985be42a3badc9a1d3b26df1a41bc572:BDO.GWT.GLOBAL/appsettings.json:azure-ad-client-secret:25
+7d807e75fc3e5b3c72a5ef567dc43aebdce7516e:BDO.GWT.GLOBAL/appsettings.json:azure-ad-client-secret:25
+27322b5140893441681282510f71424283929bd3:BDO.GWT.GLOBAL/Program.cs:azure-ad-client-secret:75
+65c2579742b263cf5c150cee620327162e5e0cec:BDO.GWT.GLOBAL/Program.cs:azure-ad-client-secret:52
+00c03e3da28e03f5450454a81ace0d25c36f03ab:BDO.GWT.GLOBAL/Program.cs:generic-api-key:50
+e976c09ac3b67e8d9aeb1734effd16b32121c8d5:BDO.GWT.GLOBAL/appsettings.json:azure-ad-client-secret:35
+4665cbe5b358d0548ebc3d8e5e4ed0f30af5d2ea:BDO.GWT.GLOBAL/appsettings.json:azure-ad-client-secret:38
+5df48c4f8b739d1e5ae9e2c906d47655a3490d6b:BDO.GWT.GLOBAL/appsettings.json:azure-ad-client-secret:38
+4665cbe5b358d0548ebc3d8e5e4ed0f30af5d2ea:BDO.GWT.GLOBAL/appsettings.json:generic-api-key:15
+5df48c4f8b739d1e5ae9e2c906d47655a3490d6b:BDO.GWT.GLOBAL/appsettings.json:generic-api-key:16
+8a8fcd6dd5b8e53bbdc75909d62e20b34c69b6fe:BDO.GWT.GLOBAL/appsettings.json:azure-ad-client-secret:33
+8a8fcd6dd5b8e53bbdc75909d62e20b34c69b6fe:BDO.GWT.GLOBAL.API/appsettings.json:generic-api-key:15
+8a8fcd6dd5b8e53bbdc75909d62e20b34c69b6fe:BDO.GWT.GLOBAL/appsettings.json:generic-api-key:15
+
+# Added storage account shared key into appsettings.json; key has been removed and rotated.
+e976c09ac3b67e8d9aeb1734effd16b32121c8d5:BDO.GWT.GLOBAL/appsettings.json:generic-api-key:15
+
+# React.cs; false positive
+fd99209e05b6807d5130feb09dad26daf33e5c5f:BDO.GWT.Core/Constants/ReactComponentType.cs:generic-api-key:90
+23e0414eed52adf196c487574ff8ad2224c78a72:BDO.GWT.Core/Constants/ReactComponentType.cs:generic-api-key:71
+d32e02bad0af5885a1dbdeee9c7c49270811a46e:BDO.GWT.Core/Constants/ReactComponentType.cs:generic-api-key:87
+49aa7f354f295e3250004f77a42e8df9c1551a3b:BDO.GWT.Core/Constants/ReactComponentType.cs:generic-api-key:87
+b313d9098552adbe27fc100a033f94c31d58ddf3:BDO.GWT.Core/Constants/ReactComponentType.cs:generic-api-key:90
+3e4d364f565387cb5b8bd2942e316a84f9506eb4:BDO.GWT.Core/Constants/ReactComponentType.cs:generic-api-key:90

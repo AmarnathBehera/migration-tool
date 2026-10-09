@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Localization Translation</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="LocalizationTranslationItemID" columntype="integer" enabled="true" guid="5009c5b6-cffa-4f45-af45-04608bf24115" isPK="true" />
+      <field column="LocalizationTranslationItemGuid" columnprecision="0" columntype="guid" enabled="true" guid="904ee77c-5805-45ba-840d-6eecdc2e6101" visible="true" />
+      <field column="LocalizationTranslationItemLocalizationKeyItemId" columnprecision="0" columntype="integer" enabled="true" guid="21ad3e94-6a24-4f19-8b3d-681afb31fc2c" refobjtype="nittinlocalization.localizationkeyitem" reftype="Required" visible="true" />
+      <field column="LocalizationTranslationItemContentLanguageId" columnprecision="0" columntype="integer" enabled="true" guid="3bfb47e0-9b50-4159-b303-5f3fe3ef2227" refobjtype="cms.contentlanguage" reftype="Required" visible="true" />
+      <field allowempty="true" column="LocalizationTranslationItemText" columnprecision="0" columntype="longtext" enabled="true" guid="bf13e123-61e5-4025-8b92-89f387bc7f34" visible="true" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>3ec370c8-59af-4ddb-8875-86a9226b5832</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>NittinLocalization.LocalizationTranslationItem</ClassName>
+  <ClassResourceID>
+    <CodeName>XperienceCommunity.Localization</CodeName>
+    <GUID>5ab00892-5a6c-448a-9df7-7d19a983b65f</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>NittinLocalization_LocalizationTranslationItem</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

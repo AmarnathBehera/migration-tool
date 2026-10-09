@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>PrintorShare</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="PrintorShareID" columntype="integer" enabled="true" guid="eab99893-4af1-424c-8c30-4356ba355b3f" isPK="true" />
+      <field column="DisableDownload" columnprecision="0" columntype="boolean" enabled="true" guid="483252fb-59bd-4d6d-b0c8-73b65ded9ad1" />
+      <field column="DisablePrint" columnprecision="0" columntype="boolean" enabled="true" guid="ec8f41a9-3103-4879-bf9d-7f5b4338f9cb" />
+      <field column="DisableFacebook" columnprecision="0" columntype="boolean" enabled="true" guid="dcf2666c-a3de-45ac-83d5-622ace43faae" />
+      <field column="DisableTwitter" columnprecision="0" columntype="boolean" enabled="true" guid="421b2eee-e4e0-4f73-9273-7e51ba819f30" />
+      <field column="DisableLinkedIn" columnprecision="0" columntype="boolean" enabled="true" guid="e52f5e7c-21b8-4527-9155-95a9a22e7c4e" />
+      <field column="DisableEmail" columnprecision="0" columntype="boolean" enabled="true" guid="cde7befb-24df-4b78-b7d8-1d3b07c23224" />
+      <field column="DisableCopyLinkButton" columnprecision="0" columntype="boolean" enabled="true" guid="5101f7b6-8dc7-469f-af6d-7e9d8490cf59" />
+      <field column="PnSSettingsWebChannelSettingID" columnprecision="0" columntype="integer" enabled="true" guid="38016a68-0369-4b5f-aaa1-ba1fc6389844" refobjtype="bdo.webchannelsettings" reftype="Required" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>076741d7-dfd7-4d63-ba9d-2e92535df55a</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.PrintorShare</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_PrintorShare</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

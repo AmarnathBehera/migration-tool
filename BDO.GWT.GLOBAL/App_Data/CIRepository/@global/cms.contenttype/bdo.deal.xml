@@ -1,0 +1,298 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Deal</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="7d3584a8-3e45-40e8-9f95-ac788ea17a0e" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="38a8c61f-7dfb-40f5-8a3a-2efc156f6076" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="07fb2f90-4f9c-4a5c-b8c2-fec8892d528a" isunique="true" system="true" />
+      <field allowempty="true" column="MetadataShowTitle" columnprecision="0" columntype="boolean" enabled="true" guid="ebabff49-7326-4712-a586-508d5d09ce30" visible="true">
+        <properties>
+          <defaultvalue>False</defaultvalue>
+          <explanationtext>
+            <![CDATA[Changing this option may affect SEO if the page already has a Main Heading (H1) tag title.]]>
+          </explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Show title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <field allowempty="true" column="DealContent" columnprecision="0" columntype="longtext" enabled="true" guid="0d54bdd8-baf9-4149-bc18-7334587e4ff7" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Content</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <ConfigurationName>Kentico.Administration.StructuredContent</ConfigurationName>
+          <controlname>Kentico.Administration.RichTextEditor</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="Industry" columnprecision="0" columntype="contentitemreference" enabled="true" guid="948a7b8d-df0f-4494-b9c1-58c782ff753e" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Industry</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["bdd17a11-079d-4afa-9490-c8c2f90f8353"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="SubIndustry" columnprecision="0" columntype="contentitemreference" enabled="true" guid="584b9dca-a1d6-46f5-a070-78f4563db586" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Sub Industry</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["cdab0d33-430e-407a-ad3e-f0a5ac05d5e0"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+        <visibilityconditiondata>
+          <VisibilityConditionConfiguration>
+            <Identifier>Kentico.Administration.MinLengthContentItems</Identifier>
+            <Properties>
+              <PropertyName>Industry</PropertyName>
+              <Length>1</Length>
+            </Properties>
+          </VisibilityConditionConfiguration>
+        </visibilityconditiondata>
+      </field>
+      <field allowempty="true" column="DealType" columnprecision="0" columntype="contentitemreference" enabled="true" guid="48680518-2f40-47d0-9ae7-fb6cbc8a635d" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Deal type</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["cfe5a014-3dc5-4df5-8727-b21e91016436"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field column="DateField" columnprecision="0" columntype="date" enabled="true" guid="4a35f79b-5035-44de-b957-dc642704b01a" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Date</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.DateInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="Size" columnprecision="0" columntype="contentitemreference" enabled="true" guid="06db6bec-f0c6-4e23-91e1-114cea43e1d6" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Deal size</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["b06a34f3-9904-41b9-8a1a-a9747892bb6e"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <field allowempty="true" column="MetadataOfficeLocation" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="97452d9a-b043-4d95-b691-4cdb210316b3" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Office location</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.SQLDropdown</controlname>
+          <Script>
+<![CDATA[
+SELECT lo.ContentItemDataCommonDataID, cicd.MetadataTitle FROM dbo.BDO_LocationOffice AS lo
+INNER JOIN dbo.CMS_ContentItemCommonData AS cicd ON lo.ContentItemDataCommonDataID = cicd.ContentItemCommonDataID
+]]>
+          </Script>
+        </settings>
+      </field>
+      <field allowempty="true" column="ClientName" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="f4beeb2d-00f6-4d6e-b528-448c9d4ef85a" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Client name</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="RelatedDeals" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="e29f5246-217e-4e20-9620-93a52fae11a0" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Related deals</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.SQLDropdown</controlname>
+          <Script>
+<![CDATA[
+    SELECT
+    cicd.MetadataTitle
+FROM dbo.BDO_Deal AS lo
+INNER JOIN dbo.CMS_ContentItemCommonData AS cicd
+    ON lo.ContentItemDataCommonDataID = cicd.ContentItemCommonDataID;
+]]>
+          </Script>
+        </settings>
+      </field>
+      <field allowempty="true" column="DealMetadataRssCategory" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="cbfb63f4-0aab-4fb9-8d21-e43d481593a1" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>RSS category</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="DealMetadataRssImage" columnprecision="0" columntype="contentitemreference" enabled="true" guid="04e565b2-d7c0-4e2c-8d96-26d0e67c7bd9" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Rss Image</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["4e214df1-edd5-4441-a0b7-53849526b1d3"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <schema guid="b3326bf5-1ba7-415e-9366-fab20a18b931" name="b3326bf5-1ba7-415e-9366-fab20a18b931">
+        <properties />
+      </schema>
+      <schema guid="b760a373-943b-4321-ac39-d5067101ff82" name="b760a373-943b-4321-ac39-d5067101ff82">
+        <properties />
+      </schema>
+      <schema guid="34bc2c94-d4b6-4c53-a6f4-9b9520a24493" name="34bc2c94-d4b6-4c53-a6f4-9b9520a24493">
+        <properties />
+      </schema>
+      <field allowempty="true" column="ContentSharingSeperator" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="f28f0082-8d74-48b1-8e06-c74e67a3e718" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Content sharing options</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="SharingOptIn" columnprecision="0" columntype="boolean" enabled="true" guid="1c988b45-a59b-44f4-81ac-83b7bcb426fd" visible="true">
+        <properties>
+          <explanationtext>
+            <![CDATA[Only English deal cards are shared on the BDO Global website. ]]>
+          </explanationtext>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Share deal on BDO Global website</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.Checkbox</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="DealCountry" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="a5b88a75-ec4e-4ffd-a6a0-b08e6a774364" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Country</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="AuthorInformationSeperator" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="68fcc55e-68e4-49a5-ab11-87602e8e9725" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Author Information</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>BDO.GWT.Admin.FieldGroupSeparator</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="DisplayedContacts" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="e9cf71ba-0d1e-4072-86f4-825b92dc854f" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>No. of contacts displayed in sidebar</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+          <includeintranslation>True</includeintranslation>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.DropDownSelector</controlname>
+          <Options>
+<![CDATA[
+1;1
+2;2
+3;3
+]]>
+          </Options>
+          <OptionsValueSeparator>;</OptionsValueSeparator>
+        </settings>
+      </field>
+      <field allowempty="true" column="RelevantContactPersonDeal" columnprecision="0" columntype="contentitemreference" enabled="true" guid="726d3412-b273-4b57-95ca-f9ad9ad50e72" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Relevant contact people</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["f3c1aa73-5245-4566-ae9c-ac80c54a6ce2","f868347c-a9e1-459c-aa63-06b98c5fb82e"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+      </field>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>6551b6dd-873d-4535-b72d-a1ab4c4103e3</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-perfume</ClassIconClass>
+  <ClassName>BDO.Deal</ClassName>
+  <ClassShortName>BDODeal</ClassShortName>
+  <ClassTableName>BDO_Deal</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>

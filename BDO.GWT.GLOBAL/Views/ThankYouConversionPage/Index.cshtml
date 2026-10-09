@@ -1,0 +1,34 @@
+﻿@using BDO
+@using BDO.GWT.Core.Services
+@using BDO.GWT.Xperience.Core.LiveSite.Services
+@model BDO.GWT.Core.DTOs.SubServicePageDto
+
+@inject IReactService ReactService
+@inject IPageBuilderService PageBuilderService
+@inject ICookieConsentService CookieConsentService
+
+
+@{
+    var widgetsList = new[]
+    {
+        ComponentIdentifiers.Widgets.RichText,
+        ComponentIdentifiers.Widgets.InsightCarousel,
+        ComponentIdentifiers.Widgets.InsightAnimationCard,
+        ComponentIdentifiers.Widgets.FlexibleBanner,
+        ComponentIdentifiers.Widgets.Button,
+        ComponentIdentifiers.Widgets.QuoteCard,
+        ComponentIdentifiers.Widgets.ImageWithText,
+        ComponentIdentifiers.Widgets.KeyContacts,
+        ComponentIdentifiers.Widgets.Form,
+        ComponentIdentifiers.Widgets.ViewGlobalLocations,
+    };
+}
+
+@await Html.PartialAsync("_Hero")
+
+<div class="py-20">
+
+    @await PageBuilderService.AddWidgets(widgetsList).BuildEditableAreaAsync(Html, Context.RequestAborted)
+
+    
+</div>

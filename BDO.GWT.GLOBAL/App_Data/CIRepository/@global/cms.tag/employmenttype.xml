@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.tag>
+  <TagGUID>33b41d33-c55a-4011-aa33-27794375cc9e</TagGUID>
+  <TagMetadata>
+    <![CDATA[{"Translations":{}}]]>
+  </TagMetadata>
+  <TagName>EmploymentType</TagName>
+  <TagOrder>3</TagOrder>
+  <TagTaxonomyID>
+    <CodeName>CareerListFilters</CodeName>
+    <GUID>87f2995a-a3b8-43bd-8289-42ab24fd7365</GUID>
+    <ObjectType>cms.taxonomy</ObjectType>
+  </TagTaxonomyID>
+  <TagTitle>Employment Type</TagTitle>
+</cms.tag>

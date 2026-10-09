@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Status Code</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="17fc1637-802e-497b-9836-de3a172c4022" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="18099279-9575-428e-9bef-90bf56467ba5" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="578fdfd4-092d-422b-be5d-2b659ea96302" isunique="true" system="true" />
+      <field column="HttpStatusCode" columnprecision="0" columntype="integer" enabled="true" guid="295d8ae7-be52-4722-9bfc-ce616d776630" visible="true">
+        <properties>
+          <defaultvalue>0</defaultvalue>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Http Status Code</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.NumberInput</controlname>
+        </settings>
+      </field>
+      <schema guid="8b79d460-a816-437b-83fe-597bcc6fe7cf" name="8b79d460-a816-437b-83fe-597bcc6fe7cf">
+        <properties />
+      </schema>
+      <schema guid="a1394d11-ac3a-40b9-8162-d117c5ff85fe" name="a1394d11-ac3a-40b9-8162-d117c5ff85fe">
+        <properties />
+      </schema>
+      <schema guid="15e80c44-954e-403a-8fc9-1ae3d222cbf3" name="15e80c44-954e-403a-8fc9-1ae3d222cbf3">
+        <properties />
+      </schema>
+      <schema guid="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4" name="ad388f3e-cb9e-4fa7-8c99-6adb7786e4b4">
+        <properties />
+      </schema>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>a7bec4dd-14be-4451-84ef-8183386feebf</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-exclamation-triangle</ClassIconClass>
+  <ClassName>BDO.StatusCode</ClassName>
+  <ClassShortName>BDOStatusCode</ClassShortName>
+  <ClassTableName>BDO_StatusCode</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>True</ClassWebPageHasUrl>
+</cms.contenttype>

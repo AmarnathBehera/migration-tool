@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContentTypeType>Website</ClassContentTypeType>
+  <ClassDisplayName>Navigation Third Level Item</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="5ed1da40-f94d-4ab1-b2ea-cd6966a46528" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="d5c7bcf0-c09a-43e5-821b-6bb91cad9c20" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="6c8b49f1-847b-4792-9eaf-2fc0bb14f484" isunique="true" system="true" />
+      <field column="Title" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="e69eace3-93c5-4620-be97-c873d01c5f18" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Title</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <controlname>Kentico.Administration.TextInput</controlname>
+        </settings>
+      </field>
+      <field allowempty="true" column="TargetURL" columnprecision="0" columntype="contentitemreference" enabled="true" guid="7f64cc7a-3102-4413-a949-07a6feadcb46" visible="true">
+        <properties>
+          <explanationtextashtml>False</explanationtextashtml>
+          <fieldcaption>Target URL</fieldcaption>
+          <fielddescriptionashtml>False</fielddescriptionashtml>
+        </properties>
+        <settings>
+          <AllowedContentItemTypeIdentifiers>
+            <![CDATA[["b6a2aff8-7c0d-446a-be33-221a26bcac37","b3459cfa-8a48-48e5-af1f-eca5d79dd087","43fcea42-e42d-4773-95dc-b415ea3e7547","28ba1415-0ac5-40c2-bb50-ec5ee5532674","1ab55e4f-344f-4d36-a64b-5812140fcfa3","1ddec4b5-dabe-4e5d-a38a-1cf710c59244","81fa7e92-5ecc-4b38-a9d9-0246c97567d7","1972aba8-80f8-4d07-bfa2-7f088d2f4219","3c5bfaa6-f77c-46a6-947b-87ab1bb8404b","75615b26-2702-4a3a-bf7d-34c13b87bb63"]]]>
+          </AllowedContentItemTypeIdentifiers>
+          <controlname>Kentico.Administration.ContentItemSelector</controlname>
+          <MaximumItems>1</MaximumItems>
+          <MinimumItems>1</MinimumItems>
+          <SelectionType>contentTypes</SelectionType>
+        </settings>
+        <validationrulesdata>
+          <ValidationRuleConfiguration>
+            <ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier>
+            <RuleValues>
+              <ErrorMessage>Please select one page</ErrorMessage>
+            </RuleValues>
+          </ValidationRuleConfiguration>
+        </validationrulesdata>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>bbb47bec-837d-498b-b57c-4c4503a2d5d5</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassIconClass>xp-add-module</ClassIconClass>
+  <ClassName>BDO.NavigationThirdLevelItem</ClassName>
+  <ClassShortName>BDONavigationThirdLevelItem</ClassShortName>
+  <ClassTableName>BDO_NavigationThirdLevelItem</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

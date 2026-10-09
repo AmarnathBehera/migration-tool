@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.class>
+  <ClassDisplayName>Content Sharing</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentSharingID" columntype="integer" enabled="true" guid="fc8d965b-09a6-4882-9e6b-c4d83f571e6f" isPK="true" />
+      <field column="MemberfirmID" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="caf3ffd0-d6da-4990-a151-5697ffd9e54c" />
+      <field column="LastContentSharingMail" columnprecision="0" columnsize="200" columntype="text" enabled="true" guid="c8122bd8-2383-4439-b5b0-51b7d099ad35" />
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>f973eb94-3c22-4798-b1df-0b32355cdfd2</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>BDO.ContentSharing</ClassName>
+  <ClassResourceID>
+    <CodeName>BDO.Projectsettings</CodeName>
+    <GUID>33bf9698-b2fb-4e85-9053-bb6d9ee931c7</GUID>
+    <ObjectType>cms.resource</ObjectType>
+  </ClassResourceID>
+  <ClassTableName>BDO_ContentSharing</ClassTableName>
+  <ClassType>Other</ClassType>
+</cms.class>

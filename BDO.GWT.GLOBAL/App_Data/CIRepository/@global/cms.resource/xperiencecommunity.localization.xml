@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.resource>
+  <ResourceDescription>Localization module data</ResourceDescription>
+  <ResourceDisplayName>NITTIN - Xperience Localization</ResourceDisplayName>
+  <ResourceGUID>5ab00892-5a6c-448a-9df7-7d19a983b65f</ResourceGUID>
+  <ResourceIsInDevelopment>False</ResourceIsInDevelopment>
+  <ResourceName>XperienceCommunity.Localization</ResourceName>
+</cms.resource>

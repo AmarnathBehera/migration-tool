@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contenttype>
+  <ClassContactOverwriteEnabled>False</ClassContactOverwriteEnabled>
+  <ClassContentTypeType>Reusable</ClassContentTypeType>
+  <ClassDisplayName>Legacy attachment</ClassDisplayName>
+  <ClassFormDefinition>
+    <form>
+      <field column="ContentItemDataID" columntype="integer" enabled="true" guid="747b1e85-e5ac-4bad-b1f2-649720b49a08" isPK="true" />
+      <field column="ContentItemDataCommonDataID" columntype="integer" enabled="true" guid="5e5b6a75-93e6-43a4-8971-2b6ec2a11415" refobjtype="cms.contentitemcommondata" reftype="Required" system="true" />
+      <field column="ContentItemDataGUID" columntype="guid" enabled="true" guid="16306d99-b403-4865-a1e8-d3fe5ed8a72d" isunique="true" system="true" />
+      <field allowempty="true" column="LegacyAttachmentAsset" columntype="contentitemasset" enabled="true" guid="50c2bc4c-a8ff-46ba-95c2-0e74752d147f" visible="true">
+        <properties>
+          <fieldcaption>Asset</fieldcaption>
+        </properties>
+        <settings>
+          <AllowedExtensions>_INHERITED_</AllowedExtensions>
+          <controlname>Kentico.Administration.ContentItemAssetUploader</controlname>
+        </settings>
+      </field>
+    </form>
+  </ClassFormDefinition>
+  <ClassGUID>4e214df1-edd5-4441-a0b7-53849526b1d3</ClassGUID>
+  <ClassHasUnmanagedDbSchema>False</ClassHasUnmanagedDbSchema>
+  <ClassName>Legacy.Attachment</ClassName>
+  <ClassShortName>ContentAttachmentHjvi2pu4</ClassShortName>
+  <ClassShowTemplateSelection>False</ClassShowTemplateSelection>
+  <ClassTableName>Legacy_Attachment</ClassTableName>
+  <ClassType>Content</ClassType>
+  <ClassWebPageHasUrl>False</ClassWebPageHasUrl>
+</cms.contenttype>

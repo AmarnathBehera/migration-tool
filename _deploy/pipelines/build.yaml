@@ -1,0 +1,54 @@
+# XbyK Build and Test Pipeline
+# This pipeline is responsible for building the XbyK project and running tests.
+
+name: $(Date:yyyyMMdd).$(Rev:r)
+
+trigger:
+  branches:
+    include:
+      - "*"
+  paths:
+    exclude:
+      - _deploy/pipelines/**
+      - .octopus/**
+
+variables:
+  buildConfiguration: "Release"
+  dotnetVersion: "10.x"
+
+stages:
+  - stage: BuildAndTest
+    displayName: Build and Test
+    jobs:
+      - job: Build
+        condition: true
+        displayName: "Build and Test XbyK solution"
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - task: UseDotNet@2
+            displayName: "Use .NET $(dotnetVersion)"
+            inputs:
+              packageType: "sdk"
+              version: "$(dotnetVersion)"
+              installationPath: $(Agent.ToolsDirectory)/dotnet
+
+          - task: DotNetCoreCLI@2
+            displayName: Restore XbyK solution
+            inputs:
+              command: "restore"
+              restoreSolution: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
+              feedsToUse: "select"
+
+          - task: DotNetCoreCLI@2
+            displayName: Build XbyK solution
+            inputs:
+              command: "build"
+              projects: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
+
+          - task: DotNetCoreCLI@2
+            displayName: "Test XbyK solution with Code Coverage"
+            inputs:
+              command: "test"
+              projects: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
+              arguments: '--collect "Code Coverage"'

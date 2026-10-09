@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.contentworkflow>
+  <ContentWorkflowDisplayName>Content Sharing</ContentWorkflowDisplayName>
+  <ContentWorkflowGUID>9f10643a-fd7a-46f5-aec1-f2c75ea58d13</ContentWorkflowGUID>
+  <ContentWorkflowName>AdditionalApprovalStep</ContentWorkflowName>
+</cms.contentworkflow>

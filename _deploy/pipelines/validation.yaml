@@ -1,0 +1,74 @@
+# XbyK Validation Pipeline
+# This pipeline is responsible for validating the XbyK project by running secret scanning and other checks
+
+name: $(Date:yyyyMMdd).$(Rev:r)
+
+trigger:
+  - main
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  repositories:
+    - repository: pipelines-shared
+      type: git
+      name: Azure Environment/pipelines-shared
+      ref: refs/heads/main
+
+stages:
+  - stage: Validation
+    displayName: "Validation Stage"
+    jobs:
+      - template: .pipelines/templates/jobs/secretScanning.yml@pipelines-shared
+
+      - job: SonarQube
+        displayName: "SonarQube Cloud Analysis"
+        steps:
+          - checkout: self
+            fetchDepth: 0
+
+          - task: SonarCloudPrepare@4
+            inputs:
+              SonarCloud: "GWT.XbyK.Web - SonarQube Cloud"
+              organization: "vsts-sonarcloud41751"
+              scannerMode: "dotnet"
+              projectKey: "bdo_GWT.XbyK.Web"
+              projectName: "GWT.XbyK.Web"
+              extraProperties: |
+                sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**,**/*.bacpac,**/TestResults/**,**/*.Tests/**,/BDO.GWT.GLOBAL/App_Data/**,BDO.GWT.GLOBAL/wwwroot/**
+                sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/**/coverage.opencover.xml
+
+          - task: DotNetCoreCLI@2
+            displayName: Restore XbyK solution
+            inputs:
+              command: "restore"
+              restoreSolution: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
+              feedsToUse: "select"
+
+          - task: DotNetCoreCLI@2
+            displayName: Build XbyK solution
+            inputs:
+              command: "build"
+              projects: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
+              arguments: "--configuration Release --no-restore"
+
+          - task: DotNetCoreCLI@2
+            displayName: "Test XbyK solution with Code Coverage"
+            inputs:
+              command: "test"
+              projects: "$(Build.SourcesDirectory)/GWTXbyKWeb.slnx"
+              arguments: >-
+                --no-build
+                --configuration Release
+                --collect:"XPlat Code Coverage"
+                --settings "$(Build.SourcesDirectory)/coverlet.runsettings"
+              publishTestResults: true
+
+          - task: SonarCloudAnalyze@4
+            displayName: "Run SonarCloud Analysis"
+
+          - task: SonarCloudPublish@4
+            displayName: "Publish SonarCloud Results"
+            inputs:
+              pollingTimeoutSec: 300
