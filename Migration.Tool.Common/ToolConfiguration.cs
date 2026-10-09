@@ -159,6 +159,8 @@ public class ToolConfiguration
         set => kxConnectionString = value;
     }
 
+    public int SourceSqlCommandTimeoutSeconds { get; set; }
+
     #endregion
 
     #region Connection string of target instance

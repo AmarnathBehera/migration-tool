@@ -148,7 +148,7 @@ public class MediaFileInfoMapper(
 
             cmd.CommandText = query;
             cmd.CommandType = CommandType.Text;
-            cmd.CommandTimeout = 3;
+            cmd.CommandTimeout = toolConfiguration.SourceSqlCommandTimeoutSeconds;
             cmd.Parameters.AddWithValue("id", sourceMediaFile.FileID);
 
             conn.Open();

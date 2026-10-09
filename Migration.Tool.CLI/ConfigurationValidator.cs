@@ -33,6 +33,12 @@ public static class ConfigurationValidator
             yield return new ValidationMessage(ValidationMessageType.Error, Resources.ConfigurationValidator_GetValidationErrors_SourceConnectionString_IsRequired);
         }
 
+        if (settings?.GetValue<int?>(nameof(ToolConfiguration.SourceSqlCommandTimeoutSeconds)) is < 0)
+        {
+            yield return new ValidationMessage(ValidationMessageType.Error,
+                $"'{nameof(ToolConfiguration.SourceSqlCommandTimeoutSeconds)}' must be zero (no command timeout) or a positive number of seconds.");
+        }
+
         if (CheckCfgValue(settings?.GetValue<string>(ConfigurationNames.KxCmsDirPath)))
         {
             yield return new ValidationMessage(ValidationMessageType.Warning, Resources.ConfigurationValidator_GetValidationErrors_SourceCmsDirPath_IsRecommended);

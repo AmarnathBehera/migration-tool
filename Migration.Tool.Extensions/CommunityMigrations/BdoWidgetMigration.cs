@@ -50,8 +50,6 @@ public class BdoWidgetMigration(AssetMigration assetMigration, ModelFacade model
         {
             if (AssetProperties.TryGetValue(identifier.TypeIdentifier, out var assetProperties))
             {
-                var site = modelFacade.SelectById<ICmsSite>(context.SiteId)
-                    ?? throw new InvalidOperationException($"Source site '{context.SiteId}' was not found.");
                 foreach (var propertyName in assetProperties)
                 {
                     var property = properties.Property(propertyName, StringComparison.OrdinalIgnoreCase);
@@ -64,6 +62,8 @@ public class BdoWidgetMigration(AssetMigration assetMigration, ModelFacade model
                             continue;
                         }
 
+                        var site = modelFacade.SelectById<ICmsSite>(context.SiteId)
+                            ?? throw new InvalidOperationException($"Source site '{context.SiteId}' was not found.");
                         Guid.TryParse(properties.Parent?.Parent?["identifier"]?.ToString(), out var variantGuid);
                         var migrationContext = new FieldMigrationContext(KsFieldDataType.Text,
                             Kx13FormControls.UserControlForText.MediaSelectionControl, property.Name,

@@ -107,7 +107,7 @@ public class MemberInfoMapper(
 
                     cmd.CommandText = query;
                     cmd.CommandType = CommandType.Text;
-                    cmd.CommandTimeout = 3;
+                    cmd.CommandTimeout = toolConfiguration.SourceSqlCommandTimeoutSeconds;
                     cmd.Parameters.AddWithValue("id", source.User.UserId);
 
                     conn.Open();
@@ -150,7 +150,7 @@ public class MemberInfoMapper(
 
                     cmd.CommandText = query;
                     cmd.CommandType = CommandType.Text;
-                    cmd.CommandTimeout = 3;
+                    cmd.CommandTimeout = toolConfiguration.SourceSqlCommandTimeoutSeconds;
                     cmd.Parameters.AddWithValue("id", source.UserSetting.UserSettingsId);
 
                     conn.Open();

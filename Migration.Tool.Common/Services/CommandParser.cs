@@ -27,6 +27,11 @@ public class CommandParser : ICommandParser
         var subcommands = new List<ICommand>();
         while (args.TryDequeue(out string? arg))
         {
+            if (arg == "--nowait")
+            {
+                continue;
+            }
+
             if (arg.IsIn("help", "h"))
             {
                 PrintCommandDescriptions();

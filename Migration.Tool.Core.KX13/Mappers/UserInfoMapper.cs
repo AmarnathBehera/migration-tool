@@ -66,7 +66,7 @@ public class UserInfoMapper(
 
                 cmd.CommandText = query;
                 cmd.CommandType = CommandType.Text;
-                cmd.CommandTimeout = 3;
+                cmd.CommandTimeout = toolConfiguration.SourceSqlCommandTimeoutSeconds;
                 cmd.Parameters.AddWithValue("id", source.UserId);
 
                 conn.Open();

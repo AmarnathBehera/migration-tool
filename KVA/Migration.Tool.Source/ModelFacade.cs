@@ -17,7 +17,7 @@ public class ModelFacade(ILogger<ModelFacade> logger, ToolConfiguration configur
 
         await using var conn = GetConnection();
         await conn.OpenAsync(cancellationToken);
-        var cmd = conn.CreateCommand();
+        var cmd = CreateCommand(conn);
         cmd.CommandText = $"SELECT * FROM {T.TableName}";
         await using var reader = await cmd.ExecuteReaderAsync(cancellationToken);
         while (await reader.ReadAsync(cancellationToken))
@@ -31,7 +31,7 @@ public class ModelFacade(ILogger<ModelFacade> logger, ToolConfiguration configur
         semanticVersion ??= SelectVersion();
         using var conn = GetConnection();
         conn.Open();
-        var cmd = conn.CreateCommand();
+        var cmd = CreateCommand(conn);
         cmd.CommandText = $"SELECT * FROM {T.TableName}";
         if (!string.IsNullOrWhiteSpace(orderBy))
         {
@@ -50,7 +50,7 @@ public class ModelFacade(ILogger<ModelFacade> logger, ToolConfiguration configur
         semanticVersion ??= SelectVersion();
         using var conn = GetConnection();
         conn.Open();
-        var cmd = conn.CreateCommand();
+        var cmd = CreateCommand(conn);
         cmd.CommandText = $"SELECT * FROM {tableName}";
         if (!string.IsNullOrWhiteSpace(orderBy))
         {
@@ -91,7 +91,7 @@ public class ModelFacade(ILogger<ModelFacade> logger, ToolConfiguration configur
         semanticVersion ??= SelectVersion();
         using var conn = GetConnection();
         conn.Open();
-        var cmd = conn.CreateCommand();
+        var cmd = CreateCommand(conn);
         cmd.CommandText = $"SELECT * FROM {T.TableName} WHERE {where}";
         cmd.Parameters.AddRange(parameters);
         using var reader = cmd.ExecuteReader();
@@ -112,7 +112,7 @@ public class ModelFacade(ILogger<ModelFacade> logger, ToolConfiguration configur
         semanticVersion ??= SelectVersion();
         using var conn = GetConnection();
         conn.Open();
-        var cmd = conn.CreateCommand();
+        var cmd = CreateCommand(conn);
         cmd.CommandText = $"SELECT * FROM {T.TableName} WHERE {where} ORDER BY {orderBy}";
         cmd.Parameters.AddRange(parameters);
         using var reader = cmd.ExecuteReader();
@@ -127,7 +127,7 @@ public class ModelFacade(ILogger<ModelFacade> logger, ToolConfiguration configur
         semanticVersion ??= SelectVersion();
         using var conn = GetConnection();
         conn.Open();
-        var cmd = conn.CreateCommand();
+        var cmd = CreateCommand(conn);
         cmd.CommandText = query;
         cmd.Parameters.AddRange(parameters);
         using var reader = cmd.ExecuteReader();
@@ -147,7 +147,7 @@ public class ModelFacade(ILogger<ModelFacade> logger, ToolConfiguration configur
         semanticVersion ??= SelectVersion();
         using var conn = GetConnection();
         conn.Open();
-        var cmd = conn.CreateCommand();
+        var cmd = CreateCommand(conn);
         cmd.CommandText = $"SELECT * FROM {T.TableName} WHERE {T.GetPrimaryKeyName(semanticVersion)}={id}";
         using var reader = cmd.ExecuteReader();
         T? result = default;
@@ -175,7 +175,7 @@ public class ModelFacade(ILogger<ModelFacade> logger, ToolConfiguration configur
         semanticVersion ??= SelectVersion();
         using var conn = GetConnection();
         conn.Open();
-        var cmd = conn.CreateCommand();
+        var cmd = CreateCommand(conn);
         cmd.CommandText = $"SELECT {T.GuidColumnName} FROM {T.TableName} WHERE {T.GetPrimaryKeyName(semanticVersion)}={id}";
         object ret = cmd.ExecuteScalar();
         if (ret is Guid guid)
@@ -203,7 +203,7 @@ public class ModelFacade(ILogger<ModelFacade> logger, ToolConfiguration configur
         using var conn = GetConnection();
         conn.Open();
 
-        var cmd = conn.CreateCommand();
+        var cmd = CreateCommand(conn);
         cmd.CommandText = "SELECT KeyValue FROM CMS_SettingsKey WHERE KeyName LIKE 'CMSDataVersion'";
 
         string cmsVersion = "";
@@ -216,7 +216,7 @@ public class ModelFacade(ILogger<ModelFacade> logger, ToolConfiguration configur
             throw new InvalidOperationException("Unable to determine source instance version");
         }
 
-        cmd = conn.CreateCommand();
+        cmd = CreateCommand(conn);
         cmd.CommandText = "SELECT KeyValue FROM CMS_SettingsKey WHERE KeyName LIKE 'CMSHotfixVersion'";
         if (cmd.ExecuteScalar() is string cmsHotfixVersion)
         {
@@ -234,12 +234,19 @@ public class ModelFacade(ILogger<ModelFacade> logger, ToolConfiguration configur
 
     private SqlConnection GetConnection() => new(configuration.KxConnectionString);
 
+    private SqlCommand CreateCommand(SqlConnection connection)
+    {
+        var command = connection.CreateCommand();
+        command.CommandTimeout = configuration.SourceSqlCommandTimeoutSeconds;
+        return command;
+    }
+
     public string HashPath(string path)
     {
         semanticVersion ??= SelectVersion();
         using var conn = GetConnection();
         conn.Open();
-        var cmd = conn.CreateCommand();
+        var cmd = CreateCommand(conn);
         cmd.CommandText = "SELECT CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', LOWER(@path)), 2)";
         cmd.Parameters.AddWithValue("path", path);
         if (cmd.ExecuteScalar() is string s)

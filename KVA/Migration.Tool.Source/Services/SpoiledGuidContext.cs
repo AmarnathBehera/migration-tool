@@ -24,15 +24,16 @@ public class SpoiledGuidContext(ModelFacade modelFacade, ILogger<SpoiledGuidCont
 
     internal IDictionary<Guid, ImmutableList<SpoiledDocumentGuidInfo>> SpoiledDocumentGuids =>
         spoiledDocumentGuids ??= modelFacade.Select("""
-                                                     SELECT DocumentGUID, NodeSiteID, NodeID 
-                                                     FROM View_CMS_Tree_Joined TJ
-                                                     WHERE EXISTS(
-                                                     	SELECT 1
-                                                     	FROM View_CMS_Tree_Joined TJI
-                                                     	WHERE TJI.DocumentGUID = TJ.DocumentGUID
-                                                     	GROUP BY DocumentGUID
-                                                     	HAVING COUNT(DocumentID) > 1
+                                                     WITH DuplicateDocumentGuids AS (
+                                                         SELECT DocumentGUID
+                                                         FROM CMS_Document
+                                                         GROUP BY DocumentGUID
+                                                         HAVING COUNT(DocumentID) > 1
                                                      )
+                                                     SELECT document.DocumentGUID, tree.NodeSiteID, document.DocumentNodeID AS NodeID
+                                                     FROM CMS_Document AS document
+                                                     INNER JOIN DuplicateDocumentGuids AS duplicate ON duplicate.DocumentGUID = document.DocumentGUID
+                                                     INNER JOIN CMS_Tree AS tree ON tree.NodeID = document.DocumentNodeID
                                                      """,
                 (reader, version) => new
                 {
@@ -48,15 +49,15 @@ public class SpoiledGuidContext(ModelFacade modelFacade, ILogger<SpoiledGuidCont
 
     internal IDictionary<Guid, ImmutableList<SpoiledNodeGuidInfo>> SpoiledNodeGuids =>
         spoiledNodeGuids ??= modelFacade.Select("""
-                                                 SELECT NodeGUID, NodeSiteID 
-                                                 FROM View_CMS_Tree_Joined TJ
-                                                 WHERE EXISTS (
-                                                 	SELECT 1
-                                                 	FROM View_CMS_Tree_Joined TJI
-                                                 	WHERE TJI.NodeGUID = TJ.NodeGUID
-                                                 	GROUP BY NodeGUID
-                                                 	HAVING COUNT(NodeGUID) > 1
+                                                 WITH DuplicateNodeGuids AS (
+                                                     SELECT NodeGUID
+                                                     FROM CMS_Tree
+                                                     GROUP BY NodeGUID
+                                                     HAVING COUNT(NodeGUID) > 1
                                                  )
+                                                 SELECT tree.NodeGUID, tree.NodeSiteID
+                                                 FROM CMS_Tree AS tree
+                                                 INNER JOIN DuplicateNodeGuids AS duplicate ON duplicate.NodeGUID = tree.NodeGUID
                                                  """,
                 (reader, version) => new
                 {

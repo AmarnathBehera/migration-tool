@@ -2,13 +2,42 @@ using Migration.Tool.Common;
 using Migration.Tool.Common.Helpers;
 using Migration.Tool.Common.Services;
 using Migration.Tool.Extensions.CommunityMigrations;
+using Migration.Tool.Extensions.DefaultMigrations;
 using Migration.Tool.KXP.Api.Services.CmsClass;
+using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json.Linq;
 
 namespace Migration.Tool.Tests;
 
 public class InsightPageWidgetMigrationTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void CommandParser_AcceptsUnattendedMigrationFlags(bool rerun)
+    {
+        var arguments = new Queue<string>(new[]
+        {
+            "migrate", "--nowait", "--sites", "--custom-modules", "--users",
+            "--page-types", "--pages", "--categories", "--media-libraries", "--forms"
+        });
+        if (rerun)
+        {
+            arguments.Enqueue("--bypass-dependency-check");
+        }
+        var bypassDependencyCheck = false;
+
+        var (masterCommand, commands) = new CommandParser().Parse(arguments, ref bypassDependencyCheck);
+
+        Assert.NotNull(masterCommand);
+        Assert.Equal(9, commands.Count);
+        Assert.Contains(commands, command => command is MigratePagesCommand);
+        Assert.Contains(commands, command => command is MigrateMediaLibrariesCommand);
+        Assert.Contains(commands, command => command is MigrateAttachmentsCommand);
+        Assert.Equal(rerun, bypassDependencyCheck);
+        Assert.Empty(arguments);
+    }
+
     [Fact]
     public void TargetChannelDomain_UsesDistinctHostOnXbyKPort()
     {
@@ -94,6 +123,78 @@ public class InsightPageWidgetMigrationTests
         Assert.Equal("BDO.Widget.AnimatedTileCarouselWidget", result.Value["type"]!.Value<string>());
         Assert.Equal(nodeGuid, converted.Value![0]!["Identifier"]!.Value<Guid>());
         Assert.False(converted.AllowDefaultMigrations);
+    }
+
+    [Theory]
+    [InlineData("Accordion", "AccordionWidget")]
+    [InlineData("Button", "Button")]
+    [InlineData("EditorsPick", "EditorsPick")]
+    [InlineData("EventsWebinarsSlider", "EventWebinarSliderWidget")]
+    [InlineData("ExternalNavigation", "ExternalNavigation")]
+    [InlineData("Faq", "FaqWidget")]
+    [InlineData("FlexibleBanner", "FlexibleBanner")]
+    [InlineData("FlexibleContent", "FlexibleContent")]
+    [InlineData("Hero", "Hero")]
+    [InlineData("HTML", "HTML")]
+    [InlineData("ImageWithText", "ImageWithText")]
+    [InlineData("InFocus", "InFocus")]
+    [InlineData("InsightAnimationCard", "AnimatedTileCarouselWidget")]
+    [InlineData("InsightCarousel", "InsightCarousel")]
+    [InlineData("KeyContacts", "KeyContacts")]
+    [InlineData("KeyTakeaways", "KeyTakeaways")]
+    [InlineData("LocalNavigation", "LocalNavigation")]
+    [InlineData("NewsCarousel", "NewsCarousel")]
+    [InlineData("QuoteCard", "QuoteCard")]
+    [InlineData("RelatedContacts", "RelatedContacts")]
+    [InlineData("RelatedContentCarousel", "RelatedContentCarousel")]
+    [InlineData("RichText", "RichText")]
+    [InlineData("SocialMediaButtons", "SocialMediaButtons")]
+    [InlineData("TabAccordion", "TabAccordion")]
+    [InlineData("TiledLinkSection", "TiledLinkSection")]
+    [InlineData("TrendingTopicsCarousel", "TrendingTopicsCarousel")]
+    public async Task ObservedBdoWidgets_MapToTargetIdentifiers(string sourceName, string targetName)
+    {
+        var sourceType = "BDO.Widget." + sourceName;
+        var identifier = new WidgetIdentifier(sourceType, Guid.NewGuid());
+        var context = new WidgetMigrationContext(7);
+        var widget = new JObject
+        {
+            ["type"] = sourceType,
+            ["variants"] = new JArray(new JObject { ["properties"] = new JObject() })
+        };
+        IWidgetMigration migration = new InsightPageWidgetMigration();
+        if (!migration.ShallMigrate(context, identifier))
+        {
+            migration = new BdoWidgetMigration(null!, null!, NullLogger<BdoWidgetMigration>.Instance);
+        }
+
+        Assert.True(migration.ShallMigrate(context, identifier));
+        var result = await migration.MigrateWidget(identifier, widget, context);
+
+        Assert.Equal("BDO.Widget." + targetName, result.Value!["type"]!.Value<string>());
+    }
+
+    [Fact]
+    public async Task BdoWidget_DelegatesPageAndFileSelectorsWithoutApiDiscovery()
+    {
+        var widget = new JObject
+        {
+            ["type"] = "BDO.Widget.InsightCarousel",
+            ["variants"] = new JArray(new JObject
+            {
+                ["properties"] = new JObject
+                {
+                    ["featuredInsights"] = new JArray(new JObject { ["nodeGuid"] = Guid.NewGuid() }),
+                    ["backgroundImages"] = new JArray(new JObject { ["fileGuid"] = Guid.NewGuid() })
+                }
+            })
+        };
+        var migration = new BdoWidgetMigration(null!, null!, NullLogger<BdoWidgetMigration>.Instance);
+
+        var result = await migration.MigrateWidget(new WidgetIdentifier("BDO.Widget.InsightCarousel", Guid.NewGuid()), widget, new WidgetMigrationContext(7));
+
+        Assert.Equal(typeof(InsightPageSelectorMigration), result.PropertyMigrations["featuredInsights"]);
+        Assert.Equal(typeof(WidgetFileMigration), result.PropertyMigrations["backgroundImages"]);
     }
 
     private sealed class PassThroughGuidContext : ISpoiledGuidContext

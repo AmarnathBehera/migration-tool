@@ -1,5 +1,6 @@
 using System.Xml.Linq;
 using CMS.ContentEngine;
+using CMS.ContentEngine.Internal;
 using CMS.Core;
 using CMS.DataEngine;
 using CMS.MediaLibrary;
@@ -157,6 +158,11 @@ public class AssetMigration(
                         else
                         {
                             var (ownerContentItemGuid, _) = assetFacade.GetRef(sourceMediaFile);
+                            if (ContentItemInfo.Provider.Get(ownerContentItemGuid) is null)
+                            {
+                                logger.LogWarning("Skipping asset field '{FieldName}' reference to unavailable media file '{MediaGuid}'", fieldName, sourceMediaFile.FileGUID);
+                                return new FieldMigrationResult(true, "[]");
+                            }
                             mfis =
                             [
                                 new ContentItemReference { Identifier = ownerContentItemGuid }
@@ -222,6 +228,11 @@ public class AssetMigration(
                         else
                         {
                             var (ownerContentItemGuid, _) = assetFacade.GetRef(sourceMediaFile);
+                            if (ContentItemInfo.Provider.Get(ownerContentItemGuid) is null)
+                            {
+                                logger.LogWarning("Skipping asset field '{FieldName}' reference to unavailable media file '{MediaGuid}'", fieldName, sourceMediaFile.FileGUID);
+                                return new FieldMigrationResult(true, "[]");
+                            }
                             mfis =
                             [
                                 new ContentItemReference { Identifier = ownerContentItemGuid }

@@ -25,6 +25,38 @@ public class ConfigurationValidatorTests
     }
 
     [Fact]
+    public void ToolConfiguration_SourceSqlCommandTimeoutDefaultsToInfiniteAndCanBeConfigured()
+    {
+        var defaults = new ToolConfiguration();
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Settings:SourceSqlCommandTimeoutSeconds"] = "45"
+            })
+            .Build();
+
+        var settings = configuration.GetSection(ConfigurationNames.Settings).Get<ToolConfiguration>();
+
+        Assert.Equal(0, defaults.SourceSqlCommandTimeoutSeconds);
+        Assert.Equal(45, settings!.SourceSqlCommandTimeoutSeconds);
+    }
+
+    [Fact]
+    public void GetValidationErrors_RejectsNegativeSourceSqlCommandTimeout()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Settings:SourceSqlCommandTimeoutSeconds"] = "-1"
+            })
+            .Build();
+
+        var errors = ConfigurationValidator.GetValidationErrors(configuration).ToList();
+
+        Assert.Contains(errors, error => error.Message.Contains("SourceSqlCommandTimeoutSeconds"));
+    }
+
+    [Fact]
     public void GetValidationErrors_WhenCommerceConfigurationSectionDoesNotExist_ShouldNotReturnValidationErrors()
     {
         // Arrange - Create configuration without CommerceConfiguration section

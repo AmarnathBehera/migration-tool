@@ -1,4 +1,6 @@
 ﻿using CMS.ContentEngine;
+using CMS.ContentEngine.Internal;
+using CMS.DataEngine;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Migration.Tool.Common;
@@ -52,6 +54,11 @@ public class WidgetFileMigration(ILogger<WidgetFileMigration> logger, EntityIden
                     if (sourceMediaFile != null)
                     {
                         var (ownerContentItemGuid, _) = assetFacade.GetRef(sourceMediaFile);
+                        if (ContentItemInfo.Provider.Get(ownerContentItemGuid) is null)
+                        {
+                            logger.LogWarning("Skipping widget property '{PropertyName}' reference to unavailable media file '{MediaGuid}' in site {SiteId}", key, mediaSelectorItem.FileGuid, siteId);
+                            continue;
+                        }
                         refsToMedia.Add(new ContentItemReference { Identifier = ownerContentItemGuid });
                     }
                     else

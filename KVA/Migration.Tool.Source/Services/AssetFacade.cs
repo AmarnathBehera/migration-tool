@@ -112,6 +112,10 @@ public class AssetFacade(
             }
 
             mediaFilePath = Path.Combine(mediaLibraryAbsolutePath, mediaFile.FilePath);
+            if (!File.Exists(mediaFilePath))
+            {
+                throw new FileNotFoundException("Source media file is unavailable.", mediaFilePath);
+            }
         }
 
         int? createdByUserId = AdminUserHelper.MapTargetAdminUser(
